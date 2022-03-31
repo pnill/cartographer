@@ -3,8 +3,8 @@
 #include "XUserContext.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "XLive\xbox\xbox.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);

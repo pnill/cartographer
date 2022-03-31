@@ -3,7 +3,7 @@
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"

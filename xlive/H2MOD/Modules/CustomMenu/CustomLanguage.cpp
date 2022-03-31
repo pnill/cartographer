@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -199,7 +199,7 @@ bool read_custom_labels() {
 		int lineNumber = 0;
 		int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
 		custom_language* curr_lang = get_custom_language(language_id, 0);
-		while (keepReading && GetFileLine(labelsFile, fileLine)) {
+		while (keepReading && GetFileLine(labelsFile, &fileLine)) {
 			lineNumber++;
 			if (fileLine) {
 				int fileLineLength = strlen(fileLine);
@@ -680,7 +680,7 @@ static void overrideCoreH2Labels() {
 	}
 } 
 
-void initGSCustomLanguage() {
+void InitCustomLanguage() {
 	if (!H2IsDediServer) {
 		setGameLanguage();
 
@@ -702,7 +702,7 @@ void initGSCustomLanguage() {
 	}
 }
 
-void deinitGSCustomLanguage() {
+void DeinitCustomLanguage() {
 	if (!H2IsDediServer) {
 		write_custom_labels();
 	}

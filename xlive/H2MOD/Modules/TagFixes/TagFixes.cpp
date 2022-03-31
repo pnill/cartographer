@@ -7,7 +7,7 @@
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 
 namespace TagFixes
 {

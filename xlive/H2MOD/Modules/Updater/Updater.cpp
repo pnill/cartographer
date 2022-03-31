@@ -1,13 +1,12 @@
 #include "stdafx.h"
 
 #include "Updater.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include <curl\curl.h>
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
@@ -87,7 +86,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	CURLcode res;
 	curl = curl_interface_init_no_ssl();
 	if (curl) {
-		EnsureDirectoryExists(local_full_path);
+		CreateDirTree(local_full_path);
 		fp = _wfopen(local_full_path, L"wb");
 		if (!fp) {
 			addDebugText("Failed to obtain FILE* for DL from: %s to: %s", url, local_full_path);

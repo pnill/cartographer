@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Utils.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include <sys\timeb.h>
 
@@ -23,15 +23,13 @@ int FindLineStart(FILE* fp, int lineStrLen) {
 	return fp_offset_orig - lineStrLen;
 }
 
-bool GetFileLine(FILE* fp, char* &fileLine) {
-	bool moretogo = true;
-	int fileLineLen = 256;
-	fileLine = (char*)malloc(fileLineLen);
-	int fileLineCursor = 0;
-	int c;
+bool GetFileLine(FILE* fp, char** fileLine) {
+	bool moreToGo = true;
+	int c, fileLineLen = 256, fileLineCursor = 0;
+	*fileLine = (char*)malloc(fileLineLen);
 	while (c = fgetc(fp)) {
 		if (c == EOF) {
-			moretogo = false;
+			moreToGo = false;
 			break;
 		}
 		else if (c == '\r') {
@@ -41,22 +39,22 @@ bool GetFileLine(FILE* fp, char* &fileLine) {
 			break;
 		}
 		else {
-			fileLine[fileLineCursor++] = c;
+			(*fileLine)[fileLineCursor++] = c;
 		}
 		if (fileLineCursor >= fileLineLen - 2) {
 			fileLineLen += 256;
-			fileLine = (char*)realloc(fileLine, fileLineLen);
+			*fileLine = (char*)realloc(*fileLine, fileLineLen);
 		}
 	}
-	fileLine[fileLineCursor++] = 0;
-	if (strlen(fileLine) == 0) {
-		free(fileLine);
-		fileLine = 0;
+	(*fileLine)[fileLineCursor++] = 0;
+	if (strlen(*fileLine) == 0) {
+		free(*fileLine);
+		*fileLine = 0;
 	}
-	return moretogo || fileLine != 0;
+	return moreToGo || *fileLine != 0;
 }
 
-bool GetNTStringLine(char* text, int lineNum, char* &line) {
+bool GetNTStringLine(char* text, int lineNum, char** line) {
 	int inc_line_num = 0;
 	char* line_begin = text;
 
@@ -67,7 +65,7 @@ bool GetNTStringLine(char* text, int lineNum, char* &line) {
 		}
 	}
 
-	int line_len = 0;
+	size_t line_len = 0;
 	char* line_next = strchr(line_begin, '\n');
 	if (line_next == 0) {
 		line_len = strlen(line_begin);
@@ -80,20 +78,20 @@ bool GetNTStringLine(char* text, int lineNum, char* &line) {
 	}
 
 	if (line_len <= 0) {
-		line = 0;
+		*line = NULL;
 		return true;
 	}
 
-	line = (char*)malloc(sizeof(char) * (line_len + 1));
+	*line = (char*)malloc(sizeof(char) * (line_len + 1));
 
-	memcpy(line, line_begin, line_len);
-	line[line_len] = 0;
+	memcpy(*line, line_begin, line_len);
+	(*line)[line_len] = 0;
 
 	return true;
 }
 
 //if missing versioning parameters, major will always be on leftmost side.
-char CmpVersions(char* version_base, char* version_alt) {
+char CmpVersions(const char* version_base, const char* version_alt) {
 
 	if (strcmp(version_base, version_alt) == 0)
 		return 0b00000;//same
@@ -142,7 +140,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 	bool keepReading = true;
 	int lineNumber = 0;
 	char* fileLine;
-	while (keepReading && ((configIsFILE && GetFileLine((FILE*)fileConfig, fileLine)) || (!configIsFILE && GetNTStringLine((char*)fileConfig, lineNumber, fileLine)))) {
+	while (keepReading && ((configIsFILE && GetFileLine((FILE*)fileConfig, &fileLine)) || (!configIsFILE && GetNTStringLine((char*)fileConfig, lineNumber, &fileLine)))) {
 		lineNumber++;
 		if (fileLine) {
 			if (fileLine[0] == header[0] && sscanf_s(fileLine, header, &version, 30)) {
@@ -179,22 +177,25 @@ std::string GetVKeyCodeString(int vkey) {
 	return strStream.str();
 }
 
-void PadCStringWithChar(char* strToPad, int toFullLength, char c) {
-	for (int i = strlen(strToPad); i < toFullLength - 1; i++) {
+void PadCStringWithChar(char* strToPad, size_t toFullLength, char c) {
+	for (size_t i = strlen(strToPad); i < toFullLength - 1; i++) {
 		memset(strToPad + i, c, sizeof(char));
 	}
 	SecureZeroMemory(strToPad + toFullLength - 1, sizeof(char));
 }
 
-int GetWidePathFromFullWideFilename(wchar_t* filepath, wchar_t* rtnpath) {
-	wchar_t* offset = wcsrchr(filepath, L'\\');
-	wchar_t* off2 = wcsrchr(filepath, L'/');
-	offset = offset == NULL ? off2 : ((off2 != NULL && offset < off2) ? off2 : offset);
-	if (offset == NULL) {
-		return -1;
+int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
+	const wchar_t* backslash_offset = wcsrchr(filepath, L'\\');
+	const wchar_t* forward_slash_offset = wcsrchr(filepath, L'/');
+	const wchar_t* most_right_slash_offset = 
+		backslash_offset == NULL ? forward_slash_offset : ((forward_slash_offset != NULL && backslash_offset < forward_slash_offset) ? forward_slash_offset : backslash_offset);
+
+	if (most_right_slash_offset != NULL) {
+		wcsncpy(rtnpath, filepath, (most_right_slash_offset - filepath) + 1);
+		return 0;
 	}
-	swprintf(rtnpath, offset - filepath + 2, filepath);
-	return 0;
+
+	return -1;
 }
 
 LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
@@ -211,35 +212,6 @@ LONG GetDWORDRegKey(HKEY hKey, wchar_t* strValueName, DWORD* nValue) {
 		*nValue = nResult;
 	}
 	return nError;
-}
-
-void pushHostLobby() {
-	typedef bool(__cdecl* should_send_broadcast_reply)(void* session);
-	auto p_should_send_broadcast_reply = reinterpret_cast<should_send_broadcast_reply>(Memory::GetAddress(0x1ADA7B, 0x1A69DB));
-
-	if (p_should_send_broadcast_reply(NULL))
-	{
-		char msg[100] = { 0x00, 0x43, 0x05 };
-		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
-
-		addDebugText("Pushing open lobby.");
-
-		SOCKET socketDescriptor;
-		struct sockaddr_in serverAddress;
-		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
-			addDebugText("ERROR: Could not create socket.");
-		}
-		serverAddress.sin_family = AF_INET;
-		serverAddress.sin_addr.s_addr = H2Config_master_ip;
-		serverAddress.sin_port = htons(H2Config_master_port_relay);
-
-		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr *) &serverAddress, sizeof(serverAddress)) <= 0) {
-			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
-			addDebugText("ERROR: Failed to push open lobby.");
-		}
-
-		closesocket(socketDescriptor);
-	}
 }
 
 char* custom_label_literal(char* label_escaped) {
@@ -362,7 +334,7 @@ int HostnameToIp(char* hostname, char* ip) {
 	return 1;
 }
 
-DWORD crc32buf(char* buf, size_t len)
+DWORD crc32buf(const char* buf, size_t len)
 {
 	register DWORD oldcrc32;
 
@@ -433,8 +405,8 @@ static bool rfc3986_allow(char i) {
 	return false;
 }
 
-char* encode_rfc3986(char* label_literal, int label_literal_length) {
-	if (label_literal_length < 0)
+char* encode_rfc3986(char* label_literal, size_t label_literal_length) {
+	if (label_literal_length == 0)
 		label_literal_length = strlen(label_literal);
 	int escaped_buflen = (label_literal_length * 3) + 1;
 	char* label_escaped = (char*)malloc(escaped_buflen * sizeof(char));
@@ -455,17 +427,18 @@ char* encode_rfc3986(char* label_literal, int label_literal_length) {
 	return label_escaped;
 }
 
-void wcstombs2(char* buffer, wchar_t* text, int buf_len) {
-	int loop_len = wcslen(text);
-	if (loop_len > buf_len)
-		loop_len = buf_len;
-	int buffer_i = 0;
+void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len) {
+	size_t loop_len = wcslen(source);
+	if (loop_len >= buf_len)
+		loop_len = buf_len - 1; // - 1 for null
+
+	int out_buffer_idx = 0;
 	for (int i = 0; i < loop_len; i++) {
-		if (text[i] >= 0 && text[i] <= 0xFF) {
-			buffer[buffer_i++] = (char)text[i];
+		if (source[i] >= 0 && source[i] <= 0xFF) {
+			out_buffer[out_buffer_idx++] = (char)source[i];
 		}
 	}
-	buffer[buffer_i] = 0;
+	out_buffer[out_buffer_idx] = 0;
 }
 
 std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
@@ -480,8 +453,9 @@ std::string ToNarrow(const wchar_t *s, char dfault,	const std::locale& loc)
 
 char* wcstombs2r(wchar_t* text)
 {
-	char* output = (char*)malloc(sizeof(char) * wcslen(text) + 1);
-	wcstombs2(output, text, wcslen(text) + 1);
+	size_t output_size = (wcslen(text) + 1) * sizeof(char);
+	char* output = (char*)malloc(output_size);
+	wcstombs2(text, output, output_size);
 	return output;
 }
 
@@ -564,60 +538,31 @@ int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_re
 	return result;
 }
 
-bool StrnCaseInsensEqu(char* str1, char* str2, unsigned int chk_len) {
-	unsigned int chk_len2 = strlen(str1);
-	if (chk_len2 < chk_len) {
-		chk_len = chk_len2;
-	}
-	chk_len2 = strlen(str2);
-	if (chk_len2 != chk_len) {
-		return false;
-	}
-	const int case_diff = 'A' - 'a';
-	for (unsigned int i = 0; i < chk_len; i++) {
-		if (str1[i] != str2[i]) {
-			int sa = str1[i];
-			if (sa >= 'a' && sa <= 'z') {
-				sa += case_diff;
-			}
-			else if (sa >= 'A' && sa <= 'Z') {
-				sa -= case_diff;
-			}
-			if (sa == str2[i]) {
-				continue;
-			}
-			return false;
-		}
-	}
-
-	return true;
-}
-
-void EnsureDirectoryExists(wchar_t* path) {
-	int buflen = wcslen(path) + 1;
-	wchar_t* path2 = (wchar_t*)malloc(sizeof(wchar_t) * buflen);
-	memcpy(path2, path, sizeof(wchar_t) * buflen);
+void CreateDirTree(const wchar_t* path) {
+	size_t buflen = wcslen(path) + 1;
+	wchar_t* temp_path = (wchar_t*)malloc(sizeof(wchar_t) * buflen);
+	wcscpy_s(temp_path, buflen, path);
 
 	for (int i = 1; i < buflen; i++) {
-		if (path2[i] == L'/' || path2[i] == L'\\') {
+		if (temp_path[i] == L'/' || temp_path[i] == L'\\') {
 			wchar_t temp_cut = 0;
-			if (path2[i + 1] != 0) {
-				temp_cut = path2[i + 1];
-				path2[i + 1] = 0;
+			if (temp_path[i + 1] != 0) {
+				temp_cut = temp_path[i + 1];
+				temp_path[i + 1] = 0;
 			}
-			CreateDirectoryW(path2, NULL);
+			CreateDirectoryW(temp_path, NULL);
 			if (temp_cut) {
-				path2[i + 1] = temp_cut;
+				temp_path[i + 1] = temp_cut;
 			}
 		}
 	}
 
-	free(path2);
+	free(temp_path);
 }
 
 int TrimRemoveConsecutiveSpaces(char* text) {
-	int text_len = strlen(text);
 	int text_pos = 0;
+	size_t text_len = strlen(text);
 	for (int j = 0; j < text_len; j++) {
 		if (text_pos == 0) {
 			if (text[j] != ' ')
@@ -657,6 +602,36 @@ int stripWhitespace(wchar_t *inputStr) {
 	memmove(inputStr, start, wcslen(start) + 1);
 	return 0;
 }
+
+void pushHostLobby() {
+	typedef bool(__cdecl* should_send_broadcast_reply_t)(void* session);
+	auto p_should_send_broadcast_reply = Memory::GetAddress<should_send_broadcast_reply_t>(0x1ADA7B, 0x1A69DB);
+
+	if (p_should_send_broadcast_reply(NULL))
+	{
+		char msg[100] = { 0x00, 0x43, 0x05 };
+		sprintf(&msg[3], "push clientlobby %d", H2Config_base_port + 1);
+
+		addDebugText("Pushing open lobby.");
+
+		SOCKET socketDescriptor;
+		struct sockaddr_in serverAddress;
+		if ((socketDescriptor = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET) {
+			addDebugText("ERROR: Could not create socket.");
+		}
+		serverAddress.sin_family = AF_INET;
+		serverAddress.sin_addr.s_addr = H2Config_master_ip;
+		serverAddress.sin_port = htons(H2Config_master_port_relay);
+
+		if (sendto(socketDescriptor, msg, strlen(&msg[3]) + 3, 0, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) <= 0) {
+			//returns -1 if it wasn't successful. Note that it doesn't return -1 if the connection couldn't be established (UDP)
+			addDebugText("ERROR: Failed to push open lobby.");
+		}
+
+		closesocket(socketDescriptor);
+	}
+}
+
 
 // use this only if input is expected to always be properly formated
 // preper format means it only contains only these characters: '01234556789ABCDEFabcdef' and no (pre/su)fixes

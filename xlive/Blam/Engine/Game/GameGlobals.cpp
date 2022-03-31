@@ -29,7 +29,7 @@ bool s_game_globals::game_is_campaign()
 
 bool s_game_globals::game_is_multiplayer()
 {
-	return get_game_options()->m_engine_type == e_engine_type::_mutliplayer;
+	return get_game_options()->m_engine_type == e_engine_type::_multiplayer;
 }
 
 bool s_game_globals::game_is_mainmenu()

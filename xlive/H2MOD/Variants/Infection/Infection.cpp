@@ -7,7 +7,7 @@
 #include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"

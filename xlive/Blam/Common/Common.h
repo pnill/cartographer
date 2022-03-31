@@ -50,7 +50,7 @@ static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGrou
 enum e_engine_type : int
 {
 	_single_player = 1,
-	_mutliplayer,
+	_multiplayer,
 	_main_menu,
 	_mutiplayer_shared,
 	_single_player_shared

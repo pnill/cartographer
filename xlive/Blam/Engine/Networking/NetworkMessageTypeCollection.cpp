@@ -3,7 +3,7 @@
 #include "NetworkMessageTypeCollection.h"
 #include "Blam\Engine\Memory\bitstream.h"
 
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\MapManager\MapManager.h"

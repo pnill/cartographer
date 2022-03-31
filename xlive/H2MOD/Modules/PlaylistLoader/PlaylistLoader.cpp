@@ -4,8 +4,8 @@
 #include "H2MOD.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 #include "Util\Hooks\Hook.h"
 
 namespace playlist_loader
@@ -263,7 +263,7 @@ namespace playlist_loader
 			p_playlist_process_setting(playlist_entry);
 		}
 	}
-	void reset_custom_settings(ServerConsole::ServerConsoleCommands command)
+	void reset_custom_settings(ServerConsole::e_server_console_commands command)
 	{
 		if (command == ServerConsole::play)
 			CustomVariantSettingsMap.clear();

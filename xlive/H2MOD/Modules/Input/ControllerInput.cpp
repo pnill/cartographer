@@ -2,7 +2,7 @@
 
 #include "ControllerInput.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 namespace ControllerInput

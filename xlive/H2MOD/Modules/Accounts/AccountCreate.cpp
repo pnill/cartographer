@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
-#include "H2MOD\Modules\Accounts\AccountCreate.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "AccountCreate.h"
+
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 
 #define ERROR_CODE_INVALID_PARAM -1
 #define ERROR_CODE_INVALID_EMAIL -2

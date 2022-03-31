@@ -26,7 +26,7 @@ static void refresh_mp_explosion_physics() {
 }
 
 static void actuallySendPacket() {
-	if (!NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() != e_engine_type::_mutliplayer)
+	if (!NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() != e_engine_type::_multiplayer)
 		return;
 
 	LOG_TRACE_GAME("[h2mod] Sending AdvLobbySettings.");

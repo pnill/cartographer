@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam\Common\Common.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
+#include "H2MOD\Modules\Shell\ServerConsole.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 
 
@@ -83,7 +83,7 @@ namespace EventHandler
 	using GameLifeCycleEventCallback = void(*)(e_game_life_cycle state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEventCallback = void(*)();
-	using ServerCommandEventCallback = void(*)(ServerConsole::ServerConsoleCommands command);
+	using ServerCommandEventCallback = void(*)(ServerConsole::e_server_console_commands command);
 	using PlayerControlEventCallback = void(*)(float* yaw, float* pitch);
 	using MapLoadEventCallback = void(*)(e_engine_type type);
 	using BlueScreenEventCallback = void(*)();

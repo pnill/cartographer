@@ -2,8 +2,8 @@
 #include <vector>
 #include <unordered_map>
 
-void initGSCustomLanguage();
-void deinitGSCustomLanguage();
+void InitCustomLanguage();
+void DeinitCustomLanguage();
 char* add_cartographer_label(int label_menu_id, int label_id, char* label);
 char* add_cartographer_label(int label_menu_id, int label_id, char* label, bool is_dynamic);
 char* add_cartographer_label(int label_menu_id, int label_id, int labelBufferLen);

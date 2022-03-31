@@ -5,10 +5,10 @@
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "Util\hash.h"
 
 bool MatchInvalidated = false;
@@ -98,7 +98,7 @@ void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlay
 	}
 }
 
-void StatsHandler::server_command_event(ServerConsole::ServerConsoleCommands command)
+void StatsHandler::server_command_event(ServerConsole::e_server_console_commands command)
 {
 	if(Status.StatsEnabled)
 	{
@@ -362,8 +362,9 @@ int StatsHandler::uploadPlaylist(char* token)
 {
 	LOG_TRACE_GAME("Uploading Playlist");
 	wchar_t* playlist_file = getPlaylistFile();
-	char* pFile = (char*)malloc(sizeof(char) * wcslen(playlist_file) + 1);
-	wcstombs2(pFile, playlist_file, wcslen(playlist_file) + 1);
+	size_t playlist_file_buf_size = (wcslen(playlist_file) + 1) * sizeof(char);
+	char* pFile = (char*)malloc(playlist_file_buf_size);
+	wcstombs2(playlist_file, pFile, playlist_file_buf_size);
 	LOG_TRACE_GAME(pFile);
 	std::string checksum = getChecksum();
 	if (checksum.empty())
@@ -820,8 +821,10 @@ char* StatsHandler::buildJSON()
 	{
 		LOG_ERROR_GAME("{} Failed to write to file", __FUNCTION__);
 	}
-	char* oFile = (char*)malloc(sizeof(char) * wcslen(fileOutPath) + 1);
-	wcstombs2(oFile, fileOutPath, wcslen(fileOutPath) + 1);
+
+	size_t oFileBufSize = (wcslen(fileOutPath) + 1) * sizeof(char);
+	char* oFile = (char*)malloc(oFileBufSize);
+	wcstombs2(fileOutPath, oFile, oFileBufSize);
 	return oFile;
 }
 

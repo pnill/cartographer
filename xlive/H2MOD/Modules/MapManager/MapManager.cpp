@@ -3,7 +3,7 @@
 #include "MapManager.h"
 #include "CustomMapDataCache\CustomMapDataCache.h"
 
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -354,7 +354,7 @@ void MapManager::ApplyHooks() {
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
 
 	// custom map cache patches/hooks
-	s_custom_map_data::applyCustomMapExtensionLimitPatches();
+	s_custom_map_data::ApplyCustomMapExtensionLimitPatches();
 }
 
 /**

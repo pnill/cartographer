@@ -2,30 +2,16 @@
 
 #include "Config.h"
 
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
-#include "H2MOD/Modules/Updater/Updater.h"
+#include "H2MOD\Modules\Shell\Shell.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
+#include "H2MOD\Modules\Updater\Updater.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 #include "Util\SimpleIni.h"
 
-static void HandleFileError(int fpErrNo) {//TODO
-	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
-		MessageBoxA(NULL, "Cannot write a file. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else if (fpErrNo == ESRCH) {
-		MessageBoxA(NULL, "Probably a missing folder issue if file writing related. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else {
-		char NotificationPlayerText[20];
-		sprintf(NotificationPlayerText, "Error 0x%x", fpErrNo);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
-	}
-}
-
 #pragma region Config IO
-const wchar_t H2ConfigFilenames[][25] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
+const wchar_t* H2ConfigFilenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
 
 std::string H2ConfigVersionNumber("1");
 std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNumber);
@@ -91,7 +77,7 @@ char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
 bool H2Config_force_even = false;
 bool H2Config_koth_random = true;
-H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_none;
+H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
@@ -155,14 +141,13 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
 	}
 
-	addDebugText(L"Saving Config: \"%ws\"", fileConfigPath);
+	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
 	FILE* fileConfig = nullptr;
 	errno_t err = _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
-
 	if (err != 0) {
-		HandleFileError(GetLastError());
-		addDebugText("ERROR: Unable to write H2Configuration File!");
+		_Shell::FileErrorDialog(errno);
+		addDebugText("ERROR: Unable to write H2Configuration file!");
 	}
 	else {
 #pragma region Put Data To File
@@ -624,16 +609,16 @@ void SaveH2Config() {
 		fclose(fileConfig);
 	}
 
-	addDebugText("End Saving H2Configuration File.");
+	addDebugText("End saving H2Configuration file.");
 }
 
 
 void ReadH2Config() {
-	addDebugText("Reading H2Configuration File...");
+	addDebugText("Reading H2Configuration file...");
 
 	int readInstanceIdFile = H2GetInstanceId();
 	wchar_t local[1024];
-	swprintf(local, ARRAYSIZE(local), L"%ws", H2AppDataLocal);
+	wcscpy_s(local, ARRAYSIZE(local), H2AppDataLocal);
 	H2Config_isConfigFileAppDataLocal = false;
 
 	errno_t err = 0;
@@ -641,8 +626,8 @@ void ReadH2Config() {
 	wchar_t fileConfigPath[1024];
 
 	if (FlagFilePathConfig) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		addDebugText(L"Reading Flag Config: \"%ws\"", fileConfigPath);
+		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
+		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
@@ -652,11 +637,11 @@ void ReadH2Config() {
 				checkFilePath = local;
 			}
 			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
-			addDebugText(L"Reading Config: \"%ws\"", fileConfigPath);
+			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
 			if (err) {
-				addDebugText("H2Configuration File does not exist.");
+				addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
 			}
 			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
 			if (err && !H2Config_isConfigFileAppDataLocal) {
@@ -667,7 +652,7 @@ void ReadH2Config() {
 	}
 
 	if (err) {
-		addDebugText("ERROR: No H2Configuration Files Could Be Found!");
+		addDebugText("ERROR: No H2Configuration files could be found!");
 		CMForce_Update = true;
 		H2Config_isConfigFileAppDataLocal = true;
 	}
@@ -751,16 +736,16 @@ void ReadH2Config() {
 				{
 					default:
 					case 0:
-						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_none;
+						H2Config_experimental_fps = _rendering_mode_none;
 						break;
 					case 1:
-						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_old;
+						H2Config_experimental_fps = _rendering_mode_old;
 						break;
 					case 2:
-						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_new;
+						H2Config_experimental_fps = _rendering_mode_new;
 						break;
 					case 3:
-						H2Config_experimental_fps = H2Config_Experimental_Rendering_Mode::e_render_original_game_frame_limit;
+						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
 				}
 				
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
@@ -955,7 +940,7 @@ void ReadH2Config() {
 		}
 	}
 
-	addDebugText("End Reading H2Configuration File.");
+	addDebugText("End reading H2Configuration file.");
 }
 #pragma endregion
 

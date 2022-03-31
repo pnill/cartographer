@@ -2,9 +2,12 @@
 
 #include "RunLoop.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Shell.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\GUI\GUI.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Modules\Stats\StatsHandler.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\Input\ControllerInput.h"
@@ -12,9 +15,8 @@
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Stats\StatsHandler.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+
+#include "H2MOD\Utils\Utils.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 
 #include "Util\Hooks\Hook.h"
@@ -243,9 +245,9 @@ inline void defaultFrameLimiter() {
 	static bool frameLimiterInitialized = false;
 	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
 
-	if (H2Config_experimental_fps == e_render_original_game_frame_limit
+	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit
 		|| H2Config_fps_limit <= 0
-		|| Engine::is_game_minimized())
+		|| _Shell::IsGameMinimized())
 	{
 		lastFrameSetting = H2Config_fps_limit;
 		frameLimiterInitialized = false;
@@ -324,19 +326,19 @@ bool __cdecl cinematic_in_progress_hook()
 
 	switch (experimental_rendering_mode)
 	{
-	case e_render_old:
+	case _rendering_mode_old:
 		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
 		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
-		return p_cinematic_is_running() || Engine::get_game_life_cycle() == _life_cycle_in_game || Engine::is_game_minimized();
+		return p_cinematic_is_running() || Engine::get_game_life_cycle() == _life_cycle_in_game || _Shell::IsGameMinimized();
 
 	// these two options disable the hacks that hired gun added to the main loop
-	case e_render_new:
-	case e_render_original_game_frame_limit:
+	case _rendering_mode_new:
+	case _rendering_mode_original_game_frame_limit:
 		return true;
 
-	case e_render_none:
+	case _rendering_mode_none:
 	default:
-		return p_cinematic_is_running() || b_XboxTick || Engine::is_game_minimized();
+		return p_cinematic_is_running() || b_XboxTick || _Shell::IsGameMinimized();
 	}
 
 	return false;
@@ -348,13 +350,13 @@ bool __cdecl should_limit_framerate()
 
 	switch (experimental_rendering_mode)
 	{
-	case e_render_original_game_frame_limit:
+	case _rendering_mode_original_game_frame_limit:
 		return false; // e_render_original_game_frame_limit handles frame limit in OriginalFPSLimiter.cpp
-	case e_render_none:
-	case e_render_new:
-	case e_render_old:
+	case _rendering_mode_none:
+	case _rendering_mode_new:
+	case _rendering_mode_old:
 	default:
-		return (Engine::is_game_minimized() || b_XboxTick);
+		return (_Shell::IsGameMinimized() || b_XboxTick);
 	}
 
 	return false;
@@ -403,7 +405,7 @@ float alt_system_time_update()
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
 
-	if (p_cinematic_is_running() || Engine::is_game_minimized())
+	if (p_cinematic_is_running() || _Shell::IsGameMinimized())
 		result = original_time_update;
 
 	return result;
@@ -481,7 +483,7 @@ void __cdecl game_main_loop()
 			break;
 		
 		p_input_update();
-		if (!Engine::is_game_minimized()) 
+		if (!_Shell::IsGameMinimized()) 
 		{
 			if (H2Config_controller_modern)
 			{
@@ -534,7 +536,7 @@ void __cdecl game_main_loop()
 			else
 				v5 = v15;
 			v13 = v5;
-			if (!Engine::is_game_minimized())
+			if (!_Shell::IsGameMinimized())
 			{
 				p_sub_CDCA7D(v15);
 				p_sub_B0A221();
@@ -569,7 +571,7 @@ void __cdecl game_main_loop()
 				/*v7 = get_xbox_achievements_data();
 				XAchievements(v7);*/
 			}
-			if (Engine::is_game_minimized())
+			if (_Shell::IsGameMinimized())
 			{
 				p_vibrations_clear();
 			}
@@ -614,7 +616,7 @@ void alt_main_game_loop_hook()
 		init = true;
 
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-		if (init_flags_array[2] == 0 && !Engine::is_game_minimized())
+		if (init_flags_array[2] == 0 && !_Shell::IsGameMinimized())
 			p_render_audio();
 
 		if (p_game_in_simulation())
@@ -700,14 +702,14 @@ void initialize_main_loop_function_pointers()
 	b_restart_game_loop = Memory::GetAddress<bool*>(0x479EA0);
 }
 
-void initGSRunLoop() {
-	addDebugText("Pre RunLoop Hooking.");
+void InitRunLoop() {
+	addDebugText("Pre RunLoop hooking.");
 	if (H2IsDediServer) {
-		addDebugText("Hooking Loop & Shutdown Function");
+		addDebugText("Hooking loop & shutdown Function");
 		PatchCall(H2BaseAddr + 0xc6cb, HookedServerShutdownCheck);
 	}
 	else {
-		addDebugText("Hooking Loop Function");
+		addDebugText("Hooking loop Function");
 		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
@@ -718,25 +720,25 @@ void initGSRunLoop() {
 		switch (experimental_rendering_mode)
 		{
 		default:
-		case e_render_none:
-				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+		case _rendering_mode_none:
+			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			break;
-		case e_render_old:
-				PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
-				UncappedFPS2::Init();
+		case _rendering_mode_old:
+			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+			UncappedFPS2::Init();
 			break;
-		case e_render_new:
-				//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
-				PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
-				//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
-				QueryPerformanceFrequency(&freq);
-				//Remove original render call
-				NopFill(Memory::GetAddress(0x39DAA), 5);
-				//Stop Hold to Zoom.
-				NopFill(Memory::GetAddress(0x9355C), 4);
+		case _rendering_mode_new:
+			//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
+			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
+			//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
+			QueryPerformanceFrequency(&freq);
+			//Remove original render call
+			NopFill(Memory::GetAddress(0x39DAA), 5);
+			//Stop Hold to Zoom.
+			NopFill(Memory::GetAddress(0x9355C), 4);
 			break;
 
-		case e_render_original_game_frame_limit:
+		case _rendering_mode_original_game_frame_limit:
 			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			OriginalFPSLimiter::ApplyPatches();
 			break;
@@ -754,6 +756,6 @@ void initGSRunLoop() {
 	addDebugText("Post RunLoop Hooking.");
 }
 
-void deinitGSRunLoop() {
+void DeinitRunLoop() {
 
 }

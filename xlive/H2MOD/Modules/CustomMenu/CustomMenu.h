@@ -1,7 +1,7 @@
 #pragma once
 
-void initGSCustomMenu();
-void deinitGSCustomMenu();
+void InitCustomMenu();
+void DeinitCustomMenu();
 
 void GSCustomMenuCall_Language();
 void GSCustomMenuCall_Update_Note();

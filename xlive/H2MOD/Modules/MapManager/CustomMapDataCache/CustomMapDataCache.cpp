@@ -894,7 +894,7 @@ public:
 
 static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook() { __asm jmp c_custom_game_custom_map_list::constructor_hook }
 
-void s_custom_map_data::applyCustomMapExtensionLimitPatches()
+void s_custom_map_data::ApplyCustomMapExtensionLimitPatches()
 {
 	WriteJmpTo(Memory::GetAddressRelative(0x44CF41, 0x441819), jmp_get_entry_by_id);
 	WriteJmpTo(Memory::GetAddressRelative(0x44CC30, 0x490356), jmp_load_custom_map_data_cache);

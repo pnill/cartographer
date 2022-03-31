@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "MeleeFix.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 #include "Blam\Enums\HaloStrings.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\GamePhysics\MeleeLunge.h"
 
 #include <float.h>

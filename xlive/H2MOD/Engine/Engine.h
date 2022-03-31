@@ -7,7 +7,6 @@
 namespace Engine
 {
 	e_game_life_cycle get_game_life_cycle();
-	bool __cdecl is_game_minimized();
 	e_engine_type get_current_engine_type();
 	int get_global_random_seed_address();
 	int get_game_mode_engine();

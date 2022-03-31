@@ -19,7 +19,7 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
-    <ClCompile Include="H2MOD\Modules\ServerConsole\ServerConsole.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
@@ -33,7 +33,7 @@
     <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.cpp" />
-    <ClCompile Include="H2MOD\Modules\Config\Config.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
@@ -45,10 +45,10 @@
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
-    <ClCompile Include="H2MOD\Modules\Startup\Startup.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
-    <ClCompile Include="H2MOD\Modules\Utils\Utils.cpp" />
+    <ClCompile Include="H2MOD\Utils\Utils.cpp" />
     <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
@@ -59,7 +59,7 @@
     <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
-    <ClCompile Include="Util\Debug\Debug.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="Util\Hooks\Detour.cpp" />
@@ -140,6 +140,8 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_account_list_menu.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\Shell.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -261,7 +263,7 @@
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
-    <ClInclude Include="H2MOD\Modules\ServerConsole\ServerConsole.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
@@ -295,7 +297,7 @@
     <ClInclude Include="H2MOD\Modules\Accounts\Accounts.h" />
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h" />
-    <ClInclude Include="H2MOD\Modules\Config\Config.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
     <ClInclude Include="H2MOD\Modules\Console\ConsoleCommands.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
@@ -307,10 +309,10 @@
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h" />
-    <ClInclude Include="H2MOD\Modules\Startup\Startup.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
-    <ClInclude Include="H2MOD\Modules\Utils\Utils.h" />
+    <ClInclude Include="H2MOD\Utils\Utils.h" />
     <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
@@ -323,7 +325,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="Util\ClipboardAPI.h" />
-    <ClInclude Include="Util\Debug\Debug.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\Debug\Debug.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\Hooks\Detour.h" />
@@ -461,6 +463,8 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_account_list_menu.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\Shell.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

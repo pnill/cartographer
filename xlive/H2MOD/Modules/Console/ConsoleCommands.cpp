@@ -4,13 +4,13 @@
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\ServerConsole.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
@@ -662,7 +662,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetEngineType() == e_engine_type::_mutliplayer && !NetworkSession::LocalPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::_multiplayer && !NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -670,7 +670,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			displayXyz = !displayXyz;
 			return;
 		}
-		
+
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 7) {
 				output(L"Invalid command, usage $spawn command_name count x y z same_team");
@@ -711,7 +711,7 @@ void ConsoleCommands::handle_command(std::string command) {
 			bool sameTeam = false;
 			if (splitCommands[6] == "true")
 				sameTeam = true;
-			
+
 			this->spawn(object_datum, count, x, y, z, 1.0f, true, sameTeam);
 			return;
 		}

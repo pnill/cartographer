@@ -46,10 +46,10 @@ enum e_override_texture_resolution : int
 
 enum H2Config_Experimental_Rendering_Mode : byte
 {
-	e_render_none,
-	e_render_old,
-	e_render_new,
-	e_render_original_game_frame_limit
+	_rendering_mode_none,
+	_rendering_mode_old,
+	_rendering_mode_new,
+	_rendering_mode_original_game_frame_limit
 };
 
 extern std::string cartographerURL;

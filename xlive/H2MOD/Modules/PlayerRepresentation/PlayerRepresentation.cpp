@@ -12,7 +12,7 @@
 #include "H2MOD.h"
 #include "Blam/Engine/Players/Players.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -189,7 +189,7 @@ namespace player_representation
 	}
 	void on_map_load()
 	{
-		if (h2mod->GetEngineType() == _mutliplayer) 
+		if (h2mod->GetEngineType() == _multiplayer) 
 		{
 			representation_count = 4;
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())

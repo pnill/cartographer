@@ -32,11 +32,11 @@ void c_pregame_lobby_menu::ApplyPatches()
 				&& buttons_block->block_data_offset != -1)
 			{
 				char* buttons_data = tags::get_tag_data() + buttons_block->block_data_offset;
-				INT16 fixed_button_delay[2] = { 0, 0 };
-				rect2d fixed_button_bounds[2] = { {480, -690, 440, -360}, {480, -320, 440, 8} };
-				point2d fixed_bitmap_offset_placement[2] = { {-15, -12}, { -15, -12} };
-				INT16 fixed_depth_bias[2] = { 6, 6 };
-				INT16 fixed_mouse_region[2] = { -12, -12 };
+				INT16 fixed_button_delay[] = { 0, 0 };
+				rect2d fixed_button_bounds[] = { {480, -690, 440, -360}, {480, -320, 440, 8} };
+				point2d fixed_bitmap_offset_placement[] = { {-15, -12}, { -15, -12} };
+				INT16 fixed_depth_bias[] = { 6, 6 };
+				INT16 fixed_mouse_region[] = { -12, -12 };
 
 				for (int i = 0; i < buttons_block->block_count; i++)
 				{
@@ -66,11 +66,11 @@ void c_pregame_lobby_menu::ApplyPatches()
 				&& text_strings_block->block_data_offset != -1)
 			{
 				char* text_strings_data = tags::get_tag_data() + text_strings_block->block_data_offset;
-				INT16 fixed_text_delay_placemets[44] = { 0, 0, 0, 0, 0, 0, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
+				INT16 fixed_text_delay_placemets[] = { 0, 0, 0, 0, 0, 0, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
 													, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
 													, 250, 250, 250, 250 };
 
-				rect2d fixed_text_bounds_placemets[44] = { {320, -650, 200, -30}, {-195, -675, -235, -300}, {-95, -580, -135, -150}, {-130, -580, -170, -150} , {-235, -675, -400, -325}
+				rect2d fixed_text_bounds_placemets[] = { {320, -650, 200, -30}, {-195, -675, -235, -300}, {-95, -580, -135, -150}, {-130, -580, -170, -150} , {-235, -675, -400, -325}
 													  ,{90, -650, 50, -30}, {177, 118, 157, 276}, {155, 118, 135, 276}, {133, 118, 113, 276} , {111, 118, 91, 276}
 													  ,{89, 118, 69, 276}, {67, 118, 47, 276}, {45, 118, 25, 276}, {23, 118, 3, 276} , {1, 118, -19, 276}
 													  ,{-21, 118, -41, 276}, {-43, 118, -63, 276}, {-65, 118, -85, 276}, {-87, 118, -107, 276} , {-109, 118, -129, 276}
@@ -99,11 +99,11 @@ void c_pregame_lobby_menu::ApplyPatches()
 				std::string arrows_tag_path("ui\\screens\\game_shell\\network_squad_browser_screen\\arrows");
 				datum arrows_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::bitmap, arrows_tag_path);
 
-				INT16 fixed_bitmap_delay[42] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
+				INT16 fixed_bitmap_delay[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
 											   , 250, 0, 0, 0, 0, 0, 0, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250
 											   , 250, 250 };
 
-				point2d fixed_top_left_placement[42] = { {-279, 174}, {-705, 350}, { -448, -30}, { -700, -30}, { -670, -90}
+				point2d fixed_top_left_placement[] = { {-279, 174}, {-705, 350}, { -448, -30}, { -700, -30}, { -670, -90}
 													   , { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999} 
 													   , { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999}
 													   , { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999}, { 9999, 9999}

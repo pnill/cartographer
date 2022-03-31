@@ -2,7 +2,7 @@
 
 #include "Mouseinput.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 typedef struct DIMOUSESTATE {

@@ -5,13 +5,13 @@
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomResolutions\CustomResolutions.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Variants\VariantMPGameEngine.h"
 #include "Util\Hooks\Hook.h"
@@ -135,153 +135,6 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 }
 
 
-#pragma region init hook
-
-#pragma region func_wrappers
-void real_math_initialize()
-{
-	typedef int (__cdecl* real_math_initialize_t)();
-	auto p_real_math_initialize_impl = Memory::GetAddress<real_math_initialize_t>(0x000340d7);
-	p_real_math_initialize_impl();
-}
-
-void async_initialize()
-{
-	typedef int (__cdecl* async_initialize_t)();
-	auto p_async_initialize_impl = Memory::GetAddress<async_initialize_t>(0x00032ce5);
-	p_async_initialize_impl();
-}
-
-bool init_gfwl_gamestore()
-{
-	typedef char (__cdecl* init_gfwl_gamestore_t)();
-	auto p_init_gfwl_gamestore_impl = Memory::GetAddress<init_gfwl_gamestore_t>(0x00202f3e);
-	return p_init_gfwl_gamestore_impl();
-}
-// not sure if this is all it does
-HANDLE init_data_checksum_info()
-{
-	typedef HANDLE (__cdecl* init_data_checksum_info_t)();
-	auto p_init_data_checksum_info_impl = Memory::GetAddress<init_data_checksum_info_t>(0x000388d3);
-	return p_init_data_checksum_info_impl();
-}
-
-// returns memory
-void* runtime_state_init()
-{
-	typedef void* (__cdecl* runtime_state_init_t)();
-	auto p_runtime_state_init_impl = Memory::GetAddress<runtime_state_init_t>(0x00037ed5);
-	return p_runtime_state_init_impl();
-}
-
-void game_preferences_initialize()
-{
-	typedef void (__cdecl* game_preferences_initialize_t)();
-	auto p_global_preferences_initialize_impl = Memory::GetAddress<game_preferences_initialize_t>(0x325FD);
-	p_global_preferences_initialize_impl();
-}
-
-void font_initialize()
-{
-	typedef void (__cdecl* font_initialize_t)();
-	auto p_font_initialize_impl = Memory::GetAddress<font_initialize_t>(0x00031dff);
-	p_font_initialize_impl();
-}
-
-bool tag_files_open()
-{
-	typedef bool (__cdecl* tag_files_open_t)();
-	auto p_tag_files_open_impl = Memory::GetAddress<tag_files_open_t>(0x30D58);
-	return p_tag_files_open_impl();
-}
-
-void init_timing(int a1)
-{
-	typedef DWORD (__cdecl* init_timing_t)(int a1);
-	auto p_init_timing_impl = Memory::GetAddress<init_timing_t>(0x37E39);
-	p_init_timing_impl(a1);
-}
-
-void game_state_initialize()
-{
-	typedef void (__cdecl* game_state_initialize_t)();
-	auto p_game_state_initialize = Memory::GetAddress<game_state_initialize_t>(0x00030aa6);
-	p_game_state_initialize();
-}
-
-bool rasterizer_initialize()
-{
-	typedef char (__cdecl* rasterizer_initialize_t)();
-	auto p_rasterizer_initialize = Memory::GetAddress<rasterizer_initialize_t>(0x00263359);
-	return p_rasterizer_initialize();
-}
-
-bool input_initialize()
-{
-	typedef char (__cdecl* input_initialize_t)();
-	auto p_input_initialize = Memory::GetAddress<input_initialize_t>(0x2FD23);
-	return p_input_initialize();
-}
-
-void sound_initialize()
-{
-	typedef void (__cdecl* sound_initialize_t)();
-	auto p_sound_initialize = Memory::GetAddress<sound_initialize_t>(0x2979E);
-	return p_sound_initialize();
-}
-
-#pragma endregion
-
-enum startup_flags : int
-{
-	windowed,
-	disable_voice_chat,
-	nosound,
-	allow_d3d_ex_version, // allows the d3d ex version to be used instead
-	disable_hardware_vertex_processing, // force hardware vertex processing off
-	novsync,
-	unk6, // squad browser/xlive/ui?
-	nointro, // disables intro movie
-	unk8, // some tag thing?
-	unk9, // some tag thing?
-	unk10, // some tag thing?
-	unk11, // some tag thing?
-	unk12, // some tag thing?
-	unk13, // some tag thing?
-	unk14, // some tag thing?
-	custom_map_entry_test_map_name_instead_of_hash, // flag to test the map name instead of the hash of the custom map
-	unk16,
-	xbox_live_silver_account, // if true, disables 'gold-only' features, like quickmatch etc
-	unk18, // fuzzer/automated testing? (sapien)
-	ui_fast_test_no_start, // same as below but doesn't start a game
-	ui_fast_test, // auto navigates the UI selecting the default option
-	unk21, // player controls related, is checked when using a vehicle
-	monitor_count,
-	unk23,
-	unk24,
-	unk25, // something to do with game time?
-	unk26,
-	unk27, // network? value seems unused?
-	high_quality, // forced sound reverb ignoring CPU score and disable forcing low graphical settings (sapien)
-
-	count
-};
-static_assert(startup_flags::count == 29, "Bad flags count");
-
-int flag_log_count[startup_flags::count];
-BOOL __cdecl is_init_flag_set(startup_flags id)
-{
-	if (flag_log_count[id] < 10)
-	{
-		LOG_TRACE_GAME("is_init_flag_set() : flag {}", id);
-		flag_log_count[id]++;
-		if (flag_log_count[id] == 10)
-			LOG_TRACE_GAME("is_init_flag_set() : flag {} logged to many times ignoring", id);
-	}
-	DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-	return init_flags_array[id] != 0;
-}
-
 typedef int(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
 Video_HUDSizeUpdate_t Video_HUDSizeUpdate_orig;
 
@@ -329,238 +182,6 @@ int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int 
 	}
 	return p_sub_671B02(a1, a2, a3, a4, a5, a6, a7, a8);
 }
-
-const static int max_mointor_count = 9;
-bool engine_basic_init()
-{
-	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-	ZeroMemory(flags_array, startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
-
-	H2Config_voice_chat = false;
-	flags_array[startup_flags::nointro] = H2Config_skip_intro;
-
-	void(__cdecl* fn_c000285fd)() = (void(__cdecl*)())Memory::GetAddress<void*>(0x000285fd);
-
-	init_gfwl_gamestore();
-	init_data_checksum_info();
-	runtime_state_init();
-
-	if (H2Config_hiresfix) {
-		// HUD text size fix for higher resolutions
-		Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_t)DetourFunc(Memory::GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
-
-		// menu text fix for higher resolutions
-		p_sub_671B02 = (sub_671B02_t)DetourFunc(Memory::GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
-	}
-
-	if (H2Config_d3dex) {
-		flags_array[startup_flags::allow_d3d_ex_version] = 1;
-	}
-
-	int arg_count;
-	wchar_t **cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
-	if (cmd_line_args && arg_count > 1) {
-		for (int i = 1; i < arg_count; i++) {
-			wchar_t* cmd_line_arg = cmd_line_args[i];
-
-			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				flags_array[startup_flags::windowed] = 1;
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				flags_array[startup_flags::nosound] = 1;
-				WriteValue(Memory::GetAddress(0x479EDC), 1);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				flags_array[startup_flags::novsync] = 1;
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
-				flags_array[startup_flags::nointro] = 1;
-			}
-			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
-				int monitor_id = _wtol(&cmd_line_arg[9]);
-				flags_array[startup_flags::monitor_count] = min(max(0, monitor_id), max_mointor_count);
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				flags_array[startup_flags::high_quality] = 1;
-			}
-			else if (_wcsicmp(cmd_line_arg, L"-depthbiasfix") == 0)
-			{
-				// Fixes issue #118
-			    /* g_depth_bias always NULL rather than taking any value from
-			    shader tag before calling g_D3DDevice->SetRenderStatus(D3DRS_DEPTHBIAS, g_depth_bias); */
-				NopFill(Memory::GetAddress(0x269FD5), 8);
-			}
-#if COMPILE_WITH_VOICE
-			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
-			{
-				flags_array[startup_flags::disable_voice_chat] = 0;
-				H2Config_voice_chat = true;
-			}
-#endif
-#ifdef _DEBUG
-			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
-				int flag_id = _wtol(&cmd_line_arg[10]);
-				flags_array[min(max(0, flag_id), startup_flags::count - 1)] = 1;
-			}
-#endif
-		}
-	}
-	LocalFree(cmd_line_args);
-
-	if (flags_array[startup_flags::unk26])
-		init_timing(1000 * flags_array[startup_flags::unk26]);
-	real_math_initialize();
-	async_initialize();
-	game_preferences_initialize();
-
-	s_network_observer::ResetNetworkPreferences();
-
-	font_initialize();
-
-	if (!LOG_CHECK(tag_files_open()))
-		return false;
-	
-	game_state_initialize();
-
-	// modifies esi need to check what the caller sets that too
-	// Update 1/13/2022:
-	// initializes some interface that's used to download the network config from the bungie's website
-	// but a stub in release
-	void(__cdecl*network_configuration_initialize)() = (void(__cdecl*)())(Memory::GetAddress(0x001a9de6));
-	network_configuration_initialize();
-
-	if (!LOG_CHECK(rasterizer_initialize()))
-		return false;
-
-	// does some weird stuff with sound, might setup volume
-	fn_c000285fd();
-
-	input_initialize();
-	sound_initialize();
-
-	struct FakePBuffer {
-		HANDLE id;
-		DWORD dwSize;
-		DWORD magic;
-		LPBYTE pbData;
-	};
-	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
-	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall* XLivePBufferAllocate)(DWORD size, FakePBuffer **pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))Memory::GetAddress(0xe886);
-	DWORD(__stdcall* XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))Memory::GetAddress(0xe880);
-	FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x00479e78);
-	XLivePBufferAllocate(2, var_c00479e78);
-	XLivePBufferSetByte(*var_c00479e78, 0, 0);
-	XLivePBufferSetByte(*var_c00479e78, 1, 0);
-
-	//SLDLInitialize
-
-	//SLDLOpen
-	//SLDLConsumeRight
-	//SLDLClose
-	// This call would disable the multiplayer buttons in the mainmenu. Likely setup this way from SLDL.
-	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
-
-	return true;
-}
-
-#pragma region func_wrappers
-bool InitPCCInfo()
-{
-	typedef bool (__cdecl* InitPCCInfo_t)();
-	auto p_InitPCCInfo = Memory::GetAddress<InitPCCInfo_t>(0x260DDD);
-	return p_InitPCCInfo();
-}
-
-void run_main_loop()
-{
-	typedef int (__cdecl* run_main_loop_t)();
-	auto p_run_main_loop = Memory::GetAddress<run_main_loop_t>(0x39E2C);
-	p_run_main_loop();
-}
-
-void main_engine_dispose()
-{
-	typedef int (__cdecl* main_engine_dispose_t)();
-	auto p_main_engine_dispose = Memory::GetAddress<main_engine_dispose_t>(0x48A9);
-	p_main_engine_dispose();
-}
-
-void show_error_message_by_id(int id)
-{
-	typedef void (__cdecl* show_error_message_by_id_t)(int id);
-	auto p_show_error_message_by_id = Memory::GetAddress<show_error_message_by_id_t>(0x4A2E);
-	p_show_error_message_by_id(id);
-}
-#pragma endregion
-
-void show_fatal_error(int error_id)
-{
-	LOG_TRACE_FUNC("error_id : {}", error_id);
-
-	auto destory_window = [](HWND handle) {
-		if (handle)
-			DestroyWindow(handle);
-	};
-
-	HWND hWnd = *Memory::GetAddress<HWND*>(0x46D9C4);
-	HWND d3d_window = *Memory::GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
-	destory_window(hWnd);
-	destory_window(d3d_window);
-	show_error_message_by_id(error_id);
-}
-
-int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
-{
-	// set args
-	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
-	WriteValue(Memory::GetAddress(0x46D9C0), hInstance); // g_instance
-	WriteValue(Memory::GetAddress(0x46D9CC), nShowCmd); // g_CmdShow
-
-	// window setup
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
-	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
-	WriteValue(Memory::GetAddress(0x46D9D0), g_WndProc); // g_WndProc_ptr
-
-	if (!LOG_CHECK(InitPCCInfo()))
-	{
-		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
-		std::thread( [=]{ MessageBoxA(NULL, "Failed to get compatibility info.", "PCC Error", S_OK); }).detach();
-
-		show_error_message_by_id(108);
-		// todo: load some default values here?
-	}
-	// mouse cursor setup
-	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
-	WriteValue(Memory::GetAddress(0x46D9B8), cursor); // g_hCursor
-
-	// mess around with xlive (not calling XLiveInitialize etc)
-	WriteValue<BYTE>(Memory::GetAddress(0x4FAD98), 1);
-
-	// intialize some basic game subsystems
-	if (LOG_CHECK(engine_basic_init()))
-	{
-		run_main_loop(); // actually run game
-		main_engine_dispose(); // cleanup
-	} else
-	{
-		LOG_TRACE_FUNC("Engine startup failed!");
-		show_fatal_error(108);
-		return 1;
-	}
-
-	int g_fatal_error_id = *Memory::GetAddress<int*>(0x46DAD4);
-	if (g_fatal_error_id) // check if the game exited cleanly
-	{
-		show_fatal_error(g_fatal_error_id);
-		return 1;
-	} else
-	{
-		return 0;
-	}
-}
-#pragma endregion
 
 char is_remote_desktop()
 {
@@ -675,6 +296,13 @@ char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
+typedef BOOL(__stdcall* is_debugger_present_t)();
+is_debugger_present_t p_is_debugger_present;
+
+BOOL __stdcall isDebuggerPresent() {
+	return false;
+}
+
 void InitH2Tweaks() {
 
 	RefreshTogglexDelay();
@@ -707,12 +335,20 @@ void InitH2Tweaks() {
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
 		}
 
+		if (H2Config_hiresfix) {
+			// HUD text size fix for higher resolutions
+			Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_t)DetourFunc(Memory::GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
+
+			// menu text fix for higher resolutions
+			p_sub_671B02 = (sub_671B02_t)DetourFunc(Memory::GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
+		}
+
 		// adds support for more monitor resolutions
 		CustomResolution::Initialize();
 
 		//Disables the ESRB warning (only occurs for English Language).
 		//disables the one if no intro vid occurs.
-		WriteValue<BYTE>(Memory::GetAddress(0x411030), 0);
+		WriteValue<bool>(Memory::GetAddress(0x411030), 0);
 
 		//disables the one after the intro video, by removing 0x40 flag from 0x7C6 bitmask
 		WriteValue(Memory::GetAddress(0x39948 + 2), 0x7C6 & ~FLAG(6));
@@ -726,8 +362,6 @@ void InitH2Tweaks() {
 		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
 		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
 
-		WriteJmpTo(Memory::GetAddress(0x4544), is_init_flag_set);
-
 		HudElements::Init();
 
 		H2Tweaks::SunflareFix();
@@ -735,7 +369,6 @@ void InitH2Tweaks() {
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
 
-		WriteJmpTo(Memory::GetAddress(0x7E43), WinMain_Halo2);
 		WriteJmpTo(Memory::GetAddress(0x39EA2), is_remote_desktop);
 
 		//tags::on_map_load(fix_shaders_nvidia);
@@ -776,6 +409,9 @@ void InitH2Tweaks() {
 		NopFill(Memory::GetAddressRelative(0x46C7C7), 5);
 		NopFill(Memory::GetAddressRelative(0x45C338), 5);
 		NopFill(Memory::GetAddressRelative(0x473C61), 5);
+
+		//TODO: turn on if you want to debug halo2.exe from start of process
+		//p_is_debugger_present = (is_debugger_present_t)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
 	}
 
 	// disables profiles/game saves encryption

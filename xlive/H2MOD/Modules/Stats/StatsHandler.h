@@ -2,7 +2,7 @@
 
 #include "H2MOD.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\Memory\bitstream.h"
@@ -115,5 +115,5 @@ public:
 	static void Initialize();
 	static void game_life_cycle_update_event(e_game_life_cycle state);
 	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
-	static void server_command_event(ServerConsole::ServerConsoleCommands command);
+	static void server_command_event(ServerConsole::e_server_console_commands command);
 };

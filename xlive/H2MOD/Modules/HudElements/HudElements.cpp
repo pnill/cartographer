@@ -3,13 +3,13 @@
 #include "HudElements.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Util\Hooks\Hook.h"
 
@@ -103,7 +103,7 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 
 	if (Memory::IsDedicatedServer())
 		return;
-	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
+	if (h2mod->GetEngineType() == e_engine_type::_multiplayer) {
 
 		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
 		char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);

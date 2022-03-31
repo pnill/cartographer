@@ -7,7 +7,7 @@
 
 #include "GUI.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"

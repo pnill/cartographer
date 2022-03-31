@@ -8,20 +8,23 @@
 #include <string>
 #include <time.h>
 
+#include "..\Shell.h"
+
 #define crash_reports_path "\\halo2_crash_reports\\"
 
 using namespace Debug;
 
-LPTOP_LEVEL_EXCEPTION_FILTER expection_filter = nullptr;
-LONG WINAPI Debug::On_UnhandledException(struct _EXCEPTION_POINTERS* ExceptionInfo)
+LPTOP_LEVEL_EXCEPTION_FILTER exception_filter = nullptr;
+
+LONG WINAPI Debug::On_UnhandledException(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
 	// get documents path.
 	CHAR documents_path[MAX_PATH];
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents_path);
 
 	// get reports path.
-	char reports_path[400];
-	_fullpath(reports_path, documents_path, 400);
+	char reports_path[512];
+	_fullpath(reports_path, documents_path, sizeof(reports_path));
 	PathAppendA(reports_path, crash_reports_path);
 
 	// get exe name.
@@ -35,7 +38,7 @@ LONG WINAPI Debug::On_UnhandledException(struct _EXCEPTION_POINTERS* ExceptionIn
 
 	// get current timestamp.
 	time_t timer;
-	char timestamp[20];
+	char timestamp[128];
 	struct tm* tm_info;
 
 	time(&timer);
@@ -77,29 +80,31 @@ LONG WINAPI Debug::On_UnhandledException(struct _EXCEPTION_POINTERS* ExceptionIn
 		std::string message = "Halo 2 has encountered a fatal error and needs to exit,\n"
 			" a crash dump has been saved to '" + dump_file_name + "',\n"
 			"please note the path if you want to report the issue, as the file may be necessary.";
-		MessageBoxA(NULL, message.c_str(), "Crash!", 0);
+
+		_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Crash!", message.c_str());
 	}
 
 	LOG_TRACE_GAME("Halo 2 has crashed and a dump file has been saved to \"{}\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
-	if (expection_filter)
-		return expection_filter(ExceptionInfo);
+	if (exception_filter)
+		return exception_filter(ExceptionInfo);
 	else
 		return EXCEPTION_CONTINUE_SEARCH;
 }
+static_assert(std::is_same<decltype(&Debug::On_UnhandledException), LPTOP_LEVEL_EXCEPTION_FILTER>::value, "invalid exception handler declaration");
 
-void Debug::init()
+void Debug::Init()
 {
-	LPTOP_LEVEL_EXCEPTION_FILTER expection_filter = SetUnhandledExceptionFilter(Debug::On_UnhandledException);
+	exception_filter = SetUnhandledExceptionFilter(Debug::On_UnhandledException);
 }
 
 void Debug::set_expection_filter(LPTOP_LEVEL_EXCEPTION_FILTER filter)
 {
-	LPTOP_LEVEL_EXCEPTION_FILTER expection_filter = filter;
+	exception_filter = filter;
 }
 
 LPTOP_LEVEL_EXCEPTION_FILTER Debug::get_expection_filter()
 {
-	return expection_filter;
+	return exception_filter;
 }

@@ -15,7 +15,7 @@
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
@@ -493,7 +493,7 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 }
 
 // Client Sided Patch
-void H2MOD::disable_weapon_pickup(bool b_Enable)
+void H2MOD::disable_weapon_pickup(bool bEnable)
 {
 	static BYTE oldBytes[5];
 	static BYTE oldBytesRead = false;
@@ -505,7 +505,7 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 		oldBytesRead = true;
 	}
 
-	if (b_Enable) 
+	if (bEnable) 
 	{
 		WriteBytes(address, oldBytes, sizeof(oldBytes));
 	}
@@ -638,7 +638,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	ControllerInput::SetSensitiviy(H2Config_controller_sens);
 	MouseInput::SetSensitivity(H2Config_mouse_sens);
 	HudElements::OnMapLoad();
-	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
+	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
 		addDebugText("Engine type: Multiplayer");
 		
@@ -749,13 +749,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	return ret;
 }
 
-typedef BOOL(__stdcall *is_debugger_present_t)();
-is_debugger_present_t is_debugger_present_method;
-
-BOOL __stdcall isDebuggerPresent() {
-	return false;
-}
-
 typedef void(__cdecl* change_team_t)(int a1, int a2);
 change_team_t p_change_local_team;
 
@@ -849,13 +842,13 @@ bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 bool GrenadeChainReactIsEngineMPCheck() {
 	if (AdvLobbySettings_grenade_chain_react)
 		return false;
-	return h2mod->GetEngineType() == e_engine_type::_mutliplayer;
+	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
 	if (AdvLobbySettings_banshee_bomb)
 		return false;
-	return h2mod->GetEngineType() == e_engine_type::_mutliplayer;
+	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
@@ -907,7 +900,7 @@ bool device_active = true;
 //This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
+	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
@@ -1283,9 +1276,6 @@ void H2MOD::ApplyHooks() {
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 
 		PatchCall(Memory::GetAddress(0x169E59), aim_assist_targeting_clear_hook);
-
-		//TODO: turn on if you want to debug halo2.exe from start of process
-		//is_debugger_present_method = (is_debugger_present)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);

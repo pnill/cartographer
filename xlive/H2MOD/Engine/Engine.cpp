@@ -13,18 +13,6 @@ namespace Engine
 		return p_get_game_life_cycle();
 	}
 
-	bool __cdecl is_game_minimized()
-	{
-		typedef bool(__cdecl* is_game_is_minimized_t)();
-		auto p_game_is_minimized = Memory::GetAddress<is_game_is_minimized_t>(0x28729);
-		
-		//Check just in case this gets ran by server
-		if (Memory::IsDedicatedServer())
-			return false;
-		
-		return p_game_is_minimized();
-	}
-
 	e_engine_type get_current_engine_type()
 	{
 		typedef e_engine_type(__cdecl* get_current_engine_type_t)();

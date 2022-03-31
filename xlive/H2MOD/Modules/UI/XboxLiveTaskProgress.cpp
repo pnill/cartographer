@@ -52,7 +52,7 @@ void c_xbox_live_task_progress_menu::ApplyPatches()
 				&& menu_ui_bitmaps->block_data_offset != -1)
 			{
 				char* ui_bitmap = tags::get_tag_data() + menu_ui_bitmaps->block_data_offset;
-				point2d fixed_bitmaps_placemets[4] = { {-292, 210}, {150, -130}, {-282, 198}, {-230, 242} };
+				point2d fixed_bitmaps_placemets[] = { {-292, 210}, {150, -130}, {-282, 198}, {-230, 242} };
 				for (int i = 0; i < menu_ui_bitmaps->block_count; i++)
 				{
 					// fix the ui bitmap elements position

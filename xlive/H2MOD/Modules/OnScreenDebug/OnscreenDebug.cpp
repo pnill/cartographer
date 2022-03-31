@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 
 char** DebugStr;
 const int DebugTextArrayLenMax = 160;
@@ -110,7 +110,7 @@ void addDebugText(const char* format, ...)
 	va_end(valist);
 }
 
-void initOnScreenDebugText() {
+void InitOnScreenDebugText() {
 	initialisedDebugText = true;
 	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"), true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
 	DebugStr = (char**)calloc(DebugTextArrayLenMax, sizeof(char*));

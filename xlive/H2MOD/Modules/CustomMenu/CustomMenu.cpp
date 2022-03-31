@@ -11,12 +11,12 @@
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\Updater\Updater.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "Util\Hooks\Hook.h"
@@ -414,9 +414,9 @@ char __stdcall sub_23CC18_CM(int thisptr)//__thiscall
 	// reconvert back to single byte string, because the rest of the menus code apparently uses single byte
 	// but for some retarded reason the virtual keyboard uses wide string
 	wchar_t* returnString = *(wchar_t**)(thisptr + 0xC64);
-	int returnStrLen = wcslen(returnString) + 1;
-	char* end = (char*)malloc(sizeof(char) * returnStrLen);
-	wcstombs2(end, returnString, returnStrLen);
+	size_t returnStrLen = (wcslen(returnString) + 1) * sizeof(char);
+	char* end = (char*)malloc(returnStrLen);
+	wcstombs2(returnString, end, returnStrLen);
 	strcpy((char*)returnString, end);
 	free(end);
 
@@ -2884,7 +2884,7 @@ void CMSetupVFTables_AdvSettings() {
 }
 
 int __cdecl CustomMenu_AdvSettings(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer ? 4 : 4, 272);
+	return CustomMenu_CallHead(a1, menu_vftable_1_AdvSettings, menu_vftable_2_AdvSettings, (DWORD)&CMButtonHandler_AdvSettings, NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_multiplayer ? 4 : 4, 272);
 }
 
 void GSCustomMenuCall_AdvSettings() {
@@ -2942,7 +2942,7 @@ static bool CMButtonHandler_AdvLobbySettings(int button_id) {
 	}
 	else if (button_id == 1) {
 		loadLabelToggle_AdvLobbySettings(button_id + 1, 0xFFFFFFF2, !(AdvLobbySettings_disable_kill_volumes = !AdvLobbySettings_disable_kill_volumes));
-		if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer && !AdvLobbySettings_disable_kill_volumes) {
+		if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_multiplayer && !AdvLobbySettings_disable_kill_volumes) {
 			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0x8, 0x9);
 		}
 		H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
@@ -2992,7 +2992,7 @@ __declspec(naked) void sub_20F790_CM_nak_AdvLobbySettings() {//__thiscall
 
 void* __stdcall sub_248beb_deconstructor_AdvLobbySettings(LPVOID lpMem, char a2)//__thiscall
 {
-	if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
+	if (NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() == e_engine_type::_multiplayer) {
 		//advLobbySettings->sendLobbySettingsPacket();
 	}
 	
@@ -4307,9 +4307,7 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 	}
 }
 
-
-
-void initGSCustomMenu() {
+void InitCustomMenu() {
 	
 #pragma region Init_Cartographer_Labels
 
@@ -4738,7 +4736,7 @@ void initGSCustomMenu() {
 	replace_brightness_menu();
 }
 
-void deinitGSCustomMenu() {
+void DeinitCustomMenu() {
 	if (H2IsDediServer)
 		return;
 
@@ -5213,9 +5211,9 @@ char __stdcall sub_23CF88_CM(int thisptr, int* a2) //__thiscall
 	}
 	if (v20) {
 		wchar_t* returnString = (wchar_t*)*(DWORD*)((BYTE*)v4 + 0xC64);
-		int returnStrLen = wcslen(returnString) + 1;
-		char* end = (char*)calloc(returnStrLen, sizeof(char));
-		wcstombs2(end, returnString, returnStrLen);
+		int returnStrLen = (wcslen(returnString) + 1) * sizeof(char);
+		char* end = (char*)malloc(returnStrLen);
+		wcstombs2(returnString, end, returnStrLen);
 		strcpy((char*)returnString, end);
 		free(end);
 	}

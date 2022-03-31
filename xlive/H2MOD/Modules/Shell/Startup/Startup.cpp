@@ -1,15 +1,20 @@
 #include "stdafx.h"
 
 #include "Startup.h"
+#include "WinMainH2.h"
+#include "..\Config.h"
+#include "..\Shell.h"
+
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Config\Config.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
+#include "H2MOD\Modules\Updater\Updater.h"
 
-#include "Util\Debug\Debug.h"
+#include "..\Debug\Debug.h"
+
 #include "Util\filesys.h"
 #include "Util\hash.h"
 #include "Util\Hooks\Hook.h"
@@ -39,37 +44,21 @@ h2log* voice_log = nullptr;
 
 std::random_device rd;
 
-ProcessInfo game_info;
-
-bool H2IsDediServer = false;
 DWORD H2BaseAddr = NULL;
+bool H2IsDediServer = false;
+
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
 HWND H2hWnd = NULL;
 
 int instanceNumber = 0;
+
 int H2GetInstanceId() {
 	return instanceNumber;
 }
 
-void fileFail(FILE* fp) {
-	int fperrno = GetLastError();
-	if (fperrno == EACCES || fperrno == EIO || fperrno == EPERM) {
-		MessageBoxA(NULL, "Cannot write a file. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else if (fperrno == ESRCH) {
-		MessageBoxA(NULL, "Probably a missing folder issue if file writing related. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else if (!fp) {
-		char NotificationPlayerText[20];
-		sprintf(NotificationPlayerText, "Error 0x%x", fperrno);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
-	}
-}
-
-void initInstanceNumber() {
+void InitInstanceNumber() {
 	addDebugText("Determining Process Instance Number.");
 	HANDLE mutex;
 	DWORD lastErr;
@@ -86,17 +75,15 @@ void initInstanceNumber() {
 	addDebugText("You are Instance #%d.", instanceNumber);
 }
 
-void postConfig() {
+void PostH2Config() {
 
-	wchar_t mutexName2[255];
+	wchar_t mutexName2[256];
 	swprintf(mutexName2, ARRAYSIZE(mutexName2), L"Halo2BasePort#%d", H2Config_base_port);
 	HANDLE mutex2 = CreateMutex(0, TRUE, mutexName2);
 	DWORD lastErr2 = GetLastError();
 	if (lastErr2 == ERROR_ALREADY_EXISTS) {
-		char NotificationPlayerText[120];
-		sprintf(NotificationPlayerText, "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "BASE PORT BIND WARNING!", MB_OK);
+		addDebugText("Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
+		_Shell::OpenMessageBox(NULL, MB_ICONWARNING, "BASE PORT BIND WARNING!", "Base port %d is already bound to!\nExpect MP to not work!", H2Config_base_port);
 	}
 	addDebugText("Base port: %d.", H2Config_base_port);
 }
@@ -147,7 +134,7 @@ bool configureXinput() {
 				if (_access_s("xinput9_1_0.dll", 04) != 0) {
 					char xinputError[] = "ERROR! An xinput9_1_0.dll does not exist in the local game directory or is inaccessible!\nFor \'Split-screen\' play, any supported .dll is required.";
 					addDebugText(xinputError);
-					MessageBoxA(NULL, xinputError, "DLL Missing Error", MB_OK);
+					_Shell::OpenMessageBox(NULL, MB_ICONERROR, "DLL Missing Error", xinputError);
 					exit(EXIT_FAILURE);
 				}
 				int xinput_index = -1;
@@ -179,7 +166,7 @@ bool configureXinput() {
 				if (xinput_index < 0) {
 					char xinputError[] = "ERROR! For \'Split-screen\' play, a supported xinput9_1_0.dll is required to be installed in the local game directory!\nOr you may install a custom one manually in the xinput/p??/ folders.";
 					addDebugText(xinputError);
-					MessageBoxA(NULL, xinputError, "Incorrect DLL Error", MB_OK);
+					_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Incorrect DLL Error", xinputError);
 					exit(EXIT_FAILURE);
 				}
 
@@ -191,7 +178,7 @@ bool configureXinput() {
 
 				FILE* xinput_patched = fopen(xinputName, "r+b");
 				if (!xinput_patched) {
-					fileFail(xinput_patched);
+					_Shell::FileErrorDialog(errno);
 					report_error("Can't open xinput file for patching.");
 					exit(EXIT_FAILURE);
 				}
@@ -208,10 +195,8 @@ bool configureXinput() {
 				else {
 					fclose(xinput_patched);
 					remove(xinputName);
-					char xinputError[255];
-					sprintf(xinputError, "ERROR! Failed to write hex edit to file: %s", xinputName);
-					addDebugText(xinputError);
-					MessageBoxA(NULL, xinputError, "DLL Edit Error", MB_OK);
+					addDebugText("ERROR! Failed to write hex edit to file: %s", xinputName);
+					_Shell::OpenMessageBox(NULL, MB_OK, "DLL Edit Error", "ERROR! Failed to write hex edit to file:\n %s", xinputName);
 					exit(EXIT_FAILURE);
 				}
 				fclose(xinput_patched);
@@ -222,7 +207,7 @@ bool configureXinput() {
 	return true;
 }
 
-void initLocalAppData() {
+void InitLocalAppData() {
 	addDebugText("Find AppData Local.");
 
 	if (H2AppDataLocal != 0) {
@@ -250,7 +235,7 @@ void initLocalAppData() {
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
@@ -270,7 +255,7 @@ void initLocalAppData() {
 			int fperrno1 = GetLastError();
 			if (fperrno1 == ERROR_ALREADY_EXISTS || fperrno1 == ERROR_SUCCESS) {
 				int appdatabuflen = wcslen(local2) + 1;
-				H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
+				H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
 				wcscpy_s(H2AppDataLocal, appdatabuflen, local2);
 			}
 		}
@@ -278,9 +263,10 @@ void initLocalAppData() {
 
 	if (H2AppDataLocal == nullptr) {
 		int appdatabuflen = wcslen(H2ProcessFilePath) + 1;
-		H2AppDataLocal = (wchar_t*)calloc(1, sizeof(wchar_t) * appdatabuflen);
-		swprintf(H2AppDataLocal, appdatabuflen, L"%ws", H2ProcessFilePath);
+		H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
+		wcscpy_s(H2AppDataLocal, appdatabuflen, H2ProcessFilePath);
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
+		addDebugText(H2AppDataLocal);
 	}
 	else {
 		addDebugText("Found AppData Local: %s", H2AppDataLocal);
@@ -288,41 +274,6 @@ void initLocalAppData() {
 }
 
 CRITICAL_SECTION log_section;
-
-H2Types detect_process_type()
-{
-	// try and detect type based on module name.
-	if (GetModuleHandleW(L"h2server.exe"))
-		return H2Types::H2Server;
-	else if (GetModuleHandleW(L"Halo2.exe"))
-		return H2Types::H2Game;
-
-	// fallback to checking file information in case the file was renamed.
-	wchar_t exe_file_path[_MAX_PATH + 1];
-	int result = GetModuleFileNameW(NULL, exe_file_path, ARRAYSIZE(exe_file_path));
-	if (result <= _MAX_PATH && GetLastError() != ERROR_INSUFFICIENT_BUFFER) {
-		DWORD version_info_size = GetFileVersionInfoSizeW(exe_file_path, NULL);
-		if (version_info_size != 0) {
-
-			BYTE *version_info = new BYTE[version_info_size];
-			 if (GetFileVersionInfoW(exe_file_path, NULL, version_info_size, version_info)) {
-				wchar_t *orginal_filename;
-				size_t filename_len;
-				// shouldn't be hardcoded but who cares
-				VerQueryValueW(version_info, L"\\StringFileInfo\\040904b0\\OriginalFilename", (LPVOID*)&orginal_filename, &filename_len);
-
-				std::wstring exe_orginal_filename = orginal_filename;
-				delete[] version_info;
-
-				if (exe_orginal_filename == L"h2server.exe")
-					return H2Types::H2Server;
-				else if (exe_orginal_filename == L"Halo2.exe")
-					return H2Types::H2Game;
-			}
-		}
-	}
-	return H2Types::Invalid;
-}
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
@@ -353,52 +304,38 @@ void ServerStartupFixes()
 ///Before the game window appears
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
-	Debug::init();
 
-	game_info.base = GetModuleHandle(NULL);
-	game_info.process_type = detect_process_type();
+	Debug::Init();
 
-	if (game_info.process_type == H2Types::Invalid)
-	{
-		MessageBoxA(NULL, "Project Cartographer loaded into unsupported process, will now exit!", "ERROR!", MB_OK);
-		TerminateProcess(GetCurrentProcess(), 1);
-	}
+	Memory::Initialize();
 
-	H2BaseAddr = (DWORD)game_info.base;
+	H2BaseAddr = Memory::GetAddress();
+	H2IsDediServer = Memory::IsDedicatedServer();
 
-	if (game_info.process_type == H2Types::H2Server)
-	{
-		H2IsDediServer = true;
-	}
-	else if (game_info.process_type == H2Types::H2Game)
-	{
-		H2IsDediServer = false;
-	}
-	Memory::setBaseAddress(H2BaseAddr, H2IsDediServer);
-
-	initInstanceNumber();
+	InitInstanceNumber();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
-	H2ProcessFilePath = (wchar_t*)calloc(1, wcslen(ArgList[0]) * sizeof(wchar_t));
+	H2ProcessFilePath = (wchar_t*)calloc(wcslen(ArgList[0]) + 1, sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
 	if (rtncodepath == -1) {
 		std::wstring path = GetExeDirectoryWide();
 		path.append(L"\\");
-		H2ProcessFilePath = (wchar_t*)calloc(1, path.length() * sizeof(wchar_t));
+		H2ProcessFilePath = (wchar_t*)calloc(path.length() + 1, sizeof(wchar_t));
 		swprintf(H2ProcessFilePath, path.c_str());
 	}
+
 	// fix the game not finding the files it needs if the current directory is not the install directory
 	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
 	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
 	
-	initLocalAppData();
+	InitLocalAppData();
 
 	// initialize curl
 	curl_global_init(CURL_GLOBAL_ALL);
 
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
-	initOnScreenDebugText();
+	InitOnScreenDebugText();
 
 	if (H2IsDediServer) {
 		addDebugText("Process is Dedi-Server");
@@ -424,7 +361,8 @@ void InitH2Startup() {
 	}
 
 	InitH2Config();
-	postConfig();
+	PostH2Config();
+
 	EnterCriticalSection(&log_section);
 
 	// prepare default log files if enabled, after we read the H2Config
@@ -452,16 +390,15 @@ void InitH2Startup() {
 	//apply any network hooks
 	CustomNetwork::ApplyNetworkPatches();
 	InitH2Tweaks();
-	extern void initGSCustomLanguage();
-	initGSCustomLanguage();
-	extern void initGSCustomMenu();
-	initGSCustomMenu();
-	extern void initGSRunLoop();
-	initGSRunLoop();
+	InitH2WinMainPatches();
+	extern void InitCustomLanguage();
+	InitCustomLanguage();
+	extern void InitCustomMenu();
+	InitCustomMenu();
+	extern void InitRunLoop();
+	InitRunLoop();
 	addDebugText("ProcessStartup finished.");
 }
-
-#include "H2MOD\Modules\Updater\Updater.h"
 
 ///After the game window appears
 void InitH2Startup2() {
@@ -484,12 +421,12 @@ void InitH2Startup2() {
 }
 
 void DeinitH2Startup() {
-	extern void deinitGSRunLoop();
-	deinitGSRunLoop();
-	extern void deinitGSCustomMenu();
-	deinitGSCustomMenu();
-	extern void deinitGSCustomLanguage();
-	deinitGSCustomLanguage();
+	extern void DeinitRunLoop();
+	DeinitRunLoop();
+	extern void DeinitCustomMenu();
+	DeinitCustomMenu();
+	extern void DeinitCustomLanguage();
+	DeinitCustomLanguage();
 	DeinitH2Tweaks();
 	DeinitH2Accounts();
 	DeinitH2Config();

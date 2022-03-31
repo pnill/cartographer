@@ -1,10 +1,8 @@
 #pragma once
 
-
-
 namespace ServerConsole
 {
-	enum ServerConsoleCommands {
+	enum e_server_console_commands {
 		ban,
 		description,
 		exit,
@@ -23,11 +21,12 @@ namespace ServerConsole
 		vip,
 		any
 	};
-	static std::map<std::wstring, ServerConsoleCommands> s_commandsMap;
+
+	static std::map<std::wstring, e_server_console_commands> s_commandsMap;
 	void ApplyHooks();
 	void logToDedicatedServerConsole(const wchar_t* string, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);
-	void AddVip(std::wstring gamertag);
+	void AddVip(std::wstring gamerTag);
 	void ClearVip();
 	/**
 	 * \brief Proxies sending a command to the server via H2Admin or H2Server

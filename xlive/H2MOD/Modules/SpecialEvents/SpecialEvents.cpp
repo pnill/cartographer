@@ -16,7 +16,7 @@
 #include "Blam\Enums\HaloStrings.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
@@ -136,7 +136,7 @@ namespace SpecialEvents
 				track_loop->TagIndex = -1;
 			}
 		}
-		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenery, "carto_shared");
 			auto w_datum_i = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", blam_tag::tag_group_type::weathersystem, "carto_shared");
@@ -335,7 +335,7 @@ namespace SpecialEvents
 
 	void PaddysOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -438,7 +438,7 @@ namespace SpecialEvents
 
 	void MookMaddnessOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -723,7 +723,7 @@ namespace SpecialEvents
 
 	void HalloweenOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == _mutliplayer)
+		if (h2mod->GetEngineType() == _multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -813,7 +813,7 @@ namespace SpecialEvents
 
 	void AddNewMarkers()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::_mutliplayer) {
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer) {
 			auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(mode_elite_datum);
 			auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));

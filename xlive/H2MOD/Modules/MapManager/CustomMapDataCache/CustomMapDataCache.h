@@ -97,7 +97,7 @@ struct s_custom_map_data
 	s_custom_map_entry_linked_list* custom_map_to_add_linked_list; // un-cached maps that have to be added
 	wchar_t custom_maps_folder_path[MAX_PATH];
 
-	static void applyCustomMapExtensionLimitPatches();
+	static void ApplyCustomMapExtensionLimitPatches();
 
 	static void create_custom_map_data_directory();
 
