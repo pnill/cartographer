@@ -1,27 +1,27 @@
 #pragma once
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
-#include "c_brightness_menu.h"
-#include "CustomMenuGlobals.h"
 
-static const int CMLabelMenuId_AccountList = 0xFF000009;
+#include "..\c_brightness_menu.h"
+#include "..\CustomMenuGlobals.h"
+#include "..\CustomLanguage.h"
 
 class c_account_edit_list : public c_list_widget
 {
 public:
-	char account_list_items[132 * 4];
+	// 4 items displayed at once in the list
+	char list_items[132 * 4];
 	int field_2C0;
 	c_slot2<c_account_edit_list> slot_2_unk;
 	int default_selected_button;
 	bool account_removal_mode;
 	// button handler callback
-	
 
 	c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode);
 
 	virtual char* get_item_list() override
 	{
-		return account_list_items; // returns pointer to edit list
+		return list_items; // returns pointer to edit list
 	}
 
 	virtual int get_list_item_count() override
@@ -62,7 +62,7 @@ public:
 
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
-	c_account_list_menu::c_account_list_menu(int a3, int a4, int a5, bool account_removal_mode);
+	c_account_list_menu::c_account_list_menu(int _ui_channel, int a4, __int16 _flags, bool account_removal_mode);
 
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override
@@ -75,7 +75,7 @@ public:
 	virtual int IUnkFunc23(int a2) override
 	{
 		// int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
-		return sub_2111ab_CMLTD((int)this, a2, 0xFF000009, 0xFFFFFFF0, 0xFFFFFFF1);
+		return sub_2111ab_CMLTD((int)this, a2, CMLabelMenuId_AccountList, 0xFFFFFFF0, 0xFFFFFFF1);
 		// return c_screen_with_menu::IUnkFunc23(a2);
 	}
 

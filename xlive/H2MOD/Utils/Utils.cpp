@@ -151,7 +151,7 @@ void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* 
 					continue;
 				}
 				else {
-					addDebugText("Incorrect Version! Continue searching!");
+					addDebugText("Incorrect version! Continue searching!");
 				}
 			}
 			int rtnCode = interpretSettingFunc(fileLine, foundFirstHeader ? version : 0, lineNumber);

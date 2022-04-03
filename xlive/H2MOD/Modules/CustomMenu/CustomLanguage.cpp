@@ -427,8 +427,8 @@ void saveCustomLanguages() {
 
 #pragma endregion
 
-typedef char*(__stdcall *tH2GetLabel)(int, int, int, int);
-tH2GetLabel pH2GetLabel;
+typedef char*(__stdcall *H2GetLabel_t)(int, int, int, int);
+H2GetLabel_t pH2GetLabel;
 char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	//int label_menu_id = *(int*)(*(int*)a1 + 8 * a3 + 4);
 	int label_menu_id = a3;
@@ -505,7 +505,6 @@ void setGameLanguage() {
 		case 4:
 			language_id = _lang_id_chinese;
 			break;
-
 		default:
 			language_id = _lang_id_english;
 			break;
@@ -609,8 +608,8 @@ void setCustomLanguage(int main) {
 }
 
 #pragma region Weapon Pickup training string fix
-typedef void(__stdcall* string_id_to_wide_string)(int thisx, int string_id, wchar_t *a3, int a4, int a5);
-string_id_to_wide_string p_string_id_to_wide_string;
+typedef void(__stdcall* string_id_to_wide_string_t)(int thisx, int string_id, wchar_t *a3, int a4, int a5);
+string_id_to_wide_string_t p_string_id_to_wide_string;
 
 void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *output, int a4, int a5)
 {
@@ -688,9 +687,9 @@ void InitCustomLanguage() {
 		overrideCoreH2Labels();
 		read_custom_labels();
 
-		p_string_id_to_wide_string = (string_id_to_wide_string)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
+		p_string_id_to_wide_string = (string_id_to_wide_string_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
 
-		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
+		pH2GetLabel = (H2GetLabel_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
 
 		//Hook the function that sets the font table filename.
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);

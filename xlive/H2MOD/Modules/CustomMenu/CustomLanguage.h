@@ -1,6 +1,11 @@
 #pragma once
-#include <vector>
-#include <unordered_map>
+
+const int CMLabelMenuId_VKeyTest = 0xFF00000B;
+const int CMLabelMenuId_EscSettings = 0xFF000004;
+static const int CMLabelMenuId_Error = 0xFF000001;
+static const int CMLabelMenuId_AccountList = 0xFF000009;
+static const int CMLabelMenuId_AccountEdit = 0xFF00000A;
+static const int CMLabelMenuId_AccountCreate = 0xFF00000C;
 
 void InitCustomLanguage();
 void DeinitCustomLanguage();

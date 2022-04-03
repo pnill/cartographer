@@ -8,7 +8,7 @@
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-#include "CustomLanguage.h"
+#include "..\CustomLanguage.h"
 
 #include "H2MOD\Modules\Shell\Config.h"
 
@@ -30,7 +30,7 @@ void c_account_list_menu::updateAccountingActiveHandle(bool active) {
 	}
 }
 
-static void CM_AccountList_Setup_Buttons() {
+static void AccountListSetupButtons() {
 	for (int i = 0; i < H2AccountCount; i++) {
 		add_cartographer_label(CMLabelMenuId_AccountList, 1 + i, H2AccountArrayUsername[i] ? H2AccountArrayUsername[i] : H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0005), true);
 	}
@@ -41,31 +41,31 @@ static void CM_AccountList_Setup_Buttons() {
 	add_cartographer_label(CMLabelMenuId_AccountList, 1 + H2AccountCount + 3, H2CustomLanguageGetLabel(CMLabelMenuId_AccountList, 0xFFFF0001 + (accountRemoveMode ? 1 : 0)), true);
 }
 
-void* __cdecl c_account_list_menu::open(s_new_ui_screen_parameters* a1)
+void* __cdecl c_account_list_menu::open(s_new_ui_screen_parameters* parameters)
 {
 	c_account_list_menu* account_list_menu = nullptr;
 	BYTE* ui_buffer = (BYTE*)ui_memory_pool_allocate(sizeof(c_account_list_menu), 0);
 
-	CM_AccountList_Setup_Buttons();
+	AccountListSetupButtons();
 
 	if (ui_buffer) {
 		c_account_list_menu::updateAccountingActiveHandle(true);
-		account_list_menu = new (ui_buffer) c_account_list_menu(a1->ui_channel, a1->field_8, HIWORD(a1->flags), accountRemoveMode); // manually call the constructor
+		account_list_menu = new (ui_buffer) c_account_list_menu(parameters->ui_channel, parameters->field_8, HIWORD(parameters->flags), accountRemoveMode); // manually call the constructor
 	}
 
 	account_list_menu->field_6C = true;
-	user_interface_register_screen_to_channel(account_list_menu, a1);
+	user_interface_register_screen_to_channel(account_list_menu, parameters);
 	return account_list_menu;
 }
 
-c_account_list_menu::c_account_list_menu(int _ui_channel, int _a4, int _flags, bool _account_removal_mode) :
-	c_screen_with_menu(BRIGHTNESS_MENU_ID, _ui_channel, _a4, _flags, &this->account_edit_list),
+c_account_list_menu::c_account_list_menu(int _ui_channel, int a4, __int16 _flags, bool _account_removal_mode) :
+	c_screen_with_menu(BRIGHTNESS_MENU_ID, _ui_channel, a4, _flags, &this->account_edit_list, true),
 	account_edit_list(_flags, H2AccountCount, H2AccountLastUsed, _account_removal_mode)
 {
 }
 
 c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _default_selected_button, bool _account_removal_mode) :
-	c_list_widget(_flags)
+	c_list_widget(_flags, true)
 {
 	auto sub_2113C6 = Memory::GetAddress<int(__thiscall*)(void*)>(0x2113C6);
 	auto sub_2113D3 = Memory::GetAddress<void*(__thiscall*)(void*, void*)>(0x2113D3);
@@ -75,7 +75,7 @@ c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _de
 
 	// this constructs the buttons list widgets drawn inside the window
 	// brightness menu can display 4 widget list buttons at once
-	p_vector_constructor(this->account_list_items, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
+	p_vector_constructor(this->list_items, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
 
 	this->field_2C0 = 0;
 	sub_2113C6(&this->slot_2_unk.field_8);
@@ -127,7 +127,7 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 	bool close_parent_screen = false;
 
 	s_new_ui_screen_parameters new_ui_account_list_screen;
-	new_ui_account_list_screen.data_new(1 << *(int*)(*a2 + 4), parent_screen_ui_channel, 4, c_account_list_menu::open);
+	new_ui_account_list_screen.data_new(0, 1 << *(int*)(*a2 + 4), parent_screen_ui_channel, 4, c_account_list_menu::open);
 
 	if (button_id == H2AccountCount + 1) {
 		if (!this->account_removal_mode) {
@@ -150,7 +150,7 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 		if (this->account_removal_mode) {
 			H2AccountAccountRemove(button_id);
 			// update button list
-			CM_AccountList_Setup_Buttons();
+			AccountListSetupButtons();
 			// then re-open the menu
 			accountRemoveMode = false; // reset global accountRemove state
 			new_ui_account_list_screen.ui_screen_load_proc_exec();

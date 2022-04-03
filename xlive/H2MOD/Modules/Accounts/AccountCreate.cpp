@@ -5,8 +5,9 @@
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Utils\Utils.h"
+
+#include "H2MOD/Modules/CustomMenu/c_error_menu.h"
 
 #define ERROR_CODE_INVALID_PARAM -1
 #define ERROR_CODE_INVALID_EMAIL -2
@@ -105,29 +106,29 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
 			//internal error
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_EMAIL) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01A, 0xFFFFF01B);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01A, 0xFFFFF01B);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_USERNAME) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01C, 0xFFFFF01D);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01C, 0xFFFFF01D);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01E, 0xFFFFF01F);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01E, 0xFFFFF01F);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_EMAIL) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF020, 0xFFFFF021);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF020, 0xFFFFF021);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_USERNAME) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF022, 0xFFFFF023);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF022, 0xFFFFF023);
 		}
 		else if (rtn_code == ERROR_CODE_BANNED_EMAIL_DOMAIN) {
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF024, 0xFFFFF025);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF024, 0xFFFFF025);
 		}
 		else {
 			//unknown error!
-			GSCustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
+			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
 		}
 	}
 	else {

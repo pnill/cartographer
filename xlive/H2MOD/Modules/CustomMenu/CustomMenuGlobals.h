@@ -1,4 +1,5 @@
 #pragma once
+
 #include "c_list_widget.h"
 #include "c_screen_with_menu.h"
 
@@ -16,9 +17,9 @@ enum e_ui_channel
 
 struct __declspec(align(4)) s_new_ui_screen_parameters
 {
-	void data_new(__int16 flags, int ui_channel, int a4, void* (__cdecl* ui_screen_load_cb)(s_new_ui_screen_parameters*))
+	void data_new(__int16 _flags1, __int16 _flags2, int ui_channel, int a4, void* (__cdecl* ui_screen_load_cb)(s_new_ui_screen_parameters*))
 	{
-		this->flags = (DWORD)(flags << 16);
+		this->flags = ((DWORD)_flags1 | (DWORD)(_flags2 << 16));
 		this->ui_channel = ui_channel;
 		this->field_8 = a4;
 		this->field_10 = -1;
@@ -59,18 +60,19 @@ BYTE* ui_memory_pool_allocate(int size, int a2);
 int __cdecl user_interface_register_screen_to_channel(void* ui_memory, s_new_ui_screen_parameters* parameters);
 int __cdecl user_interface_back_out_from_channel(int ui_channel, int screen_idx);
 
-#define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
-
-// we just re-use the first seventeen keyboard id's in default code for now
-#define VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW (VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX * 2)
-
 void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id);
 
+int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu_button_handler, int number_of_buttons);
 int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description);
 void __stdcall sub_2101a4_CMLTD(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
 char __stdcall sub_21bb0b_CMLTD(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description);
 void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label_menu_id);
-int __cdecl CustomMenu_CallHead_(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);
-void CallWgit_(int WgitScreenfunctionPtr);
-void CallWgit_(int WgitScreenfunctionPtr, int open_method);
-void CallWgit_(int WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
+
+// vkeyboard related
+int __stdcall sub_23ae3c_CMLTD(void* thisptr, int label_menu_id, int label_id_title, int label_id_description);
+char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description);
+
+int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);
+void CallWgit(int WgitScreenfunctionPtr);
+void CallWgit(int WgitScreenfunctionPtr, int open_method);
+void CallWgit(int WgitScreenfunctionPtr, int open_method, int menu_wgit_type);

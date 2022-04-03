@@ -2,19 +2,30 @@
 
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "c_user_interface_widget.h"
+
 #include "CustomMenuGlobals.h"
 
-class c_list_widget : public c_user_interface_widget
+class c_list_widget : protected c_user_interface_widget
 {
 public:
 	// c_lost_widget specific data
 	s_data_array* list_data_array;
 	char gap_70[60];
 
-	c_list_widget::c_list_widget(int a2)
+	// if you are implementing the child's class ctor, set _call_ctor to true
+	// if not (you're calling the game's bin ctor), set to false
+	c_list_widget::c_list_widget(int a2, bool _call_ctor)
+		: c_user_interface_widget(_widget_type_list_widget, a2, false)
 	{
-		auto p_c_list_widget_ctor = Memory::GetAddress<c_list_widget*(__thiscall*)(void*, int)>(0x213B1C);
-		p_c_list_widget_ctor(this, a2);
+		typedef c_list_widget* (__thiscall* c_list_widget_ctor_t)(c_list_widget*, int);
+		auto p_c_list_widget = Memory::GetAddressRelative<c_list_widget_ctor_t>(0x613B1C);
+
+		void* old_vtbl = *(void**)this;
+		if (_call_ctor)
+		{
+			p_c_list_widget(this, a2);
+		}
+		*(void**)this = old_vtbl;
 	}
 
 	// interface
@@ -50,7 +61,7 @@ public:
 		return (this->* * pFn)();
 	}
 
-	virtual void IUnkFunc5_maybe_debug(int a2) override
+	virtual void IUnkFunc5_used_by_virtual_kb(int a2) override
 	{
 		typedef void(class_type::** fnT)(int);
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(4);
@@ -106,9 +117,9 @@ public:
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc13(DWORD* a2) override
+	virtual int IUnkFunc13(int* a2) override
 	{
-		typedef int(class_type::** fnT)(DWORD*);
+		typedef int(class_type::** fnT)(int*);
 		auto pFn = c_list_widget_base_vtable_get_func_ptr<fnT>(12);
 		return (this->* * pFn)(a2);
 	}
