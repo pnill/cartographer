@@ -10,11 +10,11 @@ XUID VariantPlayer::GetXUID(datum object_index, bool player)
 	s_biped_data_definition* playerUnit = object_get_fast_unsafe<s_biped_data_definition>(object_index);
 
 	if (player)
-		return s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index))->identifier;
+		return s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index))->identifier;
 	else
 	{
 		short player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerUnit->controlling_player_index);
-		return s_player::getPlayer(player_index)->identifier;
+		return s_player::GetPlayer(player_index)->identifier;
 	}
 }
 

@@ -252,17 +252,17 @@ struct s_player
 	- This functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
 	*/
 
-	static s_data_array* getArray();
-	static bool indexValid(int playerIndex);
-	static s_player* getPlayer(int playerIndex);
-	static e_object_team getTeam(int playerIndex);
-	static void setTeam(int playerIndex, e_object_team team);
-	static void setUnitBipedType(int playerIndex, s_player::e_character_type bipedType);
-	static void setUnitBipedType(int playerIndex, byte representationIndex);
-	static void setBipedSpeed(int playerIndex, float speed);
-	static wchar_t* getName(int playerIndex);
-	static datum getPlayerUnitDatumIndex(int playerIndex);
-	static XUID getIdentifier(int playerIndex);
+	static s_data_array* GetArray();
+	static bool IndexValid(int playerIndex);
+	static s_player* GetPlayer(int playerIndex);
+	static e_object_team GetTeam(int playerIndex);
+	static void SetTeam(int playerIndex, e_object_team team);
+	static void SetUnitBipedType(int playerIndex, s_player::e_character_type bipedType);
+	static void SetUnitBipedType(int playerIndex, byte representationIndex);
+	static void SetBipedSpeed(int playerIndex, float speed);
+	static wchar_t* GetName(int playerIndex);
+	static datum GetPlayerUnitDatumIndex(int playerIndex);
+	static XUID GetIdentifier(int playerIndex);
 };
 CHECK_STRUCT_SIZE(s_player, 0x204);
 #pragma pack(pop)

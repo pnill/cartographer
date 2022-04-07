@@ -64,7 +64,7 @@ enum e_network_message_type_collection : unsigned int
 	_anti_cheat,
 	_custom_variant_settings,
 
-	_end
+	_network_message_type_collection_end
 };
 
 static const char* network_message_type_collection_name[] = {

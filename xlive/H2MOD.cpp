@@ -1,20 +1,21 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
+#include "Blam\Enums\HaloStrings.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
 #include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
@@ -31,7 +32,6 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "Blam\Engine\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
@@ -44,9 +44,6 @@
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-
 #include <float.h>
 
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
@@ -55,12 +52,11 @@
 
 H2MOD* h2mod = new H2MOD();
 GunGame* gunGame = new GunGame();
-DeviceShop* device_shop = new DeviceShop();
+DeviceShop* deviceShop = new DeviceShop();
 Infection* infectionHandler = new Infection();
 FireFight* fireFightHandler = new FireFight();
 HeadHunter* headHunterHandler = new HeadHunter();
-VariantPlayer* variant_player = new VariantPlayer();
-AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
+VariantPlayer* variantPlayer = new VariantPlayer();
 
 extern int H2GetInstanceId();
 
@@ -208,7 +204,7 @@ real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
 }
 
 BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (DATUM_IS_NONE(unit_datum))
 		return nullptr;
 
@@ -219,7 +215,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
@@ -237,7 +233,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return s_player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
@@ -300,7 +296,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	datum unit_datum_index = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
@@ -419,6 +415,7 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 
 	/* This is the unit of the player who last damaged the object*/
 	int damaging_player_unit = get_damage_owner(unit_datum_index);
+
 	if (b_HeadHunter)
 	{
 		headHunterHandler->playerDeath->SetDeadPlayer(unit_datum_index); // set this so we can spawn a skull on their position.
@@ -448,9 +445,11 @@ char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
 		infectionHandler->playerDeath->setUnitDatumIndex(unit_datum_index);
 		infectionHandler->playerDeath->execute();
 	}
+
 	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	bool ret = p_player_death(unit_datum_index, a2, a3, a4);
 	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
+
 	return ret;
 }
 
@@ -642,7 +641,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	{
 		addDebugText("Engine type: Multiplayer");
 		
-		for (auto gametype_it : GametypesMap)
+		for (auto& gametype_it : GametypesMap)
 		{
 			if (StrStrIW(variant_name, gametype_it.first)) {
 				LOG_INFO_GAME(L"[h2mod] {} custom gametype turned on!", gametype_it.first);
@@ -680,8 +679,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				gunGame->initializer->execute();
 			}
 
-			if(b_HeadHunter)
-			{
+			if (b_HeadHunter) {
 				headHunterHandler->initializer->execute();
 			}
 		}
@@ -706,11 +704,8 @@ player_spawn_t p_player_spawn;
 
 bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 {
-	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
-	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
-
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	if(b_HeadHunter)
+	if (b_HeadHunter)
 	{
 		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->preSpawnPlayer->execute();
@@ -730,7 +725,7 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
 	bool ret = p_player_spawn(playerDatumIndex);
 	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIndex);
 
-	if(b_HeadHunter)
+	if (b_HeadHunter)
 	{
 		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
 		headHunterHandler->spawnPlayer->execute();
@@ -821,39 +816,24 @@ typedef bool(__cdecl* fn_c000bd114_t)(int);
 fn_c000bd114_t p_fn_c000bd114;
 bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
 {
-	//bool result = pfn_c000bd114(skull_index);
-	//return result;
-
 	bool* var_c004d8320 = Memory::GetAddress<bool*>(0x4d8320);
 	bool(*fn_c00049833_IsEngineModeCampaign)() = (bool(*)())Memory::GetAddress(0x49833);
 
 	bool result = false;
 	if (skull_index <= 14 && fn_c00049833_IsEngineModeCampaign())
 		result = var_c004d8320[skull_index];
-	if (skull_index == 10 && AdvLobbySettings_mp_sputnik)
-		result = true;
-	else if (skull_index == 1 && AdvLobbySettings_mp_grunt_bday_party)
-		result = true;
-	else if (skull_index == 6 && AdvLobbySettings_mp_blind)
-		result = true;
 	return result;
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	if (AdvLobbySettings_grenade_chain_react)
-		return false;
 	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	if (AdvLobbySettings_banshee_bomb)
-		return false;
 	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
-	if (AdvLobbySettings_flashlight)
-		return true;
 	return h2mod->GetEngineType() == e_engine_type::_single_player;
 }
 
@@ -905,7 +885,7 @@ int __cdecl device_touch(datum device_datum, datum unit_datum)
 		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
 		{
-			if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+			if (deviceShop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
 			{
 				if (device_active == false)
 					return pdevice_touch(device_datum, unit_datum);
@@ -1371,5 +1351,4 @@ void H2MOD::Initialize()
 }
 
 void H2MOD::Deinitialize() {
-
 }

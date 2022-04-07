@@ -8,7 +8,6 @@
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
@@ -48,9 +47,6 @@ __asm pop ebp \
 void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow, DWORD sub_248beb_nak_deconstructor);
 int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3);
 int __stdcall sub_20F790_CM(int thisptr, __int16 selected_button_id);
-
-void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id);
-void __stdcall sub_28870B_CM(int a1, int a2, int a3, void*(__stdcall* a4)(int), int a5);
 
 bool CMForce_Update = false;
 
@@ -662,8 +658,6 @@ static bool blind_hud = false;
 bool __cdecl sub_BD114_blind_fp(unsigned int a1)//render first person model
 {
 	bool result = blind_fp ? true : false;
-	if (AdvLobbySettings_mp_blind & 0b10)
-		result = true;
 	return result;
 }
 
@@ -674,7 +668,7 @@ bool __cdecl sub_BD114_blind_hud(unsigned int a1)//render hud
 	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
 	float& hud_opacity = *(float*)(new_hud_globals + 0x228); // set the opacity
 
-	if (blind_hud || AdvLobbySettings_mp_blind & 0b01)
+	if (blind_hud)
 	{
 		hud_opacity = 0.f;
 		hud_opacity_reset = false;
@@ -745,17 +739,6 @@ void RefreshTogglexDelay() {
 
 #pragma endregion
 
-const int CMLabelMenuId_EditHudGui = 0xFF000007;
-
-const int CMLabelMenuId_ToggleSkulls = 0xFF000008;
-
-const int CMLabelMenuId_OtherSettings = 0xFF00000D;
-
-const int CMLabelMenuId_AdvSettings = 0xFF000005;
-
-const int CMLabelMenuId_AdvLobbySettings = 0xFF000016;
-
-const int CMLabelMenuId_Credits = 0xFF000006;
 #pragma region CM_Credits
 
 void __stdcall CMLabelButtons_Credits(int a1, int a2)

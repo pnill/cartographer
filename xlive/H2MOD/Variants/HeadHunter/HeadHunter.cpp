@@ -83,7 +83,7 @@ void HeadHunter::PickupSkull(XUID player, datum SkullDatum)
 		char* player_score_data = p_get_score_data_ptr();
 		if (player_score_data)
 		{
-			datum PlayerDatum = variant_player->GetPlayerDatum(player);
+			datum PlayerDatum = variantPlayer->GetPlayerDatum(player);
 			p_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), 0, 1, -1, 0);
 			HaloScript::ObjectDestroy(SkullDatum);
 			if(TimeElapsedMS(soundBuffer) > 2500)
@@ -142,15 +142,15 @@ datum HeadHunterHandler::GetDeadPlayer()
 /* Should probably inherit variant_player... */
 void HeadHunterHandler::SetPlayerIndex(datum player_datum)
 {
-	XUID player = variant_player->GetXUID(player_datum, true);
-	variant_player->SetPlayerDatum(player, player_datum);
+	XUID player = variantPlayer->GetXUID(player_datum, true);
+	variantPlayer->SetPlayerDatum(player, player_datum);
 	SetXUID(player);
 }
 
 void HeadHunterHandler::SetUnitDatum(datum unit_datum)
 {
-	XUID player = variant_player->GetXUID(unit_datum, false);
-	variant_player->SetUnitDatum(player, unit_datum);
+	XUID player = variantPlayer->GetXUID(unit_datum, false);
+	variantPlayer->SetUnitDatum(player, unit_datum);
 	SetXUID(player);
 }
 
@@ -193,12 +193,12 @@ void HeadHunterDeinitializer::onClient()
 
 void HeadHunterDeinitializer::onPeerHost()
 {
-	variant_player->Deinitialize();
+	variantPlayer->Deinitialize();
 }
 
 void HeadHunterDeinitializer::onDedi()
 {
-	variant_player->Deinitialize();
+	variantPlayer->Deinitialize();
 }
 
 void HeadHunterPreSpawnHandler::onClient()

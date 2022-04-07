@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\IceCreamFlavour\IceCreamFlavor.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
@@ -681,12 +681,12 @@ namespace imgui_handler {
 
 						ImGui::Columns(1);
 						ImGui::Separator();
-						auto Skulls = reinterpret_cast<skull_enabled_flags*>(Memory::GetAddress(0x4D8320));
+						bool* skulls = ice_cream_flavor_state();
 						ImGui::Columns(3, NULL, false);
 
 						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAnger", &Skulls->Anger);
+						ImGui::Checkbox("##SkullAnger", &skulls[_anger]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_anger_tooltip));
 
@@ -694,7 +694,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAssassins", &Skulls->Assassians);
+						ImGui::Checkbox("##SkullAssassins", &skulls[_assassians]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_assassins_tooltip));
 
@@ -702,7 +702,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlackEye", &Skulls->Black_Eye);
+						ImGui::Checkbox("##SkullBlackEye", &skulls[_black_eye]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_black_eye_tooltip));
 
@@ -710,7 +710,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlind", &Skulls->Blind);
+						ImGui::Checkbox("##SkullBlind", &skulls[_blind]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_blind_tooltip));
 
@@ -718,7 +718,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullCatch", &Skulls->Catch);
+						ImGui::Checkbox("##SkullCatch", &skulls[_catch]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_catch_tooltip));
 
@@ -726,7 +726,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullEnvy", &Skulls->Envy);
+						ImGui::Checkbox("##SkullEnvy", &skulls[_envy]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_envy_tooltip));
 
@@ -734,7 +734,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullFamine", &Skulls->Famine);
+						ImGui::Checkbox("##SkullFamine", &skulls[_famine]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_famine_tooltip));
 
@@ -742,7 +742,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGhost", &Skulls->Ghost);
+						ImGui::Checkbox("##SkullGhost", &skulls[_ghost]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_ghost_tooltip));
 
@@ -750,7 +750,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGBP", &Skulls->Grunt_Birthday_Party);
+						ImGui::Checkbox("##SkullGBP", &skulls[_grunt_birthday_party]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_grunt_tooltip));
 
@@ -758,7 +758,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIron", &Skulls->Iron);
+						ImGui::Checkbox("##SkullIron", &skulls[_iron]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iron_tooltip));
 
@@ -766,7 +766,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIWHBYD", &Skulls->IWHBYD);
+						ImGui::Checkbox("##SkullIWHBYD", &skulls[_IWHBYD]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iwbyd_tooltip));
 
@@ -774,7 +774,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullMythic", &Skulls->Mythic);
+						ImGui::Checkbox("##SkullMythic", &skulls[_mythic]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_mythic_tooltip));
 
@@ -782,7 +782,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullSputnik", &Skulls->Sputnik);
+						ImGui::Checkbox("##SkullSputnik", &skulls[_sputnik]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_sputnik_tooltip));
 
@@ -790,7 +790,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullThunderstorm", &Skulls->Thunderstorm);
+						ImGui::Checkbox("##SkullThunderstorm", &skulls[_thunderstorm]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_thunderstorm_tooltip));
 
@@ -798,7 +798,7 @@ namespace imgui_handler {
 
 						TextVerticalPad(GetString(skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullWhuppopatamus", &Skulls->Whuppopotamus);
+						ImGui::Checkbox("##SkullWhuppopatamus", &skulls[_whuppopotamus]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_whuppopotamus_tooltip));
 

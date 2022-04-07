@@ -366,7 +366,7 @@ void ConsoleCommands::spawn(datum object_idx, int count, float x, float y, float
 			s_object_placement_data nObject;
 
 			if (!DATUM_IS_NONE(object_idx)) {
-				datum player_datum = s_player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				datum player_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 				Engine::Objects::create_new_placement_data(&nObject, object_idx, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 

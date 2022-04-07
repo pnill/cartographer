@@ -1,11 +1,17 @@
 #pragma once
 
-const int CMLabelMenuId_VKeyTest = 0xFF00000B;
-const int CMLabelMenuId_EscSettings = 0xFF000004;
+static const int CMLabelMenuId_VKeyTest = 0xFF00000B;
+static const int CMLabelMenuId_EscSettings = 0xFF000004;
 static const int CMLabelMenuId_Error = 0xFF000001;
 static const int CMLabelMenuId_AccountList = 0xFF000009;
 static const int CMLabelMenuId_AccountEdit = 0xFF00000A;
 static const int CMLabelMenuId_AccountCreate = 0xFF00000C;
+static const int CMLabelMenuId_EditHudGui = 0xFF000007;
+static const int CMLabelMenuId_ToggleSkulls = 0xFF000008;
+static const int CMLabelMenuId_OtherSettings = 0xFF00000D;
+static const int CMLabelMenuId_AdvSettings = 0xFF000005;
+static const int CMLabelMenuId_AdvLobbySettings = 0xFF000016;
+static const int CMLabelMenuId_Credits = 0xFF000006;
 
 void InitCustomLanguage();
 void DeinitCustomLanguage();

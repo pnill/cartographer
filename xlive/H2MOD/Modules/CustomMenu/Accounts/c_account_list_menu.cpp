@@ -75,7 +75,7 @@ c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _de
 
 	// this constructs the buttons list widgets drawn inside the window
 	// brightness menu can display 4 widget list buttons at once
-	p_vector_constructor(this->list_items, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
+	p_vector_constructor(this->item_list, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
 
 	this->field_2C0 = 0;
 	sub_2113C6(&this->slot_2_unk.field_8);

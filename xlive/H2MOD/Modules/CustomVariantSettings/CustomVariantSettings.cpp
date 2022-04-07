@@ -18,7 +18,7 @@
 #include "Util\Hooks\Hook.h"
 
 std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
-CustomVariantSettings::s_variantSettings CurrentVariantSettings;
+CustomVariantSettings::s_variantSettings currentVariantSettings;
 CustomVariantSettings::s_variantSettings defaultCustomVariantSettings;
 
 namespace CustomVariantSettings
@@ -54,7 +54,7 @@ namespace CustomVariantSettings
 
 	void UpdateCustomVariantSettings(s_variantSettings* data)
 	{
-		CurrentVariantSettings = *data;
+		currentVariantSettings = *data;
 	}
 
 	void SendCustomVariantSettings(int peerIndex)
@@ -68,8 +68,8 @@ namespace CustomVariantSettings
 			auto customVariantSetting = CustomVariantSettingsMap.find(VariantName);
 			if (customVariantSetting != CustomVariantSettingsMap.end())
 			{
-				CurrentVariantSettings = customVariantSetting->second;
-				if (CurrentVariantSettings != defaultCustomVariantSettings) {
+				currentVariantSettings = customVariantSetting->second;
+				if (currentVariantSettings != defaultCustomVariantSettings) {
 					s_network_observer* observer = session->p_network_observer;
 					s_peer_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIndex);
 					if (peerIndex != -1 && !NetworkSession::PeerIndexLocal(peerIndex))
@@ -77,7 +77,7 @@ namespace CustomVariantSettings
 						if (observer_channel->field_1)
 							observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
 								s_network_observer::e_network_message_send_protocol::in_band, _custom_variant_settings,
-								CustomVariantSettingsPacketSize, &CurrentVariantSettings);
+								CustomVariantSettingsPacketSize, &currentVariantSettings);
 					}
 				}
 			}
@@ -85,14 +85,14 @@ namespace CustomVariantSettings
 	}
 	void ResetSettings()
 	{
-		CurrentVariantSettings = defaultCustomVariantSettings;
-		ApplyCustomSettings(&CurrentVariantSettings);
+		currentVariantSettings = defaultCustomVariantSettings;
+		ApplyCustomSettings(&currentVariantSettings);
 	}
 
 	void OnPlayerSpawn(datum PlayerDatum)
 	{
 		if (NetworkSession::LocalPeerIsSessionHost()) {
-			if (CurrentVariantSettings.infiniteGrenades)
+			if (currentVariantSettings.infiniteGrenades)
 			{
 				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
 				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
@@ -165,7 +165,7 @@ namespace CustomVariantSettings
 	void ApplyCurrentSettings()
 	{
 		// no idea why this is needed to be executed on blue screen but whatever
-		ApplyCustomSettings(&CurrentVariantSettings);
+		ApplyCustomSettings(&currentVariantSettings);
 	}
 	void OnGameLifeCycleUpdate(e_game_life_cycle state)
 	{
@@ -209,7 +209,7 @@ namespace CustomVariantSettings
 		//Return -1 to tell the engine there is no koth hills on the map.
 		if (hillCount <= 0)
 			return -1;
-		switch(CurrentVariantSettings.hillRotation)
+		switch(currentVariantSettings.hillRotation)
 		{
 			case _sequential:
 				if (previousHill + 1 >= hillCount)
@@ -222,11 +222,11 @@ namespace CustomVariantSettings
 			case _predefined:
 				if (currentPredefinedIndex == 15)
 					currentPredefinedIndex = 0;
-				else if (CurrentVariantSettings.predefinedHillSet[currentPredefinedIndex + 1] == 0)
+				else if (currentVariantSettings.predefinedHillSet[currentPredefinedIndex + 1] == 0)
 					currentPredefinedIndex = 0;
 				else
 					++currentPredefinedIndex;
-				return CurrentVariantSettings.predefinedHillSet[currentPredefinedIndex] - 1;
+				return currentVariantSettings.predefinedHillSet[currentPredefinedIndex] - 1;
 			default:
 			case _random:
 				return p_get_next_hill_index(previousHill);

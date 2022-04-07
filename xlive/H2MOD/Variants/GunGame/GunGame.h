@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "H2MOD\Variants\VariantSystem.h"
 
@@ -61,13 +62,13 @@ class GunGame : public GameType<GunGameHandler>
 {
 public:
 	GunGame();
-	static void readWeaponLevels();
-	static void initWeaponLevels();
-	static void spawnPlayerServer(int playerIndex);
-	static void playerDiedServer(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
-	static void levelUpServer(int PlayerIndex);
-	static void resetPlayerLevels();
-	static void preSpawnPlayerSetup(int playerIndex);
+	static void ReadWeaponLevels();
+	static void InitWeaponLevels();
+	static void SpawnPlayerServer(int playerIndex);
+	static void PlayerDiedServer(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
+	static void LevelUpServer(int PlayerIndex);
+	static void ResetPlayerLevels();
+	static void PreSpawnPlayerSetup(int playerIndex);
 
 	static std::unordered_map<int, datum> levelWeapon;
 	static std::unordered_map<XUID, int> gungamePlayers;

@@ -38,7 +38,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
-int H2Config_static_lod_state = static_lod::disable;
+int H2Config_static_lod_state = e_static_lod::disable;
 int H2Config_field_of_view = 70;
 int H2Config_vehicle_field_of_view = 70;
 __int16 H2Config_refresh_rate = 60;
@@ -146,7 +146,7 @@ void SaveH2Config() {
 	errno_t err = _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
 	if (err != 0) {
-		_Shell::FileErrorDialog(errno);
+		_Shell::FileErrorDialog(err);
 		addDebugText("ERROR: Unable to write H2Configuration file!");
 	}
 	else {

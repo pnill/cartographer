@@ -69,7 +69,7 @@ datum DeviceShop::GetItemDatum(datum device_datum)
 bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 {
 
-	XUID player = variant_player->GetXUID(unit_datum, false);
+	XUID player = variantPlayer->GetXUID(unit_datum, false);
 	
 	int cost = GetCost(device_datum);
 	int points = player_points[player];

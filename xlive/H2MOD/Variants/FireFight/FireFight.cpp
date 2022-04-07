@@ -34,7 +34,7 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 			if (character && character->SwarmProperties.size > 0)
 				points = character->SwarmProperties[0]->scatterKilledCount;
 
-			device_shop->AddPoints(killer, points);
+			deviceShop->AddPoints(killer, points);
 		}
 	}
 
@@ -58,8 +58,8 @@ void FireFightHandler::SetXUID(XUID xuid)
 /* Should probably inherit variant_player... */
 void FireFightHandler::SetPlayerIndex(datum player_datum)
 {
-	XUID player = variant_player->GetXUID(player_datum, true);
-	variant_player->SetPlayerDatum(player,player_datum);
+	XUID player = variantPlayer->GetXUID(player_datum, true);
+	variantPlayer->SetPlayerDatum(player,player_datum);
 
 	SetXUID(player);
 }
@@ -67,8 +67,8 @@ void FireFightHandler::SetPlayerIndex(datum player_datum)
 void FireFightHandler::SetUnitDatum(datum unit_datum)
 {
 
-	XUID player = variant_player->GetXUID(unit_datum, false);
-	variant_player->SetUnitDatum(player, unit_datum);
+	XUID player = variantPlayer->GetXUID(unit_datum, false);
+	variantPlayer->SetUnitDatum(player, unit_datum);
 
 	SetXUID(player);
 }
@@ -110,14 +110,14 @@ void FireFightDeinitializer::onClient()
 
 void FireFightDeinitializer::onPeerHost()
 {
-	variant_player->Deinitialize();
-	device_shop->deinitialize();
+	variantPlayer->Deinitialize();
+	deviceShop->deinitialize();
 }
 
 void FireFightDeinitializer::onDedi()
 {
-	variant_player->Deinitialize();
-	device_shop->deinitialize();
+	variantPlayer->Deinitialize();
+	deviceShop->deinitialize();
 }
 
 void FireFightPreSpawnHandler::onClient()

@@ -10,102 +10,102 @@
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
 */
 
-s_data_array* s_player::getArray()
+s_data_array* s_player::GetArray()
 {
 	return *Memory::GetAddress<s_data_array**>(0x4A8260, 0x4D64C4);
 }
 
-bool s_player::indexValid(int playerIndex)
+bool s_player::IndexValid(int playerIndex)
 {
 	return playerIndex >= 0 && playerIndex < ENGINE_PLAYER_MAX;
 }
 
-s_player* s_player::getPlayer(int playerIndex)
+s_player* s_player::GetPlayer(int playerIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return nullptr;
 	}
-	return (s_player*)&getArray()->data[playerIndex * getArray()->datum_element_size];
+	return (s_player*)&GetArray()->data[playerIndex * GetArray()->datum_element_size];
 }
 
-e_object_team s_player::getTeam(int playerIndex)
+e_object_team s_player::GetTeam(int playerIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return (e_object_team)NONE;
 	}
-	return getPlayer(playerIndex)->properties[0].player_team;
+	return GetPlayer(playerIndex)->properties[0].player_team;
 }
 
-void s_player::setTeam(int playerIndex, e_object_team team)
+void s_player::SetTeam(int playerIndex, e_object_team team)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	getPlayer(playerIndex)->properties[0].player_team = team;
+	GetPlayer(playerIndex)->properties[0].player_team = team;
 }
 
-void s_player::setUnitBipedType(int playerIndex, s_player::e_character_type bipedType)
+void s_player::SetUnitBipedType(int playerIndex, s_player::e_character_type bipedType)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	getPlayer(playerIndex)->properties[0].profile.player_character_type = bipedType;
+	GetPlayer(playerIndex)->properties[0].profile.player_character_type = bipedType;
 }
 
-void s_player::setUnitBipedType(int playerIndex, byte representationIndex)
+void s_player::SetUnitBipedType(int playerIndex, byte representationIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	getPlayer(playerIndex)->properties[0].profile.player_character_type = (e_character_type)representationIndex;
+	GetPlayer(playerIndex)->properties[0].profile.player_character_type = (e_character_type)representationIndex;
 }
 
-void s_player::setBipedSpeed(int playerIndex, float speed)
+void s_player::SetBipedSpeed(int playerIndex, float speed)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	getPlayer(playerIndex)->unit_speed = speed;
+	GetPlayer(playerIndex)->unit_speed = speed;
 }
 
-wchar_t* s_player::getName(int playerIndex)
+wchar_t* s_player::GetName(int playerIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return L"";
 	}
-	return getPlayer(playerIndex)->properties[0].player_name;
+	return GetPlayer(playerIndex)->properties[0].player_name;
 }
 
-datum s_player::getPlayerUnitDatumIndex(int playerIndex)
+datum s_player::GetPlayerUnitDatumIndex(int playerIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 		return DATUM_INDEX_NONE;
 
-	if (DATUM_IS_NONE(getPlayer(playerIndex)->unit_index))
+	if (DATUM_IS_NONE(GetPlayer(playerIndex)->unit_index))
 		return DATUM_INDEX_NONE;
 		
-	return getPlayer(playerIndex)->unit_index;
+	return GetPlayer(playerIndex)->unit_index;
 }
 
-XUID s_player::getIdentifier(int playerIndex)
+XUID s_player::GetIdentifier(int playerIndex)
 {
-	if (!indexValid(playerIndex))
+	if (!IndexValid(playerIndex))
 	{
 		return XUID(0ll);
 	}
 
-	return getPlayer(playerIndex)->identifier;
+	return GetPlayer(playerIndex)->identifier;
 }
 
 PlayerIterator::PlayerIterator() 
-	: s_data_iterator(s_player::getArray())
+	: s_data_iterator(s_player::GetArray())
 {
 
 }
@@ -145,5 +145,5 @@ wchar_t* PlayerIterator::get_current_player_name()
 
 XUID PlayerIterator::get_current_player_id()
 {
-	return s_player::getIdentifier(this->get_current_player_index());
+	return s_player::GetIdentifier(this->get_current_player_index());
 }

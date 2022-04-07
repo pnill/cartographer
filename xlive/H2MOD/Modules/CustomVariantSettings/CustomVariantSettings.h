@@ -55,7 +55,7 @@ namespace CustomVariantSettings
 	void Initialize();
 }
 
-extern CustomVariantSettings::s_variantSettings CurrentVariantSettings;
+extern CustomVariantSettings::s_variantSettings currentVariantSettings;
 extern std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 
 #define CustomVariantSettingsPacketSize (sizeof(CustomVariantSettings::s_variantSettings))

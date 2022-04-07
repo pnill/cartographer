@@ -249,7 +249,7 @@ void NetworkSession::LogPlayersToConsole() {
 			outStr += L", PlayerName=";
 			outStr += GetPlayerName(playerIdx);
 			outStr += L", Name from game player state=";
-			outStr += s_player::getName(playerIdx);
+			outStr += s_player::GetName(playerIdx);
 			outStr += L", Team=" + std::to_wstring(GetPlayerTeam(playerIdx));
 			outStr += L", Identifier=" + std::to_wstring(GetPlayerXuid(playerIdx));
 
@@ -285,7 +285,7 @@ void NetworkSession::LogPeersToConsole() {
 				outStr += GetPlayerName(playerIdx);
 
 				outStr += L", Name from game player state=";
-				outStr += s_player::getName(playerIdx);
+				outStr += s_player::GetName(playerIdx);
 
 			}
 			commands->output(outStr);

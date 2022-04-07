@@ -54,7 +54,7 @@ GunGame::GunGame()
 	this->playerKill = new GunGameKillHandler();
 }
 
-void GunGame::readWeaponLevels()
+void GunGame::ReadWeaponLevels()
 {
 	FILE* gfp;
 	gfp = fopen("gungame.ini", "r");
@@ -99,7 +99,7 @@ void GunGame::readWeaponLevels()
 	}
 }
 
-void GunGame::initWeaponLevels() {
+void GunGame::InitWeaponLevels() {
 	if (weapon_one != 0) {
 		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one: {}", weapon_one);
 		LOG_TRACE_GAME("[H2Mod-GunGame] : Intialize() - weapon_one enum:  {:x}", weaponDatums[weapon_one]);
@@ -138,27 +138,27 @@ void GunGame::initWeaponLevels() {
 	}
 }
 
-void GunGame::resetPlayerLevels() {
+void GunGame::ResetPlayerLevels() {
 	gungamePlayers.clear();
 }
 
-void GunGame::preSpawnPlayerSetup(int playerIndex)
+void GunGame::PreSpawnPlayerSetup(int playerIndex)
 {
 	if (playerIndex != NONE) {
-		s_player::setUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
+		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
 	}
 }
 
-void GunGame::spawnPlayerServer(int playerIndex) {
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, s_player::getName(playerIndex));
+void GunGame::SpawnPlayerServer(int playerIndex) {
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, s_player::GetName(playerIndex));
 
-	datum unit_datum_index = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 
 	if (unit_object) {
 		int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
 
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, s_player::getName(playerIndex), level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, s_player::GetName(playerIndex), level);
 
 		datum CurrentWeapon = GunGame::levelWeapon[level];
 
@@ -166,17 +166,17 @@ void GunGame::spawnPlayerServer(int playerIndex) {
 			call_give_player_weapon(playerIndex, CurrentWeapon, 1);
 		}
 		else if (level == 15) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", s_player::getName(playerIndex));
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", s_player::GetName(playerIndex));
 			h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 99, true);
 		}
 		else if (level == 16) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", s_player::getName(playerIndex));
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", s_player::GetName(playerIndex));
 			h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 99, true);
 		}
 	}
 }
 
-void GunGame::playerDiedServer(int unit_datum_index)
+void GunGame::PlayerDiedServer(int unit_datum_index)
 {
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object) {
@@ -186,9 +186,9 @@ void GunGame::playerDiedServer(int unit_datum_index)
 	}
 }
 
-void GunGame::levelUpServer(int playerIndex)
+void GunGame::LevelUpServer(int playerIndex)
 {
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", playerIndex, s_player::getName(playerIndex));
+	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", playerIndex, s_player::GetName(playerIndex));
 
 	int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
 	level++;
@@ -201,7 +201,7 @@ void GunGame::levelUpServer(int playerIndex)
 	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp() player index: {0} - new level: {1} ", playerIndex, level);
 
 	if (level < 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", s_player::getName(playerIndex), level);
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", s_player::GetName(playerIndex), level);
 
 		datum LevelWeapon = GunGame::levelWeapon[level];
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0, true);
@@ -210,12 +210,12 @@ void GunGame::levelUpServer(int playerIndex)
 	}
 
 	else if (level == 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", s_player::getName(playerIndex));
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", s_player::GetName(playerIndex));
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 99,  true);
 	}
 
 	else if (level == 16) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", s_player::getName(playerIndex));
+		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", s_player::GetName(playerIndex));
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0,  true);
 		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 99,  true);
 	}
@@ -234,17 +234,17 @@ void GunGameDeinitializer::onPeerHost() {
 }
 
 void GunGameInitializer::onClient() {
-	GunGame::initWeaponLevels();
+	GunGame::InitWeaponLevels();
 }
 
 void GunGameInitializer::onDedi() {
-	GunGame::initWeaponLevels();
-	GunGame::resetPlayerLevels();
+	GunGame::InitWeaponLevels();
+	GunGame::ResetPlayerLevels();
 }
 
 void GunGameInitializer::onPeerHost() {
-	GunGame::initWeaponLevels();
-	GunGame::resetPlayerLevels();
+	GunGame::InitWeaponLevels();
+	GunGame::ResetPlayerLevels();
 	//TODO: is this really necessary (from old code)?
 	//init peer host gun game level
 	GunGame::gungamePlayers[GetPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
@@ -261,7 +261,7 @@ void GunGamePreSpawnHandler::onDedi() {
 }
 
 void GunGamePreSpawnHandler::onPeerHost() {
-	GunGame::preSpawnPlayerSetup(this->getPlayerIndex());
+	GunGame::PreSpawnPlayerSetup(this->getPlayerIndex());
 }
 
 void GunGameSpawnHandler::onClient() {
@@ -269,11 +269,11 @@ void GunGameSpawnHandler::onClient() {
 }
 
 void GunGameSpawnHandler::onDedi() {
-	GunGame::spawnPlayerServer(this->getPlayerIndex());
+	GunGame::SpawnPlayerServer(this->getPlayerIndex());
 }
 
 void GunGameSpawnHandler::onPeerHost() {
-	GunGame::spawnPlayerServer(this->getPlayerIndex());
+	GunGame::SpawnPlayerServer(this->getPlayerIndex());
 }
 
 void GunGameDeathHandler::onClient() {
@@ -281,11 +281,11 @@ void GunGameDeathHandler::onClient() {
 }
 
 void GunGameDeathHandler::onDedi() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex());
+	GunGame::PlayerDiedServer(this->getUnitDatumIndex());
 }
 
 void GunGameDeathHandler::onPeerHost() {
-	GunGame::playerDiedServer(this->getUnitDatumIndex());
+	GunGame::PlayerDiedServer(this->getUnitDatumIndex());
 }
 
 void GunGameKillHandler::onClient() {
@@ -293,11 +293,11 @@ void GunGameKillHandler::onClient() {
 }
 
 void GunGameKillHandler::onDedi() {
-	GunGame::levelUpServer(this->getPlayerIndex());
+	GunGame::LevelUpServer(this->getPlayerIndex());
 }
 
 void GunGameKillHandler::onPeerHost() {
-	GunGame::levelUpServer(this->getPlayerIndex());
+	GunGame::LevelUpServer(this->getPlayerIndex());
 }
 
 GunGameHandler::GunGameHandler() {}

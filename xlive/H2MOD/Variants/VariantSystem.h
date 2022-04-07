@@ -3,8 +3,8 @@
 class GameClientServerHandler {
 public:
 	virtual void onPeerHost() = 0;
-	virtual void onDedi() = 0;
 	virtual void onClient() = 0;
+	virtual void onDedi() = 0;
 	void execute();
 };
 

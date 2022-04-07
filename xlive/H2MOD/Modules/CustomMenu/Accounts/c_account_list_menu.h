@@ -10,7 +10,7 @@ class c_account_edit_list : public c_list_widget
 {
 public:
 	// 4 items displayed at once in the list
-	char list_items[132 * 4];
+	char item_list[132 * 4];
 	int field_2C0;
 	c_slot2<c_account_edit_list> slot_2_unk;
 	int default_selected_button;
@@ -21,7 +21,7 @@ public:
 
 	virtual char* get_item_list() override
 	{
-		return list_items; // returns pointer to edit list
+		return item_list; // returns pointer to edit list
 	}
 
 	virtual int get_list_item_count() override
