@@ -80,7 +80,7 @@ void CXnIp::SetTimeConnectionInteractionHappened(IN_ADDR ina)
 {
 	XnIp* xnIp = GetConnection(ina);
 	if (xnIp != nullptr)
-		xnIp->lastConnectionInteractionTime = GetTickCount64();
+		xnIp->lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
 }
 
 void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int bytesRecvdCount)
@@ -90,7 +90,7 @@ void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int byte
 	if (xnIp != nullptr)
 	{
 		xnIp->pckStats.PckRecvdStatsUpdate(1, bytesRecvdCount);
-		xnIp->lastPacketReceivedTime = GetTickCount64();
+		xnIp->lastPacketReceivedTime = _Shell::QPCToTimeNowMsec();
 		GetLocalUserXn()->pckStats.PckRecvdStatsUpdate(1, bytesRecvdCount);
 	}
 }
@@ -121,8 +121,8 @@ void CXnIp::LogConnectionsToConsole()
 					L"Packets recvd avg/sec: " + std::to_wstring(pckStats->pckAvgRecvdPerSec) + L" " +
 					L"Connect status: " + std::to_wstring(xnIp->connectStatus) + L" " +
 					L"Connection initiator: " + (xnIp->connectionInitiator ? L"yes" : L"no") + L" " +
-					L"Time since last interaction: " + std::to_wstring((float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
-					L"Time since last packet received: " + std::to_wstring((float)(GetTickCount64() - xnIp->lastPacketReceivedTime) / 1000.f);
+					L"Time since last interaction: " + std::to_wstring((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
+					L"Time since last packet received: " + std::to_wstring((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastPacketReceivedTime) / 1000.f);
 			}
 			else
 			{
@@ -180,8 +180,8 @@ void CXnIp::LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode
 				const XnIpPckTransportStats* pckStats;
 				xnIp->PckGetStats(&pckStats);
 
-				float connectionLastInteractionSeconds = (float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f;
-				float connectionLastPacketReceivedSeconds = (float)(GetTickCount64() - xnIp->lastConnectionInteractionTime) / 1000.f;
+				float connectionLastInteractionSeconds = (float)(_Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime) / 1000.f;
+				float connectionLastPacketReceivedSeconds = (float)(_Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime) / 1000.f;
 				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
 					__FUNCTION__,
 					i,
@@ -615,7 +615,7 @@ int CXnIp::RegisterNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID*
 		LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, connectionIndex, htonl(connectionIndex | randIdentifier));
 
 		newXnIp->connectionIdentifier.s_addr = htonl(connectionIndex | randIdentifier);
-		newXnIp->lastConnectionInteractionTime = GetTickCount64();
+		newXnIp->lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
 		newXnIp->connectStatus = XNET_CONNECT_STATUS_IDLE;
 		newXnIp->pckStats.PckDataSampleUpdate();
 		newXnIp->bValid = true;
@@ -998,7 +998,7 @@ void CXnIp::ClearLostConnections()
 	{
 		XnIp* xnIp = &m_XnIPs[i];
 		if (xnIp->bValid
-			&& GetTickCount64() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+			&& _Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
 		{
 			lostConnectionsCount++;
 			UnregisterXnIpIdentifier(xnIp->connectionIdentifier);
@@ -1155,7 +1155,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		gXnIp.SetTimeConnectionInteractionHappened(ina);
 	}
 	else if (xnIp->connectStatus < XNET_CONNECT_STATUS_CONNECTED
-		&& GetTickCount64() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
+		&& _Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime >= XnIp_ConnectionTimeOut)
 	{
 		return XNET_CONNECT_STATUS_LOST;
 	}

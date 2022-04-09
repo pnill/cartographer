@@ -2,6 +2,7 @@
 
 #include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 
 #define MAX_HDR_STR 32
 
@@ -151,13 +152,13 @@ struct XnIpPckTransportStats
 			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
 			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
 
-			lastTimeUpdate = GetTickCount64();
+			lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 		}
 		else
 		{
 			const ULONGLONG sample_end_time = 1ull * 1000ull;
 
-			if (GetTickCount64() - lastTimeUpdate >= sample_end_time)
+			if (_Shell::QPCToTimeNowMsec() - lastTimeUpdate >= sample_end_time)
 			{
 				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
@@ -171,7 +172,7 @@ struct XnIpPckTransportStats
 				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 
-				lastTimeUpdate = GetTickCount64();
+				lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 			}
 		}
 	}

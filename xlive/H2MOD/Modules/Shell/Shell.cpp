@@ -3,6 +3,39 @@
 #include "Shell.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+long long _Shell::QPCToTime(long long denominator, LARGE_INTEGER counter, LARGE_INTEGER freq)
+{
+	long long _Whole, _Part;
+
+	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
+	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
+
+	return _Whole + _Part;
+}
+
+long long _Shell::QPCToTimeNowSec()
+{
+	LARGE_INTEGER freq;
+	LARGE_INTEGER currentCounter;
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&currentCounter);
+	return QPCToTime(1, currentCounter, freq);
+}
+
+long long _Shell::QPCToTimeNowMsec()
+{
+	LARGE_INTEGER freq;
+	LARGE_INTEGER currentCounter;
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&currentCounter);
+	return QPCToTime(std::milli::den, currentCounter, freq);
+}
+
+double _Shell::QPCToSecondsPrecise(LARGE_INTEGER counter, LARGE_INTEGER freq)
+{
+	return static_cast<double>((double)QPCToTime(std::micro::den, counter, freq) / (double)std::micro::den);
+}
+
 bool __cdecl _Shell::IsGameMinimized()
 {
 	typedef bool(__cdecl* is_game_is_minimized_t)();

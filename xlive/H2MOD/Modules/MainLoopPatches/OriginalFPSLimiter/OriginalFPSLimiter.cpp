@@ -2,9 +2,10 @@
 
 #include "OriginalFPSLimiter.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
+#include "H2MOD\Modules\Shell\Shell.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 extern bool b_XboxTick;
@@ -12,31 +13,6 @@ static LARGE_INTEGER frequency;
 static LARGE_INTEGER counterAtStartup;
 
 static __int64 network_time;
-
-// TODO move these to _Shell?
-long long QPCToTime(long long denominator, LARGE_INTEGER counter, LARGE_INTEGER freq)
-{
-	long long _Whole, _Part;
-
-	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
-	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
-
-	return _Whole + _Part;
-}
-
-long long QPCToTimeNow()
-{
-	LARGE_INTEGER freq;
-	LARGE_INTEGER currentCounter;
-	QueryPerformanceFrequency(&freq);
-	QueryPerformanceCounter(&currentCounter);
-	return QPCToTime(1, currentCounter, freq);
-}
-
-double QPCToSecondsPrecise(LARGE_INTEGER counter, LARGE_INTEGER freq)
-{
-	return static_cast<double>((double)QPCToTime(std::micro::den, counter, freq) / (double)std::micro::den);
-}
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
@@ -109,7 +85,7 @@ static LARGE_INTEGER lastCounter;
 void __cdecl reset_time()
 {
 	QueryPerformanceCounter(&lastCounter);
-	network_time = QPCToTime(std::milli::den, lastCounter, frequency);
+	network_time = _Shell::QPCToTime(std::milli::den, lastCounter, frequency);
 	*Memory::GetAddress<bool*>(0x479EA0) = true;
 }
 
@@ -124,8 +100,8 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 	float timeDeltaSec = 0.0f;
 
-	_timeAtStartupSec = (double)QPCToSecondsPrecise(counterAtStartup, frequency);
-	_timeAtStartupMsec = QPCToTime(std::milli::den, counterAtStartup, frequency);
+	_timeAtStartupSec = _Shell::QPCToSecondsPrecise(counterAtStartup, frequency);
+	_timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, counterAtStartup, frequency);
 
 	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit)
 	{
@@ -139,8 +115,8 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 		// TODO move to function and cleanup
 
 		QueryPerformanceCounter(&currentCounter);
-		_currentTimeSec = QPCToSecondsPrecise(currentCounter, frequency);
-		_lastTimeSec = QPCToSecondsPrecise(lastCounter, frequency);
+		_currentTimeSec = _Shell::QPCToSecondsPrecise(currentCounter, frequency);
+		_lastTimeSec = _Shell::QPCToSecondsPrecise(lastCounter, frequency);
 
 		timeDeltaSec = _currentTimeSec - _lastTimeSec;
 
@@ -164,7 +140,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 					Sleep(iMsSleep);
 
 					QueryPerformanceCounter(&currentCounter);
-					_currentTimeSec = QPCToSecondsPrecise(currentCounter, frequency);
+					_currentTimeSec = _Shell::QPCToSecondsPrecise(currentCounter, frequency);
 
 					timeDeltaSec = (double)(_currentTimeSec - _lastTimeSec);
 				}
@@ -172,7 +148,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 		}
 
 		// no need to update counter here
-		_currentTimeMsec = QPCToTime(std::milli::den, currentCounter, frequency);
+		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 		network_time = (_currentTimeMsec - _timeAtStartupMsec);
 
 		lastCounter = currentCounter;
@@ -184,7 +160,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 		timeDeltaSec = p_compute_time_delta(use_static_time_increase, static_time_delta);
 		
 		QueryPerformanceCounter(&currentCounter);
-		_currentTimeMsec = QPCToTime(std::milli::den, currentCounter, frequency);
+		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 		network_time = (_currentTimeMsec - _timeAtStartupMsec);
 	}
 

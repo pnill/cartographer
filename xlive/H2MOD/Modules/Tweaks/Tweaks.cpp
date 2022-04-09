@@ -233,12 +233,11 @@ DWORD WINAPI timeGetTime_hook()
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&currentCounter);
 
-	// algorithm used from Microsoft's high resolution clock now() implementation
-	const long long counterSinceProgramEpoch = currentCounter.QuadPart - startupCounter.QuadPart;
-	const long long _Whole = (counterSinceProgramEpoch / frequency.QuadPart) * 1000;
-	const long long _Part = (counterSinceProgramEpoch % frequency.QuadPart) * 1000 / frequency.QuadPart;
+	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
+	const long long startupTime = _Shell::QPCToTime(std::milli::den, startupCounter, frequency);
 
-	return _Whole + _Part;
+	// gets truncated
+	return (DWORD)(timeNow - startupTime);
 }
 static_assert(std::is_same<decltype(timeGetTime), decltype(timeGetTime_hook)>::value, "Invalid timeGetTime_hook signature");
 
