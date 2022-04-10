@@ -107,6 +107,7 @@ c_error_edit_list::c_error_edit_list(int _flags) :
 	int button_count = 0;
 	//s_data_array* account_list_data = allocate_list_data("brightness edit list", button_count, 4);
 	//this->list_data_array = account_list_data;
+	this->list_data_array = nullptr;
 
 	// s_data_array::data_make_valid(account_list_data);
 
