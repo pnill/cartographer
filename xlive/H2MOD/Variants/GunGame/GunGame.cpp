@@ -144,10 +144,6 @@ void GunGame::Initialize()
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		GunGame::ResetPlayerLevels();
-		if (!Memory::IsDedicatedServer())
-		{
-			GunGame::gungamePlayers[GetPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
-		}
 	}
 }
 
@@ -240,7 +236,17 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
 			if (unit_object) {
-				int level = GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)];
+
+				int level = 0;
+				auto gungamePlayer = gungamePlayers.find(GetPlayerXuid(absPlayerIdx));
+				if (gungamePlayer != gungamePlayers.end())
+				{
+					level = gungamePlayer->second;
+				}
+				else
+				{
+					gungamePlayers.insert(std::make_pair(GetPlayerXuid(absPlayerIdx), level));
+				}
 
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {1} - Level: {2}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx), level);
 
@@ -273,6 +279,7 @@ bool GunGame::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2,
 {
 	int absPlayerIdx = a2;
 	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+	unsigned long long playerId = GetPlayerXuid(absPlayerIdx);
 
 	// in gungame we just keep track of the score
 	bool handled = false;
@@ -288,13 +295,13 @@ bool GunGame::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2,
 		{
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx));
 
-			int level = GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)];
+			int level = GunGame::gungamePlayers[playerId];
 			level++;
 
 			if (level > 16)
 				level = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
 
-			GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)] = level;
+			GunGame::gungamePlayers[playerId] = level;
 
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {} - new level: {} ", __FUNCTIONW__, absPlayerIdx, level);
 
