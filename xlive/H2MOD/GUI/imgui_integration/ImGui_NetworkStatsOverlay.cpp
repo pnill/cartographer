@@ -95,6 +95,10 @@ void ShowNetworkStatsOverlay(bool* p_open)
 			ImGui::Text("Network protocol: <disconnected>");
 		}
 
+		unsigned long long network_time = *Memory::GetAddressRelative<unsigned long long*>(0x879E98);
+
+		ImGui::Text("Network time: %llu msec", network_time);
+
 		XnIp* localIp = gXnIp.GetLocalUserXn();
 
 		if (localIp->bValid)
