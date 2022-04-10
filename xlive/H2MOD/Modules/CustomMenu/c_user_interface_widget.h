@@ -1,5 +1,8 @@
 #pragma once
 
+// disable "'c_user_interface_widget' variables are uninitialized. Always initialize a member variable" warning
+#pragma warning( disable : 26495 )
+
 enum e_user_interface_widget_type
 {
 	_widget_type_screen_widget = 0,
@@ -234,3 +237,5 @@ private:
 };
 
 static_assert(sizeof(c_user_interface_widget) == 112);
+
+#pragma warning( default : 26495 )
