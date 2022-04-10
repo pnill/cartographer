@@ -94,7 +94,7 @@ datum s_player::GetPlayerUnitDatumIndex(int playerIndex)
 	return GetPlayer(playerIndex)->unit_index;
 }
 
-XUID s_player::GetIdentifier(int playerIndex)
+unsigned long long s_player::GetIdentifier(int playerIndex)
 {
 	if (!IndexValid(playerIndex))
 	{

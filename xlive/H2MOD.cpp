@@ -287,9 +287,6 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object != NULL)
 	{
-		if (resetEquipment)
-			Engine::Unit::remove_equipment(unit_datum_index);
-
 		// not sure what these flags are, but this is called when picking up grenades
 		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
 		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
@@ -300,6 +297,10 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		// send simulation update for grenades if we control the simulation
 		if (!s_game_globals::game_is_predicted())
 		{
+			// delete all weapons if required
+			if (resetEquipment)
+				Engine::Unit::remove_equipment(unit_datum_index);
+
 			// set grenade count
 			*(BYTE*)(unit_object + 0x252 + type) = count;
 
@@ -625,7 +626,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 {
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
 	
-
 	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
 	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
 

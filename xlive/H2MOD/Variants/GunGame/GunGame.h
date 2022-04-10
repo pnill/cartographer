@@ -36,6 +36,6 @@ public:
 	static void ResetPlayerLevels();
 
 	static std::unordered_map<int, datum> levelWeapon;
-	static std::unordered_map<XUID, int> gungamePlayers;
+	static std::unordered_map<unsigned long long, int> gungamePlayers;
 
 };

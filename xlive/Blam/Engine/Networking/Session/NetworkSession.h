@@ -49,7 +49,7 @@ namespace NetworkSession
 	int GetPlayerCount();
 	const wchar_t* GetPlayerName(int playerIdx);
 	int GetPlayerIdByName(const wchar_t* playerName);
-	long long GetPlayerXuid(int playerIdx);
+	unsigned long long GetPlayerXuid(int playerIdx);
 
 	int GetPlayerTeam(int playerIdx);
 	int GetPlayerTeamFromXuid(long long xuid);

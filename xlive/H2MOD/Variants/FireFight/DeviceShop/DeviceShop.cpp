@@ -9,7 +9,7 @@
 extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index);
 
-std::unordered_map<long long, int> player_points;
+std::unordered_map<unsigned long long, int> player_points;
 
 // power transition time
 // TODO: Convert to TagGroup/Block

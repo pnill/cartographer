@@ -48,12 +48,12 @@ public:
 	static void sendTeamChange();
 	static void disableSlayerSounds();
 	static void resetZombiePlayerStatus();
-	static void setZombiePlayerStatus(XUID identifier);
+	static void setZombiePlayerStatus(unsigned long long identifier);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);
 	static int calculateZombiePlayerIndex();
 private:
-	static std::vector<XUID> zombieIdentifiers;
+	static std::vector<unsigned long long> zombieIdentifiers;
 };
 

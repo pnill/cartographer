@@ -148,7 +148,7 @@ const wchar_t* NetworkSession::GetPlayerName(int playerIdx)
 	return GetPlayerInformation(playerIdx)->properties.player_name;
 }
 
-long long NetworkSession::GetPlayerXuid(int playerIdx)
+unsigned long long NetworkSession::GetPlayerXuid(int playerIdx)
 {
 	return GetPlayerInformation(playerIdx)->identifier;
 }

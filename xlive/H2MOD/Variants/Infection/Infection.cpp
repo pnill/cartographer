@@ -14,16 +14,20 @@
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Tags\TagInterface.h"
 
-std::vector<XUID> Infection::zombieIdentifiers;
+std::vector<unsigned long long> Infection::zombieIdentifiers;
 
 const e_object_team HUMAN_TEAM = e_object_team::Red;
 const e_object_team ZOMBIE_TEAM = e_object_team::Green;
 
-std::map<int, std::map<e_infection_sounds, const wchar_t*>> i_SoundsTable;
+std::map<int, std::map<e_infection_sounds, const wchar_t*>> infectionSoundTable;
 
 bool initialSpawn;
 bool infectedPlayed;
 int zombiePlayerIndex = NONE;
+
+Infection::Infection()
+{
+}
 
 int Infection::calculateZombiePlayerIndex() 
 {
@@ -82,21 +86,17 @@ void Infection::sendTeamChange()
 	}
 }
 
-Infection::Infection()
-{
-}
-
 void Infection::triggerSound(e_infection_sounds sound, int sleep)
 {
-	if (i_SoundsTable.count(H2Config_language.code_main))
+	if (infectionSoundTable.count(H2Config_language.code_main))
 	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", i_SoundsTable[H2Config_language.code_main][sound]);
-		h2mod->custom_sound_play(i_SoundsTable[H2Config_language.code_main][sound], sleep);
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[H2Config_language.code_main][sound]);
+		h2mod->custom_sound_play(infectionSoundTable[H2Config_language.code_main][sound], sleep);
 	}
 	else
 	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", i_SoundsTable[0][sound]);
-		h2mod->custom_sound_play(i_SoundsTable[0][sound], sleep);
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[0][sound]);
+		h2mod->custom_sound_play(infectionSoundTable[0][sound], sleep);
 	}
 }
 
@@ -106,12 +106,12 @@ void Infection::InitClient()
 	infectedPlayed = false;
 	initialSpawn = true;
 
-	i_SoundsTable[_lang_id_english][e_infection_sounds::_snd_infected] = L"sounds/en/infected.wav";
-	i_SoundsTable[_lang_id_english][e_infection_sounds::_snd_infection] = L"sounds/en/infection.wav";
-	i_SoundsTable[_lang_id_english][e_infection_sounds::_snd_new_zombie] = L"sounds/en/new_zombie.wav";
-	i_SoundsTable[_lang_id_spanish][e_infection_sounds::_snd_infected] = L"sounds/es/infected.wav";
-	i_SoundsTable[_lang_id_spanish][e_infection_sounds::_snd_infection] = L"sounds/es/infection.wav";
-	i_SoundsTable[_lang_id_spanish][e_infection_sounds::_snd_new_zombie] = L"sounds/es/new_zombie.wav";
+	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_infected] = L"sounds/en/infected.wav";
+	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_infection] = L"sounds/en/infection.wav";
+	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_new_zombie] = L"sounds/en/new_zombie.wav";
+	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_infected] = L"sounds/es/infected.wav";
+	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_infection] = L"sounds/es/infection.wav";
+	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_new_zombie] = L"sounds/es/new_zombie.wav";
 
 	
 	//Change Local Player's Team to Human if Not in Green
@@ -125,7 +125,7 @@ void Infection::resetZombiePlayerStatus() {
 	zombieIdentifiers.clear();
 }
 
-void Infection::setZombiePlayerStatus(XUID identifier)
+void Infection::setZombiePlayerStatus(unsigned long long identifier)
 {
 	zombieIdentifiers.push_back(identifier);
 }
