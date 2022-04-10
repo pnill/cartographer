@@ -48,14 +48,12 @@
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
-    <ClCompile Include="H2MOD\Variants\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\HeadHunter\HeadHunter.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
-    <ClCompile Include="H2MOD\Variants\VariantPlayer.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Debug\Debug.cpp" />
@@ -145,6 +143,7 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
+    <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -315,14 +314,12 @@
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
-    <ClInclude Include="H2MOD\Variants\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
     <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
-    <ClInclude Include="H2MOD\Variants\VariantPlayer.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
@@ -471,7 +468,8 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
-    <ClInclude Include="Blam\Engine\IceCreamFlavour\IceCreamFlavor.h" />
+    <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
+    <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

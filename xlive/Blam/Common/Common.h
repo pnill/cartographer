@@ -47,15 +47,6 @@ static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagbloc
 #define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
 static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
 
-enum e_engine_type : int
-{
-	_single_player = 1,
-	_multiplayer,
-	_main_menu,
-	_mutiplayer_shared,
-	_single_player_shared
-};
-
 enum e_game_life_cycle : int
 {
 	_life_cycle_none,

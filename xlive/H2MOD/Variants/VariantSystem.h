@@ -1,23 +1,74 @@
 #pragma once
 
-class GameClientServerHandler {
-public:
-	virtual void onPeerHost() = 0;
-	virtual void onClient() = 0;
-	virtual void onDedi() = 0;
-	void execute();
+#include "Blam/Common/Common.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Engine/Game/GameOptions.h"
+
+enum CustomVariantId
+{
+	_id_unknown = -1,
+	_id_infection = 0,
+	_id_gungame,
+	_id_headhunter,
+	_id_firefigth,
+
+	_custom_variant_id_end
 };
 
-template <class GameClientServerHandler>
-class GameType {
+enum class ExecTime : int
+{
+	_ExecTimeUnknown = -1,
+
+	_preEventExec,
+	_postEventExec,
+};
+
+class IGameEngineEvent
+{
 public:
-	GameClientServerHandler* initializer;
-	GameClientServerHandler* deinitializer;
-	GameClientServerHandler* preSpawnPlayer;
-	GameClientServerHandler* spawnPlayer;
-	GameClientServerHandler* playerDeath;
-	GameClientServerHandler* playerKill;
-	GameClientServerHandler* itemInteraction;
+	// on map load can be used as Initialize
+	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) = 0;
+
+	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) = 0;
+	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
+	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) = 0;
+	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) = 0;
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) = 0;
+};
+
+class ICustomGameVariant : public IGameEngineEvent
+{
+public:
+	virtual void Initialize() = 0;
+	virtual void Dispose() = 0;
+	virtual CustomVariantId GetVariantId() = 0;
+	// virtual wchar_t* GetVariantName() = 0;
+};
+
+class CustomVariantHandler
+{
+public:
+	static void RegisterCustomVariants();
+	static void GameVarianEnable(const wchar_t* variant);
+
+	static void OnMapLoad(ExecTime execTime, s_game_options* gameOptions);
+
+	static void OnPlayerSpawn(ExecTime execTime, datum playerIdx);
+	static void OnPlayerDeath(ExecTime execTime, datum playerIdx);
+	static void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4);
+
+	static bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
+	static bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+
+	static void DisposeGameVariant();
+
+	static bool VariantEnabled(CustomVariantId variantId);
+
+private:
+	static ICustomGameVariant* GetCurrentGameVariant();
+	static ICustomGameVariant* GetGameVariant(CustomVariantId variantId);
+
+	static std::vector<ICustomGameVariant*> customVariants;
 };
 
 // TODO move this out

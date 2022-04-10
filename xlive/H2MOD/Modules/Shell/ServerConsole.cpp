@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "ServerConsole.h"
+
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Utils\Utils.h"

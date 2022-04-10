@@ -14,13 +14,22 @@ enum e_game_simulation : __int8
 	k_game_simulation_count = 0x6,
 };
 
+enum e_engine_type : int
+{
+	_single_player = 1,
+	_multiplayer,
+	_main_menu,
+	_mutiplayer_shared,
+	_single_player_shared
+};
+
 #pragma pack(push,1)
 struct s_game_options
 {
 	e_engine_type m_engine_type;
 	e_game_simulation m_simulation_type;
 	char field_5;
-	char session_host_is_dedicated;
+	bool session_host_is_dedicated;
 	char filed_7;
 	__int16 tickrate;
 	PAD(6);

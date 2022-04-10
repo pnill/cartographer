@@ -146,7 +146,7 @@ struct s_object_data_definition
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
-struct s_unit_data_definition :s_object_data_definition
+struct s_unit_data_definition : s_object_data_definition
 {
 	char gap_12C[4];
 	DWORD field_130;
@@ -155,8 +155,8 @@ struct s_unit_data_definition :s_object_data_definition
 							  //unit_data->unit_flags |= 2         -->unit_is_alive
 	e_object_team unit_team;
 	char pad[3];
-	WORD controlling_player_index;
-	char gap_142[14];
+	datum controlling_player_index;
+	char gap_142[12];
 	DWORD control_flags;
 	DWORD control_flags_2;
 	DWORD animation_state;

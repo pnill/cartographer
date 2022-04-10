@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "GunGame.h"
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
 #include "H2MOD\Engine\Engine.h"
@@ -46,12 +48,6 @@ datum weaponDatums[36] = {
 
 GunGame::GunGame()
 {
-	this->deinitializer = new GunGameDeinitializer();
-	this->initializer = new GunGameInitializer();
-	this->preSpawnPlayer = new GunGamePreSpawnHandler();
-	this->spawnPlayer = new GunGameSpawnHandler();
-	this->playerDeath = new GunGameDeathHandler();
-	this->playerKill = new GunGameKillHandler();
 }
 
 void GunGame::ReadWeaponLevels()
@@ -142,182 +138,194 @@ void GunGame::ResetPlayerLevels() {
 	gungamePlayers.clear();
 }
 
-void GunGame::PreSpawnPlayerSetup(int playerIndex)
+void GunGame::Initialize()
 {
-	if (playerIndex != NONE) {
-		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
-	}
-}
-
-void GunGame::SpawnPlayerServer(int playerIndex) {
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", playerIndex, s_player::GetName(playerIndex));
-
-	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-
-	if (unit_object) {
-		int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
-
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", playerIndex, s_player::GetName(playerIndex), level);
-
-		datum CurrentWeapon = GunGame::levelWeapon[level];
-
-		if (level < 15) {
-			call_give_player_weapon(playerIndex, CurrentWeapon, 1);
-		}
-		else if (level == 15) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", s_player::GetName(playerIndex));
-			h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 99, true);
-		}
-		else if (level == 16) {
-			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", s_player::GetName(playerIndex));
-			h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 99, true);
+	GunGame::InitWeaponLevels();
+	if (NetworkSession::LocalPeerIsSessionHost())
+	{
+		GunGame::ResetPlayerLevels();
+		if (!Memory::IsDedicatedServer())
+		{
+			GunGame::gungamePlayers[GetPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
 		}
 	}
 }
 
-void GunGame::PlayerDiedServer(int unit_datum_index)
+void GunGame::Dispose()
 {
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
-	if (unit_object) {
-		int playerIndex = h2mod->get_player_index_from_unit_datum_index(unit_datum_index);
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0, true);
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 0, true);
+	ResetPlayerLevels();
+}
+
+CustomVariantId GunGame::GetVariantId()
+{
+	return CustomVariantId::_id_gungame;
+}
+
+void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
+{
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		break;
+
+	case ExecTime::_postEventExec:
+		LOG_TRACE_GAME("[h2mod-infection] Peer host init");
+
+		switch (gameOptions->m_engine_type)
+		{
+			// cleanup when loading main menu
+		case _multiplayer:
+			this->Initialize();
+			break;
+		case _main_menu:
+			this->Dispose();
+			break;
+		default:
+			break;
+		}
+
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
 	}
 }
 
-void GunGame::LevelUpServer(int playerIndex)
+void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", playerIndex, s_player::GetName(playerIndex));
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
-	int level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)];
-	level++;
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		// to note after the original function executes, the controlled unit by this player is set to NONE
+		break;
 
-	if (level > 16)
-		level = GunGame::gungamePlayers[GetPlayerXuid(playerIndex)] = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
+	case ExecTime::_postEventExec:
+		if (!s_game_globals::game_is_predicted())
+		{
+			h2mod->set_player_unit_grenades_count(playerIdx, e_grenades::Fragmentation, 0, true);
+			h2mod->set_player_unit_grenades_count(playerIdx, e_grenades::Plasma, 0, true);
+		}
+		break;
 
-	GunGame::gungamePlayers[GetPlayerXuid(playerIndex)] = level;
-
-	LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp() player index: {0} - new level: {1} ", playerIndex, level);
-
-	if (level < 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", s_player::GetName(playerIndex), level);
-
-		datum LevelWeapon = GunGame::levelWeapon[level];
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0, true);
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 0, true);
-		call_give_player_weapon(playerIndex, LevelWeapon, 1);
-	}
-
-	else if (level == 15) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", s_player::GetName(playerIndex));
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 99,  true);
-	}
-
-	else if (level == 16) {
-		LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", s_player::GetName(playerIndex));
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Fragmentation, 0,  true);
-		h2mod->set_player_unit_grenades_count(playerIndex, e_grenades::Plasma, 99,  true);
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
 	}
 }
 
-void GunGameDeinitializer::onClient() {
-	//gun game does nothing for client on deinit
-}
 
-void GunGameDeinitializer::onDedi() {
-	//gun game does nothing for dedi on deinit
-}
-
-void GunGameDeinitializer::onPeerHost() {
-	//gun game does nothing for peer host on deinit
-}
-
-void GunGameInitializer::onClient() {
-	GunGame::InitWeaponLevels();
-}
-
-void GunGameInitializer::onDedi() {
-	GunGame::InitWeaponLevels();
-	GunGame::ResetPlayerLevels();
-}
-
-void GunGameInitializer::onPeerHost() {
-	GunGame::InitWeaponLevels();
-	GunGame::ResetPlayerLevels();
-	//TODO: is this really necessary (from old code)?
-	//init peer host gun game level
-	GunGame::gungamePlayers[GetPlayerXuid(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))] = 0;
-}
-
-void GunGamePreSpawnHandler::onClient() {
-	// do the same thing host does
-	onPeerHost();
-}
-
-void GunGamePreSpawnHandler::onDedi() {
-	// do the same thing host does
-	onPeerHost();
-}
-
-void GunGamePreSpawnHandler::onPeerHost() {
-	GunGame::PreSpawnPlayerSetup(this->getPlayerIndex());
-}
-
-void GunGameSpawnHandler::onClient() {
-	//gungame does nothing for the client on spawn
-}
-
-void GunGameSpawnHandler::onDedi() {
-	GunGame::SpawnPlayerServer(this->getPlayerIndex());
-}
-
-void GunGameSpawnHandler::onPeerHost() {
-	GunGame::SpawnPlayerServer(this->getPlayerIndex());
-}
-
-void GunGameDeathHandler::onClient() {
-	//gun game does nothing for clients on death
-}
-
-void GunGameDeathHandler::onDedi() {
-	GunGame::PlayerDiedServer(this->getUnitDatumIndex());
-}
-
-void GunGameDeathHandler::onPeerHost() {
-	GunGame::PlayerDiedServer(this->getUnitDatumIndex());
-}
-
-void GunGameKillHandler::onClient() {
-	//gun game does nothing for clients on score/kills
-}
-
-void GunGameKillHandler::onDedi() {
-	GunGame::LevelUpServer(this->getPlayerIndex());
-}
-
-void GunGameKillHandler::onPeerHost() {
-	GunGame::LevelUpServer(this->getPlayerIndex());
-}
-
-GunGameHandler::GunGameHandler() {}
-
-void GunGameHandler::setPlayerIndex(int playerIndex)
+void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 {
-	this->playerIndex = playerIndex;
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+
+	switch (execTime)
+	{
+		// prespawn handler
+	case ExecTime::_preEventExec:
+		s_player::SetUnitBipedType(absPlayerIdx, s_player::e_character_type::Spartan);
+		break;
+
+		// postspawn handler
+	case ExecTime::_postEventExec:
+		// host only (dedicated server and client)
+		if (!s_game_globals::game_is_predicted())
+		{
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() player index: {}, player name: {1}", absPlayerIdx, s_player::GetName(absPlayerIdx));
+
+			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
+			if (unit_object) {
+				int level = GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)];
+
+				LOG_TRACE_GAME(L"[H2Mod-GunGame]: SpawnPlayer() - player index: {}, player name: {1} - Level: {2}", absPlayerIdx, s_player::GetName(absPlayerIdx), level);
+
+				datum CurrentWeapon = GunGame::levelWeapon[level];
+
+				if (level < 15) {
+					call_give_player_weapon(absPlayerIdx, CurrentWeapon, 1);
+				}
+				else if (level == 15) {
+					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on frag grenade level!", s_player::GetName(absPlayerIdx));
+					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+				}
+				else if (level == 16) {
+					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on plasma grenade level!", s_player::GetName(absPlayerIdx));
+					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+				}
+			}
+		}
+
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 }
 
-void GunGameHandler::setUnitDatumIndex(datum unitDatumIndex)
+bool GunGame::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
-	this->unitDatumIndex = (h2mod->get_player_index_from_unit_datum_index(unitDatumIndex) != -1 ? unitDatumIndex : -1);
-}
+	int absPlayerIdx = a2;
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
-int GunGameHandler::getPlayerIndex()
-{
-	return this->playerIndex;
-}
+	// in gungame we just keep track of the score
+	bool handled = false;
 
-datum GunGameHandler::getUnitDatumIndex()
-{
-	return this->unitDatumIndex;
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		break;
+		
+	case ExecTime::_postEventExec:
+		if (!s_game_globals::game_is_predicted())
+		{
+			LOG_TRACE_GAME(L"[H2Mod-GunGame]: LevelUp() player index: {0}, player name: {1}", absPlayerIdx, s_player::GetName(absPlayerIdx));
+
+			int level = GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)];
+			level++;
+
+			if (level > 16)
+				level = 0; // reset level, so we dont keep the player without weapons, in case the game doesnt end
+
+			GunGame::gungamePlayers[GetPlayerXuid(absPlayerIdx)] = level;
+
+			LOG_TRACE_GAME("[H2Mod-GunGame]: LevelUp() player index: {0} - new level: {1} ", absPlayerIdx, level);
+
+			if (level < 15) {
+				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} on level {} giving them weapon...", s_player::GetName(absPlayerIdx), level);
+
+				datum LevelWeapon = GunGame::levelWeapon[level];
+				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
+				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
+				call_give_player_weapon(absPlayerIdx, LevelWeapon, 1);
+			}
+
+			else if (level == 15) {
+				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 15 - Frag Grenades!", s_player::GetName(absPlayerIdx));
+				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+			}
+
+			else if (level == 16) {
+				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} Level 16 - Plasma Grenades!", s_player::GetName(absPlayerIdx));
+				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
+				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+			}
+		}
+
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
+
+	return handled;
 }

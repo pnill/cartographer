@@ -13,7 +13,7 @@
 
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Engine\IceCreamFlavour\IceCreamFlavor.h"
+#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

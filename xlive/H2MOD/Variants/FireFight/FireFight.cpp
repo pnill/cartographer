@@ -1,32 +1,33 @@
 #include "stdafx.h"
 
 #include "FireFight.h"
+
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Cache\TagGroups\character_definition.hpp"
+
 #include "Blam\Engine\Actor\Actor.h"
 #include "Blam\Engine\Objects\Objects.h"
-#include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"
+
+#include "H2MOD.h"
+
+DeviceShop* deviceShop = new DeviceShop();
 
 FireFight::FireFight()
 {
-	this->deinitializer = new FireFightDeinitializer();
-	this->initializer = new FireFightInitializer();
-	this->preSpawnPlayer = new FireFightPreSpawnHandler();
-	this->spawnPlayer = new FireFightSpawnHandler();
-	this->playerDeath = new FireFightDeathHandler();
-	this->playerKill = new FireFightKillHandler();
 }
 
-void FireFight::KilledAI(datum ai_datum, XUID killer)
+void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
 	s_data_iterator<Actor> actorIt(game_state_actors);
-	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(ai_datum, FLAG(e_object_type::biped));
+	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(e_object_type::biped));
 
 	if (actorObject != NULL)
 	{
 		datum actor_datum = actorObject->simulation_actor_index; // Grab the actor from the killed AI
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(actor_datum) != -1) // Ensure that it was valid
+		if (!DATUM_IS_NONE(actor_datum)) // Ensure that it was valid
 		{
 			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->character_datum; // get the character tag datum assigned to the actor.
 			auto* character = tags::get_tag<blam_tag::tag_group_type::character, character_tag_group>(char_datum);
@@ -34,153 +35,142 @@ void FireFight::KilledAI(datum ai_datum, XUID killer)
 			if (character && character->SwarmProperties.size > 0)
 				points = character->SwarmProperties[0]->scatterKilledCount;
 
-			deviceShop->AddPoints(killer, points);
+			deviceShop->AddPoints(killerPlayerIdx, points);
 		}
 	}
-
 }
 
-XUID FireFightHandler::GetXUID()
-{
-	return this->xuid;
-}
-
-datum FireFightHandler::GetKilledDatum()
-{
-	return this->killed_datum;
-}
-
-void FireFightHandler::SetXUID(XUID xuid)
-{
-	this->xuid = xuid;
-}
-
-/* Should probably inherit variant_player... */
-void FireFightHandler::SetPlayerIndex(datum player_datum)
-{
-	XUID player = variantPlayer->GetXUID(player_datum, true);
-	variantPlayer->SetPlayerDatum(player,player_datum);
-
-	SetXUID(player);
-}
-
-void FireFightHandler::SetUnitDatum(datum unit_datum)
-{
-
-	XUID player = variantPlayer->GetXUID(unit_datum, false);
-	variantPlayer->SetUnitDatum(player, unit_datum);
-
-	SetXUID(player);
-}
-
-void FireFightHandler::SetKilledDatum(datum unit_datum)
-{
-	this->killed_datum = unit_datum;
-}
-
-void FireFight::initClient()
-{
-
-}
-
-void FireFight::initHost()
-{
-
-}
-
-void FireFightInitializer::onClient()
-{
-
-}
-
-void FireFightInitializer::onPeerHost()
-{
-
-}
-
-void FireFightInitializer::onDedi()
-{
-
-}
-
-void FireFightDeinitializer::onClient()
+void FireFight::Initialize()
 {
 	
 }
 
-void FireFightDeinitializer::onPeerHost()
+void FireFight::Dispose()
 {
-	variantPlayer->Deinitialize();
-	deviceShop->deinitialize();
+	if (NetworkSession::LocalPeerIsSessionHost())
+	{
+		deviceShop->Dispose();
+	}
 }
 
-void FireFightDeinitializer::onDedi()
+CustomVariantId FireFight::GetVariantId()
 {
-	variantPlayer->Deinitialize();
-	deviceShop->deinitialize();
+	return CustomVariantId::_id_firefigth;
 }
 
-void FireFightPreSpawnHandler::onClient()
+void FireFight::OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4)
 {
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		break;
 
+	case ExecTime::_postEventExec:
+		KilledAI(unitDatumIdx, *(datum*)(a2));
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 }
 
-void FireFightPreSpawnHandler::onPeerHost()
+void FireFight::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 {
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		break;
 
+	case ExecTime::_postEventExec:
+		switch (h2mod->GetEngineType())
+		{
+			// cleanup when loading main menu
+		case _multiplayer:
+			this->Initialize();
+			break;
+		/*case _main_menu:
+			this->Dispose();
+			break;*/
+
+		default:
+			break;
+		}
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 }
 
-void FireFightPreSpawnHandler::onDedi()
+void FireFight::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		// to note after the original function executes, the controlled unit by this player is set to NONE
+		break;
+
+	case ExecTime::_postEventExec:
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 }
 
-void FireFightSpawnHandler::onClient()
-{
 
+void FireFight::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
+{
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+
+	switch (execTime)
+	{
+		// prespawn handler
+	case ExecTime::_preEventExec:
+		break;
+
+		// postspawn handler
+	case ExecTime::_postEventExec:
+		// host only (dedicated server and client)
+		break;
+
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 }
 
-void FireFightSpawnHandler::onPeerHost()
+bool FireFight::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
+	int absPlayerIdx = a2;
+	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
-}
+	bool handled = false;
 
-void FireFightSpawnHandler::onDedi()
-{
+	switch (execTime)
+	{
+	case ExecTime::_preEventExec:
+		break;
 
-}
+	case ExecTime::_postEventExec:
+		break;
 
+	case ExecTime::_ExecTimeUnknown:
+	default:
+		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
+		break;
+	}
 
-/*
-	In the case of FireFight currently we use the OnDeath handler to also determine that someone killed an AI,
-	The reason being is it gives us the datum of the AI where the OnPlayerScore function will not.
-*/
-void FireFightDeathHandler::onClient()
-{
-
-}
-
-void FireFightDeathHandler::onPeerHost()
-{
-	FireFight::KilledAI(this->GetKilledDatum(), this->GetXUID());
-}
-
-void FireFightDeathHandler::onDedi()
-{
-	FireFight::KilledAI(this->GetKilledDatum(),this->GetXUID());
-}
-
-void FireFightKillHandler::onClient()
-{
-	
-}
-
-void FireFightKillHandler::onPeerHost()
-{
-
-}
-
-void FireFightKillHandler::onDedi()
-{
-
+	return handled;
 }

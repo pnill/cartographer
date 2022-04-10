@@ -1,7 +1,9 @@
 #pragma once
+
 #include "Blam\Common\Common.h"
-#include "H2MOD\Modules\Shell\ServerConsole.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
+#include "H2MOD\Modules\Shell\ServerConsole.h"
 
 
 #define EVENT_HANDLER_ENABLE_TEST_EVENTS 0
@@ -56,14 +58,14 @@ class EventCallback
 public:
 	void* callback;
 	EventType type;
-	EventExecutionType execution_type;
+	EventExecutionType executionType;
 	bool runOnce;
 	bool hasRun = false;
 
-	EventCallback::EventCallback(void* _callback, EventType _type, EventExecutionType _execution_type = EventExecutionType::execute_after, bool _runOnce = false) :
+	EventCallback::EventCallback(void* _callback, EventType _type, EventExecutionType _executionType = EventExecutionType::execute_after, bool _runOnce = false) :
 		callback(_callback),
 		type(_type),
-		execution_type(_execution_type),
+		executionType(_executionType),
 		runOnce(_runOnce)
 	{
 	}
@@ -163,7 +165,7 @@ namespace EventHandler
 		auto events = get_vector(event_type);
 		for (auto it = events->begin(); it != events->end(); ++it)
 		{
-			if (it->callback == callback && it->type == event_type && it->execution_type == execution_type)
+			if (it->callback == callback && it->type == event_type && it->executionType == execution_type)
 			{
 				events->erase(it);
 				return;
@@ -182,7 +184,7 @@ namespace EventHandler
 		auto it = events->begin();
 		while (it != events->end())
 		{
-			if (it->type == event_type && it->runOnce && it->hasRun && it->execution_type == execution_type)
+			if (it->type == event_type && it->runOnce && it->hasRun && it->executionType == execution_type)
 				it = events->erase(it);
 			else
 				++it;
@@ -216,7 +218,7 @@ namespace EventHandler
 		{
 			std::vector<EventCallback>* events = get_vector(event_type);
 			for (auto it = events->begin(); it != events->end(); ++it) {
-				if (it->type == event_type && it->execution_type == execution_type)
+				if (it->type == event_type && it->executionType == execution_type)
 				{
 					((T)it->callback)(std::forward<Args>(args) ...);
 					it->hasRun = true;

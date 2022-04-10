@@ -36,3 +36,8 @@ bool s_game_globals::game_is_mainmenu()
 {
 	return get_game_options()->m_engine_type == e_engine_type::_main_menu;
 }
+
+bool s_game_globals::game_is_predicted()
+{
+	return get_game_options()->m_simulation_type == _game_simulation_distributed_client;
+}

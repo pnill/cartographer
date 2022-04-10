@@ -4,79 +4,53 @@
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
-class ZombieHandler : public GameClientServerHandler {
-public:
-	void setPlayerIndex(int playerIndex);
-	void setUnitDatumIndex(datum unitDatumIndex);
-	int getPlayerIndex();
-	datum getUnitDatumIndex();
-private:
-	int playerIndex;
-	datum unitDatumIndex;
-};
-
-class InfectionInitializer : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class InfectionDeinitializer : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class ZombieSpawnHandler : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class ZombiePreSpawnHandler : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class ZombieDeathHandler : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class KillZombieHandler : public ZombieHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-
 enum e_infection_sounds
 {
-	infection,
-	infected,
-	new_zombie
+	_snd_infection,
+	_snd_infected,
+	_snd_new_zombie
 };
 
-class Infection : public GameType<ZombieHandler>
+class Infection : public ICustomGameVariant
 {
 public:
-	Infection();
-	static void initClient();
-	static void initHost();
+	virtual void Initialize() override;
+	virtual void Dispose() override;
+	virtual CustomVariantId GetVariantId() override;
+
+	// on map load can be used as Initialize
+	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) override;
+	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
+	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
+	
+	// unused bellow
+	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override
+	{
+	}
+
+	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override
+	{
+		return false;
+	}
+
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override
+	{
+		return false;
+	}
+
+	Infection::Infection();
+	Infection::~Infection();
+
+	static void InitClient();
+	static void InitHost();
 	static void preSpawnServerSetup();
 	static void resetWeaponInteractionAndEmblems();
 	static void sendTeamChange();
 	static void disableSlayerSounds();
 	static void resetZombiePlayerStatus();
 	static void setZombiePlayerStatus(XUID identifier);
-	static void spawnPlayerClientSetup(int playerIndex);
-	static void spawnServerPlayerSetup(int playerIndex);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
-	static void infectPlayer(int playerIndex, datum unitDatumIndex);
-	static void infectPlayers(int playerIndex, datum unitDatumIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);
 	static int calculateZombiePlayerIndex();
 private:

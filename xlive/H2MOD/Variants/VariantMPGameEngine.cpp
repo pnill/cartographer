@@ -609,7 +609,7 @@ void custom_game_engines::init()
 	custom_engine_wrapper_vtble.unk_function_51 = unk_function_51_wrapper;
 }
 
-bool custom_game_engines::register_engine(c_game_engine_types id, c_game_engine_base *engine, c_game_engine_types base_id)
+bool custom_game_engines::register_engine(e_game_engine_types id, c_game_engine_base *engine, e_game_engine_types base_id)
 {
 	// not freed till process exit
 	auto wrapper_class = new c_engine_internal;

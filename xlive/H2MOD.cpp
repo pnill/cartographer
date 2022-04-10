@@ -12,6 +12,7 @@
 #include "Blam\Engine\Game\DamageData.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
+#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
@@ -51,35 +52,19 @@
 #endif
 
 H2MOD* h2mod = new H2MOD();
-GunGame* gunGame = new GunGame();
-DeviceShop* deviceShop = new DeviceShop();
-Infection* infectionHandler = new Infection();
-FireFight* fireFightHandler = new FireFight();
-HeadHunter* headHunterHandler = new HeadHunter();
-VariantPlayer* variantPlayer = new VariantPlayer();
 
 extern int H2GetInstanceId();
 
 bool b_H2X = false;
-bool b_GunGame = false;
-bool b_FireFight = false;
 bool b_XboxTick = false;
-bool b_Infection = false;
-bool b_HeadHunter = false;
 
 // TODO: remove these
 s_data_array* game_state_actors = nullptr;
 
-std::unordered_map<wchar_t*, bool&> GametypesMap
+std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
-	{ L"gungame", b_GunGame },
-	{ L"zombies", b_Infection },
-	{ L"infection", b_Infection },
-	{ L"wareconomy", b_FireFight },
-	{ L"headhunter", b_HeadHunter },
-	{ L"graverobber", b_HeadHunter }
 };
 
 #pragma region engine calls
@@ -94,7 +79,7 @@ object_cause_damage_t p_object_cause_damage;
 void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
-	if (b_Infection) {
+	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
 		if (!DATUM_IS_NONE(damage_data->creator_datum) && damage_data->field_10 != -1)
 		{
 			LOG_TRACE_GAME(
@@ -305,9 +290,6 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		if (resetEquipment)
 			Engine::Unit::remove_equipment(unit_datum_index);
 
-		typedef bool(__cdecl* simulation_is_predicted)();
-		auto p_simulation_is_predicted = Memory::GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
-
 		// not sure what these flags are, but this is called when picking up grenades
 		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
 		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
@@ -316,7 +298,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
-		if (!p_simulation_is_predicted())
+		if (!s_game_globals::game_is_predicted())
 		{
 			// set grenade count
 			*(BYTE*)(unit_object + 0x252 + type) = count;
@@ -402,52 +384,32 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		std::thread(playSound).detach();
 }
 
-/* This is technically closer to object death than player-death as it impacts anything with health at all. */
-typedef char(__cdecl* player_death_t)(datum unit_datum_index, int a2, char a3, char a4);
-player_death_t p_player_death;
+typedef void(__cdecl* player_died_t)(datum player_index);
+player_died_t p_player_died;
 
-char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
+void __cdecl OnPlayerDeath(datum playerIdx)
 {
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, playerIdx);
+	p_player_died(playerIdx);
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, playerIdx);
+}
 
+/* This is technically closer to object death than player-death as it impacts anything with health at all. */
+typedef char(__cdecl* object_deplete_body_internal_t)(datum unit_datum_index, int a2, bool a3, bool a4);
+object_deplete_body_internal_t p_object_deplete_body_internal;
+
+char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
+{
 	//LOG_TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 
 	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
 
-	/* This is the unit of the player who last damaged the object*/
-	int damaging_player_unit = get_damage_owner(unit_datum_index);
-
-	if (b_HeadHunter)
-	{
-		headHunterHandler->playerDeath->SetDeadPlayer(unit_datum_index); // set this so we can spawn a skull on their position.
-		headHunterHandler->playerDeath->execute();
-	}
-
-	if (b_FireFight)
-	{
-		/* Hack until rest of code is changed to support datum vs int*/
-		datum ai_datum = datum(unit_datum_index);
-
-		/*
-			In firefight we want to track AI deaths and execute on them to grant points.
-		*/
-		fireFightHandler->playerDeath->SetPlayerIndex(*(datum*)(a2)); // this is the player datum of player who killed the datum.
-		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
-		fireFightHandler->playerDeath->execute();
-	}
-
-	if (b_GunGame) 
-	{
-		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
-		gunGame->playerDeath->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->playerDeath->setUnitDatumIndex(unit_datum_index);
-		infectionHandler->playerDeath->execute();
-	}
-
 	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
-	bool ret = p_player_death(unit_datum_index, a2, a3, a4);
+	CustomVariantHandler::OnObjectDamage(ExecTime::_preEventExec, unit_datum_index, a2, a3, a4);
+
+	bool ret = p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
+
+	CustomVariantHandler::OnObjectDamage(ExecTime::_postEventExec, unit_datum_index, a2, a3, a4);
 	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 
 	return ret;
@@ -467,28 +429,9 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
-	if (a5 == -1)
-	{
-		if(b_HeadHunter)
-			return;
-	}
-
-	if (a5 == 7) //player got a kill?
-	{
-		int PlayerIndex = a2;
-
-		if (b_GunGame) {
-			gunGame->playerKill->setPlayerIndex(PlayerIndex);
-			gunGame->playerKill->execute();
-		}
-
-		if (b_HeadHunter)
-		{
-			return;
-		}
-	}
-
+	CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
 	p_update_player_score(thisptr, a2, a3, a4, a5, a6);
+	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
 }
 
 // Client Sided Patch
@@ -538,17 +481,16 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 	int(_cdecl* AutoHandler)(datum, datum);
 	AutoHandler = (int(_cdecl*)(datum, datum))Memory::GetAddress(0x57AA5, 0x5FF9D);
 
-	if (b_HeadHunter)
-	{
-		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
-		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum);
-		headHunterHandler->itemInteraction->execute();
+	int result = 0;
 
-		if (handled)
-			return 0;
-	}
+	bool handled = CustomVariantHandler::OnAutoPickupHandler(ExecTime::_preEventExec, player_datum, object_datum);
 
-	return AutoHandler(player_datum, object_datum);
+	if (!handled)
+		result = AutoHandler(player_datum, object_datum);
+
+	CustomVariantHandler::OnAutoPickupHandler(ExecTime::_postEventExec, player_datum, object_datum);
+
+	return result;
 }
 
 void get_object_table_memory()
@@ -561,14 +503,17 @@ map_cache_load_t p_map_cache_load;
 
 bool __cdecl OnMapLoad(s_game_options* options)
 {
-	//Set the light suppressor flag to false
+	static bool resetAfterMatch = false;
+
+	// set the light suppressor flag to false
 	if (H2Config_light_suppressor)
 	{
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
-	static bool resetAfterMatch = false;
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
+
 	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -578,8 +523,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	tags::run_callbacks();
 
-	
-
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
@@ -588,31 +531,13 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
 	{
-		//TODO: issue #232
-		/*if (!NetworkSession::localPeerIsSessionHost()) {
-			advLobbySettings->resetLobbySettings();
-		}*/
-
-		if (b_Infection) {
-			infectionHandler->deinitializer->execute();
-			b_Infection = false;
-		}
-
-		if (b_GunGame) {
-			gunGame->deinitializer->execute();
-			b_GunGame = false;
-		}
-
 		if (b_XboxTick) {
 			options->tickrate = XboxTick::setTickRate(false);
 			b_XboxTick = false;
 		}
 
-		if(b_HeadHunter)
-		{
-			headHunterHandler->deinitializer->execute();
-			b_HeadHunter = false;
-		}
+		// here deinitialize the custom variant
+		CustomVariantHandler::DisposeGameVariant();
 
 		resetAfterMatch = false;
 	}
@@ -624,121 +549,93 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
-		return result;
 	}
-
-
-	wchar_t* variant_name = NetworkSession::GetGameVariantName();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad engine type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
-
-	for (auto& gametype_it : GametypesMap)
-		gametype_it.second = false; // reset custom gametypes state
-
-	ControllerInput::SetSensitiviy(H2Config_controller_sens);
-	MouseInput::SetSensitivity(H2Config_mouse_sens);
-	HudElements::OnMapLoad();
-	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
+	else
 	{
-		addDebugText("Engine type: Multiplayer");
-		
+		wchar_t* variant_name = NetworkSession::GetGameVariantName();
+		LOG_INFO_GAME(L"[h2mod] variant name {}", (int)h2mod->GetEngineType(), variant_name);
+
 		for (auto& gametype_it : GametypesMap)
 		{
-			if (StrStrIW(variant_name, gametype_it.first)) {
-				LOG_INFO_GAME(L"[h2mod] {} custom gametype turned on!", gametype_it.first);
-				gametype_it.second = true; // enable a gametype if substring is found
-			}
+			gametype_it.second = false; // reset custom gametypes state
 		}
-		
-		if (!b_XboxTick) 
+
+		ControllerInput::SetSensitiviy(H2Config_controller_sens);
+		MouseInput::SetSensitivity(H2Config_mouse_sens);
+		HudElements::OnMapLoad();
+
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
-			H2X::Initialize(b_H2X);
-			ProjectileFix::ApplyProjectileVelocity();
-			options->tickrate = XboxTick::setTickRate(false);
+			addDebugText("Engine type: Multiplayer");
+
+			for (auto& gametype_it : GametypesMap)
+			{
+				if (StrStrIW(variant_name, gametype_it.first)) {
+					LOG_INFO_GAME(L"{} - {} custom gametype turned on!", __FUNCTIONW__, gametype_it.first);
+					gametype_it.second = true;
+					break;
+				}
+			}
+
+			if (!b_XboxTick)
+			{
+				H2X::Initialize(b_H2X);
+				ProjectileFix::ApplyProjectileVelocity();
+				options->tickrate = XboxTick::setTickRate(false);
+			}
+			else
+			{
+				options->tickrate = XboxTick::setTickRate(true);
+			}
+
+			H2Tweaks::toggleAiMp(true);
+			H2Tweaks::toggleUncappedCampaignCinematics(false);
+
+			if (Engine::get_game_life_cycle() == _life_cycle_in_game)
+			{
+				// send server map checksums to client
+				//MapChecksumSync::SendState();
+
+				// here initialize custom variant
+				// in case it is found
+				CustomVariantHandler::GameVarianEnable(variant_name);
+			}
+
 		}
-		else
+		else if (h2mod->GetEngineType() == e_engine_type::_single_player)
 		{
-			options->tickrate = XboxTick::setTickRate(true);
+			//if anyone wants to run code on map load single player
+			addDebugText("Engine type: Singleplayer");
+			//H2X::Initialize(true);
+			H2Tweaks::toggleUncappedCampaignCinematics(true);
 		}
 
-		H2Tweaks::toggleAiMp(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(false);
-
-		if (Engine::get_game_life_cycle() == _life_cycle_in_game)
-		{
-			// send server map checksums to client
-			//MapChecksumSync::SendState();
-			//inform players of the current advanced lobby settings
-			// TODO: issue #232
-			//advLobbySettings->sendLobbySettingsPacket();
-
-			if (b_Infection) {
-				infectionHandler->initializer->execute();
-			}
-
-			if (b_GunGame) {
-				gunGame->initializer->execute();
-			}
-
-			if (b_HeadHunter) {
-				headHunterHandler->initializer->execute();
-			}
-		}
+		resetAfterMatch = true;
 	}
 
-	else if (h2mod->GetEngineType() == e_engine_type::_single_player)
-	{
-		//if anyone wants to run code on map load single player
-		addDebugText("Engine type: Singleplayer");
-		//H2X::Initialize(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(true);
-	}
-
-	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
-	resetAfterMatch = true;
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
 	return result;
 }
 
 typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
 player_spawn_t p_player_spawn;
 
-bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
+bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 {
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	if (b_HeadHunter)
+	
+
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
+	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
+
+	bool ret = p_player_spawn(playerDatumIdx);
+
+	// check if the spawn was successful
+	if (ret)
 	{
-		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		headHunterHandler->preSpawnPlayer->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		infectionHandler->preSpawnPlayer->execute();
-	}
-
-	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		gunGame->preSpawnPlayer->execute();
-	}
-
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIndex);
-	bool ret = p_player_spawn(playerDatumIndex);
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIndex);
-
-	if (b_HeadHunter)
-	{
-		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		headHunterHandler->spawnPlayer->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		infectionHandler->spawnPlayer->execute();
-	}
-
-	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		gunGame->spawnPlayer->execute();
+		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIdx);
+		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, playerDatumIdx);
 	}
 
 	return ret;
@@ -812,17 +709,12 @@ void __cdecl onCustomMapChange(const void* a1) {
 	on_custom_map_change_method(a1);
 }
 
-typedef bool(__cdecl* fn_c000bd114_t)(int);
+typedef bool(__cdecl* fn_c000bd114_t)(e_skulls);
 fn_c000bd114_t p_fn_c000bd114;
-bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
-{
-	bool* var_c004d8320 = Memory::GetAddress<bool*>(0x4d8320);
-	bool(*fn_c00049833_IsEngineModeCampaign)() = (bool(*)())Memory::GetAddress(0x49833);
 
-	bool result = false;
-	if (skull_index <= 14 && fn_c00049833_IsEngineModeCampaign())
-		result = var_c004d8320[skull_index];
-	return result;
+bool __cdecl fn_c000bd114_IsSkullEnabled(e_skulls skull_index)
+{
+	return ice_cream_flavor_available(skull_index);
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
@@ -877,12 +769,12 @@ typedef int(__cdecl *tdevice_touch)(datum device_datum, datum unit_datum);
 tdevice_touch pdevice_touch;
 
 bool device_active = true;
-//This happens whenever a player activates a device control.
+// This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
 	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
-		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
+		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
 		{
 			if (deviceShop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
@@ -926,7 +818,7 @@ short __cdecl get_enabled_teams_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	if (new_teams_enabled_flags && !b_Infection)
+	if (new_teams_enabled_flags && !CustomVariantHandler::VariantEnabled(_id_infection))
 		return new_teams_enabled_flags;
 	else
 		return default_teams_enabled_flags;
@@ -1229,12 +1121,13 @@ void H2MOD::ApplyHooks() {
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
-	DETOUR_ATTACH(p_player_death, Memory::GetAddress<player_death_t>(0x17B674, 0x152ED4), OnPlayerDeath);
-	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
+	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DE4A), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
+	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
+	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 
 	// bellow hooks applied to specific executables
-	if (Memory::IsDedicatedServer() == false) {
+	if (!Memory::IsDedicatedServer()) {
 
 		LOG_TRACE_GAME("Applying client hooks...");
 		/* These hooks are only built for the client, don't enable them on the server! */
@@ -1334,6 +1227,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();

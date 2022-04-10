@@ -8,7 +8,6 @@
 #include "Blam\Common\Common.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 
-#include "H2MOD\Variants\VariantPlayer.h"
 #include "H2MOD\Variants\Variants.h"
 
 enum e_sound_type
@@ -78,7 +77,4 @@ private:
 };
 
 extern H2MOD* h2mod;
-extern VariantPlayer* variantPlayer;
-extern DeviceShop* deviceShop;
-
 extern s_data_array* game_state_actors;

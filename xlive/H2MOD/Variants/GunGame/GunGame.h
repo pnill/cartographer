@@ -3,75 +3,39 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "H2MOD\Variants\VariantSystem.h"
 
-class GunGameHandler : public GameClientServerHandler {
-public:
-	GunGameHandler();
-	void setPlayerIndex(int playerIndex);
-	void setUnitDatumIndex(datum unitDatumIndex);
-	int getPlayerIndex();
-	datum getUnitDatumIndex();
-private:
-	int playerIndex;
-	datum unitDatumIndex;
-};
-
-class GunGameInitializer : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class GunGameDeinitializer : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class GunGameSpawnHandler : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class GunGamePreSpawnHandler : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class GunGameDeathHandler : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class GunGameKillHandler : public GunGameHandler {
-public:
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-
-class GunGame : public GameType<GunGameHandler>
+class GunGame : public ICustomGameVariant
 {
 public:
+	virtual void Initialize() override;
+	virtual void Dispose() override;
+	virtual CustomVariantId GetVariantId() override;
+
+	// on map load can be used as Initialize
+	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) override;
+	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
+	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
+
+
+	// unused bellow
+	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override
+	{
+	}
+
+	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override
+	{
+		return false;
+	}
+
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override;
+
 	GunGame();
+	~GunGame() {  };
+
 	static void ReadWeaponLevels();
 	static void InitWeaponLevels();
-	static void SpawnPlayerServer(int playerIndex);
-	static void PlayerDiedServer(int unit_datum_index); // We need to start using PlayerIndex here for sanity.
-	static void LevelUpServer(int PlayerIndex);
 	static void ResetPlayerLevels();
-	static void PreSpawnPlayerSetup(int playerIndex);
 
 	static std::unordered_map<int, datum> levelWeapon;
 	static std::unordered_map<XUID, int> gungamePlayers;
 
-	~GunGame() {  };
 };

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\IceCreamFlavour\IceCreamFlavor.h"
+#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
