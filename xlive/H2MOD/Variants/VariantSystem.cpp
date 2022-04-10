@@ -102,10 +102,14 @@ bool CustomVariantHandler::OnAutoPickupHandler(ExecTime execTime, datum playerId
 {
 	if (GetCurrentGameVariant() != nullptr)
 		return GetCurrentGameVariant()->OnAutoPickupHandler(execTime, playerIdx, objectIdx);
+
+	return false;
 }
 
 bool CustomVariantHandler::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
 	if (GetCurrentGameVariant() != nullptr)
 		return GetCurrentGameVariant()->OnPlayerScore(execTime, thisptr, a2, a3, a4, a5, a6);
+
+	return false;
 }
