@@ -1,5 +1,12 @@
 #pragma once
 
+static const int CMLabelMenuId_EditCrosshair = 0xFF000010;
+static const int CMLabelMenuId_EditFOV = 0xFF00000F;
+static const int CMLabelMenuId_VehicleEditFOV = 0xFF000020;
+static const int CMLabelMenuId_EditHz = 0xFF000018;
+static const int CMLabelMenuId_EditFPS = 0xFF00000E;
+static const int CMLabelMenuId_EditStaticLoD = 0xFF000014;
+static const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
 static const int CMLabelMenuId_VKeyTest = 0xFF00000B;
 static const int CMLabelMenuId_EscSettings = 0xFF000004;
 static const int CMLabelMenuId_Error = 0xFF000001;
@@ -12,6 +19,7 @@ static const int CMLabelMenuId_OtherSettings = 0xFF00000D;
 static const int CMLabelMenuId_AdvSettings = 0xFF000005;
 static const int CMLabelMenuId_AdvLobbySettings = 0xFF000016;
 static const int CMLabelMenuId_Credits = 0xFF000006;
+static const int CMLabelMenuId_Update = 0xFF000011;
 
 void InitCustomLanguage();
 void DeinitCustomLanguage();

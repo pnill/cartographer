@@ -3,7 +3,10 @@
 #include "c_list_widget.h"
 #include "c_screen_with_menu.h"
 
+struct s_new_ui_screen_parameters;
+
 typedef void(__thiscall* button_handler_cb_t)(void* context, int a1, int* a2);
+typedef void* (__cdecl* proc_ui_screen_load_cb_t)(s_new_ui_screen_parameters*);
 
 enum e_ui_channel
 {
@@ -17,7 +20,7 @@ enum e_ui_channel
 
 struct __declspec(align(4)) s_new_ui_screen_parameters
 {
-	void data_new(__int16 _flags1, __int16 _flags2, int ui_channel, int a4, void* (__cdecl* ui_screen_load_cb)(s_new_ui_screen_parameters*))
+	void data_new(__int16 _flags1, __int16 _flags2, int ui_channel, int a4, proc_ui_screen_load_cb_t ui_screen_load_cb)
 	{
 		this->flags = ((DWORD)_flags1 | (DWORD)(_flags2 << 16));
 		this->ui_channel = ui_channel;
@@ -40,7 +43,7 @@ struct __declspec(align(4)) s_new_ui_screen_parameters
 	DWORD field_10;
 	DWORD field_14;
 	DWORD field_18;
-	void*(__cdecl* proc_ui_screen_load_cb)(s_new_ui_screen_parameters*);
+	proc_ui_screen_load_cb_t proc_ui_screen_load_cb;
 };
 static_assert(sizeof(s_new_ui_screen_parameters) == 0x20);
 
@@ -62,6 +65,7 @@ int __cdecl user_interface_back_out_from_channel(int ui_channel, int screen_idx)
 
 void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id);
 
+int __stdcall sub_20F790_CM(int thisptr, __int16 selected_button_id);
 int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu_button_handler, int number_of_buttons);
 int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description);
 void __stdcall sub_2101a4_CMLTD(int thisptr, int label_id, wchar_t* rtn_label, int label_menu_id);
@@ -72,7 +76,7 @@ void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label
 int __stdcall sub_23ae3c_CMLTD(void* thisptr, int label_menu_id, int label_id_title, int label_id_description);
 char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id, int label_id_title, int label_id_description);
 
-int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);
-void CallWgit(int WgitScreenfunctionPtr);
-void CallWgit(int WgitScreenfunctionPtr, int open_method);
-void CallWgit(int WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr);
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method);
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
+int __cdecl CustomMenu_CallHead(s_new_ui_screen_parameters* a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);

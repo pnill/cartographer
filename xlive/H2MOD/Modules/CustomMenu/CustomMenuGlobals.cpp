@@ -24,21 +24,20 @@ int __cdecl user_interface_back_out_from_channel(int ui_channel, int window_idx)
 }
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
-int lastOuterMenuFuncPtr = 0;
+void* lastOuterMenuFuncPtr = 0;
 
-void CallWgit(int WgitScreenfunctionPtr) {
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr) {
 	CallWgit(WgitScreenfunctionPtr, 1, 0);
 }
 
-void CallWgit(int WgitScreenfunctionPtr, int open_method2) {
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2) {
 	CallWgit(WgitScreenfunctionPtr, open_method2, 0);
 }
 
 int prevOpenMethod = 3;
 //bool hacked21 = false;
-void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
+void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 	//int(__thiscall*WgitInitialize)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
-	signed int(__thiscall*WgitLoad)(void*, __int16, int, int, int) = (signed int(__thiscall*)(void*, __int16, int, int, int))((char*)H2BaseAddr + 0x20C226);
 	//0x0020C258 is another one.
 	//void*(__thiscall*WgitFinalize)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
 
@@ -71,24 +70,18 @@ void CallWgit(int WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 
 	//char* menu_setup = (char*)malloc(sizeof(char) * 0x20);
 	//WgitInitialize(menu_setup);
-	DWORD menu_setup[8];
-	menu_setup[3] = 0;
 
+	s_new_ui_screen_parameters new_screen_params;
 	switch (open_method) {
 	case 3:
-		WgitLoad(menu_setup, 1, 3, 4, WgitScreenfunctionPtr);
+		new_screen_params.data_new(0, 1, _ui_channel_gameshell_dialog, 4, WgitScreenfunctionPtr);
 		break;
 	case 0:
 	default:
-		WgitLoad(menu_setup, 1, 5, 4, WgitScreenfunctionPtr);
+		new_screen_params.data_new(0, 1, _ui_channel_gameshell_screen, 4, WgitScreenfunctionPtr);
 	}
 
-	void*(__cdecl *MenuHeadSetup)(DWORD*) = (void*(__cdecl*)(DWORD*))menu_setup[7];
-	void* menu_struct = MenuHeadSetup(menu_setup);
-
-	//void* menu_struct = WgitFinalize(menu_setup);
-
-	//free(menu_setup);
+	new_screen_params.ui_screen_load_proc_exec();
 }
 
 int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu_button_handler, int number_of_buttons)
@@ -165,14 +158,14 @@ int __cdecl sub_248B17_CM(int thisptr, int a2, int a3, int a4, DWORD* menu_vftab
 	return thisptr;
 }
 
-int __cdecl CustomMenu_CallHead(int a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type)
+int __cdecl CustomMenu_CallHead(s_new_ui_screen_parameters* a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type)
 {
-	int(__cdecl* sub_20B8C3)(int, int) = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x20B8C3);
+	auto sub_20B8C3 = (int(__cdecl*)(int, s_new_ui_screen_parameters*))((char*)H2BaseAddr + 0x20B8C3);
 
 	int menu_struct = (int)ui_memory_pool_allocate(3388, 0);
 	int menu_id = ((int*)menu_struct)[28];
 	if (menu_struct) {
-		menu_struct = sub_248B17_CM(menu_struct, *(DWORD*)(a1 + 4), *(DWORD*)(a1 + 8), *(WORD*)(a1 + 2), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
+		menu_struct = sub_248B17_CM(menu_struct, a1->ui_channel, a1->field_8, HIWORD(a1->flags), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
 	}
 	*(BYTE *)(menu_struct + 0x6C) = 1;
 	//*(BYTE *)(menu_struct + 0xd20) = 1;

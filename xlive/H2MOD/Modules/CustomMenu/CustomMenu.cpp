@@ -46,7 +46,6 @@ __asm pop ebp \
 
 void CMSetupVFTables(DWORD** menu_vftable_1, DWORD** menu_vftable_2, DWORD CM_LabelButtons, DWORD sub_2111ab_CMLTD_nak, DWORD CM_FuncPtrHelper, DWORD CM_ButtonPreselection, bool isInternalMenuWindow, DWORD sub_248beb_nak_deconstructor);
 int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3);
-int __stdcall sub_20F790_CM(int thisptr, __int16 selected_button_id);
 
 bool CMForce_Update = false;
 
@@ -66,7 +65,7 @@ void CM_Language_Sub_Setup_Buttons() {
 	Language_Sub_Count = 0;
 	cm_lang_variant_map.clear();
 	cm_lang_other_lang_map.clear();
-	for (auto const &ent1 : custom_languages) {
+	for (auto const& ent1 : custom_languages) {
 		if (CM_Language_Main == -1) {
 			if (ent1->other) {
 				add_cartographer_label(CMLabelMenuId_Language, 0x40 + Language_Sub_Count, ent1->lang_name, true);
@@ -96,8 +95,8 @@ void CM_Language_Sub_Setup_Buttons() {
 
 void __stdcall CMLabelButtons_Language_Sub(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -119,7 +118,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Language_Sub() {//__thiscall
 		push eax
 		push ecx
 		call sub_2111ab_CMLTD//__stdcall
-		
+
 		POP_REGISTERS
 
 		retn 4
@@ -146,9 +145,9 @@ __declspec(naked) void sub_20F790_CM_nak_Language_Sub() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Language_Sub(int);
+void* __cdecl CustomMenu_Language_Sub(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Language_Sub())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Language_Sub())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Language_Sub;
 }
 
@@ -159,15 +158,14 @@ void CMSetupVFTables_Language_Sub() {
 	CMSetupVFTables(&menu_vftable_1_Language_Sub, &menu_vftable_2_Language_Sub, (DWORD)CMLabelButtons_Language_Sub, (DWORD)sub_2111ab_CMLTD_nak_Language_Sub, (DWORD)CustomMenuFuncPtrHelp_Language_Sub, (DWORD)sub_20F790_CM_nak_Language_Sub, true, 0);
 }
 
-int __cdecl CustomMenu_Language_Sub(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Language_Sub, menu_vftable_2_Language_Sub, (DWORD)&CMButtonHandler_Language_Sub, Language_Sub_Count, 272);
+void* __cdecl CustomMenu_Language_Sub(s_new_ui_screen_parameters* a1) {
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Language_Sub, menu_vftable_2_Language_Sub, (DWORD)&CMButtonHandler_Language_Sub, Language_Sub_Count, 272);
 }
 
 bool GSCustomMenuCall_Language_Sub() {
 	CM_Language_Sub_Setup_Buttons();
 	if (Language_Sub_Count > 0) {
-		int WgitScreenfunctionPtr = (int)(CustomMenu_Language_Sub);
-		CallWgit(WgitScreenfunctionPtr);
+		CallWgit(CustomMenu_Language_Sub);
 		return true;
 	}
 	else {
@@ -198,8 +196,8 @@ void toggleLanguageCapture() {
 
 void __stdcall CMLabelButtons_Language(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -270,9 +268,9 @@ __declspec(naked) void sub_20F790_CM_nak_Language() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Language(int);
+void* __cdecl CustomMenu_Language(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Language())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Language())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Language;
 }
 
@@ -283,44 +281,27 @@ void CMSetupVFTables_Language() {
 	CMSetupVFTables(&menu_vftable_1_Language, &menu_vftable_2_Language, (DWORD)CMLabelButtons_Language, (DWORD)sub_2111ab_CMLTD_nak_Language, (DWORD)CustomMenuFuncPtrHelp_Language, (DWORD)sub_20F790_CM_nak_Language, true, 0);
 }
 
-int __cdecl CustomMenu_Language(int a1) {
+void* __cdecl CustomMenu_Language(s_new_ui_screen_parameters* a1) {
 	languageCaptureSetLabel();
-	return CustomMenu_CallHead(a1, menu_vftable_1_Language, menu_vftable_2_Language, (DWORD)&CMButtonHandler_Language, 13, 272);
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Language, menu_vftable_2_Language, (DWORD)&CMButtonHandler_Language, 13, 272);
 }
 
 void GSCustomMenuCall_Language() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Language);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Language);
 }
 
 #pragma endregion
 
 #pragma endregion
 
-
-const int CMLabelMenuId_EditCrosshair = 0xFF000010;
-
-const int CMLabelMenuId_EditFOV = 0xFF00000F;
-
-const int CMLabelMenuId_VehicleEditFOV = 0xFF000020;
-
-const int CMLabelMenuId_EditHz = 0xFF000018;
-
-const int CMLabelMenuId_EditFPS = 0xFF00000E;
-
-const int CMLabelMenuId_EditStaticLoD = 0xFF000014;
-
-const int CMLabelMenuId_EditCrosshairSize = 0xFF000015;
-
-const int CMLabelMenuId_Update = 0xFF000011;
 #pragma region CM_Update
 
 static bool force_keep_open_Update = false;
 
 void __stdcall CMLabelButtons_Update(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -390,8 +371,8 @@ void* __stdcall sub_248beb_deconstructor_Update(LPVOID lpMem, char a2)//__thisca
 		GSCustomMenuCall_Update();
 	}
 
-	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -416,9 +397,9 @@ __declspec(naked) void sub_248beb_nak_deconstructor_Update() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Update(int);
+void* __cdecl CustomMenu_Update(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Update())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Update())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Update;
 }
 
@@ -429,15 +410,14 @@ void CMSetupVFTables_Update() {
 	CMSetupVFTables(&menu_vftable_1_Update, &menu_vftable_2_Update, (DWORD)CMLabelButtons_Update, (DWORD)sub_2111ab_CMLTD_nak_Update, (DWORD)CustomMenuFuncPtrHelp_Update, (DWORD)sub_20F790_CM_nak_Update, true, (DWORD)sub_248beb_nak_deconstructor_Update);
 }
 
-int __cdecl CustomMenu_Update(int a1) {
+void* __cdecl CustomMenu_Update(s_new_ui_screen_parameters* a1) {
 	force_keep_open_Update = true;
 	GSDownloadInit();
-	return CustomMenu_CallHead(a1, menu_vftable_1_Update, menu_vftable_2_Update, (DWORD)&CMButtonHandler_Update, 4, 272);
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Update, menu_vftable_2_Update, (DWORD)&CMButtonHandler_Update, 4, 272);
 }
 
 void GSCustomMenuCall_Update() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Update);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Update);
 }
 
 #pragma endregion
@@ -448,8 +428,8 @@ const int CMLabelMenuId_Update_Note = 0xFF000012;
 
 void __stdcall CMLabelButtons_Update_Note(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -500,9 +480,9 @@ __declspec(naked) void sub_20F790_CM_nak_Update_Note() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Update_Note(int);
+void* __cdecl CustomMenu_Update_Note(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Update_Note())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Update_Note())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Update_Note;
 }
 
@@ -513,14 +493,13 @@ void CMSetupVFTables_Update_Note() {
 	CMSetupVFTables(&menu_vftable_1_Update_Note, &menu_vftable_2_Update_Note, (DWORD)CMLabelButtons_Update_Note, (DWORD)sub_2111ab_CMLTD_nak_Update_Note, (DWORD)CustomMenuFuncPtrHelp_Update_Note, (DWORD)sub_20F790_CM_nak_Update_Note, true, 0);
 }
 
-int __cdecl CustomMenu_Update_Note(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Update_Note, menu_vftable_2_Update_Note, (DWORD)&CMButtonHandler_Update_Note, 2, 272);
+void* __cdecl CustomMenu_Update_Note(s_new_ui_screen_parameters* a1) {
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Update_Note, menu_vftable_2_Update_Note, (DWORD)&CMButtonHandler_Update_Note, 2, 272);
 }
 
 void GSCustomMenuCall_Update_Note() {
 	if (!H2IsDediServer) {
-		int WgitScreenfunctionPtr = (int)(CustomMenu_Update_Note);
-		CallWgit(WgitScreenfunctionPtr);
+		CallWgit(CustomMenu_Update_Note);
 	}
 	char* lblTitle = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFF004);
 	char* lblDesc = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFF005);
@@ -543,8 +522,8 @@ const int CMLabelMenuId_Login_Warn = 0xFF000013;
 
 void __stdcall CMLabelButtons_Login_Warn(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -598,8 +577,8 @@ void* __stdcall sub_248beb_deconstructor_Login_Warn(LPVOID lpMem, char a2)//__th
 	extern int notify_xlive_ui;
 	notify_xlive_ui = 0;
 
-	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -624,9 +603,9 @@ __declspec(naked) void sub_248beb_nak_deconstructor_Login_Warn() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Login_Warn(int);
+void* __cdecl CustomMenu_Login_Warn(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Login_Warn())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Login_Warn())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Login_Warn;
 }
 
@@ -637,13 +616,12 @@ void CMSetupVFTables_Login_Warn() {
 	CMSetupVFTables(&menu_vftable_1_Login_Warn, &menu_vftable_2_Login_Warn, (DWORD)CMLabelButtons_Login_Warn, (DWORD)sub_2111ab_CMLTD_nak_Login_Warn, (DWORD)CustomMenuFuncPtrHelp_Login_Warn, (DWORD)sub_20F790_CM_nak_Login_Warn, true, (DWORD)sub_248beb_nak_deconstructor_Login_Warn);
 }
 
-int __cdecl CustomMenu_Login_Warn(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Login_Warn, menu_vftable_2_Login_Warn, (DWORD)&CMButtonHandler_Login_Warn, 0, 272);
+void* __cdecl CustomMenu_Login_Warn(s_new_ui_screen_parameters* a1) {
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Login_Warn, menu_vftable_2_Login_Warn, (DWORD)&CMButtonHandler_Login_Warn, 0, 272);
 }
 
 void GSCustomMenuCall_Login_Warn() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Login_Warn);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Login_Warn);
 }
 
 #pragma endregion
@@ -713,7 +691,7 @@ void RefreshToggleIngameKeyboardControls() {
 		//Reset them all back.
 		BYTE getFocusB[] = { 0x01 };
 		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
-		
+
 		BYTE getFocusE[] = { 0x0F, 0x85, 0x02, 0x02, 0x00, 0x00 };
 		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
 		getFocusE[2] = 0xF0;
@@ -721,7 +699,7 @@ void RefreshToggleIngameKeyboardControls() {
 		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
 		getFocusE[2] = 0xE3;
 		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
-		
+
 		BYTE disableKeyboard1[] = { 0x56, 0xFF, 0xD3 };
 		WriteBytes(H2BaseAddr + 0x2FA8A, disableKeyboard1, 3);
 		BYTE disableKeyboard2[] = { 0x01 };
@@ -743,8 +721,8 @@ void RefreshTogglexDelay() {
 
 void __stdcall CMLabelButtons_Credits(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -799,9 +777,9 @@ __declspec(naked) void sub_20F790_CM_nak_Credits() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Credits(int);
+void* __cdecl CustomMenu_Credits(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Credits())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Credits())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Credits;
 }
 
@@ -809,7 +787,7 @@ int(__cdecl *CustomMenuFuncPtrHelp_Credits())(int) {
 DWORD* menu_vftable_1_Credits = 0;
 DWORD* menu_vftable_2_Credits = 0;
 
-int __fastcall test_credits_construct(void* a1,DWORD _EDX, char a2)
+int __fastcall test_credits_construct(void* a1, DWORD _EDX, char a2)
 {
 	return sub_2111ab_CMLTD((int)a1, a2, CMLabelMenuId_Credits, 0xFFFFFFF0, 0xFFFFFFF1);
 }
@@ -819,13 +797,12 @@ void CMSetupVFTables_Credits() {
 	CMSetupVFTables(&menu_vftable_1_Credits, &menu_vftable_2_Credits, (DWORD)CMLabelButtons_Credits, (DWORD)sub_2111ab_CMLTD_nak_Credits, (DWORD)CustomMenuFuncPtrHelp_Credits, (DWORD)sub_20F790_CM_nak_Credits, true, 0);
 }
 
-int __cdecl CustomMenu_Credits(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 16, 272);
+void* __cdecl CustomMenu_Credits(s_new_ui_screen_parameters* a1) {
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Credits, menu_vftable_2_Credits, (DWORD)&CMButtonHandler_Credits, 16, 272);
 }
 
 void GSCustomMenuCall_Credits() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Credits);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Credits);
 }
 
 #pragma endregion
@@ -837,8 +814,8 @@ const int CMLabelMenuId_Invalid_Login_Token = 0xFF000017;
 
 void __stdcall CMLabelButtons_Invalid_Login_Token(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -851,7 +828,7 @@ void __stdcall CMLabelButtons_Invalid_Login_Token(int a1, int a2)
 __declspec(naked) void sub_2111ab_CMLTD_nak_Invalid_Login_Token() {//__thiscall
 	__asm {
 		mov eax, [esp + 4h]
-		
+
 		PUSH_REGISTERS
 
 		push 0xFFFFFFF1//label_id_description
@@ -885,9 +862,9 @@ __declspec(naked) void sub_20F790_CM_nak_Invalid_Login_Token() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Invalid_Login_Token(int);
+void* __cdecl CustomMenu_Invalid_Login_Token(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Invalid_Login_Token())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Invalid_Login_Token())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Invalid_Login_Token;
 }
 
@@ -901,8 +878,8 @@ void* __stdcall sub_248beb_deconstructor_Login_Token(LPVOID lpMem, char a2)//__t
 
 	c_account_list_menu::updateAccountingActiveHandle(false);
 
-	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -934,15 +911,14 @@ void CMSetupVFTables_Invalid_Login_Token() {
 	CMSetupVFTables(&menu_vftable_1_Invalid_Login_Token, &menu_vftable_2_Invalid_Login_Token, (DWORD)CMLabelButtons_Invalid_Login_Token, (DWORD)sub_2111ab_CMLTD_nak_Invalid_Login_Token, (DWORD)CustomMenuFuncPtrHelp_Invalid_Login_Token, (DWORD)sub_20F790_CM_nak_Invalid_Login_Token, true, (DWORD)sub_248beb_nak_deconstructor_Login_Token);
 }
 
-int __cdecl CustomMenu_Invalid_Login_Token(int a1) {
+void* __cdecl CustomMenu_Invalid_Login_Token(s_new_ui_screen_parameters* a1) {
 	c_account_list_menu::accountingGoBackToList = true;
 	c_account_list_menu::updateAccountingActiveHandle(true);
-	return CustomMenu_CallHead(a1, menu_vftable_1_Invalid_Login_Token, menu_vftable_2_Invalid_Login_Token, (DWORD)&CMButtonHandler_Invalid_Login_Token, 0, 272);
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Invalid_Login_Token, menu_vftable_2_Invalid_Login_Token, (DWORD)&CMButtonHandler_Invalid_Login_Token, 0, 272);
 }
 
 void GSCustomMenuCall_Invalid_Login_Token() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Invalid_Login_Token);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Invalid_Login_Token);
 }
 
 #pragma endregion
@@ -950,9 +926,9 @@ void GSCustomMenuCall_Invalid_Login_Token() {
 #pragma region CM_AccountCreate
 
 void GSCustomMenuCall_AccountCreate() {
-	int WgitScreenfunctionPtr = (int)(c_account_create_menu::open);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(c_account_create_menu::open);
 }
+
 #pragma endregion /* CM_AccountCreate */
 
 #pragma region CM_AccountEdit
@@ -974,8 +950,8 @@ void setupAccountEditLabels() {
 
 void __stdcall CMLabelButtons_AccountEdit(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -1074,7 +1050,7 @@ void xbox_live_task_progress_callback(DWORD a1)
 				return;
 			}
 			else {
-				if(CMForce_Update)
+				if (CMForce_Update)
 				{
 					//Just in case save the config to prevent a high iq individual from getting themsevles in an update loop.
 					SaveH2Config();
@@ -1104,7 +1080,7 @@ DWORD WINAPI ThreadLogin(LPVOID lParam)
 		char* identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		//login to account
-		
+
 		if (HandleGuiLogin(0, identifier, identifier_pass, &master_login_code)) {
 			H2AccountLastUsed = 0;
 		}
@@ -1170,8 +1146,8 @@ void* __stdcall sub_248beb_deconstructor_AccountEdit(LPVOID lpMem, char a2)//__t
 
 	c_account_list_menu::updateAccountingActiveHandle(false);
 
-	int(__thiscall* sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl* sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -1195,9 +1171,9 @@ __declspec(naked) void sub_248beb_nak_deconstructor_AccountEdit() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_AccountEdit(int);
+void* __cdecl CustomMenu_AccountEdit(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_AccountEdit())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_AccountEdit())(s_new_ui_screen_parameters*) {
 	return CustomMenu_AccountEdit;
 }
 
@@ -1208,16 +1184,15 @@ void CMSetupVFTables_AccountEdit() {
 	CMSetupVFTables(&menu_vftable_1_AccountEdit, &menu_vftable_2_AccountEdit, (DWORD)CMLabelButtons_AccountEdit, (DWORD)sub_2111ab_CMLTD_nak_AccountEdit, (DWORD)CustomMenuFuncPtrHelp_AccountEdit, (DWORD)sub_20F790_CM_nak_AccountEdit, true, (DWORD)sub_248beb_nak_deconstructor_AccountEdit);
 }
 
-int __cdecl CustomMenu_AccountEdit(int a1) {
+void* __cdecl CustomMenu_AccountEdit(s_new_ui_screen_parameters* a1) {
 	c_account_list_menu::accountingGoBackToList = true;
 	c_account_list_menu::updateAccountingActiveHandle(true);
 	setupAccountEditLabels();
-	return CustomMenu_CallHead(a1, menu_vftable_1_AccountEdit, menu_vftable_2_AccountEdit, (DWORD)&CMButtonHandler_AccountEdit, 4, 272);
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_AccountEdit, menu_vftable_2_AccountEdit, (DWORD)&CMButtonHandler_AccountEdit, 4, 272);
 }
 
 void GSCustomMenuCall_AccountEdit() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_AccountEdit);
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_AccountEdit);
 }
 
 #pragma endregion
@@ -1225,15 +1200,9 @@ void GSCustomMenuCall_AccountEdit() {
 
 #pragma region CM_AccountList
 
-void __cdecl CustomMenu_AccountList(s_new_ui_screen_parameters* parameters) {
-	c_account_list_menu::open(parameters);
-}
-
 void GSCustomMenuCall_AccountList() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_AccountList);
-	CallWgit(WgitScreenfunctionPtr, 3);
+	CallWgit(c_account_list_menu::open, 3);
 }
-
 
 #pragma endregion
 
@@ -1243,8 +1212,8 @@ const int CMLabelMenuId_Guide = 0xFF000003;
 
 void __stdcall CMLabelButtons_Guide(int a1, int a2)
 {
-	int(__thiscall* sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
-	void(__thiscall* sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
+	int(__thiscall * sub_211909)(int, int, int, int) = (int(__thiscall*)(int, int, int, int))((char*)H2BaseAddr + 0x211909);
+	void(__thiscall * sub_21bf85)(int, int label_id) = (void(__thiscall*)(int, int))((char*)H2BaseAddr + 0x21bf85);
 
 	__int16 button_id = *(WORD*)(a1 + 112);
 	int v3 = sub_211909(a1, 6, 0, 0);
@@ -1304,9 +1273,9 @@ __declspec(naked) void sub_20F790_CM_nak_Guide() {//__thiscall
 	}
 }
 
-int __cdecl CustomMenu_Guide(int);
+void* __cdecl CustomMenu_Guide(s_new_ui_screen_parameters*);
 
-int(__cdecl *CustomMenuFuncPtrHelp_Guide())(int) {
+void* (__cdecl* CustomMenuFuncPtrHelp_Guide())(s_new_ui_screen_parameters*) {
 	return CustomMenu_Guide;
 }
 
@@ -1317,18 +1286,17 @@ void CMSetupVFTables_Guide() {
 	CMSetupVFTables(&menu_vftable_1_Guide, &menu_vftable_2_Guide, (DWORD)CMLabelButtons_Guide, (DWORD)sub_2111ab_CMLTD_nak_Guide, (DWORD)CustomMenuFuncPtrHelp_Guide, (DWORD)sub_20F790_CM_nak_Guide, false, 0);
 }
 
-int __cdecl CustomMenu_Guide(int a1) {
+void* __cdecl CustomMenu_Guide(s_new_ui_screen_parameters* a1) {
 	char* guide_desc_base = H2CustomLanguageGetLabel(CMLabelMenuId_Guide, 0xFFFFFFF2);
 	char* guide_description = (char*)malloc(strlen(guide_desc_base) + 50);
 	sprintf(guide_description, guide_desc_base, GetVKeyCodeString(H2Config_hotkeyIdGuide).c_str());
 	add_cartographer_label(CMLabelMenuId_Guide, 0xFFFFFFF1, guide_description, true);
 	free(guide_description);
-	return CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Guide, menu_vftable_2_Guide, (DWORD)&CMButtonHandler_Guide, 4, 272);
 }
 
 void GSCustomMenuCall_Guide() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Guide);
-	CallWgit(WgitScreenfunctionPtr, 2, 272);
+	CallWgit(CustomMenu_Guide, 2, 272);
 }
 
 #pragma endregion
@@ -1347,27 +1315,27 @@ void GSCustomMenuCall_Esc() {
 
 #pragma region some tests
 
-typedef int(__stdcall *tbtnhandler)(void* thisptr, int a2, int a3);
+typedef int(__stdcall* tbtnhandler)(void* thisptr, int a2, int a3);
 tbtnhandler pbtnHandler;
 
-typedef int(__stdcall *tsub_20C226)(void*, __int16, int, int, int);
+typedef int(__stdcall* tsub_20C226)(void*, __int16, int, int, int);
 tsub_20C226 psub_20C226;
 int __stdcall sub_20C226(void* thisptr, __int16 a2, int a3, int a4, int a5) {
 	return psub_20C226(thisptr, a2, a3, a4, a5);
 }
 
 
-typedef char(__stdcall *tsub_24DC0D)(void*, int);
+typedef char(__stdcall* tsub_24DC0D)(void*, int);
 tsub_24DC0D psub_24DC0D;
 char __stdcall sub_24DC0D_CM(void* thisptr, int a2) {//__thiscall
-	
+
 	//char result = psub_24DC0D(thisptr, a2);
 	//return result;
 
 	//when sub_20EB2B returns 1 - closing outermost menu
 	//when sub_20EB2B returns 0 - closing inner menu's to go back not out completely
 
-	char(__thiscall*sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
+	char(__thiscall * sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
 	int(*sub_209BA3)() = (int(*)())((char*)H2BaseAddr + 0x209BA3);
 	signed int(*sub_209D08)() = (signed int(*)())((char*)H2BaseAddr + 0x209D08);
 
@@ -1393,16 +1361,16 @@ __declspec(naked) void sub_24DC0D_CM_nak() {
 	}
 }
 
-typedef char(__thiscall *tsub_23D8AE)(void*, int);
+typedef char(__thiscall* tsub_23D8AE)(void*, int);
 tsub_23D8AE psub_23D8AE;
 char __stdcall sub_23D8AE_CM(void* thisptr, int a2) {//__thiscall - cannot hook. must manually asm
 
 	//char result = psub_23D8AE(thisptr, a2);
 
 	//return result;
-	
-	char(__thiscall*sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
-	int(__thiscall*sub_212604)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x212604);
+
+	char(__thiscall * sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
+	int(__thiscall * sub_212604)(void*, int) = (int(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x212604);
 
 	int v2; // eax@2
 	char result; // al@4
@@ -1435,18 +1403,18 @@ __declspec(naked) void sub_23D8AE_CM_nak() {
 	}
 }
 
-typedef char(__stdcall *tsub_20EEBE)(void*, int);
+typedef char(__stdcall* tsub_20EEBE)(void*, int);
 tsub_20EEBE psub_20EEBE;
 char __stdcall sub_20EEBE_CM(void* thisptr, int a2) {//__thiscall
-	
+
 	//char result = psub_20EEBE(thisptr, a2);
 	//return result;
 
 	//when sub_20EB2B returns 1 - closing outermost menu
 	//when sub_20EB2B returns 0 - closing inner menu's to go back not out completely
 
-	char(__thiscall*sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
-	char(__thiscall*sub_214DDD)(void*) = (char(__thiscall*)(void*))((char*)H2BaseAddr + 0x214DDD);
+	char(__thiscall * sub_20EB2B)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x20EB2B);
+	char(__thiscall * sub_214DDD)(void*) = (char(__thiscall*)(void*))((char*)H2BaseAddr + 0x214DDD);
 
 	char result = sub_20EB2B(thisptr, a2);
 	if (!result)
@@ -1633,27 +1601,11 @@ __declspec(naked) void CM_keyHandler_outer_nak2() {
 
 #pragma endregion
 
-typedef char(__stdcall *tsub_23d060)(int, int*);
+typedef char(__stdcall* tsub_23d060)(int, int*);
 tsub_23d060 psub_23d060;
 char __stdcall sub_23d060(int thisptr, int* a2) //__thiscall
 {
 	return psub_23d060(thisptr, a2);//keyboard keypress handler
-}
-
-
-typedef void*(__stdcall *tsub_23BC45)(void*);
-tsub_23BC45 psub_23BC45;
-void* __stdcall sub_23BC45(void* thisptr)//__thiscall
-{
-	return psub_23BC45(thisptr);
-
-	void*(__thiscall* sub_23F756)(void*, __int16, __int16) = (void*(__thiscall*)(void*, __int16, __int16))((char*)H2BaseAddr + 0x23F756);
-
-	void* v1 = thisptr;
-	sub_23F756(thisptr, -1, 0);
-	//*v1 = &c_virtual_keyboard_button::`vftable';
-	*(DWORD*)v1 = (DWORD)(char*)H2BaseAddr + 0x3D30D4;
-	return v1;
 }
 
 void XUiShowSignInH2() {
@@ -1666,7 +1618,7 @@ void XUiShowSignInH2() {
 	}
 }
 
-typedef int(__cdecl *tsub_23f6b7)(int);
+typedef int(__cdecl* tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
@@ -1692,34 +1644,33 @@ void CMSetupVFTables_Obscure() {
 
 int Obscure_wgit_id = 296;
 
-int __cdecl CustomMenu_Obscure(int a1) {
-	return CustomMenu_CallHead(a1, menu_vftable_1_Obscure, menu_vftable_2_Obscure, (DWORD)&CMButtonHandler_Obscure, 14, Obscure_wgit_id);
+void* __cdecl CustomMenu_Obscure(s_new_ui_screen_parameters* a1) {
+	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Obscure, menu_vftable_2_Obscure, (DWORD)&CMButtonHandler_Obscure, 14, Obscure_wgit_id);
 }
 
 void GSCustomMenuCall_Obscure() {
-	int WgitScreenfunctionPtr = (int)(CustomMenu_Obscure);
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0021f5f8);//Network Adapter list.
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0021f681);//About dialog
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x0025692c);//keyboard layout
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x00259d05);//thumbstick layout
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x00259dc0);//button layout
-	CallWgit(WgitScreenfunctionPtr);
+	CallWgit(CustomMenu_Obscure);
 }
 
 
 #pragma endregion
 
 
-typedef void(__cdecl *tsub_bd137)(unsigned int);
+typedef void(__cdecl* tsub_bd137)(unsigned int);
 tsub_bd137 psub_bd137;
 void __cdecl sub_bd137(unsigned int skull_id) {
 	//psub_bd137(skull_id);
 
-	BYTE*(*sub_22CE83)() = (BYTE*(*)())((BYTE*)H2BaseAddr + 0x22CE83);
+	BYTE* (*sub_22CE83)() = (BYTE * (*)())((BYTE*)H2BaseAddr + 0x22CE83);
 	signed int(*sub_5343F)() = (signed int(*)())((BYTE*)H2BaseAddr + 0x5343F);
-	int(__cdecl* sub_22DEA4)(int, int) = (int(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x22DEA4);
-	DWORD(__cdecl* sub_A402C)(float, float, float, __int16) = (DWORD(__cdecl*)(float, float, float, __int16))((BYTE*)H2BaseAddr + 0xA402C);
-	DWORD(__cdecl* sub_8836C)(DWORD, float) = (DWORD(__cdecl*)(DWORD, float))((BYTE*)H2BaseAddr + 0x8836C);
+	int(__cdecl * sub_22DEA4)(int, int) = (int(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x22DEA4);
+	DWORD(__cdecl * sub_A402C)(float, float, float, __int16) = (DWORD(__cdecl*)(float, float, float, __int16))((BYTE*)H2BaseAddr + 0xA402C);
+	DWORD(__cdecl * sub_8836C)(DWORD, float) = (DWORD(__cdecl*)(DWORD, float))((BYTE*)H2BaseAddr + 0x8836C);
 
 	BYTE* byte_4D8320 = (BYTE*)((char*)H2BaseAddr + 0x4D8320);
 	DWORD* dword_3BCAF8 = (DWORD*)((char*)H2BaseAddr + 0x3BCAF8);
@@ -1758,7 +1709,7 @@ void __cdecl sub_bd137(unsigned int skull_id) {
 }
 
 void InitCustomMenu() {
-	
+
 #pragma region Init_Cartographer_Labels
 
 	add_cartographer_label(CMLabelMenuId_EscSettings, 0xFFFFFFF0, "Esc Settings");
@@ -1912,7 +1863,7 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 5, "L4 - High");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 6, "L5 - Very High");
 	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 7, "L6 - Cinematic");
-	
+
 
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size. Use the config file to modify crosshairs in more detail.");
@@ -1921,7 +1872,7 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Very Small");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Small");
 	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
-	
+
 
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
@@ -1999,7 +1950,7 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 1, "> FPS Limit");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 2, "> Static Model LoD");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 3, "> Refresh Rate");
-//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Controller Aim-Assist");
+	//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Controller Aim-Assist");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "Discord Rich Presence");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "xDelay");
 	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
@@ -2013,11 +1964,11 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
 	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
-//	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
+	//	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
 
 
-//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
-//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
+	//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
+	//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF2, "Enable %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF3, "Disable %s");
 	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF4, "Show %s");
@@ -2112,7 +2063,7 @@ void InitCustomMenu() {
 
 
 #pragma endregion
-	
+
 	if (H2IsDediServer)
 		return;
 
@@ -2148,7 +2099,7 @@ void InitCustomMenu() {
 	CMSetupVFTables_AccountEdit();
 
 	CMSetupVFTables_Guide();
-	
+
 	c_screen_with_menu::applyPatches();
 
 	// replace brightness menu for testing
@@ -2174,13 +2125,13 @@ int aab4 = 4;
 */
 
 
-void CMSetupVFTables(DWORD** menu_vftable_1, 
-	DWORD** menu_vftable_2, 
+void CMSetupVFTables(DWORD** menu_vftable_1,
+	DWORD** menu_vftable_2,
 	DWORD CM_LabelButtons,
-	DWORD sub_2111ab_CMLTD_nak, 
-	DWORD CM_FuncPtrHelper, 
+	DWORD sub_2111ab_CMLTD_nak,
+	DWORD CM_FuncPtrHelper,
 	DWORD CM_ButtonPreselection,
-	bool isInternalMenuWindow, 
+	bool isInternalMenuWindow,
 	DWORD sub_248beb_nak_deconstructor) {
 
 	//clone a brightness menu_vftable_1
@@ -2234,7 +2185,7 @@ void CMSetupVFTables(DWORD** menu_vftable_1,
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0x30) = (DWORD)H2BaseAddr + 0x2531AC;
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0x30) = (DWORD)H2BaseAddr + 0x25C9E8;
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0x30) = (DWORD)H2BaseAddr + 0x25D2D0;
-	
+
 
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0xC) = (DWORD)H2BaseAddr + 0x212CD8;//text related?
 	//*(DWORD*)((DWORD)*menu_vftable_2 + 0xC) = (DWORD)H2BaseAddr + 0x23D64E;//text related?
@@ -2257,7 +2208,7 @@ int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3) {
 	//result = pbtnHandler(thisptr, a2, a3);
 	int firstFuncPtr = *(int*)(*(DWORD*)thisptr - 4);
 	if (!firstFuncPtr) {
-		bool(__cdecl* customHandlerFunc)(int) = (bool(__cdecl*)(int))(*(int*)(*(DWORD*)thisptr + 16));
+		bool(__cdecl * customHandlerFunc)(int) = (bool(__cdecl*)(int))(*(int*)(*(DWORD*)thisptr + 16));
 		int button_id = *(int*)a3 & 0xFFFF;
 		bool success = customHandlerFunc(button_id);
 
@@ -2266,14 +2217,14 @@ int __stdcall BtnHandlerCaller(void* thisptr, int a2, int a3) {
 			int v4 = (*(int(__thiscall**)(int))(*(DWORD*)v3 + 56))(v3);//__thiscall
 			int v5 = (*(int(__thiscall**)(int))(*(DWORD*)v3 + 52))(v3);//__thiscall
 
-			int(__cdecl* sub_5A96DA)(int a1, int a2);
+			int(__cdecl * sub_5A96DA)(int a1, int a2);
 			sub_5A96DA = (int(__cdecl*)(int, int))((char*)H2BaseAddr + 0x2096DA);
 			result = sub_5A96DA(v5, v4);
 		}
 	}
 	else {
 		for (int i = *(DWORD*)thisptr; i; i = *(DWORD*)(i + 4)) {
-			result = (**(int(__thiscall ***)(DWORD, DWORD, DWORD))(i - 4))(i - 4, a2, a3);
+			result = (**(int(__thiscall***)(DWORD, DWORD, DWORD))(i - 4))(i - 4, a2, a3);
 		}
 	}
 	return result;
