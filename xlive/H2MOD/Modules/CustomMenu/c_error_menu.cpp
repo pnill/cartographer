@@ -12,8 +12,7 @@ void* __cdecl CustomMenu_Error_Inner(s_new_ui_screen_parameters* parameters) {
 
 void CustomMenuCall_Error_Inner() {
 	if (!Memory::IsDedicatedServer()) {
-		int WgitScreenfunctionPtr = (int)(CustomMenu_Error_Inner);
-		CallWgit(WgitScreenfunctionPtr, 1);
+		CallWgit(CustomMenu_Error_Inner, 1);
 	}
 
 	/*char* lblTitle = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFFFF0);
