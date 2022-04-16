@@ -336,7 +336,7 @@ int HostnameToIp(char* hostname, char* ip) {
 
 DWORD crc32buf(const char* buf, size_t len)
 {
-	register DWORD oldcrc32;
+	DWORD oldcrc32;
 
 	oldcrc32 = 0xFFFFFFFF;
 
@@ -350,7 +350,7 @@ DWORD crc32buf(const char* buf, size_t len)
 
 bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD &rtncrc32) {
 
-	register DWORD oldcrc32;
+	DWORD oldcrc32;
 
 	oldcrc32 = 0xFFFFFFFF;
 
