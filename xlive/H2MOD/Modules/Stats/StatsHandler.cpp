@@ -190,7 +190,7 @@ char* StatsHandler::checkServerRegistration()
 
 	CURL *curl;
 	CURLcode curlResult;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
@@ -251,7 +251,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -311,7 +311,7 @@ char* StatsHandler::getAPIToken()
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -379,7 +379,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -444,7 +444,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		CURL *curl;
 		CURLcode curlResult;
 
-		curl = curl_interface_init_no_ssl();
+		curl = curl_interface_init_no_verify();
 		if(curl)
 		{
 			//Set the URL for the GET
@@ -481,7 +481,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
@@ -985,7 +985,7 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	http_request_body.append(playerList);
 	
 	CURL *curl;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		struct curl_response_text s;

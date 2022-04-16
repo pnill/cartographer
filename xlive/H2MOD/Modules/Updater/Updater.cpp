@@ -84,7 +84,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 	CURL *curl;
 	FILE *fp;
 	CURLcode res;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		CreateDirTree(local_full_path);
 		fp = _wfopen(local_full_path, L"wb");

@@ -24,7 +24,7 @@ void AchievementUnlock(XUID xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 	std::string readBuffer;
 
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		rapidjson::Document document;
 		document.SetObject();
@@ -60,7 +60,7 @@ void GetAchievements(XUID xuid)
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 
 		std::string server_url(cartographerURL + "/achievement-api/achievement_list.php?xuid=" + std::to_string(xuid));

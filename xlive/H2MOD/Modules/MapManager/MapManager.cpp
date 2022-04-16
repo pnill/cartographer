@@ -442,7 +442,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += m_clientMapFilename;
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		fp = fopen(nonUnicodeMapFilePath.c_str(), "wb");
 		if (fp == nullptr) {

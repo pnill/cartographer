@@ -497,7 +497,7 @@ int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_re
 	CURLcode res;
 
 	/* get a curl handle */
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the

@@ -60,7 +60,7 @@ namespace imgui_handler
 					return false;
 			}*/
 
-			curl = curl_interface_init_no_ssl();
+			curl = curl_interface_init_no_verify();
 			if (curl)
 			{
 				fp = fopen(cpath.c_str(), "wb");
