@@ -405,13 +405,13 @@ char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 
 	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
 
-	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
+	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	CustomVariantHandler::OnObjectDamage(ExecTime::_preEventExec, unit_datum_index, a2, a3, a4);
 
 	bool ret = p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
 
 	CustomVariantHandler::OnObjectDamage(ExecTime::_postEventExec, unit_datum_index, a2, a3, a4);
-	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
+	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 
 	return ret;
 }
