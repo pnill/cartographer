@@ -13,7 +13,7 @@ namespace Engine
 
 	namespace Unit
 	{
-		int __cdecl remove_equipment(datum unit_idx);
+		void __cdecl remove_equipment(datum unit_idx);
 		signed int __cdecl inventory_next_weapon(datum unit_idx);
 		bool __cdecl assign_equipment_to_unit(datum unit_idx, datum object_idx, short a3);
 	}

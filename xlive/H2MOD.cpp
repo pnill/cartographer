@@ -702,13 +702,6 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-typedef void(__cdecl *on_custom_map_change)(const void* a1);
-on_custom_map_change on_custom_map_change_method;
-
-void __cdecl onCustomMapChange(const void* a1) {
-	on_custom_map_change_method(a1);
-}
-
 typedef bool(__cdecl* fn_c000bd114_t)(e_skulls);
 fn_c000bd114_t p_fn_c000bd114;
 
@@ -1094,13 +1087,9 @@ void H2MOD::ApplyHooks() {
 	DETOUR_BEGIN();
 
 	EngineHooks::ApplyHooks();
+
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
-
-	// hook to initialize stuff before game start
-	// p_map_cache_load = (map_cache_load)DetourFunc(Memory::GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-
-	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(Memory::GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
 
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
@@ -1121,7 +1110,7 @@ void H2MOD::ApplyHooks() {
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
-	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DE4A), OnPlayerDeath);
+	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
 	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
