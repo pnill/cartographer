@@ -262,7 +262,7 @@ struct s_player
 	static void SetBipedSpeed(int playerIndex, float speed);
 	static wchar_t* GetName(int playerIndex);
 	static datum GetPlayerUnitDatumIndex(int playerIndex);
-	static unsigned long long GetIdentifier(int playerIndex);
+	static unsigned long long GetId(int playerIndex);
 };
 CHECK_STRUCT_SIZE(s_player, 0x204);
 #pragma pack(pop)

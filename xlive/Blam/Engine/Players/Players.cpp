@@ -94,11 +94,11 @@ datum s_player::GetPlayerUnitDatumIndex(int playerIndex)
 	return GetPlayer(playerIndex)->unit_index;
 }
 
-unsigned long long s_player::GetIdentifier(int playerIndex)
+unsigned long long s_player::GetId(int playerIndex)
 {
 	if (!IndexValid(playerIndex))
 	{
-		return XUID(0ll);
+		return 0ull;
 	}
 
 	return GetPlayer(playerIndex)->identifier;
@@ -107,7 +107,6 @@ unsigned long long s_player::GetIdentifier(int playerIndex)
 PlayerIterator::PlayerIterator() 
 	: s_data_iterator(s_player::GetArray())
 {
-
 }
 
 bool PlayerIterator::get_next_active_player()
@@ -145,5 +144,5 @@ wchar_t* PlayerIterator::get_current_player_name()
 
 XUID PlayerIterator::get_current_player_id()
 {
-	return s_player::GetIdentifier(this->get_current_player_index());
+	return s_player::GetId(this->get_current_player_index());
 }

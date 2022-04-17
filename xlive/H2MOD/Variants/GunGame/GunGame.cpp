@@ -238,14 +238,14 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			if (unit_object) {
 
 				int level = 0;
-				auto gungamePlayer = gungamePlayers.find(GetPlayerXuid(absPlayerIdx));
+				auto gungamePlayer = gungamePlayers.find(GetPlayerId(absPlayerIdx));
 				if (gungamePlayer != gungamePlayers.end())
 				{
 					level = gungamePlayer->second;
 				}
 				else
 				{
-					gungamePlayers.insert(std::make_pair(GetPlayerXuid(absPlayerIdx), level));
+					gungamePlayers.insert(std::make_pair(GetPlayerId(absPlayerIdx), level));
 				}
 
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {1} - Level: {2}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx), level);
@@ -279,7 +279,7 @@ bool GunGame::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2,
 {
 	int absPlayerIdx = a2;
 	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
-	unsigned long long playerId = GetPlayerXuid(absPlayerIdx);
+	unsigned long long playerId = GetPlayerId(absPlayerIdx);
 
 	// in gungame we just keep track of the score
 	bool handled = false;
