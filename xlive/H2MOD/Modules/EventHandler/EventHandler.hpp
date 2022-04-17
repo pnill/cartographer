@@ -44,7 +44,7 @@ enum class EventType
 	player_control,
 	blue_screen,
 	player_spawn,
-	player_death
+	object_damage
 };
 
 enum class EventExecutionType
@@ -90,7 +90,7 @@ namespace EventHandler
 	using MapLoadEventCallback = void(*)(e_engine_type type);
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
-	using PlayerDeathEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
+	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
 
 	static const char* get_event_name(EventType event_type)
 	{
@@ -114,8 +114,8 @@ namespace EventHandler
 			return STRINGIFY(EventType::blue_screen);
 		case EventType::player_spawn:
 			return STRINGIFY(EventType::player_spawn);
-		case EventType::player_death:
-			return STRINGIFY(EventType::player_death);
+		case EventType::object_damage:
+			return STRINGIFY(EventType::object_damage);
 		case EventType::none:
 			return STRINGIFY(EventType::none);
 		default:
@@ -247,7 +247,5 @@ namespace EventHandler
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerControlEventExecute, EventType::player_control, PlayerControlEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(BlueScreenEventExecute, EventType::blue_screen, BlueScreenEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerSpawnEventExecute, EventType::player_spawn, PlayerSpawnEventCallback);
-	REGISTER_EVENT_EXECUTE_METHOD(PlayerDeathEventExecute, EventType::player_death, PlayerDeathEventCallback);
+	REGISTER_EVENT_EXECUTE_METHOD(ObjectDamageEventExecute, EventType::object_damage, ObjectDamageEventCallback);
 }
-
-

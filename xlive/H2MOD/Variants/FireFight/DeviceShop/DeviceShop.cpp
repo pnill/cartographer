@@ -75,7 +75,7 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 
 	if (!DATUM_IS_NONE(playerIdx))
 	{
-		long long playerId = s_player::GetIdentifier(playerAbsIdx);
+		unsigned long long playerId = s_player::GetId(playerAbsIdx);
 
 		int cost = GetCost(device_datum);
 		int points = player_points[playerId];
@@ -146,7 +146,7 @@ void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_tag_index)
 
 void DeviceShop::AddPoints(datum killerPlayerIdx, int points)
 {
-	long long playerId = s_player::GetIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(killerPlayerIdx));
+	unsigned long long playerId = s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(killerPlayerIdx));
 
 	std::string debug_txt;
 	debug_txt.append("Adding points: ");

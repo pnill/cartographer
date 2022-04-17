@@ -206,7 +206,7 @@ void Infection::preSpawnServerSetup() {
 	while (playerIt.get_next_active_player())
 	{
 		int currentPlayerIndex = playerIt.get_current_player_index();
-		XUID playerIdentifier = playerIt.get_current_player_id();
+		unsigned long long playerIdentifier = playerIt.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 		if (s_player::GetTeam(currentPlayerIndex) == ZOMBIE_TEAM && isZombie == false) {
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
@@ -271,7 +271,7 @@ void Infection::Initialize()
 			LOG_TRACE_GAME("[h2mod-infection] Peer host setting player as human");
 			//send out the team change packets to peers
 			Infection::sendTeamChange();
-			Infection::setZombiePlayerStatus(NetworkSession::GetPlayerXuid(zombiePlayerIndex));
+			Infection::setZombiePlayerStatus(NetworkSession::GetPlayerId(zombiePlayerIndex));
 		}
 	}
 }
@@ -335,12 +335,12 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		{
 			if (s_player::GetTeam(absPlayerIdx) != ZOMBIE_TEAM) {
 				//if we have a valid object and the object is not on the zombie team
-				XUID playerIdentifier = s_player::GetIdentifier(absPlayerIdx);
+				unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 
 				LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", h2mod->get_local_player_name(0), playerIdentifier);
 
 				// check if the player being infected is local
-				if (playerIdentifier == s_player::GetIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+				if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 					LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 					h2mod->set_local_team_index(0, ZOMBIE_TEAM);
 					s_player::SetUnitBipedType(absPlayerIdx, s_player::e_character_type::Flood);
@@ -359,7 +359,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
 			if (unit_object) {
 				if (h2mod->get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
-					Infection::setZombiePlayerStatus(s_player::GetIdentifier(absPlayerIdx));
+					Infection::setZombiePlayerStatus(s_player::GetId(absPlayerIdx));
 				}
 				else {
 					// take away zombie's weapons
@@ -392,10 +392,10 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 		if (!Memory::IsDedicatedServer())
 		{
-			XUID playerIdentifier = s_player::GetIdentifier(absPlayerIdx);
+			unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, h2mod->get_local_player_name(0));
 			//If player being spawned is LocalUser/Player
-			if (playerIdentifier == s_player::GetIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
+			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
 			{
 				LOG_TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = {}", h2mod->get_local_team_index());
 				//Change biped if LocalUser is in GreenTeam
@@ -406,6 +406,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 			}
 		}
+
 		if (!s_game_globals::game_is_predicted())
 			Infection::preSpawnServerSetup();
 		break;
@@ -416,9 +417,9 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// client only
 		if (!Memory::IsDedicatedServer())
 		{
-			XUID playerIdentifier = s_player::GetIdentifier(absPlayerIdx);
+			unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 			// if player being spawned is local
-			if (playerIdentifier == s_player::GetIdentifier(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 				if (initialSpawn == true) {
 					//start of zombie match
 					Infection::triggerSound(e_infection_sounds::_snd_infection, 1000);

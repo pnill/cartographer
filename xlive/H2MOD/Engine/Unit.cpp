@@ -6,16 +6,15 @@ namespace Engine
 {
 	namespace Unit
 	{
-		int __cdecl remove_equipment(datum unit_idx)
+		void __cdecl remove_equipment(datum unit_idx)
 		{
 			//LOG_TRACE_GAME("unit_reset_equipment(unit_datum_index: %08X)", unit_datum_index);
-			typedef int(__cdecl* unit_reset_equipment_t)(datum unit_idx);
+			typedef void(__cdecl* unit_reset_equipment_t)(datum unit_idx);
 			auto p_unit_reset_equipment = Memory::GetAddress<unit_reset_equipment_t>(0x1441E0, 0x133030);
 			if (!DATUM_IS_NONE(unit_idx))
 			{
-				return p_unit_reset_equipment(unit_idx);
+				p_unit_reset_equipment(unit_idx);
 			}
-			return 0;
 		}
 
 		signed int __cdecl inventory_next_weapon(datum unit_idx)

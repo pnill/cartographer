@@ -148,7 +148,7 @@ const wchar_t* NetworkSession::GetPlayerName(int playerIdx)
 	return GetPlayerInformation(playerIdx)->properties.player_name;
 }
 
-unsigned long long NetworkSession::GetPlayerXuid(int playerIdx)
+unsigned long long NetworkSession::GetPlayerId(int playerIdx)
 {
 	return GetPlayerInformation(playerIdx)->identifier;
 }
@@ -158,22 +158,6 @@ int NetworkSession::GetPlayerTeam(int playerIdx)
 	return GetPlayerInformation(playerIdx)->properties.player_team;
 }
 
-int NetworkSession::GetPlayerTeamFromXuid(long long xuid)
-{
-	if (GetPlayerCount() > 0)
-	{
-		int playerIdx = 0;
-		do
-		{
-			if (PlayerIsActive(playerIdx) && GetPlayerXuid(playerIdx) == xuid)
-				return GetPlayerTeam(playerIdx);
-
-			playerIdx++;
-		} while (playerIdx < 16);
-	}
-	return NONE;
-}
-
 int NetworkSession::GetPeerIndexFromId(long long xuid)
 {
 	if (GetPlayerCount() > 0)
@@ -181,7 +165,7 @@ int NetworkSession::GetPeerIndexFromId(long long xuid)
 		int playerIdx = 0;
 		do
 		{
-			if (PlayerIsActive(playerIdx) && GetPlayerXuid(playerIdx) == xuid)
+			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
 				return GetPeerIndex(playerIdx);
 			playerIdx++;
 		} while (playerIdx < 16);
@@ -251,7 +235,7 @@ void NetworkSession::LogPlayersToConsole() {
 			outStr += L", Name from game player state=";
 			outStr += s_player::GetName(playerIdx);
 			outStr += L", Team=" + std::to_wstring(GetPlayerTeam(playerIdx));
-			outStr += L", Identifier=" + std::to_wstring(GetPlayerXuid(playerIdx));
+			outStr += L", Identifier=" + std::to_wstring(GetPlayerId(playerIdx));
 
 			commands->output(outStr);
 		}

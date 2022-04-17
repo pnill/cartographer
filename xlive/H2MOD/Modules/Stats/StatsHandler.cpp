@@ -190,7 +190,7 @@ char* StatsHandler::checkServerRegistration()
 
 	CURL *curl;
 	CURLcode curlResult;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
@@ -251,7 +251,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -311,7 +311,7 @@ char* StatsHandler::getAPIToken()
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -379,7 +379,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -444,7 +444,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		CURL *curl;
 		CURLcode curlResult;
 
-		curl = curl_interface_init_no_ssl();
+		curl = curl_interface_init_no_verify();
 		if(curl)
 		{
 			//Set the URL for the GET
@@ -481,7 +481,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
@@ -916,7 +916,7 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 					{
 						auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
 
-						if (playerIdentifier == NetworkSession::GetPlayerXuid(j)
+						if (playerIdentifier == NetworkSession::GetPlayerId(j)
 							&& playerInfo->properties.player_displayed_skill != rank)
 						{
 							LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
@@ -942,7 +942,7 @@ std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 			bool addSeparator = false;
 			if (NetworkSession::PlayerIsActive(i))
 			{
-				auto playerIdentifier = NetworkSession::GetPlayerXuid(i);
+				auto playerIdentifier = NetworkSession::GetPlayerId(i);
 				XUIDs.append(IntToString(playerIdentifier, std::dec));
 				
 				if (i + 1 < ENGINE_PLAYER_MAX 
@@ -985,7 +985,7 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	http_request_body.append(playerList);
 	
 	CURL *curl;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		struct curl_response_text s;

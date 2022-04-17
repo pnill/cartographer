@@ -90,7 +90,7 @@ int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu
 	void*(__thiscall* sub_21FFC9)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x21FFC9);
 	void(__stdcall* sub_28870B)(int, int, int, void(__thiscall*)(DWORD), int) = (void(__stdcall*)(int, int, int, void(__thiscall*)(DWORD), int))((char*)H2BaseAddr + 0x28870B);
 	int(__thiscall* sub_2113C6)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x2113C6);
-	int(__cdecl* sub_20D1FD)(char*, int numberOfButtons, int) = (int(__cdecl*)(char*, int, int))((char*)H2BaseAddr + 0x20D1FD);
+	int(__cdecl* sub_20D1FD)(const char*, int numberOfButtons, int) = (int(__cdecl*)(const char*, int, int))((char*)H2BaseAddr + 0x20D1FD);
 	int(__cdecl* sub_66B33)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x66B33);
 	int(__cdecl* sub_667A0)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x667A0);
 	void*(__thiscall* sub_2113D3)(int, int) = (void*(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2113D3);
@@ -119,7 +119,7 @@ int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu
 	*((DWORD*)v2 + 182) = (DWORD)menu_button_handler;
 	DWORD* safds = ((DWORD*)v2 + 182);
 
-	char editliststr[] = "brightness level settings edit list";
+	const char* editliststr = "brightness level settings edit list";
 
 	int v3 = sub_20D1FD(editliststr, number_of_buttons, 4);
 
