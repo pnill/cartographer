@@ -125,18 +125,18 @@ namespace MeleeFix
 				float tolerance = 0.1f;
 				//This is to calculate how many frames before and after the action frame a melee should be possible..
 				float leeway = (float)(biped_melee_info->max_animation_range) * tolerance / 2;
-				LOG_INFO_GAME("[MeleeFix] Frame Data: Current Frame {} Action Frame {} Leeway {}", currentFrame, actionFrame, leeway);
+				LOG_TRACE_GAME("[MeleeFix] Frame Data: Current Frame {} Action Frame {} Leeway {}", currentFrame, actionFrame, leeway);
 
 				if (currentFrame >= actionFrame - leeway && currentFrame <= actionFrame + leeway)
 				{
 					melee_damage(object_index, melee_type, biped_melee_info->field_30, (float)(unsigned __int8)biped_melee_info->field_31 * 0.0039215689);
 					if (MeleeHit) 
 					{
-						LOG_INFO_GAME("[MeleeFix] Melee Hit!");
+						LOG_TRACE_GAME("[MeleeFix] Melee Hit!");
 					}
 					else 
 					{
-						LOG_INFO_GAME("[MeleeFix] Melee Missed!");
+						LOG_TRACE_GAME("[MeleeFix] Melee Missed!");
 					}
 				}
 			}

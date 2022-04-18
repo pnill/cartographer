@@ -113,12 +113,12 @@ namespace player_representation
 		return 0xF28C3826;
 	}
 
-	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, s_player::s_player_properties* a2);
-	t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
+	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
+	network_session_player_profile_recieve_t* p_network_session_player_profile_recieve;
 
 	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* a2)
 	{
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
 			p_network_session_player_profile_recieve(player_index, a2);
@@ -303,7 +303,7 @@ namespace player_representation
 	}
 	void apply_hooks()
 	{
-		p_network_session_player_profile_recieve = Memory::GetAddress<t_network_session_player_profile_recieve*>(0x52F23);
+		p_network_session_player_profile_recieve = Memory::GetAddress<network_session_player_profile_recieve_t*>(0x52F23);
 		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), network_session_player_profile_recieve);
 		//Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
 		WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);

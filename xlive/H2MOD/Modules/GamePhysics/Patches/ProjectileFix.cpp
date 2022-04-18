@@ -37,12 +37,12 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
 	{
-		//LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
+		LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
 		tick_length = time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / HitFix_Projectile_Tick_Rate);
 	}
 	else
 	{
-		//LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
+		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
 		tick_length = time_globals::get_seconds_per_tick();
 	}
 }
@@ -66,14 +66,14 @@ bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, true);
-	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, false);
-	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 

@@ -75,16 +75,7 @@ int WINAPI XNetDnsRelease(void * pxndns)
 // #75
 DWORD WINAPI XNetGetEthernetLinkStatus()
 {
-	static int print = 0;
-
-
-	if (print < 15)
-	{
-		//LOG_TRACE_NETWORK("XNetGetEthernetLinkStatus() - active: 100 mbps, full duplex");
-
-		print++;
-	}
-
+	LIMITED_LOG(35, LOG_TRACE_NETWORK, "XNetGetEthernetLinkStatus() - active: 100 mbps, full duplex");
 	return XNET_ETHERNET_LINK_ACTIVE | XNET_ETHERNET_LINK_100MBPS | XNET_ETHERNET_LINK_FULL_DUPLEX;
 }
 

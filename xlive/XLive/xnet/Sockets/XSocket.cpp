@@ -120,8 +120,8 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 	{
 		LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
 		// set socket send/recv buffers size, but only if the socket isn't blocking
-		xsocket->setBufferSize(SO_SNDBUF, gXnIp.GetMinSockSendBufferSizeInBytes());
-		xsocket->setBufferSize(SO_RCVBUF, gXnIp.GetMinSockRecvBufferSizeInBytes());
+		xsocket->SetBufferSize(SO_SNDBUF, gXnIp.GetMinSockSendBufferSizeInBytes());
+		xsocket->SetBufferSize(SO_RCVBUF, gXnIp.GetMinSockRecvBufferSizeInBytes());
 
 		// remove last error even if we didn't successfuly increased the recv/send buffer size
 		WSASetLastError(0);
@@ -142,7 +142,7 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 		|| optname == SO_RCVBUF)
 	{
 		int bufferSize = *(int*)(optval);
-		return xsocket->setBufferSize(optname, bufferSize);
+		return xsocket->SetBufferSize(optname, bufferSize);
 	}
 
 	int ret = setsockopt(xsocket->winSockHandle, level, optname, optval, optlen);
@@ -158,7 +158,7 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 // #8: XSocketGetSockOpt
 int WINAPI XSocketGetSockOpt(SOCKET s, int level, int optname, char *optval, int *optlen)
 {
-	//LOG_TRACE_NETWORK("XSocketGetSockOpt()");
+	LOG_TRACE_NETWORK("XSocketGetSockOpt()");
 	XSocket* xsocket = (XSocket*)s;
 	return getsockopt(xsocket->winSockHandle, level, optname, optval, optlen);
 }
@@ -177,7 +177,7 @@ int WINAPI XSocketGetPeerName(SOCKET s, struct sockaddr *name, int *namelen)
 	LOG_TRACE_NETWORK("XSocketGetPeerName()");
 	XSocket* xsocket = (XSocket*)s;
 
-	if (xsocket->isTCP())
+	if (xsocket->IsTCP())
 		return getpeername(xsocket->winSockHandle, name, namelen);
 	else
 		return WSAENOTCONN;
@@ -191,7 +191,7 @@ int WINAPI XSocketConnect(SOCKET s, const struct sockaddr *name, int namelen)
 	LOG_TRACE_NETWORK("XSocketConnect  (socket = {0:x}, name = {1:p}, namelen = {2})",
 		xsocket->winSockHandle, (void*)name, namelen);
 
-	if (xsocket->isTCP())
+	if (xsocket->IsTCP())
 		return connect(xsocket->winSockHandle, name, namelen);
 	else
 		return SOCKET_ERROR;
@@ -213,16 +213,9 @@ int WINAPI XSocketListen(SOCKET s, int backlog)
 SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
 {
 	XSocket* xsocket = (XSocket*)s;
-
-	static int print = 0;
-	if (print < 25)
-	{
-		LOG_TRACE_NETWORK("XSocketAccept  (socket = {0:x}, addr = {1:p}, addrlen = {2})",
+	
+	LIMITED_LOG(35, LOG_TRACE_NETWORK, "XSocketAccept  (socket = {0:x}, addr = {1:p}, addrlen = {2})",
 			xsocket->winSockHandle, (void*)addr, *addrlen);
-
-		print++;
-	}
-
 
 	return accept(xsocket->winSockHandle, addr, addrlen);
 }
@@ -231,13 +224,7 @@ SOCKET WINAPI XSocketAccept(SOCKET s, struct sockaddr *addr, int *addrlen)
 // #15: XSocketSelect
 int WINAPI XSocketSelect(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, const struct timeval *timeout)
 {
-	static int print = 0;
-	if (print < 15)
-	{
-		LOG_TRACE_NETWORK("XSocketSelect()");
-
-		print++;
-	}
+	LIMITED_LOG(35, LOG_TRACE_NETWORK, "XSocketSelect()");
 
 	return select(nfds, readfds, writefds, exceptfds, timeout);
 }
@@ -272,7 +259,7 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	if (outWinApiError)
 		*outWinApiError = false;
 
-	if (this->isTCP()
+	if (this->IsTCP()
 		|| lpFrom == NULL)
 	{
 		return WSARecv(
@@ -360,7 +347,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	XSocket* xsocket = (XSocket*)s;
 	sockaddr_in* inTo = (sockaddr_in*)lpTo;
 
-	if (xsocket->isTCP() || inTo == NULL)
+	if (xsocket->IsTCP() || inTo == NULL)
 	{
 		return WSASend(
 			xsocket->winSockHandle,
@@ -408,34 +395,34 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
-		sendToAddr.sin_addr.s_addr = xnIp->getOnlineIpAddress().s_addr;
+		sendToAddr.sin_addr.s_addr = xnIp->GetOnlineIpAddr().s_addr;
 
 		// check if the online ip address is the same as the local one
 		// and if the online ip address of the connection is 0, fall back to LAN address
 		// to allow packets to be sent even if an account is logged in locally or online (local Xbox profile or Online profile)
-		if (xnIp->getOnlineIpAddress().s_addr == gXnIp.GetLocalUserXn()->getOnlineIpAddress().s_addr
-			|| xnIp->getOnlineIpAddress().s_addr == 0)
+		if (xnIp->GetOnlineIpAddr().s_addr == gXnIp.GetLocalUserXn()->GetOnlineIpAddr().s_addr
+			|| xnIp->GetOnlineIpAddr().s_addr == 0)
 		{
-			sendToAddr.sin_addr.s_addr = xnIp->getLanIpAddr().s_addr;
+			sendToAddr.sin_addr.s_addr = xnIp->GetLanIpAddr().s_addr;
 		}
 
 		switch (ntohs(inTo->sin_port))
 		{
 		case 1000:
 			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2v_sockets::Sock1000)))
+			if (!xsocket->SockAddrInInvalid(xnIp->GetNatAddr(H2v_sockets::Sock1000)))
 			{
 				// if there's nat data use it
-				sendToAddr = *xnIp->getNatAddr(H2v_sockets::Sock1000);
+				sendToAddr = *xnIp->GetNatAddr(H2v_sockets::Sock1000);
 			}
 
 			break;
 
 		case 1001:
 			sendToAddr.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-			if (!xsocket->sockAddrInInvalid(xnIp->getNatAddr(H2v_sockets::Sock1001)))
+			if (!xsocket->SockAddrInInvalid(xnIp->GetNatAddr(H2v_sockets::Sock1001)))
 			{
-				sendToAddr = *xnIp->getNatAddr(H2v_sockets::Sock1001);
+				sendToAddr = *xnIp->GetNatAddr(H2v_sockets::Sock1001);
 			}
 
 			break;
@@ -723,7 +710,7 @@ u_short WINAPI XSocketHTONS(u_short hostshort)
 	return htons(hostshort);
 }
 
-int XSocket::setBufferSize(int optname, INT bufSize)
+int XSocket::SetBufferSize(int optname, INT bufSize)
 {
 	static const std::unordered_set<int> sockOpts = { SO_SNDBUF, SO_RCVBUF };
 
@@ -733,7 +720,7 @@ int XSocket::setBufferSize(int optname, INT bufSize)
 		return SOCKET_ERROR;
 	}
 
-	if (!this->isUDP())
+	if (!this->IsUDP())
 	{
 		WSASetLastError(WSAEINVAL);
 		return SOCKET_ERROR;
@@ -766,12 +753,12 @@ int XSocket::setBufferSize(int optname, INT bufSize)
 	return 0;
 }
 
-int XSocket::udpSend(const char* buf, int len, int flags, sockaddr *to, int tolen)
+int XSocket::UdpSend(const char* buf, int len, int flags, sockaddr *to, int tolen)
 {
 	return XSocketSendTo((SOCKET)this, buf, len, flags, to, tolen);
 }
 
-void XSocket::socketsDisposeAll()
+void XSocket::SocketsDisposeAll()
 {
 	for (auto xsocket : Sockets)
 	{

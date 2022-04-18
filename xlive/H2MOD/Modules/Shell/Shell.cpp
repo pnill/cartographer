@@ -81,9 +81,8 @@ void _Shell::FileErrorDialog(int fpErrNo)
 		break;
 	case ESRCH:
 		_Shell::OpenMessageBox(NULL, MB_ICONEXCLAMATION, "Permission Error!", "Probably a missing folder issue if file writing related. Please restart Halo 2 in Administrator mode!");
-
+		break;
 	default:
-		addDebugText("Unknown file failure! error 0x%x", fpErrNo);
 		_Shell::OpenMessageBox(NULL, MB_ICONEXCLAMATION, "Unknown file failure!", "Error 0x%x", fpErrNo);
 		break;
 	}

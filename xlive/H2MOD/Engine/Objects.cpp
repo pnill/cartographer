@@ -14,8 +14,7 @@ namespace Engine::Objects
 {
 	void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
 	{
-		//LOG_TRACE_GAME("object_placement_data_new(s_object_placement_data: %08X,",s_object_placement_data);
-		//LOG_TRACE_GAME("object_definition_index: %08X, object_owner: %08X, unk: %08X)", object_definition_index, object_owner, unk);
+		LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
 
 		typedef void(__cdecl* object_placement_data_new_t)(void*, datum, datum, int);
 		auto p_object_placement_data_new = Memory::GetAddress<object_placement_data_new_t>(0x132163, 0x121033);
@@ -26,7 +25,7 @@ namespace Engine::Objects
 	//Pass new placement data into Create_object_new
 	datum object_new(s_object_placement_data* object_placement_data)
 	{
-		//LOG_TRACE_GAME("object_new(pObject: %08X)", pObject);
+		LOG_TRACE_GAME("{}", __FUNCTION__);
 
 		typedef datum(__cdecl* object_new_t)(s_object_placement_data*);
 		auto p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
@@ -169,6 +168,8 @@ namespace Engine::Objects
 
 	void apply_biped_object_definition_patches()
 	{
+		LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
+
 		// increase the data size for biped representation
 		WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_data_definition));
 
