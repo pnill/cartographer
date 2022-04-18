@@ -554,7 +554,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	else
 	{
 		wchar_t* variant_name = NetworkSession::GetGameVariantName();
-		LOG_INFO_GAME(L"[h2mod] variant name {}", (int)h2mod->GetEngineType(), variant_name);
+		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)h2mod->GetEngineType(), variant_name);
 
 		for (auto& gametype_it : GametypesMap)
 		{
@@ -824,10 +824,10 @@ signed int __cdecl get_next_hill_index(int previousHill)
 	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
 	if (previousHill + 1 >= hillCount) 
 	{
-		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
+		LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, 0);
 		return 0;
 	}
-	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
+	LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, previousHill + 1);
 	return previousHill + 1;
 }
 
@@ -864,7 +864,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 	{
 		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
 		{
-			LOG_DEBUG_GAME(L"Minimum Player count met.");
+			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
 			minimumPlayersConditionMet = true;
 		}
 		else
@@ -881,7 +881,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 	if (H2Config_force_even && TeamPlay == 1 && minimumPlayersConditionMet)
 	{
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
-		LOG_DEBUG_GAME(L"Balancing teams");
+		LOG_INFO_GAME(L"{} - balancing teams", __FUNCTIONW__);
 		std::map<std::string, std::vector<int>> Parties;
 		std::vector<int> nonPartyPlayers;
 		for (auto i = 0; i < 16; i++) //Detect party members
@@ -1035,14 +1035,17 @@ void vip_lock(e_game_life_cycle state)
 
 void H2MOD::RegisterEvents()
 {
-	if(!Memory::IsDedicatedServer())//Client only callbacks	
+	if(!Memory::IsDedicatedServer())
 	{
+		// Client only callbacks	
 
 	}
-	else //Server only callbacks
+	else 
 	{
-		//Setup Events for H2Config_vip_lock
-		if(H2Config_vip_lock)
+		// Server only callbacks
+		
+		// Setup Events for H2Config_vip_lock
+		if (H2Config_vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
 	//Things that apply to both
@@ -1066,6 +1069,7 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
+// sword-flying target clear patch
 void __cdecl aim_assist_targeting_clear_hook(int target_data)
 {
 	if (!s_game_globals::game_is_campaign())
@@ -1082,7 +1086,7 @@ void __cdecl aim_assist_targeting_clear_hook(int target_data)
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
-	LOG_TRACE_GAME("Applying hooks...");
+	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
 
 	DETOUR_BEGIN();
 
@@ -1118,7 +1122,7 @@ void H2MOD::ApplyHooks() {
 	// bellow hooks applied to specific executables
 	if (!Memory::IsDedicatedServer()) {
 
-		LOG_TRACE_GAME("Applying client hooks...");
+		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		//Shader display hook
@@ -1174,8 +1178,8 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}
 	else {
+		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
 
-		LOG_TRACE_GAME("Applying dedicated server hooks...");
 		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 
@@ -1192,6 +1196,9 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
+	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
+	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
+
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
@@ -1224,14 +1231,15 @@ void H2MOD::Initialize()
 	HaloScript::Initialize();
 	player_representation::initialize();
 	KantTesting::Initialize();
-	LOG_TRACE_GAME("H2MOD - Initialized {}", DLL_VERSION_STR);
-	LOG_TRACE_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 
 	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
+
+	LOG_INFO_GAME("H2MOD - Initialized");
 }
 
-void H2MOD::Deinitialize() {
+void H2MOD::Deinitialize() 
+{
 }

@@ -31,7 +31,6 @@ enum e_static_lod : DWORD
 	cinematic
 };
 
-bool __cdecl call_add_object_to_sync(datum gamestate_object_datum);
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 
 class H2MOD

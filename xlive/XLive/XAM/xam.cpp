@@ -3,8 +3,6 @@
 #include "xam.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 
-//extern ConsoleCommands* commands;
-
 struct NOTIFY_LISTEN
 {
 	HANDLE id;
@@ -369,6 +367,6 @@ DWORD WINAPI XNotifyPositionUI(DWORD dwPosition)
 // #653
 int WINAPI XNotifyDelayUI(int a1)
 {
-	//LOG_TRACE_XLIVE("XNotifyDelayUI");
+	LOG_TRACE_XLIVE("XNotifyDelayUI");
 	return 0;
 }

@@ -13,7 +13,7 @@ CXNetQoS XNetQoS;
 
 void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
 {
-	//LOG_TRACE_NETWORK_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "ClientQoSLookup( cxna: {}, cProbes: {})", cxna, cProbes);
 
 	while (pqos->cxnqosPending > 0)
 	{
@@ -471,8 +471,8 @@ void CXNetQoS::Listener()
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags)
 {
-	//LOG_TRACE_NETWORK("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
-	//	pxnkid, pb, cb, dwBitsPerSec, dwFlags);
+	LOG_TRACE_NETWORK("XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
+		cb, dwBitsPerSec, dwFlags);
 
 	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_DISABLE)) 
 	{
@@ -527,7 +527,7 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 // #70: XNetQosLookup
 DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY * apxnkey[], UINT cina, IN_ADDR aina[], DWORD adwServiceId[], UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS** pxnqos)
 {
-	LOG_TRACE_NETWORK("{} ( cxna: {}, cina: {}, cProbes: {}, dwBitsPerSec: {}, hEvent: {})",
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "{} ( cxna: {}, cina: {}, cProbes: {}, dwBitsPerSec: {}, hEvent: {})",
 		__FUNCTION__, cxna, cina, cProbes, dwBitsPerSec, hEvent);
 
 	XNADDR** apxna_copy = new XNADDR*[cxna];
@@ -568,6 +568,7 @@ INT WINAPI XNetQosServiceLookup(DWORD dwFlags, WSAEVENT hEvent, XNQOS** ppxnqos)
 // #72: XNetQosRelease
 INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "XNetQosRelease()");
 	for (unsigned int i = 0; i < pxnqos->cxnqos; i++)
 	{
 		// this may crash other games, doesn't for H2PC
@@ -580,7 +581,6 @@ INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 	// delete[] pxnqos; 
 
 	/* We need to clean-up all XNetQoSLookup data here, listener data should be cleaned up inside the Listen function Only. */
-	LOG_TRACE_NETWORK("XNetQosRelease()");
 	return 0;
 }
 

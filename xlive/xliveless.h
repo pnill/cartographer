@@ -34,7 +34,45 @@ extern h2log *onscreendebug_log;
 extern h2log *voice_log;
 
 #define CHECK_PTR(check, expression) \
-	((void) ((!(check)) || ((expression), 0)))
+do \
+{ \
+	if ((check)) \
+		(expression); \
+} while (0)
+
+// to note this is not thread safe
+// you might see the max log count reached message more than once in a row
+#define LIMITED_LOG(log_limit, logger, ...) \
+do \
+{ \
+	static unsigned int _logged_times_count; \
+	if (_logged_times_count < log_limit) { \
+		logger(__VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+	else if (_logged_times_count == log_limit) \
+	{ \
+		logger("	reached max log count of {} for: ", log_limit); \
+		logger(__VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+} while(0)
+
+#define LIMITED_LOGW(log_limit, logger, ...) \
+do \
+{ \
+	static unsigned int _logged_times_count; \
+	if (_logged_times_count < log_limit) { \
+		logger(__VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+	else if (_logged_times_count == log_limit) \
+	{ \
+		logger(L"	reached max log count of {} for: ", log_limit); \
+		logger(__VA_ARGS__); \
+		_logged_times_count++; \
+	} \
+} while(0)
 
 // Generic logging
 // For the most unimportant stuff

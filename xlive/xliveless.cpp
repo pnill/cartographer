@@ -345,8 +345,8 @@ DWORD WINAPI XGetOverlappedExtendedError(PXOVERLAPPED pOverlapped)
 // #1083: XGetOverlappedResult
 DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOOL bWait)
 {
-	//LOG_TRACE_XLIVE("XGetOverlappedResult  (pOverlapped = %X, pResult = %X, bWait = %d)  (internalLow = %X, internalHigh = %X)",
-	//	pOverlapped, pResult, bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
+	//LOG_TRACE_XLIVE("XGetOverlappedResult  (bWait = %d)  (internalLow = %X, internalHigh = %X)",
+	// bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
 
 	if (bWait)
 	{
@@ -443,17 +443,7 @@ LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 // #5017: XLivePBufferFree
 DWORD WINAPI XLivePBufferFree (FakePBuffer * pBuffer)
 {
-	static int print = 0;
-
-
-	if( print < 35 )
-	{
-		print++;
-
-
-		LOG_TRACE_XLIVE("XLivePBufferFree  (pBuffer = {:p})", (void*)pBuffer);
-	}
-
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferFree  (pBuffer = {:X})", (void*)pBuffer);
 
 	if( !pBuffer ) return 0;
 
@@ -533,6 +523,8 @@ int WINAPI XCancelOverlapped (PXOVERLAPPED pOverlapped)
 // #5256: XEnumerate
 int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcItemsReturned, PXOVERLAPPED pOverlapped)
 {
+	LOG_TRACE_XLIVE("XEnumerate (hEnum: {}, cbBuffer: {})", hEnum, cbBuffer);
+
 	BOOL async;
 
 	if( pOverlapped != 0 )
@@ -563,12 +555,8 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		{
 			XCONTENT_DATA aaa;
 
-
-			// check max
 			if( total >= cbBuffer )
 			{
-			//	if( print < 100 )
-			//		LOG_TRACE_XLIVE( "- Full enumerate" );
 				break;
 			}
 
@@ -577,8 +565,6 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 			aaa.ContentPackageType = 2;
 			memcpy( &aaa.TitleId, &marketplaceDlc[ dlcinit ].dwTitleID, sizeof(aaa.TitleId) );
 			memcpy( &aaa.ContentId, &marketplaceDlc[ dlcinit ].contentId, sizeof(aaa.ContentId) );
-
-			LOG_TRACE_XLIVE( "- [{0}] DLC = {1:x}", dlcinit, *((DWORD *) aaa.ContentId) );
 			dlcinit++;
 
 			if( async == FALSE )
@@ -637,16 +623,14 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 	{
 		if( *pcItemsReturned )
 		{
-			//if( print < 100 )
-			//	LOG_TRACE_XLIVE("- ItemsReturned = {}", *pcItemsReturned);
+			LIMITED_LOG(100, LOG_TRACE_XLIVE, "- ItemsReturned = {}", *pcItemsReturned);
 
 			return ERROR_SUCCESS;
 		}
 
 		else
 		{
-			//if( print < 100 )
-			//	LOG_TRACE_XLIVE("- NO_MORE_FILES");
+			LIMITED_LOG(100, LOG_TRACE_XLIVE, "- NO_MORE_FILES");
 			*pcItemsReturned = 0;
 			return ERROR_SUCCESS;
 		}
@@ -655,8 +639,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 	{
 		if( pOverlapped->InternalHigh )
 		{
-			//if( print < 100 )
-				//LOG_TRACE_XLIVE( "- async items = {}", pOverlapped->InternalHigh );
+			LIMITED_LOG(100, LOG_TRACE_XLIVE, "- async items = {}", pOverlapped->InternalHigh);
 
 
 			pOverlapped->InternalLow = ERROR_SUCCESS;
@@ -671,9 +654,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 
 		else
 		{
-			//if( print < 100 )
-			//	LOG_TRACE_XLIVE( "- async = NO_MORE_FILES" );
-
+			LIMITED_LOG(100, LOG_TRACE_XLIVE, "- async = NO_MORE_FILES" );
 
 			pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 			pOverlapped->dwExtendedError = ERROR_NO_MORE_FILES;
@@ -1020,36 +1001,25 @@ DWORD WINAPI XContentCreatePackage(DWORD dwUserIndex, PXCONTENT_DATA pContentDat
 // #5360: XContentCreateEnumerator
 DWORD WINAPI XContentCreateEnumerator(DWORD MaxEnumerator, PDWORD a2, PDWORD pchBuffer, PHANDLE phEnum)
 {
-	static int print = 0;
-
-
-	if( print < 15 )
-	{
-    LOG_TRACE_XLIVE("XContentCreateEnumerator  (MaxEnumerator = {0:x}, a2 = {1:p}, pchBuffer = {2:p}, phEnum = {3:p}",
-			MaxEnumerator, (void*)a2, (void*)pchBuffer, (void*)phEnum );
-
-		print++;
-	}
-
+	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XContentCreateEnumerator  (MaxEnumerator = {0:x}, a2 = {1:p}, pchBuffer = {2:p}, phEnum = {3:p}",
+		MaxEnumerator, (void*)a2, (void*)pchBuffer, (void*)phEnum);
 
 	// init DLC list
 	SetDlcBasepath(0);
 
 
-	if(pchBuffer) *pchBuffer = MaxEnumerator * sizeof(XCONTENT_DATA);
-	if(phEnum) *phEnum = g_dwFakeContent = CreateMutex(NULL,NULL,NULL);
+	if (pchBuffer) *pchBuffer = MaxEnumerator * sizeof(XCONTENT_DATA);
+	if (phEnum) *phEnum = g_dwFakeContent = CreateMutex(NULL, NULL, NULL);
 
 
 	// recount DLCs again
 	dlcinit = 0;
 
 
-	if( print < 15 )
-	{
-		if( pchBuffer ) LOG_TRACE_XLIVE("- pchBuffer = {0:x}  ({1})", *pchBuffer, *pchBuffer / sizeof(XCONTENT_DATA) );
-	  LOG_TRACE_XLIVE("- phEnum = {:p}", (void*)*phEnum );
-	}
+	if (pchBuffer) 
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "- pchBuffer = {0:x}  ({1})", *pchBuffer, *pchBuffer / sizeof(XCONTENT_DATA));
 
+	LIMITED_LOG(15, LOG_TRACE_XLIVE, "- phEnum = {:p}", (void*)*phEnum);
 
 	return 0;
 }
@@ -1064,38 +1034,26 @@ DWORD WINAPI XContentRetrieveOffersByDate (DWORD dwUserIndex, DWORD dwOffserInfo
 }
 
 
-
-
-
 // #5295: XLivePBufferSetByteArray
-DWORD WINAPI XLivePBufferSetByteArray (FakePBuffer * pBuffer, DWORD offset, BYTE *source, DWORD size)
+DWORD WINAPI XLivePBufferSetByteArray(FakePBuffer* pBuffer, DWORD offset, BYTE* source, DWORD size)
 {
-	static int print = 0;
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferSetByteArray  (pBuffer = {:p}, offset = {:x}, source = {:p}, size = {})",
+		(void*)pBuffer, offset, (void*)source, size);
 
-
-	if( print < 35 )
-	{
-		print++;
-
-    LOG_TRACE_XLIVE("XLivePBufferSetByteArray  (pBuffer = {0:p}, offset = {1:x}, source = {2:p}, size = {3:x})",
-		(void*)pBuffer, offset, (void*)source, size );
-	}
-
-
-	if( !pBuffer || !source || offset < 0 || offset+size > pBuffer->dwSize )
+	if (!pBuffer || !source || offset < 0 || offset + size > pBuffer->dwSize)
 	{
 		LOG_TRACE_XLIVE("- Invalid parameter");
 		return -1;
 	}
 
-	if( pBuffer->magic != 0xDEADC0DE )
+	if (pBuffer->magic != 0xDEADC0DE)
 	{
-		LOG_TRACE_XLIVE("- bad magic" );
+		LOG_TRACE_XLIVE("- bad magic");
 		return 0;
 	}
 
 
-	memcpy( pBuffer->pbData + offset, source, size );
+	memcpy(pBuffer->pbData + offset, source, size);
 	return 0;
 }
 
@@ -1103,18 +1061,8 @@ DWORD WINAPI XLivePBufferSetByteArray (FakePBuffer * pBuffer, DWORD offset, BYTE
 // #5294: XLivePBufferGetByteArray
 DWORD WINAPI XLivePBufferGetByteArray (FakePBuffer * pBuffer, DWORD offset, BYTE * destination, DWORD size)
 {
-	static int print = 0;
-
-
-	if( print < 35 )
-	{
-		print++;
-
-
-    LOG_TRACE_XLIVE("XLivePBufferGetByteArray  (pBuffer = {0:p}, pBuffer->Id = {1:p}, offset = {2}, dest = {3:p}, size = {4}",
-		(void*)pBuffer, (void*)pBuffer->id, offset, (void*)destination, size );
-	}
-
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferGetByteArray  (pBuffer = {0:p}, pBuffer->Id = {}, offset = {2}, dest = {3:p}, size = {4}",
+		(void*)pBuffer, pBuffer->id, offset, (void*)destination, size);
 
 	if (!pBuffer || !destination || offset < 0 || offset+size > pBuffer->dwSize)
 	{
@@ -1138,17 +1086,8 @@ DWORD WINAPI XLivePBufferGetByteArray (FakePBuffer * pBuffer, DWORD offset, BYTE
 // #5019: XLivePBufferSetByte
 DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE value)
 {
-	static int print = 0;
-
-
-	if( print < 35 )
-	{
-		//LOG_TRACE_XLIVE("XLivePBufferSetByte  (pBuffer = %X, offset = %X, value = %X)",
-		//	pBuffer, offset, value );
-
-
-		print++;
-	}
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferSetByte  (pBuffer = {:p}, offset = {:X}, value = {})",
+		(void*)pBuffer, offset, value );
 
 
 	if (!pBuffer || offset < 0 || offset+1 > pBuffer->dwSize)
@@ -1156,7 +1095,6 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 		LOG_TRACE_XLIVE("- Invalid parameter");
 		return -1;
 	}
-
 
 	if( pBuffer->magic != 0xDEADC0DE )
 	{
@@ -1171,31 +1109,21 @@ DWORD WINAPI XLivePBufferSetByte (FakePBuffer * pBuffer, DWORD offset, BYTE valu
 
 
 // #5018: XLivePBufferGetByte
-DWORD WINAPI XLivePBufferGetByte (FakePBuffer * pBuffer, DWORD offset, BYTE * value)
+DWORD WINAPI XLivePBufferGetByte(FakePBuffer* pBuffer, DWORD offset, BYTE* value)
 {
-	static int print = 0;
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferGetByte  (pBuffer = {:p}, offset = {:X}, value = {:p})",
+		(void*)pBuffer, offset, (void*)value);
 
-
-	if( print < 35 )
-	{
-      //LOG_TRACE_XLIVE("XLivePBufferGetByte  (pBuffer = %X, offset = %X, value = %X)",
-	//		pBuffer, offset, value );
-
-
-		print++;
-	}
-
-
-  if (!pBuffer || !value || offset < 0 || offset+1 > pBuffer->dwSize)
+	if (!pBuffer || !value || offset < 0 || offset + 1 > pBuffer->dwSize)
 	{
 		//LOG_TRACE_XLIVE("- Invalid parameter");
 		return -1;
 	}
 
 
-	if( pBuffer->magic != 0xDEADC0DE )
+	if (pBuffer->magic != 0xDEADC0DE)
 	{
-		LOG_TRACE_XLIVE("- bad magic" );
+		LOG_TRACE_XLIVE("- bad magic");
 		return 0;
 	}
 
@@ -1206,36 +1134,25 @@ DWORD WINAPI XLivePBufferGetByte (FakePBuffer * pBuffer, DWORD offset, BYTE * va
 
 
 // #5020: XLivePBufferGetDWORD
-DWORD WINAPI XLivePBufferGetDWORD (FakePBuffer * pBuffer, DWORD dwOffset, DWORD * pdwValue)
+DWORD WINAPI XLivePBufferGetDWORD(FakePBuffer* pBuffer, DWORD dwOffset, DWORD* pdwValue)
 {
-	static int print = 0;
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferGetDWORD  (pBuffer = {:p}, dwOffset = {:X}, pdwValue = {:p})",
+		(void*)pBuffer, dwOffset, (void*)pdwValue);
 
-
-	if( print < 35 )
-	{
-    LOG_TRACE_XLIVE("XLivePBufferGetDWORD  (pBuffer = {0:p}, dwOffset = {1:x}, pdwValue = {2:p})",
-		(void*)pBuffer, dwOffset, (void*)pdwValue );
-
-
-		print++;
-	}
-
-
-	if (!pBuffer || dwOffset < 0 || dwOffset+4 > pBuffer->dwSize || !pdwValue)
+	if (!pBuffer || dwOffset < 0 || dwOffset + 4 > pBuffer->dwSize || !pdwValue)
 	{
 		LOG_TRACE_XLIVE("- Invalid parameter");
 		return -1;
 	}
 
-
-	if( pBuffer->magic != 0xDEADC0DE )
+	if (pBuffer->magic != 0xDEADC0DE)
 	{
-		LOG_TRACE_XLIVE("- bad magic" );
+		LOG_TRACE_XLIVE("- bad magic");
 		return 0;
 	}
 
 
-	*pdwValue = *((DWORD *)(pBuffer->pbData+dwOffset));
+	*pdwValue = *((DWORD*)(pBuffer->pbData + dwOffset));
 	return 0;
 }
 
@@ -1243,18 +1160,8 @@ DWORD WINAPI XLivePBufferGetDWORD (FakePBuffer * pBuffer, DWORD dwOffset, DWORD 
 // #5021: XLivePBufferSetDWORD
 DWORD WINAPI XLivePBufferSetDWORD( FakePBuffer * pBuffer, DWORD dwOffset, DWORD dwValue )
 {
-	static int print = 0;
-
-
-	if( print < 35 )
-	{
-		LOG_TRACE_XLIVE("XLivePBufferSetDWORD  (pBuffer = {0:p}, dwOffset = {1:x}, dwValue = {2:x})",
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XLivePBufferSetDWORD  (pBuffer = {:p}, dwOffset = {:X}, dwValue = {})",
 			(void*)pBuffer, dwOffset, dwValue );
-
-
-		print++;
-	}
-
 
 	if (!pBuffer || dwOffset < 0 || dwOffset+4 > pBuffer->dwSize )
 	{
@@ -1279,7 +1186,7 @@ DWORD WINAPI XLivePBufferSetDWORD( FakePBuffer * pBuffer, DWORD dwOffset, DWORD 
 // #5026: XLiveSetSponsorToken
 DWORD WINAPI XLiveSetSponsorToken (LPCWSTR pwszToken, DWORD dwTitleId)
 {
-    LOG_TRACE_XLIVE("XLiveSetSponsorToken (, {:x})", dwTitleId);
+    LOG_TRACE_XLIVE("XLiveSetSponsorToken ({:X})", dwTitleId);
     return S_OK;
 }
 
