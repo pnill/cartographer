@@ -1072,7 +1072,8 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 // sword-flying target clear patch
 void __cdecl aim_assist_targeting_clear_hook(int target_data)
 {
-	if (!s_game_globals::game_is_campaign())
+	if (!s_game_globals::game_is_campaign()
+		&& !b_XboxTick)
 	{
 		*(DWORD*)(target_data) = -1;
 		*(DWORD*)(target_data + 4) = -1;

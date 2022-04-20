@@ -181,8 +181,7 @@ void ProjectileFix::ApplyPatches()
 #if	ENABLE_H3_COLLISION_DATA_SOURCE
 	Codecave(Memory::GetAddressRelative(0x547BDA, 0x572B77), update_projectile_collision_data, 6);
 	Codecave(Memory::GetAddressRelative(0x55D66E, 0x54192E), matrix4x3_transform_point_parameter_replacement, 2);
+	PatchCall(Memory::GetAddressRelative(0x55D653), object_get_origin);
+	PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point);
 #endif
-
-	//PatchCall(Memory::GetAddressRelative(0x55D653), object_get_origin);
-	//PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point);
 }
