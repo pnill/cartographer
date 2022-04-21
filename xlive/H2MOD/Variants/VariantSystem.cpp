@@ -49,7 +49,7 @@ void CustomVariantHandler::GameVarianEnable(const wchar_t* variant)
 
 	for (auto& varIds : customGameVarStr)
 	{
-		if (StrStrIW(varIds.first, variant))
+		if (StrStrIW(variant, varIds.first))
 		{
 			variantId = varIds.second;
 			break;
