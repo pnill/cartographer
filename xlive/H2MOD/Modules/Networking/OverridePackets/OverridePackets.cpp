@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "OverridePackets.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam\Engine\Memory\bitstream.h"
 #include "Util\Hooks\Hook.h"
 
 #define SYNCRONOUS_UPDATE_DEFAULT_SIZE 15320
@@ -85,14 +85,14 @@ namespace OverridePackets
 		return result;
 	}
 
-	typedef void(__cdecl *register_connection_packets)(void* a1);
-	register_connection_packets register_connection_packets_method;
+	typedef void(__cdecl *register_connection_packets_t)(void* a1);
+	register_connection_packets_t p_register_connection_packets;
 
 	void __cdecl registerConnectionPackets(void* packetObject) {
-		register_packet_impl(packetObject, 4, "connect-request", 0, 8, 8, request_write, request_read, 0); //request
-		register_packet_impl(packetObject, 5, "connect-refuse", 0, 8, 8, refuse_write, refuse_read, 0); //refuse
-		register_packet_impl(packetObject, 6, "connect-establish", 0, 8, 8, establish_write, establish_read, 0); //establish
-		register_packet_impl(packetObject, 7, "connect-closed", 0, 12, 12, closed_write, closed_read, 0); //closed
+		register_network_message(packetObject, 4, "connect-request", 0, 8, 8, request_write, request_read, 0); //request
+		register_network_message(packetObject, 5, "connect-refuse", 0, 8, 8, refuse_write, refuse_read, 0); //refuse
+		register_network_message(packetObject, 6, "connect-establish", 0, 8, 8, establish_write, establish_read, 0); //establish
+		register_network_message(packetObject, 7, "connect-closed", 0, 12, 12, closed_write, closed_read, 0); //closed
 	}
 
 	bool __cdecl deserializePlayerAdd(void* a1, int a2, int a3) {
@@ -137,70 +137,66 @@ namespace OverridePackets
 	//	}
 	//}
 
-	typedef void(__cdecl *register_player_packets)(void* a1);
-	register_player_packets register_player_packets_method;
+	typedef void(__cdecl *register_player_network_messages_t)(void* a1);
+	register_player_network_messages_t p_register_player_network_messages;
 
 	void __cdecl registerPlayerPackets(void* packetObject) {
 
-		register_packet_impl(packetObject, 25, "membership-update", 0, 15784, 15784,
+		register_network_message(packetObject, 25, "membership-update", 0, 15784, 15784,
 			Memory::GetAddress<void*>(0x1EF6B9, 0x1D0072),
 			Memory::GetAddress<void*>(0x1EFADD, 0x1D0496), NULL);
 
-		register_packet_impl(packetObject, 37, "virtual-couch-update", 0, 216, 216,
+		register_network_message(packetObject, 37, "virtual-couch-update", 0, 216, 216,
 			Memory::GetAddress<void*>(0x1F0042, 0x1D09FB),
 			Memory::GetAddress<void*>(0x1F0143, 0x1D0AFC), NULL);
 
-		register_packet_impl(packetObject, 38, "virtual-couch-request", 0, 208, 208,
+		register_network_message(packetObject, 38, "virtual-couch-request", 0, 208, 208,
 			Memory::GetAddress<void*>(0x1F0264, 0x1D0C1D),
 			Memory::GetAddress<void*>(0x1F031D, 0x1D0CD6), NULL);
 
-		register_packet_impl(packetObject, 26, "peer-properties", 0, 208, 208,
+		register_network_message(packetObject, 26, "peer-properties", 0, 208, 208,
 			Memory::GetAddress<void*>(0x1F03F5, 0x1D0DAE),
 			Memory::GetAddress<void*>(0x1F04E0, 0x1D0E99), NULL);
 
-		register_packet_impl(packetObject, 27, "delegate-leadership", 0, 44, 44,
+		register_network_message(packetObject, 27, "delegate-leadership", 0, 44, 44,
 			Memory::GetAddress<void*>(0x1F05EE, 0x1D0FA7),
 			Memory::GetAddress<void*>(0x1F061A, 0x1D0FD3), NULL);
 
-		register_packet_impl(packetObject, 28, "boot-machine", 0, 44, 44,
+		register_network_message(packetObject, 28, "boot-machine", 0, 44, 44,
 			Memory::GetAddress<void*>(0x1F0652, 0x1D100B),
 			Memory::GetAddress<void*>(0x1F067E, 0x1D1037), NULL);
 
-		register_packet_impl(packetObject, 29, "player-add", 0, 168, 168,
+		register_network_message(packetObject, 29, "player-add", 0, 168, 168,
 			Memory::GetAddress<void*>(0x1F06B6, 0x1D106F),
 			Memory::GetAddress<void*>(0x1F0752, 0x1D110B), NULL);
-			//(void*)deserializePlayerAdd, 0);
+			// (void*)deserializePlayerAdd, 0);
 
-		register_packet_impl(packetObject, 30, "player-refuse", 0, 20, 20,
+		register_network_message(packetObject, 30, "player-refuse", 0, 20, 20,
 			Memory::GetAddress<void*>(0x1F081F, 0x1D11D8),
 			Memory::GetAddress<void*>(0x1F085F, 0x1D1218), NULL);
 
-		register_packet_impl(packetObject, 31, "player-remove", 0, 12, 12,
+		register_network_message(packetObject, 31, "player-remove", 0, 12, 12,
 			Memory::GetAddress<void*>(0x1F08BC, 0x1D1275),
 			Memory::GetAddress<void*>(0x1F08EA, 0x1D12A3), NULL);
 
-		register_packet_impl(packetObject, 32, "player-properties", 0, 156, 156,
+		register_network_message(packetObject, 32, "player-properties", 0, 156, 156,
 			Memory::GetAddress<void*>(0x1F0935, 0x1D12EE),
 			Memory::GetAddress<void*>(0x1F09AC, 0x1D1365), NULL);
 	}
 
-	typedef bool(__cdecl* decode_text_chat_packet_)(bitstream* container, int a2, s_text_chat* data);
-	decode_text_chat_packet_ p_decode_text_chat_packet;
+	typedef bool(__cdecl* decode_text_chat_packet_t)(bitstream* stream, int a2, s_text_chat* data);
+	decode_text_chat_packet_t p_decode_text_chat_packet;
 
-	bool __cdecl decode_text_chat_packet(bitstream* container, int a2, s_text_chat* data)
+	bool __cdecl decode_text_chat_packet(bitstream* stream, int a2, s_text_chat* data)
 	{
-		bool ret = p_decode_text_chat_packet(container, a2, data);
+		bool ret = p_decode_text_chat_packet(stream, a2, data);
 		return ret;
 	}
 
 	void ApplyGamePatches()
 	{
-		register_connection_packets_method = (register_connection_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
+		p_register_connection_packets = (register_connection_packets_t)DetourFunc(Memory::GetAddress<BYTE*>(0x1F1B36, 0x1D24EF), (BYTE*)registerConnectionPackets, 5);
 		//use for debugging
-		//register_player_packets_method = (register_player_packets)DetourFunc(Memory::GetAddress<BYTE*>(0x1F0A55, 0x1D140E), (BYTE*)registerPlayerPackets, 5);
-
-
-		//p_network_session_player_properties_recieve = (t_network_session_player_properties_recieve*)DetourFunc(Memory::GetAddress<BYTE*>(0x5502A), (BYTE*)network_session_player_properties_recieve,12);
 
 		/*p_encode_player_properties = Memory::GetAddress<t_encode_player_properties*>(0x1E42BB);
 		PatchCall(Memory::GetAddress(0x1F071D), encode_player_properties_impl);
@@ -210,17 +206,8 @@ namespace OverridePackets
 		PatchCall(Memory::GetAddress(0x1F07B7), decode_player_properties_impl);
 		PatchCall(Memory::GetAddress(0x1F09ED), decode_player_properties_impl);*/
 
-		//serialize_parameters_update_packet_method = (serialize_parameters_update_packet)DetourFunc((BYTE*)Memory::GetAddress(0x1F03F5, 0x1CE5FA), (BYTE*)serializeParametersUpdatePacket, 5);
-
-		/////////////////////////////////////////////////////////////////////
-		//send/recv packet functions below (for troubleshooting and research)
-		/////////////////////////////////////////////////////////////////////
-		//send_packet_method = (send_packet)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E8296, 0x1CA259), (BYTE*)sendPacket, 8);
-
-		//receive_packet_method = (receive_packet)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1E82E0, 0x1CA2A3), (BYTE*)receivePacket, 11);
-
-		if (Memory::isDedicatedServer()) {
-			p_decode_text_chat_packet = (decode_text_chat_packet_)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
+		if (Memory::IsDedicatedServer()) {
+			p_decode_text_chat_packet = (decode_text_chat_packet_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CD8A4), (BYTE*)decode_text_chat_packet, 12);
 		}
 	}
 }

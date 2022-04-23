@@ -11,8 +11,8 @@
 #include "Blam\Engine\Players\Players.h"
 #include "H2MOD.h"
 #include "Blam/Engine/Players/Players.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -113,12 +113,12 @@ namespace player_representation
 		return 0xF28C3826;
 	}
 
-	typedef void(__cdecl t_network_session_player_profile_recieve)(int player_index, s_player::s_player_properties* a2);
-	t_network_session_player_profile_recieve* p_network_session_player_profile_recieve;
+	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
+	network_session_player_profile_recieve_t* p_network_session_player_profile_recieve;
 
 	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* a2)
 	{
-		LOG_INFO_GAME("[{}] {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
 			p_network_session_player_profile_recieve(player_index, a2);
@@ -148,12 +148,12 @@ namespace player_representation
 			if (a2->profile.player_character_type == s_player::e_character_type::Dervish)
 				a2->profile.player_character_type = s_player::e_character_type::Elite;
 
-			if(SpecialEvents::getCurrentEvent() != SpecialEvents::e_halloween)
+			if(SpecialEvents::getCurrentEvent() != SpecialEvents::_halloween)
 			{
 				if (a2->profile.player_character_type == s_player::e_character_type::Skeleton)
 					a2->profile.player_character_type = s_player::e_character_type::Spartan;
 			}
-			else if (H2Config_spooky_boy && !Memory::isDedicatedServer())
+			else if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			/*if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
@@ -180,7 +180,7 @@ namespace player_representation
 		if (a2->bungie_user_role <= 7)
 			a2->bungie_user_role = 7;
 
-		if (EngineCalls::get_game_mode_engine()
+		if (Engine::get_game_mode_engine()
 			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
 			&& (a2->player_team && !(s_game_engine_globals::get()->Unk1 & FLAG(a2->player_team))))
 		{
@@ -189,10 +189,10 @@ namespace player_representation
 	}
 	void on_map_load()
 	{
-		if (h2mod->GetEngineType() == Multiplayer) 
+		if (h2mod->GetEngineType() == _multiplayer) 
 		{
 			representation_count = 4;
-			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !Memory::isDedicatedServer())
+			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
@@ -200,7 +200,7 @@ namespace player_representation
 			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
-			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && SpecialEvents::getCurrentEvent() == SpecialEvents::e_halloween && !H2Config_no_events)
+			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !H2Config_no_events)
 			{
 				tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
@@ -303,7 +303,7 @@ namespace player_representation
 	}
 	void apply_hooks()
 	{
-		p_network_session_player_profile_recieve = Memory::GetAddress<t_network_session_player_profile_recieve*>(0x52F23);
+		p_network_session_player_profile_recieve = Memory::GetAddress<network_session_player_profile_recieve_t*>(0x52F23);
 		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), network_session_player_profile_recieve);
 		//Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
 		WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);

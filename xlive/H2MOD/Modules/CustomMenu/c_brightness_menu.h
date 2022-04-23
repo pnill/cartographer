@@ -17,7 +17,7 @@ public:
 	// todo maybe implement the actual constructor
 
 	c_brightness_level_edit_list::c_brightness_level_edit_list(int a2) :
-		c_list_widget(a2)
+		c_list_widget(a2, false)
 	{
 		void* old_vtbl = *(void**)this;
 		// this will replace the vtable
@@ -90,7 +90,7 @@ static_assert(offsetof(c_brightness_level_edit_list, edit_list) == 176);
 class c_brightness_menu : protected c_screen_with_menu
 {
 public:
-	c_brightness_menu::c_brightness_menu(int a3, int a4, int a5);
+	c_brightness_menu(int _ui_channel, int a4, __int16 _flags);
 
 	c_brightness_menu::~c_brightness_menu()
 	{
@@ -126,7 +126,7 @@ public:
 		return (this->**pFn)();
 	}
 
-	virtual void IUnkFunc5_maybe_debug(int a2) override
+	virtual void IUnkFunc5_used_by_virtual_kb(int a2) override
 	{
 		typedef void(class_type::** fnT)(int);
 		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(4);
@@ -182,9 +182,9 @@ public:
 		return (this->**pFn)();
 	}
 
-	virtual int IUnkFunc13(DWORD* a2) override
+	virtual int IUnkFunc13(int* a2) override
 	{
-		typedef int(class_type::** fnT)(DWORD*);
+		typedef int(class_type::** fnT)(int*);
 		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(12);
 		return (this->**pFn)(a2);
 	}
@@ -387,6 +387,7 @@ public:
 
 	c_brightness_level_edit_list list_widgets;
 
+	
 	static void* open_brightness_menu(s_new_ui_screen_parameters* a1);
 
 private:

@@ -1,28 +1,14 @@
 #include "stdafx.h"
 
-#include "H2MOD\Modules\Accounts\Accounts.h"
+#include "Accounts.h"
 
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Shell.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 
+#include "H2MOD\Utils\Utils.h"
 #include "Util\SimpleIni.h"
-
-static void HandleFileError(int fpErrNo) {//TODO
-	if (fpErrNo == EACCES || fpErrNo == EIO || fpErrNo == EPERM) {
-		MessageBoxA(NULL, "Cannot write a file. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else if (fpErrNo == ESRCH) {
-		MessageBoxA(NULL, "Probably a missing folder issue if file writing related. Please restart Halo 2 in Administrator mode!", "Permission Error!", MB_OK);
-	}
-	else {
-		char NotificationPlayerText[20];
-		sprintf(NotificationPlayerText, "Error 0x%x", fpErrNo);
-		addDebugText(NotificationPlayerText);
-		MessageBoxA(NULL, NotificationPlayerText, "Unknown File Failure!", MB_OK);
-	}
-}
 
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";
@@ -83,7 +69,7 @@ bool TestGetAccountConfigLock(wchar_t* mutexName) {
 		return true;
 	}
 
-	DWORD crc32num = crc32buf((char*)mutexName, wcslen(mutexName) * 2);
+	DWORD crc32num = crc32buf((char*)mutexName, wcslen(mutexName) * sizeof(wchar_t));
 	wchar_t crc32mutexName[40] = { L"" };
 	swprintf(crc32mutexName, ARRAYSIZE(crc32mutexName), L"Halo2AccountsFile-%x", crc32num);
 
@@ -120,7 +106,7 @@ void SaveH2Accounts() {
 		FILE* fileConfig = _wfopen(fileConfigPath, L"wb");
 
 		if (fileConfig == nullptr) {
-			HandleFileError(GetLastError());
+			_Shell::FileErrorDialog(errno);
 			addDebugText("ERROR: Unable to write H2Accounts File!");
 		}
 		else {
@@ -181,8 +167,7 @@ void H2AccountAccountAdd(const char* username, const char* token) {
 
 	// verify if the same credentials already exist
 	for (int i = 0; i < H2AccountCount; i++) {
-		if (StrnCaseInsensEqu(H2AccountArrayUsername[i], (char*)username, XUSER_MAX_NAME_LENGTH)) {
-			
+		if (!_strnicmp(H2AccountArrayUsername[i], username, XUSER_MAX_NAME_LENGTH)) {
 			if (H2AccountArrayLoginToken[i]) {
 				free(H2AccountArrayLoginToken[i]);
 			}

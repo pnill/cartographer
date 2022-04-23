@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Modules\Config\Config.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "XLive\xbox\xbox.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
@@ -58,11 +58,11 @@ static const std::unordered_map <int, std::string> game_mode_list
 void update_player_count()
 {
 	s_network_session* session = nullptr;
-	if (NetworkSession::getCurrentNetworkSession(&session))
+	if (NetworkSession::GetCurrentNetworkSession(&session))
 	{
 		DiscordInterface::SetPlayerCountInfo(
-			session->membership.player_count, 
-			session->parameters.max_party_players);
+			session->membership[0].player_count, 
+			session->parameters[0].max_party_players);
 	}
 	else
 	{
@@ -79,7 +79,7 @@ std::string getEnglishMapName()
 
 std::string getVariantName()
 {
-	std::wstring variant = NetworkSession::getGameVariantName();
+	std::wstring variant = NetworkSession::GetGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
 	return wstring_to_string.to_bytes(variant);
 }
@@ -114,7 +114,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
 
-	if (Memory::isDedicatedServer() || !H2Config_discord_enable || H2GetInstanceId() > 1)
+	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || H2GetInstanceId() > 1)
 		return ERROR_SUCCESS;
 
 	if (dwContextId == 0x00000003)

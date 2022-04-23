@@ -1,60 +1,25 @@
 #pragma once
 
 #include "c_user_interface_widget.h"
-
-class c_screen_with_menu;
-
-// this is so we don't have to use the preserve/restore virtual table hack
-// c_user_interface_widget is not the main parent class
-// but for now it's ok
-class c_screen_with_menu_game_base : protected c_user_interface_widget
-{
-protected:
-	c_screen_with_menu_game_base::c_screen_with_menu_game_base(int menu_wgit_type, int a3, int a4, __int16 a5, void* a6)
-	{
-		typedef void* (__thiscall* c_screen_with_menu_ctor_game_impl)(c_screen_with_menu_game_base*, int, int, int, __int16, void*);
-		auto p_c_screen_with_menu_ctor_game_impl = Memory::GetAddressRelative<c_screen_with_menu_ctor_game_impl>(0x611159);
-		// call the constructor built-in game, which will set-up the vtable and everything
-		p_c_screen_with_menu_ctor_game_impl(this, menu_wgit_type, a3, a4, a5, a6);
-	}
-
-	c_screen_with_menu_game_base::~c_screen_with_menu_game_base()
-	{
-	}
-
-public:
-	// c_screen_with_menu interface
-	virtual void IUnkFunc22_maybe_debug() = 0;
-	virtual int IUnkFunc23(int a2) = 0;
-	virtual int IUnkFunc24() = 0;
-	virtual BYTE* IUnkFunc25() = 0;
-	virtual int IUnkFunc26() = 0;
-	virtual int IUnkFunc27() = 0;
-	virtual int IUnkFunc28(int a2) = 0;
-	virtual bool IUnkFunc29(int* a2) = 0;
-	virtual bool IUnkFunc30(int a2) = 0;
-	virtual int IUnkFunc31(int a2) = 0;
-	virtual bool IUnkFunc32(int a2) = 0;
-	virtual int IUnkFunc33() = 0;
-	virtual int IUnkFunc34() = 0;
-	virtual unsigned int IUnkFunc35(int a2) = 0;
-	virtual void IUnkFunc36_maybe_debug(int a2) = 0;
-	virtual int IUnkFunc37(DWORD* a2) = 0;
-	virtual int IUnkFunc38(int a2) = 0;
-	virtual void* get_open_menu_cb() = 0;
-	virtual bool IUnkFunc40() = 0;
-	virtual void IUnkFunc41(bool a2) = 0;
-};
-
+#include "c_screen_widget.h"
 
 // base class of many menus
-class c_screen_with_menu : public c_screen_with_menu_game_base
+class c_screen_with_menu : protected c_screen_widget
 {
 public:
 
-	c_screen_with_menu::c_screen_with_menu(int menu_wgit_type, int ui_channel, int a4, __int16 a5, void* a6) :
-		c_screen_with_menu_game_base(menu_wgit_type, ui_channel, a4, a5, a6)
+	c_screen_with_menu::c_screen_with_menu(int _menu_id, int _ui_channel, int a4, __int16 _flags, void* _item_edit_list, bool _call_ctor) :
+		c_screen_widget(_menu_id, _ui_channel, a4, _flags, false)
 	{
+		typedef void* (__thiscall* c_screen_with_menu_ctor_game_impl)(c_screen_with_menu*, int, int, int, __int16, void*);
+		auto p_c_screen_with_menu_ctor_game_impl = Memory::GetAddressRelative<c_screen_with_menu_ctor_game_impl>(0x611159);
+
+		void* old_vtbl = *(void**)this;
+		if (_call_ctor)
+		{
+			p_c_screen_with_menu_ctor_game_impl(this, _menu_id, _ui_channel, a4, _flags, _item_edit_list);
+		}
+		*(void**)this = old_vtbl;
 	};
 
 	c_screen_with_menu::~c_screen_with_menu()
@@ -94,7 +59,7 @@ public:
 		return (this->* * pFn)();
 	}
 
-	virtual void IUnkFunc5_maybe_debug(int a2) override
+	virtual void IUnkFunc5_used_by_virtual_kb(int a2) override
 	{
 		typedef void(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(4);
@@ -150,9 +115,9 @@ public:
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc13(DWORD* a2) override
+	virtual int IUnkFunc13(int* a2) override
 	{
-		typedef int(class_type::** fnT)(DWORD*);
+		typedef int(class_type::** fnT)(int*);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(12);
 		return (this->* * pFn)(a2);
 	}
@@ -213,7 +178,7 @@ public:
 		return (this->* * pFn)();
 	}
 
-	virtual void IUnkFunc22_maybe_debug() override
+	virtual void IUnkFunc22_maybe_debug()
 	{
 		typedef void(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(21);
@@ -221,133 +186,133 @@ public:
 	}
 
 	// c_screen_with_menu specific interface
-	virtual int IUnkFunc23(int a2) override
+	virtual int IUnkFunc23(int a2)
 	{
 		typedef int(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(22);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc24() override
+	virtual int IUnkFunc24()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(23);
 		return (this->* * pFn)();
 	}
 
-	virtual BYTE* IUnkFunc25() override
+	virtual BYTE* IUnkFunc25()
 	{
 		typedef BYTE* (class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(24);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc26() override
+	virtual int IUnkFunc26()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(25);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc27() override
+	virtual int IUnkFunc27()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(26);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc28(int a2) override
+	virtual int IUnkFunc28(int a2)
 	{
 		typedef int(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(27);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual bool IUnkFunc29(int* a2) override
+	virtual bool IUnkFunc29(int* a2)
 	{
 		typedef bool(class_type::** fnT)(int*);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(28);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual bool IUnkFunc30(int a2) override
+	virtual bool IUnkFunc30(int a2)
 	{
 		typedef bool(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(29);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc31(int a2) override
+	virtual int IUnkFunc31(int a2)
 	{
 		typedef int(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(30);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual bool IUnkFunc32(int a2) override
+	virtual bool IUnkFunc32(int a2)
 	{
 		typedef bool(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(31);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc33() override
+	virtual int IUnkFunc33()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(32);
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc34() override
+	virtual int IUnkFunc34()
 	{
 		typedef int(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(33);
 		return (this->* * pFn)();
 	}
 
-	virtual unsigned int IUnkFunc35(int a2) override
+	virtual unsigned int IUnkFunc35(int a2)
 	{
 		typedef unsigned int(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(34);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual void IUnkFunc36_maybe_debug(int a2)  override
+	virtual void IUnkFunc36_maybe_debug(int a2)
 	{
 		typedef void(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(35);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc37(DWORD* a2) override
+	virtual int IUnkFunc37(DWORD* a2)
 	{
 		typedef int(class_type::** fnT)(DWORD*);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(36);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual int IUnkFunc38(int a2) override
+	virtual int IUnkFunc38(int a2)
 	{
 		typedef int(class_type::** fnT)(int);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(37);
 		return (this->* * pFn)(a2);
 	}
 
-	virtual void* get_open_menu_cb() override
+	virtual void* get_open_menu_cb()
 	{
 		typedef void*(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(38);
 		return (this->* * pFn)();
 	}
 
-	virtual bool IUnkFunc40() override
+	virtual bool IUnkFunc40()
 	{
 		typedef bool(class_type::** fnT)();
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(39);
 		return (this->* * pFn)();
 	}
 
-	virtual void IUnkFunc41(bool a2) override
+	virtual void IUnkFunc41(bool a2)
 	{
 		typedef void(class_type::** fnT)(bool);
 		auto pFn = c_screen_with_menu_base_vtable_get_func_ptr<fnT>(40);

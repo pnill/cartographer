@@ -7,7 +7,7 @@
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 
 namespace TagFixes
 {
@@ -49,7 +49,7 @@ namespace TagFixes
 		}
 		void fix_shaders_nvidia()
 		{
-			if (Memory::isDedicatedServer()) return;
+			if (Memory::IsDedicatedServer()) return;
 
 			fix_shader_template_nvidia(
 				"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
@@ -65,7 +65,9 @@ namespace TagFixes
 		}
 		void fix_dynamic_lights()
 		{
+			// TODO FIXME: this breaks other shadows
 			return;
+
 			auto cinematic_shadow_datum = tags::find_tag(blam_tag::tag_group_type::vertexshader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
 			auto shadow_datum = tags::find_tag(blam_tag::tag_group_type::shaderpass, "shaders\\shader_passes\\shadow\\shadow_generate");
 			byte* shadow_tag = tags::get_tag<blam_tag::tag_group_type::shaderpass, BYTE>(shadow_datum);
@@ -192,7 +194,7 @@ namespace TagFixes
 
 	void OnMapLoad()
 	{
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
 			fix_dynamic_lights();

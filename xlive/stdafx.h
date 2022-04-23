@@ -4,6 +4,7 @@
 //
 #pragma once
 
+#define HEAP_DEBUG 0
 
 #define _BIND_TO_CURRENT_CRT_VERSION 1
 

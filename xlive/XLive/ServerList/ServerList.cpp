@@ -2,14 +2,14 @@
 
 #include "ServerList.h"
 #include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 
 #include "..\xnet\IpManagement\XnIp.h"
 
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 
 using namespace rapidjson;
 
@@ -419,7 +419,7 @@ void CServerList::EnumerateFromHttp()
 	m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
 	addDebugText("Requesting server list");
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_XLIVE("{} - curl failed to initialize", __FUNCTION__);
@@ -510,7 +510,7 @@ void CServerList::EnumerateFromHttp()
 				// simply reuse the curl handle/allocated std::string buffer if already present
 				if (itemsToDownloadQuery[serverQueryIdx].first == nullptr)
 				{
-					itemsToDownloadQuery[serverQueryIdx] = std::make_pair(curl_interface_init_no_ssl(), std::make_shared<std::string>());
+					itemsToDownloadQuery[serverQueryIdx] = std::make_pair(curl_interface_init_no_verify(), std::make_shared<std::string>());
 				}
 				else
 				{
@@ -636,7 +636,7 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 	CURLcode res;
 	std::string readBuffer;
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		std::string url(cartographerURL + "/live/dedicount.php");
 
@@ -741,7 +741,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 	pOverlapped->InternalHigh = 0;
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		rapidjson::Document document;
@@ -784,7 +784,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
 
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
 		rapidjson::Document document;
 		document.SetObject();

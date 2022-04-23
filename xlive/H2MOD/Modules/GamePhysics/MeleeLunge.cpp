@@ -13,6 +13,8 @@
 #pragma fenv_access (on)
 #endif
 
+extern bool b_XboxTick;
+
 bool melee_lunge_hook_enabled = true;
 
 #define MELEE_DEBUG 0
@@ -714,7 +716,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 						// no idea why
 						//scale_vector3d(&physics_output->out_translational_velocity, (float)time_globals::seconds_to_ticks_precise(1.0f), &physics_output->out_translational_velocity);
 
-						if (min_velocity_after_deceleration_per_tick > (temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f) + k_valid_real_epsilon))
+						if (min_velocity_after_deceleration_per_tick > ((temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f)) + k_valid_real_epsilon))
 						{
 							force_leave_melee_lunge_physics = true;
 							m_time_to_target_in_ticks = 0;
@@ -794,7 +796,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 		// update_melee_parameters();
 
 		m_melee_tick++;
-		if ((!s_game_globals::game_is_campaign() && distance_between_havok_components > 5.0f)
+		if (((!s_game_globals::game_is_campaign() && !b_XboxTick) && distance_between_havok_components > 5.0f)
 			|| force_leave_melee_lunge_physics
 			|| m_time_to_target_in_ticks <= 0
 			|| m_melee_tick >= (m_maximum_counter + 6)

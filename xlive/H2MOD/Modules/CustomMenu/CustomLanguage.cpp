@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -199,7 +199,7 @@ bool read_custom_labels() {
 		int lineNumber = 0;
 		int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
 		custom_language* curr_lang = get_custom_language(language_id, 0);
-		while (keepReading && GetFileLine(labelsFile, fileLine)) {
+		while (keepReading && GetFileLine(labelsFile, &fileLine)) {
 			lineNumber++;
 			if (fileLine) {
 				int fileLineLength = strlen(fileLine);
@@ -427,8 +427,8 @@ void saveCustomLanguages() {
 
 #pragma endregion
 
-typedef char*(__stdcall *tH2GetLabel)(int, int, int, int);
-tH2GetLabel pH2GetLabel;
+typedef char*(__stdcall *H2GetLabel_t)(int, int, int, int);
+H2GetLabel_t pH2GetLabel;
 char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	//int label_menu_id = *(int*)(*(int*)a1 + 8 * a3 + 4);
 	int label_menu_id = a3;
@@ -485,29 +485,28 @@ void setGameLanguage() {
 		switch (GetUserDefaultLangID() & 0x3FF)
 		{
 		case 0x11:
-			language_id = language_ids::japanese;
+			language_id = _lang_id_japanese;
 			break;
 		case 7:
-			language_id = language_ids::german;
+			language_id = _lang_id_german;
 			break;
 		case 0xC:
-			language_id = language_ids::french;
+			language_id = _lang_id_french;
 			break;
 		case 0xA:
-			language_id = language_ids::spanish;
+			language_id = _lang_id_spanish;
 			break;
 		case 0x10:
-			language_id = language_ids::italian;
+			language_id = _lang_id_italian;
 			break;
 		case 0x12:
-			language_id = language_ids::korean;
+			language_id = _lang_id_korean;
 			break;
 		case 4:
-			language_id = language_ids::chinese;
+			language_id = _lang_id_chinese;
 			break;
-
 		default:
-			language_id = language_ids::english;
+			language_id = _lang_id_english;
 			break;
 		}
 	}
@@ -519,7 +518,7 @@ void setGameLanguage() {
 	{
 		int result = atol(DstBuf);
 		if (result > 0 || result > 9)
-			language_id = language_ids::english;
+			language_id = _lang_id_english;
 	}
 
 	*HasLoadedLanguage = true;
@@ -609,8 +608,8 @@ void setCustomLanguage(int main) {
 }
 
 #pragma region Weapon Pickup training string fix
-typedef void(__stdcall* string_id_to_wide_string)(int thisx, int string_id, wchar_t *a3, int a4, int a5);
-string_id_to_wide_string p_string_id_to_wide_string;
+typedef void(__stdcall* string_id_to_wide_string_t)(int thisx, int string_id, wchar_t *a3, int a4, int a5);
+string_id_to_wide_string_t p_string_id_to_wide_string;
 
 void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *output, int a4, int a5)
 {
@@ -680,7 +679,7 @@ static void overrideCoreH2Labels() {
 	}
 } 
 
-void initGSCustomLanguage() {
+void InitCustomLanguage() {
 	if (!H2IsDediServer) {
 		setGameLanguage();
 
@@ -688,9 +687,9 @@ void initGSCustomLanguage() {
 		overrideCoreH2Labels();
 		read_custom_labels();
 
-		p_string_id_to_wide_string = (string_id_to_wide_string)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
+		p_string_id_to_wide_string = (string_id_to_wide_string_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
 
-		pH2GetLabel = (tH2GetLabel)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
+		pH2GetLabel = (H2GetLabel_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
 
 		//Hook the function that sets the font table filename.
 		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
@@ -702,7 +701,7 @@ void initGSCustomLanguage() {
 	}
 }
 
-void deinitGSCustomLanguage() {
+void DeinitCustomLanguage() {
 	if (!H2IsDediServer) {
 		write_custom_labels();
 	}

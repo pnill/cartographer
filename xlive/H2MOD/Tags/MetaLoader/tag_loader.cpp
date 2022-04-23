@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "tag_loader.h"
+#include "Blam\Common\Common.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenery_definition.hpp"
-#include "Blam\Common\Common.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "Util\filesys.h"
@@ -120,7 +121,7 @@ namespace tag_loader
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);
 
-		if (tags::get_cache_header()->type == e_engine_type::MultiplayerShared || tags::get_cache_header()->type == e_engine_type::SinglePlayerShared)
+		if (tags::get_cache_header()->type == e_engine_type::_mutiplayer_shared || tags::get_cache_header()->type == e_engine_type::_single_player_shared)
 		{
 			delete[] map_header;
 			return true;

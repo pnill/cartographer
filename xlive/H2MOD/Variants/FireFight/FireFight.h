@@ -1,63 +1,33 @@
 #pragma once
+
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "H2MOD\Variants\VariantSystem.h"
 
-class FireFightHandler : public GameClientServerHandler {
-public:
-	void SetXUID(XUID xuid);
-	void SetPlayerIndex(datum player_datum);
-	void SetUnitDatum(datum unit_datum);
-	void SetKilledDatum(datum unit_datum);
-	XUID GetXUID();
-	datum GetKilledDatum();
-private:
-	XUID xuid;
-	datum killed_datum = DATUM_INDEX_NONE;
-};
+extern class DeviceShop* deviceShop;
 
-
-class FireFightInitializer : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class FireFightDeinitializer : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class FireFightSpawnHandler : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class FireFightPreSpawnHandler : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class FireFightDeathHandler : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-class FireFightKillHandler : public FireFightHandler {
-	// Inherited via GameClientServerHandler
-	virtual void onPeerHost() override;
-	virtual void onDedi() override;
-	virtual void onClient() override;
-};
-
-class FireFight : public GameType<FireFightHandler>
+class FireFight : public ICustomGameVariant
 {
 public:
+	virtual void Initialize() override;
+	virtual void Dispose() override;
+	virtual CustomVariantId GetVariantId();
+	
+	// on map load can be used as Initialize
+	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) override;
+	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
+	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
+	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override;
+
+	// unused bellow
+	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override
+	{
+		return false;
+	}
+
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override;
+
 	FireFight();
-	static void KilledAI(datum ai_datum,XUID killer);
-	static void initClient();
-	static void initHost();
+	~FireFight();
+
+	static void KilledAI(datum killedAi, datum killerPlayerIdx);
 };

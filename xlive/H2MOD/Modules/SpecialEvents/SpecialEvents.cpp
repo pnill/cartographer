@@ -7,17 +7,17 @@
 #include "Blam\Cache\TagGroups\render_model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
 #include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "Blam\Cache\TagGroups\shader_definition.hpp"
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Enums\HaloStrings.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
@@ -103,26 +103,26 @@ namespace SpecialEvents
 	e_event_type getCurrentEvent()
 	{
 		if (H2Config_no_events)
-			return e_none;
+			return _no_event;
 
 		if (CheckIfEventTime(L"3-17"))
-			return e_st_paddys;
+			return _st_paddys;
 
 		if (CheckIfEventTime(L"12-24") || CheckIfEventTime(L"12-30") || CheckIfEventTime(L"1-4"))
-			return e_christmas;
+			return _christmas;
 
 		if (CheckIfEventTime(L"4-12"))
-			return e_mook_maddness;
+			return _mook_maddness;
 
 		if (CheckIfEventTime(L"10-20") || CheckIfEventTime(L"10-27") || CheckIfEventTime2(L"10-31"))
-			return e_halloween;
+			return _halloween;
 
-		return e_none;
+		return _no_event;
 	}
 
 	void ChristmasOnMapLoad()
 	{
-		if(h2mod->GetEngineType() == e_engine_type::MainMenu)
+		if(h2mod->GetEngineType() == e_engine_type::_main_menu)
 		{
 			auto md = tags::find_tag(blam_tag::tag_group_type::soundlooping, "sound\\ui\\main_menu_music\\main_menu_music");
 			auto m = tags::get_tag<blam_tag::tag_group_type::soundlooping, char>(md);
@@ -136,7 +136,7 @@ namespace SpecialEvents
 				track_loop->TagIndex = -1;
 			}
 		}
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", blam_tag::tag_group_type::scenery, "carto_shared");
 			auto w_datum_i = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", blam_tag::tag_group_type::weathersystem, "carto_shared");
@@ -335,7 +335,7 @@ namespace SpecialEvents
 
 	void PaddysOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -426,7 +426,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -438,7 +438,7 @@ namespace SpecialEvents
 
 	void MookMaddnessOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -467,7 +467,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -657,13 +657,13 @@ namespace SpecialEvents
 	datum pump_datum;
 	void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
-		if (state == life_cycle_in_game) {
+		if (state == _life_cycle_in_game) {
 			if (H2Config_spooky_boy)
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
 			s_object_placement_data placement;
-			datum player_datum = s_player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+			datum player_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
@@ -675,15 +675,15 @@ namespace SpecialEvents
 					switch (std::get<0>(scen_place))
 					{
 					case 0:
-						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
-						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					case 2:
-						EngineCalls::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -692,7 +692,7 @@ namespace SpecialEvents
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
 
-					unsigned int object = EngineCalls::Objects::call_object_new(&placement);
+					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
 			if (strcmp(mapName, "lockout") == 0)
@@ -702,11 +702,11 @@ namespace SpecialEvents
 					switch (std::get<0>(scen_place))
 					{
 					case 0:
-						EngineCalls::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[std::get<1>(scen_place)]->name.get_packed();
 						break;
 					case 1:
-						EngineCalls::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -715,7 +715,7 @@ namespace SpecialEvents
 					set_orientation(&placement.orientation, &placement.up, &std::get<3>(scen_place));
 					placement.scale = std::get<4>(scen_place);
 
-					unsigned int object = EngineCalls::Objects::call_object_new(&placement);
+					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
 		}
@@ -723,7 +723,7 @@ namespace SpecialEvents
 
 	void HalloweenOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == Multiplayer)
+		if (h2mod->GetEngineType() == _multiplayer)
 		{
 			if (tag_loader::Map_exists("carto_shared"))
 			{
@@ -801,7 +801,7 @@ namespace SpecialEvents
 			}
 			else
 			{
-				if (NetworkSession::getCurrentNetworkSession()->local_peer_index != NetworkSession::getCurrentNetworkSession()->session_host_peer_index)
+				if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
 				{
 					*Memory::GetAddress<int*>(0x46DCF1) = 1;
 					imgui_handler::iMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");
@@ -813,7 +813,7 @@ namespace SpecialEvents
 
 	void AddNewMarkers()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::Multiplayer) {
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer) {
 			auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 			auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(mode_elite_datum);
 			auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));
@@ -845,7 +845,7 @@ namespace SpecialEvents
 		tags::on_map_load(AddNewMarkers);
 		switch (getCurrentEvent())
 		{
-		case e_christmas:
+		case _christmas:
 			if (H2Config_event_music) {
 				auto playSound = [=]()
 				{
@@ -854,7 +854,7 @@ namespace SpecialEvents
 					while (true)
 					{
 						std::this_thread::sleep_for(1000ms);
-						if (h2mod->GetEngineType() == MainMenu && H2Config_event_music)
+						if (h2mod->GetEngineType() == _main_menu && H2Config_event_music)
 						{
 							if (!flop) {
 								flop = true;
@@ -872,13 +872,13 @@ namespace SpecialEvents
 			}
 			tags::on_map_load(ChristmasOnMapLoad);
 			break;
-		case e_st_paddys:
+		case _st_paddys:
 			tags::on_map_load(PaddysOnMapLoad);
 			break;
-		case e_mook_maddness:
+		case _mook_maddness:
 			tags::on_map_load(MookMaddnessOnMapLoad);
 			break;
-		case e_halloween:
+		case _halloween:
 			tags::on_map_load(HalloweenOnMapLoad);
 			break;
 		}

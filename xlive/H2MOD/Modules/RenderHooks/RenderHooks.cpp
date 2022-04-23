@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 #include "RenderHooks.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 bool ras_layer_overrides[RenderHooks::end];
 bool geo_render_overrides[24];
 namespace RenderHooks
 {
-	int layer_calls[]
+	DWORD layer_calls[]
 	{
 		0x28053A,
 		0x280557,
@@ -28,7 +28,7 @@ namespace RenderHooks
 		0x280799,
 		0x2807B7
 	};
-	int render_calls[]
+	DWORD render_calls[]
 	{
 		0x190B0F,
 		0x1914D4,
@@ -52,11 +52,11 @@ namespace RenderHooks
 
 	bool* reset_screen;
 
-	typedef bool(__cdecl p_initialize_rasterizer_layer)(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5);
-	p_initialize_rasterizer_layer* c_initialize_rasterizer_layer;
+	typedef bool(__cdecl initialize_rasterizer_layer_t)(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5);
+	initialize_rasterizer_layer_t* p_initialize_rasterizer_layer;
 
-	typedef void(__cdecl p_render_geometry)(e_render_geometry_type type);
-	p_render_geometry* c_render_geometry;
+	typedef void(__cdecl render_geometry_t)(e_render_geometry_type type);
+	render_geometry_t* p_render_geometry;
 
 	int getWidth(e_layer_type e, unsigned int width)
 	{
@@ -143,7 +143,7 @@ namespace RenderHooks
 		}
 		return height;
 	}
-	bool __cdecl h_initialize_rasterizer_layer(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5)
+	bool __cdecl initialize_rasterizer_layer_hook(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5)
 	{
 		int texture_width = getWidth(type, width);
 		int texture_height = getHeight(type, height);
@@ -153,14 +153,14 @@ namespace RenderHooks
 			texture_width = 128;
 			texture_height = 128;
 		}
-		LOG_TRACE_GAME(L"[Render Hooks] init_rasterizer_layer: {} {} {} {} {}", type, texture_width, texture_height, fmt, a5);
-		return c_initialize_rasterizer_layer(type, texture_width, texture_height, fmt, a5);
+		LIMITED_LOG(15, LOG_TRACE_GAME, L"{} - : {} {} {} {} {}", __FUNCTIONW__, type, texture_width, texture_height, fmt, a5);
+		return p_initialize_rasterizer_layer(type, texture_width, texture_height, fmt, a5);
 	}
 
-	void __cdecl h_render_geometry(e_render_geometry_type type)
+	void __cdecl render_geometry_hook(e_render_geometry_type type)
 	{
 		if (!geo_render_overrides[(int)type - 1]) {
-			return c_render_geometry(type);
+			return p_render_geometry(type);
 		}
 	}
 
@@ -171,17 +171,17 @@ namespace RenderHooks
 
 	void ApplyHooks()
 	{
-		//c_initialize_rasterizer_layer = (p_initialize_rasterizer_layer)DetourFunc(Memory::GetAddress<BYTE*>(0x28024C), (BYTE*)h_initialize_rasterizer_layer, 7);
-		//c_render_geometry = (p_render_geometry)DetourFunc(Memory::GetAddress<BYTE*>(0x1A155C), (BYTE*)h_render_geometry, 13);
-		c_initialize_rasterizer_layer = Memory::GetAddress<p_initialize_rasterizer_layer*>(0x28024C);
-		c_render_geometry = Memory::GetAddress<p_render_geometry*>(0x1A155C);
+		//p_initialize_rasterizer_layer = (p_initialize_rasterizer_layer)DetourFunc(Memory::GetAddress<BYTE*>(0x28024C), (BYTE*)initialize_rasterizer_layer_hook, 7);
+		//p_render_geometry = (render_geometry_t)DetourFunc(Memory::GetAddress<BYTE*>(0x1A155C), (BYTE*)render_geometry_hook, 13);
+		p_initialize_rasterizer_layer = Memory::GetAddress<initialize_rasterizer_layer_t*>(0x28024C);
+		p_render_geometry = Memory::GetAddress<render_geometry_t*>(0x1A155C);
 		for(auto &call : layer_calls)
 		{
-			PatchCall(Memory::GetAddress(call), h_initialize_rasterizer_layer);
+			PatchCall(Memory::GetAddress(call), initialize_rasterizer_layer_hook);
 		}
 		for(auto &call : render_calls)
 		{
-			PatchCall(Memory::GetAddress(call), h_render_geometry);
+			PatchCall(Memory::GetAddress(call), render_geometry_hook);
 		}
 	}
 

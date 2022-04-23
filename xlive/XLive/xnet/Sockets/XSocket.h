@@ -38,38 +38,38 @@ struct XSocket
 		memset(&name, 0, sizeof(name));
 	}
 
-	bool isTCP() const { return protocol == IPPROTO_TCP; }
-	bool isUDP() const { return protocol == IPPROTO_UDP; }
+	bool IsTCP() const { return protocol == IPPROTO_TCP; }
+	bool IsUDP() const { return protocol == IPPROTO_UDP; }
 
 	/* VDP uses UDP, and some encryption (done at network transport layer, not game layer) */
-	bool isVDP() const { return protocol == IPPROTO_UDP; }
+	bool IsVDP() const { return protocol == IPPROTO_UDP; }
 
-	bool isValid() const { return identifier == 'XSoC'; }
+	bool IsValid() const { return identifier == 'XSoC'; }
 
 	// all fields in sockaddr_in are in network byte order
 	// some helpers for conversion for each case needed
 	/* get the port, in host byte order, in this case little-endian */
-	short getHostOrderSocketPort() const { return ntohs(name.sin_port); }
+	short GetHostOrderSocketPort() const { return ntohs(name.sin_port); }
 
 	/* get the port, in network byte order, in this case big-endian */
-	short getNetworkOrderSocketPort() const { return name.sin_port; }
+	short GetNetworkOrderSocketPort() const { return name.sin_port; }
 
 	/* sets the socket send/recv buffer size */
-	int setBufferSize(int optName, INT bufSize);
+	int SetBufferSize(int optName, INT bufSize);
 
-	static bool sockAddrInEqual(const sockaddr_in* a1, const sockaddr_in* a2)
+	static bool SockAddrInEqual(const sockaddr_in* a1, const sockaddr_in* a2)
 	{
 		return (a1->sin_addr.s_addr == a2->sin_addr.s_addr && a1->sin_port == a2->sin_port);
 	}
 
-	static bool sockAddrInInvalid(const sockaddr_in* a1)
+	static bool SockAddrInInvalid(const sockaddr_in* a1)
 	{
 		return a1->sin_addr.s_addr == 0 || a1->sin_port == 0;
 	}
 
-	int udpSend(const char* buf, int len, int flags, sockaddr *to, int tolen);
+	int UdpSend(const char* buf, int len, int flags, sockaddr *to, int tolen);
 
-	static void socketsDisposeAll();
+	static void SocketsDisposeAll();
 
 	static std::vector<XSocket*> Sockets;
 

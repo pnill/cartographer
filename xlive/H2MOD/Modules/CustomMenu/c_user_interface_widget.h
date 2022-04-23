@@ -1,5 +1,8 @@
 #pragma once
 
+// disable "'c_user_interface_widget' variables are uninitialized. Always initialize a member variable" warning
+#pragma warning( disable : 26495 )
+
 enum e_user_interface_widget_type
 {
 	_widget_type_screen_widget = 0,
@@ -14,9 +17,28 @@ enum e_user_interface_widget_type
 	_widget_type_player_widget = 10
 };
 
+// base class for many (if not all) UI widgets
 class c_user_interface_widget
 {
 protected:
+
+	// in child classes the constructors of base classes are called manually, only if it is actually needed
+	// (when reimplementing the entire child class ctor for example)
+	// because when calling the constructor of that child class directly from the game's code
+	// it implicitly calls the base class ctors as well
+	c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type _widget_type, __int16 _flags, bool _call_ctor)
+	{
+		typedef c_user_interface_widget* (__thiscall* class_constructor_t)(e_user_interface_widget_type, __int16);
+		auto p_class_constructor = Memory::GetAddressRelative<class_constructor_t>(0x611D81);
+
+		void* old_vtbl = *(void**)this;
+		if (_call_ctor)
+		{
+			p_class_constructor(_widget_type, _flags);
+		}
+		*(void**)this = old_vtbl;
+	}
+
 	// void* vtbl;
 	int m_widget_type;
 	__int16 m_flags;
@@ -85,7 +107,7 @@ protected:
 		return (this->* * pFn)();
 	}
 
-	virtual void IUnkFunc5_maybe_debug(int a2)
+	virtual void IUnkFunc5_used_by_virtual_kb(int a2)
 	{
 		typedef void(class_type::** fnT)(int);
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(4);
@@ -141,9 +163,9 @@ protected:
 		return (this->* * pFn)();
 	}
 
-	virtual int IUnkFunc13(DWORD* a2)
+	virtual int IUnkFunc13(int* a2)
 	{
-		typedef int(class_type::** fnT)(DWORD*);
+		typedef int(class_type::** fnT)(int*);
 		auto pFn = c_user_interface_widget_base_vtable_get_func_ptr<fnT>(12);
 		return (this->* * pFn)(a2);
 	}
@@ -215,3 +237,5 @@ private:
 };
 
 static_assert(sizeof(c_user_interface_widget) == 112);
+
+#pragma warning( default : 26495 )

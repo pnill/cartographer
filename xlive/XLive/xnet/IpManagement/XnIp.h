@@ -2,6 +2,7 @@
 
 #include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 
 #define MAX_HDR_STR 32
 
@@ -151,13 +152,13 @@ struct XnIpPckTransportStats
 			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
 			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
 
-			lastTimeUpdate = GetTickCount64();
+			lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 		}
 		else
 		{
 			const ULONGLONG sample_end_time = 1ull * 1000ull;
 
-			if (GetTickCount64() - lastTimeUpdate >= sample_end_time)
+			if (_Shell::QPCToTimeNowMsec() - lastTimeUpdate >= sample_end_time)
 			{
 				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
@@ -171,7 +172,7 @@ struct XnIpPckTransportStats
 				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 
-				lastTimeUpdate = GetTickCount64();
+				lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 			}
 		}
 	}
@@ -250,20 +251,20 @@ struct XnIp
 	// TODO: add single async socket implementation or figure out another way
 	NatTranslation natTranslation[2];
 
-	sockaddr_in* getNatAddr(H2v_sockets natIndex)
+	sockaddr_in* GetNatAddr(H2v_sockets natIndex)
 	{
 		int index = (int)natIndex;
 		return &natTranslation[index].natAddress;
 	}
 
-	void updateNat(H2v_sockets natIndex, const sockaddr_in* addr)
+	void UpdateNat(H2v_sockets natIndex, const sockaddr_in* addr)
 	{
 		int index = (int)natIndex;
 		natTranslation[index].natAddress = *addr;
 		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
 	}
 
-	void natDiscard()
+	void NatDiscard()
 	{
 		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
@@ -272,12 +273,12 @@ struct XnIp
 		}
 	}
 
-	bool natIsUpdated(int natIndex) const
+	bool NatIsUpdated(int natIndex) const
 	{
 		return natTranslation[natIndex].state == NatTranslation::eNatDataState::natAvailable;
 	}
 
-	bool natIsUpdated() const
+	bool NatIsUpdated() const
 	{
 		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
@@ -301,17 +302,17 @@ public:
 		*outPckStats = &pckStats;
 	}
 
-	IN_ADDR getOnlineIpAddress() const
+	IN_ADDR GetOnlineIpAddr() const
 	{
 		return xnaddr.inaOnline;
 	}
 
-	IN_ADDR getLanIpAddr() const
+	IN_ADDR GetLanIpAddr() const
 	{
 		return xnaddr.ina;
 	}
 
-	bool XnIp::isValid(IN_ADDR identifier) const
+	bool XnIp::IsValid(IN_ADDR identifier) const
 	{
 		if (identifier.s_addr != this->connectionIdentifier.s_addr)
 		{

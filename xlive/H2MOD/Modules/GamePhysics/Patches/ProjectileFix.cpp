@@ -22,11 +22,11 @@
 static float tick_length;
 float HitFix_Projectile_Tick_Rate = 30.f;
 
-typedef bool(__cdecl* projectile_new_def)(unsigned __int16 projectile_object_index, int a2);
-projectile_new_def p_projectile_new;
+typedef bool(__cdecl* projectile_new_t)(datum projectile_object_index, int a2);
+projectile_new_t p_projectile_new;
 
-typedef void(__cdecl* projectile_update_def)(datum projectile_object_index, real_point3d *a2);
-projectile_update_def p_projectile_update;
+typedef void(__cdecl* projectile_update_t)(datum projectile_object_index, real_point3d *a2);
+projectile_update_t p_projectile_update;
 
 // determines whether the projectile should be updated in a 30hz context or not
 void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
@@ -37,12 +37,12 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
 	{
-		//LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
+		LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
 		tick_length = time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / HitFix_Projectile_Tick_Rate);
 	}
 	else
 	{
-		//LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
+		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
 		tick_length = time_globals::get_seconds_per_tick();
 	}
 }
@@ -54,7 +54,7 @@ inline void projectile_set_creation_tick(datum projectile_datum_index)
 	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
 }
 
-bool __cdecl projectile_new(unsigned __int16 projectile_object_index, int a2)
+bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
 {
 	bool ret = p_projectile_new(projectile_object_index, a2);
 
@@ -66,14 +66,14 @@ bool __cdecl projectile_new(unsigned __int16 projectile_object_index, int a2)
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, true);
-	//LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
 	projectile_set_tick_length_context(projectile_object_index, false);
-	//LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2);
 }
 
@@ -169,10 +169,10 @@ void ProjectileFix::ApplyPatches()
 	WriteValue<unsigned short>(Memory::GetAddress(0x41EE58, 0x3C2368) + 0x8, INCREASED_PROJECTILE_OBJECT_DATA_SIZE);
 
 	// hook projectile_create
-	p_projectile_new = (projectile_new_def)DetourFunc(Memory::GetAddress<BYTE*>(0x146ECE, 0x171E6B), (BYTE*)projectile_new, 5);
+	DETOUR_ATTACH(p_projectile_new, Memory::GetAddress<projectile_new_t>(0x146ECE, 0x171E6B), projectile_new_hook);
 
 	// replace update_projectile
-	p_projectile_update = (projectile_update_def)(Memory::GetAddress(0x1493F2, 0x174392));
+	p_projectile_update = (projectile_update_t)(Memory::GetAddress(0x1493F2, 0x174392));
 	PatchCall(Memory::GetAddress(0x14A30D, 0x1752AD), projectile_update_regular);
 	PatchCall(Memory::GetAddress(0x14A25B, 0x1751FB), projectile_update_instantaneous);
 
@@ -181,8 +181,7 @@ void ProjectileFix::ApplyPatches()
 #if	ENABLE_H3_COLLISION_DATA_SOURCE
 	Codecave(Memory::GetAddressRelative(0x547BDA, 0x572B77), update_projectile_collision_data, 6);
 	Codecave(Memory::GetAddressRelative(0x55D66E, 0x54192E), matrix4x3_transform_point_parameter_replacement, 2);
+	PatchCall(Memory::GetAddressRelative(0x55D653), object_get_origin);
+	PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point);
 #endif
-
-	//PatchCall(Memory::GetAddressRelative(0x55D653), object_get_origin);
-	//PatchCall(Memory::GetAddressRelative(0x55D67E), matrix4x3_transform_point);
 }

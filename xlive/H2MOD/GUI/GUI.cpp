@@ -7,7 +7,7 @@
 
 #include "GUI.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
@@ -613,7 +613,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::localPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::SinglePlayer)) {
+			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::_single_player)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_active_player()) 

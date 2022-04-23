@@ -30,7 +30,7 @@ __declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::b
 
 void c_screen_with_menu::applyPatches()
 {
-	if (Memory::isDedicatedServer()) return;
+	if (Memory::IsDedicatedServer()) return;
 
 	PatchCall(Memory::GetAddressRelative(0x619650), jmp_build_player_list);
 }

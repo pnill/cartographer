@@ -23,7 +23,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 
 namespace EngineHooks
 {
-	static e_game_life_cycle previousGamestate = life_cycle_none;
+	static e_game_life_cycle previousGamestate = _life_cycle_none;
 
 	game_life_cycle_update p_game_life_cycle_update;
 	void GameLifeCycleUpdate()
@@ -82,7 +82,7 @@ namespace EngineHooks
 
 		/*Game Version Hooks*/
 		p_get_game_version = (get_game_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)get_game_version_hook, 8);
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
 			p_verify_executable_version = (verify_executable_type)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 		}

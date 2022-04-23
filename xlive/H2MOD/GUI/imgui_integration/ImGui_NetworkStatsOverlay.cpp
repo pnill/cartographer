@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-#include "H2MOD/Modules/Networking/NetworkSession/NetworkSession.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 
@@ -86,7 +86,7 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		ImGui::Separator();
 
 		s_network_session* session;
-		if (NetworkSession::getCurrentNetworkSession(&session))
+		if (NetworkSession::GetCurrentNetworkSession(&session))
 		{
 			ImGui::Text("Network protocol: %s", session->get_game_network_protocol());
 		}
@@ -94,6 +94,10 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		{
 			ImGui::Text("Network protocol: <disconnected>");
 		}
+
+		unsigned long long network_time = *Memory::GetAddressRelative<unsigned long long*>(0x879E98);
+
+		ImGui::Text("Network time: %llu msec", network_time);
 
 		XnIp* localIp = gXnIp.GetLocalUserXn();
 

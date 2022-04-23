@@ -2,7 +2,7 @@
 
 #include "Mouseinput.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 typedef struct DIMOUSESTATE {
@@ -31,7 +31,7 @@ mouse_input_t* p_mouse_input;
 char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, float *a6, void *a7)
 {
 	time_globals* time = time_globals::get();
-	if(H2Config_raw_input)
+	if (H2Config_raw_input)
 	{
 		if (!b_raw_init) {
 			MouseInput::SetSensitivity(1);
@@ -42,10 +42,10 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 		}
 		*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
 		*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
-	} 
+	}
 	else
 	{
-		if(b_raw_init)
+		if (b_raw_init)
 		{
 			MouseInput::SetSensitivity(H2Config_mouse_sens);
 			WriteBytes(base + 0x627CC, o_SetDX, 8);

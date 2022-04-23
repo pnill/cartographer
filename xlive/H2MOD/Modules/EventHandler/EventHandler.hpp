@@ -1,7 +1,9 @@
 #pragma once
+
 #include "Blam\Common\Common.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
+#include "H2MOD\Modules\Shell\ServerConsole.h"
 
 
 #define EVENT_HANDLER_ENABLE_TEST_EVENTS 0
@@ -42,7 +44,7 @@ enum class EventType
 	player_control,
 	blue_screen,
 	player_spawn,
-	player_death
+	object_damage
 };
 
 enum class EventExecutionType
@@ -56,14 +58,14 @@ class EventCallback
 public:
 	void* callback;
 	EventType type;
-	EventExecutionType execution_type;
+	EventExecutionType executionType;
 	bool runOnce;
 	bool hasRun = false;
 
-	EventCallback::EventCallback(void* _callback, EventType _type, EventExecutionType _execution_type = EventExecutionType::execute_after, bool _runOnce = false) :
+	EventCallback::EventCallback(void* _callback, EventType _type, EventExecutionType _executionType = EventExecutionType::execute_after, bool _runOnce = false) :
 		callback(_callback),
 		type(_type),
-		execution_type(_execution_type),
+		executionType(_executionType),
 		runOnce(_runOnce)
 	{
 	}
@@ -83,12 +85,12 @@ namespace EventHandler
 	using GameLifeCycleEventCallback = void(*)(e_game_life_cycle state);
 	using NetworkPlayerEventCallback = void(*)(int peerIndex, NetworkPlayerEventType type);
 	using GameLoopEventCallback = void(*)();
-	using ServerCommandEventCallback = void(*)(ServerConsole::ServerConsoleCommands command);
+	using ServerCommandEventCallback = void(*)(ServerConsole::e_server_console_commands command);
 	using PlayerControlEventCallback = void(*)(float* yaw, float* pitch);
 	using MapLoadEventCallback = void(*)(e_engine_type type);
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
-	using PlayerDeathEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
+	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);
 
 	static const char* get_event_name(EventType event_type)
 	{
@@ -112,8 +114,8 @@ namespace EventHandler
 			return STRINGIFY(EventType::blue_screen);
 		case EventType::player_spawn:
 			return STRINGIFY(EventType::player_spawn);
-		case EventType::player_death:
-			return STRINGIFY(EventType::player_death);
+		case EventType::object_damage:
+			return STRINGIFY(EventType::object_damage);
 		case EventType::none:
 			return STRINGIFY(EventType::none);
 		default:
@@ -163,7 +165,7 @@ namespace EventHandler
 		auto events = get_vector(event_type);
 		for (auto it = events->begin(); it != events->end(); ++it)
 		{
-			if (it->callback == callback && it->type == event_type && it->execution_type == execution_type)
+			if (it->callback == callback && it->type == event_type && it->executionType == execution_type)
 			{
 				events->erase(it);
 				return;
@@ -182,7 +184,7 @@ namespace EventHandler
 		auto it = events->begin();
 		while (it != events->end())
 		{
-			if (it->type == event_type && it->runOnce && it->hasRun && it->execution_type == execution_type)
+			if (it->type == event_type && it->runOnce && it->hasRun && it->executionType == execution_type)
 				it = events->erase(it);
 			else
 				++it;
@@ -216,7 +218,7 @@ namespace EventHandler
 		{
 			std::vector<EventCallback>* events = get_vector(event_type);
 			for (auto it = events->begin(); it != events->end(); ++it) {
-				if (it->type == event_type && it->execution_type == execution_type)
+				if (it->type == event_type && it->executionType == execution_type)
 				{
 					((T)it->callback)(std::forward<Args>(args) ...);
 					it->hasRun = true;
@@ -245,7 +247,5 @@ namespace EventHandler
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerControlEventExecute, EventType::player_control, PlayerControlEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(BlueScreenEventExecute, EventType::blue_screen, BlueScreenEventCallback);
 	REGISTER_EVENT_EXECUTE_METHOD(PlayerSpawnEventExecute, EventType::player_spawn, PlayerSpawnEventCallback);
-	REGISTER_EVENT_EXECUTE_METHOD(PlayerDeathEventExecute, EventType::player_death, PlayerDeathEventCallback);
+	REGISTER_EVENT_EXECUTE_METHOD(ObjectDamageEventExecute, EventType::object_damage, ObjectDamageEventCallback);
 }
-
-

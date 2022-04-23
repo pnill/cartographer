@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
+#include "AccountLogin.h"
+
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Config\Config.h"
-
 
 #include "XLive\xnet\upnp.h"
 
@@ -26,19 +26,19 @@ void UpdateConnectionStatus() {
 	extern char* ServerStatus;
 	if (userSignedOnline(0)) {
 		MasterState = 10;
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Online");
 	}
 	else if (userSignedInLocally(0))
 	{
 		MasterState = 2;
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Locally signed in");
 	}
 	else
 	{
 		MasterState = 2;
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			snprintf(ServerStatus, 250, "Status: Offline");
 	}
 }
@@ -56,7 +56,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	UpdateConnectionStatus();
 
 	if (onlineSignIn) {
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			ForwardPorts();
 	}
 
@@ -441,7 +441,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 // 5257: ??
 HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
 {
-	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
+	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {}, lpszLiveIdPassword = {}, dwCredFlags = {:#x}, pXOverlapped = {:p})",
 		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
 
 	if (pXOverlapped)
