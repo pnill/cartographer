@@ -73,17 +73,17 @@ sub_B4BFD1_t p_sub_B4BFD1;
 typedef char(__cdecl* sub_AD985E_t)();
 sub_AD985E_t p_sub_AD985E;
 
-typedef bool (__cdecl* c_cinematic_in_progress_t)();
-c_cinematic_in_progress_t p_cinematic_in_progress;
+typedef bool (__cdecl* cinematic_in_progress_t)();
+cinematic_in_progress_t p_cinematic_in_progress;
 
-typedef char (__cdecl* c_cinematic_is_running_t)();
-c_cinematic_is_running_t p_cinematic_is_running;
+typedef char (__cdecl* cinematic_is_running_t)();
+cinematic_is_running_t p_cinematic_is_running;
 
-typedef void(__cdecl* input_update)();
-input_update p_input_update;
+typedef void(__cdecl* input_update_t)();
+input_update_t p_input_update;
 
-typedef void(__cdecl* input_abstraction_update)();
-input_abstraction_update p_input_abstraction_update;
+typedef void(__cdecl* input_abstraction_update_t)();
+input_abstraction_update_t p_input_abstraction_update;
 
 typedef char(__cdecl* sub_B1BA65_t)();
 sub_B1BA65_t p_sub_B1BA65;
@@ -112,8 +112,8 @@ game_time_globals_prep_t p_game_time_globals_prep;
 typedef int(__cdecl* system_milliseconds_t)();
 system_milliseconds_t p_system_milliseconds;
 
-typedef float(__cdecl* main_game_time_system_update)(bool a1, float a2);
-main_game_time_system_update p_main_time_update;
+typedef float(__cdecl* main_game_time_system_update_t)(bool a1, float a2);
+main_game_time_system_update_t p_main_time_update;
 
 typedef void(__cdecl* render_audio_t)();
 render_audio_t p_render_audio;
@@ -687,12 +687,12 @@ void initialize_main_loop_function_pointers()
 	p_simulation_update = Memory::GetAddress<simulation_update_t>(0x4A5D0);
 	p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC);
 	p_director_update = Memory::GetAddress<director_update_t>(0x5A658);
-	p_main_time_update = Memory::GetAddress<main_game_time_system_update>(0x28814);
-	p_cinematic_in_progress = Memory::GetAddress<c_cinematic_in_progress_t>(0x3a928);
-	p_cinematic_is_running = Memory::GetAddress<c_cinematic_is_running_t>(0x3a938);
+	p_main_time_update = Memory::GetAddress<main_game_time_system_update_t>(0x28814);
+	p_cinematic_in_progress = Memory::GetAddress<cinematic_in_progress_t>(0x3a928);
+	p_cinematic_is_running = Memory::GetAddress<cinematic_is_running_t>(0x3a938);
 	p_rumble_update = Memory::GetAddress<rumble_update_t>(0x90438);
-	p_input_abstraction_update = Memory::GetAddress<input_abstraction_update>(0x628A8);
-	p_input_update = Memory::GetAddress<input_update>(0x2F9AC);
+	p_input_abstraction_update = Memory::GetAddress<input_abstraction_update_t>(0x628A8);
+	p_input_update = Memory::GetAddress<input_update_t>(0x2F9AC);
 		
 	dword_F52268 = Memory::GetAddress<int*>(0x482268);
 	max_tick_count = Memory::GetAddress<int*>(0x482264);
@@ -703,6 +703,8 @@ void initialize_main_loop_function_pointers()
 }
 
 void InitRunLoop() {
+	LOG_INFO_GAME("{} - initializing", __FUNCTION__);
+
 	addDebugText("Pre RunLoop hooking.");
 	if (H2IsDediServer) {
 		addDebugText("Hooking loop & shutdown Function");
