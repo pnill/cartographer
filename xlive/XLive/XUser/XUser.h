@@ -81,15 +81,17 @@ typedef struct _XUSER_SIGNIN_INFO
 	CHAR                 szUserName[XUSER_NAME_SIZE];
 } XUSER_SIGNIN_INFO, *PXUSER_SIGNIN_INFO;
 
-bool signInStatusChanged();
 extern bool signInChanged[4];
 extern XUSER_SIGNIN_INFO usersSignInInfo[4];
+
+void XUserSignInSetStatusChanged(DWORD dwUserIndex);
 void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online);
 void XUserSignOut(DWORD dwUserIndex);
 
-bool userSignedIn(DWORD dwUserIndex);
-bool userSignedOnline(DWORD dwUserIndex);
-bool userSignedInLocally(DWORD dwUserIndex);
+bool SignInStatusChanged();
+bool UserSignedIn(DWORD dwUserIndex);
+bool UserSignedOnline(DWORD dwUserIndex);
+bool UserSignedInLocally(DWORD dwUserIndex);
 
 int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid);
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex);

@@ -64,7 +64,7 @@ public:
 			c_account_list_menu::accountingGoBackToList = false;
 		}
 
-		c_account_list_menu::updateAccountingActiveHandle(false);
+		c_account_list_menu::UpdateAccountingActiveHandle(false);
 
 		return c_screen_with_menu::custom_deconstructor(flags);
 	};

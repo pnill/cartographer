@@ -22,7 +22,7 @@ bool c_account_list_menu::isAccountingActiveHandle() {
 	return accountingActiveHandleCount > 0;
 }
 
-void c_account_list_menu::updateAccountingActiveHandle(bool active) {
+void c_account_list_menu::UpdateAccountingActiveHandle(bool active) {
 	accountingActiveHandleCount += active ? 1 : -1;
 	addDebugText("Accounting active: %d", accountingActiveHandleCount);
 	if (accountingActiveHandleCount <= 0) {
@@ -49,7 +49,7 @@ void* __cdecl c_account_list_menu::open(s_new_ui_screen_parameters* parameters)
 	AccountListSetupButtons();
 
 	if (ui_buffer) {
-		c_account_list_menu::updateAccountingActiveHandle(true);
+		c_account_list_menu::UpdateAccountingActiveHandle(true);
 		account_list_menu = new (ui_buffer) c_account_list_menu(parameters->ui_channel, parameters->field_8, HIWORD(parameters->flags), accountRemoveMode); // manually call the constructor
 	}
 
@@ -159,7 +159,7 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 		}
 		else if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			c_account_list_menu::accountingGoBackToList = false;
-			c_account_list_menu::updateAccountingActiveHandle(true);
+			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)button_id, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 			close_parent_screen = true;
@@ -178,6 +178,7 @@ void c_account_edit_list::button_handler(int* a2, int* a3)
 			H2Config_master_ip = inet_addr("127.0.0.1");
 			H2Config_master_port_relay = 2001;
 			close_parent_screen = true;
+			XUserSignInSetStatusChanged(0);
 		}
 	}
 

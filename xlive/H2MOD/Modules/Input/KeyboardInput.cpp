@@ -3,6 +3,7 @@
 #include "KeyboardInput.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Utils\Utils.h"

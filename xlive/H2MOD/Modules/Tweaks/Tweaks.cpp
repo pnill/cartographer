@@ -303,10 +303,9 @@ BOOL __stdcall isDebuggerPresent() {
 }
 
 void InitH2Tweaks() {
-
-	RefreshTogglexDelay();
-
 	addDebugText("Begin Startup Tweaks.");
+	
+	RefreshTogglexDelay();
 
 	//TODO(Num005) crashes dedis
 	//custom_game_engines::init();

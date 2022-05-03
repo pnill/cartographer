@@ -12,7 +12,7 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 bool signInChanged[4];
 XUSER_SIGNIN_INFO usersSignInInfo[4];
 
-bool signInStatusChanged()
+bool SignInStatusChanged()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -22,7 +22,7 @@ bool signInStatusChanged()
 	return false;
 }
 
-bool userSignedIn(DWORD dwUserIndex)
+bool UserSignedIn(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally
 		|| usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
@@ -31,8 +31,7 @@ bool userSignedIn(DWORD dwUserIndex)
 	return false;
 }
 
-
-bool userSignedInLocally(DWORD dwUserIndex)
+bool UserSignedInLocally(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally)
 		return true;
@@ -40,7 +39,7 @@ bool userSignedInLocally(DWORD dwUserIndex)
 	return false;
 }
 
-bool userSignedOnline(DWORD dwUserIndex)
+bool UserSignedOnline(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
 		return true;
@@ -69,7 +68,10 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnad
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
 	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
+}
 
+void XUserSignInSetStatusChanged(DWORD dwUserIndex)
+{
 	signInChanged[dwUserIndex] = true;
 }
 
@@ -95,7 +97,7 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 
 	memset(pXuid, 0, sizeof(XUID));
 
-	if (!userSignedIn(dwUserIndex))
+	if (!UserSignedIn(dwUserIndex))
 		return ERROR_NOT_LOGGED_ON;
 
 	*pXuid = usersSignInInfo[dwUserIndex].xuid;
@@ -421,14 +423,13 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	if (!userSignedOnline(dwUserIndex))
+	if (!UserSignedOnline(dwUserIndex))
 		return ERROR_NOT_FOUND;
 
 	BOOL async;
 
 	if (pOverlapped)
 		async = TRUE;
-
 	else
 		async = FALSE;
 
@@ -479,7 +480,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 		pResults->pSettings = (XUSER_PROFILE_SETTING *)((BYTE *)pResults + sizeof(XUSER_READ_PROFILE_SETTING_RESULT));
 
 		XUSER_PROFILE_SETTING* profileSettings = pResults->pSettings;
-		BYTE* pSettingData = (BYTE*)profileSettings + dwNumSettingIds * sizeof(XUSER_PROFILE_SETTING);
+		BYTE* pSettingData = (BYTE*)profileSettings + (dwNumSettingIds * sizeof(XUSER_PROFILE_SETTING));
 
 		// read data values
 		for (DWORD lcv = 0; lcv < dwNumSettingIds; lcv++)
