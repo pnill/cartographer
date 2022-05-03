@@ -3,11 +3,12 @@
 #define BASE_IMAGE_ADDRESS_HALO2 0x00400000
 #define BASE_IMAGE_ADDRESS_H2SERVER 0x00400000
 
-enum H2Type
+enum H2Type : int
 {
+	Invalid = -1,
+	UnsupportedVersion,
 	H2Game,
 	H2Server,
-	Invalid
 };
 
 class ProcessInfo
