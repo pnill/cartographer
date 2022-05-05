@@ -19,39 +19,17 @@
 extern void InitInstance();
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+bool displayXyz = false;
 bool doDrawIMGUI = false;
 
-bool displayXyz = false;
-
-typedef struct _XLIVE_INITIALIZE_INFO {
-	UINT cbSize;
-	DWORD dwFlags;
-	IUnknown *pD3D;
-	VOID *pD3DPP;
-	LANGID langID;
-	WORD wReserved1;
-	PCHAR pszAdapterName;
-	WORD wLivePortOverride;
-	WORD wReserved2;
-} XLIVE_INITIALIZE_INFO;
-
-typedef struct XLIVE_INPUT_INFO {
-	UINT cbSize;
-	HWND hWnd;
-	UINT uMSG;
-	WPARAM wParam;
-	LPARAM lParam;
-	BOOL fHandled;
-	LRESULT lRet;
-} XLIVE_INPUT_INFO;
-
+HWND H2hWnd;
 LPDIRECT3DDEVICE9 pDevice;
 
 IDirect3DTexture9* Primitive = NULL;
 
-int MasterState = 0;
-char* BuildText = nullptr;
-char* ServerStatus = nullptr;
+int masterState = 0;
+char* buildText = nullptr;
+char* serverStatus = nullptr;
 
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;
@@ -114,11 +92,11 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
 
-		ServerStatus = new char[250];
-		snprintf(ServerStatus, 250, "Status: Initializing....");
+		serverStatus = new char[256];
+		snprintf(serverStatus, 256, "Status: Initializing....");
 
-		BuildText = new char[250];
-		snprintf(BuildText, 250, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+		buildText = new char[256];
+		snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
 		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 		GUI::Initialize(d3dpp->hDeviceWindow);
@@ -409,7 +387,7 @@ int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
 
-char* Auto_Update_Text = 0;
+char* autoUpdateText = 0;
 
 static HWND                 g_hWnd = NULL;
 
@@ -421,8 +399,6 @@ void GUI::ToggleMenu()
 	if(!doDrawIMGUI)
 		SaveH2Config();
 }
-
-
 
 void GUI::Initialize(HWND hWnd)
 {
@@ -437,16 +413,26 @@ void GUI::Initialize(HWND hWnd)
 	imgui_handler::Initalize(pDevice, hWnd);
 	g_hWnd = hWnd;
 }
+
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 {
 	static bool has_initialised_input = false;
 	if (!has_initialised_input) {
-		extern HWND H2hWnd;
 		extern RECT rectScreenOriginal;
 		H2hWnd = pPii->hWnd;
 		GetWindowRect(H2hWnd, &rectScreenOriginal);
 		has_initialised_input = true;
+	}
+
+	if ((pPii->uMSG == WM_KEYDOWN || pPii->uMSG == WM_SYSKEYDOWN)
+		&& (GetKeyState(pPii->wParam) & 0x8000))
+	{
+		// hotkeys
+		KeyboardInput::ExecuteHotkey(pPii->wParam);
+		//handleHotkeyInput(lpMsg->wParam);
+		// console
+		commands->handleInput(pPii->wParam);
 	}
 
 	if (imgui_handler::ImGuiShouldHandleInput())
@@ -455,25 +441,10 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 	return S_OK;
 }
 
-extern void handleHotkeyInput(WPARAM lpMsg);
-
 // #5030: XLivePreTranslateMessage
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
-	//return true;
-	if ((GetKeyState(lpMsg->wParam) & 0x8000) && (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
-	{
-		// hotkeys
-		KeyboardInput::ExecuteHotkey(lpMsg->wParam);
-		//handleHotkeyInput(lpMsg->wParam);
-		// console
-		commands->handleInput(lpMsg->wParam);
-	}
-	if (imgui_handler::IsWindowActive("motd")
-		&& (lpMsg->message == WM_KEYDOWN || lpMsg->message == WM_SYSKEYDOWN))
-		return true;
-	else
-		return false;
+	return false;
 }
 
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -524,20 +495,20 @@ int WINAPI XLiveRender()
 			}
 
 
-			DWORD GameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
-			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			DWORD gameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
+			DWORD gameEngine = *(DWORD*)(gameGlobals + 0x8);
 			bool paused_or_in_menus = (*Memory::GetAddress<BYTE*>(0x47A568) != 0);
 
-			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
-				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
-				if (MasterState == 0)
-					drawText(0, 15, COLOR_WHITE, ServerStatus, smallFont);
-				else if (MasterState == 1)
-					drawText(0, 15, COLOR_GREY, ServerStatus, smallFont);
-				else if (MasterState == 2)
-					drawText(0, 15, COLOR_RED, ServerStatus, smallFont);
-				else if (MasterState == 10)
-					drawText(0, 15, COLOR_GREEN, ServerStatus, smallFont);
+			if (gameEngine == 3 || (gameEngine != 3 && paused_or_in_menus)) {
+				drawText(0, 0, COLOR_WHITE, buildText, smallFont);
+				if (masterState == 0)
+					drawText(0, 15, COLOR_WHITE, serverStatus, smallFont);
+				else if (masterState == 1)
+					drawText(0, 15, COLOR_GREY, serverStatus, smallFont);
+				else if (masterState == 2)
+					drawText(0, 15, COLOR_RED, serverStatus, smallFont);
+				else if (masterState == 10)
+					drawText(0, 15, COLOR_GREEN, serverStatus, smallFont);
 
 				if(H2Config_anti_cheat_enabled)
 					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
@@ -567,9 +538,9 @@ int WINAPI XLiveRender()
 					achievement_height = achievement_height + 2;		
 
 				float scalar = 11.0f;
-				D3DXVECTOR3 Position;
-				Position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
-				Position.y = (gameWindowHeight - achievement_height + 3) * scalar;
+				D3DXVECTOR3 position;
+				position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
+				position.y = (gameWindowHeight - achievement_height + 3) * scalar;
 
 
 				Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
@@ -579,8 +550,6 @@ int WINAPI XLiveRender()
 				D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
 
 				D3DXMATRIX mat;
-
-
 
 				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
 
@@ -594,7 +563,7 @@ int WINAPI XLiveRender()
 				D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
 				Sprite_Interface->SetTransform(&mat);
 
-				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &Position, 0xFFFFFFFF);
+				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &position, 0xFFFFFFFF);
 				Sprite_Interface->End();
 
 				if (achievement_freeze == true)
@@ -649,14 +618,14 @@ int WINAPI XLiveRender()
 				}
 			}
 
-			if (Auto_Update_Text) {
-				drawText(10, 60, COLOR_WHITE, Auto_Update_Text, normalSizeFont);
+			if (autoUpdateText) {
+				drawText(10, 60, COLOR_WHITE, autoUpdateText, normalSizeFont);
 			}
-			extern long long Size_Of_Download;
-			extern long long Size_Of_Downloaded;
-			if (Size_Of_Download > 0) {
+			extern long long sizeOfDownload;
+			extern long long sizeOfDownloaded;
+			if (sizeOfDownload > 0) {
 				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
-				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
+				drawBox(10, 52, ((sizeOfDownloaded * 100) / sizeOfDownload) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
 			imgui_handler::DrawImgui();

@@ -97,11 +97,11 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			dwMsgFilter = XN_SYS_UI;
 		}
 
-		else if (signInStatusChanged())
-			dwMsgFilter = XN_SYS_SIGNINCHANGED;
-
 		else if (notify_xlive_ui != -1)
 			dwMsgFilter = XN_SYS_UI;
+
+		else if (SignInStatusChanged())
+			dwMsgFilter = XN_SYS_SIGNINCHANGED;
 
 		// ex. GTA IV - recheck DLC containers
 		else if (sys_storage == 0)
@@ -205,7 +205,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 				
 			if (*pParam) 
 			{
-				if (userSignedIn(0))
+				if (UserSignedIn(0))
 				{
 					sys_storage = 0;
 					sys_profile = 0;
@@ -248,7 +248,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 				// player 1-4
 				for (int i = 0; i < 4; i++)
 				{
-					if (userSignedIn(i))
+					if (UserSignedIn(i))
 						*pParam |= 1 << i;
 				}
 
@@ -286,7 +286,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 				for (int i = 0; i < 4; i++)
 				{
-					if (userSignedIn(i)) {
+					if (UserSignedIn(i)) {
 						
 						*pParam |= 1 << i;
 					}
@@ -344,11 +344,11 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 	default:
 		break;
-	} // switch
+	} // switch (dwMsgFilter)
 
 
 
-	  // check for more messages
+	// check for more messages
 	if (exit_code)
 		SetEvent(hNotification);
 

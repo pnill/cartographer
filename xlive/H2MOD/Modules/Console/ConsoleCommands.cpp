@@ -8,7 +8,7 @@
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\Shell\ServerConsole.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 #include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"

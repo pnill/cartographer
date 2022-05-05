@@ -50,7 +50,6 @@ bool H2IsDediServer = false;
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
-HWND H2hWnd = NULL;
 
 int instanceNumber = 0;
 

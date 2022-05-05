@@ -15,4 +15,3 @@ extern DWORD H2BaseAddr;
 extern wchar_t* H2ProcessFilePath;
 extern wchar_t* H2AppDataLocal;
 extern wchar_t* FlagFilePathConfig;
-extern HWND H2hWnd;

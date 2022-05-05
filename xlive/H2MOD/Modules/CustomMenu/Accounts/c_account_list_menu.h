@@ -58,7 +58,7 @@ public:
 	static bool accountingGoBackToList;
 	static int accountingActiveHandleCount;
 	static bool isAccountingActiveHandle();
-	static void updateAccountingActiveHandle(bool active);
+	static void UpdateAccountingActiveHandle(bool active);
 
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
@@ -67,7 +67,7 @@ public:
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override
 	{
-		updateAccountingActiveHandle(false);
+		UpdateAccountingActiveHandle(false);
 		return c_screen_with_menu::custom_deconstructor(flags);
 	};
 

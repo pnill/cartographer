@@ -46,7 +46,7 @@ static DWORD WINAPI AccountCreateThread(LPVOID lParam)
 		SecureZeroMemory(pass, strlen(pass));
 	}
 
-	c_account_list_menu::updateAccountingActiveHandle(false);
+	c_account_list_menu::UpdateAccountingActiveHandle(false);
 
 	hThreadCreate = 0;
 	return 0;
@@ -76,7 +76,7 @@ void* __cdecl c_account_create_menu::open(s_new_ui_screen_parameters* parameters
 	BYTE* ui_buffer = (BYTE*)ui_memory_pool_allocate(sizeof(c_account_create_menu), 0);
 
 	c_account_list_menu::accountingGoBackToList = true;
-	c_account_list_menu::updateAccountingActiveHandle(true);
+	c_account_list_menu::UpdateAccountingActiveHandle(true);
 	AccountCreateSetupButtonLabels();
 
 	if (ui_buffer) {
@@ -162,7 +162,7 @@ void c_account_create_list::button_handler(int* a2, int* a3)
 	else if (button_id == 3) {
 		if (!hThreadCreate) {
 			c_account_list_menu::accountingGoBackToList = false;
-			c_account_list_menu::updateAccountingActiveHandle(true);
+			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF02C, 0xFFFFF02D);
 			hThreadCreate = CreateThread(NULL, 0, AccountCreateThread, (LPVOID)0, 0, NULL);
 			close_parent_screen = true;

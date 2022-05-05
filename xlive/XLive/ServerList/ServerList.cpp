@@ -888,7 +888,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 
 DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	if (userSignedOnline(dwUserIndex))
+	if (UserSignedOnline(dwUserIndex))
 	{
 		std::thread(&CServerList::AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
@@ -900,7 +900,7 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 DWORD WINAPI XLocatorServerUnAdvertise(DWORD dwUserIndex, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE("XLocatorServerUnAdvertise()");
-	if (userSignedOnline(dwUserIndex))
+	if (UserSignedOnline(dwUserIndex))
 	{
 		std::thread(&CServerList::RemoveServer, pOverlapped).detach();
 		return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
@@ -921,7 +921,7 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 	// so instead to write the data asynchronously, we store the properties in XLIVE memory, then pass it to the game when it needs it
 	// and get the properties asynchronously
 
-	if (userSignedOnline(dwUserIndex))
+	if (UserSignedOnline(dwUserIndex))
 		std::thread(&CServerList::GetServerCounts, pOverlapped).detach();
 
 	// we simply just give the game the results synchronously, if we have any

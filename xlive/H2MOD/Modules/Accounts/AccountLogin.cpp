@@ -22,24 +22,24 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
 void UpdateConnectionStatus() {
-	extern int MasterState;
-	extern char* ServerStatus;
-	if (userSignedOnline(0)) {
-		MasterState = 10;
+	extern int masterState;
+	extern char* serverStatus;
+	if (UserSignedOnline(0)) {
+		masterState = 10;
 		if (!Memory::IsDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Online");
+			snprintf(serverStatus, 256, "Status: Online");
 	}
-	else if (userSignedInLocally(0))
+	else if (UserSignedInLocally(0))
 	{
-		MasterState = 2;
+		masterState = 2;
 		if (!Memory::IsDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Locally signed in");
+			snprintf(serverStatus, 256, "Status: Locally signed in");
 	}
 	else
 	{
-		MasterState = 2;
+		masterState = 2;
 		if (!Memory::IsDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Offline");
+			snprintf(serverStatus, 256, "Status: Offline");
 	}
 }
 
@@ -318,9 +318,9 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (!H2IsDediServer) {
-				extern char* ServerStatus;
+				extern char* serverStatus;
 				if (result == 4) {
-					snprintf(ServerStatus, 250, "Status: Developer");
+					snprintf(serverStatus, 256, "Status: Developer");
 				}
 			}
 		}
@@ -463,13 +463,13 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 	addDebugText("Logging the Dedi Server in...");
 
 	// clear LAN login info if we are logged in locally
-	if (userSignedInLocally(0))
+	if (UserSignedInLocally(0))
 	{
 		XUserSignOut(0);
 	}
 
 	// if we are not signed in online, sign us in
-	if (!userSignedOnline(0))
+	if (!UserSignedOnline(0))
 	{
 		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
 		//currently credentials are taken from the config file.

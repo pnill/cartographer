@@ -335,10 +335,10 @@ static bool CMButtonHandler_Update(int button_id) {
 	if (button_id == 0) {
 		GSDownloadCheck();
 	}
-	else if (button_id == 1 && GSDownload_files_to_download) {
+	else if (button_id == 1 && updater_has_files_to_download) {
 		GSDownloadDL();
 	}
-	else if (button_id == 2 && GSDownload_files_to_install) {
+	else if (button_id == 2 && updater_has_files_to_install) {
 		GSDownloadInstall();
 	}
 	else if (button_id == 3) {
@@ -876,7 +876,7 @@ void* __stdcall sub_248beb_deconstructor_Login_Token(LPVOID lpMem, char a2)//__t
 		c_account_list_menu::accountingGoBackToList = true;
 	}
 
-	c_account_list_menu::updateAccountingActiveHandle(false);
+	c_account_list_menu::UpdateAccountingActiveHandle(false);
 
 	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -913,7 +913,7 @@ void CMSetupVFTables_Invalid_Login_Token() {
 
 void* __cdecl CustomMenu_Invalid_Login_Token(s_new_ui_screen_parameters* a1) {
 	c_account_list_menu::accountingGoBackToList = true;
-	c_account_list_menu::updateAccountingActiveHandle(true);
+	c_account_list_menu::UpdateAccountingActiveHandle(true);
 	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_Invalid_Login_Token, menu_vftable_2_Invalid_Login_Token, (DWORD)&CMButtonHandler_Invalid_Login_Token, 0, 272);
 }
 
@@ -995,8 +995,8 @@ void xbox_live_task_progress_callback(DWORD a1)
 		{
 			switch (master_login_code)
 			{
-			case ERROR_CODE_CURL_SOCKET_FAILED:
 			case ERROR_CODE_CURL_HANDLE:
+			case ERROR_CODE_CURL_SOCKET_FAILED:
 			case ERROR_CODE_ACCOUNT_DATA:
 			case ERROR_CODE_INVALID_PARAM:
 				CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
@@ -1093,7 +1093,7 @@ DWORD WINAPI ThreadLogin(LPVOID lParam)
 		}
 	}
 
-	c_account_list_menu::updateAccountingActiveHandle(false);
+	c_account_list_menu::UpdateAccountingActiveHandle(false);
 
 	hThreadLogin = INVALID_HANDLE_VALUE;
 	return 0;
@@ -1115,7 +1115,7 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 	else if (button_id == 3) { // login button id
 		if (hThreadLogin == INVALID_HANDLE_VALUE) {
 			c_account_list_menu::accountingGoBackToList = false;
-			c_account_list_menu::updateAccountingActiveHandle(true);
+			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
 		}
@@ -1144,7 +1144,7 @@ void* __stdcall sub_248beb_deconstructor_AccountEdit(LPVOID lpMem, char a2)//__t
 		c_account_list_menu::accountingGoBackToList = false;
 	}
 
-	c_account_list_menu::updateAccountingActiveHandle(false);
+	c_account_list_menu::UpdateAccountingActiveHandle(false);
 
 	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
 	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
@@ -1186,7 +1186,7 @@ void CMSetupVFTables_AccountEdit() {
 
 void* __cdecl CustomMenu_AccountEdit(s_new_ui_screen_parameters* a1) {
 	c_account_list_menu::accountingGoBackToList = true;
-	c_account_list_menu::updateAccountingActiveHandle(true);
+	c_account_list_menu::UpdateAccountingActiveHandle(true);
 	setupAccountEditLabels();
 	return (void*)CustomMenu_CallHead(a1, menu_vftable_1_AccountEdit, menu_vftable_2_AccountEdit, (DWORD)&CMButtonHandler_AccountEdit, 4, 272);
 }
@@ -1622,7 +1622,7 @@ typedef int(__cdecl* tsub_23f6b7)(int);
 tsub_23f6b7 psub_23f6b7;
 int __cdecl sub_23f6b7(int a1)
 {
-	if (userSignedIn(0)) {
+	if (UserSignedIn(0)) {
 		XUserSignOut(0);
 		UpdateConnectionStatus();
 	}
