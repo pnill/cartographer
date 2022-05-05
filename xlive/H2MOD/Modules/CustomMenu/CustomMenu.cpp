@@ -335,10 +335,10 @@ static bool CMButtonHandler_Update(int button_id) {
 	if (button_id == 0) {
 		GSDownloadCheck();
 	}
-	else if (button_id == 1 && GSDownload_files_to_download) {
+	else if (button_id == 1 && updater_has_files_to_download) {
 		GSDownloadDL();
 	}
-	else if (button_id == 2 && GSDownload_files_to_install) {
+	else if (button_id == 2 && updater_has_files_to_install) {
 		GSDownloadInstall();
 	}
 	else if (button_id == 3) {

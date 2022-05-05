@@ -28,7 +28,7 @@ LPDIRECT3DDEVICE9 pDevice;
 IDirect3DTexture9* Primitive = NULL;
 
 int masterState = 0;
-char* BuildText = nullptr;
+char* buildText = nullptr;
 char* serverStatus = nullptr;
 
 const char CompileDate[] = __DATE__;
@@ -95,8 +95,8 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 		serverStatus = new char[256];
 		snprintf(serverStatus, 256, "Status: Initializing....");
 
-		BuildText = new char[256];
-		snprintf(BuildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
+		buildText = new char[256];
+		snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
 		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 		GUI::Initialize(d3dpp->hDeviceWindow);
@@ -387,7 +387,7 @@ int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
 
-char* Auto_Update_Text = 0;
+char* autoUpdateText = 0;
 
 static HWND                 g_hWnd = NULL;
 
@@ -495,12 +495,12 @@ int WINAPI XLiveRender()
 			}
 
 
-			DWORD GameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
-			DWORD GameEngine = *(DWORD*)(GameGlobals + 0x8);
+			DWORD gameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
+			DWORD gameEngine = *(DWORD*)(gameGlobals + 0x8);
 			bool paused_or_in_menus = (*Memory::GetAddress<BYTE*>(0x47A568) != 0);
 
-			if (GameEngine == 3 || (GameEngine != 3 && paused_or_in_menus)) {
-				drawText(0, 0, COLOR_WHITE, BuildText, smallFont);
+			if (gameEngine == 3 || (gameEngine != 3 && paused_or_in_menus)) {
+				drawText(0, 0, COLOR_WHITE, buildText, smallFont);
 				if (masterState == 0)
 					drawText(0, 15, COLOR_WHITE, serverStatus, smallFont);
 				else if (masterState == 1)
@@ -538,9 +538,9 @@ int WINAPI XLiveRender()
 					achievement_height = achievement_height + 2;		
 
 				float scalar = 11.0f;
-				D3DXVECTOR3 Position;
-				Position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
-				Position.y = (gameWindowHeight - achievement_height + 3) * scalar;
+				D3DXVECTOR3 position;
+				position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
+				position.y = (gameWindowHeight - achievement_height + 3) * scalar;
 
 
 				Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
@@ -550,8 +550,6 @@ int WINAPI XLiveRender()
 				D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
 
 				D3DXMATRIX mat;
-
-
 
 				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
 
@@ -565,7 +563,7 @@ int WINAPI XLiveRender()
 				D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
 				Sprite_Interface->SetTransform(&mat);
 
-				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &Position, 0xFFFFFFFF);
+				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &position, 0xFFFFFFFF);
 				Sprite_Interface->End();
 
 				if (achievement_freeze == true)
@@ -620,14 +618,14 @@ int WINAPI XLiveRender()
 				}
 			}
 
-			if (Auto_Update_Text) {
-				drawText(10, 60, COLOR_WHITE, Auto_Update_Text, normalSizeFont);
+			if (autoUpdateText) {
+				drawText(10, 60, COLOR_WHITE, autoUpdateText, normalSizeFont);
 			}
-			extern long long Size_Of_Download;
-			extern long long Size_Of_Downloaded;
-			if (Size_Of_Download > 0) {
+			extern long long sizeOfDownload;
+			extern long long sizeOfDownloaded;
+			if (sizeOfDownload > 0) {
 				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
-				drawBox(10, 52, ((Size_Of_Downloaded * 100) / Size_Of_Download) * 2, 6, COLOR_GREEN, COLOR_GREEN);
+				drawBox(10, 52, ((sizeOfDownloaded * 100) / sizeOfDownload) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
 			imgui_handler::DrawImgui();
