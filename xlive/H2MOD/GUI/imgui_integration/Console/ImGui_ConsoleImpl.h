@@ -61,9 +61,7 @@ public:
         return m_completion_data->Count;
     };
 
-    static int help_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
     static int clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-    static int d3d9ex_set_state_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
     static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
  
     static void Open()

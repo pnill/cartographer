@@ -222,66 +222,7 @@ void NetworkSession::LeaveSession()
 	p_leave_session(0);
 }
 
-void NetworkSession::LogPlayersToConsole() {
-	int playerIdx = 0;
-	do
-	{
-		if (PlayerIsActive(playerIdx))
-		{
-			std::wstring outStr = L"Player index=" + std::to_wstring(playerIdx);
-			outStr += L", Peer index=" + std::to_wstring(GetPeerIndex(playerIdx));
-			outStr += L", PlayerName=";
-			outStr += GetPlayerName(playerIdx);
-			outStr += L", Name from game player state=";
-			outStr += s_player::GetName(playerIdx);
-			outStr += L", Team=" + std::to_wstring(GetPlayerTeam(playerIdx));
-			outStr += L", Identifier=" + std::to_wstring(GetPlayerId(playerIdx));
-
-			commands->output(outStr);
-		}
-		playerIdx++;
-	} while (playerIdx < ENGINE_PLAYER_MAX);
-
-	std::wstring total_players = L"Total players: " + std::to_wstring(GetPlayerCount());
-	commands->output(total_players);
-}
-
-void NetworkSession::LogPeersToConsole() {
-	if (GetPeerCount() > 0)
-	{
-		s_network_observer* observer = GetCurrentNetworkSession()->p_network_observer;
-
-		for (int peerIdx = 0; peerIdx < GetPeerCount(); peerIdx++)
-		{
-			auto peer_observer_channel = &observer->observer_channels[GetCurrentNetworkSession()->peer_observer_channels[peerIdx].observer_index];
-
-			std::wstring outStr = L"Peer index=" + std::to_wstring(peerIdx);
-			outStr += L", Peer Name=";
-			outStr += GetCurrentNetworkSession()->membership[0].peer_data[peerIdx].name;
-			outStr += L", Connection Status=";
-			outStr += std::to_wstring(peer_observer_channel->state);
-			outStr += L", Peer map state: " + std::to_wstring(GetCurrentNetworkSession()->membership[0].peer_data[peerIdx].map_status);
-			int playerIdx = GetCurrentNetworkSession()->membership[0].peer_data[peerIdx].player_index[0];
-			if (playerIdx != -1)
-			{
-				outStr += L", Player index=" + std::to_wstring(playerIdx);
-				outStr += L", Player name=";
-				outStr += GetPlayerName(playerIdx);
-
-				outStr += L", Name from game player state=";
-				outStr += s_player::GetName(playerIdx);
-
-			}
-			commands->output(outStr);
-		}
-	}
-
-	std::wstring total_players = L"Total peers: " + std::to_wstring(GetPeerCount());
-	commands->output(total_players);
-}
-
 void NetworkSession::LogStructureOffsets() {
-
 	std::wostringstream outStr;
 	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(s_network_session, local_peer_index);
 	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(s_network_session, peer_observer_channels);

@@ -10,8 +10,6 @@ const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
 ConsoleVarCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, Console::set_opacity_cb);
 
-// DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex, "var", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, Console::d3d9x_set_state);
-
 Console* GetMainConsoleInstance()
 {
 	static std::unique_ptr<Console> console(std::make_unique<Console>());
@@ -32,7 +30,6 @@ Console::Console() :
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
 	console_opacity_var_cmd.UpdateVarPtr((ComVar*)&m_console_opacity);
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
-	CommandCollection::InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 parameter(s)", 0, Console::help_cb));
 	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, Console::clear_cb));
 }
 
@@ -540,28 +537,6 @@ int Console::clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxD
 	return 0;
 }
 
-// help command
-int Console::help_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
-{
-	IOutput* output = cbData.strOutput;
-	const ConsoleCommand* command_data = cbData.consoleCommandData;
-	
-	output->Output(StringFlag_None, "# available commands: ");
-
-	for (auto& command_entry : CommandCollection::commandTable)
-	{
-		if ((command_entry->GetFlags() & CommandFlag_Hidden) == 0)
-		{
-			output->OutputFmt(StringFlag_None, "# %s ", command_entry->GetName());
-			if (command_entry->GetDescription() != NULL)
-			{
-				output->OutputFmt(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
-			}
-		}
-	}
-	return 0;
-}
-
 // set opacity command
 int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
@@ -574,11 +549,5 @@ int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleComma
 		console_data->m_output.AddString(StringFlag_None, command_error_bad_arg);
 		console_data->m_output.AddStringFmt(StringFlag_None, "	%s", exception.c_str());
 	}
-	return 0;
-}
-
-int Console::d3d9ex_set_state_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
-{
-	Console* console_data = (Console*)cbData.strOutput;
 	return 0;
 }

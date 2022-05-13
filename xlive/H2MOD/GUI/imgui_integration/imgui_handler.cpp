@@ -108,7 +108,7 @@ namespace ImGuiHandler
 				}
 			}
 
-			// here we check if we still need to block game's input
+			// check if we still need to block the input of the game
 			if (window.doRender && !keep_game_input_blocked)
 			{
 				keep_game_input_blocked = true;

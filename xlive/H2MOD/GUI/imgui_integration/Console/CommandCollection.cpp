@@ -15,10 +15,14 @@ DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex,
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
 	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, CommandCollection::BoolVarHandler);
 
-// don't forget to add '_cmd' after the name
+// don't forget to add '_cmd' after the name, 
+// if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	&d3d9ex_var_cmd,
 	&network_stats_overlay_var_cmd,
+	new ConsoleCommand("help", "outputs all commands, 0 parameter(s)", 0, CommandCollection::HelpCmd),
+	new ConsoleCommand("logpeers", "logs all peers to console, 0 parameter(s)", 0, CommandCollection::LogPeersCmd),
+	new ConsoleCommand("logplayers", "logs all players to console, 0 parameter(s)", 0, CommandCollection::LogPlayersCmd),
 	new ConsoleCommand("mapdownload", "download specified map, 1 parameter(s): <string>", 1, CommandCollection::DownloadMapCmd),
 	new ConsoleCommand("reloadmaps", "re-load custom map data cache into memory, 0 parameter(s)", 0, CommandCollection::ReloadMapsCmd),
 };
@@ -82,6 +86,20 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, ComVar* varPtr
 //	commands
 //////////////////////////////////////////////////////////////////////////
 
+int CommandCollection::BoolVarHandler(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = (IOutput*)cbData.strOutput;
+	auto var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
+
+	std::string exception;
+	if (!var->SetValFromStr(tokens[1], 10, exception))
+	{
+		output->Output(StringFlag_None, command_error_bad_arg);
+		output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+	}
+	return 0;
+}
+
 int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	IOutput* output = (IOutput*)cbData.strOutput;
@@ -119,20 +137,6 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 	return 0;
 }
 
-int CommandCollection::BoolVarHandler(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
-{
-	IOutput* output = (IOutput*)cbData.strOutput;
-	auto var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
-
-	std::string exception;
-	if (!var->SetValFromStr(tokens[1], 10, exception))
-	{
-		output->Output(StringFlag_None, command_error_bad_arg);
-		output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
-	}
-	return 0;
-}
-
 int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	IOutput* output = (IOutput*)cbData.strOutput;
@@ -154,3 +158,120 @@ int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, Con
 	mapManager->ReloadAllMaps();
 	return 0;
 }
+
+int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = cbData.strOutput;
+	const ConsoleCommand* command_data = cbData.consoleCommandData;
+
+	output->Output(StringFlag_None, "# available commands: ");
+
+	for (auto& command_entry : CommandCollection::commandTable)
+	{
+		if ((command_entry->GetFlags() & CommandFlag_Hidden) == 0)
+		{
+			output->OutputFmt(StringFlag_None, "# %s ", command_entry->GetName());
+			if (command_entry->GetDescription() != NULL)
+			{
+				output->OutputFmt(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
+			}
+		}
+	}
+	return 0;
+}
+
+int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = cbData.strOutput;
+	const ConsoleCommand* command_data = cbData.consoleCommandData;
+
+	if (!NetworkSession::GetCurrentNetworkSession(nullptr))
+	{
+		output->Output(StringFlag_None, "# not in a network session");
+		return 0;
+	}
+	if (!NetworkSession::LocalPeerIsSessionHost())
+	{
+		output->Output(StringFlag_None, "# must be network session host");
+		return 0;
+	}
+
+	output->OutputFmt(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
+
+	for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+	{
+		if (NetworkSession::PlayerIsActive(playerIdx))
+		{
+			std::wstring playerNameWide(NetworkSession::GetPlayerName(playerIdx));
+			std::string playerName(playerNameWide.begin(), playerNameWide.end());
+			std::string outStr = "Player index=" + std::to_string(playerIdx);
+			outStr += ", Peer index=" + std::to_string(NetworkSession::GetPeerIndex(playerIdx));
+			outStr += ", PlayerName=" + playerName;
+
+			playerNameWide = s_player::GetName(playerIdx);
+			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
+
+			outStr += ", Name from game player state=" + playerName;
+			outStr += ", Team=" + std::to_string(NetworkSession::GetPlayerTeam(playerIdx));
+			outStr += ", Identifier=" + std::to_string(NetworkSession::GetPlayerId(playerIdx));
+
+			output->Output(StringFlag_None, outStr.c_str());
+		}
+	}
+
+	return 0;
+}
+
+int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = cbData.strOutput;
+	const ConsoleCommand* command_data = cbData.consoleCommandData;
+
+	s_network_session* session;
+
+	if (!NetworkSession::GetCurrentNetworkSession(&session))
+	{
+		output->Output(StringFlag_None, "# not in a network session");
+		return 0;
+	}
+	if (!NetworkSession::LocalPeerIsSessionHost())
+	{
+		output->Output(StringFlag_None, "# must be network session host");
+		return 0;
+	}
+
+	s_network_observer* observer = NetworkSession::GetCurrentNetworkSession()->p_network_observer;
+
+	output->OutputFmt(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
+
+	for (int peerIdx = 0; peerIdx < NetworkSession::GetPeerCount(); peerIdx++)
+	{
+		auto peer_observer_channel = &observer->observer_channels[session->peer_observer_channels[peerIdx].observer_index];
+
+		std::wstring peerNameWide(session->membership[0].peer_data[peerIdx].name);
+		std::string peerName(peerNameWide.begin(), peerNameWide.end());
+
+		std::string outStr = "Peer index=" + std::to_string(peerIdx);
+		outStr += ", Peer Name=" + peerName;
+		outStr += ", Connection Status=" + std::to_string(peer_observer_channel->state);
+		outStr += ", Peer map state: " + std::to_string(session->membership[0].peer_data[peerIdx].map_status);
+		int playerIdx = session->membership[0].peer_data[peerIdx].player_index[0];
+		if (playerIdx != -1)
+		{
+			std::wstring playerNameWide(NetworkSession::GetPlayerName(playerIdx));
+			std::string playerName(playerNameWide.begin(), playerNameWide.end());
+			outStr += ", Player index=" + std::to_string(playerIdx);
+			outStr += ", Player name=" + playerName;
+
+			playerNameWide = s_player::GetName(playerIdx);
+			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
+			outStr += ", Name from game player state=" + playerName;
+		}
+		output->Output(StringFlag_None, outStr.c_str());
+	}
+
+	return 0;
+}
+
+
+

@@ -512,22 +512,6 @@ void CommandCollection::handle_command(std::string command) {
 			}
 			return;
 		}
-		else if (firstCommand == "$logplayers") {
-			if (!NetworkSession::LocalPeerIsSessionHost()) {
-				output(L"Only host can log player information.");
-				return;
-			}
-			NetworkSession::LogPlayersToConsole();
-			return;
-		}
-		else if (firstCommand == "$logpeers") {
-			if (!NetworkSession::LocalPeerIsSessionHost()) {
-				output(L"Only host can log peer information.");
-				return;
-			}
-			NetworkSession::LogPeersToConsole();
-			return;
-		}
 		else if (firstCommand == "$maxplayers") {
 			if (splitCommands.size() != 2) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");

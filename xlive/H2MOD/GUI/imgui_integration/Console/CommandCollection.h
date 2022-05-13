@@ -18,5 +18,7 @@ namespace CommandCollection
 	int BoolVarHandler(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int SetNetMetricStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 }

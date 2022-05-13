@@ -60,8 +60,6 @@ namespace NetworkSession
 	void LeaveSession();
 
 	// logging
-	void LogPeersToConsole();
-	void LogPlayersToConsole();
 	void LogStructureOffsets();
 }
 
