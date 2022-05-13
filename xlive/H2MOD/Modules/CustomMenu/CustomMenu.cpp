@@ -1058,7 +1058,7 @@ void xbox_live_task_progress_callback(DWORD a1)
 					GSCustomMenuCall_Update_Note();
 					return;
 				}
-				imgui_handler::ToggleWindow("motd");
+				ImGuiHandler::ToggleWindow("motd");
 				//extern int notify_xlive_ui;
 				//notify_xlive_ui = 0;
 				//sub_248beb_nak_deconstructor_Login_Warn();
@@ -1244,7 +1244,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Guide() {//__thiscall
 
 static bool CMButtonHandler_Guide(int button_id) {
 	if (button_id == 0) {
-		imgui_handler::ToggleWindow("Advanced Settings");
+		ImGuiHandler::ToggleWindow("Advanced Settings");
 		//GSCustomMenuCall_AdvSettings();
 	}
 	else if (button_id == 1) {

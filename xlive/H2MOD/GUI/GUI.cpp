@@ -141,7 +141,7 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
-	imgui_handler::ReleaseTextures();
+	ImGuiHandler::ReleaseTextures();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 	//pDevice->Reset(pD3DPP);
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
@@ -410,7 +410,7 @@ void GUI::Initialize(HWND hWnd)
 	}
 
 	D3DXCreateSprite(pDevice, &Sprite_Interface);
-	imgui_handler::Initalize(pDevice, hWnd);
+	ImGuiHandler::Initalize(pDevice, hWnd);
 	g_hWnd = hWnd;
 }
 
@@ -432,10 +432,10 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		KeyboardInput::ExecuteHotkey(pPii->wParam);
 		//handleHotkeyInput(lpMsg->wParam);
 		// console
-		commands->handleInput(pPii->wParam);
+		// commands->handleInput(pPii->wParam);
 	}
 
-	if (imgui_handler::ImGuiShouldHandleInput())
+	if (ImGuiHandler::ImGuiShouldHandleInput())
 		ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
 
 	return S_OK;
@@ -471,29 +471,6 @@ int WINAPI XLiveRender()
 
 			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
 			int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
-			//TODO: move into chatbox commands
-			//drawPrimitiveRect(0, 0, gameWindowWidth, 200, D3DCOLOR_ARGB(255, 000, 000, 0));
-			if (commands->console) {
-				int x = 0, y = 0;
-				int height = 400;
-				float startingPosY = height - 15.0f;
-				drawPrimitiveRect(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-				//drawFilledBox(x, y, gameWindowWidth, height, D3DCOLOR_ARGB(155, 000, 000, 000));
-				drawText(0, startingPosY, COLOR_WHITE, ">>", normalSizeFont);
-
-				std::string strCommand = commands->command;
-				if (!commands->shouldCaretBlink())
-					strCommand.replace(commands->caretPos, 1, "_");
-
-				drawText(35, startingPosY, COLOR_WHITE, strCommand.c_str(), normalSizeFont);
-
-				startingPosY -= 12.0f;
-				for (std::string& it : commands->prevOutput) {
-					startingPosY -= 15.0f;
-					drawText(0, startingPosY, COLOR_WHITE, it.c_str(), normalSizeFont);
-				}
-			}
-
 
 			DWORD gameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
 			DWORD gameEngine = *(DWORD*)(gameGlobals + 0x8);
@@ -628,7 +605,7 @@ int WINAPI XLiveRender()
 				drawBox(10, 52, ((sizeOfDownloaded * 100) / sizeOfDownload) * 2, 6, COLOR_GREEN, COLOR_GREEN);
 			}
 
-			imgui_handler::DrawImgui();
+			ImGuiHandler::DrawImgui();
 		}
 	}
 	return 0;

@@ -17,8 +17,8 @@
 #include "imgui.h"
 #include "imgui_handler.h"
 
-namespace imgui_handler {
-	namespace AdvancedSettings {
+namespace ImGuiHandler {
+	namespace ImAdvancedSettings {
 		namespace
 		{
 			float crosshairSize = 1.0f;

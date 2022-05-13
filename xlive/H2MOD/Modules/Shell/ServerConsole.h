@@ -24,7 +24,7 @@ namespace ServerConsole
 
 	static std::map<std::wstring, e_server_console_commands> s_commandsMap;
 	void ApplyHooks();
-	void logToDedicatedServerConsole(const wchar_t* string, ...);
+	void LogToDedicatedServerConsole(const wchar_t* string, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);
 	void AddVip(std::wstring gamerTag);
 	void ClearVip();

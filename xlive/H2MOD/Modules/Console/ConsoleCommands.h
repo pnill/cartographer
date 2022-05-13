@@ -2,9 +2,9 @@
 
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
-class ConsoleCommands {
+class CommandCollection {
 public:
-	ConsoleCommands();
+	CommandCollection();
 	void handle_command(std::string);
 	void spawn(datum object_idx, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam);
 	void spawn_rotate(datum object_idx, float x, float y, float z, float i, float j, float k);
@@ -37,4 +37,4 @@ private:
 	bool caretBlinked = false;
 };
 
-extern ConsoleCommands* commands;
+extern CommandCollection* commands;

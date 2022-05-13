@@ -3961,8 +3961,10 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
         return false;
 
     IM_ASSERT(buf != NULL && buf_size >= 0);
-    IM_ASSERT(!((flags & ImGuiInputTextFlags_CallbackHistory) && (flags & ImGuiInputTextFlags_Multiline)));        // Can't use both together (they both use up/down keys)
-    IM_ASSERT(!((flags & ImGuiInputTextFlags_CallbackCompletion) && (flags & ImGuiInputTextFlags_AllowTabInput))); // Can't use both together (they both use tab key)
+    IM_ASSERT(!((flags & ImGuiInputTextFlags_CallbackHistory) && (flags & ImGuiInputTextFlags_Multiline)));             // Can't use both together (they both use up/down keys)
+    IM_ASSERT(!((flags & ImGuiInputTextFlags_CallbackCompletion) && (flags & ImGuiInputTextFlags_AllowTabInput)));      // Can't use both together (they both use tab key)
+    IM_ASSERT(!((flags & ImGuiInputTextFlags_DisplaySuggestions) && (flags & ImGuiInputTextFlags_Password)));           // Doesn't make sense to use them together 
+    IM_ASSERT(!((flags & ImGuiInputTextFlags_DisplaySuggestions) && !(flags & ImGuiInputTextFlags_CallbackCompletion)));  // Cannot use ImGuiInputTextFlags_DisplaySuggestions without ImGuiInputTextFlags_CallbackCompletion
 
     ImGuiContext& g = *GImGui;
     ImGuiIO& io = g.IO;
@@ -3974,6 +3976,10 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
     const bool is_password = (flags & ImGuiInputTextFlags_Password) != 0;
     const bool is_undoable = (flags & ImGuiInputTextFlags_NoUndoRedo) == 0;
     const bool is_resizable = (flags & ImGuiInputTextFlags_CallbackResize) != 0;
+    const bool is_displaying_suggestion_popup = (flags & ImGuiInputTextFlags_DisplaySuggestions) != 0;
+
+    ImGuiTextInputCompletion* completion = NULL;
+
     if (is_resizable)
         IM_ASSERT(callback != NULL); // Must provide a callback if you set the ImGuiInputTextFlags_CallbackResize flag!
 
@@ -4495,7 +4501,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                     callback_data.EventFlag = event_flag;
                     callback_data.Flags = flags;
                     callback_data.UserData = callback_user_data;
-
+                    callback_data.CompletionData = NULL;
                     char* callback_buf = is_readonly ? buf : state->TextA.Data;
                     callback_data.EventKey = event_key;
                     callback_data.Buf = callback_buf;
@@ -4513,6 +4519,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                     callback(&callback_data);
 
                     // Read back what user may have modified
+                    completion = callback_data.CompletionData;
                     callback_buf = is_readonly ? buf : state->TextA.Data; // Pointer may have been invalidated by a resize callback
                     IM_ASSERT(callback_data.Buf == callback_buf);         // Invalid to modify those fields
                     IM_ASSERT(callback_data.BufSize == state->BufCapacityA);
@@ -4816,6 +4823,53 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
 
     if (value_changed && !(flags & ImGuiInputTextFlags_NoMarkEdited))
         MarkItemEdited(id);
+
+    const bool input_text_is_active = ImGui::IsItemActive();
+
+    // create the suggestions window
+    if (is_displaying_suggestion_popup && input_text_is_active && completion != NULL)
+    {
+        ImGuiID suggestion_menu_id = g.CurrentWindow->GetID("##text_input_suggestions");
+        bool popup_open = IsPopupOpen(suggestion_menu_id, ImGuiPopupFlags_None);
+        /* there's anything to display? */
+        if (!popup_open)
+        {
+            OpenPopupEx(suggestion_menu_id, 0);
+        }
+
+        // set the next popup position to the last caret position
+        ImVec2 suggestion_menu_pos = ImGui::GetCursorScreenPos();
+        ImGui::SetNextWindowPos(suggestion_menu_pos);
+
+        // TODO add support to display the suggestion above the text input frame
+        if (BeginTextInputSuggestionPopup(suggestion_menu_id, 0))
+        {
+            char completion_candidate_display[1024];
+            completion_candidate_display[0] = '\x0';
+
+            for (int i = 0; i < completion->Count; i++)
+            {
+                ImGuiTextInputCompletionCandidate* completionData = &completion->CompletionCandidate[i];
+                strncpy(completion_candidate_display, completionData->CompletionText, sizeof(completion_candidate_display));
+
+                if (completionData->CompletionVariable != nullptr)
+                {
+                    strncat(completion_candidate_display, " : ", sizeof(completion_candidate_display));
+                    strncat(completion_candidate_display, completionData->CompletionVariable, sizeof(completion_candidate_display));
+                }
+
+                bool selected = i == completion->SelectedCandidateIndex;
+                if (ImGui::Selectable(completion_candidate_display, selected))
+                {
+                    // TODO FIXME for some reason clicking the completion candidate doesn't work
+                    // probably thinks the background is clicked
+                    completion->ClickedCandidateIndex = i;
+                }
+            }
+
+            EndPopup();
+        }
+    }
 
     IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
     if ((flags & ImGuiInputTextFlags_EnterReturnsTrue) != 0)

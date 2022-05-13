@@ -3,9 +3,9 @@
 #include "imgui_handler.h"
 #include "imgui_internal.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	namespace DebugOverlay
+	namespace ImDebugOverlay
 	{
 		struct DebugWatchItem
 		{

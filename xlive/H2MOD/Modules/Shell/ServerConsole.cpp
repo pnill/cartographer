@@ -16,11 +16,11 @@ kablam_vip_add_t p_kablam_vip_add;
 typedef signed int(__cdecl* kablam_vip_clear_t)();
 kablam_vip_clear_t p_kablam_vip_clear;
 
-void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, char a3) {
+void* __cdecl DediCommandHook(wchar_t** command_line_args, int split_strings, char a3) {
 
 	wchar_t* command = command_line_args[0];
 	if (command[0] == L'$') {
-		ServerConsole::logToDedicatedServerConsole(L"Running custom command\n");
+		ServerConsole::LogToDedicatedServerConsole(L"Running custom command\n");
 		//run the chatbox commands
 		std::wstring wsCommand(command);
 		commands->handle_command(std::string(wsCommand.begin(), wsCommand.end()));
@@ -62,7 +62,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	const auto& playCommandFind = ServerConsole::s_commandsMap.find(lowerCommand);
+	auto playCommandFind = ServerConsole::s_commandsMap.find(lowerCommand);
 	if (playCommandFind != ServerConsole::s_commandsMap.end()
 		&& playCommandFind->second == ServerConsole::play)
 		playCommand = true;
@@ -114,7 +114,7 @@ void ServerConsole::ApplyHooks()
 	s_commandsMap[L"unban"] = e_server_console_commands::unban;
 	s_commandsMap[L"vip"] = e_server_console_commands::vip;
 	s_commandsMap[L"any"] = e_server_console_commands::any;
-	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
+	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)DediCommandHook, 7);
 	p_kablam_vip_add = Memory::GetAddress<kablam_vip_add_t>(0, 0x1D932);
 	p_kablam_vip_clear = Memory::GetAddress<kablam_vip_clear_t>(0, 0x1DB16);
 
@@ -122,7 +122,7 @@ void ServerConsole::ApplyHooks()
 	PatchCall(Memory::GetAddress(0, 0x724B), kablam_command_play);
 }
 
-void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
+void ServerConsole::LogToDedicatedServerConsole(const wchar_t* string, ...) {
 
 	if (!Memory::IsDedicatedServer())
 		return;
@@ -170,7 +170,7 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 	BYTE v8 = (*(BYTE**)(threadparams + 8))[20];
 	*(BYTE*)(threadparams + 4) = v8;
 	if (!v8)
-		logToDedicatedServerConsole(L"\r\n");
+		LogToDedicatedServerConsole(L"\r\n");
 }
 
 

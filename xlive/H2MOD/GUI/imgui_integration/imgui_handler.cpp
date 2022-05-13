@@ -9,15 +9,21 @@
 #include "backends\imgui_impl_dx9.h"
 #include "backends\imgui_impl_win32.h"
 
-#include "ImGui_Cartographer_Style.h"
+#include "ImGui_CartographerStyle.h"
+#include "Console\ImGui_ConsoleImpl.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	//Window Name, DrawState, RenderFunc, OpenFunc, CloseFunc
-	/*std::vector<std::tuple<std::string, bool, std::function<void(bool*)>,
-		std::function<void()>, std::function<void()>>> windows;*/
-	std::vector<s_imgui_window> imgui_windows;
+	std::vector<s_imgui_window> imgui_windows =
+	{
+		{"motd", false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close},
+		{"debug_overlay", false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close},
+		{"messagebox", false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close},
+		{"advanced_settings", false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close},
+		{"console", false, Console::Render, Console::Open, Console::Close}
+	};
+
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
 	static INT64                g_TicksPerSecond = 0;
@@ -45,11 +51,12 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
+		// TODO add these to some container
 		if (g_network_stats_overlay)
 			return true;
 		for (auto& window : imgui_windows)
 		{
-			if (window.DoRender)
+			if (window.doRender)
 				return true;
 		}
 		return false;
@@ -57,7 +64,7 @@ namespace imgui_handler
 
 	void DrawImgui()
 	{
-		if (!imgui_handler::CanDrawImgui()) return;
+		if (!ImGuiHandler::CanDrawImgui()) return;
 
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -65,9 +72,9 @@ namespace imgui_handler
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
 		for (auto& window : imgui_windows)
 		{
-			if (window.DoRender)
+			if (window.doRender)
 			{
-				window.RenderFunc(&window.DoRender);
+				window.renderFunc(&window.doRender);
 			}
 		}
 		ImGui::Render();
@@ -80,16 +87,16 @@ namespace imgui_handler
 		{
 			if (window.name == name)
 			{
-				window.DoRender = !window.DoRender;
-				if (window.DoRender)
+				window.doRender = !window.doRender;
+				if (window.doRender)
 				{
-					if (window.OpenFunc != nullptr)
-						window.OpenFunc();
+					if (window.openFunc != nullptr)
+						window.openFunc();
 				}
 				else
 				{
-					if (window.CloseFunc != nullptr)
-						window.CloseFunc();
+					if (window.closeFunc != nullptr)
+						window.closeFunc();
 				}
 			}
 		}
@@ -102,18 +109,13 @@ namespace imgui_handler
 		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
-				return window.DoRender;
+				return window.doRender;
 		}
 		return false;
 	}
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		imgui_windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
-		imgui_windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
-		imgui_windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		imgui_windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
-		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -130,7 +132,7 @@ namespace imgui_handler
 
 		ImGui_ImplDX9_Init(pDevice);
 
-		AdvancedSettings::BuildStringsTable();
+		ImAdvancedSettings::BuildStringsTable();
 	}
 	float WidthPercentage(float percent)
 	{
@@ -215,7 +217,7 @@ namespace imgui_handler
 		auto grab_thread = []()
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			MOTD::GetMOTD(getAspectRatio(viewport->WorkSize));
+			ImMOTD::GetMOTD(getAspectRatio(viewport->WorkSize));
 		};
 		std::thread(grab_thread).detach();
 	}

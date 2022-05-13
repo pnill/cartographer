@@ -13,9 +13,9 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 
 extern int notify_xlive_ui;
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	namespace MOTD {
+	namespace ImMOTD {
 		namespace
 		{
 			bool g_motd = false;
@@ -30,7 +30,7 @@ namespace imgui_handler
 		{
 			// check if the texture has been reset
 			if (g_complete 
-				&& imgui_handler::GetTexture(patch_notes) != nullptr)
+				&& ImGuiHandler::GetTexture(patch_notes) != nullptr)
 				return g_success;
 
 			auto path = std::wstring(H2AppDataLocal);
@@ -40,7 +40,7 @@ namespace imgui_handler
 			// and the texture got reset, so we just re-load it
 			if (g_complete)
 			{
-				imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
+				ImGuiHandler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
 				return g_success;
 			}
 
@@ -73,7 +73,7 @@ namespace imgui_handler
 				int size = ftell(fp);
 				fclose(fp);
 				if (size > 10252) {
-					imgui_handler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
+					ImGuiHandler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
 					g_success = true;
 				}
 			}
@@ -86,7 +86,7 @@ namespace imgui_handler
 			s_aspect_ratio ratio = getAspectRatio(viewport->WorkSize);
 
 			// check if the texture has been reset
-			if (imgui_handler::GetTexture(patch_notes) == nullptr
+			if (ImGuiHandler::GetTexture(patch_notes) == nullptr
 				&& !g_textureLoading)
 			{
 				// if so, re-upload it to memory
@@ -115,7 +115,7 @@ namespace imgui_handler
 						if (!g_success) {
 							*p_open = false;
 							notify_xlive_ui = 0;
-							MOTD::Close();
+							ImMOTD::Close();
 						}
 						g_init = true;
 					}
@@ -163,20 +163,20 @@ namespace imgui_handler
 				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
 				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
 				//);
-				foreground_draw_list->AddImage((void*)imgui_handler::GetTexture(patch_notes), ImVec2(0, 0), ImGui::GetIO().DisplaySize);
+				foreground_draw_list->AddImage((void*)ImGuiHandler::GetTexture(patch_notes), ImVec2(0, 0), ImGui::GetIO().DisplaySize);
 				/*draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0, 0),
 					ImVec2(X, Y));*/
 
 				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
 					*p_open = false;
-					MOTD::Close();
+					ImMOTD::Close();
 					notify_xlive_ui = 0;
 				}
 				else if (MouseInput::GetMouseState()[12] != 0)
 				{
 					*p_open = false;
-					MOTD::Close();
+					ImMOTD::Close();
 					notify_xlive_ui = 0;
 				}
 				else
@@ -188,7 +188,7 @@ namespace imgui_handler
 						if (bKeys[i] & 0x80)
 						{
 							*p_open = false;
-							MOTD::Close();
+							ImMOTD::Close();
 							notify_xlive_ui = 0;
 							break;
 						}

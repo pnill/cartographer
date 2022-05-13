@@ -134,34 +134,36 @@ Index of this file:
 //-----------------------------------------------------------------------------
 
 // Forward declarations
-struct ImDrawChannel;               // Temporary storage to output draw commands out of order, used by ImDrawListSplitter and ImDrawList::ChannelsSplit()
-struct ImDrawCmd;                   // A single draw command within a parent ImDrawList (generally maps to 1 GPU draw call, unless it is a callback)
-struct ImDrawData;                  // All draw command lists required to render the frame + pos/size coordinates to use for the projection matrix.
-struct ImDrawList;                  // A single draw command list (generally one per window, conceptually you may see this as a dynamic "mesh" builder)
-struct ImDrawListSharedData;        // Data shared among multiple draw lists (typically owned by parent ImGui context, but you may create one yourself)
-struct ImDrawListSplitter;          // Helper to split a draw list into different layers which can be drawn into out of order, then flattened back.
-struct ImDrawVert;                  // A single vertex (pos + uv + col = 20 bytes by default. Override layout with IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT)
-struct ImFont;                      // Runtime data for a single font within a parent ImFontAtlas
-struct ImFontAtlas;                 // Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF/OTF font loader
-struct ImFontBuilderIO;             // Opaque interface to a font builder (stb_truetype or FreeType).
-struct ImFontConfig;                // Configuration data when adding a font or merging fonts
-struct ImFontGlyph;                 // A single font glyph (code point + coordinates within in ImFontAtlas + offset)
-struct ImFontGlyphRangesBuilder;    // Helper to build glyph ranges from text/string data
-struct ImColor;                     // Helper functions to create a color that can be converted to either u32 or float4 (*OBSOLETE* please avoid using)
-struct ImGuiContext;                // Dear ImGui context (opaque structure, unless including imgui_internal.h)
-struct ImGuiIO;                     // Main configuration and I/O between your application and ImGui
-struct ImGuiInputTextCallbackData;  // Shared state of InputText() when using custom ImGuiInputTextCallback (rare/advanced use)
-struct ImGuiListClipper;            // Helper to manually clip large list of items
-struct ImGuiOnceUponAFrame;         // Helper for running a block of code not more than once a frame
-struct ImGuiPayload;                // User data payload for drag and drop operations
-struct ImGuiSizeCallbackData;       // Callback data when using SetNextWindowSizeConstraints() (rare/advanced use)
-struct ImGuiStorage;                // Helper for key->value storage
-struct ImGuiStyle;                  // Runtime data for styling/colors
-struct ImGuiTableSortSpecs;         // Sorting specifications for a table (often handling sort specs for a single column, occasionally more)
-struct ImGuiTableColumnSortSpecs;   // Sorting specification for one column of a table
-struct ImGuiTextBuffer;             // Helper to hold and append into a text buffer (~string builder)
-struct ImGuiTextFilter;             // Helper to parse and apply text filters (e.g. "aaaaa[,bbbbb][,ccccc]")
-struct ImGuiViewport;               // A Platform Window (always only one in 'master' branch), in the future may represent Platform Monitor
+struct ImDrawChannel;                       // Temporary storage to output draw commands out of order, used by ImDrawListSplitter and ImDrawList::ChannelsSplit()
+struct ImDrawCmd;                           // A single draw command within a parent ImDrawList (generally maps to 1 GPU draw call, unless it is a callback)
+struct ImDrawData;                          // All draw command lists required to render the frame + pos/size coordinates to use for the projection matrix.
+struct ImDrawList;                          // A single draw command list (generally one per window, conceptually you may see this as a dynamic "mesh" builder)
+struct ImDrawListSharedData;                // Data shared among multiple draw lists (typically owned by parent ImGui context, but you may create one yourself)
+struct ImDrawListSplitter;                  // Helper to split a draw list into different layers which can be drawn into out of order, then flattened back.
+struct ImDrawVert;                          // A single vertex (pos + uv + col = 20 bytes by default. Override layout with IMGUI_OVERRIDE_DRAWVERT_STRUCT_LAYOUT)
+struct ImFont;                              // Runtime data for a single font within a parent ImFontAtlas
+struct ImFontAtlas;                         // Runtime data for multiple fonts, bake multiple fonts into a single texture, TTF/OTF font loader
+struct ImFontBuilderIO;                     // Opaque interface to a font builder (stb_truetype or FreeType).
+struct ImFontConfig;                        // Configuration data when adding a font or merging fonts
+struct ImFontGlyph;                         // A single font glyph (code point + coordinates within in ImFontAtlas + offset)
+struct ImFontGlyphRangesBuilder;            // Helper to build glyph ranges from text/string data
+struct ImColor;                             // Helper functions to create a color that can be converted to either u32 or float4 (*OBSOLETE* please avoid using)
+struct ImGuiContext;                        // Dear ImGui context (opaque structure, unless including imgui_internal.h)
+struct ImGuiIO;                             // Main configuration and I/O between your application and ImGui
+struct ImGuiInputTextCallbackData;          // Shared state of InputText() when using custom ImGuiInputTextCallback (rare/advanced use)
+struct ImGuiListClipper;                    // Helper to manually clip large list of items
+struct ImGuiOnceUponAFrame;                 // Helper for running a block of code not more than once a frame
+struct ImGuiPayload;                        // User data payload for drag and drop operations
+struct ImGuiSizeCallbackData;               // Callback data when using SetNextWindowSizeConstraints() (rare/advanced use)
+struct ImGuiStorage;                        // Helper for key->value storage
+struct ImGuiStyle;                          // Runtime data for styling/colors
+struct ImGuiTableSortSpecs;                 // Sorting specifications for a table (often handling sort specs for a single column, occasionally more)
+struct ImGuiTableColumnSortSpecs;           // Sorting specification for one column of a table
+struct ImGuiTextBuffer;                     // Helper to hold and append into a text buffer (~string builder)
+struct ImGuiTextFilter;                     // Helper to parse and apply text filters (e.g. "aaaaa[,bbbbb][,ccccc]")
+struct ImGuiViewport;                       // A Platform Window (always only one in 'master' branch), in the future may represent Platform Monitor
+struct ImGuiTextInputCompletion;
+struct ImGuiTextInputCompletionCandidate;   
 
 // Enums/Flags (declared as int for compatibility with old C++, to allow using as flags without overhead, and to not pollute the top of this file)
 // - Tip: Use your programming IDE navigation facilities on the names in the _central column_ below to find the actual flags/enum lists!
@@ -979,7 +981,8 @@ enum ImGuiWindowFlags_
     ImGuiWindowFlags_Tooltip                = 1 << 25,  // Don't use! For internal use by BeginTooltip()
     ImGuiWindowFlags_Popup                  = 1 << 26,  // Don't use! For internal use by BeginPopup()
     ImGuiWindowFlags_Modal                  = 1 << 27,  // Don't use! For internal use by BeginPopupModal()
-    ImGuiWindowFlags_ChildMenu              = 1 << 28   // Don't use! For internal use by BeginMenu()
+    ImGuiWindowFlags_ChildMenu              = 1 << 28,  // Don't use! For internal use by BeginMenu()
+    ImGuiWindowFlags_SuggestionPopup        = 1 << 29   // Don't use! For internal use by TextInputWithSuggestions() 
 
     // [Obsolete]
     //ImGuiWindowFlags_ResizeFromAnySide    = 1 << 17,  // --> Set io.ConfigWindowsResizeFromEdges=true and make sure mouse cursors are supported by backend (io.BackendFlags & ImGuiBackendFlags_HasMouseCursors)
@@ -1008,7 +1011,8 @@ enum ImGuiInputTextFlags_
     ImGuiInputTextFlags_NoUndoRedo          = 1 << 16,  // Disable undo/redo. Note that input text owns the text data while active, if you want to provide your own undo/redo stack you need e.g. to call ClearActiveID().
     ImGuiInputTextFlags_CharsScientific     = 1 << 17,  // Allow 0123456789.+-*/eE (Scientific notation input)
     ImGuiInputTextFlags_CallbackResize      = 1 << 18,  // Callback on buffer capacity changes request (beyond 'buf_size' parameter value), allowing the string to grow. Notify when the string wants to be resized (for string types which hold a cache of their Size). You will be provided a new BufSize in the callback and NEED to honor it. (see misc/cpp/imgui_stdlib.h for an example of using this)
-    ImGuiInputTextFlags_CallbackEdit        = 1 << 19   // Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
+    ImGuiInputTextFlags_CallbackEdit        = 1 << 19,  // Callback on any edit (note that InputText() already returns true on edit, the callback is useful mainly to manipulate the underlying buffer while focus is active)
+    ImGuiInputTextFlags_DisplaySuggestions  = 1 << 20
 
     // Obsolete names (will be removed soon)
 #ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
@@ -1985,6 +1989,8 @@ struct ImGuiInputTextCallbackData
     int                 SelectionStart; //                                      // Read-write   // [Completion,History,Always] == to SelectionEnd when no selection)
     int                 SelectionEnd;   //                                      // Read-write   // [Completion,History,Always]
 
+    ImGuiTextInputCompletion*   CompletionData;
+
     // Helper functions for text manipulation.
     // Use those function to benefit from the CallbackResize behaviors. Calling those function reset the selection.
     IMGUI_API ImGuiInputTextCallbackData();
@@ -2253,6 +2259,30 @@ struct ImColor
     // FIXME-OBSOLETE: May need to obsolete/cleanup those helpers.
     inline void    SetHSV(float h, float s, float v, float a = 1.0f){ ImGui::ColorConvertHSVtoRGB(h, s, v, Value.x, Value.y, Value.z); Value.w = a; }
     static ImColor HSV(float h, float s, float v, float a = 1.0f)   { float r, g, b; ImGui::ColorConvertHSVtoRGB(h, s, v, r, g, b); return ImColor(r, g, b, a); }
+};
+
+struct ImGuiTextInputCompletionCandidate
+{
+    const char* CompletionText;
+    const char* CompletionDescription; // optional
+    const char* CompletionVariable;
+    ImColor     CompletionTextColor;
+    ImColor     CompletionDescriptionTextColor;
+};
+
+struct ImGuiTextInputCompletion
+{
+    int                                 SelectedCandidateIndex;
+    int                                 ClickedCandidateIndex;
+    unsigned int                        Count;
+    ImGuiTextInputCompletionCandidate*  CompletionCandidate;
+
+    ImGuiTextInputCompletion(unsigned int _candidatesCount)
+    {
+        this->SelectedCandidateIndex = -1;
+        this->ClickedCandidateIndex = -1;
+        this->Count = _candidatesCount;
+    };
 };
 
 //-----------------------------------------------------------------------------

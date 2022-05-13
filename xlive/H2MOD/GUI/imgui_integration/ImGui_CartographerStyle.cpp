@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "ImGui_Cartographer_Style.h"
+#include "ImGui_CartographerStyle.h"
 
 const static ImVec2 wPadding(20, 10);
 const static ImVec2 fPadding(8, 3);

@@ -6,7 +6,7 @@
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
+
 #include "H2MOD\Modules\Shell\ServerConsole.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
@@ -21,27 +21,27 @@
 
 std::wstring ERROR_OPENING_CLIPBOARD(L"Error opening clipboard");
 
-ConsoleCommands* commands = new ConsoleCommands();
+CommandCollection* commands = new CommandCollection();
 
-ConsoleCommands::ConsoleCommands() {
+CommandCollection::CommandCollection() {
 	command = "";
 	caretPos = 0;
 }
 
-void ConsoleCommands::writePreviousCommand(std::string& msg) {
+void CommandCollection::writePreviousCommand(std::string& msg) {
 	this->prevCommands.insert(this->prevCommands.begin(), msg);
 	if (this->prevCommands.size() > 6)
 		this->prevCommands.pop_back();
 }
 
-void ConsoleCommands::writePreviousOutput(std::string& msg) {
+void CommandCollection::writePreviousOutput(std::string& msg) {
 	this->prevOutput.insert(this->prevOutput.begin(), msg);
 	if (this->prevOutput.size() > 18)
 		this->prevOutput.pop_back();
 }
 
 time_t start = time(0);
-BOOL ConsoleCommands::handleInput(WPARAM wp) {
+BOOL CommandCollection::handleInput(WPARAM wp) {
 	if (H2hWnd != GetForegroundWindow()) {
 		//halo2 is not in focus
 		return false;
@@ -321,7 +321,7 @@ BOOL ConsoleCommands::handleInput(WPARAM wp) {
 	return false;
 }
 
-bool ConsoleCommands::shouldCaretBlink()
+bool CommandCollection::shouldCaretBlink()
 {
 	if (timeGetTime() - lastTimeCaretBlink >= caretBlinkTimeMs)
 	{
@@ -333,13 +333,13 @@ bool ConsoleCommands::shouldCaretBlink()
 	return caretBlinked;
 }
 
-void ConsoleCommands::resetCaretBlink()
+void CommandCollection::resetCaretBlink()
 {
 	caretBlinked = false;
 	lastTimeCaretBlink = timeGetTime();
 }
 
-void ConsoleCommands::checkForIds() {
+void CommandCollection::checkForIds() {
 	if (!checked_for_ids) {
 		//only check once per game
 		checked_for_ids = true;
@@ -359,7 +359,7 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(datum object_idx, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
+void CommandCollection::spawn(datum object_idx, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
 
 	for (int i = 0; i < count; i++) {
 		try {
@@ -395,7 +395,7 @@ void ConsoleCommands::spawn(datum object_idx, int count, float x, float y, float
 	}
 }
 
-void ConsoleCommands::spawn_rotate(datum object_idx, float x, float y, float z, float i, float j, float k)
+void CommandCollection::spawn_rotate(datum object_idx, float x, float y, float z, float i, float j, float k)
 {
 	s_object_placement_data nObject;
 	if (!DATUM_IS_NONE(object_idx))
@@ -414,17 +414,17 @@ void ConsoleCommands::spawn_rotate(datum object_idx, float x, float y, float z, 
 		output(IntToWString<unsigned int>(gamestate_datum, std::hex));
 	}
 }
-void ConsoleCommands::delete_object(datum object_datum)
+void CommandCollection::delete_object(datum object_datum)
 {
 	if (!DATUM_IS_NONE(object_datum))
 	{
 		Engine::Objects::object_destroy(object_datum);
 	}
 }
-void ConsoleCommands::output(std::wstring result) {
+void CommandCollection::output(std::wstring result) {
 	if (Memory::IsDedicatedServer()) {
 		result = result + L"\n";
-		ServerConsole::logToDedicatedServerConsole(result.c_str());
+		ServerConsole::LogToDedicatedServerConsole(result.c_str());
 	}
 	else {
 		std::string str(result.begin(), result.end());
@@ -432,12 +432,12 @@ void ConsoleCommands::output(std::wstring result) {
 	}
 }
 
-void ConsoleCommands::display(std::string output)
+void CommandCollection::display(std::string output)
 {
 	writePreviousOutput(output);
 }
 
-bool ConsoleCommands::isNum(const char* s) {
+bool CommandCollection::isNum(const char* s) {
 	int i = 0;
 	while (s[i]) {
 		//if there is a letter in a string then string is not a number
@@ -453,21 +453,14 @@ bool ConsoleCommands::isNum(const char* s) {
 * Handles the given string command
 * Returns a bool indicating whether the command is a valid command or not
 */
-void ConsoleCommands::handle_command(std::string command) {
+void CommandCollection::handle_command(std::string command) {
 	//split by a space
 	std::vector<std::string> splitCommands = split(command, ' ');
 
 	if (splitCommands.size() != 0) {
 		std::string firstCommand = splitCommands[0];
 		std::transform(firstCommand.begin(), firstCommand.end(), firstCommand.begin(), ::tolower);
-		if (firstCommand == "$reloadmaps") {
-			if (splitCommands.size() != 1) {
-				output(L"Invalid command, usage - $reloadMaps");
-				return;
-			}
-			mapManager->ReloadAllMaps();
-		}
-		else if (firstCommand == "$help") {
+		if (firstCommand == "$help") {
 			output(L"reloadMaps");
 			output(L"kick");
 			output(L"logPlayers");
@@ -479,30 +472,14 @@ void ConsoleCommands::handle_command(std::string command) {
 			output(L"controller_sens");
 			output(L"mouse_sens");
 			output(L"warpfix");
-			output(L"maingamelooppatches");
 			output(L"injecttag (tag_name) (tag_type) (map_name)");
 			return;
 		}
 		else if (firstCommand == "$mapfilename")
 		{
 			std::wstring map_file_name;
-			mapManager->GetMapFilename(map_file_name);
-			output(map_file_name);
-			return;
-		}
-		else if (firstCommand == "$downloadmap") {
-			if (splitCommands.size() != 2) {
-				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
-				return;
-			}
-			if (!NetworkSession::LocalPeerIsSessionHost())
-			{
-				output(L"Cannot download map using command while not being the session host!");
-				return;
-			}
-			std::string firstArg = splitCommands[1];
-			auto downloadQuery = mapManager->AddDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
-			downloadQuery->StartMapDownload(); // since we have the map name, start the download
+			//mapManager->GetMapFilename(map_file_name);
+			//output(map_file_name);
 			return;
 		}
 		else if (firstCommand == "$kick") {
@@ -878,7 +855,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		
 		else if (firstCommand == "$net_metrics")
 		{
-			imgui_handler::g_network_stats_overlay = !imgui_handler::g_network_stats_overlay;
+			ImGuiHandler::g_network_stats_overlay = !ImGuiHandler::g_network_stats_overlay;
 		}
 		else {
 			output(L"Unknown command.");

@@ -17,8 +17,8 @@ RECT rectScreenOriginal;
 
 
 //Leveraging this call to unset the controller state
-typedef void(__cdecl p_sub_B524F7)(signed int a1);
-p_sub_B524F7* c_sub_B524F7;
+typedef void(__cdecl sub_B524F7_t)(signed int a1);
+sub_B524F7_t* p_sub_B524F7;
 
 __int16 last_user_index;
 //Patching this call to enable keyboards to switch death targets
@@ -210,33 +210,28 @@ void hotkeyFuncWindowMode() {
 }
 
 void hotkeyFuncToggleHideIngameChat() {
-	if (H2IsDediServer) {
-		return;
-	}
 	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
 	if (H2Config_hide_ingame_chat) {
-		addDebugText("Hiding In-game Chat Menu.");
+		addDebugText("Hiding in-game chat menu.");
 	}
 	else {
-		addDebugText("Showing In-game Chat Menu.");
+		addDebugText("Showing in-game chat menu.");
 	}
+}
+void hotkeyFuncGuide() {
+	ImGuiHandler::ToggleWindow("advanced_settings");
+}
+void hotkeyFuncDebug() {
+	ImGuiHandler::ToggleWindow("debug_overlay");
+}
+void hotkeyFuncConsole() {
+	ImGuiHandler::ToggleWindow("console");
 }
 
-void hotkeyFuncGuide() {
-	if (H2IsDediServer) {
-		return;
-	}
-	imgui_handler::ToggleWindow("Advanced Settings");
-}
-void hotkeyFuncDebug()
-{
-	// imgui_handler::ToggleWindow("debug_overlay");
-}
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	
-	c_sub_B524F7 = Memory::GetAddress<p_sub_B524F7*>(0x824F7);
+	p_sub_B524F7 = Memory::GetAddress<sub_B524F7_t*>(0x824F7);
 	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
 	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {
@@ -247,11 +242,12 @@ void KeyboardInput::Initialize()
 	ToggleKeyboardInput();
 	addDebugText("Registering Hotkeys");
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
+	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
+	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
+	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 
 

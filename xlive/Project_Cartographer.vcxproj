@@ -321,8 +321,11 @@
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\DebugOverlay.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
@@ -645,7 +648,12 @@
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandsUtil.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ComVar.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />

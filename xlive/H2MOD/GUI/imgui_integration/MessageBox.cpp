@@ -7,9 +7,9 @@
 #include "imgui_handler.h"
 #include "Util\Hooks\Hook.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	namespace iMessageBox
+	namespace ImMessageBox
 	{
 		namespace
 		{

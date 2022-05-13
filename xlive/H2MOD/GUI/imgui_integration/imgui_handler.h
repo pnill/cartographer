@@ -1,7 +1,7 @@
 #pragma once
 #include "imgui.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
 	extern bool g_network_stats_overlay;
 
@@ -13,17 +13,17 @@ namespace imgui_handler
 	struct s_imgui_window
 	{
 		std::string name;
-		bool DoRender;
-		std::function<void(bool*)> RenderFunc;
-		std::function<void()> OpenFunc;
-		std::function<void()> CloseFunc;
-		s_imgui_window(std::string name, bool doRender, std::function<void(bool*)> renderFunc, std::function<void()> openFunc, std::function<void()> closeFunc)
+		bool doRender;
+		std::function<void(bool*)> renderFunc;
+		std::function<void()> openFunc;
+		std::function<void()> closeFunc;
+		s_imgui_window(const std::string& _name, bool _doRender, std::function<void(bool*)> _renderFunc, std::function<void()> _openFunc, std::function<void()> _closeFunc)
 		{
-			this->name = name;
-			this->DoRender = doRender;
-			this->RenderFunc = renderFunc;
-			this->OpenFunc = openFunc;
-			this->CloseFunc = closeFunc;
+			name = _name;
+			doRender = _doRender;
+			renderFunc = _renderFunc;
+			openFunc = _openFunc;
+			closeFunc = _closeFunc;
 		}
 	};
 	enum s_aspect_ratio : byte
@@ -46,13 +46,13 @@ namespace imgui_handler
 	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
 	void preloadImages();
-	namespace MOTD {
+	namespace ImMOTD {
 		bool GetMOTD(s_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();
 	}
-	namespace AdvancedSettings
+	namespace ImAdvancedSettings
 	{
 		enum e_advanced_string : int
 		{
@@ -183,7 +183,7 @@ namespace imgui_handler
 		void Open();
 		void Close();
 	}
-	namespace DebugOverlay
+	namespace ImDebugOverlay
 	{
 
 		void Render(bool* p_open);
@@ -192,7 +192,7 @@ namespace imgui_handler
 		void Open();
 		void Close();
 	}
-	namespace iMessageBox
+	namespace ImMessageBox
 	{
 		void Render(bool* p_open);
 		void SetMessage(std::string message);

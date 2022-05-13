@@ -98,7 +98,7 @@
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
@@ -127,7 +127,7 @@
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
@@ -144,6 +144,9 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -442,7 +445,7 @@
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
@@ -470,6 +473,11 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandsUtil.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ComVar.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
