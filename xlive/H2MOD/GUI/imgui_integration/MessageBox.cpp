@@ -52,15 +52,9 @@ namespace ImGuiHandler
 
 		void Open()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
-			ImGuiToggleInput(true);
-			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
-			ImGuiToggleInput(false);
-			PlayerControl::DisableLocalCamera(false);
 		}
 	}
 }

@@ -7,6 +7,9 @@
 #include "CommandCollection.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
 
+class Console;
+
+Console* GetMainConsoleInstance();
 void ImGui_Console_OpenDefault(const char*, bool*);
 
 class Console : IOutput
@@ -15,6 +18,7 @@ private:
     // variables
     bool                                m_auto_scroll;
     bool                                m_scroll_to_botom;
+    bool                                m_reclaim_input_box_focus = false;
 
     char                                m_input_buffer[MAX_CONSOLE_INPUT_BUFFER];
     CircularStringBuffer                m_output;
@@ -62,23 +66,12 @@ public:
     static int d3d9ex_set_state_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
     static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
  
-    static void SetGameInputState(bool enable)
-	{
-		// TODO move this function somewhere else
-		*Memory::GetAddress<bool*>(0x9712CC) = enable;
-	}
-
     static void Open()
     {
-        SetGameInputState(true);
-        ImGuiHandler::ImGuiToggleInput(true);
-		PlayerControl::DisableLocalCamera(true);
+        GetMainConsoleInstance()->m_reclaim_input_box_focus = true;
     }
     static void Close()
     {
-        SetGameInputState(false);
-        ImGuiHandler::ImGuiToggleInput(false);
-		PlayerControl::DisableLocalCamera(false);
     }
 
     static void Render(bool* b_open)

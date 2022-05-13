@@ -197,22 +197,12 @@ namespace ImGuiHandler
 
 			}
 		}
-		void SetGameInputState(bool enable)
-		{
-			// TODO move this function somewhere else
-			*Memory::GetAddress<bool*>(0x9712cC) = enable;
-		}
 		void Open()
 		{
-			SetGameInputState(false);
-			ImGuiToggleInput(true);
-			PlayerControl::DisableLocalCamera(true);
+
 		}
 		void Close()
 		{
-			SetGameInputState(true);
-			ImGuiToggleInput(false);
-			PlayerControl::DisableLocalCamera(false);
 			XUserSignInSetStatusChanged(0);
 		}
 	}

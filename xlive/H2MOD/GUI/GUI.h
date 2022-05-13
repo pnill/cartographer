@@ -51,11 +51,9 @@ static CONST D3DCOLOR COLOR_WHITE = D3DCOLOR_ARGB(255, 255, 255, 249);
 static CONST D3DCOLOR COLOR_GREY_TRANSPARENT = D3DCOLOR_ARGB(150, 112, 112, 112);
 static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
-
 namespace GUI
 {
 	extern void Initialize(HWND hWnd);
-	extern void ToggleMenu();
 };
 
 extern HWND H2hWnd;

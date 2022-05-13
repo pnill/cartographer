@@ -1035,7 +1035,6 @@ namespace ImGuiHandler {
 		}
 		void Open()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
 			for(auto i = 0; i < 14; i++)
@@ -1046,14 +1045,9 @@ namespace ImGuiHandler {
 						button_placeholders[i] = j;
 				}
 			}
-			ImGuiToggleInput(true);
-			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
-			ImGuiToggleInput(false);
-			PlayerControl::DisableLocalCamera(false);
 			SaveH2Config();
 		}
 		void BuildStringsTable()

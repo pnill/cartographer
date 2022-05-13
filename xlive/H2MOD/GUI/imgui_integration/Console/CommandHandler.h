@@ -60,7 +60,7 @@ public:
 
     static bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* command_line, const std::vector<std::string>& tokens);
 	
-    static bool ConsoleCommand::TempNameExec(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* strOutput, ConsoleCommand* command);
+    static bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* strOutput, ConsoleCommand* command);
    
     ConsoleCommand(const char* _name, const char* _command_description, int _parameter_count, ExecuteCommandCallbackT* _callback,
         CommandFlags _flags = CommandFlag_None);

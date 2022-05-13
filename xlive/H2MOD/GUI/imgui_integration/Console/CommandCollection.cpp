@@ -32,7 +32,6 @@ void CommandCollection::InitializeCommandsMap()
 	atexit([]() -> void {
 		for (auto command : commandTable)
 		{
-			delete command;
 		}
 
 		commandTable.clear();
@@ -89,7 +88,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 	ComVarT<int> peerIdxVar;
 	std::string exception;
 
-	do 
+	do
 	{
 		if (!peerIdxVar.SetValFromStr(tokens[1], 10, exception))
 		{

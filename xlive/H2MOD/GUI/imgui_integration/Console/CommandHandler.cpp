@@ -33,7 +33,7 @@ bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* comma
 	return true;
 }
 
-bool ConsoleCommand::TempNameExec(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* ctx, ConsoleCommand* command)
+bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* ctx, ConsoleCommand* command)
 {
 	ConsoleCommandCtxData command_data;
 	command_data.strOutput = ctx;
@@ -62,14 +62,14 @@ bool ConsoleCommand::TempNameExec(const char* command_line, size_t command_line_
 }
 
 // static function, executes command
-bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* context)
+bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* output)
 {
     bool ret = false;
 
 	std::vector<std::string> command_first_tokens;
 	if (tokenize(command_line, command_line_length, " ", command_first_tokens))
 	{
-		ConsoleCommand* command = NULL;
+		ConsoleCommand* command = nullptr;
 		for (auto& command_entry : CommandCollection::commandTable)
 		{
 			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), strlen(command_entry->GetName())) == 0)
@@ -78,7 +78,16 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 			}
 		}
 
-		ret = ConsoleCommand::TempNameExec(command_line, command_line_length, command_first_tokens, context, command);
+		if (command == nullptr)
+		{
+			output->Output(StringFlag_None, "# unknown command: ");
+			output->Output(StringFlag_History, command_line);
+			ret = false;
+		}
+		else
+		{
+			ret = ConsoleCommand::ExecCommand(command_line, command_line_length, command_first_tokens, output, command);
+		}
 	}
 
     return ret;

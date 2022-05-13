@@ -306,8 +306,6 @@ void Console::ExecCommand(const char* command_line, size_t command_line_length)
 
 	if (!ConsoleCommand::HandleCommandLine(command_line, command_line_length, this))
 	{
-		m_output.AddString(StringFlag_None, "# unknown command: ");
-		m_output.AddString(StringFlag_History, command_line);
 		m_scroll_to_botom = true;
 	}
 }
@@ -451,8 +449,6 @@ void Console::Draw(const char* title, bool* p_open)
 	ImGui::PopStyleColor();
 	ImGui::EndChild();
 
-	static bool reclaim_input_box_focus = false;
-
 	// ImGui::PushItemWidth(-(ImGui::CalcTextSize("Enter").x + style.FramePadding.x * 2.0f + 5.0f + 1.0f));
 	ImGuiInputTextFlags input_text_flags = 0
 		| ImGuiInputTextFlags_EnterReturnsTrue
@@ -472,17 +468,17 @@ void Console::Draw(const char* title, bool* p_open)
 		{
 			ExecCommand(m_input_buffer, input_buffer_string_length);
 			memset(m_input_buffer, 0, 2);
-			reclaim_input_box_focus = true;
+			m_reclaim_input_box_focus = true;
 		}
 	}
 	bool input_text_active = ImGui::IsItemActive();
 
 	// Auto-focus on window apparition
 	ImGui::SetItemDefaultFocus();
-	if (reclaim_input_box_focus)
+	if (m_reclaim_input_box_focus)
 	{
 		ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
-		reclaim_input_box_focus = false;
+		m_reclaim_input_box_focus = false;
 	}
 
 	//ImGui::PopItemWidth();

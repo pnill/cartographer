@@ -62,6 +62,12 @@ namespace ImGuiHandler
 		return false;
 	}
 
+	void SetGameInputState(bool enable)
+	{
+		// TODO move this function somewhere else
+		*Memory::GetAddress<bool*>(0x9712C8 + 4) = !enable;
+	}
+
 	void DrawImgui()
 	{
 		if (!ImGuiHandler::CanDrawImgui()) return;
@@ -83,6 +89,8 @@ namespace ImGuiHandler
 
 	void ToggleWindow(const std::string& name)
 	{
+		bool keep_game_input_blocked = false;
+
 		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
@@ -99,7 +107,17 @@ namespace ImGuiHandler
 						window.closeFunc();
 				}
 			}
+
+			// here we check if we still need to block game's input
+			if (window.doRender && !keep_game_input_blocked)
+			{
+				keep_game_input_blocked = true;
+			}
 		}
+
+		SetGameInputState(!keep_game_input_blocked);
+		ImGuiToggleInput(keep_game_input_blocked);
+		PlayerControl::DisableLocalCamera(keep_game_input_blocked);
 	}
 
 	bool IsWindowActive(const std::string& name)

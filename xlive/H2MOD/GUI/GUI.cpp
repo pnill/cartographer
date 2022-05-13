@@ -391,15 +391,6 @@ char* autoUpdateText = 0;
 
 static HWND                 g_hWnd = NULL;
 
-void GUI::ToggleMenu()
-{
-	doDrawIMGUI = !doDrawIMGUI;
-	WriteValue<bool>(Memory::GetAddress(0x9712CC), doDrawIMGUI);
-	PlayerControl::DisableLocalCamera(doDrawIMGUI);
-	if(!doDrawIMGUI)
-		SaveH2Config();
-}
-
 void GUI::Initialize(HWND hWnd)
 {
 	initFontsIfRequired();
@@ -436,7 +427,9 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 	}
 
 	if (ImGuiHandler::ImGuiShouldHandleInput())
+	{
 		ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);
+	}
 
 	return S_OK;
 }
