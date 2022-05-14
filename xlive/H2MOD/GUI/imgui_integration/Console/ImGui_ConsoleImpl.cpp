@@ -145,6 +145,9 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 			{
 				console_data->m_completion_data->CompletionCandidate[i].CompletionVariable = var_command->VarAsStr();
 			}
+
+			if (console_data->m_completion_data->SelectedCandidateIndex == -1)
+				console_data->m_completion_data->SelectedCandidateIndex = 0;
 		}
 
 		// after we found the candidates, update the callback data with the pointers to the buffer
@@ -374,6 +377,7 @@ void Console::Draw(const char* title, bool* p_open)
 		if (ImGui::BeginMenu("Menu"))
 		{
 			if (ImGui::MenuItem("Clear")) { ClearOutput(); }
+			if (ImGui::MenuItem("Close Window")) { *p_open = false; }
 			ImGui::EndMenu();
 		}
 
