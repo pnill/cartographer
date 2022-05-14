@@ -43,7 +43,6 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 
 	if (CheckArgs(&command_data, command_line, tokens))
 	{
-		output->OutputFmt(StringFlag_History, command_line);
 
 		if (const auto* varCommand = dynamic_cast<const ConsoleVarCommand*>(command))
 		{
@@ -86,6 +85,7 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 		}
 		else
 		{
+			output->OutputFmt(StringFlag_History, command_line);
 			ret = ConsoleCommand::ExecCommand(command_line, command_line_length, command_first_tokens, output, command);
 		}
 	}
