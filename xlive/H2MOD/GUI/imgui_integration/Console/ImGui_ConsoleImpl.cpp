@@ -363,7 +363,7 @@ void Console::Draw(const char* title, bool* p_open)
 
 	ImGui::SetNextWindowBgAlpha(m_console_opacity.GetVal());
 
-	if (!ImGui::Begin(title, p_open, console_main_window_flags))
+	if (!ImGui::Begin(title, NULL, console_main_window_flags))
 	{
 		ImGui::End();
 		return;
@@ -377,7 +377,7 @@ void Console::Draw(const char* title, bool* p_open)
 		if (ImGui::BeginMenu("Menu"))
 		{
 			if (ImGui::MenuItem("Clear")) { ClearOutput(); }
-			if (ImGui::MenuItem("Close Window")) { *p_open = false; }
+			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow("console"); }
 			ImGui::EndMenu();
 		}
 
@@ -387,7 +387,7 @@ void Console::Draw(const char* title, bool* p_open)
 	// Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (ImGui::MenuItem("Close Window")) { *p_open = false; }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow("console"); }
 		ImGui::EndPopup();
 	}
 
