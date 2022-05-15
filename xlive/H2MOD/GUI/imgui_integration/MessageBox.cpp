@@ -17,6 +17,7 @@ namespace ImGuiHandler
 		}
 		void Render(bool* p_open)
 		{
+			bool open = *p_open;
 			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
@@ -30,14 +31,13 @@ namespace ImGuiHandler
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 250), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == _main_menu)
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin("Message", p_open, window_flags))
+			if (ImGui::Begin("Message", NULL, window_flags))
 			{
 				ImGui::TextWrapped(message.c_str());
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
-					*p_open = false;
-					Close();
+					ImGuiHandler::ToggleWindow("messagebox");
 				}
 			}
 			// Pop style var
