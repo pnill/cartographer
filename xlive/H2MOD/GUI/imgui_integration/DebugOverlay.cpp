@@ -12,7 +12,7 @@ namespace ImGuiHandler
 			std::string Description;
 			std::string Value;
 		};
-		std::unordered_map<std::string, DebugWatchItem> WatchItems;
+		std::unordered_map<std::string, DebugWatchItem> watchItems;
 		void Render(bool* p_open)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -22,7 +22,7 @@ namespace ImGuiHandler
 
 			//draw_list->AddText(ImGui::GetDefaultFont(), 20, ImVec2(50, 200), ImColor(0, 0, 0), "Banana");
 			int index = 0;
-			for(auto item : WatchItems)
+			for(auto item : watchItems)
 			{
 				std::string temp_str = item.second.Description;
 				temp_str += ": ";
@@ -34,12 +34,12 @@ namespace ImGuiHandler
 		}
 		void AddWatchItem(std::string Key, std::string Description)
 		{
-			WatchItems.emplace(Key, DebugWatchItem{ Description, "" });
+			watchItems.emplace(Key, DebugWatchItem{ Description, "" });
 		}
 		void UpdateWatchItem(std::string Key, std::string Value)
 		{
-			if (WatchItems.count(Key))
-				WatchItems.at(Key).Value = Value;
+			if (watchItems.count(Key))
+				watchItems.at(Key).Value = Value;
 		}
 		void Open()
 		{

@@ -113,9 +113,8 @@ namespace ImGuiHandler
 					if(g_complete)
 					{
 						if (!g_success) {
-							*p_open = false;
 							notify_xlive_ui = 0;
-							ImMOTD::Close();
+							ImGuiHandler::ToggleWindow("motd");
 						}
 						g_init = true;
 					}
@@ -169,15 +168,13 @@ namespace ImGuiHandler
 
 				if (ControllerInput::get_controller_input(0)[16] == 1)
 				{
-					*p_open = false;
-					ImMOTD::Close();
 					notify_xlive_ui = 0;
+					ImGuiHandler::ToggleWindow("motd");
 				}
 				else if (MouseInput::GetMouseState()[12] != 0)
 				{
-					*p_open = false;
-					ImMOTD::Close();
 					notify_xlive_ui = 0;
+					ImGuiHandler::ToggleWindow("motd");
 				}
 				else
 				{
@@ -187,9 +184,8 @@ namespace ImGuiHandler
 					{
 						if (bKeys[i] & 0x80)
 						{
-							*p_open = false;
-							ImMOTD::Close();
 							notify_xlive_ui = 0;
+							ImGuiHandler::ToggleWindow("motd");
 							break;
 						}
 					}
@@ -199,7 +195,6 @@ namespace ImGuiHandler
 		}
 		void Open()
 		{
-
 		}
 		void Close()
 		{

@@ -916,7 +916,7 @@ namespace ImGuiHandler {
 		}
 		void Render(bool* p_open)
 		{
-			if(!g_init)
+			if (!g_init)
 			{
 				g_deadzone = (int)H2Config_Controller_Deadzone;
 				g_aiming = (int)H2Config_controller_modern;
@@ -928,6 +928,8 @@ namespace ImGuiHandler {
 					g_language_code = 8;
 				g_init = true;
 			}
+
+			bool open = *p_open;
 			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
@@ -941,7 +943,7 @@ namespace ImGuiHandler {
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == _main_menu)
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
+			if (ImGui::Begin(GetString(e_advanced_string::title), &open, window_flags))
 			{
 				HudSettings();
 				VideoSettings();
@@ -1030,8 +1032,11 @@ namespace ImGuiHandler {
 
 			ImGui::PopStyleVar();
 			ImGui::End();
-			if (!*p_open)
-				Close();
+
+			if (!open)
+			{
+				ImGuiHandler::ToggleWindow("advanced_settings");
+			}
 		}
 		void Open()
 		{

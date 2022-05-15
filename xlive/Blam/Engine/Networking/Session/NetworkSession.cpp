@@ -10,7 +10,7 @@ bool NetworkSession::PlayerIsActive(int playerIdx)
 
 s_network_session* NetworkSession::GetNetworkSessions()
 {
-	return *Memory::GetAddress<s_network_session**>(0x51C474, 0x520B94); sizeof(s_membership_information);
+	return *Memory::GetAddress<s_network_session**>(0x51C474, 0x520B94);
 }
 
 s_network_session* NetworkSession::GetCurrentNetworkSession()
