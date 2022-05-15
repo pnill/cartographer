@@ -8,14 +8,6 @@ typedef int StringHeaderFlags;
 
 #define MAX_CONSOLE_INPUT_BUFFER 256
 
-// for redirecting output to either dedicated server/imgui console
-class IOutput
-{
-public:
-	virtual int Output(StringHeaderFlags flags, const char* fmt) = 0;
-	virtual int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) = 0;
-};
-
 static bool InputTextContainsCommandSubstring(const char* command, const char* input_text, bool test_only_first_token)
 {
 	char input_text_upper_temp[MAX_CONSOLE_INPUT_BUFFER];

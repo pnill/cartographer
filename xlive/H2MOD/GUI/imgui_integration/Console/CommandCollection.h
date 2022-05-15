@@ -4,6 +4,8 @@
 #include "CommandHandler.h"
 #include "CommandCollection.h"
 
+#include "Blam/Math/BlamMath.h"
+
 namespace CommandCollection
 {
 	extern std::vector<ConsoleCommand*> commandTable;
@@ -14,11 +16,29 @@ namespace CommandCollection
 	void InitializeCommandsMap();
 
 	// commands
-	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int BoolVarHandler(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	int LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	
+	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+
+	// misc
+	void ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, datum playerIdx, float randomMultiplier, bool sameTeam);
+	void ReadObjectDatumIdx();
+	void DeleteObject(datum objectDatumIdx);
 }

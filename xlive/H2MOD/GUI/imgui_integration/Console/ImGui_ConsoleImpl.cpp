@@ -108,7 +108,8 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 		{
 			if (InputTextContainsCommandSubstring(command_ptr->GetName(), data->Buf, true))
 			{
-				completion_commands.push_back(command_ptr);
+				if (!command_ptr->Hidden())
+					completion_commands.push_back(command_ptr);
 			}
 		}
 
@@ -132,6 +133,8 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 		// in case we didn't need to re-allocate memory, set the count and selected index
 		console_data->m_completion_data->SelectedCandidateIndex = -1;
 		console_data->m_completion_data->Count = completion_commands.size();
+		if (console_data->m_completion_data->Count > 0)
+			console_data->m_completion_data->SelectedCandidateIndex = 0;
 
 		for (int i = 0; i < completion_commands.size(); i++)
 		{
@@ -145,9 +148,6 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 			{
 				console_data->m_completion_data->CompletionCandidate[i].CompletionVariable = var_command->VarAsStr();
 			}
-
-			if (console_data->m_completion_data->SelectedCandidateIndex == -1)
-				console_data->m_completion_data->SelectedCandidateIndex = 0;
 		}
 
 		// after we found the candidates, update the callback data with the pointers to the buffer

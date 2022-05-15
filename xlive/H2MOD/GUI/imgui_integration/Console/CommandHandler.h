@@ -7,9 +7,18 @@
 class IOutput;
 class ConsoleCommand;
 struct ConsoleCommandCtxData;
+typedef int CommandFlags;
 
 // change name, this can be used to execute the command without the console
 typedef int(ExecuteCommandCallbackT)(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+
+// for redirecting output to either dedicated server/imgui console
+class IOutput
+{
+public:
+	virtual int Output(StringHeaderFlags flags, const char* fmt) = 0;
+	virtual int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) = 0;
+};
 
 struct ConsoleCommandCtxData
 {
@@ -18,8 +27,6 @@ struct ConsoleCommandCtxData
     ExecuteCommandCallbackT* execCmdCb;
     const ConsoleCommand* consoleCommandData;
 };
-
-typedef int CommandFlags;
 
 enum CommandFlags_
 {
@@ -32,6 +39,7 @@ class ConsoleCommand
 {
 public:
     bool CommandSetsVariable() const { return (m_flags & CommandFlag_SetsVariable) != 0;  }
+    bool Hidden() const { return (m_flags & CommandFlag_Hidden) != 0;  }
 
     const char* GetName() const
     {

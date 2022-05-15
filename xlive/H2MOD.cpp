@@ -18,7 +18,6 @@
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
@@ -675,10 +674,10 @@ void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
 	p_update_player_profile(local_player_index);
 }
 
-void __cdecl print_to_console(char *output)
+void __cdecl print_to_console(const char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
-	commands->display(prefix + output);
+	// TODO FIXME add another tab to ImGui console to log these kind of things
 }
 
 DWORD calculate_model_lod;

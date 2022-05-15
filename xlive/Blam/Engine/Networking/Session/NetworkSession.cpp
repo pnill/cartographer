@@ -2,7 +2,6 @@
 
 #include "NetworkSession.h"
 #include "Blam\Engine\Game\GameGlobals.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
@@ -221,15 +220,3 @@ void NetworkSession::LeaveSession()
 	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
 	p_leave_session(0);
 }
-
-void NetworkSession::LogStructureOffsets() {
-	std::wostringstream outStr;
-	outStr << L"Offset of local_peer_index=" << std::hex << offsetof(s_network_session, local_peer_index);
-	outStr << L", Offset of peer_observer_channels=" << std::hex << offsetof(s_network_session, peer_observer_channels);
-	outStr << L", Offset of local_session_state=" << std::hex << offsetof(s_network_session, local_session_state);
-	outStr << L", Offset of membership=" << std::hex << offsetof(s_network_session, membership);
-	outStr << L", Offset of session_host_peer_index=" << std::hex << offsetof(s_network_session, session_host_peer_index);
-
-	commands->output(outStr.str());
-}
-

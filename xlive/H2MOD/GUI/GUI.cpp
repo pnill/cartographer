@@ -8,7 +8,6 @@
 #include "GUI.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Modules\Networking\Networking.h"
@@ -421,9 +420,6 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 	{
 		// hotkeys
 		KeyboardInput::ExecuteHotkey(pPii->wParam);
-		//handleHotkeyInput(lpMsg->wParam);
-		// console
-		// commands->handleInput(pPii->wParam);
 	}
 
 	if (ImGuiHandler::ImGuiShouldHandleInput())

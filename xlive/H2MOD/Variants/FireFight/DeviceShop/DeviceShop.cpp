@@ -6,7 +6,6 @@
 
 #include "Blam\Engine\Players\Players.h"
 
-extern void __cdecl print_to_console(char *output);
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index);
 
 std::unordered_map<unsigned long long, int> player_points;
@@ -82,13 +81,15 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 
 		if (cost > points)
 		{
-			print_to_console("Player did not have enough points to buy item");
+			// TODO FIXME add another tab to ImGui console to log these kind of things
+			// print_to_console("Player did not have enough points to buy item");
 			std::string debug_points;
 			debug_points.append("Points: ");
 			debug_points.append(std::to_string(points));
 			debug_points.append(" player id: ");
 			debug_points.append(std::to_string(playerId));
-			print_to_console((char*)debug_points.c_str());
+			// TODO FIXME add another tab to ImGui console to log these kind of things
+			// print_to_console((char*)debug_points.c_str());
 			return false;
 		}
 		else
@@ -108,7 +109,8 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 				break;
 
 			case _weapon_item:
-				print_to_console("Player purchased a weapon!");
+				// TODO FIXME add another tab to ImGui console to log these kind of things
+				// print_to_console("Player purchased a weapon!");
 				std::string debug_text;
 				debug_text.append("Player: ");
 				debug_text.append(std::to_string(playerId));
@@ -117,7 +119,8 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 				debug_text.append(" Cost: ");
 				debug_text.append(std::to_string(GetCost(device_datum)));
 
-				print_to_console((char*)debug_text.c_str());
+				// TODO FIXME add another tab to ImGui console to log these kind of things
+				// print_to_console((char*)debug_text.c_str());
 				GiveWeapon(unit_datum, item_datum);
 				break;
 			}
@@ -154,7 +157,8 @@ void DeviceShop::AddPoints(datum killerPlayerIdx, int points)
 	debug_txt.append(" to player: ");
 	debug_txt.append(std::to_string(playerId));
 
-	print_to_console((char*)debug_txt.c_str());
+	// TODO FIXME add another tab to ImGui console to log these kind of things
+	// print_to_console((char*)debug_txt.c_str());
 
 	player_points[playerId] += points;
 }

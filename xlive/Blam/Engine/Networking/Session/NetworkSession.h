@@ -58,9 +58,6 @@ namespace NetworkSession
 	wchar_t* GetGameVariantName();
 
 	void LeaveSession();
-
-	// logging
-	void LogStructureOffsets();
 }
 
 enum e_network_session_state : int

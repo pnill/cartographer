@@ -3,7 +3,6 @@
 #include "H2MOD.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"

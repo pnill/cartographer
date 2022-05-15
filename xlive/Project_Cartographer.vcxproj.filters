@@ -33,7 +33,6 @@
     <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
-    <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
@@ -302,7 +301,6 @@
     <ClInclude Include="H2MOD\Modules\Accounts\Accounts.h" />
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
-    <ClInclude Include="H2MOD\Modules\Console\ConsoleCommands.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />

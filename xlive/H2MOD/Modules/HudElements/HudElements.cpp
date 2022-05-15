@@ -3,7 +3,6 @@
 #include "HudElements.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
