@@ -223,9 +223,7 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				if (*lpBytesRecvdCount > sizeof(XBroadcastPacket))
 				{
 					*lpBytesRecvdCount = *lpBytesRecvdCount - sizeof(XBroadcastPacket);
-					char* buffer = (char*)_alloca(*lpBytesRecvdCount); // allocate on stack
-					memcpy(buffer, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
-					memcpy(lpBuffers[0].buf, buffer, *lpBytesRecvdCount);
+					memmove(lpBuffers[0].buf, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
 					lpFrom->sin_addr = broadcastPck->data.name.sin_addr;
 					lpFrom->sin_port = xsocket->GetNetworkOrderSocketPort();
 					return 0;
