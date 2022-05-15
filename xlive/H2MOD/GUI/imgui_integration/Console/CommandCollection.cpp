@@ -52,7 +52,7 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("warpfix", "(EXPERIMENTAL) increases client position update control threshold", 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("logxnetconnections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
-		"<string>: object_name <int>: count <bool>: same_team, near_player <float> : (if near_player true) xyz, (rotation optional) ijk", 4, CommandCollection::SpawnCmd),
+		"<string>: object_name <int>: count <bool>: same_team, near_player <float> : (if near_player false) xyz, (rotation optional) ijk", 4, CommandCollection::SpawnCmd),
 	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, CommandCollection::ReloadSpawnCommandListCmd),
 	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
 };
