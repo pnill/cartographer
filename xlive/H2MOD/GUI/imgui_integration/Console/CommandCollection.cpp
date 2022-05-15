@@ -23,9 +23,9 @@ std::unordered_map<std::string, unsigned int> objectIds;
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
 DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex, 
-	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, CommandCollection::BoolVarHandlerCmd);
+	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, CommandCollection::SetD3D9ExStateCmd);
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
-	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, CommandCollection::BoolVarHandlerCmd);
+	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, CommandCollection::NetworkMetricsCmd);
 
 extern bool displayXyz;
 DECL_ComVarCommandPtr(display_xyz_var, bool*, &displayXyz,
@@ -144,6 +144,30 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 	return BoolVarHandlerCmd(tokens, cbData);
 }
 
+int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = (IOutput*)cbData.strOutput;
+
+	if (Memory::IsDedicatedServer()) {
+		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	return BoolVarHandlerCmd(tokens, cbData);
+}
+
+int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	IOutput* output = (IOutput*)cbData.strOutput;
+	
+	if (Memory::IsDedicatedServer()) {
+		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
+
+	return BoolVarHandlerCmd(tokens, cbData);
+}
+
 int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	IOutput* output = (IOutput*)cbData.strOutput;
@@ -197,9 +221,8 @@ int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& to
 		output->Output(StringFlag_None, "# not in a network session");
 		return 0;
 	}
-	else if (Memory::IsDedicatedServer())
-	{
-		output->Output(StringFlag_None, "# client-only command");
+	else if (Memory::IsDedicatedServer()) {
+		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
@@ -241,7 +264,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 			break;
 		}
 		else if (Memory::IsDedicatedServer()) {
-			output->Output(StringFlag_None, "# don't use this on dedis");
+			output->Output(StringFlag_None, "# command unavailable on dedicated servers");
 			break;
 		}
 		else if (!NetworkSession::LocalPeerIsSessionHost()) {
@@ -438,6 +461,11 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 {
 	IOutput* output = cbData.strOutput;
 	ComVarT<bool> warpFixVar;
+
+	if (Memory::IsDedicatedServer()) {
+		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		return 0;
+	}
 
 	std::string exception;
 	if (!warpFixVar.SetValFromStr(tokens[1], 10, exception))

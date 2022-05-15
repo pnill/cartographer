@@ -207,7 +207,7 @@ public:
         int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
         if (buffer_size_needed < max_buffer_size_per_line)
         {
-            char* buffer = (char*)_malloca(max_buffer_size_per_line);
+            char* buffer = (char*)_malloca(buffer_size_needed);
             int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
             AddString(flags, buffer, copied_characters);
             _freea(buffer);
@@ -220,7 +220,7 @@ public:
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
 		if (buffer_size_needed < max_buffer_size_per_line)
 		{
-			char* buffer = (char*)_malloca(max_buffer_size_per_line);
+			char* buffer = (char*)_malloca(buffer_size_needed);
 			int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
 			AddString(flags, buffer, copied_characters);
 			_freea(buffer);

@@ -12,7 +12,7 @@ class Console;
 Console* GetMainConsoleInstance();
 void ImGui_Console_OpenDefault(const char*, bool*);
 
-class Console : IOutput
+class Console : public IOutput
 {
 private:
     // variables
