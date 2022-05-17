@@ -13,9 +13,12 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 
 extern int notify_xlive_ui;
+
 namespace ImGuiHandler
 {
 	namespace ImMOTD {
+		std::string windowName = "motd";
+		
 		namespace
 		{
 			bool g_motd = false;
@@ -80,6 +83,8 @@ namespace ImGuiHandler
 			g_complete = true;
 			return g_success;
 		}
+
+
 		void Render(bool *p_open)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
@@ -113,15 +118,16 @@ namespace ImGuiHandler
 					if(g_complete)
 					{
 						if (!g_success) {
-							notify_xlive_ui = 0;
-							ImGuiHandler::ToggleWindow("motd");
+							ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
 						}
 						g_init = true;
 					}
 				}
 			}
-			else {
-				ImDrawList* foreground_draw_list = ImGui::GetForegroundDrawList();
+			else 
+			{
+				// ImDrawList* foreground_draw_list = ImGui::GetForegroundDrawList();
+				// 
 				//ImVec2 Resolution(
 				//	ImGui::GetIO().DisplaySize.x,
 				//	ImGui::GetIO().DisplaySize.y
@@ -162,35 +168,44 @@ namespace ImGuiHandler
 				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
 				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
 				//);
-				foreground_draw_list->AddImage((void*)ImGuiHandler::GetTexture(patch_notes), ImVec2(0, 0), ImGui::GetIO().DisplaySize);
-				/*draw_list->AddImage((void*)imgui_handler::GetImage(patch_notes), ImVec2(0, 0),
-					ImVec2(X, Y));*/
 
-				if (ControllerInput::get_controller_input(0)[16] == 1)
+				ImGuiWindowFlags window_flags = 0
+					| ImGuiWindowFlags_NoDecoration
+					| ImGuiWindowFlags_NoSavedSettings
+					| ImGuiWindowFlags_NoBackground
+					;
+
+				ImGuiIO& io = ImGui::GetIO();
+				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+				ImGui::SetNextWindowPos(viewport->WorkPos);
+				ImGui::SetNextWindowSize(viewport->WorkSize);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+				if (ImGui::Begin("##motd", NULL, window_flags))
 				{
-					notify_xlive_ui = 0;
-					ImGuiHandler::ToggleWindow("motd");
-				}
-				else if (MouseInput::GetMouseState()[12] != 0)
-				{
-					notify_xlive_ui = 0;
-					ImGuiHandler::ToggleWindow("motd");
-				}
-				else
-				{
-					BYTE bKeys[256];
-					GetKeyboardState(bKeys);
-					for (int i = 0; i < ARRAYSIZE(bKeys); i++)
+					ImTextureID texId = ImGuiHandler::GetTexture(patch_notes);
+					ImGui::Image(texId, ImGui::GetIO().DisplaySize);
+
+					if (ControllerInput::get_controller_input(0)[16] == 1
+						|| ImGui::IsItemClicked())
 					{
-						if (bKeys[i] & 0x80)
+						ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+					}
+					else
+					{
+						for (int i = 0; i < ARRAYSIZE(io.KeysDown); i++)
 						{
-							notify_xlive_ui = 0;
-							ImGuiHandler::ToggleWindow("motd");
-							break;
+							if (ImGui::IsKeyPressed(i))
+							{
+								ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+								break;
+							}
 						}
 					}
 				}
-
+				ImGui::PopStyleVar(2);
+				ImGui::End();
 			}
 		}
 		void Open()
@@ -198,6 +213,7 @@ namespace ImGuiHandler
 		}
 		void Close()
 		{
+			notify_xlive_ui = 0;
 			XUserSignInSetStatusChanged(0);
 		}
 	}

@@ -7,6 +7,8 @@ namespace ImGuiHandler
 {
 	namespace ImDebugOverlay
 	{
+		std::string windowName = "debug_overlay";
+
 		struct DebugWatchItem
 		{
 			std::string Description;

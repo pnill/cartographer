@@ -19,6 +19,7 @@
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
+		std::string windowName = "advanced_settings";
 		namespace
 		{
 			float crosshairSize = 1.0f;
@@ -34,6 +35,7 @@ namespace ImGuiHandler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+
 			
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
@@ -1035,7 +1037,7 @@ namespace ImGuiHandler {
 
 			if (!open)
 			{
-				ImGuiHandler::ToggleWindow("advanced_settings");
+				ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
 			}
 		}
 		void Open()

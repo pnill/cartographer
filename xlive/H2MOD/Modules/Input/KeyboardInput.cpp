@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "KeyboardInput.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\GUI\GUI.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Utils\Utils.h"
@@ -24,12 +25,10 @@ __int16 last_user_index;
 //Patching this call to enable keyboards to switch death targets
 unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 {
-	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
-
 	last_user_index = a1;
 	unsigned char* result = ControllerInput::get_controller_input(a1);
 	//Modifies the result for A button pressed if space is.
-	unsigned char keyboard_space_key_state = input_abstraction_get_key_state_byte(VK_SPACE);
+	unsigned char keyboard_space_key_state = KeyboardInput::GetGameKbState(VK_SPACE);
 	if (keyboard_space_key_state > 0)
 	{
 		result[16] = keyboard_space_key_state;
@@ -41,6 +40,12 @@ void __cdecl sub_B524F7(signed int a1)
 {
 	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;
+}
+
+unsigned char KeyboardInput::GetGameKbState(__int16 keycode)
+{
+	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
+	return input_abstraction_get_key_state_byte(keycode);
 }
 
 void KeyboardInput::ToggleKeyboardInput()
@@ -219,13 +224,13 @@ void hotkeyFuncToggleHideIngameChat() {
 	}
 }
 void hotkeyFuncGuide() {
-	ImGuiHandler::ToggleWindow("advanced_settings");
+	ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
 }
 void hotkeyFuncDebug() {
-	ImGuiHandler::ToggleWindow("debug_overlay");
+	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);
 }
 void hotkeyFuncConsole() {
-	ImGuiHandler::ToggleWindow("console");
+	ImGuiHandler::ToggleWindow(Console::windowName);
 }
 
 int pause = VK_PRIOR;

@@ -11,6 +11,8 @@ namespace ImGuiHandler
 {
 	namespace ImMessageBox
 	{
+		std::string windowName = "messagebox";
+
 		namespace
 		{
 			std::string message;
@@ -37,7 +39,7 @@ namespace ImGuiHandler
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
-					ImGuiHandler::ToggleWindow("messagebox");
+					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMessageBox::windowName);
 				}
 			}
 			// Pop style var

@@ -15,24 +15,16 @@
 
 namespace ImGuiHandler
 {
-	std::vector<s_imgui_window> imgui_windows =
-	{
-		{"motd", false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close},
-		{"debug_overlay", false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close},
-		{"messagebox", false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close},
-		{"advanced_settings", false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close},
-		{"console", false, Console::Render, Console::Open, Console::Close}
-	};
-
+	std::vector<s_imgui_window> imgui_windows;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
-	static INT64                g_TicksPerSecond = 0;
-	static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
 	static bool                 g_HasGamepad = false;
 	static bool                 g_WantUpdateHasGamepad = true;
 	static LPDIRECT3DDEVICE9	g_pDevice;
 	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_take_input = false;
+	static bool					g_one_more_frame_update = true; // need to update ImGui state at least one more tick
+																// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
 
 	bool						g_network_stats_overlay = false;
 
@@ -70,11 +62,24 @@ namespace ImGuiHandler
 
 	void DrawImgui()
 	{
-		if (!ImGuiHandler::CanDrawImgui()) return;
+		if (!ImGuiHandler::CanDrawImgui() && 
+			!g_one_more_frame_update)
+			return;
+
+		// clear keyboard/mouse input state if we are about to close the ImGui windows
+		if (g_one_more_frame_update)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.ClearInputKeys();
+			io.ClearMouseInput();
+			io.ClearInputCharacters();
+			g_one_more_frame_update = false;
+		}
 
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
 		for (auto& window : imgui_windows)
 		{
@@ -83,6 +88,8 @@ namespace ImGuiHandler
 				window.renderFunc(&window.doRender);
 			}
 		}
+
+		// Rendering
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
@@ -109,12 +116,13 @@ namespace ImGuiHandler
 			}
 
 			// check if we still need to block the input of the game
-			if (window.doRender && !keep_game_input_blocked)
+			if (window.doRender && !window.NoImInput())
 			{
 				keep_game_input_blocked = true;
 			}
 		}
 
+		g_one_more_frame_update = !keep_game_input_blocked;
 		SetGameInputState(!keep_game_input_blocked);
 		ImGuiToggleInput(keep_game_input_blocked);
 		PlayerControl::DisableLocalCamera(keep_game_input_blocked);
@@ -151,6 +159,18 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_Init(pDevice);
 
 		ImAdvancedSettings::BuildStringsTable();
+
+		imgui_windows.push_back({ ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close });
+		imgui_windows.push_back({ ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close });
+		imgui_windows.push_back({ ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close });
+		imgui_windows.push_back({ ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close });
+		imgui_windows.push_back({ Console::windowName, false, Console::Render, Console::Open, Console::Close });
+
+		atexit([]() {
+			ImGui_ImplDX9_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+			});
 	}
 	float WidthPercentage(float percent)
 	{

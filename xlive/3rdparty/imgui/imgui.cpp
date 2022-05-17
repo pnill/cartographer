@@ -1208,6 +1208,14 @@ void ImGuiIO::ClearInputKeys()
         NavInputsDownDuration[n] = NavInputsDownDurationPrev[n] = -1.0f;
 }
 
+void ImGuiIO::ClearMouseInput()
+{
+    memset(MouseDown, 0, sizeof(MouseDown));
+    for (int i = 0; i < IM_ARRAYSIZE(MouseDownDuration); i++)
+        MouseDownDuration[i] = MouseDownDurationPrev[i] = -1.0f;
+    MouseWheel = MouseWheelH = 0.0f;
+}
+
 void ImGuiIO::AddFocusEvent(bool focused)
 {
     // We intentionally overwrite this and process in NewFrame(), in order to give a chance

@@ -10,6 +10,12 @@ namespace ImGuiHandler
 		patch_notes
 	};
 
+	typedef int ImWWindowHandlerFlags;
+	enum ImWWindowHandlerFlags_
+	{
+		_ImWindow_no_input = 1 << 0,
+	};
+
 	struct s_imgui_window
 	{
 		std::string name;
@@ -17,13 +23,21 @@ namespace ImGuiHandler
 		std::function<void(bool*)> renderFunc;
 		std::function<void()> openFunc;
 		std::function<void()> closeFunc;
-		s_imgui_window(const std::string& _name, bool _doRender, std::function<void(bool*)> _renderFunc, std::function<void()> _openFunc, std::function<void()> _closeFunc)
+		ImWWindowHandlerFlags flags;
+
+		s_imgui_window(const std::string& _name, bool _doRender, std::function<void(bool*)> _renderFunc, std::function<void()> _openFunc, std::function<void()> _closeFunc, ImWWindowHandlerFlags _flags = 0)
 		{
 			name = _name;
 			doRender = _doRender;
 			renderFunc = _renderFunc;
 			openFunc = _openFunc;
 			closeFunc = _closeFunc;
+			flags = _flags;
+		}
+
+		bool NoImInput()
+		{
+			return (flags & _ImWindow_no_input) != 0;
 		}
 	};
 	enum s_aspect_ratio : byte
@@ -34,10 +48,11 @@ namespace ImGuiHandler
 	HWND get_HWND();
 	bool ImGuiShouldHandleInput();
 	void ImGuiToggleInput(bool state);
+	void SetGameInputState(bool enable);
 	bool CanDrawImgui();
 	void DrawImgui();
-	void ToggleWindow(const std::string& name);
 	bool IsWindowActive(const std::string& name);
+	void ToggleWindow(const std::string& name);
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
 	void TextVerticalPad(char* label);
@@ -51,6 +66,8 @@ namespace ImGuiHandler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
 	namespace ImAdvancedSettings
 	{
@@ -182,15 +199,18 @@ namespace ImGuiHandler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
 	namespace ImDebugOverlay
 	{
-
 		void Render(bool* p_open);
 		void AddWatchItem(std::string Key, std::string Description);
 		void UpdateWatchItem(std::string Key, std::string Value);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
 	namespace ImMessageBox
 	{
@@ -198,5 +218,7 @@ namespace ImGuiHandler
 		void SetMessage(std::string message);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
 }

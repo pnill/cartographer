@@ -27,6 +27,7 @@ private:
     int                                 m_history_string_index;
     ImGuiTextFilter                     m_filter;
 
+
     static int TextEditCallback(ImGuiInputTextCallbackData* data);
 
     void ExecCommand(const char* command_line, size_t command_line_length);
@@ -34,6 +35,7 @@ private:
     void ClearOutput();
 
 public:
+    static std::string                 windowName;
     ComVarT<float>                     m_console_opacity;
 
     Console();

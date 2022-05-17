@@ -10,6 +10,8 @@ const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
 ConsoleVarCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, Console::set_opacity_cb);
 
+std::string Console::windowName = "console";
+
 Console* GetMainConsoleInstance()
 {
 	static std::unique_ptr<Console> console(std::make_unique<Console>());
@@ -377,7 +379,7 @@ void Console::Draw(const char* title, bool* p_open)
 		if (ImGui::BeginMenu("Menu"))
 		{
 			if (ImGui::MenuItem("Clear")) { ClearOutput(); }
-			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow("console"); }
+			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 			ImGui::EndMenu();
 		}
 
@@ -387,7 +389,7 @@ void Console::Draw(const char* title, bool* p_open)
 	// Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow("console"); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 		ImGui::EndPopup();
 	}
 
@@ -408,8 +410,8 @@ void Console::Draw(const char* title, bool* p_open)
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
 		if (m_output.GetStringHeaderSize() > 0)
-			if (ImGui::MenuItem("Clear")) { ClearOutput(); }
-		if (ImGui::MenuItem("Close Window")) { *p_open = false; }
+		if (ImGui::MenuItem("Clear")) { ClearOutput(); }
+		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 		ImGui::EndPopup();
 	}
 

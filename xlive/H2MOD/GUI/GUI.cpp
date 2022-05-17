@@ -421,7 +421,7 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 		// hotkeys
 		KeyboardInput::ExecuteHotkey(pPii->wParam);
 	}
-
+	
 	if (ImGuiHandler::ImGuiShouldHandleInput())
 	{
 		ImGui_ImplWin32_WndProcHandler(pPii->hWnd, pPii->uMSG, pPii->wParam, pPii->lParam);

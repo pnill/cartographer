@@ -1902,6 +1902,7 @@ struct ImGuiIO
     IMGUI_API void  AddFocusEvent(bool focused);                // Notifies Dear ImGui when hosting platform windows lose or gain input focus
     IMGUI_API void  ClearInputCharacters();                     // [Internal] Clear the text input buffer manually
     IMGUI_API void  ClearInputKeys();                           // [Internal] Release all keys
+    IMGUI_API void  ClearMouseInput();                          // [Internal] Reset mouse input data
 
     //------------------------------------------------------------------
     // Output - Updated by NewFrame() or EndFrame()/Render()
