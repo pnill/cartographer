@@ -56,13 +56,12 @@ namespace ImGuiHandler
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
 	void TextVerticalPad(char* label);
-	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
+	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
-	void preloadImages();
 	namespace ImMOTD {
-		bool GetMOTD(s_aspect_ratio ratio);
+		bool DownloadMOTD(const std::wstring& motd_path, s_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();

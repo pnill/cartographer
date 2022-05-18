@@ -18,198 +18,177 @@ namespace ImGuiHandler
 {
 	namespace ImMOTD {
 		std::string windowName = "motd";
-		
+
 		namespace
 		{
-			bool g_motd = false;
-			bool g_complete = false;
-			bool g_success = false;	
-			bool g_init = false;
-			std::atomic<bool> g_textureLoading = false;
+			bool load_complete = false;
+			bool download_success = false;
+			bool download_complete = false;
+			std::atomic<bool> motd_texture_load_in_progress = false;
 			int X;
 			int Y;
 		}
-		bool GetMOTD(s_aspect_ratio ratio)
+		bool DownloadMOTD(const std::wstring& file_path, s_aspect_ratio ratio)
 		{
-			// check if the texture has been reset
-			if (g_complete 
-				&& ImGuiHandler::GetTexture(patch_notes) != nullptr)
-				return g_success;
-
-			auto path = std::wstring(H2AppDataLocal);
-			auto cpath = std::string(path.begin(), path.end()) + "motd.png";
-
-			// if we got this far, and g_complete is true, we already downloaded the image from the webserver
-			// and the texture got reset, so we just re-load it
-			if (g_complete)
-			{
-				ImGuiHandler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
-				return g_success;
-			}
-
-			CURL *curl;
-			FILE *fp;
+			FILE* fp = NULL;
+			CURL* curl;
 			CURLcode res;
 			std::string url = "http://www.halo2pc.com/motd.png";
-			/*switch (ratio)
-			{
-				case four_three:
-					url += "motd_43.png";
-					break;
-				case sixten_nine:
-					url += "motd_169.png";
-					break;
-				default:
-					return false;
-			}*/
+
+			bool success = false;
 
 			curl = curl_interface_init_no_verify();
 			if (curl)
 			{
-				fp = fopen(cpath.c_str(), "wb");
+				fp = _wfopen(file_path.c_str(), L"wb");
 				curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 				curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, NULL);
 				curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 				res = curl_easy_perform(curl);
-				curl_easy_cleanup(curl);
-				fseek(fp, 0, SEEK_END);
-				int size = ftell(fp);
-				fclose(fp);
-				if (size > 10252) {
-					ImGuiHandler::LoadTextureFromFile(cpath.c_str(), patch_notes, &X, &Y);
-					g_success = true;
-				}
-			}
-			g_complete = true;
-			return g_success;
-		}
-
-
-		void Render(bool *p_open)
-		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			s_aspect_ratio ratio = getAspectRatio(viewport->WorkSize);
-
-			// check if the texture has been reset
-			if (ImGuiHandler::GetTexture(patch_notes) == nullptr
-				&& !g_textureLoading)
-			{
-				// if so, re-upload it to memory
-				g_init = false;
-				g_motd = false;
-			}
-
-			if(!g_init)
-			{
-				if (!g_motd)
+				if (res == CURLcode::CURLE_OK)
 				{
-					g_textureLoading = true;
-					auto grab_thread = []()
+					fseek(fp, 0, SEEK_END);
+					int size = ftell(fp);
+					if (size > 10252) 
 					{
-						GetMOTD(getAspectRatio(ImGui::GetMainViewport()->WorkSize));
-
-						g_textureLoading = false;
-					};
-					std::thread(grab_thread).detach();
-					g_motd = true;
-				} 
+						success = true;
+					}
+					fclose(fp);
+				}
 				else
 				{
-					if(g_complete)
-					{
-						if (!g_success) {
-							ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
-						}
-						g_init = true;
-					}
+					fclose(fp);
+					// _wremove(file_path.c_str());
 				}
+				curl_easy_cleanup(curl);
 			}
-			else 
+
+			return success;
+		}
+		bool LoadMOTD(const std::wstring& file_path, s_aspect_ratio ratio)
+		{
+			if (std::filesystem::exists(file_path))
 			{
-				// ImDrawList* foreground_draw_list = ImGui::GetForegroundDrawList();
-				// 
-				//ImVec2 Resolution(
-				//	ImGui::GetIO().DisplaySize.x,
-				//	ImGui::GetIO().DisplaySize.y
-				//);
-				//ImVec2 Dimensions;
-				//switch(ratio)
-				//{
-				//	case four_three: 
-				//		Dimensions = ImVec2(
-				//			1184, 745
-				//		);
-				//	break;
-				//	default:
-				//	case sixten_nine:
-				//		Dimensions = ImVec2(
-				//			1786, 745
-				//		);
-				//	break;
-				//
-				//}
+				return ImGuiHandler::LoadTextureFromFile(file_path.c_str(), patch_notes, &X, &Y);
+			}
+			return false;
+		}
+		void DownloadAndLoadMOTD()
+		{
+			motd_texture_load_in_progress = true;
+			std::wstring motd_path_wide = std::wstring(H2AppDataLocal) + L"motd.png";
+			if (!download_complete)
+			{
+				download_success = DownloadMOTD(motd_path_wide, getAspectRatio(ImGui::GetMainViewport()->WorkSize));
+				download_complete = true;
+			}
+			load_complete = LoadMOTD(motd_path_wide, getAspectRatio(ImGui::GetMainViewport()->WorkSize));
+			motd_texture_load_in_progress = false;
+		}
 
-				//float MinScale = 1.5f;
+		void Render(bool* p_open)
+		{
+			if (!download_complete
+				|| motd_texture_load_in_progress)
+				return;
 
-				//ImVec2 Scale(
-				//	fmaxf(MinScale, (Dimensions.x / Resolution.x)),
-				//	fmaxf(MinScale, (Dimensions.y / Resolution.y))
-				//);
-				///*Scale.x = fmaxf(MinScale, Scale.x);
-				//Scale.y = fmaxf(MinScale, Scale.y);*/
-				//float scaledx = Dimensions.x / Scale.x;
-				//float scaledy = Dimensions.y / Scale.y;
+			// if MOTD cannot be loaded, just close the menu
+			if (!load_complete)
+			{
+				ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+				return;
+			}
 
-				//ImVec2 TopLeft(
-				//	(ImGui::GetIO().DisplaySize.x / 2) - (scaledx / 2),
-				//	(ImGui::GetIO().DisplaySize.y / 2) - (scaledy / 2)
-				//);
-				//ImVec2 BottomRight(
-				//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
-				//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
-				//);
+			if (ImGuiHandler::GetTexture(patch_notes) == nullptr)
+			{
+				load_complete = false;
+				std::thread(DownloadAndLoadMOTD).detach();
+				return;
+			}
 
-				ImGuiWindowFlags window_flags = 0
-					| ImGuiWindowFlags_NoDecoration
-					| ImGuiWindowFlags_NoSavedSettings
-					| ImGuiWindowFlags_NoBackground
-					;
+			//ImVec2 Resolution(
+			//	ImGui::GetIO().DisplaySize.x,
+			//	ImGui::GetIO().DisplaySize.y
+			//);
+			//ImVec2 Dimensions;
+			//switch(ratio)
+			//{
+			//	case four_three: 
+			//		Dimensions = ImVec2(
+			//			1184, 745
+			//		);
+			//	break;
+			//	default:
+			//	case sixten_nine:
+			//		Dimensions = ImVec2(
+			//			1786, 745
+			//		);
+			//	break;
+			//
+			//}
 
-				ImGuiIO& io = ImGui::GetIO();
-				const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			//float MinScale = 1.5f;
 
-				ImGui::SetNextWindowPos(viewport->WorkPos);
-				ImGui::SetNextWindowSize(viewport->WorkSize);
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-				if (ImGui::Begin("##motd", NULL, window_flags))
+			//ImVec2 Scale(
+			//	fmaxf(MinScale, (Dimensions.x / Resolution.x)),
+			//	fmaxf(MinScale, (Dimensions.y / Resolution.y))
+			//);
+			///*Scale.x = fmaxf(MinScale, Scale.x);
+			//Scale.y = fmaxf(MinScale, Scale.y);*/
+			//float scaledx = Dimensions.x / Scale.x;
+			//float scaledy = Dimensions.y / Scale.y;
+
+			//ImVec2 TopLeft(
+			//	(ImGui::GetIO().DisplaySize.x / 2) - (scaledx / 2),
+			//	(ImGui::GetIO().DisplaySize.y / 2) - (scaledy / 2)
+			//);
+			//ImVec2 BottomRight(
+			//	(ImGui::GetIO().DisplaySize.x / 2) + (scaledx / 2),
+			//	(ImGui::GetIO().DisplaySize.y / 2) + (scaledy / 2)
+			//);
+
+			ImGuiWindowFlags window_flags = 0
+				| ImGuiWindowFlags_NoDecoration
+				| ImGuiWindowFlags_NoSavedSettings
+				| ImGuiWindowFlags_NoBackground
+				;
+
+			ImGuiIO& io = ImGui::GetIO();
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+			ImGui::SetNextWindowPos(viewport->WorkPos);
+			ImGui::SetNextWindowSize(viewport->WorkSize);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			if (ImGui::Begin("##motd", NULL, window_flags))
+			{
+				ImTextureID texId = ImGuiHandler::GetTexture(patch_notes);
+				ImGui::Image(texId, ImGui::GetIO().DisplaySize);
+
+				if (ControllerInput::get_controller_input(0)[16] == 1
+					|| ImGui::IsItemClicked())
 				{
-					ImTextureID texId = ImGuiHandler::GetTexture(patch_notes);
-					ImGui::Image(texId, ImGui::GetIO().DisplaySize);
-
-					if (ControllerInput::get_controller_input(0)[16] == 1
-						|| ImGui::IsItemClicked())
+					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+				}
+				else
+				{
+					for (int i = 0; i < ARRAYSIZE(io.KeysDown); i++)
 					{
-						ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
-					}
-					else
-					{
-						for (int i = 0; i < ARRAYSIZE(io.KeysDown); i++)
+						if (ImGui::IsKeyPressed(i))
 						{
-							if (ImGui::IsKeyPressed(i))
-							{
-								ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
-								break;
-							}
+							ImGuiHandler::ToggleWindow(ImGuiHandler::ImMOTD::windowName);
+							break;
 						}
 					}
 				}
-				ImGui::PopStyleVar(2);
-				ImGui::End();
 			}
+			ImGui::PopStyleVar(2);
+			ImGui::End();
 		}
 		void Open()
 		{
+			if (!download_complete)
+				std::thread(DownloadAndLoadMOTD).detach();
 		}
 		void Close()
 		{

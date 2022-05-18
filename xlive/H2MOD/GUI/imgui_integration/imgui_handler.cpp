@@ -187,13 +187,13 @@ namespace ImGuiHandler
 		ImGui::Text(label);
 	}
 
-	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height)
+	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height)
 	{
 		// Load texture from disk
 		D3DXIMAGE_INFO imgInfo;
 		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		HRESULT hr = D3DXCreateTextureFromFileExA(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+		HRESULT hr = D3DXCreateTextureFromFileEx(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
 			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
@@ -248,15 +248,5 @@ namespace ImGuiHandler
 		{
 			return four_three;
 		}
-	}
-
-	void preloadImages()
-	{
-		auto grab_thread = []()
-		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImMOTD::GetMOTD(getAspectRatio(viewport->WorkSize));
-		};
-		std::thread(grab_thread).detach();
 	}
 }
