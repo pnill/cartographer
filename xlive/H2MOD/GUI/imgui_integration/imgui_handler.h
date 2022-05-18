@@ -4,6 +4,7 @@
 namespace ImGuiHandler
 {
 	extern bool g_network_stats_overlay;
+	extern PDIRECT3DTEXTURE9 g_patch_notes_texture;
 
 	enum s_imgui_images
 	{

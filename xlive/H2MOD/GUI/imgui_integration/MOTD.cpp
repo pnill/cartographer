@@ -194,6 +194,8 @@ namespace ImGuiHandler
 		{
 			notify_xlive_ui = 0;
 			XUserSignInSetStatusChanged(0);
+			if (g_patch_notes_texture != nullptr) g_patch_notes_texture->Release();
+			g_patch_notes_texture = nullptr;
 		}
 	}
 }

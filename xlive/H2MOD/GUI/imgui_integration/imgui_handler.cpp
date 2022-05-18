@@ -16,12 +16,12 @@
 namespace ImGuiHandler
 {
 	std::vector<s_imgui_window> imgui_windows;
+	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
 	static bool                 g_HasGamepad = false;
 	static bool                 g_WantUpdateHasGamepad = true;
 	static LPDIRECT3DDEVICE9	g_pDevice;
-	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_take_input = false;
 	static bool					g_one_more_frame_update = true; // need to update ImGui state at least one more tick
 																// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
@@ -203,10 +203,10 @@ namespace ImGuiHandler
 		switch (image)
 		{
 		case patch_notes:
-			if (g_patchNotes_Image)
-				g_patchNotes_Image->Release(); // release the texture if we already have one
+			if (g_patch_notes_texture)
+				g_patch_notes_texture->Release(); // release the texture if we already have one
 
-			g_patchNotes_Image = texture;
+			g_patch_notes_texture = texture;
 			break;
 		default:
 			return false;
@@ -226,7 +226,7 @@ namespace ImGuiHandler
 	{
 		switch (image) {
 		case patch_notes:
-			return g_patchNotes_Image;
+			return g_patch_notes_texture;
 		default: 
 			return NULL;
 		}
@@ -234,8 +234,8 @@ namespace ImGuiHandler
 
 	void ReleaseTextures()
 	{
-		if (g_patchNotes_Image) g_patchNotes_Image->Release();
-		g_patchNotes_Image = nullptr;
+		if (g_patch_notes_texture) g_patch_notes_texture->Release();
+		g_patch_notes_texture = nullptr;
 	}
 
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize)
