@@ -471,7 +471,7 @@ void CXNetQoS::Listener()
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags)
 {
-	LOG_TRACE_NETWORK("XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
 		cb, dwBitsPerSec, dwFlags);
 
 	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_DISABLE)) 

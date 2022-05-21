@@ -247,7 +247,7 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, lpBytesRecvdCount); // save NAT info and send back a connection packet
 
 				// set the bytes received count to 0
-				// pool another packet after, so we keep the game fed with data
+				// should pool another packet after, so we keep the game fed with data
 				*lpBytesRecvdCount = 0;
 				return SOCKET_ERROR;
 			}
@@ -969,7 +969,7 @@ void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr
 	else
 	{
 		// fall back to localhost if what GetBestIpToIpRoute found is not a private/local host ip address (maybe we are not under a NAT gateway)
-		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, fall back to localhost IP address!", __FUNCTION__);
+		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, falling back to localhost IP address!", __FUNCTION__);
 		m_ipLocal.xnaddr.ina.s_addr = inet_addr("127.0.0.1");
 	}
 
@@ -1011,6 +1011,7 @@ void CXnIp::ClearLostConnections()
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams* pxnsp)
 {
+	LOG_TRACE_NETWORK("XNetStartup()");
 	gXnIp.Initialize(pxnsp);
 	return 0;
 }
@@ -1179,15 +1180,14 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR* pxna)
 }
 
 
-// #55: XNetRegisterKey //need #51
+// #55: XNetRegisterKey
 int WINAPI XNetRegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	LOG_TRACE_NETWORK("XNetRegisterKey()");
 	return gXnIp.RegisterKey(pxnkid, pxnkey);
 }
 
-
-// #56: XNetUnregisterKey // need #51
+// #56: XNetUnregisterKey
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
 	LOG_TRACE_NETWORK("XNetUnregisterKey()");
