@@ -9,7 +9,7 @@ void GSDownloadDL();
 void GSDownloadInstall();
 void GSDownloadCancel();
 
-extern bool GSDownload_files_to_download;
-extern bool GSDownload_files_to_install;
-extern long long Size_Of_Download;
-extern long long Size_Of_Downloaded;
+extern bool updater_has_files_to_download;
+extern bool updater_has_files_to_install;
+extern long long sizeOfDownload;
+extern long long sizeOfDownloaded;

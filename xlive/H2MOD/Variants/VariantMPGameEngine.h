@@ -2,30 +2,31 @@
 
 #include "Blam\Engine\Objects\Objects.h"
 
-enum c_game_engine_types
+enum e_game_engine_types
 {
-	none = 0,
-	ctf = 1,
-	slayer = 2,
-	oddball = 3,
-	king_of_the_hill = 4,
-	unknown5 = 5,
-	unknown6 = 6,
-	juggernaut = 7,
-	territories = 8,
-	assualt = 9,
-	unknown10 = 10,
+	invalid = -1,
 
-	enum_size,
-	invalid = -1
+	_none = 0,
+	_ctf = 1,
+	_slayer = 2,
+	_oddball = 3,
+	_king_of_the_hill = 4,
+	_unknown5 = 5,
+	_unknown6 = 6,
+	_juggernaut = 7,
+	_territories = 8,
+	_assualt = 9,
+	_unknown10 = 10,
+
+	_game_engine_type_enum_size,
 };
 
 struct c_engine_internal;
 class c_game_engine_base
 {
 public:
-	virtual c_game_engine_types get_type() const { return type; }
-	virtual c_game_engine_types get_base_type() const { return base_type; }
+	virtual e_game_engine_types get_type() const { return type; }
+	virtual e_game_engine_types get_base_type() const { return base_type; }
 	virtual c_engine_internal *get_base_engine() const;
 	/* 
 		Called on scenario load, returns success
@@ -86,17 +87,17 @@ public:
 	virtual bool unk_function_50(__int16 a1, __int16 a2, int a3, int a4);
 	virtual int unk_function_51(int arg1, int arg2, int arg3, int arg4, int arg5);
 
-	void set_type(c_game_engine_types new_type)
+	void set_type(e_game_engine_types new_type)
 	{
 		type = new_type;
 	}
-	void set_base_type(c_game_engine_types new_type)
+	void set_base_type(e_game_engine_types new_type)
 	{
 		base_type = new_type;
 	}
 private:
-	c_game_engine_types type = c_game_engine_types::none;
-	c_game_engine_types base_type = c_game_engine_types::slayer;
+	e_game_engine_types type = e_game_engine_types::_none;
+	e_game_engine_types base_type = e_game_engine_types::_slayer;
 };
 
 namespace custom_game_engines
@@ -105,5 +106,5 @@ namespace custom_game_engines
 	void init();
 
 	/* Register a custom game engine */
-	bool register_engine(c_game_engine_types id, c_game_engine_base *engine, c_game_engine_types base_id = c_game_engine_types::slayer);
+	bool register_engine(e_game_engine_types id, c_game_engine_base *engine, e_game_engine_types base_id = e_game_engine_types::_slayer);
 }

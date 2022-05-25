@@ -3,16 +3,33 @@
 #define BASE_IMAGE_ADDRESS_HALO2 0x00400000
 #define BASE_IMAGE_ADDRESS_H2SERVER 0x00400000
 
+enum H2Type : int
+{
+	Invalid = -1,
+	UnsupportedVersion,
+	H2Game,
+	H2Server,
+};
+
+class ProcessInfo
+{
+public:
+	HMODULE base;
+	H2Type process_type = H2Type::Invalid;
+};
+
 class Memory
 {
 public:
+	static void Initialize();
 
-	static void setBaseAddress(DWORD base, bool isDedicatedServer)
+	static void SetBaseAddress(DWORD base, bool isDedicatedServer)
 	{
 		baseAddress = base;
 		dedicatedServer = isDedicatedServer;
 	}
 	
+	// gets base address
 	static DWORD GetAddress()
 	{
 		return baseAddress;
@@ -45,8 +62,12 @@ public:
 		return reinterpret_cast<T>(baseAddress + (dedicatedServer ? (server - BASE_IMAGE_ADDRESS_H2SERVER) : (client - BASE_IMAGE_ADDRESS_HALO2)));
 	}
 
-	static bool isDedicatedServer() { return dedicatedServer; }
+	static bool IsDedicatedServer() { return dedicatedServer; }
 
 	static DWORD baseAddress;
 	static bool dedicatedServer;
 };
+
+// utilites
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const BYTE* buffer, size_t size);

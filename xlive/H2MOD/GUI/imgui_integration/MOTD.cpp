@@ -6,7 +6,7 @@
 #include "H2MOD\Modules\Input\KeyboardInput.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
 #include "imgui_handler.h"
 #include "Util\Hooks\Hook.h"
@@ -60,7 +60,7 @@ namespace imgui_handler
 					return false;
 			}*/
 
-			curl = curl_interface_init_no_ssl();
+			curl = curl_interface_init_no_verify();
 			if (curl)
 			{
 				fp = fopen(cpath.c_str(), "wb");
@@ -173,38 +173,47 @@ namespace imgui_handler
 					MOTD::Close();
 					notify_xlive_ui = 0;
 				}
-				if (MouseInput::GetMouseState()[0xC] != 0)
+				else if (MouseInput::GetMouseState()[12] != 0)
 				{
 					*p_open = false;
 					MOTD::Close();
 					notify_xlive_ui = 0;
 				}
-				BYTE bKeys[256];
-				GetKeyboardState(bKeys);
-				for (unsigned char bKey : bKeys)
+				else
 				{
-					if(bKey & 0x80)
+					BYTE bKeys[256];
+					GetKeyboardState(bKeys);
+					for (int i = 0; i < ARRAYSIZE(bKeys); i++)
 					{
-						*p_open = false;
-						MOTD::Close();
-						notify_xlive_ui = 0;
-						break;
+						if (bKeys[i] & 0x80)
+						{
+							*p_open = false;
+							MOTD::Close();
+							notify_xlive_ui = 0;
+							break;
+						}
 					}
 				}
+
 			}
+		}
+		void SetGameInputState(bool enable)
+		{
+			// TODO move this function somewhere else
+			*Memory::GetAddress<bool*>(0x9712cC) = enable;
 		}
 		void Open()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
+			SetGameInputState(false);
 			ImGuiToggleInput(true);
 			PlayerControl::DisableLocalCamera(true);
-			
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
+			SetGameInputState(true);
 			ImGuiToggleInput(false);
 			PlayerControl::DisableLocalCamera(false);
+			XUserSignInSetStatusChanged(0);
 		}
 	}
 }

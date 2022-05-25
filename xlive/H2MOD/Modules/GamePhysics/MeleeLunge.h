@@ -26,7 +26,7 @@ struct s_character_physics_output
 {
 	DWORD flags;
 	BYTE gap_4[8];
-	real_vector3d out_translational_velocity;
+	real_vector3d translational_velocity;
 	real_point3d field_18;
 	real_vector3d field_24;
 	BYTE gap_30[52];

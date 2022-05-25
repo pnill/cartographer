@@ -46,13 +46,13 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
+		if (g_network_stats_overlay)
+			return true;
 		for (auto& window : imgui_windows)
 		{
 			if (window.DoRender)
 				return true;
 		}
-		if (g_network_stats_overlay) 
-			return true;
 		return false;
 	}
 
@@ -98,13 +98,13 @@ namespace imgui_handler
 
 	bool IsWindowActive(const std::string& name)
 	{
+		if (name == "net_metrics" && g_network_stats_overlay)
+			return true;
 		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 				return window.DoRender;
 		}
-		if (name == "net_metrics" && g_network_stats_overlay)
-			return true;
 		return false;
 	}
 
@@ -215,7 +215,6 @@ namespace imgui_handler
 
 	void preloadImages()
 	{
-
 		auto grab_thread = []()
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();

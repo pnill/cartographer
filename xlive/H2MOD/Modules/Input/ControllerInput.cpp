@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "ControllerInput.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 namespace ControllerInput
@@ -30,85 +30,76 @@ namespace ControllerInput
 		short* axialDeadzoneY;
 		short radialDeadzone;
 
+		typedef int(__cdecl system_milliseconds_t)();
+		system_milliseconds_t* p_system_milliseconds;
 
-		typedef char(p_game_minimized)();
-		p_game_minimized* game_is_minimized;
-
-		typedef int(__cdecl p_system_milliseconds)();
-		p_system_milliseconds* system_milliseconds;
-
-		typedef char(__cdecl p_sub_B31EA2)(int local_player_index, byte* keybind_base, int a4, float* a5, float* a6, byte* a7);
-		p_sub_B31EA2* sub_B31EA2;
+		typedef char(__cdecl* sub_B31EA2_t)(int local_player_index, byte* keybind_base, int a4, float* a5, float* a6, byte* a7);
+		sub_B31EA2_t p_sub_B31EA2;
 
 		byte* default_profile;
 		byte* unk_input_struct;
 	}
 
 
-	XINPUT_BUTTONS Overwrite = XINPUT_GAMEPAD_NONE;
 	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
 	void __cdecl update_xinput_devices()
 	{
+		XINPUT_BUTTONS controller_button = XINPUT_GAMEPAD_NONE;
 		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
 		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
 		for(auto i = 0; i < 20; i++)
 		{
 			auto InputDevice = InputDevices[i];
-			if(InputDevice->error_level == 0)
+			if (InputDevice->error_level == 0)
 			{
 				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
-				if (EngineCalls::get_game_life_cycle() == life_cycle_in_game) {
-					Overwrite = XINPUT_GAMEPAD_NONE;
+				if (Engine::get_game_life_cycle() == _life_cycle_in_game) 
+				{
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
-						Overwrite |= H2Config_CustomLayout.DPAD_UP;
+						controller_button |= H2Config_CustomLayout.DPAD_UP;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
-						Overwrite |= H2Config_CustomLayout.DPAD_DOWN;
+						controller_button |= H2Config_CustomLayout.DPAD_DOWN;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-						Overwrite |= H2Config_CustomLayout.DPAD_LEFT;
+						controller_button |= H2Config_CustomLayout.DPAD_LEFT;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-						Overwrite |= H2Config_CustomLayout.DPAD_RIGHT;
+						controller_button |= H2Config_CustomLayout.DPAD_RIGHT;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
-						Overwrite |= H2Config_CustomLayout.START;
+						controller_button |= H2Config_CustomLayout.START;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
-						Overwrite |= H2Config_CustomLayout.BACK;
+						controller_button |= H2Config_CustomLayout.BACK;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
-						Overwrite |= H2Config_CustomLayout.LEFT_THUMB;
+						controller_button |= H2Config_CustomLayout.LEFT_THUMB;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-						Overwrite |= H2Config_CustomLayout.RIGHT_THUMB;
+						controller_button |= H2Config_CustomLayout.RIGHT_THUMB;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-						Overwrite |= H2Config_CustomLayout.LEFT_SHOULDER;
+						controller_button |= H2Config_CustomLayout.LEFT_SHOULDER;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-						Overwrite |= H2Config_CustomLayout.RIGHT_SHOULDER;
+						controller_button |= H2Config_CustomLayout.RIGHT_SHOULDER;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
-						Overwrite |= H2Config_CustomLayout.A;
+						controller_button |= H2Config_CustomLayout.A;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
-						Overwrite |= H2Config_CustomLayout.B;
+						controller_button |= H2Config_CustomLayout.B;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
-						Overwrite |= H2Config_CustomLayout.X;
+						controller_button |= H2Config_CustomLayout.X;
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
-						Overwrite |= H2Config_CustomLayout.Y;
-					InputDevice->xinput_state.Gamepad.wButtons = Overwrite;
+						controller_button |= H2Config_CustomLayout.Y;
+
+					InputDevice->xinput_state.Gamepad.wButtons = controller_button;
 				}
 			}
 		}
 	}
 
-
-
-	void __cdecl sub_B31BF4(int user_index, unsigned int a2)
-	{
-		memcpy((void *)a2, &default_profile + user_index, 0x1680u);
-	}
-	//Hijacking the call to game_is_minimized to apply radial deadzone calculations instead of rewritting the main function
-	//File offset: 0x2EB1B
+	// Hijacking the call to game_is_minimized to apply radial deadzone calculations instead of rewritting the main function
+	// File offset: 0x2EB1B
 	char h_game_is_minimized()
 	{
-		//Just pulling the first controller index, if multiple controller support is added find a way to link
-		//the controller index used in ControllerInput::update_controller_input.
+		// Just pulling the first controller index, if multiple controller support is added find a way to link
+		// the controller index used in ControllerInput::update_controller_input.
 		short* controller_input = (short*)ControllerInput::get_controller_input(0);
 
-		//Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given
-		//Radius it is accepted as valid input otherwise it is rejected.
+		// Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given
+		// Radius it is accepted as valid input otherwise it is rejected.
 		byte result = 0;
 		
 		unsigned int ar = pow(radialDeadzone, 2);
@@ -151,7 +142,7 @@ namespace ControllerInput
 	static float RightStickThrottle[2]; // [rsp+C0h] [rbp+6Fh]
 	static short *InputMap; // rax
 
-	//TODO: Refactor this to a General Input namespace, it's called whether or not you are using a controller.
+	// TODO: Refactor this to a General Input namespace, it's called whether or not you are using a controller.
 	void __cdecl ControllerInput::procces_input()
 	{
 		unsigned int ControllerIndex = 0; // edi
@@ -217,16 +208,17 @@ namespace ControllerInput
 				LeftStickThrottle[1] = -1.0f;
 			}
 		}
-		sub_B31EA2(ControllerIndex, default_profile, (int)InputMap, RightStickThrottle, LeftStickThrottle, unk_input_struct);
+		p_sub_B31EA2(ControllerIndex, default_profile, (int)InputMap, RightStickThrottle, LeftStickThrottle, unk_input_struct);
 	}
 
-	typedef unsigned char*(__cdecl p_get_controller_input)(__int16 a1);
-	p_get_controller_input* c_get_controller_input;
+	typedef unsigned char*(__cdecl* get_controller_input_t)(__int16 a1);
+	get_controller_input_t p_get_controller_input;
 
 	unsigned char* ControllerInput::get_controller_input(__int16 index)
 	{
-		return c_get_controller_input(index);
+		return p_get_controller_input(index);
 	}
+
 	void ControllerInput::ToggleModern()
 	{
 		if(H2Config_controller_modern)
@@ -238,6 +230,7 @@ namespace ControllerInput
 			PatchCall(Memory::GetAddress(0x39B82), Memory::GetAddress(0x628A8));
 		}
 	}
+
 	void ControllerInput::SetSensitiviy(float value)
 	{
 		if (value == 0)
@@ -245,6 +238,7 @@ namespace ControllerInput
 		*Memory::GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
 		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
 	}
+
 	void ControllerInput::SetDeadzones()
 	{
 		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
@@ -309,11 +303,11 @@ namespace ControllerInput
 		axialDeadzoneX = Memory::GetAddress<short*>(0x4AA02C);
 		axialDeadzoneY = Memory::GetAddress<short*>(0x4AA02E);
 
-		c_get_controller_input = Memory::GetAddress<p_get_controller_input*>(0x2F433);
+		p_get_controller_input = Memory::GetAddress<get_controller_input_t>(0x2F433);
 
 		default_profile = Memory::GetAddress<byte*>(0x4a89b0);
 		unk_input_struct = Memory::GetAddress<byte*>(0x4AE578);
-		sub_B31EA2 = Memory::GetAddress< p_sub_B31EA2*>(0x61EA2);
+		p_sub_B31EA2 = Memory::GetAddress<sub_B31EA2_t>(0x61EA2);
 		
 
 		//PatchCall(Memory::GetAddress(0x2e95d), sub_B31BF4);
@@ -336,8 +330,7 @@ namespace ControllerInput
 		sThumbRY = Memory::GetAddress<short*>(0x47A606);
 		dword_F4A724 = Memory::GetAddress<int*>(0x47A724);
 		dword_F4A720 = Memory::GetAddress<int*>(0x47A720);
-		game_is_minimized = Memory::GetAddress<p_game_minimized*>(0x28729);
-		system_milliseconds = Memory::GetAddress<p_system_milliseconds*>(0x37E51);
+		p_system_milliseconds = Memory::GetAddress<system_milliseconds_t*>(0x37E51);
 		//PatchCall(Memory::GetAddress(0x2FBD2), update_controller_input);
 		PatchCall(Memory::GetAddress(0x2eb1b), h_game_is_minimized);
 		PatchCall(Memory::GetAddress(0x2FA58), update_xinput_devices);

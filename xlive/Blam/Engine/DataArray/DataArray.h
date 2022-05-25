@@ -25,16 +25,14 @@ struct s_data_array
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
-		auto p_datum_new_in_range = Memory::GetAddressRelative<datum(__cdecl*)(s_data_array*)>(0x4667A0, 0x0); // TODO DEDI OFFSET
+		auto p_datum_new_in_range = Memory::GetAddress<datum(__cdecl*)(s_data_array*)>(0x667A0, 0x3248C);
 		return p_datum_new_in_range(data_array);
 	}
 
 	static void data_make_valid(s_data_array* data_array)
 	{
 		// not entirely sure what this actually does
-		typedef void(_cdecl* make_data_valid)(s_data_array* data_array);
-		auto p_data_make_valid = Memory::GetAddressRelative<make_data_valid>(0x466B33, 0x0); // TODO DEDI OFFSET
-
+		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x0); // TODO DEDI OFFSET
 		return p_data_make_valid(data_array);
 	}
 };

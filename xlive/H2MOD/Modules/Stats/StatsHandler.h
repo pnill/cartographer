@@ -1,11 +1,12 @@
 #pragma once
+
 #include "H2MOD.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\NetworkSession\NetworkSession.h"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "rapidjson\document.h"
 #include "rapidjson\prettywriter.h"
 #include <rapidjson\document.h>
@@ -19,7 +20,7 @@ public:
 
 	static void sendStats()
 	{
-		if (Memory::isDedicatedServer()
+		if (Memory::IsDedicatedServer()
 			&& RegisteredStatus().Registered && RegisteredStatus().StatsEnabled) 
 		{
 			auto token = getAPIToken();
@@ -39,23 +40,23 @@ public:
 							}
 							else
 							{
-								LOG_ERROR_GAME(L"[H2MOD] Stats Uploading encountered an error");
+								LOG_ERROR_GAME("[H2MOD] Stats Uploading encountered an error");
 							}
 						}
 						else
 						{
-							LOG_ERROR_GAME(L"[H2MOD] Stats Json failed to build");
+							LOG_ERROR_GAME("[H2MOD] Stats Json failed to build");
 						}
 
 					}
 					else
 					{
-						LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
+						LOG_ERROR_GAME("[H2MOD] Playlist Uploading encountered an error");
 					}
 				}
 				else if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
 				{
-					LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
+					LOG_ERROR_GAME("[H2MOD] Playlist Verification encountered a server error");
 				}
 			}
 		}
@@ -63,18 +64,18 @@ public:
 
 	static void verifySendPlaylist()
 	{
-		if (Memory::isDedicatedServer() && RegisteredStatus().Registered)
+		if (Memory::IsDedicatedServer() && RegisteredStatus().Registered)
 		{
 			auto token = getAPIToken();
 			int verifyPlaylistResponse = verifyPlaylist(token);
 			if (verifyPlaylistResponse == 500 || verifyPlaylistResponse == -1)
 			{
-				LOG_ERROR_GAME(L"[H2MOD] Playlist Verification encountered a server error");
+				LOG_ERROR_GAME("[H2MOD] Playlist Verification encountered a server error");
 			}
 			else if (verifyPlaylistResponse == 201)
 			{
 				if (uploadPlaylist(token) != 200) {
-					LOG_ERROR_GAME(L"[H2MOD] Playlist Uploading encountered an error");
+					LOG_ERROR_GAME("[H2MOD] Playlist Uploading encountered an error");
 				}
 			}
 		}
@@ -114,5 +115,5 @@ public:
 	static void Initialize();
 	static void game_life_cycle_update_event(e_game_life_cycle state);
 	static void network_player_event(int peerIndex, EventHandler::NetworkPlayerEventType type);
-	static void server_command_event(ServerConsole::ServerConsoleCommands command);
+	static void server_command_event(ServerConsole::e_server_console_commands command);
 };

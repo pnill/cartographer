@@ -3,7 +3,7 @@
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
 
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()
@@ -47,25 +47,24 @@ void ForwardPorts()
 		Utils::UPnPResult upnpResult(Utils::UPnPErrorType::None, 0);
 
 		upnpResult = upnp.UPnPForwardPort(false, H2Config_base_port, H2Config_base_port, "Halo2");
-		LOG_TRACE_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
+		LOG_INFO_NETWORK("ForwardPorts() - Halo2 port forwarding result: {}", upnpResult.ErrorCode);
 
-		upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
-		LOG_TRACE_NETWORK("ForwardPorts() - Halo2_1 port forwarding result: {}", upnpResult.ErrorCode);
+		upnpResult = upnp.UPnPForwardPort(false, (H2Config_base_port + 1), (H2Config_base_port + 1), "Halo2_1");
+		LOG_INFO_NETWORK("ForwardPorts() - Halo2_1 port forwarding result: {}", upnpResult.ErrorCode);
 
-		upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
-		LOG_TRACE_NETWORK("ForwardPorts() - Halo2_QoSport forwarding result: {}", upnpResult.ErrorCode);
+		upnpResult = upnp.UPnPForwardPort(true, (H2Config_base_port + 10), (H2Config_base_port + 10), "Halo2_QoS");
+		LOG_INFO_NETWORK("ForwardPorts() - Halo2_QoSport forwarding result: {}", upnpResult.ErrorCode);
 
-		LOG_TRACE_NETWORK("ForwardPorts() - Finished forwarding ports.");
+		LOG_INFO_NETWORK("ForwardPorts() - Finished forwarding ports.");
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("ForwardPorts() - UPNP disabled by config, skipping forwarding.");
+		LOG_INFO_NETWORK("ForwardPorts() - UPNP disabled by config, skipping forwarding.");
 	}
 }
 
 DWORD WINAPI XLiveGetUPnPState(DWORD a1)
 {
 	LOG_TRACE_XLIVE("XLiveGetUPnPState  (a1 = {:x})", a1);
-
 	return 0;
 }

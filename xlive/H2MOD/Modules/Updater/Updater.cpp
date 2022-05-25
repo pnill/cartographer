@@ -1,13 +1,12 @@
 #include "stdafx.h"
 
 #include "Updater.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
-#include <curl\curl.h>
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\Utils\Utils.h"
 
 bool fork_cmd_elevate(const wchar_t* cmd, wchar_t* flags = 0) {
 	SHELLEXECUTEINFO shExInfo = { 0 };
@@ -62,12 +61,12 @@ bool fork_cmd(LPSTR cmd) {
 	return bSuccess;
 }
 
-long long Size_Of_Download = 0;
-long long Size_Of_Downloaded = 0;
+long long sizeOfDownload = 0;
+long long sizeOfDownloaded = 0;
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	size_t written = fwrite(ptr, size, nmemb, stream);
-	Size_Of_Downloaded += nmemb;
+	sizeOfDownloaded += nmemb;
 	return written;
 }
 
@@ -76,18 +75,18 @@ static size_t header_callback(char* buffer, size_t size, size_t nitems, void* us
 	/* received header is nitems * size long in 'buffer' NOT ZERO TERMINATED */
 	/* 'userdata' is set with CURLOPT_HEADERDATA */
 
-	sscanf(buffer, "Content-Length:%lld", &Size_Of_Download);
+	sscanf(buffer, "Content-Length:%lld", &sizeOfDownload);
 	return nitems * size;
 }
 
 int DownloadFile(const char* url, wchar_t* local_full_path) {
-	Size_Of_Download = Size_Of_Downloaded = 0;
+	sizeOfDownload = sizeOfDownloaded = 0;
 	CURL *curl;
 	FILE *fp;
 	CURLcode res;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl) {
-		EnsureDirectoryExists(local_full_path);
+		CreateDirTree(local_full_path);
 		fp = _wfopen(local_full_path, L"wb");
 		if (!fp) {
 			addDebugText("Failed to obtain FILE* for DL from: %s to: %s", url, local_full_path);
@@ -102,7 +101,7 @@ int DownloadFile(const char* url, wchar_t* local_full_path) {
 		/* always cleanup */
 		curl_easy_cleanup(curl);
 		fclose(fp);
-		Size_Of_Download = Size_Of_Downloaded = 0;
+		sizeOfDownload = sizeOfDownloaded = 0;
 		return 0;
 	}
 	return 1;
@@ -125,13 +124,13 @@ static void freeUpdateFileEntry(UpdateFileEntry* update_file_entry) {
 	free(update_file_entry);
 }
 
-static const char H2UpdateVersionStr[] = "[Version:%[^]]]";
-static const char H2UpdateLocationsStr[3][10] = { "[Temp]", "[Game]", "[AppData]" };
+static const char* H2UpdateVersionStr = "[Version:%[^]]]";
+static const char* H2UpdateLocationsStr[] = { "[Temp]", "[Game]", "[AppData]" };
 static char H2UpdateVersion[30] = "0";
 static char current_location_id = 0;
 
-bool GSDownload_files_to_download = false;
-bool GSDownload_files_to_install = false;
+bool updater_has_files_to_download = false;
+bool updater_has_files_to_install = false;
 
 static void setButtonState(unsigned int btn_ID, char button_state) {
 	if (button_state == 0)
@@ -274,12 +273,12 @@ static void FetchUpdateDetails() {
 	H2UpdateVersion[0] = '0';
 	H2UpdateVersion[1] = 0;
 
-	GSDownload_files_to_download = false;
-	GSDownload_files_to_install = false;
+	updater_has_files_to_download = false;
+	updater_has_files_to_install = false;
 
 	addDebugText("Fetching Update Details.");
 	char* rtn_result = 0;
-	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/update1.ini"), "", rtn_result);
+	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/update1.ini"), "", &rtn_result);
 	if (rtn_code == 0) {
 		addDebugText("Got Update Details.");
 
@@ -345,12 +344,12 @@ static void FetchUpdateDetails() {
 	entry_count = UpdateFileEntries.size();
 	for (int i = 0; i < entry_count; i++) {
 		if (UpdateFileEntries[i]->need_to_update == 2) {
-			GSDownload_files_to_download = true;
+			updater_has_files_to_download = true;
 		}
 		if (UpdateFileEntries[i]->need_to_update == 1 && UpdateFileEntries[i]->location_id > 0) {
-			GSDownload_files_to_install = true;
+			updater_has_files_to_install = true;
 		}
-		if (GSDownload_files_to_download && GSDownload_files_to_install)
+		if (updater_has_files_to_download && updater_has_files_to_install)
 			break;
 	}
 
@@ -385,15 +384,15 @@ static void FetchUpdateDetails() {
 	if (im_lazy.length() <= 0)
 		im_lazy = H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF4);
 
-	extern char* Auto_Update_Text;
-	char* Auto_Update_Text_alt = Auto_Update_Text;
-	Auto_Update_Text = 0;
-	if (Auto_Update_Text_alt) {
-		free(Auto_Update_Text_alt);
+	extern char* autoUpdateText;
+	char* autoUpdateTextAlt = autoUpdateText;
+	autoUpdateText = 0;
+	if (autoUpdateTextAlt) {
+		free(autoUpdateTextAlt);
 	}
-	Auto_Update_Text_alt = (char*)malloc(im_lazy.size() + 1);
-	strcpy_s(Auto_Update_Text_alt, im_lazy.size() + 1, im_lazy.c_str());
-	Auto_Update_Text = Auto_Update_Text_alt;
+	autoUpdateTextAlt = (char*)malloc(im_lazy.size() + 1);
+	strcpy_s(autoUpdateTextAlt, im_lazy.size() + 1, im_lazy.c_str());
+	autoUpdateText = autoUpdateTextAlt;
 }
 
 bool DownloadUpdatedFiles() {
@@ -448,11 +447,11 @@ static DWORD WINAPI DownloadThread(LPVOID lParam)
 	}
 
 	setButtonState(1, 1);
-	if (GSDownload_files_to_download)
+	if (updater_has_files_to_download)
 		setButtonState(2, 1);
 	else
 		setButtonState(2, 0);
-	if (GSDownload_files_to_install)
+	if (updater_has_files_to_install)
 		setButtonState(3, 1);
 	else
 		setButtonState(3, 0);
@@ -553,17 +552,17 @@ void GSDownloadCancel() {
 	if (hThreadDownloader) {
 		TerminateThread(hThreadDownloader, 1);
 		hThreadDownloader = 0;
-		Size_Of_Download = Size_Of_Downloaded = 0;
+		sizeOfDownload = sizeOfDownloaded = 0;
 	}
 
-	extern char* Auto_Update_Text;
-	if (Auto_Update_Text) {
-		free(Auto_Update_Text);
-		Auto_Update_Text = 0;
+	extern char* autoUpdateText;
+	if (autoUpdateText) {
+		free(autoUpdateText);
+		autoUpdateText = 0;
 	}
 
-	GSDownload_files_to_download = false;
-	GSDownload_files_to_install = false;
+	updater_has_files_to_download = false;
+	updater_has_files_to_install = false;
 
 	setButtonState(1, 0);
 	setButtonState(2, 0);

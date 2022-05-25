@@ -4,5 +4,5 @@
 extern std::chrono::duration<double, std::nano> desiredRenderTime;
 #define SET_DESIRED_RENDER_TIME() desiredRenderTime = std::chrono::duration<double, std::micro>((1000000.0 / (double)H2Config_fps_limit));
 
-void initGSRunLoop();
-void deinitGSRunLoop();
+void InitRunLoop();
+void DeinitRunLoop();

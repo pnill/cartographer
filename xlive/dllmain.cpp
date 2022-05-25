@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "H2MOD/Modules/Startup/Startup.h"
-#include "Util/Hooks/Detour.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "Util\Hooks\Detour.h"
 
 HMODULE hThis = NULL;
 CRITICAL_SECTION d_lock;
@@ -37,24 +37,29 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 	return std::wstring(strPath);
 }
 
+void HeapDebugInitialize()
+{
+#if HEAP_DEBUG
+	int CurrentFlags;
+	CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;
+	CurrentFlags |= _CRTDBG_LEAK_CHECK_DF;
+	CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
+	_CrtSetDbgFlag(CurrentFlags);
+#endif
+}
+
 void InitInstance()
 {
-	static bool init = true;
+	static bool init = false;
 
-	if (init)
+	if (!init)
 	{
-#ifdef _DEBUG
-		int CurrentFlags;
-		CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-		CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;
-		CurrentFlags |= _CRTDBG_LEAK_CHECK_DF;
-		CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
-		_CrtSetDbgFlag(CurrentFlags);
-#endif
-
-		init = false;
-		InitH2Startup2();						//Initializes Startup.cpp
+		init = true;
+		InitH2Startup2();
 		InitializeCriticalSection(&d_lock);
+
+		HeapDebugInitialize();
 
 		dlcbasepath = L"DLC";
 

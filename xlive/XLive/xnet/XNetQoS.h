@@ -15,11 +15,12 @@ public:
 	void Listener();
 	bool IsListening();
 
-	bool m_bStopListening = false;
 	SOCKET m_ListenSocket = INVALID_SOCKET;
-	WSAEVENT m_WsaEvent = WSA_INVALID_EVENT;
+	// first is used to alert the thread it has to cleanup
+	// second is used for connections
+	WSAEVENT m_WsaEvents[2] = { WSA_INVALID_EVENT, WSA_INVALID_EVENT };
 
-	unsigned int cbData = 0;
+	UINT cbData = 0;
 	PBYTE pbData = nullptr;
 
 	static void CALLBACK HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags);

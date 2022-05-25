@@ -36,6 +36,8 @@ struct s_game_globals
 	static bool game_is_campaign();
 	static bool game_is_multiplayer();
 	static bool game_is_mainmenu();
+
+	static bool game_is_predicted();
 };
 CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
 #pragma pack(pop)

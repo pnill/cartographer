@@ -1,12 +1,14 @@
 #include "stdafx.h"
 
 #include "StatsHandler.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Startup\Startup.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "Util\hash.h"
 
 bool MatchInvalidated = false;
@@ -23,7 +25,7 @@ void StatsHandler::Initialize()
 {
 	return;
 
-	if (Memory::isDedicatedServer()) {
+	if (Memory::IsDedicatedServer()) {
 		Status.Registered = false;
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;
@@ -45,7 +47,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 		
 		switch (state)
 		{
-		case life_cycle_pre_game:
+		case _life_cycle_pre_game:
 			if (!pregameFirstInitialization)
 			{
 				verifyRegistrationStatus();
@@ -58,10 +60,10 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 				InvalidateMatch(false);
 				return;
 			}
-		case life_cycle_in_game:
+		case _life_cycle_in_game:
 			InvalidateMatch(false);
 			return;
-		case life_cycle_post_game:
+		case _life_cycle_post_game:
 			sendStats();
 			return;
 		default:
@@ -69,13 +71,13 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 		}
 	};
 	
-	if (Memory::isDedicatedServer()) 
+	if (Memory::IsDedicatedServer()) 
 	{
 		std::thread(updateStatsLifeCycle, state).detach();
 	}
 	else
 	{
-		if (state == life_cycle_none) 
+		if (state == _life_cycle_none) 
 		{
 			h2mod->set_local_rank(255);
 			return;
@@ -96,11 +98,11 @@ void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlay
 	}
 }
 
-void StatsHandler::server_command_event(ServerConsole::ServerConsoleCommands command)
+void StatsHandler::server_command_event(ServerConsole::e_server_console_commands command)
 {
 	if(Status.StatsEnabled)
 	{
-		if(command == ServerConsole::skip && EngineCalls::get_game_life_cycle() == life_cycle_in_game)
+		if(command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
 		{
 			InvalidateMatch(true);
 		}
@@ -188,11 +190,11 @@ char* StatsHandler::checkServerRegistration()
 
 	CURL *curl;
 	CURLcode curlResult;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-		auto sXUID = IntToString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
+		auto sXUID = IntToString<::XUID>(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid, std::dec);
 		http_request_body += sXUID;
 		struct curl_response_text s;
 		init_curl_response(&s);
@@ -249,7 +251,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -264,7 +266,7 @@ bool StatsHandler::serverRegistration(char* authKey)
 	curl_mime_data(field, H2Config_dedi_server_name, CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Server_XUID");
-	curl_mime_data(field, std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
+	curl_mime_data(field, std::to_string(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid).c_str(), CURL_ZERO_TERMINATED);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, authKey, CURL_ZERO_TERMINATED);
@@ -309,7 +311,7 @@ char* StatsHandler::getAPIToken()
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -360,8 +362,9 @@ int StatsHandler::uploadPlaylist(char* token)
 {
 	LOG_TRACE_GAME("Uploading Playlist");
 	wchar_t* playlist_file = getPlaylistFile();
-	char* pFile = (char*)malloc(sizeof(char) * wcslen(playlist_file) + 1);
-	wcstombs2(pFile, playlist_file, wcslen(playlist_file) + 1);
+	size_t playlist_file_buf_size = (wcslen(playlist_file) + 1) * sizeof(char);
+	char* pFile = (char*)malloc(playlist_file_buf_size);
+	wcstombs2(playlist_file, pFile, playlist_file_buf_size);
 	LOG_TRACE_GAME(pFile);
 	std::string checksum = getChecksum();
 	if (checksum.empty())
@@ -376,7 +379,7 @@ int StatsHandler::uploadPlaylist(char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
@@ -441,7 +444,7 @@ int StatsHandler::verifyPlaylist(char* token)
 		CURL *curl;
 		CURLcode curlResult;
 
-		curl = curl_interface_init_no_ssl();
+		curl = curl_interface_init_no_verify();
 		if(curl)
 		{
 			//Set the URL for the GET
@@ -478,7 +481,7 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 	curl_mime *form = NULL;
 	curl_mimepart *field = NULL;
 	struct curl_slist *headerlist = NULL;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
@@ -810,7 +813,7 @@ char* StatsHandler::buildJSON()
 	wchar_t unix[100];
 
 	swprintf(unix, 100, L"%.f", seconds);
-	auto sXUID = IntToWString<::XUID>(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid, std::dec);
+	auto sXUID = IntToWString<::XUID>(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid, std::dec);
 	swprintf(fileOutPath, 1024, L"%wsz%s-%s.json", H2ProcessFilePath, sXUID.c_str(), unix);
 	std::ofstream of(fileOutPath);
 	of << json;
@@ -818,8 +821,10 @@ char* StatsHandler::buildJSON()
 	{
 		LOG_ERROR_GAME("{} Failed to write to file", __FUNCTION__);
 	}
-	char* oFile = (char*)malloc(sizeof(char) * wcslen(fileOutPath) + 1);
-	wcstombs2(oFile, fileOutPath, wcslen(fileOutPath) + 1);
+
+	size_t oFileBufSize = (wcslen(fileOutPath) + 1) * sizeof(char);
+	char* oFile = (char*)malloc(oFileBufSize);
+	wcstombs2(fileOutPath, oFile, oFileBufSize);
 	return oFile;
 }
 
@@ -884,8 +889,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (EngineCalls::get_game_life_cycle() != life_cycle_pre_game
-		&& EngineCalls::get_game_life_cycle() != life_cycle_post_game)
+	if (Engine::get_game_life_cycle() != _life_cycle_pre_game
+		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
 	std::thread(getPlayerRanksByStringList, buildPlayerRankUpdateQueryStringList()).detach();
@@ -895,7 +900,7 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 {
 	rapidjson::Document& doc = *document;
 
-	if (NetworkSession::localPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
+	if (NetworkSession::LocalPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
 	{
 		if (doc.MemberCount() != 0)
 		{
@@ -907,16 +912,16 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 
 				for (auto j = 0; j < ENGINE_PLAYER_MAX; j++)
 				{
-					if (NetworkSession::playerIsActive(j))
+					if (NetworkSession::PlayerIsActive(j))
 					{
-						auto playerInfo = NetworkSession::getPlayerInformation(j); // for now we only support local player 0
+						auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
 
-						if (playerIdentifier == NetworkSession::getPlayerXuid(j)
+						if (playerIdentifier == NetworkSession::GetPlayerId(j)
 							&& playerInfo->properties.player_displayed_skill != rank)
 						{
 							LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
 
-							CustomPackets::sendRankChange(NetworkSession::getPeerIndex(j), rank);
+							NetworkMessage::SendRankChange(NetworkSession::GetPeerIndex(j), rank);
 						}
 					}
 				}
@@ -929,19 +934,19 @@ std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 {
 	std::string XUIDs = "";
 
-	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::getPlayerCount());
-	if (NetworkSession::getPlayerCount() > 0)
+	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::GetPlayerCount());
+	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		for (auto i = 0; i < ENGINE_PLAYER_MAX; i++)
 		{
 			bool addSeparator = false;
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
-				auto playerIdentifier = NetworkSession::getPlayerXuid(i);
+				auto playerIdentifier = NetworkSession::GetPlayerId(i);
 				XUIDs.append(IntToString(playerIdentifier, std::dec));
 				
 				if (i + 1 < ENGINE_PLAYER_MAX 
-					&& NetworkSession::playerIsActive(i + 1))
+					&& NetworkSession::PlayerIsActive(i + 1))
 					addSeparator = true;
 
 				LOG_TRACE_GAME("	Added player index {}, identifier: {} to rank update!", i, playerIdentifier);
@@ -975,12 +980,12 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());
 	http_request_body.append("&Server_XUID=");
-	http_request_body.append(std::to_string(NetworkSession::getCurrentNetworkSession()->membership.dedicated_server_xuid));
+	http_request_body.append(std::to_string(NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid));
 	http_request_body.append("&Player_XUIDS=");
 	http_request_body.append(playerList);
 	
 	CURL *curl;
-	curl = curl_interface_init_no_ssl();
+	curl = curl_interface_init_no_verify();
 	if (curl)
 	{
 		struct curl_response_text s;

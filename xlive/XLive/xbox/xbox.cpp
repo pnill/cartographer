@@ -9,7 +9,7 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 // #5260: XShowSigninUI
 int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 {
-	if (!userSignedIn(0))
+	if (!UserSignedIn(0))
 	{
 		extern void XUiShowSignInH2();
 		XUiShowSignInH2();

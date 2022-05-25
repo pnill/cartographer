@@ -146,7 +146,7 @@ struct s_object_data_definition
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
-struct s_unit_data_definition :s_object_data_definition
+struct s_unit_data_definition : s_object_data_definition
 {
 	char gap_12C[4];
 	DWORD field_130;
@@ -155,8 +155,8 @@ struct s_unit_data_definition :s_object_data_definition
 							  //unit_data->unit_flags |= 2         -->unit_is_alive
 	e_object_team unit_team;
 	char pad[3];
-	WORD controlling_player_index;
-	char gap_142[14];
+	datum controlling_player_index;
+	char gap_142[12];
 	DWORD control_flags;
 	DWORD control_flags_2;
 	DWORD animation_state;
@@ -240,23 +240,23 @@ static s_data_array* get_objects_header()
 };
 
 // Gets the header of the object, containing some details
-static s_object_header* get_objects_header(datum object_index)
+static s_object_header* get_objects_header(datum object_idx)
 {
 	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index)]);
+	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)]);
 }
 
 // Get the object fast, with no validation from datum index
 template<typename T = s_object_data_definition>
-static T* object_get_fast_unsafe(datum object_index)
+static T* object_get_fast_unsafe(datum object_idx)
 {
-	return (T*)get_objects_header(object_index)->object;
+	return (T*)get_objects_header(object_idx)->object;
 }
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 template<typename T = s_object_data_definition>
-static T* object_try_and_get_and_verify_type(datum object_index, int object_type_flags)
+static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
 {
 	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
-	return (T*)p_object_try_and_get_and_verify_type(object_index, object_type_flags);
+	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }

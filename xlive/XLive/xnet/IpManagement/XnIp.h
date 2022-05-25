@@ -2,6 +2,7 @@
 
 #include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 
 #define MAX_HDR_STR 32
 
@@ -119,8 +120,8 @@ struct XnIpPckTransportStats
 	unsigned int pckBytesSent;
 	unsigned int pckBytesRecvd;
 
-	unsigned int pckAvgSent;
-	unsigned int pckAvgRecvd;
+	unsigned int pckAvgSentPerSec;
+	unsigned int pckAvgRecvdPerSec;
 
 	unsigned int pckSentPerSec[MAX_NETSTATS_SAMPLES];
 	unsigned int pckBytesSentPerSec[MAX_NETSTATS_SAMPLES];
@@ -131,7 +132,7 @@ struct XnIpPckTransportStats
 	int			 pckCurrentSendPerSecIdx;
 	int			 pckCurrentRecvdPerSecIdx;
 
-	void PckStatsUpdate()
+	void PckDataSampleUpdate()
 	{
 		if (!bInit)
 		{
@@ -141,8 +142,8 @@ struct XnIpPckTransportStats
 			pckBytesSent = 0;
 			pckBytesRecvd = 0;
 
-			pckAvgSent = 0;
-			pckAvgRecvd = 0;
+			pckAvgSentPerSec = 0;
+			pckAvgRecvdPerSec = 0;
 			pckSentPerSecIdx = 0;
 			pckRecvdPerSecIdx = 0;
 			pckCurrentSendPerSecIdx = -1;
@@ -151,13 +152,13 @@ struct XnIpPckTransportStats
 			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
 			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
 
-			lastTimeUpdate = timeGetTime();
+			lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 		}
 		else
 		{
-			const int time_to_next_sample = 1 * 1000;
+			const ULONGLONG sample_end_time = 1ull * 1000ull;
 
-			if (timeGetTime() - lastTimeUpdate >= time_to_next_sample)
+			if (_Shell::QPCToTimeNowMsec() - lastTimeUpdate >= sample_end_time)
 			{
 				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
@@ -171,13 +172,15 @@ struct XnIpPckTransportStats
 				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
 
-				lastTimeUpdate = timeGetTime();
+				lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 			}
 		}
 	}
 
 	void PckSendStatsUpdate(unsigned int _pckXmit, unsigned int _pckXmitBytes)
 	{
+		PckDataSampleUpdate();
+
 		pckSent += _pckXmit;
 		pckBytesSent += _pckXmitBytes;
 
@@ -187,6 +190,8 @@ struct XnIpPckTransportStats
 
 	void PckRecvdStatsUpdate(unsigned int _pckRecvd, unsigned int _pckRecvdBytes)
 	{
+		PckDataSampleUpdate();
+
 		pckRecvd += _pckRecvd;
 		pckBytesRecvd += _pckRecvdBytes;
 
@@ -195,7 +200,7 @@ struct XnIpPckTransportStats
 	}
 
 private:
-	DWORD lastTimeUpdate;
+	ULONGLONG lastTimeUpdate;
 	int pckSentPerSecIdx;
 	int pckRecvdPerSecIdx;
 };
@@ -211,8 +216,8 @@ struct XnIp
 	bool bValid;
 	int connectStatus;
 	int connectionPacketsSentCount;
-	DWORD lastConnectionInteractionTime;
-	DWORD lastPacketReceivedTime;
+	ULONGLONG lastConnectionInteractionTime;
+	ULONGLONG lastPacketReceivedTime;
 
 	BYTE connectionNonce[8];
 	BYTE connectionNonceOtherSide[8];
@@ -246,20 +251,20 @@ struct XnIp
 	// TODO: add single async socket implementation or figure out another way
 	NatTranslation natTranslation[2];
 
-	sockaddr_in* getNatAddr(H2v_sockets natIndex)
+	sockaddr_in* GetNatAddr(H2v_sockets natIndex)
 	{
 		int index = (int)natIndex;
 		return &natTranslation[index].natAddress;
 	}
 
-	void updateNat(H2v_sockets natIndex, const sockaddr_in* addr)
+	void UpdateNat(H2v_sockets natIndex, const sockaddr_in* addr)
 	{
 		int index = (int)natIndex;
 		natTranslation[index].natAddress = *addr;
 		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
 	}
 
-	void natDiscard()
+	void NatDiscard()
 	{
 		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
@@ -268,12 +273,12 @@ struct XnIp
 		}
 	}
 
-	bool natIsUpdated(int natIndex) const
+	bool NatIsUpdated(int natIndex) const
 	{
 		return natTranslation[natIndex].state == NatTranslation::eNatDataState::natAvailable;
 	}
 
-	bool natIsUpdated() const
+	bool NatIsUpdated() const
 	{
 		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
 		{
@@ -287,7 +292,7 @@ struct XnIp
 public:
 	XnIpPckTransportStats pckStats;
 
-	void PclStatsReset()
+	void PckStatsReset()
 	{
 		pckStats.bInit = false;
 	}
@@ -297,17 +302,17 @@ public:
 		*outPckStats = &pckStats;
 	}
 
-	IN_ADDR getOnlineIpAddress() const
+	IN_ADDR GetOnlineIpAddr() const
 	{
 		return xnaddr.inaOnline;
 	}
 
-	IN_ADDR getLanIpAddr() const
+	IN_ADDR GetLanIpAddr() const
 	{
 		return xnaddr.ina;
 	}
 
-	bool XnIp::isValid(IN_ADDR identifier) const
+	bool XnIp::IsValid(IN_ADDR identifier) const
 	{
 		if (identifier.s_addr != this->connectionIdentifier.s_addr)
 		{
@@ -359,7 +364,7 @@ public:
 	void SaveNatInfo(XSocket* xsocket, IN_ADDR ipIdentifier, const sockaddr_in* addr);
 
 	// Packet handlers
-	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, LPDWORD bytesRecvdCount);
+	int HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBuffers, DWORD dwBufferCount, LPDWORD bytesRecvdCount);
 	void HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPacket* reqPaket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
 	void HandleConnectionPacket(XSocket* xsocket, XnIp* xnIp, const XNetRequestPacket* conReqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);

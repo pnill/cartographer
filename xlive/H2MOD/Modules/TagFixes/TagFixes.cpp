@@ -3,10 +3,11 @@
 #include "TagFixes.h"
 #include "Blam\Cache\TagGroups\shader_definition.hpp"
 #include "Blam/Cache/TagGroups/light_definition.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD/Modules/Config/Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 
 namespace TagFixes
 {
@@ -48,7 +49,7 @@ namespace TagFixes
 		}
 		void fix_shaders_nvidia()
 		{
-			if (Memory::isDedicatedServer()) return;
+			if (Memory::IsDedicatedServer()) return;
 
 			fix_shader_template_nvidia(
 				"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
@@ -64,7 +65,9 @@ namespace TagFixes
 		}
 		void fix_dynamic_lights()
 		{
+			// TODO FIXME: this breaks other shadows
 			return;
+
 			auto cinematic_shadow_datum = tags::find_tag(blam_tag::tag_group_type::vertexshader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
 			auto shadow_datum = tags::find_tag(blam_tag::tag_group_type::shaderpass, "shaders\\shader_passes\\shadow\\shadow_generate");
 			byte* shadow_tag = tags::get_tag<blam_tag::tag_group_type::shaderpass, BYTE>(shadow_datum);
@@ -94,7 +97,7 @@ namespace TagFixes
 			auto fp_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
 			BYTE* fp_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(fp_shader_datum);
 			if (fp_shader_tag_data != nullptr)
-				*(float*)(fp_shader_tag_data + 0x44) = 1;
+				*(float*)(fp_shader_tag_data + 0x44) = 1.0f;
 
 			//Fix the Visor(s)
 			auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
@@ -136,18 +139,9 @@ namespace TagFixes
 			auto grunt_torso_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
 			BYTE* grunt_torso_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(grunt_torso_shader_datum);
 			if (grunt_torso_shader_tag_data != nullptr)
-				*(float*)(grunt_torso_shader_tag_data + 0x44) = 1;
+				*(float*)(grunt_torso_shader_tag_data + 0x44) = 1.0f;
+		}
 
-		}
-		void fall_damage_fix()
-		{
-			if (h2mod->GetEngineType() == Multiplayer) {
-				*(float*)(&tags::get_tag_data()[0xE610B0]) = 14.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
-				*(float*)(&tags::get_tag_data()[0xE610B4]) = 20.0f; /*masterchief_mp hlmt max abs acc default value doubled*/
-				*(float*)(&tags::get_tag_data()[0xE65D98]) = 14.0f; /*elite_mp hlmt max abs acc default value doubled*/
-				*(float*)(&tags::get_tag_data()[0xE65D9C]) = 20.0f; /*elite_mp hlmt max abs acc default value doubled*/
-			}
-		}
 		void font_table_fix()
 		{
 			WriteValue<int>(Memory::GetAddress(0x464940), 0);
@@ -186,12 +180,21 @@ namespace TagFixes
 			}
 		}
 
+		void fall_damage_fix()
+		{
+			auto bipeds = tags::find_tags(blam_tag::tag_group_type::biped);
+			for (auto& biped_item : bipeds)
+			{
+				auto biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(biped_item.first);
+				biped->unitTag.objectTag.min_abs_acc_default *= 2.0f;
+				biped->unitTag.objectTag.max_abs_acc_default *= 2.0f;
+			}
+		}
 	}
-
 
 	void OnMapLoad()
 	{
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
 			fix_dynamic_lights();
@@ -204,10 +207,8 @@ namespace TagFixes
 			{
 				light_framerate_killer();
 			}
-
 		}
-
-		// both server and client
+		// both client/server
 		fall_damage_fix();
 	}
 

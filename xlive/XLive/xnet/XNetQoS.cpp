@@ -5,7 +5,7 @@
 #include "xnet.h"
 #include "XLive\xnet\XNetQoS.h"
 #include "IpManagement\XnIp.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 
 using namespace std::chrono_literals;
 
@@ -13,7 +13,7 @@ CXNetQoS XNetQoS;
 
 void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
 {
-	//LOG_TRACE_NETWORK_N("ClientQoSLookup( cxna: %i, cProbes: %i, XNADDR array: %08X)", cxna,cProbes,apxna);
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "ClientQoSLookup( cxna: {}, cProbes: {})", cxna, cProbes);
 
 	while (pqos->cxnqosPending > 0)
 	{
@@ -24,11 +24,11 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: {}", pqos->cxnqosPending);
 
+			int iResult;
 			SOCKET connectSocket = INVALID_SOCKET;
 			struct addrinfo *result = NULL, *ptr = NULL, hints;
-			int iResult;
 
-			SecureZeroMemory(&hints, sizeof(hints));
+			ZeroMemory(&hints, sizeof(hints));
 			hints.ai_family = AF_INET;
 			hints.ai_socktype = SOCK_STREAM;
 			hints.ai_protocol = IPPROTO_TCP;
@@ -69,7 +69,6 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 				iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
 				if (iResult == SOCKET_ERROR) {
 					closesocket(connectSocket);
-					connectSocket = INVALID_SOCKET;
 					continue;
 				}
 
@@ -95,16 +94,16 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			int recvResult = 0;
 			int recvBufLen = gXnIp.GetReqQoSBufferSize();
 			BYTE *recvBuf = new BYTE[recvBufLen];
-			SecureZeroMemory(recvBuf, recvBufLen);
+			ZeroMemory(recvBuf, recvBufLen);
 
-			std::vector<long long int> ping_storage;
+			std::vector<long long> ping_storage;
 			int probes = cProbes;
 			do
 			{
 				//	LOG_TRACE_NETWORK_N("[XNetQoSLookup][Client] Sending Probe {}..",probes);
 
 				char send_data[4];
-				SecureZeroMemory(send_data, 4);
+				ZeroMemory(send_data, sizeof(send_data));
 				*(DWORD*)&send_data = 0xAABBCCDD;
 
 				auto started = std::chrono::high_resolution_clock::now();
@@ -116,7 +115,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 
 				std::chrono::milliseconds d = std::chrono::duration_cast<std::chrono::milliseconds>(done - started);
 
-				long long int diff = d.count();
+				long long diff = d.count();
 
 				//	LOG_TRACE_NETWORK_N("[XNetQoSLookup][Client] Probe {} finished ping: %lld", probes, diff);
 
@@ -126,11 +125,16 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			} while (probes > 0);
 
 			/*int WSAError = WSAGetLastError();
-			if (RecvLen == -1 || WSAError == WSAETIMEDOUT || WSAError == WSAECONNRESET || WSAError == WSAESHUTDOWN || WSAError == WSAEINVAL || connectSocket == INVALID_SOCKET || connectSocket == SOCKET_ERROR)
+			if (RecvLen == SOCKET_ERROR 
+				|| WSAError == WSAETIMEDOUT 
+				|| WSAError == WSAECONNRESET 
+				|| WSAError == WSAESHUTDOWN 
+				|| WSAError == WSAEINVAL 
+				|| connectSocket == INVALID_SOCKET 
+				|| connectSocket == SOCKET_ERROR)
 			{
 				closesocket(connectSocket);
 					LOG_TRACE_NETWORK_N("[XNetQoSLookup][Socket: %08X] Winsock Error Occured: %i - Socket Closed", connectSocket, WSAError);
-
 			}*/
 
 			closesocket(connectSocket);
@@ -150,8 +154,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 			}
 
 			auto ping_result = std::minmax_element(ping_storage.begin(), ping_storage.end());
-			long long min_ping = ping_storage[(ping_result.first - ping_storage.begin())];
-			long long max_ping = ping_storage[(ping_result.second - ping_storage.begin())];
+			long long min_ping = *ping_result.first;
+			long long max_ping = *ping_result.second;
 			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
 
 			ping_storage.clear();
@@ -193,295 +197,293 @@ LPFN_ACCEPTEX lpfnAcceptEx = nullptr;
 void CALLBACK CXNetQoS::HandleClient(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
-	//LOG_TRACE_NETWORK_N("CXNetQoS::HandleClient() - socket: {}", acceptSockInfo->Socket);
+	//LOG_TRACE_NETWORK_N("{} - socket: {}", __FUNCTION__, acceptSockInfo->Socket);
 
-	auto HandleClientCleanup = [](LPSOCKET_INFORMATION lpSocketInfo) -> void
+	do
+		// while (0) for the break functionality
+		// break in this context is goto cleanup; equivalent
 	{
-		closesocket(lpSocketInfo->Socket);
-		delete[] lpSocketInfo->DataBuf.buf;
-		delete lpSocketInfo;
-	};
-
-	if (dwError != 0)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::HandleClient() - dwError: {}", dwError);
-		HandleClientCleanup(acceptSockInfo);
-		return;
-	}
-
-	if (cbTransferred == 0)
-	{
-		//LOG_TRACE_NETWORK("CXNetQoS::HandleClient() - no bytes sent!");
-		HandleClientCleanup(acceptSockInfo);
-		return;
-	}
-
-	// delete memory allocated inside SendBack callback
-	delete[] acceptSockInfo->DataBuf.buf;
-
-	acceptSockInfo->DataBuf.len = 4;
-	acceptSockInfo->DataBuf.buf = new char[acceptSockInfo->DataBuf.len];
-	SecureZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
-
-	DWORD flags = 0;
-	DWORD recvResult = WSARecv(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, &flags, &acceptSockInfo->Overlapped, SendBack);
-	if (recvResult != 0)
-	{
-		if (recvResult == SOCKET_ERROR)
+		if (dwError != 0)
 		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-			{
-				LOG_TRACE_NETWORK("CXNetQoS::HandleClient() - WSARecv operation failed with error: {}", WSAGetLastError());
-				HandleClientCleanup(acceptSockInfo);
-				return;
-			}
-			else
+			LOG_TRACE_NETWORK("{} - closing connection, dwError: {}", __FUNCTION__, dwError);
+			break;
+		}
+
+		if (cbTransferred == 0)
+		{
+			//LOG_TRACE_NETWORK("{} - no bytes sent!", __FUNCTION__);
+			break;
+		}
+
+		// delete memory allocated inside SendBack callback
+		delete[] acceptSockInfo->DataBuf.buf;
+
+		acceptSockInfo->DataBuf.len = 4;
+		acceptSockInfo->DataBuf.buf = new char[acceptSockInfo->DataBuf.len];
+		ZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
+
+		DWORD flags = 0;
+		int recvResult = WSARecv(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, &flags, &acceptSockInfo->Overlapped, SendBack);
+		if (recvResult == 0)
+		{
+			// the operation will be completed synchronously
+			return;
+		}
+		else if (recvResult == SOCKET_ERROR)
+		{
+			if (WSAGetLastError() == WSA_IO_PENDING)
 			{
 				// the operation will be completed asynchronously, don't clear memory because it will be used
 				return;
 			}
+			else
+			{
+				LOG_TRACE_NETWORK("{} - WSARecv operation failed with error: {}", __FUNCTION__, WSAGetLastError());
+				break;
+			}
 		}
-	}
-	else
-	{
-		// the operation will be completed synchronously
-		return;
-	}
+	} while (0);
+
+	closesocket(acceptSockInfo->Socket);
+	delete[] acceptSockInfo->DataBuf.buf;
+	delete acceptSockInfo;
+	return;
 }
 
 void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLAPPED lpOverlapped, DWORD dwFlags)
 {
 	LPSOCKET_INFORMATION acceptSockInfo = reinterpret_cast<LPSOCKET_INFORMATION>(lpOverlapped);
 
-	//LOG_TRACE_NETWORK_N("[H2MOD-QoS] SendBack callback -> socket: %d", acceptSockInfo->Socket);
+	//LOG_TRACE_NETWORK("{} - callback -> socket: {}", __FUNCTION__, acceptSockInfo->Socket);
 
-	auto SendBackCleanup = [](LPSOCKET_INFORMATION lpSocketInfo) -> void 
+	do
+		// while (0) for the break functionality
+		// break in this context is goto cleanup; equivalent
 	{
-		closesocket(lpSocketInfo->Socket);
-		delete[] lpSocketInfo->DataBuf.buf;
-		delete lpSocketInfo;
-	};
-
-	if (dwError != (DWORD)0)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::SendBack() - dwError: {}, cleaning up", dwError);
-		SendBackCleanup(acceptSockInfo);
-		return;
-	}
-
-	if (cbTransferred == 0)
-	{
-		//LOG_TRACE_NETWORK("CXNetQoS::SendBack() - no data received!");
-		SendBackCleanup(acceptSockInfo);
-		return;
-	}
-
-	if (*(DWORD*)(&acceptSockInfo->DataBuf.buf[0]) == 0xAABBCCDD)
-	{
-		//LOG_TRACE_NETWORK_N("CXNetQoS::SendBack() - magic is right, sending data back on socket {}", acceptSockInfo->Socket);
-
-		delete[] acceptSockInfo->DataBuf.buf;
-
-		// copy the data passed by the game
-		acceptSockInfo->DataBuf.len = gXnIp.GetReqQoSBufferSize();
-		acceptSockInfo->DataBuf.buf = new CHAR[gXnIp.GetReqQoSBufferSize()];
-		memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
-
-		SecureZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
-		DWORD sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
-		if (sendResult != 0)
+		if (dwError != (DWORD)0)
 		{
-			if (sendResult == SOCKET_ERROR)
+			LOG_TRACE_NETWORK("{} - dwError: {}, cleaning up", __FUNCTION__, dwError);
+			break;
+		}
+
+		if (cbTransferred == 0)
+		{
+			//LOG_TRACE_NETWORK("{} - no data received!", __FUNCTION__);
+			break;
+		}
+
+		if (*(DWORD*)acceptSockInfo->DataBuf.buf == 0xAABBCCDD)
+		{
+			//LOG_TRACE_NETWORK("{} - magic is right, sending data back on socket {}", __FUNCTION__, acceptSockInfo->Socket);
+
+			delete[] acceptSockInfo->DataBuf.buf;
+
+			// copy the data passed by the game
+			acceptSockInfo->DataBuf.len = gXnIp.GetReqQoSBufferSize();
+			acceptSockInfo->DataBuf.buf = new CHAR[gXnIp.GetReqQoSBufferSize()];
+			memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+
+			ZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
+			int sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
+			if (sendResult == 0)
 			{
-				if (WSAGetLastError() != WSA_IO_PENDING)
+				// the operation will be completed synchronously
+				return;
+			}
+			else if (sendResult == SOCKET_ERROR)
+			{
+				if (WSAGetLastError() == WSA_IO_PENDING)
 				{
-					//LOG_TRACE_NETWORK("CXNetQoS::SendBack() - WSASend() failed with error {}", WSAGetLastError());
-					SendBackCleanup(acceptSockInfo);
+					// the operation will be completed asynchronously, don't clear memory because it will be used
 					return;
 				}
 				else
 				{
-					// the operation will be completed asynchronously, don't clear memory because it will be used
-					return;
+					// LOG_TRACE_NETWORK("{} - WSASend() failed with error {}", __FUNCTION__, WSAGetLastError());
+					break;
 				}
 			}
 		}
 		else
 		{
-			// the operation will be completed synchronously
-			return;
+			// LOG_TRACE_NETWORK("{} - Unknown data received! (wtf)", __FUNCTION__);
+			break;
 		}
-	}
-	else
-	{
-		//LOG_TRACE_NETWORK("CXNetQoS::SendBack() - Unknown data received! (wtf)");
-		SendBackCleanup(acceptSockInfo);
-		return;
-	}
+
+	} while (0);
+
+	closesocket(acceptSockInfo->Socket);
+	delete[] acceptSockInfo->DataBuf.buf;
+	delete acceptSockInfo;
+	return;
 }
 
 void CXNetQoS::Listener()
 {
-	m_listenerThreadRunning = true;
-	LOG_TRACE_NETWORK("CXNetQoS::Listener() - QoS Listener initializing.");
-
-	sockaddr_in serverAddr;
-	SecureZeroMemory(&serverAddr, sizeof(sockaddr_in));
-
-	serverAddr.sin_family = AF_INET;
-	serverAddr.sin_addr.s_addr = INADDR_ANY; // anyone can connect
-	serverAddr.sin_port = htons(H2Config_base_port + 10);
-
-	DWORD dwBytes = 0;
-	GUID GuidAcceptEx = WSAID_ACCEPTEX;
-
-	auto listener_thread_cleanup = [&, this]() -> void
+	do
+		// while (0) for the break functionality
+		// break in this context is goto cleanup; equivalent
 	{
-		if (m_ListenSocket != INVALID_SOCKET)
+		m_listenerThreadRunning = true;
+		LOG_TRACE_NETWORK("{} - QoS listener initializing", __FUNCTION__);
+
+		sockaddr_in serverAddr;
+		ZeroMemory(&serverAddr, sizeof(serverAddr));
+
+		serverAddr.sin_family = AF_INET;
+		serverAddr.sin_addr.s_addr = INADDR_ANY; // anyone can connect
+		serverAddr.sin_port = htons(H2Config_base_port + 10);
+
+		DWORD dwBytes = 0;
+		GUID GuidAcceptEx = WSAID_ACCEPTEX;
+
+		m_WsaEvents[0] = WSACreateEvent();
+		m_WsaEvents[1] = WSACreateEvent();
+		if (m_WsaEvents[0] == WSA_INVALID_EVENT
+			|| m_WsaEvents[1] == WSA_INVALID_EVENT)
 		{
-			closesocket(m_ListenSocket);
-			m_ListenSocket = INVALID_SOCKET;
+			LOG_TRACE_NETWORK("{} - failed to create listener end event handle, error: {}", __FUNCTION__, WSAGetLastError());
+			break;
 		}
 
-		WSACloseEvent(m_WsaEvent);
-		m_WsaEvent = WSA_INVALID_EVENT;
-
-		m_bStopListening = false;
-		m_listenerThreadRunning = false;
-		return;
-	};
-
-	m_ListenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-	if (m_ListenSocket == INVALID_SOCKET)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::Listener() - Listener socket creation failed.");
-		listener_thread_cleanup();
-		return;
-	}
-
-	if (bind(m_ListenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::Listener() - Unable to bind listener socket!");
-		listener_thread_cleanup();
-		return;
-	}
-
-	if (WSAIoctl(m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
-		&GuidAcceptEx, sizeof(GuidAcceptEx),
-		&lpfnAcceptEx, sizeof(lpfnAcceptEx),
-		&dwBytes, NULL, NULL) == SOCKET_ERROR)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::Listener() - failed to get AcceptEx function pointer, WSAIoctl() error: {}", WSAGetLastError());
-		listener_thread_cleanup();
-		return;
-	}
-
-	if (listen(m_ListenSocket, SOMAXCONN) == SOCKET_ERROR)
-	{
-		LOG_TRACE_NETWORK("CXNetQoS::Listener() - listen() error: {}", WSAGetLastError());
-		listener_thread_cleanup();
-		return;
-	}
-	
-	// if listen socket initialization went fine, wait for client connections
-	while (true)
-	{
-		OVERLAPPED acceptOvelapped;
-		SecureZeroMemory(&acceptOvelapped, sizeof(acceptOvelapped));
-
-		// check if we have to stop listening before re-setting WsaEvent
-		if (m_bStopListening) {
-			LOG_TRACE_NETWORK("CXNetQoS::Listener() - signaled to terminate thread, last WSAError - {}", WSAGetLastError());
-			listener_thread_cleanup();
-			return;
+		m_ListenSocket = WSASocket(serverAddr.sin_family, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+		if (m_ListenSocket == INVALID_SOCKET)
+		{
+			LOG_TRACE_NETWORK("{} - listener socket creation failed.", __FUNCTION__);
+			break;
 		}
 
-		WSAResetEvent(m_WsaEvent);
-		acceptOvelapped.hEvent = m_WsaEvent;
-		SOCKET acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
-		if (acceptSocket == INVALID_SOCKET)
+		if (bind(m_ListenSocket, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR)
 		{
-			LOG_TRACE_NETWORK("CXNetQoS::Listener() - WSASocket failed with error: {}", WSAGetLastError());
-			continue;
+			LOG_TRACE_NETWORK("{} - unable to bind listener socket!", __FUNCTION__);
+			break;
 		}
 
-		char AcceptBuffer[2 * (sizeof(sockaddr_in) + 16)];
-		if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)AcceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, NULL, &acceptOvelapped) == FALSE)
+		if (WSAIoctl(m_ListenSocket, SIO_GET_EXTENSION_FUNCTION_POINTER,
+			&GuidAcceptEx, sizeof(GuidAcceptEx),
+			&lpfnAcceptEx, sizeof(lpfnAcceptEx),
+			&dwBytes, NULL, NULL) == SOCKET_ERROR)
 		{
-			if (WSAGetLastError() != ERROR_IO_PENDING) {
-				LOG_TRACE_NETWORK("CXNetQoS::Listener() - AcceptEx failed with error: {}", WSAGetLastError());
+			LOG_TRACE_NETWORK("{} - failed to get AcceptEx function pointer, WSAIoctl() error: {}", __FUNCTION__, WSAGetLastError());
+			break;
+		}
+
+		if (listen(m_ListenSocket, SOMAXCONN) == SOCKET_ERROR)
+		{
+			LOG_TRACE_NETWORK("{} - listen() error: {}", __FUNCTION__, WSAGetLastError());
+			break;
+		}
+
+		// if listen socket initialization went fine, wait for client connections
+		while (true)
+		{
+			OVERLAPPED acceptOvelapped;
+			ZeroMemory(&acceptOvelapped, sizeof(acceptOvelapped));
+
+			acceptOvelapped.hEvent = m_WsaEvents[1];
+			SOCKET acceptSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
+			if (acceptSocket == INVALID_SOCKET)
+			{
+				LOG_TRACE_NETWORK("{} - WSASocket failed with error: {}", __FUNCTION__, WSAGetLastError());
+				continue;
+			}
+
+			char acceptBuffer[2 * (sizeof(sockaddr_in) + 16)];
+			if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)acceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, NULL, &acceptOvelapped) == FALSE)
+			{
+				if (WSAGetLastError() != ERROR_IO_PENDING) {
+					LOG_TRACE_NETWORK("{} - AcceptEx failed with error: {}", __FUNCTION__, WSAGetLastError());
+					closesocket(acceptSocket);
+					continue;
+				}
+			}
+
+			bool bConnectionInbound = false;
+
+			// Wait for AcceptEx events
+			// We use the async version of AcceptEx because we want to have the abillity to exit the thread
+			DWORD eventWaitRet;
+			do 
+				eventWaitRet = WSAWaitForMultipleEvents(ARRAYSIZE(m_WsaEvents), m_WsaEvents, FALSE, WSA_INFINITE, TRUE);
+			while (eventWaitRet == WSA_WAIT_IO_COMPLETION);
+
+			if (eventWaitRet == WSA_WAIT_FAILED)
+			{
+				LOG_TRACE_NETWORK("{} - WSAWaitForMultipleEvents() failed with error {}", __FUNCTION__, WSAGetLastError());
 				closesocket(acceptSocket);
 				continue;
 			}
-		}
-
-		bool bWaitEventSuccess = true;
-
-		// Wait for AcceptEx events
-		// We use the async version of AcceptEx because we want to have the abillity to exit the thread
-		while (true)
-		{
-			DWORD ret = WSAWaitForMultipleEvents(1, &m_WsaEvent, FALSE, WSA_INFINITE, TRUE);
-
-			if (m_bStopListening) {
-				closesocket(acceptSocket);
-				LOG_TRACE_NETWORK("CXNetQoS::Listener() - Listener thread signaled to terminate - last WSA error {}", WSAGetLastError());
-				listener_thread_cleanup();
-				return;
-			}
-
-			if (ret == WSA_WAIT_FAILED)
+			else if (eventWaitRet - WSA_WAIT_EVENT_0 == 0u)
 			{
-				LOG_TRACE_NETWORK("WSAWaitForMultipleEvents() failed with error {}", WSAGetLastError());
+				LOG_TRACE_NETWORK("{} - signaled to terminate thread, last WSAError - {}", __FUNCTION__, WSAGetLastError());
 				closesocket(acceptSocket);
-				bWaitEventSuccess = false;
 				break;
 			}
-
-			if (ret != WSA_WAIT_IO_COMPLETION)
+			else if (eventWaitRet - WSA_WAIT_EVENT_0 == 1u)
 			{
-				break;
+				// connection inbound, continue normally
+				WSAResetEvent(m_WsaEvents[1]);
+			}
+
+			LPSOCKET_INFORMATION lpSockInfo = new SOCKET_INFORMATION;
+			ZeroMemory(lpSockInfo, sizeof(SOCKET_INFORMATION));
+
+			lpSockInfo->BytesSEND = 0;
+			lpSockInfo->BytesRECV = 0;
+			lpSockInfo->Socket = acceptSocket;
+
+			// recv buffer prep
+			lpSockInfo->DataBuf.len = 4;
+			lpSockInfo->DataBuf.buf = new char[lpSockInfo->DataBuf.len];
+
+			DWORD flags = 0;
+			// LOG_TRACE_NETWORK("{} - WSARecv about to receive data on socket: {}", __FUNCTION__, acceptSocket);
+			if (WSARecv(lpSockInfo->Socket, &lpSockInfo->DataBuf, 1, NULL, &flags, &lpSockInfo->Overlapped, SendBack) == SOCKET_ERROR)
+			{
+				if (WSAGetLastError() != WSA_IO_PENDING)
+				{
+					LOG_TRACE_NETWORK("{} - WSARecv failed with error: {}", __FUNCTION__, WSAGetLastError());
+					closesocket(acceptSocket);
+					delete lpSockInfo;
+				}
 			}
 		}
 
-		if (bWaitEventSuccess == false)
-			continue;
+	} while (0);
 
-		LPSOCKET_INFORMATION lpSockInfo = new SOCKET_INFORMATION;
-		SecureZeroMemory(lpSockInfo, sizeof(SOCKET_INFORMATION));
-
-		lpSockInfo->BytesSEND = 0;
-		lpSockInfo->BytesRECV = 0;
-		lpSockInfo->Socket = acceptSocket;
-
-		// recv buffer prep
-		lpSockInfo->DataBuf.len = 4;
-		lpSockInfo->DataBuf.buf = new char[lpSockInfo->DataBuf.len];
-
-		DWORD flags = 0;
-		//LOG_TRACE_NETWORK("CXNetQoS::Listener() - WSARecv about to receive data on socket: {}", acceptSocket);
-		if (WSARecv(lpSockInfo->Socket, &lpSockInfo->DataBuf, 1, NULL, &flags, &lpSockInfo->Overlapped, SendBack) == SOCKET_ERROR)
-		{
-			if (WSAGetLastError() != WSA_IO_PENDING)
-			{
-				LOG_TRACE_NETWORK("CXNetQoS::Listener() - WSARecv failed with error: {}", WSAGetLastError());
-				closesocket(acceptSocket);
-				delete lpSockInfo;
-			}
-		}
+	// cleanup
+	if (m_ListenSocket != INVALID_SOCKET)
+	{
+		closesocket(m_ListenSocket);
+		m_ListenSocket = INVALID_SOCKET;
 	}
+
+	for (DWORD i = 0; i < ARRAYSIZE(m_WsaEvents); i++)
+	{
+		WSACloseEvent(m_WsaEvents[i]);
+		m_WsaEvents[i] = WSA_INVALID_EVENT;
+	}
+
+	m_listenerThreadRunning = false;
+	return;
 }
 
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags)
 {
-	//LOG_TRACE_NETWORK_N("XNetQosListen  (pxnkid = %X, pb = %X, cb = %d, bitsPerSec = %d, flags = %X)",
-	//	pxnkid, pb, cb, dwBitsPerSec, dwFlags);
+	LOG_TRACE_NETWORK("XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
+		cb, dwBitsPerSec, dwFlags);
+
+	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_DISABLE)) 
+	{
+		LOG_ERROR_NETWORK("{} - invalid dwFlags: cannot enable and disable.", __FUNCTION__);
+		return WSAEINVAL;
+	}
 
 	if (XNetQoS.pbData == nullptr)
 	{
 		XNetQoS.pbData = new BYTE[gXnIp.GetReqQoSBufferSize()];
-		SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+		ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_SET_DATA)
@@ -489,19 +491,19 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 		if (cb > 0)
 		{
 			if (cb > XNetQoS.cbData)
+			{
+				// cb shouldn't be higher than gXnIp.GetReqQoSBufferSize()
 				XNetQoS.cbData = cb;
+			}
 
-			SecureZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+			ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
 			memcpy(XNetQoS.pbData, pb, cb);
 		}
 	}
 
 	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && XNetQoS.IsListening() == false)
 	{
-		XNetQoS.m_WsaEvent = WSACreateEvent();
-		
-		if (XNetQoS.m_WsaEvent != WSA_INVALID_EVENT)
-			std::thread(&CXNetQoS::Listener, &XNetQoS).detach();
+		std::thread(&CXNetQoS::Listener, &XNetQoS).detach();
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_DISABLE)
@@ -511,12 +513,11 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if ((dwFlags & XNET_QOS_LISTEN_RELEASE) && XNetQoS.IsListening() != false)
 	{
-		if (XNetQoS.m_WsaEvent != WSA_INVALID_EVENT)
+		if (XNetQoS.m_WsaEvents[0] != WSA_INVALID_EVENT)
 		{
-			XNetQoS.m_bStopListening = true;
 			// signal the thread it has to unblock, and based on m_bStopListening it will decide wheter terminate the thread or not
-			WSASetEvent(XNetQoS.m_WsaEvent);
-			LOG_TRACE_NETWORK("XNetQosListen() - Listener released!");
+			WSASetEvent(XNetQoS.m_WsaEvents[0]);
+			LOG_TRACE_NETWORK("{} - listener signaled to release resources!", __FUNCTION__);
 		}
 	}
 
@@ -526,8 +527,8 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 // #70: XNetQosLookup
 DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY * apxnkey[], UINT cina, IN_ADDR aina[], DWORD adwServiceId[], UINT cProbes, DWORD dwBitsPerSec, DWORD dwFlags, WSAEVENT hEvent, XNQOS** pxnqos)
 {
-	LOG_TRACE_NETWORK("XNetQosLookup ( cxna: {0}, cina: {1}, cProbes: {2}, dwBitsPerSec: {3}, hEvent: {4})",
-		cxna, cina, cProbes, dwBitsPerSec, hEvent);
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "{} ( cxna: {}, cina: {}, cProbes: {}, dwBitsPerSec: {}, hEvent: {})",
+		__FUNCTION__, cxna, cina, cProbes, dwBitsPerSec, hEvent);
 
 	XNADDR** apxna_copy = new XNADDR*[cxna];
 	for (DWORD i = 0; i < cxna; i++)
@@ -539,7 +540,7 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];
 
 	XNQOS* pqos = *pxnqos;
-	SecureZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
+	ZeroMemory(pqos, sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1)));
 
 	pqos->cxnqos = cxna;
 	pqos->cxnqosPending = cxna;
@@ -567,6 +568,7 @@ INT WINAPI XNetQosServiceLookup(DWORD dwFlags, WSAEVENT hEvent, XNQOS** ppxnqos)
 // #72: XNetQosRelease
 INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 {
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "XNetQosRelease()");
 	for (unsigned int i = 0; i < pxnqos->cxnqos; i++)
 	{
 		// this may crash other games, doesn't for H2PC
@@ -579,11 +581,9 @@ INT WINAPI XNetQosRelease(XNQOS* pxnqos)
 	// delete[] pxnqos; 
 
 	/* We need to clean-up all XNetQoSLookup data here, listener data should be cleaned up inside the Listen function Only. */
-	LOG_TRACE_NETWORK("XNetQosRelease()");
 	return 0;
 }
 
-// TODO: Check if halo2 uses this at all and implement it.
 // #77
 DWORD WINAPI XNetQosGetListenStats(XNKID *pxnKid, XNQOSLISTENSTATS *pQosListenStats)
 {

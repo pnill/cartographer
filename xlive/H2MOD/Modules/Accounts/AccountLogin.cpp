@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
+#include "AccountLogin.h"
+
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\Startup\Startup.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Config\Config.h"
-
 
 #include "XLive\xnet\upnp.h"
 
@@ -22,24 +22,24 @@ typedef LONG NTSTATUS, *PNTSTATUS;
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
 void UpdateConnectionStatus() {
-	extern int MasterState;
-	extern char* ServerStatus;
-	if (userSignedOnline(0)) {
-		MasterState = 10;
-		if (!Memory::isDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Online");
+	extern int masterState;
+	extern char* serverStatus;
+	if (UserSignedOnline(0)) {
+		masterState = 10;
+		if (!Memory::IsDedicatedServer())
+			snprintf(serverStatus, 256, "Status: Online");
 	}
-	else if (userSignedInLocally(0))
+	else if (UserSignedInLocally(0))
 	{
-		MasterState = 2;
-		if (!Memory::isDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Locally signed in");
+		masterState = 2;
+		if (!Memory::IsDedicatedServer())
+			snprintf(serverStatus, 256, "Status: Locally signed in");
 	}
 	else
 	{
-		MasterState = 2;
-		if (!Memory::isDedicatedServer())
-			snprintf(ServerStatus, 250, "Status: Offline");
+		masterState = 2;
+		if (!Memory::IsDedicatedServer())
+			snprintf(serverStatus, 256, "Status: Offline");
 	}
 }
 
@@ -56,7 +56,7 @@ char ConfigureUserDetails(char* username, char* login_token, unsigned long long 
 	UpdateConnectionStatus();
 
 	if (onlineSignIn) {
-		if (!Memory::isDedicatedServer())
+		if (!Memory::IsDedicatedServer())
 			ForwardPorts();
 	}
 
@@ -318,9 +318,9 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (!H2IsDediServer) {
-				extern char* ServerStatus;
+				extern char* serverStatus;
 				if (result == 4) {
-					snprintf(ServerStatus, 250, "Status: Developer");
+					snprintf(serverStatus, 256, "Status: Developer");
 				}
 			}
 		}
@@ -360,7 +360,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 			GetVersionEx(&osvi);
 		}
 
-		os_string_buflen = 30;
+		os_string_buflen = 512;
 		os_string = (char*)calloc(os_string_buflen, sizeof(char));
 		snprintf(os_string, os_string_buflen, "Windows: %u.%u", osvi.dwMajorVersion, osvi.dwMinorVersion);
 	}
@@ -371,23 +371,27 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	char* escaped_user_login_token = encode_rfc3986(ltoken == 0 ? "" : ltoken);
 	char* escaped_user_identifier = encode_rfc3986(identifier == 0 ? "" : identifier);
 	char* escaped_user_password = encode_rfc3986(password == 0 ? "" : password);
-	
+
+#if !defined(LC3)
 	int http_request_body_build_len = (89 + 8 + strlen(DLL_VERSION_STR) + strlen(escaped_user_identifier) + strlen(escaped_user_password) + strlen(escaped_user_login_token) + strlen(os_string));
 	char* http_request_body_build = (char*)malloc(sizeof(char) * http_request_body_build_len + 1);
-
 	char* http_request_body_build2 = http_request_body_build + snprintf(http_request_body_build, http_request_body_build_len, http_request_body, ltoken == 0 ? 1 : 2, DLL_VERSION_STR, escaped_user_identifier, escaped_user_password, escaped_user_login_token, os_string);
+#else
+	TEST_N_DEF(LC3);
+#endif
 
 	free(os_string);
-
 	free(escaped_user_login_token);
 	free(escaped_user_identifier);
 	free(escaped_user_password);
 
-	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, rtn_result);
+#if !defined(LC2)
+	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, &rtn_result);
+#else
+	TEST_N_DEF(LC2);
+#endif
 
-	for (int i = strlen(http_request_body_build) - 1; i >= 0; i--) {
-		http_request_body_build[i] = 0;
-	}
+	SecureZeroMemory(http_request_body_build, sizeof(char) * http_request_body_build_len + 1);
 	free(http_request_body_build);
 
 	if (error_code == 0) {
@@ -397,6 +401,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 		}
 		free(rtn_result);
 	}
+
 	if (error_code < 0) {
 		addDebugText("ERROR Account Login: %d", error_code);
 
@@ -436,7 +441,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 // 5257: ??
 HRESULT WINAPI XLiveManageCredentials(LPCWSTR lpszLiveIdName, LPCWSTR lpszLiveIdPassword, DWORD dwCredFlags, PXOVERLAPPED pXOverlapped)
 {
-	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {0}, lpszLiveIdPassword = {1}, dwCredFlags = {2:#x}, pXOverlapped = {3:p})",
+	LOG_TRACE_XLIVE(L"XLiveManageCredentials (lpszLiveIdName = {}, lpszLiveIdPassword = {}, dwCredFlags = {:#x}, pXOverlapped = {:p})",
 		lpszLiveIdName, lpszLiveIdPassword, dwCredFlags, (void*)pXOverlapped);
 
 	if (pXOverlapped)
@@ -458,19 +463,22 @@ HRESULT WINAPI XLiveSignin(PWSTR pszLiveIdName, PWSTR pszLiveIdPassword, DWORD d
 	addDebugText("Logging the Dedi Server in...");
 
 	// clear LAN login info if we are logged in locally
-	if (userSignedInLocally(0))
+	if (UserSignedInLocally(0))
 	{
 		XUserSignOut(0);
 	}
 
 	// if we are not signed in online, sign us in
-	if (!userSignedOnline(0))
+	if (!UserSignedOnline(0))
 	{
 		//none of that stuff is setup for the dedi server yet since there are no gui commands for it.
 		//currently credentials are taken from the config file.
 		//also don't enable this since nothing's initialised for the server.
 		addDebugText("Signing in dedicated server online.");
-		HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr);
+		if (HandleGuiLogin(0, H2Config_login_identifier, H2Config_login_password, nullptr))
+		{
+			XUserSignInSetStatusChanged(0);
+		}
 	}
 	
 	if (pOverlapped)

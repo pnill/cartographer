@@ -3,11 +3,11 @@ namespace SpecialEvents
 {
 	enum e_event_type
 	{
-		e_none,
-		e_christmas,
-		e_st_paddys,
-		e_mook_maddness,
-		e_halloween
+		_no_event,
+		_christmas,
+		_st_paddys,
+		_mook_maddness,
+		_halloween
 	};
 	e_event_type getCurrentEvent();
 	void ChristmasOnMapLoad();

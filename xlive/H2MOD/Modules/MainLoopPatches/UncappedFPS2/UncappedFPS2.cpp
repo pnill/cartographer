@@ -2,7 +2,7 @@
 
 #include "UncappedFPS2.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Util\Hooks\Hook.h"
 
@@ -12,19 +12,19 @@ static float gameEffectsUnknownValue = 30.f;
 
 void UncappedFPS2::OnGameLifeCycleChange(e_game_life_cycle state)
 {
-	switch(state)
+	switch (state)
 	{
-		case life_cycle_pre_game:
-			gameEffectsUnknownValue = 30.f;
-			WriteBytes(Memory::GetAddress(0x9355C), toggleZoom, 4);
-			break;
-		case life_cycle_in_game:
-			time_globals* timeGlobals = time_globals::get();
-			gameEffectsUnknownValue = timeGlobals->ticks_per_second;
-			WriteValue<BYTE>(Memory::GetAddress(0x7C389), (BYTE)timeGlobals->ticks_per_second);
-			WritePointer(Memory::GetAddress(0x104950), &gameEffectsUnknownValue);
-			NopFill(Memory::GetAddress(0x9355C), 4);
-			break;
+	case _life_cycle_pre_game:
+		gameEffectsUnknownValue = 30.f;
+		WriteBytes(Memory::GetAddress(0x9355C), toggleZoom, 4);
+		break;
+	case _life_cycle_in_game:
+		time_globals* timeGlobals = time_globals::get();
+		gameEffectsUnknownValue = timeGlobals->ticks_per_second;
+		WriteValue<BYTE>(Memory::GetAddress(0x7C389), (BYTE)timeGlobals->ticks_per_second);
+		WritePointer(Memory::GetAddress(0x104950), &gameEffectsUnknownValue);
+		NopFill(Memory::GetAddress(0x9355C), 4);
+		break;
 	}
 }
 

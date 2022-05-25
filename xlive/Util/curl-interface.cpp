@@ -8,9 +8,14 @@
 #pragma comment(lib, "libcurl_a.lib")
 #endif
 
-CURL* curl_interface_init_no_ssl()
+CURL* curl_interface_init()
 {
-	CURL* curl = curl_easy_init();
+	return curl_easy_init();
+}
+
+CURL* curl_interface_init_no_verify()
+{
+	CURL* curl = curl_interface_init();
 	if (curl != nullptr)
 	{
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);

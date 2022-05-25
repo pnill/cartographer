@@ -12,7 +12,7 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 bool signInChanged[4];
 XUSER_SIGNIN_INFO usersSignInInfo[4];
 
-bool signInStatusChanged()
+bool SignInStatusChanged()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -22,7 +22,7 @@ bool signInStatusChanged()
 	return false;
 }
 
-bool userSignedIn(DWORD dwUserIndex)
+bool UserSignedIn(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally
 		|| usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
@@ -31,8 +31,7 @@ bool userSignedIn(DWORD dwUserIndex)
 	return false;
 }
 
-
-bool userSignedInLocally(DWORD dwUserIndex)
+bool UserSignedInLocally(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInLocally)
 		return true;
@@ -40,7 +39,7 @@ bool userSignedInLocally(DWORD dwUserIndex)
 	return false;
 }
 
-bool userSignedOnline(DWORD dwUserIndex)
+bool UserSignedOnline(DWORD dwUserIndex)
 {
 	if (usersSignInInfo[dwUserIndex].UserSigninState == eXUserSigninState_SignedInToLive)
 		return true;
@@ -69,7 +68,10 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnad
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
 	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
+}
 
+void XUserSignInSetStatusChanged(DWORD dwUserIndex)
+{
 	signInChanged[dwUserIndex] = true;
 }
 
@@ -91,17 +93,11 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	static int print = 0;
-	if (print < 15)
-	{
-		LOG_TRACE_XLIVE("XUserGetXUID()");
-
-		print++;
-	}
+	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XUserGetXUID()");
 
 	memset(pXuid, 0, sizeof(XUID));
 
-	if (!userSignedIn(dwUserIndex))
+	if (!UserSignedIn(dwUserIndex))
 		return ERROR_NOT_LOGGED_ON;
 
 	*pXuid = usersSignInInfo[dwUserIndex].xuid;
@@ -112,8 +108,6 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 // #5262: XUserGetSigninState
 XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 {
-	static int print = 0;
-
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
@@ -123,24 +117,22 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 	{
 	case eXUserSigninState_SignedInToLive:
 		ret = eXUserSigninState_SignedInToLive;
-		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Online");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Online");
 		break;
 
 	case eXUserSigninState_SignedInLocally:
 		ret = eXUserSigninState_SignedInLocally;
-		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Local profile");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Local profile");
 		break;
 
 	case eXUserSigninState_NotSignedIn:
 		ret = eXUserSigninState_NotSignedIn;
-		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninState() - Not signed in");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninState() - Not signed in");
 		break;
 
 	default:
 		ret = eXUserSigninState_NotSignedIn;
 	}
-
-	print++;
 
 	return ret;
 }
@@ -157,17 +149,14 @@ DWORD WINAPI XUserGetName(DWORD dwUserIndex, LPSTR szUserName, DWORD cchUserName
 		dwUserIndex = 0;
 
 	if (usersSignInInfo[dwUserIndex].UserSigninState != eXUserSigninState_NotSignedIn)
-		strncpy_s(szUserName, cchUserName, usersSignInInfo[dwUserIndex].szUserName, strnlen_s(usersSignInInfo[dwUserIndex].szUserName, XUSER_MAX_NAME_LENGTH));
-	else
-		return ERROR_NOT_LOGGED_ON;
-
-	if (print < 15)
 	{
-		LOG_TRACE_XLIVE("XUserGetName  (userIndex = {0}, userName = {1}, cchUserName = {2})", dwUserIndex, szUserName, cchUserName);
-		print++;
-	}
+		strncpy_s(szUserName, cchUserName, usersSignInInfo[dwUserIndex].szUserName, strnlen_s(usersSignInInfo[dwUserIndex].szUserName, XUSER_MAX_NAME_LENGTH));
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetName  (userIndex = {}, userName = {}, cchUserName = {})", dwUserIndex, szUserName, cchUserName);
 
-	return ERROR_SUCCESS;
+		return ERROR_SUCCESS;
+	}
+	
+	return ERROR_NOT_LOGGED_ON;
 }
 
 // #5267: XUserGetSigninInfo
@@ -196,7 +185,7 @@ int WINAPI XUserGetSigninInfo(DWORD dwUserIndex, DWORD dwFlags, PXUSER_SIGNIN_IN
 	}
 	else
 	{
-		if (print < 15) LOG_TRACE_XLIVE("XUserGetSigninInfo() - Not signed in");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserGetSigninInfo() - Not signed in");
 		return ERROR_NO_SUCH_USER;
 	}
 }
@@ -211,40 +200,29 @@ int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidC
 // #5265: XUserCheckPrivilege
 DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeType, PBOOL pfResult)
 {
-	static int print = 0;
-
-	if (print < 15)
+	switch (privilegeType)
 	{
-		LOG_TRACE_XLIVE("XUserCheckPrivilege  (userIndex = {}, privilegeType = {})",
-			dwUserIndex, 
-			privilegeType);
+	case XPRIVILEGE_COMMUNICATIONS:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - COMMUNICATIONS");
+		break;
 
-		switch (privilegeType)
-		{
-		case XPRIVILEGE_COMMUNICATIONS:
-			LOG_TRACE_XLIVE(" - COMMUNICATIONS");
-			break;
+	case XPRIVILEGE_MULTIPLAYER_SESSIONS:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - MULTIPLAYER_SESSIONS");
+		break;
 
-		case XPRIVILEGE_MULTIPLAYER_SESSIONS:
-			LOG_TRACE_XLIVE(" - MULTIPLAYER_SESSIONS");
-			break;
+	case XPRIVILEGE_PROFILE_VIEWING:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PROFILE_VIEWING");
+		break;
 
-		case XPRIVILEGE_PROFILE_VIEWING:
-			LOG_TRACE_XLIVE("- PROFILE_VIEWING");
-			break;
+	case XPRIVILEGE_PRESENCE:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PRESCENCE");
 
-		case XPRIVILEGE_PRESENCE:
-			LOG_TRACE_XLIVE("- PRESCENCE");
+	case XPRIVILEGE_USER_CREATED_CONTENT:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - USER_CREATED_CONTENT");
 
-		case XPRIVILEGE_USER_CREATED_CONTENT:
-			LOG_TRACE_XLIVE("- USER_CREATED_CONTENT");
-
-		default:
-			LOG_TRACE_XLIVE("- UNKNOWN PRIVILEGE");
-			break;
-		}
-
-		print++;
+	default:
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - UNKNOWN PRIVILEGE");
+		break;
 	}
 
 	if (pfResult) {
@@ -431,7 +409,7 @@ std::wstring XProfileSettingIdToString(DWORD settingId)
 	case 0x3FFE: return L"XPROFILE_TITLE_SPECIFIC2";
 	case 0x3FFD: return L"XPROFILE_TITLE_SPECIFIC3";
 	
-	default: return L"Unknown";
+	default: return L"<unknown>";
 	}
 }
 
@@ -445,14 +423,13 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	if (dwUserIndex != 0)
 		dwUserIndex = 0;
 
-	if (!userSignedOnline(dwUserIndex))
+	if (!UserSignedOnline(dwUserIndex))
 		return ERROR_NOT_FOUND;
 
 	BOOL async;
 
 	if (pOverlapped)
 		async = TRUE;
-
 	else
 		async = FALSE;
 
@@ -503,7 +480,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 		pResults->pSettings = (XUSER_PROFILE_SETTING *)((BYTE *)pResults + sizeof(XUSER_READ_PROFILE_SETTING_RESULT));
 
 		XUSER_PROFILE_SETTING* profileSettings = pResults->pSettings;
-		BYTE* pSettingData = (BYTE*)profileSettings + dwNumSettingIds * sizeof(XUSER_PROFILE_SETTING);
+		BYTE* pSettingData = (BYTE*)profileSettings + (dwNumSettingIds * sizeof(XUSER_PROFILE_SETTING));
 
 		// read data values
 		for (DWORD lcv = 0; lcv < dwNumSettingIds; lcv++)
@@ -647,7 +624,7 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 		size = (pSettings[lcv].dwSettingId >> 16) & 0xFFF;
 		id = (pSettings[lcv].dwSettingId >> 0) & 0x3FFF;
 
-		LOG_TRACE_XLIVE("- [{}] source = {}, id = {:x}, type = {}, size = {:x}, sub-id = {:x}, type2 = {}",
+		LOG_TRACE_XLIVE("- {} source = {}, id = {:x}, type = {}, size = {:x}, sub-id = {:x}, type2 = {}",
 			lcv,
 			pSettings[lcv].source,
 			pSettings[lcv].dwSettingId,

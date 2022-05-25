@@ -1,15 +1,16 @@
 #include "stdafx.h"
 
 #include "ConsoleCommands.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+
+#include "H2MOD\Engine\Engine.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\ServerConsole\ServerConsole.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\ServerConsole.h"
+#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Modules\Utils\Utils.h"
+#include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Variants\GunGame\GunGame.h"
 
@@ -358,15 +359,15 @@ void ConsoleCommands::checkForIds() {
 	}
 }
 
-void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
+void ConsoleCommands::spawn(datum object_idx, int count, float x, float y, float z, float randomMultiplier, bool specificPosition, bool sameTeam) {
 
 	for (int i = 0; i < count; i++) {
 		try {
 			s_object_placement_data nObject;
 
-			if (!DATUM_IS_NONE(object_datum)) {
-				datum player_datum = s_player::getPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
-				EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, player_datum, 0);
+			if (!DATUM_IS_NONE(object_idx)) {
+				datum player_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
+				Engine::Objects::create_new_placement_data(&nObject, object_idx, player_datum, 0);
 				real_point3d* player_position = h2mod->get_player_unit_coords(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)));
 
 				if (player_position != nullptr) {
@@ -383,9 +384,9 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 				if (!sameTeam)
 					nObject.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_datum, nObject.position.x, nObject.position.y, nObject.position.z);
-				unsigned int object_gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
-				call_add_object_to_sync(object_gamestate_datum);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, nObject.position.x, nObject.position.y, nObject.position.z);
+				datum object_gamestate_datum = Engine::Objects::object_new(&nObject);
+				Engine::Objects::simulation_action_object_create(object_gamestate_datum);
 			}
 		}
 		catch (...) {
@@ -394,12 +395,12 @@ void ConsoleCommands::spawn(datum object_datum, int count, float x, float y, flo
 	}
 }
 
-void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z, float i, float j, float k)
+void ConsoleCommands::spawn_rotate(datum object_idx, float x, float y, float z, float i, float j, float k)
 {
 	s_object_placement_data nObject;
-	if(!DATUM_IS_NONE(object_datum))
+	if (!DATUM_IS_NONE(object_idx))
 	{
-		EngineCalls::Objects::create_new_placement_data(&nObject, object_datum, -1, 0);
+		Engine::Objects::create_new_placement_data(&nObject, object_idx, -1, 0);
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, real_point3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 		nObject.position.x = x;
@@ -407,21 +408,21 @@ void ConsoleCommands::spawn_rotate(datum object_datum, float x, float y, float z
 		nObject.position.z = z;
 		real_vector3d rotation{ i = i, j = j, k = k };
 		set_orientation(&nObject.orientation, &nObject.up, &rotation);
-		auto gamestate_datum = EngineCalls::Objects::call_object_new(&nObject);
-		EngineCalls::Objects::call_add_object_to_sync(gamestate_datum);
+		auto gamestate_datum = Engine::Objects::object_new(&nObject);
+		Engine::Objects::simulation_action_object_create(gamestate_datum);
 		output(L"Spawned object: ");
 		output(IntToWString<unsigned int>(gamestate_datum, std::hex));
 	}
 }
 void ConsoleCommands::delete_object(datum object_datum)
 {
-	if(!DATUM_IS_NONE(object_datum))
+	if (!DATUM_IS_NONE(object_datum))
 	{
-		EngineCalls::Objects::object_destroy(object_datum);
+		Engine::Objects::object_destroy(object_datum);
 	}
 }
 void ConsoleCommands::output(std::wstring result) {
-	if (Memory::isDedicatedServer()) {
+	if (Memory::IsDedicatedServer()) {
 		result = result + L"\n";
 		ServerConsole::logToDedicatedServerConsole(result.c_str());
 	}
@@ -464,7 +465,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid command, usage - $reloadMaps");
 				return;
 			}
-			mapManager->reloadAllMaps();
+			mapManager->ReloadAllMaps();
 		}
 		else if (firstCommand == "$help") {
 			output(L"reloadMaps");
@@ -485,7 +486,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		else if (firstCommand == "$mapfilename")
 		{
 			std::wstring map_file_name;
-			mapManager->getMapFilename(map_file_name);
+			mapManager->GetMapFilename(map_file_name);
 			output(map_file_name);
 			return;
 		}
@@ -494,18 +495,18 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid download map command, usage - $downloadMap MAP_NAME");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost())
+			if (!NetworkSession::LocalPeerIsSessionHost())
 			{
 				output(L"Cannot download map using command while not being the session host!");
 				return;
 			}
 			std::string firstArg = splitCommands[1];
-			auto downloadQuery = mapManager->addDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
+			auto downloadQuery = mapManager->AddDownloadQuery(std::wstring(firstArg.begin(), firstArg.end()));
 			downloadQuery->StartMapDownload(); // since we have the map name, start the download
 			return;
 		}
 		else if (firstCommand == "$kick") {
-			if (Memory::isDedicatedServer()) {
+			if (Memory::IsDedicatedServer()) {
 				output(L"Don't use this on dedis");
 				return;
 			}
@@ -513,7 +514,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Invalid kick command, usage - $kick PEER_INDEX");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only the server can kick players");
 				return;
 			}
@@ -522,32 +523,32 @@ void ConsoleCommands::handle_command(std::string command) {
 
 			if (isNum(firstArg.c_str())) {
 				int peerIndex = atoi(firstArg.c_str());
-				if (peerIndex == NetworkSession::getCurrentNetworkSession()->session_host_peer_index) {
+				if (peerIndex == NetworkSession::GetCurrentNetworkSession()->session_host_peer_index) {
 					output(L"Don't kick yourself");
 					return;
 				}
-				if (peerIndex >= NetworkSession::getPeerCount()) {
+				if (peerIndex >= NetworkSession::GetPeerCount()) {
 					output(L"Peer at the specified index doesn't exist");
 					return;
 				}
-				NetworkSession::kickPeer(peerIndex);
+				NetworkSession::KickPeer(peerIndex);
 			}
 			return;
 		}
 		else if (firstCommand == "$logplayers") {
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can log player information.");
 				return;
 			}
-			NetworkSession::logPlayersToConsole();
+			NetworkSession::LogPlayersToConsole();
 			return;
 		}
 		else if (firstCommand == "$logpeers") {
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can log peer information.");
 				return;
 			}
-			NetworkSession::logPeersToConsole();
+			NetworkSession::LogPeersToConsole();
 			return;
 		}
 		else if (firstCommand == "$maxplayers") {
@@ -555,7 +556,7 @@ void ConsoleCommands::handle_command(std::string command) {
 				output(L"Usage: $maxplayers value (betwen 1 and 16).");
 				return;
 			}
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can be only used while hosting.");
 				return;
 			}
@@ -568,12 +569,12 @@ void ConsoleCommands::handle_command(std::string command) {
 					output(L"The value needs to be between 1 and 16.");
 					return;
 				}
-				if (maxPlayersToSet < NetworkSession::getPlayerCount()) {
+				if (maxPlayersToSet < NetworkSession::GetPlayerCount()) {
 					output(L"You can't set a value of max players smaller than the actual number of players on the server.");
 					return;
 				}
 				else {
-					NetworkSession::getCurrentNetworkSession()->parameters.max_party_players = maxPlayersToSet;
+					NetworkSession::GetCurrentNetworkSession()->parameters[0].max_party_players = maxPlayersToSet;
 					output(L"Maximum players set.");
 					return;
 				}
@@ -591,13 +592,13 @@ void ConsoleCommands::handle_command(std::string command) {
 				return;
 			}
 
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				//TODO: need a nicer way to detect this for dedis
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
+			if (!NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;
@@ -644,24 +645,24 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$ishost") {
-			s_network_session* session = NetworkSession::getCurrentNetworkSession();
+			s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 			std::wstring isHostStr = L"isHost=";
 			DWORD isHostByteValue = session->local_session_state;
 			std::wostringstream ws;
 			ws << isHostByteValue;
 			const std::wstring s(ws.str());
-			isHostStr += (NetworkSession::localPeerIsSessionHost() ? L"yes" : L"no");
+			isHostStr += (NetworkSession::LocalPeerIsSessionHost() ? L"yes" : L"no");
 			isHostStr += L", value=";
 			isHostStr += s;
 			output(isHostStr);
 			return;
 		}
 		else if (firstCommand == "$leavegame") {
-			h2mod->leave_session();
+			NetworkSession::LeaveSession();
 			return;
 		}
 		else if (firstCommand == "$xyz") {
-			if (h2mod->GetEngineType() == e_engine_type::Multiplayer && !NetworkSession::localPeerIsSessionHost()) {
+			if (h2mod->GetEngineType() == e_engine_type::_multiplayer && !NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Only host can see xyz for now...");
 				return;
 			}
@@ -669,19 +670,19 @@ void ConsoleCommands::handle_command(std::string command) {
 			displayXyz = !displayXyz;
 			return;
 		}
-		
+
 		else if (firstCommand == "$spawn") {
 			if (splitCommands.size() != 7) {
 				output(L"Invalid command, usage $spawn command_name count x y z same_team");
 				return;
 			}
 
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can only be used by the session host!");
 				return;
 			}
@@ -710,23 +711,23 @@ void ConsoleCommands::handle_command(std::string command) {
 			bool sameTeam = false;
 			if (splitCommands[6] == "true")
 				sameTeam = true;
-			
+
 			this->spawn(object_datum, count, x, y, z, 1.0f, true, sameTeam);
 			return;
 		}
 		else if (firstCommand == "$spawn_rotate")
 		{
-			if(splitCommands.size() != 8)
+			if (splitCommands.size() != 8)
 			{
 				output(L"Invalid command, usage $spawn_rotate object_id x y z i j k");
 				return;
 			}
-			if (h2mod->GetEngineType() == e_engine_type::MainMenu) {
+			if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 				output(L"Can only be used ingame");
 				return;
 			}
 
-			if (!NetworkSession::localPeerIsSessionHost()) {
+			if (!NetworkSession::LocalPeerIsSessionHost()) {
 				output(L"Can only be used by the session host!");
 				return;
 			}
@@ -761,7 +762,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$destroy_object")
 		{
-			if(splitCommands.size() != 2)
+			if (splitCommands.size() != 2)
 			{
 				output(L"Invalid usage, usage $destroy_object datum");
 				return;
@@ -802,11 +803,11 @@ void ConsoleCommands::handle_command(std::string command) {
 			return;
 		}
 		else if (firstCommand == "$lognetworksessionoffsets") {
-			NetworkSession::logStructureOffsets();
+			NetworkSession::LogStructureOffsets();
 			return;
 		}
 		else if (firstCommand == "$requestfilename") {
-			CustomPackets::sendRequestMapFilename(NONE);
+			NetworkMessage::SendRequestMapFilename(NONE);
 		}
 		else if (firstCommand == "$warpfix") {
 			if (splitCommands.size() != 2 && !splitCommands[1].empty()) {
@@ -842,7 +843,7 @@ void ConsoleCommands::handle_command(std::string command) {
 		}
 		else if (firstCommand == "$injecttag")
 		{
-			if (!NetworkSession::localPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::SinglePlayer)
+			if (!NetworkSession::LocalPeerIsSessionHost() && h2mod->GetEngineType() != e_engine_type::_single_player)
 			{
 				output(L"Can only be used by the session host!");
 				return;

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "MeleeFix.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 #include "Blam\Enums\HaloStrings.h"
-#include "H2MOD\Modules\Startup\Startup.h"
+#include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\GamePhysics\MeleeLunge.h"
 
 #include <float.h>
@@ -18,7 +18,7 @@ namespace MeleeFix
 {
 	void MeleeCollisionPatch()
 	{
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			/*
 				.text:007C3027 148 E8 C1 73 F8 FF       call    collision_test_vector ; Call Procedure
 				.text:007C302C 148 83 C4 18             add     esp, 18h        ; Add
@@ -125,18 +125,18 @@ namespace MeleeFix
 				float tolerance = 0.1f;
 				//This is to calculate how many frames before and after the action frame a melee should be possible..
 				float leeway = (float)(biped_melee_info->max_animation_range) * tolerance / 2;
-				LOG_INFO_GAME("[MeleeFix] Frame Data: Current Frame {} Action Frame {} Leeway {}", currentFrame, actionFrame, leeway);
+				LOG_TRACE_GAME("[MeleeFix] Frame Data: Current Frame {} Action Frame {} Leeway {}", currentFrame, actionFrame, leeway);
 
 				if (currentFrame >= actionFrame - leeway && currentFrame <= actionFrame + leeway)
 				{
 					melee_damage(object_index, melee_type, biped_melee_info->field_30, (float)(unsigned __int8)biped_melee_info->field_31 * 0.0039215689);
 					if (MeleeHit) 
 					{
-						LOG_INFO_GAME("[MeleeFix] Melee Hit!");
+						LOG_TRACE_GAME("[MeleeFix] Melee Hit!");
 					}
 					else 
 					{
-						LOG_INFO_GAME("[MeleeFix] Melee Missed!");
+						LOG_TRACE_GAME("[MeleeFix] Melee Missed!");
 					}
 				}
 			}
@@ -150,7 +150,7 @@ namespace MeleeFix
 			if (melee_type == HaloString::HS_MELEE_DASH || melee_type == HaloString::HS_MELEE_DASH_AIRBORNE)
 			{
 				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
-				signed int melee_max_ticks = time_globals::seconds_to_ticks_impercise(melee_max_duration);
+				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;
 			}

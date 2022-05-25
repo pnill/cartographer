@@ -3,13 +3,47 @@
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
+#include "Blam\Engine\Networking\Session\NetworkSession.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
-const char* network_bandwidth_measurement_unit[] =
+// converts the ammount of bytes to the appropriate measurement unit and gets the units description string
+net_bandwidth_display_data get_net_bandwidth_display_data(unsigned int bytes_count)
 {
-	"byte(s)",
-	"kbyte(s)"
-};
+	static const char* network_bandwidth_measurement_unit[] =
+	{
+		"byte(s)",
+		"kbyte(s)",
+		"mbytes(s)",
+		"gbytes(s)",
+		"<unknown>",
+	};
+
+	net_bandwidth_display_data result = { -1.0f, network_bandwidth_measurement_unit[4] };
+
+	if (bytes_count >= 1000000000u)
+	{
+		result.val = (float)bytes_count / 1000000000.f;
+		result.unit_str = network_bandwidth_measurement_unit[3];
+	}
+	else if (bytes_count >= 1000000u)
+	{
+		result.val = (float)bytes_count / 1000000.f;
+		result.unit_str = network_bandwidth_measurement_unit[2];
+	}
+	else if (bytes_count >= 1000u)
+	{
+		result.val = (float)bytes_count / 1000.f;
+		result.unit_str = network_bandwidth_measurement_unit[1];
+	}
+	else
+	{
+		result.val = (float)bytes_count;
+		result.unit_str = network_bandwidth_measurement_unit[0];
+	}
+
+	return result;
+}
 
 void ShowNetworkStatsOverlay(bool* p_open)
 {
@@ -51,6 +85,20 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		ImGui::Text("Network stats overlay\n");
 		ImGui::Separator();
 
+		s_network_session* session;
+		if (NetworkSession::GetCurrentNetworkSession(&session))
+		{
+			ImGui::Text("Network protocol: %s", session->get_game_network_protocol());
+		}
+		else
+		{
+			ImGui::Text("Network protocol: <disconnected>");
+		}
+
+		unsigned long long network_time = *Memory::GetAddressRelative<unsigned long long*>(0x879E98);
+
+		ImGui::Text("Network time: %llu msec", network_time);
+
 		XnIp* localIp = gXnIp.GetLocalUserXn();
 
 		if (localIp->bValid)
@@ -58,42 +106,44 @@ void ShowNetworkStatsOverlay(bool* p_open)
 			const XnIpPckTransportStats* local_user_net_metrics;
 			localIp->PckGetStats(&local_user_net_metrics);
 			
-			localIp->pckStats.PckStatsUpdate();
+			localIp->pckStats.PckDataSampleUpdate();
 
 			int currentSentPerSecIdx = local_user_net_metrics->pckCurrentSendPerSecIdx;
 			int currentRecvdPerSecIdx = local_user_net_metrics->pckCurrentRecvdPerSecIdx;
 
-			if (currentSentPerSecIdx != -1 && currentRecvdPerSecIdx != -1)
+			if (currentSentPerSecIdx != -1)
 			{
-				ImGui::Text("Network pck xmit:  %d pck/s", local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx]);
-				ImGui::Text("Network pck recvd: %d pck/s", local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx]);
+				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx]);
 
-				bool use_kbyte_bytes_sent = local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx] > 1000;
-				bool use_kbyte_bytes_recvd = local_user_net_metrics->pckBytesRecvdPerSec[currentRecvdPerSecIdx] > 1000;
+				ImGui::Text("Network pck xmit:  %d pck/s", 
+					local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx]);
+				ImGui::Text("Network pck bandwidth xmit:  %.3g %s/s", 
+					bandwidth_usage.val, bandwidth_usage.unit_str);
+			}
 
-				// TODO measurement unit improvements
-				float xmit_per_sec_in_var_units = local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx];
-				if (use_kbyte_bytes_sent)
-					xmit_per_sec_in_var_units = (float)local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx] / 1000.f;
+			if (currentRecvdPerSecIdx != -1)
+			{
+				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesRecvdPerSec[currentRecvdPerSecIdx]);
 
-				float bytes_recvd_in_var_units = local_user_net_metrics->pckBytesRecvdPerSec[currentSentPerSecIdx];
-				if (use_kbyte_bytes_recvd)
-					bytes_recvd_in_var_units = (float)local_user_net_metrics->pckBytesRecvdPerSec[currentSentPerSecIdx] / 1000.f;
-
-				ImGui::Text("Network pck bandwidth xmit:  %.3g %s/s", xmit_per_sec_in_var_units, network_bandwidth_measurement_unit[use_kbyte_bytes_sent]);
-				ImGui::Text("Network pck bandwidth recvd: %.3g %s/s", bytes_recvd_in_var_units, network_bandwidth_measurement_unit[use_kbyte_bytes_recvd]);
+				ImGui::Text("Network pck recvd: %d pck/s", 
+					local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx]);
+				ImGui::Text("Network pck bandwidth recvd: %.3g %s/s", 
+					bandwidth_usage.val, bandwidth_usage.unit_str);
 			}
 		}
 
-		if (ImGui::BeginPopupContextWindow())
+		if (window_flags & ImGuiWindowFlags_NoMouseInputs)
 		{
-			if (ImGui::MenuItem("Custom", NULL, corner == -1)) corner = -1;
-			if (ImGui::MenuItem("Top-left", NULL, corner == 0)) corner = 0;
-			if (ImGui::MenuItem("Top-right", NULL, corner == 1)) corner = 1;
-			if (ImGui::MenuItem("Bottom-left", NULL, corner == 2)) corner = 2;
-			if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
-			if (p_open && ImGui::MenuItem("Close")) *p_open = false;
-			ImGui::EndPopup();
+			if (ImGui::BeginPopupContextWindow())
+			{
+				if (ImGui::MenuItem("Custom", NULL, corner == -1)) corner = -1;
+				if (ImGui::MenuItem("Top-left", NULL, corner == 0)) corner = 0;
+				if (ImGui::MenuItem("Top-right", NULL, corner == 1)) corner = 1;
+				if (ImGui::MenuItem("Bottom-left", NULL, corner == 2)) corner = 2;
+				if (ImGui::MenuItem("Bottom-right", NULL, corner == 3)) corner = 3;
+				if (p_open && ImGui::MenuItem("Close")) *p_open = false;
+				ImGui::EndPopup();
+			}
 		}
 	}
 

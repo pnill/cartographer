@@ -5,6 +5,7 @@
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Util\Hooks\Hook.h"
 
+#if !defined(_CARTOGRAPHER_DLL_CONF)
 // DO NOT USE VERSIONS ABOVE USHORT_MAX - 1 (above 65534) OR BELLOW 0 
 // REPLACE THE DEFAULTS FOR BOTH EXECUTABLE_VERSION AND COMPATIBLE_VERSION WITH THE SAME VALUE FOR THE MOST PART
 // OR YOU CAN SET THE COMPATIBLE VERSION HIGHER IF YOU WANT TO ALLOW OLDER VERSIONS TO JOIN (EXECUTABLE_VERSION SHOULD NOT BE ABOVE IT)
@@ -18,10 +19,11 @@ static_assert(COMPATIBLE_VERSION < 65535 && COMPATIBLE_VERSION > 0, "COMPATIBLE_
 // DO NOT CHANGE, DO NOT USE TYPES ABOVE 7 OR BELLOW 0 (3 bits values max)
 #define EXECUTABLE_TYPE 4
 static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VALUE EXCEEDS 7 OR BELLOW 0");
+#endif
 
 namespace EngineHooks
 {
-	static e_game_life_cycle previousGamestate = life_cycle_none;
+	static e_game_life_cycle previousGamestate = _life_cycle_none;
 
 	game_life_cycle_update p_game_life_cycle_update;
 	void GameLifeCycleUpdate()
@@ -80,7 +82,7 @@ namespace EngineHooks
 
 		/*Game Version Hooks*/
 		p_get_game_version = (get_game_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)get_game_version_hook, 8);
-		if (!Memory::isDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) {
 			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
 			p_verify_executable_version = (verify_executable_type)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 		}

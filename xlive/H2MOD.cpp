@@ -1,19 +1,23 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
+#include "Blam\Enums\HaloStrings.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "Blam\Engine\FileSystem\FiloInterface.h"
+#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
+#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
 #include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\EngineCalls\EngineCalls.h"
+#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
-#include "H2MOD\Modules\AdvLobbySettings\AdvLobbySettings.h"
-#include "H2MOD\Modules\Config\Config.h"
+#include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
@@ -29,8 +33,6 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\Networking\CustomPackets\CustomPackets.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
@@ -51,55 +53,39 @@
 #endif
 
 H2MOD* h2mod = new H2MOD();
-GunGame* gunGame = new GunGame();
-DeviceShop* device_shop = new DeviceShop();
-Infection* infectionHandler = new Infection();
-FireFight* fireFightHandler = new FireFight();
-HeadHunter* headHunterHandler = new HeadHunter();
-VariantPlayer* variant_player = new VariantPlayer();
-AdvLobbySettings* advLobbySettings = new AdvLobbySettings();
 
 extern int H2GetInstanceId();
 
 bool b_H2X = false;
-bool b_GunGame = false;
-bool b_FireFight = false;
 bool b_XboxTick = false;
-bool b_Infection = false;
-bool b_HeadHunter = false;
 
 // TODO: remove these
 s_data_array* game_state_actors = nullptr;
 
-std::unordered_map<wchar_t*, bool&> GametypesMap
+std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
-	{ L"gungame", b_GunGame },
-	{ L"zombies", b_Infection },
-	{ L"infection", b_Infection },
-	{ L"wareconomy", b_FireFight },
-	{ L"headhunter", b_HeadHunter },
-	{ L"graverobber", b_HeadHunter }
 };
-
-
 
 #pragma region engine calls
 
+TEST_N_DEF(PC1);
+
 // Used to get damage on any object
-typedef void(__cdecl* p_object_cause_damage)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
-p_object_cause_damage c_object_cause_damage;
+typedef void(__cdecl* object_cause_damage_t)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
+object_cause_damage_t p_object_cause_damage;
 
 // Engine call to set damage applied on an object by a projectile
 void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7)
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
-	if (b_Infection) {
+	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
 		if (!DATUM_IS_NONE(damage_data->creator_datum) && damage_data->field_10 != -1)
 		{
 			LOG_TRACE_GAME(
 				"{} {} {} {} {} {} {} {}",
+				__FUNCTION__,
 				damage_data->flags,
 				IntToString<int>(damage_data->damage_tag_index, std::hex),
 				IntToString<int>(damage_data->creator_datum, std::hex),
@@ -110,7 +96,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 				IntToString<int>(damage_data->field_24, std::hex),
 				IntToString<int>(damage_data->field_28, std::hex)
 			);
-			c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+			p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 		}
 		else
 		{
@@ -120,24 +106,8 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 	else
 	{
 		//Calls basic engine function when not in zombies game
-		c_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
+		p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 	}
-}
-
-//TODO: Document what entity datum is used for
-int __cdecl call_entity_datum_to_gamestate_datum(int entity_datum)
-{
-	typedef int(__cdecl *entity_datum_to_gamestate_datum)(int entity_datum);
-	entity_datum_to_gamestate_datum pentity_datum_to_gamestate_datum = (entity_datum_to_gamestate_datum)Memory::GetAddress(0x1F2211);
-	return pentity_datum_to_gamestate_datum(entity_datum);
-}
-
-bool __cdecl call_add_object_to_sync(datum gamestate_object_datum)
-{
-	typedef int(__cdecl add_object_to_sync)(datum gamestate_object_datum);
-	auto p_add_object_to_sync = Memory::GetAddress<add_object_to_sync*>(0x1B8D14, 0x1B2C44);
-
-	return p_add_object_to_sync(gamestate_object_datum);
 }
 
 /* This looks at the actors table to get the character datum which is assigned to the specific actor. */
@@ -164,58 +134,22 @@ int get_damage_owner(datum damaged_unit_index)
 	return NONE;
 }
 
-int __cdecl call_get_character_sid_from_datum(int char_datum)
-{
-	typedef int(__cdecl get_character_sid_from_datum)(int datum);
-	auto p_get_character_sid_from_datum = Memory::GetAddress<get_character_sid_from_datum*>(0x31796C);
-
-	return p_get_character_sid_from_datum(char_datum);
-}
-
-int __cdecl call_fill_creation_data_from_object_index(int object_index, void* creation_data)
-{
-	typedef int(__cdecl fill_creation_data_from_object_index)(int datum,void* creation_data);
-	auto p_fill_creation_data_from_object_index = Memory::GetAddress<fill_creation_data_from_object_index*>(0x1F24ED);
-
-	return p_fill_creation_data_from_object_index(object_index, creation_data);
-}
-
-void H2MOD::leave_session()
-{
-	if (Memory::isDedicatedServer())
-		return;
-
-	if (GetEngineType() != e_engine_type::MainMenu)
-	{
-		// request_squad_browser
-		WriteValue<BYTE>(Memory::GetAddress(0x978BAC), 1);
-
-		typedef void(__cdecl load_main_menu_with_context)(int context);
-		auto load_main_menu_with_context_impl = Memory::GetAddress<load_main_menu_with_context*>(0x08EAF);
-		load_main_menu_with_context_impl(0);
-	}
-
-	typedef int(__cdecl leave_game_type)(int a1);
-	auto leave_session = Memory::GetAddress<leave_game_type*>(0x216388);
-	leave_session(0);
-}
-
 #pragma endregion
 
-typedef int(__cdecl* show_error_screen_t)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6);
+typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen_t p_show_error_screen;
 
-int __cdecl showErrorScreen(int a1, signed int a2, int a3, __int16 a4, int a5, int a6) {
-	if (a2 == 0x117)
+int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6) {
+	if (widget_type == 0x117)
 	{
 		LOG_TRACE_FUNC("Ignoring need to reinstall maps");
 		return 0;
 	}
-	return p_show_error_screen(a1, a2, a3, a4, a5, a6);
+	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
 }
 
-typedef signed int(__cdecl *wcsncpy_s_hook)(int a1, unsigned int a2, wchar_t* a3, int a4);
-wcsncpy_s_hook p_wcsncpy_s_hook;
+typedef signed int(__cdecl *wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
+wcsncpy_s_hook_t p_wcsncpy_s_hook;
 
 //lets you follow the call path of any string that is displayed (in a debugger)
 signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
@@ -256,7 +190,7 @@ real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
 }
 
 BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (DATUM_IS_NONE(unit_datum))
 		return nullptr;
 
@@ -267,25 +201,25 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		s_object_placement_data nObject;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		Engine::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
 
-		int object_index = EngineCalls::Objects::call_object_new(&nObject);
+		datum object_idx = Engine::Objects::object_new(&nObject);
 
 		if (bReset == true)
-			EngineCalls::Unit::remove_equipment(unit_datum);
+			Engine::Unit::remove_equipment(unit_datum);
 
-		EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);
+		Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
 	}
 }
 
 wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return s_player::getName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
@@ -348,18 +282,12 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	datum unit_datum_index = s_player::getPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
 	if (unit_object != NULL)
 	{
-		if (resetEquipment)
-			EngineCalls::Unit::remove_equipment(unit_datum_index);
-
-		typedef bool(__cdecl* simulation_is_predicted)();
-		auto p_simulation_is_predicted = Memory::GetAddress<simulation_is_predicted>(0x498B7, 0x42B54);
-
 		// not sure what these flags are, but this is called when picking up grenades
 		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
 		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
@@ -368,8 +296,12 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
-		if (!p_simulation_is_predicted())
+		if (!s_game_globals::game_is_predicted())
 		{
+			// delete all weapons if required
+			if (resetEquipment)
+				Engine::Unit::remove_equipment(unit_datum_index);
+
 			// set grenade count
 			*(BYTE*)(unit_object + 0x252 + type) = count;
 
@@ -377,7 +309,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 			//p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
 		}
 
-		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::getPeerIndex(playerIndex));
+		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::GetPeerIndex(playerIndex));
 	}
 }
 
@@ -402,7 +334,7 @@ void H2MOD::disable_sounds(int sound_flags)
 			{
 				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
-				if (sound_flags & FLAG(SoundType::Slayer))
+				if (sound_flags & FLAG(_sound_type_slayer))
 				{
 					runtime_tag_block_data->slayer_events.size = 0;
 					runtime_tag_block_data->slayer_events.data = 0;
@@ -416,10 +348,10 @@ void H2MOD::disable_sounds(int sound_flags)
 						auto* general_event = runtime_tag_block_data->general_events[i];
 						auto event = general_event->event;
 						if (
-							(sound_flags & FLAG(SoundType::GainedTheLead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
-							|| (sound_flags & FLAG(SoundType::TeamChange) && event == sound_events::player_changed_team)
-							|| (sound_flags & FLAG(SoundType::LostTheLead) && (event == sound_events::lost_lead))
-							|| (sound_flags & FLAG(SoundType::TiedLeader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
+							(sound_flags & FLAG(_sound_type_gained_the_lead) && (event == sound_events::gained_lead || event == sound_events::gained_team_lead))
+							|| (sound_flags & FLAG(_sound_type_team_change) && event == sound_events::player_changed_team)
+							|| (sound_flags & FLAG(_sound_type_lost_the_lead) && (event == sound_events::lost_lead))
+							|| (sound_flags & FLAG(_sound_type_tied_leader) && (event == sound_events::tied_leader || event == sound_events::tied_team_leader))
 							)
 						{
 							// disable all sounds from english to chinese
@@ -450,55 +382,38 @@ void H2MOD::custom_sound_play(const wchar_t* soundName, int delay)
 		PlaySound(soundName, NULL, SND_FILENAME | SND_NODEFAULT);
 	};
 
-	if (!Memory::isDedicatedServer())
+	if (!Memory::IsDedicatedServer())
 		std::thread(playSound).detach();
 }
 
-/* This is technically closer to object death than player-death as it impacts anything with health at all. */
-typedef char(__cdecl* player_death_t)(datum unit_datum_index, int a2, char a3, char a4);
-player_death_t p_player_death;
+typedef void(__cdecl* player_died_t)(datum player_index);
+player_died_t p_player_died;
 
-char __cdecl OnPlayerDeath(datum unit_datum_index, int a2, char a3, char a4)
+void __cdecl OnPlayerDeath(datum playerIdx)
 {
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, playerIdx);
+	p_player_died(playerIdx);
+	CustomVariantHandler::OnPlayerDeath(ExecTime::_postEventExec, playerIdx);
+}
 
+/* This is technically closer to object death than player-death as it impacts anything with health at all. */
+typedef char(__cdecl* object_deplete_body_internal_t)(datum unit_datum_index, int a2, bool a3, bool a4);
+object_deplete_body_internal_t p_object_deplete_body_internal;
+
+char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
+{
 	//LOG_TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 
 	/* The first value within a2 ( *(DWORD*)(a2) ) appears to be the datum_index of a player from the gamestate_player_table */
 
-	/* This is the unit of the player who last damaged the object*/
-	int damaging_player_unit = get_damage_owner(unit_datum_index);
-	if (b_HeadHunter)
-	{
-		headHunterHandler->playerDeath->SetDeadPlayer(unit_datum_index); // set this so we can spawn a skull on their position.
-		headHunterHandler->playerDeath->execute();
-	}
+	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
+	CustomVariantHandler::OnObjectDamage(ExecTime::_preEventExec, unit_datum_index, a2, a3, a4);
 
-	if (b_FireFight)
-	{
-		/* Hack until rest of code is changed to support datum vs int*/
-		datum ai_datum = datum(unit_datum_index);
+	bool ret = p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
 
-		/*
-			In firefight we want to track AI deaths and execute on them to grant points.
-		*/
-		fireFightHandler->playerDeath->SetPlayerIndex(*(datum*)(a2)); // this is the player datum of player who killed the datum.
-		fireFightHandler->playerDeath->SetKilledDatum(ai_datum);
-		fireFightHandler->playerDeath->execute();
-	}
+	CustomVariantHandler::OnObjectDamage(ExecTime::_postEventExec, unit_datum_index, a2, a3, a4);
+	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 
-	if (b_GunGame) 
-	{
-		gunGame->playerDeath->setUnitDatumIndex(unit_datum_index);
-		gunGame->playerDeath->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->playerDeath->setUnitDatumIndex(unit_datum_index);
-		infectionHandler->playerDeath->execute();
-	}
-	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
-	bool ret = p_player_death(unit_datum_index, a2, a3, a4);
-	EventHandler::PlayerDeathEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 	return ret;
 }
 
@@ -516,32 +431,13 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
-	if (a5 == -1)
-	{
-		if(b_HeadHunter)
-			return;
-	}
-
-	if (a5 == 7) //player got a kill?
-	{
-		int PlayerIndex = a2;
-
-		if (b_GunGame) {
-			gunGame->playerKill->setPlayerIndex(PlayerIndex);
-			gunGame->playerKill->execute();
-		}
-
-		if (b_HeadHunter)
-		{
-			return;
-		}
-	}
-
+	CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
 	p_update_player_score(thisptr, a2, a3, a4, a5, a6);
+	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
 }
 
 // Client Sided Patch
-void H2MOD::disable_weapon_pickup(bool b_Enable)
+void H2MOD::disable_weapon_pickup(bool bEnable)
 {
 	static BYTE oldBytes[5];
 	static BYTE oldBytesRead = false;
@@ -553,7 +449,7 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 		oldBytesRead = true;
 	}
 
-	if (b_Enable) 
+	if (bEnable) 
 	{
 		WriteBytes(address, oldBytes, sizeof(oldBytes));
 	}
@@ -565,7 +461,7 @@ void H2MOD::disable_weapon_pickup(bool b_Enable)
 
 void H2MOD::set_local_rank(BYTE rank)
 {
-	if (Memory::isDedicatedServer())
+	if (Memory::IsDedicatedServer())
 		return;
 
 	static bool initialized = false;
@@ -587,17 +483,16 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 	int(_cdecl* AutoHandler)(datum, datum);
 	AutoHandler = (int(_cdecl*)(datum, datum))Memory::GetAddress(0x57AA5, 0x5FF9D);
 
-	if (b_HeadHunter)
-	{
-		headHunterHandler->itemInteraction->SetPlayerIndex(player_datum);
-		bool handled = headHunterHandler->itemInteraction->SetInteractedObject(object_datum);
-		headHunterHandler->itemInteraction->execute();
+	int result = 0;
 
-		if (handled)
-			return 0;
-	}
+	bool handled = CustomVariantHandler::OnAutoPickupHandler(ExecTime::_preEventExec, player_datum, object_datum);
 
-	return AutoHandler(player_datum, object_datum);
+	if (!handled)
+		result = AutoHandler(player_datum, object_datum);
+
+	CustomVariantHandler::OnAutoPickupHandler(ExecTime::_postEventExec, player_datum, object_datum);
+
+	return result;
 }
 
 void get_object_table_memory()
@@ -610,14 +505,17 @@ map_cache_load_t p_map_cache_load;
 
 bool __cdecl OnMapLoad(s_game_options* options)
 {
-	//Set the light suppressor flag to false
+	static bool resetAfterMatch = false;
+
+	// set the light suppressor flag to false
 	if (H2Config_light_suppressor)
 	{
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
-	static bool resetAfterMatch = false;
 
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
+
 	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
@@ -627,8 +525,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	tags::run_callbacks();
 
-	
-
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
@@ -637,200 +533,114 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
 	{
-		//TODO: issue #232
-		/*if (!NetworkSession::localPeerIsSessionHost()) {
-			advLobbySettings->resetLobbySettings();
-		}*/
-
-		if (b_Infection) {
-			infectionHandler->deinitializer->execute();
-			b_Infection = false;
-		}
-
-		if (b_GunGame) {
-			gunGame->deinitializer->execute();
-			b_GunGame = false;
-		}
-
 		if (b_XboxTick) {
 			options->tickrate = XboxTick::setTickRate(false);
 			b_XboxTick = false;
 		}
 
-		if(b_HeadHunter)
-		{
-			headHunterHandler->deinitializer->execute();
-			b_HeadHunter = false;
-		}
+		// here deinitialize the custom variant
+		CustomVariantHandler::DisposeGameVariant();
 
 		resetAfterMatch = false;
 	}
 
-	if (h2mod->GetEngineType() == e_engine_type::MainMenu)
+	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();
 		H2Tweaks::toggleAiMp(false);
 		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
-		return result;
 	}
-
-
-	wchar_t* variant_name = NetworkSession::getGameVariantName();
-	LOG_INFO_GAME(L"[h2mod] OnMapLoad engine type {}, variant name {}", (int)h2mod->GetEngineType(), variant_name);
-
-	for (auto& gametype_it : GametypesMap)
-		gametype_it.second = false; // reset custom gametypes state
-
-	ControllerInput::SetSensitiviy(H2Config_controller_sens);
-	MouseInput::SetSensitivity(H2Config_mouse_sens);
-	HudElements::OnMapLoad();
-	imgui_handler::WeaponOffsets::Initialize();
-	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+	else
 	{
-		addDebugText("Engine type: Multiplayer");
-		
-		for (auto gametype_it : GametypesMap)
+		wchar_t* variant_name = NetworkSession::GetGameVariantName();
+		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)h2mod->GetEngineType(), variant_name);
+
+		for (auto& gametype_it : GametypesMap)
 		{
-			if (StrStrIW(variant_name, gametype_it.first)) {
-				LOG_INFO_GAME(L"[h2mod] {} custom gametype turned on!", gametype_it.first);
-				gametype_it.second = true; // enable a gametype if substring is found
-			}
-		}
-		
-		if (!b_XboxTick) 
-		{
-			H2X::Initialize(b_H2X);
-			ProjectileFix::ApplyProjectileVelocity();
-			options->tickrate = XboxTick::setTickRate(false);
-		}
-		else
-		{
-			options->tickrate = XboxTick::setTickRate(true);
+			gametype_it.second = false; // reset custom gametypes state
 		}
 
-		H2Tweaks::toggleAiMp(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(false);
+		ControllerInput::SetSensitiviy(H2Config_controller_sens);
+		MouseInput::SetSensitivity(H2Config_mouse_sens);
+    ImGuiHandler::WeaponOffsets::Initialize();
+		HudElements::OnMapLoad();
 
-		if (EngineCalls::get_game_life_cycle() == life_cycle_in_game)
+		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
-			// send server map checksums to client
-			//MapChecksumSync::SendState();
-			//inform players of the current advanced lobby settings
-			// TODO: issue #232
-			//advLobbySettings->sendLobbySettingsPacket();
+			addDebugText("Engine type: Multiplayer");
 
-			if (b_Infection) {
-				infectionHandler->initializer->execute();
-			}
-
-			if (b_GunGame) {
-				gunGame->initializer->execute();
-			}
-
-			if(b_HeadHunter)
+			for (auto& gametype_it : GametypesMap)
 			{
-				headHunterHandler->initializer->execute();
+				if (StrStrIW(variant_name, gametype_it.first)) {
+					LOG_INFO_GAME(L"{} - {} custom gametype turned on!", __FUNCTIONW__, gametype_it.first);
+					gametype_it.second = true;
+					break;
+				}
 			}
+
+			if (!b_XboxTick)
+			{
+				H2X::Initialize(b_H2X);
+				ProjectileFix::ApplyProjectileVelocity();
+				options->tickrate = XboxTick::setTickRate(false);
+			}
+			else
+			{
+				options->tickrate = XboxTick::setTickRate(true);
+			}
+
+			H2Tweaks::toggleAiMp(true);
+			H2Tweaks::toggleUncappedCampaignCinematics(false);
+
+			if (Engine::get_game_life_cycle() == _life_cycle_in_game)
+			{
+				// send server map checksums to client
+				//MapChecksumSync::SendState();
+
+				// here initialize custom variant
+				// in case it is found
+				CustomVariantHandler::GameVarianEnable(variant_name);
+			}
+
 		}
+		else if (h2mod->GetEngineType() == e_engine_type::_single_player)
+		{
+			//if anyone wants to run code on map load single player
+			addDebugText("Engine type: Singleplayer");
+			//H2X::Initialize(true);
+			H2Tweaks::toggleUncappedCampaignCinematics(true);
+		}
+
+		resetAfterMatch = true;
 	}
 
-	else if (h2mod->GetEngineType() == e_engine_type::SinglePlayer)
-	{
-		//if anyone wants to run code on map load single player
-		addDebugText("Engine type: Singleplayer");
-		//H2X::Initialize(true);
-		H2Tweaks::toggleUncappedCampaignCinematics(true);
-	}
-
-	// if we got this far, it means map is MP or SP, and if map load is called again, it should reset/deinitialize any custom gametypes
-	resetAfterMatch = true;
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
 	return result;
 }
 
 typedef bool(__cdecl* player_spawn_t)(datum playerDatumIndex);
 player_spawn_t p_player_spawn;
 
-bool __cdecl OnPlayerSpawn(datum playerDatumIndex)
+bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 {
-	//I cant find somewhere to put this where it actually works (only needs to be done once on map load). It's only a few instructions so it shouldn't take long to execute.
-	H2Tweaks::toggleKillVolumes(!AdvLobbySettings_disable_kill_volumes);
-
 	//LOG_TRACE_GAME("OnPlayerSpawn(a1: %08X)", a1);
-	if(b_HeadHunter)
+	
+	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIdx);
+	CustomVariantHandler::OnPlayerSpawn(ExecTime::_preEventExec, playerDatumIdx);
+
+	bool ret = p_player_spawn(playerDatumIdx);
+
+	// check if the spawn was successful
+	if (ret)
 	{
-		headHunterHandler->preSpawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		headHunterHandler->preSpawnPlayer->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		infectionHandler->preSpawnPlayer->execute();
-	}
-
-	if (b_GunGame) {
-		gunGame->preSpawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		gunGame->preSpawnPlayer->execute();
-	}
-
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_before, playerDatumIndex);
-	bool ret = p_player_spawn(playerDatumIndex);
-	EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIndex);
-
-	if(b_HeadHunter)
-	{
-		headHunterHandler->spawnPlayer->SetPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		headHunterHandler->spawnPlayer->execute();
-	}
-
-	if (b_Infection) {
-		infectionHandler->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		infectionHandler->spawnPlayer->execute();
-	}
-
-	if (b_GunGame) {
-		gunGame->spawnPlayer->setPlayerIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(playerDatumIndex));
-		gunGame->spawnPlayer->execute();
+		EventHandler::PlayerSpawnEventExecute(EventExecutionType::execute_after, playerDatumIdx);
+		CustomVariantHandler::OnPlayerSpawn(ExecTime::_postEventExec, playerDatumIdx);
 	}
 
 	return ret;
-}
-
-typedef int(__cdecl *object_p_hook)(int s_object_placement_data, int a2, signed int a3, int a4);
-object_p_hook object_p_hook_method;
-
-int __cdecl objectPHook(int s_object_placement_data, int object_definition_index, int object_owner, int unk) {
-	if (h2mod->hookedObjectDefs.find(object_definition_index) == h2mod->hookedObjectDefs.end()) {
-		//ingame only
-		wchar_t* mapName = Memory::GetAddress<wchar_t*>(0x97737C);
-		LOG_TRACE_GAME(L"MapName={0}, object_definition_index: {1:x}", mapName, object_definition_index);
-		h2mod->hookedObjectDefs.insert(object_definition_index);
-	}
-	return object_p_hook_method(s_object_placement_data, object_definition_index, object_owner, unk);
-}
-
-typedef BOOL(__stdcall *is_debugger_present)();
-is_debugger_present is_debugger_present_method;
-
-BOOL __stdcall isDebuggerPresent() {
-	return false;
-}
-
-typedef void*(__thiscall* load_wgit_t)(void* thisptr, int a2, int a3, int a4, unsigned short a5);
-load_wgit_t p_load_wgit;
-
-void* __fastcall OnWgitLoad(void* thisptr, BYTE* _edx, int a2, int a3, int a4, unsigned short a5) {
-	int wgit = a2;
-
-	//char NotificationPlayerText[20];
-	//sprintf(NotificationPlayerText, "WGIT ID: %d", a2);
-	//addDebugText(NotificationPlayerText);
-	//MessageBoxA(NULL, NotificationPlayerText, "WGITness", MB_OK);
-
-	p_load_wgit(thisptr, wgit, a3, a4, a5);
-	return thisptr;
 }
 
 typedef void(__cdecl* change_team_t)(int a1, int a2);
@@ -838,10 +648,10 @@ change_team_t p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
-	s_network_session* session = NetworkSession::getCurrentNetworkSession();
+	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 
-	if ((session->parameters.session_mode == 4 && EngineCalls::get_game_life_cycle() == life_cycle_pre_game)
-		|| (StrStrIW(NetworkSession::getGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
+	if ((session->parameters[0].session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
+		|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;
 	}
@@ -858,17 +668,6 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
-void H2MOD::set_local_team_match_xuid(XUID xuid)
-{
-	s_network_session* session = NetworkSession::getCurrentNetworkSession();
-	if ((EngineCalls::get_game_life_cycle() == life_cycle_pre_game))
-		for(auto i = 0; i < 16; i++)
-			if(session->membership.player_data[i].identifier == xuid)
-			{
-				changeTeam(0, session->membership.player_data[i].properties.player_team);
-				break;
-			}
-}
 void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
 {
 	typedef void(__cdecl update_player_profile)(int local_player_index);
@@ -882,55 +681,6 @@ void __cdecl print_to_console(char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
 	commands->display(prefix + output);
-}
-
-
-void DuplicateDataBlob(DATA_BLOB  *pDataIn, DATA_BLOB  *pDataOut)
-{
-	pDataOut->cbData = pDataIn->cbData;
-	pDataOut->pbData = static_cast<BYTE*>(LocalAlloc(LMEM_FIXED, pDataIn->cbData));
-	CopyMemory(pDataOut->pbData, pDataIn->pbData, pDataIn->cbData);
-}
-
-BOOL WINAPI CryptProtectDataHook(
-	_In_       DATA_BLOB                 *pDataIn,
-	_In_opt_   LPCWSTR                   szDataDescr,
-	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
-	_Reserved_ PVOID                     pvReserved,
-	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
-	_In_       DWORD                     dwFlags,
-	_Out_      DATA_BLOB                 *pDataOut
-)
-{
-	DuplicateDataBlob(pDataIn, pDataOut);
-
-	return TRUE;
-}
-
-BOOL WINAPI CryptUnprotectDataHook(
-	_In_       DATA_BLOB                 *pDataIn,
-	_Out_opt_  LPWSTR                    *ppszDataDescr,
-	_In_opt_   DATA_BLOB                 *pOptionalEntropy,
-	_Reserved_ PVOID                     pvReserved,
-	_In_opt_   CRYPTPROTECT_PROMPTSTRUCT *pPromptStruct,
-	_In_       DWORD                     dwFlags,
-	_Out_      DATA_BLOB                 *pDataOut
-)
-{
-	if (CryptUnprotectData(pDataIn, ppszDataDescr, pOptionalEntropy, pvReserved, pPromptStruct, dwFlags, pDataOut) == FALSE) {
-		DuplicateDataBlob(pDataIn, pDataOut); // if decrypting the data fails just assume it's unencrypted
-	}
-
-	return TRUE;
-}
-
-char filo_write__encrypted_data_hook(filo *file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
-{
-	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
-
-	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
-		FiloInterface::change_size(file_ptr, 0);
-	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
 DWORD calculate_model_lod;
@@ -954,66 +704,39 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-typedef void(__cdecl *on_custom_map_change)(const void* a1);
-on_custom_map_change on_custom_map_change_method;
-
-void __cdecl onCustomMapChange(const void* a1) {
-	on_custom_map_change_method(a1);
-}
-
-typedef bool(__cdecl* fn_c000bd114_t)(int);
+typedef bool(__cdecl* fn_c000bd114_t)(e_skulls);
 fn_c000bd114_t p_fn_c000bd114;
-bool __cdecl fn_c000bd114_IsSkullEnabled(int skull_index)
+
+bool __cdecl fn_c000bd114_IsSkullEnabled(e_skulls skull_index)
 {
-	//bool result = pfn_c000bd114(skull_index);
-	//return result;
-
-	bool* var_c004d8320 = Memory::GetAddress<bool*>(0x4d8320);
-	bool(*fn_c00049833_IsEngineModeCampaign)() = (bool(*)())Memory::GetAddress(0x49833);
-
-	bool result = false;
-	if (skull_index <= 14 && fn_c00049833_IsEngineModeCampaign())
-		result = var_c004d8320[skull_index];
-	if (skull_index == 10 && AdvLobbySettings_mp_sputnik)
-		result = true;
-	else if (skull_index == 1 && AdvLobbySettings_mp_grunt_bday_party)
-		result = true;
-	else if (skull_index == 6 && AdvLobbySettings_mp_blind)
-		result = true;
-	return result;
+	return ice_cream_flavor_available(skull_index);
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	if (AdvLobbySettings_grenade_chain_react)
-		return false;
-	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	if (AdvLobbySettings_banshee_bomb)
-		return false;
-	return h2mod->GetEngineType() == e_engine_type::Multiplayer;
+	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
-	if (AdvLobbySettings_flashlight)
-		return true;
-	return h2mod->GetEngineType() == e_engine_type::SinglePlayer;
+	return h2mod->GetEngineType() == e_engine_type::_single_player;
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data nObject;
+		s_object_placement_data object_placement;
 
-		EngineCalls::Objects::create_new_placement_data(&nObject, weapon_tag_index, unit_datum, 0);
+		Engine::Objects::create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
 
-		datum object_index = EngineCalls::Objects::call_object_new(&nObject);
-		if (!DATUM_IS_NONE(object_index))
+		datum object_idx = Engine::Objects::object_new(&object_placement);
+		if (!DATUM_IS_NONE(object_idx))
 		{
-			EngineCalls::Unit::remove_equipment(unit_datum);
-			EngineCalls::Unit::assign_equipment_to_unit(unit_datum, object_index, 1);
+			Engine::Unit::remove_equipment(unit_datum);
+			Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
 		}
 	}
 }
@@ -1041,15 +764,15 @@ typedef int(__cdecl *tdevice_touch)(datum device_datum, datum unit_datum);
 tdevice_touch pdevice_touch;
 
 bool device_active = true;
-//This happens whenever a player activates a device control.
+// This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == e_engine_type::Multiplayer)
+	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
-		//We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
+		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
 		{
-			if (device_shop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
+			if (deviceShop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
 			{
 				if (device_active == false)
 					return pdevice_touch(device_datum, unit_datum);
@@ -1090,7 +813,7 @@ short __cdecl get_enabled_teams_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	if (new_teams_enabled_flags && !b_Infection)
+	if (new_teams_enabled_flags && !CustomVariantHandler::VariantEnabled(_id_infection))
 		return new_teams_enabled_flags;
 	else
 		return default_teams_enabled_flags;
@@ -1103,10 +826,10 @@ signed int __cdecl get_next_hill_index(int previousHill)
 	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
 	if (previousHill + 1 >= hillCount) 
 	{
-		//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, 0);
+		LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, 0);
 		return 0;
 	}
-	//LOG_TRACE_GAME("[KoTH Behavior] Hill Count: {} Current Hill: {} Next Hill: {}", hillCount, previousHill, previousHill + 1);
+	LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, previousHill + 1);
 	return previousHill + 1;
 }
 
@@ -1115,12 +838,12 @@ void H2MOD::ApplyFirefightHooks()
 	pdevice_touch = (tdevice_touch)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
-typedef void(__cdecl p_set_screen_bounds)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
-p_set_screen_bounds* c_set_screen_bounds;
+typedef void(__cdecl set_screen_bounds_t)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+set_screen_bounds_t* p_set_screen_bounds;
 
 void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
 {
-	c_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
 
 bool __cdecl should_start_pregame_countdown_hook()
@@ -1141,9 +864,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 	if (H2Config_minimum_player_start > 0)
 	{
-		if (NetworkSession::getPlayerCount() >= H2Config_minimum_player_start)
+		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
 		{
-			LOG_DEBUG_GAME(L"Minimum Player count met.");
+			LOG_INFO_GAME(L"{} - minimum Player count met", __FUNCTIONW__);
 			minimumPlayersConditionMet = true;
 		}
 		else
@@ -1160,12 +883,12 @@ bool __cdecl should_start_pregame_countdown_hook()
 	if (H2Config_force_even && TeamPlay == 1 && minimumPlayersConditionMet)
 	{
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
-		LOG_DEBUG_GAME(L"Balancing teams");
+		LOG_INFO_GAME(L"{} - balancing teams", __FUNCTIONW__);
 		std::map<std::string, std::vector<int>> Parties;
 		std::vector<int> nonPartyPlayers;
 		for (auto i = 0; i < 16; i++) //Detect party members
 		{
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
 				//auto player = NetworkSession::getPlayerInformation(i);
 				int calcBaseOffset = 0x530E34 + (i * 0x128);
@@ -1177,15 +900,15 @@ bool __cdecl should_start_pregame_countdown_hook()
 				if (ClanDescripton != 0)
 				{
 					LOG_DEBUG_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
-					Parties[partyCode].push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					Parties[partyCode].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
 				}
 				else
-					nonPartyPlayers.push_back(NetworkSession::getPlayerIdByName(Gamertag));
+					nonPartyPlayers.push_back(NetworkSession::GetPlayerIdByName(Gamertag));
 			}
 		}
 		for (auto i = 0; i < 16; i++) //Detect party leaders
 		{
-			if (NetworkSession::playerIsActive(i))
+			if (NetworkSession::PlayerIsActive(i))
 			{
 
 
@@ -1197,8 +920,8 @@ bool __cdecl should_start_pregame_countdown_hook()
 				if (Parties.count(xuidslug) == 1) //Party leader found
 				{
 					LOG_DEBUG_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), Gamertag);
-					Parties[xuidslug].push_back(NetworkSession::getPlayerIdByName(Gamertag));
-					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::getPlayerIdByName(Gamertag));
+					Parties[xuidslug].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
+					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::GetPlayerIdByName(Gamertag));
 					if (position != nonPartyPlayers.end())
 						nonPartyPlayers.erase(position);
 				}
@@ -1223,7 +946,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 			{
 				LOG_DEBUG_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
 				sortedPlayers.push_back(player);
-				CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
 				teamPlayers[currentTeam] += 1;
 				if (teamPlayers[currentTeam] == playersPerTeam)
 					for (auto i = 0; i < 8; i++)
@@ -1250,7 +973,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		{
 			LOG_DEBUG_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
 			sortedPlayers.push_back(player);
-			CustomPackets::sendTeamChange(NetworkSession::getPeerIndex(player), currentTeam);
+			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
 			teamPlayers[currentTeam] += 1;
 			if (teamPlayers[currentTeam] == playersPerTeam)
 				for (auto i = 0; i < 8; i++)
@@ -1280,31 +1003,31 @@ bool __cdecl should_start_pregame_countdown_hook()
 		teamsAreValidConditionMet = true;
 	}
 
-
-
 	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
 	{
 		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 		return true;
 	}
 	else
+	{
 		return false;
+	}
 }
 //TODO: Move this.
 void vip_lock(e_game_life_cycle state)
 {
-	if(state == life_cycle_post_game)
+	if(state == _life_cycle_post_game)
 	{
 		ServerConsole::ClearVip();
 		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
 		//ServerConsole::SendCommand2(1, L"vip", L"clear");
 		//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
 	}
-	if(state == life_cycle_in_game)
+	if(state == _life_cycle_in_game)
 	{
-		for (auto i = 0; i < NetworkSession::getPeerCount(); i++)
+		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
 		{
-			ServerConsole::AddVip(NetworkSession::getPeerPlayerName(i));
+			ServerConsole::AddVip(NetworkSession::GetPeerPlayerName(i));
 			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
 		}
 		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
@@ -1314,14 +1037,17 @@ void vip_lock(e_game_life_cycle state)
 
 void H2MOD::RegisterEvents()
 {
-	if(!Memory::isDedicatedServer())//Client only callbacks	
+	if(!Memory::IsDedicatedServer())
 	{
+		// Client only callbacks	
 
 	}
-	else //Server only callbacks
+	else 
 	{
-		//Setup Events for H2Config_vip_lock
-		if(H2Config_vip_lock)
+		// Server only callbacks
+		
+		// Setup Events for H2Config_vip_lock
+		if (H2Config_vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
 	//Things that apply to both
@@ -1345,21 +1071,32 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
+// sword-flying target clear patch
+void __cdecl aim_assist_targeting_clear_hook(int target_data)
+{
+	if (!s_game_globals::game_is_campaign()
+		&& !b_XboxTick)
+	{
+		*(DWORD*)(target_data) = -1;
+		*(DWORD*)(target_data + 4) = -1;
+		*(DWORD*)(target_data + 8) = -1;
+		*(WORD*)(target_data + 24) = 0;
+		*(DWORD*)(target_data + 28) = 0;
+		*(DWORD*)(target_data + 32) = 0;
+	}
+}
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
-	LOG_TRACE_GAME("Applying hooks...");
+	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
 
 	DETOUR_BEGIN();
 
 	EngineHooks::ApplyHooks();
+
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
-
-	// hook to initialize stuff before game start
-	// p_map_cache_load = (map_cache_load)DetourFunc(Memory::GetAddress<BYTE*>(0x8F62, 0x1F35C), (BYTE*)OnMapLoad, 11);
-
-	//on_custom_map_change_method = (on_custom_map_change)DetourFunc(Memory::GetAddress<BYTE*>(0x32176, 0x25738), (BYTE*)onCustomMapChange, 5);
 
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
@@ -1370,29 +1107,25 @@ void H2MOD::ApplyHooks() {
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}
 
-	// disables profiles/game saves encryption
-	PatchWinAPICall(Memory::GetAddress(0x9B08A, 0x85F5E), CryptProtectDataHook);
-	PatchWinAPICall(Memory::GetAddress(0x9AF9E, 0x352538), CryptUnprotectDataHook);
-	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
-
 	ApplyFirefightHooks();
 
 	ProjectileFix::ApplyPatches();
 
 	//Guardian Patch
-	c_object_cause_damage = Memory::GetAddress<p_object_cause_damage>(0x17AD81, 0x1525E1);
+	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
-	DETOUR_ATTACH(p_player_death, Memory::GetAddress<player_death_t>(0x17B674, 0x152ED4), OnPlayerDeath);
-	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
+	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
+	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
+	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 
 	// bellow hooks applied to specific executables
-	if (Memory::isDedicatedServer() == false) {
+	if (!Memory::IsDedicatedServer()) {
 
-		LOG_TRACE_GAME("Applying client hooks...");
+		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		//Shader display hook
@@ -1411,18 +1144,15 @@ void H2MOD::ApplyHooks() {
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 
-		//TODO: turn on if you want to debug halo2.exe from start of process
-		//is_debugger_present_method = (is_debugger_present)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
-
-		//TODO: use for object spawn hooking
-		//0x132163
-		//object_p_hook_method = (object_p_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x132163), (BYTE*)objectPHook, 6);
+		PatchCall(Memory::GetAddress(0x169E59), aim_assist_targeting_clear_hook);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
 
 		//pResetRound = (ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
 
+		TEST_N_DEF(PC2);
+		
 		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), changeTeam);
 
 		// hook the print command to redirect the output to our console
@@ -1445,15 +1175,15 @@ void H2MOD::ApplyHooks() {
 
 		// Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		c_set_screen_bounds = Memory::GetAddress<p_set_screen_bounds*>(0x264979);
+		p_set_screen_bounds = Memory::GetAddress<set_screen_bounds_t*>(0x264979);
 		// PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}
 	else {
+		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
 
-		LOG_TRACE_GAME("Applying dedicated server hooks...");
-		PatchCall(Memory::GetAddress(0x0,0xBF43), should_start_pregame_countdown_hook);
+		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
 
 		DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0, 0x19698B), get_enabled_teams_flags);
@@ -1469,7 +1199,10 @@ VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DW
 
 void H2MOD::Initialize()
 {
-	if (!Memory::isDedicatedServer())
+	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
+	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
+
+	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
@@ -1480,6 +1213,7 @@ void H2MOD::Initialize()
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
 		//ObserverMode::Initialize();
+		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
@@ -1492,6 +1226,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();
@@ -1499,16 +1234,15 @@ void H2MOD::Initialize()
 	HaloScript::Initialize();
 	player_representation::initialize();
 	KantTesting::Initialize();
-	LOG_TRACE_GAME("H2MOD - Initialized {}", DLL_VERSION_STR);
-	LOG_TRACE_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
-	//WriteValue(GetAddress(0xC25EA + 8), 100);
 	h2mod->ApplyHooks();
 	h2mod->RegisterEvents();
 
-	EngineCalls::Objects::apply_biped_object_definition_patches();
+	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
+
+	LOG_INFO_GAME("H2MOD - Initialized");
 }
 
-void H2MOD::Deinitialize() {
-
+void H2MOD::Deinitialize() 
+{
 }
