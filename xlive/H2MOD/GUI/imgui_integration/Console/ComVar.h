@@ -104,26 +104,7 @@ public:
 	}
 
 	template<typename Type = baseTypeT>
-	void SetVal(const Type _val);
-
-	template<>
-	void SetVal<int>(const int _val)
-	{
-		SETVAR_CHECK_PTR_TYPE_VALID();
-		baseTypeT& val = Get();
-		val = _val;
-	}
-
-	template<>
-	void SetVal<long long>(const long long _val)
-	{
-		SETVAR_CHECK_PTR_TYPE_VALID();
-		baseTypeT& val = Get();
-		val = _val;
-	}
-
-	template<>
-	void SetVal<float>(const float _val)
+	void SetVal(const Type _val)
 	{
 		SETVAR_CHECK_PTR_TYPE_VALID();
 		baseTypeT& val = Get();
