@@ -26,7 +26,16 @@ bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* comma
 	// + 1 to count for the actual command
 	if (tokens.size() != command_data->GetParameterCount() + 1)
 	{
-		output->OutputFmt(StringFlag_None, command_error_not_enough_params, command_data->GetName());
+		if (command_data->Hidden())
+		{
+			output->Output(StringFlag_None, "# unknown command: ");
+			output->Output(StringFlag_History, command_line);
+		}
+		else
+		{
+			output->OutputFmt(StringFlag_None, command_error_not_enough_params, command_data->GetName());
+		}
+
 		return false;
 	}
 
@@ -43,7 +52,6 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 
 	if (CheckArgs(&command_data, command_line, tokens))
 	{
-
 		if (const auto* varCommand = dynamic_cast<const ConsoleVarCommand*>(command))
 		{
 			command_data.commandVar = varCommand->m_var_ptr;
@@ -77,16 +85,15 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 			}
 		}
 
-		if (command == nullptr)
-		{
-			output->Output(StringFlag_None, "# unknown command: ");
-			output->Output(StringFlag_History, command_line);
-			ret = false;
-		}
-		else
+		if (command != nullptr)
 		{
 			output->OutputFmt(StringFlag_History, command_line);
 			ret = ConsoleCommand::ExecCommand(command_line, command_line_length, command_first_tokens, output, command);
+		}
+		else
+		{
+			output->Output(StringFlag_None, "# unknown command: ");
+			output->Output(StringFlag_History, command_line);
 		}
 	}
 
