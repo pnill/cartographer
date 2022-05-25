@@ -27,7 +27,7 @@ private:
 };
 
 template<typename T, bool base_type_is_ptr = std::is_pointer<T>::value>
-class ComVarT : ComVar
+class ComVarT : public ComVar
 {
 	using baseTypeT = std::remove_pointer_t<T>;
 

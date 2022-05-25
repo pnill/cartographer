@@ -18,7 +18,7 @@
 std::mutex commandInsertMtx;
 
 bool readObjectIds = true;
-std::unordered_map<std::string, unsigned int> objectIds;
+std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
@@ -383,7 +383,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 		output->Output(StringFlag_None, "# not in a network session");
 		return 0;
 	}
-	if (!NetworkSession::LocalPeerIsSessionHost())
+	else if (!NetworkSession::LocalPeerIsSessionHost())
 	{
 		output->Output(StringFlag_None, "# must be network session host");
 		return 0;
