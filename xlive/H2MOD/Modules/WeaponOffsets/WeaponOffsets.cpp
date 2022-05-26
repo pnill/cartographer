@@ -293,7 +293,7 @@ namespace imgui_handler {
 		}
 		void ApplyOffset(s_weapon_group_definition* tag, real_vector3d offset)
 		{
-			if (tag != nullptr && h2mod->GetEngineType() != _main_menu)
+			if (tag != nullptr)
 			{
 				tag->first_person_weapon_offset = offset;
 			}
@@ -321,6 +321,7 @@ namespace imgui_handler {
 
 			for (byte i = BattleRifle; i != Sniper + 1; i++)
 			{
+				tags[i] = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>(tags::find_tag(blam_tag::tag_group_type::weapon, WeaponPaths[i]));
 				ApplyOffset(tags[i], ModifiedOffsets[i]);
 			}
 		}
