@@ -735,9 +735,7 @@ struct s_weapon_group_definition
 	tag_reference deployed_vehicle;//0x2F0
 	tag_reference age_effect;//0x2F8
 	tag_reference aged_weapon;//0x300
-	float first_person_weapon_offset_i;//0x308
-	float first_person_weapon_offset_j;//0x310
-	float first_person_weapon_offset_k;//0x312
+	real_vector3d first_person_weapon_offset;//0x308
 	float first_person_scope_size_i;//0x314
 	float first_person_scope_size_j;//0x318
 };

@@ -127,8 +127,8 @@
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
-    <ClCompile Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
@@ -444,7 +444,7 @@
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />

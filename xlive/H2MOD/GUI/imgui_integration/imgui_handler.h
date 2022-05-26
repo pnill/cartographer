@@ -204,23 +204,6 @@ namespace imgui_handler
 	}
 	namespace WeaponOffsets
 	{
-		extern s_weapon_group_definition* battle_rifle_tag;
-		extern s_weapon_group_definition* beam_rifle_tag;
-		extern s_weapon_group_definition* brute_plasma_rifle_tag;
-		extern s_weapon_group_definition* brute_shot_tag;
-		extern s_weapon_group_definition* carbine_tag;
-		extern s_weapon_group_definition* energy_sword_tag;
-		extern s_weapon_group_definition* fuel_rod_tag;
-		extern s_weapon_group_definition* magnum_tag;
-		extern s_weapon_group_definition* needler_tag;
-		extern s_weapon_group_definition* plasma_pistol_tag;
-		extern s_weapon_group_definition* plasma_rifle_tag;
-		extern s_weapon_group_definition* rocket_launcher_tag;
-		extern s_weapon_group_definition* sentinel_beam_tag;
-		extern s_weapon_group_definition* shotgun_tag;
-		extern s_weapon_group_definition* smg_tag;
-		extern s_weapon_group_definition* sniper_tag;
-
 		enum e_weapon_offsets_string : int
 		{
 			title,
@@ -251,7 +234,7 @@ namespace imgui_handler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
-		void ApplyOffset(s_weapon_group_definition* tag, float i, float j, float k);
+		void ApplyOffset(s_weapon_group_definition* tag, real_vector3d offset);
 		void ApplyOffsetImgui(s_weapon_group_definition* tag, char* slider, float& offset);
 		void Initialize();
 	}

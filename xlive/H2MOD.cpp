@@ -528,6 +528,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
+	imgui_handler::WeaponOffsets::Initialize();
 
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
@@ -562,9 +563,9 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			gametype_it.second = false; // reset custom gametypes state
 		}
 
+		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
-    ImGuiHandler::WeaponOffsets::Initialize();
 		HudElements::OnMapLoad();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
