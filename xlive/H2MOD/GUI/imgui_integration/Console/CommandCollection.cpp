@@ -37,10 +37,10 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	&d3d9ex_var_cmd,
 	&display_xyz_var_cmd,
 	&network_stats_overlay_var_cmd,
-	new ConsoleCommand("help", "outputs all commands, 0 parameter(s)", 0, 0, CommandCollection::HelpCmd),
+	new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd),
 	new ConsoleCommand("logpeers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
 	new ConsoleCommand("logplayers", "logs all players to console, 0 parameter(s)", 0, 0,CommandCollection::LogPlayersCmd),
-	new ConsoleCommand("kickpeer", "kicks peer from network session, 1 parameter(s): <int>: peer_index", 1, 1, CommandCollection::KickPeerCmd),
+	new ConsoleCommand("kickpeer", "kicks peer from network session, 1 parameter(s): <int>: peer index", 1, 1, CommandCollection::KickPeerCmd),
 	new ConsoleCommand("leavesession", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd),
 	new ConsoleCommand("ishost", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd),
 	new ConsoleCommand("mapdownload", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd),
@@ -52,7 +52,7 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("warpfix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("logxnetconnections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
-		"<string>: object_name <int>: count <bool>: same_team, near_player <float>: (if near_player false) xyz, (rotation optional) ijk", 4, 10, CommandCollection::SpawnCmd),
+		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
 	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
 	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
 };
@@ -313,10 +313,23 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 	IOutput* output = cbData.strOutput;
 	const ConsoleCommand* command_data = cbData.consoleCommandData;
 
-	output->Output(StringFlag_None, "# available commands: ");
+	const std::string* commandToHelp = nullptr;
 
-	for (auto& command_entry : CommandCollection::commandTable)
+	int parameterCount = tokens.size() - 1; // only parameters
+	bool singleCommandHelp = parameterCount >= 1;
+	bool singleCommandHelpFound = false;
+
+	if (singleCommandHelp)
+		commandToHelp = &tokens[1];
+
+	if (!singleCommandHelp)
+		output->Output(StringFlag_None, "# available commands: ");
+
+	for (auto command_entry : CommandCollection::commandTable)
 	{
+		if (singleCommandHelp && _strnicmp(command_entry->GetName(), commandToHelp->c_str(), commandToHelp->length()) != 0)
+			continue;
+
 		if (!command_entry->Hidden())
 		{
 			output->OutputFmt(StringFlag_None, "# %s ", command_entry->GetName());
@@ -324,8 +337,22 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 			{
 				output->OutputFmt(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
 			}
+			else
+			{
+				output->OutputFmt(StringFlag_None, "	# command has no description");
+			}
+
+			if (singleCommandHelp)
+			{
+				singleCommandHelpFound = true;
+				break;
+			}
 		}
 	}
+
+	if (singleCommandHelp && !singleCommandHelpFound)
+		output->OutputFmt(StringFlag_None, "	# unknown command: %s", commandToHelp->c_str());
+
 	return 0;
 }
 
