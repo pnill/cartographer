@@ -5,9 +5,9 @@
 /// Command Variable
 
 // useful macros
-#define DECL_ComVarCommandPtr(_var_name, _var_type, _var_ptr, _command_name, _description, _parameter_count, _callback) \
+#define DECL_ComVarCommandPtr(_var_name, _var_type, _var_ptr, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback) \
 ComVarTPtr<_var_type> _var_name(_var_ptr); \
-ConsoleVarCommand _var_name## _cmd(_command_name, _description, _parameter_count, _callback, (ComVar*)&_var_name);
+ConsoleVarCommand _var_name## _cmd(_command_name, _description, _min_parameter_count, _max_parameter_count, _callback, (ComVar*)&_var_name);
 
 class ComVar
 {

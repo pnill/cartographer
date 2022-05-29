@@ -8,7 +8,7 @@
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ConsoleVarCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, Console::set_opacity_cb);
+ConsoleVarCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, Console::set_opacity_cb);
 
 std::string Console::windowName = "console";
 
@@ -32,7 +32,7 @@ Console::Console() :
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
 	console_opacity_var_cmd.UpdateVarPtr((ComVar*)&m_console_opacity);
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
-	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, Console::clear_cb));
+	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, Console::clear_cb));
 }
 
 int Console::Output(StringHeaderFlags flags, const char* fmt)

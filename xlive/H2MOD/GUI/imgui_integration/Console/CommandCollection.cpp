@@ -23,13 +23,13 @@ std::map<std::string, unsigned int> objectIds;
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
 DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex, 
-	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, CommandCollection::SetD3D9ExStateCmd);
+	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
-	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, CommandCollection::NetworkMetricsCmd);
+	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
 
 extern bool displayXyz;
 DECL_ComVarCommandPtr(display_xyz_var, bool*, &displayXyz,
-	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, CommandCollection::DisplayXyzCmd);
+	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -37,24 +37,24 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	&d3d9ex_var_cmd,
 	&display_xyz_var_cmd,
 	&network_stats_overlay_var_cmd,
-	new ConsoleCommand("help", "outputs all commands, 0 parameter(s)", 0, CommandCollection::HelpCmd),
-	new ConsoleCommand("logpeers", "logs all peers to console, 0 parameter(s)", 0, CommandCollection::LogPeersCmd),
-	new ConsoleCommand("logplayers", "logs all players to console, 0 parameter(s)", 0, CommandCollection::LogPlayersCmd),
-	new ConsoleCommand("kickpeer", "kicks peer from network session, 1 parameter(s): <int>: peer_index", 1, CommandCollection::KickPeerCmd),
-	new ConsoleCommand("leavesession", "leave current session, 0 parameter(s)", 0, CommandCollection::LeaveNetworkSessionCmd),
-	new ConsoleCommand("ishost", "logs if you are session host or not, 0 parameter(s)", 0, CommandCollection::IsSessionHostCmd),
-	new ConsoleCommand("mapdownload", "download specified map, 1 parameter(s): <string>", 1, CommandCollection::DownloadMapCmd),
-	new ConsoleCommand("reloadmaps", "re-load custom map data cache into memory, 0 parameter(s)", 0, CommandCollection::ReloadMapsCmd),
-	new ConsoleCommand("logmapfilename", "logs selected map filename, 0 parameter(s)", 0, CommandCollection::LogSelectedMapFilenameCmd),
-	new ConsoleCommand("requestmapfilename", "requests map file name from host, 0 parameter(s)", 0, CommandCollection::RequestFileNameCmd),
-	new ConsoleCommand("maxplayers", "set maximum players that can join, 1 parameter(s): <int>", 1, CommandCollection::SetMaxPlayersCmd),
-	new ConsoleCommand("deleteobject", "deletes an object, 1 parameter(s): <int>: object datum index", 1, CommandCollection::DestroyObjectCmd),
-	new ConsoleCommand("warpfix", "(EXPERIMENTAL) increases client position update control threshold", 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("logxnetconnections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("help", "outputs all commands, 0 parameter(s)", 0, 0, CommandCollection::HelpCmd),
+	new ConsoleCommand("logpeers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
+	new ConsoleCommand("logplayers", "logs all players to console, 0 parameter(s)", 0, 0,CommandCollection::LogPlayersCmd),
+	new ConsoleCommand("kickpeer", "kicks peer from network session, 1 parameter(s): <int>: peer_index", 1, 1, CommandCollection::KickPeerCmd),
+	new ConsoleCommand("leavesession", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd),
+	new ConsoleCommand("ishost", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd),
+	new ConsoleCommand("mapdownload", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd),
+	new ConsoleCommand("reloadmaps", "re-load custom map data cache into memory, 0 parameter(s)", 0, 0, CommandCollection::ReloadMapsCmd),
+	new ConsoleCommand("logmapfilename", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd),
+	new ConsoleCommand("requestmapfilename", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd),
+	new ConsoleCommand("maxplayers", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd),
+	new ConsoleCommand("deleteobject", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd),
+	new ConsoleCommand("warpfix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("logxnetconnections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
-		"<string>: object_name <int>: count <bool>: same_team, near_player <float>: (if near_player false) xyz, (rotation optional) ijk", 4, CommandCollection::SpawnCmd),
-	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, CommandCollection::ReloadSpawnCommandListCmd),
-	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
+		"<string>: object_name <int>: count <bool>: same_team, near_player <float>: (if near_player false) xyz, (rotation optional) ijk", 4, 10, CommandCollection::SpawnCmd),
+	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
+	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -517,6 +517,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	ComVarT<float> pos_x, pos_y, pos_z; // position
 	ComVarT<float> rot_i, rot_j, rot_k; // rotation
 	ComVarT<bool> sameTeam, nearPlayerSpawn;
+	int parameter_count = tokens.size() - 1; // only parameters
 
 	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
 	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
@@ -552,27 +553,30 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	}
 	else
 	{
-		if (tokens.size() < 8
+		if (parameter_count < 7
 			|| !pos_x.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !pos_y.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !pos_z.SetValFromStr(tokens[positionArgsStartIdx++]))
 		{
-			output->Output(StringFlag_None, "# insufficient/invalid position spawn arguments");
+			output->Output(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
 			return 0;
 		}
 	}
 
 	// check if rotation parameters were passed
-	bool withRotation = (tokens.size() >= 12 && !nearPlayerSpawn.GetVal())
-		|| (tokens.size() >= 8 && nearPlayerSpawn.GetVal());
+	// even if invalid, error handled after
+	bool withRotation = (parameter_count >= 5 && nearPlayerSpawn.GetVal())
+		|| (parameter_count >= 8 && !nearPlayerSpawn.GetVal());
 
 	if (withRotation)
 	{
-		if (!rot_i.SetValFromStr(tokens[positionArgsStartIdx++])
+		if ((parameter_count < 7 && nearPlayerSpawn.GetVal())
+			|| (parameter_count < 10 && !nearPlayerSpawn.GetVal())
+			|| !rot_i.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !rot_j.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !rot_k.SetValFromStr(tokens[positionArgsStartIdx++]))
 		{
-			output->Output(StringFlag_None, "# insufficient/invalid rotation spawn arguments");
+			output->Output(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
 			return 0;
 		}
 	}
@@ -607,7 +611,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	ObjectSpawn(objectDatum, count.GetVal(), pPosition, pRotation, 1.0f, playerUnitIdx, sameTeam.GetVal());
 
-	// output->OutputFmt(StringFlag_None, "# player xyz: %.3f %.3f %.3f", position.x, position.y, position.z);
+	// output->OutputFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.GetValStr().c_str(), withRotation);
 
 	return 0;
 }

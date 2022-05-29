@@ -5,13 +5,14 @@
 
 const char command_error_not_enough_params[] = "# %s command error: invalid parameter count";
 
-ConsoleCommand::ConsoleCommand(const char* _name, const char* _command_description, int _parameter_count, ExecuteCommandCallbackT* _input_callback,
+ConsoleCommand::ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _input_callback,
 	CommandFlags _flags)
 {
 	m_name = _name;
 	m_command_description = _command_description;
 	m_flags = _flags;
-	m_parameter_count = _parameter_count;
+	m_min_parameter_count = _min_parameter_count;
+	m_max_parameter_count = _max_parameter_count;
 	p_exec_command_cb = _input_callback;
 	m_user_data = nullptr;
 }
@@ -24,7 +25,8 @@ bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* comma
 		return false;
 
 	// + 1 to count for the actual command
-	if (tokens.size() != command_data->GetParameterCount() + 1)
+	if (tokens.size() < command_data->GetMinParameterCount() + 1
+		|| tokens.size() > command_data->GetMaxParameterCount() + 1)
 	{
 		if (command_data->Hidden())
 		{
@@ -82,6 +84,7 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), strlen(command_entry->GetName())) == 0)
 			{
 				command = command_entry;
+				break;
 			}
 		}
 
@@ -100,8 +103,8 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
     return ret;
 }
 
-ConsoleVarCommand::ConsoleVarCommand(const char* _name, const char* _var_description, int _parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr, CommandFlags _flags)
-    : ConsoleCommand(_name, _var_description, _parameter_count, _callback, _flags | CommandFlag_SetsVariable)
+ConsoleVarCommand::ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr, CommandFlags _flags)
+    : ConsoleCommand(_name, _var_description, _min_parameter_count, _max_parameter_count, _callback, _flags | CommandFlag_SetsVariable)
 {
     m_var_ptr = _var_ptr;
 	memset(m_var_str, 0, sizeof(m_var_str));

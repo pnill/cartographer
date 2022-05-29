@@ -51,10 +51,15 @@ public:
         return m_command_description;
     }
 
-    int GetParameterCount() const
+    int GetMinParameterCount() const
     {
-        return m_parameter_count;
+        return m_min_parameter_count;
     }
+
+	int GetMaxParameterCount() const
+	{
+		return m_max_parameter_count;
+	}
 
     template<typename T = void*> T GetUserData() const 
     { 
@@ -70,7 +75,7 @@ public:
 	
     static bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* strOutput, ConsoleCommand* command);
    
-    ConsoleCommand(const char* _name, const char* _command_description, int _parameter_count, ExecuteCommandCallbackT* _callback,
+    ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback,
         CommandFlags _flags = CommandFlag_None);
 
     virtual ~ConsoleCommand() = default;
@@ -84,7 +89,8 @@ protected:
     CommandFlags m_flags;
     const char* m_name;
     const char* m_command_description;
-    int m_parameter_count;
+    int m_min_parameter_count;
+    int m_max_parameter_count;
     void* m_user_data;
 
 private:
@@ -96,7 +102,7 @@ private:
 class ConsoleVarCommand final : public ConsoleCommand
 {
 public:
-    ConsoleVarCommand(const char* _name, const char* _var_description, int _parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr = nullptr, CommandFlags _flags = CommandFlag_None);
+    ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr = nullptr, CommandFlags _flags = CommandFlag_None);
     
     ~ConsoleVarCommand() override = default;
 
