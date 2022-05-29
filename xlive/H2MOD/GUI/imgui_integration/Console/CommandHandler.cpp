@@ -79,9 +79,9 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 	if (tokenize(command_line, command_line_length, " ", command_first_tokens))
 	{
 		ConsoleCommand* command = nullptr;
-		for (auto& command_entry : CommandCollection::commandTable)
+		for (auto command_entry : CommandCollection::commandTable)
 		{
-			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), strlen(command_entry->GetName())) == 0)
+			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), command_first_tokens[0].length()) == 0)
 			{
 				command = command_entry;
 				break;
