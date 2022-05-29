@@ -517,7 +517,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	ComVarT<float> pos_x, pos_y, pos_z; // position
 	ComVarT<float> rot_i, rot_j, rot_k; // rotation
 	ComVarT<bool> sameTeam, nearPlayerSpawn;
-	int parameter_count = tokens.size() - 1; // only parameters
+	int parameterCount = tokens.size() - 1; // only parameters
 
 	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
 	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
@@ -553,7 +553,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	}
 	else
 	{
-		if (parameter_count < 7
+		if (parameterCount < 7
 			|| !pos_x.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !pos_y.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !pos_z.SetValFromStr(tokens[positionArgsStartIdx++]))
@@ -565,13 +565,13 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	// check if rotation parameters were passed
 	// even if invalid, error handled after
-	bool withRotation = (parameter_count >= 5 && nearPlayerSpawn.GetVal())
-		|| (parameter_count >= 8 && !nearPlayerSpawn.GetVal());
+	bool withRotation = (parameterCount >= 5 && nearPlayerSpawn.GetVal())
+		|| (parameterCount >= 8 && !nearPlayerSpawn.GetVal());
 
 	if (withRotation)
 	{
-		if ((parameter_count < 7 && nearPlayerSpawn.GetVal())
-			|| (parameter_count < 10 && !nearPlayerSpawn.GetVal())
+		if ((parameterCount < 7 && nearPlayerSpawn.GetVal())
+			|| (parameterCount < 10 && !nearPlayerSpawn.GetVal())
 			|| !rot_i.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !rot_j.SetValFromStr(tokens[positionArgsStartIdx++])
 			|| !rot_k.SetValFromStr(tokens[positionArgsStartIdx++]))

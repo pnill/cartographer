@@ -38,8 +38,8 @@ enum CommandFlags_
 class ConsoleCommand
 {
 public:
-    bool CommandSetsVariable() const { return (m_flags & CommandFlag_SetsVariable) != 0;  }
     bool Hidden() const { return (m_flags & CommandFlag_Hidden) != 0;  }
+    bool CommandSetsVariable() const { return (m_flags & CommandFlag_SetsVariable) != 0;  }
 
     const char* GetName() const
     {
