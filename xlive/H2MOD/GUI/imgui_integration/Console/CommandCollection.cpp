@@ -535,21 +535,21 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 {
 	IOutput* output = cbData.strOutput;
 	
-	int positionArgsStartIdx = 5;
+	int tokenArgPos = 1;
 
 	// spawn object_name count same_team near_player x y z i j k
 
 	datum objectDatum = DATUM_INDEX_NONE;
 	ComVarT<int> count;
-	ComVarT<float> pos_x, pos_y, pos_z; // position
-	ComVarT<float> rot_i, rot_j, rot_k; // rotation
+	ComVarT<float> varPos[3];
+	ComVarT<float> varRotation[3];
 	ComVarT<bool> sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
 	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
 	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 
-	std::string objectName = tokens[1];
+	std::string objectName = tokens[tokenArgPos++];
 
 	if (h2mod->GetEngineType() == e_engine_type::_main_menu) {
 		output->Output(StringFlag_None, "# can only be used ingame");
@@ -559,9 +559,9 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		output->Output(StringFlag_None, "# can only be used by the session host");
 		return 0;
 	}
-	else if (!count.SetValFromStr(tokens[2])
-		|| !sameTeam.SetValFromStr(tokens[3])
-		|| !nearPlayerSpawn.SetValFromStr(tokens[4])
+	else if (!count.SetValFromStr(tokens[tokenArgPos++])
+		|| !sameTeam.SetValFromStr(tokens[tokenArgPos++])
+		|| !nearPlayerSpawn.SetValFromStr(tokens[tokenArgPos++])
 		)
 	{
 		output->Output(StringFlag_None, "# one or more invalid spawn arguments");
@@ -573,17 +573,17 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
 		if (localPlayerPos != nullptr)
 		{
-			pos_x.SetVal(localPlayerPos->x + 0.5f);
-			pos_y.SetVal(localPlayerPos->y + 0.5f);
-			pos_z.SetVal(localPlayerPos->z + 0.5f);
+			varPos[0].SetVal(localPlayerPos->x + 0.5f);
+			varPos[1].SetVal(localPlayerPos->y + 0.5f);
+			varPos[2].SetVal(localPlayerPos->z + 0.5f);
 		}
 	}
 	else
 	{
 		if (parameterCount < 7
-			|| !pos_x.SetValFromStr(tokens[positionArgsStartIdx++])
-			|| !pos_y.SetValFromStr(tokens[positionArgsStartIdx++])
-			|| !pos_z.SetValFromStr(tokens[positionArgsStartIdx++]))
+			|| !varPos[0].SetValFromStr(tokens[tokenArgPos++])
+			|| !varPos[1].SetValFromStr(tokens[tokenArgPos++])
+			|| !varPos[2].SetValFromStr(tokens[tokenArgPos++]))
 		{
 			output->Output(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
 			return 0;
@@ -599,9 +599,9 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	{
 		if ((parameterCount < 7 && nearPlayerSpawn.GetVal())
 			|| (parameterCount < 10 && !nearPlayerSpawn.GetVal())
-			|| !rot_i.SetValFromStr(tokens[positionArgsStartIdx++])
-			|| !rot_j.SetValFromStr(tokens[positionArgsStartIdx++])
-			|| !rot_k.SetValFromStr(tokens[positionArgsStartIdx++]))
+			|| !varRotation[0].SetValFromStr(tokens[tokenArgPos++])
+			|| !varRotation[1].SetValFromStr(tokens[tokenArgPos++])
+			|| !varRotation[2].SetValFromStr(tokens[tokenArgPos++]))
 		{
 			output->Output(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
 			return 0;
@@ -627,13 +627,13 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	if (!nearPlayerSpawn.GetVal())
 	{
 		pPosition = &position;
-		position = { pos_x.GetVal(), pos_y.GetVal(), pos_z.GetVal() };
+		position = { varPos[0].GetVal(), varPos[1].GetVal(), varPos[2].GetVal() };
 	}
 
 	if (withRotation)
 	{
 		pRotation = &rotation;
-		rotation = { rot_i.GetVal(), rot_j.GetVal(), rot_k.GetVal() };
+		rotation = { varRotation[0].GetVal(), varRotation[1].GetVal(), varRotation[2].GetVal() };
 	}
 
 	ObjectSpawn(objectDatum, count.GetVal(), pPosition, pRotation, 1.0f, playerUnitIdx, sameTeam.GetVal());
