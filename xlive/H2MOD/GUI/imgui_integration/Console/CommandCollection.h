@@ -2,7 +2,6 @@
 
 #include "ComVar.h"
 #include "CommandHandler.h"
-#include "CommandCollection.h"
 
 #include "Blam/Math/BlamMath.h"
 
