@@ -424,7 +424,7 @@ void Console::Draw(const char* title, bool* p_open)
 		ImGui::PushID(console_text_id);
 
 		auto& stringHeader = m_output.GetHeader(i);
-		const char* stringToAdd = m_output.GetStringAtOffset(stringHeader.offset);
+		const char* stringToAdd = m_output.GetStringAtIdx(stringHeader.idx);
 		if (stringHeader.flags & StringFlag_CopyToClipboard)
 			ImGui::LogToClipboard();
 

@@ -84,7 +84,7 @@ static inline bool tokenize(const char* str, size_t str_length, const char* deli
 
 struct StringLineHeader
 {
-    size_t offset;
+    int idx;
     size_t size;
     StringHeaderFlags flags;
 };
@@ -101,124 +101,108 @@ enum StringHeaderFlags_
 class CircularStringBuffer
 {
 public:
-    // initial buffer size
-    unsigned int line_count;
-    size_t max_buffer_size_per_line;
+	// initial buffer size
+	size_t m_line_buf_size;
+	unsigned int m_line_count;
 
-    size_t GetBufferSize() const { return line_count * max_buffer_size_per_line; }
+	size_t GetBufferSize() const { return m_line_count * m_line_buf_size; }
+	size_t GetLineBufferSize() const { return m_line_buf_size; }
 
-    CircularStringBuffer(unsigned int _line_count, size_t _max_buffer_size_per_line)
-    {
-        line_count = _line_count;
-        max_buffer_size_per_line = _max_buffer_size_per_line;
+	CircularStringBuffer(unsigned int _line_count, size_t _max_buffer_size_per_line)
+	{
+		m_line_count = _line_count;
+		m_line_buf_size = _max_buffer_size_per_line;
 
-        // allocate once we know the size
-        s = new char[GetBufferSize()];
-        last_buffer_position = s;
-        strings_header.reserve(line_count);
-    };
+		// allocate once we know the size
+		m_buf = new char[GetBufferSize()];
+		m_buffer_idx = 0;
+		m_strings_headers.reserve(m_line_count);
+	};
 
-    //CircularStringBuffer()
-    //{
-        // default 256 strings of 256 bytes each
-        // to note default line count isn't that relevant when using dynamic string allocation from the buffer
-        // what does dynamic string allocation mean in this context?
-        // everytime someone tries to pass a string to this buffer
-        // it'll allow the code to append it exactly after the NULL delimiter of the previous string
-        // if the buffer is full, it'll override the first string, but im too lazy rn to fully implement and fix all edge cases this behaviour implies 
-        // so we just use a static lenght buffer for each string, even if it sounds like wasted memory
-    //}
+	~CircularStringBuffer()
+	{
+		m_strings_headers.clear();
+		delete[] m_buf;
+		m_buf = NULL;
+		m_buffer_idx = 0;
+	}
 
-    ~CircularStringBuffer()
-    {
-        delete[] s;
-        s = NULL;
-        last_buffer_position = NULL;
-    }
+	void Clear()
+	{
+		m_strings_headers.clear();
+		m_buffer_idx = 0;
+		m_buf[0] = '\0';
+	}
 
-    void Clear()
-    {
-        strings_header.clear();
-        last_buffer_position = s;
-        last_buffer_position[0] = '\0';
-    }
+	void StringBufferResize(int newLineCount, size_t newLineBufSize)
+	{
+		size_t oldBufferSize = GetBufferSize();
 
-    void StringBufferResize(int newLineCount, size_t newDefaultMaxBufferSizePerLine)
-    {
-        size_t oldBufferSize = GetBufferSize();
+		m_line_count = newLineCount;
+		m_line_buf_size = newLineBufSize;
 
-        line_count = newLineCount;
-        max_buffer_size_per_line = newDefaultMaxBufferSizePerLine;
+		size_t newBufferSize = GetBufferSize();
+		IM_ASSERT(newBufferSize > oldBufferSize);
+		char* new_buffer = (char*)IM_ALLOC(newBufferSize);
+		if (m_buf != NULL)
+		{
+			memcpy(new_buffer, m_buf, GetBufferSize());
+			IM_DELETE(m_buf);
+		}
+		m_buf = new_buffer;
+	}
 
-        size_t newBufferSize = GetBufferSize();
-        IM_ASSERT(newBufferSize > oldBufferSize);
-        size_t lastPosition = GetUsedBufferSize();
-        char* new_buffer = (char*)IM_ALLOC(newBufferSize);
-        if (s != NULL)
-        {
-            memcpy(new_buffer, s, GetBufferSize());
-            IM_DELETE(s);
-        }
-        s = new_buffer;
-        last_buffer_position = &s[lastPosition];
-    }
+	/// <summary>
+	/// Add a string entry in the buffer
+	/// </summary>
+	/// <param name="source"></param>
+	/// Source of the string
+	/// <param name="characterCount"></param>
+	/// Character count of the string
+	void AddString(StringHeaderFlags flags, const char* source, size_t characterCount = 0)
+	{
+		if (characterCount == 0)
+			characterCount = strnlen_s(source, m_line_buf_size - 1);
 
-    /// <summary>
-    /// Add a string entry in the buffer
-    /// </summary>
-    /// <param name="source"></param>
-    /// Source of the string
-    /// <param name="characterCount"></param>
-    /// Character count of the string
-    void AddString(StringHeaderFlags flags, const char* source, size_t characterCount = 0)
-    {
-        if (characterCount == 0)
-            characterCount = strnlen_s(source, max_buffer_size_per_line - 1);
+		IM_ASSERT(characterCount < m_line_buf_size - 1 || source[characterCount - 1] == '\0');
 
-        IM_ASSERT(characterCount < max_buffer_size_per_line - 1 || source[characterCount] == '\0');
+		char* destinationBuffer;
+		size_t destinationBufferSize = GetNewlineBuffer(m_line_buf_size, &destinationBuffer);
 
-        // TODO view comment in constructor
-        //size_t sourceStringSize = characterCount + 1; // + 1 for the NULL
+		if (destinationBufferSize > 0)
+		{
+			// position has been updated, copy the source string
+			strncpy_s(destinationBuffer, destinationBufferSize, source, characterCount);
+			destinationBuffer[characterCount] = '\0';
 
-        char* destinationBuffer;
-        size_t destinationBufferSize = GetNewlineBuffer(max_buffer_size_per_line, &destinationBuffer);
-        // TODO view comment in constructor
-        // size_t destinationBufferSize = GetNewlineBuffer(sourceStringSize, &destinationBuffer);
+			m_strings_headers.push_back(StringLineHeader{ m_buffer_idx - 1, destinationBufferSize, flags });
+		}
+		else
+		{
+			// log error
+			// printf("AddString failed, destination buffer size < 0");
+		}
+	}
 
-        if (destinationBufferSize > 0)
-        {
-            // position has been updated, copy the source string
-            strncpy_s(destinationBuffer, destinationBufferSize, source, characterCount);
-            destinationBuffer[characterCount] = '\0';
-
-            strings_header.push_back(StringLineHeader{ (size_t)(destinationBuffer - s), destinationBufferSize, flags });
-        }
-        else
-        {
-            // log error
-            // printf("AddString failed, destination buffer size < 0");
-        }
-    }
-
-    void AddStringFmt(StringHeaderFlags flags, const char* fmt, ...)
-    {
-        va_list valist;
-        va_start(valist, fmt);
-        int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-        if (buffer_size_needed < max_buffer_size_per_line)
-        {
-            char* buffer = (char*)_malloca(buffer_size_needed);
-            int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
-            AddString(flags, buffer, copied_characters);
-            _freea(buffer);
-        }
-        va_end(valist);
-    }
+	void AddStringFmt(StringHeaderFlags flags, const char* fmt, ...)
+	{
+		va_list valist;
+		va_start(valist, fmt);
+		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
+		if (buffer_size_needed < m_line_buf_size)
+		{
+			char* buffer = (char*)_malloca(buffer_size_needed);
+			int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+			AddString(flags, buffer, copied_characters);
+			_freea(buffer);
+		}
+		va_end(valist);
+	}
 
 	void AddStringFmt(StringHeaderFlags flags, const char* fmt, va_list valist)
 	{
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-		if (buffer_size_needed < max_buffer_size_per_line)
+		if (buffer_size_needed < m_line_buf_size)
 		{
 			char* buffer = (char*)_malloca(buffer_size_needed);
 			int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
@@ -227,104 +211,77 @@ public:
 		}
 	}
 
-    const char* GetStringAtIndex(int headerIndex) const
-    {
-        assert(headerIndex < GetStringHeaderSize());
-        const StringLineHeader& string_header = GetHeader(headerIndex);
-        return GetStringAtOffset(string_header.offset);
-    }
+	const char* GetStringAtIndex(int headerIdx) const
+	{
+		assert(headerIdx < GetStringHeaderSize());
+		const StringLineHeader& string_header = GetHeader(headerIdx);
+		return GetStringAtIdx(string_header.idx);
+	}
 
-    const char* GetStringAtOffset(size_t offset) const
-    {
-        return &s[offset];
-    }
+	const char* GetStringAtIdx(int idx) const
+	{
+		return &m_buf[idx * m_line_buf_size];
+	}
 
-    const StringLineHeader& GetHeader(int headerIndex) const
-    {
-        return strings_header.at(headerIndex);
-    }
+	const StringLineHeader& GetHeader(int headerIdx) const
+	{
+		return m_strings_headers.at(headerIdx);
+	}
 
-    StringLineHeader& GetHeader(int headerIndex)
-    {
-        return strings_header.at(headerIndex);
-    }
+	StringLineHeader& GetHeader(int headerIdx)
+	{
+		return m_strings_headers.at(headerIdx);
+	}
 
-    size_t GetStringHeaderSize() const
-    {
-        return strings_header.size();
-    }
+	size_t GetStringHeaderSize() const
+	{
+		return m_strings_headers.size();
+	}
 
 private:
-    // private data
-    char* s; // buffer
+	// private data
+	char* m_buf; // buffer
 
-    // buffer details
-    // current position of the string
-    char* last_buffer_position;
-    // header for each line of characters
-    std::vector<StringLineHeader> strings_header;
+	// buffer details
+	// current position of the string
+	int m_buffer_idx;
+	// header for each line of characters
+	std::vector<StringLineHeader> m_strings_headers;
 
-    /// <summary>
-    /// Gets the size of the buffer and the pointer to the buffer itself
-    /// where to copy the source string
-    /// </summary>
-    /// <param name="sourceStringSize"></param>
-    /// size of the string about to get copied in the circular buffer
-    /// <param name="outDestinationBuf"></param>
-    /// pointer to destination buffer
-    /// <returns></returns>
-    size_t GetNewlineBuffer(size_t sourceStringBufferSize, char** outBufferPtr)
-    {
-        if (sourceStringBufferSize > GetBufferSize()) return 0; // we cannot copy this string, buffer too small
+	size_t GetNewlineBuffer(size_t sourceStringBufferSize, char** outBufferPtr)
+	{
+		if (sourceStringBufferSize > GetLineBufferSize())
+			return 0; // we cannot copy this string, line buffer too small
 
-        // check if can fit the 'size' in current position remaining buffer
-        bool remainingSpaceAvailable = (GetRemainingBufferSize() / sourceStringBufferSize) >= 1;
-        if (remainingSpaceAvailable)
-        {
-            *outBufferPtr = last_buffer_position;
-            // use current position as the buffer, there's enough space
-            last_buffer_position += sourceStringBufferSize;
-            return sourceStringBufferSize;
-        }
-        else
-        {
-            // then discard the old one
-            last_buffer_position = s;
+		// check if can fit the 'size' in current position remaining buffer
+		bool remainingSpaceAvailable = m_buffer_idx < m_line_count;
+		if (remainingSpaceAvailable)
+		{
+			// use current position as the buffer, there's enough space
+			*outBufferPtr = &m_buf[m_buffer_idx * m_line_buf_size];
+			m_buffer_idx++;
+			return sourceStringBufferSize;
 
-            auto OffsetInRange = [](size_t lower, size_t upper, size_t offset) -> bool
-            {
-                return lower <= offset && offset <= upper;
-            };
+		}
+		else
+		{
+			m_buffer_idx = 0;
 
-            // clear string range, otherwise we might leave bad string_positions inside the container
-            for (auto it = strings_header.begin(); it < strings_header.end(); )
-            {
-                if (OffsetInRange((size_t)(last_buffer_position - s), (size_t)((size_t)(last_buffer_position - s) + sourceStringBufferSize), it->offset))
-                {
-                    it = strings_header.erase(it);
-                }
-                else
-                {
-                    it++;
-                }
-            }
+			// clear string range, otherwise we might leave bad string_positions inside the container
+			for (auto it = m_strings_headers.begin(); it < m_strings_headers.end(); )
+			{
+				if (m_buffer_idx == it->idx)
+				{
+					it = m_strings_headers.erase(it);
+				}
+				else
+				{
+					it++;
+				}
+			}
 
-            // then attempt one more time
-            return GetNewlineBuffer(sourceStringBufferSize, outBufferPtr);
-        }
-    }
-
-    /// <summary>
-    /// </summary>
-    size_t GetRemainingBufferSize() const
-    {
-        return GetBufferSize() - GetUsedBufferSize();
-    }
-
-    /// <summary>
-    /// </summary>
-    size_t GetUsedBufferSize() const
-    {
-        return (size_t)(last_buffer_position - s);
-    }
+			// then attempt one more time
+			return GetNewlineBuffer(sourceStringBufferSize, outBufferPtr);
+		}
+	}
 };
