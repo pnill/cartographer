@@ -389,7 +389,8 @@ void CXNetQoS::Listener()
 			}
 
 			char acceptBuffer[2 * (sizeof(sockaddr_in) + 16)];
-			if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)acceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, NULL, &acceptOvelapped) == FALSE)
+			DWORD dwBytesReceived = 0;
+			if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)acceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, &dwBytesReceived, &acceptOvelapped) == FALSE)
 			{
 				if (WSAGetLastError() != ERROR_IO_PENDING) {
 					LOG_TRACE_NETWORK("{} - AcceptEx failed with error: {}", __FUNCTION__, WSAGetLastError());
