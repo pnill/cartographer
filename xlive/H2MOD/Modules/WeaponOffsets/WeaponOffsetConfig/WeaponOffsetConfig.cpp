@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Blam/Math/real_math.h"
 #include "WeaponOffsetConfig.h"
 
 char* path = strcat
@@ -8,7 +7,7 @@ char* path = strcat
     "\\Microsoft\\Halo 2\\WeaponOffsets.cfg"
 );
 
-void ReadWeaponOffsetConfig(real_vector3d *WeaponOffset)
+void ReadWeaponOffsetConfig(s_weapon_custom_offset *WeaponOffsets)
 {
     FILE* file = NULL;
 
@@ -17,36 +16,46 @@ void ReadWeaponOffsetConfig(real_vector3d *WeaponOffset)
     {
         for (byte i = BattleRifle; i != Sniper + 1; i++)
         {
-            fscanf(file, "%f,%f,%f\n", &WeaponOffset[i].i, &WeaponOffset[i].j, &WeaponOffset[i].k);
+            fscanf(file, "%f,%f,%f\n", &WeaponOffsets[i].ModifiedOffset.i, &WeaponOffsets[i].ModifiedOffset.j, &WeaponOffsets[i].ModifiedOffset.k);
         }
         fclose(file);
     }
 }
 
-void SaveWeaponOffsetConfig(const real_vector3d WeaponOffset[])
+void SaveWeaponOffsetConfig(const s_weapon_custom_offset customOffsets[], bool defaultOffsets)
 {
     FILE* file = NULL;
 
     file = fopen(path, "w");
     if (file != NULL)
     {
-        for (byte i = BattleRifle; i != Sniper + 1; i++)
+        if (defaultOffsets == false)
         {
-            fprintf(file, "%.3f,%.3f,%.3f\n", WeaponOffset[i].i, WeaponOffset[i].j, WeaponOffset[i].k);
+            for (byte i = BattleRifle; i != Sniper + 1; i++)
+            {
+                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].ModifiedOffset.i, customOffsets[i].ModifiedOffset.j, customOffsets[i].ModifiedOffset.k);
+            }
+        }
+        else
+        {
+            for (byte i = BattleRifle; i != Sniper + 1; i++)
+            {
+                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].DefaultOffset.i, customOffsets[i].DefaultOffset.j, customOffsets[i].DefaultOffset.k);
+            }
         }
         fclose(file);
     }
 }
 
 // only writes anything if file dosent already exist
-void WriteDefaultFile(const real_vector3d WeaponOffset[])
+void WriteDefaultFile(const s_weapon_custom_offset WeaponOffsets[])
 {
     FILE* file = NULL;    
 
     file = fopen(path, "r");
     if (file == NULL)
     {
-        SaveWeaponOffsetConfig(WeaponOffset);
+        SaveWeaponOffsetConfig(WeaponOffsets, true);
     }
     else fclose(file);
 }

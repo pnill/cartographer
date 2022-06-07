@@ -236,6 +236,6 @@ namespace imgui_handler
 		void Close();
 		void ApplyOffset(s_weapon_group_definition* tag, real_vector3d offset);
 		void ApplyOffsetImgui(s_weapon_group_definition* tag, char* slider, float& offset);
-		void Initialize();
+		void Setup();
 	}
 }

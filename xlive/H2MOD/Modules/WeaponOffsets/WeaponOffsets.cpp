@@ -3,56 +3,30 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h"
 
 namespace imgui_handler {
 	namespace WeaponOffsets {
-		
-		struct s_weapon_custom_offset {
-			const real_vector3d DefaultOffsets[16] = 
-			{
-				{0.02, 0, -0.004},
-				{0.02, 0, 0},
-				{0.02, 0, 0},
-				{0.02, -0.01, 0.001},
-				{0.02, 0, -0.004},
-				{0.05, 0, 0},
-				{0.02, 0, -0.005},
-				{0.03, 0, -0.005},
-				{0.03, 0, -0.005},
-				{0.03, 0, -0.005},
-				{0.02, 0, 0},
-				{0.02, 0, -0.005},
-				{0.02, 0.03, 0},
-				{0.02, -0.001, -0.015},
-				{0.02, 0, 0},
-				{0.01, 0, 0}
-			};
-			const char WeaponPaths[16][128] =
-			{
-				"objects\\weapons\\rifle\\battle_rifle\\battle_rifle",
-				"objects\\weapons\\rifle\\beam_rifle\\beam_rifle",
-				"objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle",
-				"objects\\weapons\\support_low\\brute_shot\\brute_shot",
-				"objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine",
-				"objects\\weapons\\melee\\energy_blade\\energy_blade",
-				"objects\\weapons\\support_high\\flak_cannon\\flak_cannon",
-				"objects\\weapons\\pistol\\magnum\\magnum",
-				"objects\\weapons\\pistol\\needler\\needler",
-				"objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol",
-				"objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle",
-				"objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher",
-				"objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam",
-				"objects\\weapons\\rifle\\shotgun\\shotgun",
-				"objects\\weapons\\rifle\\smg\\smg",
-				"objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle"
-			};
-			real_vector3d ModifiedOffsets[16];
-			s_weapon_group_definition* tags[16];
+		s_weapon_custom_offset customOffsets[16]
+		{
+			{{0.02, 0, -0.004}, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {0,0,0}, NULL},
+			{{0.02, 0, 0}, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {0,0,0}, NULL},
+			{{0.02, 0, 0}, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", {0,0,0}, NULL},
+			{{0.02, -0.01, 0.001}, "objects\\weapons\\support_low\\brute_shot\\brute_shot", {0,0,0}, NULL},
+			{{0.02, 0, -0.004}, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", {0,0,0}, NULL},
+			{{0.05, 0, 0}, "objects\\weapons\\melee\\energy_blade\\energy_blade", {0,0,0}, NULL},
+			{{0.02, 0, -0.005}, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon", {0,0,0}, NULL},
+			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\magnum\\magnum", {0,0,0}, NULL},
+			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\needler\\needler", {0,0,0}, NULL},
+			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", {0,0,0}, NULL},
+			{{0.02, 0, 0}, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", {0,0,0}, NULL},
+			{{0.02, 0, -0.005}, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", {0,0,0}, NULL},
+			{{0.02, 0.03, 0}, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam", {0,0,0}, NULL},
+			{{0.02, -0.001, -0.015}, "objects\\weapons\\rifle\\shotgun\\shotgun", {0,0,0}, NULL},
+			{{0.02, 0, 0}, "objects\\weapons\\rifle\\smg\\smg", {0,0,0}, NULL},
+			{{0.01, 0, 0}, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
 		};
-		s_weapon_custom_offset customOffsets;
 
 		namespace
 		{
@@ -101,138 +75,12 @@ namespace imgui_handler {
 
 				// Setup combo box menus for each weapon
 				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
-				switch (selectedOption)
-				{
-				case BattleRifle:
-					OffsetMenu(customOffsets.tags[BattleRifle], "##BattleRifle_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[BattleRifle].i, customOffsets.DefaultOffsets[BattleRifle].i);
-					OffsetMenu(customOffsets.tags[BattleRifle], "##BattleRifle_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[BattleRifle].j, customOffsets.DefaultOffsets[BattleRifle].j);
-					OffsetMenu(customOffsets.tags[BattleRifle], "##BattleRifle_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[BattleRifle].k, customOffsets.DefaultOffsets[BattleRifle].k);
-					break;
-				case BeamRifle:
-					OffsetMenu
-					(customOffsets.tags[BeamRifle], "##BeamRifle_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[BeamRifle].i, customOffsets.DefaultOffsets[BeamRifle].i);
-					OffsetMenu(customOffsets.tags[BeamRifle], "##BeamRifle_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[BeamRifle].j, customOffsets.DefaultOffsets[BeamRifle].j);
-					OffsetMenu(customOffsets.tags[BeamRifle], "##BeamRifle_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[BeamRifle].k, customOffsets.DefaultOffsets[BeamRifle].k);
-					break;
-				case BrutePlasmaRifle:
-					OffsetMenu(customOffsets.tags[BrutePlasmaRifle], "##BrutePlasmaRifle_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[BrutePlasmaRifle].i, customOffsets.DefaultOffsets[BrutePlasmaRifle].i);
-					OffsetMenu(customOffsets.tags[BrutePlasmaRifle], "##BrutePlasmaRifle_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[BrutePlasmaRifle].j, customOffsets.DefaultOffsets[BrutePlasmaRifle].j);
-					OffsetMenu(customOffsets.tags[BrutePlasmaRifle], "##BrutePlasmaRifle_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[BrutePlasmaRifle].k, customOffsets.DefaultOffsets[BrutePlasmaRifle].k);
-					break;
-				case BruteShot:
-					OffsetMenu(customOffsets.tags[BruteShot], "##BruteShot_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[BruteShot].i, customOffsets.DefaultOffsets[BruteShot].i);
-					OffsetMenu(customOffsets.tags[BruteShot], "##BruteShot_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[BruteShot].j, customOffsets.DefaultOffsets[BruteShot].j);
-					OffsetMenu(customOffsets.tags[BruteShot], "##BruteShot_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[BruteShot].k, customOffsets.DefaultOffsets[BruteShot].k);
-					break;
-				case Carbine:
-					OffsetMenu(customOffsets.tags[Carbine], "##Carbine_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[Carbine].i, customOffsets.DefaultOffsets[Carbine].i);
-					OffsetMenu(customOffsets.tags[Carbine], "##Carbine_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[Carbine].j, customOffsets.DefaultOffsets[Carbine].j);
-					OffsetMenu(customOffsets.tags[Carbine], "##Carbine_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[Carbine].k, customOffsets.DefaultOffsets[Carbine].k);
-					break;
-				case EnergySword:
-					OffsetMenu(customOffsets.tags[EnergySword], "##EnergySword_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[EnergySword].i, customOffsets.DefaultOffsets[EnergySword].i);
-					OffsetMenu(customOffsets.tags[EnergySword], "##EnergySword_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[EnergySword].j, customOffsets.DefaultOffsets[EnergySword].j);
-					OffsetMenu(customOffsets.tags[EnergySword], "##EnergySword_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[EnergySword].k, customOffsets.DefaultOffsets[EnergySword].k);
-					break;
-				case FuelRod:
-					OffsetMenu(customOffsets.tags[FuelRod], "##FuelRod_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[FuelRod].i, customOffsets.DefaultOffsets[FuelRod].i);
-					OffsetMenu(customOffsets.tags[FuelRod], "##FuelRod_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[FuelRod].j, customOffsets.DefaultOffsets[FuelRod].j);
-					OffsetMenu(customOffsets.tags[FuelRod], "##FuelRod_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[FuelRod].k, customOffsets.DefaultOffsets[FuelRod].k);
-					break;
-				case Magnum:
-					OffsetMenu(customOffsets.tags[Magnum], "##Magnum_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[Magnum].i, customOffsets.DefaultOffsets[Magnum].i);
-					OffsetMenu(customOffsets.tags[Magnum], "##Magnum_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[Magnum].j, customOffsets.DefaultOffsets[Magnum].j);
-					OffsetMenu(customOffsets.tags[Magnum], "##Magnum_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[Magnum].k, customOffsets.DefaultOffsets[Magnum].k);
-					break;
-				case Needler:
-					OffsetMenu(customOffsets.tags[Needler], "##Needler_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[Needler].i, customOffsets.DefaultOffsets[Needler].i);
-					OffsetMenu(customOffsets.tags[Needler], "##Needler_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[Needler].j, customOffsets.DefaultOffsets[Needler].j);
-					OffsetMenu(customOffsets.tags[Needler], "##Needler_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[Needler].k, customOffsets.DefaultOffsets[Needler].k);
-					break;
-				case PlasmaPistol:
-					OffsetMenu(customOffsets.tags[PlasmaPistol], "##PlasmaPistol_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[PlasmaPistol].i, customOffsets.DefaultOffsets[PlasmaPistol].i);
-					OffsetMenu(customOffsets.tags[PlasmaPistol], "##PlasmaPistol_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[PlasmaPistol].j, customOffsets.DefaultOffsets[PlasmaPistol].j);
-					OffsetMenu(customOffsets.tags[PlasmaPistol], "##PlasmaPistol_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[PlasmaPistol].k, customOffsets.DefaultOffsets[PlasmaPistol].k);
-					break;
-				case PlasmaRifle:
-					OffsetMenu(customOffsets.tags[PlasmaRifle], "##PlasmaRifle_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[PlasmaRifle].i, customOffsets.DefaultOffsets[PlasmaRifle].i);
-					OffsetMenu(customOffsets.tags[PlasmaRifle], "##PlasmaRifle_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[PlasmaRifle].j, customOffsets.DefaultOffsets[PlasmaRifle].j);
-					OffsetMenu(customOffsets.tags[PlasmaRifle], "##PlasmaRifle_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[PlasmaRifle].k, customOffsets.DefaultOffsets[PlasmaRifle].k);
-					break;
-				case RocketLauncher:
-					OffsetMenu(customOffsets.tags[RocketLauncher], "##RocketLauncher_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[RocketLauncher].i, customOffsets.DefaultOffsets[RocketLauncher].i);
-					OffsetMenu(customOffsets.tags[RocketLauncher], "##RocketLauncher_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[RocketLauncher].j, customOffsets.DefaultOffsets[RocketLauncher].j);
-					OffsetMenu(customOffsets.tags[RocketLauncher], "##RocketLauncher_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[RocketLauncher].k, customOffsets.DefaultOffsets[RocketLauncher].k);
-					break;
-				case SentinelBeam:
-					OffsetMenu(customOffsets.tags[SentinelBeam], "##SentinelBeam_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[SentinelBeam].i, customOffsets.DefaultOffsets[SentinelBeam].i);
-					OffsetMenu(customOffsets.tags[SentinelBeam], "##SentinelBeam_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[SentinelBeam].j, customOffsets.DefaultOffsets[SentinelBeam].j);
-					OffsetMenu(customOffsets.tags[SentinelBeam], "##SentinelBeam_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[SentinelBeam].k, customOffsets.DefaultOffsets[SentinelBeam].k);
-					break;
-				case Shotgun:
-					OffsetMenu(customOffsets.tags[Shotgun], "##Shotgun_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[Shotgun].i, customOffsets.DefaultOffsets[Shotgun].i);
-					OffsetMenu(customOffsets.tags[Shotgun], "##Shotgun_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[Shotgun].j, customOffsets.DefaultOffsets[Shotgun].j);
-					OffsetMenu(customOffsets.tags[Shotgun], "##Shotgun_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[Shotgun].k, customOffsets.DefaultOffsets[Shotgun].k);
-					break;
-				case SMG:
-					OffsetMenu(customOffsets.tags[SMG], "##SMG_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[SMG].i, customOffsets.DefaultOffsets[SMG].i);
-					OffsetMenu(customOffsets.tags[SMG], "##SMG_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[SMG].j, customOffsets.DefaultOffsets[SMG].j);
-					OffsetMenu(customOffsets.tags[SMG], "##SMG_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[SMG].k, customOffsets.DefaultOffsets[SMG].k);
-					break;
-				case Sniper:
-					OffsetMenu(customOffsets.tags[Sniper], "##Sniper_OffsetX", weapon_offset_x,
-						customOffsets.ModifiedOffsets[Sniper].i, customOffsets.DefaultOffsets[Sniper].i);
-					OffsetMenu(customOffsets.tags[Sniper], "##Sniper_OffsetY", weapon_offset_y,
-						customOffsets.ModifiedOffsets[Sniper].j, customOffsets.DefaultOffsets[Sniper].j);
-					OffsetMenu(customOffsets.tags[Sniper], "##Sniper_OffsetZ", weapon_offset_z,
-						customOffsets.ModifiedOffsets[Sniper].k, customOffsets.DefaultOffsets[Sniper].k);
-					break;
-				}
+				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetX", weapon_offset_x,
+					customOffsets[selectedOption].ModifiedOffset.i, customOffsets[selectedOption].DefaultOffset.i);
+				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetY", weapon_offset_y,
+					customOffsets[selectedOption].ModifiedOffset.j, customOffsets[selectedOption].DefaultOffset.j);
+				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetZ", weapon_offset_z,
+					customOffsets[selectedOption].ModifiedOffset.k, customOffsets[selectedOption].DefaultOffset.k);
 			}
 		}
 
@@ -281,7 +129,7 @@ namespace imgui_handler {
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			ImGuiToggleInput(true);
 			PlayerControl::DisableLocalCamera(true);
-			ReadWeaponOffsetConfig(customOffsets.ModifiedOffsets);
+			ReadWeaponOffsetConfig(customOffsets);
 		}
 		void Close()
 		{
@@ -292,7 +140,7 @@ namespace imgui_handler {
 				ImGuiToggleInput(false);
 				PlayerControl::DisableLocalCamera(false);
 			}
-			SaveWeaponOffsetConfig(customOffsets.ModifiedOffsets);
+			SaveWeaponOffsetConfig(customOffsets, false);
 		}
 		void BuildStringsTable()
 		{
@@ -365,17 +213,18 @@ namespace imgui_handler {
 				break;
 			}
 		}
-		void Initialize()
+		void Setup()
 		{
-			WriteDefaultFile(customOffsets.DefaultOffsets);
+			WriteDefaultFile(customOffsets);
 
-			ReadWeaponOffsetConfig(customOffsets.ModifiedOffsets);
+			ReadWeaponOffsetConfig(customOffsets);
 
 			for (byte i = BattleRifle; i != Sniper + 1; i++)
 			{
-				customOffsets.tags[i] = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
-					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets.WeaponPaths[i]));
-				ApplyOffset(customOffsets.tags[i], customOffsets.ModifiedOffsets[i]);
+				customOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
+					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].WeaponPath));
+
+				ApplyOffset(customOffsets[i].tag, customOffsets[i].ModifiedOffset);
 			}
 		}
 	}
