@@ -234,8 +234,7 @@ namespace imgui_handler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
-		void ApplyOffset(s_weapon_group_definition* tag, real_vector3d offset);
-		void ApplyOffsetImgui(s_weapon_group_definition* tag, char* slider, float& offset);
-		void Setup();
+		void MapLoad();
+		void Initialize();
 	}
 }

@@ -28,13 +28,18 @@ namespace imgui_handler {
 			{{0.01, 0, 0}, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
 		};
 
+		void ApplyOffsetImgui(Weapons weapon)
+		{
+			customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].ModifiedOffset;
+		}
+
 		namespace
 		{
 			std::map<int, std::map<e_weapon_offsets_string, char*>> string_table;
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
-			void OffsetMenu(s_weapon_group_definition* tag, char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
+			void OffsetMenu(Weapons weapon, char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
 			{
 				// Bullshit for unique widget ids
 				char item2[32], item3[32];
@@ -49,17 +54,17 @@ namespace imgui_handler {
 				ImGui::Text(GetString(text));
 				ImGui::PushItemWidth(WidthPercentage(60));
 				ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				ImGui::InputFloat(item2, &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				if (ImGui::Button(GetString(reset, item3), b2_size))
 				{
 					offset = default_value;
-					if (tag != nullptr) { ApplyOffsetImgui(tag, slider, offset); }
+					if (customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
 				}
 				ImGui::PopItemWidth();
 			}
@@ -75,11 +80,11 @@ namespace imgui_handler {
 
 				// Setup combo box menus for each weapon
 				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
-				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetX", weapon_offset_x,
+				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetX", weapon_offset_x,
 					customOffsets[selectedOption].ModifiedOffset.i, customOffsets[selectedOption].DefaultOffset.i);
-				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetY", weapon_offset_y,
+				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetY", weapon_offset_y,
 					customOffsets[selectedOption].ModifiedOffset.j, customOffsets[selectedOption].DefaultOffset.j);
-				OffsetMenu(customOffsets[selectedOption].tag, "##OffsetZ", weapon_offset_z,
+				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetZ", weapon_offset_z,
 					customOffsets[selectedOption].ModifiedOffset.k, customOffsets[selectedOption].DefaultOffset.k);
 			}
 		}
@@ -191,41 +196,28 @@ namespace imgui_handler {
 			string_table[4][e_weapon_offsets_string::weapon_offset_z] = "Compensación de Armas Z";
 			string_table[4][e_weapon_offsets_string::reset] = "Reiniciar";
 		}
-		void ApplyOffset(s_weapon_group_definition* tag, real_vector3d offset)
+		void ApplyOffset(Weapons weapon)
 		{
-			if (tag != nullptr)
+			if (customOffsets[weapon].tag != nullptr)
 			{
-				tag->first_person_weapon_offset = offset;
+				customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].ModifiedOffset;
 			}
 		}
-		void ApplyOffsetImgui(s_weapon_group_definition* tag, char* slider, float &offset)
+		void MapLoad()
 		{
-			switch (slider[strlen(slider) - 1])
-			{
-			case 'X':
-				tag->first_person_weapon_offset.i = offset;
-				break;
-			case 'Y':
-				tag->first_person_weapon_offset.j = offset;
-				break;
-			case 'Z':
-				tag->first_person_weapon_offset.k = offset;
-				break;
-			}
-		}
-		void Setup()
-		{
-			WriteDefaultFile(customOffsets);
-
-			ReadWeaponOffsetConfig(customOffsets);
-
 			for (byte i = BattleRifle; i != Sniper + 1; i++)
 			{
 				customOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
 					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].WeaponPath));
 
-				ApplyOffset(customOffsets[i].tag, customOffsets[i].ModifiedOffset);
+				ApplyOffset(static_cast<Weapons>(i));
 			}
+		}
+		void Initialize() 
+		{
+			WriteDefaultFile(customOffsets);
+
+			ReadWeaponOffsetConfig(customOffsets);
 		}
 	}
 }

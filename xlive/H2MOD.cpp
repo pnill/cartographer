@@ -528,7 +528,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
-	imgui_handler::WeaponOffsets::Setup();
+	imgui_handler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
@@ -1213,6 +1213,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
+		imgui_handler::WeaponOffsets::Initialize();
 		//ObserverMode::Initialize();
 		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
