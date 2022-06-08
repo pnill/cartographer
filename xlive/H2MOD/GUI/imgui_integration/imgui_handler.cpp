@@ -73,6 +73,7 @@ namespace ImGuiHandler
 			io.ClearInputKeys();
 			io.ClearMouseInput();
 			io.ClearInputCharacters();
+			ReleaseTextures();
 			g_one_more_frame_update = false;
 		}
 

@@ -403,6 +403,7 @@ float alt_system_time_update()
 		b_sys_init = true;
 		return 1;
 	}
+
 	int currentTime = timeGetTime();
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
