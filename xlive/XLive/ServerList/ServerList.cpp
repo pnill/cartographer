@@ -90,7 +90,7 @@ static size_t ServerlistDownloadWriteCb(void* contents, size_t size, size_t nmem
 	return size * nmemb;
 }
 
-void BadServer(ULONGLONG xuid, const char* log_catch)
+void BadServer(unsigned long long xuid, const char* log_catch)
 {
 	LOG_ERROR_XLIVE("{} - XUID: {} - Log Catch: {}", __FUNCTION__, xuid, log_catch);
 }

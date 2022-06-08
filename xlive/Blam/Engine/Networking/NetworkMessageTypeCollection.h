@@ -2,7 +2,7 @@
 
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 
-#define player_identifier_size_bits (sizeof(XUID) * CHAR_BIT)
+#define player_identifier_size_bits (sizeof(unsigned long long) * CHAR_BIT)
 
 enum e_network_message_type_collection : unsigned int
 {
@@ -137,7 +137,7 @@ struct s_custom_map_filename
 
 struct s_request_map_filename
 {
-	XUID user_identifier;
+	unsigned long long player_id;
 	int map_download_id;
 };
 
@@ -163,8 +163,8 @@ struct s_text_chat
 	unsigned int routed_players_mask;
 	unsigned int metadata;
 	bool source_is_server;
-	XUID source_player_id;
-	XUID destination_players_ids[16];
+	unsigned long long source_player_id;
+	unsigned long long destination_players_ids[16];
 	BYTE gap_99[3];
 	int destination_player_count;
 	wchar_t text[122];

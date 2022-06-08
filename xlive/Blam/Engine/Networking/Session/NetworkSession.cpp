@@ -157,17 +157,15 @@ int NetworkSession::GetPlayerTeam(int playerIdx)
 	return GetPlayerInformation(playerIdx)->properties.player_team;
 }
 
-int NetworkSession::GetPeerIndexFromId(long long xuid)
+int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
 {
 	if (GetPlayerCount() > 0)
 	{
-		int playerIdx = 0;
-		do
+		for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
 		{
 			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
 				return GetPeerIndex(playerIdx);
-			playerIdx++;
-		} while (playerIdx < 16);
+		}
 	}
 	return NONE;
 }

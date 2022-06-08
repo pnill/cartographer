@@ -116,11 +116,10 @@ bool PlayerIterator::get_next_active_player()
 	{
 		do
 		{
-			if (!(m_current_player->flags & FLAG(s_player::flags::player_inactive)))
+			if (!TEST_FLAG(m_current_player->flags, s_player::flags::player_inactive))
 				break;
 
 			m_current_player = get_next_datum();
-
 		} while (m_current_player);
 	}
 
@@ -142,7 +141,7 @@ wchar_t* PlayerIterator::get_current_player_name()
 	return m_current_player->properties[0].player_name;
 }
 
-XUID PlayerIterator::get_current_player_id()
+unsigned long long PlayerIterator::get_current_player_id()
 {
 	return s_player::GetId(this->get_current_player_index());
 }

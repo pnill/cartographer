@@ -665,7 +665,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
-void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
+void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
 {
 	typedef void(__cdecl update_player_profile)(int local_player_index);
 	auto p_update_player_profile = Memory::GetAddress<update_player_profile*>(0x206A97);
@@ -907,12 +907,10 @@ bool __cdecl should_start_pregame_countdown_hook()
 		{
 			if (NetworkSession::PlayerIsActive(i))
 			{
-
-
 				int calcBaseOffset = 0x530E34 + (i * 0x128);
-				auto XUID = *Memory::GetAddress<::XUID*>(0, calcBaseOffset);
+				auto playerId = *Memory::GetAddress<unsigned long long*>(0, calcBaseOffset);
 				auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-				auto xuidslug = IntToString<unsigned long>(XUID & 0xFFFFFFFF, std::dec);
+				auto xuidslug = IntToString<unsigned long>(playerId & 0xFFFFFFFF, std::dec);
 				LOG_DEBUG_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
 				if (Parties.count(xuidslug) == 1) //Party leader found
 				{
