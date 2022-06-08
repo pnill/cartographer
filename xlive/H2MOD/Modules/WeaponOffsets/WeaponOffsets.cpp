@@ -28,11 +28,6 @@ namespace imgui_handler {
 			{{0.01, 0, 0}, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
 		};
 
-		void ApplyOffsetImgui(Weapons weapon)
-		{
-			customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].ModifiedOffset;
-		}
-
 		namespace
 		{
 			std::map<int, std::map<e_weapon_offsets_string, char*>> string_table;
@@ -54,17 +49,17 @@ namespace imgui_handler {
 				ImGui::Text(GetString(text));
 				ImGui::PushItemWidth(WidthPercentage(60));
 				ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
+				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				ImGui::InputFloat(item2, &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
+				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
 				if (ImGui::Button(GetString(reset, item3), b2_size))
 				{
 					offset = default_value;
-					if (customOffsets[weapon].tag != nullptr) { ApplyOffsetImgui(weapon); }
+					if (customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 				}
 				ImGui::PopItemWidth();
 			}
