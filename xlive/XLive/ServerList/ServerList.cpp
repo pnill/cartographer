@@ -85,8 +85,8 @@ static size_t BasicStrDownloadCb(void *contents, size_t size, size_t nmemb, void
 
 static size_t ServerlistDownloadWriteCb(void* contents, size_t size, size_t nmemb, void* userp)
 {
-	auto* buffer = reinterpret_cast<std::shared_ptr<std::string>*>(userp);
-	(*buffer)->append((char*)contents, size * nmemb);
+	auto* buffer = reinterpret_cast<std::string*>(userp);
+	buffer->append((char*)contents, size * nmemb);
 	return size * nmemb;
 }
 
@@ -142,13 +142,13 @@ int CServerList::GetValidItemsFoundCount()
 	return m_pageItemsFoundCount;
 }
 
-bool CServerList::SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer)
+bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer)
 {
 	XLOCATOR_SEARCHRESULT searchResult;
 	ZeroMemory(&searchResult, sizeof(XLOCATOR_SEARCHRESULT));
 
 	rapidjson::Document doc;
-	doc.Parse(serverResultData->c_str());
+	doc.Parse(serverResultData.c_str());
 
 	// operation successful or not
 	bool result = false;
@@ -465,7 +465,7 @@ void CServerList::EnumerateFromHttp()
 	curl_mhandle = curl_multi_init();
 	curl_multi_setopt(curl_mhandle, CURLMOPT_PIPELINING, CURLPIPE_MULTIPLEX);
 
-	std::vector<std::pair<CURL*, std::shared_ptr<std::string>>> itemsToDownloadQuery(itemListMaxQueryCount);
+	std::vector<std::pair<CURL*, std::string>> itemsToDownloadQuery(itemListMaxQueryCount);
 
 	bool itemQueryError = false;
 
@@ -510,13 +510,13 @@ void CServerList::EnumerateFromHttp()
 				// simply reuse the curl handle/allocated std::string buffer if already present
 				if (itemsToDownloadQuery[serverQueryIdx].first == nullptr)
 				{
-					itemsToDownloadQuery[serverQueryIdx] = std::make_pair(curl_interface_init_no_verify(), std::make_shared<std::string>());
+					itemsToDownloadQuery[serverQueryIdx] = std::make_pair(curl_interface_init_no_verify(), std::string());
 				}
 				else
 				{
 					// remove the handle first, easy handle still valid, to update the easyopts
 					curl_multi_remove_handle(curl_mhandle, itemsToDownloadQuery[serverQueryIdx].first);
-					itemsToDownloadQuery[serverQueryIdx].second->clear();
+					itemsToDownloadQuery[serverQueryIdx].second.clear();
 				}
 
 				auto& itemQuery = itemsToDownloadQuery[serverQueryIdx++];
@@ -617,7 +617,7 @@ void CServerList::EnumerateFromHttp()
 		curl_multi_remove_handle(curl_mhandle, itemQuery.first);
 		curl_easy_cleanup(itemQuery.first);
 		itemQuery.first = nullptr;
-		itemQuery.second.reset();
+		itemQuery.second.clear();
 	}
 	curl_multi_cleanup(curl_mhandle);
 
