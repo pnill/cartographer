@@ -41,7 +41,7 @@ namespace imgui_handler
 	bool IsWindowActive(const std::string& name);
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
-	void TextVerticalPad(char* label);
+	void TextVerticalPad(const char* label);
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
@@ -181,7 +181,7 @@ namespace imgui_handler
 			event_music_tooltip
 		};
 		void BuildStringsTable();
-		char* GetString(e_advanced_string string, const std::string& id = "");
+		const char* GetString(e_advanced_string string, const std::string& id = "");
 		void Render(bool* p_open);
 		void Open();
 		void Close();
@@ -230,7 +230,7 @@ namespace imgui_handler
 			reset
 		};
 		void BuildStringsTable();
-		char* GetString(e_weapon_offsets_string string, const std::string& id = "");
+		const char* GetString(e_weapon_offsets_string string, const std::string& id = "");
 		void Render(bool* p_open);
 		void Open();
 		void Close();

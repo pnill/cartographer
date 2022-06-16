@@ -144,7 +144,7 @@ namespace imgui_handler
 		return Width * (percent / 100.0f);
 	}
 
-	void TextVerticalPad(char* label)
+	void TextVerticalPad(const char* label)
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text(label);

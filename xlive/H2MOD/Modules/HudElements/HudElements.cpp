@@ -10,7 +10,7 @@
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
-
+#include "Blam\Cache\TagGroups\bitmap_definition.hpp"
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
@@ -106,31 +106,32 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 		crosshairInit = false;
 	}
 
-	if (h2mod->GetEngineType() == e_engine_type::_multiplayer) {
-
-		auto hud_reticles = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
-		char* hud_reticles_data = tags::get_tag<blam_tag::tag_group_type::bitmap, char>(hud_reticles);
-		tags::tag_data_block* hud_reticles_bitmaps = reinterpret_cast<tags::tag_data_block*>(hud_reticles_data + 0x44);
-		if (hud_reticles_bitmaps->block_data_offset != -1)
+	if (h2mod->GetEngineType() != e_engine_type::_main_menu) {
+		auto hud_reticles_datum = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
+		if (hud_reticles_datum != DATUM_INDEX_NONE)
 		{
-			char* reticle_bitmap = tags::get_tag_data() + hud_reticles_bitmaps->block_data_offset;
-			for (auto i = 0; i < hud_reticles_bitmaps->block_count; i++)
-			{
-				point2d* ui_bitmap_size = reinterpret_cast<point2d*>(reticle_bitmap + (i * 0x74) + 0x4);
-				if (!crosshairInit) {
-					if (defaultCrosshairSizes == nullptr)
-						defaultCrosshairSizes = new point2d[hud_reticles_bitmaps->block_count];
+			auto hud_reticles_data = tags::get_tag_fast<bitmap_definition>(hud_reticles_datum);
 
-					defaultCrosshairSizes[i].x = ui_bitmap_size->x;
-					defaultCrosshairSizes[i].y = ui_bitmap_size->y;
+			for (auto i = 0; i < hud_reticles_data->bitmaps.size; i++)
+			{
+				if (!crosshairInit)
+				{
+					if (defaultCrosshairSizes == nullptr) defaultCrosshairSizes = new point2d[hud_reticles_data->bitmaps.size];
+
+					defaultCrosshairSizes[i] = hud_reticles_data->bitmaps[i]->size;
 				}
 
-				*ui_bitmap_size = point2d{ (short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale), (short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale) };
+				hud_reticles_data->bitmaps[i]->size = point2d
+				{
+					(short)round(defaultCrosshairSizes[i].x * H2Config_crosshair_scale),
+					(short)round(defaultCrosshairSizes[i].y * H2Config_crosshair_scale)
+				};
 			}
+			crosshairInit = true;
 		}
-		crosshairInit = true;
 	}
 }
+
 void HudElements::setCrosshairPos() {
 
 	if (Memory::IsDedicatedServer())

@@ -1,46 +1,50 @@
 #include "stdafx.h"
+#include <shlobj_core.h>
 #include "WeaponOffsetConfig.h"
 
-char* path = strcat
-(
-    getenv("localappdata"),
-    "\\Microsoft\\Halo 2\\WeaponOffsets.cfg"
-);
+wchar_t* GetOffsetPath()
+{
+    wchar_t* path;
+    SHGetKnownFolderPath(FOLDERID_LocalAppData, KF_FLAG_CREATE, NULL, &path);
+    return wcsncat(path, L"\\Microsoft\\Halo 2\\WeaponOffsets.cfg", MAX_PATH);
+}
 
-void ReadWeaponOffsetConfig(s_weapon_custom_offset *WeaponOffsets)
+void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets)
 {
     FILE* file = NULL;
+    wchar_t *path = GetOffsetPath();
 
-    file = fopen(path, "r");
+    file = _wfopen(path, L"r");
     if (file != NULL)
     {
-        for (byte i = BattleRifle; i != Sniper + 1; i++)
+        for (byte i = BattleRifleOffset; i < End; i++)
         {
-            fscanf(file, "%f,%f,%f\n", &WeaponOffsets[i].ModifiedOffset.i, &WeaponOffsets[i].ModifiedOffset.j, &WeaponOffsets[i].ModifiedOffset.k);
+            fscanf(file, "%f,%f,%f\n", &WeaponOffsets[i].modifiedOffset.i, &WeaponOffsets[i].modifiedOffset.j, &WeaponOffsets[i].modifiedOffset.k);
         }
         fclose(file);
     }
 }
 
-void SaveWeaponOffsetConfig(const s_weapon_custom_offset customOffsets[], bool defaultOffsets)
+void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, bool defaultOffsets)
 {
     FILE* file = NULL;
+    wchar_t* path = GetOffsetPath();
 
-    file = fopen(path, "w");
+    file = _wfopen(path, L"w");
     if (file != NULL)
     {
         if (defaultOffsets == false)
         {
-            for (byte i = BattleRifle; i != Sniper + 1; i++)
+            for (byte i = BattleRifleOffset; i < End; i++)
             {
-                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].ModifiedOffset.i, customOffsets[i].ModifiedOffset.j, customOffsets[i].ModifiedOffset.k);
+                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].modifiedOffset.i, customOffsets[i].modifiedOffset.j, customOffsets[i].modifiedOffset.k);
             }
         }
         else
         {
-            for (byte i = BattleRifle; i != Sniper + 1; i++)
+            for (byte i = BattleRifleOffset; i < End; i++)
             {
-                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].DefaultOffset.i, customOffsets[i].DefaultOffset.j, customOffsets[i].DefaultOffset.k);
+                fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].defaultOffset.i, customOffsets[i].defaultOffset.j, customOffsets[i].defaultOffset.k);
             }
         }
         fclose(file);
@@ -48,11 +52,13 @@ void SaveWeaponOffsetConfig(const s_weapon_custom_offset customOffsets[], bool d
 }
 
 // only writes anything if file dosent already exist
-void WriteDefaultFile(const s_weapon_custom_offset WeaponOffsets[])
+void WriteDefaultFile(const s_Weapon_custom_offset*WeaponOffsets)
 {
-    FILE* file = NULL;    
+    FILE* file = NULL;
+    wchar_t* path = GetOffsetPath();
 
-    file = fopen(path, "r");
+    file = _wfopen(path, L"r");
+
     if (file == NULL)
     {
         SaveWeaponOffsetConfig(WeaponOffsets, true);

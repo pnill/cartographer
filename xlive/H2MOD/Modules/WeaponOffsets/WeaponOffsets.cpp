@@ -8,7 +8,7 @@
 
 namespace imgui_handler {
 	namespace WeaponOffsets {
-		s_weapon_custom_offset customOffsets[16]
+		s_Weapon_custom_offset customOffsets[16]
 		{
 			{{0.02, 0, -0.004}, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {0,0,0}, NULL},
 			{{0.02, 0, 0}, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {0,0,0}, NULL},
@@ -28,13 +28,21 @@ namespace imgui_handler {
 			{{0.01, 0, 0}, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
 		};
 
+
+		void ApplyOffset(e_WeaponOffsets weapon)
+		{
+			if (customOffsets[weapon].tag != nullptr)
+			{
+				customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].modifiedOffset;
+			}
+		}
 		namespace
 		{
 			std::map<int, std::map<e_weapon_offsets_string, char*>> string_table;
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
-			void OffsetMenu(Weapons weapon, char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
+			void OffsetMenu(e_WeaponOffsets weapon, const char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
 			{
 				// Bullshit for unique widget ids
 				char item2[32], item3[32];
@@ -75,16 +83,16 @@ namespace imgui_handler {
 
 				// Setup combo box menus for each weapon
 				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
-				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetX", weapon_offset_x,
-					customOffsets[selectedOption].ModifiedOffset.i, customOffsets[selectedOption].DefaultOffset.i);
-				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetY", weapon_offset_y,
-					customOffsets[selectedOption].ModifiedOffset.j, customOffsets[selectedOption].DefaultOffset.j);
-				OffsetMenu(static_cast<Weapons>(selectedOption), "##OffsetZ", weapon_offset_z,
-					customOffsets[selectedOption].ModifiedOffset.k, customOffsets[selectedOption].DefaultOffset.k);
+				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetX", weapon_offset_x,
+					customOffsets[selectedOption].modifiedOffset.i, customOffsets[selectedOption].defaultOffset.i);
+				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetY", weapon_offset_y,
+					customOffsets[selectedOption].modifiedOffset.j, customOffsets[selectedOption].defaultOffset.j);
+				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetZ", weapon_offset_z,
+					customOffsets[selectedOption].modifiedOffset.k, customOffsets[selectedOption].defaultOffset.k);
 			}
 		}
 
-		char* GetString(e_weapon_offsets_string string, const std::string& id)
+		const char* GetString(e_weapon_offsets_string string, const std::string& id)
 		{
 			if (id.empty()) {
 				return const_cast<char*>(string_table.at(0).at(string));
@@ -191,21 +199,14 @@ namespace imgui_handler {
 			string_table[4][e_weapon_offsets_string::weapon_offset_z] = "Compensación de Armas Z";
 			string_table[4][e_weapon_offsets_string::reset] = "Reiniciar";
 		}
-		void ApplyOffset(Weapons weapon)
-		{
-			if (customOffsets[weapon].tag != nullptr)
-			{
-				customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].ModifiedOffset;
-			}
-		}
 		void MapLoad()
 		{
-			for (byte i = BattleRifle; i != Sniper + 1; i++)
+			for (byte i = BattleRifleOffset; i != End; i++)
 			{
 				customOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
-					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].WeaponPath));
+					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].weaponPath));
 
-				ApplyOffset(static_cast<Weapons>(i));
+				ApplyOffset(static_cast<e_WeaponOffsets>(i));
 			}
 		}
 		void Initialize() 
