@@ -15,15 +15,7 @@ struct bitmap_definition
     * SPRITES : Sprite texture pages will be generated.
     * INTERFACE BITMAPS : Similar to 2D TEXTURES but without mipmaps and without the power of 2 restriction.")]*/
 
-    enum Type : short
-    {
-        _2DTextures = 0,
-        _3DTextures = 1,
-        CubeMaps = 2,
-        Sprites = 3,
-        InterfaceBitmaps = 4,
-    };
-    Type type;
+    short bitmaptype;
 
     /*[Explaination("Format", "Format controls how pixels will be stored internally:
     

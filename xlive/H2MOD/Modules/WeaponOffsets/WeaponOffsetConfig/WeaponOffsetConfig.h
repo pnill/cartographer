@@ -8,28 +8,8 @@ struct s_Weapon_custom_offset {
 	s_weapon_group_definition* tag;
 };
 
-enum e_WeaponOffsets
-{
-	BattleRifleOffset,
-	BeamRifleOffset,
-	BrutePlasmaRifleOffset,
-	BruteShotOffset,
-	CarbineOffset,
-	EnergySwordOffset,
-	FuelRodOffset,
-	MagnumOffset,
-	NeedlerOffset,
-	PlasmaPistolOffset,
-	PlasmaRifleOffset,
-	RocketLauncherOffset,
-	SentinelBeamOffset,
-	ShotgunOffset,
-	SMGOffset,
-	SniperOffset,
-	End
-};
 
 wchar_t* GetOffsetPath();
-void ReadWeaponOffsetConfig(s_Weapon_custom_offset* WeaponOffsets);
-void SaveWeaponOffsetConfig(const s_Weapon_custom_offset*customOffsets, bool defaultOffsets);
-void WriteDefaultFile(const s_Weapon_custom_offset*WeaponOffsets);
+void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets, const byte size);
+void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, const byte size, bool defaultOffsets);
+void WriteDefaultFile(const s_Weapon_custom_offset *WeaponOffsets, const byte size);

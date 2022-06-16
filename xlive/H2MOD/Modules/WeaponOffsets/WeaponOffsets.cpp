@@ -29,7 +29,7 @@ namespace imgui_handler {
 		};
 
 
-		void ApplyOffset(e_WeaponOffsets weapon)
+		void ApplyOffset(const byte weapon)
 		{
 			if (customOffsets[weapon].tag != nullptr)
 			{
@@ -42,7 +42,7 @@ namespace imgui_handler {
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
-			void OffsetMenu(e_WeaponOffsets weapon, const char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
+			void OffsetMenu(const byte weapon, const char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
 			{
 				// Bullshit for unique widget ids
 				char item2[32], item3[32];
@@ -83,11 +83,11 @@ namespace imgui_handler {
 
 				// Setup combo box menus for each weapon
 				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
-				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetX", weapon_offset_x,
+				OffsetMenu(selectedOption, "##OffsetX", weapon_offset_x,
 					customOffsets[selectedOption].modifiedOffset.i, customOffsets[selectedOption].defaultOffset.i);
-				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetY", weapon_offset_y,
+				OffsetMenu(selectedOption, "##OffsetY", weapon_offset_y,
 					customOffsets[selectedOption].modifiedOffset.j, customOffsets[selectedOption].defaultOffset.j);
-				OffsetMenu(static_cast<e_WeaponOffsets>(selectedOption), "##OffsetZ", weapon_offset_z,
+				OffsetMenu(selectedOption, "##OffsetZ", weapon_offset_z,
 					customOffsets[selectedOption].modifiedOffset.k, customOffsets[selectedOption].defaultOffset.k);
 			}
 		}
@@ -137,7 +137,7 @@ namespace imgui_handler {
 			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			ImGuiToggleInput(true);
 			PlayerControl::DisableLocalCamera(true);
-			ReadWeaponOffsetConfig(customOffsets);
+			ReadWeaponOffsetConfig(customOffsets, sizeof(customOffsets) / sizeof(*customOffsets));
 		}
 		void Close()
 		{
@@ -148,7 +148,7 @@ namespace imgui_handler {
 				ImGuiToggleInput(false);
 				PlayerControl::DisableLocalCamera(false);
 			}
-			SaveWeaponOffsetConfig(customOffsets, false);
+			SaveWeaponOffsetConfig(customOffsets, sizeof(customOffsets) / sizeof(*customOffsets), false);
 		}
 		void BuildStringsTable()
 		{
@@ -201,19 +201,21 @@ namespace imgui_handler {
 		}
 		void MapLoad()
 		{
-			for (byte i = BattleRifleOffset; i != End; i++)
+			for (byte i = 0; i != sizeof(customOffsets) / sizeof(*customOffsets); i++)
 			{
 				customOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
 					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].weaponPath));
 
-				ApplyOffset(static_cast<e_WeaponOffsets>(i));
+				ApplyOffset(i);
 			}
 		}
 		void Initialize() 
 		{
-			WriteDefaultFile(customOffsets);
+			byte size = sizeof(customOffsets) / sizeof(*customOffsets);
 
-			ReadWeaponOffsetConfig(customOffsets);
+			WriteDefaultFile(customOffsets, size);
+
+			ReadWeaponOffsetConfig(customOffsets, size);
 		}
 	}
 }

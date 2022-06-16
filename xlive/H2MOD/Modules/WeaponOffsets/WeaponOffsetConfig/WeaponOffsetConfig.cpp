@@ -9,7 +9,7 @@ wchar_t* GetOffsetPath()
     return wcsncat(path, L"\\Microsoft\\Halo 2\\WeaponOffsets.cfg", MAX_PATH);
 }
 
-void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets)
+void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets, const byte size)
 {
     FILE* file = NULL;
     wchar_t *path = GetOffsetPath();
@@ -17,7 +17,7 @@ void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets)
     file = _wfopen(path, L"r");
     if (file != NULL)
     {
-        for (byte i = BattleRifleOffset; i < End; i++)
+        for (byte i = 0; i < size; i++)
         {
             fscanf(file, "%f,%f,%f\n", &WeaponOffsets[i].modifiedOffset.i, &WeaponOffsets[i].modifiedOffset.j, &WeaponOffsets[i].modifiedOffset.k);
         }
@@ -25,7 +25,7 @@ void ReadWeaponOffsetConfig(s_Weapon_custom_offset *WeaponOffsets)
     }
 }
 
-void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, bool defaultOffsets)
+void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, const byte size, bool defaultOffsets)
 {
     FILE* file = NULL;
     wchar_t* path = GetOffsetPath();
@@ -35,14 +35,14 @@ void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, bool de
     {
         if (defaultOffsets == false)
         {
-            for (byte i = BattleRifleOffset; i < End; i++)
+            for (byte i = 0; i < size; i++)
             {
                 fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].modifiedOffset.i, customOffsets[i].modifiedOffset.j, customOffsets[i].modifiedOffset.k);
             }
         }
         else
         {
-            for (byte i = BattleRifleOffset; i < End; i++)
+            for (byte i = 0; i < size; i++)
             {
                 fprintf(file, "%.3f,%.3f,%.3f\n", customOffsets[i].defaultOffset.i, customOffsets[i].defaultOffset.j, customOffsets[i].defaultOffset.k);
             }
@@ -52,7 +52,7 @@ void SaveWeaponOffsetConfig(const s_Weapon_custom_offset *customOffsets, bool de
 }
 
 // only writes anything if file dosent already exist
-void WriteDefaultFile(const s_Weapon_custom_offset*WeaponOffsets)
+void WriteDefaultFile(const s_Weapon_custom_offset *WeaponOffsets, const byte size)
 {
     FILE* file = NULL;
     wchar_t* path = GetOffsetPath();
@@ -61,7 +61,7 @@ void WriteDefaultFile(const s_Weapon_custom_offset*WeaponOffsets)
 
     if (file == NULL)
     {
-        SaveWeaponOffsetConfig(WeaponOffsets, true);
+        SaveWeaponOffsetConfig(WeaponOffsets, size, true);
     }
     else fclose(file);
 }
