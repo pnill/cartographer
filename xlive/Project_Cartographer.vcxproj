@@ -310,6 +310,7 @@
     <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
@@ -372,6 +373,8 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
@@ -654,6 +657,7 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
+    <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
@@ -698,6 +702,7 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
+    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />

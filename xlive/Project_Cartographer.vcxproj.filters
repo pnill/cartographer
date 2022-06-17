@@ -146,6 +146,8 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -476,6 +478,9 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ComVar.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.h" />
+    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

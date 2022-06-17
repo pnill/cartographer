@@ -3,16 +3,17 @@
 #include "Blam\Cache\TagGroups.hpp"
 
 #pragma pack(push,1)
-struct shader_postprocess_bitmap_new_block
-{
-	tag_reference bitmapGroup;
-	size_t bitmapIndex;
-	float logBitmapDimension;
-};
 
 struct shader_postprocess_definition_new_block
 {
-	tag_reference shaderTemplateIndex;
+	DWORD shaderTemplateIndex;
+
+	struct shader_postprocess_bitmap_new_block
+	{
+		tag_reference bitmapGroup;
+		float logBitmapDimension;
+	};
+	CHECK_STRUCT_SIZE(shader_postprocess_bitmap_new_block, 12);
 	tag_block<shader_postprocess_bitmap_new_block> bitmaps;
 
 	tag_block<> pixelConstants;
@@ -43,6 +44,7 @@ struct shader_postprocess_definition_new_block
 
 	tag_block<> oldLevelsOfDetail;
 };
+//CHECK_STRUCT_SIZE(shader_definition, 184);
 
 /*********************************************************************
 * name: shader_block

@@ -160,17 +160,18 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_Init(pDevice);
 
 		ImAdvancedSettings::BuildStringsTable();
-
-		imgui_windows.push_back({ ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close });
-		imgui_windows.push_back({ ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close });
-		imgui_windows.push_back({ ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close });
-		imgui_windows.push_back({ ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close });
-		imgui_windows.push_back({ Console::windowName, false, Console::Render, Console::Open, Console::Close });
+		WeaponOffsets::BuildStringsTable();
+		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
+		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
+		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
+		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
+		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
+		imgui_windows.emplace_back(Console::windowName, false, Console::Render, Console::Open, Console::Close);
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
-			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
+			ImGui_ImplWin32_Shutdown();
 			});
 	}
 	float WidthPercentage(float percent)
@@ -182,7 +183,7 @@ namespace ImGuiHandler
 		return Width * (percent / 100.0f);
 	}
 
-	void TextVerticalPad(char* label)
+	void TextVerticalPad(const char* label)
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text(label);

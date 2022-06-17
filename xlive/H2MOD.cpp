@@ -43,6 +43,7 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 
 #include <float.h>
 
@@ -526,6 +527,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
+	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
@@ -560,6 +562,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			gametype_it.second = false; // reset custom gametypes state
 		}
 
+		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		HudElements::OnMapLoad();
@@ -1207,6 +1210,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
+		ImGuiHandler::WeaponOffsets::Initialize();
 		//ObserverMode::Initialize();
 		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
@@ -1215,7 +1219,6 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
-		
 	}
 	else
 	{
