@@ -72,52 +72,27 @@ typedef struct XHV_INIT_PARAMS
 #define XHV_LOCK_TYPE_UNLOCK                    2
 #define XHV_LOCK_TYPE_COUNT                     3
 
-class IXHVEngine
+class XHVENGINE
 {
 public:
-	virtual LONG AddRef(VOID *pthis) = 0;	// 00
-	virtual LONG Release(VOID *pthis) = 0;	// 04
-	virtual HRESULT Lock(VOID *pthis, XHV_LOCK_TYPE lockType) = 0;	// 08
-	virtual HRESULT StartLocalProcessingModes(VOID *pthis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes) = 0;
-	virtual HRESULT StopLocalProcessingModes(VOID *pthis, DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes) = 0;
-	virtual HRESULT StartRemoteProcessingModes(VOID *pthis, XUID xuidRemoteTalker, int a2, int a3) = 0;
-	virtual HRESULT StopRemoteProcessingModes(VOID *pthis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3) = 0;	// 18
-	virtual HRESULT SetMaxDecodePackets(VOID *pthis, int dwMaxDecodePackets) = 0;	// 1C
-	virtual HRESULT RegisterLocalTalker(VOID *pthis, DWORD dwUserIndex) = 0;
-	virtual HRESULT UnregisterLocalTalker(VOID *pthis, DWORD dwUserIndex) = 0;
-	virtual HRESULT RegisterRemoteTalker(VOID *pthis, XUID xuid, LPVOID reserved, LPVOID reserved2, LPVOID reserved3) = 0;	// 28
-	virtual HRESULT UnregisterRemoteTalker(VOID *pthis, XUID xuid) = 0;
-	virtual HRESULT GetRemoteTalkers(VOID *pthis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers) = 0;	// 30	
-	virtual BOOL IsHeadsetPresent(VOID *pthis, DWORD dwUserIndex) = 0;
-	virtual BOOL IsLocalTalking(VOID *pthis, DWORD dwUserIndex) = 0;
-	virtual BOOL isRemoteTalking(VOID *pthis, XUID xuidRemoteTalker) = 0;
-	virtual DWORD GetDataReadyFlags(VOID *pthis) = 0;
-	virtual HRESULT GetLocalChatData(VOID *pthis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets) = 0;
-	virtual HRESULT SetPlaybackPriority(VOID *pthis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3) = 0;
-	virtual HRESULT SubmitIncomingChatData(VOID *pthis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize) = 0;	// 4C
-};
-
-class XHVENGINE : public IXHVEngine
-{
-public:
-	LONG AddRef(VOID *pthis) override;	// 00
-	LONG Release(VOID *pthis) override;	// 04
-	HRESULT Lock(VOID *pthis, XHV_LOCK_TYPE lockType) override;	// 08
-	HRESULT StartLocalProcessingModes(VOID *pthis, DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes) override;
-	HRESULT StopLocalProcessingModes(VOID *pthis, DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID *processingModes, DWORD dwNumProcessingModes)  override;
-	HRESULT StartRemoteProcessingModes(VOID *pthis, XUID xuidRemoteTalker, int a2, int a3) override;
-	HRESULT StopRemoteProcessingModes(VOID *pthis, XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3) override;	// 18
-	HRESULT SetMaxDecodePackets(VOID *pthis, int dwMaxDecodePackets) override;	// 1C
-	HRESULT RegisterLocalTalker(VOID *pthis, DWORD dwUserIndex) override;
-	HRESULT UnregisterLocalTalker(VOID *pthis, DWORD dwUserIndex) override;
-	HRESULT RegisterRemoteTalker(VOID *pthis, XUID xuid, LPVOID reserved, LPVOID reserved2, LPVOID reserved3) override;	// 28
-	HRESULT UnregisterRemoteTalker(VOID *pthis, XUID xuid) override;
-	HRESULT GetRemoteTalkers(VOID *pthis, PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers) override;	// 30	
-	BOOL IsLocalTalking(VOID *pthis, DWORD dwUserIndex) override;
-	BOOL isRemoteTalking(VOID *pthis, XUID xuidRemoteTalker) override;
-	BOOL IsHeadsetPresent(VOID *pthis, DWORD dwUserIndex) override;
-	DWORD GetDataReadyFlags(VOID *pthis) override;
-	HRESULT GetLocalChatData(VOID *pthis, DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets) override;
-	HRESULT SetPlaybackPriority(VOID *pthis, XUID xuidRemoteTalker, DWORD dwUserIndex, int a3) override;
-	HRESULT SubmitIncomingChatData(VOID *pthis, XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize) override;	// 4C
+	virtual LONG	STDMETHODCALLTYPE AddRef();	// 00
+	virtual LONG	STDMETHODCALLTYPE Release();	// 04
+	virtual HRESULT STDMETHODCALLTYPE Lock(XHV_LOCK_TYPE lockType);	// 08
+	virtual HRESULT STDMETHODCALLTYPE StartLocalProcessingModes(DWORD dwUserIndex, /* CONST PXHV_PROCESSING_MODE*/ VOID* processingModes, DWORD dwNumProcessingModes);
+	virtual HRESULT STDMETHODCALLTYPE StopLocalProcessingModes(DWORD dwUserIndex, /*CONST PXHV_PROCESSING_MODE*/ VOID* processingModes, DWORD dwNumProcessingModes);
+	virtual HRESULT STDMETHODCALLTYPE StartRemoteProcessingModes(XUID xuidRemoteTalker, VOID* a2, int a3);
+	virtual HRESULT STDMETHODCALLTYPE StopRemoteProcessingModes(XUID xuidRemoteTalker, /*CONST PXHV_PROCESSING_MODE*/ VOID* a2, int a3);	// 18
+	virtual HRESULT STDMETHODCALLTYPE SetMaxDecodePackets(DWORD dwMaxDecodePackets);	// 1C
+	virtual HRESULT STDMETHODCALLTYPE RegisterLocalTalker(DWORD dwUserIndex);
+	virtual HRESULT STDMETHODCALLTYPE UnregisterLocalTalker(DWORD dwUserIndex);
+	virtual HRESULT STDMETHODCALLTYPE RegisterRemoteTalker(XUID xuid, LPVOID reserved, LPVOID reserved2, LPVOID reserved3);	// 28
+	virtual HRESULT STDMETHODCALLTYPE UnregisterRemoteTalker(XUID xuid);
+	virtual HRESULT STDMETHODCALLTYPE GetRemoteTalkers(PDWORD pdwRemoteTalkersCount, PXUID pxuidRemoteTalkers);	// 30	
+	virtual BOOL	STDMETHODCALLTYPE IsHeadsetPresent(DWORD dwUserIndex);
+	virtual BOOL	STDMETHODCALLTYPE IsLocalTalking(DWORD dwUserIndex);
+	virtual BOOL	STDMETHODCALLTYPE IsRemoteTalking(XUID xuidRemoteTalker);
+	virtual DWORD	STDMETHODCALLTYPE GetDataReadyFlags();
+	virtual HRESULT STDMETHODCALLTYPE GetLocalChatData(DWORD dwUserIndex, PBYTE pbData, PDWORD pdwSize, PDWORD pdwPackets);
+	virtual HRESULT STDMETHODCALLTYPE SetPlaybackPriority(XUID xuidRemoteTalker, DWORD dwUserIndex, int a3);
+	virtual HRESULT STDMETHODCALLTYPE SubmitIncomingChatData(XUID xuidRemoteTalker, const BYTE* pbData, PDWORD pdwSize);	// 4C
 };

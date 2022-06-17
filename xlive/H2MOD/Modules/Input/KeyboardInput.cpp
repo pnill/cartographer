@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "KeyboardInput.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\GUI\GUI.h"
+#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Utils\Utils.h"
@@ -17,19 +18,17 @@ RECT rectScreenOriginal;
 
 
 //Leveraging this call to unset the controller state
-typedef void(__cdecl p_sub_B524F7)(signed int a1);
-p_sub_B524F7* c_sub_B524F7;
+typedef void(__cdecl sub_B524F7_t)(signed int a1);
+sub_B524F7_t* p_sub_B524F7;
 
 __int16 last_user_index;
 //Patching this call to enable keyboards to switch death targets
 unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 {
-	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
-
 	last_user_index = a1;
 	unsigned char* result = ControllerInput::get_controller_input(a1);
 	//Modifies the result for A button pressed if space is.
-	unsigned char keyboard_space_key_state = input_abstraction_get_key_state_byte(VK_SPACE);
+	unsigned char keyboard_space_key_state = KeyboardInput::GetGameKbState(VK_SPACE);
 	if (keyboard_space_key_state > 0)
 	{
 		result[16] = keyboard_space_key_state;
@@ -41,6 +40,12 @@ void __cdecl sub_B524F7(signed int a1)
 {
 	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;
+}
+
+unsigned char KeyboardInput::GetGameKbState(__int16 keycode)
+{
+	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
+	return input_abstraction_get_key_state_byte(keycode);
 }
 
 void KeyboardInput::ToggleKeyboardInput()
@@ -210,34 +215,28 @@ void hotkeyFuncWindowMode() {
 }
 
 void hotkeyFuncToggleHideIngameChat() {
-	if (H2IsDediServer) {
-		return;
-	}
 	H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;
 	if (H2Config_hide_ingame_chat) {
-		addDebugText("Hiding In-game Chat Menu.");
+		addDebugText("Hiding in-game chat menu.");
 	}
 	else {
-		addDebugText("Showing In-game Chat Menu.");
+		addDebugText("Showing in-game chat menu.");
 	}
 }
-
 void hotkeyFuncGuide() {
-	if (H2IsDediServer) {
-		return;
-	}
-	imgui_handler::ToggleWindow("Advanced Settings");
+	ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
+}
+void hotkeyFuncDebug() {
+	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);
+}
+void hotkeyFuncConsole() {
+	ImGuiHandler::ToggleWindow(Console::windowName);
 }
 
-void hotkeyFuncDebug()
-{
-	// imgui_handler::ToggleWindow("debug_overlay");
-}
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	
-	c_sub_B524F7 = Memory::GetAddress<p_sub_B524F7*>(0x824F7);
+	p_sub_B524F7 = Memory::GetAddress<sub_B524F7_t*>(0x824F7);
 	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
 	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {
@@ -248,11 +247,12 @@ void KeyboardInput::Initialize()
 	ToggleKeyboardInput();
 	addDebugText("Registering Hotkeys");
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdHelp, hotkeyFuncHelp);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
+	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
+	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
+	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 
 

@@ -16,7 +16,9 @@
 #if _MSC_VER >= 1200
 #pragma warning(push)
 #endif
-#pragma warning(disable:4201) // anonymous unions warning
+// anonymous unions warning
+// always initialize a member variable
+#pragma warning(disable : 4201 26495) 
 
 
 
@@ -1789,7 +1791,7 @@ HRESULT WINAPI D3DXSHProjectCubeMap
 #if _MSC_VER >= 1200
 #pragma warning(pop)
 #else
-#pragma warning(default:4201)
+#pragma warning(default : 4201 26495)
 #endif
 
 #endif // __D3DX9MATH_H__

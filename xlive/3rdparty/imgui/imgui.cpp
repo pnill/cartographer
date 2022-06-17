@@ -1208,6 +1208,14 @@ void ImGuiIO::ClearInputKeys()
         NavInputsDownDuration[n] = NavInputsDownDurationPrev[n] = -1.0f;
 }
 
+void ImGuiIO::ClearMouseInput()
+{
+    memset(MouseDown, 0, sizeof(MouseDown));
+    for (int i = 0; i < IM_ARRAYSIZE(MouseDownDuration); i++)
+        MouseDownDuration[i] = MouseDownDurationPrev[i] = -1.0f;
+    MouseWheel = MouseWheelH = 0.0f;
+}
+
 void ImGuiIO::AddFocusEvent(bool focused)
 {
     // We intentionally overwrite this and process in NewFrame(), in order to give a chance
@@ -5949,6 +5957,9 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
     IM_ASSERT(g.WithinFrameScope);                  // Forgot to call ImGui::NewFrame()
     IM_ASSERT(g.FrameCountEnded != g.FrameCount);   // Called ImGui::Render() or ImGui::EndFrame() and haven't called ImGui::NewFrame() again yet
 
+    if ((flags & ImGuiWindowFlags_SuggestionPopup) != 0)
+        flags |= ImGuiWindowFlags_Popup;
+
     // Find or create
     ImGuiWindow* window = FindWindowByName(name);
     const bool window_just_created = (window == NULL);
@@ -6712,19 +6723,19 @@ void ImGui::FocusWindow(ImGuiWindow* window)
 {
     ImGuiContext& g = *GImGui;
 
-    if (g.NavWindow != window)
-    {
-        g.NavWindow = window;
-        if (window && g.NavDisableMouseHover)
-            g.NavMousePosDirty = true;
-        g.NavId = window ? window->NavLastIds[0] : 0; // Restore NavId
-        g.NavFocusScopeId = 0;
-        g.NavIdIsAlive = false;
-        g.NavLayer = ImGuiNavLayer_Main;
-        g.NavInitRequest = g.NavMoveSubmitted = g.NavMoveScoringItems = false;
-        NavUpdateAnyRequestFlag();
-        //IMGUI_DEBUG_LOG("FocusWindow(\"%s\")\n", window ? window->Name : NULL);
-    }
+	if (g.NavWindow != window)
+	{
+		g.NavWindow = window;
+		if (window && g.NavDisableMouseHover)
+			g.NavMousePosDirty = true;
+		g.NavId = window ? window->NavLastIds[0] : 0; // Restore NavId
+		g.NavFocusScopeId = 0;
+		g.NavIdIsAlive = false;
+		g.NavLayer = ImGuiNavLayer_Main;
+		g.NavInitRequest = g.NavMoveSubmitted = g.NavMoveScoringItems = false;
+		NavUpdateAnyRequestFlag();
+		//IMGUI_DEBUG_LOG("FocusWindow(\"%s\")\n", window ? window->Name : NULL);
+	}
 
     // Close popups if any
     ClosePopupsOverWindow(window, false);
@@ -6737,15 +6748,18 @@ void ImGui::FocusWindow(ImGuiWindow* window)
     // Steal active widgets. Some of the cases it triggers includes:
     // - Focus a window while an InputText in another window is active, if focus happens before the old InputText can run.
     // - When using Nav to activate menu items (due to timing of activating on press->new window appears->losing ActiveId)
-    if (g.ActiveId != 0 && g.ActiveIdWindow && g.ActiveIdWindow->RootWindow != focus_front_window)
-        if (!g.ActiveIdNoClearOnFocusLoss)
-            ClearActiveID();
+	if (window == NULL || (window->Flags & ImGuiWindowFlags_SuggestionPopup) == 0)
+	{
+		if (g.ActiveId != 0 && g.ActiveIdWindow && g.ActiveIdWindow->RootWindow != focus_front_window)
+			if (!g.ActiveIdNoClearOnFocusLoss)
+				ClearActiveID();
+    }
 
     // Passing NULL allow to disable keyboard focus
     if (!window)
         return;
 
-    // Bring to front
+    // Bring to front display, but not to input focus if we are using a SuggestionPopup window
     BringWindowToFocusFront(focus_front_window);
     if (((window->Flags | display_front_window->Flags) & ImGuiWindowFlags_NoBringToFrontOnFocus) == 0)
         BringWindowToDisplayFront(display_front_window);
@@ -8761,6 +8775,13 @@ bool ImGui::BeginPopup(const char* str_id, ImGuiWindowFlags flags)
     return BeginPopupEx(g.CurrentWindow->GetID(str_id), flags);
 }
 
+bool ImGui::BeginTextInputSuggestionPopup(ImGuiID id, ImGuiWindowFlags flags)
+{
+    flags |= ImGuiWindowFlags_SuggestionPopup;
+    flags |= ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoSavedSettings;
+    return BeginPopupEx(id, flags);
+}
+
 // If 'p_open' is specified for a modal popup window, the popup will have a regular close button which will close the popup.
 // Note that popup visibility status is owned by Dear ImGui (and manipulated with e.g. OpenPopup) so the actual value of *p_open is meaningless here.
 bool ImGui::BeginPopupModal(const char* name, bool* p_open, ImGuiWindowFlags flags)
@@ -9472,6 +9493,9 @@ static inline void ImGui::NavUpdateAnyRequestFlag()
 // This needs to be called before we submit any widget (aka in or before Begin)
 void ImGui::NavInitWindow(ImGuiWindow* window, bool force_reinit)
 {
+    if ((window->Flags & ImGuiWindowFlags_SuggestionPopup) != 0)
+        return;
+
     ImGuiContext& g = *GImGui;
     IM_ASSERT(window == g.NavWindow);
 

@@ -312,13 +312,13 @@ void get_map_download_source(int a1, wchar_t* out_string)
 	Seems to be a function responsible for loading data about maps when displaying them.
 	This is hooked to fix/re-add removed custom map images.
 */
-void* unknown_xbox_live_data1 = nullptr;
+void* user_interface_data = nullptr;
 void __declspec(naked) load_map_data_for_display() {
 	__asm {
 		mov eax, [esp + 0x10] // grab map_data pointer from stack
 		mov ecx, [eax + 0x964] // mov bitmap pointer into ecx
 		mov[ebx], ecx // mov bitmap pointer into map_data on stack
-		mov eax, unknown_xbox_live_data1
+		mov eax, user_interface_data
 		ret // return to original load_map_data_for display function
 	}
 }
@@ -343,7 +343,7 @@ void MapManager::ApplyHooks() {
 
 		//Hooked to fix custom map images.
 		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
-		unknown_xbox_live_data1 = Memory::GetAddress<void*>(0x9712C8);
+		user_interface_data = Memory::GetAddress<void*>(0x9712C8);
 	}
 	
 	// allow host to start the game, even if there are peers that didn't load the map

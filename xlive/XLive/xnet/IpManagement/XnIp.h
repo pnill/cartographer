@@ -2,7 +2,9 @@
 
 #include "..\xnet.h"
 #include "..\Sockets\XSocket.h"
+
 #include "H2MOD\Modules\Shell\Shell.h"
+#include "H2MOD\GUI\imgui_integration\Console\CommandHandler.h"
 
 #define MAX_HDR_STR 32
 
@@ -381,7 +383,7 @@ public:
 	XnKeyPair* GetKeyPair(const XNKID* xnkid);
 	
 	// Logging 
-	void LogConnectionsToConsole();
+	void LogConnectionsToConsole(IOutput* output);
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
 
 	// XNet startup parameters

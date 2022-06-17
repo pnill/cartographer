@@ -27,7 +27,7 @@ struct s_player_control_globals
 	int field_4;
 	int field_8;
 	int field_C;
-	char DisableCamera;
+	bool disableCamera;
 	PAD(7);
 	s_player_control local_players[4];
 };

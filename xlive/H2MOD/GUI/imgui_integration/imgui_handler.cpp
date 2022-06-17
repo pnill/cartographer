@@ -9,26 +9,23 @@
 #include "backends\imgui_impl_dx9.h"
 #include "backends\imgui_impl_win32.h"
 
-#include "ImGui_Cartographer_Style.h"
+#include "ImGui_CartographerStyle.h"
+#include "Console\ImGui_ConsoleImpl.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	//Window Name, DrawState, RenderFunc, OpenFunc, CloseFunc
-	/*std::vector<std::tuple<std::string, bool, std::function<void(bool*)>,
-		std::function<void()>, std::function<void()>>> windows;*/
 	std::vector<s_imgui_window> imgui_windows;
+	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
 	static HWND                 g_hWnd = NULL;
 	static INT64                g_Time = 0;
-	static INT64                g_TicksPerSecond = 0;
-	static ImGuiMouseCursor     g_LastMouseCursor = ImGuiMouseCursor_COUNT;
 	static bool                 g_HasGamepad = false;
 	static bool                 g_WantUpdateHasGamepad = true;
 	static LPDIRECT3DDEVICE9	g_pDevice;
-	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_take_input = false;
+	static bool					g_one_more_frame_update = true; // need to update ImGui state at least one more tick
+																// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
 
-	short g_NumWindowsOpen = 0;
 	bool						g_network_stats_overlay = false;
 
 	HWND get_HWND()
@@ -46,54 +43,90 @@ namespace imgui_handler
 	}
 	bool CanDrawImgui()
 	{
+		// TODO add these to some container
 		if (g_network_stats_overlay)
 			return true;
 		for (auto& window : imgui_windows)
 		{
-			if (window.DoRender)
+			if (window.doRender)
 				return true;
 		}
 		return false;
 	}
 
+	void SetGameInputState(bool enable)
+	{
+		// TODO move this function somewhere else
+		*Memory::GetAddress<bool*>(0x9712C8 + 4) = !enable;
+	}
+
 	void DrawImgui()
 	{
-		if (!imgui_handler::CanDrawImgui()) return;
+		if (!ImGuiHandler::CanDrawImgui() && 
+			!g_one_more_frame_update)
+			return;
+
+		// clear keyboard/mouse input state if we are about to close the ImGui windows
+		if (g_one_more_frame_update)
+		{
+			ImGuiIO& io = ImGui::GetIO();
+			io.ClearInputKeys();
+			io.ClearMouseInput();
+			io.ClearInputCharacters();
+			ReleaseTextures();
+			g_one_more_frame_update = false;
+		}
 
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
 		for (auto& window : imgui_windows)
 		{
-			if (window.DoRender)
+			if (window.doRender)
 			{
-				window.RenderFunc(&window.DoRender);
+				window.renderFunc(&window.doRender);
 			}
 		}
+
+		// Rendering
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 	}
 
 	void ToggleWindow(const std::string& name)
 	{
+		bool keep_game_input_blocked = false;
+
 		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
 			{
-				window.DoRender = !window.DoRender;
-				if (window.DoRender)
+				window.doRender = !window.doRender;
+				if (window.doRender)
 				{
-					if (window.OpenFunc != nullptr)
-						window.OpenFunc();
+					if (window.openFunc != nullptr)
+						window.openFunc();
 				}
 				else
 				{
-					if (window.CloseFunc != nullptr)
-						window.CloseFunc();
+					if (window.closeFunc != nullptr)
+						window.closeFunc();
 				}
 			}
+
+			// check if we still need to block the input of the game
+			if (window.doRender && !window.NoImInput())
+			{
+				keep_game_input_blocked = true;
+			}
 		}
+
+		g_one_more_frame_update = !keep_game_input_blocked;
+		SetGameInputState(!keep_game_input_blocked);
+		ImGuiToggleInput(keep_game_input_blocked);
+		PlayerControl::DisableLocalCamera(keep_game_input_blocked);
 	}
 
 	bool IsWindowActive(const std::string& name)
@@ -103,19 +136,13 @@ namespace imgui_handler
 		for (auto& window : imgui_windows)
 		{
 			if (window.name == name)
-				return window.DoRender;
+				return window.doRender;
 		}
 		return false;
 	}
 
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
-		imgui_windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
-		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
-		imgui_windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
-		imgui_windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
-		imgui_windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
-		
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO();
@@ -132,8 +159,20 @@ namespace imgui_handler
 
 		ImGui_ImplDX9_Init(pDevice);
 
-		AdvancedSettings::BuildStringsTable();
+		ImAdvancedSettings::BuildStringsTable();
 		WeaponOffsets::BuildStringsTable();
+		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
+		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
+		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
+		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
+		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
+		imgui_windows.emplace_back(Console::windowName, false, Console::Render, Console::Open, Console::Close);
+
+		atexit([]() {
+			ImGui_ImplDX9_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+			});
 	}
 	float WidthPercentage(float percent)
 	{
@@ -150,13 +189,13 @@ namespace imgui_handler
 		ImGui::Text(label);
 	}
 
-	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height)
+	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height)
 	{
 		// Load texture from disk
 		D3DXIMAGE_INFO imgInfo;
 		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		HRESULT hr = D3DXCreateTextureFromFileExA(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+		HRESULT hr = D3DXCreateTextureFromFileEx(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
 			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
@@ -166,10 +205,10 @@ namespace imgui_handler
 		switch (image)
 		{
 		case patch_notes:
-			if (g_patchNotes_Image)
-				g_patchNotes_Image->Release(); // release the texture if we already have one
+			if (g_patch_notes_texture)
+				g_patch_notes_texture->Release(); // release the texture if we already have one
 
-			g_patchNotes_Image = texture;
+			g_patch_notes_texture = texture;
 			break;
 		default:
 			return false;
@@ -189,7 +228,7 @@ namespace imgui_handler
 	{
 		switch (image) {
 		case patch_notes:
-			return g_patchNotes_Image;
+			return g_patch_notes_texture;
 		default: 
 			return NULL;
 		}
@@ -197,8 +236,8 @@ namespace imgui_handler
 
 	void ReleaseTextures()
 	{
-		if (g_patchNotes_Image) g_patchNotes_Image->Release();
-		g_patchNotes_Image = nullptr;
+		if (g_patch_notes_texture) g_patch_notes_texture->Release();
+		g_patch_notes_texture = nullptr;
 	}
 
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize)
@@ -211,15 +250,5 @@ namespace imgui_handler
 		{
 			return four_three;
 		}
-	}
-
-	void preloadImages()
-	{
-		auto grab_thread = []()
-		{
-			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			MOTD::GetMOTD(getAspectRatio(viewport->WorkSize));
-		};
-		std::thread(grab_thread).detach();
 	}
 }

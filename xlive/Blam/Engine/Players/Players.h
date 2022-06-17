@@ -201,7 +201,7 @@ struct s_player
 
 	WORD datum_salt;
 	WORD flags;
-	XUID identifier;
+	unsigned long long identifier;
 	DWORD player_creation_tick;
 	BYTE abNet[6];
 	__int16 machine_index;
@@ -281,7 +281,7 @@ public:
 
 	wchar_t* get_current_player_name();
 
-	XUID get_current_player_id();
+	unsigned long long get_current_player_id();
 
 private:
 	s_player* m_current_player = nullptr;

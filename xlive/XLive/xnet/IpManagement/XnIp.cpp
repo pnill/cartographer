@@ -6,7 +6,6 @@
 #include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 
 #include "..\NIC.h"
 #include "..\net_utils.h"
@@ -94,17 +93,18 @@ void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int byte
 	}
 }
 
-void CXnIp::LogConnectionsToConsole()
+void CXnIp::LogConnectionsToConsole(IOutput* output)
 {
 	if (GetRegisteredKeyCount() > 0)
 	{
-		const wchar_t* xnet_connections_str = L"XNet connections: ";
-		commands->output(xnet_connections_str);
+		const char* xnet_connections_str = "XNet connections: ";
 		LOG_CRITICAL_NETWORK(xnet_connections_str);
+		if (output)
+			output->OutputFmt(StringFlag_None, "# %s", xnet_connections_str);
 
 		for (int i = 0; i < GetMaxXnConnections(); i++)
 		{
-			std::wstring logString;
+			std::string logString;
 			if (m_XnIPs[i].bValid)
 			{
 				XnIp* xnIp = &m_XnIPs[i];
@@ -113,30 +113,33 @@ void CXnIp::LogConnectionsToConsole()
 				xnIp->PckGetStats(&pckStats);
 
 				logString +=
-					L"		Index: " + std::to_wstring(i) + L" " +
-					L"Packets sent: " + std::to_wstring(pckStats->pckBytesSent) + L" " +
-					L"Packets received: " + std::to_wstring(pckStats->pckBytesRecvd) + L" " +
-					L"Packets sent avg/sec: " + std::to_wstring(pckStats->pckAvgSentPerSec) + L" " +
-					L"Packets recvd avg/sec: " + std::to_wstring(pckStats->pckAvgRecvdPerSec) + L" " +
-					L"Connect status: " + std::to_wstring(xnIp->connectStatus) + L" " +
-					L"Connection initiator: " + (xnIp->connectionInitiator ? L"yes" : L"no") + L" " +
-					L"Time since last interaction: " + std::to_wstring((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime) / 1000.f) + L" " +
-					L"Time since last packet received: " + std::to_wstring((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastPacketReceivedTime) / 1000.f);
+					"		Index: " + std::to_string(i) + " " +
+					"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
+					"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
+					"Packets sent avg/sec: " + std::to_string(pckStats->pckAvgSentPerSec) + " " +
+					"Packets recvd avg/sec: " + std::to_string(pckStats->pckAvgRecvdPerSec) + " " +
+					"Connect status: " + std::to_string(xnIp->connectStatus) + " " +
+					"Connection initiator: " + (xnIp->connectionInitiator ? "yes" : "no") + " " +
+					"Time since last interaction: " + std::to_string((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastConnectionInteractionTime) / 1000.f) + " " +
+					"Time since last packet received: " + std::to_string((float)(_Shell::QPCToTimeNowMsec() - xnIp->lastPacketReceivedTime) / 1000.f);
 			}
 			else
 			{
 				logString +=
-					L"Unused connection index: " + std::to_wstring(i);
+					"Unused connection index: " + std::to_string(i);
 			}
-			commands->output(logString);
+
 			LOG_CRITICAL_NETWORK(logString);
+			if (output)
+				output->OutputFmt(StringFlag_None, "# %s", logString.c_str());
 		}
 	}
 	else
 	{
-		const wchar_t* message = L"Cannot log XNet connections when no keys are registerd (you need to host/be in a game)";
-		commands->output(message);
-		LOG_CRITICAL_NETWORK(message);
+		const char* err_message = "cannot log XNet connections when no keys are registerd (you need to host/be in a game)";
+		LOG_CRITICAL_NETWORK(err_message);
+		if (output)
+			output->OutputFmt(StringFlag_None, "# %s", err_message);
 	}
 }
 
@@ -220,9 +223,7 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				if (*lpBytesRecvdCount > sizeof(XBroadcastPacket))
 				{
 					*lpBytesRecvdCount = *lpBytesRecvdCount - sizeof(XBroadcastPacket);
-					char* buffer = (char*)_alloca(*lpBytesRecvdCount); // allocate on stack
-					memcpy(buffer, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
-					memcpy(lpBuffers[0].buf, buffer, *lpBytesRecvdCount);
+					memmove(lpBuffers[0].buf, lpBuffers[0].buf + sizeof(XBroadcastPacket), *lpBytesRecvdCount);
 					lpFrom->sin_addr = broadcastPck->data.name.sin_addr;
 					lpFrom->sin_port = xsocket->GetNetworkOrderSocketPort();
 					return 0;
@@ -246,7 +247,7 @@ int CXnIp::HandleRecvdPacket(XSocket* xsocket, sockaddr_in* lpFrom, WSABUF* lpBu
 				HandleXNetRequestPacket(xsocket, XNetPck, lpFrom, lpBytesRecvdCount); // save NAT info and send back a connection packet
 
 				// set the bytes received count to 0
-				// pool another packet after, so we keep the game fed with data
+				// should pool another packet after, so we keep the game fed with data
 				*lpBytesRecvdCount = 0;
 				return SOCKET_ERROR;
 			}
@@ -968,7 +969,7 @@ void CXnIp::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr
 	else
 	{
 		// fall back to localhost if what GetBestIpToIpRoute found is not a private/local host ip address (maybe we are not under a NAT gateway)
-		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, fall back to localhost IP address!", __FUNCTION__);
+		LOG_TRACE_NETWORK("{} - GetBestIpToIpRoute() returned public IP address, maybe we are not under a NAT device, falling back to localhost IP address!", __FUNCTION__);
 		m_ipLocal.xnaddr.ina.s_addr = inet_addr("127.0.0.1");
 	}
 
@@ -1010,6 +1011,7 @@ void CXnIp::ClearLostConnections()
 // #51: XNetStartup
 int WINAPI XNetStartup(const XNetStartupParams* pxnsp)
 {
+	LOG_TRACE_NETWORK("XNetStartup()");
 	gXnIp.Initialize(pxnsp);
 	return 0;
 }
@@ -1178,15 +1180,14 @@ DWORD WINAPI XNetGetTitleXnAddr(XNADDR* pxna)
 }
 
 
-// #55: XNetRegisterKey //need #51
+// #55: XNetRegisterKey
 int WINAPI XNetRegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 {
 	LOG_TRACE_NETWORK("XNetRegisterKey()");
 	return gXnIp.RegisterKey(pxnkid, pxnkey);
 }
 
-
-// #56: XNetUnregisterKey // need #51
+// #56: XNetUnregisterKey
 int WINAPI XNetUnregisterKey(const XNKID* pxnkid)
 {
 	LOG_TRACE_NETWORK("XNetUnregisterKey()");

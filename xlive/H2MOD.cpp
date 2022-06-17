@@ -18,7 +18,6 @@
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
@@ -528,7 +527,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	get_object_table_memory();
 
 	H2Tweaks::setHz();
-	imgui_handler::WeaponOffsets::MapLoad();
+	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading Main menu
 	// this is where resetAfterMatch var comes in for help
@@ -669,7 +668,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
-void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
+void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
 {
 	typedef void(__cdecl update_player_profile)(int local_player_index);
 	auto p_update_player_profile = Memory::GetAddress<update_player_profile*>(0x206A97);
@@ -678,10 +677,10 @@ void H2MOD::set_local_clan_tag(int local_player_index, XUID tag)
 	p_update_player_profile(local_player_index);
 }
 
-void __cdecl print_to_console(char *output)
+void __cdecl print_to_console(const char *output)
 {
 	const static std::string prefix = "[HSC Print] ";
-	commands->display(prefix + output);
+	// TODO FIXME add another tab to ImGui console to log these kind of things
 }
 
 DWORD calculate_model_lod;
@@ -911,12 +910,10 @@ bool __cdecl should_start_pregame_countdown_hook()
 		{
 			if (NetworkSession::PlayerIsActive(i))
 			{
-
-
 				int calcBaseOffset = 0x530E34 + (i * 0x128);
-				auto XUID = *Memory::GetAddress<::XUID*>(0, calcBaseOffset);
+				auto playerId = *Memory::GetAddress<unsigned long long*>(0, calcBaseOffset);
 				auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-				auto xuidslug = IntToString<unsigned long>(XUID & 0xFFFFFFFF, std::dec);
+				auto xuidslug = IntToString<unsigned long>(playerId & 0xFFFFFFFF, std::dec);
 				LOG_DEBUG_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
 				if (Parties.count(xuidslug) == 1) //Party leader found
 				{
@@ -1213,7 +1210,7 @@ void H2MOD::Initialize()
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
-		imgui_handler::WeaponOffsets::Initialize();
+		ImGuiHandler::WeaponOffsets::Initialize();
 		//ObserverMode::Initialize();
 		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
@@ -1222,7 +1219,6 @@ void H2MOD::Initialize()
 			DiscordInterface::Init();
 			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
 		}
-		
 	}
 	else
 	{

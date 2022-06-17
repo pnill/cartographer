@@ -2,7 +2,6 @@
 
 #include "ServerConsole.h"
 
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Utils\Utils.h"
 #include "Util\Hooks\Hook.h"
@@ -16,14 +15,35 @@ kablam_vip_add_t p_kablam_vip_add;
 typedef signed int(__cdecl* kablam_vip_clear_t)();
 kablam_vip_clear_t p_kablam_vip_clear;
 
-void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, char a3) {
+ServerConsole::DediConsoleOutput dediOutput;
 
-	wchar_t* command = command_line_args[0];
+void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count, char a3) {
+
+	wchar_t* command = command_line_split_wide[0];
 	if (command[0] == L'$') {
-		ServerConsole::logToDedicatedServerConsole(L"Running custom command\n");
-		//run the chatbox commands
-		std::wstring wsCommand(command);
-		commands->handle_command(std::string(wsCommand.begin(), wsCommand.end()));
+		ServerConsole::LogToDedicatedServerConsole(L"# running custom command: ");
+		
+		std::string command_line;
+		command_line.reserve(MAX_CONSOLE_INPUT_BUFFER);
+		for (int i = 0; i < split_count; i++)
+		{
+			std::wstring tokenWide;
+
+			if (i > 0)
+			{
+				tokenWide = command_line_split_wide[i];
+			}
+			else
+			{
+				// skip $ character
+				tokenWide = &command_line_split_wide[i][1];
+			}
+
+			command_line += std::string(tokenWide.begin(), tokenWide.end());
+			command_line += " ";
+		}
+
+		ConsoleCommand::HandleCommandLine(command_line.c_str(), command_line.length(), &dediOutput);
 		return 0;
 	}
 
@@ -62,7 +82,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	const auto& playCommandFind = ServerConsole::s_commandsMap.find(lowerCommand);
+	auto playCommandFind = ServerConsole::s_commandsMap.find(lowerCommand);
 	if (playCommandFind != ServerConsole::s_commandsMap.end()
 		&& playCommandFind->second == ServerConsole::play)
 		playCommand = true;
@@ -70,7 +90,7 @@ void* __cdecl dediCommandHook(wchar_t** command_line_args, int split_strings, ch
 	if (!playCommand)
 		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::s_commandsMap[lowerCommand]);
 
-	void* result = p_dedi_command(command_line_args, split_strings, a3);
+	void* result = p_dedi_command(command_line_split_wide, split_count, a3);
 
 	// Temporary if statement to prevent double calling events,
 	// all server command functions will be hooked in the future and these executes will be removed.
@@ -114,7 +134,7 @@ void ServerConsole::ApplyHooks()
 	s_commandsMap[L"unban"] = e_server_console_commands::unban;
 	s_commandsMap[L"vip"] = e_server_console_commands::vip;
 	s_commandsMap[L"any"] = e_server_console_commands::any;
-	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)dediCommandHook, 7);
+	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)DediCommandHook, 7);
 	p_kablam_vip_add = Memory::GetAddress<kablam_vip_add_t>(0, 0x1D932);
 	p_kablam_vip_clear = Memory::GetAddress<kablam_vip_clear_t>(0, 0x1DB16);
 
@@ -122,15 +142,15 @@ void ServerConsole::ApplyHooks()
 	PatchCall(Memory::GetAddress(0, 0x724B), kablam_command_play);
 }
 
-void ServerConsole::logToDedicatedServerConsole(const wchar_t* string, ...) {
+void ServerConsole::LogToDedicatedServerConsole(const wchar_t* fmt, ...) {
 
 	if (!Memory::IsDedicatedServer())
 		return;
 
-	typedef signed int(dedi_print)(const wchar_t* str, ...);
-	auto dedi_print_method = Memory::GetAddress<dedi_print*>(0, 0x2354C8);
+	typedef int(__cdecl* dedi_print_t)(const wchar_t* fmt, ...);
+	auto p_dedi_print = Memory::GetAddress<dedi_print_t>(0, 0x2354C8);
 
-	dedi_print_method(string);
+	p_dedi_print(fmt);
 }
 
 void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char unk)
@@ -170,7 +190,7 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 	BYTE v8 = (*(BYTE**)(threadparams + 8))[20];
 	*(BYTE*)(threadparams + 4) = v8;
 	if (!v8)
-		logToDedicatedServerConsole(L"\r\n");
+		LogToDedicatedServerConsole(L"\r\n");
 }
 
 
@@ -225,4 +245,26 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 		// send the message
 		sendMsgCommand.sendGameMessage();
 	}
+}
+
+int ServerConsole::DediConsoleOutput::Output(StringHeaderFlags flags, const char* fmt)
+{
+	std::string fmtStr(fmt);
+	std::wstring fmtStrWide(fmtStr.begin(), fmtStr.end());
+	ServerConsole::LogToDedicatedServerConsole(fmtStrWide.c_str());
+	ServerConsole::LogToDedicatedServerConsole(L"\n");
+	return 0;
+}
+
+int ServerConsole::DediConsoleOutput::OutputFmt(StringHeaderFlags flags, const char* fmt, ...)
+{
+	va_list valist;
+	va_start(valist, fmt);
+	int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
+	char* buffer = (char*)_malloca(buffer_size_needed);
+	int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+	DediConsoleOutput::Output(flags, buffer);
+	_freea(buffer);
+	va_end(valist);
+	return 0;
 }

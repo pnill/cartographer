@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "xam.h"
-#include "H2MOD\Modules\Console\ConsoleCommands.h"
 
 struct NOTIFY_LISTEN
 {
@@ -91,13 +90,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	if (g_listener[listenerIndex].area & XNOTIFY_SYSTEM &&
 		dwMsgFilter == 0)
 	{
-		if (commands->consoleOpen() != last_ui_state)
-		{
-			last_ui_state = commands->consoleOpen();
-			dwMsgFilter = XN_SYS_UI;
-		}
-
-		else if (notify_xlive_ui != -1)
+		if (notify_xlive_ui != -1)
 			dwMsgFilter = XN_SYS_UI;
 
 		else if (SignInStatusChanged())
@@ -176,10 +169,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 			{
 				*pParam = false;
 				notify_xlive_ui = -1;
-			}
-			else
-			{
-				*pParam = commands->consoleOpen();
 			}
 
 			LOG_TRACE_XLIVE("- {:p} = XN_SYS_UI (1)", (void*)hNotification);

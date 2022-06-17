@@ -1,5 +1,7 @@
 #pragma once
 
+#include "H2MOD/GUI/imgui_integration/Console/CommandHandler.h"
+
 namespace ServerConsole
 {
 	enum e_server_console_commands {
@@ -22,9 +24,15 @@ namespace ServerConsole
 		any
 	};
 
+	class DediConsoleOutput : public IOutput
+	{
+		int Output(StringHeaderFlags flags, const char* fmt) override;
+		int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) override;
+	};
+
 	static std::map<std::wstring, e_server_console_commands> s_commandsMap;
 	void ApplyHooks();
-	void logToDedicatedServerConsole(const wchar_t* string, ...);
+	void LogToDedicatedServerConsole(const wchar_t* fmt, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);
 	void AddVip(std::wstring gamerTag);
 	void ClearVip();

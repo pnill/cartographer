@@ -15,7 +15,7 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-void AchievementUnlock(XUID xuid, int achievement_id, XOVERLAPPED* pOverlapped)
+void AchievementUnlock(unsigned long long xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 {
 	LOG_TRACE_GAME("[H2Mod-Achievement] - Unlocking achievement ID: {:d}", achievement_id);
 
@@ -54,7 +54,7 @@ void AchievementUnlock(XUID xuid, int achievement_id, XOVERLAPPED* pOverlapped)
 	}
 }
 
-void GetAchievements(XUID xuid)
+void GetAchievements(unsigned long long xuid)
 {
 	CURL *curl;
 	CURLcode res;

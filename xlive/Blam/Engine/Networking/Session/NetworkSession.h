@@ -52,17 +52,12 @@ namespace NetworkSession
 	unsigned long long GetPlayerId(int playerIdx);
 
 	int GetPlayerTeam(int playerIdx);
-	int GetPeerIndexFromId(long long xuid);
+	int GetPeerIndexFromId(unsigned long long xuid);
 	s_player_information* GetPlayerInformation(int playerIdx);
 
 	wchar_t* GetGameVariantName();
 
 	void LeaveSession();
-
-	// logging
-	void LogPeersToConsole();
-	void LogPlayersToConsole();
-	void LogStructureOffsets();
 }
 
 enum e_network_session_state : int
@@ -131,7 +126,7 @@ struct s_peer_observer_channel
 
 struct s_player_information
 {
-	XUID identifier; // -0xA
+	unsigned long long identifier; // -0xA
 	int peer_index; // -0x8
 	int peer_user_index; // -0x4
 	WORD player_flags; // 0x0
@@ -152,7 +147,7 @@ struct s_virtual_couch
 	XSESSION_INFO xsession_info;
 	char pad[3];
 	DWORD xuid_count;
-	XUID xuid[16];
+	unsigned long long player_ids[16];
 };
 CHECK_STRUCT_SIZE(s_virtual_couch, 200);
 
@@ -210,7 +205,7 @@ struct s_membership_information
 {
 	DWORD update_number; // 0x70
 	int session_leader_index; // 0x74
-	XUID dedicated_server_xuid; // 0x78
+	unsigned long long dedicated_server_xuid; // 0x78
 	int xbox_session_leader_peer_index; // 0x80
 	int peer_count; // 0x84
 	s_peer_information peer_data[17]; // 0x88

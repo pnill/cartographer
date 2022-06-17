@@ -7,16 +7,19 @@
 #include "imgui_handler.h"
 #include "Util\Hooks\Hook.h"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
-	namespace iMessageBox
+	namespace ImMessageBox
 	{
+		std::string windowName = "messagebox";
+
 		namespace
 		{
 			std::string message;
 		}
 		void Render(bool* p_open)
 		{
+			bool open = *p_open;
 			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
@@ -30,14 +33,13 @@ namespace imgui_handler
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 250), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == _main_menu)
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin("Message", p_open, window_flags))
+			if (ImGui::Begin("Message", NULL, window_flags))
 			{
 				ImGui::TextWrapped(message.c_str());
 				ImGui::SetCursorPosY(190);
 				if (ImGui::Button("Ok", ImVec2(610, 50)))
 				{
-					*p_open = false;
-					Close();
+					ImGuiHandler::ToggleWindow(ImGuiHandler::ImMessageBox::windowName);
 				}
 			}
 			// Pop style var
@@ -52,15 +54,9 @@ namespace imgui_handler
 
 		void Open()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);
-			ImGuiToggleInput(true);
-			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);
-			ImGuiToggleInput(false);
-			PlayerControl::DisableLocalCamera(false);
 		}
 	}
 }

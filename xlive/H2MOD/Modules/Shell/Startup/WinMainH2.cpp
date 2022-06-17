@@ -38,7 +38,7 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
 		LOG_TRACE_FUNC("Failed to get PCC info / insufficient system resources");
-		std::thread([=] {
+		std::thread([]() {
 			_Shell::OpenMessageBox(NULL, MB_ICONEXCLAMATION, "PCC Error", "Failed to get compatibility info."); }).detach();
 
 		show_error_message_by_id(108);

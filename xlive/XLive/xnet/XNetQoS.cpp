@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 
 CXNetQoS XNetQoS;
 
-void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
+void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQOS** apxnqos, DWORD dwBitsPerSec, XNQOS* pqos)
 {
 	LIMITED_LOG(15, LOG_TRACE_NETWORK, "ClientQoSLookup( cxna: {}, cProbes: {})", cxna, cProbes);
 
@@ -19,14 +19,14 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 	{
 		if (cProbes > 0)
 		{
-			XNADDR *xn = apxna[pqos->cxnqosPending - 1];
-			XNQOSINFO *xnqosinfo = &pqos->axnqosinfo[(pqos->cxnqosPending - 1)];
+			XNADDR* xn = &pxna[pqos->cxnqosPending - 1];
+			XNQOSINFO* xnqosinfo = &pqos->axnqosinfo[(pqos->cxnqosPending - 1)];
 
 			//	LOG_TRACE_NETWORK_N("[XNetQoSLookup] Looping cxnas for probes pqos->xnqosPending: {}", pqos->cxnqosPending);
 
 			int iResult;
 			SOCKET connectSocket = INVALID_SOCKET;
-			struct addrinfo *result = NULL, *ptr = NULL, hints;
+			struct addrinfo* result = NULL, * ptr = NULL, hints;
 
 			ZeroMemory(&hints, sizeof(hints));
 			hints.ai_family = AF_INET;
@@ -93,7 +93,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 
 			int recvResult = 0;
 			int recvBufLen = gXnIp.GetReqQoSBufferSize();
-			BYTE *recvBuf = new BYTE[recvBufLen];
+			BYTE* recvBuf = new BYTE[recvBufLen];
 			ZeroMemory(recvBuf, recvBufLen);
 
 			std::vector<long long> ping_storage;
@@ -177,14 +177,8 @@ void ClientQoSLookUp(UINT cxna, XNADDR *apxna[], UINT cProbes, IN_ADDR aina[], X
 		}
 	}
 
-	for (UINT i = 0; i < cxna; i++)
-	{
-		// XNADDR
-		delete apxna[i];
-	}
-
-	// XNADDR**
-	delete[] apxna;
+	// XNADDR
+	delete[] pxna;
 }
 
 bool CXNetQoS::IsListening()
@@ -389,7 +383,8 @@ void CXNetQoS::Listener()
 			}
 
 			char acceptBuffer[2 * (sizeof(sockaddr_in) + 16)];
-			if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)acceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, NULL, &acceptOvelapped) == FALSE)
+			DWORD dwBytesReceived = 0;
+			if (lpfnAcceptEx(m_ListenSocket, acceptSocket, (PVOID)acceptBuffer, 0, sizeof(sockaddr_in) + 16, sizeof(sockaddr_in) + 16, &dwBytesReceived, &acceptOvelapped) == FALSE)
 			{
 				if (WSAGetLastError() != ERROR_IO_PENDING) {
 					LOG_TRACE_NETWORK("{} - AcceptEx failed with error: {}", __FUNCTION__, WSAGetLastError());
@@ -471,7 +466,7 @@ void CXNetQoS::Listener()
 // #69: XNetQosListen
 DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec, DWORD dwFlags)
 {
-	LOG_TRACE_NETWORK("XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
+	LIMITED_LOG(15, LOG_TRACE_NETWORK, "XNetQosListen  (pb - cb = {}, dwbitsPerSec = {:X}, flags = {:X})", 
 		cb, dwBitsPerSec, dwFlags);
 
 	if ((dwFlags & XNET_QOS_LISTEN_ENABLE) && (dwFlags & XNET_QOS_LISTEN_DISABLE)) 
@@ -530,11 +525,10 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	LIMITED_LOG(15, LOG_TRACE_NETWORK, "{} ( cxna: {}, cina: {}, cProbes: {}, dwBitsPerSec: {}, hEvent: {})",
 		__FUNCTION__, cxna, cina, cProbes, dwBitsPerSec, hEvent);
 
-	XNADDR** apxna_copy = new XNADDR*[cxna];
+	XNADDR* pxna = new XNADDR[cxna];
 	for (DWORD i = 0; i < cxna; i++)
 	{
-		apxna_copy[i] = new XNADDR;
-		memcpy(apxna_copy[i], apxna[i], sizeof(XNADDR));
+		memcpy(&pxna[i], apxna[i], sizeof(XNADDR));
 	}
 
 	*pxnqos = (XNQOS*)new char[sizeof(XNQOS) + (sizeof(XNQOSINFO) * (cxna - 1))];
@@ -550,7 +544,7 @@ DWORD WINAPI XNetQosLookup(UINT cxna, XNADDR * apxna[], XNKID * apxnkid[], XNKEY
 	We want to abuse the CPU where possible considering more modern systems will have decent CPUs so we'll be able to force things to happen faster but still want to keep compatibility with older setups.
 	*/
 
-	std::thread(ClientQoSLookUp, cxna, apxna_copy, cProbes, aina, pxnqos, dwBitsPerSec, pqos).detach();
+	std::thread(ClientQoSLookUp, cxna, pxna, cProbes, aina, pxnqos, dwBitsPerSec, pqos).detach();
 
 	return 0;
 }

@@ -2,29 +2,44 @@
 #include "imgui.h"
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 
-namespace imgui_handler
+namespace ImGuiHandler
 {
 	extern bool g_network_stats_overlay;
+	extern PDIRECT3DTEXTURE9 g_patch_notes_texture;
 
 	enum s_imgui_images
 	{
 		patch_notes
 	};
 
+	typedef int ImWWindowHandlerFlags;
+	enum ImWWindowHandlerFlags_
+	{
+		_ImWindow_no_input = 1 << 0,
+	};
+
 	struct s_imgui_window
 	{
 		std::string name;
-		bool DoRender;
-		std::function<void(bool*)> RenderFunc;
-		std::function<void()> OpenFunc;
-		std::function<void()> CloseFunc;
-		s_imgui_window(std::string name, bool doRender, std::function<void(bool*)> renderFunc, std::function<void()> openFunc, std::function<void()> closeFunc)
+		bool doRender;
+		std::function<void(bool*)> renderFunc;
+		std::function<void()> openFunc;
+		std::function<void()> closeFunc;
+		ImWWindowHandlerFlags flags;
+
+		s_imgui_window(const std::string& _name, bool _doRender, std::function<void(bool*)> _renderFunc, std::function<void()> _openFunc, std::function<void()> _closeFunc, ImWWindowHandlerFlags _flags = 0)
 		{
-			this->name = name;
-			this->DoRender = doRender;
-			this->RenderFunc = renderFunc;
-			this->OpenFunc = openFunc;
-			this->CloseFunc = closeFunc;
+			name = _name;
+			doRender = _doRender;
+			renderFunc = _renderFunc;
+			openFunc = _openFunc;
+			closeFunc = _closeFunc;
+			flags = _flags;
+		}
+
+		bool NoImInput()
+		{
+			return (flags & _ImWindow_no_input) != 0;
 		}
 	};
 	enum s_aspect_ratio : byte
@@ -35,26 +50,27 @@ namespace imgui_handler
 	HWND get_HWND();
 	bool ImGuiShouldHandleInput();
 	void ImGuiToggleInput(bool state);
+	void SetGameInputState(bool enable);
 	bool CanDrawImgui();
 	void DrawImgui();
-	void ToggleWindow(const std::string& name);
 	bool IsWindowActive(const std::string& name);
+	void ToggleWindow(const std::string& name);
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
 	void TextVerticalPad(const char* label);
-	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
+	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
-	void preloadImages();
-	extern short g_NumWindowsOpen;
-	namespace MOTD {
-		bool GetMOTD(s_aspect_ratio ratio);
+	namespace ImMOTD {
+		bool DownloadMOTD(const std::wstring& motd_path, s_aspect_ratio ratio);
 		void Render(bool* p_open);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
-	namespace AdvancedSettings
+	namespace ImAdvancedSettings
 	{
 		enum e_advanced_string : int
 		{
@@ -185,22 +201,27 @@ namespace imgui_handler
 		void Render(bool* p_open);
 		void Open();
 		void Close();
-	}
-	namespace DebugOverlay
-	{
 
+		extern std::string windowName;
+	}
+	namespace ImDebugOverlay
+	{
 		void Render(bool* p_open);
 		void AddWatchItem(std::string Key, std::string Description);
 		void UpdateWatchItem(std::string Key, std::string Value);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
-	namespace iMessageBox
+	namespace ImMessageBox
 	{
 		void Render(bool* p_open);
 		void SetMessage(std::string message);
 		void Open();
 		void Close();
+
+		extern std::string windowName;
 	}
 	namespace WeaponOffsets
 	{

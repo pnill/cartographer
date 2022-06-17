@@ -96,7 +96,6 @@ public:
 
 	static bool CountResultsUpdated;
 
-
 	static DWORD Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXOVERLAPPED pOverlapped);
 
 	// basic functions 
@@ -129,7 +128,7 @@ public:
 	void CancelOperation() { m_cancelOperation = true; }
 
 	void EnumerateFromHttp();
-	bool SearchResultParseAndWrite(std::shared_ptr<std::string> serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
+	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
 
 	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
 	{

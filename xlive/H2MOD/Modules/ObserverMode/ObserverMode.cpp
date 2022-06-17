@@ -106,24 +106,24 @@ namespace ObserverMode
 			CameraPosition->j += (num15 + num17);
 			CameraPosition->k += num14 + (control->actions.trigger * 0.03f) + -(control->actions.secondary_trigger * 0.03f);
 
-			if (imgui_handler::IsWindowActive("debug_overlay")) 
+			if (ImGuiHandler::IsWindowActive("debug_overlay")) 
 			{
-				imgui_handler::DebugOverlay::UpdateWatchItem("oyaw", IntToString<float>(CameraAngles->i));
-				imgui_handler::DebugOverlay::UpdateWatchItem("opitch", IntToString<float>(CameraAngles->j));
-				imgui_handler::DebugOverlay::UpdateWatchItem("oyaw", IntToString<float>(CameraAngles->i));
-				imgui_handler::DebugOverlay::UpdateWatchItem("opitch", IntToString<float>(CameraAngles->j));
-				imgui_handler::DebugOverlay::UpdateWatchItem("oyawu", IntToString<float>(YawUnk));
-				imgui_handler::DebugOverlay::UpdateWatchItem("opitchu", IntToString<float>(PitchUnk));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o1", IntToString<float>(Num1));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o2", IntToString<float>(Num2));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o3", IntToString<float>(num14));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o4", IntToString<float>(num15));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o5", IntToString<float>(num16));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o6", IntToString<float>(num17));
-				imgui_handler::DebugOverlay::UpdateWatchItem("o7", IntToString<float>(num18));
-				imgui_handler::DebugOverlay::UpdateWatchItem("ox", IntToString<float>((num18 + num16)));
-				imgui_handler::DebugOverlay::UpdateWatchItem("oy", IntToString<float>((num15 + num17)));
-				imgui_handler::DebugOverlay::UpdateWatchItem("oz", IntToString<float>(num14));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("oyaw", IntToString<float>(CameraAngles->i));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("opitch", IntToString<float>(CameraAngles->j));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("oyaw", IntToString<float>(CameraAngles->i));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("opitch", IntToString<float>(CameraAngles->j));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("oyawu", IntToString<float>(YawUnk));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("opitchu", IntToString<float>(PitchUnk));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o1", IntToString<float>(Num1));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o2", IntToString<float>(Num2));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o3", IntToString<float>(num14));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o4", IntToString<float>(num15));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o5", IntToString<float>(num16));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o6", IntToString<float>(num17));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("o7", IntToString<float>(num18));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("ox", IntToString<float>((num18 + num16)));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("oy", IntToString<float>((num15 + num17)));
+				ImGuiHandler::ImDebugOverlay::UpdateWatchItem("oz", IntToString<float>(num14));
 			}
 		}
 
@@ -254,20 +254,20 @@ namespace ObserverMode
 
 		sub_7BD2EC = Memory::GetAddress<p_sub_7BD2EC*>(0x13D2EC);
 
-		imgui_handler::DebugOverlay::AddWatchItem("oyaw", "Observer Yaw");
-		imgui_handler::DebugOverlay::AddWatchItem("opitch", "Observer Pitch");
-		imgui_handler::DebugOverlay::AddWatchItem("oyawu", "Yaw Calc");
-		imgui_handler::DebugOverlay::AddWatchItem("opitchu", "Pitch Calc");
-		imgui_handler::DebugOverlay::AddWatchItem("o1", "num1");
-		imgui_handler::DebugOverlay::AddWatchItem("o2", "num2");
-		imgui_handler::DebugOverlay::AddWatchItem("o3", "num14");
-		imgui_handler::DebugOverlay::AddWatchItem("o4", "num15");
-		imgui_handler::DebugOverlay::AddWatchItem("o5", "num16");
-		imgui_handler::DebugOverlay::AddWatchItem("o6", "num17");
-		imgui_handler::DebugOverlay::AddWatchItem("o7", "num18");
-		imgui_handler::DebugOverlay::AddWatchItem("ox", "XMod");
-		imgui_handler::DebugOverlay::AddWatchItem("oy", "YMod");
-		imgui_handler::DebugOverlay::AddWatchItem("oz", "ZMod");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("oyaw", "Observer Yaw");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("opitch", "Observer Pitch");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("oyawu", "Yaw Calc");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("opitchu", "Pitch Calc");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o1", "num1");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o2", "num2");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o3", "num14");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o4", "num15");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o5", "num16");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o6", "num17");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("o7", "num18");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("ox", "XMod");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("oy", "YMod");
+		ImGuiHandler::ImDebugOverlay::AddWatchItem("oz", "ZMod");
 
 
 		ApplyHooks();

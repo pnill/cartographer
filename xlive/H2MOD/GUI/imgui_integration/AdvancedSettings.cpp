@@ -17,8 +17,9 @@
 #include "imgui.h"
 #include "imgui_handler.h"
 
-namespace imgui_handler {
-	namespace AdvancedSettings {
+namespace ImGuiHandler {
+	namespace ImAdvancedSettings {
+		std::string windowName = "advanced_settings";
 		namespace
 		{
 			float crosshairSize = 1.0f;
@@ -34,6 +35,7 @@ namespace imgui_handler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
+
 			
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
@@ -216,7 +218,7 @@ namespace imgui_handler {
 					//Ingame Change Display
 					if (ImGui::Button(GetString(weaponoffsets, "WeaponOffsets"), b3_size))
 					{
-						imgui_handler::ToggleWindow("Weapon Offsets");
+						ImGuiHandler::ToggleWindow("Weapon Offsets");
 					}
 
 					ImGui::Columns(2, NULL, false);
@@ -921,7 +923,7 @@ namespace imgui_handler {
 		}
 		void Render(bool* p_open)
 		{
-			if(!g_init)
+			if (!g_init)
 			{
 				g_deadzone = (int)H2Config_Controller_Deadzone;
 				g_aiming = (int)H2Config_controller_modern;
@@ -933,6 +935,8 @@ namespace imgui_handler {
 					g_language_code = 8;
 				g_init = true;
 			}
+
+			bool open = *p_open;
 			ImGuiIO& io = ImGui::GetIO();
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
 			ImGuiWindowFlags window_flags = 0;
@@ -946,7 +950,7 @@ namespace imgui_handler {
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
 			if (h2mod->GetEngineType() == _main_menu)
 				ImGui::SetNextWindowBgAlpha(1);
-			if (ImGui::Begin(GetString(e_advanced_string::title), p_open, window_flags))
+			if (ImGui::Begin(GetString(e_advanced_string::title), &open, window_flags))
 			{
 				HudSettings();
 				VideoSettings();
@@ -1035,13 +1039,14 @@ namespace imgui_handler {
 
 			ImGui::PopStyleVar();
 			ImGui::End();
-			if (!*p_open)
-				Close();
+
+			if (!open)
+			{
+				ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
+			}
 		}
 		void Open()
 		{
-			g_NumWindowsOpen++;
-			WriteValue<byte>(Memory::GetAddress(0x9712cC), 1);		// Enable Cursor visibility
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
 			for(auto i = 0; i < 14; i++)
@@ -1052,18 +1057,9 @@ namespace imgui_handler {
 						button_placeholders[i] = j;
 				}
 			}
-			ImGuiToggleInput(true);
-			PlayerControl::DisableLocalCamera(true);
 		}
 		void Close()
 		{
-			g_NumWindowsOpen--;
-			if (g_NumWindowsOpen == 0)
-			{
-				WriteValue<byte>(Memory::GetAddress(0x9712cC), 0);		// Disable Cursor visibility
-				ImGuiToggleInput(false);
-				PlayerControl::DisableLocalCamera(false);
-			}
 			SaveH2Config();
 		}
 		void BuildStringsTable()

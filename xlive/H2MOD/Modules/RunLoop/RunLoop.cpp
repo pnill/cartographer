@@ -243,6 +243,7 @@ inline void defaultFrameLimiter() {
 	static _clock::time_point lastTime;
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
+	static const double thread_sleep_threshold = 3.0;
 	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
 
 	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit
@@ -274,13 +275,14 @@ inline void defaultFrameLimiter() {
 	{
 		double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
 		double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
-		int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - 2.0 - 0.5);
 
-		if (iSleepTimeMsAdjusted < 0)
-			iSleepTimeMsAdjusted = 0;
-
-		if (dbSleepTimeMs >= 2.0)
+		if (dbSleepTimeMs >= thread_sleep_threshold)
+		{
+			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - thread_sleep_threshold - 0.5);
+			if (iSleepTimeMsAdjusted < 0)
+				iSleepTimeMsAdjusted = 0;
 			Sleep(iSleepTimeMsAdjusted);
+		}
 
 		do
 		{
@@ -401,6 +403,7 @@ float alt_system_time_update()
 		b_sys_init = true;
 		return 1;
 	}
+
 	int currentTime = timeGetTime();
 	float result = (float)(currentTime - startTime) * 0.001;
 	startTime = currentTime;
@@ -736,8 +739,6 @@ void InitRunLoop() {
 			QueryPerformanceFrequency(&freq);
 			//Remove original render call
 			NopFill(Memory::GetAddress(0x39DAA), 5);
-			//Stop Hold to Zoom.
-			NopFill(Memory::GetAddress(0x9355C), 4);
 			break;
 
 		case _rendering_mode_original_game_frame_limit:
@@ -750,6 +751,9 @@ void InitRunLoop() {
 		// apply the code that fixes and determines if the amin loop should be throttled
 		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
 		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
+
+		// stop Hold to Zoom.
+		NopFill(Memory::GetAddress(0x9355C), 4);
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);

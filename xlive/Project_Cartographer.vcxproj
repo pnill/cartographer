@@ -17,7 +17,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}</ProjectGuid>
     <ProjectName>xlive</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.22000.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -322,8 +322,11 @@
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\debug_overlay.cpp" />
-    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\DebugOverlay.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\MessageBox.cpp" />
@@ -370,7 +373,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
-    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
@@ -405,7 +408,6 @@
     <ClCompile Include="H2MOD\Modules\Accounts\Accounts.cpp" />
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
-    <ClCompile Include="H2MOD\Modules\Console\ConsoleCommands.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
@@ -648,9 +650,13 @@
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Cartographer_Style.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_handler.h" />
-    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandHandler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\CommandsUtil.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ComVar.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_CartographerStyle.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_Handler.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
@@ -696,7 +702,7 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
     <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
-    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
@@ -735,7 +741,6 @@
     <ClInclude Include="H2MOD\Modules\Accounts\Accounts.h" />
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
-    <ClInclude Include="H2MOD\Modules\Console\ConsoleCommands.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />

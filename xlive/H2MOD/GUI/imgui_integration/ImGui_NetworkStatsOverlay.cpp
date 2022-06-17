@@ -19,27 +19,16 @@ net_bandwidth_display_data get_net_bandwidth_display_data(unsigned int bytes_cou
 		"<unknown>",
 	};
 
-	net_bandwidth_display_data result = { -1.0f, network_bandwidth_measurement_unit[4] };
+	net_bandwidth_display_data result = { bytes_count, network_bandwidth_measurement_unit[0] };
 
-	if (bytes_count >= 1000000000u)
+	int bandwidth_measurement_unit_idx = 0;
+	while (result.val > 1000)
 	{
-		result.val = (float)bytes_count / 1000000000.f;
-		result.unit_str = network_bandwidth_measurement_unit[3];
-	}
-	else if (bytes_count >= 1000000u)
-	{
-		result.val = (float)bytes_count / 1000000.f;
-		result.unit_str = network_bandwidth_measurement_unit[2];
-	}
-	else if (bytes_count >= 1000u)
-	{
-		result.val = (float)bytes_count / 1000.f;
-		result.unit_str = network_bandwidth_measurement_unit[1];
-	}
-	else
-	{
-		result.val = (float)bytes_count;
-		result.unit_str = network_bandwidth_measurement_unit[0];
+		if (bandwidth_measurement_unit_idx >= 5)
+			break;
+
+		result.val = (float)result.val / 1000.f;
+		result.unit_str = network_bandwidth_measurement_unit[++bandwidth_measurement_unit_idx];
 	}
 
 	return result;

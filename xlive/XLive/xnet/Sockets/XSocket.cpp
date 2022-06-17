@@ -276,7 +276,7 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 	int result = ::recvfrom(this->winSockHandle, lpBuffers->buf, lpBuffers->len, *lpFlags, lpFrom, lpFromlen);
 	*lpNumberOfBytesRecvd = result;
 #else
-	int result = WSARecvFrom(xsocket->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
+	int result = WSARecvFrom(this->winSockHandle, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd, lpFlags, lpFrom, lpFromlen, lpOverlapped, lpCompletionRoutine);
 #endif
 	if (result == SOCKET_ERROR)
 	{

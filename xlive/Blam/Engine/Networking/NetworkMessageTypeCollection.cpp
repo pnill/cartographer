@@ -43,12 +43,12 @@ bool __cdecl decode_map_file_name_message(bitstream* stream, int a2, s_custom_ma
 
 void __cdecl encode_request_map_filename_message(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_encode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
+	stream->data_encode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
 	stream->data_encode_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
 bool __cdecl decode_request_map_filename_message(bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_decode_bits("user-identifier", &data->user_identifier, player_identifier_size_bits);
+	stream->data_decode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
 	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->overflow() == false;
 }
@@ -142,7 +142,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
 		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on handle_channel_message_hook request-map-filename from XUID: {}", 
-			received_data->user_identifier);
+			received_data->player_id);
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
 		{
@@ -162,8 +162,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
 					data.map_download_id = received_data->map_download_id;
 
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] sending map file name packet to XUID: {}, peer index: {}, map name: {}, download id {}", 
-						received_data->user_identifier, 
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] sending map file name packet to player id: {}, peer index: {}, map name: {}, download id {}", 
+						received_data->player_id,
 						peer_index, map_filename.c_str(), received_data->map_download_id);
 
 					s_network_observer* observer = session->p_network_observer;
@@ -173,8 +173,8 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 				else
 				{
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] no map file name found, abort sending packet! {} - {}", 
-						received_data->user_identifier, peer_index, map_filename.c_str());
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] no map file name found, abort sending packet! player id: {}, peer idx: {} map filename: {}", 
+						received_data->player_id, peer_index, map_filename.c_str());
 				}
 			}
 		}
@@ -302,7 +302,7 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 	if (session->local_session_state == _network_session_state_peer_established)
 	{
 		s_request_map_filename data;
-		XUserGetXUID(0, &data.user_identifier);
+		XUserGetXUID(0, &data.player_id);
 		data.map_download_id = mapDownloadId;
 
 		s_network_observer* observer = session->p_network_observer;

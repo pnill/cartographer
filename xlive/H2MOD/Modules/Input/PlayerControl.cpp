@@ -51,5 +51,5 @@ s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
 void PlayerControl::DisableLocalCamera(bool state)
 {
 	auto player_controls_globals = *Memory::GetAddress<s_player_control_globals**>(0x4ca37c);
-	player_controls_globals->DisableCamera = state;
+	player_controls_globals->disableCamera = state;
 }
