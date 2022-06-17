@@ -170,8 +170,8 @@ namespace ImGuiHandler
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
-			ImGui::DestroyContext();
 			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
 			});
 	}
 	float WidthPercentage(float percent)

@@ -15,7 +15,16 @@ struct bitmap_definition
     * SPRITES : Sprite texture pages will be generated.
     * INTERFACE BITMAPS : Similar to 2D TEXTURES but without mipmaps and without the power of 2 restriction.")]*/
 
-    short bitmaptype;
+    enum : short
+    {
+		_2D_textures = 0,
+		_3D_textures,
+		_cube_maps,
+		_sprites,
+		_interface_bitmaps,
+    };
+
+    short bitmapType;
 
     /*[Explaination("Format", "Format controls how pixels will be stored internally:
     
@@ -26,16 +35,16 @@ struct bitmap_definition
     * 32-BIT COLOR: Uses 32 bits/pixel. Very high quality and can have alpha at no added cost. This format takes up the most memory, however. Bitmap formats are x8r8g8b8 and a8r8g8b.
     * MONOCHROME: Uses either 8 or 16 bits/pixel. Bitmap formats are a8 (alpha), y8 (intensity), ay8 (combined alpha intensity), and a8y8 (separate alpha intensity).")]*/
 
-    enum Format : short
+    enum : short
     {
-        CompressedWithColorKeyTransparency = 0,
-        CompressedWithExplicitAlpha = 1,
-        CompressedWithInterpolatedAlpha = 2,
-        _16BitColor = 3,
-        _32BitColor = 4,
-        Monochrome = 5,
+		_compressed_with_color_key_transparency = 0,
+		_compressed_with_explicit_alpha,
+		_compressed_with_interpolated_alpha,
+		_16_bit_color,
+		_32_bit_color,
+		_mono_chrome,
     };
-    Format format;
+    short format;
 
     /*[Explaination("Usage", "Usage controls how mipmaps are generated:
     

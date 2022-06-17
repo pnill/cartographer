@@ -1,39 +1,39 @@
 #include "stdafx.h"
+
 #include "H2MOD.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\GUI\imgui_integration\imgui_handler.h"
 #include "Util\Hooks\Hook.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h"
+#include "H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h"
 
 namespace ImGuiHandler {
 	namespace WeaponOffsets {
-		s_Weapon_custom_offset customOffsets[16]
+		s_weapon_custom_offset weapOffsets[16]
 		{
-			{{0.02, 0, -0.004}, "objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {0,0,0}, NULL},
-			{{0.02, 0, 0}, "objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {0,0,0}, NULL},
-			{{0.02, 0, 0}, "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", {0,0,0}, NULL},
-			{{0.02, -0.01, 0.001}, "objects\\weapons\\support_low\\brute_shot\\brute_shot", {0,0,0}, NULL},
-			{{0.02, 0, -0.004}, "objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", {0,0,0}, NULL},
-			{{0.05, 0, 0}, "objects\\weapons\\melee\\energy_blade\\energy_blade", {0,0,0}, NULL},
-			{{0.02, 0, -0.005}, "objects\\weapons\\support_high\\flak_cannon\\flak_cannon", {0,0,0}, NULL},
-			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\magnum\\magnum", {0,0,0}, NULL},
-			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\needler\\needler", {0,0,0}, NULL},
-			{{0.03, 0, -0.005}, "objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", {0,0,0}, NULL},
-			{{0.02, 0, 0}, "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", {0,0,0}, NULL},
-			{{0.02, 0, -0.005}, "objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", {0,0,0}, NULL},
-			{{0.02, 0.03, 0}, "objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam", {0,0,0}, NULL},
-			{{0.02, -0.001, -0.015}, "objects\\weapons\\rifle\\shotgun\\shotgun", {0,0,0}, NULL},
-			{{0.02, 0, 0}, "objects\\weapons\\rifle\\smg\\smg", {0,0,0}, NULL},
-			{{0.01, 0, 0}, "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
+			{{0.02f, 0.f, -0.004f},		"objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {0,0,0}, NULL},
+			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {0,0,0}, NULL},
+			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", {0,0,0}, NULL},
+			{{0.02f, -0.01f, 0.001f},	"objects\\weapons\\support_low\\brute_shot\\brute_shot", {0,0,0}, NULL},
+			{{0.02f, 0.f, -0.004f},		"objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", {0,0,0}, NULL},
+			{{0.05f, 0.f, 0.f},			"objects\\weapons\\melee\\energy_blade\\energy_blade", {0,0,0}, NULL},
+			{{0.02f, 0.f, -0.005f},		"objects\\weapons\\support_high\\flak_cannon\\flak_cannon", {0,0,0}, NULL},
+			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\magnum\\magnum", {0,0,0}, NULL},
+			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\needler\\needler", {0,0,0}, NULL},
+			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", {0,0,0}, NULL},
+			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", {0,0,0}, NULL},
+			{{0.02f, 0.f, -0.005f},		"objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", {0,0,0}, NULL},
+			{{0.02f, 0.03f, 0.f},		"objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam", {0,0,0}, NULL},
+			{{0.02f, -0.001f, -0.015f}, "objects\\weapons\\rifle\\shotgun\\shotgun", {0,0,0}, NULL},
+			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\smg\\smg", {0,0,0}, NULL},
+			{{0.01f, 0.f, 0.f},			"objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
 		};
 
-
-		void ApplyOffset(const byte weapon)
+		void ApplyOffset(int weapon)
 		{
-			if (customOffsets[weapon].tag != nullptr)
+			if (weapOffsets[weapon].tag != nullptr)
 			{
-				customOffsets[weapon].tag->first_person_weapon_offset = customOffsets[weapon].modifiedOffset;
+				weapOffsets[weapon].tag->first_person_weapon_offset = weapOffsets[weapon].modifiedOffset;
 			}
 		}
 		namespace
@@ -42,81 +42,78 @@ namespace ImGuiHandler {
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
-			void OffsetMenu(const byte weapon, const char* slider, e_weapon_offsets_string text, float& offset, const float default_value)
+			void OffsetMenu(int weapon, const char* slider, e_weapon_offsets_string text, float& offset, float default_value)
 			{
-				// Bullshit for unique widget ids
-				char item2[32], item3[32];
-				strcpy(item2, slider);
-				strcat(item2, "1");
-				strcpy(item3, slider);
-				strcat(item3, "2");
-
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				ImVec2 b2_size = ImVec2(WidthPercentage(20), item_size.y);
+
+				std::string sliderId(slider); sliderId += "slider";
+				std::string buttonId(slider); buttonId += "button";
 
 				ImGui::Text(GetString(text));
 				ImGui::PushItemWidth(WidthPercentage(60));
 				ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
+				if (ImGui::IsItemEdited() && weapOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
-				ImGui::InputFloat(item2, &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
-				if (ImGui::IsItemEdited() && customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
+				ImGui::InputFloat(sliderId.c_str(), &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
+				if (ImGui::IsItemEdited() && weapOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
-				if (ImGui::Button(GetString(reset, item3), b2_size))
+				if (ImGui::Button(GetString(reset, buttonId.c_str()), b2_size))
 				{
 					offset = default_value;
-					if (customOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
+					if (weapOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 				}
 				ImGui::PopItemWidth();
 			}
 			void OffsetSettings()
 			{
-
-				static const char* weapons[]
-				{ GetString(battle_rifle_title), GetString(beam_rifle_title),GetString(brute_plasma_rifle_title), GetString(brute_shot_title),
-				GetString(carbine_title), GetString(energy_sword_title), GetString(fuel_rod_title), GetString(magnum_title),
-				GetString(needler_title), GetString(plasma_pistol_title), GetString(plasma_rifle_title), GetString(rocket_launcher_title),
-				GetString(sentinel_beam_title), GetString(shotgun_title), GetString(smg_title), GetString(sniper_title) };
 				static int selectedOption = 0;
 
+				// TODO cleanup
+				const char* weapons[] = { 
+					GetString(battle_rifle_title), GetString(beam_rifle_title),GetString(brute_plasma_rifle_title), GetString(brute_shot_title),
+					GetString(carbine_title), GetString(energy_sword_title), GetString(fuel_rod_title), GetString(magnum_title),
+					GetString(needler_title), GetString(plasma_pistol_title), GetString(plasma_rifle_title), GetString(rocket_launcher_title),
+					GetString(sentinel_beam_title), GetString(shotgun_title), GetString(smg_title), GetString(sniper_title) 
+				};
+
 				// Setup combo box menus for each weapon
-				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, IM_ARRAYSIZE(weapons));
+				ImGui::Combo(GetString(combo_title), &selectedOption, weapons, ARRAYSIZE(weapons));
 				OffsetMenu(selectedOption, "##OffsetX", weapon_offset_x,
-					customOffsets[selectedOption].modifiedOffset.i, customOffsets[selectedOption].defaultOffset.i);
+					weapOffsets[selectedOption].modifiedOffset.i, weapOffsets[selectedOption].defaultOffset.i);
 				OffsetMenu(selectedOption, "##OffsetY", weapon_offset_y,
-					customOffsets[selectedOption].modifiedOffset.j, customOffsets[selectedOption].defaultOffset.j);
+					weapOffsets[selectedOption].modifiedOffset.j, weapOffsets[selectedOption].defaultOffset.j);
 				OffsetMenu(selectedOption, "##OffsetZ", weapon_offset_z,
-					customOffsets[selectedOption].modifiedOffset.k, customOffsets[selectedOption].defaultOffset.k);
+					weapOffsets[selectedOption].modifiedOffset.k, weapOffsets[selectedOption].defaultOffset.k);
 			}
 		}
 
 		const char* GetString(e_weapon_offsets_string string, const std::string& id)
 		{
 			if (id.empty()) {
-				return const_cast<char*>(string_table.at(0).at(string));
+				return string_table.at(0).at(string);
 			}
 			if (!string_cache.count(id))
 			{
-				std::string temp_str(const_cast<char*>(string_table.at(0).at(string)));
+				std::string temp_str(string_table.at(0).at(string));
 				temp_str.append("##");
 				temp_str.append(id);
 				string_cache[id] = temp_str;
 			}
-			return (char*)string_cache[id].c_str();
+			return string_cache[id].c_str();
 		}
 		void Render(bool* p_open)
 		{
 			bool open = *p_open;
 			
 			ImGuiIO& io = ImGui::GetIO();
-			RECT clientRect;
-			::GetClientRect(get_HWND(), &clientRect);
-			io.DisplaySize = ImVec2((float)(clientRect.right - clientRect.left), (float)(clientRect.bottom - clientRect.top));
-			ImGuiWindowFlags window_flags = 0;
-			window_flags |= ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_AlwaysVerticalScrollbar;
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+			ImGuiWindowFlags window_flags = 0
+				| ImGuiWindowFlags_NoCollapse
+				| ImGuiWindowFlags_AlwaysVerticalScrollbar
+				;
 			ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_::ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			ImGui::SetNextWindowSize(ImVec2(450, 320), ImGuiCond_Appearing);
@@ -137,11 +134,11 @@ namespace ImGuiHandler {
 		}
 		void Open()
 		{
-			ReadWeaponOffsetConfig(customOffsets, sizeof(customOffsets) / sizeof(*customOffsets));
+			ReadWeaponOffsetConfig(weapOffsets, ARRAYSIZE(weapOffsets));
 		}
 		void Close()
 		{
-			SaveWeaponOffsetConfig(customOffsets, sizeof(customOffsets) / sizeof(*customOffsets), false);
+			SaveWeaponOffsetConfig(weapOffsets, ARRAYSIZE(weapOffsets), false);
 		}
 		void BuildStringsTable()
 		{
@@ -194,21 +191,18 @@ namespace ImGuiHandler {
 		}
 		void MapLoad()
 		{
-			for (byte i = 0; i != sizeof(customOffsets) / sizeof(*customOffsets); i++)
+			for (int i = 0; i < ARRAYSIZE(weapOffsets); i++)
 			{
-				customOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
-					(tags::find_tag(blam_tag::tag_group_type::weapon, customOffsets[i].weaponPath));
+				weapOffsets[i].tag = tags::get_tag < blam_tag::tag_group_type::weapon, s_weapon_group_definition>
+					(tags::find_tag(blam_tag::tag_group_type::weapon, weapOffsets[i].weaponPath));
 
 				ApplyOffset(i);
 			}
 		}
-		void Initialize() 
+		void Initialize()
 		{
-			byte size = sizeof(customOffsets) / sizeof(*customOffsets);
-
-			WriteDefaultFile(customOffsets, size);
-
-			ReadWeaponOffsetConfig(customOffsets, size);
+			WriteDefaultFile(weapOffsets, ARRAYSIZE(weapOffsets));
+			ReadWeaponOffsetConfig(weapOffsets, ARRAYSIZE(weapOffsets));
 		}
 	}
 }
