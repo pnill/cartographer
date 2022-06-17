@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include <shlobj_core.h>
+
+#include <shlobj.h>
 #include "WeaponOffsetConfig.h"
 
 wchar_t* GetOffsetPath()
