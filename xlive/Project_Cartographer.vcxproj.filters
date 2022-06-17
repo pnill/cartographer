@@ -144,6 +144,8 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
     <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -456,6 +458,7 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\imgui_impl_dx9.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
@@ -470,6 +473,9 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
+    <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

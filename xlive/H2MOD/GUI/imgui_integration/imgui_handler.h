@@ -1,5 +1,6 @@
 #pragma once
 #include "imgui.h"
+#include "Blam\Cache\TagGroups\weapon_definition.hpp"
 
 namespace imgui_handler
 {
@@ -40,12 +41,13 @@ namespace imgui_handler
 	bool IsWindowActive(const std::string& name);
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd);
 	float WidthPercentage(float percent);
-	void TextVerticalPad(char* label);
+	void TextVerticalPad(const char* label);
 	bool LoadTextureFromFile(const char* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
 	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
 	void preloadImages();
+	extern short g_NumWindowsOpen;
 	namespace MOTD {
 		bool GetMOTD(s_aspect_ratio ratio);
 		void Render(bool* p_open);
@@ -66,6 +68,7 @@ namespace imgui_handler
 			hide_ingame_chat,
 			show_hud,
 			show_first_person,
+			weaponoffsets,
 			video_title,
 			fps_limit,
 			fps_limit_tooltip,
@@ -178,7 +181,7 @@ namespace imgui_handler
 			event_music_tooltip
 		};
 		void BuildStringsTable();
-		char* GetString(e_advanced_string string, const std::string& id = "");
+		const char* GetString(e_advanced_string string, const std::string& id = "");
 		void Render(bool* p_open);
 		void Open();
 		void Close();
@@ -198,5 +201,40 @@ namespace imgui_handler
 		void SetMessage(std::string message);
 		void Open();
 		void Close();
+	}
+	namespace WeaponOffsets
+	{
+		enum e_weapon_offsets_string : int
+		{
+			title,
+			combo_title,
+			battle_rifle_title,
+			beam_rifle_title,
+			brute_plasma_rifle_title,
+			brute_shot_title,
+			carbine_title,
+			energy_sword_title,
+			fuel_rod_title,
+			magnum_title,
+			needler_title,
+			plasma_pistol_title,
+			plasma_rifle_title,
+			rocket_launcher_title,
+			sentinel_beam_title,
+			shotgun_title,
+			sniper_title,
+			smg_title,
+			weapon_offset_x,
+			weapon_offset_y,
+			weapon_offset_z,
+			reset
+		};
+		void BuildStringsTable();
+		const char* GetString(e_weapon_offsets_string string, const std::string& id = "");
+		void Render(bool* p_open);
+		void Open();
+		void Close();
+		void MapLoad();
+		void Initialize();
 	}
 }

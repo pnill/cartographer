@@ -28,6 +28,7 @@ namespace imgui_handler
 	static PDIRECT3DTEXTURE9	g_patchNotes_Image = NULL;
 	static bool					g_take_input = false;
 
+	short g_NumWindowsOpen = 0;
 	bool						g_network_stats_overlay = false;
 
 	HWND get_HWND()
@@ -110,6 +111,7 @@ namespace imgui_handler
 	void Initalize(LPDIRECT3DDEVICE9 pDevice, HWND hWnd)
 	{
 		imgui_windows.emplace_back("Advanced Settings", false, AdvancedSettings::Render, AdvancedSettings::Open, AdvancedSettings::Close);
+		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
 		imgui_windows.emplace_back("motd", false, MOTD::Render, MOTD::Open, MOTD::Close);
 		imgui_windows.emplace_back("debug_overlay", false, DebugOverlay::Render, DebugOverlay::Open, DebugOverlay::Close);
 		imgui_windows.emplace_back("messagebox", false, iMessageBox::Render, iMessageBox::Open, iMessageBox::Close);
@@ -131,6 +133,7 @@ namespace imgui_handler
 		ImGui_ImplDX9_Init(pDevice);
 
 		AdvancedSettings::BuildStringsTable();
+		WeaponOffsets::BuildStringsTable();
 	}
 	float WidthPercentage(float percent)
 	{
@@ -141,7 +144,7 @@ namespace imgui_handler
 		return Width * (percent / 100.0f);
 	}
 
-	void TextVerticalPad(char* label)
+	void TextVerticalPad(const char* label)
 	{
 		ImGui::AlignTextToFramePadding();
 		ImGui::Text(label);

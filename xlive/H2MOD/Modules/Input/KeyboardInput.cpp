@@ -228,6 +228,7 @@ void hotkeyFuncGuide() {
 	}
 	imgui_handler::ToggleWindow("Advanced Settings");
 }
+
 void hotkeyFuncDebug()
 {
 	// imgui_handler::ToggleWindow("debug_overlay");

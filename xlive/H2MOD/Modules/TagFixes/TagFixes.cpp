@@ -95,51 +95,42 @@ namespace TagFixes
 		{
 			//Fix the Master Chief FP Arms Shader
 			auto fp_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
-			BYTE* fp_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(fp_shader_datum);
-			if (fp_shader_tag_data != nullptr)
-				*(float*)(fp_shader_tag_data + 0x44) = 1.0f;
-
-			//Fix the Visor(s)
-			auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
-
-			//Fix the Visor
-			auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
-			BYTE* visor_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(visor_shader_datum);
-
-			if (visor_shader_tag_data != nullptr)
-				*(unsigned long*)(visor_shader_tag_data + 0x4) = tex_bump_env_datum;
-			if (visor_shader_tag_data != nullptr)
+			if (fp_shader_datum != DATUM_INDEX_NONE)
 			{
-				auto *visor_pp = reinterpret_cast<tags::tag_data_block*>(visor_shader_tag_data + 0x20);
-				if (visor_pp->block_count > 0 && visor_pp->block_data_offset != -1)
-				{
-					auto visor_pp_data = tags::get_tag_data() + visor_pp->block_data_offset;
-					*(unsigned long*)(visor_pp_data) = tex_bump_env_datum;
-				}
+				auto fp_shader = tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(fp_shader_datum);
+				fp_shader->lightmapSpecularBrightness = 1.0f;
 			}
 
-			auto pilot_visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\marine\\shaders\\helmet_pilot_visor");
-			auto pilot_visor_tag = tags::get_tag < blam_tag::tag_group_type::shader, shader_definition>(pilot_visor_shader_datum);
-			if(pilot_visor_tag != nullptr)
+			//Fix the Visor
+			auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
+			auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
+			if (visor_shader_datum != DATUM_INDEX_NONE)
 			{
-				pilot_visor_tag->postprocessDefinition[0]->shaderTemplateIndex.TagIndex = tex_bump_env_datum;
+				auto visor_shader = tags::get_tag_fast<shader_definition>(visor_shader_datum);
+				visor_shader->postprocessDefinition[0]->shaderTemplateIndex = tex_bump_env_datum;
 			}
 
 			//Fix the Grunt Shaders
 			auto grunt_arm_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
-			BYTE* grunt_arm_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(grunt_arm_shader_datum);
-			if (grunt_arm_shader_tag_data != nullptr)
-				*(float*)(grunt_arm_shader_tag_data + 0x44) = 1;
+			if (grunt_arm_shader_datum != DATUM_INDEX_NONE)
+			{
+				auto grunt_arm_shader = tags::get_tag_fast<shader_definition>(grunt_arm_shader_datum);
+				grunt_arm_shader->lightmapSpecularBrightness = 1.0f;
+			}
 
 			auto grunt_backpack_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
-			BYTE* grunt_backpack_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(grunt_backpack_shader_datum);
-			if (grunt_backpack_shader_tag_data != nullptr)
-				*(float*)(grunt_backpack_shader_tag_data + 0x44) = 1;
+			if (grunt_backpack_shader_datum != DATUM_INDEX_NONE)
+			{
+				auto grunt_backpack_shader = tags::get_tag_fast<shader_definition>(grunt_backpack_shader_datum);
+				grunt_backpack_shader->lightmapSpecularBrightness = 1.0f;
+			}
 
 			auto grunt_torso_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
-			BYTE* grunt_torso_shader_tag_data = tags::get_tag<blam_tag::tag_group_type::shader, BYTE>(grunt_torso_shader_datum);
-			if (grunt_torso_shader_tag_data != nullptr)
-				*(float*)(grunt_torso_shader_tag_data + 0x44) = 1.0f;
+			if (grunt_torso_shader_datum != DATUM_INDEX_NONE)
+			{
+				auto grunt_torso_shader = tags::get_tag_fast<shader_definition>(grunt_torso_shader_datum);
+				grunt_torso_shader->lightmapSpecularBrightness = 1.0f;
+			}
 		}
 
 		void font_table_fix()
@@ -175,8 +166,9 @@ namespace TagFixes
 			auto lights = tags::find_tags(blam_tag::tag_group_type::light);
 			for (auto& light_item : lights)
 			{
-				auto light = tags::get_tag<blam_tag::tag_group_type::light, s_light_group_definition>(light_item.first);
+				auto light = tags::get_tag_fast<s_light_group_definition>(light_item.first);
 				light->flags |= s_light_group_definition::e_flags::light_framerate_killer;
+				light->flags |= s_light_group_definition::e_flags::multiplayer_override;
 			}
 		}
 
