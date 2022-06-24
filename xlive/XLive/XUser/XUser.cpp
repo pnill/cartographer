@@ -203,25 +203,26 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 	switch (privilegeType)
 	{
 	case XPRIVILEGE_COMMUNICATIONS:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - COMMUNICATIONS");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - COMMUNICATIONS", dwUserIndex, privilegeType);
 		break;
 
 	case XPRIVILEGE_MULTIPLAYER_SESSIONS:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - MULTIPLAYER_SESSIONS");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - MULTIPLAYER_SESSIONS", dwUserIndex, privilegeType);
 		break;
 
 	case XPRIVILEGE_PROFILE_VIEWING:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PROFILE_VIEWING");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PROFILE_VIEWING", dwUserIndex, privilegeType);
 		break;
 
 	case XPRIVILEGE_PRESENCE:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PRESCENCE");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PRESCENCE", dwUserIndex, privilegeType);
 
 	case XPRIVILEGE_USER_CREATED_CONTENT:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - USER_CREATED_CONTENT");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - USER_CREATED_CONTENT", dwUserIndex, privilegeType);
+		break;
 
 	default:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - UNKNOWN PRIVILEGE");
+		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - UNKNOWN PRIVILEGE", dwUserIndex, privilegeType);
 		break;
 	}
 

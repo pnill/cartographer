@@ -221,6 +221,7 @@ namespace ControllerInput
 
 	void ControllerInput::ToggleModern()
 	{
+		if (Memory::IsDedicatedServer()) return;
 		if(H2Config_controller_modern)
 		{
 			PatchCall(Memory::GetAddress(0x39B82), procces_input);
@@ -233,14 +234,15 @@ namespace ControllerInput
 
 	void ControllerInput::SetSensitiviy(float value)
 	{
-		if (value == 0)
-			return;
+		if (Memory::IsDedicatedServer()) return;
+		if (value == 0) return;
 		*Memory::GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
 		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
 	}
 
 	void ControllerInput::SetDeadzones()
 	{
+		if (Memory::IsDedicatedServer()) return;
 		if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
 			*axialDeadzoneX = (short)((float)MAXSHORT * (H2Config_Deadzone_A_X / 100));
 			*axialDeadzoneY = (short)((float)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
@@ -300,6 +302,7 @@ namespace ControllerInput
 
 	void ControllerInput::Initialize()
 	{
+		if (Memory::IsDedicatedServer()) return;
 		axialDeadzoneX = Memory::GetAddress<short*>(0x4AA02C);
 		axialDeadzoneY = Memory::GetAddress<short*>(0x4AA02E);
 

@@ -194,7 +194,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 		}
 	}
 
-	return success == true ? true : false;
+	return success;
 }
 
 bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_custom_map_file_cache* custom_map_data_cache)
@@ -250,7 +250,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 			__FUNCTION__);
 	}
 
-	return success == true ? true : false;
+	return success;
 }
 
 void __thiscall s_custom_map_data::save_custom_map_data()
@@ -675,7 +675,7 @@ bool __thiscall s_custom_map_data::add_entry(const s_custom_map_entry* entry)
 	}
 
 	LeaveCriticalSection(custom_map_lock);
-	return success ? true : false;
+	return success;
 }
 
 bool __thiscall s_custom_map_data::remove_duplicates_and_add_entry(const s_custom_map_entry* entry)
