@@ -7,9 +7,6 @@
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 
-using namespace std;
-
-
 class Ini
 {
 public:

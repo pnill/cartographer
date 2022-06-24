@@ -135,8 +135,8 @@ int WINAPI XSocketSetSockOpt(SOCKET s, int level, int optname, const char *optva
 {
 	XSocket* xsocket = (XSocket*)s;
 
-	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {}, optval = {}, optlen = {})",
-		xsocket->winSockHandle, level, sockOpt_string(optname), optval ? optval : "", optlen);
+	LOG_TRACE_NETWORK("XSocketSetSockOpt  (socket = {:x}, level = {}, optname = {},  optlen = {})",
+		xsocket->winSockHandle, level, sockOpt_string(optname), optlen);
 
 	if (optname == SO_SNDBUF
 		|| optname == SO_RCVBUF)
