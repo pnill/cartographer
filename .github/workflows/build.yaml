@@ -1,0 +1,31 @@
+name: Build Cartographer
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build-win:
+    env:
+      SOLUTION_FILE_PATH: .
+      PLATFORM: x86
+    strategy:
+      matrix:
+        BUILD_CONFIGURATION: [Debug, Release]
+
+    runs-on: windows-2019
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Restore NuGet packages
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: nuget restore ${{matrix.SOLUTION_FILE_PATH}}
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: msbuild /m /p:Configuration=${{matrix.BUILD_CONFIGURATION}} /p:Platform=${{env.PLATFORM}} ${{matrix.SOLUTION_FILE_PATH}}
