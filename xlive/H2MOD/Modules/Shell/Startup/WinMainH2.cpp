@@ -3,6 +3,7 @@
 #include "WinMainH2.h"
 #include "..\Shell.h"
 #include "..\Config.h"
+#include "H2MOD\Utils\Utils.h"
 
 #include "Blam\Engine\Networking\Transport\NetworkObserver.h"
 #include "Util\Hooks\Hook.h"
@@ -21,6 +22,42 @@ void InitH2WinMainPatches()
 	WriteJmpTo(Memory::GetAddress(0x7E43), WinMain_Halo2);
 }
 
+LRESULT WINAPI WinMainH2_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static FrequencyLimiter frqLimiter(150);
+	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
+	bool* unk_condition1 = Memory::GetAddress<bool*>(0x46DAD8);
+	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
+
+	LRESULT result;
+	if (uMsg != WM_SETCURSOR)
+	{
+		result = g_WndProc(hWnd, uMsg, wParam, lParam);
+	}
+	else
+	{
+		// if we have to set the cursor, limit the frequency of the cursor being set
+		// because it's very expensive on CPU
+		bool enable_cursor = *window_in_focus && !*unk_condition1;
+		// if the cursor is about to get disabled, reset the frqLimiter
+		// and allow the cursor to be disabled
+		if (!enable_cursor)
+		{
+			frqLimiter.Reset();
+		}
+
+		result = 1;
+
+		// ShouldUpdate also updates the state of the frqLimiter
+		if (frqLimiter.ShouldUpdate())
+		{
+			result = g_WndProc(hWnd, uMsg, wParam, lParam);
+		}
+	}
+
+	return result;
+}
+
 // WinMain replacement
 int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
@@ -32,8 +69,8 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	// window setup
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
-	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
-	WriteValue(Memory::GetAddress(0x46D9D0), g_WndProc); // g_WndProc_ptr
+	
+	WriteValue(Memory::GetAddress(0x46D9D0), WinMainH2_hook); // g_WndProc_ptr
 
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
