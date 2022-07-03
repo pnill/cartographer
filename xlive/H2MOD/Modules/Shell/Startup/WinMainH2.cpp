@@ -22,7 +22,7 @@ void InitH2WinMainPatches()
 	WriteJmpTo(Memory::GetAddress(0x7E43), WinMain_Halo2);
 }
 
-LRESULT WINAPI WinMainH2_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI H2WndProc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	static FrequencyLimiter frqLimiter(150);
 	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
@@ -70,7 +70,7 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
 	
-	WriteValue(Memory::GetAddress(0x46D9D0), WinMainH2_hook); // g_WndProc_ptr
+	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc_hook); // g_WndProc_ptr
 
 	if (!LOG_CHECK(InitPCCInfo()))
 	{
