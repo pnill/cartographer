@@ -85,11 +85,15 @@ public:
 		return result;
 	}
 
-	bool m_initialUpdate;
-	std::chrono::milliseconds m_maxUpdateRateMsec;
-	unsigned int m_maxUpdateRateHz; // update the cursor each 8 milliseconds
+	void Reset()
+	{
+		m_initialUpdate = true;
+	}
 
 private:
+	bool m_initialUpdate;
+	unsigned int m_maxUpdateRateHz; // update the cursor each 8 milliseconds
+	std::chrono::milliseconds m_maxUpdateRateMsec;
 	_time::time_point lastTime;
 };
 

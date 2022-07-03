@@ -32,40 +32,6 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 	return result;
 }
 
-HCURSOR __cdecl disable_mouse_cursor()
-{
-	auto p_disable_mouse_cursor = Memory::GetAddressRelative<decltype(&disable_mouse_cursor)>(0x40497B);
-	
-	static HCURSOR hCur;
-	static FrequencyLimiter frqLimiter(150);
-
-	if (frqLimiter.ShouldUpdate())
-	{
-		hCur = p_disable_mouse_cursor();
-		return hCur;
-	}
-	else
-	{
-		return hCur;
-	}
-}
-
-void __cdecl enable_custom_cursor()
-{
-	auto p_enable_custom_cursor = Memory::GetAddressRelative<decltype(&enable_custom_cursor)>(0x42EDC4);
-
-	static FrequencyLimiter frqLimiter(150);
-	
-	if (frqLimiter.ShouldUpdate())
-	{
-		return p_enable_custom_cursor();
-	}
-	else
-	{
-		return;
-	}
-}
-
 void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bool a4, int a5)
 {
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
@@ -237,7 +203,7 @@ DWORD WINAPI timeGetTime_hook()
 	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 	return (DWORD)timeNow;
 }
-static_assert(std::is_same<decltype(timeGetTime), decltype(timeGetTime_hook)>::value, "Invalid timeGetTime_hook signature");
+static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 
 void initializeTimeHooks()
 {
@@ -389,9 +355,6 @@ void InitH2Tweaks() {
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
 		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
 
-		PatchCall(Memory::GetAddressRelative(0x407BFA), disable_mouse_cursor);
-		PatchCall(Memory::GetAddressRelative(0x407BE6), enable_custom_cursor);
-
 		NopFill(Memory::GetAddressRelative(0x42FABF), 2);
 		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
 		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
@@ -503,12 +466,12 @@ void H2Tweaks::WarpFix(bool enable)
 	//Improves warping issues 
 	if (enable)
 	{
-		WriteValue<float>(Memory::GetAddress(0x4F958C), 4.0);
-		WriteValue<float>(Memory::GetAddress(0x4F9594), 10.0);
+		WriteValue<float>(Memory::GetAddress(0x4F958C), 4.0f);
+		WriteValue<float>(Memory::GetAddress(0x4F9594), 10.0f);
 	}
 	else
 	{
-		WriteValue<float>(Memory::GetAddress(0x4F958C), 2.5);
-		WriteValue<float>(Memory::GetAddress(0x4F9594), 7.5);
+		WriteValue<float>(Memory::GetAddress(0x4F958C), 2.5f);
+		WriteValue<float>(Memory::GetAddress(0x4F9594), 7.5f);
 	}	
 }

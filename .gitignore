@@ -18,7 +18,6 @@ Project_Cartographer.vcxproj.user
 *.opendb
 *.db
 /GSSecurity.cpp
-/.vs/Project_Cartographer/v15
 /Directx SDK/include
 /Directx SDK/lib/
 UpgradeLog.htm
@@ -27,7 +26,8 @@ xlive.ilk
 xliveless.aps
 xliveless.opensdf
 xliveless.v12.suo
-/.vs
+**/.vs
+**/.vscode
 /Directx SDK/include
 /Halo2
 /xlive/Debug
