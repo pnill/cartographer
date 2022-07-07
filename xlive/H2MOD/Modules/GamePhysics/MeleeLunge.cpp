@@ -826,9 +826,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 
 	float unk_float_distance = dot_product3d(&m_aiming_direction, translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
-	if (unk_velocity < 0.0f)
-		unk_velocity = 0.0f;
+	float unk_velocity = blam_max(0.0f, melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword)));
 
 	float log_magnitude = magnitude3d(&physics_output->translational_velocity);
 

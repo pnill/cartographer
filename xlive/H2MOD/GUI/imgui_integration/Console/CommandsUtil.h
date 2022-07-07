@@ -115,9 +115,20 @@ public:
 
 		// allocate once we know the size
 		m_buf = new char[GetBufferSize()];
+		memset(m_buf, 0, GetBufferSize());
 		m_buffer_idx = 0;
 		m_strings_headers.reserve(m_line_count);
 	};
+
+	CircularStringBuffer(const CircularStringBuffer& other)
+		: CircularStringBuffer(other.m_line_count, other.m_line_buf_size)
+	{
+	}
+
+	CircularStringBuffer(CircularStringBuffer&& other)
+		: CircularStringBuffer(other.m_line_count, other.m_line_buf_size)
+	{
+	}
 
 	~CircularStringBuffer()
 	{
@@ -147,7 +158,7 @@ public:
 		if (m_buf != NULL)
 		{
 			memcpy(new_buffer, m_buf, GetBufferSize());
-			IM_DELETE(m_buf);
+			delete[] m_buf;
 		}
 		m_buf = new_buffer;
 	}
@@ -164,7 +175,9 @@ public:
 		if (characterCount == 0)
 			characterCount = strnlen_s(source, m_line_buf_size - 1);
 
-		IM_ASSERT(characterCount < m_line_buf_size - 1 || source[characterCount - 1] == '\0');
+		size_t nullCharIdx = characterCount;
+
+		IM_ASSERT(characterCount < m_line_buf_size - 1 || source[nullCharIdx] == '\0');
 
 		char* destinationBuffer;
 		size_t destinationBufferSize = GetNewlineBuffer(m_line_buf_size, &destinationBuffer);
@@ -173,8 +186,7 @@ public:
 		{
 			// position has been updated, copy the source string
 			strncpy_s(destinationBuffer, destinationBufferSize, source, characterCount);
-			destinationBuffer[characterCount] = '\0';
-
+			destinationBuffer[nullCharIdx] = '\0';
 			m_strings_headers.push_back(StringLineHeader{ m_buffer_idx - 1, destinationBufferSize, flags });
 		}
 		else
@@ -213,7 +225,7 @@ public:
 
 	const char* GetStringAtIndex(int headerIdx) const
 	{
-		assert(headerIdx < GetStringHeaderSize());
+		assert(headerIdx < GetHeaderCount());
 		const StringLineHeader& string_header = GetHeader(headerIdx);
 		return GetStringAtIdx(string_header.idx);
 	}
@@ -233,7 +245,7 @@ public:
 		return m_strings_headers.at(headerIdx);
 	}
 
-	size_t GetStringHeaderSize() const
+	size_t GetHeaderCount() const
 	{
 		return m_strings_headers.size();
 	}
@@ -268,7 +280,7 @@ private:
 			m_buffer_idx = 0;
 
 			// clear string range, otherwise we might leave bad string_positions inside the container
-			for (auto it = m_strings_headers.begin(); it < m_strings_headers.end(); )
+			for (auto it = m_strings_headers.begin(); it != m_strings_headers.end(); )
 			{
 				if (m_buffer_idx == it->idx)
 				{

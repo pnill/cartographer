@@ -161,6 +161,8 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 	{
 		// if we have completion data, we do not want to use history
 		// unless the current string is actually history
+
+		CircularStringBuffer* output_buffer = &console_data->m_output;
 		if (data->BufTextLen > 0
 			&& console_data->CompletionAvailable()
 			&& console_data->m_history_string_index == -1)
@@ -175,7 +177,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 			console_data->m_completion_data->SelectedCandidateIndex = CONSOLE_CLAMP(console_data->m_completion_data->SelectedCandidateIndex, -1, (int)(console_data->GetCompletionCandidatesCount() - 1));
 		}
 		// check if we actually have something to display first
-		else if (console_data->m_output.GetStringHeaderSize() > 0)
+		else if (output_buffer->GetHeaderCount() > 0)
 		{
 			const int prev_history_index = console_data->m_history_string_index;
 			if (data->EventKey == ImGuiKey_UpArrow)
@@ -184,7 +186,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 				console_data->m_history_string_index--;
 
 			// clamp between -1 and string header size - 1
-			console_data->m_history_string_index = CONSOLE_CLAMP(console_data->m_history_string_index, -1, (int)(console_data->m_output.GetStringHeaderSize() - 1));
+			console_data->m_history_string_index = CONSOLE_CLAMP(console_data->m_history_string_index, -1, (int)(output_buffer->GetHeaderCount() - 1));
 
 			// TODO cleanup and maybe? simplify
 			// wrote this at ~ 1 am and hackily fixed the bugs the next day
@@ -193,10 +195,10 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 				if (console_data->m_history_string_index >= 0)
 				{
 					const char* new_text_box_from_history = NULL;
-					for (int i = (int)console_data->m_output.GetStringHeaderSize() - 1; i >= 0; i--)
+					for (int i = (int)output_buffer->GetHeaderCount() - 1; i >= 0; i--)
 					{
-						auto& string_header = console_data->m_output.GetHeader(i);
-						int string_header_index_to_history_index = (int)console_data->m_output.GetStringHeaderSize() - 1 - i;
+						auto& string_header = output_buffer->GetHeader(i);
+						int string_header_index_to_history_index = (int)output_buffer->GetHeaderCount() - 1 - i;
 						if (string_header.flags & StringFlag_History)
 						{
 							if ((prev_history_index == -1 && console_data->m_history_string_index > prev_history_index)
@@ -204,7 +206,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 								|| (console_data->m_history_string_index < prev_history_index && prev_history_index > string_header_index_to_history_index)
 								)
 							{
-								new_text_box_from_history = console_data->m_output.GetStringAtIndex(i);
+								new_text_box_from_history = output_buffer->GetStringAtIndex(i);
 								console_data->m_history_string_index = string_header_index_to_history_index;
 
 								// if we are scrolling back down, don't stop at the first string we find
@@ -409,14 +411,14 @@ void Console::Draw(const char* title, bool* p_open)
 	// Child log Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (m_output.GetStringHeaderSize() > 0)
+		if (m_output.GetHeaderCount() > 0)
 		if (ImGui::MenuItem("Clear")) { ClearOutput(); }
 		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 		ImGui::EndPopup();
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
-	for (int i = 0; i < m_output.GetStringHeaderSize(); i++)
+	for (int i = 0; i < m_output.GetHeaderCount(); i++)
 	{
 		// TODO add color support
 		char console_text_id[512];
@@ -428,7 +430,7 @@ void Console::Draw(const char* title, bool* p_open)
 		if (stringHeader.flags & StringFlag_CopyToClipboard)
 			ImGui::LogToClipboard();
 
-		ImGui::Text(stringToAdd, stringToAdd + (stringHeader.size - 1));
+		ImGui::Text(stringToAdd);
 
 		if (stringHeader.flags & StringFlag_CopyToClipboard)
 		{
@@ -471,8 +473,8 @@ void Console::Draw(const char* title, bool* p_open)
 		{
 			ExecCommand(m_input_buffer, input_buffer_string_length);
 			memset(m_input_buffer, 0, 2);
-			m_reclaim_input_box_focus = true;
 		}
+		m_reclaim_input_box_focus = true;
 	}
 	bool input_text_active = ImGui::IsItemActive();
 
@@ -496,6 +498,7 @@ void Console::Draw(const char* title, bool* p_open)
 			ExecCommand(m_input_buffer, input_buffer_string_length);
 			memset(m_input_buffer, 0, 2);
 		}
+		m_reclaim_input_box_focus = true;
 	}
 
 	if (input_text_active)
@@ -552,8 +555,8 @@ int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleComma
 	std::string exception;
 	if (!console_data->m_console_opacity.SetValFromStr(tokens[1], 10, exception))
 	{
-		console_data->m_output.AddString(StringFlag_None, command_error_bad_arg);
-		console_data->m_output.AddStringFmt(StringFlag_None, "	%s", exception.c_str());
+		console_data->Output(StringFlag_None, command_error_bad_arg);
+		console_data->OutputFmt(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
 }
