@@ -38,8 +38,8 @@ public:
 		return false;
 	}
 
-	Infection::Infection();
-	Infection::~Infection();
+	Infection();
+	~Infection();
 
 	static void InitClient();
 	static void InitHost();

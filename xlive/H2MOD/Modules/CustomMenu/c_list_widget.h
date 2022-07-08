@@ -14,7 +14,7 @@ public:
 
 	// if you are implementing the child's class ctor, set _call_ctor to true
 	// if not (you're calling the game's bin ctor), set to false
-	c_list_widget::c_list_widget(int a2, bool _call_ctor)
+	c_list_widget(int a2, bool _call_ctor)
 		: c_user_interface_widget(_widget_type_list_widget, a2, false)
 	{
 		typedef c_list_widget* (__thiscall* c_list_widget_ctor_t)(c_list_widget*, int);

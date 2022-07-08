@@ -20,8 +20,8 @@ public:
 	static void* __cdecl open(s_new_ui_screen_parameters* parameters);
 
 	// TODO list initializer once the ctors are re-implemented
-	c_virtual_keyboard_menu::c_virtual_keyboard_menu(int _ui_channel, int a4, __int16 _flags) :
-		c_screen_widget::c_screen_widget(VIRTUAL_KEYBOARD_MENU_ID, _ui_channel, a4, _flags, false)
+	c_virtual_keyboard_menu(int _ui_channel, int a4, __int16 _flags) :
+		c_screen_widget(VIRTUAL_KEYBOARD_MENU_ID, _ui_channel, a4, _flags, false)
 	{
 		typedef c_virtual_keyboard_menu* (__thiscall* c_virtual_keyboard_menu_ctor_t)(c_virtual_keyboard_menu*, int, int, __int16);
 		auto p_c_virtual_keyboard_menu_base_ctor = Memory::GetAddressRelative<c_virtual_keyboard_menu_ctor_t>(0x63BDF6);
@@ -31,7 +31,7 @@ public:
 		*(void**)this = old_vtbl;
 	}
 
-	c_virtual_keyboard_menu::~c_virtual_keyboard_menu()
+	~c_virtual_keyboard_menu()
 	{
 	}
 

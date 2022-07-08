@@ -1081,7 +1081,7 @@ DWORD WINAPI ThreadLogin(LPVOID lParam)
 		char* identifier_pass = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 2);
 		//login to account
 
-		if (HandleGuiLogin(0, identifier, identifier_pass, &master_login_code)) {
+		if (HandleGuiLogin(NULL, identifier, identifier_pass, &master_login_code)) {
 			H2AccountLastUsed = 0;
 		}
 		SecureZeroMemory(identifier_pass, strlen(identifier_pass));

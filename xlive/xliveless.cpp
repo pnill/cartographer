@@ -110,7 +110,7 @@ VOID ReadLine( FILE *fp, char *str )
 }
 
 
-BOOL SkipText( FILE *fp, char *str )
+BOOL SkipText( FILE *fp, const char *str )
 {
 	char line[1024];
 

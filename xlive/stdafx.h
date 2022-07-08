@@ -27,10 +27,6 @@
 #define _SECURE_SCL 0
 #endif
 
-#ifndef UNICODE
-#define UNICODE
-#endif
-
 #define TEST_N_DEF(TEST)
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers

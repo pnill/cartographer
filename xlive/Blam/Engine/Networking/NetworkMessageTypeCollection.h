@@ -173,7 +173,7 @@ struct s_text_chat
 CHECK_STRUCT_SIZE(s_text_chat, 404);
 
 const char* GetNetworkMessageName(int enumVal);
-void register_network_message(void *, int, char*, int, int, int, void*, void*, void*);
+void register_network_message(void *, int, const char*, int, int, int, void*, void*, void*);
 
 namespace NetworkMessage
 {

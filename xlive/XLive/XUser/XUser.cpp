@@ -47,7 +47,7 @@ bool UserSignedOnline(DWORD dwUserIndex)
 	return false;
 }
 
-void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
+void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
 {
 	// GFWL supports only 1 user logged in at the time
 	if (dwUserIndex != 0)

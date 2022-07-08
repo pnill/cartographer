@@ -6,7 +6,7 @@
 class c_screen_widget : protected c_user_interface_widget
 {
 public:
-	c_screen_widget::c_screen_widget(int _menu_id, int _ui_channel, int a4, __int16 _flags, bool _call_ctor) :
+	c_screen_widget(int _menu_id, int _ui_channel, int a4, __int16 _flags, bool _call_ctor) :
 		c_user_interface_widget::c_user_interface_widget(_widget_type_screen_widget, _flags, false)
 	{
 		typedef void* (__thiscall* c_screen_with_menu_ctor_game_t)(c_screen_widget*, int, int, int, __int16);

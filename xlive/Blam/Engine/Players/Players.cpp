@@ -74,7 +74,7 @@ void s_player::SetBipedSpeed(int playerIndex, float speed)
 	GetPlayer(playerIndex)->unit_speed = speed;
 }
 
-wchar_t* s_player::GetName(int playerIndex)
+const wchar_t* s_player::GetName(int playerIndex)
 {
 	if (!IndexValid(playerIndex))
 	{

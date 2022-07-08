@@ -15,6 +15,6 @@
 
 void UpdateConnectionStatus();
 bool HandleGuiLogin(char* token, char* identifier, char* password, int* master_login_interpret_result);
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn);
+char ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn);
 
 extern bool AccountEdit_remember;

@@ -43,7 +43,7 @@ namespace playlist_loader
 				return custom_setting.second;
 		return none;
 	}
-	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, wchar_t* a5, wchar_t* a6, wchar_t* a7);
+	typedef void(__thiscall* playlist_loader_invalid_entry)(playlist_entry* thisx, int a2, int a3, wchar_t* a5, wchar_t* a6, const wchar_t* a7);
 	playlist_loader_invalid_entry p_playlist_loader_invalid_entry;
 
 	bool custom_setting_boolean_check(playlist_entry* playlist_entry, wchar_t* value)

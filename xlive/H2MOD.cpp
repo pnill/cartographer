@@ -216,7 +216,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	}
 }
 
-wchar_t* H2MOD::get_local_player_name(int local_player_index)
+const wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
 	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
 }

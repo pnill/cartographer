@@ -41,7 +41,7 @@ namespace ImGuiHandler {
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
 			int button_placeholders[14];
-			std::map<int, std::map<e_advanced_string, char*>> string_table;
+			std::map<int, std::map<e_advanced_string, const char*>> string_table;
 			//Used for controls that use the same string, A identifier has to be appended to them
 			//I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;

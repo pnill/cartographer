@@ -228,7 +228,7 @@ void ServerConsole::ClearVip()
 
 int messageTimeout = 0;
 
-void ServerConsole::SendMsg(wchar_t* message, bool timeout)
+void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 {
 	bool execute = !timeout;
 	if (TimeElapsedMS(messageTimeout) > 10000)
@@ -240,7 +240,7 @@ void ServerConsole::SendMsg(wchar_t* message, bool timeout)
 	if (execute) {
 
 		// first we construct kablam_command_send_msg, by manually passing the vtable pointer, and the message to be copied
-		kablam_command_send_msg sendMsgCommand(Memory::GetAddress(0, 0x352dfc), message);
+		kablam_command_send_msg sendMsgCommand(Memory::GetAddress(0, 0x352DFC), message);
 
 		// send the message
 		sendMsgCommand.sendGameMessage();

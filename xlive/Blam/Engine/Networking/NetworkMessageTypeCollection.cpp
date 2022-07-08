@@ -12,9 +12,9 @@
 
 BYTE g_network_message_type_collection[e_network_message_type_collection::_network_message_type_collection_end * 32];
 
-void register_network_message(void *network_message_collection, int type, char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
+void register_network_message(void *network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
-	typedef void(__thiscall* register_packet_type)(void *, int, char*, int, int, int, void*, void*, void*);
+	typedef void(__thiscall* register_packet_type)(void *, int, const char*, int, int, int, void*, void*, void*);
 	auto register_packet = reinterpret_cast<register_packet_type>(Memory::GetAddress(0x1E81D6, 0x1CA199));
 	return register_packet(network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }

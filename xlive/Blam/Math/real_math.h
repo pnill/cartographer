@@ -73,14 +73,14 @@ union real_vector3d
 	struct { float i, j, k; };
 	struct { float x, y, z; };
 
-	BLAM_MATH_INL real_vector3d::real_vector3d(const float _i, const float _j, const float _k) :
+	BLAM_MATH_INL real_vector3d(const float _i, const float _j, const float _k) :
 		i(_i),
 		j(_j),
 		k(_k)
 	{
 	}
 
-	BLAM_MATH_INL real_vector3d::real_vector3d() : real_vector3d(0.0f, 0.0f, 0.0f)
+	BLAM_MATH_INL real_vector3d() : real_vector3d(0.0f, 0.0f, 0.0f)
 	{
 	}
 

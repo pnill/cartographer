@@ -32,7 +32,7 @@ WCHAR exePathW[8192];
 WCHAR xlivePathW[8192];
 
 
-static void __stdcall Debug_Log_W( WCHAR *name )
+static void __stdcall Debug_Log_W( const WCHAR *name )
 {
 	static FILE *fp_w = 0;
 

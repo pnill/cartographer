@@ -15,7 +15,7 @@ public:
 	int default_selected_button;
 	// button handler callback
 
-	c_account_create_list::c_account_create_list(int _flags);
+	c_account_create_list(int _flags);
 
 	virtual char* get_item_list() override
 	{
@@ -54,7 +54,7 @@ class c_account_create_menu : protected c_screen_with_menu
 public:
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
-	c_account_create_menu::c_account_create_menu(int _ui_channel, int a4, int _flags);
+	c_account_create_menu(int _ui_channel, int a4, int _flags);
 
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override

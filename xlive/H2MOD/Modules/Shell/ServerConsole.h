@@ -44,7 +44,7 @@ namespace ServerConsole
 	 * \param ... An additional argument
 	 */
 	void SendCommand2(int argCount, wchar_t* command, wchar_t* argument, ...);
-	void SendMsg(wchar_t* message, bool timeout = false);
+	void SendMsg(const wchar_t* message, bool timeout = false);
 
 	// TODO: implement this properly
 	class IKablamCommand
@@ -60,7 +60,7 @@ namespace ServerConsole
 		wchar_t message[121];
 		int unk_3;
 
-		kablam_command_send_msg(DWORD _vtbl, wchar_t* _message) : vtbl(_vtbl)
+		kablam_command_send_msg(DWORD _vtbl, const wchar_t* _message) : vtbl(_vtbl)
 		{
 			memset((void*)&unk_1, 0, sizeof(kablam_command_send_msg) - sizeof(vtbl));
 			wcscpy_s(message, ARRAYSIZE(message), _message);

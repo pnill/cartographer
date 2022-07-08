@@ -119,7 +119,7 @@ std::string tags::get_tag_name(datum tag_index)
 
 datum tags::find_tag(blam_tag type, const std::string& name)
 {
-	for (auto& it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
+	for (auto it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
 	{
 		if (_strnicmp(name.c_str(), it->second, 256) == 0)
 		{
@@ -134,7 +134,7 @@ datum tags::find_tag(blam_tag type, const std::string& name)
 std::map<datum, std::string> tags::find_tags(blam_tag type)
 {
 	std::map<datum, std::string> result;
-	for (auto& it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
+	for (auto it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
 	{
 		auto instance = tags::get_tag_instances()[it->first];
 		if (is_tag_or_parent_tag(instance.type, type)) {

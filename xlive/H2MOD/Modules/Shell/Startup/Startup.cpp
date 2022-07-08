@@ -137,19 +137,19 @@ bool configureXinput() {
 					exit(EXIT_FAILURE);
 				}
 				int xinput_index = -1;
-				constexpr char *xinput_md5_durazno_0_6_0_0 = "6140ae76b26a633ce2255f6fc88fbe34";
-				constexpr long xinput_offset_durazno_0_6_0_0 = 0x196de;
-				constexpr bool xinput_unicode_durazno_0_6_0_0 = true;
-				constexpr char *xinput_md5_x360ce_3_3_1_444 = "8f24e36d5f0a71c8a412cec6323cd781";
-				constexpr long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
-				constexpr bool xinput_unicode_x360ce_3_3_1_444 = true;
-				constexpr char *xinput_md5_x360ce_3_4_1_1357 = "5236623449893c0e1e98fc95f067fcff";
-				constexpr long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
-				constexpr bool xinput_unicode_x360ce_3_4_1_1357 = false;
-				constexpr int xinput_array_length = 3;
-				static constexpr char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
-				static constexpr long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
-				static constexpr bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
+				const char *xinput_md5_durazno_0_6_0_0 = "6140ae76b26a633ce2255f6fc88fbe34";
+				const long xinput_offset_durazno_0_6_0_0 = 0x196de;
+				const bool xinput_unicode_durazno_0_6_0_0 = true;
+				const char *xinput_md5_x360ce_3_3_1_444 = "8f24e36d5f0a71c8a412cec6323cd781";
+				const long xinput_offset_x360ce_3_3_1_444 = 0x1ea54;
+				const bool xinput_unicode_x360ce_3_3_1_444 = true;
+				const char *xinput_md5_x360ce_3_4_1_1357 = "5236623449893c0e1e98fc95f067fcff";
+				const long xinput_offset_x360ce_3_4_1_1357 = 0x16110;
+				const bool xinput_unicode_x360ce_3_4_1_1357 = false;
+				const int xinput_array_length = 3;
+				static const char* xinput_md5[xinput_array_length] = { xinput_md5_durazno_0_6_0_0, xinput_md5_x360ce_3_3_1_444, xinput_md5_x360ce_3_4_1_1357 };
+				static const long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
+				static const bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
 				std::string available_xinput_md5;
 				if (!hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5))
 				{

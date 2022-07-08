@@ -19,5 +19,5 @@ private:
 	void GiveWeapon(datum unit_datum, datum weapon_tag_index);
 	int GetCost(datum device_datum);
 	e_item_type GetType(datum device_datum);
-	datum DeviceShop::GetItemDatum(datum device_datum);
+	datum GetItemDatum(datum device_datum);
 };

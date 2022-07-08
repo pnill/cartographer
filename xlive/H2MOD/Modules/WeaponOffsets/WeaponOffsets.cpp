@@ -38,7 +38,7 @@ namespace ImGuiHandler {
 		}
 		namespace
 		{
-			std::map<int, std::map<e_weapon_offsets_string, char*>> string_table;
+			std::map<int, std::map<e_weapon_offsets_string, const char*>> string_table;
 			// Used for controls that use the same string, A identifier has to be appended to them
 			// I.E Reset##1... Reset##20
 			std::map<std::string, std::string> string_cache;
