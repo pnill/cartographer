@@ -79,10 +79,10 @@ namespace ImGuiHandler
 			std::wstring motd_path_wide = std::wstring(H2AppDataLocal) + L"motd.png";
 			if (!download_complete)
 			{
-				download_success = DownloadMOTD(motd_path_wide, getAspectRatio(ImGui::GetMainViewport()->WorkSize));
+				download_success = DownloadMOTD(motd_path_wide, GetAspectRatio(ImGui::GetMainViewport()->WorkSize));
 				download_complete = true;
 			}
-			load_complete = LoadMOTD(motd_path_wide, getAspectRatio(ImGui::GetMainViewport()->WorkSize));
+			load_complete = LoadMOTD(motd_path_wide, GetAspectRatio(ImGui::GetMainViewport()->WorkSize));
 			motd_texture_load_in_progress = false;
 		}
 

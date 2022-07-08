@@ -109,8 +109,7 @@ bool H2Config_no_events = false;
 bool H2Config_spooky_boy = true;
 bool H2Config_event_music = true;
 
-int H2Config_hotkeyIdHelp = VK_F3;
-int H2Config_hotkeyIdToggleDebug = VK_F2;
+int H2Config_hotkeyIdHelp = VK_F2;
 int H2Config_hotkeyIdAlignWindow = VK_F7;
 int H2Config_hotkeyIdWindowMode = VK_F8;
 int H2Config_hotkeyIdToggleHideIngameChat = VK_F9;
@@ -594,7 +593,6 @@ void SaveH2Config() {
 		if (!H2IsDediServer) {
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_toggle_debug", H2Config_hotkeyIdToggleDebug, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleDebug)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
@@ -808,7 +806,6 @@ void ReadH2Config() {
 				H2Config_hide_ingame_chat = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
 			
 				H2Config_hotkeyIdHelp = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp);
-				H2Config_hotkeyIdToggleDebug = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_toggle_debug", H2Config_hotkeyIdToggleDebug);
 				H2Config_hotkeyIdAlignWindow = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow);
 				H2Config_hotkeyIdWindowMode = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode);
 				H2Config_hotkeyIdToggleHideIngameChat = ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);

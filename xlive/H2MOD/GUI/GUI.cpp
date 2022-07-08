@@ -569,20 +569,6 @@ int WINAPI XLiveRender()
 					}
 				}
 			}
-			
-			if (getDebugTextDisplay()) {
-				for (int i = 0; i < getDebugTextDisplayCount(); i++) {
-					const char* text = getDebugText(i);
-					//int yOffset = 40 + (i * 14);
-					int yOffset = gameWindowHeight - 55 - (i * 14);
-					if (yOffset < 35) {
-						break;
-					}
-					if (strlen(text) > 0) {
-						drawText(10, yOffset, COLOR_WHITE, text, smallFont);
-					}
-				}
-			}
 
 			if (autoUpdateText) {
 				drawText(10, 60, COLOR_WHITE, autoUpdateText, normalSizeFont);

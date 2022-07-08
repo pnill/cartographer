@@ -70,7 +70,7 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 	return false;
 }
 
-// static function, executes command
+// static function, used to execute commands
 bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* output)
 {
     bool ret = false;
@@ -81,7 +81,8 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 		ConsoleCommand* command = nullptr;
 		for (auto command_entry : CommandCollection::commandTable)
 		{
-			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), command_first_tokens[0].length()) == 0)
+			size_t cmp_max = (std::max)(strlen(command_entry->GetName()), command_first_tokens[0].length());
+			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), cmp_max) == 0)
 			{
 				command = command_entry;
 				break;
@@ -90,7 +91,7 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 
 		if (command != nullptr)
 		{
-			output->OutputFmt(StringFlag_History, command_line);
+			output->Output(StringFlag_History, command_line);
 			ret = ConsoleCommand::ExecCommand(command_line, command_line_length, command_first_tokens, output, command);
 		}
 		else

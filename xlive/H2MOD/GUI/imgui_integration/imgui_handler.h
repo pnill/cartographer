@@ -61,7 +61,7 @@ namespace ImGuiHandler
 	bool LoadTextureFromFile(const wchar_t* filename, s_imgui_images image, int* out_width, int* out_height);
 	PDIRECT3DTEXTURE9 GetTexture(s_imgui_images image);
 	void ReleaseTextures();
-	s_aspect_ratio getAspectRatio(const ImVec2 displaySize);
+	s_aspect_ratio GetAspectRatio(const ImVec2 displaySize);
 	namespace ImMOTD {
 		bool DownloadMOTD(const std::wstring& motd_path, s_aspect_ratio ratio);
 		void Render(bool* p_open);

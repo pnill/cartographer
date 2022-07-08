@@ -9,30 +9,56 @@
 
 class Console;
 
+// used to get the main console instance
 Console* GetMainConsoleInstance();
-void ImGui_Console_OpenDefault(const char*, bool*);
+
+#define CONSOLE_TABS 2
+
+static const char* console_tab_name[CONSOLE_TABS] = {
+    "Console commands",
+    "Logs"
+};
+
+enum ConsoleTabs
+{
+    _console_tab_commands,
+	_console_tab_logs,
+
+    _console_tab_end
+};
 
 class Console : public IOutput
 {
 private:
+	Console(const Console&) = delete;
+	Console(Console&&) = delete;
+	Console operator=(Console&) = delete;
+
     // variables
     bool                                m_auto_scroll;
     bool                                m_scroll_to_botom;
     bool                                m_reclaim_input_box_focus = false;
 
     char                                m_input_buffer[MAX_CONSOLE_INPUT_BUFFER];
-    CircularStringBuffer                m_output;
     ImGuiTextInputCompletion*           m_completion_data;
     CircularStringBuffer                m_completion_text_buffer;
     int                                 m_history_string_index;
     ImGuiTextFilter                     m_filter;
-
+    int                                 m_selected_tab;
+    bool                                m_selected_tab_dirty;
+	std::vector<CircularStringBuffer>
+                                        m_output;
 
     static int TextEditCallback(ImGuiInputTextCallbackData* data);
 
     void ExecCommand(const char* command_line, size_t command_line_length);
 
-    void ClearOutput();
+    void ClearMainOutput();
+
+    CircularStringBuffer* GetMainOutput()
+    {
+        return &m_output.data()[m_selected_tab];
+    };
 
 public:
     static std::string                 windowName;
@@ -41,21 +67,19 @@ public:
     Console();
     ~Console() = default;
 
-    Console(const Console&) = delete;
-    Console(Console&&) = delete;
-    Console operator=(Console& other) = delete;
-
     int Output(StringHeaderFlags flags, const char* fmt) override;
     int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) override;
 
-    void Draw(const char* title, bool* p_open);
+	void Draw(const char* title, bool* p_open);
 
     void AllocateCompletionCandidatesBuf(unsigned int candidates_count);
     void DiscardCompletionCandidatesBuf();
 
+    void SelectTab(ConsoleTabs tab);
+
     bool CompletionAvailable() const
     {
-        return m_completion_data != NULL ? true : false;
+        return m_completion_data != NULL;
     };
 
     unsigned int GetCompletionCandidatesCount() const {
@@ -63,8 +87,10 @@ public:
         return m_completion_data->Count;
     };
 
-    static int clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-    static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	CircularStringBuffer* GetTabOutput(ConsoleTabs tab)
+	{
+		return &m_output.data()[tab];
+	};
  
     static void Open()
     {
@@ -73,10 +99,14 @@ public:
     static void Close()
     {
     }
-
     static void Render(bool* b_open)
     {
-        ImGui_Console_OpenDefault("console", b_open);
+		auto console = GetMainConsoleInstance();
+		console->Draw(windowName.c_str(), b_open);
     }
+
+    // commands
+	static int clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 };
 
