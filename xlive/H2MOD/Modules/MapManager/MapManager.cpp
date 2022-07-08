@@ -287,11 +287,11 @@ int __cdecl get_total_map_downloading_percentage()
 		return 0;
 }
 
-wchar_t* receiving_map_string[] = {
+const wchar_t* receiving_map_string[] = {
 	L"You are receiving the map from %s. \r\nPlease wait...%i%%"
 };
 
-wchar_t* get_receiving_map_string()
+const wchar_t* get_receiving_map_string()
 { 
 	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)Memory::GetAddress(0x381fd));
 	wchar_t** receiving_map_message = Memory::GetAddress<wchar_t**>(0x46575C);
@@ -302,7 +302,7 @@ wchar_t* get_receiving_map_string()
 	return receiving_map_message[get_default_game_language()];
 }
 
-wchar_t* repo_string[] = { L"repository" };
+const wchar_t* repo_string[] = { L"repository" };
 void get_map_download_source(int a1, wchar_t* out_string)
 {	
 	if (out_string != NULL)

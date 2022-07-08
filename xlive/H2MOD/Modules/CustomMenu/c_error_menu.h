@@ -12,7 +12,7 @@ public:
 	c_slot2<c_error_edit_list> slot_2_unk;
 	// button handler callback
 
-	c_error_edit_list::c_error_edit_list(int _flags);
+	c_error_edit_list(int _flags);
 
 	virtual char* get_item_list() override
 	{
@@ -52,7 +52,7 @@ public:
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);
 
 
-	c_error_menu::c_error_menu(int _ui_channel, int a4, int _flags);
+	c_error_menu(int _ui_channel, int a4, int _flags);
 
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override

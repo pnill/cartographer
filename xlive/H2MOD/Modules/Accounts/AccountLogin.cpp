@@ -43,7 +43,7 @@ void UpdateConnectionStatus() {
 	}
 }
 
-char ConfigureUserDetails(char* username, char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
+char ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
 
 	if (strlen(username) <= 0 || xuid == 0 || strnlen(abEnet, 12) != 12 || strnlen(abOnline, 40) != 40) {
 		return 0;

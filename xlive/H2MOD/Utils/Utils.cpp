@@ -134,7 +134,7 @@ char CmpVersions(const char* version_base, const char* version_alt) {
 	//return 0b10001;//old build
 }
 
-void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber)) {
+void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber)) {
 	bool foundFirstHeader = false;
 	char version[30] = "0";
 	bool keepReading = true;
@@ -405,7 +405,7 @@ static bool rfc3986_allow(char i) {
 	return false;
 }
 
-char* encode_rfc3986(char* label_literal, size_t label_literal_length) {
+char* encode_rfc3986(const char* label_literal, size_t label_literal_length) {
 	if (label_literal_length == 0)
 		label_literal_length = strlen(label_literal);
 	int escaped_buflen = (label_literal_length * 3) + 1;

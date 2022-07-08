@@ -29,7 +29,7 @@ struct XSocket
 	SOCKET winSockHandle;
 	sockaddr_in name;
 
-	XSocket::XSocket(int _protocol, bool _isVoiceSocket)
+	XSocket(int _protocol, bool _isVoiceSocket)
 	{
 		identifier = 'XSOC';
 		protocol = _protocol;

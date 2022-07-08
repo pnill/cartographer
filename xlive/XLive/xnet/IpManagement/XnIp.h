@@ -63,7 +63,7 @@ struct XNetPacketHeader
 
 struct XBroadcastPacket
 {
-	XBroadcastPacket::XBroadcastPacket()
+	XBroadcastPacket()
 	{
 		pckHeader.intHdr = 'BrOd';
 		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
@@ -314,7 +314,7 @@ public:
 		return xnaddr.ina;
 	}
 
-	bool XnIp::IsValid(IN_ADDR identifier) const
+	bool IsValid(IN_ADDR identifier) const
 	{
 		if (identifier.s_addr != this->connectionIdentifier.s_addr)
 		{
@@ -340,8 +340,8 @@ public:
 		// TODO maybe terminate all connections
 	}
 
-	CXnIp::CXnIp(const CXnIp& other) = delete;
-	CXnIp::CXnIp(CXnIp&& other) = delete;
+	CXnIp(const CXnIp& other) = delete;
+	CXnIp(CXnIp&& other) = delete;
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 
@@ -355,7 +355,7 @@ public:
 	void SetTimeConnectionInteractionHappened(IN_ADDR ina);
 
 	// local network address
-	static XnIp* CXnIp::GetLocalUserXn();
+	static XnIp* GetLocalUserXn();
 	static void UnregisterLocalConnectionInfo();
 	static void SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline);
 

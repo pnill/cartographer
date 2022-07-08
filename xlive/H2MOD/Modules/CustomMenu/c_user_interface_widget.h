@@ -26,7 +26,7 @@ protected:
 	// (when reimplementing the entire child class ctor for example)
 	// because when calling the constructor of that child class directly from the game's code
 	// it implicitly calls the base class ctors as well
-	c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type _widget_type, __int16 _flags, bool _call_ctor)
+	c_user_interface_widget(e_user_interface_widget_type _widget_type, __int16 _flags, bool _call_ctor)
 	{
 		typedef c_user_interface_widget* (__thiscall* class_constructor_t)(e_user_interface_widget_type, __int16);
 		auto p_class_constructor = Memory::GetAddressRelative<class_constructor_t>(0x611D81);

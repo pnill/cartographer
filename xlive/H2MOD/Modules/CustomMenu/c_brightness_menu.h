@@ -16,7 +16,7 @@ public:
 
 	// todo maybe implement the actual constructor
 
-	c_brightness_level_edit_list::c_brightness_level_edit_list(int a2) :
+	c_brightness_level_edit_list(int a2) :
 		c_list_widget(a2, false)
 	{
 		void* old_vtbl = *(void**)this;
@@ -92,7 +92,7 @@ class c_brightness_menu : protected c_screen_with_menu
 public:
 	c_brightness_menu(int _ui_channel, int a4, __int16 _flags);
 
-	c_brightness_menu::~c_brightness_menu()
+	~c_brightness_menu()
 	{
 	}
 

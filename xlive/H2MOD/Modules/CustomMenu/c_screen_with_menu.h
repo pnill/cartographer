@@ -8,7 +8,7 @@ class c_screen_with_menu : protected c_screen_widget
 {
 public:
 
-	c_screen_with_menu::c_screen_with_menu(int _menu_id, int _ui_channel, int a4, __int16 _flags, void* _item_edit_list, bool _call_ctor) :
+	c_screen_with_menu(int _menu_id, int _ui_channel, int a4, __int16 _flags, void* _item_edit_list, bool _call_ctor) :
 		c_screen_widget(_menu_id, _ui_channel, a4, _flags, false)
 	{
 		typedef void* (__thiscall* c_screen_with_menu_ctor_game_impl)(c_screen_with_menu*, int, int, int, __int16, void*);
@@ -22,7 +22,7 @@ public:
 		*(void**)this = old_vtbl;
 	};
 
-	c_screen_with_menu::~c_screen_with_menu()
+	~c_screen_with_menu()
 	{
 	}
 

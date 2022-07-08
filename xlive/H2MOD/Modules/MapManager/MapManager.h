@@ -6,8 +6,8 @@
 */
 class MapDownloadQuery {
 public:
-	MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId);
-	MapDownloadQuery::~MapDownloadQuery();
+	MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId);
+	~MapDownloadQuery();
 
 	void SetMapNameToDownload(const std::wstring& mapNameToDownload);
 	void SetMapNameToDownload(const wchar_t* mapNameToDownload);

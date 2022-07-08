@@ -13,9 +13,9 @@
 class StatsHandler
 {
 public:
-	StatsHandler::StatsHandler() = delete;
-	StatsHandler::StatsHandler(const StatsHandler& other) = delete;
-	StatsHandler::StatsHandler(StatsHandler&& other) = delete;
+	StatsHandler() = delete;
+	StatsHandler(const StatsHandler& other) = delete;
+	StatsHandler(StatsHandler&& other) = delete;
 
 	static void sendStats()
 	{
@@ -90,7 +90,7 @@ public:
 	};
 
 	static std::string buildPlayerRankUpdateQueryStringList();
-	static void StatsHandler::getPlayerRanksByStringList(std::string& playerList);
+	static void getPlayerRanksByStringList(std::string& playerList);
 
 	static void init();
 	static void InvalidateMatch(bool state);

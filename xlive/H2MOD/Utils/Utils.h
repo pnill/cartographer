@@ -4,7 +4,7 @@ int FindLineStart(FILE* fp, int lineStrLen);
 ///FREE MEMOERY in fileLine
 bool GetFileLine(FILE* fp, char** fileLine);
 char CmpVersions(const char* version_base, const char* version_alt);
-void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
+void ReadIniFile(void* fileConfig, bool configIsFILE, const char* header, const char* headerVersion, int(interpretSettingFunc)(char* fileLine, char* version, int lineNumber));
 std::string GetVKeyCodeString(int vkey);
 void PadCStringWithChar(char* strToPad, size_t toFullLength, char c);
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath);
@@ -22,7 +22,7 @@ bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 
-char* encode_rfc3986(char* label_literal, size_t label_literal_length = 0u);
+char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u);
 void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len);
 char* wcstombs2r(wchar_t* text);
 std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
@@ -63,7 +63,7 @@ class FrequencyLimiter
 	using _time = std::chrono::high_resolution_clock;
 
 public:
-	FrequencyLimiter::FrequencyLimiter(unsigned int _frequency) :
+	FrequencyLimiter(unsigned int _frequency) :
 		m_maxUpdateRateHz(_frequency)
 	{
 		m_initialUpdate = true;

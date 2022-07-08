@@ -62,7 +62,7 @@ public:
 	bool runOnce;
 	bool hasRun = false;
 
-	EventCallback::EventCallback(void* _callback, EventType _type, EventExecutionType _executionType = EventExecutionType::execute_after, bool _runOnce = false) :
+	EventCallback(void* _callback, EventType _type, EventExecutionType _executionType = EventExecutionType::execute_after, bool _runOnce = false) :
 		callback(_callback),
 		type(_type),
 		executionType(_executionType),

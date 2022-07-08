@@ -199,13 +199,6 @@ public:
 		ComVarT(_var_ptr)
 	{
 	}
-
-	ComVarTPtr(std::remove_pointer_t<T> _default_value, T _var_ptr) :
-		ComVarT(_var_ptr)
-	{
-		*m_val = default_value;
-	}
-
 private:
 
 #undef SETVAR_CHECK_PTR_TYPE_VALID

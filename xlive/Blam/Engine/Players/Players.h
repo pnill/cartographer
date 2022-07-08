@@ -260,7 +260,7 @@ struct s_player
 	static void SetUnitBipedType(int playerIndex, s_player::e_character_type bipedType);
 	static void SetUnitBipedType(int playerIndex, byte representationIndex);
 	static void SetBipedSpeed(int playerIndex, float speed);
-	static wchar_t* GetName(int playerIndex);
+	static const wchar_t* GetName(int playerIndex);
 	static datum GetPlayerUnitDatumIndex(int playerIndex);
 	static unsigned long long GetId(int playerIndex);
 };

@@ -85,7 +85,7 @@ extern bool signInChanged[4];
 extern XUSER_SIGNIN_INFO usersSignInInfo[4];
 
 void XUserSignInSetStatusChanged(DWORD dwUserIndex);
-void XUserSetup(DWORD dwUserIndex, XUID xuid, char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online);
+void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online);
 void XUserSignOut(DWORD dwUserIndex);
 
 bool SignInStatusChanged();

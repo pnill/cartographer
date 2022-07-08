@@ -91,8 +91,8 @@ typedef struct _HALO2VISTA_TITLE_SERVICE_PROPERTIES
 class CServerList
 {
 public:
-	CServerList::CServerList(const CServerList& other) = delete;
-	CServerList::CServerList(CServerList&& other) = delete;
+	CServerList(const CServerList& other) = delete;
+	CServerList(CServerList&& other) = delete;
 
 	static bool CountResultsUpdated;
 
@@ -106,7 +106,7 @@ public:
 #pragma region ServerListQuery
 	HANDLE Handle = INVALID_HANDLE_VALUE;
 
-	CServerList::CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
+	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
 	{
 		m_itemsPerPageCount = _cItemsPerPage;
 		m_searchPropertiesIdCount = _cSearchPropertiesIDs;
@@ -114,7 +114,7 @@ public:
 		memcpy(m_pSearchPropertyIds, _pSearchProperties, _cSearchPropertiesIDs * sizeof(*_pSearchProperties));
 	}
 
-	CServerList::~CServerList()
+	~CServerList()
 	{
 		delete[] m_pSearchPropertyIds;
 
