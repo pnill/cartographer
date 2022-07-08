@@ -115,7 +115,6 @@ extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
 extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_hotkeyIdHelp;
-extern int H2Config_hotkeyIdToggleDebug;
 extern int H2Config_hotkeyIdAlignWindow;
 extern int H2Config_hotkeyIdWindowMode;
 extern int H2Config_hotkeyIdToggleHideIngameChat;

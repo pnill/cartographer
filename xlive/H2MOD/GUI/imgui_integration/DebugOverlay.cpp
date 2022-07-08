@@ -18,7 +18,7 @@ namespace ImGuiHandler
 		void Render(bool* p_open)
 		{
 			const ImGuiViewport* viewport = ImGui::GetMainViewport();
-			s_aspect_ratio ratio = getAspectRatio(viewport->WorkSize);
+			s_aspect_ratio ratio = GetAspectRatio(viewport->WorkSize);
 
 			ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 

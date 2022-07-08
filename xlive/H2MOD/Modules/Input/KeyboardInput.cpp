@@ -106,18 +106,18 @@ void KeyboardInput::ExecuteHotkey(WPARAM message)
 void hotkeyFuncHelp() {
 	addDebugText("------------------------------");
 	addDebugText("Options:");
-	addDebugText("%s - Toggle hiding this text display.", GetVKeyCodeString(H2Config_hotkeyIdToggleDebug).c_str());
 	addDebugText("%s - Print and show this help text.", GetVKeyCodeString(H2Config_hotkeyIdHelp).c_str());
 	addDebugText("%s - Align/Correct window positioning (into Borderless).", GetVKeyCodeString(H2Config_hotkeyIdAlignWindow).c_str());
 	addDebugText("%s - Toggle Windowed/Borderless mode.", GetVKeyCodeString(H2Config_hotkeyIdWindowMode).c_str());
 	addDebugText("%s - Toggles hiding the in-game chat menu.", GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat).c_str());
 	addDebugText("%s - Toggles hiding the Console Menu.", GetVKeyCodeString(H2Config_hotkeyIdConsole).c_str());
 	addDebugText("------------------------------");
-	setDebugTextDisplay(true);
-}
 
-void hotkeyFuncHideDebug() {
-	setDebugTextDisplay(!getDebugTextDisplay());
+	if (!ImGuiHandler::IsWindowActive(Console::windowName))
+	{
+		ImGuiHandler::ToggleWindow(Console::windowName);
+	}
+	GetMainConsoleInstance()->SelectTab(_console_tab_logs);
 }
 
 //TODO:REFACTOR
@@ -251,7 +251,6 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
-	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleDebug, hotkeyFuncHideDebug);
 	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }
 

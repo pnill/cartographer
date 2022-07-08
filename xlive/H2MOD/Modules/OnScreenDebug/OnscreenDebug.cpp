@@ -1,24 +1,19 @@
 #include "stdafx.h"
 
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h"
 
-char** DebugStr;
-const int DebugTextArrayLenMax = 160;
-int DebugTextArrayPos = 0;
-int DebugTextCount = 0;
-bool DebugTextDisplay = false;
 bool initialisedDebugText = false;
 
 // we change global variables, async debug text could result in hazzard
 std::recursive_mutex addTextMutex;
 
-int getDebugTextArrayMaxLen() {
-	return DebugTextArrayLenMax;
-}
-
-int getDebugTextDisplayCount() {
-	return DebugTextCount;
-}
+/*
+//
+// TODO remove entirely
+// and replace with console code
+//
+*/
 
 void addDebugTextInternal(char* text) {
 
@@ -31,30 +26,12 @@ void addDebugTextInternal(char* text) {
 		lenInput = endChar - text;
 	}
 
-	std::lock_guard<std::recursive_mutex> lg(addTextMutex);
+	std::lock_guard lg(addTextMutex);
 
-	int _DebugTextCount = DebugTextCount;
-	_DebugTextCount++;
-	if (_DebugTextCount >= DebugTextArrayLenMax)
-		_DebugTextCount = DebugTextArrayLenMax;
-
-	int _DebugTextArrayPos = DebugTextArrayPos;
-	_DebugTextArrayPos++;
-	if (_DebugTextArrayPos >= DebugTextArrayLenMax)
-		_DebugTextArrayPos = 0;
-
-	if (DebugStr[_DebugTextArrayPos])
-		free(DebugStr[_DebugTextArrayPos]);
-
-	DebugStr[_DebugTextArrayPos] = (char*)calloc(lenInput + 1, sizeof(char));
-	strncpy(DebugStr[_DebugTextArrayPos], text, lenInput);
-
+	CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
+	output->AddString(StringFlag_None, text, lenInput);
 	onscreendebug_log->debug(text);
 
-	// set global counters just after we added the text
-	DebugTextCount = _DebugTextCount;
-	DebugTextArrayPos = _DebugTextArrayPos;
-	
 	if (endChar) {
 		return addDebugTextInternal(endChar + 1);
 	}
@@ -113,22 +90,5 @@ void addDebugText(const char* format, ...)
 void InitOnScreenDebugText() {
 	initialisedDebugText = true;
 	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"), true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
-	DebugStr = (char**)calloc(DebugTextArrayLenMax, sizeof(char*));
 	addDebugText("Initialised On Screen Debug Text.");
-}
-
-char* getDebugText(int ordered_index) {
-	if (ordered_index < DebugTextArrayLenMax) {
-		int array_index = ((DebugTextArrayPos - ordered_index) + DebugTextArrayLenMax) % DebugTextArrayLenMax;
-		return DebugStr[array_index];
-	}
-	return "";
-}
-
-void setDebugTextDisplay(bool setOn) {
-	DebugTextDisplay = setOn;
-}
-
-bool getDebugTextDisplay() {
-	return DebugTextDisplay;
 }

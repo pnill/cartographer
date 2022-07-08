@@ -70,7 +70,7 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 	return false;
 }
 
-// static function, executes command
+// static function, used to execute commands
 bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* output)
 {
     bool ret = false;

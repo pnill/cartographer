@@ -240,7 +240,7 @@ namespace ImGuiHandler
 		g_patch_notes_texture = nullptr;
 	}
 
-	s_aspect_ratio getAspectRatio(const ImVec2 displaySize)
+	s_aspect_ratio GetAspectRatio(const ImVec2 displaySize)
 	{
 		if (displaySize.x / displaySize.y >= 1.6f)
 		{

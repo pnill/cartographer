@@ -19,7 +19,6 @@ Console* GetMainConsoleInstance()
 }
 
 Console::Console() :
-	m_output(256, MAX_CONSOLE_INPUT_BUFFER),
 	m_completion_text_buffer(32, 64),
 	m_console_opacity(.75f)
 {
@@ -27,7 +26,14 @@ Console::Console() :
 	m_scroll_to_botom = false;
 	m_history_string_index = -1;
 	m_completion_data = NULL;
+	m_selected_tab = 0;
+	m_selected_tab_dirty = false;
 	memset(m_input_buffer, 0, sizeof(m_input_buffer));
+
+	for (int i = 0; i < CONSOLE_TABS; i++)
+	{
+		m_output.emplace_back(256, MAX_CONSOLE_INPUT_BUFFER);
+	}
 
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
 	console_opacity_var_cmd.UpdateVarPtr((ComVar*)&m_console_opacity);
@@ -37,7 +43,7 @@ Console::Console() :
 
 int Console::Output(StringHeaderFlags flags, const char* fmt)
 {
-	m_output.AddString(flags, fmt);
+	GetMainOutput()->AddString(flags, fmt);
 	return 0;
 }
 
@@ -45,7 +51,7 @@ int Console::OutputFmt(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);
-	m_output.AddStringFmt(flags, fmt, valist);
+	GetMainOutput()->AddStringFmt(flags, fmt, valist);
 	va_end(valist);
 	return 0;
 }
@@ -162,7 +168,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 		// if we have completion data, we do not want to use history
 		// unless the current string is actually history
 
-		CircularStringBuffer* output_buffer = &console_data->m_output;
+		CircularStringBuffer* output_buffer = console_data->GetTabOutput(_console_tab_commands);
 		if (data->BufTextLen > 0
 			&& console_data->CompletionAvailable()
 			&& console_data->m_history_string_index == -1)
@@ -299,9 +305,9 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 	return 0;
 }
 
-void Console::ClearOutput() 
+void Console::ClearMainOutput() 
 {
-	m_output.Clear();
+	GetMainOutput()->Clear();
 };
 
 void Console::ExecCommand(const char* command_line, size_t command_line_length)
@@ -336,11 +342,15 @@ void Console::DiscardCompletionCandidatesBuf()
 	m_completion_data = NULL;
 }
 
+void Console::SelectTab(ConsoleTabs tab)
+{
+	m_selected_tab_dirty = true;
+	m_selected_tab = tab;
+}
+
 void Console::Draw(const char* title, bool* p_open)
 {
 	if (!*p_open) return;
-
-	static bool  console_window_initialized = false;
 
 	ImGuiIO& io = ImGui::GetIO();
 	const ImGuiStyle& style = ImGui::GetStyle();
@@ -380,7 +390,7 @@ void Console::Draw(const char* title, bool* p_open)
 	{
 		if (ImGui::BeginMenu("Menu"))
 		{
-			if (ImGui::MenuItem("Clear")) { ClearOutput(); }
+			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
 			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 			ImGui::EndMenu();
 		}
@@ -397,6 +407,40 @@ void Console::Draw(const char* title, bool* p_open)
 
 	ImGui::Separator();
 
+	ImGuiTabBarFlags tab_bar_flags = 0
+		;
+
+	if (ImGui::BeginTabBar("OutputTabBar", tab_bar_flags))
+	{
+		int currently_selected_tab = -1;
+		for (int i = 0; i < CONSOLE_TABS; i++)
+		{
+			ImGuiTabItemFlags tab_item_flags = 0
+				;
+
+			bool programmatically_switch_tab = m_selected_tab == i
+				&& m_selected_tab != currently_selected_tab
+				&& m_selected_tab_dirty;
+
+			if (programmatically_switch_tab)
+			{
+				m_selected_tab_dirty = false;
+				currently_selected_tab = m_selected_tab;
+				tab_item_flags |= ImGuiTabItemFlags_SetSelected;
+			}
+
+			if (ImGui::BeginTabItem(console_tab_name[i], NULL, tab_item_flags))
+			{
+				currently_selected_tab = i;
+				ImGui::EndTabItem();
+			}
+		}
+
+		m_selected_tab = currently_selected_tab;
+
+		ImGui::EndTabBar();
+	}
+
 	// console text window
 	ImGuiWindowFlags console_log_child_window_flags = 0
 		| ImGuiWindowFlags_HorizontalScrollbar
@@ -404,6 +448,8 @@ void Console::Draw(const char* title, bool* p_open)
 
 	//float footer_height_to_reserve = 0.0f;
 	float footer_height_to_reserve = (ImGui::GetFrameHeightWithSpacing());
+	if (m_selected_tab != _console_tab_commands)
+		footer_height_to_reserve = 0.0f;
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_FrameBg]);
 	ImGui::SetNextWindowBgAlpha(m_console_opacity.GetVal());
 	ImGui::BeginChild("##consolelog", ImVec2(-1, -footer_height_to_reserve), true, console_log_child_window_flags);
@@ -411,22 +457,22 @@ void Console::Draw(const char* title, bool* p_open)
 	// Child log Poput Context Window
 	if (ImGui::BeginPopupContextWindow(NULL, ImGuiPopupFlags_NoOpenOverItems | ImGuiPopupFlags_MouseButtonRight))
 	{
-		if (m_output.GetHeaderCount() > 0)
-		if (ImGui::MenuItem("Clear")) { ClearOutput(); }
+		if (GetMainOutput()->GetHeaderCount() > 0)
+			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
 		if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 		ImGui::EndPopup();
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
-	for (int i = 0; i < m_output.GetHeaderCount(); i++)
+	for (int i = 0; i < GetMainOutput()->GetHeaderCount(); i++)
 	{
 		// TODO add color support
 		char console_text_id[512];
 		snprintf(console_text_id, ARRAYSIZE(console_text_id), "##consolelogid%d", i);
 		ImGui::PushID(console_text_id);
 
-		auto& stringHeader = m_output.GetHeader(i);
-		const char* stringToAdd = m_output.GetStringAtIdx(stringHeader.idx);
+		auto& stringHeader = GetMainOutput()->GetHeader(i);
+		const char* stringToAdd = GetMainOutput()->GetStringAtIdx(stringHeader.idx);
 		if (stringHeader.flags & StringFlag_CopyToClipboard)
 			ImGui::LogToClipboard();
 
@@ -454,82 +500,78 @@ void Console::Draw(const char* title, bool* p_open)
 	ImGui::PopStyleColor();
 	ImGui::EndChild();
 
-	// ImGui::PushItemWidth(-(ImGui::CalcTextSize("Enter").x + style.FramePadding.x * 2.0f + 5.0f + 1.0f));
-	ImGuiInputTextFlags input_text_flags = 0
-		| ImGuiInputTextFlags_EnterReturnsTrue
-		| ImGuiInputTextFlags_AutoSelectAll
-		| ImGuiInputTextFlags_CallbackCompletion
-		| ImGuiInputTextFlags_CallbackHistory
-		| ImGuiInputTextFlags_CallbackEdit
-		| ImGuiInputTextFlags_CallbackAlways
-		| ImGuiInputTextFlags_DisplaySuggestions
-		;
-
-	ImGui::SetNextItemWidth(-(ImGui::CalcTextSize("Enter").x + style.FramePadding.x * 2.0f + 5.0f + 1.0f));
-	if (ImGui::InputTextWithHint("##command1", "<command>", m_input_buffer, IM_ARRAYSIZE(m_input_buffer), input_text_flags, TextEditCallback, this))
+	if (m_selected_tab == _console_tab_commands)
 	{
-		size_t input_buffer_string_length = strnlen_s(m_input_buffer, sizeof(m_input_buffer) - 1);
-		if (input_buffer_string_length > 0)
-		{
-			ExecCommand(m_input_buffer, input_buffer_string_length);
-			memset(m_input_buffer, 0, 2);
-		}
-		m_reclaim_input_box_focus = true;
-	}
-	bool input_text_active = ImGui::IsItemActive();
-
-	// Auto-focus on window apparition
-	ImGui::SetItemDefaultFocus();
-	if (m_reclaim_input_box_focus)
-	{
-		ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
-		m_reclaim_input_box_focus = false;
-	}
-
-	//ImGui::PopItemWidth();
-
-	// enter button
-	ImGui::SameLine(0.0f, 5.0f);
-	if (ImGui::Button("Enter"))
-	{
-		size_t input_buffer_string_length = strnlen_s(m_input_buffer, sizeof(m_input_buffer) - 1);
-		if (input_buffer_string_length > 0)
-		{
-			ExecCommand(m_input_buffer, input_buffer_string_length);
-			memset(m_input_buffer, 0, 2);
-		}
-		m_reclaim_input_box_focus = true;
-	}
-
-	if (input_text_active)
-	{
-		// Command-line
-		// ImGui::Separator();
-
-		ImGuiWindowFlags completion_window_flags = 0
-			| ImGuiWindowFlags_NoTitleBar
-			| ImGuiWindowFlags_NoSavedSettings
-			| ImGuiWindowFlags_AlwaysAutoResize
-			| ImGuiWindowFlags_NoMove
-			| ImGuiWindowFlags_NoFocusOnAppearing
-			// | ImGuiWindowFlags_NoResize
+		// ImGui::PushItemWidth(-(ImGui::CalcTextSize("Enter").x + style.FramePadding.x * 2.0f + 5.0f + 1.0f));
+		ImGuiInputTextFlags input_text_flags = 0
+			| ImGuiInputTextFlags_EnterReturnsTrue
+			| ImGuiInputTextFlags_AutoSelectAll
+			| ImGuiInputTextFlags_CallbackCompletion
+			| ImGuiInputTextFlags_CallbackHistory
+			| ImGuiInputTextFlags_CallbackEdit
+			| ImGuiInputTextFlags_CallbackAlways
+			| ImGuiInputTextFlags_DisplaySuggestions
 			;
 
-		// window cursor positon 
-		ImVec2 main_window_last_screen_pos_cursor = ImGui::GetCursorScreenPos(); // will use this to display the command completion candidates
+		ImGui::SetNextItemWidth(-(ImGui::CalcTextSize("Enter").x + style.FramePadding.x * 2.0f + 5.0f + 1.0f));
+		if (ImGui::InputTextWithHint("##command1", "<command>", m_input_buffer, IM_ARRAYSIZE(m_input_buffer), input_text_flags, TextEditCallback, this))
+		{
+			size_t input_buffer_string_length = strnlen_s(m_input_buffer, sizeof(m_input_buffer) - 1);
+			if (input_buffer_string_length > 0)
+			{
+				ExecCommand(m_input_buffer, input_buffer_string_length);
+				memset(m_input_buffer, 0, 2);
+			}
+			m_reclaim_input_box_focus = true;
+		}
+		bool input_text_active = ImGui::IsItemActive();
 
-		ImVec2 req_text_input_window_size
-			= ImVec2(main_viewport->WorkSize.x - style.WindowPadding.x - style.ItemSpacing.x, 0.0f);
+		// Auto-focus on window apparition
+		ImGui::SetItemDefaultFocus();
+		if (m_reclaim_input_box_focus)
+		{
+			ImGui::SetKeyboardFocusHere(-1); // Auto focus previous widget
+			m_reclaim_input_box_focus = false;
+		}
+
+		//ImGui::PopItemWidth();
+
+		// enter button
+		ImGui::SameLine(0.0f, 5.0f);
+		if (ImGui::Button("Enter"))
+		{
+			size_t input_buffer_string_length = strnlen_s(m_input_buffer, sizeof(m_input_buffer) - 1);
+			if (input_buffer_string_length > 0)
+			{
+				ExecCommand(m_input_buffer, input_buffer_string_length);
+				memset(m_input_buffer, 0, 2);
+			}
+			m_reclaim_input_box_focus = true;
+		}
+
+		if (input_text_active)
+		{
+			// Command-line
+			// ImGui::Separator();
+
+			ImGuiWindowFlags completion_window_flags = 0
+				| ImGuiWindowFlags_NoTitleBar
+				| ImGuiWindowFlags_NoSavedSettings
+				| ImGuiWindowFlags_AlwaysAutoResize
+				| ImGuiWindowFlags_NoMove
+				| ImGuiWindowFlags_NoFocusOnAppearing
+				// | ImGuiWindowFlags_NoResize
+				;
+
+			// window cursor positon 
+			ImVec2 main_window_last_screen_pos_cursor = ImGui::GetCursorScreenPos(); // will use this to display the command completion candidates
+
+			ImVec2 req_text_input_window_size
+				= ImVec2(main_viewport->WorkSize.x - style.WindowPadding.x - style.ItemSpacing.x, 0.0f);
+		}
 	}
 
-	console_window_initialized = true;
-
 	ImGui::End();
-}
-void ImGui_Console_OpenDefault(const char* title, bool* p_open)
-{
-	auto console = GetMainConsoleInstance();
-	console->Draw(title, p_open);
 }
 
 // -------------
@@ -542,7 +584,7 @@ void ImGui_Console_OpenDefault(const char* title, bool* p_open)
 int Console::clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	Console* console_data = (Console*)cbData.strOutput;
-	console_data->ClearOutput();
+	console_data->ClearMainOutput();
 	return 0;
 }
 

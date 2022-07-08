@@ -677,10 +677,10 @@ void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
 	p_update_player_profile(local_player_index);
 }
 
-void __cdecl print_to_console(const char *output)
+void __cdecl print_to_console(const char* output)
 {
-	const static std::string prefix = "[HSC Print] ";
-	// TODO FIXME add another tab to ImGui console to log these kind of things
+	std::string finalOutput("[HSC Print] "); finalOutput += output;
+	addDebugText(finalOutput.c_str());
 }
 
 DWORD calculate_model_lod;
