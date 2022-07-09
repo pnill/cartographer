@@ -59,7 +59,7 @@ public:
 	// interface
 	virtual int custom_deconstructor(BYTE flags) override
 	{
-		if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::isAccountingActiveHandle()) {
+		if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::IsAccountingActiveHandle()) {
 			//CustomMenuCall_AccountList();
 			c_account_list_menu::accountingGoBackToList = false;
 		}
