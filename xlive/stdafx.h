@@ -6,17 +6,9 @@
 
 #define HEAP_DEBUG 0
 
-#define _BIND_TO_CURRENT_CRT_VERSION 1
-
-#define VC_EXTRALEAN
-
-//#include <WinSDKVer.h>
-
 #define WINVER _WIN32_WINNT_VISTA
 #define _WIN32_WINNT _WIN32_WINNT_VISTA
-#define _WINDSOCK_DEPRECATED_NO_WARNINGS
-
-//#include <SDKDDKVer.h>
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 #ifdef _DEBUG
 #define _SECURE_SCL 1
