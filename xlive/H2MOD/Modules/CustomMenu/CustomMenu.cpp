@@ -871,15 +871,15 @@ void* (__cdecl* CustomMenuFuncPtrHelp_Invalid_Login_Token())(s_new_ui_screen_par
 
 void* __stdcall sub_248beb_deconstructor_Login_Token(LPVOID lpMem, char a2)//__thiscall
 {
-	if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::isAccountingActiveHandle()) {
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::IsAccountingActiveHandle()) {
 		GSCustomMenuCall_AccountEdit();
 		c_account_list_menu::accountingGoBackToList = true;
 	}
 
 	c_account_list_menu::UpdateAccountingActiveHandle(false);
-
-	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -1100,6 +1100,7 @@ DWORD WINAPI ThreadLogin(LPVOID lParam)
 }
 
 static bool CMButtonHandler_AccountEdit(int button_id) {
+	bool close_menu = false;
 	if (button_id == 0) {
 		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		CustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
@@ -1118,9 +1119,10 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
+			close_menu = true;
 		}
 	}
-	return false;
+	return close_menu;
 }
 
 __declspec(naked) void sub_20F790_CM_nak_AccountEdit() {//__thiscall
@@ -1139,15 +1141,15 @@ __declspec(naked) void sub_20F790_CM_nak_AccountEdit() {//__thiscall
 
 void* __stdcall sub_248beb_deconstructor_AccountEdit(LPVOID lpMem, char a2)//__thiscall
 {
-	if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::isAccountingActiveHandle()) {
+	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
+	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
+
+	if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::IsAccountingActiveHandle()) {
 		GSCustomMenuCall_AccountList();
 		c_account_list_menu::accountingGoBackToList = false;
 	}
 
 	c_account_list_menu::UpdateAccountingActiveHandle(false);
-
-	int(__thiscall * sub_248b90)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x248b90);
-	int(__cdecl * sub_287c23)(void*) = (int(__cdecl*)(void*))((char*)H2BaseAddr + 0x287c23);
 
 	sub_248b90((void*)lpMem);
 	if (a2 & 1) {
@@ -1608,11 +1610,11 @@ char __stdcall sub_23d060(int thisptr, int* a2) //__thiscall
 }
 
 void XUiShowSignInH2() {
-	if (!c_account_list_menu::isAccountingActiveHandle() && ReadH2Accounts()) {
+	if (!c_account_list_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
 		GSCustomMenuCall_AccountList();
 	}
 	else {
-		if (!c_account_list_menu::isAccountingActiveHandle())
+		if (!c_account_list_menu::IsAccountingActiveHandle())
 			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF016, 0xFFFFF017);
 	}
 }

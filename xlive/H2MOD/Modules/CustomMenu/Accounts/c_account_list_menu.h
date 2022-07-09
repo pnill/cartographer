@@ -57,7 +57,7 @@ public:
 	
 	static bool accountingGoBackToList;
 	static int accountingActiveHandleCount;
-	static bool isAccountingActiveHandle();
+	static bool IsAccountingActiveHandle();
 	static void UpdateAccountingActiveHandle(bool active);
 
 	static void* __cdecl open(s_new_ui_screen_parameters* a1);

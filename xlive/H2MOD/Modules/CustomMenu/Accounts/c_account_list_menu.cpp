@@ -18,7 +18,7 @@ static bool accountRemoveMode;
 bool c_account_list_menu::accountingGoBackToList = false;
 int c_account_list_menu::accountingActiveHandleCount = 0;
 
-bool c_account_list_menu::isAccountingActiveHandle() {
+bool c_account_list_menu::IsAccountingActiveHandle() {
 	return accountingActiveHandleCount > 0;
 }
 
