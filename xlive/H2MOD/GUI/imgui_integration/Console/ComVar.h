@@ -127,6 +127,14 @@ protected:
 	}
 
 	template<>
+	void SetValFromStrInternal<unsigned int>(const std::string& str, int _Base)
+	{
+		SETVAR_CHECK_PTR_TYPE_VALID();
+		baseTypeT& val = Get();
+		val = std::stoul(str, nullptr, _Base);
+	}
+
+	template<>
 	void SetValFromStrInternal<long long>(const std::string& str, int _Base)
 	{
 		SETVAR_CHECK_PTR_TYPE_VALID();
