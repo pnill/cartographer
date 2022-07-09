@@ -1100,6 +1100,7 @@ DWORD WINAPI ThreadLogin(LPVOID lParam)
 }
 
 static bool CMButtonHandler_AccountEdit(int button_id) {
+	bool close_menu = false;
 	if (button_id == 0) {
 		wchar_t* textBuffer = (wchar_t*)H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
 		CustomMenuCall_VKeyboard_Inner(textBuffer, 256, 16, CMLabelMenuId_AccountEdit, 0xFFFFF002, CMLabelMenuId_AccountEdit, 0xFFFFF003);
@@ -1118,9 +1119,10 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
 			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
+			close_menu = true;
 		}
 	}
-	return false;
+	return close_menu;
 }
 
 __declspec(naked) void sub_20F790_CM_nak_AccountEdit() {//__thiscall
