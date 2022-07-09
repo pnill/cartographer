@@ -509,7 +509,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	IOutput* output = cbData.strOutput;
-	ComVarT<int> datumIdx;
+	ComVarT<datum> datumIdx;
 
 	std::string exception;
 	if (!datumIdx.SetValFromStr(tokens[1], 0, exception))
@@ -519,7 +519,7 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 		return 0;
 	}
 
-	DeleteObject((datum)datumIdx.GetVal());
+	DeleteObject(datumIdx.GetVal());
 	return 0;
 }
 
