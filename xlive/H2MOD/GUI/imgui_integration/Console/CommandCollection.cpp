@@ -519,7 +519,17 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 		return 0;
 	}
 
-	DeleteObject(datumIdx.GetVal());
+	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx.GetVal(), -1);
+	if (object_data != NULL)
+	{
+		DeleteObject(datumIdx.GetVal());
+		output->OutputFmt(StringFlag_None, "# deleted object idx: 0x%X", datumIdx.GetVal());
+	}
+	else
+	{
+		output->OutputFmt(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx.GetVal());
+	}
+
 	return 0;
 }
 
