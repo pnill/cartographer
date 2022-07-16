@@ -24,6 +24,7 @@ unsigned short H2Config_master_port_relay = 1001;
 bool H2Portable = false;//TODO
 
 std::string cartographerURL = "https://cartographer.online";
+std::string unSecureCartographerURL = "http://cartographer.online";
 std::string cartographerMapRepoURL = "http://www.h2maps.net/Cartographer/CustomMaps";
 
 unsigned short H2Config_base_port = 2000;

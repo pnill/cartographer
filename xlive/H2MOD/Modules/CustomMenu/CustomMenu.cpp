@@ -1004,6 +1004,7 @@ void xbox_live_task_progress_callback(DWORD a1)
 
 			case ERROR_CODE_CURL_EASY_PERF:
 				CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF030, 0xFFFFF031);
+				GSCustomMenuCall_Update_Note(); // add this to prompt for an update when it errors out due to a certificate mismatch
 				return;
 
 			case ERROR_CODE_INVALID_VERSION:
