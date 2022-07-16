@@ -1,27 +1,35 @@
 #include "stdafx.h"
 
 #include "OriginalFPSLimiter.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "..\Interpolation\Interpolation.h"
+
 #include "Util\Hooks\Hook.h"
+
+#include "Blam\Engine\Game\GameTimeGlobals.h"
 
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Utils\Utils.h"
+
+#include "H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h"
 
 extern bool b_XboxTick;
 static LARGE_INTEGER frequency;
 static LARGE_INTEGER counterAtStartup;
+
+bool OriginalFPSLimiter::fps_limiter_enabled = false;
 
 static __int64 network_time;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
 
-float get_remaining_time_until_next_tick_in_seconds()
+float get_ticks_leftover_time()
 {
 	time_globals* timeGlobals = time_globals::get();
-	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->update_time / (float)timeGlobals->ticks_per_second);
-	return fmaxf(result, 0.f);
+	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->game_ticks_leftover / (float)timeGlobals->ticks_per_second);
+	return blam_max(result, 0.0f);
 }
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
@@ -120,7 +128,7 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 
 		timeDeltaSec = _currentTimeSec - _lastTimeSec;
 
-		//if (Engine:IsGameMinimized())
+		if (OriginalFPSLimiter::fps_limiter_enabled || _Shell::IsGameMinimized())
 		{
 			if (timeGlobals && timeGlobals->initialized)
 			{
@@ -129,10 +137,10 @@ float __cdecl main_time_update(bool use_static_time_increase, float static_time_
 				// TODO: in order to have real-time input and network updates, which is not a thing if we are forcing a fake time delta on each frame (basically what Hired Gun did to the game)
 				// we have to add interpolation
 
-				while (get_remaining_time_until_next_tick_in_seconds() > timeDeltaSec)
+				while (get_ticks_leftover_time() > timeDeltaSec)
 				{
 					int iMsSleep = 0;
-					float fMsSleep = (float)(get_remaining_time_until_next_tick_in_seconds() - timeDeltaSec) * 1000.f;
+					float fMsSleep = (float)(get_ticks_leftover_time() - timeDeltaSec) * 1000.f;
 
 					if ((int)fMsSleep > 0)
 						iMsSleep = (int)fMsSleep;
@@ -188,6 +196,7 @@ void OriginalFPSLimiter::ApplyPatches()
 
 		//NopFill(Memory::GetAddress(0x39DE1), 5);
 	}
+	Interpolation::ApplyPatches();
 
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&counterAtStartup);

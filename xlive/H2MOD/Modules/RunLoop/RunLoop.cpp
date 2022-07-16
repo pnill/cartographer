@@ -246,8 +246,7 @@ inline void defaultFrameLimiter() {
 	static const double thread_sleep_threshold = 3.0;
 	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
 
-	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit
-		|| H2Config_fps_limit <= 0
+	if (H2Config_fps_limit <= 0
 		|| _Shell::IsGameMinimized())
 	{
 		lastFrameSetting = H2Config_fps_limit;
@@ -724,10 +723,6 @@ void InitRunLoop() {
 
 		switch (experimental_rendering_mode)
 		{
-		default:
-		case _rendering_mode_none:
-			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
-			break;
 		case _rendering_mode_old:
 			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
 			UncappedFPS2::Init();
@@ -746,6 +741,10 @@ void InitRunLoop() {
 			OriginalFPSLimiter::ApplyPatches();
 			break;
 
+		case _rendering_mode_none:
+		default:
+			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+			break;
 		} // switch (experimental_rendering_mode)
 
 		// apply the code that fixes and determines if the amin loop should be throttled

@@ -258,6 +258,8 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
@@ -542,6 +544,7 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
+    <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
@@ -582,6 +585,8 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />

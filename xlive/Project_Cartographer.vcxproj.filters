@@ -148,6 +148,8 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -481,6 +483,9 @@
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.h" />
+    <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

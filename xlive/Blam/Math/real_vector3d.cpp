@@ -112,3 +112,11 @@ bool limit3d(void* a1, float limit)
 	*v1 = *v1 * ((1.0f / square_root(dot_product)) * limit);
 	return true;
 }
+
+void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, float fractional_tick, real_point3d* out)
+{
+	real_point3d tp1, tp2;
+	scale_vector3d(previous_point, 1.0f - fractional_tick, &tp1);
+	scale_vector3d(target_point, fractional_tick, &tp2);
+	add_vectors3d(&tp1, &tp2, out);
+}

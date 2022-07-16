@@ -17,7 +17,7 @@ s_data_array* s_player::GetArray()
 
 bool s_player::IndexValid(int playerIndex)
 {
-	return playerIndex >= 0 && playerIndex < ENGINE_PLAYER_MAX;
+	return playerIndex >= 0 && playerIndex < ENGINE_MAX_PLAYERS;
 }
 
 s_player* s_player::GetPlayer(int playerIndex)
@@ -88,9 +88,6 @@ datum s_player::GetPlayerUnitDatumIndex(int playerIndex)
 	if (!IndexValid(playerIndex))
 		return DATUM_INDEX_NONE;
 
-	if (DATUM_IS_NONE(GetPlayer(playerIndex)->unit_index))
-		return DATUM_INDEX_NONE;
-		
 	return GetPlayer(playerIndex)->unit_index;
 }
 

@@ -211,7 +211,7 @@ struct s_membership_information
 	s_peer_information peer_data[17]; // 0x88
 	int player_count; // 0x1254
 	DWORD players_active_mask; // 0x1258
-	s_player_information player_data[ENGINE_PLAYER_MAX]; // 0x125C
+	s_player_information player_data[ENGINE_MAX_PLAYERS]; // 0x125C
 	DWORD unk;
 };
 CHECK_STRUCT_SIZE(s_membership_information, 9328);
@@ -317,4 +317,3 @@ struct s_network_session
 CHECK_STRUCT_SIZE(s_network_session, 31624);
 CHECK_STRUCT_OFFSET(s_network_session, parameters[0].max_party_players, 0x4C80);
 #pragma pack(pop)
-

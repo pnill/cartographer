@@ -81,7 +81,7 @@ void Infection::sendTeamChange()
 				}
 
 				playerIndex++;
-			} while (playerIndex < ENGINE_PLAYER_MAX);
+			} while (playerIndex < ENGINE_MAX_PLAYERS);
 		}
 	}
 }

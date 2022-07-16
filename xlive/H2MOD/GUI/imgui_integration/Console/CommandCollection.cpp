@@ -374,7 +374,7 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 
 	output->OutputFmt(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
 
-	for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+	for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 	{
 		if (NetworkSession::PlayerIsActive(playerIdx))
 		{
