@@ -147,7 +147,7 @@ int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5,
 	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
 }
 
-typedef signed int(__cdecl *wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
+typedef signed int(__cdecl* wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
 wcsncpy_s_hook_t p_wcsncpy_s_hook;
 
 //lets you follow the call path of any string that is displayed (in a debugger)
@@ -158,8 +158,8 @@ signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a
 /* controller index aka local player index -> player index */
 datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
 {
-	typedef int(__cdecl* get_local_player_index)(int controller_index); 
-	auto p_get_local_player_index = reinterpret_cast<get_local_player_index>(Memory::GetAddress(0x5141D));
+	typedef int(__cdecl* get_local_player_index_t)(int controller_index); 
+	auto p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
 	return p_get_local_player_index(controller_index); 
 }
 
@@ -209,7 +209,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 		datum object_idx = Engine::Objects::object_new(&nObject);
 
-		if (bReset == true)
+		if (bReset)
 			Engine::Unit::remove_equipment(unit_datum);
 
 		Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
@@ -288,11 +288,11 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	if (unit_object != NULL)
 	{
 		// not sure what these flags are, but this is called when picking up grenades
-		typedef void(__cdecl* entity_set_unk_flags)(datum objectIndex, int flags);
-		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags>(0x1B6685, 0x1B05B5);
+		typedef void(__cdecl* entity_set_unk_flags_t)(datum objectIndex, int flags);
+		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
 
-		typedef void(__cdecl* unit_add_grenade_to_inventory_send)(datum unitDatumIndex, datum equipamentTagIndex);
-		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send>(0x1B6F12, 0x1B0E42);
+		typedef void(__cdecl* unit_add_grenade_to_inventory_send_t)(datum unitDatumIndex, datum equipamentTagIndex);
+		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
 		if (!s_game_globals::game_is_predicted())
@@ -479,15 +479,14 @@ void H2MOD::set_local_rank(BYTE rank)
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
-	int(_cdecl* AutoHandler)(datum, datum);
-	AutoHandler = (int(_cdecl*)(datum, datum))Memory::GetAddress(0x57AA5, 0x5FF9D);
+	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
 
 	int result = 0;
 
 	bool handled = CustomVariantHandler::OnAutoPickupHandler(ExecTime::_preEventExec, player_datum, object_datum);
 
 	if (!handled)
-		result = AutoHandler(player_datum, object_datum);
+		result = p_auto_handle(player_datum, object_datum);
 
 	CustomVariantHandler::OnAutoPickupHandler(ExecTime::_postEventExec, player_datum, object_datum);
 
@@ -661,8 +660,8 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 void H2MOD::set_local_team_index(int local_player_index, int team_index)
 {
 	// we only use player index 0 due to no splitscreen support but whatever
-	typedef void(__cdecl update_player_profile)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile*>(0x206A97);
+	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
+	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
 
 	p_change_local_team(local_player_index, team_index);
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
@@ -670,8 +669,8 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 
 void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
 {
-	typedef void(__cdecl update_player_profile)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile*>(0x206A97);
+	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
+	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
 	unsigned long low = tag & 0xFFFFFFFF;
 	*(unsigned long*)Memory::GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
 	p_update_player_profile(local_player_index);
@@ -799,8 +798,8 @@ void H2MOD::team_player_indicator_visibility(bool toggle)
 
 void __cdecl game_mode_engine_draw_team_indicators()
 {
-	typedef void(__cdecl* game_mode_engine_draw_team_indicators_def)();
-	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_def>(0x6AFA4);
+	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)();
+	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
 
 	if (h2mod->drawTeamIndicators)
 		p_game_mode_engine_draw_team_indicators();
@@ -819,8 +818,8 @@ short __cdecl get_enabled_teams_flags(s_network_session* session)
 		return default_teams_enabled_flags;
 }
 
-typedef int(__cdecl* getnexthillindex)(int previousHill);
-getnexthillindex p_get_next_hill_index;
+typedef int(__cdecl* get_next_hill_index_t)(int previousHill);
+get_next_hill_index_t p_get_next_hill_index;
 signed int __cdecl get_next_hill_index(int previousHill)
 {
 	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
