@@ -3,6 +3,30 @@
 #include "Shell.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+int instanceNumber = 0;
+static LARGE_INTEGER startupCounter;
+
+int _Shell::GetInstanceId() {
+	return instanceNumber;
+}
+
+static void InitializeInstanceId() {
+	addDebugText("Determining Process Instance Number.");
+	HANDLE mutex;
+	DWORD lastErr;
+	do {
+		instanceNumber++;
+		wchar_t mutexName[64];
+		swprintf(mutexName, ARRAYSIZE(mutexName), (Memory::IsDedicatedServer() ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
+		mutex = CreateMutexW(0, TRUE, mutexName);
+		lastErr = GetLastError();
+		if (lastErr == ERROR_ALREADY_EXISTS) {
+			CloseHandle(mutex);
+		}
+	} while (lastErr == ERROR_ALREADY_EXISTS);
+	addDebugText("You are Instance #%d.", instanceNumber);
+}
+
 long long _Shell::QPCToTime(long long denominator, LARGE_INTEGER counter, LARGE_INTEGER freq)
 {
 	long long _Whole, _Part;
@@ -45,6 +69,19 @@ bool __cdecl _Shell::IsGameMinimized()
 		return false;
 
 	return p_game_is_minimized();
+}
+
+LARGE_INTEGER _Shell::QPCGetStartupCounter()
+{
+	return startupCounter;
+}
+
+void _Shell::Initialize()
+{
+	// get QPC time counter at startup
+	QueryPerformanceCounter(&startupCounter);
+	// initialize game instance Id
+	InitializeInstanceId();
 }
 
 void _Shell::OpenMessageBox(HWND hWnd, UINT uType, const char* caption,  const char* format, ...)

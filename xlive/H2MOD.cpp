@@ -17,6 +17,7 @@
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
@@ -52,8 +53,6 @@
 #endif
 
 H2MOD* h2mod = new H2MOD();
-
-extern int H2GetInstanceId();
 
 bool b_H2X = false;
 bool b_XboxTick = false;
@@ -1212,7 +1211,7 @@ void H2MOD::Initialize()
 		ImGuiHandler::WeaponOffsets::Initialize();
 		//ObserverMode::Initialize();
 		TEST_N_DEF(PC3);
-		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
+		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();

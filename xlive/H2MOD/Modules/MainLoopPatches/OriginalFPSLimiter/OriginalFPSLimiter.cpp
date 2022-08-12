@@ -6,6 +6,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
@@ -15,12 +16,8 @@
 #include "H2MOD\GUI\imgui_integration\Console\ImGui_ConsoleImpl.h"
 
 extern bool b_XboxTick;
-static LARGE_INTEGER frequency;
-static LARGE_INTEGER counterAtStartup;
 
 bool OriginalFPSLimiter::fps_limiter_enabled = false;
-
-static __int64 network_time;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
@@ -84,96 +81,101 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 #endif // USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
 }
 
-__int64 get_time_delta_msec()
+float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta)
 {
-	return network_time;
-}
+	// original code
+	/*
+	dt = p_compute_time_delta(static_time_step, static_time_delta);
 
-static LARGE_INTEGER lastCounter;
-void __cdecl reset_time()
-{
-	QueryPerformanceCounter(&lastCounter);
-	network_time = _Shell::QPCToTime(std::milli::den, lastCounter, frequency);
-	*Memory::GetAddress<bool*>(0x479EA0) = true;
-}
+	QueryPerformanceCounter(&currentCounter);
+	_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
+	network_time = (_currentTimeMsec - _timeAtStartupMsec);
+	*/
 
-float __cdecl main_time_update(bool use_static_time_increase, float static_time_delta)
-{
+	//
+	// TODO cleanup
+	//
+
 	typedef float(__cdecl* compute_time_delta_t)(bool, float);
 	auto p_compute_time_delta = Memory::GetAddress<compute_time_delta_t>(0x28814);
 
-	LARGE_INTEGER currentCounter;
+	typedef void(__cdecl* translate_windows_messages_t)();
+	auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages_t>(0x7902);
+
+	int game_time;
+	float dtSec = 0.0f;
+	LARGE_INTEGER currentCounter, counterFrq; 
 	long long _currentTimeMsec, _timeAtStartupMsec;
-	double _currentTimeSec, _lastTimeSec, _timeAtStartupSec;
+	
+	s_main_time_globals* main_time_globals;
 
-	float timeDeltaSec = 0.0f;
+	main_time_globals = s_main_time_globals::get();
+	game_time = s_game_globals::game_is_in_progress() ? time_globals::get_game_time() : 0;
 
-	_timeAtStartupSec = _Shell::QPCToSecondsPrecise(counterAtStartup, frequency);
-	_timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, counterAtStartup, frequency);
+	QueryPerformanceFrequency(&counterFrq);
+	_timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
 
-	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit)
+	// TranslateMessage()
+	// TODO move to function and cleanup
+	p_translate_windows_messages();
+
+	if (fixed_time_step)
 	{
-		typedef void(__cdecl* translate_windows_messages_t)();
-		auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages_t>(0x7902);
-
-		// TranslateMessage()
-		p_translate_windows_messages();
-		time_globals* timeGlobals = time_globals::get();
-
-		// TODO move to function and cleanup
-
-		QueryPerformanceCounter(&currentCounter);
-		_currentTimeSec = _Shell::QPCToSecondsPrecise(currentCounter, frequency);
-		_lastTimeSec = _Shell::QPCToSecondsPrecise(lastCounter, frequency);
-
-		timeDeltaSec = _currentTimeSec - _lastTimeSec;
-
-		if (OriginalFPSLimiter::fps_limiter_enabled || _Shell::IsGameMinimized())
-		{
-			if (timeGlobals && timeGlobals->initialized)
-			{
-				// what this code does is limit the FPS and makes sure every frame a tick has been executed, to prevent stale rendering (or without game state updated)
-				// which causes stuttering and jagged movement due to fast execution time on newer PCs
-				// TODO: in order to have real-time input and network updates, which is not a thing if we are forcing a fake time delta on each frame (basically what Hired Gun did to the game)
-				// we have to add interpolation
-
-				while (get_ticks_leftover_time() > timeDeltaSec)
-				{
-					int iMsSleep = 0;
-					float fMsSleep = (float)(get_ticks_leftover_time() - timeDeltaSec) * 1000.f;
-
-					if ((int)fMsSleep > 0)
-						iMsSleep = (int)fMsSleep;
-
-					Sleep(iMsSleep);
-
-					QueryPerformanceCounter(&currentCounter);
-					_currentTimeSec = _Shell::QPCToSecondsPrecise(currentCounter, frequency);
-
-					timeDeltaSec = (double)(_currentTimeSec - _lastTimeSec);
-				}
-			}
-		}
-
-		// no need to update counter here
-		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-		network_time = (_currentTimeMsec - _timeAtStartupMsec);
-
-		lastCounter = currentCounter;
-
-		timeDeltaSec = blam_min(timeDeltaSec, 10.f);
+		dtSec = fixed_time_delta;
 	}
 	else
 	{
-		timeDeltaSec = p_compute_time_delta(use_static_time_increase, static_time_delta);
-		
 		QueryPerformanceCounter(&currentCounter);
-		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-		network_time = (_currentTimeMsec - _timeAtStartupMsec);
+		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+		dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
 	}
 
-	//LOG_TRACE_GAME("compute_time_delta() - timeDeltaSeconds: {}", timeDeltaSeconds);
-	return timeDeltaSec;
+	if (OriginalFPSLimiter::fps_limiter_enabled || _Shell::IsGameMinimized())
+	{
+		if (time_globals::available()
+			&& !fixed_time_step) // don't run the frame limiter when time step is fixed, because the code doesn't support it
+		{
+			// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
+			// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
+			while (get_ticks_leftover_time() > dtSec)
+			{
+				int iMsSleep = 0;
+				float fMsSleep = (float)(get_ticks_leftover_time() - dtSec) * 1000.f;
+
+				if ((int)fMsSleep > 0)
+					iMsSleep = (int)fMsSleep;
+
+				// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
+				// Sleep is not precise since Windows is not a RTOS
+				Sleep(iMsSleep);
+
+				QueryPerformanceCounter(&currentCounter);
+				_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+				dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+			}
+		}
+		else
+		{
+			Sleep(15u);
+
+			QueryPerformanceCounter(&currentCounter);
+			_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+			dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+		}
+	}
+
+	dtSec = blam_min(dtSec, 10.f);
+	QueryPerformanceCounter(&currentCounter);
+	_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+	if (fixed_time_delta)
+		_currentTimeMsec = main_time_globals->last_time_ms + fixed_time_delta;
+	main_time_globals->last_time_ms = _currentTimeMsec;
+	main_time_globals->game_time_passed = game_time;
+	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
+	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
+
+	//LOG_TRACE_GAME("main_time_update() - timeDeltaSeconds: {}", timeDeltaSeconds);
+	return dtSec;
 }
 
 void OriginalFPSLimiter::ApplyPatches()
@@ -182,10 +184,8 @@ void OriginalFPSLimiter::ApplyPatches()
 	{
 		//NopFill(Memory::GetAddress(0x2728E7), 5);
 
-		PatchCall(Memory::GetAddress(0x39BE3), main_time_update);
-		PatchCall(Memory::GetAddress(0x39C0D), main_time_update);
-		WriteJmpTo(Memory::GetAddress(0x1B3C5C), get_time_delta_msec);
-		WriteJmpTo(Memory::GetAddress(0x286D9), reset_time);
+		PatchCall(Memory::GetAddress(0x39BE3), main_time_update_hook);
+		PatchCall(Memory::GetAddress(0x39C0D), main_time_update_hook);
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
 		PatchCall(Memory::GetAddress(0x39D04), compute_target_tick_count);
@@ -197,8 +197,5 @@ void OriginalFPSLimiter::ApplyPatches()
 		//NopFill(Memory::GetAddress(0x39DE1), 5);
 	}
 	Interpolation::ApplyPatches();
-
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&counterAtStartup);
 }
 

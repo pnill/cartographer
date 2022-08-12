@@ -12,6 +12,11 @@ time_globals* time_globals::get()
 	return *Memory::GetAddress<time_globals**>(0x4C06E4, 0x4CF0EC);
 }
 
+int time_globals::get_game_time()
+{
+	return get()->tick_count;
+}
+
 float time_globals::get_seconds_per_tick()
 {
 	return get()->seconds_per_tick;
@@ -40,4 +45,9 @@ float time_globals::get_ticks_difference_real()
 float time_globals::get_ticks_fraction_leftover()
 {
 	return get()->game_ticks_leftover;
+}
+
+bool time_globals::available()
+{
+	return get() && get()->initialized;
 }

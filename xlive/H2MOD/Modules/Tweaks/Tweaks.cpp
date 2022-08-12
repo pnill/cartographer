@@ -192,22 +192,20 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 	}
 }
 
-static LARGE_INTEGER startupCounter;
 DWORD WINAPI timeGetTime_hook()
 {
 	LARGE_INTEGER currentCounter, frequency;
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&currentCounter);
 
-	currentCounter.QuadPart = currentCounter.QuadPart - startupCounter.QuadPart;
+	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
 	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 	return (DWORD)timeNow;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 
-void initializeTimeHooks()
+static void InitializeTimeHooks()
 {
-	QueryPerformanceCounter(&startupCounter);
 	WritePointer(Memory::GetAddressRelative(0x79B568, 0x752540), (void*)timeGetTime_hook);
 }
 
@@ -275,7 +273,7 @@ void InitH2Tweaks() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	initializeTimeHooks();
+	InitializeTimeHooks();
 	mapManager->ApplyHooks();
 
 	if (Memory::IsDedicatedServer()) {

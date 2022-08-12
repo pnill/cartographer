@@ -167,11 +167,11 @@ void GSMainLoop() {
 			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 		}
 
-		if (H2GetInstanceId() > 1) {
+		if (_Shell::GetInstanceId() > 1) {
 			wchar_t titleMod[256];
 			wchar_t titleOriginal[256];
 			GetWindowText(H2hWnd, titleOriginal, 256);
-			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
+			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, _Shell::GetInstanceId());
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}

@@ -17,7 +17,9 @@ struct time_globals
 	float field_1C;
 	float field_20;
 
+	static bool available();
 	static time_globals* get();
+	static int get_game_time();
 	static float get_seconds_per_tick();
 	static float seconds_to_ticks_real(float s);
 	static int seconds_to_ticks_round(float s);

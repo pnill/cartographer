@@ -51,29 +51,6 @@ wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
 
-int instanceNumber = 0;
-
-int H2GetInstanceId() {
-	return instanceNumber;
-}
-
-void InitInstanceNumber() {
-	addDebugText("Determining Process Instance Number.");
-	HANDLE mutex;
-	DWORD lastErr;
-	do {
-		instanceNumber++;
-		wchar_t mutexName[32];
-		swprintf(mutexName, ARRAYSIZE(mutexName), (H2IsDediServer ? L"Halo2Server%d" : L"Halo2Player%d"), instanceNumber);
-		mutex = CreateMutexW(0, TRUE, mutexName);
-		lastErr = GetLastError();
-		if (lastErr == ERROR_ALREADY_EXISTS) {
-			CloseHandle(mutex);
-		}
-	} while (lastErr == ERROR_ALREADY_EXISTS);
-	addDebugText("You are Instance #%d.", instanceNumber);
-}
-
 void PostH2Config() {
 
 	wchar_t mutexName2[256];
@@ -94,16 +71,16 @@ bool configureXinput() {
 		MessageBoxA(NULL, message.c_str(), "Xinput config error!", MB_OK);
 	};
 
-	if (!H2IsDediServer) {
-		if (H2GetInstanceId() > 1) {
-			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", H2GetInstanceId());
+	if (!Memory::IsDedicatedServer()) {
+		if (_Shell::GetInstanceId() > 1) {
+			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", _Shell::GetInstanceId());
 			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
 
 			WritePointer(H2BaseAddr + 0x8AD28, xinput_path);
 
 			char xinputName[_MAX_PATH];
 			char xinputdir[_MAX_PATH];
-			sprintf(xinputdir, "xinput/p%02d", H2GetInstanceId());
+			sprintf(xinputdir, "xinput/p%02d", _Shell::GetInstanceId());
 			sprintf(xinputName, "%s/xinput9_1_0.dll", xinputdir);
 
 			/* Creates a directory and displays error if it fails */
@@ -183,7 +160,7 @@ bool configureXinput() {
 				}
 
 				int len_to_write = 2;
-				BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (H2GetInstanceId() / 10), 0x30 + (H2GetInstanceId() % 10), 0x30 + (H2GetInstanceId() % 10) };
+				BYTE assmXinputDuraznoNameEdit[] = { 0x30 + (_Shell::GetInstanceId() / 10), 0x30 + (_Shell::GetInstanceId() % 10), 0x30 + (_Shell::GetInstanceId() % 10) };
 				if (xinput_unicode[xinput_index]) {
 					assmXinputDuraznoNameEdit[1] = 0x00;
 					len_to_write = 3;
@@ -278,8 +255,8 @@ CRITICAL_SECTION log_section;
 // by default useAppDataLocalPath is set to true, if not specified
 std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath) {
 	std::wstring filename = (useAppDataLocalPath ? H2AppDataLocal : L"");
-	std::wstring processName(H2IsDediServer ? L"H2Server" : L"Halo2Client");
-	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(H2GetInstanceId()));
+	std::wstring processName(Memory::IsDedicatedServer() ? L"H2Server" : L"Halo2Client");
+	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(_Shell::GetInstanceId()));
 	filename += folders;
 	// try making logs directory
 	if (!filesystem::create_directories(filename) && !filesystem::is_directory(filesystem::status(filename)))
@@ -311,7 +288,7 @@ void InitH2Startup() {
 	H2BaseAddr = Memory::GetAddress();
 	H2IsDediServer = Memory::IsDedicatedServer();
 
-	InitInstanceNumber();
+	_Shell::Initialize();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
@@ -336,7 +313,7 @@ void InitH2Startup() {
 	// after localAppData filepath initialized, we can initialize OnScreenDebugLog
 	InitOnScreenDebugText();
 
-	if (H2IsDediServer) {
+	if (Memory::IsDedicatedServer()) {
 		addDebugText("Process is Dedi-Server");
 	}
 	else {
@@ -405,7 +382,7 @@ void InitH2Startup2() {
 
 	// initialize default data to run under LAN
 	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
-	if (H2IsDediServer)
+	if (Memory::IsDedicatedServer())
 	{
 		addDebugText("Signing in dedicated server locally.");
 
