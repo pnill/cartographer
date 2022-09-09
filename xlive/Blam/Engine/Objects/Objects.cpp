@@ -1,14 +1,15 @@
 #include "stdafx.h"
 
-#include "Engine.h"
-#include "H2MOD.h"
+#include "Objects.h"
+
+#include "Util\Hooks\Hook.h"
+
+#include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h"
-#include "Blam\Engine\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "Util\Hooks\Hook.h"
 
 namespace Engine::Objects
 {
@@ -196,6 +197,23 @@ namespace Engine::Objects
 		// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 		PatchCall(Memory::GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 		p_set_unit_color_data = Memory::GetAddress<set_unit_color_data_t>(0x6E5C3, 0x6D1BF);
+	}
+
+	int object_get_count()
+	{
+		s_data_iterator object_it(get_objects_header());
+		return object_it.get_data_count();
+	}
+
+	int object_count_from_iter()
+	{
+		s_data_iterator object_it(get_objects_header());
+		int count = 0;
+		while (object_it.get_next_datum())
+		{
+			count++;
+		}
+		return count;
 	}
 #pragma endregion
 }

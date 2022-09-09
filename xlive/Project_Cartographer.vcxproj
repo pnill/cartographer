@@ -236,9 +236,10 @@
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
+    <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
-    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\AdvancedSettings.cpp" />
@@ -258,8 +259,9 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
@@ -565,6 +567,7 @@
     <ClInclude Include="Blam\Math\integer_math.h" />
     <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
+    <ClInclude Include="Blam\Math\real_matrix4x3.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
@@ -585,8 +588,9 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />

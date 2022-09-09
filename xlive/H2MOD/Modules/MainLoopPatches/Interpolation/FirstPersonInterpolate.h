@@ -1,6 +1,6 @@
 #pragma once
 
-namespace CameraInterpolate
+namespace FirstPersonInterpolate
 {
 	void PreGameTickLocalPlayersUpdate();
 	void PostGameTickLocalPlayersUpdate();

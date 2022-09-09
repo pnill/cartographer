@@ -110,7 +110,7 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
-    <ClCompile Include="H2MOD\Engine\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -148,8 +148,10 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
+    <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -483,9 +485,11 @@
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\CameraInterpolate.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
     <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
+    <ClInclude Include="Blam\Math\real_matrix4x3.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

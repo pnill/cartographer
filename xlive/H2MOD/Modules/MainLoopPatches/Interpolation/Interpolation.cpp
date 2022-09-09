@@ -8,7 +8,8 @@
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\Engine\Players\LocalPlayers.h"
 
-#include "CameraInterpolate.h"
+#include "FirstPersonInterpolate.h"
+#include "ObjectInterpolate.h"
 
 namespace Interpolation
 {
@@ -16,27 +17,37 @@ namespace Interpolation
 	bool game_state_updating = false;
 	bool ticks_executed = false;
 	float effect_update_accumulator = 0.0f;
+	float game_frame_accumulator = 0.0f;
 
 	void PreGameTick()
 	{
+		FirstPersonInterpolate::PreGameTickLocalPlayersUpdate();
+		ObjectInterpolate::PreGameTickLocalPlayersUpdate();
 		game_state_updating = true;
-		CameraInterpolate::PreGameTickLocalPlayersUpdate();
 	}
 
 	void PostGameTick()
 	{
 		game_state_updating = false;
-		CameraInterpolate::PostGameTickLocalPlayersUpdate();
+		FirstPersonInterpolate::PostGameTickLocalPlayersUpdate();
+		ObjectInterpolate::PostGameTickLocalPlayersUpdate();
 	}
 
 	float GetInterpolateTime()
 	{
-		return time_globals::get_ticks_fraction_leftover();
+		return blam_max(0.0f, blam_min(time_globals::get_ticks_fraction_leftover(), 1.0f));
+	}
+
+	// TODO
+	bool ShouldInterpolate()
+	{
+		return enabled && !game_state_updating;
 	}
 
 	void Reset()
 	{
-		CameraInterpolate::Reset();
+		FirstPersonInterpolate::Reset();
+		ObjectInterpolate::Reset();
 	}
 
 	void __cdecl game_update_hook(int target_ticks, float* a2)
@@ -62,6 +73,21 @@ namespace Interpolation
 		}
 	}
 
+	void __cdecl game_frame_hook(float dt)
+	{
+		typedef void(__cdecl* game_frame_t)(float);
+		auto p_game_frame = Memory::GetAddressRelative<game_frame_t>(0x448CDC);
+
+		game_frame_accumulator += dt;
+		if (ticks_executed)
+		{
+			p_game_frame(game_frame_accumulator);
+			game_frame_accumulator = 0.0f;
+		}
+
+		*Memory::GetAddressRelative<double*>(0x8E6968) += dt;
+	}
+
 	void __cdecl game_tick_hook()
 	{
 		typedef void(__cdecl* game_tick_t)();
@@ -77,11 +103,15 @@ namespace Interpolation
 		if (Memory::IsDedicatedServer())
 			return;
 
-		CameraInterpolate::ApplyPatches();
+		FirstPersonInterpolate::ApplyPatches();
+		ObjectInterpolate::ApplyPatches();
 
 		// fix effects at uncapped FPS
 		PatchCall(Memory::GetAddressRelative(0x439D2A), game_update_hook);
-		PatchCall(Memory::GetAddressRelative(0x448D5C), effects_update_hook);
+		// PatchCall(Memory::GetAddressRelative(0x448D5C), effects_update_hook);
+		PatchCall(Memory::GetAddressRelative(0x439D45), game_frame_hook);
 		PatchCall(Memory::GetAddressRelative(0x44A5E8), game_tick_hook);
+
+		NopFill(Memory::GetAddressRelative(0x448D68), 5);
 	}
 }

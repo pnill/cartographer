@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "CameraInterpolate.h"
+#include "FirstPersonInterpolate.h"
 #include "Interpolation.h"
 
 #include "Util\Hooks\Hook.h"
@@ -10,7 +10,7 @@
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Players\LocalPlayers.h"
 
-namespace CameraInterpolate
+namespace FirstPersonInterpolate
 {
 	namespace
 	{
@@ -45,27 +45,42 @@ namespace CameraInterpolate
 
 	void PreGameTickLocalPlayersUpdate()
 	{
-		if (!Interpolation::enabled)
+		if (!Interpolation::ShouldInterpolate())
+		{
+			Reset(); // just reset
 			return;
+		}
 
 		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
+
+			// check if we actually executed any ticks
+			if (!(time_globals::get_game_time() > 0))
+			{
+				Reset();
+				break;
+			}
+
 			if (!local_user_has_player(i))
 			{
 				ResetPlayer(i);
 				continue;
 			}
 
-			// if we got this far, the local player/user must control an unit
 			player_datum = local_user_get_player_idx(i);
 			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 			if (DATUM_IS_NONE(player_unit_datum))
+			{
+				ResetPlayer(i);
 				continue;
+			}
 
+			// if we got this far, the local player/user must control an unit
 			// pretick, update previous camera position with what's currently in the game's state before updating it (i.e executing a tick)
+			// TODO FP weapon interpolation
 			unit_get_camera_position(player_unit_datum, &camera_state->previous_position);
 			camera_state->unit_idx = player_unit_datum;
 			camera_state->player_idx = player_datum;
@@ -75,11 +90,8 @@ namespace CameraInterpolate
 
 	void PostGameTickLocalPlayersUpdate()
 	{
-		if (!Interpolation::enabled)
-		{
-			Reset(); // just reset
+		if (!Interpolation::ShouldInterpolate())
 			return;
-		}
 
 		// basic checks, verify if player died, if unit has changed etc. after a game tick update
 		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
@@ -107,8 +119,7 @@ namespace CameraInterpolate
 
 	void UnitGetInterpolatedCameraPosition(datum unit_idx, real_vector3d* out_cam_position)
 	{
-		if (Interpolation::game_state_updating
-			|| !Interpolation::enabled)
+		if (!Interpolation::ShouldInterpolate())
 		{
 			unit_get_camera_position(unit_idx, out_cam_position);
 			return;
@@ -163,7 +174,10 @@ namespace CameraInterpolate
 
 	void ApplyPatches()
 	{
+		// camera interpolation
 		PatchCall(Memory::GetAddress(0xCD64F), unit_get_camera_position_hook);
+
+		// first person weapons interpolation
 	}
 }
 

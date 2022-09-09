@@ -2,7 +2,7 @@
 
 // NOTE: DO NOT USE THIS IN DataTypes headers
 // to avoid include recursion
-// just simply include the headers you need in the data type header
+// simply just include the headers you need in the blam data type header
 // and use this header for external usage
 
 #include "StringID.h"
