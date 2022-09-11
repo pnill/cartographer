@@ -8,7 +8,7 @@ struct s_bitflags
 	T* m_flags;
 
 	// only power of 2 sized types
-	// static_assert(sizeof(T) > 0 && sizeof(T) - (sizeof(T) - 1) == 0);
+	static_assert(sizeof(T) > 0 && (sizeof(T) & (sizeof(T) - 1)) == 0);
 
 	bool test_bit(int index)
 	{
