@@ -399,7 +399,7 @@ void MapManager::MapDownloadUpdateTick()
 		}
 		else
 		{
-			it++;
+			++it;
 		}
 	}
 }

@@ -552,15 +552,10 @@ bool __thiscall s_custom_map_data::entry_is_duplicate(const s_custom_map_entry* 
 
 	bool duplicate = false;
 
-	if (find_matching_entries_by_file_path(entry->file_path, 0, 0) > 0u)
+	if (find_matching_entries_by_file_path(entry->file_path, 0, 0) > 0u
+		|| find_matching_entries_by_map_name_and_hash(entry->map_name, entry->map_sha256_hash, 0, 0) > 0u)
 	{
 		duplicate = true;
-	}
-
-	if (!duplicate)
-	{
-		if (find_matching_entries_by_map_name_and_hash(entry->map_name, entry->map_sha256_hash, 0, 0) > 0u)
-			duplicate = true;
 	}
 
 	LeaveCriticalSection(custom_map_lock);
