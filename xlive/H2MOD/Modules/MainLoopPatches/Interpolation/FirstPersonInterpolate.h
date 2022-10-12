@@ -2,8 +2,8 @@
 
 namespace FirstPersonInterpolate
 {
-	void PreGameTickLocalPlayersUpdate();
-	void PostGameTickLocalPlayersUpdate();
+	void PreGameTickUpdateLocalPlayers();
+	void PostGameTickUpdateLocalPlayers();
 	void Reset();
 	void ApplyPatches();
 }

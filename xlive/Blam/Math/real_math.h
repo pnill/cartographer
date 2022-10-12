@@ -115,7 +115,7 @@ union real_vector3d
 	}
 
 	// scalar multiplication
-	BLAM_MATH_INL real_vector3d operator*(const float& scalar) const
+	BLAM_MATH_INL real_vector3d operator*(const float scalar) const
 	{
 		real_vector3d v;
 		v.i = this->i * scalar;
@@ -124,7 +124,7 @@ union real_vector3d
 		return v;
 	}
 
-	BLAM_MATH_INL real_vector3d operator/(const float& scalar) const
+	BLAM_MATH_INL real_vector3d operator/(const float scalar) const
 	{
 		real_vector3d v;
 		v.i = this->i / scalar;

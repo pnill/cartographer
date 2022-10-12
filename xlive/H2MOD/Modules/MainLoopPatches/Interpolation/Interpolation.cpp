@@ -21,16 +21,16 @@ namespace Interpolation
 
 	void PreGameTick()
 	{
-		FirstPersonInterpolate::PreGameTickLocalPlayersUpdate();
-		ObjectInterpolate::PreGameTickLocalPlayersUpdate();
+		FirstPersonInterpolate::PreGameTickUpdateLocalPlayers();
+		ObjectInterpolate::PreGameTickUpdate();
 		game_state_updating = true;
 	}
 
 	void PostGameTick()
 	{
 		game_state_updating = false;
-		FirstPersonInterpolate::PostGameTickLocalPlayersUpdate();
-		ObjectInterpolate::PostGameTickLocalPlayersUpdate();
+		FirstPersonInterpolate::PostGameTickUpdateLocalPlayers();
+		ObjectInterpolate::PostGameTickUpdate();
 	}
 
 	float GetInterpolateTime()

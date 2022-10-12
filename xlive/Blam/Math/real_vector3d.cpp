@@ -100,16 +100,14 @@ float normalize3d(real_vector3d* v1)
 	// return Memory::GetAddressRelative<float(__cdecl*)(real_vector3d*)>(0x429359, 0x4273B0)(v1);
 }
 
-bool limit3d(void* a1, float limit)
+bool limit3d(real_vector3d* v, float limit)
 {
-	real_vector3d* v1 = (real_vector3d*)a1;
-
-	float dot_product = dot_product3d(v1, v1);
+	float dot_product = dot_product3d(v, v);
 
 	if (dot_product <= pow(limit, 2.0f))
 		return false;
 
-	*v1 = *v1 * ((1.0f / square_root(dot_product)) * limit);
+	*v = *v * ((1.0f / square_root(dot_product)) * limit);
 	return true;
 }
 

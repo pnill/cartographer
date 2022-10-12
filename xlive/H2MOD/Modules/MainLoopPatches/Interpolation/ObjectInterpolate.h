@@ -4,8 +4,8 @@
 
 namespace ObjectInterpolate
 {
-	void PreGameTickLocalPlayersUpdate();
-	void PostGameTickLocalPlayersUpdate();
+	void PreGameTickUpdate();
+	void PostGameTickUpdate();
 	void Reset();
 	void ResetObject(datum object_idx);
 	void ApplyPatches();

@@ -43,7 +43,7 @@ namespace FirstPersonInterpolate
 		}
 	}
 
-	void PreGameTickLocalPlayersUpdate()
+	void PreGameTickUpdateLocalPlayers()
 	{
 		if (!Interpolation::ShouldInterpolate())
 		{
@@ -88,7 +88,7 @@ namespace FirstPersonInterpolate
 		}
 	}
 
-	void PostGameTickLocalPlayersUpdate()
+	void PostGameTickUpdateLocalPlayers()
 	{
 		if (!Interpolation::ShouldInterpolate())
 			return;

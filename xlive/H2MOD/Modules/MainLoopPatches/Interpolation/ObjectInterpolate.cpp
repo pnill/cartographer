@@ -50,7 +50,7 @@ namespace ObjectInterpolate
 		datum object_last_datum_idx;
 	}
 
-	void PreGameTickLocalPlayersUpdate()
+	void PreGameTickUpdate()
 	{
 		if (!Interpolation::ShouldInterpolate())
 			return;
@@ -92,7 +92,7 @@ namespace ObjectInterpolate
 		}
 	}
 
-	void PostGameTickLocalPlayersUpdate()
+	void PostGameTickUpdate()
 	{
 		if (!Interpolation::ShouldInterpolate())
 		{

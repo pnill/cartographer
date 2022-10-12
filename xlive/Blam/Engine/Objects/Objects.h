@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\DataArray\DataArray.h"
