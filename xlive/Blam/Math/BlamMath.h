@@ -19,6 +19,6 @@ inline static auto blam_min(T a, U b) {
 // decimal part <0.5, floor
 // decimal part >0.5, ceil
 inline static auto blam_ticks_real_to_integer(float ticks_real) {
-	auto tick_val_integer = static_cast<int>(ticks_real + (ticks_real > 0.0f ? 0.5f : -0.5f));
+	auto tick_val_integer = static_cast<int>(ticks_real + (ticks_real < 0.0f ? -0.5f : 0.5f));
 	return tick_val_integer;
 }

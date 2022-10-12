@@ -616,8 +616,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 
 				m_melee_start_origin = *player_origin;
 				m_has_target = true;
-				m_maximum_counter = m_weapon_is_sword ? 7 : 1;
-				m_maximum_counter += (int)lunge_tick_count_2;
+				m_maximum_counter = (int)((float)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2);
 
 				if (unk_distance1 > k_valid_real_epsilon)
 				{
