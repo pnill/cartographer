@@ -3,6 +3,8 @@
 #include "FirstPersonInterpolate.h"
 #include "Interpolation.h"
 
+#if GAME_FRAME_INTERPOLATOR_ENABLED
+
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Math\BlamMath.h"
@@ -181,3 +183,4 @@ namespace FirstPersonInterpolate
 	}
 }
 
+#endif

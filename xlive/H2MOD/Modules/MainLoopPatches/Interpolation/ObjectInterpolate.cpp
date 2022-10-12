@@ -2,8 +2,11 @@
 
 #include "ObjectInterpolate.h"
 
-#include "Util\Hooks\Hook.h"
 #include "Interpolation.h"
+
+#if GAME_FRAME_INTERPOLATOR_ENABLED
+
+#include "Util\Hooks\Hook.h"
 
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\Objects\Objects.h"
@@ -178,3 +181,5 @@ namespace ObjectInterpolate
 		PatchCall(Memory::GetAddressRelative(0x59650A), object_get_node_matrices_hook);
 	}
 }
+
+#endif

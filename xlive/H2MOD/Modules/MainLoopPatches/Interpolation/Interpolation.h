@@ -1,5 +1,7 @@
 #pragma once
 
+#define GAME_FRAME_INTERPOLATOR_ENABLED false
+
 namespace Interpolation
 {
 	extern bool enabled;

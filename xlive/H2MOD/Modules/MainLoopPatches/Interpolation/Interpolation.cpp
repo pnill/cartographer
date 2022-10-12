@@ -2,6 +2,8 @@
 
 #include "Interpolation.h"
 
+#if GAME_FRAME_INTERPOLATOR_ENABLED
+
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Math\BlamMath.h"
@@ -115,3 +117,5 @@ namespace Interpolation
 		NopFill(Memory::GetAddressRelative(0x448D68), 5);
 	}
 }
+
+#endif
