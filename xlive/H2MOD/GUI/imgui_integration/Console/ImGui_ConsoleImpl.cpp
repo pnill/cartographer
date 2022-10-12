@@ -30,6 +30,7 @@ Console::Console() :
 	m_selected_tab_dirty = false;
 	memset(m_input_buffer, 0, sizeof(m_input_buffer));
 
+	m_output.reserve(CONSOLE_TABS);
 	for (int i = 0; i < CONSOLE_TABS; i++)
 	{
 		m_output.emplace_back(256, MAX_CONSOLE_INPUT_BUFFER);

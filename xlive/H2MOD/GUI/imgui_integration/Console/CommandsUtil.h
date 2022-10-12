@@ -125,11 +125,6 @@ public:
 	{
 	}
 
-	CircularStringBuffer(CircularStringBuffer&& other)
-		: CircularStringBuffer(other.m_line_count, other.m_line_buf_size)
-	{
-	}
-
 	~CircularStringBuffer()
 	{
 		m_strings_headers.clear();
