@@ -7,6 +7,8 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 
+#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
+
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
@@ -26,6 +28,8 @@ DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex,
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
 	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
+DECL_ComVarCommandPtr(og_frame_limiter_var, bool*, &MainGameTime::fps_limiter_enabled,
+	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
 DECL_ComVarCommandPtr(display_xyz_var, bool*, &displayXyz,

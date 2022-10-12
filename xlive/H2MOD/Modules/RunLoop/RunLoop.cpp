@@ -11,7 +11,7 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\Input\ControllerInput.h"
-#include "H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h"
+#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -738,7 +738,8 @@ void InitRunLoop() {
 
 		case _rendering_mode_original_game_frame_limit:
 			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
-			OriginalFPSLimiter::ApplyPatches();
+			MainGameTime::ApplyPatches();
+			MainGameTime::fps_limiter_enabled = true;
 			break;
 
 		case _rendering_mode_none:

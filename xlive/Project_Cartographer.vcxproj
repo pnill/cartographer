@@ -277,7 +277,7 @@
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -606,7 +606,7 @@
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />

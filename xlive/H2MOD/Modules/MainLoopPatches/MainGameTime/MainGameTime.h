@@ -1,6 +1,6 @@
 #pragma once
 
-namespace OriginalFPSLimiter
+namespace MainGameTime
 {
 	void ApplyPatches();
 	extern bool fps_limiter_enabled;

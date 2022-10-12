@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
-#include "OriginalFPSLimiter.h"
-#include "..\Interpolation\Interpolation.h"
+#include "MainGameTime.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -17,7 +16,7 @@
 
 extern bool b_XboxTick;
 
-bool OriginalFPSLimiter::fps_limiter_enabled = false;
+bool MainGameTime::fps_limiter_enabled = false;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
@@ -35,7 +34,7 @@ static float accumulator = 0.0f;
 
 void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out_target_tick_count)
 {
-	typedef void(__cdecl *compute_target_tick_count_t)(float, float*, int*);
+	typedef void(__cdecl* compute_target_tick_count_t)(float, float*, int*);
 	auto p_compute_target_tick_count = Memory::GetAddress<compute_target_tick_count_t>(0x7C1BF);
 
 	typedef bool(__cdecl* game_is_not_paused_t)();
@@ -104,9 +103,9 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 
 	int game_time;
 	float dtSec = 0.0f;
-	LARGE_INTEGER currentCounter, counterFrq; 
+	LARGE_INTEGER currentCounter, counterFrq;
 	long long _currentTimeMsec, _timeAtStartupMsec;
-	
+
 	s_main_time_globals* main_time_globals;
 
 	main_time_globals = s_main_time_globals::get();
@@ -122,53 +121,56 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	if (fixed_time_step)
 	{
 		dtSec = fixed_time_delta;
+		if (time_globals::available())
+			time_globals::get()->game_ticks_leftover = 0.0f;
 	}
 	else
 	{
 		QueryPerformanceCounter(&currentCounter);
 		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
 		dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
-	}
 
-	if (OriginalFPSLimiter::fps_limiter_enabled || _Shell::IsGameMinimized())
-	{
-		if (time_globals::available()
-			&& !fixed_time_step) // don't run the frame limiter when time step is fixed, because the code doesn't support it
+		// don't run the frame limiter when time step is fixed, because the code doesn't support it
+		// in case of fixed time step, frame limiter should be handled by the other frame limiter
+		if (MainGameTime::fps_limiter_enabled || _Shell::IsGameMinimized())
 		{
-			// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
-			// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-			while (get_ticks_leftover_time() > dtSec)
+			if (time_globals::available())
 			{
-				int iMsSleep = 0;
-				float fMsSleep = (float)(get_ticks_leftover_time() - dtSec) * 1000.f;
+				// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
+				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
+				while (get_ticks_leftover_time() > dtSec)
+				{
+					int iMsSleep = 0;
+					float fMsSleep = (float)(get_ticks_leftover_time() - dtSec) * 1000.f;
 
-				if ((int)fMsSleep > 0)
-					iMsSleep = (int)fMsSleep;
+					if ((int)fMsSleep > 0)
+						iMsSleep = (int)fMsSleep;
 
-				// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
-				// Sleep is not precise since Windows is not a RTOS
-				Sleep(iMsSleep);
+					// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
+					// Sleep is not precise since Windows is not a RTOS
+					Sleep(iMsSleep);
+
+					QueryPerformanceCounter(&currentCounter);
+					_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+					dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+				}
+			}
+			else
+			{
+				Sleep(15u);
 
 				QueryPerformanceCounter(&currentCounter);
 				_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
 				dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
 			}
 		}
-		else
-		{
-			Sleep(15u);
-
-			QueryPerformanceCounter(&currentCounter);
-			_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-			dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
-		}
 	}
 
 	dtSec = blam_min(dtSec, 10.f);
 	QueryPerformanceCounter(&currentCounter);
 	_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-	if (fixed_time_delta)
-		_currentTimeMsec = main_time_globals->last_time_ms + fixed_time_delta;
+	if (fixed_time_step)
+		_currentTimeMsec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0f);
 	main_time_globals->last_time_ms = _currentTimeMsec;
 	main_time_globals->game_time_passed = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
@@ -178,7 +180,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	return dtSec;
 }
 
-void OriginalFPSLimiter::ApplyPatches()
+void MainGameTime::ApplyPatches()
 {
 	if (Memory::IsDedicatedServer() == false)
 	{
@@ -196,6 +198,5 @@ void OriginalFPSLimiter::ApplyPatches()
 
 		//NopFill(Memory::GetAddress(0x39DE1), 5);
 	}
-	Interpolation::ApplyPatches();
 }
 
