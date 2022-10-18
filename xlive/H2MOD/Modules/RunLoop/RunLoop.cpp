@@ -235,7 +235,7 @@ void __cdecl game_modules_dispose() {
 
 void (*main_game_loop)();
 
-std::chrono::duration<double, std::nano> desiredRenderTime;
+std::chrono::duration<long long, std::micro> gMaxFrameTime;
 inline void defaultFrameLimiter() {
 	
 	CHRONO_DEFINE_TIME_AND_CLOCK();
@@ -243,8 +243,11 @@ inline void defaultFrameLimiter() {
 	static _clock::time_point lastTime;
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
-	static const double thread_sleep_threshold = 3.0;
-	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
+
+	static const _time::duration<long long, std::milli> skipThreadSleepThreshold(3ms);
+	// skip sleep if we have to sleep under 5 ns
+	static const _time::duration<long long, std::nano> threshold(5ns);
+	static HANDLE hFrameLimitTimer = NULL;
 
 	if (H2Config_fps_limit <= 0
 		|| _Shell::IsGameMinimized())
@@ -265,29 +268,62 @@ inline void defaultFrameLimiter() {
 		SET_DESIRED_RENDER_TIME();
 		lastTime = _clock::now();
 		frameLimiterInitialized = true;
+
+		/*if (NULL == hFrameLimitTimer)
+		{
+			hFrameLimitTimer = CreateWaitableTimer(NULL, TRUE, NULL);
+
+			atexit([]() {
+				if (NULL != hFrameLimitTimer)
+					CloseHandle(hFrameLimitTimer);
+
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
+				});
+		}*/
 	}
 
-	auto timeBeforeSleep = _clock::now();
-	auto timeDelta = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
-	auto targetRenderTime = desiredRenderTime - threshold;
-	while (targetRenderTime > timeDelta)
-	{
-		double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
-		double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
+	auto targetRenderTime = gMaxFrameTime - threshold;
+	auto timeDelta = _time::duration_cast<std::chrono::duration<long long, std::micro>>(_clock::now() - lastTime);
 
-		if (dbSleepTimeMs >= thread_sleep_threshold)
+	auto sleepTimeNs = targetRenderTime - timeDelta;
+
+	if (sleepTimeNs > 0ns)
+	{
+		if (sleepTimeNs > skipThreadSleepThreshold)
 		{
-			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - thread_sleep_threshold - 0.5);
-			if (iSleepTimeMsAdjusted < 0)
-				iSleepTimeMsAdjusted = 0;
-			Sleep(iSleepTimeMsAdjusted);
+			auto dueTime = _time::duration_cast<_time::duration<long long, std::micro>>(sleepTimeNs - skipThreadSleepThreshold - 5us);
+
+			/*if (NULL != hFrameLimitTimer)
+			{
+				LARGE_INTEGER liDueTime;
+				liDueTime.QuadPart = -10ll * dueTime.count();
+
+				// Create an unnamed waitable timer.
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
+
+				bool waitableTimer = SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE);
+
+				if (waitableTimer)
+				{
+					// Wait for the timer.
+					_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, NULL);
+				}
+			}*/
+
+			int sleepTime = dueTime.count() / 1000ll;
+			if (sleepTime < 0)
+				sleepTime = 0;
+
+			Sleep(sleepTime);
 		}
 
-		do
+		while (targetRenderTime > _clock::now() - lastTime)
 		{
-		} while (targetRenderTime > _clock::now() - lastTime);
-
-		timeDelta = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
+		}
 	}
 
 	lastTime = _clock::now();
