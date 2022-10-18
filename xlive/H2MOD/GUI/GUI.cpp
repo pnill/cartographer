@@ -437,12 +437,100 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 }
 
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-std::mutex xliveRenderMutex;
+
+void XLiveLimitFramerate(int maxFramerate) {
+
+	CHRONO_DEFINE_TIME_AND_CLOCK();
+
+	static _clock::time_point lastTime;
+	static int lastFrameSetting = -1;
+	static bool frameLimiterInitialized = false;
+
+	static const _time::duration<long long, std::milli> skipThreadSleepThreshold(3ms);
+	// skip sleep if we have to sleep under 5 ns
+	static HANDLE hFrameLimitTimer = NULL;
+
+	if (maxFramerate <= 0)
+	{
+		lastFrameSetting = maxFramerate;
+		frameLimiterInitialized = false;
+		return;
+	}
+
+	if (lastFrameSetting != maxFramerate)
+	{
+		lastFrameSetting = maxFramerate;
+		frameLimiterInitialized = false;
+	}
+
+	if (!frameLimiterInitialized)
+	{
+		lastTime = _clock::now();
+		frameLimiterInitialized = true;
+
+		/*if (NULL == hFrameLimitTimer)
+		{
+			hFrameLimitTimer = CreateWaitableTimer(NULL, TRUE, NULL);
+
+			atexit([]() {
+				if (NULL != hFrameLimitTimer)
+					CloseHandle(hFrameLimitTimer);
+
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
+				});
+		}*/
+	}
+
+	auto targetRenderTime = std::chrono::duration<long long, std::micro>(long long(1000000.0 / (double)maxFramerate));
+	auto timeDelta = _time::duration_cast<std::chrono::duration<long long, std::micro>>(_clock::now() - lastTime);
+
+	auto sleepTimeUs = targetRenderTime - timeDelta;
+
+	if (sleepTimeUs > 0us)
+	{
+		if (sleepTimeUs > skipThreadSleepThreshold)
+		{
+			auto dueTime = _time::duration_cast<_time::duration<long long, std::micro>>(sleepTimeUs - skipThreadSleepThreshold - 5us);
+
+			/*if (NULL != hFrameLimitTimer)
+			{
+				LARGE_INTEGER liDueTime;
+				liDueTime.QuadPart = -10ll * dueTime.count();
+
+				// Create an unnamed waitable timer.
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
+
+				bool waitableTimer = SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE);
+
+				if (waitableTimer)
+				{
+					// Wait for the timer.
+					_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, NULL);
+				}
+			}*/
+
+			int sleepTime = dueTime.count() / 1000ll;
+			if (sleepTime >= 0)
+				Sleep(sleepTime);
+		}
+
+		while (targetRenderTime > _clock::now() - lastTime)
+		{
+		}
+	}
+
+	lastTime = _clock::now();
+}
 
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
-	std::lock_guard<std::mutex> lg(xliveRenderMutex);
+	static std::mutex renderMtx;
+	std::lock_guard lg(renderMtx);
 
 	if (pDevice)
 	{
@@ -583,6 +671,9 @@ int WINAPI XLiveRender()
 			ImGuiHandler::DrawImgui();
 		}
 	}
+
+	// limit framerate if needed
+	XLiveLimitFramerate(H2Config_fps_limit);
 	return 0;
 }
 
