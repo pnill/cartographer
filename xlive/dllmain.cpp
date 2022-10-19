@@ -16,10 +16,11 @@ std::string ModulePathA(HMODULE hModule = NULL)
 	memset(strPath, 0, sizeof(strPath));
 	GetModuleFileNameA(hModule, strPath, MAX_PATH);
 
-	for (int i = strlen(strPath); i > 0; i--) 
+	for (int i = strlen(strPath) - 1; i >= 0; i--)
 	{ 
-		if (strPath[i] == '\\') 
-			strPath[i + 1] = 0; break; 
+		if (strPath[i] == '\\') {
+			strPath[i + 1] = '\0'; break;
+		}
 	}
 	return std::string(strPath);
 }
@@ -29,10 +30,11 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 	wchar_t strPath[MAX_PATH];
 	memset(strPath, 0, sizeof(strPath));
 	GetModuleFileNameW(hModule, strPath, MAX_PATH);
-	for (int i = wcslen(strPath); i > 0; i--)
+	for (int i = wcslen(strPath) - 1; i >= 0; i--)
 	{
-		if (strPath[i] == L'\\')
-			strPath[i + 1] = 0; break;
+		if (strPath[i] == L'\\') {
+			strPath[i + 1] = L'\0'; break;
+		}
 	}
 	return std::wstring(strPath);
 }

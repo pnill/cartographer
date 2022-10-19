@@ -164,8 +164,8 @@ void InitalizeFont(std::wstring strFontName, const std::wstring& strFontPath, in
 {
 	if (OnOff)
 	{
-		addDebugText("Adding font: %s", strFontPath.c_str());
-		if(AddFontResource(strFontPath.c_str()) > 0)
+		addDebugText("Adding font: %ws", strFontPath.c_str());
+		if (AddFontResource(strFontPath.c_str()) > 0)
 		{
 			addDebugText("Font successfully added.");
 		}
