@@ -21,8 +21,7 @@ bool melee_lunge_hook_enabled = true;
 
 #if MELEE_DEBUG
 #define LOG_TRACE_MELEE(msg, ...) \
- ((void) ((LOG_TRACE_GAME(msg, __VA_ARGS__), true))) \
-
+ ((void) ((LOG_TRACE_GAME(msg, __VA_ARGS__), true)))
 #else
 #define LOG_TRACE_MELEE(msg, ...) ((void)0)
 #endif

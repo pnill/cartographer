@@ -90,6 +90,6 @@ extern std::random_device rd;
 #define CHRONO_DEFINE_TIME_AND_CLOCK() \
 	namespace _time = std::chrono; \
 	using _clock = std::chrono::steady_clock; \
-	using namespace std::chrono_literals; \
+	using namespace std::chrono_literals;
 
 #undef small

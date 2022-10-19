@@ -298,7 +298,7 @@ void InitH2Startup() {
 		std::wstring path = GetExeDirectoryWide();
 		path.append(L"\\");
 		H2ProcessFilePath = (wchar_t*)calloc(path.length() + 1, sizeof(wchar_t));
-		swprintf(H2ProcessFilePath, path.c_str());
+		_swprintf(H2ProcessFilePath, path.c_str());
 	}
 
 	// fix the game not finding the files it needs if the current directory is not the install directory
