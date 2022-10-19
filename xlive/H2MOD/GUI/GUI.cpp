@@ -12,6 +12,7 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -159,7 +160,7 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-void InitalizeFont(std::wstring strFontName, std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(std::wstring strFontName, const std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
 	if (OnOff)
 	{
@@ -446,7 +447,7 @@ void XLiveLimitFramerate(int maxFramerate) {
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
 
-	static const _time::duration<long long, std::milli> skipThreadSleepThreshold(3ms);
+	const int threadWaitTimePercentage = 90;
 	// skip sleep if we have to sleep under 5 ns
 	static HANDLE hFrameLimitTimer = NULL;
 
@@ -468,7 +469,7 @@ void XLiveLimitFramerate(int maxFramerate) {
 		lastTime = _clock::now();
 		frameLimiterInitialized = true;
 
-		/*if (NULL == hFrameLimitTimer)
+		if (NULL == hFrameLimitTimer)
 		{
 			hFrameLimitTimer = CreateWaitableTimer(NULL, TRUE, NULL);
 
@@ -480,7 +481,7 @@ void XLiveLimitFramerate(int maxFramerate) {
 				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
 				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
 				});
-		}*/
+		}
 	}
 
 	auto targetRenderTime = std::chrono::duration<long long, std::micro>(long long(1000000.0 / (double)maxFramerate));
@@ -490,37 +491,38 @@ void XLiveLimitFramerate(int maxFramerate) {
 
 	if (sleepTimeUs > 0us)
 	{
-		if (sleepTimeUs > skipThreadSleepThreshold)
-		{
-			auto dueTime = _time::duration_cast<_time::duration<long long, std::micro>>(sleepTimeUs - skipThreadSleepThreshold - 5us);
+		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
+		long long timeToWaitSleepUs = ((long long)threadWaitTimePercentage * sleepTimeUs.count()) / 100ll;
 
-			/*if (NULL != hFrameLimitTimer)
+		// skip if time to wait is lower than 2ms
+		if (timeToWaitSleepUs > 2000) 
+		{
+			if (NULL != hFrameLimitTimer)
 			{
 				LARGE_INTEGER liDueTime;
-				liDueTime.QuadPart = -10ll * dueTime.count();
+				liDueTime.QuadPart = -10ll * timeToWaitSleepUs;
 
 				// Create an unnamed waitable timer.
 				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
 				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
 
-				bool waitableTimer = SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE);
-
-				if (waitableTimer)
+				if (10ll * timeToWaitSleepUs >= ulMaximumResolution)
 				{
-					// Wait for the timer.
-					_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, NULL);
+					_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
+					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
+					{
+						// Wait for the timer.
+						_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, NULL);
+					}
 				}
-			}*/
+			}
 
-			int sleepTime = dueTime.count() / 1000ll;
+			/*int sleepTime = sleepTimeUs.count() / 1000ll;
 			if (sleepTime >= 0)
-				Sleep(sleepTime);
+				Sleep(sleepTime);*/
 		}
 
-		while (targetRenderTime > _clock::now() - lastTime)
-		{
-		}
+		while (targetRenderTime > _clock::now() - lastTime) YieldProcessor();
 	}
 
 	lastTime = _clock::now();
