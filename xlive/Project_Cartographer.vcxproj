@@ -343,7 +343,7 @@
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
-    <ClCompile Include="H2MOD\Modules\RunLoop\RunLoop.cpp" />
+    <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
@@ -676,7 +676,7 @@
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
-    <ClInclude Include="H2MOD\Modules\RunLoop\RunLoop.h" />
+    <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
