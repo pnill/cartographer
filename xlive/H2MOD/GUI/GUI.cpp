@@ -472,7 +472,7 @@ void XLiveThrottleFramerate(int maxFramerate) {
 
 		if (NULL == hFrameLimitTimer)
 		{
-			hFrameLimitTimer = CreateWaitableTimer(NULL, TRUE, NULL);
+			hFrameLimitTimer = CreateWaitableTimer(NULL, FALSE, NULL);
 
 			atexit([]() {
 				if (NULL != hFrameLimitTimer)
