@@ -439,7 +439,8 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-void XLiveLimitFramerate(int maxFramerate) {
+// TODO move to _Shell
+void XLiveThrottleFramerate(int maxFramerate) {
 
 	CHRONO_DEFINE_TIME_AND_CLOCK();
 
@@ -484,13 +485,13 @@ void XLiveLimitFramerate(int maxFramerate) {
 		}
 	}
 
-	auto targetRenderTime = std::chrono::duration<long long, std::micro>(long long(1000000.0 / (double)maxFramerate));
-	auto timeDelta = _time::duration_cast<std::chrono::duration<long long, std::micro>>(_clock::now() - lastTime);
+	auto minFrameTime = std::chrono::duration<long long, std::micro>(long long(1000000.0 / (double)maxFramerate));
+	auto deltaTime = _time::duration_cast<std::chrono::duration<long long, std::micro>>(_clock::now() - lastTime);
 
-	auto sleepTimeUs = targetRenderTime - timeDelta;
-
-	if (sleepTimeUs > 0us)
+	if (deltaTime < minFrameTime)
 	{
+		auto sleepTimeUs = minFrameTime - deltaTime;
+
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
 		long long timeToWaitSleepUs = ((long long)threadWaitTimePercentage * sleepTimeUs.count()) / 100ll;
 
@@ -522,7 +523,11 @@ void XLiveLimitFramerate(int maxFramerate) {
 				Sleep(sleepTime);*/
 		}
 
-		while (targetRenderTime > _clock::now() - lastTime) YieldProcessor();
+		while ((deltaTime = _time::duration_cast<decltype(deltaTime)>(_clock::now() - lastTime)), 
+			deltaTime < minFrameTime)
+		{
+			YieldProcessor();
+		}
 	}
 
 	lastTime = _clock::now();
@@ -675,7 +680,8 @@ int WINAPI XLiveRender()
 	}
 
 	// limit framerate if needed
-	XLiveLimitFramerate(H2Config_fps_limit);
+	// UPDATE: frame limiting in XLiveRender adds input lag
+	// XLiveThrottleFramerate(H2Config_fps_limit);
 	return 0;
 }
 

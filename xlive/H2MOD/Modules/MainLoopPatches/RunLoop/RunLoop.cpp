@@ -223,7 +223,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 	return p_main_game_time_initialize_defaults();
 }
 
-void __cdecl game_modules_dispose() {
+void __cdecl game_modules_dispose_hook() {
 	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
 	p_game_modules_dispose();
 
@@ -233,8 +233,17 @@ void __cdecl game_modules_dispose() {
 	timeEndPeriod(TIMER_RESOLUTION);
 }
 
-void (*main_game_loop)();
+// rasterizer_present hook
+// used to limit framerate using our implementation
+void rasterizer_present_hook(int a1) {
+	typedef void(__cdecl* rasterizer_present_t)(int);
+	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
+	p_rasterizer_present(a1);
+	XLiveThrottleFramerate(H2Config_fps_limit);
+}
+
+void (__cdecl* p_main_game_loop)();
 void main_game_loop_hook() {
 	if (!QuitGSMainLoop)
 		GSMainLoop();
@@ -243,7 +252,7 @@ void main_game_loop_hook() {
 	mapManager->MapDownloadUpdateTick();
 	// update local user network stats
 	gXnIp.GetLocalUserXn()->pckStats.PckDataSampleUpdate();
-	main_game_loop();
+	p_main_game_loop();
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
@@ -286,14 +295,14 @@ bool __cdecl cinematic_in_progress_hook()
 	return false;
 }
 
-bool __cdecl should_limit_framerate()
+bool __cdecl should_limit_framerate_hook()
 {
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
 	switch (experimental_rendering_mode)
 	{
 	case _rendering_mode_original_game_frame_limit:
-		return false; // e_render_original_game_frame_limit handles frame limit in OriginalFPSLimiter.cpp
+		return false; // e_render_original_game_frame_limit handles frame limit in MainGameTime.cpp
 	case _rendering_mode_none:
 	case _rendering_mode_new:
 	case _rendering_mode_old:
@@ -655,12 +664,16 @@ void InitRunLoop() {
 	}
 	else {
 		addDebugText("Hooking loop Function");
-		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
+		p_main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
 
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
 		// always init these pointers
 		initialize_main_loop_function_pointers();
+
+		// frame limiter hooks
+		PatchCall(Memory::GetAddress(0x19073C), rasterizer_present_hook);
+		PatchCall(Memory::GetAddress(0x19074C), rasterizer_present_hook);
 
 		switch (experimental_rendering_mode)
 		{
@@ -690,7 +703,7 @@ void InitRunLoop() {
 		} // switch (experimental_rendering_mode)
 
 		// apply the code that fixes and determines if the amin loop should be throttled
-		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
+		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
 		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
 
 		// stop Hold to Zoom.
@@ -698,7 +711,7 @@ void InitRunLoop() {
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
-	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose);
+	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose_hook);
 
 	addDebugText("Post RunLoop Hooking.");
 }
