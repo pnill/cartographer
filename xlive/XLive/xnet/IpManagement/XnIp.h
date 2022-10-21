@@ -383,7 +383,7 @@ public:
 	XnKeyPair* GetKeyPair(const XNKID* xnkid);
 	
 	// Logging 
-	void LogConnectionsToConsole(IOutput* output);
+	void LogConnectionsToConsole(ConsoleLog* output);
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
 
 	// XNet startup parameters

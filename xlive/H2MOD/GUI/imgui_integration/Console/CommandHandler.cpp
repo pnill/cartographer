@@ -19,7 +19,7 @@ ConsoleCommand::ConsoleCommand(const char* _name, const char* _command_descripti
 
 bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* command_line, const std::vector<std::string>& tokens)
 {
-	IOutput* output = cb_data->strOutput;
+	ConsoleLog* output = cb_data->strOutput;
 	const ConsoleCommand* command_data = cb_data->consoleCommandData;
 	if (command_data == nullptr)
 		return false;
@@ -35,7 +35,7 @@ bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* comma
 		}
 		else
 		{
-			output->OutputFmt(StringFlag_None, command_error_not_enough_params, command_data->GetName());
+			output->Output(StringFlag_None, command_error_not_enough_params, command_data->GetName());
 		}
 
 		return false;
@@ -44,13 +44,12 @@ bool ConsoleCommand::CheckArgs(ConsoleCommandCtxData* cb_data, const char* comma
 	return true;
 }
 
-bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* ctx, ConsoleCommand* command)
+bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, ConsoleLog* output, ConsoleCommand* command)
 {
 	ConsoleCommandCtxData command_data;
-	command_data.strOutput = ctx;
+	command_data.strOutput = output;
 	command_data.commandVar = nullptr;
 	command_data.consoleCommandData = command;
-	IOutput* output = command_data.strOutput;
 
 	if (CheckArgs(&command_data, command_line, tokens))
 	{
@@ -71,7 +70,7 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 }
 
 // static function, used to execute commands
-bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* output)
+bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_line_length, ConsoleLog* output)
 {
     bool ret = false;
 

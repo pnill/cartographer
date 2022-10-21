@@ -247,23 +247,17 @@ void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 	}
 }
 
-int ServerConsole::DediConsoleOutput::Output(StringHeaderFlags flags, const char* fmt)
-{
-	std::string fmtStr(fmt);
-	std::wstring fmtStrWide(fmtStr.begin(), fmtStr.end());
-	ServerConsole::LogToDedicatedServerConsole(fmtStrWide.c_str());
-	ServerConsole::LogToDedicatedServerConsole(L"\n");
-	return 0;
-}
-
-int ServerConsole::DediConsoleOutput::OutputFmt(StringHeaderFlags flags, const char* fmt, ...)
+int ServerConsole::DediConsoleOutput::Output(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);
 	int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
 	char* buffer = (char*)_malloca(buffer_size_needed);
 	int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
-	DediConsoleOutput::Output(flags, buffer);
+	std::string outputStr(buffer);
+	std::wstring outputStrWide(outputStr.begin(), outputStr.end());
+	ServerConsole::LogToDedicatedServerConsole(outputStrWide.c_str());
+	ServerConsole::LogToDedicatedServerConsole(L"\n");
 	_freea(buffer);
 	va_end(valist);
 	return 0;

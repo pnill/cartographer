@@ -27,7 +27,7 @@ enum ConsoleTabs
     _console_tab_end
 };
 
-class Console : public IOutput
+class Console : public ConsoleLog
 {
 private:
 	Console(const Console&) = delete;
@@ -67,8 +67,7 @@ public:
     Console();
     ~Console() = default;
 
-    int Output(StringHeaderFlags flags, const char* fmt) override;
-    int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) override;
+    int Output(StringHeaderFlags flags, const char* fmt, ...) override;
 
 	void Draw(const char* title, bool* p_open);
 
@@ -82,7 +81,8 @@ public:
         return m_completion_data != NULL;
     };
 
-    unsigned int GetCompletionCandidatesCount() const {
+    unsigned int GetCompletionCandidatesCount() const 
+    {
         if (!CompletionAvailable()) return 0;
         return m_completion_data->Count;
     };
@@ -103,6 +103,14 @@ public:
     {
 		auto console = GetMainConsoleInstance();
 		console->Draw(windowName.c_str(), b_open);
+    }
+
+    static void LogToTab(ConsoleTabs tab, const char* fmt, ...)
+    {
+		va_list valist;
+		va_start(valist, fmt);
+        GetMainConsoleInstance()->GetTabOutput(tab)->AddStringFmt(StringFlag_None, fmt, valist);
+        va_end(valist);
     }
 
     // commands

@@ -93,14 +93,14 @@ void CXnIp::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned int byte
 	}
 }
 
-void CXnIp::LogConnectionsToConsole(IOutput* output)
+void CXnIp::LogConnectionsToConsole(ConsoleLog* output)
 {
 	if (GetRegisteredKeyCount() > 0)
 	{
 		const char* xnet_connections_str = "XNet connections: ";
 		LOG_CRITICAL_NETWORK(xnet_connections_str);
 		if (output)
-			output->OutputFmt(StringFlag_None, "# %s", xnet_connections_str);
+			output->Output(StringFlag_None, "# %s", xnet_connections_str);
 
 		for (int i = 0; i < GetMaxXnConnections(); i++)
 		{
@@ -131,7 +131,7 @@ void CXnIp::LogConnectionsToConsole(IOutput* output)
 
 			LOG_CRITICAL_NETWORK(logString);
 			if (output)
-				output->OutputFmt(StringFlag_None, "# %s", logString.c_str());
+				output->Output(StringFlag_None, "# %s", logString.c_str());
 		}
 	}
 	else
@@ -139,7 +139,7 @@ void CXnIp::LogConnectionsToConsole(IOutput* output)
 		const char* err_message = "cannot log XNet connections when no keys are registerd (you need to host/be in a game)";
 		LOG_CRITICAL_NETWORK(err_message);
 		if (output)
-			output->OutputFmt(StringFlag_None, "# %s", err_message);
+			output->Output(StringFlag_None, "# %s", err_message);
 	}
 }
 
