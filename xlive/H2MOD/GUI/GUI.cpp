@@ -513,7 +513,7 @@ void XLiveThrottleFramerate(int maxFramerate) {
 					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
 					{
 						// Wait for the timer.
-						_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, NULL);
+						_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, &liDueTime);
 					}
 				}
 			}
