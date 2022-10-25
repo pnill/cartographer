@@ -192,6 +192,7 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 	}
 }
 
+static DWORD (WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {
 	LARGE_INTEGER currentCounter, frequency;
@@ -203,11 +204,6 @@ DWORD WINAPI timeGetTime_hook()
 	return (DWORD)timeNow;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
-
-static void InitializeTimeHooks()
-{
-	WritePointer(Memory::GetAddressRelative(0x79B568, 0x752540), (void*)timeGetTime_hook);
-}
 
 void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
@@ -273,7 +269,10 @@ void H2Tweaks::ApplyPatches() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	InitializeTimeHooks();
+	DETOUR_BEGIN();
+
+	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
+
 	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
@@ -379,6 +378,8 @@ void H2Tweaks::ApplyPatches() {
 
 	// custom map hooks
 	MapManager::ApplyPatches();
+
+	DETOUR_COMMIT();
 
 	addDebugText("End Startup Tweaks.");
 }
