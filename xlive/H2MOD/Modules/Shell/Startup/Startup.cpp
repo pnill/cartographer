@@ -364,8 +364,8 @@ void InitH2Startup() {
 		exit(EXIT_FAILURE);
 
 	//apply any network hooks
-	CustomNetwork::ApplyNetworkPatches();
-	InitH2Tweaks();
+	CustomNetwork::ApplyPatches();
+	H2Tweaks::ApplyPatches();
 	InitH2WinMainPatches();
 	extern void InitCustomLanguage();
 	InitCustomLanguage();
@@ -377,9 +377,7 @@ void InitH2Startup() {
 }
 
 ///After the game window appears
-void InitH2Startup2() {
-	InitGSDownload();
-
+void H2DedicatedServerStartup() {
 	// initialize default data to run under LAN
 	// if the server runs in LIVE mode, check XLiveSignIn/XLiveSignOut in AccountLogin.cpp
 	if (Memory::IsDedicatedServer())
@@ -403,7 +401,7 @@ void DeinitH2Startup() {
 	DeinitCustomMenu();
 	extern void DeinitCustomLanguage();
 	DeinitCustomLanguage();
-	DeinitH2Tweaks();
+	H2Tweaks::DisposePatches();
 	DeinitH2Accounts();
 	DeinitH2Config();
 	curl_global_cleanup();

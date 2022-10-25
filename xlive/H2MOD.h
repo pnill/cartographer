@@ -36,11 +36,11 @@ void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 class H2MOD
 {
 public:
-	void Initialize();
-	void Deinitialize();
-	void ApplyHooks();
-	void ApplyFirefightHooks();
-	void RegisterEvents();
+	static void Initialize();
+	static void Deinitialize();
+	static void ApplyHooks();
+	static void ApplyFirefightHooks();
+	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
 	BYTE* get_player_unit_from_player_index(int playerIndex);
@@ -64,16 +64,11 @@ public:
 	e_engine_type GetEngineType() { return engineType; }
 	void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
-	std::deque<std::wstring> CustomSounds;
-
-	std::mutex sound_mutex;
-
-	std::set<int> hookedObjectDefs;
 	bool drawTeamIndicators = true;
 
 private:
 	e_engine_type engineType;
 };
 
-extern H2MOD* h2mod;
+extern std::unique_ptr<H2MOD> h2mod;
 extern s_data_array* game_state_actors;

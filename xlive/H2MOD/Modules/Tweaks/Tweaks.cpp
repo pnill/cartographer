@@ -264,7 +264,7 @@ BOOL __stdcall isDebuggerPresent() {
 	return false;
 }
 
-void InitH2Tweaks() {
+void H2Tweaks::ApplyPatches() {
 	addDebugText("Begin Startup Tweaks.");
 	
 	RefreshTogglexDelay();
@@ -274,8 +274,6 @@ void InitH2Tweaks() {
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
 	InitializeTimeHooks();
-	mapManager->ApplyHooks();
-
 	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
 
@@ -379,10 +377,13 @@ void InitH2Tweaks() {
 	// fixes edge drop fast fall when using higher tickrates than 30
 	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
+	// custom map hooks
+	MapManager::ApplyPatches();
+
 	addDebugText("End Startup Tweaks.");
 }
 
-void DeinitH2Tweaks() {
+void H2Tweaks::DisposePatches() {
 
 }
 

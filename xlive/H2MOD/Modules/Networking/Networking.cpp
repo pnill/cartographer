@@ -52,7 +52,7 @@ void PatchabEnetUpdate()
 	}
 }
 
-void CustomNetwork::ApplyNetworkPatches() {
+void CustomNetwork::ApplyPatches() {
 	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
 
 	PatchabEnetUpdate();

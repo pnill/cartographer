@@ -5,9 +5,6 @@
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "H2MOD\Modules\Shell\ServerConsole.h"
 
-
-#define EVENT_HANDLER_ENABLE_TEST_EVENTS 0
-
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum
  * Then inside EventHandler you need to create a function alias type use the current ones as an example

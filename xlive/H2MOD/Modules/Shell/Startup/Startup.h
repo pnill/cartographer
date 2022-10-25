@@ -2,7 +2,7 @@
 
 
 void InitH2Startup();
-void InitH2Startup2();
+void H2DedicatedServerStartup();
 void DeinitH2Startup();
 
 // use only after initLocalAppData has been called

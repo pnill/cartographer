@@ -52,7 +52,7 @@
 #pragma fenv_access (on)
 #endif
 
-H2MOD* h2mod = new H2MOD();
+std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
 bool b_H2X = false;
 bool b_XboxTick = false;
@@ -1033,23 +1033,17 @@ void vip_lock(e_game_life_cycle state)
 
 void H2MOD::RegisterEvents()
 {
-	if(!Memory::IsDedicatedServer())
-	{
-		// Client only callbacks	
-
-	}
-	else 
+	if (Memory::IsDedicatedServer())
 	{
 		// Server only callbacks
-		
 		// Setup Events for H2Config_vip_lock
 		if (H2Config_vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
-	//Things that apply to both
-#if EVENT_HANDLER_ENABLE_TEST_EVENTS
-	EventHandler::TestEvents();
-#endif
+	else 
+	{
+		// Client only callbacks	
+	}
 }
 
 //Shader LOD Bias stuff
@@ -1230,8 +1224,8 @@ void H2MOD::Initialize()
 	HaloScript::Initialize();
 	player_representation::initialize();
 	KantTesting::Initialize();
-	h2mod->ApplyHooks();
-	h2mod->RegisterEvents();
+	H2MOD::ApplyHooks();
+	H2MOD::RegisterEvents();
 
 	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();

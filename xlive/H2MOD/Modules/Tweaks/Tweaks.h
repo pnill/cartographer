@@ -1,7 +1,5 @@
 #pragma once
 
-void InitH2Tweaks();
-void DeinitH2Tweaks();
 struct ui_text_bounds
 {
 	short top;
@@ -10,6 +8,8 @@ struct ui_text_bounds
 	short right;
 };
 namespace H2Tweaks {
+	void ApplyPatches();
+	void DisposePatches();
 	void toggleKillVolumes(bool enable);
 	void toggleAiMp(bool toggle);
 	void toggleUncappedCampaignCinematics(bool toggle);

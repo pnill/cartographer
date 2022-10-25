@@ -325,7 +325,7 @@ void __declspec(naked) load_map_data_for_display() {
 /**
 * Makes changes to game functionality
 */
-void MapManager::ApplyHooks() {
+void MapManager::ApplyPatches() {
 
 	if (!Memory::IsDedicatedServer()) {
 

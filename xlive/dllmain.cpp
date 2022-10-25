@@ -58,17 +58,14 @@ void InitInstance()
 	if (!init)
 	{
 		init = true;
-		InitH2Startup2();
 		InitializeCriticalSection(&d_lock);
 
 		HeapDebugInitialize();
+		H2DedicatedServerStartup();
 
 		dlcbasepath = L"DLC";
 
-		if (h2mod)
-			h2mod->Initialize();
-		else
-			LOG_CRITICAL_GAME("H2MOD Failed to intialize");
+		H2MOD::Initialize();
 
 		//extern GunGame* gunGame;
 		//gunGame->readWeaponLevels();
