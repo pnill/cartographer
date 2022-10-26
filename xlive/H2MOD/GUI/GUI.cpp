@@ -77,8 +77,9 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 
 LPD3DXSPRITE pSprite;
 
-LPDIRECT3DTEXTURE9 Texture_Interface;
 LPD3DXSPRITE Sprite_Interface;
+LPDIRECT3DTEXTURE9 Texture_Interface;
+
 
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
@@ -439,17 +440,14 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 
 ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-// TODO move to _Shell
-void XLiveThrottleFramerate(int maxFramerate) {
-
-	CHRONO_DEFINE_TIME_AND_CLOCK();
-
-	static _clock::time_point lastTime;
+// TODO: move to _Shell or somewhere else?
+void XLiveThrottleFramerate(int maxFramerate) 
+{
+	static LARGE_INTEGER lastCounter;
 	static int lastFrameSetting = -1;
 	static bool frameLimiterInitialized = false;
 
 	const int threadWaitTimePercentage = 90;
-	// skip sleep if we have to sleep under 5 ns
 	static HANDLE hFrameLimitTimer = NULL;
 
 	if (maxFramerate <= 0)
@@ -467,7 +465,7 @@ void XLiveThrottleFramerate(int maxFramerate) {
 
 	if (!frameLimiterInitialized)
 	{
-		lastTime = _clock::now();
+		QueryPerformanceCounter(&lastCounter);
 		frameLimiterInitialized = true;
 
 		if (NULL == hFrameLimitTimer)
@@ -483,20 +481,29 @@ void XLiveThrottleFramerate(int maxFramerate) {
 				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
 				});
 		}
+
+		// skip the first frame after init
+		return;
 	}
 
-	auto minFrameTime = std::chrono::duration<long long, std::micro>(long long(1000000.0 / (double)maxFramerate));
-	auto deltaTime = _time::duration_cast<std::chrono::duration<long long, std::micro>>(_clock::now() - lastTime);
+	LARGE_INTEGER frequency;
+	LARGE_INTEGER deltaCounter;
+	QueryPerformanceFrequency(&frequency);
 
-	if (deltaTime < minFrameTime)
+	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
+	QueryPerformanceCounter(&deltaCounter);
+	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
+	auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+
+	if (deltaTimeUs < minFrameTimeUs)
 	{
-		auto sleepTimeUs = minFrameTime - deltaTime;
+		auto sleepTimeUs = minFrameTimeUs - deltaTimeUs;
 
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		long long timeToWaitSleepUs = ((long long)threadWaitTimePercentage * sleepTimeUs.count()) / 100ll;
+		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;
 
 		// skip if time to wait is lower than 2ms
-		if (timeToWaitSleepUs > 2000) 
+		if (timeToWaitSleepUs > 2000)
 		{
 			if (NULL != hFrameLimitTimer)
 			{
@@ -507,7 +514,7 @@ void XLiveThrottleFramerate(int maxFramerate) {
 				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
 				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
 
-				if (10ll * timeToWaitSleepUs >= ulMaximumResolution)
+				if (10ll * timeToWaitSleepUs > ulMaximumResolution)
 				{
 					_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
 					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
@@ -523,14 +530,17 @@ void XLiveThrottleFramerate(int maxFramerate) {
 				Sleep(sleepTime);*/
 		}
 
-		while ((deltaTime = _time::duration_cast<decltype(deltaTime)>(_clock::now() - lastTime)), 
-			deltaTime < minFrameTime)
+		while (true)
 		{
-			YieldProcessor();
+			QueryPerformanceCounter(&deltaCounter);
+			deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
+			auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+			if (deltaTimeUs >= minFrameTimeUs)
+				break;
 		}
 	}
 
-	lastTime = _clock::now();
+	QueryPerformanceCounter(&lastCounter);
 }
 
 // #5002: XLiveRender
