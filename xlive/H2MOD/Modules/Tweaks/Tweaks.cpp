@@ -253,10 +253,8 @@ char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-typedef BOOL(__stdcall* is_debugger_present_t)();
-is_debugger_present_t p_is_debugger_present;
-
-BOOL __stdcall isDebuggerPresent() {
+BOOL (WINAPI* p_is_debugger_present)();
+BOOL WINAPI IsDebuggerPresent_hook() {
 	return false;
 }
 
@@ -365,7 +363,7 @@ void H2Tweaks::ApplyPatches() {
 		NopFill(Memory::GetAddressRelative(0x473C61), 5);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
-		//p_is_debugger_present = (is_debugger_present_t)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
+		// DETOUR_ATTACH(p_is_debugger_present, IsDebuggerPresent, IsDebuggerPresent_hook);
 	}
 
 	// disables profiles/game saves encryption
