@@ -7,6 +7,7 @@ struct ui_text_bounds
 	short bottom;
 	short right;
 };
+
 namespace H2Tweaks {
 	void ApplyPatches();
 	void DisposePatches();
