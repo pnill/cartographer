@@ -1,5 +1,6 @@
 #pragma once
 
+#include "physics_model_definition.hpp"
 #include "unit_definition.hpp"
 
 /*********************************************************************
@@ -105,31 +106,7 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_dead_sphere_shapes_block, 0x80);
 	tag_block<s_dead_sphere_shapes_block> dead_sphere_shapes;//0x284
-	struct s_pill_shapes_block
-	{
-		string_id name;//0x0
-		__int16 material;//0x4
-		enum class e_flags : __int16
-		{
-			unused = FLAG(0),
-		};
-		e_flags flags;//0x6
-		float relative_mass_scale;//0x8
-		float friction;//0xC
-		float restitution;//0x10
-		float volume;//0x14
-		float mass;//0x18
-		PAD(0x2);//0x1C
-		__int16 phantom;//0x1E
-		PAD(0x4);//0x20
-		__int16 size;//0x24
-		__int16 count;//0x26
-		PAD(0x4);//0x28
-		float radius;//0x2C
-		PAD(0x20);//0x30
-	};
-	TAG_BLOCK_SIZE_ASSERT(s_pill_shapes_block, 0x50);
-	tag_block<s_pill_shapes_block> pill_shapes;//0x28C
+	tag_block<s_physics_model_group_definition::s_pills_block> pill_shapes;
 	struct s_sphere_shapes_block
 	{
 		string_id name;//0x0
@@ -179,7 +156,7 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	float crouch_velocity_modifier;//0x2F4
 	struct s_contact_points_block
 	{
-	string_id marker_name_old_string_id;//0x0
+		string_id marker_name_old_string_id;//0x0
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_contact_points_block, 0x4);
 	tag_block<s_contact_points_block> contact_points;//0x2F8
@@ -190,4 +167,3 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 };
 TAG_GROUP_SIZE_ASSERT(s_biped_group_definition, 0x314);
 #pragma pack(pop)
-

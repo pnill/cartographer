@@ -1,22 +1,21 @@
 #include "stdafx.h"
 
 #include "PlayerRepresentation.h"
-#include "Blam\Cache\DataTypes\BlamTag.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Engine\Game\GameEngineGlobals.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"
-#include "H2MOD.h"
-#include "Blam/Engine/Players/Players.h"
+#include "Blam\Enums\HaloStrings.h"
+
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "H2MOD\Tags\TagInterface.h"
+
 #include "Util\Hooks\Hook.h"
 
 namespace player_representation
@@ -109,8 +108,9 @@ namespace player_representation
 			if(type_map.find(representation_index) != type_map.end())
 				return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
 		}
-		//Maybe not the best way to do this, but there should be no situation where the spartan datum changes.
-		return 0xF28C3826;
+
+		return tags::find_tag(blam_tag::tag_group_type::biped, "objects\\characters\\masterchief\\masterchief");
+
 	}
 
 	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
@@ -218,7 +218,6 @@ namespace player_representation
 			auto flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
 			auto flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
-			auto dervish_jmad_datum = tags::find_tag(blam_tag::tag_group_type::modelanimationgraph, "objects\\characters\\dervish\\dervish");
 			if (!DATUM_IS_NONE(flood_datum) && !DATUM_IS_NONE(flood_arms_datum) && !DATUM_IS_NONE(flood_body_datum))
 			{
 				tag_loader::Load_tag(flood_datum, true, "carto_shared");
@@ -233,7 +232,9 @@ namespace player_representation
 			{
 				clone_representation(3, s_player::e_character_type::Flood);
 			}
-			/*auto mode_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+
+			// Create copy of default variant for chief and add lmao object to head
+			auto mode_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 			auto mode_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_chief_mp_datum);
 			auto base_variant = mode_chief_mp->variants[0];
 			auto new_variant = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block>((unsigned long)std::addressof(mode_chief_mp->variants));
@@ -284,21 +285,22 @@ namespace player_representation
 				}
 			}
 
-			auto e_datum_i = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", blam_tag::tag_group_type::scenery, "carto_shared");
-			if (!DATUM_IS_NONE(e_datum_i))
+			datum lmao_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", blam_tag::tag_group_type::scenery, "carto_shared");
+			if (!DATUM_IS_NONE(lmao_datum))
 			{
-				tag_loader::Load_tag(e_datum_i, true, "carto_shared");
+				tag_loader::Load_tag(lmao_datum, true, "carto_shared");
 				tag_loader::Push_Back();
-				auto e_datum = tag_loader::ResolveNewDatum(e_datum_i);
-				if (!DATUM_IS_NONE(e_datum))
+				
+				lmao_datum = tag_loader::ResolveNewDatum(lmao_datum);
+				if (!DATUM_IS_NONE(lmao_datum))
 				{
 					auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
-					new_object->parent_marker = string_id(184552154);
+					new_object->parent_marker = HaloString::HS_HEAD;
 					new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-					new_object->child_object.TagIndex = e_datum;
+					new_object->child_object.TagIndex = lmao_datum;
 				}
 			}
-			add_representation(-1, -1, -1, s_player::e_character_type::Kant, new_variant->name);*/
+			add_representation(-1, -1, -1, s_player::e_character_type::Lmao, new_variant->name);
 		}
 	}
 	void apply_hooks()

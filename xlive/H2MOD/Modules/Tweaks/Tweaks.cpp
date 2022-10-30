@@ -269,7 +269,7 @@ BOOL __stdcall isDebuggerPresent() {
 void InitH2Tweaks() {
 	addDebugText("Begin Startup Tweaks.");
 	
-	RefreshTogglexDelay();
+	H2Tweaks::RefreshTogglexDelay();
 
 	//TODO(Num005) crashes dedis
 	//custom_game_engines::init();
@@ -474,4 +474,11 @@ void H2Tweaks::WarpFix(bool enable)
 		WriteValue<float>(Memory::GetAddress(0x4F958C), 2.5f);
 		WriteValue<float>(Memory::GetAddress(0x4F9594), 7.5f);
 	}	
+}
+
+void H2Tweaks::RefreshTogglexDelay() {
+	BYTE xDelayJMP[] = { 0x74 };
+	if (!H2Config_xDelay)
+		xDelayJMP[0] = 0xEB;
+	WriteBytes(Memory::GetAddress(0x1a1316, 0x1c9d8e), xDelayJMP, 1);
 }
