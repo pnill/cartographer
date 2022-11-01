@@ -63,7 +63,7 @@ namespace Engine::Objects
 		}
 	}
 
-	void update_object_variant_index_hook(datum object_idx, int variant_index)
+	void __cdecl update_object_variant_index_hook(datum object_idx, int variant_index)
 	{
 		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
 		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
@@ -127,7 +127,6 @@ namespace Engine::Objects
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
 	}
 
-	// original update_object_variant_index is usercall, with data in CX register as first param
 	__declspec(naked) void c_simulation_object_entity_definition_object_create_object_to_stdcall()
 	{
 		__asm

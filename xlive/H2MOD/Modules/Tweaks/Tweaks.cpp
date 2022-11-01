@@ -35,40 +35,39 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bool a4, int a5)
 {
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
-	
-	if (H2Config_disable_ingame_keyboard)
+
+	BYTE keyboardState[256] = {};
+	if (!H2Config_disable_ingame_keyboard 
+		&& GetKeyboardState(keyboardState))
+	{
+		for (int i = 0; i < 256; i++)
+		{
+			if (i != VK_SCROLL)
+			{
+				bool state = keyboardState[i] & 0x80;
+
+				// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
+				if (i == VK_RSHIFT
+					|| i == VK_LSHIFT
+					|| i == VK_RCONTROL
+					|| i == VK_LCONTROL
+					|| i == VK_RMENU
+					|| i == VK_LMENU)
+				{
+					SHORT asyncKeyState = GetAsyncKeyState(i);
+
+					state = asyncKeyState & 0x8000;
+				}
+
+				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
+			}
+		}
+	}
+	else
 	{
 		for (int i = 0; i < 256; i++)
 			if (i != VK_SCROLL)
 				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
-		
-		return;
-	}
-
-	BYTE keyboardState[256] = {};
-	GetKeyboardState(keyboardState);
-
-	for (int i = 0; i < 256; i++)
-	{
-		if (i != VK_SCROLL)
-		{
-			bool state = keyboardState[i] & 0x80;
-
-			// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
-			if (i == VK_RSHIFT
-				|| i == VK_LSHIFT
-				|| i == VK_RCONTROL
-				|| i == VK_LCONTROL
-				|| i == VK_RMENU
-				|| i == VK_LMENU)
-			{
-				SHORT asyncKeyState = GetAsyncKeyState(i);
-
-				state = asyncKeyState & 0x8000;
-			}
-
-			p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
-		}
 	}
 }
 
