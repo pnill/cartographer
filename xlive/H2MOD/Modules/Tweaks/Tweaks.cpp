@@ -105,7 +105,7 @@ typedef int(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
 Video_HUDSizeUpdate_t Video_HUDSizeUpdate_orig;
 
 const float maxHUDTextScale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
-const float maxUiScaleFonts = 1.249f; // >= 1.25 will make text disappear
+const float maxUiScaleFonts = 1.049f; // >= 1.25 will make text disappear
 
 int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 {
