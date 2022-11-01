@@ -438,8 +438,6 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 	return false;
 }
 
-ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-
 // TODO: move to _Shell or somewhere else?
 void XLiveThrottleFramerate(int maxFramerate) 
 {
@@ -488,7 +486,7 @@ void XLiveThrottleFramerate(int maxFramerate)
 
 	LARGE_INTEGER frequency;
 	LARGE_INTEGER deltaCounter;
-	QueryPerformanceFrequency(&frequency);
+	QueryPerformanceFrequency(&frequency); 
 
 	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
 	QueryPerformanceCounter(&deltaCounter);
@@ -503,7 +501,7 @@ void XLiveThrottleFramerate(int maxFramerate)
 		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;
 
 		// skip if time to wait is lower than 2ms
-		if (timeToWaitSleepUs > 2000)
+		if (timeToWaitSleepUs > 3000)
 		{
 			if (NULL != hFrameLimitTimer)
 			{
@@ -525,16 +523,18 @@ void XLiveThrottleFramerate(int maxFramerate)
 				}
 			}
 
-			/*int sleepTime = sleepTimeUs.count() / 1000ll;
+			/*
+			int sleepTime = sleepTimeUs / 1000ll;
 			if (sleepTime >= 0)
-				Sleep(sleepTime);*/
+				Sleep(sleepTime);
+				*/
 		}
 
 		while (true)
 		{
 			QueryPerformanceCounter(&deltaCounter);
 			deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
-			auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+			deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
 			if (deltaTimeUs >= minFrameTimeUs)
 				break;
 		}
