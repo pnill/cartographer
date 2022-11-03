@@ -2,6 +2,7 @@
 #include "Blam\Cache\CacheHeader.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\BlamTag.h"
+#include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Common\Common.h"
 
 namespace tags
@@ -56,7 +57,7 @@ namespace tags
 	char* get_tag_data();
 
 	/* gets the globals\globals aka matg for the current map/cache file (TODO: add the matg structure) */
-	char* get_matg_globals_ptr();
+	s_globals_group_definition* get_matg_globals_ptr();
 
 	/* header for the current .map/cache file */
 	s_cache_header* get_cache_header();

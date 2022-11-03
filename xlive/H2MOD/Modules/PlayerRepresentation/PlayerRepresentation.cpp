@@ -18,7 +18,7 @@
 
 #include "Util\Hooks\Hook.h"
 
-namespace player_representation
+namespace PlayerRepresentation
 {
 	//Non-zero index based value for the count of valid representation types
 	std::map<s_player::e_character_type, byte> type_map
@@ -26,91 +26,71 @@ namespace player_representation
 		{s_player::e_character_type::MasterChief, 0},
 		{s_player::e_character_type::Dervish, 1},
 		{s_player::e_character_type::Spartan, 2},
-		{s_player::e_character_type::Elite, 3}
+		{s_player::e_character_type::Elite, 3},
 	};
+
 	byte representation_count = 4;
 	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, s_player::e_character_type type, string_id variant)
 	{
-		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-		if (!DATUM_IS_NONE(globals_datum)) 
+		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+
+		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		if (!DATUM_IS_NONE(fp_hands))
 		{
-			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
-			if (!DATUM_IS_NONE(fp_hands))
-			{
-				new_rep->first_person_hands.TagGroup = blam_tag::tag_group_type::rendermodel;
-				new_rep->first_person_hands.TagIndex = fp_hands;
-			}
-			else
-				new_rep->first_person_hands = globals->player_representation[2]->first_person_hands;
-
-			if (!DATUM_IS_NONE(fp_body))
-			{
-				new_rep->first_person_body.TagGroup = blam_tag::tag_group_type::rendermodel;
-				new_rep->first_person_body.TagIndex = fp_body;
-			}
-			else
-				new_rep->first_person_body = globals->player_representation[2]->first_person_body;
-
-			if (!DATUM_IS_NONE(tp_biped))
-			{
-				new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
-				new_rep->third_person_unit.TagIndex = tp_biped;
-			}
-			else
-				new_rep->third_person_unit = globals->player_representation[2]->third_person_unit;
-
-			if (variant != -1)
-				new_rep->third_person_variant = variant;
-			type_map.emplace(type, representation_count);
-			++representation_count;
-			return new_rep;
+			new_rep->first_person_hands.TagGroup = blam_tag::tag_group_type::rendermodel;
+			new_rep->first_person_hands.TagIndex = fp_hands;
 		}
-		return nullptr;
+		else
+			new_rep->first_person_hands = globals->player_representation[2]->first_person_hands;
+
+		if (!DATUM_IS_NONE(fp_body))
+		{
+			new_rep->first_person_body.TagGroup = blam_tag::tag_group_type::rendermodel;
+			new_rep->first_person_body.TagIndex = fp_body;
+		}
+		else
+			new_rep->first_person_body = globals->player_representation[2]->first_person_body;
+
+		if (!DATUM_IS_NONE(tp_biped))
+		{
+			new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
+			new_rep->third_person_unit.TagIndex = tp_biped;
+		}
+		else
+			new_rep->third_person_unit = globals->player_representation[2]->third_person_unit;
+
+		if (variant != -1)
+			new_rep->third_person_variant = variant;
+		type_map.emplace(type, representation_count);
+		++representation_count;
+		return new_rep;
 	}
 
 
 	s_globals_group_definition::s_player_representation_block* clone_representation(int index, s_player::e_character_type newType)
 	{
-		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-		if (!DATUM_IS_NONE(globals_datum))
-		{
-			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
-			new_rep->first_person_body = globals->player_representation[index]->first_person_body;
-			new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
-			new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
-			new_rep->third_person_variant = globals->player_representation[index]->third_person_variant;
-			type_map.emplace(newType, representation_count);
-			++representation_count;
-			return new_rep;
-		}
-		return nullptr;
+		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		new_rep->first_person_body = globals->player_representation[index]->first_person_body;
+		new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
+		new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
+		new_rep->third_person_variant = globals->player_representation[index]->third_person_variant;
+		type_map.emplace(newType, representation_count);
+		++representation_count;
+		return new_rep;
 	}
 
 	s_globals_group_definition::s_player_representation_block* get_representation(int index)
 	{
-		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-		if (!DATUM_IS_NONE(globals_datum))
-		{
-			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			return globals->player_representation[index];
-		}
-		return nullptr;
+		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		return globals->player_representation[index];
 	}
 
 	datum get_object_datum_from_representation(s_player::e_character_type representation_index)
 	{
-		auto globals_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-		if (!DATUM_IS_NONE(globals_datum))
-		{
-			auto globals = tags::get_tag_fast<s_globals_group_definition>(globals_datum);
-			if(type_map.find(representation_index) != type_map.end())
-				return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
-		}
-
-		return tags::find_tag(blam_tag::tag_group_type::biped, "objects\\characters\\masterchief\\masterchief");
-
+		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
+	
 	}
 
 	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
@@ -187,11 +167,11 @@ namespace player_representation
 			a2->player_team = e_object_team::None;
 		}
 	}
-	void on_map_load()
+	void OnMapLoad()
 	{
 		if (h2mod->GetEngineType() == _multiplayer) 
 		{
-			representation_count = 4;
+			representation_count = 6;
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
@@ -207,7 +187,7 @@ namespace player_representation
 				tag_loader::Load_tag(skele_datum, true, "carto_shared");
 				tag_loader::Push_Back();
 				auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-				player_representation::add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, s_player::e_character_type::Skeleton);
+				add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, s_player::e_character_type::Skeleton);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = skele_new_datum;
 			}
@@ -224,7 +204,7 @@ namespace player_representation
 				tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 				tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 				tag_loader::Push_Back();
-				player_representation::add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), s_player::e_character_type::Flood);
+				add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), s_player::e_character_type::Flood);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
 			}
@@ -303,7 +283,7 @@ namespace player_representation
 			add_representation(-1, -1, -1, s_player::e_character_type::Lmao, new_variant->name);
 		}
 	}
-	void apply_hooks()
+	void ApplyHooks()
 	{
 		p_network_session_player_profile_recieve = Memory::GetAddress<network_session_player_profile_recieve_t*>(0x52F23);
 		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), network_session_player_profile_recieve);
@@ -311,9 +291,10 @@ namespace player_representation
 		WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
 	}
 
-	void initialize()
+	void Initialize()
 	{
-		apply_hooks();
-		tags::on_map_load(on_map_load);
+		ApplyHooks();
+		tags::on_map_load(OnMapLoad);
 	}
+
 }

@@ -207,14 +207,11 @@ namespace SpecialEvents
 					AddHatAndBeard(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 				}
 
-				if (CustomVariantHandler::VariantEnabled(_id_infection))
+				auto flood_datum = PlayerRepresentation::get_object_datum_from_representation(s_player::e_character_type::Flood);
+				if (!DATUM_IS_NONE(flood_datum))
 				{
-					auto flood_datum = player_representation::get_object_datum_from_representation(s_player::e_character_type::Flood);
-					if (!DATUM_IS_NONE(flood_datum))
-					{
-						auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
-						AddHatAndBeard(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, true);
-					}
+					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
+					AddHatAndBeard(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);
 				}				
 			}
 			if (!DATUM_IS_NONE(snow_datum))
