@@ -645,7 +645,7 @@ void InitRunLoop() {
 	addDebugText("Pre RunLoop hooking.");
 	if (H2IsDediServer) {
 		addDebugText("Hooking loop & shutdown Function");
-		PatchCall(Memory::GetAddress(0xc6cb), dedicated_server_should_quit_hook);
+		PatchCall(Memory::GetAddress(0x0, 0xc6cb), dedicated_server_should_quit_hook);
 	}
 	else {
 		addDebugText("Hooking loop Function");

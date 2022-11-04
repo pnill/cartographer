@@ -252,7 +252,7 @@ char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-BOOL (WINAPI* p_IsDebuggerPresent)();
+static BOOL (WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;
 BOOL WINAPI IsDebuggerPresent_hook() {
 	return false;
 }

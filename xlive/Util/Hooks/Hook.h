@@ -21,7 +21,7 @@ do \
 } while (0)
 
 #define DETOUR_COMMIT() \
-	DetourTransactionCommit(); \
+	DetourTransactionCommit();
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len);
 void RetourFunc(BYTE *src, BYTE *restore, const unsigned int len);
