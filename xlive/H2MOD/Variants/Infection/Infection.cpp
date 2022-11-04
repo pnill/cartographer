@@ -36,8 +36,6 @@ int Infection::calculateZombiePlayerIndex()
 		std::mt19937 mt_rand(rd());
 		std::vector<int> vecPlayersActiveIndexes;
 
-		int playerIndex = 0;
-
 		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
