@@ -3,7 +3,7 @@
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Engine\Players\Players.h"
 
-namespace player_representation
+namespace PlayerRepresentation
 {
 	/**
 	 * \brief Adds a new player representation to the globals tag block
@@ -24,6 +24,5 @@ namespace player_representation
 	s_globals_group_definition::s_player_representation_block* clone_representation(int index, s_player::e_character_type newType);
 
 	datum get_object_datum_from_representation(s_player::e_character_type representation_index);
-	void apply_hooks();
-	void initialize();
+	void Initialize();
 }

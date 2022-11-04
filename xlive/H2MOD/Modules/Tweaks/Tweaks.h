@@ -17,4 +17,5 @@ namespace H2Tweaks {
 	void setHz();
 	void SunflareFix();
 	void WarpFix(bool enable);
+	void RefreshTogglexDelay();
 }

@@ -217,12 +217,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			create_at_rest = FLAG(8),
 		};
 		e_placement_flags placement_flags;//0x4
-		float position_x;//0x8
-		float position_y;//0xC
-		float position_z;//0x10
-		angle rotation_yaw;//0x14
-		angle rotation_pitch;//0x18
-		angle rotation_roll;//0x1C
+		real_point3d position;
+		real_vector3d rotation;
 		float scale;//0x20
 		enum class e_transform_flags : __int16
 		{
@@ -248,7 +244,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			crate = 11,
 			creature = 12,
 		};
-		e_type type1;//0x2E
+		e_type object_type;//0x2E
 		enum class e_source : __int8
 		{
 			structure = 0,

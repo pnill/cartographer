@@ -33,6 +33,7 @@
 #include "H2MOD\Modules\KantTesting\KantTesting.h"
 #include "H2MOD\Modules\MainMenu\MapSlots.h"
 #include "H2MOD\Modules\MainMenu\Ranks.h"
+#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
@@ -1192,6 +1193,8 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
+	PlayerRepresentation::Initialize();
+
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
@@ -1203,7 +1206,9 @@ void H2MOD::Initialize()
 		DirectorHooks::Initialize();
 		SpecialEvents::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
-		//ObserverMode::Initialize();
+#ifndef NDEBUG
+		ObserverMode::Initialize();
+#endif
 		TEST_N_DEF(PC3);
 		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
 			// Discord init
@@ -1222,7 +1227,6 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
-	player_representation::initialize();
 	KantTesting::Initialize();
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
