@@ -5,7 +5,6 @@
 namespace MetaExtender
 {
 	void add_tag_block(unsigned long tag_block_ptr, int tag_block_item_size, int tag_block_item_count, int newCount);
-	void test();
 	void free_tag_blocks();
 	void add_to_free(void* mem);
 	template<typename T = void>

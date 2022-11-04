@@ -148,6 +148,7 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -482,6 +483,10 @@
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Lockout.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Coagulation.h" />
+    <ClInclude Include="Blam\Engine\camera\camera.h" />
+    <ClInclude Include="Blam\Engine\render\render_cameras.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -21,11 +21,11 @@ p_network_player_actions_to_player_actions* network_player_actions_to_player_act
 
 void PlayerControl::ApplyHooks()
 {
-	//return; // TODO FIXME usercall convention functions, bad hooks
+	return; // TODO FIXME usercall convention functions, bad hooks
 	p_UpdatePlayerControl = Memory::GetAddress<c_UpdatePlayerControl*>(0x90D62);
 	network_player_actions_to_player_actions = Memory::GetAddress<p_network_player_actions_to_player_actions*>(0x1DB569);
-	//PatchCall(Memory::GetAddress(0x93596), UpdatePlayerControl);
-	//PatchCall(Memory::GetAddress(0x9390D), UpdatePlayerControl);
+	PatchCall(Memory::GetAddress(0x93596), UpdatePlayerControl);
+	PatchCall(Memory::GetAddress(0x9390D), UpdatePlayerControl);
 }
 
 s_player_actions PlayerControl::GetPlayerActions(int player_index)

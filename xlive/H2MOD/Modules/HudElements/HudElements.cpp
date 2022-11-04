@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "HudElements.h"
+
+#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
+#include "Blam\Engine\render\render_cameras.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
@@ -12,17 +15,12 @@
 #include "Blam\Cache\TagGroups\bitmap_definition.hpp"
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
-
 #define _USE_MATH_DEFINES
 #include <math.h>
 
 static bool b_showHUD = true;
 static bool b_showFirstPerson = true;
 static bool RenderIngameChat() {
-	int GameGlobals = *Memory::GetAddress<int*>(0x482D3C);
-	DWORD* GameEngine = (DWORD*)(GameGlobals + 0x8);
-
 	if (H2Config_hide_ingame_chat) {
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
 		if (s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) {
@@ -32,13 +30,13 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (*GameEngine != 3 && Engine::get_game_life_cycle() == _life_cycle_in_game) {
+	else if (h2mod->GetEngineType() != _main_menu && Engine::get_game_life_cycle() == _life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
 	else {
 		//original test - if is campaign
-		return *GameEngine == 1;
+		return true;
 	}
 }
 
@@ -66,24 +64,6 @@ static bool __cdecl RenderHudCheck(unsigned int a1)
 	}
 
 	return false;
-}
-
-typedef void(__cdecl render_camera_build_projection_t)(char*, int, int);
-render_camera_build_projection_t* p_render_camera_build_projection;
-
-void __cdecl render_camera_build_projection_hook(char* camera, int frustum_bounds, int out_projection)
-{
-	float old_camera_field_of_view = *(float*)(camera + 0x28);
-	
-	if (H2Config_static_first_person) 
-	{
-		*(float*)(camera + 0x28) = ((64.f * M_PI) / 180.0f) * 0.78500003f;
-		//*(float*)(a1 + 0x28) = 0.86558843f;
-	}
-	
-	p_render_camera_build_projection(camera, frustum_bounds, out_projection);
-	
-	*(float*)(camera + 0x28) = old_camera_field_of_view;
 }
 
 void HudElements::setCrosshairSize(bool mapLoadContext)
@@ -137,19 +117,14 @@ void HudElements::setCrosshairPos() {
 		return;
 
 	if (!FloatIsNaN(H2Config_crosshair_offset)) {
-		tags::tag_data_block* player_controls_block = reinterpret_cast<tags::tag_data_block*>(tags::get_matg_globals_ptr() + 240);
-		if (player_controls_block->block_count > 0)
-		{
-			for (int i = 0; i < player_controls_block->block_count; i++) {
-				*(float*)(tags::get_tag_data() + player_controls_block->block_data_offset + 128 * i + 28) = H2Config_crosshair_offset;
-			}
-		}
+		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		globals->player_control[0]->crosshair_location.y = H2Config_crosshair_offset;
 	}
 }
 
 void HudElements::RadarPatch()
 {
-	WriteValue<BYTE>(H2BaseAddr + 0x2849C4, (BYTE)4);
+	WriteValue<BYTE>(Memory::GetAddress(0x2849C4), (BYTE)4);
 	addDebugText("Motion sensor patched successfully.");
 }
 
@@ -226,13 +201,16 @@ void HudElements::OnMapLoad()
 
 void HudElements::ApplyHooks()
 {
-	//Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
+	// Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 	PatchCall(Memory::GetAddress(0x22667B), RenderIngameChat);
 	PatchCall(Memory::GetAddress(0x226628), RenderIngameChat);
+
 	PatchCall(Memory::GetAddress(0x228579), RenderFirstPersonCheck);
+
+	// Redirect ice_cream_flavor_available call 
 	PatchCall(Memory::GetAddress(0x223955), RenderHudCheck);
+
 	PatchCall(Memory::GetAddress(0x191440), render_camera_build_projection_hook);
-	p_render_camera_build_projection = Memory::GetAddress<render_camera_build_projection_t*>(0x1953f5);
 }
 
 void HudElements::Init()

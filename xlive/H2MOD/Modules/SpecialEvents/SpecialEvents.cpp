@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "SpecialEvents.h"
+#include "MapObjectPlacements\Halloween\Coagulation.h"
+#include "MapObjectPlacements\Halloween\Lockout.h"
 
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
@@ -120,7 +122,7 @@ namespace SpecialEvents
 		weapon->first_person[0]->first_person_model.TagIndex = fp_model_datum;
 		weapon->first_person[1]->first_person_model.TagIndex = fp_model_datum;
 
-		auto model_datum = weapon->model.TagIndex;
+		datum model_datum = weapon->model.TagIndex;
 		auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(model_datum);
 		model->render_model.TagIndex = _3p_model_datum;
 
@@ -193,21 +195,21 @@ namespace SpecialEvents
 				santa_hat_datum = tag_loader::ResolveNewDatum(santa_hat_datum);
 				beard_datum = tag_loader::ResolveNewDatum(beard_datum);
 
-				auto hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
+				datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
 				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 					AddHatAndBeard(hlmt_chief_datum, santa_hat_datum, beard_datum);
 				}
-				auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_mp_datum != DATUM_INDEX_NONE) {
 					AddHatAndBeard(hlmt_chief_mp_datum, santa_hat_datum, beard_datum);
 				}
-				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+				datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 				if (hlmt_elite_datum != DATUM_INDEX_NONE)
 				{
 					AddHatAndBeard(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 				}
 
-				auto flood_datum = PlayerRepresentation::get_object_datum_from_representation(s_player::e_character_type::Flood);
+				datum flood_datum = PlayerRepresentation::get_object_datum_from_representation(s_player::e_character_type::Flood);
 				if (!DATUM_IS_NONE(flood_datum))
 				{
 					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
@@ -271,7 +273,7 @@ namespace SpecialEvents
 				ghost_vehicle->objectTag.attachments.data = 0;
 				ghost_vehicle->objectTag.attachments.size = 0;
 
-				auto ghost_model_datum = ghost_vehicle->objectTag.model.TagIndex;
+				datum ghost_model_datum = ghost_vehicle->objectTag.model.TagIndex;
 				auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ghost_model_datum);
 				ghost_model->render_model.TagIndex = deer_datum;
 			}
@@ -330,24 +332,22 @@ namespace SpecialEvents
 				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 					AddHatAndBeard(hlmt_chief_datum, paddy_hat_datum, paddy_beard_datum);
 				}
-				auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_mp_datum != DATUM_INDEX_NONE) {
 					AddHatAndBeard(hlmt_chief_mp_datum, paddy_hat_datum, paddy_beard_datum);
 				}
-				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+				datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 				if (hlmt_elite_datum != DATUM_INDEX_NONE)
 				{
 					AddHatAndBeard(hlmt_elite_datum, paddy_hat_datum, paddy_beard_datum, true);
 				}
 
 				// Replace ball and bomb with the pot of gold
-				auto ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\head_sp");
+				datum ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\head_sp");
 				if (ball_weapon_datum != DATUM_INDEX_NONE)
 				{
 					auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_weapon_datum);
-
-					auto ball_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\ball\\ball");
-					auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_model_datum);
+					auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_weapon->model.TagIndex);
 
 					ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
 
@@ -355,13 +355,11 @@ namespace SpecialEvents
 					ball_weapon->bounding_radius = 0.3f;
 					ball_weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
 				}
-				auto bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+				datum bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 				if (bomb_weapon_datum != DATUM_INDEX_NONE)
 				{
 					auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_weapon_datum);
-
-					auto bomb_model_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_model_datum);
+					auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_weapon->model.TagIndex);
 
 					bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
 					auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
@@ -415,8 +413,8 @@ namespace SpecialEvents
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
 			
-			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
-			if (strcmp(mapName, "coagulation") == 0)
+			s_cache_header* cache_header = tags::get_cache_header();
+			if (strcmp(cache_header->name, "coagulation") == 0)
 			{
 				for (auto& scen_place : coag_scen_places)
 				{
@@ -445,7 +443,7 @@ namespace SpecialEvents
 					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
-			if (strcmp(mapName, "lockout") == 0)
+			if (strcmp(cache_header->name, "lockout") == 0)
 			{
 				for (auto& scen_place : lockout_scen_places)
 				{
@@ -506,18 +504,20 @@ namespace SpecialEvents
 				pump_datum = tag_loader::ResolveNewDatum(pump_datum);
 				large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
 				lbitm_datum = tag_loader::ResolveNewDatum(lbitm_datum);
+				sky_datum = tag_loader::ResolveNewDatum(sky_datum);
 
 				LOG_INFO_GAME("{:x}", candle_datum);
 				LOG_INFO_GAME("{:x}", candle_fire_datum);
 				LOG_INFO_GAME("{:x}", pump_datum);
-				LOG_INFO_GAME("{:x}", large_candle_datum);
+				LOG_INFO_GAME("{:x}", lbitm_datum);
+				LOG_INFO_GAME("{:x}", sky_datum);
 
 				if (!DATUM_IS_NONE(sky_datum))
 				{
-					auto sky = tags::get_tag<blam_tag::tag_group_type::sky, char*>(tag_loader::ResolveNewDatum(sky_datum), true);
+					auto sky = tags::get_tag<blam_tag::tag_group_type::sky, char*>(sky_datum, true);
 					auto render_model_ref = reinterpret_cast<tag_reference*>(sky);
 					auto render_model = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(render_model_ref->TagIndex, true);
-					scnr->skies[0]->sky.TagIndex = tag_loader::ResolveNewDatum(sky_datum);
+					scnr->skies[0]->sky.TagIndex = sky_datum;
 				}
 				if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
 				{
@@ -587,11 +587,11 @@ namespace SpecialEvents
 				if (hlmt_chief_datum != DATUM_INDEX_NONE) {
 					AddHat(hlmt_chief_datum, bday_hat_datum);
 				}
-				auto hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+				datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 				if (hlmt_chief_mp_datum != DATUM_INDEX_NONE) {
 					AddHat(hlmt_chief_mp_datum, bday_hat_datum);
 				}
-				auto hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+				datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 				if (hlmt_elite_datum != DATUM_INDEX_NONE)
 				{
 					AddHat(hlmt_elite_datum, bday_hat_datum, true);

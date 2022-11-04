@@ -140,7 +140,7 @@ void Infection::InitHost() {
 	for each (auto itemcollection in itemcollections)
 		{
 			std::string item_name = tags::get_tag_name(itemcollection.first);
-			if (strstr(item_name.c_str(), "multiplayer\\powerups") != nullptr ||
+			if (item_name.find("multiplayer\\powerups") != std::string::npos ||
 				item_name == "multiplayer\\single_weapons\\frag_grenades" ||
 				item_name == "multiplayer\\single_weapons\\plasma_grenades")
 			{
