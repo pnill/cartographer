@@ -7,7 +7,7 @@
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
@@ -29,7 +29,7 @@ Infection::Infection()
 {
 }
 
-int Infection::calculateZombiePlayerIndex() 
+int Infection::calculateZombiePlayerIndex()
 {
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
@@ -37,14 +37,14 @@ int Infection::calculateZombiePlayerIndex()
 		std::vector<int> vecPlayersActiveIndexes;
 
 		int playerIndex = 0;
-		do 
+		do
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
 
 			playerIndex++;
 		} while (playerIndex < 16);
-	
+
 		if (vecPlayersActiveIndexes.empty())
 			return NONE;
 
@@ -55,7 +55,7 @@ int Infection::calculateZombiePlayerIndex()
 
 		return infectedPlayerIndex;
 	}
-	
+
 	return NONE;
 }
 
@@ -113,7 +113,7 @@ void Infection::InitClient()
 	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_infection] = L"sounds/es/infection.wav";
 	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_new_zombie] = L"sounds/es/new_zombie.wav";
 
-	
+
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
 	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
@@ -134,50 +134,46 @@ void Infection::InitHost() {
 	LOG_TRACE_GAME("[h2mod-infection] Host init setting unit speed patch");
 	//Applying SpeedCheck fix
 	h2mod->set_unit_speed_patch(true);
-	//Fixing broken equipment and replace powerups/vehicles with weapons
-	//auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
-	//auto magnum_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\pistol\\magnum\\magnum");
-	//auto shotgun_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\rifle\\shotgun\\shotgun");
-	//for(auto &scenario_ : scenarios)
-	//{
-	//	auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
-	//	//Using this to make all vehicle spawns be shotguns
-	//	datum itmc_override;
-	//	bool flop = false;
-	//	for(auto i = 0; i < scenario->netgame_equipment.size; i++)
-	//	{
-	//		auto equipment = scenario->netgame_equipment[i];
-	//		equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
-	//		s_item_collection_group_definition* i_collection;
-	//		s_vehicle_collection_group_definition* v_collection;
-	//		switch(equipment->itemvehicle_collection.TagGroup.tag_type)
-	//		{
-	//			case blam_tag::tag_group_type::itemcollection:
-	//				if (!flop)
-	//					itmc_override = equipment->itemvehicle_collection.TagIndex;
-	//				i_collection = tags::get_tag<blam_tag::tag_group_type::itemcollection, s_item_collection_group_definition>(equipment->itemvehicle_collection.TagIndex);
-	//				for(auto j = 0; j < i_collection->item_permutations.size; j++)
-	//				{
-	//					i_collection->item_permutations[j]->item.TagGroup = blam_tag::tag_group_type::weapon;
-	//					if (flop) {
-	//						i_collection->item_permutations[j]->item.TagIndex = magnum_datum;
-	//					}
-	//					else
-	//					{
-	//						flop = true;
-	//						i_collection->item_permutations[j]->item.TagIndex = shotgun_datum;
-	//					}
-	//				}
-	//				
-	//				break;
-	//			case blam_tag::tag_group_type::vehiclecollection:
-	//				equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-	//				equipment->itemvehicle_collection.TagIndex = itmc_override;
-	//				break;
-	//		}
 
-	//	}
-	//}
+	// Remove unwanted items in infection
+	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
+	for each (auto itemcollection in itemcollections)
+		{
+			std::string item_name = tags::get_tag_name(itemcollection.first);
+			if (item_name.find("multiplayer\\powerups") != std::string::npos ||
+				item_name == "multiplayer\\single_weapons\\frag_grenades" ||
+				item_name == "multiplayer\\single_weapons\\plasma_grenades")
+			{
+				auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
+
+				// Can't make equipment null otherwise it'll crash, dosent spawn anything anyways so it's fine
+				if (itmc->item_permutations[0]->item.TagGroup == blam_tag::tag_group_type::equipment)
+				{
+					itmc->item_permutations[0]->item.TagIndex = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\powerups\shotgun_ammo\shotgun_ammo");
+				}
+				else
+				{
+					itmc->item_permutations[0]->item.TagIndex = NULL;
+				}
+			}
+		}
+	
+	//Replace vehicles with shotguns
+	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
+	for(auto &scenario_ : scenarios)
+	{
+		auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
+		for(auto i = 0; i < scenario->netgame_equipment.size; i++)
+		{
+			auto equipment = scenario->netgame_equipment[i];
+			if(equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
+			{
+				equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+				equipment->itemvehicle_collection.TagIndex = DATUM_INDEX_NONE;
+			}
+		}
+	}
+
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
@@ -217,13 +213,13 @@ void Infection::preSpawnServerSetup() {
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::GetName(currentPlayerIndex));
 		if (isZombie) {
 			s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Flood);
-			if (s_player::GetTeam(currentPlayerIndex) != ZOMBIE_TEAM)  {
+			if (s_player::GetTeam(currentPlayerIndex) != ZOMBIE_TEAM) {
 				if (NetworkSession::LocalPeerIsSessionHost())
 					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
 			}
 		}
 		else {
-			if(SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+			if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
@@ -305,9 +301,9 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		case _multiplayer:
 			this->Initialize();
 			break;
-		/*case _main_menu:
-			this->Dispose();
-			break;*/
+			/*case _main_menu:
+				this->Dispose();
+				break;*/
 		default:
 			break;
 		}

@@ -108,6 +108,9 @@ bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
 bool H2Config_spooky_boy = true;
 bool H2Config_event_music = true;
+#ifndef NDEBUG
+int H2Config_forced_event = 0;
+#endif
 
 int H2Config_hotkeyIdHelp = VK_F2;
 int H2Config_hotkeyIdAlignWindow = VK_F7;
@@ -532,6 +535,9 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "event_music", H2Config_event_music);
+#ifndef NDEBUG
+			ini.SetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event);
+#endif
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
@@ -851,6 +857,9 @@ void ReadH2Config() {
 				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 				H2Config_spooky_boy = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 				H2Config_event_music = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "event_music", H2Config_event_music);
+#ifndef NDEBUG
+				H2Config_forced_event = ini.GetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event);
+#endif
 			}
 
 			// dedicated server only

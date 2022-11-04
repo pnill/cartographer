@@ -56,8 +56,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 		tag_block<s_bsp_3d_nodes_block> bsp_3d_nodes;//0x0
 		struct s_planes_block
 		{
-			PAD(0xC);//0x0
-			float plane_distance;//0xC
+			real_plane3d plane_distance;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_planes_block, 0x10);
 		tag_block<s_planes_block> planes;//0x8
@@ -122,9 +121,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 		tag_block<s_edges_block> edges;//0x30
 		struct s_vertices_block
 		{
-			float point_x;//0x0
-			float point_y;//0x4
-			float point_z;//0x8
+			real_point3d point;
 			__int16 first_edge;//0xC
 			PAD(0x2);//0xE
 		};

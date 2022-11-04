@@ -1,18 +1,23 @@
 #include "stdafx.h"
 
-#include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
 #include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Modules\RenderHooks\RenderHooks.h"
 #include "H2MOD\Modules\RunLoop\RunLoop.h"
-#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
 #include "Util\Hooks\Hook.h"
+
+#ifndef NDEBUG
+#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
+#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
+#include "H2MOD\Utils\Utils.h"
+#endif
 
 #include "imgui.h"
 #include "imgui_handler.h"
@@ -36,7 +41,6 @@ namespace ImGuiHandler {
 			bool g_init = false;
 			int g_language_code = -1;
 
-			
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
@@ -53,7 +57,7 @@ namespace ImGuiHandler {
 					viewport->WorkSize.x - 200,
 					viewport->WorkSize.y - 200
 				);
-				
+
 				draw_list->AddRectFilled(ImVec2(Center.x - 100, Center.y - 100), ImVec2(Center.x + 100, Center.y + 100), ImColor(20, 20, 20));
 				draw_list->AddCircleFilled(Center, 100, ImColor(255, 255, 255), 120);
 				if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
@@ -100,7 +104,7 @@ namespace ImGuiHandler {
 					if (radial_invalid)
 						valid = false;
 
-				if(valid)
+				if (valid)
 				{
 					draw_list->AddCircleFilled(Thumb_Pos, 5, ImColor(0, 255, 0), 60);
 				}
@@ -144,7 +148,7 @@ namespace ImGuiHandler {
 					//Vehicle FOV
 					ImGui::Text(GetString(vehicle_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, "");ImGui::SameLine();
+					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
 						HudElements::setVehicleFOV();
 
@@ -264,7 +268,7 @@ namespace ImGuiHandler {
 
 						SET_DESIRED_RENDER_TIME();
 					}
-					
+
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
@@ -295,7 +299,7 @@ namespace ImGuiHandler {
 					ImGui::Text(GetString(shadow_title));
 					const char* s_items[] = { GetString(tex_L1), GetString(e_default), GetString(tex_L2), GetString(tex_L3) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					if(ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
+					if (ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
 					{
 						H2Config_Override_Shadows = (e_override_texture_resolution)g_shadows;
 						RenderHooks::ResetDevice();
@@ -338,11 +342,11 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(hires_fix_tooltip));
 
-					
+
 					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
 					//if (ImGui::IsItemHovered())
 					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
-					
+
 				}
 			}
 			void MouseKeyboardSettings()
@@ -600,57 +604,57 @@ namespace ImGuiHandler {
 					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
 					ImGui::Columns(3, NULL, false);
-					for (auto i = 0; i < 14; i++) 
+					for (auto i = 0; i < 14; i++)
 					{
 						ImGui::Text(button_items[i]);
 						ImGui::PushItemWidth(ImGui::GetColumnWidth());
 						std::string Id = "##C_L" + std::to_string(i);
 						if (ImGui::Combo(Id.c_str(), &button_placeholders[i], action_items, 14))
 						{
-							switch((ControllerInput::XINPUT_BUTTONS)button_values[i])
+							switch ((ControllerInput::XINPUT_BUTTONS)button_values[i])
 							{
-								case ControllerInput::XINPUT_GAMEPAD_DPAD_UP: 
-									H2Config_CustomLayout.DPAD_UP = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_DPAD_DOWN:
-									H2Config_CustomLayout.DPAD_DOWN = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_DPAD_LEFT:
-									H2Config_CustomLayout.DPAD_LEFT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_DPAD_RIGHT: 
-									H2Config_CustomLayout.DPAD_RIGHT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_START: 
-									H2Config_CustomLayout.START = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_BACK: 
-									H2Config_CustomLayout.BACK = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_LEFT_THUMB: 
-									H2Config_CustomLayout.LEFT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_RIGHT_THUMB: 
-									H2Config_CustomLayout.RIGHT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_LEFT_SHOULDER: 
-									H2Config_CustomLayout.LEFT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_RIGHT_SHOULDER: 
-									H2Config_CustomLayout.RIGHT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_A: 
-									H2Config_CustomLayout.A = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_B: 
-									H2Config_CustomLayout.B = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_X: 
-									H2Config_CustomLayout.X = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
-								case ControllerInput::XINPUT_GAMEPAD_Y: 
-									H2Config_CustomLayout.Y = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
-									break;
+							case ControllerInput::XINPUT_GAMEPAD_DPAD_UP:
+								H2Config_CustomLayout.DPAD_UP = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_DPAD_DOWN:
+								H2Config_CustomLayout.DPAD_DOWN = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_DPAD_LEFT:
+								H2Config_CustomLayout.DPAD_LEFT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_DPAD_RIGHT:
+								H2Config_CustomLayout.DPAD_RIGHT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_START:
+								H2Config_CustomLayout.START = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_BACK:
+								H2Config_CustomLayout.BACK = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_LEFT_THUMB:
+								H2Config_CustomLayout.LEFT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_RIGHT_THUMB:
+								H2Config_CustomLayout.RIGHT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_LEFT_SHOULDER:
+								H2Config_CustomLayout.LEFT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_RIGHT_SHOULDER:
+								H2Config_CustomLayout.RIGHT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_A:
+								H2Config_CustomLayout.A = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_B:
+								H2Config_CustomLayout.B = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_X:
+								H2Config_CustomLayout.X = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
+							case ControllerInput::XINPUT_GAMEPAD_Y:
+								H2Config_CustomLayout.Y = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+								break;
 							}
 						}
 						ImGui::PopItemWidth();
@@ -684,8 +688,10 @@ namespace ImGuiHandler {
 						//XDelay
 						TextVerticalPad(GetString(disable_x_delay));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##XDelay", &H2Config_xDelay);
-
+						if (ImGui::Checkbox("##XDelay", &H2Config_xDelay))
+						{
+							H2Tweaks::RefreshTogglexDelay();
+						}
 						ImGui::Columns(1);
 						ImGui::Separator();
 						bool* skulls = ice_cream_flavor_state();
@@ -959,17 +965,18 @@ namespace ImGuiHandler {
 				HostSettings();
 				GameSettings();
 
-				
-#if DISPLAY_DEV_TESTING_MENU
+
+#ifndef NDEBUG
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
+					/*
 					if(ImGui::CollapsingHeader("Misc"))
 					{
 						if(ImGui::Button("Log Player Unit Objects"))
 						{
 							PlayerIterator playerIt;
 							s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
-							
+
 							while(playerIt.get_next_active_player())
 							{
 								auto player = playerIt.get_current_player_data();
@@ -978,14 +985,20 @@ namespace ImGuiHandler {
 							}
 						}
 					}
-					if(ImGui::CollapsingHeader("Director Mode"))
+					*/
+					ImGui::Indent();
+					if (ImGui::CollapsingHeader("Director Mode"))
 					{
-						if(ImGui::Button("Game"))
+						if (ImGui::Button("Set Observer Team"))
+						{
+							WriteValue(Memory::GetAddress(0x51A6B4), 255);
+						}
+						if (ImGui::Button("Game"))
 						{
 							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
 						}
-						if(ImGui::Button("Editor"))
+						if (ImGui::Button("Editor"))
 						{
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_freecam);
 						}
@@ -996,17 +1009,17 @@ namespace ImGuiHandler {
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
 						}
 						ImGui::SameLine();
-						if(ImGui::Button("Editor First Person"))
+						if (ImGui::Button("Editor First Person"))
 						{
 							ObserverMode::NextPlayer();
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_firstperson);
 						}
-						if(ImGui::Button("Player"))
+						if (ImGui::Button("Player"))
 						{
 							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
 							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
 						}
-						if(ImGui::Button("N"))
+						if (ImGui::Button("N"))
 						{
 							ObserverMode::NextPlayer();
 						}
@@ -1023,15 +1036,52 @@ namespace ImGuiHandler {
 						}
 						ImGui::Columns(1);
 					}
-					if(ImGui::CollapsingHeader("Render Geometries"))
+					if (ImGui::CollapsingHeader("Render Geometries"))
 					{
 						ImGui::Columns(4, NULL, false);
-						for(auto i = 0; i < 24; i++)
+						for (auto i = 0; i < 24; i++)
 						{
 							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
 							ImGui::NextColumn();
 						}
 						ImGui::Columns(1);
+					}
+					static int event_type = H2Config_forced_event;
+					if (ImGui::CollapsingHeader("Events"))
+					{
+						if (ImGui::RadioButton("None", &event_type, SpecialEvents::e_event_type::_no_event))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_no_event;
+						} ImGui::SameLine();
+						if (ImGui::RadioButton("Christmas", &event_type, SpecialEvents::e_event_type::_christmas))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_christmas;
+						} ImGui::SameLine();
+						if (ImGui::RadioButton("St Paddys", &event_type, SpecialEvents::e_event_type::_st_paddys))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_st_paddys;
+						} ImGui::SameLine();
+						if (ImGui::RadioButton("Mook Madness", &event_type, SpecialEvents::e_event_type::_mook_maddness))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_mook_maddness;
+						}
+
+						if (ImGui::RadioButton("Halloween", &event_type, SpecialEvents::e_event_type::_halloween))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_halloween;
+						}ImGui::SameLine();
+						if (ImGui::RadioButton("Birthday", &event_type, SpecialEvents::e_event_type::_birthday))
+						{
+							H2Config_forced_event = (int)SpecialEvents::e_event_type::_birthday;
+						}
+
+					}
+					if (ImGui::CollapsingHeader("WGIT Testing"))
+					{
+						if (ImGui::Button("Custom Languages"))
+						{
+							GSCustomMenuCall_Language();
+						}
 					}
 				}
 #endif
@@ -1049,9 +1099,9 @@ namespace ImGuiHandler {
 		{
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
-			for(auto i = 0; i < 14; i++)
+			for (auto i = 0; i < 14; i++)
 			{
-				for(auto j = 0; j < 14; j++)
+				for (auto j = 0; j < 14; j++)
 				{
 					if (button_values[j] == Buttons[i])
 						button_placeholders[i] = j;
@@ -1150,7 +1200,7 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::host_campagin_settings] = "Host & Campaign Settings";
 			string_table[0][e_advanced_string::anti_cheat] = "Anti-Cheat";
 			string_table[0][e_advanced_string::anti_cheat_tooltip] = "Allows you to disable the Anti-Cheat for your lobby.";
-			string_table[0][e_advanced_string::disable_x_delay] = "Disable X to Delay";
+			string_table[0][e_advanced_string::disable_x_delay] = "Enable X to Delay";
 			string_table[0][e_advanced_string::skull_anger] = "Anger";
 			string_table[0][e_advanced_string::skull_anger_tooltip] = "Enemies and allies fire their weapons faster and more frequently.";
 			string_table[0][e_advanced_string::skull_assassins] = "Assassins";
@@ -1274,11 +1324,11 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::tex_L3] = "Muy alto";
 			string_table[4][e_advanced_string::lod_tooltip] = "Cambiar esto forzará el juego a usar los modelos del nivel de detalle seleccionado si están disponibles.\nDejarlo en Predeterminado hará que el nivel de detalle sea dinámico y controlado por el juego.";
 			string_table[4][e_advanced_string::shader_lod_max] = "Máximo nivel de profundidad de sombreado";
-			string_table[4][e_advanced_string::shader_lod_max_tooltip] = 
+			string_table[4][e_advanced_string::shader_lod_max_tooltip] =
 				"Esto obligará a los shaders a usar los LODS más altos independientemente de su distancia del jugador."
 				"\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::light_suppressor] = "Desactivar supresión de luz";
-			string_table[4][e_advanced_string::light_suppressor_tooltip] = 
+			string_table[4][e_advanced_string::light_suppressor_tooltip] =
 				"Esto hará que las luces no se desvanezcan cuando haya varias en la pantalla"
 				"\nEste ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::hires_fix] = "Arreglos de alta resolución";

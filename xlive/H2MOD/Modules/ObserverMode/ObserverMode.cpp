@@ -16,7 +16,7 @@ namespace ObserverMode
 	e_observer_mode ObserverMode = observer_freecam;
 	real_vector3d* CameraAngles;
 	byte* EditorCameraTargetFunction;
-	//Blam::EngineDefinitions::Players::s_network_player_actions** network_player_actions;
+	s_player_motion** network_player_actions;
 
 
 
@@ -250,7 +250,7 @@ namespace ObserverMode
 	{
 		CameraAngles = Memory::GetAddress<real_vector3d*>(0x4A84C0);
 		EditorCameraTargetFunction = Memory::GetAddress<byte*>(0x4D8500);
-		//network_player_actions = Memory::GetAddress<Blam::EngineDefinitions::Players::s_network_player_actions**>(0x514EE8);
+		network_player_actions = Memory::GetAddress<s_player_motion**>(0x514EE8);
 
 		sub_7BD2EC = Memory::GetAddress<p_sub_7BD2EC*>(0x13D2EC);
 

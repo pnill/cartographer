@@ -37,7 +37,7 @@ struct s_player
 		Elite = 3,
 		Skeleton = 4,
 		Flood = 5,
-		Kant = 6
+		Lmao = 6
 	};
 
 	enum class e_emblem_foreground : BYTE

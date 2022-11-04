@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Math\BlamMath.h"
@@ -283,14 +284,17 @@ struct s_physics_model_group_definition : TagGroup<'phmo'>
 		float restitution;//0x10
 		float volume;//0x14
 		float mass;//0x18
-		PAD(0x2);//0x1C
+		PAD(2);//0x1C
 		__int16 phantom;//0x1E
-		PAD(0x4);//0x20
-		__int16 size;//0x24
-		__int16 count;//0x26
-		PAD(0x4);//0x28
-		float radius;//0x2C
-		PAD(0x20);//0x30
+		PAD(4);
+		short size;
+		short count;
+		__int32 user_data;
+		float radius;
+		real_vector3d bottom;
+		float wbottom;
+		real_vector3d top;
+		float wtop;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_pills_block, 0x50);
 	tag_block<s_pills_block> pills;//0x58

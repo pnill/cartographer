@@ -708,13 +708,6 @@ void RefreshToggleIngameKeyboardControls() {
 	}
 }
 
-void RefreshTogglexDelay() {
-	BYTE xDelayJMP[] = { 0x74 };
-	if (!H2Config_xDelay)
-		xDelayJMP[0] = 0xEB;
-	WriteBytes(H2BaseAddr + (H2IsDediServer ? 0x1a1316 : 0x1c9d8e), xDelayJMP, 1);
-}
-
 #pragma endregion
 
 #pragma region CM_Credits
