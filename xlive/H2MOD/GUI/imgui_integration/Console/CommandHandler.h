@@ -4,7 +4,7 @@
 
 #include "ComVar.h"
 
-class IOutput;
+class ConsoleLog;
 class ConsoleCommand;
 struct ConsoleCommandCtxData;
 typedef int CommandFlags;
@@ -13,16 +13,15 @@ typedef int CommandFlags;
 typedef int(ExecuteCommandCallbackT)(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 
 // for redirecting output to either dedicated server/imgui console
-class IOutput
+class ConsoleLog
 {
 public:
-	virtual int Output(StringHeaderFlags flags, const char* fmt) = 0;
-	virtual int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) = 0;
+	virtual int Output(StringHeaderFlags flags, const char* fmt, ...) = 0;
 };
 
 struct ConsoleCommandCtxData
 {
-    IOutput* strOutput;
+    ConsoleLog* strOutput;
     ComVar* commandVar;
     ExecuteCommandCallbackT* execCmdCb;
     const ConsoleCommand* consoleCommandData;
@@ -73,7 +72,7 @@ public:
 
     static bool CheckArgs(ConsoleCommandCtxData* cb_data, const char* command_line, const std::vector<std::string>& tokens);
 	
-    static bool ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, IOutput* strOutput, ConsoleCommand* command);
+    static bool ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, ConsoleLog* output, ConsoleCommand* command);
    
     ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback,
         CommandFlags _flags = CommandFlag_None);
@@ -82,7 +81,7 @@ public:
 
     // handles command line
     // returns true if command line has been handled
-    static bool HandleCommandLine(const char* command_line, size_t command_line_length, IOutput* context);
+    static bool HandleCommandLine(const char* command_line, size_t command_line_length, ConsoleLog* context);
 
 protected:
 

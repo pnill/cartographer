@@ -7,6 +7,8 @@
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 
+#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
+
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
@@ -26,6 +28,8 @@ DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex,
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
 	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
+DECL_ComVarCommandPtr(og_frame_limiter_var, bool*, &MainGameTime::fps_limiter_enabled,
+	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
 DECL_ComVarCommandPtr(display_xyz_var, bool*, &displayXyz,
@@ -118,21 +122,21 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, ComVar* varPtr
 
 int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	auto var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
 
 	std::string exception;
 	if (!var->SetValFromStr(tokens[1], 10, exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
-		output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+		output->Output(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
 }
 
 int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	
 	if (h2mod->GetEngineType() == e_engine_type::_multiplayer 
 		&& !NetworkSession::LocalPeerIsSessionHost()) 
@@ -146,7 +150,7 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 
 int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 
 	if (Memory::IsDedicatedServer()) {
 		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
@@ -158,7 +162,7 @@ int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens,
 
 int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	
 	if (Memory::IsDedicatedServer()) {
 		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
@@ -170,14 +174,14 @@ int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens,
 
 int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	gXnIp.LogConnectionsToConsole(output);
 	return 0;
 }
 
 int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 
 	if (!NetworkSession::GetCurrentNetworkSession(nullptr))
 	{
@@ -189,13 +193,13 @@ int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>&
 	std::wstring mapFilenameWide;
 	mapManager->GetMapFilename(mapFilenameWide);
 	mapFileName = std::string(mapFilenameWide.begin(), mapFilenameWide.end());
-	output->OutputFmt(StringFlag_None, "# map file name: %s", mapFileName.c_str());
+	output->Output(StringFlag_None, "# map file name: %s", mapFileName.c_str());
 	return 0;
 }
 
 int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 
 	if (!NetworkSession::GetCurrentNetworkSession(nullptr))
 	{
@@ -214,7 +218,7 @@ int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens
 
 int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 
 	if (!NetworkSession::GetCurrentNetworkSession(nullptr))
 	{
@@ -232,7 +236,7 @@ int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& to
 
 int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 
 	s_network_session* session;
 	if (!NetworkSession::GetCurrentNetworkSession(&session))
@@ -251,7 +255,7 @@ int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, 
 
 int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	ComVarT<int> peerIdxVar;
 	std::string exception;
 
@@ -260,7 +264,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 		if (!peerIdxVar.SetValFromStr(tokens[1], 10, exception))
 		{
 			output->Output(StringFlag_None, command_error_bad_arg);
-			output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+			output->Output(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
 		else if (Memory::IsDedicatedServer()) {
@@ -288,7 +292,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 
 int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = (IOutput*)cbData.strOutput;
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	
 	if (!NetworkSession::LocalPeerIsSessionHost())
 	{
@@ -310,7 +314,7 @@ int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, Con
 
 int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	const ConsoleCommand* command_data = cbData.consoleCommandData;
 
 	const std::string* commandToHelp = nullptr;
@@ -332,14 +336,14 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 
 		if (!command_entry->Hidden())
 		{
-			output->OutputFmt(StringFlag_None, "# %s ", command_entry->GetName());
+			output->Output(StringFlag_None, "# %s ", command_entry->GetName());
 			if (command_entry->GetDescription() != NULL)
 			{
-				output->OutputFmt(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
+				output->Output(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
 			}
 			else
 			{
-				output->OutputFmt(StringFlag_None, "	# command has no description");
+				output->Output(StringFlag_None, "	# command has no description");
 			}
 
 			if (singleCommandHelp)
@@ -351,14 +355,14 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 	}
 
 	if (singleCommandHelp && !singleCommandHelpFound)
-		output->OutputFmt(StringFlag_None, "	# unknown command: %s", commandToHelp->c_str());
+		output->Output(StringFlag_None, "	# unknown command: %s", commandToHelp->c_str());
 
 	return 0;
 }
 
 int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	const ConsoleCommand* command_data = cbData.consoleCommandData;
 
 	if (!NetworkSession::GetCurrentNetworkSession(nullptr))
@@ -372,9 +376,9 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 		return 0;
 	}
 
-	output->OutputFmt(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
+	output->Output(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
 
-	for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+	for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 	{
 		if (NetworkSession::PlayerIsActive(playerIdx))
 		{
@@ -400,7 +404,7 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 
 int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	const ConsoleCommand* command_data = cbData.consoleCommandData;
 
 	s_network_session* session;
@@ -418,7 +422,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 
 	s_network_observer* observer = NetworkSession::GetCurrentNetworkSession()->p_network_observer;
 
-	output->OutputFmt(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
+	output->Output(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
 
 	for (int peerIdx = 0; peerIdx < NetworkSession::GetPeerCount(); peerIdx++)
 	{
@@ -451,7 +455,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 
 int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 
 	ComVarT<int> value; 
 	std::string exception;
@@ -465,7 +469,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 		else if (!value.SetValFromStr(tokens[1], 10, exception))
 		{
 			output->Output(StringFlag_None, command_error_bad_arg);
-			output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+			output->Output(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
 		else if (value.GetVal() < 1 || value.GetVal() > 16) {
@@ -478,7 +482,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 		}
 
 		NetworkSession::GetCurrentNetworkSession()->parameters[0].max_party_players = value.GetVal();
-		output->OutputFmt(StringFlag_None, "# maximum players set: %i", value.GetVal());
+		output->Output(StringFlag_None, "# maximum players set: %i", value.GetVal());
 	} while (0);
 
 	return 0;
@@ -486,7 +490,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 
 int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	ComVarT<bool> warpFixVar;
 
 	if (Memory::IsDedicatedServer()) {
@@ -498,7 +502,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 	if (!warpFixVar.SetValFromStr(tokens[1], 10, exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
-		output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+		output->Output(StringFlag_None, "	%s", exception.c_str());
 		return 0;
 	}
 
@@ -508,14 +512,14 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 
 int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	ComVarT<datum> datumIdx;
 
 	std::string exception;
 	if (!datumIdx.SetValFromStr(tokens[1], 0, exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
-		output->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+		output->Output(StringFlag_None, "	%s", exception.c_str());
 		return 0;
 	}
 
@@ -523,11 +527,11 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 	if (object_data != NULL)
 	{
 		DeleteObject(datumIdx.GetVal());
-		output->OutputFmt(StringFlag_None, "# deleted object idx: 0x%X", datumIdx.GetVal());
+		output->Output(StringFlag_None, "# deleted object idx: 0x%X", datumIdx.GetVal());
 	}
 	else
 	{
-		output->OutputFmt(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx.GetVal());
+		output->Output(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx.GetVal());
 	}
 
 	return 0;
@@ -535,7 +539,7 @@ int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, 
 
 int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	output->Output(StringFlag_None, "# object ids reset next time spawn is used");
 	readObjectIds = false;
 	return 0;
@@ -543,7 +547,7 @@ int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>&
 
 int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 	
 	int tokenArgPos = 1;
 
@@ -655,7 +659,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	IOutput* output = cbData.strOutput;
+	ConsoleLog* output = cbData.strOutput;
 
 	if (!NetworkSession::LocalPeerIsSessionHost() 
 		&& h2mod->GetEngineType() != e_engine_type::_single_player)
@@ -671,7 +675,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
 	tag_loader::Load_tag(tagDatum, true, mapName);
 	tag_loader::Push_Back();
-	output->OutputFmt(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
+	output->Output(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tagType.as_string(), mapName);
 	return 0;

@@ -36,6 +36,7 @@ struct s_game_globals
 	static bool game_is_campaign();
 	static bool game_is_multiplayer();
 	static bool game_is_mainmenu();
+	static bool game_is_in_progress();
 
 	static bool game_is_predicted();
 };

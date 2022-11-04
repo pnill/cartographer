@@ -2,9 +2,8 @@
 
 
 void InitH2Startup();
-void InitH2Startup2();
+void H2DedicatedServerStartup();
 void DeinitH2Startup();
-int H2GetInstanceId();
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified

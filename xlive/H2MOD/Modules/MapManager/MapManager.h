@@ -40,7 +40,7 @@ class MapManager {
 public:
 	void ReloadAllMaps();
 
-	static void ApplyHooks();
+	static void ApplyPatches();
 
 	void GetMapFilename(std::wstring& buffer);
 

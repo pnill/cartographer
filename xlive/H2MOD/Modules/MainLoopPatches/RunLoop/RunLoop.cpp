@@ -11,7 +11,7 @@
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\Input\ControllerInput.h"
-#include "H2MOD\Modules\MainLoopPatches\OriginalFPSLimiter\OriginalFPSLimiter.h"
+#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -107,7 +107,7 @@ typedef void(__cdecl* observer_update_t)(float a1);
 observer_update_t p_observer_update;
 
 typedef void(__cdecl* game_time_globals_prep_t)(float a1, float* a2, int* a3);
-game_time_globals_prep_t p_game_time_globals_prep;
+game_time_globals_prep_t p_game_time_update;
 
 typedef int(__cdecl* system_milliseconds_t)();
 system_milliseconds_t p_system_milliseconds;
@@ -130,10 +130,10 @@ rumble_update_t p_rumble_update;
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
-bool QuitGSMainLoop = false;
+static bool shouldQuitMainLoop = false;
 
 DWORD* get_scenario_global_address() {
-	return (DWORD*)(H2BaseAddr + 0x479e74);
+	return Memory::GetAddress<DWORD*>(0x479e74);
 }
 
 int get_scenario_volume_count() {
@@ -153,7 +153,7 @@ void kill_volume_enable(int volume_id) {
 	kill_volume_enable(volume_id);
 }
 
-void GSMainLoop() {
+void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
@@ -167,11 +167,11 @@ void GSMainLoop() {
 			SetWindowLong(H2hWnd, GWL_STYLE, GetWindowLong(H2hWnd, GWL_STYLE) | WS_SIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
 		}
 
-		if (H2GetInstanceId() > 1) {
+		if (_Shell::GetInstanceId() > 1) {
 			wchar_t titleMod[256];
 			wchar_t titleOriginal[256];
 			GetWindowText(H2hWnd, titleOriginal, 256);
-			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, H2GetInstanceId());
+			wsprintf(titleMod, L"%ls (P%d)", titleOriginal, _Shell::GetInstanceId());
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
@@ -223,7 +223,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 	return p_main_game_time_initialize_defaults();
 }
 
-void __cdecl game_modules_dispose() {
+void __cdecl game_modules_dispose_hook() {
 	auto p_game_modules_dispose = Memory::GetAddress<void(__cdecl*)()>(0x48BBF, 0x41E60);
 	p_game_modules_dispose();
 
@@ -233,88 +233,37 @@ void __cdecl game_modules_dispose() {
 	timeEndPeriod(TIMER_RESOLUTION);
 }
 
-void (*main_game_loop)();
+// rasterizer_present hook
+// used to limit framerate using our implementation
+void __cdecl rasterizer_present_hook(int a1) {
+	typedef void(__cdecl* rasterizer_present_t)(int);
+	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
-std::chrono::duration<double, std::nano> desiredRenderTime;
-inline void defaultFrameLimiter() {
-	
-	CHRONO_DEFINE_TIME_AND_CLOCK();
-
-	static _clock::time_point lastTime;
-	static int lastFrameSetting = -1;
-	static bool frameLimiterInitialized = false;
-	static const double thread_sleep_threshold = 3.0;
-	static _time::duration<double, std::nano> threshold(5.0ns); // skip sleep if we have to sleep under 5 ns
-
-	if (H2Config_experimental_fps == _rendering_mode_original_game_frame_limit
-		|| H2Config_fps_limit <= 0
-		|| _Shell::IsGameMinimized())
-	{
-		lastFrameSetting = H2Config_fps_limit;
-		frameLimiterInitialized = false;
-		return;
-	}
-
-	if (lastFrameSetting != H2Config_fps_limit)
-	{
-		lastFrameSetting = H2Config_fps_limit;
-		frameLimiterInitialized = false;
-	}
-
-	if (!frameLimiterInitialized)
-	{
-		SET_DESIRED_RENDER_TIME();
-		lastTime = _clock::now();
-		frameLimiterInitialized = true;
-	}
-
-	auto timeBeforeSleep = _clock::now();
-	auto timeDelta = _time::duration_cast<decltype(desiredRenderTime)>(timeBeforeSleep - lastTime);
-	auto targetRenderTime = desiredRenderTime - threshold;
-	while (targetRenderTime > timeDelta)
-	{
-		double dbSleepTimeNs = (targetRenderTime - timeDelta).count();
-		double dbSleepTimeMs = dbSleepTimeNs / 1000000.0;
-
-		if (dbSleepTimeMs >= thread_sleep_threshold)
-		{
-			int iSleepTimeMsAdjusted = (int)(dbSleepTimeMs - thread_sleep_threshold - 0.5);
-			if (iSleepTimeMsAdjusted < 0)
-				iSleepTimeMsAdjusted = 0;
-			Sleep(iSleepTimeMsAdjusted);
-		}
-
-		do
-		{
-		} while (targetRenderTime > _clock::now() - lastTime);
-
-		timeDelta = _time::duration_cast<decltype(targetRenderTime)>(_clock::now() - lastTime);
-	}
-
-	lastTime = _clock::now();
+	p_rasterizer_present(a1);
+	XLiveThrottleFramerate(H2Config_fps_limit);
 }
 
-void main_game_loop_hook() {
-	defaultFrameLimiter();
-	if (!QuitGSMainLoop)
-		GSMainLoop();
+void (__cdecl* p_main_game_loop)();
+void __cdecl main_game_loop_hook() {
+	if (!shouldQuitMainLoop)
+		CartographerMainLoop();
 
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 	mapManager->MapDownloadUpdateTick();
 	// update local user network stats
 	gXnIp.GetLocalUserXn()->pckStats.PckDataSampleUpdate();
-	main_game_loop();
+	p_main_game_loop();
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
-static char HookedServerShutdownCheck() {
-	if (!QuitGSMainLoop)
-		GSMainLoop();
+static char __cdecl dedicated_server_should_quit_hook() {
+	if (!shouldQuitMainLoop)
+		CartographerMainLoop();
 	
-	bool& Quit_Exit_Game = *(bool*)((char*)H2BaseAddr + 0x4a7083);
+	bool& dedicated_server_quit = *Memory::GetAddress<bool*>(0x0, 0x4A7083);
 
 	//original test - if game should shutdown
-	return Quit_Exit_Game;
+	return dedicated_server_quit;
 }
 
 extern bool b_XboxTick;
@@ -346,14 +295,14 @@ bool __cdecl cinematic_in_progress_hook()
 	return false;
 }
 
-bool __cdecl should_limit_framerate()
+bool __cdecl should_limit_framerate_hook()
 {
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
 	switch (experimental_rendering_mode)
 	{
 	case _rendering_mode_original_game_frame_limit:
-		return false; // e_render_original_game_frame_limit handles frame limit in OriginalFPSLimiter.cpp
+		return false; // e_render_original_game_frame_limit handles frame limit in MainGameTime.cpp
 	case _rendering_mode_none:
 	case _rendering_mode_new:
 	case _rendering_mode_old:
@@ -373,21 +322,6 @@ double render_time;
 bool init = false;
 float tps = (1.0f / 60);
 
-
-void alt_prep_time(float a1, float *a2, int *a3)
-{
-	if (Engine::get_game_life_cycle() != _life_cycle_in_game) {
-		float _a2;
-		int _a3;
-		p_game_time_globals_prep(a1, &_a2, &_a3);
-		*a2 = _a2;
-		*a3 = _a3;
-	}
-	else {
-		*a2 = a1;
-		*a3 = 1;
-	}
-}
 bool b_sys_init = false;
 int startTime;
 
@@ -553,7 +487,7 @@ void __cdecl game_main_loop()
 			}
 			if (p_game_in_simulation())
 			{
-				p_game_time_globals_prep(v13, &out_dt, &out_target_ticks);
+				p_game_time_update(v13, &out_dt, &out_target_ticks);
 				p_local_players_update_and_send_synchronous_actions(v13, out_dt);
 				p_simulation_update(out_target_ticks, &out_dt);
 				if (v10)
@@ -607,15 +541,15 @@ float __cdecl fps_get_seconds_per_frame()
 {
 	return (1.0f / H2Config_fps_limit);
 }
-void alt_main_game_loop_hook()
+void __cdecl alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart;// -render_time;
 	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
-		if (!QuitGSMainLoop)
-			GSMainLoop();
+		if (!shouldQuitMainLoop)
+			CartographerMainLoop();
 		init = true;
 
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
@@ -679,7 +613,7 @@ void initialize_main_loop_function_pointers()
 	p_vibrations_clear = (void(*)())((char*)H2BaseAddr + 0x901B8);
 	p_game_network_dispatcher = (void(*)())((char*)H2BaseAddr + 0x1B5456);
 	p_restart_game_loop = Memory::GetAddress<restart_game_loop_t>(0x286E1);
-	p_game_time_globals_prep = Memory::GetAddress<game_time_globals_prep_t>(0x7C1BF);
+	p_game_time_update = Memory::GetAddress<game_time_globals_prep_t>(0x7C1BF);
 	p_present_rendered_screen = Memory::GetAddress<present_rendered_screen_t>(0x27002A);
 	p_game_in_simulation = Memory::GetAddress<game_in_simulation_t>(0x1ADD30);
 	p_game_freeze = Memory::GetAddress<game_freeze_t>(0x145B);
@@ -711,53 +645,57 @@ void InitRunLoop() {
 	addDebugText("Pre RunLoop hooking.");
 	if (H2IsDediServer) {
 		addDebugText("Hooking loop & shutdown Function");
-		PatchCall(H2BaseAddr + 0xc6cb, HookedServerShutdownCheck);
+		PatchCall(Memory::GetAddress(0xc6cb), dedicated_server_should_quit_hook);
 	}
 	else {
 		addDebugText("Hooking loop Function");
-		main_game_loop = (void(*)())((char*)H2BaseAddr + 0x399CC);
+		p_main_game_loop = Memory::GetAddress<decltype(p_main_game_loop)>(0x399CC);
 
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
 		// always init these pointers
 		initialize_main_loop_function_pointers();
 
+		// present hooks for the frame limiter
+		PatchCall(Memory::GetAddress(0x19073C), rasterizer_present_hook);
+		PatchCall(Memory::GetAddress(0x19074C), rasterizer_present_hook);
+
 		switch (experimental_rendering_mode)
 		{
-		default:
-		case _rendering_mode_none:
-			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
-			break;
 		case _rendering_mode_old:
-			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
+			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			UncappedFPS2::Init();
 			break;
 		case _rendering_mode_new:
-			//PatchCall(Memory::GetAddress(0x39D04), alt_prep_time);
-			PatchCall(H2BaseAddr + 0x39E64, alt_main_game_loop_hook);
-			//PatchCall(H2BaseAddr + 0x39e64, game_main_loop);
+			PatchCall(Memory::GetAddress(0x39E64), alt_main_game_loop_hook);
+			//PatchCall(Memory::GetAddress(0x39e64), game_main_loop);
 			QueryPerformanceFrequency(&freq);
 			//Remove original render call
 			NopFill(Memory::GetAddress(0x39DAA), 5);
 			break;
 
 		case _rendering_mode_original_game_frame_limit:
-			PatchCall(H2BaseAddr + 0x39E64, main_game_loop_hook);
-			OriginalFPSLimiter::ApplyPatches();
+			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
+			MainGameTime::ApplyPatches();
+			MainGameTime::fps_limiter_enabled = true;
 			break;
 
+		case _rendering_mode_none:
+		default:
+			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
+			break;
 		} // switch (experimental_rendering_mode)
 
-		// apply the code that fixes and determines if the amin loop should be throttled
-		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate);
+		// apply framerate throttle patches for when the game is minimized
 		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
+		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
 
 		// stop Hold to Zoom.
 		NopFill(Memory::GetAddress(0x9355C), 4);
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
-	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose);
+	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose_hook);
 
 	addDebugText("Post RunLoop Hooking.");
 }

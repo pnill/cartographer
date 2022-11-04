@@ -2,8 +2,29 @@
 
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 
-// The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
+template<typename T = int>
+struct s_bitflags
+{
+	T* m_flags;
 
+	// only power of 2 sized types
+	static_assert(sizeof(T) > 0 && (sizeof(T) & (sizeof(T) - 1)) == 0);
+
+	bool test_bit(int index)
+	{
+		return (m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1))) != 0;
+	}
+
+	void set_bit(int index, bool state)
+	{
+		if (state)
+			m_flags[index / (CHAR_BIT * sizeof(T))] |= m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1));
+		else
+			m_flags[index / (CHAR_BIT * sizeof(T))] = m_flags[index / (CHAR_BIT * sizeof(T))] & ~(FLAG(index & (CHAR_BIT * sizeof(T) - 1)));
+	}
+};
+
+// The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array
 {
 	char name[0x20];				// 0x0
@@ -14,14 +35,12 @@ struct s_data_array
 	WORD flags;						// 0x2A
 	char data_signature[4];			// 0x2C
 	void **allocator;				// 0x30
-	struct {
-		int bit_index_size;			// 0x34
-		int max_data_count;			// 0x38
-	} active_indices; 
+	int bit_index_size;				// 0x34
+	int next_unused_index;					// 0x38
 	int total_elements_used;		// 0x3C 
-	datum next_datum;				// 0x40
-	char* data;					// 0x44
-	int* data_usable_bit_mask;		// 0x48
+	int field_40;					// 0x40
+	char* data;						// 0x44
+	s_bitflags<> active_bit_mask;		// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -94,12 +113,12 @@ public:
 		if (index < 0)
 			return -1;
 
-		if (index >= m_data_array->active_indices.max_data_count)
+		if (index >= m_data_array->next_unused_index)
 			return -1;
 
-		while (!((1 << (index & 0x1F)) & m_data_array->data_usable_bit_mask[index >> 5]))
+		while (!m_data_array->active_bit_mask.test_bit(index))
 		{
-			if (++index >= m_data_array->active_indices.max_data_count)
+			if (++index >= m_data_array->next_unused_index)
 				return -1;
 		}
 		return index;
@@ -113,6 +132,11 @@ public:
 	datum get_current_datum_index() const
 	{
 		return m_last_datum_index;
+	}
+
+	int get_data_count() const
+	{
+		return m_data_array->total_elements_used;
 	}
 
 private:

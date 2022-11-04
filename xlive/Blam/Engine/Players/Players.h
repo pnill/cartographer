@@ -2,7 +2,7 @@
 #include "Blam\Engine\DataArray\DataArray.h"
 #include "Blam\Engine\Objects\Objects.h"
 
-#define ENGINE_PLAYER_MAX 16
+#define ENGINE_MAX_PLAYERS 16
 
 #pragma pack(push, 1)
 struct s_player

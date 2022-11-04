@@ -36,15 +36,12 @@ int Infection::calculateZombiePlayerIndex()
 		std::mt19937 mt_rand(rd());
 		std::vector<int> vecPlayersActiveIndexes;
 
-		int playerIndex = 0;
-		do
+		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
 				vecPlayersActiveIndexes.push_back(playerIndex);
-
-			playerIndex++;
-		} while (playerIndex < 16);
-
+		}
+	
 		if (vecPlayersActiveIndexes.empty())
 			return NONE;
 
@@ -65,8 +62,7 @@ void Infection::sendTeamChange()
 	{
 		if (NetworkSession::GetPlayerCount() > 0)
 		{
-			int playerIndex = 0;
-			do
+			for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
 			{
 				if (NetworkSession::PlayerIsActive(playerIndex))
 				{
@@ -79,9 +75,7 @@ void Infection::sendTeamChange()
 						LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", zombiePlayerIndex == playerIndex ? true : false);
 					}
 				}
-
-				playerIndex++;
-			} while (playerIndex < ENGINE_PLAYER_MAX);
+			}
 		}
 	}
 }

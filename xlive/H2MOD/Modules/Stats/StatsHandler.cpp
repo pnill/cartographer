@@ -911,7 +911,7 @@ void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
 				BYTE rank = std::stoi(doc[i]["Rank"].GetString(), 0);
 				long long playerIdentifier = std::stoll(doc[i]["XUID"].GetString(), &sz, 0);
 
-				for (auto j = 0; j < ENGINE_PLAYER_MAX; j++)
+				for (auto j = 0; j < ENGINE_MAX_PLAYERS; j++)
 				{
 					if (NetworkSession::PlayerIsActive(j))
 					{
@@ -938,7 +938,7 @@ std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::GetPlayerCount());
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
-		for (auto playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+		for (auto playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 		{
 			bool addSeparator = false;
 			if (NetworkSession::PlayerIsActive(playerIdx))
@@ -946,7 +946,7 @@ std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
 				auto playerIdentifier = NetworkSession::GetPlayerId(playerIdx);
 				playerIdsStr.append(IntToString(playerIdentifier, std::dec));
 				
-				if (playerIdx + 1 < ENGINE_PLAYER_MAX 
+				if (playerIdx + 1 < ENGINE_MAX_PLAYERS 
 					&& NetworkSession::PlayerIsActive(playerIdx + 1))
 					addSeparator = true;
 

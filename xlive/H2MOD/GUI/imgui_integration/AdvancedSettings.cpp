@@ -8,7 +8,6 @@
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Modules\Input\Mouseinput.h"
 #include "H2MOD\Modules\RenderHooks\RenderHooks.h"
-#include "H2MOD\Modules\RunLoop\RunLoop.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
 #include "Util\Hooks\Hook.h"
@@ -265,15 +264,12 @@ namespace ImGuiHandler {
 							H2Config_fps_limit = 10;
 						if (H2Config_fps_limit > 2048)
 							H2Config_fps_limit = 2048;
-
-						SET_DESIRED_RENDER_TIME();
 					}
 
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
 					{
 						H2Config_fps_limit = 60;
-						SET_DESIRED_RENDER_TIME();
 					}
 					ImGui::NextColumn();
 					ImGui::PopItemWidth();

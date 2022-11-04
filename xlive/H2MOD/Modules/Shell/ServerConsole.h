@@ -24,10 +24,9 @@ namespace ServerConsole
 		any
 	};
 
-	class DediConsoleOutput : public IOutput
+	class DediConsoleOutput : public ConsoleLog
 	{
-		int Output(StringHeaderFlags flags, const char* fmt) override;
-		int OutputFmt(StringHeaderFlags flags, const char* fmt, ...) override;
+		int Output(StringHeaderFlags flags, const char* fmt, ...) override;
 	};
 
 	static std::map<std::wstring, e_server_console_commands> s_commandsMap;

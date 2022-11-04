@@ -17,6 +17,7 @@
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\GUI\GUI.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
@@ -52,9 +53,7 @@
 #pragma fenv_access (on)
 #endif
 
-H2MOD* h2mod = new H2MOD();
-
-extern int H2GetInstanceId();
+std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
 bool b_H2X = false;
 bool b_XboxTick = false;
@@ -1035,23 +1034,17 @@ void vip_lock(e_game_life_cycle state)
 
 void H2MOD::RegisterEvents()
 {
-	if(!Memory::IsDedicatedServer())
-	{
-		// Client only callbacks	
-
-	}
-	else 
+	if (Memory::IsDedicatedServer())
 	{
 		// Server only callbacks
-		
 		// Setup Events for H2Config_vip_lock
 		if (H2Config_vip_lock)
 			EventHandler::register_callback(vip_lock, EventType::gamelifecycle_change, EventExecutionType::execute_after);
 	}
-	//Things that apply to both
-#if EVENT_HANDLER_ENABLE_TEST_EVENTS
-	EventHandler::TestEvents();
-#endif
+	else 
+	{
+		// Client only callbacks	
+	}
 }
 
 //Shader LOD Bias stuff
@@ -1217,7 +1210,7 @@ void H2MOD::Initialize()
 		ObserverMode::Initialize();
 #endif
 		TEST_N_DEF(PC3);
-		if (H2Config_discord_enable && H2GetInstanceId() == 1) {
+		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
 			// Discord init
 			DiscordInterface::SetDetails("Startup");
 			DiscordInterface::Init();
@@ -1235,8 +1228,8 @@ void H2MOD::Initialize()
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();
-	h2mod->ApplyHooks();
-	h2mod->RegisterEvents();
+	H2MOD::ApplyHooks();
+	H2MOD::RegisterEvents();
 
 	Engine::Objects::apply_biped_object_definition_patches();
 	StatsHandler::Initialize();

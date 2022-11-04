@@ -1,14 +1,15 @@
 #include "stdafx.h"
 
-#include "Engine.h"
-#include "H2MOD.h"
+#include "Objects.h"
+
+#include "Util\Hooks\Hook.h"
+
+#include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h"
-#include "Blam\Engine\Memory\bitstream.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "Util\Hooks\Hook.h"
 
 namespace Engine::Objects
 {
@@ -62,7 +63,7 @@ namespace Engine::Objects
 		}
 	}
 
-	void update_object_variant_index_hook(datum object_idx, int variant_index)
+	void __cdecl update_object_variant_index_hook(datum object_idx, int variant_index)
 	{
 		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
 		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
@@ -120,13 +121,14 @@ namespace Engine::Objects
 		if(*(byte*)((char*)creation_data + 0x10) != -1)
 		{
 			auto profile = reinterpret_cast<s_player::s_player_properties::s_player_profile*>((char*)creation_data + 0x10);
-			object_placement_data->tag_index = PlayerRepresentation::get_object_datum_from_representation(profile->player_character_type);
+			datum player_representation_datum = PlayerRepresentation::get_object_datum_from_representation(profile->player_character_type);
+			if (player_representation_datum != DATUM_INDEX_NONE)
+				object_placement_data->tag_index = player_representation_datum;
 		}
 		//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
 		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
 	}
 
-	// original update_object_variant_index is usercall, with data in CX register as first param
 	__declspec(naked) void c_simulation_object_entity_definition_object_create_object_to_stdcall()
 	{
 		__asm
@@ -196,6 +198,23 @@ namespace Engine::Objects
 		// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 		PatchCall(Memory::GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 		p_set_unit_color_data = Memory::GetAddress<set_unit_color_data_t>(0x6E5C3, 0x6D1BF);
+	}
+
+	int object_get_count()
+	{
+		s_data_iterator object_it(get_objects_header());
+		return object_it.get_data_count();
+	}
+
+	int object_count_from_iter()
+	{
+		s_data_iterator object_it(get_objects_header());
+		int count = 0;
+		while (object_it.get_next_datum())
+		{
+			count++;
+		}
+		return count;
 	}
 #pragma endregion
 }

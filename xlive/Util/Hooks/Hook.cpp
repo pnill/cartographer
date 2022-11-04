@@ -9,7 +9,7 @@
 	DWORD dwBack[2]; \
 	VirtualProtect((_address), (_length), (_protection), &dwBack[0]); \
 	_code \
-	VirtualProtect((_address), (_length), dwBack[0], &dwBack[1]); \
+	VirtualProtect((_address), (_length), dwBack[0], &dwBack[1]);
 
 void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 {

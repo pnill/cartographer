@@ -41,3 +41,8 @@ bool s_game_globals::game_is_predicted()
 {
 	return get_game_options()->m_simulation_type == _game_simulation_distributed_client;
 }
+
+bool s_game_globals::game_is_in_progress()
+{
+	return get() && get()->game_in_progress;
+}

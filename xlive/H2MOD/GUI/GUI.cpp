@@ -12,6 +12,7 @@
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Modules\Networking\Networking.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD\Modules\Shell\Shell.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -76,8 +77,9 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 
 LPD3DXSPRITE pSprite;
 
-LPDIRECT3DTEXTURE9 Texture_Interface;
 LPD3DXSPRITE Sprite_Interface;
+LPDIRECT3DTEXTURE9 Texture_Interface;
+
 
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
@@ -159,12 +161,12 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	return S_OK;
 }
 
-void InitalizeFont(std::wstring strFontName, std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
+void InitalizeFont(std::wstring strFontName, const std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
 {
 	if (OnOff)
 	{
-		addDebugText("Adding font: %s", strFontPath.c_str());
-		if(AddFontResource(strFontPath.c_str()) > 0)
+		addDebugText("Adding font: %ws", strFontPath.c_str());
+		if (AddFontResource(strFontPath.c_str()) > 0)
 		{
 			addDebugText("Font successfully added.");
 		}
@@ -436,13 +438,116 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 	return false;
 }
 
-ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-std::mutex xliveRenderMutex;
+// TODO: move to _Shell or somewhere else?
+void XLiveThrottleFramerate(int maxFramerate) 
+{
+	static LARGE_INTEGER lastCounter;
+	static int lastFrameSetting = -1;
+	static bool frameLimiterInitialized = false;
+
+	const int threadWaitTimePercentage = 90;
+	static HANDLE hFrameLimitTimer = NULL;
+
+	if (maxFramerate <= 0)
+	{
+		lastFrameSetting = maxFramerate;
+		frameLimiterInitialized = false;
+		return;
+	}
+
+	if (lastFrameSetting != maxFramerate)
+	{
+		lastFrameSetting = maxFramerate;
+		frameLimiterInitialized = false;
+	}
+
+	if (!frameLimiterInitialized)
+	{
+		QueryPerformanceCounter(&lastCounter);
+		frameLimiterInitialized = true;
+
+		if (NULL == hFrameLimitTimer)
+		{
+			hFrameLimitTimer = CreateWaitableTimer(NULL, FALSE, NULL);
+
+			atexit([]() {
+				if (NULL != hFrameLimitTimer)
+					CloseHandle(hFrameLimitTimer);
+
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
+				});
+		}
+
+		// skip the first frame after init
+		return;
+	}
+
+	LARGE_INTEGER frequency;
+	LARGE_INTEGER deltaCounter;
+	QueryPerformanceFrequency(&frequency); 
+
+	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
+	QueryPerformanceCounter(&deltaCounter);
+	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
+	auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+
+	if (deltaTimeUs < minFrameTimeUs)
+	{
+		auto sleepTimeUs = minFrameTimeUs - deltaTimeUs;
+
+		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
+		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;
+
+		// skip if time to wait is lower than 2ms
+		if (timeToWaitSleepUs > 3000)
+		{
+			if (NULL != hFrameLimitTimer)
+			{
+				LARGE_INTEGER liDueTime;
+				liDueTime.QuadPart = -10ll * timeToWaitSleepUs;
+
+				// Create an unnamed waitable timer.
+				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+
+				if (10ll * timeToWaitSleepUs > ulMaximumResolution)
+				{
+					_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
+					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
+					{
+						// Wait for the timer.
+						_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, &liDueTime);
+					}
+				}
+			}
+
+			/*
+			int sleepTime = sleepTimeUs / 1000ll;
+			if (sleepTime >= 0)
+				Sleep(sleepTime);
+				*/
+		}
+
+		while (true)
+		{
+			QueryPerformanceCounter(&deltaCounter);
+			deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
+			deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+			if (deltaTimeUs >= minFrameTimeUs)
+				break;
+		}
+	}
+
+	QueryPerformanceCounter(&lastCounter);
+}
 
 // #5002: XLiveRender
 int WINAPI XLiveRender()
 {
-	std::lock_guard<std::mutex> lg(xliveRenderMutex);
+	static std::mutex renderMtx;
+	std::lock_guard lg(renderMtx);
 
 	if (pDevice)
 	{
@@ -583,6 +688,10 @@ int WINAPI XLiveRender()
 			ImGuiHandler::DrawImgui();
 		}
 	}
+
+	// limit framerate if needed
+	// UPDATE: frame limiting in XLiveRender adds input lag
+	// XLiveThrottleFramerate(H2Config_fps_limit);
 	return 0;
 }
 

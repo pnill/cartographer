@@ -372,9 +372,9 @@ public:
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
 
 	// XnIp handling function
-	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid, bool* firstUnusedIndexFound = nullptr, int* firstUnusedIndex = nullptr);
-	int CreateXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
-	int RegisterNewXnIp(int connectionIndex, const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
+	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid);
+	int CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
+	int RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
 	
 	// Key functions
@@ -383,7 +383,7 @@ public:
 	XnKeyPair* GetKeyPair(const XNKID* xnkid);
 	
 	// Logging 
-	void LogConnectionsToConsole(IOutput* output);
+	void LogConnectionsToConsole(ConsoleLog* output);
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
 
 	// XNet startup parameters

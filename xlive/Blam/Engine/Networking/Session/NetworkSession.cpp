@@ -110,7 +110,7 @@ const wchar_t* NetworkSession::GetPeerPlayerName(int peerIdx)
 {
 	if (GetPeerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 		{
 			if (GetPeerIndex(playerIdx) == peerIdx)
 				return GetPlayerName(playerIdx);
@@ -133,7 +133,7 @@ int NetworkSession::GetPlayerIdByName(const wchar_t* name)
 {
 	if (GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 		{
 			if (PlayerIsActive(playerIdx) && wcscmp(GetPlayerName(playerIdx), name) == 0)
 				return playerIdx;
@@ -161,7 +161,7 @@ int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
 {
 	if (GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < ENGINE_PLAYER_MAX; playerIdx++)
+		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 		{
 			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
 				return GetPeerIndex(playerIdx);

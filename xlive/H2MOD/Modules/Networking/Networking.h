@@ -4,5 +4,5 @@
 
 namespace CustomNetwork
 {
-	void ApplyNetworkPatches();
+	void ApplyPatches();
 }

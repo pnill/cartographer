@@ -137,10 +137,10 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, H2GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, H2GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, _Shell::GetInstanceId());
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
@@ -620,7 +620,7 @@ void SaveH2Config() {
 void ReadH2Config() {
 	addDebugText("Reading H2Configuration file...");
 
-	int readInstanceIdFile = H2GetInstanceId();
+	int readInstanceIdFile = _Shell::GetInstanceId();
 	wchar_t local[1024];
 	wcscpy_s(local, ARRAYSIZE(local), H2AppDataLocal);
 	H2Config_isConfigFileAppDataLocal = false;
@@ -661,7 +661,7 @@ void ReadH2Config() {
 		H2Config_isConfigFileAppDataLocal = true;
 	}
 	else {
-		ownsConfigFile = (readInstanceIdFile == H2GetInstanceId());
+		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
 
 		if (!H2IsDediServer) {
 			extern int current_language_main;
@@ -952,7 +952,7 @@ void ReadH2Config() {
 
 #pragma region Config Init/Deinit
 void InitH2Config() {
-	H2Config_disable_ingame_keyboard = H2GetInstanceId() > 1 ? true : false;
+	H2Config_disable_ingame_keyboard = _Shell::GetInstanceId() > 1 ? true : false;
 	ReadH2Config();
 }
 void DeinitH2Config() {

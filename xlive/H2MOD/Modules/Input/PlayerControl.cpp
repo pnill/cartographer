@@ -31,7 +31,7 @@ void PlayerControl::ApplyHooks()
 s_player_actions PlayerControl::GetPlayerActions(int player_index)
 {
 	s_player_actions newActions;
-	s_player_motion nActions = *Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
+	s_player_motion nActions = Memory::GetAddress<s_player_motion*>(0x514EE8)[player_index];
 	network_player_actions_to_player_actions(&nActions, &newActions);
 	return newActions;
 }

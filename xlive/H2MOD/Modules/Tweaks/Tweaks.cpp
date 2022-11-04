@@ -35,40 +35,39 @@ int __cdecl LoadRegistrySettings(HKEY hKey, LPCWSTR lpSubKey) {
 void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bool a4, int a5)
 {
 	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&update_keyboard_buttons_state_hook)>(0x42E4C5);
-	
-	if (H2Config_disable_ingame_keyboard)
+
+	BYTE keyboardState[256] = {};
+	if (!H2Config_disable_ingame_keyboard 
+		&& GetKeyboardState(keyboardState))
+	{
+		for (int i = 0; i < 256; i++)
+		{
+			if (i != VK_SCROLL)
+			{
+				bool state = keyboardState[i] & 0x80;
+
+				// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
+				if (i == VK_RSHIFT
+					|| i == VK_LSHIFT
+					|| i == VK_RCONTROL
+					|| i == VK_LCONTROL
+					|| i == VK_RMENU
+					|| i == VK_LMENU)
+				{
+					SHORT asyncKeyState = GetAsyncKeyState(i);
+
+					state = asyncKeyState & 0x8000;
+				}
+
+				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
+			}
+		}
+	}
+	else
 	{
 		for (int i = 0; i < 256; i++)
 			if (i != VK_SCROLL)
 				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
-		
-		return;
-	}
-
-	BYTE keyboardState[256] = {};
-	GetKeyboardState(keyboardState);
-
-	for (int i = 0; i < 256; i++)
-	{
-		if (i != VK_SCROLL)
-		{
-			bool state = keyboardState[i] & 0x80;
-
-			// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
-			if (i == VK_RSHIFT
-				|| i == VK_LSHIFT
-				|| i == VK_RCONTROL
-				|| i == VK_LCONTROL
-				|| i == VK_RMENU
-				|| i == VK_LMENU)
-			{
-				SHORT asyncKeyState = GetAsyncKeyState(i);
-
-				state = asyncKeyState & 0x8000;
-			}
-
-			p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
-		}
 	}
 }
 
@@ -192,24 +191,18 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 	}
 }
 
-static LARGE_INTEGER startupCounter;
+static DWORD (WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {
 	LARGE_INTEGER currentCounter, frequency;
 	QueryPerformanceFrequency(&frequency);
 	QueryPerformanceCounter(&currentCounter);
 
-	currentCounter.QuadPart = currentCounter.QuadPart - startupCounter.QuadPart;
+	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
 	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 	return (DWORD)timeNow;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
-
-void initializeTimeHooks()
-{
-	QueryPerformanceCounter(&startupCounter);
-	WritePointer(Memory::GetAddressRelative(0x79B568, 0x752540), (void*)timeGetTime_hook);
-}
 
 void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
@@ -259,14 +252,12 @@ char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite
 	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
-typedef BOOL(__stdcall* is_debugger_present_t)();
-is_debugger_present_t p_is_debugger_present;
-
-BOOL __stdcall isDebuggerPresent() {
+BOOL (WINAPI* p_IsDebuggerPresent)();
+BOOL WINAPI IsDebuggerPresent_hook() {
 	return false;
 }
 
-void InitH2Tweaks() {
+void H2Tweaks::ApplyPatches() {
 	addDebugText("Begin Startup Tweaks.");
 	
 	H2Tweaks::RefreshTogglexDelay();
@@ -275,8 +266,9 @@ void InitH2Tweaks() {
 	//custom_game_engines::init();
 	//custom_game_engines::register_engine(c_game_engine_types::unknown5, &g_test_engine, king_of_the_hill);
 
-	initializeTimeHooks();
-	mapManager->ApplyHooks();
+	DETOUR_BEGIN();
+
+	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
 
 	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
@@ -348,8 +340,8 @@ void InitH2Tweaks() {
 		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
 
 		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
-		BYTE SetGammaRampSkipBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
-		WriteBytes(Memory::GetAddressRelative(0x66193B), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
+		BYTE SkipSetGammaRampBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
+		WriteBytes(Memory::GetAddressRelative(0x66193B), SkipSetGammaRampBytes, sizeof(SkipSetGammaRampBytes));
 
 		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
@@ -370,7 +362,7 @@ void InitH2Tweaks() {
 		NopFill(Memory::GetAddressRelative(0x473C61), 5);
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
-		//p_is_debugger_present = (is_debugger_present_t)DetourFunc(Memory::GetAddress<BYTE*>(0x39B394), (BYTE*)isDebuggerPresent, 5);
+		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
 	}
 
 	// disables profiles/game saves encryption
@@ -381,10 +373,15 @@ void InitH2Tweaks() {
 	// fixes edge drop fast fall when using higher tickrates than 30
 	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
+	// custom map hooks
+	MapManager::ApplyPatches();
+
+	DETOUR_COMMIT();
+
 	addDebugText("End Startup Tweaks.");
 }
 
-void DeinitH2Tweaks() {
+void H2Tweaks::DisposePatches() {
 
 }
 

@@ -62,6 +62,8 @@ struct s_custom_map_entry_linked_list
 #pragma pack(pop)
 static_assert(sizeof(s_custom_map_entry_linked_list) == 0xBA8);
 
+// disable non-standard zero-sized array in struct/union warning
+#pragma warning(disable : 4200)
 // our custom map file cache structure, to write cache data to
 struct s_custom_map_file_cache
 {
@@ -71,6 +73,7 @@ struct s_custom_map_file_cache
 
 	s_custom_map_entry entries[];
 };
+#pragma warning(default : 4200)
 
 #pragma pack(push, 1)
 struct s_custom_map_data

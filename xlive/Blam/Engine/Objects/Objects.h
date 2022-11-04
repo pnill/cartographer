@@ -1,8 +1,9 @@
-﻿#pragma once
+#pragma once
 
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\DataArray\DataArray.h"
 #include "Blam\Engine\Players\PlayerActions.h"
+#include "Blam\Engine\Objects\ObjectPlacementData.h"
 
 enum e_object_team : BYTE
 {
@@ -141,9 +142,15 @@ struct s_object_data_definition
 	WORD body_stun_ticks;
 	char gap_108[2];
 	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
-	PAD(32);
+	PAD(8);
+	__int16 node_buffer_size;
+	__int16 nodes_offset;
+	PAD(20);
+	// PAD(32);
 };
 #pragma pack(pop)
+CHECK_STRUCT_OFFSET(s_object_data_definition, node_buffer_size, 0x114);
+CHECK_STRUCT_OFFSET(s_object_data_definition, nodes_offset, 0x116);
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
 struct s_unit_data_definition : s_object_data_definition
@@ -253,10 +260,29 @@ static T* object_get_fast_unsafe(datum object_idx)
 	return (T*)get_objects_header(object_idx)->object;
 }
 
+static real_matrix4x3* get_object_nodes(datum object_idx, int* out_node_count)
+{
+	auto object = object_get_fast_unsafe(object_idx);
+	*out_node_count = object->node_buffer_size / sizeof(real_matrix4x3);
+	return (real_matrix4x3*)((char*)object + object->nodes_offset);
+}
+
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 template<typename T = s_object_data_definition>
 static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
 {
 	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
+}
+
+// TODO remove
+namespace Engine::Objects
+{
+	void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
+	datum object_new(s_object_placement_data* object_placement_data);
+	void apply_biped_object_definition_patches();
+	void simulation_action_object_create(datum object_idx);
+	void object_destroy(datum object_idx);
+	int object_get_count();
+	int object_count_from_iter();
 }

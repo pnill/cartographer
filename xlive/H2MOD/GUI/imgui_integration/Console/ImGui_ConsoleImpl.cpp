@@ -30,6 +30,7 @@ Console::Console() :
 	m_selected_tab_dirty = false;
 	memset(m_input_buffer, 0, sizeof(m_input_buffer));
 
+	m_output.reserve(CONSOLE_TABS);
 	for (int i = 0; i < CONSOLE_TABS; i++)
 	{
 		m_output.emplace_back(256, MAX_CONSOLE_INPUT_BUFFER);
@@ -41,13 +42,7 @@ Console::Console() :
 	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, Console::clear_cb));
 }
 
-int Console::Output(StringHeaderFlags flags, const char* fmt)
-{
-	GetMainOutput()->AddString(flags, fmt);
-	return 0;
-}
-
-int Console::OutputFmt(StringHeaderFlags flags, const char* fmt, ...)
+int Console::Output(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);
@@ -598,7 +593,7 @@ int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleComma
 	if (!console_data->m_console_opacity.SetValFromStr(tokens[1], 10, exception))
 	{
 		console_data->Output(StringFlag_None, command_error_bad_arg);
-		console_data->OutputFmt(StringFlag_None, "	%s", exception.c_str());
+		console_data->Output(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
 }
