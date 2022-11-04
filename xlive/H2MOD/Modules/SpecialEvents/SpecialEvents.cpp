@@ -214,7 +214,7 @@ namespace SpecialEvents
 				{
 					auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
 					AddHatAndBeard(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);
-				}				
+				}
 			}
 			if (!DATUM_IS_NONE(snow_datum))
 			{
@@ -248,7 +248,7 @@ namespace SpecialEvents
 
 				datum sword_model_datum = sword_weapon->model.TagIndex;
 				auto sword_model = tags::get_tag_fast<s_model_group_definition>(sword_model_datum);
-				
+
 				sword_model->render_model.TagIndex = candy_cane_datum;
 
 				for (auto& first_person : sword_weapon->first_person)
@@ -300,7 +300,7 @@ namespace SpecialEvents
 				fp_present_datum = tag_loader::ResolveNewDatum(fp_present_datum);
 
 				ReplaceFirstAndThirdPersonModelFromWeapon(ball_weapon_datum, fp_present_datum, present_datum);
-				ReplaceFirstAndThirdPersonModelFromWeapon(bomb_weapon_datum, fp_present_datum, present_datum);			
+				ReplaceFirstAndThirdPersonModelFromWeapon(bomb_weapon_datum, fp_present_datum, present_datum);
 			}
 		}
 	}
@@ -383,7 +383,7 @@ namespace SpecialEvents
 			datum ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 			datum bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 			datum mook_ball_weapon_datum = tag_loader::Get_tag_datum
-				("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", blam_tag::tag_group_type::weapon, "carto_shared");
+			("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", blam_tag::tag_group_type::weapon, "carto_shared");
 			if (!DATUM_IS_NONE(mook_ball_weapon_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 			{
 				tag_loader::Load_tag(mook_ball_weapon_datum, true, "carto_shared");
@@ -401,20 +401,22 @@ namespace SpecialEvents
 
 	void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
-		if (state == _life_cycle_in_game) 
+		if (state == _life_cycle_in_game)
 		{
-			if (H2Config_spooky_boy) { *Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton; }
+			if (H2Config_spooky_boy) {
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton; 
+			}
 
 			typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
 			auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 
 			s_object_placement_data placement;
-			
+
 			auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 			auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
-			
+
 			s_cache_header* cache_header = tags::get_cache_header();
-			if (strcmp(cache_header->name, "coagulation") == 0)
+			if (!strcmp(cache_header->name, "coagulation"))
 			{
 				for (auto& scen_place : coag_scen_places)
 				{
@@ -443,7 +445,7 @@ namespace SpecialEvents
 					datum object_idx = Engine::Objects::object_new(&placement);
 				}
 			}
-			if (strcmp(cache_header->name, "lockout") == 0)
+			else if (!strcmp(cache_header->name, "lockout"))
 			{
 				for (auto& scen_place : lockout_scen_places)
 				{
@@ -476,10 +478,10 @@ namespace SpecialEvents
 		if (h2mod->GetEngineType() == _multiplayer)
 		{
 			// Load specific tags from shared and modify placements depending on the map being played
-			char* mapName = Memory::GetAddress<char*>(0x47CF0C);
+			s_cache_header* cache_header = tags::get_cache_header();
 			auto scnr = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scnr->structure_bsps[0]->structure_bsp.TagIndex);
-			if (strcmp(mapName, "coagulation") == 0)
+			if (!strcmp(cache_header->name, "coagulation"))
 			{
 				lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
 				sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
@@ -496,7 +498,7 @@ namespace SpecialEvents
 				tag_loader::Push_Back();
 
 				// OG Halo 2 Coag lightmap
-				datum ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap, 
+				datum ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap,
 					"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
 				candle_datum = tag_loader::ResolveNewDatum(candle_datum);
@@ -535,12 +537,12 @@ namespace SpecialEvents
 					EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
 				}
 			}
-			if (strcmp(mapName, "lockout") == 0)
+			else if (!strcmp(cache_header->name, "lockout"))
 			{
 				candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
 				candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
 				pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
-				
+
 				tag_loader::Load_tag(pump_datum, true, "carto_shared");
 				tag_loader::Load_tag(candle_datum, true, "carto_shared");
 				tag_loader::Push_Back();
@@ -597,7 +599,7 @@ namespace SpecialEvents
 					AddHat(hlmt_elite_datum, bday_hat_datum, true);
 				}
 			}
-			
+
 			if (!DATUM_IS_NONE(bday_cake_datum) && /*!DATUM_IS_NONE(fp_bday_cake_datum) &&*/ !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 			{
 				tag_loader::Load_tag(bday_cake_datum, true, "carto_shared");

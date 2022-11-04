@@ -88,8 +88,13 @@ namespace PlayerRepresentation
 
 	datum get_object_datum_from_representation(s_player::e_character_type representation_index)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		return globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
+		auto game_globals = tags::get_matg_globals_ptr();
+		if (game_globals != nullptr)
+		{
+			if (type_map.find(representation_index) != type_map.end())
+				return game_globals->player_representation[type_map[representation_index]]->third_person_unit.TagIndex;
+		}
+		return DATUM_INDEX_NONE;
 	}
 
 	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
