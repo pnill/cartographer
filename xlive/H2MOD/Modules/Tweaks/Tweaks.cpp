@@ -477,5 +477,5 @@ void H2Tweaks::RefreshTogglexDelay() {
 	BYTE xDelayJMP[] = { 0x74 };
 	if (!H2Config_xDelay)
 		xDelayJMP[0] = 0xEB;
-	WriteBytes(Memory::GetAddress(0x1a1316, 0x1c9d8e), xDelayJMP, 1);
+	WriteBytes(Memory::GetAddress(0x1c9d8e, 0x1a1316), xDelayJMP, 1);
 }
