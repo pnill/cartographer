@@ -796,13 +796,13 @@ void H2MOD::team_player_indicator_visibility(bool toggle)
 	this->drawTeamIndicators = toggle;
 }
 
-void __cdecl game_mode_engine_draw_team_indicators()
+void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
 {
-	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)();
+	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
 	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
 
 	if (h2mod->drawTeamIndicators)
-		p_game_mode_engine_draw_team_indicators();
+		p_game_mode_engine_draw_team_indicators(local_user_render_idx);
 }
 
 typedef short(__cdecl* get_enabled_teams_flags_t)(s_network_session*);

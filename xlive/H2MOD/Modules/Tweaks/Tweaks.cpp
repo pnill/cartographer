@@ -100,15 +100,15 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 }
 
 
-typedef int(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
+typedef void(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
 Video_HUDSizeUpdate_t Video_HUDSizeUpdate_orig;
 
 const float maxHUDTextScale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
 const float maxUiScaleFonts = 1.049f; // >= 1.25 will make text disappear
 
-int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
+void Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 {
-	int retVal = Video_HUDSizeUpdate_orig(hudSize, safeArea);
+	Video_HUDSizeUpdate_orig(hudSize, safeArea);
 
 	float* HUD_TextScale = Memory::GetAddress<float*>(0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
 	if (*HUD_TextScale > maxHUDTextScale)
@@ -124,14 +124,12 @@ int Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
 	if (*UI_Scale > maxUiScaleFonts)
 	{
 		// uiScale = resolution_height * 0.00083333335f
-		// at higher resolutions text starts being cut off (retty much any UI_Scale above 1 will result in text cut-off)
+		// at higher resolutions text starts being cut off (pretty much any UI_Scale above 1 will result in text cut-off)
 		// the sub_671B02_hook below fixes that by scaling the width of the element by UI_Scale (which the game doesn't do for some reason...)
 		// however fonts will stop being rendered if the UI_Scale is too large (>= ~1.25)
 		// so this'll make sure UI_Scale doesn't go above 1.249, but will result in the UI being drawn smaller
 		*UI_Scale = maxUiScaleFonts;
 	}
-
-	return retVal;
 }
 
 typedef int(__cdecl *sub_671B02_t)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
