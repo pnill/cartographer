@@ -132,25 +132,24 @@ void Infection::InitHost() {
 	// Remove unwanted items in infection
 	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
 	for each (auto itemcollection in itemcollections)
+	{
+		std::string item_name = tags::get_tag_name(itemcollection.first);
+		if (item_name.find("multiplayer\\powerups") != std::string::npos ||
+			item_name == "multiplayer\\single_weapons\\frag_grenades" ||
+			item_name == "multiplayer\\single_weapons\\plasma_grenades")
 		{
-			std::string item_name = tags::get_tag_name(itemcollection.first);
-			if (item_name.find("multiplayer\\powerups") != std::string::npos ||
-				item_name == "multiplayer\\single_weapons\\frag_grenades" ||
-				item_name == "multiplayer\\single_weapons\\plasma_grenades")
-			{
-				auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
+			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
 
-				// Can't make equipment null otherwise it'll crash, dosent spawn anything anyways so it's fine
-				if (itmc->item_permutations[0]->item.TagGroup == blam_tag::tag_group_type::equipment)
-				{
-					itmc->item_permutations[0]->item.TagIndex = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\powerups\shotgun_ammo\shotgun_ammo");
-				}
-				else
-				{
-					itmc->item_permutations[0]->item.TagIndex = NULL;
-				}
-			}
+			__int8 highest_index = itmc->item_permutations.size - 1;
+			__int8 i = 0;
+			do 
+			{
+				itmc->item_permutations[i]->item.TagIndex = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
+				i++;
+			} while (i < highest_index);
 		}
+	}
 	
 	//Replace vehicles with shotguns
 	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
