@@ -140,14 +140,12 @@ void Infection::InitHost() {
 		{
 			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
 
-			__int8 highest_index = itmc->item_permutations.size - 1;
-			__int8 i = 0;
-			do 
+			datum shotgun_ammo_equip_datum = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+			for (int i = 0; i < itmc->item_permutations.size; i++)
 			{
-				itmc->item_permutations[i]->item.TagIndex = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
 				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
-				i++;
-			} while (i < highest_index);
+			}
 		}
 	}
 	
