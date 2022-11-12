@@ -152,6 +152,9 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
+    <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
+    <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -494,6 +497,9 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Coagulation.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
+    <ClInclude Include="Blam\Engine\Game\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\Game\math\random_math.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -1,7 +1,8 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Engine/Game/math/color_math.h"
+#include "Blam/Math/BlamMath.h"
 
 /*********************************************************************
 * name: globals
