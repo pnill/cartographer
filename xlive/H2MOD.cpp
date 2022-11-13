@@ -13,7 +13,6 @@
 #include "Blam/Engine/Game/GameHooks.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
-#include "Blam/Engine/IceCreamFlavor/IceCreamFlavor.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
@@ -698,14 +697,6 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-typedef bool(__cdecl* fn_c000bd114_t)(e_skulls);
-fn_c000bd114_t p_fn_c000bd114;
-
-bool __cdecl fn_c000bd114_IsSkullEnabled(e_skulls skull_index)
-{
-	return ice_cream_flavor_available(skull_index);
-}
-
 bool GrenadeChainReactIsEngineMPCheck() {
 	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
@@ -979,6 +970,9 @@ void H2MOD::ApplyHooks() {
 	DETOUR_BEGIN();
 
 	EngineHooks::ApplyHooks();
+#ifdef GAMEREWRITE
+	ApplyGameHooks();
+#endif
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
@@ -1045,8 +1039,6 @@ void H2MOD::ApplyHooks() {
 		// set max model quality to L6
 		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
 
-		DETOUR_ATTACH(p_fn_c000bd114, Memory::GetAddress<fn_c000bd114_t>(0xbd114), fn_c000bd114_IsSkullEnabled);
-
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
@@ -1083,10 +1075,6 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
 	PlayerRepresentation::Initialize();
-
-#ifdef GAMEREWRITE
-	ApplyGameHooks();
-#endif
 
 	if (!Memory::IsDedicatedServer())
 	{

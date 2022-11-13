@@ -155,6 +155,7 @@
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\cheats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -477,7 +478,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
-    <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
@@ -500,6 +500,8 @@
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
     <ClInclude Include="Blam\Engine\Game\math\color_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
+    <ClInclude Include="Blam\Engine\Game\game\cheats.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
