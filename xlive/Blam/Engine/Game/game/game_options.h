@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Blam\Common\Common.h"
-#include "Blam\Engine\Game\GameVariant.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Game/GameVariant.h"
 
 enum e_game_simulation : __int8
 {
@@ -28,14 +27,15 @@ struct s_game_options
 {
 	e_engine_type m_engine_type;
 	e_game_simulation m_simulation_type;
-	char field_5;
+	bool network_protocol_related;
 	bool session_host_is_dedicated;
 	char filed_7;
 	__int16 tickrate;
 	PAD(6);
 	char random_data[8];
-	int field_18;
-	__int16 field_1C;
+	int random_seed;
+	byte is_custom_map;
+	byte field_1D;
 	char custom_map_name[96];
 	PAD(2);
 	int campaign_map_id;
@@ -54,7 +54,7 @@ struct s_game_options
 	DWORD machine_flags;
 	DWORD machines;
 	DWORD field_3DC;
-	PAD(94);
+	byte pad4[94];
 	WORD player_count;
 	char gap_440[3];
 	char field_443;

@@ -101,8 +101,9 @@
     <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='GameRewriteDebug|Win32'">
-    <OutDir>$(SolutionDir)Halo2\</OutDir>
-    <IntDir>.\Debug\</IntDir>
+    <OutDir>C:\Program Files (x86)\Microsoft Games\Halo 2</OutDir>
+    <IntDir>
+    </IntDir>
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
@@ -423,11 +424,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GameRewriteDebug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\game.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\cheats.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
@@ -481,7 +482,6 @@
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
-    <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.cpp" />
@@ -752,8 +752,8 @@
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
-    <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game_engine.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game.h" />
     <ClInclude Include="Blam\Engine\Game\GameState.h" />
     <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
     <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
@@ -819,7 +819,6 @@
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
-    <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h" />
@@ -873,7 +872,7 @@
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
-    <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game_options.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />

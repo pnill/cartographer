@@ -6,7 +6,7 @@
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Engine/Memory/bitstream.h"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "Blam/FileSystem/FiloInterface.h"
 #include "Blam/Engine/Game/DamageData.h"
@@ -30,7 +30,6 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
-#include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
@@ -528,8 +527,10 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
-	// set the engine type
-	h2mod->SetCurrentEngineType(game_options->m_engine_type);
+	// This function is called before the global game options are set to the ones passed to the map load function
+	// Therefore we need to set it here in order to make sure the logic below dosent break
+	// We should probably find a better way to handle this sometime in the future
+	s_game_globals::set_engine_type(options->m_engine_type);
 
 	tags::run_callbacks();
 
@@ -561,14 +562,14 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	else
 	{
 		wchar_t* variant_name = NetworkSession::GetGameVariantName();
-		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)h2mod->GetEngineType(), variant_name);
+		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)s_game_globals::get_engine_type(), variant_name);
 
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		HudElements::OnMapLoad();
 
-		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
+		if (s_game_globals::game_is_multiplayer())
 		{
 			addDebugText("Engine type: Multiplayer");
 
@@ -599,7 +600,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
 		}
-		else if (h2mod->GetEngineType() == e_engine_type::_single_player)
+		else if (s_game_globals::game_is_campaign())
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
@@ -698,15 +699,15 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
+	return s_game_globals::game_is_multiplayer();
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
+	return s_game_globals::game_is_multiplayer();
 }
 
 bool FlashlightIsEngineSPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_single_player;
+	return s_game_globals::game_is_multiplayer();
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
@@ -752,7 +753,7 @@ bool device_active = true;
 // This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
+	if (s_game_globals::game_is_multiplayer())
 	{
 		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)
@@ -1109,7 +1110,6 @@ void H2MOD::Initialize()
 	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
-	KantTesting::Initialize();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();

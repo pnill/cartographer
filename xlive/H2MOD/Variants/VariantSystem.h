@@ -2,7 +2,7 @@
 
 #include "Blam/Common/Common.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Engine/Game/GameOptions.h"
+#include "Blam/Engine/Game/game/game.h"
 
 enum CustomVariantId
 {

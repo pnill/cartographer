@@ -1,15 +1,11 @@
 #pragma once
 
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Engine\Game\GameOptions.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
 namespace Engine
 {
 	e_game_life_cycle get_game_life_cycle();
-	e_engine_type get_current_engine_type();
-	int get_global_random_seed_address();
-	int get_game_mode_engine();
 
 	namespace Unit
 	{

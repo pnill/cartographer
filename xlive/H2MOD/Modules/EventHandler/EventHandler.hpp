@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Blam\Common\Common.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "H2MOD\Modules\Shell\ServerConsole.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "H2MOD/Modules/Shell/ServerConsole.h"
 
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum

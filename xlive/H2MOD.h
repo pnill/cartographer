@@ -3,7 +3,7 @@
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
-#include "Blam\Engine\Game\GameOptions.h"
+#include "Blam/Engine/Game/game/game.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Common\Common.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
@@ -60,18 +60,11 @@ public:
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool b_Enable);
 	void set_local_rank(BYTE rank);
-	void cine_start_tex();
-
-	e_engine_type GetEngineType() { return engineType; }
-	void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
 	void toggle_ai_multiplayer(bool toggle);
 	void toggle_xbox_tickrate(s_game_options* game_options, bool toggle);
 
 	bool drawTeamIndicators = true;
-
-private:
-	e_engine_type engineType;
 };
 
 extern std::unique_ptr<H2MOD> h2mod;

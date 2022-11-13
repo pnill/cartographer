@@ -118,7 +118,7 @@ namespace ImGuiHandler {
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			ImGui::SetNextWindowSize(ImVec2(450, 320), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 320), ImVec2(1920, 1080));
-			if (h2mod->GetEngineType() == _main_menu)
+			if (s_game_globals::game_is_mainmenu())
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_weapon_offsets_string::title), &open, window_flags))
 			{

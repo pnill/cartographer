@@ -4,8 +4,8 @@
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Engine\Game\GameEngineGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/Game/game/game_engine.h"
+#include "Blam/Engine/Game/game/game.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Enums\HaloStrings.h"
 
@@ -102,7 +102,7 @@ namespace PlayerRepresentation
 
 	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* player_properties)
 	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
 			p_network_session_player_profile_recieve(player_index, player_properties);
@@ -164,9 +164,9 @@ namespace PlayerRepresentation
 		if (player_properties->bungie_user_role <= 7)
 			player_properties->bungie_user_role = 7;
 
-		if (Engine::get_game_mode_engine()
+		if (game::get_game_mode_engine()
 			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
-			&& (player_properties->player_team && !(s_game_engine_globals::get()->Unk1 & FLAG(player_properties->player_team))))
+			&& (player_properties->player_team && !(game::s_game_engine_globals::get()->Unk1 & FLAG(player_properties->player_team))))
 		{
 			player_properties->player_team = e_object_team::None;
 		}
@@ -175,7 +175,7 @@ namespace PlayerRepresentation
 	{
 		current_representation_count = 4;
 
-		if (h2mod->GetEngineType() == _multiplayer) 
+		if (s_game_globals::game_is_multiplayer()) 
 		{
 			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;

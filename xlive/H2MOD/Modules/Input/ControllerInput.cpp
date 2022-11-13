@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "ControllerInput.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/game/game.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "Util/Hooks/Hook.h"
 
 namespace ControllerInput
 {
@@ -53,7 +54,7 @@ namespace ControllerInput
 			if (InputDevice->error_level == 0)
 			{
 				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
-				if (Engine::get_game_life_cycle() == _life_cycle_in_game || Engine::get_current_engine_type() == _single_player)
+				if (Engine::get_game_life_cycle() == _life_cycle_in_game || s_game_globals::game_is_campaign())
 				{
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 						controller_button |= H2Config_CustomLayout.DPAD_UP;

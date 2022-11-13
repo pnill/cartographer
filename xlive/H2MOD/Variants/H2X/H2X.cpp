@@ -60,7 +60,7 @@ void H2X::ApplyMapLoadPatches(bool enable)
 		}
 	}
 
-	if (enable && !Memory::IsDedicatedServer() && h2mod->GetEngineType() == e_engine_type::_multiplayer)
+	if (enable && !Memory::IsDedicatedServer() && s_game_globals::game_is_multiplayer())
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/

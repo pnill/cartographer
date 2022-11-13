@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cheats.h"
 #include "Blam/Enums/HaloStrings.h"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Game/game/game.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 

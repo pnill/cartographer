@@ -2,9 +2,9 @@
 
 #include "MeleeLunge.h"
 
-#include "Util\Memory.h"
+#include "Util/Memory.h"
 
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Game/game/game.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

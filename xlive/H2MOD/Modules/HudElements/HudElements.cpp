@@ -30,7 +30,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (h2mod->GetEngineType() != _main_menu && Engine::get_game_life_cycle() == _life_cycle_in_game) {
+	else if (!s_game_globals::game_is_mainmenu() && Engine::get_game_life_cycle() == _life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}
@@ -85,7 +85,7 @@ void HudElements::setCrosshairSize(bool mapLoadContext)
 		crosshairInit = false;
 	}
 
-	if (h2mod->GetEngineType() != e_engine_type::_main_menu) {
+	if (!s_game_globals::game_is_mainmenu()) {
 		auto hud_reticles_datum = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
 		if (hud_reticles_datum != DATUM_INDEX_NONE)
 		{

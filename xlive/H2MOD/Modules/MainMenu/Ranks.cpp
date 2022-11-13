@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
+#include "H2MOD/Tags/TagInterface.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 void UIRankPatch() {
 
-	if (h2mod->GetEngineType() != _main_menu || Memory::IsDedicatedServer())
+	if (!s_game_globals::game_is_mainmenu() || Memory::IsDedicatedServer())
 		return;
 
 	//BYTE PlayerLevel = -1;								//eventually this will pull level from webserver

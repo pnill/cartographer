@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "GameGlobals.h"
+#include "game.h"
 
 s_game_globals* s_game_globals::get()
 {
@@ -9,17 +9,27 @@ s_game_globals* s_game_globals::get()
 
 bool s_game_globals::map_initialized()
 {
-	return get() && get()->map_active && get()->sbsp_index != 0xFFFF;
+	return get() && get()->map_active && get()->active_structure_bsp_index != 0xFFFF;
 }
 
 s_game_options* s_game_globals::get_game_options()
 {
-	return &get()->m_options;
+	return &get()->options;
 }
 
 s_game_variant* s_game_globals::get_game_variant()
 {
 	return &get_game_options()->m_game_variant;
+}
+
+void s_game_globals::set_engine_type(e_engine_type engine_type)
+{
+	 get_game_options()->m_engine_type = engine_type;
+}
+
+e_engine_type s_game_globals::get_engine_type()
+{
+	return get_game_options()->m_engine_type;
 }
 
 bool s_game_globals::game_is_campaign()
