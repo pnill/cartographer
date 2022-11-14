@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Math/BlamMath.h"
 
 #pragma pack(push, 1)
 struct s_camera

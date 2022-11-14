@@ -3,7 +3,7 @@
 #include "HudElements.h"
 
 #include "Blam/Engine/Game/game/cheats.h"
-#include "Blam/Engine/render/render_cameras.h"
+#include "Blam/Engine/Game/render/render_cameras.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
