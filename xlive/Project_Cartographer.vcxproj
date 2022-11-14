@@ -424,7 +424,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GameRewriteDebug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\cheats.cpp" />
@@ -435,7 +435,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game_time.h" />
     <ClInclude Include="Blam\Engine\Game\game\cheats.h" />
     <ClInclude Include="Blam\Engine\Game\math\color_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\random_math.h" />

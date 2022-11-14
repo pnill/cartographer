@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "Mouseinput.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "Util/Hooks/Hook.h"
 
 typedef struct DIMOUSESTATE {
 	LONG lX;
@@ -40,8 +40,8 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 			WriteBytes(base + 0x627E7, assmNop, 8);
 			b_raw_init = true;
 		}
-		*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
-		*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
+		*dx = time->tick_length * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
+		*dy = time->tick_length * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
 	}
 	else
 	{

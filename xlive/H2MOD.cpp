@@ -7,7 +7,7 @@
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Engine/Memory/bitstream.h"
 #include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/FileSystem/FiloInterface.h"
 #include "Blam/Engine/Game/DamageData.h"
 #include "Blam/Engine/Game/GameHooks.h"
@@ -707,7 +707,7 @@ bool BansheeBombIsEngineMPCheck() {
 }
 
 bool FlashlightIsEngineSPCheck() {
-	return s_game_globals::game_is_multiplayer();
+	return s_game_globals::game_is_campaign();
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)

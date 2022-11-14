@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam/Math/BlamMath.h"
-#include "Blam\Engine\Game/GameTimeGlobals.h"
+#include "Blam/Engine/Game/game/game_time.h"
 
 #include "H2MOD.h"
 

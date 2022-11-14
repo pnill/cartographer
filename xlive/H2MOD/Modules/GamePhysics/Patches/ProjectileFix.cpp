@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
 #include "ProjectileFix.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Math\BlamMath.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Math/BlamMath.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
@@ -35,15 +35,15 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
-		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
+		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->passed_ticks_count)) // also check if the projectile is updated twice in the same tick
 	{
 		LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
-		tick_length = time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / HitFix_Projectile_Tick_Rate);
+		tick_length = time_globals::game_time_tick_length() * ((float)time_globals::get()->tickrate / HitFix_Projectile_Tick_Rate);
 	}
 	else
 	{
-		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
-		tick_length = time_globals::get_seconds_per_tick();
+		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->tickrate);
+		tick_length = time_globals::game_time_tick_length();
 	}
 }
 
@@ -51,7 +51,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
-	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
+	*(DWORD*)(object_data + 428) = time_globals::get()->passed_ticks_count; // store the projectile creation tick count
 }
 
 bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)

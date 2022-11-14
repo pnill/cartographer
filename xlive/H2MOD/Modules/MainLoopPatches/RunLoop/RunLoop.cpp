@@ -1,25 +1,25 @@
 #include "stdafx.h"
 
 #include "RunLoop.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\GUI\XLiveRendering.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\Stats\StatsHandler.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\Input\ControllerInput.h"
-#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
-#include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/GUI/GUI.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
+#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "H2MOD\Utils\Utils.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
+#include "H2MOD/Utils/Utils.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 #define TIMER_RESOLUTION_MS 1
 
@@ -464,7 +464,7 @@ void __cdecl game_main_loop()
 			else
 			{
 				if (v1 > 0 && p_sub_B4BFD1())
-					v3 = time_globals::get()->seconds_per_tick;
+					v3 = time_globals::get()->tick_length;
 				else
 					v3 = 0.0f;
 				a2 = v3;
@@ -556,7 +556,7 @@ void __cdecl alt_main_game_loop_hook()
 {
 	QueryPerformanceCounter(&end_tick);
 	double tick_time = static_cast<double>(end_tick.QuadPart - start_tick.QuadPart) / freq.QuadPart;// -render_time;
-	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
+	if (tick_time >= time_globals::get()->tick_length || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
 		if (!shouldQuitMainLoop)
@@ -569,7 +569,7 @@ void __cdecl alt_main_game_loop_hook()
 
 		if (p_game_in_simulation())
 		{
-			p_game_frame(time_globals::get()->seconds_per_tick);
+			p_game_frame(time_globals::get()->tick_length);
 		}
 		//game_main_loop();
 		//main_game_loop();

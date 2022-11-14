@@ -2,19 +2,20 @@
 
 #include "CustomVariantSettings.h"
 
-#include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Game\PhysicsConstants.h"
-#include "Blam\Engine\Players\PlayerControls.h"
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam/Engine/Memory/bitstream.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Game/PhysicsConstants.h"
+#include "Blam/Engine/Players/PlayerControls.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Memory/bitstream.h"
 
 #include "H2MOD.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Utils\Utils.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/Hooks/Hook.h"
 
 CustomVariantSettings::s_variantSettings currentVariantSettings;
 CustomVariantSettings::s_variantSettings defaultCustomVariantSettings;

@@ -2,17 +2,17 @@
 
 #include "MainGameTime.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/game/game.h"
 
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Utils/Utils.h"
 
-#include "H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h"
 
 extern bool b_XboxTick;
 
@@ -24,7 +24,7 @@ bool MainGameTime::fps_limiter_enabled = false;
 float get_ticks_leftover_time()
 {
 	time_globals* timeGlobals = time_globals::get();
-	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->game_ticks_leftover / (float)timeGlobals->ticks_per_second);
+	float result = timeGlobals->tick_length - (float)(timeGlobals->game_ticks_leftover / (float)timeGlobals->tickrate);
 	return blam_max(result, 0.0f);
 }
 
@@ -109,7 +109,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	s_main_time_globals* main_time_globals;
 
 	main_time_globals = s_main_time_globals::get();
-	game_time = s_game_globals::game_is_in_progress() ? time_globals::get_game_time() : 0;
+	game_time = s_game_globals::game_is_in_progress() ? time_globals::get_game_time_ticks() : 0;
 
 	QueryPerformanceFrequency(&counterFrq);
 	_timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
@@ -121,7 +121,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	if (fixed_time_step)
 	{
 		dtSec = fixed_time_delta;
-		if (time_globals::available())
+		if (time_globals::game_time_initialized())
 			time_globals::get()->game_ticks_leftover = 0.0f;
 	}
 	else
@@ -134,7 +134,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
 		if (MainGameTime::fps_limiter_enabled || _Shell::IsGameMinimized())
 		{
-			if (time_globals::available())
+			if (time_globals::game_time_initialized())
 			{
 				// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement

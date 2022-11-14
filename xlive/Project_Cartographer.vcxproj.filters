@@ -154,7 +154,7 @@
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -499,7 +499,7 @@
     <ClInclude Include="Blam\Engine\Game\math\random_math.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Game\game\cheats.h" />
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game_time.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
