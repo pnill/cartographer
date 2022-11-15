@@ -42,8 +42,6 @@ h2log *console_log = nullptr;
 // Voice chat logger
 h2log* voice_log = nullptr;
 
-std::random_device rd;
-
 DWORD H2BaseAddr = NULL;
 bool H2IsDediServer = false;
 
