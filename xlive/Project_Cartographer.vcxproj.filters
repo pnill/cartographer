@@ -93,7 +93,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
+    <ClCompile Include="Blam\Engine\Game\hs\hs.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
@@ -296,7 +296,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
@@ -382,7 +381,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\Game\hs\hs.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\Game\objects\damage.h" />

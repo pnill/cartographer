@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "color_math.h"
+
 #include "Util/Hooks/Hook.h"
 
 typedef void(__cdecl* real_rgb_colour_to_real_hsv_color_t)(const real_color_rgb* rgb, real_color_hsv* hsv);

@@ -478,7 +478,7 @@
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
+    <ClCompile Include="Blam\Engine\Game\hs\hs.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
@@ -815,7 +815,7 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\Game\hs\hs.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
@@ -868,7 +868,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />

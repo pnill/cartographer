@@ -2,13 +2,13 @@
 
 #include "HeadHunter.h"
 
+#include "Blam/Engine/Game/hs/hs.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Engine/Engine.h"
 
 int soundBuffer = 0;
