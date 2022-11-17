@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "hs.h"
 
-namespace HaloScript
+namespace hs
 {
 	typedef int(__cdecl unit_kill_t)(datum unitDatum);
 	unit_kill_t* p_unit_kill;

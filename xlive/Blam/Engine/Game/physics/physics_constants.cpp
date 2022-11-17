@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "PhysicsConstants.h"
+#include "physics_constants.h"
 
 physics_constants* physics_constants::get()
 {

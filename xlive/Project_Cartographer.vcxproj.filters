@@ -107,7 +107,7 @@
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
-    <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
+    <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
@@ -400,7 +400,7 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers-inl.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
-    <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
+    <ClInclude Include="Blam\Engine\Game\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />

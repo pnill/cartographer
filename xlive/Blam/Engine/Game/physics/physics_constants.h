@@ -1,13 +1,16 @@
 #pragma once
 #include "Blam/Math/real_math.h"
 
-struct __declspec(align(4)) physics_constants
+#pragma pack(push,1)
+struct physics_constants
 {
 	float gravity;
 	float dword4;
 	float dword8;
 	real_point3d zero_vector;
-	DWORD dword18;
+	unsigned long dword18;
 	static physics_constants* get();
 	static float get_default_gravity();
 };
+CHECK_STRUCT_SIZE(physics_constants, 0x1C);
+#pragma pack(pop)

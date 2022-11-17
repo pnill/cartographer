@@ -78,7 +78,7 @@ void HeadHunter::PickupSkull(datum playerIdx, datum skullDatum)
 		if (player_score_data)
 		{
 			p_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx), 0, 1, -1, 0);
-			HaloScript::ObjectDestroy(skullDatum);
+			hs::ObjectDestroy(skullDatum);
 			if (TimeElapsedMS(soundBuffer) > 2500)
 			{
 				soundBuffer = GetCurrentTimeMS();

@@ -159,7 +159,7 @@ struct HaloScriptCommand
 	e_hs_type arg_array[1]; // array size is dynamic, but always at least one
 };
 
-namespace HaloScript
+namespace hs
 {
 	void UnitKill(datum unitDatum);
 	bool UnitInVehicle(datum unitDatum);

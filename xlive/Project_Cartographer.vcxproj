@@ -432,7 +432,7 @@
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
-    <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
+    <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
@@ -758,7 +758,7 @@
     <ClInclude Include="Blam\Engine\Game\game\game.h" />
     <ClInclude Include="Blam\Engine\Game\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Game\saved_games\game_variant.h" />
-    <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
+    <ClInclude Include="Blam\Engine\Game\physics\physics_constants.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
