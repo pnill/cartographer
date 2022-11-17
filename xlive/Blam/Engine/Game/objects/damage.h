@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Math/BlamMath.h"
 
 #pragma pack(push, 1)
 struct s_damage_data
@@ -34,3 +34,8 @@ struct s_damage_data
 };
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(s_damage_data, 0x85);
+
+namespace damage
+{
+	void ApplyPatches();
+}

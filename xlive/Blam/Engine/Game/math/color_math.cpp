@@ -46,9 +46,9 @@ namespace color_math
         float normalized_hue = hsv->hue * 6;
         int whole_normalized_hue = (int)normalized_hue;
         float hue_difference = normalized_hue - (float)whole_normalized_hue;
-        float alpha = (float)(1.0 - hsv->saturation) * hsv->value;
-        float beta = (float)(1.0 - (hsv->saturation * hue_difference)) * hsv->value;
-        float gamma = (float)(1.0 - ((1.0 - hue_difference) * hsv->saturation)) * hsv->value;
+        float alpha = (1.0f - hsv->saturation) * hsv->value;
+        float beta = (1.0f - (hsv->saturation * hue_difference)) * hsv->value;
+        float gamma = (1.0f - ((1.0f - hue_difference) * hsv->saturation)) * hsv->value;
 
         if (hsv->saturation == 0.0)
         {
@@ -97,9 +97,9 @@ namespace color_math
     D3DCOLOR __cdecl real_argb_colour_to_d3d_color(const real_color_argb* color)
     {
         byte alpha = (byte)(color->alpha * 255);
-        byte red = (byte)(color->red * 255);
-        byte green = (byte)(color->green * 255);
-        byte blue = (byte)(color->blue * 255);
+        byte red = (byte)(color->color.red * 255);
+        byte green = (byte)(color->color.green * 255);
+        byte blue = (byte)(color->color.blue * 255);
         return D3DCOLOR_ARGB(alpha, red, green, blue);
     }
 

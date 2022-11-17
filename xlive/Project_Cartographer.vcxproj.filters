@@ -155,6 +155,7 @@
     <ClCompile Include="Blam\Engine\Game\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
+    <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -384,7 +385,7 @@
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
-    <ClInclude Include="Blam\Engine\Game\DamageData.h" />
+    <ClInclude Include="Blam\Engine\Game\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="Blam\Enums\HaloStrings.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />

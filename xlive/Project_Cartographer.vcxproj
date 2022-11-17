@@ -431,6 +431,7 @@
     <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
@@ -752,7 +753,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
-    <ClInclude Include="Blam\Engine\Game\DamageData.h" />
+    <ClInclude Include="Blam\Engine\Game\objects\damage.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\Game\game\game.h" />
     <ClInclude Include="Blam\Engine\Game\GameState.h" />
