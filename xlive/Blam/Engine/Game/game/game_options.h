@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Common/Common.h"
-#include "Blam/Engine/Game/GameVariant.h"
+#include "Blam/Engine/Game/saved_games/game_variant.h"
 
 enum e_game_simulation : __int8
 {
@@ -31,31 +31,31 @@ struct s_game_options
 	bool session_host_is_dedicated;
 	char filed_7;
 	__int16 tickrate;
-	PAD(6);
+	__int8 pad[6];
 	char random_data[8];
 	int random_seed;
-	byte is_custom_map;
-	byte field_1D;
+	__int8 is_custom_map;
+	__int8 field_1D;
 	char custom_map_name[96];
-	PAD(2);
+	__int8 pad1[2];
 	int campaign_map_id;
 	int map_id;
 	wchar_t map_tag_name[260];
 	__int16 initial_sbsp;
-	PAD(6);
+	__int8 pad2[6];
 	char playtest;
-	PAD(1);
+	__int8 pad3;
 	__int16 difficulty;
 	char coop;
 	char field_29D;
 	char gap29E[2];
 	s_game_variant m_game_variant;
-	DWORD menu_context;
-	DWORD machine_flags;
-	DWORD machines;
-	DWORD field_3DC;
-	byte pad4[94];
-	WORD player_count;
+	unsigned long menu_context;
+	unsigned long machine_flags;
+	unsigned long machines;
+	unsigned long field_3DC;
+	__int8 pad4[94];
+	short player_count;
 	char gap_440[3];
 	char field_443;
 	char gap_444[4];

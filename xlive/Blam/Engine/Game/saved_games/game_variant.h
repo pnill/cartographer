@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Common\Common.h"
+#include "Blam/Common/Common.h"
 
 enum e_game_engine_index
 {
@@ -245,31 +245,31 @@ enum e_juggernaut_engine_flags
 #pragma pack(push,1)
 struct s_game_variant
 {
-	WORD variant_flag;
-	PAD(1);
+	short variant_flag;
+	char gap[1];
 	e_game_variant_description_index description_index;
 	wchar_t variant_name[16];
-	PAD(32);
+	__int8 pad[32];
 	e_game_engine_index variant_game_engine_index;
-	int game_engine_flags;
+	e_game_engine_flags game_engine_flags;
 	e_game_engine_round_setting round_setting;
 	int score_to_win_round;
 	int round_time_limit;
 	e_game_engine_join_in_progress join_in_progress_setting;
-	PAD(24);
+	__int8 pad1[24];
 	int max_players;
 	int max_living_players;
 	int lives_per_round;
 	int respawn_time;
 	int suicide_penalty;
 	e_game_engine_shield_setting shield_setting;
-	PAD(24);
+	__int8 pad2[24];
 	e_game_engine_team_score team_score_setting;
 	e_game_engine_team_respawn team_respawn_setting;
 	int betrayal_penalty;
-	PAD(4);
+	__int8 pad3[4];
 	int maximum_allowable_teams;
-	PAD(20);
+	__int8 pad4[20];
 	e_game_engine_respawn vehicle_respawn_setting;
 	e_game_engine_light_land_vehicle primary_light_land_vehicle;
 	e_game_engine_light_land_vehicle secondary_light_land_vehicle;
@@ -290,7 +290,7 @@ struct s_game_variant
 
 	//the area below this seems like a big union
 	//TODO : figure this out
-	PAD(0x130 - 0xD8);
+	__int8 pad5[0x130 - 0xD8];
 };
 CHECK_STRUCT_SIZE(s_game_variant, 0x130);
 #pragma pack(pop)

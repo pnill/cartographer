@@ -426,8 +426,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
-    <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
-    <ClInclude Include="Blam\Engine\Game\GameState.h" />
+    <ClInclude Include="Blam\Engine\Game\saved_games\game_variant.h" />
+    <ClInclude Include="Blam\Engine\Game\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
