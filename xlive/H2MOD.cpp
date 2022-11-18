@@ -427,8 +427,9 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
-	CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
-	p_update_player_score(thisptr, a2, a3, a4, a5, a6);
+	bool handled = CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
+	if (!handled)
+		p_update_player_score(thisptr, a2, a3, a4, a5, a6);
 	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
 }
 
