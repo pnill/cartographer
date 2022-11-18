@@ -12,9 +12,7 @@ namespace H2Tweaks {
 	void ApplyPatches();
 	void DisposePatches();
 	void toggleKillVolumes(bool enable);
-	void toggleAiMp(bool toggle);
-	void toggleUncappedCampaignCinematics(bool toggle);
-	void setHz();
+	void SetScreenRefreshRate();
 	void SunflareFix();
 	void WarpFix(bool enable);
 	void RefreshTogglexDelay();

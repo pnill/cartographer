@@ -295,6 +295,17 @@ bool __cdecl cinematic_in_progress_hook()
 	return false;
 }
 
+// same as above but hook used to disable framrate cap
+// when playing cinematics
+bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
+{
+	// don't limit the game framerate if we're single player and playing cinematics
+	if (h2mod->GetEngineType() == _single_player)
+		return false;
+
+	return p_cinematic_is_running();
+}
+
 bool __cdecl should_limit_framerate_hook()
 {
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
@@ -689,6 +700,10 @@ void InitRunLoop() {
 		// apply framerate throttle patches for when the game is minimized
 		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
 		PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
+
+		// allow cinematics to run at 60 fps
+		PatchCall(Memory::GetAddress(0x97774), cinematics_in_progress_disable_framerate_cap_hook);
+		PatchCall(Memory::GetAddress(0x7C378), cinematics_in_progress_disable_framerate_cap_hook);
 
 		// stop Hold to Zoom.
 		NopFill(Memory::GetAddress(0x9355C), 4);

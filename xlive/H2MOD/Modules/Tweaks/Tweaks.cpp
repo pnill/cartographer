@@ -146,10 +146,10 @@ int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int 
 	return p_sub_671B02(a1, a2, a3, a4, a5, a6, a7, a8);
 }
 
-char is_remote_desktop()
+bool __cdecl is_remote_desktop()
 {
 	LOG_TRACE_FUNC("check disabled");
-	return 0;
+	return false;
 }
 
 class test_engine : public c_game_engine_base
@@ -374,8 +374,8 @@ void H2Tweaks::ApplyPatches() {
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
 		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
 
-		NopFill(Memory::GetAddressRelative(0x42FABF), 2);
 		NopFill(Memory::GetAddressRelative(0x42FA8A), 3);
+		NopFill(Memory::GetAddressRelative(0x42FAB9), 8);
 		PatchCall(Memory::GetAddressRelative(0x42FAAB), update_keyboard_buttons_state_hook);
 
 		// don't mess with the cursor during loading screen
@@ -439,7 +439,7 @@ void H2Tweaks::toggleKillVolumes(bool enable) {
 	}
 }
 
-void H2Tweaks::setHz() {
+void H2Tweaks::SetScreenRefreshRate() {
 
 	if (Memory::IsDedicatedServer())
 		return;
@@ -451,26 +451,6 @@ void H2Tweaks::setHz() {
 			refresh_redirected = true;
 		}
 	}
-}
-
-char ret_0() {
-	return 0; //for 60 fps cinematics
-}
-
-void H2Tweaks::toggleUncappedCampaignCinematics(bool toggle) {
-	if (Memory::IsDedicatedServer())
-		return;
-
-	typedef char(__cdecl *is_cutscene_fps_cap_t)();
-	auto p_is_cutscene_fps_cap = Memory::GetAddress<is_cutscene_fps_cap_t>(0x3A938);
-
-	//60 fps cinematics enable
-	PatchCall(Memory::GetAddress(0x97774), toggle ? ret_0 : p_is_cutscene_fps_cap);
-	PatchCall(Memory::GetAddress(0x7C378), toggle ? ret_0 : p_is_cutscene_fps_cap);
-}
-
-void H2Tweaks::toggleAiMp(bool toggle) {
-	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
 void H2Tweaks::SunflareFix()

@@ -58,9 +58,6 @@ std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 bool b_H2X = false;
 bool b_XboxTick = false;
 
-// TODO: remove these
-s_data_array* game_state_actors = nullptr;
-
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", b_H2X },
@@ -493,15 +490,27 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 	return result;
 }
 
-void get_object_table_memory()
+s_data_array* H2MOD::get_actor_table()
 {
-	game_state_actors = *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
+	return *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
+}
+
+void H2MOD::toggle_xbox_tickrate(s_game_options* game_options, bool toggle)
+{
+	game_options->tickrate = toggle ? 30 : 60;
+	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)game_options->tickrate);
+	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", game_options->tickrate);
+}
+
+void H2MOD::toggle_ai_multiplayer(bool toggle)
+{
+	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
 }
 
 typedef bool(__cdecl *map_cache_load_t)(s_game_options* map_load_settings);
 map_cache_load_t p_map_cache_load;
 
-bool __cdecl OnMapLoad(s_game_options* options)
+bool __cdecl OnMapLoad(s_game_options* game_options)
 {
 	static bool resetAfterMatch = false;
 
@@ -511,44 +520,38 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
 
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->m_engine_type);
-	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, game_options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, game_options);
 
-	bool result = p_map_cache_load(options);
+	bool result = p_map_cache_load(game_options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
 	// set the engine type
-	h2mod->SetCurrentEngineType(options->m_engine_type);
+	h2mod->SetCurrentEngineType(game_options->m_engine_type);
 
 	tags::run_callbacks();
 
-	get_object_table_memory();
-
-	H2Tweaks::setHz();
+	H2Tweaks::SetScreenRefreshRate();
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
-	// when the game is minimized, the game might skip loading Main menu
+	// when the game is minimized, the game might skip loading the main menu
 	// this is where resetAfterMatch var comes in for help
 	if (resetAfterMatch)
 	{
-		if (b_XboxTick) {
-			options->tickrate = XboxTick::setTickRate(false);
-			b_XboxTick = false;
-		}
-
 		// here deinitialize the custom variant
 		CustomVariantHandler::DisposeGameVariant();
-
 		resetAfterMatch = false;
 	}
+
+	// reset everything
+	h2mod->toggle_ai_multiplayer(false);
+	h2mod->toggle_xbox_tickrate(game_options, false);
 
 	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();
-		H2Tweaks::toggleAiMp(false);
-		H2Tweaks::toggleUncappedCampaignCinematics(false);
 		MetaExtender::free_tag_blocks();
 	}
 	else
@@ -570,7 +573,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		{
 			addDebugText("Engine type: Multiplayer");
 
-			for (auto& gametype_it : GametypesMap)
+			for (const auto& gametype_it : GametypesMap)
 			{
 				if (StrStrIW(variant_name, gametype_it.first)) {
 					LOG_INFO_GAME(L"{} - {} custom gametype turned on!", __FUNCTIONW__, gametype_it.first);
@@ -579,20 +582,14 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
+			h2mod->toggle_xbox_tickrate(game_options, b_XboxTick);
 			if (!b_XboxTick)
 			{
 				H2X::Initialize(b_H2X);
 				ProjectileFix::ApplyProjectileVelocity();
-				options->tickrate = XboxTick::setTickRate(false);
-			}
-			else
-			{
-				options->tickrate = XboxTick::setTickRate(true);
 			}
 
-			H2Tweaks::toggleAiMp(true);
-			H2Tweaks::toggleUncappedCampaignCinematics(false);
-
+			h2mod->toggle_ai_multiplayer(true);
 			if (Engine::get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client
@@ -602,21 +599,19 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				// in case it is found
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
-
 		}
 		else if (h2mod->GetEngineType() == e_engine_type::_single_player)
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
 			//H2X::Initialize(true);
-			H2Tweaks::toggleUncappedCampaignCinematics(true);
 		}
 
 		resetAfterMatch = true;
 	}
 
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->m_engine_type);
-	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, game_options->m_engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, game_options);
 	return result;
 }
 
@@ -1193,8 +1188,6 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
-	PlayerRepresentation::Initialize();
-
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
@@ -1223,6 +1216,7 @@ void H2MOD::Initialize()
 	}
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
+	PlayerRepresentation::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();

@@ -16,11 +16,9 @@ namespace DirectorHooks
 		}
 	}
 
-	typedef void( director_choose_camera_game)();
-
-	double get_deathcam_fov()
+	float __cdecl get_deathcam_fov()
 	{
-		return 1.36136; //78deg in radians
+		return 1.36136f; //78deg in radians
 	}
 
 	void ApplyHooks()

@@ -47,6 +47,7 @@ public:
 	datum get_player_datum_index_from_controller_index(int controller_index);
 	const wchar_t* get_local_player_name(int local_player_index);
 	real_point3d* get_player_unit_coords(int player_index);
+	s_data_array* get_actor_table();
 	float get_distance(int, int);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	BYTE get_unit_team_index(datum unit_datum_index);
@@ -64,6 +65,9 @@ public:
 	e_engine_type GetEngineType() { return engineType; }
 	void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
+	void toggle_ai_multiplayer(bool toggle);
+	void toggle_xbox_tickrate(s_game_options* game_options, bool toggle);
+
 	bool drawTeamIndicators = true;
 
 private:
@@ -71,4 +75,3 @@ private:
 };
 
 extern std::unique_ptr<H2MOD> h2mod;
-extern s_data_array* game_state_actors;

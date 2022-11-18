@@ -133,8 +133,8 @@ void HudElements::setFOV() {
 	if (Memory::IsDedicatedServer())
 		return;
 
-	static float fov = 70.0f * M_PI / 180.0f;
 	static bool fov_redirected = false;
+	static float fov = 70.0f * M_PI / 180.0f;
 	if (H2Config_field_of_view > 0 && H2Config_field_of_view <= 110)
 	{
 		if (!fov_redirected)
