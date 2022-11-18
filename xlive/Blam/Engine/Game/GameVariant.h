@@ -245,7 +245,7 @@ enum e_juggernaut_engine_flags
 struct s_game_variant
 {
 	WORD variant_flag;
-	char gap[1];
+	PAD(1);
 	e_game_variant_description_index description_index;
 	wchar_t variant_name[16];
 	PAD(32);
@@ -281,6 +281,11 @@ struct s_game_variant
 	e_game_engine_respawn weapon_respawn_setting;
 	e_game_engine_starting_weapon starting_equipment_primary;
 	e_game_engine_starting_weapon starting_equipment_secondary;
+
+	bool is_team_play()
+	{
+		return TEST_FLAG(this->game_engine_flags, _game_engine_teams_bit);
+	}
 
 	//the area below this seems like a big union
 	//TODO : figure this out

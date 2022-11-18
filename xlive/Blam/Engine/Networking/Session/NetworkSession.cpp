@@ -196,7 +196,12 @@ s_peer_observer_channel* NetworkSession::GetPeerObserverChannel(int peerIdx)
 
 wchar_t* NetworkSession::GetGameVariantName()
 {
-	return GetCurrentNetworkSession()->parameters[0].game_variant_name;
+	return GetCurrentNetworkSession()->parameters[0].game_variant.variant_name;
+}
+
+bool NetworkSession::VariantIsTeamPlay()
+{
+	return GetCurrentNetworkSession()->parameters[0].game_variant.is_team_play();
 }
 
 void NetworkSession::LeaveSession()

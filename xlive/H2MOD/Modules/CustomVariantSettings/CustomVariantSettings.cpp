@@ -195,8 +195,11 @@ namespace CustomVariantSettings
 		//
 		//Anything host related before the game starts goes here.
 		//
-		for(auto i = 0; i < NetworkSession::GetPeerCount(); i++)
-			SendCustomVariantSettings(i);
+		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
+		{
+			if (!NetworkSession::PeerIndexLocal(i))
+				SendCustomVariantSettings(i);
+		}
 	}
 
 	typedef int(__cdecl get_next_hill_index_t)(int previousHill);

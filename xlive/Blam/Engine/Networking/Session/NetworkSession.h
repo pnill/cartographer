@@ -3,6 +3,7 @@
 #include "..\NetworkCommon.h"
 
 #include "Blam\Engine\Players\Players.h"
+#include "Blam\Engine\Game\GameGlobals.h"
 #include "..\Transport\NetworkChannel.h"
 #include "..\Transport\NetworkObserver.h"
 
@@ -57,6 +58,7 @@ namespace NetworkSession
 
 	wchar_t* GetGameVariantName();
 
+	bool VariantIsTeamPlay();
 	void LeaveSession();
 }
 
@@ -183,9 +185,8 @@ struct s_session_parameters
 	DWORD field_4DD8;
 	wchar_t custom_map_name[32];
 	BYTE custom_map_sha256_hash[32];
-	DWORD field_4E3C;
-	wchar_t game_variant_name[16];
-	BYTE gap_4E40[672];
+	s_game_variant game_variant;
+	BYTE gap_4E40[404];
 	DWORD field_5100;
 	BYTE gap_5104[3508];
 	DWORD field_5EB8;
@@ -241,7 +242,7 @@ struct s_network_session
 	s_session_vote voting_data[2]; // unused
 	BYTE gap_4B84[64];
 	s_session_parameters parameters[2];
-	DWORD local_peer_index;
+	int local_peer_index;
 	s_peer_observer_channel peer_observer_channels[17];
 	e_network_session_state local_session_state;
 	DWORD time_unk_2;

@@ -34,20 +34,20 @@ int Infection::calculateZombiePlayerIndex()
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		std::mt19937 mt_rand(rd());
-		std::vector<int> vecPlayersActiveIndexes;
+		std::vector<int> activePlayersIndices;
 		std::uniform_int_distribution<int> dist(0, NetworkSession::GetPlayerCount() - 1);
 
 		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
-				vecPlayersActiveIndexes.push_back(playerIndex);
+				activePlayersIndices.emplace_back(playerIndex);
 		}
 	
-		if (vecPlayersActiveIndexes.empty())
+		if (activePlayersIndices.empty())
 			return NONE;
 
 
-		int infectedPlayerIndex = vecPlayersActiveIndexes[dist(mt_rand)];
+		int infectedPlayerIndex = activePlayersIndices[dist(mt_rand)];
 		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, NetworkSession::GetPlayerName(infectedPlayerIndex));
 
 		return infectedPlayerIndex;

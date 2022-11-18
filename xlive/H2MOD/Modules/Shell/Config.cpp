@@ -71,11 +71,11 @@ char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 bool H2Config_team_flag_array[8];
-byte H2Config_team_enabled_count;
+int H2Config_team_enabled_count;
 short H2Config_team_bit_flags = 0xFF;
 char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
-bool H2Config_force_even = false;
+bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 bool H2Config_anti_cheat_enabled = true;
@@ -395,8 +395,8 @@ void SaveH2Config() {
 				"\n# The VIP list will be cleared when the lobby reaches Post game"
 				"\n\n"
 
-				"# force_even (Server):"
-				"\n# This flag tells the server to force even teams before starting"
+				"# shuffle_even_teams (Server):"
+				"\n# This flag tells the server to force even and shuffle teams before starting"
 				"\n# The server will automatically organize teams before starting if the game is uneven"
 				"\n# This setting is dependent on the settings for team_enable_bit_flags and the servers current max players."
 				"\n# The server will attempt to fill each team with an equal amount of players for every enabled team."
@@ -575,7 +575,7 @@ void SaveH2Config() {
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
 
@@ -879,7 +879,7 @@ void ReadH2Config() {
         
 				H2Config_minimum_player_start = ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
 				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
-				H2Config_force_even = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "force_even", H2Config_force_even);
+				H2Config_even_shuffle_teams = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
 				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
 				H2Config_anti_cheat_enabled = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
 

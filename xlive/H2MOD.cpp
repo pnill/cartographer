@@ -548,6 +548,9 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
 	h2mod->toggle_xbox_tickrate(game_options, false);
+	// reset custom gametypes state
+	for (auto& gametype_it : GametypesMap)
+		gametype_it.second = false;
 
 	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
 	{
@@ -559,11 +562,6 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	{
 		wchar_t* variant_name = NetworkSession::GetGameVariantName();
 		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)h2mod->GetEngineType(), variant_name);
-
-		for (auto& gametype_it : GametypesMap)
-		{
-			gametype_it.second = false; // reset custom gametypes state
-		}
 
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
@@ -844,19 +842,13 @@ void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16
 bool __cdecl should_start_pregame_countdown_hook()
 {
 	// dedicated server only
-	auto p_should_start_pregame_countdown_hook = Memory::GetAddressRelative<decltype(&should_start_pregame_countdown_hook)>(0x0, 0x40BC2A);
+	auto p_should_start_pregame_countdown_hook = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
 
-	// store what the game thinks about starting the countdown timer
-	bool gameCheck = p_should_start_pregame_countdown_hook();
+	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
+	if (!p_should_start_pregame_countdown_hook())
+		return false; 
 
-	if (!gameCheck)
-		return false; // if the game already thinks the game timer doesn't need to start, return false and skip any processing
-
-	bool teamsAreValidConditionMet = false;
-	bool minimumPlayersConditionMet = false;
-
-	//network_session* networkSession = NetworkSession::getCurrentNetworkSession();
-
+	bool minimumPlayersConditionMet = true;
 	if (H2Config_minimum_player_start > 0)
 	{
 		if (NetworkSession::GetPlayerCount() >= H2Config_minimum_player_start)
@@ -866,146 +858,65 @@ bool __cdecl should_start_pregame_countdown_hook()
 		}
 		else
 		{
+			minimumPlayersConditionMet = false;
 			ServerConsole::SendMsg(L"Waiting for Players | Esperando a los jugadores", true);
 		}
 	}
-	else
-	{
-		minimumPlayersConditionMet = true;
-	}
 
-	BYTE TeamPlay = *Memory::GetAddress<BYTE*>(0, 0x992880);
-	if (H2Config_force_even && TeamPlay == 1 && minimumPlayersConditionMet)
-	{
-		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
-		LOG_INFO_GAME(L"{} - balancing teams", __FUNCTIONW__);
-		std::map<std::string, std::vector<int>> Parties;
-		std::vector<int> nonPartyPlayers;
-		for (auto i = 0; i < 16; i++) //Detect party members
-		{
-			if (NetworkSession::PlayerIsActive(i))
-			{
-				//auto player = NetworkSession::getPlayerInformation(i);
-				int calcBaseOffset = 0x530E34 + (i * 0x128);
-				auto ClanDescripton = *Memory::GetAddress<unsigned long*>(0, calcBaseOffset + 0x88);
-				auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-				//NetworkSession::getPlayerInformation(i).properties->ClanTag did not appear to have this data.
-				auto partyCode = IntToString<unsigned long>(ClanDescripton, std::dec);
-				LOG_DEBUG_GAME(L"Checking if {} is part of a party", Gamertag);
-				if (ClanDescripton != 0)
-				{
-					LOG_DEBUG_GAME(L"Party {} adding member {}", std::wstring(partyCode.begin(), partyCode.end()), Gamertag);
-					Parties[partyCode].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
-				}
-				else
-					nonPartyPlayers.push_back(NetworkSession::GetPlayerIdByName(Gamertag));
-			}
-		}
-		for (auto i = 0; i < 16; i++) //Detect party leaders
-		{
-			if (NetworkSession::PlayerIsActive(i))
-			{
-				int calcBaseOffset = 0x530E34 + (i * 0x128);
-				auto playerId = *Memory::GetAddress<unsigned long long*>(0, calcBaseOffset);
-				auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0x18);
-				auto xuidslug = IntToString<unsigned long>(playerId & 0xFFFFFFFF, std::dec);
-				LOG_DEBUG_GAME(L"Checking if {} is leader of party {}", Gamertag, std::wstring(xuidslug.begin(), xuidslug.end()));
-				if (Parties.count(xuidslug) == 1) //Party leader found
-				{
-					LOG_DEBUG_GAME(L"Party {} adding leader {}", std::wstring(xuidslug.begin(), xuidslug.end()), Gamertag);
-					Parties[xuidslug].push_back(NetworkSession::GetPlayerIdByName(Gamertag));
-					std::vector<int>::iterator position = std::find(nonPartyPlayers.begin(), nonPartyPlayers.end(), NetworkSession::GetPlayerIdByName(Gamertag));
-					if (position != nonPartyPlayers.end())
-						nonPartyPlayers.erase(position);
-				}
-			}
-		}
-		byte playersPerTeam = (*Memory::GetAddress<BYTE*>(0, 0x534858)) / H2Config_team_enabled_count;
-		LOG_DEBUG_GAME(L"Players Per Team: {}", playersPerTeam);
-		int currentTeam = 0;
-		int currentTeamPlayers = 0;
-		std::map<int, int> teamPlayers;
-		for (auto i = 0; i < 8; i++) //Detect the first enabled team flag, this is so that if red isn't the first enabled team it doesn't place players there
-			if (H2Config_team_flag_array[i]) {
-				currentTeam = i;
-				break;
-			}
-		LOG_DEBUG_GAME(L"Starting with team {}", IntToWString<int>(currentTeam, std::dec));
-		std::vector<int> sortedPlayers;
-		for (const auto& party : Parties)
-		{
-			LOG_DEBUG_GAME("Setting teams for party {}", party.first);
-			for (const int &player : party.second)
-			{
-				LOG_DEBUG_GAME(L"Setting party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
-				sortedPlayers.push_back(player);
-				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
-				teamPlayers[currentTeam] += 1;
-				if (teamPlayers[currentTeam] == playersPerTeam)
-					for (auto i = 0; i < 8; i++)
-						if (H2Config_team_flag_array[i] && i != currentTeam) {
-							if (teamPlayers[i] != playersPerTeam) {
-								currentTeam = i;
-								break;
-							}
-						}
-			}
-			for (auto i = 0; i < 8; i++)
-				if (H2Config_team_flag_array[i] && i != currentTeam) {
-					if (teamPlayers[i] != playersPerTeam) {
-						currentTeam = i;
-						break;
-					}
-				}
-		}
-		for (const auto &team : teamPlayers)
-		{
-			LOG_DEBUG_GAME(L"Team {} - {} Players", team.first, team.second);
-		}
-		for (const auto &player : nonPartyPlayers)
-		{
-			LOG_DEBUG_GAME(L"Setting Non party player Team for {} to {}", IntToWString<int>(player, std::dec), IntToWString<int>(currentTeam, std::dec));
-			sortedPlayers.push_back(player);
-			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player), currentTeam);
-			teamPlayers[currentTeam] += 1;
-			if (teamPlayers[currentTeam] == playersPerTeam)
-				for (auto i = 0; i < 8; i++)
-					if (H2Config_team_flag_array[i] && i != currentTeam) {
-						if (teamPlayers[i] != playersPerTeam) {
-							currentTeam = i;
-							break;
-						}
-					}
-		}
-		for (const auto &team : teamPlayers)
-		{
-			LOG_DEBUG_GAME(L"Team {} - {} Players", team.first, team.second);
-		}
-		int validTeams = 0;
-		for (auto i = 0; i < 8; i++)
-			if (H2Config_team_flag_array[i]) {
-				if (teamPlayers[i] == playersPerTeam)
-					validTeams++;
-			}
-
-		if (validTeams == H2Config_team_enabled_count)
-			teamsAreValidConditionMet = true;
-	}
-	else
-	{
-		teamsAreValidConditionMet = true;
-	}
-
-	if (teamsAreValidConditionMet && minimumPlayersConditionMet)
-	{
-		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
-		return true;
-	}
-	else
-	{
+	if (!minimumPlayersConditionMet)
 		return false;
+
+	if (H2Config_even_shuffle_teams
+		&& NetworkSession::VariantIsTeamPlay())
+	{
+		std::mt19937 mt_rand(rd());
+		std::vector<int> activePlayersIndices;
+
+		int maxTeams = (std::min)((std::max)(H2Config_team_enabled_count, 2), 8);
+
+		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+		{
+			if (NetworkSession::PlayerIsActive(playerIndex))
+				activePlayersIndices.emplace_back(playerIndex);
+		}
+
+		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
+
+		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
+		
+		int maxPlayersPerTeam = (std::max)(1, NetworkSession::GetPlayerCount() / maxTeams);
+
+		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
+
+		for (int i = 0; i < 8; i++)
+		{
+			int currentTeamPlayers = 0;
+			if (!H2Config_team_flag_array[i])
+				continue;
+
+			if (!activePlayersIndices.size())
+				break;
+
+			std::uniform_int_distribution<int> dist(0, activePlayersIndices.size() - 1);
+
+			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
+			{
+				int vecPlayerIdx = dist(mt_rand);
+				int playerIndexSelected = activePlayersIndices[vecPlayerIdx];
+				// swap the player index with the last one, then just pop the last element
+				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
+				activePlayersIndices.pop_back();
+
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), i);
+			}
+		}
+
+		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 	}
+
+	return true;
 }
+
 //TODO: Move this.
 void vip_lock(e_game_life_cycle state)
 {
@@ -1042,15 +953,6 @@ void H2MOD::RegisterEvents()
 		// Client only callbacks	
 	}
 }
-
-//Shader LOD Bias stuff
-//typedef int(__cdecl p_sub_81A676)(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10);
-//p_sub_81A676* c_sub_81A676;
-//
-//int __cdecl sub_81A676(int a1, int a2, float a3, int a4, int a5, int a6, int a7, int a8, int a9, int a10)
-//{
-//	return c_sub_81A676(a1, a2, a3, 4, a5, a6, a7, a8, a9, a10);
-//}
 
 // unlocks all single player maps
 int __cdecl get_last_single_player_level_id_unlocked_from_profile()
@@ -1121,11 +1023,6 @@ void H2MOD::ApplyHooks() {
 		//PatchCall(Memory::GetAddress(0x1a1324), test_hook);
 		//PatchCall(Memory::GetAddress(0x1A2FF6), test_shader_hook);
 		//PatchCall(Memory::GetAddress(0x1a316B), test_hook);
-
-		//Shader LOD Bias stuff
-		//c_sub_81A676 = Memory::GetAddress<p_sub_81A676*>(0x19A676);
-		//PatchCall(Memory::GetAddress(0x19AD71), sub_81A676);
-		//PatchCall(Memory::GetAddress(0x19ADBC), sub_81A676);
 
 		// DETOUR_ATTACH(p_load_wgit, Memory::GetAddress<load_wgit_t>(0x2106A2), OnWgitLoad);
 

@@ -159,7 +159,7 @@ namespace MapSlots
 	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
 
 	typedef int(__cdecl sub_map_slot_t)(int a1);
-	sub_map_slot_t* sub_map_slot;
+	sub_map_slot_t* p_sub_map_slot;
 
 	int* MapSlotCount;
 	int __cdecl store_multiplayer_level_data(int a1)
@@ -194,14 +194,14 @@ namespace MapSlots
 			}
 		}
 		*MapSlotCount = *MapSlotCount + i;
-		return sub_map_slot(a1);
+		return p_sub_map_slot(a1);
 	}
 
 	void ApplyHooks()
 	{
 		MapSlotCount = Memory::GetAddress<int*>(0, 0x41950C);
 		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
-		sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
+		p_sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
 		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
 		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
 	}
