@@ -9,13 +9,15 @@
 
 namespace MapSlots
 {
-	const int FIRSTUNUSEDSLOT = 23;
-	const int MAXSLOTS = 49;
+	const int FIRST_UNUSED_SLOT = 23;
+	const int MAX_SLOTS = 49;
 	const int MULTIPLAYER_SIZE = 3172;
+
 	const int MapIndex = 3000;
 	std::vector<std::string> AddedMaps;
 	std::vector<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block> MapData;
 	std::map<datum, std::string> BitmapsToLoad;
+
 	void CacheMapData()
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
@@ -23,13 +25,13 @@ namespace MapSlots
 		std::string game_dir(GetExeDirectoryNarrow());
 		std::string def_maps_loc = game_dir + "\\maps";
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
-		for (auto map : AddedMaps)
+		for (const auto& map : AddedMaps)
 		{
 			std::string map_location = def_maps_loc + "\\" + map;
 			if (PathFileExistsA(map_location.c_str()))
 			{
 				LOG_TRACE_GAME("[Map Slots]: Startup - Caching {}", map);
-				std::ifstream* fin = new std::ifstream(map_location.c_str(), std::ios::binary | std::ios::binary);
+				std::ifstream* fin = new std::ifstream(map_location.c_str(), std::ios::binary);
 				if (fin->is_open())
 				{
 					int table_off, table_size = 0;
@@ -99,9 +101,8 @@ namespace MapSlots
 			{
 				//Load all the added maps bitmaps
 				LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-				for (auto item : BitmapsToLoad)
+				for (const auto& item : BitmapsToLoad)
 				{
-
 					tag_loader::Load_tag(item.first, false, item.second);
 				}
 				tag_loader::Push_Back();
@@ -124,14 +125,14 @@ namespace MapSlots
 							auto mul_levels = tags::get_tag_data() + p_mul_levels->block_data_offset;
 
 							int i = 0;
-							for (auto newSlot : MapData)
+							for (const auto& newSlot : MapData)
 							{
-								if (i + FIRSTUNUSEDSLOT < MAXSLOTS) {
+								if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
 									LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.Text);
-									auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRSTUNUSEDSLOT + i)));
+									auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i)));
 
 									//Write the data loaded from the maps into the unused slot
-									*slot = newSlot;
+									memcpy(slot, &newSlot, sizeof(newSlot));
 									//Resolve the loaded bitmap datum
 									slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
 									//Change the map id and sort ID so that the maps are 
@@ -146,15 +147,6 @@ namespace MapSlots
 									break;
 								}
 							}
-
-							/*slot->map_id = 1234;
-							slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(0xE81E010A);
-							const wchar_t* temp_name = L"Tombstone";
-							slot->english_name = temp_name;
-							const wchar_t* temp_desc = L"The UNSC decommissioned this munitions testing complex after safety concerns came to light.";
-							slot->english_description = temp_desc;
-							slot->path = "scenarios\\multi\\halo\\highplains\\highplains";
-							slot->sort_order = 100;*/
 						}
 					}
 				}
@@ -166,30 +158,26 @@ namespace MapSlots
 	/*typedef bool(__cdecl p_store_multiplayer_level_data)();
 	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
 
-	typedef int(__cdecl p_sub_map_slot)(int a1);
-	p_sub_map_slot* sub_map_slot;
+	typedef int(__cdecl sub_map_slot_t)(int a1);
+	sub_map_slot_t* sub_map_slot;
 
-	const int StaticLevelData = 0x419510;
 	int* MapSlotCount;
 	int __cdecl store_multiplayer_level_data(int a1)
-		//bool __cdecl store_multiplayer_level_data()
 	{
-		//auto result = c_store_multiplayer_level_data();
-		//auto result = sub_map_slot(a1);
-		//if(result)
-		//{
+		using s_multiplayer_levels_block = s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block;
+
 		int i = 0;
-		for (auto newSlot : MapData)
+		for (const auto& newSlot : MapData)
 		{
-			if (i + FIRSTUNUSEDSLOT < MAXSLOTS) {
+			if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
 				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.english_name.Text);
-				auto slotAddr = Memory::GetAddress(0, StaticLevelData) + (MULTIPLAYER_SIZE * (FIRSTUNUSEDSLOT + i));
+				auto slotAddr = Memory::GetAddress(0, 0x419510) + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i));
 				DWORD dwBack[2];
 				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
-				auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(slotAddr);
+				auto slot = reinterpret_cast<s_multiplayer_levels_block*>(slotAddr);
 
 				//Write the data loaded from the maps into the unused slot
-				*slot = newSlot;
+				memcpy(slot, &newSlot, sizeof(newSlot));
 
 				//Change the map id and sort ID so that the maps are 
 				//placed in order at the end of the list
@@ -205,7 +193,6 @@ namespace MapSlots
 				break;
 			}
 		}
-		//}
 		*MapSlotCount = *MapSlotCount + i;
 		return sub_map_slot(a1);
 	}
@@ -214,7 +201,7 @@ namespace MapSlots
 	{
 		MapSlotCount = Memory::GetAddress<int*>(0, 0x41950C);
 		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
-		sub_map_slot = Memory::GetAddress<p_sub_map_slot*>(0, 0x3C8C3);
+		sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
 		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
 		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
 	}
