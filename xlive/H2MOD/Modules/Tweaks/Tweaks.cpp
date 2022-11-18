@@ -171,22 +171,50 @@ class test_engine : public c_game_engine_base
 };
 test_engine g_test_engine;
 
+void __stdcall biped_ground_mode_update_hook(int thisx,
+	void* physics_output,
+	void* physics_input,
+	void* a4,
+	int a5)
+{
+	// value converted from h2x tickrate
+	static float edgeDropFactorConverted = 0.117f * 30.f;
+
+	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, float);
+	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
+
+	float edgeDropFactorPerTick = edgeDropFactorConverted * time_globals::get_seconds_per_tick();
+
+	// push last parameter despite the function taking just 5 parameters
+	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edgeDropFactorPerTick);
+
+	// account for the last parameter that doesn't get handled by the actual function
+	__asm add esp, 4;
+}
+
+__declspec(naked) void biped_ground_mode_update_to_stdcall()
+{
+	__asm
+	{
+		pop eax // pop return address
+		push ecx // push ecx as first param
+		push eax // push the return address back on stack
+		jmp biped_ground_mode_update_hook
+	}
+}
+
 // fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
 __declspec(naked) void update_biped_ground_mode_physics_constant()
 {
-	static float edgeDropFactorConverted = 0.117f * 30.f; // value converted from h2x tickrate
-
+#define _stack_pointer_offset 4Ch + 4h
+#define _last_param_offset 14h
 	__asm
 	{
-		PUSHAD // preserve registers on stack, until we are done
-		PUSHFD
-		call time_globals::get // get the game time globals pointer in eax register
-		movss xmm2, edgeDropFactorConverted // multiply the edge drop value 
-		mulss xmm2, dword ptr[eax + 0x4] // multiply by seconds per tick or game tick length
-		POPFD // restore registers from stack
-		POPAD
+		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
 		ret
 	}
+#undef _stack_pointer_offset
+#undef _last_param_offset
 }
 
 static DWORD (WINAPI* p_timeGetTime)() = timeGetTime;
@@ -338,8 +366,9 @@ void H2Tweaks::ApplyPatches() {
 		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
 
 		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
-		BYTE SkipSetGammaRampBytes[] = { 0x90, 0x90, 0x90, 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
-		WriteBytes(Memory::GetAddressRelative(0x66193B), SkipSetGammaRampBytes, sizeof(SkipSetGammaRampBytes));
+		BYTE SetGammaRampSkipBytes[] = { 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
+		NopFill(Memory::GetAddressRelative(0x66192F), 15);
+		WriteBytes(Memory::GetAddressRelative(0x66193E), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
 
 		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
@@ -369,6 +398,7 @@ void H2Tweaks::ApplyPatches() {
 	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	// fixes edge drop fast fall when using higher tickrates than 30
+	PatchCall(Memory::GetAddressRelative(0x5082B4, 0x4FA5D4), biped_ground_mode_update_to_stdcall);
 	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
 
 	// custom map hooks
