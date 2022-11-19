@@ -386,7 +386,7 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\Game\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
-    <ClInclude Include="Blam\Enums\HaloStrings.h" />
+    <ClInclude Include="Blam\Engine\Game\tag_files\string_ids.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
     <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />

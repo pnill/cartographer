@@ -778,7 +778,7 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
-    <ClInclude Include="Blam\Enums\HaloStrings.h" />
+    <ClInclude Include="Blam\Engine\Game\tag_files\string_ids.h" />
     <ClInclude Include="Blam\Engine\Game\camera\camera.h" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />

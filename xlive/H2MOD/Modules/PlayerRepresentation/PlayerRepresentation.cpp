@@ -7,7 +7,7 @@
 #include "Blam/Engine/Game/game/game_engine.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam\Engine\Players\Players.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam/Engine/Game/tag_files/string_ids.h"
 
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
@@ -280,7 +280,7 @@ namespace PlayerRepresentation
 				if (!DATUM_IS_NONE(lmao_datum))
 				{
 					auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
-					new_object->parent_marker = HaloString::HS_HEAD;
+					new_object->parent_marker = e_global_string_ids::HS_HEAD;
 					new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 					new_object->child_object.TagIndex = lmao_datum;
 				}

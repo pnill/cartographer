@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "cheats.h"
-#include "Blam/Enums/HaloStrings.h"
+#include "Blam/Engine/Game/tag_files/string_ids.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"

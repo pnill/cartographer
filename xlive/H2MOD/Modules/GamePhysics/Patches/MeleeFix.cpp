@@ -3,7 +3,7 @@
 #include "MeleeFix.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
-#include "Blam/Enums/HaloStrings.h"
+#include "Blam/Engine/Game/tag_files/string_ids.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
 
@@ -145,7 +145,7 @@ namespace MeleeFix
 			}*/
 			
 			// this is used only for sword
-			if (melee_type == HaloString::HS_MELEE_DASH || melee_type == HaloString::HS_MELEE_DASH_AIRBORNE)
+			if (melee_type == e_global_string_ids::HS_MELEE_DASH || melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE)
 			{
 				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
 				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
