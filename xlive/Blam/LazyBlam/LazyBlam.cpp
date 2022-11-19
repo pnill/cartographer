@@ -38,7 +38,6 @@ namespace lazy_blam
 				return false;
 		}
 
-
 		map_stream = new std::ifstream(map_file.c_str(), std::ios::binary | std::ios::in);
 
 		map_stream->read((char*)&map_header, sizeof(s_cache_header));
@@ -59,9 +58,7 @@ namespace lazy_blam
 		{
 			tag_table.tag_table_start = tag_table.tag_table_start_unpadded;
 			tag_table.tag_data_start = map_header.tag_size + map_header.tag_offset;
-
 		}
-
 		
 		map_stream->seekg(tag_table.tag_table_start + DATUM_INDEX_TO_ABSOLUTE_INDEX(scenario_datum) * sizeof(tags::tag_instance) + 0x8);
 		map_stream->read((char*)&tag_table.scenario_address, 4);
@@ -147,16 +144,18 @@ namespace lazy_blam
 	}
 	unsigned int lazy_blam::resolve_data_offset(unsigned int offset)
 	{
-		auto ret = -1;
+		unsigned int ret = -1;
 		switch (map_header.type)
 		{
 			case s_cache_header::SinglePlayerScenario:
 			case s_cache_header::MultiplayerScenario:
 			case s_cache_header::MainMenuScenario:
 				ret = tag_table.tag_data_start + (offset - tag_table.scenario_address);
+				break;
 			case s_cache_header::SinglePlayerSharedScenario:
 			case s_cache_header::MultiplayerSharedScenario:
-				ret = tag_table.tag_data_start + (offset - 0x3c000);
+				ret = tag_table.tag_data_start + (offset - 0x3C000);
+				break;
 		}
 		//LOG_TRACE_GAME("[{}] {:x}", __FUNCTION__, ret);
 		return ret;
@@ -171,23 +170,20 @@ namespace lazy_blam
 		return result;
 	}
 
-
 	char* lazy_blam::load_tag_data(lazy_blam_tag_instance* instance)
 	{
 		if (instance->data.size == 0) {
 			map_stream->seekg(resolve_data_offset(instance->data_offset));
 			map_stream->read(instance->data.next(instance->size), instance->size);
 			switch (instance->type.tag_type) {
-				case blam_tag::tag_group_type::biped:
-					break;
-				case blam_tag::tag_group_type::vehicle:
-					break;
 				case blam_tag::tag_group_type::weapon:
 					loader::weapon(this, instance);
 					break;
+				case blam_tag::tag_group_type::biped:
 				case blam_tag::tag_group_type::globals:
+				case blam_tag::tag_group_type::vehicle:
+				default:
 					break;
-				default: ;
 			}
 			return instance->data[0];
 		}

@@ -2,10 +2,8 @@
 #include "H2MOD\Tags\TagInterface.h"
 #include "TagTable.h"
 
-
 namespace lazy_blam
 {
-
 	namespace rebase
 	{
 		void object(lazy_blam_tag_instance* instance, unsigned int base);
@@ -16,6 +14,7 @@ namespace lazy_blam
 		void weapon(lazy_blam_tag_instance* instance, unsigned int base);
 		void globals(lazy_blam_tag_instance* instance, unsigned int base);
 	}
+
 	class lazy_blam
 	{
 		private:
@@ -36,8 +35,6 @@ namespace lazy_blam
 				static void weapon(lazy_blam* blam, lazy_blam_tag_instance* instance);
 			};
 		public:
-
-
 			bool init_cache_file(std::string map_name);
 			void close_cache_file();
 			datum get_datum_from_name(std::string tag_name, blam_tag type);
@@ -54,10 +51,6 @@ namespace lazy_blam
 			char* load_tag_data(lazy_blam_tag_instance* instance);
 			static void rebase_tag_data(lazy_blam_tag_instance* instance);
 
-			lazy_blam()
-			{
-				
-			}
 			explicit lazy_blam(std::string map_name)
 			{
 				init_cache_file(map_name);
