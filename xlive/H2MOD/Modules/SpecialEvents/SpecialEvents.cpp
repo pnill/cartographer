@@ -1,26 +1,28 @@
 #include "stdafx.h"
 
 #include "SpecialEvents.h"
-#include "MapObjectPlacements\Halloween\Coagulation.h"
-#include "MapObjectPlacements\Halloween\Lockout.h"
+#include "MapObjectPlacements/Halloween/Coagulation.h"
+#include "MapObjectPlacements/Halloween/Lockout.h"
 
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\render_model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
-#include "Blam\Cache\TagGroups\scenery_definition.hpp"
-#include "Blam\Cache\TagGroups\weapon_definition.hpp"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/render_model_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+#include "Blam/Cache/TagGroups/scenery_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Game/tag_files/string_ids.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "Blam/Engine/Game/objects/objects.h"
+#include "Blam/Engine/Game/objects/object_placement.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 namespace SpecialEvents
 {
@@ -410,15 +412,15 @@ namespace SpecialEvents
 					switch (scen_place.type)
 					{
 					case 0:
-						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 						break;
 					case 1:
-						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					case 2:
-						Engine::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
+						objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -428,7 +430,7 @@ namespace SpecialEvents
 					placement.scale = scen_place.scale;
 
 					// Create the new object
-					datum object_idx = Engine::Objects::object_new(&placement);
+					datum object_idx = objects::object_new(&placement);
 				}
 			}
 			else if (!strcmp(cache_header->name, "lockout"))
@@ -439,11 +441,11 @@ namespace SpecialEvents
 					switch (scen_place.type)
 					{
 					case 0:
-						Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+						objects::create_new_placement_data(&placement, pump_datum, -1, 0);
 						placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 						break;
 					case 1:
-						Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+						objects::create_new_placement_data(&placement, candle_datum, -1, 0);
 						placement.variant_name = 0;
 						break;
 					}
@@ -453,7 +455,7 @@ namespace SpecialEvents
 					placement.scale = scen_place.scale;
 
 					// Create the new object
-					datum object_idx = Engine::Objects::object_new(&placement);
+					datum object_idx = objects::object_new(&placement);
 				}
 			}
 		}

@@ -7,7 +7,7 @@
 #include "Blam/Cache/TagGroups/character_definition.hpp"
 
 #include "Blam/Engine/Actor/Actor.h"
-#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Engine/Game/objects/objects.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #include "H2MOD.h"

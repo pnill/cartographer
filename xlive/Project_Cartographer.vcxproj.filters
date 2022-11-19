@@ -108,7 +108,7 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\Game\Objects\objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -296,8 +296,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Actor\Actor.h" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\Game\Objects\object_placement.h" />
+    <ClInclude Include="Blam\Engine\Game\Objects\objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="H2MOD.h" />

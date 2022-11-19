@@ -1,21 +1,21 @@
 #include "stdafx.h"
 
 #include "ImGui_ConsoleImpl.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
+#include "H2MOD/Utils/Utils.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
-#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
+#include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 // for XNet connection logging
-#include "XLive\xnet\IpManagement\XnIp.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
-#include "..\ImGui_Handler.h"
+#include "../ImGui_Handler.h"
 
 std::mutex commandInsertMtx;
 
@@ -701,7 +701,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 			
 			if (!DATUM_IS_NONE(object_idx)) 
 			{
-				Engine::Objects::create_new_placement_data(&nObject, object_idx, -1, 0);
+				objects::create_new_placement_data(&nObject, object_idx, -1, 0);
 
 				if (position)
 				{
@@ -723,8 +723,8 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 					nObject.team_index = NONE;
 
 				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, nObject.position.x, nObject.position.y, nObject.position.z);
-				datum object_gamestate_datum = Engine::Objects::object_new(&nObject);
-				Engine::Objects::simulation_action_object_create(object_gamestate_datum);
+				datum object_gamestate_datum = objects::object_new(&nObject);
+				objects::simulation_action_object_create(object_gamestate_datum);
 			}
 		}
 		catch (...) {
@@ -756,6 +756,6 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 {
 	if (!DATUM_IS_NONE(objectDatumIdx))
 	{
-		Engine::Objects::object_destroy(objectDatumIdx);
+		objects::object_destroy(objectDatumIdx);
 	}
 }

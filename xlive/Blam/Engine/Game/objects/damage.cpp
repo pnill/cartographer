@@ -1,11 +1,10 @@
 #include "stdafx.h"
 #include "damage.h"
 
-#include "Blam/Engine/Objects/Objects.h"
-#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Engine/Game/objects/objects.h"
 #include "H2MOD/Variants/VariantSystem.h"
-#include "Util/Hooks/Hook.h"
 #include "H2MOD/Utils/Utils.h"
+#include "Util/Hooks/Hook.h"
 
 // Used to get damage on any object
 typedef void(__cdecl* object_cause_damage_t)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);

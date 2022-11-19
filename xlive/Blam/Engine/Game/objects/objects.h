@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\Players\PlayerActions.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/Game/objects/object_placement.h"
+#include "Blam/Engine/Players/PlayerActions.h"
 
 enum e_object_team : BYTE
 {
@@ -275,8 +275,7 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 
-// TODO remove
-namespace Engine::Objects
+namespace objects
 {
 	void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
 	datum object_new(s_object_placement_data* object_placement_data);

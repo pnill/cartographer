@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\Objects\Objects.h"
+#include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/Game/objects/objects.h"
 
 #define ENGINE_MAX_PLAYERS 16
 

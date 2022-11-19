@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/Game/objects/object_placement.h"
 
 namespace Engine
 {
