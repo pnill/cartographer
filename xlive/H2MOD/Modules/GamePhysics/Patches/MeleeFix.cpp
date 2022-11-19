@@ -12,8 +12,6 @@
 #pragma fenv_access (on)
 #endif
 
-#define MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE 1
-
 namespace MeleeFix
 {
 	void MeleeCollisionPatch()
@@ -25,14 +23,14 @@ namespace MeleeFix
 				.text:007C302F 130 84 C0                test    al, al          ; Logical Compare
 				.text:007C3031 130 0F 84 4B 01 00 00    jz      loc_7C3182      <=== Remove this jump
 			 */
-			static byte original_melee_collision_instruction[]{ 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
 			if (H2Config_melee_fix)
 			{
-				//NopFill(Memory::GetAddress(0x143031, 0), 6);
+				// NopFill(Memory::GetAddress(0x143031, 0), 6);
 			}
 			else
 			{
-				WriteBytes(Memory::GetAddress(0x143031, 0), original_melee_collision_instruction, 6);
+				BYTE original_melee_collision_instruction[] = { 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
+				WriteBytes(Memory::GetAddress(0x143031, 0), original_melee_collision_instruction, sizeof(original_melee_collision_instruction));
 			}
 		}
 	}
@@ -166,7 +164,6 @@ namespace MeleeFix
 
 	void ApplyHooks()
 	{
-		
 		melee_get_time_to_target = Memory::GetAddress<p_melee_get_time_to_target*>(0x150784);
 		melee_damage = Memory::GetAddress<p_melee_damage*>(0x142D62);
 		c_send_melee_damage_simulation_event = Memory::GetAddress<p_send_melee_damage_simulation_event*>(0x1B8618);
@@ -180,15 +177,8 @@ namespace MeleeFix
 
 	void Initialize()
 	{
-		//ApplyHooks();
 
-#if MELEE_LUNGE_PHYSICS_UPDATE_HOOK_ENABLE
-		//Codecave(Memory::GetAddressRelative(0x50B72A), melee_force_decelerate_fixup, 3);
-		//PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
-		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal_2);
-#endif
-
-#pragma region Known good patches
+		// TODO FIXME doesn't fix melee lunge, leaving as reasearch
 		// replace cvttss2si instruction which is the convert to int by truncation (> .5 decimal values don't mean anything, truncation rounding always towards 0) 
 		// with cvtss2si instruction which reads the MXCSR register that holds the flags of the conversion rounding setting
 		// that the game sets, which is Round Control Near (if decimal part > .5, convert to upper value)
@@ -197,8 +187,11 @@ namespace MeleeFix
 		// to note this in H3 is handled by adding .5, which does the same thing
 		// BYTE cvtss2si[] = { 0xF3, 0x0F, 0x2D };
 		// WriteBytes(Memory::GetAddressRelative(0x50B419, 0x4FDA49), cvtss2si, sizeof(cvtss2si));
-#pragma endregion
 
-		MeleeCollisionPatch();
+		// MeleeCollisionPatch();
+
+		// hooks and re-implements melee lunge function
+		// ApplyHooks();
+		PatchCall(Memory::GetAddressRelative(0x50BD96, 0x4FE3C6), call_character_melee_physics_input_update_internal);
 	}
 }

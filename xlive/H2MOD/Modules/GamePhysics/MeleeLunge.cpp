@@ -132,13 +132,14 @@ NOTES:
 	outputs new flags
 */
 
-#define FINISH_DECELERATION(flags) \
-	if ((flags) > 0) { \
-		out_current_flags |= (flags); \
-	} \
-	this->m_time_to_target_in_ticks = 0; \
-	physics_output->translational_velocity = *current_velocity; \
+#define FINISH_DECELERATION(flags)									\
+	if ((flags) > 0) {												\
+		out_current_flags |= (flags);								\
+	}																\
+	this->m_time_to_target_in_ticks = 0;							\
+	physics_output->translational_velocity = *current_velocity;
 
+// TODO FIXME patch disabled, doesn't work
 void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 (
 	s_character_physics_output* physics_output,
@@ -378,141 +379,6 @@ bool c_character_physics_mode_melee_datum::pin_localized_velocity(real_vector3d*
 	return true;
 }
 
-void __thiscall c_character_physics_mode_melee_datum::update_internal
-(
-	s_character_physics_output* physics_output,
-	bool a3,
-	float distance_world_units,
-	real_vector3d *target_translational_velocity,
-	real_point3d *target_origin,
-	real_vector3d *aiming_vector,
-	real_vector3d *translational_velocity,
-	real_point3d *object_origin
-)
-{
-	//unsigned int csr = _mm_getcsr();
-	//unsigned int ctrl87Old = _control87(0, 0);
-	//LOG_TRACE_GAME("{} function called with: control87: {:x}, csr: {:x}", __FUNCTION__, ctrl87, csr);
-
-	//_control87(_RC_UP, _MCW_RC);
-	//static bool logOnce = false;
-	//if (!logOnce)
-	//{
-		//addDebugText("_control87() 0x%08x", _control87(0, 0) & _MCW_RC);
-		//logOnce = true;
-	//}
-
-	LOG_TRACE_MELEE("{} : start melee log @ tick {}", __FUNCTION__, m_melee_tick);
-
-	real_vector3d* out_velocity = &physics_output->translational_velocity;
-
-	// we keep some flags in m_started_decelerationg (first 4 bits)
-	BYTE melee_flags = this->m_started_decelerating & melee_flags_mask;
-	this->m_started_decelerating &= ~melee_flags_mask;
-
-	auto p_character_physics_mode_melee_datum_update_internal = Memory::GetAddressRelative<void(__thiscall*)(c_character_physics_mode_melee_datum*, s_character_physics_output*, char, float, real_vector3d*, real_point3d*, real_vector3d*, real_vector3d*, real_point3d*)>(0x50B0D1, 0x4FD701);
-	p_character_physics_mode_melee_datum_update_internal(this, physics_output, a3, distance_world_units, target_translational_velocity, target_origin, aiming_vector, translational_velocity, object_origin);
-
-	if (m_melee_tick == 1)
-	{
-		int added_ticks = m_maximum_counter - 6 - (m_weapon_is_sword ? 7 : 1);
-
-		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, time_globals::get()->ticks_per_second);
-		LOG_TRACE_MELEE("{} - added tick count to maximum counter: {}", __FUNCTION__, added_ticks);
-		LOG_TRACE_MELEE("{} - target_distance: {}, maximum counter: {}", __FUNCTION__, distance_world_units, m_maximum_counter);
-	}
-
-	// if deceleration has started and max accel tick count - melee tick is bellow 0, it means 4 deceleration ticks have been executed
-	BYTE melee_deceleration_tick_count = 0;
-
-	if (time_globals::get()->ticks_per_second > 30 || melee_lunge_hook_enabled == true)
-	{
-		if (m_started_decelerating)
-		{
-			melee_deceleration_fixup(physics_output, object_origin, translational_velocity, aiming_vector, melee_flags, melee_deceleration_tick_count);
-
-			if (distance_world_units > 5.0f
-				|| TEST_FLAG(melee_flags, melee_decelration_unk_flag)
-				|| m_time_to_target_in_ticks <= 0
-				|| m_melee_tick >= (m_maximum_counter + 6)
-				)
-			{
-				//pin_localized_velocity(&a2->out_translational_velocity, &localized_velocity);
-				physics_output->flags |= FLAG(2); // set to let the engine know we should get out of the melee lunge physics
-			}
-			else
-			{
-				physics_output->flags &= ~FLAG(2); // maintain lunge physics
-			}
-		}
-	}
-
-	// this is set to localized_velocity, from biped_dash_hook
-	//real_vector3d localized_velocity = field_1C;
-
-	// create vector from subtracting 1 point out of the other 
-	real_vector3d distance_vector = m_target_point - *object_origin;
-	float remaining_distance = magnitude3d(&distance_vector);
-
-	float unk_float_distance = dot_product3d(&m_aiming_direction, translational_velocity);
-	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword));
-	if (unk_velocity < 0.0f)
-		unk_velocity = 0.0f;
-
-	float log_magnitude = magnitude3d(&physics_output->translational_velocity);
-
-	LOG_TRACE_MELEE("{} : output velocity:       i: {}, j: {}, k: {}, magnitude: {}, decelerating?: {}, remaining distance to target: {}",
-		__FUNCTION__,
-		out_velocity->i,
-		out_velocity->j,
-		out_velocity->k,
-		log_magnitude,
-		this->m_started_decelerating,
-		remaining_distance);
-
-	/*LOG_TRACE_MELEE("{} : unk float value: {}, remaining distance: {}",
-		__FUNCTION__,
-		unk_velocity,
-		remaining_distance);*/
-
-	LOG_TRACE_MELEE("{} : remaining distance in ticks: {} ", __FUNCTION__, this->m_time_to_target_in_ticks);
-
-	LOG_TRACE_MELEE("{} : target point: x: {} y: {}, z: {}",
-		__FUNCTION__,
-		this->m_target_point.x,
-		this->m_target_point.y,
-		this->m_target_point.z);
-	
-	LOG_TRACE_MELEE("{} : aiming vector adjusted length: {}",
-		__FUNCTION__,
-		magnitude3d(&m_aiming_direction));
-
-	LOG_TRACE_MELEE("{} : previous velocity: {}, previous velocity dot product with aiming vector adjusted: {}",
-		__FUNCTION__,
-		magnitude3d(translational_velocity),
-		dot_product3d(&m_aiming_direction, translational_velocity));
-
-	if ((float)(m_maximum_counter - m_melee_tick) <= k_deceleration_ticks_real && !m_started_decelerating)
-		LOG_TRACE_MELEE("{} : we are about to start decelerating @ next tick : {}", __FUNCTION__, m_melee_tick);
-
-	LOG_TRACE_MELEE("{} : end log for melee @ tick {} \n", __FUNCTION__, m_melee_tick - 1);
-
-	//csr = _mm_getcsr();
-	//ctrl87 = _control87(0, 0);
-
-	//LOG_TRACE_GAME("{} after melee tick with: control87: {:x}, csr: {:x}", __FUNCTION__, ctrl87, csr);
-
-	// update with the new flags returned by h3 algorithm
-	this->m_started_decelerating |= melee_flags;
-
-	//_control87(ctrl87Old, 0xFFFFFFFF);
-
-	//field_1C = localized_velocity;
-}
-
-__declspec(naked) void call_character_melee_physics_input_update_internal() { __asm jmp c_character_physics_mode_melee_datum::update_internal }
-
 // TODO: 
 void c_character_physics_mode_melee_datum::build_initial_melee_parameters(bool valid)
 {
@@ -540,7 +406,7 @@ float melee_lunge_get_tick_count(float distance, float max_speed_per_tick)
 		return 6.0f;
 }
 
-void __thiscall c_character_physics_mode_melee_datum::update_internal_2
+void __thiscall c_character_physics_mode_melee_datum::update_internal
 (
 	s_character_physics_output* physics_output,
 	bool a3,
@@ -865,7 +731,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal_2
 	LOG_TRACE_MELEE("{} : end log for melee @ tick {} \n", __FUNCTION__, m_melee_tick - 1);
 }
 
-__declspec(naked) void call_character_melee_physics_input_update_internal_2() { __asm jmp c_character_physics_mode_melee_datum::update_internal_2 }
+__declspec(naked) void call_character_melee_physics_input_update_internal() { __asm jmp c_character_physics_mode_melee_datum::update_internal }
 
 // LOGS
 /*

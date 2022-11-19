@@ -64,16 +64,15 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	bool pin_localized_velocity(real_vector3d* output, real_vector3d* localized_velocity);
 	void melee_deceleration_fixup(s_character_physics_output* output, real_point3d* object_origin, real_vector3d* current_velocity, real_vector3d* aiming_vector, BYTE& current_flags, BYTE& deceleration_tick_count);
 
-	void __thiscall update_internal(s_character_physics_output* a2, bool a3, float distance_world_units, real_vector3d *target_translational_velocity, real_point3d *target_origin, real_vector3d *aiming_vector, real_vector3d *translational_velocity, real_point3d *object_origin);
 	void build_initial_melee_parameters(bool valid);
 	void update_melee_parameters();
 	void update_melee_deceleration();
-	void __thiscall update_internal_2(s_character_physics_output* a2, bool a3, float distance_world_units, real_vector3d* target_translational_velocity, real_point3d* target_origin, real_vector3d* aiming_vector, real_vector3d* translational_velocity, real_point3d* object_origin);
+	void __thiscall update_internal(s_character_physics_output* a2, bool a3, float distance_world_units, real_vector3d* target_translational_velocity, real_point3d* target_origin, real_vector3d* aiming_vector, real_vector3d* translational_velocity, real_point3d* object_origin);
 };
 CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 
 void call_character_melee_physics_input_update_internal();
-void call_character_melee_physics_input_update_internal_2();
+void call_character_melee_physics_input_update_internal();
 
 void melee_force_decelerate_fixup();
 void melee_limit_some_random_vector();
