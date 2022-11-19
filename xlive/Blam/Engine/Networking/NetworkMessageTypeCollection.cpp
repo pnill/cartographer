@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "NetworkMessageTypeCollection.h"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam/Engine/Game/memory/bitstream.h"
 
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"

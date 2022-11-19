@@ -7,7 +7,7 @@
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
-    <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
+    <ClCompile Include="Blam\Engine\Game\memory\bitstream.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
@@ -273,7 +273,7 @@
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
-    <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
+    <ClInclude Include="Blam\Engine\Game\memory\bitstream.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />

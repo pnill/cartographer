@@ -1,12 +1,13 @@
 #pragma once
 
 #include "H2MOD.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "rapidjson\document.h"
-#include "rapidjson\prettywriter.h"
-#include "rapidjson\document.h"
+
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "Blam/Engine/Game/memory/bitstream.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "rapidjson/document.h"
+#include "rapidjson/prettywriter.h"
+#include <rapidjson/document.h>
 
 namespace StatsHandler
 {

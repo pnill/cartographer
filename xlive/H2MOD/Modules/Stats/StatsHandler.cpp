@@ -2,13 +2,15 @@
 
 #include "StatsHandler.h"
 
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Game/memory/bitstream.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Utils\Utils.h"
-
-#include "Util\hash.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/hash.h"
 
 bool MatchInvalidated = false;
 StatsHandler::StatsAPIRegisteredStatus Status;
