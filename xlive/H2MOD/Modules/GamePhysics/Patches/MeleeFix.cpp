@@ -38,40 +38,40 @@ namespace MeleeFix
 	////////////////////Experimental//////////////////////
 	//////////////////////////////////////////////////////
 
-	typedef int(__cdecl p_melee_get_time_to_target)(unsigned __int16 object_index);
-	p_melee_get_time_to_target* melee_get_time_to_target;
+	typedef int(__cdecl melee_get_time_to_target_t)(unsigned __int16 object_index);
+	melee_get_time_to_target_t* p_melee_get_time_to_target;
 
-	typedef void(__cdecl p_melee_damage)(int object_index, signed int melee_type, char unk2, float unk3);
-	p_melee_damage* melee_damage;
+	typedef void(__cdecl melee_damage_t)(int object_index, signed int melee_type, char unk2, float unk3);
+	melee_damage_t* p_melee_damage;
 
-	typedef void (__cdecl p_send_melee_damage_simulation_event)(int a1, int a2, int arg8);
-	p_send_melee_damage_simulation_event* c_send_melee_damage_simulation_event;
+	typedef void (__cdecl send_melee_damage_simulation_event_t)(int a1, int a2, int arg8);
+	send_melee_damage_simulation_event_t* p_send_melee_damage_simulation_event;
 
-	typedef void (__cdecl p_melee_environment_damage)(int a1, int arg4, int arg8);
-	p_melee_environment_damage* c_melee_environment_damage;
+	typedef void (__cdecl melee_environment_damage_t)(int a1, int arg4, int arg8);
+	melee_environment_damage_t* p_melee_environment_damage;
 
-	typedef void (__cdecl p_sub_88B54F)(int a2, int a3);
-	p_sub_88B54F* c_sub_88B54F;
+	typedef void (__cdecl sub_88B54F_t)(int a2, int a3);
+	sub_88B54F_t* p_sub_88B54F;
 	bool MeleeHit = false;
 
 	void __cdecl melee_environment_damage(int a1, int arg4, int arg8)
 	{
 		MeleeHit = true;
-		c_melee_environment_damage(a1, arg4, arg8);
+		p_melee_environment_damage(a1, arg4, arg8);
 		//LOG_INFO_GAME("[MeleeFix] Environment Hit {} {} {}", a1, arg4, arg8);
 	}
 
 	void __cdecl send_melee_damage_simulation_event(int a1, int a2, int arg8)
 	{
 		MeleeHit = true;
-		c_send_melee_damage_simulation_event(a1, a2, arg8);
+		p_send_melee_damage_simulation_event(a1, a2, arg8);
 		//LOG_INFO_GAME("[MeleeFix] Packet Send {} {} {}", a1, a2, arg8);
 	}
 
 	void __cdecl sub_88B54F(int a2, int a3)
 	{
 		MeleeHit = true;
-		c_sub_88B54F(a2, a3);
+		p_sub_88B54F(a2, a3);
 		//LOG_INFO_GAME("[MeleeFix] unk {} {}", a2, a3);
 	}
 	
@@ -127,7 +127,7 @@ namespace MeleeFix
 
 				if (currentFrame >= actionFrame - leeway && currentFrame <= actionFrame + leeway)
 				{
-					melee_damage(object_index, melee_type, biped_melee_info->field_30, (float)(unsigned __int8)biped_melee_info->field_31 * 0.0039215689);
+					p_melee_damage(object_index, melee_type, biped_melee_info->field_30, (float)(unsigned __int8)biped_melee_info->field_31 * 0.0039215689);
 					if (MeleeHit) 
 					{
 						LOG_TRACE_GAME("[MeleeFix] Melee Hit!");
@@ -149,7 +149,7 @@ namespace MeleeFix
 			{
 				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
 				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
-				if (melee_max_ticks < 0 || melee_get_time_to_target(object_index) <= melee_max_ticks)
+				if (melee_max_ticks < 0 || p_melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;
 			}
 			if ((++biped_melee_info->melee_animation_update >= (int)biped_melee_info->max_animation_range || abort_melee_action)
@@ -164,11 +164,11 @@ namespace MeleeFix
 
 	void ApplyHooks()
 	{
-		melee_get_time_to_target = Memory::GetAddress<p_melee_get_time_to_target*>(0x150784);
-		melee_damage = Memory::GetAddress<p_melee_damage*>(0x142D62);
-		c_send_melee_damage_simulation_event = Memory::GetAddress<p_send_melee_damage_simulation_event*>(0x1B8618);
-		c_melee_environment_damage = Memory::GetAddress<p_melee_environment_damage*>(0x13F26D);
-		c_sub_88B54F = Memory::GetAddress<p_sub_88B54F*>(0x17B54F);
+		p_melee_get_time_to_target = Memory::GetAddress<melee_get_time_to_target_t*>(0x150784);
+		p_melee_damage = Memory::GetAddress<melee_damage_t*>(0x142D62);
+		p_send_melee_damage_simulation_event = Memory::GetAddress<send_melee_damage_simulation_event_t*>(0x1B8618);
+		p_melee_environment_damage = Memory::GetAddress<melee_environment_damage_t*>(0x13F26D);
+		p_sub_88B54F = Memory::GetAddress<sub_88B54F_t*>(0x17B54F);
 		PatchCall(Memory::GetAddress(0x143440), send_melee_damage_simulation_event);
 		PatchCall(Memory::GetAddress(0x14345A), melee_environment_damage);
 		PatchCall(Memory::GetAddress(0x143554), sub_88B54F);
