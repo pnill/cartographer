@@ -3,165 +3,165 @@
 
 enum e_game_engine_index
 {
-	_game_engine_campaign = 0x0,
-	_game_engine_ctf = 0x1,
-	_game_engine_slayer = 0x2,
-	_game_engine_oddball = 0x3,
-	_game_engine_koth = 0x4,
-	_game_engine_juggernaut = 0x7,
-	_game_engine_territories = 0x8,
-	_game_engine_assault = 0x9,
+	_game_engine_campaign = 0,
+	_game_engine_ctf = 1,
+	_game_engine_slayer = 2,
+	_game_engine_oddball = 3,
+	_game_engine_koth = 4,
+	_game_engine_juggernaut = 7,
+	_game_engine_territories = 8,
+	_game_engine_assault = 9,
 };
 enum e_game_variant_description_index : char
 {
-	_game_variant_description_slayer = 0x0,
-	_game_variant_description_oddball = 0x1,
-	_game_variant_description_juggernaut = 0x2,
-	_game_variant_description_king = 0x3,
-	_game_variant_description_ctf = 0x4,
-	_game_variant_description_invasion = 0x5,
-	_game_variant_description_territories = 0x6,
+	_game_variant_description_slayer = 0,
+	_game_variant_description_oddball = 1,
+	_game_variant_description_juggernaut = 2,
+	_game_variant_description_king = 3,
+	_game_variant_description_ctf = 4,
+	_game_variant_description_invasion = 5,
+	_game_variant_description_territories = 6,
 };
 enum e_game_engine_flags
 {
-	_game_engine_teams_bit = 0x0,
-	_game_engine_motion_sensor_bit = 0x1,
-	_game_engine_always_invisible_bit = 0x2,
-	_game_engine_round_switch_resets_map_bit = 0x3,
-	_game_engine_tie_resolution_bit = 0x4,
-	_game_engine_observers_bit = 0x5,
-	_game_engine_changing_teams_bit = 0x6,
-	_game_engine_friendly_fire_bit = 0x7,
-	_game_engine_overshields_on_map_bit = 0x8,
-	_game_engine_invisibility_on_map_bit = 0x9,
-	_game_engine_grenades_on_map_bit = 0xA,
-	_game_engine_starting_grenades_bit = 0xB,
-	_game_engine_extra_damage_bit = 0xC,
-	_game_engine_damage_resistant_bit = 0xD,
-	_game_engine_force_even_teams_bit = 0xE,
+	_game_engine_teams_bit = 0,
+	_game_engine_motion_sensor_bit = 1,
+	_game_engine_always_invisible_bit = 2,
+	_game_engine_round_switch_resets_map_bit = 3,
+	_game_engine_tie_resolution_bit = 4,
+	_game_engine_observers_bit = 5,
+	_game_engine_changing_teams_bit = 6,
+	_game_engine_friendly_fire_bit = 7,
+	_game_engine_overshields_on_map_bit = 8,
+	_game_engine_invisibility_on_map_bit = 9,
+	_game_engine_grenades_on_map_bit = 10,
+	_game_engine_starting_grenades_bit = 11,
+	_game_engine_extra_damage_bit = 12,
+	_game_engine_damage_resistant_bit = 13,
+	_game_engine_force_even_teams_bit = 14,
 };
 enum e_game_engine_round_setting
 {
-	_game_engine_round_setting_1_round = 0x0,
-	_game_engine_round_setting_2_rounds = 0x1,
-	_game_engine_round_setting_4_rounds = 0x2,
-	_game_engine_round_setting_6_rounds = 0x3,
-	_game_engine_round_setting_first_to_2_rounds = 0x4,
-	_game_engine_round_setting_first_to_3_rounds = 0x5,
-	_game_engine_round_setting_first_to_4_rounds = 0x6,
+	_game_engine_round_setting_1_round = 0,
+	_game_engine_round_setting_2_rounds = 1,
+	_game_engine_round_setting_4_rounds = 2,
+	_game_engine_round_setting_6_rounds = 3,
+	_game_engine_round_setting_first_to_2_rounds = 4,
+	_game_engine_round_setting_first_to_3_rounds = 5,
+	_game_engine_round_setting_first_to_4_rounds = 6,
 };
 enum e_game_engine_join_in_progress
 {
-	_game_engine_join_in_progress_on = 0x0,
-	_game_engine_join_in_progress_uneven = 0x1,
-	_game_engine_join_in_progress_off = 0x2,
+	_game_engine_join_in_progress_on = 0,
+	_game_engine_join_in_progress_uneven = 1,
+	_game_engine_join_in_progress_off = 2,
 };
 enum e_game_engine_shield_setting
 {
-	_game_engine_shield_normal = 0x0,
-	_game_engine_shield_off = 0x1,
-	_game_engine_shield_supershield = 0x2,
+	_game_engine_shield_normal = 0,
+	_game_engine_shield_off = 1,
+	_game_engine_shield_supershield = 2,
 };
 enum e_game_engine_team_score
 {
-	_game_engine_team_score_sum = 0x0,
-	_game_engine_team_score_min = 0x1,
-	_game_engine_team_score_max = 0x2,
+	_game_engine_team_score_sum = 0,
+	_game_engine_team_score_min = 1,
+	_game_engine_team_score_max = 2,
 };
 enum e_game_engine_team_respawn
 {
-	_game_engine_team_respawn_inheritance = 0x0,
-	_game_engine_team_respawn_cycling = 0x1,
-	_game_engine_team_respawn_standard = 0x2,
+	_game_engine_team_respawn_inheritance = 0,
+	_game_engine_team_respawn_cycling = 1,
+	_game_engine_team_respawn_standard = 2,
 };
-enum e_game_engine_respawn :char
+enum e_game_engine_respawn : char
 {
-	_game_engine_respawn_setting_on = 0x0,
-	_game_engine_respawn_setting_off = 0x1,
-	_game_engine_respawn_setting_half = 0x2,
-	_game_engine_respawn_setting_double = 0x3,
+	_game_engine_respawn_setting_on = 0,
+	_game_engine_respawn_setting_off = 1,
+	_game_engine_respawn_setting_half = 2,
+	_game_engine_respawn_setting_double = 3,
 };
-enum e_game_engine_light_land_vehicle :char
+enum e_game_engine_light_land_vehicle : char
 {
-	_game_engine_light_land_vehicle_default = 0x0,
-	_game_engine_light_land_vehicle_warthog = 0x1,
-	_game_engine_light_land_vehicle_gauss_warthog = 0x2,
-	_game_engine_light_land_vehicle_ghost = 0x3,
-	_game_engine_light_land_vehicle_mongoose = 0x4,
-	_game_engine_light_land_vehicle_shadow = 0x5,
-	_game_engine_light_land_vehicle_random = 0x6,
-	_game_engine_light_land_vehicle_none = 0x7,
+	_game_engine_light_land_vehicle_default = 0,
+	_game_engine_light_land_vehicle_warthog = 1,
+	_game_engine_light_land_vehicle_gauss_warthog = 2,
+	_game_engine_light_land_vehicle_ghost = 3,
+	_game_engine_light_land_vehicle_mongoose = 4,
+	_game_engine_light_land_vehicle_shadow = 5,
+	_game_engine_light_land_vehicle_random = 6,
+	_game_engine_light_land_vehicle_none = 7,
 };
-enum e_game_engine_heavy_land_vehicle :char
+enum e_game_engine_heavy_land_vehicle : char
 {
-	_game_engine_heavy_land_vehicle_default = 0x0,
-	_game_engine_heavy_land_vehicle_scorpion = 0x1,
-	_game_engine_heavy_land_vehicle_wraith = 0x2,
-	_game_engine_heavy_land_vehicle_random = 0x3,
-	_game_engine_heavy_land_vehicle_none = 0x4,
+	_game_engine_heavy_land_vehicle_default = 0,
+	_game_engine_heavy_land_vehicle_scorpion = 1,
+	_game_engine_heavy_land_vehicle_wraith = 2,
+	_game_engine_heavy_land_vehicle_random = 3,
+	_game_engine_heavy_land_vehicle_none = 4,
 };
-enum e_game_engine_flying_vehicle :char
+enum e_game_engine_flying_vehicle : char
 {
-	_game_engine_flying_vehicle_default = 0x0,
-	_game_engine_flying_vehicle_banshee = 0x1,
-	_game_engine_flying_vehicle_falcon = 0x2,
-	_game_engine_flying_vehicle_random = 0x3,
-	_game_engine_flying_vehicle_none = 0x4,
+	_game_engine_flying_vehicle_default = 0,
+	_game_engine_flying_vehicle_banshee = 1,
+	_game_engine_flying_vehicle_falcon = 2,
+	_game_engine_flying_vehicle_random = 3,
+	_game_engine_flying_vehicle_none = 4,
 };
-enum e_game_engine_turret_vehicle :char
+enum e_game_engine_turret_vehicle : char
 {
-	_game_engine_turret_vehicle_default = 0x0,
-	_game_engine_turret_vehicle_human_ap = 0x1,
-	_game_engine_turret_vehicle_human_av = 0x2,
-	_game_engine_turret_vehicle_covenant_ap = 0x3,
-	_game_engine_turret_vehicle_covenant_av = 0x4,
-	_game_engine_turret_vehicle_random = 0x5,
-	_game_engine_turret_vehicle_none = 0x6,
+	_game_engine_turret_vehicle_default = 0,
+	_game_engine_turret_vehicle_human_ap = 1,
+	_game_engine_turret_vehicle_human_av = 2,
+	_game_engine_turret_vehicle_covenant_ap = 3,
+	_game_engine_turret_vehicle_covenant_av = 4,
+	_game_engine_turret_vehicle_random = 5,
+	_game_engine_turret_vehicle_none = 6,
 };
-enum e_game_engine_weapon_set :char
+enum e_game_engine_weapon_set : char
 {
-	_game_engine_weapon_set_default = 0x0,
-	_game_engine_weapon_set_none = 0x1,
-	_game_engine_weapon_set_rockets = 0x2,
-	_game_engine_weapon_set_shotguns = 0x3,
-	_game_engine_weapon_set_swords = 0x4,
-	_game_engine_weapon_set_brute_shots = 0x5,
-	_game_engine_weapon_set_halo_classic = 0x6,
-	_game_engine_weapon_set_new_classic = 0x7,
-	_game_engine_weapon_set_heavy_weapons = 0x8,
-	_game_engine_weapon_set_all_duals = 0x9,
-	_game_engine_weapon_set_no_duals = 0xA,
-	_game_engine_weapon_set_rifles = 0xB,
-	_game_engine_weapon_set_sniping = 0xC,
-	_game_engine_weapon_set_no_sniping = 0xD,
-	_game_engine_weapon_set_pistols = 0xE,
-	_game_engine_weapon_set_plasma = 0xF,
-	_game_engine_weapon_set_human = 0x10,
-	_game_engine_weapon_set_covenant = 0x11,
-	_game_engine_weapon_set_sentinel = 0x12,
-	_game_engine_weapon_set_random = 0x13,
+	_game_engine_weapon_set_default = 0,
+	_game_engine_weapon_set_none = 1,
+	_game_engine_weapon_set_rockets = 2,
+	_game_engine_weapon_set_shotguns = 3,
+	_game_engine_weapon_set_swords = 4,
+	_game_engine_weapon_set_brute_shots = 5,
+	_game_engine_weapon_set_halo_classic = 6,
+	_game_engine_weapon_set_new_classic = 7,
+	_game_engine_weapon_set_heavy_weapons = 8,
+	_game_engine_weapon_set_all_duals = 9,
+	_game_engine_weapon_set_no_duals = 10,
+	_game_engine_weapon_set_rifles = 11,
+	_game_engine_weapon_set_sniping = 12,
+	_game_engine_weapon_set_no_sniping = 13,
+	_game_engine_weapon_set_pistols = 14,
+	_game_engine_weapon_set_plasma = 15,
+	_game_engine_weapon_set_human = 16,
+	_game_engine_weapon_set_covenant = 17,
+	_game_engine_weapon_set_sentinel = 18,
+	_game_engine_weapon_set_random = 19,
 };
-enum e_game_engine_starting_weapon :char
+enum e_game_engine_starting_weapon : char
 {
-	_game_engine_starting_weapon_default = 0x0,
-	_game_engine_starting_weapon_none = 0x1,
-	_game_engine_starting_weapon_random = 0x2,
-	_game_engine_starting_weapon_battle_rifle = 0x3,
-	_game_engine_starting_weapon_magnum = 0x4,
-	_game_engine_starting_weapon_smg = 0x5,
-	_game_engine_starting_weapon_plasma_pistol = 0x6,
-	_game_engine_starting_weapon_plasma_rifle = 0x7,
-	_game_engine_starting_weapon_rocket_launcher = 0x8,
-	_game_engine_starting_weapon_shotgun = 0x9,
-	_game_engine_starting_weapon_sniper_rifle = 0xA,
-	_game_engine_starting_weapon_brute_shot = 0xB,
-	_game_engine_starting_weapon_needler = 0xC,
-	_game_engine_starting_weapon_carbine = 0xD,
-	_game_engine_starting_weapon_beam_rifle = 0xE,
-	_game_engine_starting_weapon_disintegrator = 0xF,
-	_game_engine_starting_weapon_fuel_rod_gun = 0x10,
-	_game_engine_starting_weapon_plasma_sword = 0x11,
-	_game_engine_starting_weapon_brute_plasma = 0x12,
+	_game_engine_starting_weapon_default = 0,
+	_game_engine_starting_weapon_none = 1,
+	_game_engine_starting_weapon_random = 2,
+	_game_engine_starting_weapon_battle_rifle = 3,
+	_game_engine_starting_weapon_magnum = 4,
+	_game_engine_starting_weapon_smg = 5,
+	_game_engine_starting_weapon_plasma_pistol = 6,
+	_game_engine_starting_weapon_plasma_rifle = 7,
+	_game_engine_starting_weapon_rocket_launcher = 8,
+	_game_engine_starting_weapon_shotgun = 9,
+	_game_engine_starting_weapon_sniper_rifle = 10,
+	_game_engine_starting_weapon_brute_shot = 11,
+	_game_engine_starting_weapon_needler = 12,
+	_game_engine_starting_weapon_carbine = 13,
+	_game_engine_starting_weapon_beam_rifle = 14,
+	_game_engine_starting_weapon_disintegrator = 15,
+	_game_engine_starting_weapon_fuel_rod_gun = 16,
+	_game_engine_starting_weapon_plasma_sword = 17,
+	_game_engine_starting_weapon_brute_plasma = 18,
 };
 enum e_game_engine_player_speed
 {
@@ -241,6 +241,7 @@ enum e_juggernaut_engine_flags
 	_juggernaut_has_infinite_ammo_bit = 5,
 	_juggernaut_is_damage_resistant_bit = 6,
 };
+
 #pragma pack(push,1)
 struct s_game_variant
 {
@@ -250,7 +251,7 @@ struct s_game_variant
 	wchar_t variant_name[16];
 	PAD(32);
 	e_game_engine_index variant_game_engine_index;
-	e_game_engine_flags game_engine_flags;
+	int game_engine_flags;
 	e_game_engine_round_setting round_setting;
 	int score_to_win_round;
 	int round_time_limit;
