@@ -28,63 +28,62 @@ namespace MapSlots
 		for (const auto& map : AddedMaps)
 		{
 			std::string map_location = def_maps_loc + "\\" + map;
-			if (PathFileExistsA(map_location.c_str()))
+			if (std::filesystem::exists(map_location))
 			{
 				LOG_TRACE_GAME("[Map Slots]: Startup - Caching {}", map);
-				std::ifstream* fin = new std::ifstream(map_location.c_str(), std::ios::binary);
-				if (fin->is_open())
+				std::ifstream fin(map_location.c_str(), std::ios::binary);
+				if (fin.is_open())
 				{
 					int table_off, table_size = 0;
 
-					fin->seekg(0x10);
-					fin->read((char*)&table_off, 4);
-					fin->read((char*)&table_size, 4);
+					fin.seekg(0x10);
+					fin.read((char*)&table_off, 4);
+					fin.read((char*)&table_size, 4);
 
-
-					fin->seekg(table_off + 4);
+					fin.seekg(table_off + 4);
 					int temp;
-					fin->read((char*)&temp, 4);
+					fin.read((char*)&temp, 4);
 
 					int table_start = table_off + 0xC * temp + 0x20;
 					int scnr_off = table_off + table_size;
 
 					int scnr_memaddr;
-					fin->seekg(table_start + 0x8);
-					fin->read((char*)&scnr_memaddr, 4);
+					fin.seekg(table_start + 0x8);
+					fin.read((char*)&scnr_memaddr, 4);
 
 					//Get the tag block info for the Sencario Level Data
 					int l_count, l_offset;
-					fin->seekg(scnr_off + 0x398);
-					fin->read((char*)&l_count, 4);
-					fin->read((char*)&l_offset, 4);
+					fin.seekg(scnr_off + 0x398);
+					fin.read((char*)&l_count, 4);
+					fin.read((char*)&l_offset, 4);
 
 					//Get the tag block info for the Multiplayer Level Description
 					int m_count, m_offset;
 					temp = scnr_off + (l_offset - scnr_memaddr);
-					fin->seekg(temp + 0x10);
-					fin->read((char*)&m_count, 4);
-					fin->read((char*)&m_offset, 4);
+					fin.seekg(temp + 0x10);
+					fin.read((char*)&m_count, 4);
+					fin.read((char*)&m_offset, 4);
 
 					temp = scnr_off + (m_offset - scnr_memaddr);
 					s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block newBlock;
 
 					//The struct in the scenario is the same as the one inside the globals ui level data so just copy it into one
-					fin->seekg(temp);
-					fin->read((char*)&newBlock, sizeof(s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block));
+					fin.seekg(temp);
+					fin.read((char*)&newBlock, sizeof(s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block));
 
 					//Fix incase the maps level data is incorrectly setup
 					if (strlen(newBlock.path.Text) == 0) {
-						fin->seekg(0x1C8);
+						fin.seekg(0x1C8);
 						char* buffer = new char[128];
-						fin->read(buffer, 128);
+						fin.read(buffer, 128);
 						newBlock.path = buffer;
 					}
 
-					MapData.push_back(newBlock);
+					MapData.emplace_back(newBlock);
 
 					//Store the bitmap datum for loading it into the main menu
 					BitmapsToLoad.emplace(newBlock.bitmap.TagIndex, map);
-					fin->close();
+					fin.close();
 				}
 			}
 			else
