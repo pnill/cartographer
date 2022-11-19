@@ -698,7 +698,7 @@ namespace SpecialEvents
 		}
 		else
 		{
-			if (NetworkSession::GetCurrentNetworkSession()->local_peer_index != NetworkSession::GetCurrentNetworkSession()->session_host_peer_index)
+			if (!NetworkSession::LocalPeerIsSessionHost())
 			{
 				*Memory::GetAddress<int*>(0x46DCF1) = 1;
 				ImGuiHandler::ImMessageBox::SetMessage("Error: Cartographer Shared map content is missing. Try updating your game from the mainmenu.\r\n\r\nBy going to Cartographer > Update.\r\n\r\nIf that doesn't work reach out to us in #help on discord.");

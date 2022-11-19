@@ -150,10 +150,10 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 			int peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			s_network_session* session = NetworkSession::GetCurrentNetworkSession();
-			if (peer_index != -1 && peer_index != session->local_peer_index)
+			if (peer_index != -1 && !NetworkSession::PeerIndexLocal(peer_index))
 			{
 				s_custom_map_filename data;
-				SecureZeroMemory(&data, sizeof(s_custom_map_filename));
+				ZeroMemory(&data, sizeof(s_custom_map_filename));
 
 				std::wstring map_filename;
 				mapManager->GetMapFilename(map_filename);

@@ -208,7 +208,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_sessio
 				case _network_session_map_status_unable_to_precache:
 				case _network_session_map_status_precaching:
 				case _network_session_map_status_downloading:
-					if (i == session->local_peer_index || i == session->session_host_peer_index)
+					if (NetworkSession::PeerIndexLocal(i) || i == session->session_host_peer_index)
 						local_or_host_peer_cannot_load_map = true;
 					break;
 				case _network_session_map_status_precached:
