@@ -438,8 +438,12 @@
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_time.h" />
     <ClInclude Include="Blam\Engine\Game\game\cheats.h" />
+    <ClInclude Include="Blam\Engine\Game\items\equipment.h" />
+    <ClInclude Include="Blam\Engine\Game\items\weapons.h" />
     <ClInclude Include="Blam\Engine\Game\math\color_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\Game\units\bipeds.h" />
+    <ClInclude Include="Blam\Engine\Game\units\units.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
@@ -450,7 +454,7 @@
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\Objects\objects.cpp" />
-    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
+    <ClCompile Include="Blam\Engine\Game\units\units.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />

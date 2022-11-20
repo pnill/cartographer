@@ -3,19 +3,21 @@
 #include "XLiveRendering.h"
 
 #include "imgui.h"
-#include "backends\imgui_impl_dx9.h"
-#include "backends\imgui_impl_win32.h"
+#include "backends/imgui_impl_dx9.h"
+#include "backends/imgui_impl_win32.h"
+#include "imgui_integration/imgui_handler.h"
+#include "GUI.h"
 
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
-#include "H2MOD\Modules\Achievements\Achievements.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Input\KeyboardInput.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Shell\Shell.h"
+#include "Blam/Engine/Game/units/bipeds.h"
+#include "H2MOD/Modules/Achievements/Achievements.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Shell.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 extern void InitInstance();
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -661,8 +663,8 @@ int WINAPI XLiveRender()
 				PlayerIterator playerIt;
 				while (playerIt.get_next_active_player()) 
 				{
-					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-					s_biped_data_definition* biped_unit = (s_biped_data_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
+					real_point3d* player_position = units::carto_get_player_unit_coords(playerIt.get_current_player_index());
+					s_biped_data_definition* biped_unit = (s_biped_data_definition*)units::carto_get_player_unit_from_player_index(playerIt.get_current_player_index());
 					if (player_position != nullptr) {
 						std::wstring playerNameWide(playerIt.get_current_player_name());
 						std::string playerName(playerNameWide.begin(), playerNameWide.end());

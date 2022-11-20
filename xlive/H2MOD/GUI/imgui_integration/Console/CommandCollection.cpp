@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "ImGui_ConsoleImpl.h"
+#include "Blam/Engine/Game/units/units.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -584,7 +585,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	if (nearPlayerSpawn.GetVal())
 	{
-		real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
+		real_point3d* localPlayerPos = units::carto_get_player_unit_coords(localPlayerIdx);
 		if (localPlayerPos != nullptr)
 		{
 			varPos[0].SetVal(localPlayerPos->x + 0.5f);
@@ -697,7 +698,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 			s_object_placement_data nObject;
 			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
 			datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
-			real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
+			real_point3d* localPlayerPos = units::carto_get_player_unit_coords(localPlayerIdx);
 			
 			if (!DATUM_IS_NONE(object_idx)) 
 			{

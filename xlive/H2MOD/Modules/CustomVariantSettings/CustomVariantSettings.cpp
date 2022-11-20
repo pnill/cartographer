@@ -4,6 +4,7 @@
 
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/physics/physics_constants.h"
+#include "Blam/Engine/Game/units/units.h"
 #include "Blam/Engine/Players/PlayerControls.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
@@ -93,8 +94,8 @@ namespace CustomVariantSettings
 		if (NetworkSession::LocalPeerIsSessionHost()) {
 			if (currentVariantSettings.infiniteGrenades)
 			{
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
+				units::carto_set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
+				units::carto_set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
 			}
 		}
 	}

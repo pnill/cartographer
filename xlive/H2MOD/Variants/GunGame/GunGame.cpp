@@ -2,6 +2,7 @@
 
 #include "GunGame.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/units/units.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
@@ -200,8 +201,8 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 		if (!s_game_globals::game_is_predicted())
 		{
-			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
+			units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
+			units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
 		}
 		break;
 
@@ -253,15 +254,15 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				datum currentWeapon = GunGame::levelWeapon[level];
 
 				if (level < 15) {
-					call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
+					units::carto_call_give_player_weapon(absPlayerIdx, currentWeapon, 1);
 				}
 				else if (level == 15) {
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on frag grenade level!", __FUNCTIONW__, s_player::GetName(absPlayerIdx));
-					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+					units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
 				}
 				else if (level == 16) {
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on plasma grenade level!", __FUNCTIONW__, s_player::GetName(absPlayerIdx));
-					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+					units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
 				}
 			}
 		}
@@ -309,20 +310,20 @@ bool GunGame::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2,
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on level {} giving them weapon...", __FUNCTIONW__, s_player::GetName(absPlayerIdx), level);
 
 				datum LevelWeapon = GunGame::levelWeapon[level];
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
-				call_give_player_weapon(absPlayerIdx, LevelWeapon, 1);
+				units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
+				units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
+				units::carto_call_give_player_weapon(absPlayerIdx, LevelWeapon, 1);
 			}
 
 			else if (level == 15) {
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 15 - Frag Grenades!", __FUNCTIONW__, s_player::GetName(absPlayerIdx));
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+				units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
 			}
 
 			else if (level == 16) {
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 16 - Plasma Grenades!", __FUNCTIONW__, s_player::GetName(absPlayerIdx));
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+				units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
+				units::carto_set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
 			}
 		}
 

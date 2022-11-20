@@ -3,13 +3,14 @@
 #include "HeadHunter.h"
 
 #include "Blam/Engine/Game/hs/hs.h"
+#include "Blam/Engine/Game/items/weapons.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/units/bipeds.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
-#include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Utils/Utils.h"
 
 int soundBuffer = 0;
 std::unordered_map<int, std::unordered_map<e_headhunter_sounds, const wchar_t*>> headhunterSoundTable;

@@ -1,13 +1,12 @@
 #include "stdafx.h"
-
 #include "DeviceShop.h"
-#include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-#include "Blam\Engine\Players\Players.h"
+#include "Blam/Engine/Game/units/bipeds.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index);
+#include "Blam/Engine/Players/Players.h"
+
 
 std::unordered_map<unsigned long long, int> player_points;
 
@@ -141,7 +140,7 @@ void DeviceShop::SpawnVehicle(datum vehicle_datum)
 
 void DeviceShop::GiveWeapon(datum unit_datum, datum weapon_tag_index)
 {
-	GivePlayerWeaponDatum(unit_datum, weapon_tag_index);
+	units::carto_give_unit_weapon_from_datum(unit_datum, weapon_tag_index);
 }
 
 void DeviceShop::AddPoints(datum killerPlayerIdx, int points)

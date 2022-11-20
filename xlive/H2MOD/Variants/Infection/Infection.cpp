@@ -1,7 +1,8 @@
 #include "stdafx.h"
-
 #include "Infection.h"
+
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/units/units.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
@@ -120,7 +121,7 @@ void Infection::setZombiePlayerStatus(unsigned long long identifier)
 void Infection::InitHost() {
 	LOG_TRACE_GAME("[h2mod-infection] Host init setting unit speed patch");
 	//Applying SpeedCheck fix
-	h2mod->set_unit_speed_patch(true);
+	units::carto_set_unit_speed_patch(true);
 
 	// Remove unwanted items in infection
 	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
@@ -229,7 +230,7 @@ void Infection::setPlayerAsZombie(int playerIndex) {
 	s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Flood);
 	s_player::SetBipedSpeed(playerIndex, 1.1f);
 
-	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
+	units::carto_call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
 }
 
 void Infection::Initialize()
@@ -262,7 +263,7 @@ void Infection::Dispose()
 
 	Infection::resetWeaponInteractionAndEmblems();
 	if (!s_game_globals::game_is_predicted()) {
-		h2mod->set_unit_speed_patch(false);
+		units::carto_set_unit_speed_patch(false);
 	}
 }
 
@@ -317,7 +318,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 				//if we have a valid object and the object is not on the zombie team
 				unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 
-				LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", h2mod->get_local_player_name(0), playerIdentifier);
+				LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", units::carto_get_local_player_name(0), playerIdentifier);
 
 				// check if the player being infected is local
 				if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
@@ -338,12 +339,12 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		{
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
 			if (unit_object) {
-				if (h2mod->get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
+				if (units::carto_get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
 					Infection::setZombiePlayerStatus(s_player::GetId(absPlayerIdx));
 				}
 				else {
 					// take away zombie's weapons
-					Engine::Unit::remove_equipment(playerUnitDatum);
+					units::remove_equipment(playerUnitDatum);
 				}
 			}
 		}
@@ -373,7 +374,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!Memory::IsDedicatedServer())
 		{
 			unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
-			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, h2mod->get_local_player_name(0));
+			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, units::carto_get_local_player_name(0));
 			//If player being spawned is LocalUser/Player
 			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
 			{
@@ -432,12 +433,12 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 
-				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, h2mod->get_unit_team_index(playerUnitDatum));
-				if (h2mod->get_unit_team_index(playerUnitDatum) == HUMAN_TEAM) {
+				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, units::carto_get_unit_team_index(playerUnitDatum));
+				if (units::carto_get_unit_team_index(playerUnitDatum) == HUMAN_TEAM) {
 					Infection::setPlayerAsHuman(absPlayerIdx);
 				}
 
-				if (h2mod->get_unit_team_index(playerUnitDatum) == ZOMBIE_TEAM) {
+				if (units::carto_get_unit_team_index(playerUnitDatum) == ZOMBIE_TEAM) {
 					Infection::setPlayerAsZombie(absPlayerIdx);
 				}
 			}

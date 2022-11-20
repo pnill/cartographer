@@ -57,36 +57,6 @@ enum e_object_type : signed char
 	creature,
 };
 
-enum e_unit_weapons
-{
-	PrimaryWeapon,
-	SecondaryWeapon,
-	DualWeildWeapon
-};
-
-enum e_grenades : BYTE
-{
-	Fragmentation,
-	Plasma
-};
-
-enum e_weapon_index : WORD
-{
-	Primary = 0xFF00,
-	Secondary = 0xFF01,
-	DualWeild = 0x0201
-};
-
-enum e_biped_physics_mode : BYTE
-{
-	mode_ground = 1,
-	mode_flying,
-	mode_dead,
-	mode_posture,
-	mode_climbing,
-	mode_melee
-};
-
 #pragma pack(push, 1)
 struct s_object_data_definition
 {
@@ -153,72 +123,6 @@ CHECK_STRUCT_OFFSET(s_object_data_definition, node_buffer_size, 0x114);
 CHECK_STRUCT_OFFSET(s_object_data_definition, nodes_offset, 0x116);
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
-struct s_unit_data_definition : s_object_data_definition
-{
-	char gap_12C[4];
-	DWORD field_130;
-	datum simulation_actor_index;
-	DWORD unit_flags;		  //(unit_data->unit_flags & 8) != 0   -->active_camo_active
-							  //unit_data->unit_flags |= 2         -->unit_is_alive
-	e_object_team unit_team;
-	char pad[3];
-	datum controlling_player_index;
-	char gap_142[12];
-	DWORD control_flags;
-	DWORD control_flags_2;
-	DWORD animation_state;
-	real_vector3d desired_facing;
-	real_vector3d desired_aiming;
-	real_vector3d aiming_vector;
-	real_vector3d aiming_vector_velocity;
-	real_vector3d desired_looking;
-	real_vector3d looking_vector;
-	real_vector3d looking_vector_velocity;
-	DWORD field_1B0;
-	DWORD field_1B4;
-	DWORD field_1B8;
-	real_vector3d throttle;
-	char aiming_speed;			//might not be char
-	char gap_1C9[3];
-	float trigger;
-	float secondary_trigger;
-	s_aim_assist_targetting_data target_info;
-	char gap_1F8[24];
-	DWORD parent_seat_index;
-	char gap_214[20];
-	WORD weapon_set_identifier;
-	char gap_22A[39];
-	char current_grenade_index;
-	WORD grenade_counts_mask;
-	char gap_254;
-	char zoom_level;
-	char gap_256[110];
-	float active_camo_power;
-	char gap_2C8[4];
-	float active_camo_regrowth;
-	PAD(144);
-};
-CHECK_STRUCT_SIZE(s_unit_data_definition, 0x360);
-
-struct s_biped_data_definition : s_unit_data_definition
-{
-	PAD(0x3F4 - sizeof(s_unit_data_definition));
-	e_biped_physics_mode biped_mode;//0x3F4
-	PAD(0x480 - 0x3F5);
-
-	// NEW DATA
-	string_id variant_name;
-};
-CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
-
-struct s_weapon_data_definition : s_object_data_definition
-{
-	PAD(0x25C - sizeof(s_object_data_definition));
-};
-CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
-
-
-
 enum e_object_header_flag :BYTE
 {
 	_object_header_active_bit = 0x1,
@@ -229,7 +133,6 @@ enum e_object_header_flag :BYTE
 	_object_header_connected_to_map_bit = 0x20,
 	_object_header_child_bit = 0x40,
 };
-
 
 struct s_object_header {
 	__int16 datum_salt; //0x00
