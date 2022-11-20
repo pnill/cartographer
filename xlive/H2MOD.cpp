@@ -859,8 +859,6 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
-	PlayerRepresentation::Initialize();
-
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();

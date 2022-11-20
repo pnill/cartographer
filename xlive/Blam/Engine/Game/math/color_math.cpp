@@ -115,6 +115,9 @@ namespace color_math
         DETOUR_ATTACH(p_real_rgb_colour_to_real_hsv_color, Memory::GetAddress<real_rgb_colour_to_real_hsv_color_t>(0x75D34, 0x720C0F), real_rgb_colour_to_real_hsv_color);
         DETOUR_ATTACH(p_real_hsv_color_to_real_rgb_color, Memory::GetAddress<real_hsv_color_to_real_rgb_color_t>(0x75E44, 0x72D1F), real_hsv_color_to_real_rgb_color);
         DETOUR_ATTACH(p_real_argb_colour_to_d3d_color, Memory::GetAddress<real_argb_colour_to_d3d_color_t>(0x7602F, 0x72EA1), real_argb_colour_to_d3d_color);
-        DETOUR_ATTACH(p_real_alpha_to_d3d_alpha, Memory::GetAddress<real_alpha_to_d3d_alpha_t>(0x7617E), real_alpha_to_d3d_alpha);
+        if (!Memory::IsDedicatedServer()) 
+        {
+            DETOUR_ATTACH(p_real_alpha_to_d3d_alpha, Memory::GetAddress<real_alpha_to_d3d_alpha_t>(0x7617E), real_alpha_to_d3d_alpha);
+        }
     }
 }

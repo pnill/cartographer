@@ -24,7 +24,7 @@ namespace random_math
 	void __cdecl random_math_initialize()
 	{
 		typedef void* (__cdecl game_state_malloc_t)(char* a1, char* a2, unsigned int a3);
-		auto p_game_state_malloc = Memory::GetAddress<game_state_malloc_t*>(0x2FF1D);
+		auto p_game_state_malloc = Memory::GetAddress<game_state_malloc_t*>(0x2FF1D, 0x53327);
 		typedef DWORD(__cdecl system_milliseconds_t)();
 		auto p_system_milliseconds = Memory::GetAddress<system_milliseconds_t*>(0x37E51, 0x2B4CE);
 		typedef __time64_t(__cdecl system_seconds_t)();
