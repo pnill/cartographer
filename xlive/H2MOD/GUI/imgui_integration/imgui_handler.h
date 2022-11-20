@@ -193,8 +193,6 @@ namespace ImGuiHandler
 			render_patch,
 			skeleton_biped,
 			skeleton_biped_tooltip,
-			event_music_title,
-			event_music_tooltip
 		};
 		void BuildStringsTable();
 		const char* GetString(e_advanced_string string, const std::string& id = "");

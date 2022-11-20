@@ -656,30 +656,6 @@ namespace SpecialEvents
 			switch (getCurrentEvent())
 			{
 			case _christmas:
-				if (H2Config_event_music) {
-					auto playSound = [=]()
-					{
-						using namespace std::chrono_literals;
-						static bool flop = false;
-						while (true)
-						{
-							std::this_thread::sleep_for(1000ms);
-							if (h2mod->GetEngineType() == _main_menu && H2Config_event_music)
-							{
-								if (!flop) {
-									flop = true;
-									PlaySound(L"sounds/feliz_navidad.wav", NULL, SND_FILENAME | SND_LOOP | SND_ASYNC | SND_NODEFAULT);
-								}
-							}
-							else {
-								flop = false;
-								PlaySound(NULL, 0, 0);
-							}
-						}
-
-					};
-					std::thread(playSound).detach();
-				}
 				tags::on_map_load(ChristmasOnMapLoad);
 				break;
 			case _st_paddys:

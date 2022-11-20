@@ -839,12 +839,6 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
-					TextVerticalPad(GetString(event_music_title));
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##event_music", &H2Config_event_music);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(event_music_tooltip));
-
 					if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
@@ -1272,8 +1266,6 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::render_patch] = "Original FPS limiter";
 			string_table[0][e_advanced_string::skeleton_biped] = "Play as Spooky boy";
 			string_table[0][e_advanced_string::skeleton_biped_tooltip] = "Changes your biped to be a Spooky Scary Skeleton for the Halloween event";
-			string_table[0][e_advanced_string::event_music_title] = "Event Music";
-			string_table[0][e_advanced_string::event_music_tooltip] = "Toggles the event music";
 
 			//Spanish.
 			string_table[4][e_advanced_string::title] = "      Ajustes avanzados";
@@ -1407,8 +1399,6 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::render_patch] = "Limitador de velocidad de FPS original";
 			string_table[4][e_advanced_string::skeleton_biped] = "Juega como Spooky boy";
 			string_table[4][e_advanced_string::skeleton_biped_tooltip] = "Cambia a tu bípedo para que sea un esqueleto espeluznante y aterrador para el evento de Halloween.";
-			string_table[4][e_advanced_string::event_music_title] = "Música para eventos";
-			string_table[4][e_advanced_string::event_music_tooltip] = "Alterna la música del evento";
 
 		}
 	}
