@@ -12,7 +12,7 @@ jobs:
       PLATFORM: x86
     strategy:
       matrix:
-        BUILD_CONFIGURATION: [Debug, Release]
+        BUILD_CONFIGURATION: [Debug, Release, GameRewriteDebug, GameRewriteRelease]
 
     runs-on: windows-2019
 
