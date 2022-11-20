@@ -147,8 +147,8 @@ namespace MeleeFix
 			// this is used only for sword
 			if (melee_type == e_global_string_ids::HS_MELEE_DASH || melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE)
 			{
-				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
-				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
+				float melee_max_duration = melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
+				int melee_max_ticks = time_globals::game_time_seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || p_melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;
 			}

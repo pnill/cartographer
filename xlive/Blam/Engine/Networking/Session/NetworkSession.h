@@ -3,7 +3,7 @@
 #include "..\NetworkCommon.h"
 
 #include "Blam\Engine\Players\Players.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam\Engine\Game\game\game.h"
 #include "..\Transport\NetworkChannel.h"
 #include "..\Transport\NetworkObserver.h"
 

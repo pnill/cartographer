@@ -333,7 +333,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	// This function is called before the global game options are set to the ones passed to the map load function
 	// Therefore we need to set it here in order to make sure the logic below dosent break
 	// We should probably find a better way to handle this sometime in the future
-	s_game_globals::set_engine_type(options->m_engine_type);
+	s_game_globals::set_engine_type(game_options->m_engine_type);
 
 	tags::run_callbacks();
 
@@ -356,7 +356,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
 
-	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
+	if (s_game_globals::game_is_mainmenu())
 	{
 		addDebugText("Engine type: Main-Menu");
 		UIRankPatch();

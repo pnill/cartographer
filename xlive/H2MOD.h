@@ -39,6 +39,7 @@ public:
 
 	void team_player_indicator_visibility(bool toggle);
 	datum get_player_datum_index_from_controller_index(int controller_index);
+	s_data_array* get_actor_table();
 	void set_local_team_index(int local_player_index, int team);
 	void set_local_clan_tag(int local_player_index, unsigned long long tag);
 	BYTE get_local_team_index();
