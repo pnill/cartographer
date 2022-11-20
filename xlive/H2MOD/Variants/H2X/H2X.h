@@ -2,7 +2,9 @@
 
 namespace H2X
 {
-	void Initialize(bool toggle);
+	void ApplyMapLoadPatches(bool toggle);
+
+	void ApplyPatches();
 
 	struct h2x_mod_info
 	{

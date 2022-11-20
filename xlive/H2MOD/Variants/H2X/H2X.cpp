@@ -1,9 +1,13 @@
 #include "stdafx.h"
 
 #include "H2X.h"
+
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
+#include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "H2MOD.h"
 #include "H2MOD\Tags\TagInterface.h"
+
+#include "Util\Hooks\Hook.h"
 
 std::vector<H2X::h2x_mod_info> weapons =
 {
@@ -19,69 +23,24 @@ std::vector<H2X::h2x_mod_info> weapons =
 	{ "objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", 8.5f, 9.0f, 0, true },
 	{ "objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", 10.0f, 11.0f, 0, true }
 };
-__declspec(naked) void time_globals_seconds_to_ticks()
-{
-	__asm
-	{
-		push ecx
-		mov ecx, 120
-		mov[esp], ecx
-		fild dword ptr[esp]
-		fmul dword ptr[esp + 8]
-		pop ecx
-		ret
-	}
-}
-void __cdecl game_state_weapon_set_recovery_time(unsigned __int16 object_index, __int16 barrel_index)
-{
-	//auto gamestate_weapon = (int*)s_game_state_objects::getObject(object_index);
-	//auto weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(*gamestate_weapon);
-	//auto gamestate_weapon_barrel = (int*)&gamestate_weapon[13 * barrel_index + 0x69];
-	//auto calc_recovery = weapon_tag->barrels[barrel_index]->fire_recovery_time * (59.0f / 52.0f);
-	//auto recovery_ticks = time_globals::seconds_to_ticks_precise(calc_recovery);
-	//auto recovery_floor = floorf(recovery_ticks);
-	//auto revocery_real = (int)recovery_floor;
-}
-void H2X::Initialize(bool enable)
-{
-	/*
-	 * Hook the call that takes the fire recovery time and soft recovery time
-	 * 
-	 * * 
-	 * X = (tickrate * fire recovery)							| 30 * 0.1				= 3 Ticks
-	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 30 * ((1 - 0.5) * 0.1)= 1.5 Ticks
-	 * Z = floor(X) - floor(y)									| 3 - 1.5				= 1.5 Ticks
-	 * 
-	 * 
-	 * X = (tickrate * fire recovery)							| 60 * 0.1				= 6 Ticks
-	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 60 * ((1 - 0.5) * 0.1)= 3 Ticks
-	 * Z = floor(X) - floor(y)									| 6 - 3					= 3 Ticks
-	 * 
-	 * 
-	 * X = (tickrate * fire recovery)							| 120 * 0.1				 = 12 Ticks
-	 * Y = tickrate * ((1 - soft recovery) * fire recovery)		| 120 * ((1 - 0.5) * 0.1)= 6 Ticks
-	 * Z = floor(X) - floor(y)									| 12 - 6				 = 6 Ticks
-	 *
-	 *	H2V does calculate the 2x ticks to wait as you would expect the issue is that the game also runs at 2x the speed.
-	 *	
-	 *	
-	 */
-	//if(!Memory::isDedicatedServer())
-	//{
-	//	if(enable)
-	//	{
-	//		PatchCall(Memory::GetAddress(0x15c5b3), time_globals_seconds_to_ticks);
-	//		PatchCall(Memory::GetAddress(0x15c5e2), time_globals_seconds_to_ticks);
-	//	}
-	//	else
-	//	{	
-	//		typedef float(__cdecl time_globals_seconds_to_tick_percise)(float s);
-	//		auto p_time_globals_seconds_to_tick_percise = (time_globals_seconds_to_tick_percise*)Memory::GetAddress(0x7c0c5);
-	//		PatchCall(Memory::GetAddress(0x15c5b3), p_time_globals_seconds_to_tick_percise);
-	//		PatchCall(Memory::GetAddress(0x15c5e2), p_time_globals_seconds_to_tick_percise);
-	//	}
-	//}
 
+float __cdecl game_seconds_to_ticks_real_weapon_adjust(float s)
+{
+	// if the recovery time set in the tags isn't at least game's seconds per tick (i.e. 1/tickrate seconds) or a multiple of it,
+	// it'll result in fractional ticks that cannot be handled that easily in a fixed time step, where a game tick advances a certain amount of seconds/milliseconds per game tick
+	// e.g 0.14 seconds of carbine fire recovery time will result in 30 ticks * 0.14 recovery = 4.2 ticks of recovery time, with .2 fractional tick at 30hz 
+	// and 8.4 with .4 fractional ticks at 60hz by using the same logic
+	// causing differences between tickrates (in this case between 30 and 60)
+
+	float tick_difference = 0.0f;
+	if (trunc(s) != s)
+		tick_difference = blam_max(time_globals::get_ticks_difference_real() - 1.0f, 0.0f);
+	float seconds_to_ticks_adjusted = (float)time_globals::get()->ticks_per_second * s + tick_difference;
+	return seconds_to_ticks_adjusted;
+}
+
+void H2X::ApplyMapLoadPatches(bool enable)
+{
 	for (auto& weapon : weapons)
 	{
 		for (auto& weapon : weapons)
@@ -175,4 +134,9 @@ void H2X::Initialize(bool enable)
 	}
 }
 
-	
+
+void H2X::ApplyPatches()
+{
+	// PatchCall(Memory::GetAddress(0x15C4C3), game_seconds_to_ticks_real_weapon_adjust);
+	// PatchCall(Memory::GetAddress(0x15C5B3), game_seconds_to_ticks_real_weapon_adjust);
+}

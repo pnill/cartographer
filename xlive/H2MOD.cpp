@@ -584,7 +584,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 			h2mod->toggle_xbox_tickrate(game_options, b_XboxTick);
 			if (!b_XboxTick)
 			{
-				H2X::Initialize(b_H2X);
+				H2X::ApplyMapLoadPatches(b_H2X);
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
@@ -1120,6 +1120,7 @@ void H2MOD::Initialize()
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();
+	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
