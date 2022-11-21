@@ -294,7 +294,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
-    <ClInclude Include="Blam\Engine\Actor\Actor.h" />
+    <ClInclude Include="Blam\Engine\Game\ai\actors.h" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\objects.h" />

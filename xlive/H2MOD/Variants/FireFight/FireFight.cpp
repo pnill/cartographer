@@ -3,7 +3,7 @@
 #include "FireFight.h"
 
 #include "Blam/Cache/TagGroups/character_definition.hpp"
-#include "Blam/Engine/Actor/Actor.h"
+#include "Blam/Engine/Game/ai/actors.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/objects/objects.h"
 #include "Blam/Engine/Game/units/bipeds.h"
