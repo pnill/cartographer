@@ -3,7 +3,6 @@
 #include "ProjectileFix.h"
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/objects/objects.h"
-#include "Blam/Math/BlamMath.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 

@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam\Math\BlamMath.h"
 #include "PlayerActions.h"
 
 struct s_player_control

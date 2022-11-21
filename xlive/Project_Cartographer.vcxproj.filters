@@ -414,7 +414,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
     <ClInclude Include="Blam\Engine\Game\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\real_math.h" />
-    <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />

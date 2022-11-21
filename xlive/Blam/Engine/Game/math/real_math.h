@@ -217,7 +217,18 @@ namespace real_math
 	void scale_vector3d(const real_vector3d* v1, const float scale, real_vector3d* out);
 	bool limit3d(real_vector3d* v, float limit);
 	void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, float fractional_tick, real_point3d* out);
-	void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale);
+	void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale);	
+	inline static auto blam_ticks_real_to_integer(float ticks_real);
+
+	// added these because they properly get optimized by the compiler
+	template <class T, class U>
+	inline static auto blam_max(T a, U b) {
+		return a > b ? a : b;
+	}
+	template <class T, class U>
+	inline static auto blam_min(T a, U b) {
+		return a > b ? b : a;
+	}
 }
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
