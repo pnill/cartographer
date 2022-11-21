@@ -2,11 +2,10 @@
 
 #include "GunGame.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/units/units.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "H2MOD.h"
-#include "H2MOD/Engine/Engine.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
 
 #include "Util/ReadIniArguments.h"
 

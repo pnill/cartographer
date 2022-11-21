@@ -1,9 +1,7 @@
 #include "stdafx.h"
+#include "network_life_cycle.h"
 
-#include "Engine.h"
-#include "Blam/Engine/Game/game/game.h"
-
-namespace Engine
+namespace network_life_cycle
 {
 	e_game_life_cycle get_game_life_cycle()
 	{

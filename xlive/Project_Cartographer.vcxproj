@@ -431,6 +431,7 @@
     <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\logic\network_life_cycle.cpp" />
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
@@ -442,6 +443,7 @@
     <ClInclude Include="Blam\Engine\Game\items\weapons.h" />
     <ClInclude Include="Blam\Engine\Game\math\color_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\logic\network_life_cycle.h" />
     <ClInclude Include="Blam\Engine\Game\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\Game\units\units.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
@@ -452,7 +454,6 @@
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
-    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\Objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\Game\units\units.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -792,7 +793,6 @@
     <ClInclude Include="Blam\Math\real_matrix4x3.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />

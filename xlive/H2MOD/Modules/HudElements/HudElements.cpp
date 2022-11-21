@@ -2,17 +2,18 @@
 
 #include "HudElements.h"
 
+#include "Blam/Cache/TagGroups/bitmap_definition.hpp"
 #include "Blam/Engine/Game/game/cheats.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/render/render_cameras.h"
-#include "H2MOD/Engine/Engine.h"
-#include "H2MOD/Modules/Shell/Config.h"
+
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Blam/Cache/TagGroups/bitmap_definition.hpp"
+#include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
@@ -30,7 +31,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (!s_game_globals::game_is_mainmenu() && Engine::get_game_life_cycle() == _life_cycle_in_game) {
+	else if (!s_game_globals::game_is_mainmenu() && network_life_cycle::get_game_life_cycle() == _life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}

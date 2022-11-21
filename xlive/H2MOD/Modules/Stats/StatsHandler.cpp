@@ -5,10 +5,9 @@
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/hash.h"
 
@@ -972,8 +971,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (Engine::get_game_life_cycle() != _life_cycle_pre_game
-		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
+	if (network_life_cycle::get_game_life_cycle() != _life_cycle_pre_game
+		&& network_life_cycle::get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
 	auto activePlayerIdList = std::make_shared<std::vector<unsigned long long>>(NetworkSession::GetActivePlayerIdList());

@@ -12,11 +12,13 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
+
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/Game/tag_files/string_ids.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/objects/objects.h"
 #include "Blam/Engine/Game/objects/object_placement.h"
-#include "H2MOD/Engine/Engine.h"
+#include "Blam/Engine/Game/tag_files/string_ids.h"
+
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "EngineHooks.h"
-#include "H2MOD.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "Util/Hooks/Hook.h"
 
 #if !defined(_CARTOGRAPHER_DLL_CONF)
 // DO NOT USE VERSIONS ABOVE USHORT_MAX - 1 (above 65534) OR BELLOW 0 

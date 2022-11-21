@@ -1,25 +1,26 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "Blam/Engine/Game/tag_files/string_ids.h"
+
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Engine/Game/memory/bitstream.h"
-#include "Blam/Engine/Game/hs/hs.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/Game/GameHooks.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/FileSystem/FiloInterface.h"
+#include "Blam/Engine/Game/hs/hs.h"
+#include "Blam/Engine/Game/memory/bitstream.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/objects/damage.h"
-#include "Blam/Engine/Game/GameHooks.h"
+#include "Blam/Engine/Game/tag_files/string_ids.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/FileSystem/FiloInterface.h"
+
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Engine/Engine.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/GUI.h"
-#include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
@@ -37,6 +38,8 @@
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
@@ -44,7 +47,6 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/Hooks/Hook.h"
-#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 #include <float.h>
 
@@ -393,7 +395,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 			}
 
 			h2mod->toggle_ai_multiplayer(true);
-			if (Engine::get_game_life_cycle() == _life_cycle_in_game)
+			if (network_life_cycle::get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client
 				//MapChecksumSync::SendState();
@@ -447,7 +449,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 
-	if ((session->parameters[0].session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
+	if ((session->parameters[0].session_mode == 4 && network_life_cycle::get_game_life_cycle() == _life_cycle_pre_game)
 		|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
 		//rvb mode enabled, don't change teams
 		return;

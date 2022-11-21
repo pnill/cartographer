@@ -110,7 +110,6 @@
     <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\Game\Objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\Game\units\units.cpp" />
-    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
@@ -156,6 +155,7 @@
     <ClCompile Include="Blam\Engine\Game\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\logic\network_life_cycle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -402,7 +402,6 @@
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="Blam\Engine\Game\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
-    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="Blam\Cache\CacheHeader.h" />
     <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
@@ -504,6 +503,7 @@
     <ClInclude Include="Blam\Engine\Game\items\equipment.h" />
     <ClInclude Include="Blam\Engine\Game\units\units.h" />
     <ClInclude Include="Blam\Engine\Game\units\bipeds.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\logic\network_life_cycle.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
