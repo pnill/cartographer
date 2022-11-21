@@ -1,14 +1,15 @@
 #include "stdafx.h"
-
 #include "NetworkMessageTypeCollection.h"
+
 #include "Blam/Engine/Game/memory/bitstream.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "H2MOD.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/MapManager/MapManager.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 BYTE g_network_message_type_collection[e_network_message_type_collection::_network_message_type_collection_end * 32];
 

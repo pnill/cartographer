@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Math\real_math.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 namespace SpecialEvents
 {

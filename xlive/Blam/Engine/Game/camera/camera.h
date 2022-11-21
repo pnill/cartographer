@@ -1,5 +1,6 @@
 #pragma once
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/Game/math/integer_math.h"
 
 #pragma pack(push, 1)
 struct s_camera

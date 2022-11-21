@@ -8,13 +8,14 @@
 #include "imgui_integration/imgui_handler.h"
 #include "GUI.h"
 
+#include "H2MOD.h"
 #include "Blam/Engine/Game/units/bipeds.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 
 #include "Util/Hooks/Hook.h"

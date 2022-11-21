@@ -6,6 +6,7 @@
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Shell/Config.h"

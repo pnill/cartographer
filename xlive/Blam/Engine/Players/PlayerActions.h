@@ -1,7 +1,7 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 #pragma pack(push, 1)
 struct s_aim_assist_targetting_data

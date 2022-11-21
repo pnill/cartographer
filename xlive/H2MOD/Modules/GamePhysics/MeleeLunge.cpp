@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "MeleeLunge.h"
-
-#include "Util/Memory.h"
-
+#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/Game/math/integer_math.h"
+#include "Blam/Engine/Game/math/matrix_math.h"
 #include "Blam/Engine/Game/game/game.h"
-
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Util/Memory.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST

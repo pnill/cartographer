@@ -6,7 +6,7 @@
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Common/Common.h"
 #include "Blam/Engine/Game/math/color_math.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 /*********************************************************************
 * name: light

@@ -7,6 +7,7 @@
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/render/render_cameras.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"

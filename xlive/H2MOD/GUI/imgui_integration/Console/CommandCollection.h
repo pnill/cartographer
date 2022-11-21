@@ -1,9 +1,7 @@
 #pragma once
-
 #include "ComVar.h"
 #include "CommandHandler.h"
-
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 namespace CommandCollection
 {

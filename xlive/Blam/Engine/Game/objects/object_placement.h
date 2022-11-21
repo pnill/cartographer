@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Game/math/color_math.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 struct s_object_placement_data
 {

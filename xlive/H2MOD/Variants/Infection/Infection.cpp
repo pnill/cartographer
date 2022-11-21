@@ -9,6 +9,7 @@
 #include "Blam/Engine/Game/units/units.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Modules/Shell/Config.h"

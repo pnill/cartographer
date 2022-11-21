@@ -1,9 +1,5 @@
 #pragma once
 
-#include "real_math.h"
-#include "integer_math.h"
-#include "Blam/Engine/Game/math/matrix_math.h"
-
 // added these because they properly get optimized by the compiler
 template <class T, class U>
 inline static auto blam_max(T a, U b) {

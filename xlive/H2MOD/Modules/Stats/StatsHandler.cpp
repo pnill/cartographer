@@ -5,6 +5,7 @@
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

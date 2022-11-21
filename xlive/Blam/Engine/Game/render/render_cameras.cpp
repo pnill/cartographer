@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "Blam/Engine/Game/math/real_math.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 #include "render_cameras.h"
 

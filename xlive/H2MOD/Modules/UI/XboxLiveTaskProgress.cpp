@@ -1,8 +1,9 @@
 #include "stdafx.h"
-
 #include "XboxLiveTaskProgress.h"
-#include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
+
+#include "Blam/Engine/Game/math/integer_math.h"
+#include "Blam/Engine/Game/game/game.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 void c_xbox_live_task_progress_menu::Open(void* callback)
 {

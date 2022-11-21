@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Engine/Game/items/equipment.h"
 #include "Blam/Engine/Game/objects/objects.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 struct s_unit_data_definition : s_object_data_definition
 {

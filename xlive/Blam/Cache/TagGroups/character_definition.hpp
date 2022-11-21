@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 #pragma pack(push,1)
 struct character_tag_group

@@ -1,7 +1,8 @@
 #pragma once
-#include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
 #include "NetworkPrimitiveTypes.h"
+
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 #pragma pack(push, 1)
 struct s_player_predicted_aim_assist

@@ -8,6 +8,7 @@
 #include "Blam/Engine/Game/units/bipeds.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Utils/Utils.h"

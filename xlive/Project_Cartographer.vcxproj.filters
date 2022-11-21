@@ -155,7 +155,7 @@
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\logic\network_life_cycle.cpp" />
-    <ClCompile Include="Blam\Math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\math\real_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -412,8 +412,8 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
-    <ClInclude Include="Blam\Math\integer_math.h" />
-    <ClInclude Include="Blam\Math\real_math.h" />
+    <ClInclude Include="Blam\Engine\Game\math\integer_math.h" />
+    <ClInclude Include="Blam\Engine\Game\math\real_math.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
