@@ -156,6 +156,7 @@
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\logic\network_life_cycle.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\Game\ai\actors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -269,7 +270,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
-    <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
+    <ClInclude Include="Blam\Engine\Game\memory\data.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />

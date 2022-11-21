@@ -278,11 +278,6 @@ int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 	return result;
 }
 
-s_data_array* H2MOD::get_actor_table()
-{
-	return *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
-}
-
 void H2MOD::toggle_xbox_tickrate(s_game_options* game_options, bool toggle)
 {
 	game_options->tickrate = toggle ? 30 : 60;

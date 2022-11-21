@@ -424,6 +424,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GameRewriteDebug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
+    <ClCompile Include="Blam\Engine\Game\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
@@ -788,7 +789,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Engine\Game\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\Game\math\real_math.h" />
-    <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
+    <ClInclude Include="Blam\Engine\Game\memory\data.h" />
     <ClInclude Include="Blam\Engine\Game\math\matrix_math.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />

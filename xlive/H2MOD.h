@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Blam/Common/Common.h"
-#include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 
@@ -38,7 +37,6 @@ public:
 	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
-	s_data_array* get_actor_table();
 	void disable_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool b_Enable);

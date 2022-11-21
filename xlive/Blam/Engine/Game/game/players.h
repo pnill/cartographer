@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/Game/memory/data.h"
 #include "Blam/Engine/Game/objects/objects.h"
 
 #define ENGINE_MAX_PLAYERS 16
@@ -278,11 +278,11 @@ public:
 
 	s_player* get_current_player_data();
 
-	int get_current_player_index();
+	int get_current_player_index() const;
 
 	wchar_t* get_current_player_name();
 
-	unsigned long long get_current_player_id();
+	unsigned long long get_current_player_id() const;
 
 private:
 	s_player* m_current_player = nullptr;

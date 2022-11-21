@@ -1,16 +1,12 @@
-
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
-#include "H2MOD\Tags\TagInterface.h"
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\FileSystem\FiloInterface.h"
-
-#include "Util\Hooks\Hook.h"
-
+#include "Blam/Engine/Game/memory/data.h"
+#include "Blam/FileSystem/FiloInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
 #include "H2MOD/Modules/CustomMenu/c_list_widget.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
 #pragma region 50 map limit removal
 

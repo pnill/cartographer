@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/Game/math/matrix_math.h"
+#include "Blam/Engine/Game/memory/data.h"
 #include "Blam/Engine/Game/objects/object_placement.h"
 #include "Blam/Engine/Game/simulation/simulation_players.h"
 

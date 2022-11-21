@@ -1,6 +1,6 @@
 #pragma once
-
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Util/Memory.h"
 
 template<typename T = int>
 struct s_bitflags
@@ -30,9 +30,9 @@ struct s_data_array
 	char name[0x20];				// 0x0
 	int datum_max_elements;			// 0x20
 	int datum_element_size;			// 0x24
-	BYTE alignment_bit;				// 0x28
+	unsigned __int8 alignment_bit;	// 0x28
 	bool is_valid;					// 0x29
-	WORD flags;						// 0x2A
+	unsigned short flags;						// 0x2A
 	char data_signature[4];			// 0x2C
 	void **allocator;				// 0x30
 	int bit_index_size;				// 0x34

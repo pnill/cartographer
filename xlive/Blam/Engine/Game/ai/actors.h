@@ -1,6 +1,6 @@
 #pragma once
-
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/Game/memory/data.h"
 
 /*
    TODO: Reverse engineer more of the actor struct and fill this data in appropriately.
@@ -13,3 +13,8 @@ struct Actor {
 	BYTE pad2[0x840];
 };
 CHECK_STRUCT_SIZE(Actor, 0x898);
+
+namespace actors
+{
+	s_data_array* get_actor_table();
+}

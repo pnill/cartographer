@@ -128,7 +128,7 @@ s_player* PlayerIterator::get_current_player_data()
 	return m_current_player;
 }
 
-int PlayerIterator::get_current_player_index()
+int PlayerIterator::get_current_player_index() const
 {
 	return get_current_absolute_index();
 }
@@ -138,7 +138,7 @@ wchar_t* PlayerIterator::get_current_player_name()
 	return m_current_player->properties[0].player_name;
 }
 
-unsigned long long PlayerIterator::get_current_player_id()
+unsigned long long PlayerIterator::get_current_player_id() const
 {
 	return s_player::GetId(this->get_current_player_index());
 }
