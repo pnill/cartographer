@@ -1,10 +1,10 @@
 #include "stdafx.h"
-
 #include "OverridePackets.h"
-#include "H2MOD/Engine/Engine.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+
 #include "Blam/Engine/Game/memory/bitstream.h"
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Util/Hooks/Hook.h"
 
 #define SYNCRONOUS_UPDATE_DEFAULT_SIZE 15320
