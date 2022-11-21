@@ -146,7 +146,7 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
-    <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
+    <ClCompile Include="Blam\Engine\Game\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\Game\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
     <ClCompile Include="Blam\Engine\Game\math\color_math.cpp" />
@@ -487,7 +487,7 @@
     <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
-    <ClInclude Include="Blam\Math\real_matrix4x3.h" />
+    <ClInclude Include="Blam\Engine\Game\math\matrix_math.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Lockout.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Coagulation.h" />

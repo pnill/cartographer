@@ -452,7 +452,7 @@
     <ClCompile Include="Blam\Engine\Game\render\render_cameras.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
-    <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
+    <ClCompile Include="Blam\Engine\Game\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\Game\Objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\Game\units\units.cpp" />
@@ -790,7 +790,7 @@
     <ClInclude Include="Blam\Math\integer_math.h" />
     <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
-    <ClInclude Include="Blam\Math\real_matrix4x3.h" />
+    <ClInclude Include="Blam\Engine\Game\math\matrix_math.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
