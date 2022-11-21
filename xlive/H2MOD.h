@@ -40,7 +40,6 @@ public:
 	void disable_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool b_Enable);
-	void set_local_rank(BYTE rank);
 
 	void toggle_ai_multiplayer(bool toggle);
 	void toggle_xbox_tickrate(s_game_options* game_options, bool toggle);

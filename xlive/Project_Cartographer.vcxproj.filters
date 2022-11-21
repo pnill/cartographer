@@ -22,7 +22,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\FileSystem\FiloInterface.cpp" />
+    <ClCompile Include="Blam\Engine\Game\tag_files\files_windows.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
@@ -296,7 +296,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\Game\ai\actors.h" />
-    <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
+    <ClInclude Include="Blam\Engine\Game\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\objects.h" />
     <ClInclude Include="Blam\Engine\Game\game\player_control.h" />

@@ -32,7 +32,7 @@ struct s_data_array
 	int datum_element_size;			// 0x24
 	unsigned __int8 alignment_bit;	// 0x28
 	bool is_valid;					// 0x29
-	unsigned short flags;						// 0x2A
+	unsigned short flags;			// 0x2A
 	char data_signature[4];			// 0x2C
 	void **allocator;				// 0x30
 	int bit_index_size;				// 0x34

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
@@ -16,11 +15,9 @@
 #include "Blam/Engine/Game/objects/damage.h"
 #include "Blam/Engine/Game/tag_files/string_ids.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/FileSystem/FiloInterface.h"
 
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
-#include "H2MOD/GUI/GUI.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -243,25 +240,6 @@ void H2MOD::disable_weapon_pickup(bool bEnable)
 	}
 }
 
-void H2MOD::set_local_rank(BYTE rank)
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	static bool initialized = false;
-
-	if (!initialized)
-	{
-		NopFill(Memory::GetAddress(0x1b2c29), 7);
-		initialized = true;
-	}
-
-	s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
-
-	local_player_properties->player_overall_skill = rank;
-	local_player_properties->player_displayed_skill = rank;
-}
-
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
 {
 	auto p_auto_handle = Memory::GetAddress<int(_cdecl*)(datum, datum)>(0x57AA5, 0x5FF9D);
@@ -418,18 +396,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 	}
 
 	return ret;
-}
-
-void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
-{
-	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
-
-	if ((session->parameters[0].session_mode == 4 && network_life_cycle::get_game_life_cycle() == _life_cycle_pre_game)
-		|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
-		//rvb mode enabled, don't change teams
-		return;
-	}
-	players::p_change_local_team(localPlayerIndex, teamIndex);
 }
 
 void __cdecl print_to_console(const char* output)
@@ -770,7 +736,7 @@ void H2MOD::ApplyHooks() {
 
 		TEST_N_DEF(PC2);
 		
-		DETOUR_ATTACH(players::p_change_local_team, Memory::GetAddress<players::change_team_t>(0x2068F2), changeTeam);
+		players::ApplyPatches();
 
 		// hook the print command to redirect the output to our console
 		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);

@@ -1,12 +1,17 @@
 #include "stdafx.h"
-#include "Players.h"
+#include "players.h"
 
+#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Util/Hooks/Hook.h"
 
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
 */
+typedef void(__cdecl* change_team_t)(int a1, int a2);
+change_team_t p_change_local_team;
 
 s_data_array* s_player::GetArray()
 {
@@ -189,5 +194,41 @@ namespace players
 		unsigned long low = tag & 0xFFFFFFFF;
 		*(unsigned long*)Memory::GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
 		p_update_player_profile(local_player_index);
+	}
+
+	void carto_set_local_rank(BYTE rank)
+	{
+		if (Memory::IsDedicatedServer())
+			return;
+
+		static bool initialized = false;
+
+		if (!initialized)
+		{
+			NopFill(Memory::GetAddress(0x1b2c29), 7);
+			initialized = true;
+		}
+
+		s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
+
+		local_player_properties->player_overall_skill = rank;
+		local_player_properties->player_displayed_skill = rank;
+	}
+
+	void __cdecl carto_changeTeam(int localPlayerIndex, int teamIndex)
+	{
+		s_network_session* session = NetworkSession::GetCurrentNetworkSession();
+
+		if ((session->parameters[0].session_mode == 4 && network_life_cycle::get_game_life_cycle() == _life_cycle_pre_game)
+			|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
+			//rvb mode enabled, don't change teams
+			return;
+		}
+		p_change_local_team(localPlayerIndex, teamIndex);
+	}
+
+	void ApplyPatches()
+	{
+		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), carto_changeTeam);
 	}
 }

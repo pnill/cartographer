@@ -1,14 +1,16 @@
 #include "stdafx.h"
-
 #include "Tweaks.h"
+
 #include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/FileSystem/FiloInterface.h"
+#include "Blam/Engine/Game/tag_files/files_windows.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomResolutions/CustomResolutions.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
 #include "H2MOD/Utils/Utils.h"
@@ -16,7 +18,6 @@
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 #include "Util/Hooks/Hook.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
-#include "H2MOD/Modules/MapManager/MapManager.h"
 
 #pragma region Done_Tweaks
 

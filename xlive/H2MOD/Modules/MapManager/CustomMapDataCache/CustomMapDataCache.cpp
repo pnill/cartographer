@@ -2,7 +2,7 @@
 #include "CustomMapDataCache.h"
 
 #include "Blam/Engine/Game/memory/data.h"
-#include "Blam/FileSystem/FiloInterface.h"
+#include "Blam/Engine/Game/tag_files/files_windows.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/CustomMenu/c_list_widget.h"
 #include "H2MOD/Tags/TagInterface.h"
