@@ -119,7 +119,6 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game.cpp" />
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
-    <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
@@ -156,6 +155,7 @@
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\objects\damage.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\logic\network_life_cycle.cpp" />
+    <ClCompile Include="Blam\Math\real_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -445,7 +445,6 @@
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
-    <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />

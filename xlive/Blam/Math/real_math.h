@@ -206,9 +206,18 @@ struct angle_bounds
 };
 CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
 
-static void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale)
+namespace real_math
 {
-	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);
+	float magnitude3d(const real_vector3d* v1);
+	void add_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out);
+	float normalize3d(real_vector3d* v1);
+	void point_from_line3d(const real_point3d* p1, const real_vector3d* direction, float length, real_point3d* out);
+	float dot_product3d(const real_vector3d* v1, const real_vector3d* v2);
+	void vector_from_points3d(const real_point3d* p1, const real_point3d* p2, real_vector3d* out);
+	void scale_vector3d(const real_vector3d* v1, const float scale, real_vector3d* out);
+	bool limit3d(real_vector3d* v, float limit);
+	void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, float fractional_tick, real_point3d* out);
+	void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale);
 }
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };

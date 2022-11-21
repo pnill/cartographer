@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "matrix_math.h"
-#include "Blam/Math/real_vector3d.h"
+#include "Blam/Math/real_math.h"
 
 namespace matrix_math
 {
@@ -37,7 +37,7 @@ namespace matrix_math
 		// and convert back to matrix format, since that's what the game uses
 		quaternion_rotation_to_matrix4x3(&q3_interpolated, out_mat);
 		// interpolate scale and the position of the node
-		scale_interpolate(previous->scale, target->scale, fractional_ticks, &out_mat->scale);
-		points_interpolate(&previous->position, &target->position, fractional_ticks, &out_mat->position);
+		real_math::scale_interpolate(previous->scale, target->scale, fractional_ticks, &out_mat->scale);
+		real_math::points_interpolate(&previous->position, &target->position, fractional_ticks, &out_mat->position);
 	}
 }

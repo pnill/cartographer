@@ -2,7 +2,6 @@
 
 #include "real_math.h"
 #include "integer_math.h"
-#include "real_vector3d.h"
 #include "Blam/Engine/Game/math/matrix_math.h"
 
 // added these because they properly get optimized by the compiler
