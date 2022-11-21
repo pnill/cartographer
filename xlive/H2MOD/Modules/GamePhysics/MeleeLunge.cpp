@@ -292,7 +292,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				// either some numb nut at bungie forgot to add the line bellow or it was intentional
 				// so we just convert the current velocity and deceleration to 30 tick values
 				// and output them like that
-				// output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->ticks_per_second;
+				// output->out_translational_velocity = output->out_translational_velocity * (float)time_globals::get()->tickrate;
 
 				if (maybe_minimum_velocity <= ((current_velocity_per_tick - unk4) + k_valid_real_epsilon))
 				{
@@ -680,7 +680,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	{
 		int added_ticks = m_maximum_counter - 6 - (m_weapon_is_sword ? 7 : 1);
 
-		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, time_globals::get()->ticks_per_second);
+		LOG_TRACE_MELEE("{} - update melee at tickrate: {}", __FUNCTION__, time_globals::get()->tickrate);
 		LOG_TRACE_MELEE("{} - added tick count to maximum counter: {}", __FUNCTION__, added_ticks);
 		LOG_TRACE_MELEE("{} - target_distance: {}, maximum counter: {}", __FUNCTION__, distance_between_havok_components, m_maximum_counter);
 	}

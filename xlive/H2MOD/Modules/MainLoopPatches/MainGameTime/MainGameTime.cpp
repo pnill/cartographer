@@ -51,7 +51,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 	time_globals* timeGlobals = time_globals::get();
 	if (p_game_is_not_paused() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
 	{
-		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;
+		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->tickrate;
 		double unk = accumulator + dt; // in seconds
 		double unk_seconds = floor(unk * game_speed_in_ticks);
 
