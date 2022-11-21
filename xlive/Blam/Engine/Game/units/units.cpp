@@ -7,7 +7,6 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "H2MOD.h"
 #include "Util/Hooks/Hook.h"
 
 namespace units
@@ -97,7 +96,7 @@ namespace units
 
 	const wchar_t* carto_get_local_player_name(int local_player_index)
 	{
-		return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(local_player_index)));
+		return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(players::get_player_datum_index_from_controller_index(local_player_index)));
 	}
 
 	int carto_get_player_index_from_unit_datum_index(datum unit_datum_index)

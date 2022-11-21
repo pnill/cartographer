@@ -23,7 +23,6 @@
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HudElements/HudElements.h"
@@ -43,7 +42,6 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/Hooks/Hook.h"
@@ -102,22 +100,6 @@ wcsncpy_s_hook_t p_wcsncpy_s_hook;
 signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
-
-/* controller index aka local player index -> player index */
-datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
-{
-	typedef int(__cdecl* get_local_player_index_t)(int controller_index); 
-	auto p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
-	return p_get_local_player_index(controller_index); 
-}
-
-#pragma region PlayerFunctions
-
-BYTE H2MOD::get_local_team_index()
-{
-	return *Memory::GetAddress<BYTE*>(0x51A6B4);
-}
-#pragma endregion
 
 void H2MOD::disable_sounds(int sound_flags)
 {
@@ -442,9 +424,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 	return ret;
 }
 
-typedef void(__cdecl* change_team_t)(int a1, int a2);
-change_team_t p_change_local_team;
-
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
 {
 	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
@@ -454,26 +433,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 		//rvb mode enabled, don't change teams
 		return;
 	}
-	p_change_local_team(localPlayerIndex, teamIndex);
-}
-
-void H2MOD::set_local_team_index(int local_player_index, int team_index)
-{
-	// we only use player index 0 due to no splitscreen support but whatever
-	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
-
-	p_change_local_team(local_player_index, team_index);
-	p_update_player_profile(local_player_index); // fixes infection handicap glitch
-}
-
-void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
-{
-	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
-	unsigned long low = tag & 0xFFFFFFFF;
-	*(unsigned long*)Memory::GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
-	p_update_player_profile(local_player_index);
+	players::p_change_local_team(localPlayerIndex, teamIndex);
 }
 
 void __cdecl print_to_console(const char* output)
@@ -814,7 +774,7 @@ void H2MOD::ApplyHooks() {
 
 		TEST_N_DEF(PC2);
 		
-		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), changeTeam);
+		DETOUR_ATTACH(players::p_change_local_team, Memory::GetAddress<players::change_team_t>(0x2068F2), changeTeam);
 
 		// hook the print command to redirect the output to our console
 		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);

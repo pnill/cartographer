@@ -218,7 +218,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			s_team_change* received_data = (s_team_change*)packet;
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", 
 				received_data->team_index);
-			h2mod->set_local_team_index(0, received_data->team_index);
+			players::set_local_team_index(0, received_data->team_index);
 		}
 		break;
 	}

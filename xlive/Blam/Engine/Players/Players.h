@@ -3,6 +3,7 @@
 #include "Blam/Engine/Game/objects/objects.h"
 
 #define ENGINE_MAX_PLAYERS 16
+#define ENGINE_MAX_LOCAL_PLAYERS 4
 
 #pragma pack(push, 1)
 struct s_player
@@ -286,3 +287,16 @@ public:
 private:
 	s_player* m_current_player = nullptr;
 };
+
+namespace players
+{
+	byte get_local_team_index();
+	datum get_player_datum_index_from_controller_index(int controller_index);
+	bool local_user_has_player(int user_index);
+	datum local_user_get_player_idx(int user_index);
+
+	typedef void(__cdecl* change_team_t)(int a1, int a2);
+	static change_team_t p_change_local_team;
+	void set_local_team_index(int local_player_index, int team_index);
+	void set_local_clan_tag(int local_player_index, unsigned long long tag);
+}

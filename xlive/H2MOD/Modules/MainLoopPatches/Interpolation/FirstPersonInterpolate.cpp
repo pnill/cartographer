@@ -5,12 +5,10 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Players/Players.h"
 
-#include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Players\Players.h"
-#include "Blam\Engine\Players\LocalPlayers.h"
+#include "Util/Hooks/Hook.h"
 
 namespace FirstPersonInterpolate
 {
@@ -59,19 +57,19 @@ namespace FirstPersonInterpolate
 			s_camera_state* camera_state = &local_players_states[i];
 
 			// check if we actually executed any ticks
-			if (!(time_globals::get_game_time() > 0))
+			if (!(time_globals::get_game_time_ticks() > 0))
 			{
 				Reset();
 				break;
 			}
 
-			if (!local_user_has_player(i))
+			if (!players::local_user_has_player(i))
 			{
 				ResetPlayer(i);
 				continue;
 			}
 
-			player_datum = local_user_get_player_idx(i);
+			player_datum = players::local_user_get_player_idx(i);
 			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 			if (DATUM_IS_NONE(player_unit_datum))
@@ -104,9 +102,9 @@ namespace FirstPersonInterpolate
 			if (!camera_state->valid)
 				continue;
 			
-			if (local_user_has_player(i))
+			if (players::local_user_has_player(i))
 			{
-				player_datum = local_user_get_player_idx(i);
+				player_datum = players::local_user_get_player_idx(i);
 				player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 				if (camera_state->unit_idx == player_unit_datum)
@@ -134,10 +132,10 @@ namespace FirstPersonInterpolate
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
-			if (!local_user_has_player(i))
+			if (!players::local_user_has_player(i))
 				continue;
 
-			player_datum = local_user_get_player_idx(i);
+			player_datum = players::local_user_get_player_idx(i);
 			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 			if (DATUM_IS_NONE(player_unit_datum))
@@ -151,7 +149,7 @@ namespace FirstPersonInterpolate
 			{
 				real_point3d target_camera_pos;
 				unit_get_camera_position(unit_idx, &target_camera_pos);
-				points_interpolate(&camera_state->previous_position, &target_camera_pos, Interpolation::GetInterpolateTime(), out_cam_position);
+				real_math::points_interpolate(&camera_state->previous_position, &target_camera_pos, Interpolation::GetInterpolateTime(), out_cam_position);
 				return;
 			}
 		}

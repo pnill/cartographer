@@ -6,10 +6,10 @@
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 
@@ -559,7 +559,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	ComVarT<bool> sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
-	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
+	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(players::get_player_datum_index_from_controller_index(0));
 	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 
 	std::string objectName = tokens[tokenArgPos++];
@@ -694,7 +694,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 		try 
 		{
 			s_object_placement_data nObject;
-			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
+			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(players::get_player_datum_index_from_controller_index(0));
 			datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 			real_point3d* localPlayerPos = units::carto_get_player_unit_coords(localPlayerIdx);
 			
