@@ -448,7 +448,7 @@
     <ClInclude Include="Blam\Engine\Game\units\units.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
-    <ClCompile Include="Blam\Engine\Players\Players.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\players.cpp" />
     <ClCompile Include="Blam\Engine\Game\render\render_cameras.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
@@ -767,7 +767,7 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
+    <ClInclude Include="Blam\Engine\Game\simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\Game\render\render_cameras.h" />
@@ -872,8 +872,8 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\objects.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
-    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Engine\Game\game\player_control.h" />
+    <ClInclude Include="Blam\Engine\Game\game\players.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_options.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />

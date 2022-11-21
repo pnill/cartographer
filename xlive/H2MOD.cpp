@@ -9,6 +9,7 @@
 #include "Blam/Engine/Game/GameHooks.h"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/hs/hs.h"
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"

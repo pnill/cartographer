@@ -2,7 +2,7 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
-    <ClCompile Include="Blam\Engine\Players\Players.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\players.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
@@ -298,8 +298,8 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\Game\Objects\objects.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
-    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Engine\Game\game\player_control.h" />
+    <ClInclude Include="Blam\Engine\Game\game\players.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
@@ -434,7 +434,7 @@
     <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
+    <ClInclude Include="Blam\Engine\Game\simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />

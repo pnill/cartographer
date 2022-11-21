@@ -1,5 +1,5 @@
 #pragma once
-#include "PlayerActions.h"
+#include "Blam/Engine/Game/simulation/simulation_players.h"
 
 struct s_player_control
 {

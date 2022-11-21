@@ -1,12 +1,10 @@
 #include "stdafx.h"
 #include "DeviceShop.h"
 
+#include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/units/bipeds.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
-#include "Blam/Engine/Players/Players.h"
-
 
 std::unordered_map<unsigned long long, int> player_points;
 

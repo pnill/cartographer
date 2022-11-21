@@ -5,6 +5,7 @@
 #include "Blam/Engine/Game/math/integer_math.h"
 #include "Blam/Engine/Game/math/matrix_math.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/objects/objects.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "Util/Memory.h"
 

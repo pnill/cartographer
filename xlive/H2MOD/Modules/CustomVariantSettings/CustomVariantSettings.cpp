@@ -7,7 +7,7 @@
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/physics/physics_constants.h"
 #include "Blam/Engine/Game/units/units.h"
-#include "Blam/Engine/Players/PlayerControls.h"
+#include "Blam/Engine/Game/game/player_control.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "ObserverMode.h"
-#include "H2MOD.h"
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
-#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Utils\Utils.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Game/game/players.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/Hooks/Hook.h"
 #include <math.h>
 #define _USE_MATH_DEFINES
 
@@ -18,11 +18,8 @@ namespace ObserverMode
 	byte* EditorCameraTargetFunction;
 	s_player_motion** network_player_actions;
 
-
-
 	typedef float*(__cdecl *h_editor_camera_update)(int *a1, int a2, int a3);
 	h_editor_camera_update p_editor_camera_update;
-
 
 
 	float DegToRad(float degree)

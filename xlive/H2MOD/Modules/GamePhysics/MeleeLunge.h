@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Game/math/real_math.h"
 
 #include "H2MOD.h"
 

@@ -6,9 +6,9 @@
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/game_engine.h"
+#include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/tag_files/string_ids.h"
-#include "Blam/Engine/Players/Players.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"

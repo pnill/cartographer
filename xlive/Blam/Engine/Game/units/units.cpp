@@ -2,10 +2,10 @@
 
 #include "units.h"
 
+#include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/objects/objects.h"
 #include "Blam/Engine/Game/units/bipeds.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Util/Hooks/Hook.h"
 
