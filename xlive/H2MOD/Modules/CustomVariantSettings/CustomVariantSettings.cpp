@@ -13,13 +13,12 @@
 #include "H2MOD.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Stats\StatsHandler.h"
 #include "H2MOD\Utils\Utils.h"
 #include "Util\Hooks\Hook.h"
 
-std::map<std::wstring, CustomVariantSettings::s_variantSettings> CustomVariantSettingsMap;
 CustomVariantSettings::s_variantSettings currentVariantSettings;
 CustomVariantSettings::s_variantSettings defaultCustomVariantSettings;
+std::map<std::wstring, CustomVariantSettings::s_variantSettings> customVariantSettingsMap;
 
 namespace CustomVariantSettings
 {
@@ -65,8 +64,8 @@ namespace CustomVariantSettings
 			//TODO: Find and map out struct with current variant information.
 			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
 
-			auto customVariantSetting = CustomVariantSettingsMap.find(VariantName);
-			if (customVariantSetting != CustomVariantSettingsMap.end())
+			auto customVariantSetting = customVariantSettingsMap.find(VariantName);
+			if (customVariantSetting != customVariantSettingsMap.end())
 			{
 				currentVariantSettings = customVariantSetting->second;
 				if (currentVariantSettings != defaultCustomVariantSettings) {

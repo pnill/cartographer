@@ -1,21 +1,20 @@
 #include "stdafx.h"
 
 #include "StatsHandler.h"
-#include "Blam\Engine\Memory\bitstream.h"
+
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Utils\Utils.h"
+
 #include "Util\hash.h"
 
 bool MatchInvalidated = false;
 StatsHandler::StatsAPIRegisteredStatus Status;
 
 std::atomic<bool> rankStateUpdating;
-std::queue<rapidjson::Document*> rankUpdates;
+std::queue<std::shared_ptr<rapidjson::Document>> rankDocUpdates;
 
 using namespace std::chrono;
 
@@ -23,6 +22,7 @@ static steady_clock::time_point lastTimeRanksSynchronized;
 
 void StatsHandler::Initialize()
 {
+	// TODO FIXME disabled for now
 	return;
 
 	if (Memory::IsDedicatedServer()) {
@@ -30,13 +30,87 @@ void StatsHandler::Initialize()
 		Status.RanksEnabled = false;
 		Status.StatsEnabled = false;
 		lastTimeRanksSynchronized = steady_clock::now();
-		
+
 		// server events
 		EventHandler::register_callback(server_command_event, EventType::server_command, EventExecutionType::execute_before);
 		EventHandler::register_callback(network_player_event, EventType::network_player, EventExecutionType::execute_after);
-	} 
+	}
 
 	EventHandler::register_callback(game_life_cycle_update_event, EventType::gamelifecycle_change, EventExecutionType::execute_after);
+}
+
+void StatsHandler::sendStats()
+{
+	if (!Memory::IsDedicatedServer()
+		|| !getRegisteredStatus().StatsEnabled)
+		return;
+
+	const char* token = getAPIToken();
+	if (token == nullptr) {
+		return;
+	}
+
+	int verifyPlaylistResponse = verifyPlaylist(token);
+	if (verifyPlaylistResponse != 201) {
+		switch (verifyPlaylistResponse)
+		{
+		case -1:
+		case 500:
+			LOG_ERROR_GAME("[H2MOD] playlist verification encountered a server error code: {}", verifyPlaylistResponse);
+			break;
+		default:
+			LOG_ERROR_GAME("[H2MOD] playlist verification encountered unkown error code: {}", verifyPlaylistResponse);
+			break;
+		}
+
+		return;
+	}
+
+	if (uploadPlaylist(token) != 200) {
+		LOG_ERROR_GAME("[H2MOD] playlist uploading encountered an error");
+	}
+
+	const char* filepath = buildPostGameCarnageReportJson();
+	if (!strcmp(filepath, ""))
+	{
+		LOG_ERROR_GAME("[H2MOD] stats Json failed to build");
+		return;
+	}
+
+	if (uploadStats(filepath, token) == 200)
+	{
+		LOG_TRACE_GAME("[H2MOD] stats uploaded successfully");
+	}
+	else
+	{
+		LOG_ERROR_GAME("[H2MOD] stats uploading encountered an error");
+	}
+
+	// delete the file
+	remove(filepath);
+}
+
+void StatsHandler::verifySendPlaylist()
+{
+	if (!Memory::IsDedicatedServer()
+		|| !getRegisteredStatus().StatsEnabled)
+		return;
+
+	const char* token = getAPIToken();
+	int verifyPlaylistResponse = verifyPlaylist(token);
+	switch (verifyPlaylistResponse)
+	{
+	case 201:
+		if (uploadPlaylist(token) != 200) {
+			LOG_ERROR_GAME("[H2MOD] Playlist Uploading encountered an error");
+		}
+		break;
+	case 500:
+	case -1:
+	default:
+		LOG_ERROR_GAME("[H2MOD] Playlist Verification encountered a server error");
+		break;
+	}
 }
 
 void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
@@ -44,7 +118,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 	auto updateStatsLifeCycle = [](e_game_life_cycle state)
 	{
 		static bool pregameFirstInitialization = false;
-		
+
 		switch (state)
 		{
 		case _life_cycle_pre_game:
@@ -57,11 +131,11 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 			}
 			else
 			{
-				InvalidateMatch(false);
+				invalidateMatch(false);
 				return;
 			}
 		case _life_cycle_in_game:
-			InvalidateMatch(false);
+			invalidateMatch(false);
 			return;
 		case _life_cycle_post_game:
 			sendStats();
@@ -70,14 +144,14 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 			break;
 		}
 	};
-	
-	if (Memory::IsDedicatedServer()) 
+
+	if (Memory::IsDedicatedServer())
 	{
 		std::thread(updateStatsLifeCycle, state).detach();
 	}
 	else
 	{
-		if (state == _life_cycle_none) 
+		if (state == _life_cycle_none)
 		{
 			h2mod->set_local_rank(255);
 			return;
@@ -89,23 +163,24 @@ void StatsHandler::network_player_event(int peerIndex, EventHandler::NetworkPlay
 {
 	switch (type)
 	{
-		case EventHandler::NetworkPlayerEventType::add:
-			playerJoinEvent(peerIndex);
-			break;
-		case EventHandler::NetworkPlayerEventType::remove:
-			playerLeftEvent(peerIndex);
-			break;
+	case EventHandler::NetworkPlayerEventType::add:
+		playerJoinEvent(peerIndex);
+		break;
+	case EventHandler::NetworkPlayerEventType::remove:
+		playerLeftEvent(peerIndex);
+		break;
 	}
 }
 
 void StatsHandler::server_command_event(ServerConsole::e_server_console_commands command)
 {
-	if(Status.StatsEnabled)
+	if (Memory::IsDedicatedServer()
+		|| !Status.StatsEnabled)
+		return;
+
+	if (command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
 	{
-		if(command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
-		{
-			InvalidateMatch(true);
-		}
+		invalidateMatch(true);
 	}
 }
 
@@ -117,26 +192,24 @@ void StatsHandler::server_command_event(ServerConsole::e_server_console_commands
  * Team Games match with thier team
  * FFA place at losest remove maximum XP.
  */
-wchar_t* StatsHandler::getPlaylistFile()
+const wchar_t* StatsHandler::getPlaylistFile()
 {
-	auto output = Memory::GetAddress<wchar_t*>(0, 0x3B3704);
-	return output;
+	return Memory::GetAddress<wchar_t*>(0, 0x3B3704);
 }
 std::string StatsHandler::getChecksum()
 {
 	std::string output;
-	if (!hashes::calc_file_md5(getPlaylistFile(), output))
-		output = "";
-	return output;
+	return hashes::calc_file_md5(getPlaylistFile(), output) ? output : "";
 }
+
 struct curl_response_text {
-	char *ptr;
+	char* ptr;
 	size_t len;
 };
 
-static void init_curl_response(struct curl_response_text *s) {
+static void init_curl_response(struct curl_response_text* s) {
 	s->len = 0;
-	s->ptr = (char*)malloc(s->len + 1);
+	s->ptr = (char*)malloc(16);
 	if (s->ptr == NULL) {
 		fprintf(stderr, "malloc() failed\n");
 		exit(EXIT_FAILURE);
@@ -144,7 +217,7 @@ static void init_curl_response(struct curl_response_text *s) {
 	s->ptr[0] = '\0';
 }
 
-static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_response_text *s)
+static size_t writefunc(void* ptr, size_t size, size_t nmemb, struct curl_response_text* s)
 {
 	size_t new_len = s->len + size * nmemb;
 	s->ptr = (char*)realloc(s->ptr, new_len + 1);
@@ -152,7 +225,7 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 		fprintf(stderr, "realloc() failed\n");
 		exit(EXIT_FAILURE);
 	}
-	memcpy(s->ptr + s->len, ptr, size*nmemb);
+	memcpy(s->ptr + s->len, ptr, size * nmemb);
 	s->ptr[new_len] = '\0';
 	s->len = new_len;
 
@@ -161,94 +234,95 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct curl_respon
 
 void StatsHandler::verifyRegistrationStatus()
 {
-	auto checkResult = checkServerRegistration();
-	if (checkResult != nullptr && strlen(checkResult) == 32)
+	char* authKey = checkServerRegistration();
+	if (authKey != NULL && strlen(authKey) == 32)
 	{
-		//Check result returned a new AuthKey, attempt to register the server with it
-		if (serverRegistration(checkResult)) {
-			//Success save AuthKey to config
-			LOG_TRACE_GAME("{} was successful.", __FUNCTION__);
-			strncpy(H2Config_stats_authkey, checkResult, 32);
-			free(checkResult);
+		// check result returned a new AuthKey, attempt to register the server with it
+		if (serverRegistration(authKey)) {
+			// success save AuthKey to config
+			strncpy(H2Config_stats_authkey, authKey, 32);
 			SaveH2Config();
 			Status.Registered = true;
 			Status.StatsEnabled = true;
-		}
-		else {
-			LOG_ERROR_GAME("{} webserver error on register attempt, this will be attempted again next server launch", __FUNCTION__);
-		}
-	}
-}
-
-StatsHandler::StatsAPIRegisteredStatus StatsHandler::RegisteredStatus()
-{
-	return Status;
-}
-
-char* StatsHandler::checkServerRegistration()
-{
-	CURL *curl;
-	CURLcode curlResult;
-	curl = curl_interface_init_no_verify();
-	if (curl)
-	{
-		std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-		unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
-		http_request_body += std::to_string(dedicated_server_id);
-		struct curl_response_text s;
-		init_curl_response(&s);
-
-		//Set the URL for the GET
-		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
-
-		curlResult = curl_easy_perform(curl);
-		if (curlResult != CURLE_OK)
-		{
-			LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-		}
-		else
-		{
-			int response_code;
-			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			if(response_code == 500)
-			{
-				curl_easy_cleanup(curl);
-				return nullptr; //Server Error
-			}
-			if (response_code == 200)
-			{
-				curl_easy_cleanup(curl);
-				rapidjson::Document result;
-				result.Parse(s.ptr);
-				Status.Registered = true;
-				Status.RanksEnabled = std::strncmp(result["RanksEnabled"].GetString(), "true", 4) == 0;
-				Status.StatsEnabled = std::strncmp(result["StatsEnabled"].GetString(), "true", 4) == 0;
-				return nullptr; //Server is registered
-			}
-			if(response_code == 201)
-			{
-				curl_easy_cleanup(curl);
-				return s.ptr; //Server is unregisterd and returned a AuthKey
-			}
-			curl_easy_cleanup(curl);
+			LOG_TRACE_GAME("{} was successful.", __FUNCTION__);
 		}
 	}
 	else
 	{
-		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+		LOG_ERROR_GAME("{} webserver error on register attempt, this will be attempted again next server launch", __FUNCTION__);
 	}
-	return nullptr; 
 }
 
-bool StatsHandler::serverRegistration(char* authKey)
+char* StatsHandler::checkServerRegistration()
 {
-	CURL *curl;
-	CURLcode result;
-	curl_mime *form = NULL;
-	curl_mimepart *field = NULL;
-	struct curl_slist *headerlist = NULL;
+	CURL* curl;
+	int curl_err;
+	CURLcode curlErr;
+	char* result;
+
+	curl = curl_interface_init_no_verify();
+	if (!curl)
+	{
+		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
+		return NULL;
+	}
+
+	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
+	unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
+	http_request_body += std::to_string(dedicated_server_id);
+	struct curl_response_text s;
+	init_curl_response(&s);
+
+	//Set the URL for the GET
+	curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+
+	curlErr = curl_easy_perform(curl);
+	if (curlErr == CURLE_OK)
+	{
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &curl_err);
+
+		switch (curl_err)
+		{
+		case 200:
+		{
+			rapidjson::Document doc;
+			doc.Parse(s.ptr);
+			Status.Registered = true;
+			Status.RanksEnabled = doc["RanksEnabled"].GetBool();
+			Status.StatsEnabled = doc["StatsEnabled"].GetBool();
+			// server is registered
+			result = NULL; 
+		}
+		case 201:
+			// server is unregisterd and returned a AuthKey
+			result = s.ptr;
+		case 500:
+		default:
+			result = NULL;
+		}
+	}
+	else
+	{
+		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
+		result = NULL;
+	}
+
+	curl_easy_cleanup(curl);
+	return result;
+}
+
+bool StatsHandler::serverRegistration(const char* authKey)
+{
+	CURL* curl;
+	int response_code;
+	CURLcode curl_err;
+	curl_mime* form = NULL;
+	curl_mimepart* field = NULL;
+	struct curl_slist* headerlist = NULL;
+	bool result;
+
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
@@ -275,48 +349,51 @@ bool StatsHandler::serverRegistration(char* authKey)
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-	result = curl_easy_perform(curl);
-	if (result != CURLE_OK)
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
+	{
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+		switch (response_code)
+		{
+		case 200:
+			result = true;
+			break;
+		case 500:
+		default:
+			result = false;
+			break;
+		}
+	}
+	else
 	{
 		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-
-		return false;
+		result = false;
 	}
 
-	int response_code;
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-	if(response_code == 500)
-	{
-		curl_easy_cleanup(curl);
-		return false;
-	}
-	if(response_code == 200)
-	{
-		curl_easy_cleanup(curl);
-		return true;
-	}
 	curl_easy_cleanup(curl);
-	return response_code;
-
+	return result;
 }
 
-char* StatsHandler::getAPIToken()
+const char* StatsHandler::getAPIToken()
 {
 	if (MatchInvalidated) {
 		LOG_INFO_GAME("StatsHandler - Match was invalidated and will not be sent to the API");
-		return nullptr;
+		return NULL;
 	}
 
-	CURL *curl;
-	CURLcode result;
-	curl_mime *form = NULL;
-	curl_mimepart *field = NULL;
-	struct curl_slist *headerlist = NULL;
+	CURL* curl;
+	int response_code;
+	CURLcode curl_err;
+	curl_mime* form = NULL;
+	curl_mimepart* field = NULL;
+	struct curl_slist* headerlist = NULL;
+	char* result;
+
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
-		return nullptr;
+		return NULL;
 	}
 	form = curl_mime_init(curl);
 	field = curl_mime_addpart(form);
@@ -326,70 +403,74 @@ char* StatsHandler::getAPIToken()
 	curl_mime_name(field, "AuthKey");
 	curl_mime_data(field, H2Config_stats_authkey, CURL_ZERO_TERMINATED);
 	headerlist = curl_slist_append(headerlist, "Expect:");
-	
+
 	struct curl_response_text s;
 	init_curl_response(&s);
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
-	result = curl_easy_perform(curl);
-	if (result != CURLE_OK)
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
+	{
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+
+		switch (response_code)
+		{
+		case 200:
+			result = s.ptr;
+		case 500:
+			LOG_INFO_GAME("{} failed get token for stats API", __FUNCTION__);
+		default:
+			result = NULL;
+			break;
+		}
+	}
+	else
 	{
 		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-		curl_easy_cleanup(curl);
-		return nullptr;
+		result = NULL;
 	}
 
-	int response_code;
-	curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-	if (response_code == 500)
-	{
-		LOG_INFO_GAME("{} failed get token for stats API", __FUNCTION__);
-		curl_easy_cleanup(curl);
-		return nullptr;
-	}
-	if (response_code == 200)
-	{
-		curl_easy_cleanup(curl);
-		return s.ptr;
-	}
 	curl_easy_cleanup(curl);
-	return nullptr;
+	return result;
 }
 
 
-int StatsHandler::uploadPlaylist(char* token)
+int StatsHandler::uploadPlaylist(const char* token)
 {
-	LOG_TRACE_GAME("Uploading Playlist");
-	wchar_t* playlist_file = getPlaylistFile();
-	size_t playlist_file_buf_size = (wcslen(playlist_file) + 1) * sizeof(char);
-	char* pFile = (char*)malloc(playlist_file_buf_size);
-	wcstombs2(playlist_file, pFile, playlist_file_buf_size);
-	LOG_TRACE_GAME(pFile);
+	LOG_INFO_GAME("Uploading Playlist");
+	const wchar_t* playlist_file = getPlaylistFile();
+	std::string playlistFilename(std::wstring(playlist_file).begin(), std::wstring(playlist_file).end());
+
 	std::string checksum = getChecksum();
 	if (checksum.empty())
 	{
-		LOG_ERROR_GAME("{} failed to Hash Playlist file", __FUNCTION__);
+		LOG_ERROR_GAME("{} - failed to hash playlist file", __FUNCTION__);
 		return -1;
 	}
-	LOG_TRACE_GAME(checksum);
 
-	CURL *curl;
-	CURLcode result;
-	curl_mime *form = NULL;
-	curl_mimepart *field = NULL;
-	struct curl_slist *headerlist = NULL;
+	LOG_INFO_GAME("{} - playlist checksum: ", __FUNCTION__);
+	LOG_INFO_GAME(checksum);
+
+	CURL* curl;
+	int response_code;
+	CURLcode curl_err;
+	curl_mime* form = NULL;
+	curl_mimepart* field = NULL;
+	struct curl_slist* headerlist = NULL;
+
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} failed to init curl", __FUNCTION__);
 		return -1;
 	}
+
 	form = curl_mime_init(curl);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "file");
-	curl_mime_filedata(field, pFile);
+	curl_mime_filedata(field, playlistFilename.c_str());
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "Type");
 	curl_mime_data(field, "PlaylistUpload", CURL_ZERO_TERMINATED);
@@ -403,30 +484,33 @@ int StatsHandler::uploadPlaylist(char* token)
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-	result = curl_easy_perform(curl);
-	if(result != CURLE_OK)
+
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
 	{
-		LOG_ERROR_GAME("{} failed to execute curl", __FUNCTION__);
-		//LOG_ERROR_GAME(curl_easy_strerror(result));
-		return -1;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
 	}
 	else
 	{
-		int response_code;
-		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
-		return response_code;
+		LOG_ERROR_GAME("{} curl_easy_perform failed, error code: {}", __FUNCTION__, curl_easy_strerror(curl_err));
+		response_code = -1;
 	}
-	return -1;
+
+	return response_code;
 }
 
-int StatsHandler::verifyPlaylist(char* token)
+int StatsHandler::verifyPlaylist(const char* token)
 {
+	CURL* curl;
+	int response_code;
+	CURLcode curl_err;
+	char* response;
+
 	LOG_TRACE_GAME("Verifying Playlist..");
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistCheck&Playlist_Checksum=";
-	wchar_t* playlist_file = getPlaylistFile();
 	LOG_TRACE_GAME("{} loaded playlist is: ", __FUNCTION__);
-	LOG_TRACE_GAME(L"{}", playlist_file);
+	LOG_TRACE_GAME(L"{}", getPlaylistFile());
 
 	std::string checksum = getChecksum();
 	if (checksum == "")
@@ -434,60 +518,56 @@ int StatsHandler::verifyPlaylist(char* token)
 		LOG_ERROR_GAME("{} failed to Hash Playlist file", __FUNCTION__);
 		return -1;
 	}
-	else
-	{
-		LOG_TRACE_GAME("hash: {}", checksum);	
-		http_request_body.append(checksum);
-		LOG_TRACE_GAME(http_request_body);
-		http_request_body.append("&AuthToken=");
-		http_request_body.append(token != nullptr ? token : "");
-		char* Response;
-		CURL *curl;
-		CURLcode curlResult;
 
-		curl = curl_interface_init_no_verify();
-		if(curl)
-		{
-			//Set the URL for the GET
-			curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-			curlResult = curl_easy_perform(curl);
-			
-			if(curlResult != CURLE_OK)
-			{
-				curl_easy_cleanup(curl);
-				return -1;
-			} 
-			else
-			{
-				int response_code;
-				curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-				LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
-				curl_easy_cleanup(curl);
-				return response_code;
-			}
-		}
-		else
-		{
-			LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
-		}
-	}
+	LOG_TRACE_GAME("playlist hash: {}", checksum);
 
-	return -1;
-}
+	http_request_body.append(checksum);
+	LOG_TRACE_GAME(http_request_body);
+	http_request_body.append("&AuthToken=");
+	http_request_body.append(token != nullptr ? token : "");
 
-int StatsHandler::uploadStats(char* filepath, char* token)
-{
-	CURL *curl;
-	CURLcode result;
-	curl_mime *form = NULL;
-	curl_mimepart *field = NULL;
-	struct curl_slist *headerlist = NULL;
 	curl = curl_interface_init_no_verify();
 	if (!curl)
 	{
 		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
 		return -1;
 	}
+
+	//Set the URL for the GET
+	curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
+
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
+	{
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+		LOG_TRACE_GAME("{} response code: {}", __FUNCTION__, response_code);
+	}
+	else
+	{
+		LOG_ERROR_GAME("{} curl_easy_perform failed, error code: {}", __FUNCTION__, curl_easy_strerror(curl_err));
+		response_code = -1;
+	}
+
+	curl_easy_cleanup(curl);
+	return response_code;
+}
+
+int StatsHandler::uploadStats(const char* filepath, const char* token)
+{
+	CURL* curl;
+	int response_code;
+	CURLcode curl_err;
+	curl_mime* form = NULL;
+	curl_mimepart* field = NULL;
+	struct curl_slist* headerlist = NULL;
+
+	curl = curl_interface_init_no_verify();
+	if (!curl)
+	{
+		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
+		return -1;
+	}
+
 	form = curl_mime_init(curl);
 	field = curl_mime_addpart(form);
 	curl_mime_name(field, "file");
@@ -502,29 +582,22 @@ int StatsHandler::uploadStats(char* filepath, char* token)
 
 	curl_easy_setopt(curl, CURLOPT_URL, "https://www.halo2pc.com/test-pages/CartoStat/API/post.php");
 	curl_easy_setopt(curl, CURLOPT_MIMEPOST, form);
-	result = curl_easy_perform(curl);
-	if (result != CURLE_OK)
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
 	{
-		LOG_ERROR_GAME("{} curl_easy_perform failed to execute", __FUNCTION__);
-		curl_easy_cleanup(curl);
-		return -1;
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
 	}
 	else
 	{
-		int response_code;
-		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-		curl_easy_cleanup(curl);
-		return response_code;
+		LOG_ERROR_GAME("{} curl_easy_perform failed, error code: {}", __FUNCTION__, curl_easy_strerror(curl_err));
+		response_code = -1;
 	}
-	return -1;
+
+	curl_easy_cleanup(curl);
+	return response_code;
 }
 
-//Really should make structs for these but I don't want to take the time to learn how.
-static const int baseOffset  = 0x4dc722;
-static const int rtPCROffset = 0x4DD1EE;
-static const int PCROffset   = 0x49F6B0;
-
-char* StatsHandler::buildJSON()
+const char* StatsHandler::buildPostGameCarnageReportJson()
 {
 	WDocument document;
 	WValue value;
@@ -551,50 +624,50 @@ char* StatsHandler::buildJSON()
 	Variant.AddMember(L"Name", value, allocator);
 	BYTE VariantType = *Memory::GetAddress<BYTE*>(0, 0x4dc414);
 	Variant.AddMember(L"Type", VariantType, allocator);
-	
+
 	WValue VariantSettings(rapidjson::kObjectType);
 	BYTE TeamPlay = *Memory::GetAddress<BYTE*>(0, 0x992880);
 	VariantSettings.AddMember(L"Team Play", TeamPlay, allocator);
 	Variant.AddMember(L"Settings", VariantSettings, allocator);
 	document.AddMember(L"Variant", Variant, allocator);
-	
+
 	auto ServerName = Memory::GetAddress<wchar_t*>(0, 0x52FC88);
+
+	//Really should make structs for these but I don't want to take the time to learn how.
+	const int baseOffset = 0x4dc722;
+	const int rtPCROffset = 0x4DD1EE;
+	const int PCROffset = 0x49F6B0;
 
 	//Players
 	int playerCount = 0;
 	WValue Players(rapidjson::kArrayType);
-	for(auto i = 0; i < 16; i++)
+	for (int i = 0; i < ENGINE_MAX_PLAYERS; i++)
 	{
-		int calcBaseOffset  = baseOffset + (i * 0x94);
+		int calcBaseOffset = baseOffset + (i * 0x94);
 		auto playerId = *Memory::GetAddress<unsigned long long*>(0, calcBaseOffset);
 		if (playerId == 0) //Skip if it doesnt exists
 			continue;
-
 
 		int calcRTPCROffset = rtPCROffset + (i * 0x36A);
 		int calcPCROffset = 0;
 		int EndgameIndex = 0;
 		WValue Player(rapidjson::kObjectType);
-		
-		
+
 		auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
-		for(auto j = 0; j < 16; j++)
+		for (int j = 0; j < ENGINE_MAX_PLAYERS; j++)
 		{
 			auto tGamertag = Memory::GetAddress<wchar_t*>(0, PCROffset + (j * 0x110));
-			//I dont know why but I couldn't get any other method of comparing to work,
-			//Someone else can fix it because I know this probably is a terrible way
-			//To compare the wchar_t*.
-			if(std::wstring(Gamertag) == std::wstring(tGamertag))
+			if (!_wcsnicmp(Gamertag, tGamertag, XUSER_MAX_NAME_LENGTH))
 			{
 				calcPCROffset = PCROffset + (j * 0x110);
 				EndgameIndex = i;
 				break;
 			}
 		}
-		
+
 		playerCount++;
 
-		#pragma region Memory_Reading
+#pragma region Memory_Reading
 		auto PrimaryColor = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4A);
 		auto SecondaryColor = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4B);
 		auto PrimaryEmblem = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x4C);
@@ -609,10 +682,10 @@ char* StatsHandler::buildJSON()
 		auto Handicap = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x87);
 		auto Rank = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x88);
 		auto Nameplate = *Memory::GetAddress<BYTE*>(0, calcBaseOffset + 0x8B);
-		
+
 		wchar_t Place[16];
 		std::wcsncpy(Place, Memory::GetAddress<wchar_t*>(0, calcPCROffset + 0xE0), 16);
-		
+
 		wchar_t Score[16];
 		std::wcsncpy(Score, Memory::GetAddress<wchar_t*>(0, calcPCROffset + 0x40), 16);
 
@@ -642,16 +715,16 @@ char* StatsHandler::buildJSON()
 
 		auto KingKillsAsKing = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x26);
 		auto KingKilledKings = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x28);
-		
+
 		auto JuggKilledJuggs = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3C);
 		auto JuggKillsAsJugg = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x3E);
 		auto JuggTime = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x40);
 
 		auto TerrTaken = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x48);
 		auto TerrLost = *Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x46);
-		#pragma endregion 
+#pragma endregion 
 
-		#pragma region Document_Writing
+#pragma region Document_Writing
 		value.SetInt(EndgameIndex);
 		Player.AddMember(L"EndGameIndex", value, allocator);
 		value.SetString(std::to_wstring(playerId).c_str(), allocator);
@@ -732,9 +805,9 @@ char* StatsHandler::buildJSON()
 		Player.AddMember(L"TerrTaken", value, allocator);
 		value.SetInt(TerrLost);
 		Player.AddMember(L"TerrLost", value, allocator);
-		
+
 		WValue Medals(rapidjson::kArrayType);
-		for(auto j = 0; j < 24; j++)
+		for (int j = 0; j < 24; j++)
 		{
 			value.SetInt(*Memory::GetAddress<unsigned short*>(0, calcRTPCROffset + 0x4A + (j * 2)));
 			Medals.PushBack(value, allocator);
@@ -742,11 +815,11 @@ char* StatsHandler::buildJSON()
 		Player.AddMember(L"MedalData", Medals, allocator);
 
 		WValue DamageReport(rapidjson::kObjectType);
-		for(int j = 0; j < 36; j++)
+		for (int j = 0; j < 36; j++)
 		{
 			WValue DamageType(rapidjson::kArrayType);
 			int uselessCheck = 0;
-			for(auto k = 0; k < 7; k++)
+			for (int k = 0; k < 7; k++)
 			{
 				/*
 				 * 0 = Kills
@@ -770,15 +843,15 @@ char* StatsHandler::buildJSON()
 			}
 		}
 		Player.AddMember(L"DamageData", DamageReport, allocator);
-		#pragma endregion
+#pragma endregion
 
 		Players.PushBack(Player, allocator);
 	}
 
-	for (auto i = 0; i < playerCount; i++) {
+	for (int i = 0; i < playerCount; i++) {
 		WValue Versus(rapidjson::kArrayType);
 		int iOffset = PCROffset + Players[i][L"EndGameIndex"].GetInt() * 0x110;
-		for (auto j = 0; j < playerCount; j++)
+		for (int j = 0; j < playerCount; j++)
 		{
 			WValue Matchup(rapidjson::kArrayType);
 			int jOffset = PCROffset + Players[j][L"EndGameIndex"].GetInt() * 0x110;
@@ -829,30 +902,35 @@ char* StatsHandler::buildJSON()
 	return oFile;
 }
 
-void StatsHandler::InvalidateMatch(bool state)
+void StatsHandler::invalidateMatch(bool state)
 {
 	MatchInvalidated = state;
 }
 
 void StatsHandler::playerRanksUpdateTick()
 {
-	return;
+	if (!Memory::IsDedicatedServer()
+		|| !getRegisteredStatus().StatsEnabled)
+		return;
 
 	auto sendRankUpdate = []()
 	{
 		rankStateUpdating = true;
 
-		while (rankUpdates.size() >= 1)
+		// don't send if rank update stack is empty
+		if (rankDocUpdates.empty())
+			return;
+
+		while (true)
 		{
-			rapidjson::Document* doc = rankUpdates.front();
+			// get the oldest document update in the stack and update up to the back or lastest update
+			auto doc = rankDocUpdates.front(); 
 			sendRankChangeFromDocument(doc); // send data from the first document
 
-			// preserve last rank update
-			if (rankUpdates.size() > 1)
+			if (rankDocUpdates.size() > 1)
 			{
-				// then pop last document from queue
-				rankUpdates.pop();
-				delete doc;
+				// keep the latest rank update in the buffer
+				rankDocUpdates.pop();
 			}
 			else
 			{
@@ -869,9 +947,6 @@ void StatsHandler::playerRanksUpdateTick()
 
 	if (rankStateUpdating)
 		return; // return if queue is in use
-
-	if (rankUpdates.empty())
-		return; // don't send if we don't have anything to send
 
 	// this will update all players that don't have the matching rank from the host
 	sendRankUpdate();
@@ -894,89 +969,59 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
-	std::thread(getPlayerRanksByStringList, buildPlayerRankUpdateQueryStringList()).detach();
+	std::thread(getPlayerRanksByStringList, NetworkSession::GetActivePlayerIdList()).detach();
 }
 
-void StatsHandler::sendRankChangeFromDocument(rapidjson::Document* document)
+void StatsHandler::sendRankChangeFromDocument(std::shared_ptr<rapidjson::Document> doc)
 {
-	rapidjson::Document& doc = *document;
+	if (!NetworkSession::LocalPeerIsSessionHost()
+		|| !getRegisteredStatus().RanksEnabled)
+		return;
 
-	if (NetworkSession::LocalPeerIsSessionHost() && RegisteredStatus().RanksEnabled)
+	for (int i = 0; i < doc->MemberCount(); i++)
 	{
-		if (doc.MemberCount() != 0)
+		size_t sz = 0;
+		BYTE rank = std::stoi(doc->operator[](i)["Rank"].GetString(), 0);
+		long long playerIdentifier = std::stoll(doc->operator[](i)["XUID"].GetString(), &sz, 0);
+
+		for (int j = 0; j < ENGINE_MAX_PLAYERS; j++)
 		{
-			for (auto i = 0; i < doc.MemberCount(); i++)
+			if (NetworkSession::PlayerIsActive(j))
 			{
-				size_t sz = 0;
-				BYTE rank = std::stoi(doc[i]["Rank"].GetString(), 0);
-				long long playerIdentifier = std::stoll(doc[i]["XUID"].GetString(), &sz, 0);
+				auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
 
-				for (auto j = 0; j < ENGINE_MAX_PLAYERS; j++)
+				if (playerIdentifier == NetworkSession::GetPlayerId(j)
+					&& playerInfo->properties.player_displayed_skill != rank)
 				{
-					if (NetworkSession::PlayerIsActive(j))
-					{
-						auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
-
-						if (playerIdentifier == NetworkSession::GetPlayerId(j)
-							&& playerInfo->properties.player_displayed_skill != rank)
-						{
-							LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, doc[i]["XUID"].GetString());
-
-							NetworkMessage::SendRankChange(NetworkSession::GetPeerIndex(j), rank);
-						}
-					}
+					NetworkMessage::SendRankChange(NetworkSession::GetPeerIndex(j), rank);
+					LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, playerIdentifier);
 				}
 			}
 		}
 	}
 }
 
-std::string StatsHandler::buildPlayerRankUpdateQueryStringList()
+StatsHandler::StatsAPIRegisteredStatus StatsHandler::getRegisteredStatus()
 {
-	std::string playerIdsStr = "";
-
-	LOG_TRACE_GAME("{} - Total players {}", __FUNCTION__, NetworkSession::GetPlayerCount());
-	if (NetworkSession::GetPlayerCount() > 0)
-	{
-		for (auto playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
-		{
-			bool addSeparator = false;
-			if (NetworkSession::PlayerIsActive(playerIdx))
-			{
-				auto playerIdentifier = NetworkSession::GetPlayerId(playerIdx);
-				playerIdsStr.append(IntToString(playerIdentifier, std::dec));
-				
-				if (playerIdx + 1 < ENGINE_MAX_PLAYERS 
-					&& NetworkSession::PlayerIsActive(playerIdx + 1))
-					addSeparator = true;
-
-				LOG_TRACE_GAME("	Added player index {}, identifier: {} to rank update!", playerIdx, playerIdentifier);
-			}
-
-			// check if we should separate, also do not add the last separator if next iteration will break out of the loop
-			if (addSeparator)
-				playerIdsStr.append(",");
-		}
-	}
-
-	return playerIdsStr;
+	return Status;
 }
 
-void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
+void StatsHandler::getPlayerRanksByStringList(const std::vector<unsigned long long>& playerList)
 {
-	if (playerList.empty()) return;
-
-	auto writeToQueue = [] (rapidjson::Document* document) -> void
+	auto addDocToQueue = [](std::shared_ptr<rapidjson::Document> doc) -> void
 	{
 		while (rankStateUpdating)
-			Sleep(10);
+			Sleep(100);
 
 		rankStateUpdating = true;
-		rankUpdates.push(document);
+		rankDocUpdates.push(doc);
 		rankStateUpdating = false;
 	};
 
-	rapidjson::Document* document = new rapidjson::Document;
+	if (playerList.empty())
+		return;
+
+	std::shared_ptr<rapidjson::Document> doc = std::make_shared<rapidjson::Document>();
 	unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
 
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
@@ -984,45 +1029,48 @@ void StatsHandler::getPlayerRanksByStringList(std::string& playerList)
 	http_request_body.append("&Server_XUID=");
 	http_request_body.append(std::to_string(dedicated_server_id));
 	http_request_body.append("&Player_XUIDS=");
-	http_request_body.append(playerList);
-	
-	CURL *curl;
+	for (const auto& playerId : playerList) {
+		http_request_body.append(std::to_string(playerId));
+		http_request_body += ',';
+	}
+	// trim out the last ',' out
+	http_request_body.pop_back();
+
+	CURLcode curl_err;
+	int response_code;
+	CURL* curl;
+
 	curl = curl_interface_init_no_verify();
-	if (curl)
+	if (!curl)
 	{
-		struct curl_response_text s;
-		init_curl_response(&s);
+		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
+		return;
+	}
 
-		//Set the URL for the GET
-		curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+	struct curl_response_text s;
+	init_curl_response(&s);
 
-		CURLcode curlResult;
-		curlResult = curl_easy_perform(curl);
-		if (curlResult != CURLE_OK)
-		{
-			LOG_ERROR_GAME("{} - failed to init/execute curl!", __FUNCTION__);
-			curl_easy_cleanup(curl);
-			delete document;
-			return;
-		}
-		else
-		{
-			int response_code;
-			curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
-			LOG_TRACE_GAME(s.ptr);
-			document->Parse(s.ptr);
-			// write to queue buffer
-			writeToQueue(document);
-			curl_easy_cleanup(curl);
-			free(s.ptr);
-			return;
-		}
+	//Set the URL for the GET
+	curl_easy_setopt(curl, CURLOPT_URL, http_request_body.c_str());
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writefunc);
+	curl_easy_setopt(curl, CURLOPT_WRITEDATA, &s);
+
+	curl_err = curl_easy_perform(curl);
+	if (curl_err == CURLE_OK)
+	{
+		curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response_code);
+		LOG_TRACE_GAME("{} - player stats: ");
+		LOG_TRACE_GAME(s.ptr);
+		doc->Parse(s.ptr);
+		// write to queue buffer
+		addDocToQueue(doc);
+		free(s.ptr);
 	}
 	else
 	{
-		delete document;
-		LOG_ERROR_GAME("{} curl_easy_init failed", __FUNCTION__);
+		LOG_ERROR_GAME("{} curl_easy_perform failed, error code: {}", __FUNCTION__, curl_easy_strerror(curl_err));
 	}
+
+	curl_easy_cleanup(curl);
+	return;
 }

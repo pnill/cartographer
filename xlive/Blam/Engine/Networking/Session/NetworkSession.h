@@ -46,6 +46,8 @@ namespace NetworkSession
 	/* Use this to verify if a player is currently active in the network session */
 	/* Otherwise you will wonder why you don't get the right data/player index etc. */
 	bool PlayerIsActive(int playerIdx);
+	std::vector<unsigned long long> GetActivePlayerIdList();
+	std::vector<int> GetActivePlayerIndicesList();
 
 	int GetPlayerCount();
 	const wchar_t* GetPlayerName(int playerIdx);

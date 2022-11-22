@@ -870,15 +870,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 		&& NetworkSession::VariantIsTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
-		std::vector<int> activePlayersIndices;
+		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 
 		int maxTeams = (std::min)((std::max)(H2Config_team_enabled_count, 2), 8);
-
-		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
-		{
-			if (NetworkSession::PlayerIsActive(playerIndex))
-				activePlayersIndices.emplace_back(playerIndex);
-		}
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 

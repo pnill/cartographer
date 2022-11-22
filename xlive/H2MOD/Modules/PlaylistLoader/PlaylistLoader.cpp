@@ -145,12 +145,12 @@ namespace playlist_loader
 				//Grab or create the Custom Settings for the current variant.
 				CustomVariantSettings::s_variantSettings* settings;
 				const auto variant_string = std::wstring(variant);
-				if (CustomVariantSettingsMap.count(variant_string) > 0)
-					settings = &CustomVariantSettingsMap.at(variant_string);
+				if (customVariantSettingsMap.count(variant_string) > 0)
+					settings = &customVariantSettingsMap.at(variant_string);
 				else
 				{
-					CustomVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
-					settings = &CustomVariantSettingsMap.at(variant_string);
+					customVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
+					settings = &customVariantSettingsMap.at(variant_string);
 				}
 				std::wstring wproperty(property_value);
 				size_t pos = 0;
@@ -266,7 +266,7 @@ namespace playlist_loader
 	void reset_custom_settings(ServerConsole::e_server_console_commands command)
 	{
 		if (command == ServerConsole::play)
-			CustomVariantSettingsMap.clear();
+			customVariantSettingsMap.clear();
 	}
 
 	void apply_hooks()

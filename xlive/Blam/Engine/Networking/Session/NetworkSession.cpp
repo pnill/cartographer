@@ -8,6 +8,39 @@ bool NetworkSession::PlayerIsActive(int playerIdx)
 	return (NetworkSession::GetCurrentNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
 }
 
+std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
+{
+	std::vector<unsigned long long> activePlayerIdList;
+	if (NetworkSession::GetPlayerCount() > 0)
+	{
+		for (auto playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
+		{
+			if (NetworkSession::PlayerIsActive(playerIdx))
+			{
+				unsigned long long playerId = NetworkSession::GetPlayerId(playerIdx);
+				activePlayerIdList.emplace_back(playerId);
+			}
+		}
+	}
+
+	return activePlayerIdList;
+}
+
+std::vector<int> NetworkSession::GetActivePlayerIndicesList()
+{
+	std::vector<int> activePlayersIndices;
+	if (NetworkSession::GetPlayerCount() > 0)
+	{
+		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+		{
+			if (NetworkSession::PlayerIsActive(playerIndex))
+				activePlayersIndices.emplace_back(playerIndex);
+		}
+	}
+
+	return activePlayersIndices;
+}
+
 s_network_session* NetworkSession::GetNetworkSessions()
 {
 	return *Memory::GetAddress<s_network_session**>(0x51C474, 0x520B94);
