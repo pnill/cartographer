@@ -28,7 +28,7 @@ namespace StatsHandler
 
 	StatsAPIRegisteredStatus getRegisteredStatus();
 
-	void getPlayerRanksByStringList(const std::vector<unsigned long long>& playerList);
+	void getPlayerRanksByStringList(std::shared_ptr<std::vector<unsigned long long>> playerList);
 
 	void invalidateMatch(bool state);
 	void playerRanksUpdateTick();

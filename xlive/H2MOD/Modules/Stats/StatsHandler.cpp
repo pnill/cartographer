@@ -293,14 +293,18 @@ char* StatsHandler::checkServerRegistration()
 			Status.RanksEnabled = doc["RanksEnabled"].GetBool();
 			Status.StatsEnabled = doc["StatsEnabled"].GetBool();
 			// server is registered
-			result = NULL; 
+			result = NULL;
 		}
+		break;
+
 		case 201:
 			// server is unregisterd and returned a AuthKey
 			result = s.ptr;
+			break;
 		case 500:
 		default:
 			result = NULL;
+			break;
 		}
 	}
 	else
@@ -419,6 +423,7 @@ const char* StatsHandler::getAPIToken()
 		{
 		case 200:
 			result = s.ptr;
+			break;
 		case 500:
 			LOG_INFO_GAME("{} failed get token for stats API", __FUNCTION__);
 		default:
@@ -969,7 +974,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
-	std::thread(getPlayerRanksByStringList, NetworkSession::GetActivePlayerIdList()).detach();
+	auto activePlayerIdList = std::make_shared<std::vector<unsigned long long>>(NetworkSession::GetActivePlayerIdList());
+	std::thread(getPlayerRanksByStringList, activePlayerIdList).detach();
 }
 
 void StatsHandler::sendRankChangeFromDocument(std::shared_ptr<rapidjson::Document> doc)
@@ -1006,7 +1012,7 @@ StatsHandler::StatsAPIRegisteredStatus StatsHandler::getRegisteredStatus()
 	return Status;
 }
 
-void StatsHandler::getPlayerRanksByStringList(const std::vector<unsigned long long>& playerList)
+void StatsHandler::getPlayerRanksByStringList(std::shared_ptr<std::vector<unsigned long long>> playerList)
 {
 	auto addDocToQueue = [](std::shared_ptr<rapidjson::Document> doc) -> void
 	{
@@ -1018,7 +1024,7 @@ void StatsHandler::getPlayerRanksByStringList(const std::vector<unsigned long lo
 		rankStateUpdating = false;
 	};
 
-	if (playerList.empty())
+	if (playerList->empty())
 		return;
 
 	std::shared_ptr<rapidjson::Document> doc = std::make_shared<rapidjson::Document>();
@@ -1029,7 +1035,7 @@ void StatsHandler::getPlayerRanksByStringList(const std::vector<unsigned long lo
 	http_request_body.append("&Server_XUID=");
 	http_request_body.append(std::to_string(dedicated_server_id));
 	http_request_body.append("&Player_XUIDS=");
-	for (const auto& playerId : playerList) {
+	for (const auto& playerId : *playerList) {
 		http_request_body.append(std::to_string(playerId));
 		http_request_body += ',';
 	}
