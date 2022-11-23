@@ -180,7 +180,7 @@ void StatsHandler::server_command_event(ServerConsole::e_server_console_commands
 		|| !Status.StatsEnabled)
 		return;
 
-	if (command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
+	if (command == ServerConsole::skip && network_life_cycle::get_game_life_cycle() == _life_cycle_in_game)
 	{
 		invalidateMatch(true);
 	}
