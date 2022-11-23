@@ -43,11 +43,9 @@ void H2X::ApplyMapLoadPatches(bool enable)
 {
 	for (auto& weapon : weapons)
 	{
-		for (auto& weapon : weapons)
-		{
-			auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
-			BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
-			if (weapon_tag != nullptr)
+		auto required_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+		BYTE* weapon_tag = tags::get_tag<blam_tag::tag_group_type::weapon, BYTE>(required_datum);
+		if (weapon_tag != nullptr)
 			{
 				int barrel_data_block_size = 236;
 				tags::tag_data_block* barrel_data_block = reinterpret_cast<tags::tag_data_block*>(weapon_tag + 720);
@@ -58,12 +56,11 @@ void H2X::ApplyMapLoadPatches(bool enable)
 						+ barrel_data_block->block_data_offset
 						+ barrel_data_block_size * weapon.barrel_data_block_index
 						+ (weapon.rounds_per_second_based ? 8 : 32)) = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
-				}
 			}
 		}
 	}
 
-	if (!Memory::IsDedicatedServer() && enable && h2mod->GetEngineType() == e_engine_type::_multiplayer)
+	if (enable && !Memory::IsDedicatedServer() && h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
 		// H2X Sound_Classes
 		*(float*)(&tags::get_tag_data()[0x4821C]) = 0.0f; /*H2X projectile_impact Index 0 Gains Bounds lower*/
