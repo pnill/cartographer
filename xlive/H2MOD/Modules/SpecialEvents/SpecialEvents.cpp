@@ -152,7 +152,7 @@ namespace SpecialEvents
 
 	void ChristmasOnMapLoad()
 	{
-		if (h2mod->GetEngineType() == e_engine_type::_main_menu)
+		/*if (h2mod->GetEngineType() == e_engine_type::_main_menu)
 		{
 			datum menu_music_datum = tags::find_tag(blam_tag::tag_group_type::soundlooping, "sound\\ui\\main_menu_music\\main_menu_music");
 			auto menu_music = tags::get_tag<blam_tag::tag_group_type::soundlooping, char>(menu_music_datum);
@@ -165,7 +165,7 @@ namespace SpecialEvents
 				track_in->TagIndex = -1;
 				track_loop->TagIndex = -1;
 			}
-		}
+		}*/
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			// Halo 2 tags
