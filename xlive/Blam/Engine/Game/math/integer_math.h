@@ -33,16 +33,16 @@ struct rect2d
 };
 CHECK_STRUCT_SIZE(rect2d, sizeof(short) * 4);
 
-struct byte_color_argb
+struct pixel32
 {
 	BYTE alpha = 255;
 	BYTE red = 255;
 	BYTE green = 255;
 	BYTE blue = 255;
 
-	byte_color_argb() {}
+	pixel32() {}
 
-	byte_color_argb(BYTE _alpha, BYTE _red, BYTE _green, BYTE _blue) :
+	pixel32(BYTE _alpha, BYTE _red, BYTE _green, BYTE _blue) :
 		alpha(_alpha),
 		red(_red),
 		green(_green),
@@ -50,4 +50,4 @@ struct byte_color_argb
 	{}
 
 };
-CHECK_STRUCT_SIZE(byte_color_argb, sizeof(BYTE) * 4);
+CHECK_STRUCT_SIZE(pixel32, sizeof(BYTE) * 4);

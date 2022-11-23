@@ -1,7 +1,7 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Engine/Game/math/integer_math.h"
 
 /*********************************************************************
 * name: hud_globals
@@ -54,7 +54,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		__int16 width_offset;//0x2
 		__int16 offset_from_reference_corner_x;//0x4
 		__int16 offset_from_reference_corner_y;//0x6
-		byte_color_argb override_icon_color;//0x8
+		pixel32 override_icon_color;//0x8
 		__int8 frame_rate;//0xC
 		enum class e_flags : __int8
 		{
@@ -70,8 +70,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 
 	struct
 	{
-		byte_color_argb default_color;//0xA4
-		byte_color_argb flashing_color;//0xA8
+		pixel32 default_color;//0xA4
+		pixel32 flashing_color;//0xA8
 		float flash_period;//0xAC
 		float flash_delay;//0xB0
 		__int16 number_of_flashes;//0xB4
@@ -81,7 +81,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		};
 		e_flash_flags flash_flags;//0xB6
 		float flash_length;//0xB8
-		byte_color_argb disabled_color;//0xBC
+		pixel32 disabled_color;//0xBC
 	}hud_help_text_color;
 
 	PAD(0x4);//0xC0
@@ -89,8 +89,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 
 	struct
 	{
-		byte_color_argb default_color;//0xCC
-		byte_color_argb flashing_color;//0xD0
+		pixel32 default_color;//0xCC
+		pixel32 flashing_color;//0xD0
 		float flash_period;//0xD4
 		float flash_delay;//0xD8
 		__int16 number_of_flashes;//0xDC
@@ -100,7 +100,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		};
 		e_flash_flags flash_flags;//0xDE
 		float flash_length;//0xE0
-		byte_color_argb disabled_color;//0xE4
+		pixel32 disabled_color;//0xE4
 		__int16 uptime_ticks;//0xE8
 		__int16 fade_ticks;//0xEA
 	}objective_colors;
@@ -158,7 +158,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		tag_reference indicator_bitmap;//0x2F8
 		__int16 sequence_index;//0x300
 		__int16 multiplayer_sequence_index;//0x302
-		byte_color_argb color;//0x304
+		pixel32 color;//0x304
 
 	}hud_damage_inidicators;
 
@@ -166,8 +166,8 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 	//hud timer definitions
 	struct
 	{
-		byte_color_argb default_color;//0x318
-		byte_color_argb flashing_color;//0x31C
+		pixel32 default_color;//0x318
+		pixel32 flashing_color;//0x31C
 		float flash_period;//0x320
 		float flash_delay;//0x324
 		__int16 number_of_flashes;//0x328
@@ -177,14 +177,14 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		};
 		e_flash_flags flash_flags;//0x32A
 		float flash_length;//0x32C
-		byte_color_argb disabled_color;//0x330
+		pixel32 disabled_color;//0x330
 	}not_much_time_left;
 
 	PAD(0x4);//0x334
 	struct
 	{
-		byte_color_argb default_color;//0x338
-		byte_color_argb flashing_color;//0x33C
+		pixel32 default_color;//0x338
+		pixel32 flashing_color;//0x33C
 		float flash_period;//0x340
 		float flash_delay;//0x344
 		__int16 number_of_flashes;//0x348
@@ -194,7 +194,7 @@ struct s_hud_globals_group_definition :TagGroup<'hudg'>
 		};
 		e_flash_flags flash_flags;//0x34A
 		float flash_length;//0x34C
-		byte_color_argb disabled_color;//0x350
+		pixel32 disabled_color;//0x350
 		PAD(0x2C);//0x354
 		tag_reference carnage_report_bitmap;//0x380
 	}time_out_flash_color;

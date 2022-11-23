@@ -1,9 +1,9 @@
 #pragma once
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
+#include "H2MOD\Modules\SpecialEvents\SpecialEventHelpers.h"
 
 #define HALLOWEEN_COAG_OBJECT_COUNT 143
 
-const SpecialEvents::s_event_scenery_placement coag_scen_places[HALLOWEEN_COAG_OBJECT_COUNT]{
+const s_event_scenery_placement coag_scen_places[HALLOWEEN_COAG_OBJECT_COUNT]{
 	{ 0, 1, {85.1084f, -152.117f, 0.363701f}, {0.6927177f, 0.f, 0.f}, 2.f },
 	{ 0, 0, {82.5243f, -150.899f, 0.15004f}, {-1.193646f, 0.f, 0.f}, 2.f },
 	{ 0, 2, {84.7035f, -149.372f, 0.419855f}, {2.651836f, 0.004750926f, 0.003942908f}, 2.f},
