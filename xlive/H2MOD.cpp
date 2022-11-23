@@ -885,11 +885,12 @@ bool __cdecl should_start_pregame_countdown_hook()
 		for (int i = 0; i < 8; i++)
 		{
 			int currentTeamPlayers = 0;
+
+			if (activePlayersIndices.empty())
+				break;
+
 			if (!H2Config_team_flag_array[i])
 				continue;
-
-			if (!activePlayersIndices.size())
-				break;
 
 			std::uniform_int_distribution<int> dist(0, activePlayersIndices.size() - 1);
 
