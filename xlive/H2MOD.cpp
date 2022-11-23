@@ -659,21 +659,6 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
-// sword-flying target clear patch
-void __cdecl aim_assist_targeting_clear_hook(int target_data)
-{
-	if (!s_game_globals::game_is_campaign()
-		&& !b_XboxTick)
-	{
-		*(DWORD*)(target_data) = -1;
-		*(DWORD*)(target_data + 4) = -1;
-		*(DWORD*)(target_data + 8) = -1;
-		*(WORD*)(target_data + 24) = 0;
-		*(DWORD*)(target_data + 28) = 0;
-		*(DWORD*)(target_data + 32) = 0;
-	}
-}
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -728,7 +713,7 @@ void H2MOD::ApplyHooks() {
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 
-		PatchCall(Memory::GetAddress(0x169E59), aim_assist_targeting_clear_hook);
+		aim_assist::ApplyPatches();
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
