@@ -975,7 +975,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 		return;
 
 	auto activePlayerIdList = std::make_shared<std::vector<unsigned long long>>(NetworkSession::GetActivePlayerIdList());
-	std::thread(getPlayerRanksByStringList, activePlayerIdList).detach();
+	if (!activePlayerIdList->empty())
+		std::thread(getPlayerRanksByStringList, activePlayerIdList).detach();
 }
 
 void StatsHandler::sendRankChangeFromDocument(std::shared_ptr<rapidjson::Document> doc)
@@ -1039,7 +1040,7 @@ void StatsHandler::getPlayerRanksByStringList(std::shared_ptr<std::vector<unsign
 		http_request_body.append(std::to_string(playerId));
 		http_request_body += ',';
 	}
-	// trim out the last ',' out
+	// trim out the last ','
 	http_request_body.pop_back();
 
 	CURLcode curl_err;
