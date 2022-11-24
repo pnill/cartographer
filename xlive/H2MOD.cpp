@@ -9,6 +9,7 @@
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/game/players.h"
+#include "Blam/Engine/Game/main/console.h"
 #include "Blam/Engine/Game/hs/hs.h"
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
@@ -61,24 +62,6 @@ std::unordered_map<const wchar_t*, bool&> GametypesMap
 	{ L"h2x", b_H2X },
 	{ L"ogh2", b_XboxTick },
 };
-
-#pragma region engine calls
-
-TEST_N_DEF(PC1);
-
-/* This looks at the actors table to get the character datum which is assigned to the specific actor. */
-int get_char_datum_from_actor(int actor_datum)
-{
-	__int16 actor_index = actor_datum & 0xFFFF;
-	DWORD actor_table_ptr = *Memory::GetAddress<DWORD*>(0xA965DC);
-	DWORD actor_table = *(DWORD*)((BYTE*)actor_table_ptr + 0x44);
-	DWORD actor = (DWORD)((BYTE*)actor_table + (actor_index * 0x898));
-	int character_datum = *(int*)((BYTE*)actor+0x54);
-
-	return character_datum;
-}
-
-#pragma endregion
 
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
 show_error_screen_t p_show_error_screen;
@@ -397,12 +380,6 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 	}
 
 	return ret;
-}
-
-void __cdecl print_to_console(const char* output)
-{
-	std::string finalOutput("[HSC Print] "); finalOutput += output;
-	addDebugText(finalOutput.c_str());
 }
 
 DWORD calculate_model_lod;
@@ -725,7 +702,7 @@ void H2MOD::ApplyHooks() {
 		players::ApplyPatches();
 
 		// hook the print command to redirect the output to our console
-		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
+		console::ApplyPatches();
 
 		calculate_model_lod = Memory::GetAddress(0x19CA3E);
 		calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);

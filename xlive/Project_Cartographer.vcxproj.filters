@@ -164,6 +164,7 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\aim_assist.cpp" />
+    <ClCompile Include="Blam\Engine\Game\main\console.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -516,6 +517,7 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
     <ClInclude Include="Blam\Engine\Game\game\aim_assist.h" />
+    <ClInclude Include="Blam\Engine\Game\main\console.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
