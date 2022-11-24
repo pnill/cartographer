@@ -426,6 +426,7 @@
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="Blam\Engine\Game\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\aim_assist.cpp" />
+    <ClCompile Include="Blam\Engine\Game\game\game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\Game\game\game.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameHooks.cpp" />
@@ -441,6 +442,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
     <ClInclude Include="Blam\Engine\Game\game\aim_assist.h" />
+    <ClInclude Include="Blam\Engine\Game\game\game_engine_king.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_time.h" />
     <ClInclude Include="Blam\Engine\Game\game\cheats.h" />
     <ClInclude Include="Blam\Engine\Game\items\equipment.h" />

@@ -7,6 +7,7 @@
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/Game/GameHooks.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/game/game_engine_king.h"
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/main/console.h"
@@ -493,20 +494,6 @@ short __cdecl get_enabled_teams_flags(s_network_session* session)
 		return default_teams_enabled_flags;
 }
 
-typedef int(__cdecl* get_next_hill_index_t)(int previousHill);
-get_next_hill_index_t p_get_next_hill_index;
-signed int __cdecl get_next_hill_index(int previousHill)
-{
-	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
-	if (previousHill + 1 >= hillCount) 
-	{
-		LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, 0);
-		return 0;
-	}
-	LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, previousHill + 1);
-	return previousHill + 1;
-}
-
 void H2MOD::ApplyFirefightHooks()
 {
 	pdevice_touch = (tdevice_touch)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
@@ -665,6 +652,7 @@ void H2MOD::ApplyHooks() {
 	ProjectileFix::ApplyPatches();
 
 	damage::ApplyPatches();
+	game_engine_king::ApplyPatches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
