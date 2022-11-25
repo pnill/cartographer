@@ -15,17 +15,6 @@ enum e_sound_type
 };
 #define ALL_SOUNDS_NO_SLAYER (FLAG(_sound_type_team_change) | FLAG(_sound_type_gained_the_lead) | FLAG(_sound_type_lost_the_lead) | FLAG(_sound_type_tied_leader))
 
-enum e_static_lod : DWORD
-{
-	disable = 0,
-	super_low,
-	low,
-	medium,
-	high,
-	super_high,
-	cinematic
-};
-
 class H2MOD
 {
 public:

@@ -1,6 +1,7 @@
 #include "stdafx.h"
+#include "network_channel.h"
 
-#include "NetworkChannel.h"
+#include "Blam/Engine/Game/networking/transport/transport_address.h"
 
 s_network_channel* s_network_channel::Get(int channelIdx)
 {

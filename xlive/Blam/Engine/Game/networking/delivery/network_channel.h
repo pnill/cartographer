@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NetworkObserver.h"
+#include "Blam/Engine/Game/networking/session/network_observer.h"
 
 struct __declspec(align(8)) s_network_channel
 {

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
-#include "NetworkObserver.h"
-#include "NetworkChannel.h"
+#include "network_observer.h"
+#include "Blam/Engine/Game/networking/delivery/network_channel.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 s_network_observer_configuration* g_network_configuration;
 

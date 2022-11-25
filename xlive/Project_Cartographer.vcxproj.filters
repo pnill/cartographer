@@ -8,8 +8,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\messages\network_message_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\Game\memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\delivery\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\session\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
@@ -284,8 +284,8 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Game\networking\messages\network_message_type_collection.h" />
     <ClInclude Include="Blam\Engine\Game\memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\delivery\network_channel.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\session\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
@@ -518,6 +518,7 @@
     <ClInclude Include="Blam\Engine\Game\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\Game\main\console.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_engine_king.h" />
+    <ClInclude Include="Blam\Engine\Game\render\render_lod_new.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

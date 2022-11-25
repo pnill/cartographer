@@ -2,8 +2,8 @@
 
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/players.h"
-#include "../Transport/NetworkChannel.h"
-#include "../Transport/NetworkObserver.h"
+#include "Blam/Engine/Game/networking/delivery/network_channel.h"
+#include "Blam/Engine/Game/networking/session/network_observer.h"
 
 // forward declarations
 enum e_map_status;
