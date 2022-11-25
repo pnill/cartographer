@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "NetworkSession.h"
+#include "network_session.h"
 #include "Blam/Engine/Game/game/game.h"
 
 bool NetworkSession::PlayerIsActive(int playerIdx)

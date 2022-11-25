@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
+#include "Blam/Engine/Game/networking/session/network_session.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 

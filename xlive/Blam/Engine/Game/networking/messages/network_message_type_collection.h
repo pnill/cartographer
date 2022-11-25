@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
+#include "Blam/Engine/Game/networking/session/network_session.h"
 
 #define player_identifier_size_bits (sizeof(unsigned long long) * CHAR_BIT)
 

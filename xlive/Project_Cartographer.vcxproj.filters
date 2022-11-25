@@ -10,7 +10,7 @@
     <ClCompile Include="Blam\Engine\Game\memory\bitstream.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\delivery\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\session\network_observer.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\session\network_session.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
     <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
@@ -286,7 +286,7 @@
     <ClInclude Include="Blam\Engine\Game\memory\bitstream.h" />
     <ClInclude Include="Blam\Engine\Game\networking\delivery\network_channel.h" />
     <ClInclude Include="Blam\Engine\Game\networking\session\network_observer.h" />
-    <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\session\network_session.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
@@ -445,7 +445,7 @@
     <ClInclude Include="Blam\Engine\Game\networking\replication\replication_control_view.h" />
     <ClInclude Include="Blam\Engine\Game\simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
+    <ClInclude Include="Blam\Common\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Game\networking\replication\replication_entity.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />

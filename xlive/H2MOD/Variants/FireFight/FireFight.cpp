@@ -5,9 +5,9 @@
 #include "Blam/Cache/TagGroups/character_definition.hpp"
 #include "Blam/Engine/Game/ai/actors.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/networking/session/network_session.h"
 #include "Blam/Engine/Game/objects/objects.h"
 #include "Blam/Engine/Game/units/bipeds.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #include "H2MOD.h"

@@ -506,7 +506,7 @@
     <ClCompile Include="Blam\Engine\Game\memory\bitstream.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\delivery\network_channel.cpp" />
     <ClCompile Include="Blam\Engine\Game\networking\session\network_observer.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
+    <ClCompile Include="Blam\Engine\Game\networking\session\network_session.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
@@ -778,7 +778,7 @@
     <ClInclude Include="Blam\Engine\Game\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Game\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\Game\physics\physics_constants.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
+    <ClInclude Include="Blam\Common\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Game\networking\replication\replication_entity.h" />
     <ClInclude Include="Blam\Engine\Game\simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Game\networking\replication\replication_control_view.h" />
@@ -844,7 +844,7 @@
     <ClInclude Include="Blam\Engine\Game\memory\bitstream.h" />
     <ClInclude Include="Blam\Engine\Game\networking\delivery\network_channel.h" />
     <ClInclude Include="Blam\Engine\Game\networking\session\network_observer.h" />
-    <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\session\network_session.h" />
     <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />

@@ -5,8 +5,8 @@
 #include "Blam/Engine/Game/hs/hs.h"
 #include "Blam/Engine/Game/items/weapons.h"
 #include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/Game/networking/session/network_session.h"
 #include "Blam/Engine/Game/units/bipeds.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
