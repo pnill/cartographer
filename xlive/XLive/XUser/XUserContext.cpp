@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "XLive\xbox\xbox.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "H2MOD/Discord/DiscordInterface.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "XLive/xbox/xbox.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 extern XSESSION_LOCAL_DETAILS sessionDetails;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
 
 namespace CustomNetwork
 {

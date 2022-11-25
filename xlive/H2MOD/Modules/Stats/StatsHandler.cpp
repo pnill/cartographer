@@ -3,7 +3,7 @@
 #include "StatsHandler.h"
 
 #include "Blam/Engine/Game/memory/bitstream.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"

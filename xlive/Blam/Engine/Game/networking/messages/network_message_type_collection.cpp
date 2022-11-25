@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "NetworkMessageTypeCollection.h"
+#include "network_message_type_collection.h"
 
 #include "Blam/Engine/Game/memory/bitstream.h"
 

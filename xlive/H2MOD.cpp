@@ -14,10 +14,10 @@
 #include "Blam/Engine/Game/hs/hs.h"
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
 #include "Blam/Engine/Game/objects/damage.h"
 #include "Blam/Engine/Game/objects/objects.h"
 #include "Blam/Engine/Game/tag_files/string_ids.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"

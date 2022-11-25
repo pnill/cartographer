@@ -4,7 +4,7 @@
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/units/units.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
 #include "Util/ReadIniArguments.h"

@@ -9,7 +9,7 @@
 #include "Blam/Engine/Game/units/units.h"
 #include "Blam/Engine/Game/game/player_control.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
 
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
