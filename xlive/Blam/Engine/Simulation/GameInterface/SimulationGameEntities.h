@@ -1,8 +1,9 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam\Common\Common.h"
-#include "Blam\Engine\Networking\NetworkPrimitiveTypes.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Networking/NetworkPrimitiveTypes.h"
+#include "Blam/Engine/Game/memory/bitstream.h"
+#include <wtypes.h>
 
 enum e_simulation_entity_type : __int16
 {
@@ -29,7 +30,7 @@ enum e_simulation_entity_type : __int16
 
 struct s_simulation_game_entity
 {
-	network_entity_index entity_index;
+	DWORD entity_index;
 	e_simulation_entity_type entity_type;
 	bool exists_in_gameworld;
 	char event_reference_count;

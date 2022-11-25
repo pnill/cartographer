@@ -1,7 +1,5 @@
 #pragma once
 
-typedef unsigned int network_entity_index;
-
 #define ENTITY_INDEX_NONE ((unsigned int)(0xFFFFFFFF))
 
 #define ENTITY_IS_NONE(_entity_index) ((_entity_index) == DATUM_INDEX_NONE)

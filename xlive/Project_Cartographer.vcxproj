@@ -778,11 +778,9 @@
     <ClInclude Include="Blam\Engine\Game\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\Game\physics\physics_constants.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
-    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
-    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\replication\replication_entity.h" />
     <ClInclude Include="Blam\Engine\Game\simulation\simulation_players.h" />
-    <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
-    <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\replication\replication_control_view.h" />
     <ClInclude Include="Blam\Engine\Game\render\render_cameras.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
