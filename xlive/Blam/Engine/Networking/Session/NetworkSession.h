@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../NetworkCommon.h"
-
 #include "Blam/Engine/Game/game/game.h"
 #include "Blam/Engine/Game/game/players.h"
 #include "../Transport/NetworkChannel.h"

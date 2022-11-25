@@ -473,7 +473,7 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\transport\transport_address.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Shell.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />

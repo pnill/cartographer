@@ -1,6 +1,5 @@
 #pragma once
 
-#include "..\NetworkCommon.h"
 #include "NetworkObserver.h"
 
 struct __declspec(align(8)) s_network_channel

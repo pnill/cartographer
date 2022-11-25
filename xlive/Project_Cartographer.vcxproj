@@ -454,7 +454,7 @@
     <ClInclude Include="Blam\Engine\Game\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\Game\units\units.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
+    <ClInclude Include="Blam\Engine\Game\networking\transport\transport_address.h" />
     <ClCompile Include="Blam\Engine\Game\game\players.cpp" />
     <ClCompile Include="Blam\Engine\Game\render\render_cameras.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
