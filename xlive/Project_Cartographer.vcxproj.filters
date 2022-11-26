@@ -519,6 +519,7 @@
     <ClInclude Include="Blam\Engine\Game\main\console.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_engine_king.h" />
     <ClInclude Include="Blam\Engine\Game\render\render_lod_new.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

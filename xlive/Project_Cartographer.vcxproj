@@ -440,6 +440,7 @@
     <ClCompile Include="Blam\Engine\Game\physics\physics_constants.cpp" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
+    <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\Game\GameHooks.h" />
     <ClInclude Include="Blam\Engine\Game\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\Game\game\game_engine_king.h" />
