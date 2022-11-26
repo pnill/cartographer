@@ -49,7 +49,9 @@ void H2X::ApplyMapLoadPatches(bool enable)
 		if (weapon_datum != DATUM_INDEX_NONE)
 		{
 			s_weapon_group_definition* weapon_tag = tags::get_tag_fast<s_weapon_group_definition>(weapon_datum);
-			weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
+			weapon.rounds_per_second_based ? 
+				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second_upper = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire)
+			: weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
 		}
 	}
 
