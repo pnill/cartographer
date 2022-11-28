@@ -585,12 +585,12 @@ int CXnIp::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* out
 			if (!m_XnIPs[i].bValid)
 			{
 				XnIp* newXnIp = &m_XnIPs[i];
-		ZeroMemory(newXnIp, sizeof(*newXnIp));
+				ZeroMemory(newXnIp, sizeof(*newXnIp));
 
-		memcpy(&newXnIp->xnaddr, pxna, sizeof(*pxna));
-		newXnIp->keyPair = keyPair;
+				memcpy(&newXnIp->xnaddr, pxna, sizeof(*pxna));
+				newXnIp->keyPair = keyPair;
 
-		XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
+				XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
 
 				// if this is zero we are fucked
 				ULONG randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
