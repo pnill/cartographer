@@ -5,6 +5,7 @@
 
 namespace PlayerRepresentation
 {
+	extern BYTE current_representation_count;
 	/**
 	 * \brief Adds a new player representation to the globals tag block
 	 * \param fp_hands the datum index of the first person hands render model

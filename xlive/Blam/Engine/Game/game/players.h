@@ -152,7 +152,7 @@ struct s_player
 		On
 	};
 
-	enum class e_handicap : BYTE
+	enum class e_handicap : char
 	{
 		None = 0,
 		Minor = 1,
@@ -192,8 +192,8 @@ struct s_player
 
 		e_object_team player_team;
 		e_handicap player_handicap_level;
-		byte player_displayed_skill;
-		byte player_overall_skill;
+		char player_displayed_skill;
+		char player_overall_skill;
 		char player_is_griefer;
 		char bungie_user_role;
 		char achievement_flags;
@@ -297,7 +297,8 @@ namespace players
 	datum local_user_get_player_idx(int user_index);
 	void set_local_team_index(int local_player_index, int team_index);
 	void set_local_clan_tag(int local_player_index, unsigned long long tag);
-	void carto_set_local_rank(byte rank);
+	void __cdecl carto_player_validate_configuration(int player_index, s_player::s_player_properties* player_properties);
+	void carto_set_local_rank(BYTE rank);
 	void __cdecl carto_changeTeam(int localPlayerIndex, int teamIndex);
 
 	void ApplyPatches();

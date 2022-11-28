@@ -1,8 +1,14 @@
 #include "stdafx.h"
 #include "players.h"
 
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Engine/Game/game/game_engine.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 #include "Blam/Engine/Game/networking/session/network_session.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
 /*
@@ -196,6 +202,83 @@ namespace players
 		p_update_player_profile(local_player_index);
 	}
 
+	void __cdecl carto_player_validate_configuration(int player_index, s_player::s_player_properties* player_properties)
+	{
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.m_engine_type);
+		if (s_game_globals::game_is_campaign())
+		{
+			auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+			auto player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::masterchief;
+			if (scenario->player_starting_locations.size > 0)
+			{
+				for (auto i = 0; i < scenario->player_starting_locations.size; i++)
+				{
+					auto starting_location = scenario->player_starting_locations[i];
+					if (starting_location->campaign_player_type != s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none) {
+						player_type = starting_location->campaign_player_type;
+						break;
+					}
+				}
+				player_properties->player_team = e_object_team::player;
+				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
+					player_properties->profile.player_character_type = (s_player::e_character_type)player_type;
+			}
+			player_properties->player_team = e_object_team::player;
+			player_properties->profile.player_character_type = (s_player::e_character_type)player_type;
+		}
+		else if (s_game_globals::game_is_multiplayer())
+		{
+			if (player_properties->profile.player_character_type == s_player::e_character_type::MasterChief)
+				player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
+			if (player_properties->profile.player_character_type == s_player::e_character_type::Dervish)
+				player_properties->profile.player_character_type = s_player::e_character_type::Elite;
+
+			if (SpecialEvents::getCurrentEvent() != SpecialEvents::_halloween)
+			{
+				if (player_properties->profile.player_character_type == s_player::e_character_type::Skeleton)
+					player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
+			}
+			else if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
+
+			if ((__int8)player_properties->profile.player_character_type > PlayerRepresentation::current_representation_count)
+				player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
+		}
+
+		if (player_properties->player_displayed_skill != -1 && player_properties->player_displayed_skill < 0)
+			player_properties->player_displayed_skill = 0;
+
+		if (player_properties->player_overall_skill != -1 && player_properties->player_overall_skill < 0)
+			player_properties->player_overall_skill = 0;
+
+		if (player_properties->player_handicap_level >= s_player::e_handicap::None)
+		{
+			if (player_properties->player_handicap_level > s_player::e_handicap::Severe)
+				player_properties->player_handicap_level = s_player::e_handicap::Severe;
+		}
+		else
+		{
+			player_properties->player_handicap_level = s_player::e_handicap::None;
+		}
+
+		if (player_properties->bungie_user_role >= 0)
+		{
+			if (player_properties->bungie_user_role <= 7)
+				player_properties->bungie_user_role = 7;
+		}
+		else
+		{
+			player_properties->bungie_user_role = 0;
+		}
+
+		if (game::get_game_mode_engine()
+			&& s_game_globals::get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
+			&& (player_properties->player_team && !(game::s_game_engine_globals::get()->Unk1 & FLAG(player_properties->player_team))))
+		{
+			player_properties->player_team = e_object_team::None;
+		}
+	}
+
 	void carto_set_local_rank(BYTE rank)
 	{
 		if (Memory::IsDedicatedServer())
@@ -229,6 +312,7 @@ namespace players
 
 	void ApplyPatches()
 	{
+		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), carto_player_validate_configuration);
 		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), carto_changeTeam);
 	}
 }

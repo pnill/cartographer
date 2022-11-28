@@ -5,7 +5,7 @@
 #include "Blam/Engine/Game/objects/object_placement.h"
 #include "Blam/Engine/Game/simulation/simulation_players.h"
 
-enum e_object_team : BYTE
+enum e_object_team : char
 {
 	// MP
 	Red = 0,
@@ -36,8 +36,8 @@ enum e_object_team : BYTE
 	Unused14 = 14,
 	Unused15 = 15,
 
-	// Shared
-	None = 255
+	// Observer
+	None = -1
 };
 
 enum e_object_type : signed char
