@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
+#include "XLiveRendering.h"
+
 #include "imgui.h"
 #include "backends\imgui_impl_dx9.h"
 #include "backends\imgui_impl_win32.h"
-#include "imgui_integration\imgui_handler.h"
 
-#include "GUI.h"
+#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 #include "H2MOD\Modules\Achievements\Achievements.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
@@ -90,17 +91,9 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	if (pXii->pD3D)
 	{
-		//LOG_TRACE_XLIVE("XLiveInitialize  (pPii = %X)", pPii);
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
-
-		serverStatus = new char[256];
-		snprintf(serverStatus, 256, "Status: Initializing....");
-
-		buildText = new char[256];
-		snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
-
 		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
-		GUI::Initialize(d3dpp->hDeviceWindow);
+		XLiveRendering::Initialize(d3dpp->hDeviceWindow);
 	}
 	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
 	return 0;
@@ -180,7 +173,7 @@ void InitalizeFont(std::wstring strFontName, const std::wstring& strFontPath, in
 }
 
 
-void initFontsIfRequired()
+void InitFontsIfRequired()
 {
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
@@ -383,18 +376,22 @@ void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont)
 }
 
 
-
 int achievement_height = 0;
 bool achievement_freeze = false;
 int achievement_timer = 0;
 
 char* autoUpdateText = 0;
 
-static HWND                 g_hWnd = NULL;
 
-void GUI::Initialize(HWND hWnd)
+void XLiveRendering::Initialize(HWND hWnd)
 {
-	initFontsIfRequired();
+	InitFontsIfRequired();
+
+	serverStatus = new char[256];
+	snprintf(serverStatus, 256, "Status: Initializing....");
+
+	buildText = new char[256];
+	snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
 	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface)))
 	{
@@ -403,7 +400,6 @@ void GUI::Initialize(HWND hWnd)
 
 	D3DXCreateSprite(pDevice, &Sprite_Interface);
 	ImGuiHandler::Initalize(pDevice, hWnd);
-	g_hWnd = hWnd;
 }
 
 // #5001
@@ -436,6 +432,13 @@ int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
 BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 {
 	return false;
+}
+
+static void set_max_system_timer_resolution(bool enabled)
+{
+	ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
+	_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
+	_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, enabled, &ulCurrentResolution);
 }
 
 // TODO: move to _Shell or somewhere else?
@@ -474,10 +477,9 @@ void XLiveThrottleFramerate(int maxFramerate)
 				if (NULL != hFrameLimitTimer)
 					CloseHandle(hFrameLimitTimer);
 
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-				_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, FALSE, &ulCurrentResolution);
-				});
+				// reset timer resolution back to default on exit
+				set_max_system_timer_resolution(false);
+			});
 		}
 
 		// skip the first frame after init
@@ -489,6 +491,7 @@ void XLiveThrottleFramerate(int maxFramerate)
 	QueryPerformanceFrequency(&frequency); 
 
 	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
+
 	QueryPerformanceCounter(&deltaCounter);
 	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
 	auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
@@ -500,21 +503,24 @@ void XLiveThrottleFramerate(int maxFramerate)
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
 		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;
 
-		// skip if time to wait is lower than 2ms
+		// sleep just the milliseconds part
+		// timeToWaitSleepUs = timeToWaitSleepUs - (timeToWaitSleepUs % 1000);
+
+		// skip if time to wait is lower than 3ms
 		if (timeToWaitSleepUs > 3000)
 		{
 			if (NULL != hFrameLimitTimer)
 			{
-				LARGE_INTEGER liDueTime;
-				liDueTime.QuadPart = -10ll * timeToWaitSleepUs;
-
 				// Create an unnamed waitable timer.
 				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
 				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
 
 				if (10ll * timeToWaitSleepUs > ulMaximumResolution)
 				{
+					LARGE_INTEGER liDueTime;
 					_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
+
+					liDueTime.QuadPart = -10ll * timeToWaitSleepUs;
 					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
 					{
 						// Wait for the timer.
@@ -523,11 +529,9 @@ void XLiveThrottleFramerate(int maxFramerate)
 				}
 			}
 
-			/*
-			int sleepTime = sleepTimeUs / 1000ll;
-			if (sleepTime >= 0)
-				Sleep(sleepTime);
-				*/
+			/*int sleepTimeMs = timeToWaitSleepUs / 1000ll;
+			if (sleepTimeMs >= 0)
+				Sleep(sleepTimeMs);*/
 		}
 
 		while (true)
@@ -558,9 +562,8 @@ int WINAPI XLiveRender()
 
 			D3DDEVICE_CREATION_PARAMETERS cparams;
 			pDevice->GetCreationParameters(&cparams);
-			RECT gameWindowRect;
+			RECT gameWindowRect, gameWindowInnerRect;
 			GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
-			RECT gameWindowInnerRect;
 			GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
 
 			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
@@ -591,7 +594,7 @@ int WINAPI XLiveRender()
 			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
 	
 #pragma region Achievement Rendering		
-			if (AchievementMap.size() > 0)
+			if (!AchievementMap.empty())
 			{
 				auto it = AchievementMap.begin();
 				

@@ -16,7 +16,6 @@
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
-#include "H2MOD\GUI\GUI.h"
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
@@ -45,7 +44,7 @@
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 
 #include <float.h>
 

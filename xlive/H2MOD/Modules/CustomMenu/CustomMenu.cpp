@@ -4,7 +4,7 @@
 #include "CustomLanguage.h"
 
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 #include "H2MOD\Modules\Accounts\AccountCreate.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Accounts\Accounts.h"

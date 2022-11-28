@@ -24,7 +24,7 @@ typedef struct XLIVE_INPUT_INFO {
 
 #define DISPLAY_DEV_TESTING_MENU 0
 
-void initFontsIfRequired();
+void InitFontsIfRequired();
 void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
 void drawRect(int x, int y, int width, int height, DWORD Color);
 void drawHorizontalLine(int x, int y, int width, D3DCOLOR Color);
@@ -52,9 +52,9 @@ static CONST D3DCOLOR COLOR_WHITE = D3DCOLOR_ARGB(255, 255, 255, 249);
 static CONST D3DCOLOR COLOR_GREY_TRANSPARENT = D3DCOLOR_ARGB(150, 112, 112, 112);
 static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
-namespace GUI
+namespace XLiveRendering
 {
-	extern void Initialize(HWND hWnd);
+	void Initialize(HWND hWnd);
 };
 
 extern HWND H2hWnd;

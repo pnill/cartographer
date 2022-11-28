@@ -15,7 +15,7 @@
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Enums\HaloStrings.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
 #include "H2MOD\Modules\Shell\Config.h"

@@ -4,7 +4,7 @@
 #include "..\Sockets\XSocket.h"
 
 #include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\GUI\imgui_integration\Console\CommandHandler.h"
+#include "H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h"
 
 #define MAX_HDR_STR 32
 

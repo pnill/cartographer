@@ -2,7 +2,7 @@
 
 #include "ObserverMode.h"
 #include "H2MOD.h"
-#include "H2MOD\GUI\imgui_integration\imgui_handler.h"
+#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
 #include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
 #include "H2MOD\Modules\Input\PlayerControl.h"
 #include "H2MOD\Utils\Utils.h"

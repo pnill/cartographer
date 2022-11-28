@@ -4,7 +4,7 @@
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\GUI\GUI.h"
+#include "H2MOD\GUI\XLiveRendering.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\Stats\StatsHandler.h"
@@ -21,7 +21,7 @@
 
 #include "Util\Hooks\Hook.h"
 
-#define TIMER_RESOLUTION 1
+#define TIMER_RESOLUTION_MS 1
 
 typedef void(_cdecl* present_rendered_screen_t)();
 present_rendered_screen_t p_present_rendered_screen;
@@ -217,7 +217,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 
 	// More details @ https://randomascii.wordpress.com/2020/10/04/windows-timer-resolution-the-great-rule-change/
 
-	timeBeginPeriod(TIMER_RESOLUTION);
+	timeBeginPeriod(TIMER_RESOLUTION_MS);
 
 	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
 	return p_main_game_time_initialize_defaults();
@@ -230,7 +230,7 @@ void __cdecl game_modules_dispose_hook() {
 	DeinitH2Startup();
 
 	// reset time resolution to system default on game exit (initialization happens in main_game_time_initialize_defaults_hook())
-	timeEndPeriod(TIMER_RESOLUTION);
+	timeEndPeriod(TIMER_RESOLUTION_MS);
 }
 
 // rasterizer_present hook
