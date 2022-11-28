@@ -1,6 +1,7 @@
 #pragma once
-#include "SimulationGameObjects.h"
+#include "simulation_game_objects.h"
 #include "Blam/Engine/Game/game/players.h"
+#include <wtypes.h>
 
 #define k_orignal_unit_creation_size  0x24
 struct s_simulation_unit_state_data

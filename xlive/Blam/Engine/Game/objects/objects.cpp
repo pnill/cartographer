@@ -5,7 +5,7 @@
 #include "Blam/Engine/Game/game/players.h"
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include "Blam/Engine/Game/units/bipeds.h"
-#include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
+#include "Blam/Engine/Game/simulation/game_interface/simulation_game_units.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "Util/Hooks/Hook.h"

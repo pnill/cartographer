@@ -1,5 +1,6 @@
 #pragma once
-#include "Blam\Common\Common.h"
+#include "Blam/Common/Common.h"
+#include <wtypes.h>
 
 struct c_simulation_globals_type_collection
 {

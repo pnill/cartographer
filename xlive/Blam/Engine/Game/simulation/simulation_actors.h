@@ -1,6 +1,9 @@
 #pragma once
-#include "Blam\Engine\Players\PlayerActions.h"
-#include "Blam\Cache\DataTypes\StringID.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Cache/DataTypes/StringID.h"
+#include "Blam/Engine/Game/game/aim_assist.h"
+#include "Blam/Engine/Game/math/real_math.h"
+#include <wtypes.h>
 
 struct s_unit_control_data
 {
@@ -24,6 +27,17 @@ struct s_unit_control_data
 	DWORD field_54;
 	DWORD field_58;
 	s_aim_assist_targetting_data target_info;
-
 };
 CHECK_STRUCT_SIZE(s_unit_control_data, 0x80);
+
+struct s_simulation_actor
+{
+	int m_actor_index;	//index in actor data array
+	datum m_unit_index;	//index in object data array
+	void* m_simulation_world;
+	int gap_C;
+	DWORD start_ticks;
+	int gap_14;
+	s_unit_control_data m_control;
+};
+CHECK_STRUCT_SIZE(s_simulation_actor, 0x98);

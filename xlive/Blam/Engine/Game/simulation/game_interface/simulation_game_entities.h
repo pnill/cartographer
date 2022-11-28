@@ -1,7 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Common/Common.h"
-#include "Blam/Engine/Networking/NetworkPrimitiveTypes.h"
 #include "Blam/Engine/Game/memory/bitstream.h"
 #include <wtypes.h>
 
