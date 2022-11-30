@@ -6,15 +6,13 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 
-#include "Util\Hooks\Hook.h"
-
-#include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-
+#include "Blam/Engine/DataArray/TagDataIterator.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/Game/objects/objects.h"
+#include "Blam/Engine/Game/objects/object_placement.h"
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+#include "Util/Hooks/Hook.h"
 
 #define OBJECT_MAX_NODES (255)
 #define OBJECT_GAME_STATE_MAX_COUNT (2048)
@@ -61,7 +59,7 @@ namespace ObjectInterpolate
 		s_data_iterator<s_object_header*> object_it(get_objects_header());
 
 		// check if we actually executed any ticks
-		if (!(time_globals::get_game_time() > 0))
+		if (!(time_globals::get_game_time_ticks() > 0))
 		{
 			Reset();
 			return;
@@ -154,7 +152,7 @@ namespace ObjectInterpolate
 		real_matrix4x3* current_object_nodes = get_object_nodes(object_idx, &node_count);
 
 		for (int i = 0; i < object_state->node_count; i++)
-			matrix4x3_interpolate(&object_state->previous_node_position[i], &current_object_nodes[i], Interpolation::GetInterpolateTime(), &object_state->interpolated_nodes[i]);
+			matrix_math::matrix4x3_interpolate(&object_state->previous_node_position[i], &current_object_nodes[i], Interpolation::GetInterpolateTime(), &object_state->interpolated_nodes[i]);
 
 		*out_node_count = object_state->node_count;
 		return object_state->interpolated_nodes;

@@ -8,6 +8,7 @@
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/Interpolation/Interpolation.h"
 #include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -688,14 +689,16 @@ void InitRunLoop() {
 		case _rendering_mode_original_game_frame_limit:
 			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			MainGameTime::ApplyPatches();
-			MainGameTime::fps_limiter_enabled = true;
+#if GAME_FRAME_INTERPOLATOR_ENABLED
+			Interpolation::ApplyPatches();
+#endif
 			break;
 
 		case _rendering_mode_none:
 		default:
 			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			break;
-		} // switch (experimental_rendering_mode)
+		}
 
 		// apply framerate throttle patches for when the game is minimized
 		PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);

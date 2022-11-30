@@ -6,9 +6,9 @@
 
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Players\LocalPlayers.h"
+#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/Game/game/game_time.h"
+#include "Blam/Engine/Game/game/players.h"
 
 #include "FirstPersonInterpolate.h"
 #include "ObjectInterpolate.h"
@@ -37,7 +37,7 @@ namespace Interpolation
 
 	float GetInterpolateTime()
 	{
-		return blam_max(0.0f, blam_min(time_globals::get_ticks_fraction_leftover(), 1.0f));
+		return real_math::blam_max(0.0f, real_math::blam_min(time_globals::get_ticks_fraction_leftover(), 1.0f));
 	}
 
 	// TODO
@@ -110,7 +110,7 @@ namespace Interpolation
 
 		// fix effects at uncapped FPS
 		PatchCall(Memory::GetAddressRelative(0x439D2A), game_update_hook);
-		// PatchCall(Memory::GetAddressRelative(0x448D5C), effects_update_hook);
+		PatchCall(Memory::GetAddressRelative(0x448D5C), effects_update_hook);
 		PatchCall(Memory::GetAddressRelative(0x439D45), game_frame_hook);
 		PatchCall(Memory::GetAddressRelative(0x44A5E8), game_tick_hook);
 
