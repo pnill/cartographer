@@ -4,7 +4,7 @@
 #include "../Shell.h"
 #include "../Config.h"
 
-#include "Blam/Engine/Game/networking/session/network_observer.h"
+#include "Blam/Engine/networking/session/network_observer.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/Game/math/integer_math.h"
+#include "Blam/Engine/math/integer_math.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 
 void InitH2Config();

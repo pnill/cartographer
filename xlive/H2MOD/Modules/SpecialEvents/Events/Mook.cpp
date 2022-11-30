@@ -4,7 +4,7 @@
 #include "../SpecialEventHelpers.h"
 
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 

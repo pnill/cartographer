@@ -4,9 +4,9 @@
 
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/math/real_math.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #include "Util/Hooks/Hook.h"

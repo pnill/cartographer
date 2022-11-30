@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Engine/Game/math/integer_math.h"
-#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/math/integer_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 #pragma pack(push,1)
 

@@ -6,9 +6,9 @@
 
 #include "Util\Hooks\Hook.h"
 
-#include "Blam/Engine/Game/math/real_math.h"
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/game/players.h"
+#include "Blam/Engine/math/real_math.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/game/players.h"
 
 #include "FirstPersonInterpolate.h"
 #include "ObjectInterpolate.h"

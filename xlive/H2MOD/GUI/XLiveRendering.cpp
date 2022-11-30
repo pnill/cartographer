@@ -9,7 +9,7 @@
 #include "XLiveRendering.h"
 
 #include "H2MOD.h"
-#include "Blam/Engine/Game/units/bipeds.h"
+#include "Blam/Engine/units/bipeds.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"

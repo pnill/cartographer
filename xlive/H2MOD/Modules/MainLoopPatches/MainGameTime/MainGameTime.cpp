@@ -4,8 +4,8 @@
 
 #include "Util/Hooks/Hook.h"
 
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/game/game.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/Shell/Shell.h"

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "ProjectileFix.h"
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/objects/objects.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/objects/objects.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 

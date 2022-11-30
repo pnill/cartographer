@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "Pregame_Lobby.h"
-#include "Blam/Engine/Game/math/integer_math.h"
-#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/math/integer_math.h"
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 void c_pregame_lobby_menu::ApplyPatches()

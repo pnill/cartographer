@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamTag.h"
 #include "Blam/Cache/DataTypes/StringID.h"
-#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 struct s_event_scenery_placement
 {

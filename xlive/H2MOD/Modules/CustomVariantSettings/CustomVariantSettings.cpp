@@ -2,14 +2,14 @@
 
 #include "CustomVariantSettings.h"
 
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/memory/bitstream.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
-#include "Blam/Engine/Game/physics/physics_constants.h"
-#include "Blam/Engine/Game/units/units.h"
-#include "Blam/Engine/Game/game/player_control.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
-#include "Blam/Engine/Game/networking/session/network_session.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/physics/physics_constants.h"
+#include "Blam/Engine/units/units.h"
+#include "Blam/Engine/game/player_control.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/networking/session/network_session.h"
 
 #include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"

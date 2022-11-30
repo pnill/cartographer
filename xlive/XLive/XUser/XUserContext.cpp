@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Config.h"

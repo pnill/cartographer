@@ -3,11 +3,11 @@
 #include "HudElements.h"
 
 #include "Blam/Cache/TagGroups/bitmap_definition.hpp"
-#include "Blam/Engine/Game/game/cheats.h"
-#include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/game/players.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
-#include "Blam/Engine/Game/render/render_cameras.h"
+#include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/players.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/render/render_cameras.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"

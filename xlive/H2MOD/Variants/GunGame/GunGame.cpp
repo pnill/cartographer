@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
 #include "GunGame.h"
-#include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
-#include "Blam/Engine/Game/units/units.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
-#include "Blam/Engine/Game/networking/session/network_session.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/units/units.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/networking/session/network_session.h"
 
 #include "Util/ReadIniArguments.h"
 

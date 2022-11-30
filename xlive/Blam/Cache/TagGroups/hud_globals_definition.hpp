@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Engine/Game/math/integer_math.h"
+#include "Blam/Engine/math/integer_math.h"
 
 /*********************************************************************
 * name: hud_globals

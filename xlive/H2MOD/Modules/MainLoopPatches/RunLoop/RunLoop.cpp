@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "RunLoop.h"
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"

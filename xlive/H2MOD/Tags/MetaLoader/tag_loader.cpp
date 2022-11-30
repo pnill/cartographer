@@ -5,8 +5,8 @@
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 #include "Blam/Common/Common.h"
-#include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/tag_files/tag_groups.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/tag_files/tag_groups.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"

@@ -1,7 +1,7 @@
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Cache/DataTypes/StringID.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Engine/Game/game/players.h"
+#include "Blam/Engine/game/players.h"
 
 namespace PlayerRepresentation
 {

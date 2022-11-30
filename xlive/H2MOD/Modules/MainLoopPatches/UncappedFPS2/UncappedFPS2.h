@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
 
 namespace UncappedFPS2
 {

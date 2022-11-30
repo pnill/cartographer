@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "ObserverMode.h"
-#include "Blam/Engine/Game/game/players.h"
+#include "Blam/Engine/game/players.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"

@@ -8,7 +8,7 @@
 #include "Events/Mook.h"
 #include "Events/Paddy.h"
 
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

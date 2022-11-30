@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam/Common/Common.h"
-#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Variants/Variants.h"
 

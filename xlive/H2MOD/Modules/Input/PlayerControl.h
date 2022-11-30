@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/Game/game/player_control.h"
-#include "Blam/Engine/Game/networking/replication/replication_control_view.h"
+#include "Blam/Engine/game/player_control.h"
+#include "Blam/Engine/networking/replication/replication_control_view.h"
 
 namespace PlayerControl
 {

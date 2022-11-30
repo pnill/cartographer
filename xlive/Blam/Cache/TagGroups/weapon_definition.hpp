@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/Game/math/color_math.h"
-#include "Blam/Engine/Game/math/real_math.h"
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: weapon

@@ -9,7 +9,7 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
-#include "Blam/Engine/Game/game/game.h"
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

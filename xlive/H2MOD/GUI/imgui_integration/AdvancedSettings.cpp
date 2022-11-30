@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "Blam/Engine/Game/game/cheats.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"

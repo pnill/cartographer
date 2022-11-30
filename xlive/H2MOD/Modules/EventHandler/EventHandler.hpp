@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Engine/Game/game/game_options.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/game/game_options.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
 #include "H2MOD/Modules/Shell/ServerConsole.h"
 
 /*

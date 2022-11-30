@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "c_account_list_menu.h"
 
-#include "Blam/Engine/Game/memory/data.h"
+#include "Blam/Engine/memory/data.h"
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"

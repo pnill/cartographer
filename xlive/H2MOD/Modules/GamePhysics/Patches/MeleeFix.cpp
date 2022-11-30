@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "MeleeFix.h"
 
-#include "Blam/Engine/Game/memory/data.h"
-#include "Blam/Engine/Game/tag_files/string_ids.h"
+#include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/tag_files/string_ids.h"
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

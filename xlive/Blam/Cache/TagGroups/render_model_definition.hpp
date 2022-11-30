@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/DataTypes/Strings.h"
-#include "Blam/Engine/Game/math/color_math.h"
+#include "Blam/Engine/math/color_math.h"
 
 /*********************************************************************
 * name: render_model

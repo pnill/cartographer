@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Config.h"
 
-#include "Blam/Engine/Game/render/render_lod_new.h"
+#include "Blam/Engine/render/render_lod_new.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"

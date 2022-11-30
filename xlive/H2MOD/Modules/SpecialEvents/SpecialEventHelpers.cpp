@@ -4,7 +4,7 @@
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Game/tag_files/string_ids.h"
+#include "Blam/Engine/tag_files/string_ids.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

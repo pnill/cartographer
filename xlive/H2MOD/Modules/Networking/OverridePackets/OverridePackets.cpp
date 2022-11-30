@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "OverridePackets.h"
 
-#include "Blam/Engine/Game/memory/bitstream.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Util/Hooks/Hook.h"
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Blam/Engine/Game/memory/bitstream.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
-#include "Blam/Engine/Game/networking/session/network_session.h"
+#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/networking/session/network_session.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"

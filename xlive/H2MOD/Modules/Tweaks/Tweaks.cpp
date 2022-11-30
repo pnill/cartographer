@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
-#include "Blam/Engine/Game/game/game_time.h"
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
-#include "Blam/Engine/Game/tag_files/files.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/tag_files/files.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Shell/Config.h"

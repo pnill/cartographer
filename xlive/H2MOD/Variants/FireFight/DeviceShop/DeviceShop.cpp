@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "DeviceShop.h"
 
-#include "Blam/Engine/Game/game/players.h"
-#include "Blam/Engine/Game/units/bipeds.h"
+#include "Blam/Engine/game/players.h"
+#include "Blam/Engine/units/bipeds.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

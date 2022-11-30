@@ -3,7 +3,7 @@
 #include "CustomMenu.h"
 #include "CustomLanguage.h"
 
-#include "Blam/Engine/Game/networking/messages/network_message_type_collection.h"
+#include "Blam/Engine/networking/messages/network_message_type_collection.h"
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Accounts/AccountCreate.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"

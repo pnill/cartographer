@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "ControllerInput.h"
-#include "Blam/Engine/Game/game/game.h"
-#include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/networking/logic/network_life_cycle.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
 
