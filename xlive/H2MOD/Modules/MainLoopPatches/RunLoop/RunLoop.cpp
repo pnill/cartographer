@@ -4,7 +4,7 @@
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/networking/logic/network_life_cycle.h"
 
-#include "H2MOD/GUI/GUI.h"
+#include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Input/ControllerInput.h"
