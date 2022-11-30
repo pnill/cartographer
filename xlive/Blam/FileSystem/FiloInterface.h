@@ -49,12 +49,12 @@ enum FILO_FILE_OPEN_ERROR : DWORD
 
 namespace FiloInterface
 {
-	void filo_init(filo* filo_ptr, const std::string& path, bool path_is_directory);
+	filo* filo_init(filo* filo_ptr, const std::string& path, bool path_is_directory);
 
 	bool create_file_or_directory(filo* filo_ptr);
 
 	/* Returns success */
-	bool open(filo* filo_ptr, __int16 mode, DWORD* error_code);
+	bool open(filo* filo_ptr, __int16 mode, DWORD* out_error_code);
 
 	/* Returns success */
 	bool close(filo* filo_ptr);
@@ -69,7 +69,7 @@ namespace FiloInterface
 	On success the data read is written to data_buffer and the function returns true
 	On failure, if hide_errors_from_user is set to false an error is displayed to the user and false is returned, if the number of bytes read doesn't match the requested amount ERROR_HANDLE_EOF is set
 	*/
-	bool read(filo* filo_ptr, LPVOID data_buffer, DWORD nNumberOfBytesToRead, bool hide_errors_from_user);
+	bool read(filo* filo_ptr, LPVOID data_buffer, DWORD nNumberOfBytesToRead, bool suprress_errors);
 
 	/* Returns success */
 	bool write(filo* filo_ptr, LPVOID data, size_t data_size);
