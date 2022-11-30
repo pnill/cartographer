@@ -6,7 +6,6 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 
-#include "Blam/Engine/DataArray/TagDataIterator.h"
 #include "Blam/Engine/Game/game/game_time.h"
 #include "Blam/Engine/Game/math/real_math.h"
 #include "Blam/Engine/Game/objects/objects.h"
