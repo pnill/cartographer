@@ -19,13 +19,13 @@ namespace playlist_loader
 		Match = 2,
 	};
 
-	struct __declspec(align(4)) variant_match
+	struct alignas(4) variant_match
 	{
 		DWORD unk;
 		wchar_t variant_name[16];
 		DWORD data[302];
 	};
-	struct __declspec(align(4)) variant_matches
+	struct alignas(4) variant_matches
 	{
 		DWORD shuffle;
 		DWORD pregame_team_selection_delay;

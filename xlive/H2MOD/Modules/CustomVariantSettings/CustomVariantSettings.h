@@ -33,7 +33,7 @@ namespace CustomVariantSettings
 
 		double ComputedGravity() const
 		{
-			return gravity * physics_constants::get_default_gravity();
+			return gravity * s_physics_constants::get_default_gravity();
 		}
 
 		inline bool operator==(s_variantSettings& other) const

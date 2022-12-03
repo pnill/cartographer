@@ -51,7 +51,7 @@ struct s_qos_probe_data
 	DWORD pbData;
 };
 
-struct __declspec(align(8)) s_observer_channel
+struct alignas(8) s_observer_channel
 {
 	enum e_observer_channel_state : int
 	{
@@ -167,7 +167,7 @@ struct __declspec(align(8)) s_observer_channel
 };
 CHECK_STRUCT_SIZE(s_observer_channel, 0x740);
 
-struct __declspec(align(8)) s_network_observer
+struct alignas(8) s_network_observer
 {
 	void* network_observer_vtbl; // vtable at the start
 	void* network_link;

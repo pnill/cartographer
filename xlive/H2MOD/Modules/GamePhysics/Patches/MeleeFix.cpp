@@ -100,7 +100,7 @@ namespace MeleeFix
 
 		int biped_object = *(DWORD *)&objects->data[12 * (unsigned __int16)object_index + 8];
 		int melee_info_offset = *(__int16 *)(biped_object + 858); //???
-		auto biped_melee_info = (melee_info *)(biped_object + melee_info_offset);
+		auto biped_melee_info = (s_melee_animation_datum *)(biped_object + melee_info_offset);
 		int melee_type = biped_melee_info->melee_type_string_id;
 
 		if (biped_melee_info->melee_animation_update == biped_melee_info->max_animation_range || biped_melee_info->melee_animation_update == 0)

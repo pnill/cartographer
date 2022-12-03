@@ -3,7 +3,7 @@
 #include "..\NetworkCommon.h"
 #include "NetworkObserver.h"
 
-struct __declspec(align(8)) s_network_channel
+struct alignas(8) s_network_channel
 {
 	enum e_channel_closure_reason
 	{

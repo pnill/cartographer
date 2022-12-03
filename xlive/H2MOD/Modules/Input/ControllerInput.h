@@ -99,7 +99,7 @@ namespace ControllerInput
 		}
 	};
 
-	struct __declspec(align(2)) XINPUT_GAMEPAD
+	struct alignas(2) XINPUT_GAMEPAD
 	{
 		XINPUT_BUTTONS wButtons;
 		BYTE bLeftTrigger;
@@ -110,13 +110,13 @@ namespace ControllerInput
 		SHORT sThumbRY;
 	};
 
-	struct __declspec(align(4)) XINPUT_STATE
+	struct alignas(4) XINPUT_STATE
 	{
 		DWORD dwPacketNumber;
 		XINPUT_GAMEPAD Gamepad;
 	};
 
-	struct __declspec(align(4)) controller_info
+	struct alignas(4) controller_info
 	{
 		void **xinput_device_vtbl;
 		DWORD dwUserIndex;

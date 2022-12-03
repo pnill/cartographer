@@ -30,7 +30,7 @@ struct s_custom_map_id
 };
 static_assert(sizeof(s_custom_map_id) == 32 + sizeof(wchar_t) * 32);
 
-struct __declspec(align(4)) s_custom_map_entry
+struct alignas(4) s_custom_map_entry
 {
 	BYTE map_sha256_hash[SHA256_HASH_SIZE];
 	wchar_t map_name[MAX_MAP_NAME_SIZE]; // actually the name displayed

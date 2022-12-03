@@ -177,8 +177,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 	float remaining_distance_from_player_position = magnitude3d(&target_vector);
 	float max_speed_per_tick = get_max_melee_lunge_speed_per_tick(m_distance, m_weapon_is_sword);
 
-	float current_velocity_and_aiming_vector_dot_product = dot_product3d(&m_aiming_direction, current_velocity);
-	current_velocity_and_aiming_vector_dot_product *= time_globals::get_seconds_per_tick();
+	float current_velocity_and_aiming_vector_dot_product = dot_product3d(&m_aiming_direction, current_velocity) * time_globals::get_seconds_per_tick();
 
 	if (this->m_started_decelerating)
 	{
@@ -224,7 +223,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		if (get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword) <= k_valid_real_epsilon)
 		{
-			FINISH_DECELERATION(FLAG(melee_decelration_unk_flag));
+			FINISH_DECELERATION(FLAG(_melee_flag_deceleration_unk));
 			return;
 		}
 
@@ -244,9 +243,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		}*/
 
 		if (m_maximum_counter + ticks_to_add <= (m_melee_tick - 1))
-			out_current_flags |= FLAG(melee_deceleration_finished);
+			out_current_flags |= FLAG(_melee_flag_deceleration_finished);
 
-		if (!TEST_FLAG(out_current_flags, melee_deceleration_finished))
+		if (!TEST_FLAG(out_current_flags, _melee_flag_deceleration_finished))
 		{
 			// compare 2 dot products
 			if (dot_product3d(aiming_vector, &direction) <= (current_velocity_per_tick * melee_max_cosine) 
@@ -275,7 +274,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					return;
 				}
 
-				out_current_flags |= FLAG(melee_decelration_unk_flag);
+				out_current_flags |= FLAG(_melee_flag_deceleration_unk);
 				this->m_time_to_target_in_ticks = 0;
 				return;
 			}
@@ -283,7 +282,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			{
 				if (current_velocity_per_tick <= k_valid_real_epsilon)
 				{
-					FINISH_DECELERATION(FLAG(melee_decelration_unk_flag));
+					FINISH_DECELERATION(FLAG(_melee_flag_deceleration_unk));
 					return;
 				}
 			

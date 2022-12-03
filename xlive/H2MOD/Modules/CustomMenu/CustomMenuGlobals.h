@@ -18,7 +18,7 @@ enum e_ui_channel
 	_ui_channel_gameshell_background = 6,
 };
 
-struct __declspec(align(4)) s_new_ui_screen_parameters
+struct alignas(4) s_new_ui_screen_parameters
 {
 	void data_new(__int16 _flags1, __int16 _flags2, int ui_channel, int a4, proc_ui_screen_load_cb_t ui_screen_load_cb)
 	{

@@ -2,7 +2,7 @@
 
 namespace MeleeFix
 {
-	struct __unaligned __declspec(align(2)) melee_info
+	struct alignas(4) s_melee_animation_datum
 	{
 		DWORD field_0;
 		DWORD melee_flags;

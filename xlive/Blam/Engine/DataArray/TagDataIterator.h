@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamTag.h"
 
-struct __declspec(align(4)) s_tag_data_iterator
+struct alignas(4) s_tag_data_iterator
 {
 	DWORD dword0;
 	DWORD dword4;

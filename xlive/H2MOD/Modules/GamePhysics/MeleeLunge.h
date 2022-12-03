@@ -13,10 +13,10 @@
 
 enum melee_flags
 {
-	melee_decelration_unk_flag = 4,
-	melee_deceleration_finished,
+	_melee_flag_deceleration_unk = 4,
+	_melee_flag_deceleration_finished,
 
-	melee_flags_end
+	_melee_flag_end
 };
 
 #define melee_flags_mask 0xF0 // use first 4 bits of the 1 byte variable as flags
@@ -33,7 +33,7 @@ struct s_character_physics_output
 };
 CHECK_STRUCT_SIZE(s_character_physics_output, 0x64);
 
-struct __declspec(align(4)) c_character_physics_mode_melee_datum
+struct alignas(4) c_character_physics_mode_melee_datum
 {
 	int m_time_to_target_in_ticks;
 	int m_melee_tick;
