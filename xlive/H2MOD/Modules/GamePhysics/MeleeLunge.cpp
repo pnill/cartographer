@@ -189,7 +189,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		physics_output->translational_velocity = *current_velocity;
 
 		// get the velocity per game logic update
-		physics_output->translational_velocity = physics_output->translational_velocity * time_globals::get()->seconds_per_tick;
+		scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 
 		real_vector3d direction = physics_output->translational_velocity;
 
@@ -204,14 +204,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 		// field_28 is always the same after the first melee tick
 		float unk1 = m_field_28 * 1.5;
-		double unk2 = 0.75;
-		if (unk1 >= 0.75)
-		{
-			if (unk1 <= 3.5)
-				unk2 = unk1;
-			else
-				unk2 = 3.5;
-		}
+		double unk2 = blam_max(blam_min(unk1, 3.5), 0.75);
 
 		float maybe_minimum_velocity = time_globals::get_seconds_per_tick() * unk2;
 
@@ -235,28 +228,13 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			return;
 		}
 
-		/*LOG_TRACE_MELEE("{} - current velocity/tick: {}, unk3: {}, minimum velocity/tick: {}, velocity to decelerate/tick: {}",
-			__FUNCTION__,
-			current_velocity_per_tick,
-			unk3,
-			minimum_velocity_per_tick,
-			velocity_to_decelerate_per_tick);
-
-		LOG_TRACE_MELEE("{} - initial velocity before deceleration: {}",
-			__FUNCTION__,
-			initial_velocity_before_deceleration);*/
-
 		//current_velocity_per_tick > minimum_velocity_per_tick
 		//decelerated_velocity > this->velocity_to_decelerate
 
 		/*float aiming_and_player_velocity_product = current_velocity->dot_product(this->aiming_direction);
 		aiming_and_player_velocity_product *= time_globals::get_seconds_per_tick();*/
 
-		/*float unk5 = compute_something(aiming_and_player_velocity_product, max_speed_per_tick);
-		if (unk5 < 0.0f)
-			unk5 = 0.0f;*/
-
-		//float distance_to_target_point = distance_vector.magnitude();
+		/*float unk5 = blam_max(0.0f, compute_something(aiming_and_player_velocity_product, max_speed_per_tick));*/
 
 		int ticks_to_add = 0;
 
@@ -275,16 +253,15 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				|| normalized_current_magnitude_per_tick == 0.0f)
 			{
 				float unk4 = (this->m_velocity_to_decelerate + maybe_minimum_velocity) / 3.0f;
-				float deceleration = current_velocity_per_tick;
-				if (unk4 <= current_velocity_per_tick)
-					deceleration = unk4;
+				float deceleration = blam_min(current_velocity_per_tick, unk4);
 
 				// deceleration *= time_globals::get_ticks_difference_real();
 
 				// im not entirely sure if this is needed or not
+				// scale_vector3d(&output->out_translational_velocity, time_globals::get_ticks_difference_real(), &output->out_translational_velocity);
 				//output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
 
-				physics_output->translational_velocity = (direction * (-deceleration)) + physics_output->translational_velocity;
+				point_from_line3d(&physics_output->translational_velocity, &direction, -deceleration, &physics_output->translational_velocity);
 
 				// this shit apparently is not converted back to a vector that
 				// - defines the velocity in units per seconds intead of units per tick
@@ -321,7 +298,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					deceleration = current_velocity_per_tick;
 				}
 				
-				physics_output->translational_velocity = (direction * (-deceleration)) + physics_output->translational_velocity;
+				point_from_line3d(&physics_output->translational_velocity, &direction, -deceleration, &physics_output->translational_velocity);
 
 				//this->m_time_to_target_in_ticks = ((_FP5 * 0.5f) + v124);
 				//addDebugText("remaining target distance ticks: %f, %d", ((_FP5 * 0.5f) + v124), this->m_time_to_target_in_ticks);
@@ -331,7 +308,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 				//addDebugText("remaining target distance ticks h2 code: %f, %d", ((remaining_distance / something1) - 0.5f), this->m_time_to_target_in_ticks);
 
-				physics_output->translational_velocity = physics_output->translational_velocity * (float)time_globals::get()->ticks_per_second;
+				scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 				return;
 			}
 		}
@@ -571,8 +548,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					if (dot_product3d(aiming_vector, &direction_of_current_translational_velocity) <= (temp_current_velocity_per_tick * 0.087155744f)
 						|| current_velocity_per_tick_from_normalization == 0.0f)
 					{
-						float deceleration = (this->m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f;
-						deceleration = blam_min(deceleration, temp_current_velocity_per_tick);
+						float deceleration = blam_min((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f, temp_current_velocity_per_tick);
 
 						point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, -deceleration, &physics_output->translational_velocity);
 
@@ -592,7 +568,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						{
 							float deceleration = blam_min(m_velocity_to_decelerate / k_deceleration_ticks_real, temp_current_velocity_per_tick);
 							point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, -deceleration, &physics_output->translational_velocity);
-							scale_vector3d(&physics_output->translational_velocity, (float)time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+							scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 							m_time_to_target_in_ticks = (int)((distance_to_target_point / unk1) - 0.5f);
 							
 							// this does "fix" (more like improve, it still doesn't match 30 tick behaviour) the sword going too hard 
@@ -612,7 +588,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				{
 					// maintain current velocity
 					physics_output->translational_velocity = current_translational_velocity_per_tick;
-					scale_vector3d(&physics_output->translational_velocity, (float)time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+					scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 					m_time_to_target_in_ticks = (int)((((distance_to_target_point - unk1) / max_speed_per_tick) + 3.0f) - 0.5f);
 				}
 				else
@@ -631,7 +607,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					// 	final_acceleration = max_speed_per_tick;
 
 					point_from_line3d(&current_translational_velocity_per_tick, &m_aiming_direction, final_acceleration, &physics_output->translational_velocity);
-					scale_vector3d(&physics_output->translational_velocity, (float)time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
+					scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
 
 					// static_assert(offsetof(c_character_physics_mode_melee_datum, m_aiming_direction) == 0x3C);
 
@@ -690,7 +666,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	float unk_float_distance = dot_product3d(&m_aiming_direction, translational_velocity);
 	unk_float_distance *= time_globals::get_seconds_per_tick();
-	float unk_velocity = blam_max(0.0f, melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(this->m_distance, this->m_weapon_is_sword)));
+	float unk_velocity = blam_max(0.0f, melee_lunge_compute_something_1(unk_float_distance, get_max_melee_lunge_speed_per_tick(m_distance, m_weapon_is_sword)));
 
 	float log_magnitude = magnitude3d(&physics_output->translational_velocity);
 
@@ -712,9 +688,9 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 	LOG_TRACE_MELEE("{} : target point: x: {} y: {}, z: {}",
 		__FUNCTION__,
-		this->m_target_point.x,
-		this->m_target_point.y,
-		this->m_target_point.z);
+		m_target_point.x,
+		m_target_point.y,
+		m_target_point.z);
 
 	LOG_TRACE_MELEE("{} : aiming vector adjusted length (should be 1.0 or a little lower): {}",
 		__FUNCTION__,

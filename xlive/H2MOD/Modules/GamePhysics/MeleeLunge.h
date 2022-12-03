@@ -40,7 +40,7 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	int m_maximum_counter;
 	bool m_weapon_is_sword;
 	bool m_has_target;
-	BYTE field_E;
+	bool field_E;
 	BYTE field_F;
 	real_point3d m_melee_start_origin;
 	real_vector3d field_1C;
@@ -49,15 +49,14 @@ struct __declspec(align(4)) c_character_physics_mode_melee_datum
 	real_point3d m_target_point;
 	real_vector3d m_aiming_direction;
 	float m_maximum_distance;
-	BYTE m_started_decelerating;
-	BYTE field_4D;
-	BYTE field_4E[2];
+	bool m_started_decelerating;
+	BYTE field_4D[3]; // we could use this alignment padding to store data, like flags
 	float m_velocity_to_decelerate;
 	float m_distance_to_target_point_before_deceleration;
 	real_vector3d field_58;
 	int field_64;
 	int field_68;
-	int field_6C;
+	float field_6C;
 	int field_70;
 	char gap_74[20];
 
@@ -74,8 +73,6 @@ CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 void call_character_melee_physics_input_update_internal();
 void call_character_melee_physics_input_update_internal();
 
-void melee_force_decelerate_fixup();
-void melee_limit_some_random_vector();
 void __cdecl biped_dash_hook(datum object_index, datum target_player, char sword);
 
 extern bool melee_lunge_hook_enabled;
