@@ -6,6 +6,7 @@
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/GameHooks.h"
+#include "Blam/Engine/interface/interface.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine_king.h"
 #include "Blam/Engine/game/game_time.h"
@@ -679,6 +680,9 @@ void H2MOD::ApplyHooks() {
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 
 		aim_assist::ApplyPatches();
+		console::ApplyPatches();
+		_interface::ApplyPatches();
+		players::ApplyPatches();
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
@@ -686,11 +690,6 @@ void H2MOD::ApplyHooks() {
 		//pResetRound = (ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
 
 		TEST_N_DEF(PC2);
-		
-		players::ApplyPatches();
-
-		// hook the print command to redirect the output to our console
-		console::ApplyPatches();
 
 		calculate_model_lod = Memory::GetAddress(0x19CA3E);
 		calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);

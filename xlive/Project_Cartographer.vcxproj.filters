@@ -166,6 +166,7 @@
     <ClCompile Include="Blam\Engine\main\console.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_king.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files.cpp" />
+    <ClCompile Include="Blam\Engine\interface\interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -518,6 +519,7 @@
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files.h" />
+    <ClInclude Include="Blam\Engine\interface\interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -423,6 +423,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GameRewriteDebug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Blam\Engine\interface\interface.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
@@ -446,6 +447,7 @@
     <ClInclude Include="Blam\Engine\game\game_engine_king.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
+    <ClInclude Include="Blam\Engine\interface\interface.h" />
     <ClInclude Include="Blam\Engine\items\equipment.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
     <ClInclude Include="Blam\Engine\main\console.h" />
