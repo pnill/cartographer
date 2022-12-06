@@ -6,16 +6,16 @@
 #include "H2MOD.h"
 
 #define k_valid_real_epsilon 0.001f
+// in practice the actual acceleration takes place in just 3 ticks, but it is defined as 5 for some reason
 #define k_acceleration_ticks_real 5.0f
 #define k_acceleration_ticks ((int)k_acceleration_ticks_real)
 #define k_deceleration_ticks_real 4.0f
 #define k_deceleration_ticks ((int)k_deceleration_ticks_real)
 
-enum melee_flags
+enum
 {
 	_melee_flag_deceleration_unk = 4,
-	_melee_flag_deceleration_finished,
-
+	_melee_flag_max_deceleration_ticks_reached,
 	_melee_flag_end
 };
 
@@ -50,7 +50,12 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	real_vector3d m_aiming_direction;
 	float m_maximum_distance;
 	bool m_started_decelerating;
-	BYTE field_4D[3]; // we could use this alignment padding to store data, like flags
+	BYTE field_4D[1];
+
+	// in practice, this is actually structure padding, that we use flags to store information
+	BYTE m_flags;
+	BYTE m_deceleration_ticks;
+
 	float m_velocity_to_decelerate;
 	float m_distance_to_target_point_before_deceleration;
 	real_vector3d field_58;
@@ -61,7 +66,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	char gap_74[20];
 
 	bool pin_localized_velocity(real_vector3d* output, real_vector3d* localized_velocity);
-	void melee_deceleration_fixup(s_character_physics_output* output, real_point3d* object_origin, real_vector3d* current_velocity, real_vector3d* aiming_vector, BYTE& current_flags, BYTE& deceleration_tick_count);
+	void melee_deceleration_fixup(s_character_physics_output* output, real_point3d* object_origin, real_vector3d* current_velocity, real_vector3d* aiming_vector);
 
 	void build_initial_melee_parameters(bool valid);
 	void update_melee_parameters();
@@ -71,8 +76,5 @@ struct alignas(4) c_character_physics_mode_melee_datum
 CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 
 void call_character_melee_physics_input_update_internal();
-void call_character_melee_physics_input_update_internal();
-
-void __cdecl biped_dash_hook(datum object_index, datum target_player, char sword);
 
 extern bool melee_lunge_hook_enabled;
