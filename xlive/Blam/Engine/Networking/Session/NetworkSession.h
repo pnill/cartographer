@@ -39,7 +39,6 @@ namespace NetworkSession
 
 	// peer-player functions
 	int GetPeerIndex(int playerIdx);
-	const wchar_t* GetPeerPlayerName(int peerIdx);
 
 	// player functions
 	

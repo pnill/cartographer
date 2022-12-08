@@ -923,9 +923,10 @@ void vip_lock(e_game_life_cycle state)
 	}
 	if(state == _life_cycle_in_game)
 	{
-		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
+		for (int i = 0; i < ENGINE_MAX_PLAYERS; i++)
 		{
-			ServerConsole::AddVip(NetworkSession::GetPeerPlayerName(i));
+			if (NetworkSession::PlayerIsActive(i))
+				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));
 			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
 		}
 		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");

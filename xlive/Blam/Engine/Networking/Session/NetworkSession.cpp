@@ -139,19 +139,6 @@ int NetworkSession::GetPeerIndex(int playerIdx)
 	return GetPlayerInformation(playerIdx)->peer_index;
 }
 
-const wchar_t* NetworkSession::GetPeerPlayerName(int peerIdx)
-{
-	if (GetPeerCount() > 0)
-	{
-		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
-		{
-			if (GetPeerIndex(playerIdx) == peerIdx)
-				return GetPlayerName(playerIdx);
-		}
-	}
-	return nullptr;
-}
-
 int NetworkSession::GetPlayerCount()
 {
 	return GetCurrentNetworkSession()->membership[0].player_count;
