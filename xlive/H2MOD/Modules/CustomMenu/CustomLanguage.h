@@ -43,7 +43,8 @@ enum e_language_ids
 	_lang_id_spanish,
 	_lang_id_italian,
 	_lang_id_korean,
-	_lang_id_chinese
+	_lang_id_chinese,
+	_end
 };
 
 typedef struct {

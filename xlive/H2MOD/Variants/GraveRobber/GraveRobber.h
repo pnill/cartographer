@@ -1,15 +1,21 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "H2MOD\Variants\VariantSystem.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "H2MOD/Variants/VariantSystem.h"
 
 enum e_headhunter_sounds
 {
 	_snd_head_hunter,
-	_snd_skull_scored
+	_snd_skull_scored,
+	_snd_end
 };
 
-class HeadHunter : public ICustomGameVariant
+struct s_headhunterSoundTable
+{
+	const wchar_t* sound_file_path[_snd_end];
+};
+
+class GraveRobber : public ICustomGameVariant
 {
 public:
 	virtual void Initialize() override;
@@ -30,8 +36,8 @@ public:
 
 	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override;
 
-	HeadHunter();
-	~HeadHunter();
+	GraveRobber();
+	~GraveRobber();
 	static void initClient();
 	static void SpawnSkull(datum playerIdx);
 	static void PickupSkull(datum playerIdx, datum skullDatum);

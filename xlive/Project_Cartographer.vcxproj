@@ -352,7 +352,7 @@
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
-    <ClCompile Include="H2MOD\Variants\HeadHunter\HeadHunter.cpp" />
+    <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
@@ -688,7 +688,7 @@
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
-    <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h" />
+    <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
