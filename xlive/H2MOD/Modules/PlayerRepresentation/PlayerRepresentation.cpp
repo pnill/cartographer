@@ -1,22 +1,23 @@
 #include "stdafx.h"
 
 #include "PlayerRepresentation.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Engine\Game\GameEngineGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Players\Players.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Engine/Game/GameEngineGlobals.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Players/Players.h"
+#include "Blam/Enums/HaloStrings.h"
 
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/TagInterface.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 namespace PlayerRepresentation
 {

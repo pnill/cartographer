@@ -1,30 +1,23 @@
 #include "stdafx.h"
-
 #include "GraveRobber.h"
 
+#include "H2MOD.h"
 #include "Blam/Engine/Game/GameGlobals.h"
-#include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Utils/Utils.h"
 
 bool b_firstSpawn;
-s_headhunterSoundTable headhunterSoundTable[(int)e_language_ids::_end];
+wchar_t* headhunterSoundTable[_snd_end]	{nullptr};
 
-GraveRobber::GraveRobber()
+void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 {
-	b_firstSpawn = true;
-	headhunterSoundTable[_lang_id_english].sound_file_path[_snd_head_hunter] = { L"sounds/en/headhunter.wav"};
-	headhunterSoundTable[_lang_id_english].sound_file_path[_snd_skull_scored] = { L"sounds/en/skull_scored.wav"};
-	headhunterSoundTable[_lang_id_spanish].sound_file_path[_snd_head_hunter] = { L"sounds/es/headhunter.wav" };
-	headhunterSoundTable[_lang_id_spanish].sound_file_path[_snd_skull_scored] = { L"sounds/es/skull_scored.wav" };
-}
-
-void GraveRobber::TriggerSound(e_headhunter_sounds sound, int sleep)
-{
-	LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[H2Config_language.code_main].sound_file_path[sound]);
-	h2mod->custom_sound_play(headhunterSoundTable[H2Config_language.code_main].sound_file_path[sound], sleep);
+	if (headhunterSoundTable[sound] != nullptr)
+	{
+		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[sound]);
+		h2mod->custom_sound_play(headhunterSoundTable[sound], sleep);
+	}
 }
 
 void GraveRobber::SpawnPlayerClientSetup()
@@ -89,7 +82,49 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 
 void GraveRobber::initClient()
 {
+	const int language_id = *Memory::GetAddress<int*>(0x412818);
+
 	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	b_firstSpawn = true;
+
+	switch (language_id)
+	{
+	case _lang_id_chinese:
+		break;
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_CH) / 2] {SND_HEADHUNTER_CH};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_CH) / 2] {SND_SKULL_SCORED_CH};
+	case _lang_id_english:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
+		break;
+	case _lang_id_spanish:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_ES) / 2] {SND_HEADHUNTER_ES};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_ES) / 2] {SND_SKULL_SCORED_ES};
+		break;
+	case _lang_id_french:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_FR) / 2] {SND_HEADHUNTER_FR};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_FR) / 2] {SND_SKULL_SCORED_FR};
+		break;
+	case _lang_id_german:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_GE) / 2] {SND_HEADHUNTER_GE};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_GE) / 2] {SND_SKULL_SCORED_GE};
+		break;
+	case _lang_id_italian:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_IT) / 2] {SND_HEADHUNTER_IT};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_IT) / 2] {SND_SKULL_SCORED_IT};
+		break;
+	case _lang_id_japanese:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_JP) / 2] {SND_HEADHUNTER_JP};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_JP) / 2] {SND_SKULL_SCORED_JP};
+		break;
+	case _lang_id_korean:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_KO) / 2] {SND_HEADHUNTER_KO};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_KO) / 2] {SND_SKULL_SCORED_KO};
+		break;
+	default:
+		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
+		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
+	}
 }
 
 void GraveRobber::Initialize()
@@ -102,6 +137,13 @@ void GraveRobber::Initialize()
 
 void GraveRobber::Dispose()
 {
+	for (size_t i = 0; i < _snd_end; i++)
+	{
+		if (headhunterSoundTable[i] != nullptr)
+		{
+			delete headhunterSoundTable[i];
+		}
+	}
 }
 
 CustomVariantId GraveRobber::GetVariantId()
@@ -148,8 +190,6 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!Memory::IsDedicatedServer())
 			GraveRobber::SpawnPlayerClientSetup();
 		break;
-
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
@@ -171,8 +211,6 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 
 	case ExecTime::_postEventExec:
 		break;
-
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;

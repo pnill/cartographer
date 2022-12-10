@@ -1,21 +1,24 @@
 #include "stdafx.h"
 
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/IceCreamFlavor/IceCreamFlavor.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+
+#include "H2MOD.h"
+#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
+#include "Util/Hooks/Hook.h"
 
 #ifndef NDEBUG
-#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
-#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Utils/Utils.h"
 #endif
 
 #include "imgui.h"

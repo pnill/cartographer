@@ -1,6 +1,6 @@
 #pragma once
 
-#include "H2MOD.h"
+#include "Blam/Math/integer_math.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 
 void InitH2Config();
@@ -49,6 +49,17 @@ enum H2Config_Experimental_Rendering_Mode : byte
 	_rendering_mode_old,
 	_rendering_mode_new,
 	_rendering_mode_original_game_frame_limit
+};
+
+enum e_static_lod : DWORD
+{
+	disable = 0,
+	super_low,
+	low,
+	medium,
+	high,
+	super_high,
+	cinematic
 };
 
 extern std::string cartographerURL;

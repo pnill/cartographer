@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Engine/Objects/ObjectPlacementData.h"
 
-#include "Blam\Engine\Game\GameOptions.h"
-#include "Blam\Engine\Players\Players.h"
-#include "Blam\Common\Common.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "Blam/Engine/Game/GameOptions.h"
+#include "Blam/Engine/Players/Players.h"
+#include "Blam/Common/Common.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
 
-#include "H2MOD\Variants\Variants.h"
+#include "H2MOD/Variants/Variants.h"
 
 enum e_sound_type
 {
@@ -19,17 +19,6 @@ enum e_sound_type
 	_sound_type_slayer,
 };
 #define ALL_SOUNDS_NO_SLAYER (FLAG(_sound_type_team_change) | FLAG(_sound_type_gained_the_lead) | FLAG(_sound_type_lost_the_lead) | FLAG(_sound_type_tied_leader))
-
-enum e_static_lod : DWORD
-{
-	disable = 0,
-	super_low,
-	low,
-	medium,
-	high,
-	super_high,
-	cinematic
-};
 
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
 

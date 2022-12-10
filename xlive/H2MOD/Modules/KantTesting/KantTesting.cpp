@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "KantTesting.h"
+
+#include "H2MOD.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"

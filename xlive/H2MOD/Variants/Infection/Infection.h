@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\VariantSystem.h"
+#include "../VariantSystem.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 

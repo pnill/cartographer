@@ -1,18 +1,19 @@
 #include "stdafx.h"
-
 #include "Infection.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Cache\TagGroups\item_collection_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "H2MOD\Tags\TagInterface.h"
+
+#include "H2MOD.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Cache/TagGroups/item_collection_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 std::vector<unsigned long long> Infection::zombieIdentifiers;
 

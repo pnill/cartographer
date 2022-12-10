@@ -1,16 +1,16 @@
 #include "stdafx.h"
-
 #include "ImGui_ConsoleImpl.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
 
-#include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "H2MOD.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
 #include "XLive\xnet\IpManagement\XnIp.h"

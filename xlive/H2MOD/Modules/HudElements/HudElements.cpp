@@ -1,19 +1,19 @@
 #include "stdafx.h"
 
 #include "HudElements.h"
-
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
-#include "Blam\Engine\render\render_cameras.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
-#include "H2MOD\Modules\Input\KeyboardInput.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Blam\Cache\TagGroups\bitmap_definition.hpp"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD.h"
+#include "Blam/Engine/IceCreamFlavor/IceCreamFlavor.h"
+#include "Blam/Engine/render/render_cameras.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Utils/Utils.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Blam/Cache/TagGroups/bitmap_definition.hpp"
+#include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

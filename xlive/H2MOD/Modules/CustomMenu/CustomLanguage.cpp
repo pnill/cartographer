@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Utils/Utils.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 #pragma region Custom Language
 
@@ -477,36 +477,36 @@ void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
 void setGameLanguage() {
 	bool* HasLoadedLanguage = (bool*)(H2BaseAddr + 0x481908);
 
-	int& language_id = *(int*)(H2BaseAddr + 0x412818);
+	int* language_id = Memory::GetAddress<int*>(0x412818);
 	if (current_language_main >= 0) {
-		language_id = current_language_main;
+		*language_id = current_language_main;
 	}
 	else {
 		switch (GetUserDefaultLangID() & 0x3FF)
 		{
 		case 0x11:
-			language_id = _lang_id_japanese;
+			*language_id = _lang_id_japanese;
 			break;
 		case 7:
-			language_id = _lang_id_german;
+			*language_id = _lang_id_german;
 			break;
 		case 0xC:
-			language_id = _lang_id_french;
+			*language_id = _lang_id_french;
 			break;
 		case 0xA:
-			language_id = _lang_id_spanish;
+			*language_id = _lang_id_spanish;
 			break;
 		case 0x10:
-			language_id = _lang_id_italian;
+			*language_id = _lang_id_italian;
 			break;
 		case 0x12:
-			language_id = _lang_id_korean;
+			*language_id = _lang_id_korean;
 			break;
 		case 4:
-			language_id = _lang_id_chinese;
+			*language_id = _lang_id_chinese;
 			break;
 		default:
-			language_id = _lang_id_english;
+			*language_id = _lang_id_english;
 			break;
 		}
 	}
@@ -518,7 +518,7 @@ void setGameLanguage() {
 	{
 		int result = atol(DstBuf);
 		if (result > 0 || result > 9)
-			language_id = _lang_id_english;
+			*language_id = _lang_id_english;
 	}
 
 	*HasLoadedLanguage = true;

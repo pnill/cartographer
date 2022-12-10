@@ -2,13 +2,13 @@
 
 #include "FireFight.h"
 
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Cache\TagGroups\character_definition.hpp"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Cache/TagGroups/character_definition.hpp"
 
-#include "Blam\Engine\Actor\Actor.h"
-#include "Blam\Engine\Objects\Objects.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "Blam/Engine/Actor/Actor.h"
+#include "Blam/Engine/Objects/Objects.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 #include "H2MOD.h"
 

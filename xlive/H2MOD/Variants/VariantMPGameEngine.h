@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Engine\Objects\Objects.h"
+#include "Blam/Engine/Objects/Objects.h"
 
 enum e_game_engine_types
 {
