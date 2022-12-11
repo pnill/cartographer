@@ -9,7 +9,7 @@ enum CustomVariantId
 	_id_unknown = -1,
 	_id_infection = 0,
 	_id_gungame,
-	_id_headhunter,
+	_id_graverobber,
 	_id_firefigth,
 
 	_custom_variant_id_end
