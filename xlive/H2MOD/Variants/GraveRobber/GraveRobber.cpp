@@ -9,7 +9,7 @@
 #include "H2MOD/Utils/Utils.h"
 
 bool b_firstSpawn;
-wchar_t* headhunterSoundTable[_snd_end]	{nullptr};
+wchar_t* headhunterSoundTable[e_graverobber_sounds::_graverobber_end] { nullptr };
 
 void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 {
@@ -91,39 +91,39 @@ void GraveRobber::initClient()
 	{
 	case _lang_id_chinese:
 		break;
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_CH) / 2] {SND_HEADHUNTER_CH};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_CH) / 2] {SND_SKULL_SCORED_CH};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_CH) / 2] {SND_HEADHUNTER_CH};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_CH) / 2] {SND_SKULL_SCORED_CH};
 	case _lang_id_english:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
 		break;
 	case _lang_id_spanish:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_ES) / 2] {SND_HEADHUNTER_ES};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_ES) / 2] {SND_SKULL_SCORED_ES};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_ES) / 2] {SND_HEADHUNTER_ES};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_ES) / 2] {SND_SKULL_SCORED_ES};
 		break;
 	case _lang_id_french:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_FR) / 2] {SND_HEADHUNTER_FR};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_FR) / 2] {SND_SKULL_SCORED_FR};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_FR) / 2] {SND_HEADHUNTER_FR};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_FR) / 2] {SND_SKULL_SCORED_FR};
 		break;
 	case _lang_id_german:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_GE) / 2] {SND_HEADHUNTER_GE};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_GE) / 2] {SND_SKULL_SCORED_GE};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_GE) / 2] {SND_HEADHUNTER_GE};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_GE) / 2] {SND_SKULL_SCORED_GE};
 		break;
 	case _lang_id_italian:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_IT) / 2] {SND_HEADHUNTER_IT};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_IT) / 2] {SND_SKULL_SCORED_IT};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_IT) / 2] {SND_HEADHUNTER_IT};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_IT) / 2] {SND_SKULL_SCORED_IT};
 		break;
 	case _lang_id_japanese:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_JP) / 2] {SND_HEADHUNTER_JP};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_JP) / 2] {SND_SKULL_SCORED_JP};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_JP) / 2] {SND_HEADHUNTER_JP};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_JP) / 2] {SND_SKULL_SCORED_JP};
 		break;
 	case _lang_id_korean:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_KO) / 2] {SND_HEADHUNTER_KO};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_KO) / 2] {SND_SKULL_SCORED_KO};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_KO) / 2] {SND_HEADHUNTER_KO};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_KO) / 2] {SND_SKULL_SCORED_KO};
 		break;
 	default:
-		headhunterSoundTable[_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
-		headhunterSoundTable[_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
+		headhunterSoundTable[e_graverobber_sounds::_snd_head_hunter] = new wchar_t[sizeof(SND_HEADHUNTER_EN) / 2] {SND_HEADHUNTER_EN};
+		headhunterSoundTable[e_graverobber_sounds::_snd_skull_scored] = new wchar_t[sizeof(SND_SKULL_SCORED_EN) / 2] {SND_SKULL_SCORED_EN};
 	}
 }
 
@@ -137,7 +137,7 @@ void GraveRobber::Initialize()
 
 void GraveRobber::Dispose()
 {
-	for (size_t i = 0; i < _snd_end; i++)
+	for (size_t i = 0; i < _graverobber_end; i++)
 	{
 		if (headhunterSoundTable[i] != nullptr)
 		{

@@ -1,6 +1,12 @@
 #pragma once
-
 #define ENGINE_MAX_LOCAL_PLAYERS (4)
+#include "Players.h"
+
+struct s_local_player_properties
+{
+	s_player::s_player_properties player_properties;
+	char gap_84[52];
+};
 
 static bool local_user_has_player(int user_index)
 {

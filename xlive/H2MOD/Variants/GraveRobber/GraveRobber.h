@@ -24,7 +24,7 @@ enum e_graverobber_sounds
 {
 	_snd_head_hunter,
 	_snd_skull_scored,
-	_snd_end
+	_graverobber_end
 };
 
 class GraveRobber : public ICustomGameVariant

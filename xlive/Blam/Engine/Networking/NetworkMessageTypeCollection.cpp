@@ -230,7 +230,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			s_rank_change* recieved_data = (s_rank_change*)packet;
 			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}", 
 				recieved_data->rank);
-			h2mod->set_local_rank(recieved_data->rank);
+			h2mod->set_local_rank(recieved_data->rank, 0);
 		}
 		break;
 	}

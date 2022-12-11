@@ -43,13 +43,12 @@ public:
 	void set_unit_speed_patch(bool hackit);
 	void set_local_team_index(int local_player_index, int team);
 	void set_local_clan_tag(int local_player_index, unsigned long long tag);
-	BYTE get_local_team_index();
+	BYTE get_local_team_index(int local_player_index);
 	void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
 	void disable_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool b_Enable);
-	void set_local_rank(BYTE rank);
-	void cine_start_tex();
+	void set_local_rank(BYTE rank, unsigned long local_player_index);
 
 	e_engine_type GetEngineType() { return engineType; }
 	void SetCurrentEngineType(e_engine_type value) { engineType = value; }

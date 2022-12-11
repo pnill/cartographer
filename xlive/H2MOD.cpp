@@ -1,50 +1,51 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "Blam\Enums\HaloStrings.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\FileSystem\FiloInterface.h"
-#include "Blam\Engine\Game\DamageData.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
-#include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\EngineHooks\EngineHooks.h"
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
-#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
-#include "H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h"
-#include "H2MOD\Modules\HaloScript\HaloScript.h"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Input\ControllerInput.h"
-#include "H2MOD\Modules\Input\KeyboardInput.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Modules\KantTesting\KantTesting.h"
-#include "H2MOD\Modules\MainMenu\MapSlots.h"
-#include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
-#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Modules\Stats\StatsHandler.h"
-#include "H2MOD\Modules\TagFixes\TagFixes.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "Util\Hooks\Hook.h"
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
+#include "Blam/Enums/HaloStrings.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Engine/Memory/bitstream.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/FileSystem/FiloInterface.h"
+#include "Blam/Engine/Game/DamageData.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Players/LocalPlayers.h"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/IceCreamFlavor/IceCreamFlavor.h"
+#include "H2MOD/Discord/DiscordInterface.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineHooks/EngineHooks.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Modules/KantTesting/KantTesting.h"
+#include "H2MOD/Modules/MainMenu/MapSlots.h"
+#include "H2MOD/Modules/MainMenu/Ranks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/TagFixes/TagFixes.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "Util/Hooks/Hook.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 
 #include <float.h>
 
@@ -308,9 +309,10 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	}
 }
 
-BYTE H2MOD::get_local_team_index()
+BYTE H2MOD::get_local_team_index(int local_player_index)
 {
-	return *Memory::GetAddress<BYTE*>(0x51A6B4);
+	const s_local_player_properties *local_player_properties = Memory::GetAddress<s_local_player_properties*>(0x51A638 + (sizeof(s_local_player_properties) * local_player_index));
+	return local_player_properties->player_properties.player_team;
 }
 #pragma endregion
 
@@ -455,7 +457,7 @@ void H2MOD::disable_weapon_pickup(bool bEnable)
 	}
 }
 
-void H2MOD::set_local_rank(BYTE rank)
+void H2MOD::set_local_rank(BYTE rank, unsigned long local_player_index)
 {
 	if (Memory::IsDedicatedServer())
 		return;
@@ -468,10 +470,10 @@ void H2MOD::set_local_rank(BYTE rank)
 		initialized = true;
 	}
 
-	s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
+	s_local_player_properties* local_player_properties = Memory::GetAddress<s_local_player_properties*>(0x51A638 + (sizeof(s_local_player_properties) * local_player_index));
 
-	local_player_properties->player_overall_skill = rank;
-	local_player_properties->player_displayed_skill = rank;
+	local_player_properties->player_properties.player_overall_skill = rank;
+	local_player_properties->player_properties.player_displayed_skill = rank;
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)

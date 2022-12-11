@@ -153,7 +153,7 @@ void StatsHandler::game_life_cycle_update_event(e_game_life_cycle state)
 	{
 		if (state == _life_cycle_none)
 		{
-			h2mod->set_local_rank(255);
+			h2mod->set_local_rank(255, 0);
 			return;
 		}
 	}
