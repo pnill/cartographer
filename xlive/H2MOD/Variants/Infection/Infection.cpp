@@ -1,33 +1,39 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Cache\TagGroups\item_collection_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Cache\TagGroups\vehicle_collection_definition.hpp"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Cache/TagGroups/item_collection_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 std::vector<unsigned long long> Infection::zombieIdentifiers;
 
-const e_object_team HUMAN_TEAM = e_object_team::Red;
-const e_object_team ZOMBIE_TEAM = e_object_team::Green;
-
-std::map<int, std::map<e_infection_sounds, const wchar_t*>> infectionSoundTable;
+#define HUMAN_TEAM e_object_team::Red
+#define ZOMBIE_TEAM e_object_team::Green
 
 bool initialSpawn;
 bool infectedPlayed;
 int zombiePlayerIndex = NONE;
-
-Infection::Infection()
+const wchar_t* infectionSoundTable[e_language_ids::_lang_id_end][e_infection_sounds::_infection_end]
 {
-}
+	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
+	{SND_INFECTION_JP, SND_INFECTED_JP, SND_NEW_ZOMBIE_JP },
+	{SND_INFECTION_GE, SND_INFECTED_GE, SND_NEW_ZOMBIE_GE },
+	{SND_INFECTION_FR, SND_INFECTED_FR, SND_NEW_ZOMBIE_FR },
+	{SND_INFECTION_ES, SND_INFECTED_ES, SND_NEW_ZOMBIE_ES },
+	{SND_INFECTION_IT, SND_INFECTED_IT, SND_NEW_ZOMBIE_IT },
+	{SND_INFECTION_KO, SND_INFECTED_KO, SND_NEW_ZOMBIE_KO },
+	{SND_INFECTION_CH, SND_INFECTED_CH, SND_NEW_ZOMBIE_CH },
+};
+
 
 int Infection::calculateZombiePlayerIndex()
 {
@@ -75,31 +81,22 @@ void Infection::sendTeamChange()
 
 void Infection::triggerSound(e_infection_sounds sound, int sleep)
 {
-	if (infectionSoundTable.count(H2Config_language.code_main))
+	const int language_id = *Memory::GetAddress<int*>(0x412818);
+
+	if (infectionSoundTable[language_id][sound] != nullptr)
 	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[H2Config_language.code_main][sound]);
-		h2mod->custom_sound_play(infectionSoundTable[H2Config_language.code_main][sound], sleep);
-	}
-	else
-	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[0][sound]);
-		h2mod->custom_sound_play(infectionSoundTable[0][sound], sleep);
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[language_id][sound]);
+		h2mod->custom_sound_play(infectionSoundTable[language_id][sound], sleep);
 	}
 }
 
 void Infection::InitClient()
 {
-	Infection::disableSlayerSounds();
+	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
+	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+
 	infectedPlayed = false;
 	initialSpawn = true;
-
-	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_infected] = L"sounds/en/infected.wav";
-	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_infection] = L"sounds/en/infection.wav";
-	infectionSoundTable[_lang_id_english][e_infection_sounds::_snd_new_zombie] = L"sounds/en/new_zombie.wav";
-	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_infected] = L"sounds/es/infected.wav";
-	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_infection] = L"sounds/es/infection.wav";
-	infectionSoundTable[_lang_id_spanish][e_infection_sounds::_snd_new_zombie] = L"sounds/es/new_zombie.wav";
-
 
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
@@ -160,13 +157,6 @@ void Infection::InitHost() {
 
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
-}
-
-void Infection::disableSlayerSounds()
-{
-	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
-	//disable slayer sounds for the infection game type
-	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 }
 
 void Infection::resetWeaponInteractionAndEmblems() {
