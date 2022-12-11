@@ -494,6 +494,7 @@
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
+    <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
