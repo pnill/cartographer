@@ -1,31 +1,34 @@
 #include "stdafx.h"
-
 #include "GraveRobber.h"
 
+#include "H2MOD.h"
 #include "Blam/Engine/Game/GameGlobals.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-
-#include "H2MOD/Engine/Engine.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
-int soundBuffer = 0;
-std::unordered_map<int, std::unordered_map<e_graverobber_sounds, const wchar_t*>> graverobberSoundTable;
-bool b_firstSpawn = true;
+bool b_firstSpawn;
+const wchar_t* headhunterSoundTable[e_language_ids::_lang_id_end][e_graverobber_sounds::_graverobber_end]
+{
+	{SND_HEADHUNTER_EN, SND_SKULL_SCORED_EN},
+	{SND_HEADHUNTER_JP, SND_SKULL_SCORED_JP},
+	{SND_HEADHUNTER_GE, SND_SKULL_SCORED_GE},
+	{SND_HEADHUNTER_FR, SND_SKULL_SCORED_FR},
+	{SND_HEADHUNTER_ES, SND_SKULL_SCORED_ES},
+	{SND_HEADHUNTER_IT, SND_SKULL_SCORED_IT},
+	{SND_HEADHUNTER_KO, SND_SKULL_SCORED_KO},
+	{SND_HEADHUNTER_CH, SND_SKULL_SCORED_CH}
+};
 
 void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 {
-	if (graverobberSoundTable.count(H2Config_language.code_main))
+	const int language_id = *Memory::GetAddress<int*>(0x412818);
+
+	if (headhunterSoundTable[language_id][sound] != nullptr)
 	{
-		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", graverobberSoundTable[H2Config_language.code_main][sound]);
-		h2mod->custom_sound_play(graverobberSoundTable[H2Config_language.code_main][sound], sleep);
-	}
-	else
-	{
-		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", graverobberSoundTable[0][sound]);
-		h2mod->custom_sound_play(graverobberSoundTable[0][sound], sleep);
+		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[language_id][sound]);
+		h2mod->custom_sound_play(headhunterSoundTable[language_id][sound], sleep);
 	}
 }
 
@@ -40,7 +43,7 @@ void GraveRobber::SpawnPlayerClientSetup()
 
 void GraveRobber::SpawnSkull(datum unit_datum)
 {
-	s_biped_data_definition* biped_unit = (s_biped_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
+	const s_biped_data_definition* biped_unit = (s_biped_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(e_object_type::biped));
 
 	if (biped_unit != NULL)
 	{
@@ -62,22 +65,27 @@ extern update_player_score_t p_update_player_score;
 
 void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 {
+	const short absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+
 	if (!DATUM_IS_NONE(skullDatum))
 	{
-		//typedef void(__stdcall *update_player_score)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
-		//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-
 		typedef char* (__cdecl* get_score_data_ptr)();
 		auto p_get_score_data_ptr = Memory::GetAddress<get_score_data_ptr>(0x6B8A7, 0x6AD32);
 
 		char* player_score_data = p_get_score_data_ptr();
 		if (player_score_data)
 		{
-			p_update_player_score(player_score_data, DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx), 0, 1, -1, 0);
-			HaloScript::ObjectDestroy(skullDatum);
-			if (TimeElapsedMS(soundBuffer) > 2500)
+			if (!s_game_globals::game_is_predicted())
 			{
-				soundBuffer = GetCurrentTimeMS();
+				p_update_player_score(player_score_data, absPlayerIdx, 0, 1, -1, 0);
+			}
+			HaloScript::ObjectDestroy(skullDatum);
+
+			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)) == absPlayerIdx ||
+				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(1)) == absPlayerIdx ||
+				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(2)) == absPlayerIdx ||
+				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(3)) == absPlayerIdx)
+			{
 				TriggerSound(_snd_skull_scored, 500);
 			}
 		}
@@ -86,12 +94,8 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 
 void GraveRobber::initClient()
 {
-	b_firstSpawn = true;
 	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
-	graverobberSoundTable[_lang_id_english][e_graverobber_sounds::_snd_head_hunter] = L"sounds/en/headhunter.wav";
-	graverobberSoundTable[_lang_id_english][e_graverobber_sounds::_snd_skull_scored] = L"sounds/en/skull_scored.wav";
-	graverobberSoundTable[_lang_id_spanish][e_graverobber_sounds::_snd_head_hunter] = L"sounds/es/headhunter.wav";
-	graverobberSoundTable[_lang_id_spanish][e_graverobber_sounds::_snd_skull_scored] = L"sounds/es/skull_scored.wav";
+	b_firstSpawn = true;
 }
 
 void GraveRobber::Initialize()
@@ -102,8 +106,10 @@ void GraveRobber::Initialize()
 	}
 }
 
-void GraveRobber::Dispose()
+
+void GraveRobber::Dispose() 
 {
+	/*Unused*/
 }
 
 CustomVariantId GraveRobber::GetVariantId()
@@ -121,19 +127,16 @@ void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 	case ExecTime::_postEventExec:
 		switch (h2mod->GetEngineType())
 		{
-			// cleanup when loading main menu
 		case _multiplayer:
 			this->Initialize();
 			break;
-			/*case _main_menu:
-				this->Dispose();
-				break;*/
+		case _main_menu:
+			break;
 		default:
 			break;
 		}
 		break;
 
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
@@ -142,9 +145,6 @@ void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 
 void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
-
 	switch (execTime)
 	{
 		// prespawn handler
@@ -156,8 +156,6 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!Memory::IsDedicatedServer())
 			GraveRobber::SpawnPlayerClientSetup();
 		break;
-
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
@@ -166,21 +164,19 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+	const int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	const datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 		if (!s_game_globals::game_is_predicted())
-			GraveRobber::SpawnSkull(playerIdx);
+			GraveRobber::SpawnSkull(playerUnitDatum);
 		break;
 
 	case ExecTime::_postEventExec:
 		break;
-
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
@@ -189,26 +185,26 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 
 bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
 {
-	int absPlayerIdx = a2;
-	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
-
 	bool handled = false;
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
-		break;
-
-	case ExecTime::_postEventExec:
 		// skip recording the score, until we pickup the skull
-		if (a5 == -1
-			|| a5 == 7)
+		if (a5 == -1 || a5 == 7 || a5 == 9)
 		{
 			handled = true;
 		}
 		break;
 
-	case ExecTime::_ExecTimeUnknown:
+	case ExecTime::_postEventExec:
+		// skip recording the score, until we pickup the skull
+		if (a5 == -1 || a5 == 7 || a5 == 9)
+		{
+			handled = true;
+		}
+		break;
+
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
@@ -219,30 +215,24 @@ bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short
 
 bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+	const s_weapon_data_definition* weaponObject = object_get_fast_unsafe<s_weapon_data_definition>(objectIdx);
 
 	bool handled = false;
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
-		if (!s_game_globals::game_is_predicted())
-		{
-			s_weapon_data_definition* weaponObject = object_get_fast_unsafe<s_weapon_data_definition>(objectIdx);
 
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
-			{
-				GraveRobber::PickupSkull(playerIdx, objectIdx);
-				handled = true;
-			}
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+		{
+			GraveRobber::PickupSkull(playerIdx, objectIdx);
+			handled = true;
 		}
 		break;
 
 	case ExecTime::_postEventExec:
 		break;
 
-	case ExecTime::_ExecTimeUnknown:
 	default:
 		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
 		break;
