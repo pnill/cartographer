@@ -11,7 +11,6 @@
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Tags/TagInterface.h"
@@ -23,7 +22,17 @@ bool b_initialSpawn;
 bool b_infectedPlayed;
 int zombiePlayerIndex = NONE;
 unsigned long long zombieIdentifiers[ENGINE_MAX_PLAYERS] = { 0 };
-wchar_t* infectionSoundTable[e_infection_sounds::_infection_end] { nullptr };
+const wchar_t* infectionSoundTable[e_language_ids::_end][e_infection_sounds::_infection_end]
+{
+	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
+	{SND_INFECTION_JP, SND_INFECTED_JP, SND_NEW_ZOMBIE_JP },
+	{SND_INFECTION_GE, SND_INFECTED_GE, SND_NEW_ZOMBIE_GE },
+	{SND_INFECTION_FR, SND_INFECTED_FR, SND_NEW_ZOMBIE_FR },
+	{SND_INFECTION_ES, SND_INFECTED_ES, SND_NEW_ZOMBIE_ES },
+	{SND_INFECTION_IT, SND_INFECTED_IT, SND_NEW_ZOMBIE_IT },
+	{SND_INFECTION_KO, SND_INFECTED_KO, SND_NEW_ZOMBIE_KO },
+	{SND_INFECTION_CH, SND_INFECTED_CH, SND_NEW_ZOMBIE_CH },
+};
 
 int Infection::calculateZombiePlayerIndex()
 {
@@ -70,10 +79,12 @@ void Infection::sendTeamChange()
 
 void Infection::triggerSound(e_infection_sounds sound, int sleep)
 {
-	if (infectionSoundTable[sound] != nullptr)
+	const int language_id = *Memory::GetAddress<int*>(0x412818);
+
+	if (infectionSoundTable[language_id][sound] != nullptr)
 	{
-		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[sound]);
-		h2mod->custom_sound_play(infectionSoundTable[sound], sleep);
+		LOG_TRACE_GAME(L"[h2mod-infection] Triggering sound {}", infectionSoundTable[language_id][sound]);
+		h2mod->custom_sound_play(infectionSoundTable[language_id][sound], sleep);
 	}
 }
 
@@ -85,54 +96,6 @@ void Infection::InitClient()
 
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
 	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
-
-	switch (language_id)
-	{
-	case _lang_id_chinese:
-		break;
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_CH) / 2] {SND_INFECTION_CH};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_CH) / 2] {SND_INFECTED_CH};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_CH) / 2] {SND_NEW_ZOMBIE_CH};
-	case _lang_id_english:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_EN) / 2] {SND_INFECTION_EN};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_EN) / 2] {SND_INFECTED_EN};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_EN) / 2] {SND_NEW_ZOMBIE_EN};
-		break;
-	case _lang_id_spanish:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_ES) / 2] {SND_INFECTION_ES};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_ES) / 2] {SND_INFECTED_ES};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_ES) / 2] {SND_NEW_ZOMBIE_ES};
-		break;
-	case _lang_id_french:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_FR) / 2] {SND_INFECTION_FR};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_FR) / 2] {SND_INFECTED_FR};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_FR) / 2] {SND_NEW_ZOMBIE_FR};
-		break;
-	case _lang_id_german:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_GE) / 2] {SND_INFECTION_GE};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_GE) / 2] {SND_INFECTED_GE};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_GE) / 2] {SND_NEW_ZOMBIE_GE};
-		break;
-	case _lang_id_italian:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_IT) / 2] {SND_INFECTION_IT};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_IT) / 2] {SND_INFECTED_IT};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_IT) / 2] {SND_NEW_ZOMBIE_IT};
-		break;
-	case _lang_id_japanese:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_JP) / 2] {SND_INFECTION_JP};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_JP) / 2] {SND_INFECTED_JP};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_JP) / 2] {SND_NEW_ZOMBIE_JP};
-		break;
-	case _lang_id_korean:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_KO) / 2] {SND_INFECTION_KO};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_KO) / 2] {SND_INFECTED_KO};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_KO) / 2] {SND_NEW_ZOMBIE_KO};
-		break;
-	default:
-		infectionSoundTable[e_infection_sounds::_snd_infected] = new wchar_t[sizeof(SND_INFECTION_EN) / 2] {SND_INFECTION_EN};
-		infectionSoundTable[e_infection_sounds::_snd_infection] = new wchar_t[sizeof(SND_INFECTED_EN) / 2] {SND_INFECTED_EN};
-		infectionSoundTable[e_infection_sounds::_snd_new_zombie] = new wchar_t[sizeof(SND_NEW_ZOMBIE_EN) / 2] {SND_NEW_ZOMBIE_EN};
-	}
 
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
@@ -294,14 +257,6 @@ void Infection::Initialize()
 void Infection::Dispose()
 {
 	LOG_TRACE_GAME("{} - infection dispose!");
-
-	for (size_t i = 0; i < _infection_end; i++)
-	{
-		if (infectionSoundTable[i] != nullptr)
-		{
-			delete infectionSoundTable[i];
-		}
-	}
 
 	Infection::resetWeaponInteractionAndEmblems();
 	if (!s_game_globals::game_is_predicted()) {

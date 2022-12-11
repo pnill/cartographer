@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Variants/VariantSystem.h"
 
 #define SND_INFECTION_CH L"sounds/ch/infection.wav"
