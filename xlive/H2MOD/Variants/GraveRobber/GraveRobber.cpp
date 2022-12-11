@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "HeadHunter.h"
+#include "GraveRobber.h"
 
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
@@ -21,12 +21,12 @@ HeadHunter::HeadHunter()
 
 void HeadHunter::TriggerSound(e_headhunter_sounds sound, int sleep)
 {
-	if (headhunterSoundTable.count(H2Config_language.code_main)) 
+	if (headhunterSoundTable.count(H2Config_language.code_main))
 	{
 		LOG_TRACE_GAME(L"[h2mod-headhunter] Triggering sound {}", headhunterSoundTable[H2Config_language.code_main][sound]);
 		h2mod->custom_sound_play(headhunterSoundTable[H2Config_language.code_main][sound], sleep);
 	}
-	else 
+	else
 	{
 		LOG_TRACE_GAME(L"[h2mod-headhunter] Triggering sound {}", headhunterSoundTable[0][sound]);
 		h2mod->custom_sound_play(headhunterSoundTable[0][sound], sleep);
@@ -61,7 +61,7 @@ void HeadHunter::SpawnSkull(datum unit_datum)
 	}
 }
 
-typedef void(__thiscall *update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+typedef void(__thiscall* update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 extern update_player_score_t p_update_player_score;
 
 void HeadHunter::PickupSkull(datum playerIdx, datum skullDatum)
@@ -124,17 +124,17 @@ void HeadHunter::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 
 	case ExecTime::_postEventExec:
 		switch (h2mod->GetEngineType())
-			{
-				// cleanup when loading main menu
-			case _multiplayer:
-				this->Initialize();
-				break;
+		{
+			// cleanup when loading main menu
+		case _multiplayer:
+			this->Initialize();
+			break;
 			/*case _main_menu:
 				this->Dispose();
 				break;*/
-			default:
-				break;
-			}
+		default:
+			break;
+		}
 		break;
 
 	case ExecTime::_ExecTimeUnknown:
@@ -254,5 +254,3 @@ bool HeadHunter::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum o
 
 	return handled;
 }
-
-

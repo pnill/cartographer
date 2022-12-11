@@ -309,6 +309,7 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
+    <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -352,7 +353,6 @@
     <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
-    <ClCompile Include="H2MOD\Variants\HeadHunter\HeadHunter.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
@@ -636,6 +636,7 @@
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
+    <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
@@ -688,7 +689,6 @@
     <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
-    <ClInclude Include="H2MOD\Variants\HeadHunter\HeadHunter.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
