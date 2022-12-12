@@ -3,6 +3,7 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Players/LocalPlayers.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -65,29 +66,29 @@ extern update_player_score_t p_update_player_score;
 
 void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 {
+	typedef char* (__cdecl* get_score_data_t)();
+	auto p_get_score_data_ptr = Memory::GetAddress<get_score_data_t>(0x6B8A7, 0x6AD32);
+	
 	const short absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 
-	if (!DATUM_IS_NONE(skullDatum))
+	if (!DATUM_IS_NONE(skullDatum)) { return; }
+
+	char* player_score_data = p_get_score_data_ptr();
+	if (player_score_data) { return; }
+
+	if (!s_game_globals::game_is_predicted())
 	{
-		typedef char* (__cdecl* get_score_data_ptr)();
-		auto p_get_score_data_ptr = Memory::GetAddress<get_score_data_ptr>(0x6B8A7, 0x6AD32);
+		p_update_player_score(player_score_data, absPlayerIdx, 0, 1, -1, 0);
+	}
+	
+	HaloScript::ObjectDestroy(skullDatum);
 
-		char* player_score_data = p_get_score_data_ptr();
-		if (player_score_data)
+	for (byte i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+	{
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
 		{
-			if (!s_game_globals::game_is_predicted())
-			{
-				p_update_player_score(player_score_data, absPlayerIdx, 0, 1, -1, 0);
-			}
-			HaloScript::ObjectDestroy(skullDatum);
-
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)) == absPlayerIdx ||
-				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(1)) == absPlayerIdx ||
-				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(2)) == absPlayerIdx ||
-				DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(3)) == absPlayerIdx)
-			{
-				TriggerSound(_snd_skull_scored, 500);
-			}
+			TriggerSound(_snd_skull_scored, 500);
+			break;
 		}
 	}
 }

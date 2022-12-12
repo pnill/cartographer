@@ -62,7 +62,7 @@ public:
 	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override { return false; }
 
 	Infection() = default;
-	~Infection() = default;
+	virtual ~Infection() = default;
 
 	static void InitClient();
 	static void InitHost();

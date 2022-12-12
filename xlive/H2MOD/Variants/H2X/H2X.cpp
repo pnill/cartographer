@@ -5,6 +5,7 @@
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
@@ -52,13 +53,15 @@ void H2X::ApplyMapLoadPatches(bool enable)
 		}
 	}
 
-	if (enable && !Memory::IsDedicatedServer() && s_game_globals::game_is_multiplayer())
+	if (enable && !Memory::IsDedicatedServer() && h2mod->GetEngineType() == e_engine_type::_multiplayer)
 	{
 		// Change sound_classes data to equivalents in original halo 2
 		datum sound_classes_datum = tags::find_tag(blam_tag::tag_group_type::soundclasses, "sound\\sound_classes");
 		if (sound_classes_datum != DATUM_INDEX_NONE)
 		{
 			s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
+			if (sound_classes->soundClasses.size < 35) { return; }
+
 			sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
 			sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };
 			sound_classes->soundClasses[2]->gainBoundsDB = { -0.0f, -4.0f };
