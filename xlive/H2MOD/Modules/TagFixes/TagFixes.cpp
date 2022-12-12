@@ -1,13 +1,15 @@
 #include "stdafx.h"
-
 #include "TagFixes.h"
-#include "Blam\Cache\TagGroups\shader_definition.hpp"
-#include "Blam/Cache/TagGroups/light_definition.h"
+
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/light_definition.h"
+#include "Blam/Cache/TagGroups/shader_definition.hpp"
+#include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
+
 #include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Util\Hooks\Hook.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
 namespace TagFixes
 {
@@ -182,6 +184,41 @@ namespace TagFixes
 				biped->unitTag.objectTag.max_abs_acc_default *= 2.0f;
 			}
 		}
+
+		void sound_classes_fix()
+		{
+			// Change sound_classes data to equivalents in original halo 2
+			datum sound_classes_datum = tags::find_tag(blam_tag::tag_group_type::soundclasses, "sound\\sound_classes");
+			if (sound_classes_datum != DATUM_INDEX_NONE)
+			{
+				s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
+				if (sound_classes->soundClasses.size < 35) { return; }
+
+				sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[2]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[3]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[4]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[5]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[6]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[7]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[8]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[9]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[10]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[11]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[12]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[13]->gainBoundsDB = { -64.0f, -4.0f };
+				sound_classes->soundClasses[14]->gainBoundsDB = { -12.0f, -4.0f };
+				sound_classes->soundClasses[18]->gainBoundsDB = { -32.0f, -9.0f };
+				sound_classes->soundClasses[20]->gainBoundsDB = { -0.0f, -2.0f };
+				sound_classes->soundClasses[22]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[23]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[24]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[28]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[29]->gainBoundsDB = { -0.0f, -4.0f };
+				sound_classes->soundClasses[34]->gainBoundsDB = { -0.0f, -4.0f };
+			}
+		}
 	}
 
 	void OnMapLoad()
@@ -191,6 +228,7 @@ namespace TagFixes
 			ShaderSpecularFix();
 			fix_dynamic_lights();
 			font_table_fix();
+			sound_classes_fix();
 			if (H2Config_shader_lod_max)
 			{
 				shader_lod_max();

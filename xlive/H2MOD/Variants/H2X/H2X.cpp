@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "H2X.h"
 
-#include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
@@ -43,48 +42,14 @@ void H2X::ApplyMapLoadPatches(bool enable)
 {
 	for (auto& weapon : weapons)
 	{
+		float rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
 		datum weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
 		if (weapon_datum != DATUM_INDEX_NONE)
 		{
 			s_weapon_group_definition* weapon_tag = tags::get_tag_fast<s_weapon_group_definition>(weapon_datum);
 			weapon.rounds_per_second_based ?
-				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second_upper = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire)
-				: weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
-		}
-	}
-
-	if (enable && !Memory::IsDedicatedServer() && h2mod->GetEngineType() == e_engine_type::_multiplayer)
-	{
-		// Change sound_classes data to equivalents in original halo 2
-		datum sound_classes_datum = tags::find_tag(blam_tag::tag_group_type::soundclasses, "sound\\sound_classes");
-		if (sound_classes_datum != DATUM_INDEX_NONE)
-		{
-			s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
-			if (sound_classes->soundClasses.size < 35) { return; }
-
-			sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[2]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[3]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[4]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[5]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[6]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[7]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[8]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[9]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[10]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[11]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[12]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[13]->gainBoundsDB = { -64.0f, -4.0f };
-			sound_classes->soundClasses[14]->gainBoundsDB = { -12.0f, -4.0f };
-			sound_classes->soundClasses[18]->gainBoundsDB = { -32.0f, -9.0f };
-			sound_classes->soundClasses[20]->gainBoundsDB = { -0.0f, -2.0f };
-			sound_classes->soundClasses[22]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[23]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[24]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[28]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[29]->gainBoundsDB = { -0.0f, -4.0f };
-			sound_classes->soundClasses[34]->gainBoundsDB = { -0.0f, -4.0f };
+				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second_upper = rof : 
+				weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time = rof;
 		}
 	}
 }
