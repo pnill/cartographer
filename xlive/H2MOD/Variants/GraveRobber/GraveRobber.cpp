@@ -71,10 +71,10 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 	
 	const short absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 
-	if (!DATUM_IS_NONE(skullDatum)) { return; }
+	if (DATUM_IS_NONE(skullDatum)) { return; }
 
 	char* player_score_data = p_get_score_data();
-	if (player_score_data) { return; }
+	if (!player_score_data) { return; }
 
 	if (!s_game_globals::game_is_predicted())
 	{
