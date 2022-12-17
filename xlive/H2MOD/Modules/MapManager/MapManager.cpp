@@ -245,7 +245,7 @@ __declspec(naked) void get_map_load_status_for_all_peers_hook_2_to_stdcall() {
 * Download map callback
 */
 char __cdecl handle_map_download_callback() {
-	// add force download stop? for now no
+	// TODO add force download stop? for now no
 	// mapManager->forceStopDownloadQueries()
 
 	// add download query
@@ -381,9 +381,8 @@ bool MapManager::GetMapFilename(std::wstring& buffer) {
 		if (!filename.empty()) {
 			//if the filename exists and the current map english name is equal to the iterated map name
 			buffer = filename;
+			return true;
 		}
-
-		return true;
 	}
 
 	return false;
