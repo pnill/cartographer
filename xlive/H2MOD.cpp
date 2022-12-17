@@ -838,47 +838,6 @@ void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16
 	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
 
-void ForcePlayersToRedAndBlue()
-{
-	PlayerIterator playerIt;
-	byte team = 0;
-	byte red_team_count = 0;
-	byte player_count = playerIt.get_data_count();
-
-	// Get count of players on red and blue team
-	while (playerIt.get_next_active_player())
-	{
-		s_player* player = playerIt.get_current_player_data();
-		byte player_team = player->GetTeam(playerIt.get_current_absolute_index());
-		(team == 0 ? red_team_count++ : 0);
-	}
-
-	red_team_count = (player_count - red_team_count) / 2;
-	
-	// Loop through each player and set the team to red or blue
-	while (playerIt.get_next_active_player())
-	{
-		if (red_team_count != 0)
-		{
-			red_team_count--;
-			team = 0;
-		} 
-		else
-		{
-			team = 1;
-		}
-
-		s_player* player = playerIt.get_current_player_data();
-		byte player_index = playerIt.get_current_absolute_index();
-		byte player_team = player->GetTeam(player_index);
-
-		if (player_team != 1 && player_team != 0)
-		{
-			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player_index), team);
-		}
-	}
-}
-
 bool __cdecl should_start_pregame_countdown_hook()
 {
 	// dedicated server only
@@ -905,12 +864,6 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 	if (!minimumPlayersConditionMet)
 		return false;
-
-	// Change team to Red Or Blue if its not red or blue already
-	if (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb"))
-	{
-		ForcePlayersToRedAndBlue();
-	}
 
 	if (H2Config_even_shuffle_teams
 		&& NetworkSession::VariantIsTeamPlay())
