@@ -105,7 +105,6 @@ extern char H2Config_login_identifier[255];
 extern char H2Config_login_password[255];
 extern short H2Config_team_bit_flags;
 extern bool H2Config_team_flag_array[8];
-extern int H2Config_team_enabled_count;
 extern char H2Config_stats_authkey[32 + 1];
 extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;

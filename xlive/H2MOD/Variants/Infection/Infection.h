@@ -59,7 +59,7 @@ public:
 	// unused below
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override {}
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override { return false; }
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override { return false; }
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override { return false; }
 
 	Infection() = default;
 	virtual ~Infection() = default;

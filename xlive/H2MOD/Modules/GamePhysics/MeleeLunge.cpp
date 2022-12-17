@@ -372,16 +372,16 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 	s_character_physics_output* physics_output,
 	bool a3,
 	float distance_between_havok_components,
-	real_vector3d* target_translational_velocity,
-	real_point3d* target_origin,
-	real_vector3d* aiming_vector,
-	real_vector3d* translational_velocity,
-	real_point3d* player_origin
+	const real_vector3d* target_translational_velocity,
+	const real_point3d* target_origin,
+	const real_vector3d* aiming_vector,
+	const real_vector3d* translational_velocity,
+	const real_point3d* player_origin
 )
 {
 	LOG_TRACE_MELEE("{} : start melee log @ tick {}", __FUNCTION__, m_melee_tick);
 	
-	auto p_character_physics_mode_melee_datum_update_internal = Memory::GetAddressRelative<void(__thiscall*)(c_character_physics_mode_melee_datum*, s_character_physics_output*, bool, float, real_vector3d*, real_point3d*, real_vector3d*, real_vector3d*, real_point3d*)>(0x50B0D1, 0x4FD701);
+	auto p_character_physics_mode_melee_datum_update_internal = Memory::GetAddressRelative<void(__thiscall*)(c_character_physics_mode_melee_datum*, s_character_physics_output*, bool, float, const real_vector3d*, const real_point3d*, const real_vector3d*, const real_vector3d*, const real_point3d*)>(0x50B0D1, 0x4FD701);
 	if (!melee_lunge_hook_enabled)
 	{
 		LOG_TRACE_MELEE("{} : using default halo 2 function!", __FUNCTION__);

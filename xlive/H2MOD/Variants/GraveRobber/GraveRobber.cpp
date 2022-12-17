@@ -26,6 +26,8 @@ void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 {
 	const int language_id = *Memory::GetAddress<int*>(0x412818);
 
+	if (Memory::IsDedicatedServer()) return;
+
 	if (headhunterSoundTable[language_id][sound] != nullptr)
 	{
 		LOG_TRACE_GAME(L"[h2mod-graverobber] Triggering sound {}", headhunterSoundTable[language_id][sound]);
@@ -61,7 +63,6 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	}
 }
 
-typedef void(__thiscall* update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 extern update_player_score_t p_update_player_score;
 
 void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
@@ -69,7 +70,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 	typedef char* (__cdecl* get_score_data_t)();
 	auto p_get_score_data = Memory::GetAddress<get_score_data_t>(0x6B8A7, 0x6AD32);
 	
-	const short absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 
 	if (DATUM_IS_NONE(skullDatum)) { return; }
 
@@ -78,7 +79,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 
 	if (!s_game_globals::game_is_predicted())
 	{
-		p_update_player_score(player_score_data, absPlayerIdx, 0, 1, -1, 0);
+		p_update_player_score(player_score_data, playerIdx, 0, 1, -1, 0);
 	}
 	
 	HaloScript::ObjectDestroy(skullDatum);
@@ -93,7 +94,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 	}
 }
 
-void GraveRobber::initClient()
+void GraveRobber::InitializeClient()
 {
 	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 	b_firstSpawn = true;
@@ -103,10 +104,9 @@ void GraveRobber::Initialize()
 {
 	if (!Memory::IsDedicatedServer())
 	{
-		GraveRobber::initClient();
+		GraveRobber::InitializeClient();
 	}
 }
-
 
 void GraveRobber::Dispose() 
 {
@@ -184,7 +184,7 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
+bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	bool handled = false;
 

@@ -365,7 +365,7 @@ void MapManager::ReloadAllMaps() {
 	getCustomMapData()->start_custom_map_sync();
 }
 
-void MapManager::GetMapFilename(std::wstring& buffer) {
+bool MapManager::GetMapFilename(std::wstring& buffer) {
 	wchar_t map_file_location[256];
 	s_network_session* session = nullptr;
 
@@ -382,7 +382,11 @@ void MapManager::GetMapFilename(std::wstring& buffer) {
 			//if the filename exists and the current map english name is equal to the iterated map name
 			buffer = filename;
 		}
+
+		return true;
 	}
+
+	return false;
 }
 
 void MapManager::MapDownloadUpdateTick()

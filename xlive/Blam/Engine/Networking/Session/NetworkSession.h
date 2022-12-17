@@ -23,7 +23,7 @@ namespace NetworkSession
 	bool GetCurrentNetworkSession(s_network_session** outSession);
 	e_network_session_state GetLocalSessionState();
 	int GetPeerIndexFromNetworkAddress(network_address* address);
-	char GetMapFileLocation(wchar_t* buffer, size_t size);
+	bool GetMapFileLocation(wchar_t* buffer, size_t size);
 
 	bool LocalPeerIsSessionHost();
 	bool LocalPeerIsEstablished();

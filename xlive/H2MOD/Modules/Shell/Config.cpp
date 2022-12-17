@@ -71,7 +71,6 @@ char H2Config_login_password[255] = { "" };
 int H2Config_minimum_player_start = 0;
 char H2Config_team_bit_flags_str[] = "1-1-1-1-1-1-1-1";
 bool H2Config_team_flag_array[8];
-int H2Config_team_enabled_count;
 short H2Config_team_bit_flags = 0xFF;
 char H2Config_stats_authkey[32 + 1] = { "" };
 bool H2Config_vip_lock = false;
@@ -921,7 +920,6 @@ void ReadH2Config() {
 							{
 								H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
 								H2Config_team_flag_array[i] = true;
-								H2Config_team_enabled_count++;
 							}
 
 							occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, occurance_offset + 1);

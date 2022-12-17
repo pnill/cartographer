@@ -71,7 +71,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	void build_initial_melee_parameters(bool valid);
 	void update_melee_parameters();
 	void update_melee_deceleration();
-	void __thiscall update_internal(s_character_physics_output* a2, bool a3, float distance_world_units, real_vector3d* target_translational_velocity, real_point3d* target_origin, real_vector3d* aiming_vector, real_vector3d* translational_velocity, real_point3d* object_origin);
+	void __thiscall update_internal(s_character_physics_output* a2, bool a3, float distance_world_units, const real_vector3d* target_translational_velocity, const real_point3d* target_origin, const real_vector3d* aiming_vector, const real_vector3d* translational_velocity, const real_point3d* object_origin);
 };
 CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 

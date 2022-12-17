@@ -32,6 +32,7 @@ enum e_static_lod : DWORD
 };
 
 void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
+typedef void(__thiscall* update_player_score_t)(void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
 
 class H2MOD
 {

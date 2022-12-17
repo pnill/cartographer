@@ -191,7 +191,7 @@ int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>&
 	
 	std::string mapFileName;
 	std::wstring mapFilenameWide;
-	mapManager->GetMapFilename(mapFilenameWide);
+	MapManager::GetMapFilename(mapFilenameWide);
 	mapFileName = std::string(mapFilenameWide.begin(), mapFilenameWide.end());
 	output->Output(StringFlag_None, "# map file name: %s", mapFileName.c_str());
 	return 0;

@@ -33,7 +33,7 @@ public:
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) = 0;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) = 0;
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) = 0;
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) = 0;
 };
 
 class ICustomGameVariant : public IGameEngineEvent
@@ -42,36 +42,31 @@ public:
 	virtual void Initialize() = 0;
 	virtual void Dispose() = 0;
 	virtual CustomVariantId GetVariantId() = 0;
-	// virtual wchar_t* GetVariantName() = 0;
 };
 
-class CustomVariantHandler
+namespace CustomVariantHandler
 {
-public:
-	static void RegisterCustomVariants();
-	static void GameVarianEnable(const wchar_t* variant);
+	void RegisterCustomVariants();
 
-	static void OnMapLoad(ExecTime execTime, s_game_options* gameOptions);
+	void GameVarianEnable(const wchar_t* variant);
+	bool ContainsGameVariant(const wchar_t* variant, CustomVariantId variantId);
 
-	static void OnPlayerSpawn(ExecTime execTime, datum playerIdx);
-	static void OnPlayerDeath(ExecTime execTime, datum playerIdx);
-	static void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4);
+	void OnMapLoad(ExecTime execTime, s_game_options* gameOptions);
+	void OnPlayerSpawn(ExecTime execTime, datum playerIdx);
+	void OnPlayerDeath(ExecTime execTime, datum playerIdx);
+	void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4);
+	bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
+	bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
+	void DisposeGameVariant();
+	bool VariantEnabled(CustomVariantId variantId);
 
-	static bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
-	static bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
+	ICustomGameVariant* GetCurrentGameVariant();
+	ICustomGameVariant* GetGameVariant(CustomVariantId variantId);
 
-	static void DisposeGameVariant();
-
-	static bool VariantEnabled(CustomVariantId variantId);
-
-private:
-	static ICustomGameVariant* GetCurrentGameVariant();
-	static ICustomGameVariant* GetGameVariant(CustomVariantId variantId);
-
-	static std::vector<ICustomGameVariant*> customVariants;
+	extern std::vector<ICustomGameVariant*> customVariants;
 };
 
-// TODO move this out
+// TODO move this out/remove by using tag interface
 enum e_weapons_datum_index : unsigned int
 {
 	//Unknown = 0x2,//36

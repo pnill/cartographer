@@ -42,7 +42,7 @@ public:
 
 	static void ApplyPatches();
 
-	void GetMapFilename(std::wstring& buffer);
+	static bool GetMapFilename(std::wstring& buffer);
 
 	std::shared_ptr<MapDownloadQuery> AddDownloadQuery(const std::wstring& mapToDownload)
 	{

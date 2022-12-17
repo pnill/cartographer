@@ -26,7 +26,7 @@ public:
 		return false;
 	}
 
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6) override;
+	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
 
 	GunGame();
 	~GunGame() {  };

@@ -8,14 +8,16 @@
 enum e_object_team : BYTE
 {
 	// MP
-	Red = 0,
-	Blue = 1,
-	Yellow = 2,
-	Green = 3,
-	Purple = 4,
-	Orange = 5,
-	Bronwn = 6,
-	Pink = 7,
+	_object_team_red = 0,
+	_object_team_blue = 1,
+	_object_team_yellow = 2,
+	_object_team_green = 3,
+	_object_team_purple = 4,
+	_object_team_orange = 5,
+	_object_team_brown = 6,
+	_object_team_pink = 7,
+	_object_team_end = 8,
+
 	// SP
 	Default = 0,
 	player = 1,

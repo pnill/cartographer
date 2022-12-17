@@ -16,8 +16,8 @@
 
 std::vector<unsigned long long> Infection::zombieIdentifiers;
 
-#define HUMAN_TEAM e_object_team::Red
-#define ZOMBIE_TEAM e_object_team::Green
+#define HUMAN_TEAM _object_team_red
+#define ZOMBIE_TEAM _object_team_green
 
 bool initialSpawn;
 bool infectedPlayed;

@@ -41,6 +41,7 @@
 #include "H2MOD\Modules\Stats\StatsHandler.h"
 #include "H2MOD\Modules\TagFixes\TagFixes.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
+#include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\Hooks\Hook.h"
@@ -412,10 +413,9 @@ char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	return ret;
 }
 
-typedef void(__thiscall* update_player_score_t)(void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6);
 update_player_score_t p_update_player_score;
 
-void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a3, int a4, int a5, char a6)
+void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
@@ -426,10 +426,10 @@ void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, unsigned short a2, int a
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
-	bool handled = CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, a2, a3, a4, a5, a6);
+	bool handled = CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, playerIdx, a3, a4, a5, a6);
 	if (!handled)
-		p_update_player_score(thisptr, a2, a3, a4, a5, a6);
-	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, a2, a3, a4, a5, a6);
+		p_update_player_score(thisptr, playerIdx, a3, a4, a5, a6);
+	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, playerIdx, a3, a4, a5, a6);
 }
 
 // Client Sided Patch
@@ -638,14 +638,15 @@ bool __cdecl OnPlayerSpawn(datum playerDatumIdx)
 typedef void(__cdecl* change_team_t)(int a1, int a2);
 change_team_t p_change_local_team;
 
-void __cdecl changeTeam(int localPlayerIndex, int teamIndex) 
+void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
 	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
 
-	if ((session->parameters[0].session_mode == 4 && Engine::get_game_life_cycle() == _life_cycle_pre_game)
-		|| (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL && teamIndex > 1)) {
-		//rvb mode enabled, don't change teams
-		return;
+	// prevent team switch in the pregame lobby, when the game already started
+	if (session) {
+		if ((session->parameters[0].session_mode == 4
+			&& Engine::get_game_life_cycle() == _life_cycle_pre_game))
+			return;
 	}
 	p_change_local_team(localPlayerIndex, teamIndex);
 }
@@ -801,14 +802,46 @@ void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
 typedef short(__cdecl* get_enabled_teams_flags_t)(s_network_session*);
 get_enabled_teams_flags_t p_get_enabled_teams_flags;
 
-short __cdecl get_enabled_teams_flags(s_network_session* session)
+short __cdecl get_enabled_team_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	if (new_teams_enabled_flags && !CustomVariantHandler::VariantEnabled(_id_infection))
-		return new_teams_enabled_flags;
-	else
+	const short red_versus_blue_teams = FLAG(_object_team_red) | FLAG(_object_team_blue);
+	const short infection_teams = FLAG(_object_team_red) | FLAG(_object_team_green);
+
+	std::wstring selected_map_file_name;
+
+	// skip if we're not host, let the host control
+	if (!NetworkSession::LocalPeerIsSessionHost())
 		return default_teams_enabled_flags;
+
+	if (CustomVariantHandler::ContainsGameVariant(NetworkSession::GetGameVariantName(), _id_infection))
+	{
+		// infection overrides H2Config
+		// TODO get infection_teams through the interface
+		new_teams_enabled_flags = infection_teams;
+		if ((default_teams_enabled_flags & FLAG(_object_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(_object_team_green)) == 0)
+		{
+			LOG_WARNING_FUNC(" - infection teams disabled in default enabled team flags");
+			if (MapManager::GetMapFilename(selected_map_file_name))
+				LOG_WARNING_FUNCW(" - perhaps current selected map - {} doesn't support these teams?? overriding anyway", selected_map_file_name.c_str());
+		}
+	}
+	else if (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb") != NULL)
+	{
+		// same with rvb, overrides H2Config
+		new_teams_enabled_flags = red_versus_blue_teams;
+		if ((default_teams_enabled_flags & FLAG(_object_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(_object_team_blue)) == 0)
+		{
+			LOG_WARNING_FUNC(" - RvB teams disabled in default enabled team flags");
+			if (MapManager::GetMapFilename(selected_map_file_name))
+				LOG_WARNING_FUNCW(" - perhaps current selected map - {} doesn't support these teams??", selected_map_file_name.c_str());
+		}
+	}
+
+	return new_teams_enabled_flags;
 }
 
 typedef int(__cdecl* get_next_hill_index_t)(int previousHill);
@@ -836,6 +869,17 @@ set_screen_bounds_t* p_set_screen_bounds;
 void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
 {
 	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
+}
+
+int get_active_count_from_bitflags(short teams_bit_flags)
+{
+	int count = 0;
+	for (int i = 0; i < _object_team_end; i++)
+	{
+		if (TEST_FLAG(teams_bit_flags, i))
+			count++;
+	}
+	return count;
 }
 
 bool __cdecl should_start_pregame_countdown_hook()
@@ -870,8 +914,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 	{
 		std::mt19937 mt_rand(rd());
 		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
+		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetCurrentNetworkSession());
 
-		int maxTeams = (std::min)((std::max)(H2Config_team_enabled_count, 2), 8);
+		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_object_team_end);
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
@@ -881,14 +926,15 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
-		for (int i = 0; i < 8; i++)
+		for (int i = 0; i < _object_team_end; i++)
 		{
 			int currentTeamPlayers = 0;
 
 			if (activePlayersIndices.empty())
 				break;
 
-			if (!H2Config_team_flag_array[i])
+			// check if the team is available for play
+			if (!TEST_FLAG(activeTeamsFlags, i))
 				continue;
 
 			std::uniform_int_distribution<int> dist(0, activePlayersIndices.size() - 1);
@@ -1005,6 +1051,7 @@ void H2MOD::ApplyHooks() {
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
 	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
+	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
 	// bellow hooks applied to specific executables
 	if (!Memory::IsDedicatedServer()) {
@@ -1064,8 +1111,6 @@ void H2MOD::ApplyHooks() {
 
 		PatchCall(Memory::GetAddress(0x0, 0xBF43), should_start_pregame_countdown_hook);
 		ServerConsole::ApplyHooks();
-
-		DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0, 0x19698B), get_enabled_teams_flags);
 	}
 
 	DETOUR_COMMIT();

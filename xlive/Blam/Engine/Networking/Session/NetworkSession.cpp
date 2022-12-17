@@ -106,10 +106,10 @@ int NetworkSession::GetPeerIndexFromNetworkAddress(network_address* address)
 	return p_get_peer_index_from_network_address(GetCurrentNetworkSession(), address);
 }
 
-char NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
+bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
 {
 	// host-only
-	typedef char(__thiscall* get_map_file_location_t)(s_network_session* session, wchar_t* buffer, size_t size);
+	typedef bool(__thiscall* get_map_file_location_t)(s_network_session* session, wchar_t* buffer, size_t size);
 	auto p_get_map_file_location = Memory::GetAddress<get_map_file_location_t>(0x1C5678, 0x19CD4A);
 	return p_get_map_file_location(GetCurrentNetworkSession(), buffer, size);
 }

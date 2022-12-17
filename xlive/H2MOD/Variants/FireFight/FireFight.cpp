@@ -151,9 +151,9 @@ void FireFight::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool FireFight::OnPlayerScore(ExecTime execTime, void* thisptr, unsigned short a2, int a3, int a4, int a5, char a6)
+bool FireFight::OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
 {
-	int absPlayerIdx = a2;
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 
 	bool handled = false;
