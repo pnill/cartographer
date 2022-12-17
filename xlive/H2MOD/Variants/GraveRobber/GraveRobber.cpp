@@ -84,12 +84,15 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 	
 	HaloScript::ObjectDestroy(skullDatum);
 
-	for (byte i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+	if (!Memory::IsDedicatedServer())
 	{
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
+		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
 		{
-			TriggerSound(_snd_skull_scored, 500);
-			break;
+			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
+			{
+				TriggerSound(_snd_skull_scored, 500);
+				break;
+			}
 		}
 	}
 }
