@@ -843,27 +843,28 @@ void ForcePlayersToRedAndBlue()
 	PlayerIterator playerIt;
 	byte team = 0;
 	byte red_team_count = 0;
-	byte blue_team_count = 0;
+	byte player_count = playerIt.get_data_count();
 
 	// Get count of players on red and blue team
 	while (playerIt.get_next_active_player())
 	{
 		s_player* player = playerIt.get_current_player_data();
 		byte player_team = player->GetTeam(playerIt.get_current_absolute_index());
-		(team == 0 ? red_team_count++ : blue_team_count++);
+		(team == 0 ? red_team_count++ : 0);
 	}
 
+	red_team_count = (player_count - red_team_count) / 2;
+	
 	// Loop through each player and set the team to red or blue
 	while (playerIt.get_next_active_player())
 	{
 		if (red_team_count != 0)
 		{
-			--red_team_count; 
+			red_team_count--;
 			team = 0;
 		} 
 		else
 		{
-			--blue_team_count;
 			team = 1;
 		}
 
@@ -873,7 +874,6 @@ void ForcePlayersToRedAndBlue()
 
 		if (player_team != 1 && player_team != 0)
 		{
-
 			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player_index), team);
 		}
 	}
