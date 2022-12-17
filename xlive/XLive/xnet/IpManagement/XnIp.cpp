@@ -578,45 +578,42 @@ int CXnIp::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* out
 	*/
 
 	XnKeyPair* keyPair = GetKeyPair(pxnkid);
-	if (keyPair != nullptr)
-	{
-		for (int i = 0; i < GetMaxXnConnections(); i++)
-		{
-			if (!m_XnIPs[i].bValid)
-			{
-				XnIp* newXnIp = &m_XnIPs[i];
-				ZeroMemory(newXnIp, sizeof(*newXnIp));
-
-				memcpy(&newXnIp->xnaddr, pxna, sizeof(*pxna));
-				newXnIp->keyPair = keyPair;
-
-				XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
-
-				// if this is zero we are fucked
-				ULONG randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
-				randIdentifier <<= CHAR_BIT;
-				LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, i, htonl(i | randIdentifier));
-
-				newXnIp->connectionIdentifier.s_addr = htonl(i | randIdentifier);
-				newXnIp->lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
-				newXnIp->connectStatus = XNET_CONNECT_STATUS_IDLE;
-				newXnIp->pckStats.PckDataSampleUpdate();
-				newXnIp->bValid = true;
-
-				if (outIpIdentifier)
-					*outIpIdentifier = newXnIp->connectionIdentifier;
-
-				return 0;
-			}
-		}
-
-		// if we get this far, no more connection spots available
-		return WSAENOMORE;
-	}
-	else
+	if (keyPair == nullptr)
 	{
 		return WSAEINVAL;
 	}
+
+	for (int i = 0; i < GetMaxXnConnections(); i++)
+	{
+		if (!m_XnIPs[i].bValid)
+		{
+			XnIp* newXnIp = &m_XnIPs[i];
+			ZeroMemory(newXnIp, sizeof(*newXnIp));
+			memcpy(&newXnIp->xnaddr, pxna, sizeof(*pxna));
+			newXnIp->keyPair = keyPair;
+
+			XNetRandom(newXnIp->connectionNonce, sizeof(XnIp::connectionNonce));
+
+			// if this is zero we are fucked
+			ULONG randIdentifier = (rand() % 0xFF) + 1; // 0 to 254 + 1
+			randIdentifier <<= CHAR_BIT;
+			LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, i, htonl(i | randIdentifier));
+
+			newXnIp->connectionIdentifier.s_addr = htonl(i | randIdentifier);
+			newXnIp->lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
+			newXnIp->connectStatus = XNET_CONNECT_STATUS_IDLE;
+			newXnIp->pckStats.PckDataSampleUpdate();
+			newXnIp->bValid = true;
+
+			if (outIpIdentifier)
+				*outIpIdentifier = newXnIp->connectionIdentifier;
+
+			return 0;
+		}
+	}
+
+	// if we get this far, no more connection spots available
+	return WSAENOMORE;
 }
 
 // TODO: add separate function that doesn't create XnIp identification from packet
@@ -792,7 +789,7 @@ void CXnIp::UnregisterKey(const XNKID* pxnkid)
 		}
 	}
 
-	LOG_CRITICAL_NETWORK("{} - xnkid {} is unknown!", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)).c_str());
+	LOG_CRITICAL_NETWORK("{} - unknown session key id - {}", __FUNCTION__, ByteToHexStr(pxnkid->ab, sizeof(pxnkid->ab)));
 }
 
 XnKeyPair* CXnIp::GetKeyPair(const XNKID* pxnkid)
