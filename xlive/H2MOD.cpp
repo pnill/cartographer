@@ -1126,6 +1126,7 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
+	PlayerRepresentation::Initialize();
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
@@ -1154,7 +1155,6 @@ void H2MOD::Initialize()
 	}
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
-	PlayerRepresentation::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
