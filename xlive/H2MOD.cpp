@@ -951,9 +951,9 @@ bool __cdecl should_start_pregame_countdown_hook()
 			}
 		}
 
-		EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 	}
 
+	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 	return true;
 }
 
