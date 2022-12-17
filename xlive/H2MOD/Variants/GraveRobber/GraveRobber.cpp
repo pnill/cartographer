@@ -83,6 +83,8 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 	
 	HaloScript::ObjectDestroy(skullDatum);
 
+	if (Memory::IsDedicatedServer()) { return; }
+
 	for (byte i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
 	{
 		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)

@@ -1,50 +1,51 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "Blam\Enums\HaloStrings.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\FileSystem\FiloInterface.h"
-#include "Blam\Engine\Game\DamageData.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
-#include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\EngineHooks\EngineHooks.h"
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
-#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
-#include "H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h"
-#include "H2MOD\Modules\HaloScript\HaloScript.h"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Input\ControllerInput.h"
-#include "H2MOD\Modules\Input\KeyboardInput.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
-#include "H2MOD\Modules\KantTesting\KantTesting.h"
-#include "H2MOD\Modules\MainMenu\MapSlots.h"
-#include "H2MOD\Modules\MainMenu\Ranks.h"
-#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Modules\PlaylistLoader\PlaylistLoader.h"
-#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Modules\Stats\StatsHandler.h"
-#include "H2MOD\Modules\TagFixes\TagFixes.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "Util\Hooks\Hook.h"
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
+#include "Blam/Enums/HaloStrings.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/Game/DamageData.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/IceCreamFlavor/IceCreamFlavor.h"
+#include "Blam/Engine/Memory/bitstream.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/FileSystem/FiloInterface.h"
+
+#include "H2MOD/Discord/DiscordInterface.h"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/EngineHooks/EngineHooks.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
+#include "H2MOD/Modules/HaloScript/HaloScript.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "H2MOD/Modules/KantTesting/KantTesting.h"
+#include "H2MOD/Modules/MainMenu/MapSlots.h"
+#include "H2MOD/Modules/MainMenu/Ranks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
+#include "H2MOD/Modules/TagFixes/TagFixes.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "Util/Hooks/Hook.h"
 
 #include <float.h>
 
@@ -652,7 +653,6 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 
 void H2MOD::set_local_team_index(int local_player_index, int team_index)
 {
-	// we only use player index 0 due to no splitscreen support but whatever
 	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
 	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
 
@@ -838,6 +838,47 @@ void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16
 	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
 
+void ForcePlayersToRedAndBlue()
+{
+	PlayerIterator playerIt;
+	byte team = 0;
+	byte red_team_count = 0;
+	byte blue_team_count = 0;
+
+	// Get count of players on red and blue team
+	while (playerIt.get_next_active_player())
+	{
+		s_player* player = playerIt.get_current_player_data();
+		byte player_team = player->GetTeam(playerIt.get_current_absolute_index());
+		(team == 0 ? red_team_count++ : blue_team_count++);
+	}
+
+	// Loop through each player and set the team to red or blue
+	while (playerIt.get_next_active_player())
+	{
+		if (red_team_count != 0)
+		{
+			--red_team_count; 
+			team = 0;
+		} 
+		else
+		{
+			--blue_team_count;
+			team = 1;
+		}
+
+		s_player* player = playerIt.get_current_player_data();
+		byte player_index = playerIt.get_current_absolute_index();
+		byte player_team = player->GetTeam(player_index);
+
+		if (player_team != 1 && player_team != 0)
+		{
+
+			NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(player_index), team);
+		}
+	}
+}
+
 bool __cdecl should_start_pregame_countdown_hook()
 {
 	// dedicated server only
@@ -864,6 +905,12 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 	if (!minimumPlayersConditionMet)
 		return false;
+
+	// Change team to Red Or Blue if its not red or blue already
+	if (StrStrIW(NetworkSession::GetGameVariantName(), L"rvb"))
+	{
+		ForcePlayersToRedAndBlue();
+	}
 
 	if (H2Config_even_shuffle_teams
 		&& NetworkSession::VariantIsTeamPlay())
@@ -1081,6 +1128,7 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
+	PlayerRepresentation::Initialize();
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();
@@ -1109,7 +1157,6 @@ void H2MOD::Initialize()
 	}
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
-	PlayerRepresentation::Initialize();
 	MeleeFix::Initialize();
 	TagFixes::Initalize();
 	MapSlots::Initialize();
