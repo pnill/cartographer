@@ -92,7 +92,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			}
 
 			int recvResult = 0;
-			int recvBufLen = gXnIp.GetReqQoSBufferSize();
+			int recvBufLen = gXnIpMgr.GetReqQoSBufferSize();
 			BYTE* recvBuf = new BYTE[recvBufLen];
 			ZeroMemory(recvBuf, recvBufLen);
 
@@ -273,9 +273,9 @@ void CALLBACK CXNetQoS::SendBack(DWORD dwError, DWORD cbTransferred, LPWSAOVERLA
 			delete[] acceptSockInfo->DataBuf.buf;
 
 			// copy the data passed by the game
-			acceptSockInfo->DataBuf.len = gXnIp.GetReqQoSBufferSize();
-			acceptSockInfo->DataBuf.buf = new CHAR[gXnIp.GetReqQoSBufferSize()];
-			memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+			acceptSockInfo->DataBuf.len = gXnIpMgr.GetReqQoSBufferSize();
+			acceptSockInfo->DataBuf.buf = new CHAR[gXnIpMgr.GetReqQoSBufferSize()];
+			memcpy(acceptSockInfo->DataBuf.buf, XNetQoS.pbData, gXnIpMgr.GetReqQoSBufferSize());
 
 			ZeroMemory(&acceptSockInfo->Overlapped, sizeof(acceptSockInfo->Overlapped));
 			int sendResult = WSASend(acceptSockInfo->Socket, &acceptSockInfo->DataBuf, 1, NULL, 0, &acceptSockInfo->Overlapped, HandleClient);
@@ -477,8 +477,8 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 
 	if (XNetQoS.pbData == nullptr)
 	{
-		XNetQoS.pbData = new BYTE[gXnIp.GetReqQoSBufferSize()];
-		ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+		XNetQoS.pbData = new BYTE[gXnIpMgr.GetReqQoSBufferSize()];
+		ZeroMemory(XNetQoS.pbData, gXnIpMgr.GetReqQoSBufferSize());
 	}
 
 	if (dwFlags & XNET_QOS_LISTEN_SET_DATA)
@@ -491,7 +491,7 @@ DWORD WINAPI XNetQosListen(XNKID *pxnkid, PBYTE pb, UINT cb, DWORD dwBitsPerSec,
 				XNetQoS.cbData = cb;
 			}
 
-			ZeroMemory(XNetQoS.pbData, gXnIp.GetReqQoSBufferSize());
+			ZeroMemory(XNetQoS.pbData, gXnIpMgr.GetReqQoSBufferSize());
 			memcpy(XNetQoS.pbData, pb, cb);
 		}
 	}

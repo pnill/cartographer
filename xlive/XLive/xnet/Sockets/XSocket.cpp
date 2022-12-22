@@ -120,8 +120,8 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 	{
 		LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
 		// set socket send/recv buffers size, but only if the socket isn't blocking
-		xsocket->SetBufferSize(SO_SNDBUF, gXnIp.GetMinSockSendBufferSizeInBytes());
-		xsocket->SetBufferSize(SO_RCVBUF, gXnIp.GetMinSockRecvBufferSizeInBytes());
+		xsocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
+		xsocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());
 
 		// remove last error even if we didn't successfuly increased the recv/send buffer size
 		WSASetLastError(0);
@@ -286,7 +286,7 @@ int XSocket::winsock_read_socket(LPWSABUF lpBuffers,
 		return SOCKET_ERROR;
 	}
 
-	result = gXnIp.HandleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd);
+	result = gXnIpMgr.HandleRecvdPacket(this, (sockaddr_in*)lpFrom, lpBuffers, dwBufferCount, lpNumberOfBytesRecvd);
 	return result;
 }
 
@@ -388,10 +388,9 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		Worst case if this is found to cause performance issues we can handle the send and re-update to secure before return.
 	*/
 
-	XnIp* xnIp = gXnIp.GetConnection(inTo->sin_addr);
+	XnIp* xnIp = gXnIpMgr.GetConnection(inTo->sin_addr);
 	if (xnIp != nullptr
-		&& gXnIp.GetLocalUserXn()->bValid
-		&& xnIp->connectStatus != XNET_CONNECT_STATUS_LOST)
+		&& xnIp->GetConnectStatus() != XNET_CONNECT_STATUS_LOST)
 	{
 		sockaddr_in sendToAddr;
 		sendToAddr.sin_family = AF_INET;
@@ -400,7 +399,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		// check if the online ip address is the same as the local one
 		// and if the online ip address of the connection is 0, fall back to LAN address
 		// to allow packets to be sent even if an account is logged in locally or online (local Xbox profile or Online profile)
-		if (xnIp->GetOnlineIpAddr().s_addr == gXnIp.GetLocalUserXn()->GetOnlineIpAddr().s_addr
+		if (xnIp->GetOnlineIpAddr().s_addr == gXnIpMgr.GetLocalUserXn()->GetOnlineIpAddr().s_addr
 			|| xnIp->GetOnlineIpAddr().s_addr == 0)
 		{
 			sendToAddr.sin_addr.s_addr = xnIp->GetLanIpAddr().s_addr;
@@ -409,26 +408,24 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		switch (ntohs(inTo->sin_port))
 		{
 		case 1000:
-			sendToAddr.sin_port = xnIp->xnaddr.wPortOnline;
-			if (!xsocket->SockAddrInInvalid(xnIp->GetNatAddr(H2v_sockets::Sock1000)))
+			sendToAddr.sin_port = xnIp->m_xnaddr.wPortOnline;
+			if (!xsocket->SockAddrInInvalid(xnIp->NatGetAddr(H2v_sockets::Sock1000)))
 			{
 				// if there's nat data use it
-				sendToAddr = *xnIp->GetNatAddr(H2v_sockets::Sock1000);
+				sendToAddr = *xnIp->NatGetAddr(H2v_sockets::Sock1000);
 			}
-
 			break;
 
 		case 1001:
-			sendToAddr.sin_port = htons(ntohs(xnIp->xnaddr.wPortOnline) + 1);
-			if (!xsocket->SockAddrInInvalid(xnIp->GetNatAddr(H2v_sockets::Sock1001)))
+			sendToAddr.sin_port = htons(ntohs(xnIp->m_xnaddr.wPortOnline) + 1);
+			if (!xsocket->SockAddrInInvalid(xnIp->NatGetAddr(H2v_sockets::Sock1001)))
 			{
-				sendToAddr = *xnIp->GetNatAddr(H2v_sockets::Sock1001);
+				sendToAddr = *xnIp->NatGetAddr(H2v_sockets::Sock1001);
 			}
-
 			break;
 
 		default:
-			LOG_CRITICAL_NETWORK("XSocketSendTo() port: {} not matched!", ntohs(xnIp->xnaddr.wPortOnline));
+			LOG_CRITICAL_NETWORK("XSocketSendTo() port: {} not matched!", ntohs(xnIp->m_xnaddr.wPortOnline));
 			return SOCKET_ERROR;
 		}
 
@@ -464,8 +461,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 #if !COMPILE_WITH_STD_SOCK_FUNC
 			pckSent = dwBufferCount;
 #endif
-			xnIp->pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
-			gXnIp.GetLocalUserXn()->pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
+			xnIp->m_pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
+			gXnIpMgr.GetLocalUserXn()->m_pckStats.PckSendStatsUpdate(pckSent, dwNumberOfBytesSent);
 			if (lpNumberOfBytesSent)
 				*lpNumberOfBytesSent = dwNumberOfBytesSent;
 			
@@ -476,7 +473,8 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", gXnIp.GetConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
+		LOG_TRACE_NETWORK("XSocketSendTo() - Tried to send packet to unknown connection, connection index: {}, connection identifier: {:x}", 
+			XnIp::GetConnectionIndex(inTo->sin_addr), inTo->sin_addr.s_addr);
 		XSocketWSASetLastError(WSAEHOSTUNREACH);
 		return SOCKET_ERROR;
 	}
@@ -593,22 +591,28 @@ SOCKET WINAPI XSocketBind(SOCKET s, const struct sockaddr *name, int namelen)
 	// copy socket ip/port
 	memcpy(&xsocket->name, name, sizeof(sockaddr_in));
 
-	u_short port = (((struct sockaddr_in*)name)->sin_port);
+	u_short virtual_port = (((struct sockaddr_in*)name)->sin_port);
 
-	if (port == htons(1000)) {
-		(((struct sockaddr_in*)name)->sin_port) = htons(H2Config_base_port);
-		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", ntohs(port), H2Config_base_port);
+	switch (ntohs(virtual_port))
+	{
+	case 1000:
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port);
+		break;
+	case 1001:
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 1);
+		break;
+	case 1005:
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 5);
+		break;
+	case 1006:
+		((struct sockaddr_in*)name)->sin_port = htons(H2Config_base_port + 6);
+		break;
+	default:
+		break;
 	}
 
-	if (port == htons(1001)) {
-		(((struct sockaddr_in*)name)->sin_port) = htons(H2Config_base_port + 1);
-		LOG_TRACE_NETWORK("XSocketBind() - replaced port {} with {}", ntohs(port), H2Config_base_port + 1);
-	}
-
-	if (port == htons(1005))
-		(((struct sockaddr_in*)name)->sin_port) = htons(H2Config_base_port + 5);
-	if (port == htons(1006))
-		(((struct sockaddr_in*)name)->sin_port) = htons(H2Config_base_port + 6);
+	LOG_TRACE_NETWORK("XSocketBind() - replaced virtual socket port - {} with: {}", 
+		ntohs(virtual_port), ntohs(((struct sockaddr_in*)name)->sin_port));
 
 	int ret = bind(xsocket->winSockHandle, name, namelen);
 

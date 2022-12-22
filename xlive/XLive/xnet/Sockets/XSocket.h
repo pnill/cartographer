@@ -49,10 +49,10 @@ struct XSocket
 	// all fields in sockaddr_in are in network byte order
 	// some helpers for conversion for each case needed
 	/* get the port, in host byte order, in this case little-endian */
-	short GetHostOrderSocketPort() const { return ntohs(name.sin_port); }
+	u_short GetHostOrderSocketVirtualPort() const { return ntohs(name.sin_port); }
 
 	/* get the port, in network byte order, in this case big-endian */
-	short GetNetworkOrderSocketPort() const { return name.sin_port; }
+	u_short GetNetworkOrderSocketVirtualPort() const { return name.sin_port; }
 
 	/* sets the socket send/recv buffer size */
 	int SetBufferSize(int optName, INT bufSize);

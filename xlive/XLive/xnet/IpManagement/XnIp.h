@@ -6,20 +6,12 @@
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h"
 
-#define MAX_HDR_STR 32
+#define XNIP_MAX_PCK_STR_HDR_LEN 32
 
-#define MAX_NETSTATS_SAMPLES 30
+#define XNIP_MAX_NET_STATS_SAMPLES 30
 
-extern h2log* critical_network_errors_log;
-
-// undefine LOG_CRITICAL_NETWORK for now, to implment it using another h2log that always gets created
-// TODO: disable if all network problems are addressed
-#undef LOG_CRITICAL_NETWORK
-
-#define LOG_CRITICAL_NETWORK(msg, ...)   LOG_CRITICAL  ((network_log != nullptr ? network_log : critical_network_errors_log), msg, __VA_ARGS__)
-
-const char requestStrHdr[MAX_HDR_STR] = "XNetBrOadPack";
-const char broadcastStrHdr[MAX_HDR_STR] = "XNetReqPack";
+extern const char requestStrHdr[XNIP_MAX_PCK_STR_HDR_LEN];
+extern const char broadcastStrHdr[XNIP_MAX_PCK_STR_HDR_LEN];
 
 #define XnIp_ConnectionIndexMask 0xFF000000
 
@@ -58,7 +50,7 @@ enum class H2v_sockets : int
 struct XNetPacketHeader
 {
 	DWORD intHdr;
-	char HdrStr[MAX_HDR_STR];
+	char HdrStr[XNIP_MAX_PCK_STR_HDR_LEN];
 };
 
 struct XBroadcastPacket
@@ -66,7 +58,7 @@ struct XBroadcastPacket
 	XBroadcastPacket()
 	{
 		pckHeader.intHdr = 'BrOd';
-		strncpy(pckHeader.HdrStr, broadcastStrHdr, MAX_HDR_STR);
+		strncpy(pckHeader.HdrStr, broadcastStrHdr, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 		data.name.sin_addr.s_addr = INADDR_BROADCAST;
 	};
@@ -84,7 +76,7 @@ struct XNetRequestPacket
 	{
 		pckHeader.intHdr = 'XNeT';
 		memset(pckHeader.HdrStr, 0, sizeof(pckHeader.HdrStr));
-		strncpy(pckHeader.HdrStr, requestStrHdr, MAX_HDR_STR);
+		strncpy(pckHeader.HdrStr, requestStrHdr, XNIP_MAX_PCK_STR_HDR_LEN);
 		ZeroMemory(&data, sizeof(data));
 	}
 
@@ -125,14 +117,16 @@ struct XnIpPckTransportStats
 	unsigned int pckAvgSentPerSec;
 	unsigned int pckAvgRecvdPerSec;
 
-	unsigned int pckSentPerSec[MAX_NETSTATS_SAMPLES];
-	unsigned int pckBytesSentPerSec[MAX_NETSTATS_SAMPLES];
+	unsigned int pckSentPerSec[XNIP_MAX_NET_STATS_SAMPLES];
+	unsigned int pckBytesSentPerSec[XNIP_MAX_NET_STATS_SAMPLES];
 
-	unsigned int pckRecvdPerSec[MAX_NETSTATS_SAMPLES];
-	unsigned int pckBytesRecvdPerSec[MAX_NETSTATS_SAMPLES];
+	unsigned int pckRecvdPerSec[XNIP_MAX_NET_STATS_SAMPLES];
+	unsigned int pckBytesRecvdPerSec[XNIP_MAX_NET_STATS_SAMPLES];
 
 	int			 pckCurrentSendPerSecIdx;
 	int			 pckCurrentRecvdPerSecIdx;
+
+	ULONGLONG	 lastPacketReceivedTime;
 
 	void PckDataSampleUpdate()
 	{
@@ -162,8 +156,8 @@ struct XnIpPckTransportStats
 
 			if (_Shell::QPCToTimeNowMsec() - lastTimeUpdate >= sample_end_time)
 			{
-				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
-				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
 
 				pckSentPerSec[pckSentPerSecIdx] = 0;
 				pckBytesSentPerSec[pckSentPerSecIdx] = 0;
@@ -171,8 +165,8 @@ struct XnIpPckTransportStats
 				pckRecvdPerSec[pckRecvdPerSecIdx] = 0;
 				pckBytesRecvdPerSec[pckRecvdPerSecIdx] = 0;
 
-				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
-				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % MAX_NETSTATS_SAMPLES;
+				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
+				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
 
 				lastTimeUpdate = _Shell::QPCToTimeNowMsec();
 			}
@@ -199,6 +193,8 @@ struct XnIpPckTransportStats
 
 		pckRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvd;
 		pckBytesRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvdBytes;
+
+		lastPacketReceivedTime = _Shell::QPCToTimeNowMsec();
 	}
 
 private:
@@ -209,35 +205,38 @@ private:
 
 struct XnIp
 {
-	IN_ADDR connectionIdentifier;
-	XNADDR xnaddr;
-
+	IN_ADDR m_connectionId;
+	XNADDR m_xnaddr;
 	// key we connected with
-	XnKeyPair* keyPair;
+	XnKeyPair* m_keyPair;
 
-	bool bValid;
-	int connectStatus;
-	int connectionPacketsSentCount;
-	ULONGLONG lastConnectionInteractionTime;
-	ULONGLONG lastPacketReceivedTime;
+	bool m_valid;
+	int m_connectStatus;
+	int m_connectionPacketsSentCount;
+	
+	ULONGLONG m_lastConnectionInteractionTime;
 
-	BYTE connectionNonce[8];
-	BYTE connectionNonceOtherSide[8];
-	bool otherSideNonceKeyReceived;
+	BYTE m_nonce[8];
+	BYTE m_endpointNonce[8];
+	bool m_endpointNonceValid;
 
-	bool connectionInitiator;
-
-	bool logErrorOnce;
+	// describes if this connection was created
+	// in the event of a received packet
+	// if true, the endpoint initiated the connection
+	// if false, local machine attempted to connect
+	bool m_connectionInitiator;
 
 	enum eXnIp_Flags
 	{
-		XnIp_ConnectDeclareConnectedRequestSent
+		XnIp_ConnectDeclareConnectedRequestSent,
 	};
-
 	DWORD flags;
 
-#pragma region Nat
+#pragma region NAT handling
 
+	// TODO: currently we use multiple system sockets
+	// to send data to the corresponding virtual socket
+	// when in practice we could just use one
 	struct NatTranslation
 	{
 		enum class eNatDataState : unsigned int
@@ -249,42 +248,40 @@ struct XnIp
 		eNatDataState state;
 		sockaddr_in natAddress;
 	};
-	
-	// TODO: add single async socket implementation or figure out another way
-	NatTranslation natTranslation[2];
+	NatTranslation m_natTranslation[2];
 
-	sockaddr_in* GetNatAddr(H2v_sockets natIndex)
+	const sockaddr_in* NatGetAddr(H2v_sockets natIndex) const
 	{
 		int index = (int)natIndex;
-		return &natTranslation[index].natAddress;
+		return &m_natTranslation[index].natAddress;
 	}
 
-	void UpdateNat(H2v_sockets natIndex, const sockaddr_in* addr)
+	void NatUpdate(H2v_sockets natIndex, const sockaddr_in* addr)
 	{
 		int index = (int)natIndex;
-		natTranslation[index].natAddress = *addr;
-		natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
+		m_natTranslation[index].natAddress = *addr;
+		m_natTranslation[index].state = NatTranslation::eNatDataState::natAvailable;
 	}
 
 	void NatDiscard()
 	{
-		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
+		for (int i = 0; i < ARRAYSIZE(m_natTranslation); i++)
 		{
-			memset(&natTranslation[i], 0, sizeof(*natTranslation));
-			natTranslation[i].state = NatTranslation::eNatDataState::natUnavailable;
+			memset(&m_natTranslation[i], 0, sizeof(*m_natTranslation));
+			m_natTranslation[i].state = NatTranslation::eNatDataState::natUnavailable;
 		}
 	}
 
 	bool NatIsUpdated(int natIndex) const
 	{
-		return natTranslation[natIndex].state == NatTranslation::eNatDataState::natAvailable;
+		return m_natTranslation[natIndex].state == NatTranslation::eNatDataState::natAvailable;
 	}
 
 	bool NatIsUpdated() const
 	{
-		for (int i = 0; i < ARRAYSIZE(natTranslation); i++)
+		for (int i = 0; i < ARRAYSIZE(m_natTranslation); i++)
 		{
-			if (natTranslation[i].state != NatTranslation::eNatDataState::natAvailable)
+			if (m_natTranslation[i].state != NatTranslation::eNatDataState::natAvailable)
 				return false;
 		}
 		return true;
@@ -292,67 +289,119 @@ struct XnIp
 #pragma endregion
 
 public:
-	XnIpPckTransportStats pckStats;
+	XnIpPckTransportStats m_pckStats;
 
 	void PckStatsReset()
 	{
-		pckStats.bInit = false;
+		m_pckStats.bInit = false;
 	}
 
-	void PckGetStats(const XnIpPckTransportStats** outPckStats)
+	bool PckGetStats(const XnIpPckTransportStats** outPckStats) const
 	{
-		*outPckStats = &pckStats;
+		if (m_pckStats.bInit)
+		{
+			*outPckStats = &m_pckStats;
+			return true;
+		}
+
+		return false;
 	}
 
 	IN_ADDR GetOnlineIpAddr() const
 	{
-		return xnaddr.inaOnline;
+		return m_xnaddr.inaOnline;
 	}
 
 	IN_ADDR GetLanIpAddr() const
 	{
-		return xnaddr.ina;
+		return m_xnaddr.ina;
 	}
 
 	bool IsValid(IN_ADDR identifier) const
 	{
-		if (identifier.s_addr != this->connectionIdentifier.s_addr)
+		if (identifier.s_addr != GetConnectionId().s_addr)
 		{
-			LOG_CRITICAL_NETWORK("{} - connection identifier different {:X} != {:X}", __FUNCTION__, identifier.s_addr, connectionIdentifier.s_addr);
+			LOG_CRITICAL_NETWORK("{} - connection identifier different {:X} != {:X}", __FUNCTION__, identifier.s_addr, GetConnectionId().s_addr);
 			return false;
 		}
 
-		return bValid && identifier.s_addr == this->connectionIdentifier.s_addr;
+		return m_valid && identifier.s_addr == GetConnectionId().s_addr;
 	}
+
+	void UpdateInteractionTimeHappened()
+	{
+		m_lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
+	}
+
+	IN_ADDR GetConnectionId() const
+	{
+		return m_connectionId;
+	}
+
+	bool InitiatedConnectRequest() const 
+	{
+		return m_connectionInitiator;
+	}
+
+	int GetConnectStatus() const
+	{
+		return m_connectStatus;
+	}
+
+	void SetConnectStatus(int connectStatus)
+	{
+		m_connectStatus = connectStatus;
+	}
+
+	bool ConnectStatusConnected() const 
+	{
+		return GetConnectStatus() == XNET_CONNECT_STATUS_CONNECTED;
+	}
+
+	bool ConnectStatusLost() const
+	{
+		return GetConnectStatus() == XNET_CONNECT_STATUS_LOST;
+	}
+
+	static int GetConnectionIndex(IN_ADDR connectionId);
+
+	void SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr);
+	void HandleConnectionPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
+	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr); // TODO:
+
+	/* sends a request over the socket to the other socket end, with the same identifier */
+	void SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType);
+
+	/* sends a request to all open sockets */
+	void SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType);
 };
 
-class CXnIp
+class XnIpManager
 {
 public:
 
-	CXnIp()
+	XnIpManager()
 	{
 		memset(&m_startupParams, 0, sizeof(m_startupParams));
 	}
 
-	~CXnIp()
+	~XnIpManager()
 	{
 		// TODO maybe terminate all connections
 	}
 
-	CXnIp(const CXnIp& other) = delete;
-	CXnIp(CXnIp&& other) = delete;
+	// disable copy/move
+	XnIpManager(const XnIpManager& other) = delete;
+	XnIpManager(XnIpManager&& other) = delete;
 
 	void Initialize(const XNetStartupParams* netStartupParams);
 
 	// Connection data getters 
 	XnIp* GetConnection(const IN_ADDR ina) const;
-	static int GetConnectionIndex(IN_ADDR connectionIdentifier);
 	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier);
 
 	// Miscellaneous
 	void ClearLostConnections();
-	void SetTimeConnectionInteractionHappened(IN_ADDR ina);
 
 	// local network address
 	static XnIp* GetLocalUserXn();
@@ -407,25 +456,15 @@ public:
 		return keysCount;
 	}
 
-	/*
-		Sends a request over the socket to the other socket end, with the same identifier
-	*/
-	void SendXNetRequest(XSocket* xsocket, IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
-
-	/*
-		Sends a request to all open sockets
-	*/
-	void SendXNetRequestAllSockets(IN_ADDR connectionIdentifier, eXnip_ConnectRequestType reqType);
-
 	// Data
 	XnIp* m_XnIPs = nullptr;
 	XnKeyPair* m_XnKeyPairs = nullptr;
 
 private:
-	XNetStartupParams m_startupParams;
 	static XnIp m_ipLocal;
+	XNetStartupParams m_startupParams;
 };
 
-extern CXnIp gXnIp;
+extern XnIpManager gXnIpMgr;
 
 int WINAPI XNetRegisterKey(XNKID *pxnkid, XNKEY *pxnkey);

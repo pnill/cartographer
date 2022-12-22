@@ -251,7 +251,7 @@ void __cdecl main_game_loop_hook() {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
 	mapManager->MapDownloadUpdateTick();
 	// update local user network stats
-	gXnIp.GetLocalUserXn()->pckStats.PckDataSampleUpdate();
+	gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();
 	p_main_game_loop();
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }

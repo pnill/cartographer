@@ -71,8 +71,8 @@ LONG WINAPI XSessionCreate(DWORD dwFlags, DWORD dwUserIndex, DWORD dwMaxPublicSl
 			XNetCreateKey(&pSessionInfo->sessionID, &pSessionInfo->keyExchangeKey);
 		}
 
-		if (gXnIp.GetLocalUserXn()->bValid)
-			pSessionInfo->hostAddress = gXnIp.GetLocalUserXn()->xnaddr;
+		if (gXnIpMgr.GetLocalUserXn()->m_valid)
+			memcpy(&pSessionInfo->hostAddress, &gXnIpMgr.GetLocalUserXn()->m_xnaddr, sizeof(XNADDR));
 
 		if (pqwSessionNonce) XNetRandom((BYTE*)pqwSessionNonce, sizeof(*pqwSessionNonce));
 

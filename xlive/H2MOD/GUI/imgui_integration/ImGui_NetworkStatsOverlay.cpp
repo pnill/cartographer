@@ -88,14 +88,14 @@ void ShowNetworkStatsOverlay(bool* p_open)
 
 		ImGui::Text("Network time: %llu msec", network_time);
 
-		XnIp* localIp = gXnIp.GetLocalUserXn();
+		XnIp* localIp = gXnIpMgr.GetLocalUserXn();
 
-		if (localIp->bValid)
+		if (localIp->m_valid)
 		{
 			const XnIpPckTransportStats* local_user_net_metrics;
 			localIp->PckGetStats(&local_user_net_metrics);
 			
-			localIp->pckStats.PckDataSampleUpdate();
+			localIp->m_pckStats.PckDataSampleUpdate();
 
 			int currentSentPerSecIdx = local_user_net_metrics->pckCurrentSendPerSecIdx;
 			int currentRecvdPerSecIdx = local_user_net_metrics->pckCurrentRecvdPerSecIdx;

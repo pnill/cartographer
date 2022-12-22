@@ -747,10 +747,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 		rapidjson::Document document;
 		document.SetObject();
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[0].xuid), document.GetAllocator());
-
-		Value token(kStringType);
-		token.SetString(H2CurrentAccountLoginToken, document.GetAllocator());
-		document.AddMember("token", token, document.GetAllocator());
+		document.AddMember("token", Value().SetString(H2CurrentAccountLoginToken, document.GetAllocator()), document.GetAllocator());
 
 		StringBuffer buffer;
 		Writer<StringBuffer> writer(buffer);
@@ -799,7 +796,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		Value xnkey_val(kStringType);
 		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(xnkey.ab)).c_str(), document.GetAllocator());
 
-		XnIp* localUser = gXnIp.GetLocalUserXn();
+		XnIp* localUser = gXnIpMgr.GetLocalUserXn();
 
 		document.AddMember("token", token, document.GetAllocator());
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), document.GetAllocator());
@@ -809,9 +806,9 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), document.GetAllocator());
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), document.GetAllocator());
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), document.GetAllocator());
-		if (localUser->bValid)
+		if (localUser->m_valid)
 		{
-			document.AddMember("lanaddr", Value().SetUint(localUser->xnaddr.ina.s_addr), document.GetAllocator());
+			document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), document.GetAllocator());
 		}
 		document.AddMember("xnkid", xnkid_val, document.GetAllocator());
 		document.AddMember("xnkey", xnkey_val, document.GetAllocator());

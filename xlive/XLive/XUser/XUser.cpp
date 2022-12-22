@@ -67,7 +67,7 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
-	gXnIp.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
+	gXnIpMgr.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
 }
 
 void XUserSignInSetStatusChanged(DWORD dwUserIndex)
@@ -80,7 +80,7 @@ void XUserSignOut(DWORD dwUserIndex)
 	// clear user sign in
 	SecureZeroMemory(&usersSignInInfo[dwUserIndex], sizeof(XUSER_SIGNIN_INFO));
 	// clear connection data
-	gXnIp.UnregisterLocalConnectionInfo();
+	gXnIpMgr.UnregisterLocalConnectionInfo();
 	signInChanged[dwUserIndex] = true;
 }
 

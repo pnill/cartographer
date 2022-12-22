@@ -175,7 +175,7 @@ int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens,
 int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	gXnIp.LogConnectionsToConsole(output);
+	gXnIpMgr.LogConnectionsToConsole(output);
 	return 0;
 }
 
