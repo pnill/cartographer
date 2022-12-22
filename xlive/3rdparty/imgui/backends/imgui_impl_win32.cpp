@@ -22,7 +22,7 @@
 #include <dwmapi.h>
 
 // Configuration flags to add in your imconfig.h file:
-//#define IMGUI_IMPL_WIN32_DISABLE_GAMEPAD              // Disable gamepad support. This was meaningful before <1.81 but we now load XInput dynamically so the option is now less relevant.
+#define IMGUI_IMPL_WIN32_DISABLE_GAMEPAD              // Disable gamepad support. This was meaningful before <1.81 but we now load XInput dynamically so the option is now less relevant.
 
 // Using XInput for gamepad (will load DLL dynamically)
 #ifndef IMGUI_IMPL_WIN32_DISABLE_GAMEPAD

@@ -9,6 +9,9 @@
 #define WINVER _WIN32_WINNT_VISTA
 #define _WIN32_WINNT _WIN32_WINNT_VISTA
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
+// sets the dinput/xinput version, Halo 2 uses the older 9.1.0 version and DirectInput 0x0800
+#define XINPUT_USE_9_1_0
+#define DIRECTINPUT_VERSION 0x0800
 
 #ifdef _DEBUG
 #define _SECURE_SCL 1
@@ -31,6 +34,10 @@
 #include <mmsystem.h>
 #include <windef.h>
 #include <codecvt>
+
+// game input
+#include <xinput.h>
+#include <dinput.h>
 
 // TODO: include this only if trac
 #include <fstream>

@@ -115,7 +115,7 @@ handle_out_of_band_message_t p_handle_out_of_band_message;
 
 void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet)
 {
-	/* surprisingly the game doesn't use this too much, pretty much for request-join and tme-sync packets */
+	/* surprisingly the game doesn't use this too much, pretty much for request-join and time-sync packets */
 	LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}", 
 		__FUNCTION__, GetNetworkMessageName(message_type), NetworkSession::GetPeerIndexFromNetworkAddress(address));
 

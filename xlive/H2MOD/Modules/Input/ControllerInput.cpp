@@ -44,7 +44,7 @@ namespace ControllerInput
 	//Main function that iterates through all available input devices and calls update_xinput_state from the items vtable
 	void __cdecl update_xinput_devices()
 	{
-		XINPUT_BUTTONS controller_button = XINPUT_GAMEPAD_NONE;
+		WORD controller_button = 0;
 		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
 		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
 		for(auto i = 0; i < 20; i++)

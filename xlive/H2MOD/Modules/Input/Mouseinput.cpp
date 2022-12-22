@@ -5,13 +5,6 @@
 #include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
-typedef struct DIMOUSESTATE {
-	LONG lX;
-	LONG lY;
-	LONG lZ;
-	BYTE rgbButtons[4];
-} DIMOUSESTATE, *LPDIMOUSESTATE;
-
 bool b_raw_init = false;
 DWORD base;
 DWORD rtnAddr = 0;

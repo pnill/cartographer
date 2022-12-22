@@ -43,6 +43,7 @@ namespace ImGuiHandler {
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
+
 			int button_placeholders[14];
 			std::map<int, std::map<e_advanced_string, const char*>> string_table;
 			//Used for controls that use the same string, A identifier has to be appended to them
@@ -607,49 +608,49 @@ namespace ImGuiHandler {
 						std::string Id = "##C_L" + std::to_string(i);
 						if (ImGui::Combo(Id.c_str(), &button_placeholders[i], action_items, 14))
 						{
-							switch ((ControllerInput::XINPUT_BUTTONS)button_values[i])
+							switch (button_values[i])
 							{
-							case ControllerInput::XINPUT_GAMEPAD_DPAD_UP:
-								H2Config_CustomLayout.DPAD_UP = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_DPAD_UP:
+								H2Config_CustomLayout.DPAD_UP = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_DPAD_DOWN:
-								H2Config_CustomLayout.DPAD_DOWN = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_DPAD_DOWN:
+								H2Config_CustomLayout.DPAD_DOWN = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_DPAD_LEFT:
-								H2Config_CustomLayout.DPAD_LEFT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_DPAD_LEFT:
+								H2Config_CustomLayout.DPAD_LEFT = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_DPAD_RIGHT:
-								H2Config_CustomLayout.DPAD_RIGHT = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_DPAD_RIGHT:
+								H2Config_CustomLayout.DPAD_RIGHT = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_START:
-								H2Config_CustomLayout.START = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_START:
+								H2Config_CustomLayout.START = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_BACK:
-								H2Config_CustomLayout.BACK = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_BACK:
+								H2Config_CustomLayout.BACK = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_LEFT_THUMB:
-								H2Config_CustomLayout.LEFT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_LEFT_THUMB:
+								H2Config_CustomLayout.LEFT_THUMB = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_RIGHT_THUMB:
-								H2Config_CustomLayout.RIGHT_THUMB = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_RIGHT_THUMB:
+								H2Config_CustomLayout.RIGHT_THUMB = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_LEFT_SHOULDER:
-								H2Config_CustomLayout.LEFT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_LEFT_SHOULDER:
+								H2Config_CustomLayout.LEFT_SHOULDER = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_RIGHT_SHOULDER:
-								H2Config_CustomLayout.RIGHT_SHOULDER = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_RIGHT_SHOULDER:
+								H2Config_CustomLayout.RIGHT_SHOULDER = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_A:
-								H2Config_CustomLayout.A = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_A:
+								H2Config_CustomLayout.A = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_B:
-								H2Config_CustomLayout.B = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_B:
+								H2Config_CustomLayout.B = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_X:
-								H2Config_CustomLayout.X = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_X:
+								H2Config_CustomLayout.X = button_values[button_placeholders[i]];
 								break;
-							case ControllerInput::XINPUT_GAMEPAD_Y:
-								H2Config_CustomLayout.Y = (ControllerInput::XINPUT_BUTTONS)button_values[button_placeholders[i]];
+							case XINPUT_GAMEPAD_Y:
+								H2Config_CustomLayout.Y = button_values[button_placeholders[i]];
 								break;
 							}
 						}
