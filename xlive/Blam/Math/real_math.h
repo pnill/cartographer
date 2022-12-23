@@ -6,6 +6,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#define k_real_math_epsilon 0.000099999997f
+
 #define degreesToRadians(angleDegrees) ((float)((angleDegrees) * M_PI / 180.0))
 
 #ifndef _DEBUG

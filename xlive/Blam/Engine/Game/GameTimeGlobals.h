@@ -7,7 +7,7 @@ struct time_globals
 {
 	bool initialized;
 	bool paused;
-	WORD ticks_per_second;
+	short ticks_per_second;
 	float seconds_per_tick;
 	DWORD tick_count;
 	float game_speed;
@@ -20,6 +20,7 @@ struct time_globals
 	static bool available();
 	static time_globals* get();
 	static int get_game_time();
+	static int get_tickrate();
 	static float get_seconds_per_tick();
 	static float seconds_to_ticks_real(float s);
 	static int seconds_to_ticks_round(float s);

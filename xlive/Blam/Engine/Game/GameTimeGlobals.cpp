@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "GameTimeGlobals.h"
+#include "Blam/Math/BlamMath.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
@@ -17,6 +18,11 @@ int time_globals::get_game_time()
 	return get()->tick_count;
 }
 
+int time_globals::get_tickrate()
+{
+	return get()->ticks_per_second;
+}
+
 float time_globals::get_seconds_per_tick()
 {
 	return get()->seconds_per_tick;
@@ -24,12 +30,12 @@ float time_globals::get_seconds_per_tick()
 
 float time_globals::seconds_to_ticks_real(float s)
 {
-	return (float)(__int16)get()->ticks_per_second * s;
+	return (float)get()->ticks_per_second * s;
 }
 
 int time_globals::seconds_to_ticks_round(float s)
 {
-	return (int)(float)((float)(__int16)get()->ticks_per_second * s);
+	return blam_ticks_real_to_integer((float)get()->ticks_per_second * s);
 }
 
 int time_globals::get_ticks_difference()

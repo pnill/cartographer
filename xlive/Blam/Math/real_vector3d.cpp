@@ -90,7 +90,7 @@ float normalize3d(real_vector3d* v1)
 {
 	float length = magnitude3d(v1);
 
-	if (abs(length) < 0.000099999997f)
+	if (abs(length) < k_real_math_epsilon)
 		return 0.0f; // vector already normal
 
 	scale_vector3d(v1, 1.0f / length, v1);

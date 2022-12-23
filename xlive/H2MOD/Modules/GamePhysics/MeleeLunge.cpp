@@ -524,7 +524,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					float temp_current_velocity_per_tick = magnitude3d(&current_translational_velocity_per_tick);
 					
 					real_vector3d direction_of_current_translational_velocity = current_translational_velocity_per_tick;
-					float current_velocity_per_tick_from_normalization = normalize3d(&direction_of_current_translational_velocity);
+					float direction_magnitude_from_normalization = normalize3d(&direction_of_current_translational_velocity);
 
 					bool melee_allow_deceleration = (float)m_deceleration_ticks < k_deceleration_ticks_real
 						|| (float)(m_maximum_counter - m_melee_tick) > k_deceleration_ticks_real;
@@ -540,7 +540,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					}
 
 					if (dot_product3d(aiming_vector, &direction_of_current_translational_velocity) <= (temp_current_velocity_per_tick * 0.087155744f)
-						|| current_velocity_per_tick_from_normalization == 0.0f)
+						|| direction_magnitude_from_normalization == 0.0f)
 					{
 						float deceleration = blam_min((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f, temp_current_velocity_per_tick);
 

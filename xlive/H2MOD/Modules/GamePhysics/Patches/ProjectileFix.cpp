@@ -12,38 +12,36 @@
 #pragma fenv_access (on)
 #endif
 
-#define DEFAULT_PROJECTILE_OBJECT_DATA_SIZE 428
+#define PROJECTILE_DEFAULT_OBJECT_DATA_SIZE 428
 
 // h3 gets the projectile collision data from somewhere else
-#define ENABLE_H3_COLLISION_DATA_SOURCE 0
-#define INCREASED_PROJECTILE_OBJECT_DATA_SIZE (DEFAULT_PROJECTILE_OBJECT_DATA_SIZE + sizeof(int) + (ENABLE_H3_COLLISION_DATA_SOURCE ? sizeof(real_point3d) : 0))
-
-// game logic is updated synchronously, this shouldn't cause any issues
-static float tick_length;
-float HitFix_Projectile_Tick_Rate = 30.f;
+#define ENABLE_H3_COLLISION_DATA_SOURCE false
+#define INCREASED_PROJECTILE_OBJECT_DATA_SIZE (PROJECTILE_DEFAULT_OBJECT_DATA_SIZE + sizeof(int) + (ENABLE_H3_COLLISION_DATA_SOURCE ? sizeof(real_point3d) : 0))
 
 typedef bool(__cdecl* projectile_new_t)(datum projectile_object_index, int a2);
 projectile_new_t p_projectile_new;
 
-typedef void(__cdecl* projectile_update_t)(datum projectile_object_index, real_point3d *a2);
+// tick_length parrameter is added extra
+// and accessed by get_tick_length_hook()
+typedef void(__cdecl* projectile_update_t)(datum projectile_object_index, real_point3d *a2, float tick_length);
 projectile_update_t p_projectile_update;
 
 // determines whether the projectile should be updated in a 30hz context or not
-void projectile_set_tick_length_context(datum projectile_datum_index, bool projectile_instant_update)
+float projectile_get_update_tick_length(datum projectile_datum_index, bool projectile_instant_update)
 {
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
 	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
 
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
-		&& (projectile_instant_update || *(DWORD*)(object_data + 428) == time_globals::get()->tick_count)) // also check if the projectile is updated twice in the same tick
+		&& (projectile_instant_update || *(int*)(object_data + 428) == time_globals::get_game_time())) // also check if the projectile is updated twice in the same tick
 	{
 		LOG_TRACE_GAME("{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
-		tick_length = time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / HitFix_Projectile_Tick_Rate);
+		return time_globals::get_seconds_per_tick() * ((float)time_globals::get()->ticks_per_second / 30.f);
 	}
 	else
 	{
-		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get()->ticks_per_second);
-		tick_length = time_globals::get_seconds_per_tick();
+		LOG_TRACE_GAME("{} - projectile: {:X} at {} hz context", __FUNCTION__, projectile_datum_index, time_globals::get_tickrate());
+		return time_globals::get_seconds_per_tick();
 	}
 }
 
@@ -51,7 +49,7 @@ void projectile_set_tick_length_context(datum projectile_datum_index, bool proje
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
-	*(DWORD*)(object_data + 428) = time_globals::get()->tick_count; // store the projectile creation tick count
+	*(int*)(object_data + 428) = time_globals::get_game_time(); // store the projectile creation tick count
 }
 
 bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
@@ -65,21 +63,29 @@ bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
 
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
-	projectile_set_tick_length_context(projectile_object_index, true);
+	float tick_length = projectile_get_update_tick_length(projectile_object_index, true);
 	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
-	p_projectile_update(projectile_object_index, a2);
+	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
-	projectile_set_tick_length_context(projectile_object_index, false);
+	float tick_length = projectile_get_update_tick_length(projectile_object_index, false);
 	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
-	p_projectile_update(projectile_object_index, a2);
+	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
-float __cdecl get_tick_length_hook()
+static float __declspec(naked) get_tick_length_hook()
 {
-	return tick_length;
+#define _stack_pointer_offset 120h + 4h
+#define _last_param_offset 4h + 8h
+	__asm
+	{
+		fld [esp + _stack_pointer_offset + _last_param_offset]
+		ret
+	}
+#undef _stack_pointer_offset
+#undef _last_param_offset
 }
 
 // we still keep this because the fix above doen't fully fix it
