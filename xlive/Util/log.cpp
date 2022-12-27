@@ -30,7 +30,7 @@ bool h2log::is_valid()
 
 h2log* h2log::create(const std::string &name, std::wstring &filename, bool shouldCreateLog, int debugLogLevel)
 {
-	if (shouldCreateLog) // check if we actually need to create this log
+	if (shouldCreateLog)
 	{
 		auto new_h2log = new h2log(name);
 		// try opening file to check permissions

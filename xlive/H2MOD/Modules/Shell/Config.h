@@ -8,7 +8,7 @@ void DeinitH2Config();
 void SaveH2Config();
 void ReadH2Config();
 
-#if !defined(_CARTOGRAPHER_DLL_CONF)
+#ifndef _CARTOGRAPHER_DLL_CONF
 // added this until the code gets released
 #define USE_DEV_PREVIEW_CONFIG_FILE_PATHS 1
 
@@ -21,7 +21,6 @@ void ReadH2Config();
 #define STRINGIZE2(s) #s
 #define STRINGIZE(s) STRINGIZE2(s)
 #define DLL_VERSION_STR        STRINGIZE(DLL_VERSION_MAJOR) "." STRINGIZE(DLL_VERSION_MINOR) "." STRINGIZE(DLL_VERSION_REVISION) "." STRINGIZE(DLL_VERSION_BUILD)
-
 #endif
 
 struct _H2Config_language {
@@ -122,20 +121,6 @@ extern int H2Config_minimum_player_start;
 
 extern float H2Config_raw_mouse_scale;
 extern float H2Config_crosshair_scale;
-extern point2d H2Config_BATRIF;
-extern point2d H2Config_SMG;
-extern point2d H2Config_CRBN;
-extern point2d H2Config_BEAMRIF;
-extern point2d H2Config_MAG;
-extern point2d H2Config_PLASRIF;
-extern point2d H2Config_SHTGN;
-extern point2d H2Config_SNIP;
-extern point2d H2Config_SWRD;
-extern point2d H2Config_ROCKLAUN;
-extern point2d H2Config_PLASPI;
-extern point2d H2Config_BRUTESHOT;
-extern point2d H2Config_NEED;
-extern point2d H2Config_SENTBEAM;
 extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
 
 extern e_override_texture_resolution H2Config_Override_Shadows;

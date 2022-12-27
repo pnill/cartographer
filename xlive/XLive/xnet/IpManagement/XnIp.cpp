@@ -484,7 +484,7 @@ int XnIpManager::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADD
 int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* pxnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier)
 {
 	const XnIp* localConnectionInfo = GetLocalUserXn();
-	if (!gXnIpMgr.GetLocalUserXn()->m_valid)
+	if (!localConnectionInfo->m_valid)
 	{
 		LOG_TRACE_NETWORK("{} - XNADDR information is not populated!", __FUNCTION__);
 		return WSAEADDRNOTAVAIL;
@@ -705,7 +705,7 @@ void XnIp::SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr)
 	default:
 		LOG_CRITICAL_NETWORK("{} - unkown network socket!", __FUNCTION__);
 		break;
-	} // switch (xsocket->getHostOrderSocketPort())
+	} // switch (xsocket->GetHostOrderSocketVirtualPort())
 }
 
 void XnIp::SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType)

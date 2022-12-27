@@ -81,21 +81,6 @@ bool H2Config_anti_cheat_enabled = true;
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
-//weapon crosshair sizes
-point2d	H2Config_BATRIF = { 1 , 1 };
-point2d	H2Config_SMG = { 1 , 1 };
-point2d	H2Config_CRBN = { 1 , 1 };
-point2d	H2Config_BEAMRIF = { 1 , 1 };
-point2d	H2Config_MAG = { 1 , 1 };
-point2d	H2Config_PLASRIF = { 1 , 1 };
-point2d	H2Config_SHTGN = { 1 , 1 };
-point2d	H2Config_SNIP = { 1 , 1 };
-point2d	H2Config_SWRD = { 1 , 1 };
-point2d	H2Config_ROCKLAUN = { 1 , 1 };
-point2d	H2Config_PLASPI = { 1 , 1 };
-point2d	H2Config_BRUTESHOT = { 1 , 1 };
-point2d	H2Config_NEED = { 1 , 1 };
-point2d	H2Config_SENTBEAM = { 1 , 1 };
 
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;

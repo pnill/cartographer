@@ -3,10 +3,6 @@
 
 #include <assert.h>
 
-//#define MICRO_TIME std::chrono::time_point<std::chrono::steady_clock>
-//#define MICRO_CLOCK std::chrono::high_resolution_clock
-//#define MICRO_CLOCK_DURATION std::chrono::duration_cast<std::chrono::microseconds>
-
 enum log_level : unsigned int {
 	trace,    //          Tell me *everything*
 	debug,    //          Give me the dirty details
@@ -168,7 +164,6 @@ public:
 
 	// "Wait, that's illegal" except it is definitely not a joke
 	void critical(const std::wstring& msg) { log_d(critical); }
-
 
 #undef log_a
 #undef log_w
