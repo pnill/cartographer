@@ -401,17 +401,6 @@ int WINAPI XLiveUpdateHashes(int a1, int a2)
 	return 0;
 }
 
-
-
-// === replacement ===
-struct FakePBuffer {
-	HANDLE id;
-	DWORD dwSize;
-	DWORD magic;
-	LPBYTE pbData;
-};
-
-
 // #5016: XLivePBufferAllocate
 LONG WINAPI XLivePBufferAllocate (DWORD size, FakePBuffer **pBuffer)
 {

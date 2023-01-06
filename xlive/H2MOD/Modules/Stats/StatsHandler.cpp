@@ -268,7 +268,7 @@ char* StatsHandler::checkServerRegistration()
 	}
 
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=ServerRegistrationCheck&Server_XUID=";
-	unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
+	unsigned long long dedicated_server_id = NetworkSession::GetActiveNetworkSession()->membership[0].dedicated_server_xuid;
 	http_request_body += std::to_string(dedicated_server_id);
 	struct curl_response_text s;
 	init_curl_response(&s);
@@ -334,7 +334,7 @@ bool StatsHandler::serverRegistration(const char* authKey)
 		return false;
 	}
 
-	unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
+	unsigned long long dedicated_server_id = NetworkSession::GetActiveNetworkSession()->membership[0].dedicated_server_xuid;
 
 	form = curl_mime_init(curl);
 	field = curl_mime_addpart(form);
@@ -890,7 +890,7 @@ const char* StatsHandler::buildPostGameCarnageReportJson()
 	time(&timer);
 	seconds = difftime(timer, mktime(&y2k));
 	wchar_t unix[100];
-	unsigned long long dedcated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
+	unsigned long long dedcated_server_id = NetworkSession::GetActiveNetworkSession()->membership[0].dedicated_server_xuid;
 
 	swprintf(unix, 100, L"%.f", seconds);
 	swprintf(fileOutPath, 1024, L"%wsz%s-%s.json", H2ProcessFilePath, std::to_wstring(dedcated_server_id).c_str(), unix);
@@ -998,7 +998,7 @@ void StatsHandler::sendRankChangeFromDocument(std::shared_ptr<rapidjson::Documen
 				auto playerInfo = NetworkSession::GetPlayerInformation(j); // for now we only support local player 0
 
 				if (playerIdentifier == NetworkSession::GetPlayerId(j)
-					&& playerInfo->properties.player_displayed_skill != rank)
+					&& playerInfo->properties[0].player_displayed_skill != rank)
 				{
 					NetworkMessage::SendRankChange(NetworkSession::GetPeerIndex(j), rank);
 					LOG_TRACE_GAME("{} - sent rank update to player index: {}, player identifier: {}", __FUNCTION__, j, playerIdentifier);
@@ -1029,7 +1029,7 @@ void StatsHandler::getPlayerRanksByStringList(std::shared_ptr<std::vector<unsign
 		return;
 
 	std::shared_ptr<rapidjson::Document> doc = std::make_shared<rapidjson::Document>();
-	unsigned long long dedicated_server_id = NetworkSession::GetCurrentNetworkSession()->membership[0].dedicated_server_xuid;
+	unsigned long long dedicated_server_id = NetworkSession::GetActiveNetworkSession()->membership[0].dedicated_server_xuid;
 
 	std::string http_request_body = "https://www.halo2pc.com/test-pages/CartoStat/API/get.php?Type=PlaylistRanks&Playlist_Checksum=";
 	http_request_body.append(getChecksum());

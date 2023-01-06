@@ -75,10 +75,6 @@
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
@@ -125,9 +121,6 @@
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
-    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
-    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
-    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
@@ -152,6 +145,13 @@
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -354,12 +354,6 @@
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
     <ClInclude Include="XLive\XStorage\XStorage.h" />
-    <ClInclude Include="3rdparty\imgui\imconfig.h" />
-    <ClInclude Include="3rdparty\imgui\imgui.h" />
-    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
@@ -448,8 +442,6 @@
     <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
-    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
-    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9anim.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9core.h" />
@@ -495,6 +487,14 @@
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="3rdparty\imgui\imconfig.h" />
+    <ClInclude Include="3rdparty\imgui\imgui.h" />
+    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

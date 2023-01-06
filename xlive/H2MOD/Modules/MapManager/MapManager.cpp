@@ -11,7 +11,7 @@
 #include "Util\Hooks\Hook.h"
 #include "XLive\xnet\IpManagement\XnIp.h"
 
-MapManager* mapManager = new MapManager();
+std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 
 /* String constants below for client/server messages */
 const char* DOWNLOADING_MAP = "Downloading Map";
@@ -47,22 +47,22 @@ wchar_t EMPTY_UNICODE_STR = '\0';
 
 #pragma region allow host to start game, without all players loading the map
 
-typedef signed int(__cdecl* network_life_cycle_session_get_global_map_precache_status)(signed int*, unsigned int*);
-network_life_cycle_session_get_global_map_precache_status p_network_life_cycle_session_get_global_map_precache_status;
+typedef int(__cdecl* network_life_cycle_session_get_global_map_precache_status_t)(int*, unsigned int*);
+network_life_cycle_session_get_global_map_precache_status_t p_network_life_cycle_session_get_global_map_precache_status;
 
 // allow hosts to start the game while other peers didn't load the map
 // TODO: simplify and cleanup
-signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(signed int *out_smallest_load_percentage, unsigned int *out_host_map_status) {
+int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *out_smallest_load_percentage, unsigned int *out_host_map_status) {
 	// this just gets the current network_session, but has some extra misc checks
-	typedef bool(__cdecl* get_network_session_with_misc_checks)(s_network_session**);
-	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks>(0x1AD782, 0x1A66FF);
+	typedef bool(__cdecl* get_network_session_with_misc_checks_t)(s_network_session**);
+	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks_t>(0x1AD782, 0x1A66FF);
 
 	s_network_session* session = nullptr;
-	int result_map_status = 0;
-	int result_precache_percentage = 0;
+	int result_map_status, result_precache_percentage;
+	result_map_status = result_precache_percentage = 0;
 	bool someone_downloading_map = false;
-	e_map_status local_peer_map_status = _network_session_map_status_none;
-	e_map_status host_peer_map_status = _network_session_map_status_none;
+	e_map_status local_peer_map_status, host_peer_map_status; 
+	local_peer_map_status = host_peer_map_status = _network_session_map_status_none;
 	int peer_count_with_map_status_precached = 0;
 	int peer_count_with_map_status_downloading = 0;
 	int peer_count_with_map_status_unable_to_precache = 0;
@@ -83,10 +83,10 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 		case _network_session_state_host_disband:
 		case _network_session_state_host_handoff:
 		case _network_session_state_host_reestablish:
-			s_membership_information* membership = &session->membership[0];
+			s_session_membership* membership = &session->membership[0];
 
 			if (out_host_map_status)
-				*out_host_map_status = membership->peer_data[session->session_host_peer_index].map_status;
+				*out_host_map_status = membership->peers[session->session_host_peer_index].map_status;
 
 			result_map_status = _network_session_map_status_loaded;
 			result_precache_percentage = 100; // i don't think this is used anymore, it has been replaced by the loading screen in H2v from Xbox
@@ -99,12 +99,12 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 				// now we only check our peer and session host peer, instead of all the peers
 				// but make sure the game won't start if we have just 1 player that doesn't have the map
 				if (session->local_peer_index == i)
-					local_peer_map_status = membership->peer_data[i].map_status;
+					local_peer_map_status = membership->peers[i].map_status;
 
 				if (session->session_host_peer_index == i)
-					host_peer_map_status = membership->peer_data[i].map_status;
+					host_peer_map_status = membership->peers[i].map_status;
 
-				switch (membership->peer_data[i].map_status)
+				switch (membership->peers[i].map_status)
 				{
 				case _network_session_map_status_unable_to_precache:
 					result_precache_percentage = 0;
@@ -112,7 +112,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 					break;
 
 				case _network_session_map_status_precaching:
-					result_precache_percentage = min(membership->peer_data[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
+					result_precache_percentage = min(membership->peers[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
 					break;
 
 				case _network_session_map_status_loaded:
@@ -184,7 +184,7 @@ signed int __cdecl network_life_cycle_session_get_global_map_precache_status_hoo
 // this is actually thiscall, but the parameter is unused
 bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
 {
-	s_membership_information* membership = &session->membership[0];
+	s_session_membership* membership = &session->membership[0];
 
 	int result_bitflags = 0;
 	if (membership->peer_count > 0)
@@ -193,33 +193,30 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_sessio
 	int peers_that_can_load_map = 0;
 	bool local_or_host_peer_cannot_load_map = false;
 
-	if (membership->peer_count > 0) {
-		for (int i = 0; i < membership->peer_count; i++) {
-			// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
-			// *************
+	for (int i = 0; i < membership->peer_count; i++) {
+		// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
+		// *************
 
-			// check only session host and local peer indexes
-			//if ((i == session->local_peer_index || i == session->session_host_peer_index) 
-				//|| !more_than_one_peer_other_than_dedicated_server(session)) 
+		// check only session host and local peer indexes
+		//if ((i == session->local_peer_index || i == session->session_host_peer_index) 
+			//|| !more_than_one_peer_other_than_dedicated_server(session)) 
+		{
+			switch (membership->peers[i].map_status)
 			{
-				switch (membership->peer_data[i].map_status)
-				{
-				case _network_session_map_status_none:
-				case _network_session_map_status_unable_to_precache:
-				case _network_session_map_status_precaching:
-				case _network_session_map_status_downloading:
-					if (NetworkSession::PeerIndexLocal(i) || i == session->session_host_peer_index)
-						local_or_host_peer_cannot_load_map = true;
-					break;
-				case _network_session_map_status_precached:
-				case _network_session_map_status_loaded:
-					result_bitflags &= ~FLAG(i);
-					peers_that_can_load_map++;
-					break;
-
-				default:
-					break;
-				}
+			case _network_session_map_status_none:
+			case _network_session_map_status_unable_to_precache:
+			case _network_session_map_status_precaching:
+			case _network_session_map_status_downloading:
+				if (NetworkSession::IsPeerIndexLocal(i) || i == session->session_host_peer_index)
+					local_or_host_peer_cannot_load_map = true;
+				break;
+			case _network_session_map_status_precached:
+			case _network_session_map_status_loaded:
+				result_bitflags &= ~FLAG(i);
+				peers_that_can_load_map++;
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -270,9 +267,9 @@ char leavegame_callback()
 /**
 * Menu constructor hook
 */
-void __cdecl display_map_downloading_menu(int a1, signed int a2, int a3, __int16 a4, DWORD map_download_callback, DWORD leave_game_callback, int a7, int a8, int a9, int a10)
+void __cdecl display_map_downloading_menu(int a1, int a2, int a3, __int16 a4, DWORD map_download_callback, DWORD leave_game_callback, int a7, int a8, int a9, int a10)
 {
-	typedef void(__cdecl map_downloading_menu_constructor)(int a1, signed int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
+	typedef void(__cdecl map_downloading_menu_constructor)(int a1, int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
 	auto p_map_downloading_menu_constructor = Memory::GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
 
 	p_original_leave_game_callback = (leave_game_callback_def)leave_game_callback;
@@ -347,7 +344,7 @@ void MapManager::ApplyPatches() {
 	}
 	
 	// allow host to start the game, even if there are peers that didn't load the map
-	p_network_life_cycle_session_get_global_map_precache_status = (network_life_cycle_session_get_global_map_precache_status)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)network_life_cycle_session_get_global_map_precache_status_hook, 8);
+	p_network_life_cycle_session_get_global_map_precache_status = (network_life_cycle_session_get_global_map_precache_status_t)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)network_life_cycle_session_get_global_map_precache_status_hook, 8);
 	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2_to_stdcall);
 
 	// disables game's map downloading implementation
@@ -370,7 +367,7 @@ bool MapManager::GetMapFilename(std::wstring& buffer) {
 	s_network_session* session = nullptr;
 
 	// we want this to work in-game too
-	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::GetCurrentNetworkSession(&session)) {
+	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::GetActiveNetworkSession(&session)) {
 		ZeroMemory(map_file_location, sizeof(map_file_location));
 		NetworkSession::GetMapFileLocation(map_file_location, sizeof(map_file_location));
 
