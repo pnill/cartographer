@@ -200,13 +200,15 @@ protected:
 template<typename T>
 class ComVarTPtr : public ComVarT<T, true>
 {
-	static_assert(std::is_pointer<T>::value, "ComVarTPtr: template parameter not a pointer");
+	static_assert(!std::is_same<std::remove_all_extents<T>, T>::value, "ComVarTPtr: template parameter not a pointer");
 
 public:
 	ComVarTPtr(T _var_ptr) :
 		ComVarT(_var_ptr)
 	{
 	}
+
+	virtual ~ComVarTPtr() = default;
 private:
 
 #undef SETVAR_CHECK_PTR_TYPE_VALID
