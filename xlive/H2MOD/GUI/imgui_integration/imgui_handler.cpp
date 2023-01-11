@@ -17,29 +17,26 @@ namespace ImGuiHandler
 {
 	std::vector<s_imgui_window> imgui_windows;
 	PDIRECT3DTEXTURE9			g_patch_notes_texture = NULL;
-	static HWND                 g_hWnd = NULL;
-	static INT64                g_Time = 0;
-	static bool                 g_HasGamepad = false;
-	static bool                 g_WantUpdateHasGamepad = true;
-	static LPDIRECT3DDEVICE9	g_pDevice;
-	static bool					g_take_input = false;
-	static bool					g_one_more_frame_update = true; // need to update ImGui state at least one more tick
-																// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
+
+	namespace {
+		bool					handle_window_input = false;
+
+		// need to update ImGui state at least one more tick
+		// otherwise the enter key gets stuck when ImGui input is disabled, breaking the console
+		bool					last_frame_update = true;
+
+		LPDIRECT3DDEVICE9		p_d3d_device = nullptr;
+	}
 
 	bool						g_network_stats_overlay = false;
 
-	HWND get_HWND()
-	{
-		return g_hWnd;
-	}
-
 	bool ImGuiShouldHandleInput()
 	{
-		return g_take_input;
+		return handle_window_input;
 	}
 	void ImGuiToggleInput(bool state)
 	{
-		g_take_input = state;
+		handle_window_input = state;
 	}
 	bool CanDrawImgui()
 	{
@@ -63,18 +60,18 @@ namespace ImGuiHandler
 	void DrawImgui()
 	{
 		if (!ImGuiHandler::CanDrawImgui() && 
-			!g_one_more_frame_update)
+			!last_frame_update)
 			return;
 
 		// clear keyboard/mouse input state if we are about to close the ImGui windows
-		if (g_one_more_frame_update)
+		if (last_frame_update)
 		{
 			ImGuiIO& io = ImGui::GetIO();
 			io.ClearInputKeys();
 			io.ClearMouseInput();
 			io.ClearInputCharacters();
 			ReleaseTextures();
-			g_one_more_frame_update = false;
+			last_frame_update = false;
 		}
 
 		ImGui_ImplDX9_NewFrame();
@@ -123,7 +120,7 @@ namespace ImGuiHandler
 			}
 		}
 
-		g_one_more_frame_update = !keep_game_input_blocked;
+		last_frame_update = !keep_game_input_blocked;
 		SetGameInputState(!keep_game_input_blocked);
 		ImGuiToggleInput(keep_game_input_blocked);
 		PlayerControl::DisableLocalCamera(keep_game_input_blocked);
@@ -148,8 +145,6 @@ namespace ImGuiHandler
 		ImGuiIO& io = ImGui::GetIO();
 		ImGui_ImplWin32_Init((void*)hWnd);
 
-		g_hWnd = hWnd;
-		g_pDevice = pDevice;
 		io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange;
 		imgui::Cartographer::StyleSetAsDefault();
 
@@ -158,6 +153,7 @@ namespace ImGuiHandler
 		ImFont* font1 = io.Fonts->AddFontDefault(&fontConfig);
 
 		ImGui_ImplDX9_Init(pDevice);
+		p_d3d_device = pDevice;
 
 		ImAdvancedSettings::BuildStringsTable();
 		WeaponOffsets::BuildStringsTable();
@@ -195,7 +191,7 @@ namespace ImGuiHandler
 		D3DXIMAGE_INFO imgInfo;
 		PDIRECT3DTEXTURE9 texture = nullptr;
 		//HRESULT hr = D3DXCreateTextureFromFileA(g_pDevice, filename, &texture);
-		HRESULT hr = D3DXCreateTextureFromFileEx(g_pDevice, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
+		HRESULT hr = D3DXCreateTextureFromFileEx(p_d3d_device, filename, D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, D3DX_FROM_FILE, 0,
 			D3DFMT_FROM_FILE, D3DPOOL_DEFAULT, D3DX_FILTER_NONE, D3DX_FILTER_NONE, 0, &imgInfo, NULL, &texture);
 
 		if (hr != S_OK)
