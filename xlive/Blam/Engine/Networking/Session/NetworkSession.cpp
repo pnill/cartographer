@@ -154,19 +154,6 @@ s_membership_player* NetworkSession::GetPlayerInformation(int playerIdx)
 	return &GetActiveNetworkSession()->membership[0].players[playerIdx];
 }
 
-int NetworkSession::GetPlayerIdByName(const wchar_t* name)
-{
-	if (GetPlayerCount() > 0)
-	{
-		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
-		{
-			if (PlayerIsActive(playerIdx) && wcscmp(GetPlayerName(playerIdx), name) == 0)
-				return playerIdx;
-		}
-	}
-	return NONE;
-}
-
 const wchar_t* NetworkSession::GetPlayerName(int playerIdx)
 {
 	return GetPlayerInformation(playerIdx)->properties[0].player_name;
