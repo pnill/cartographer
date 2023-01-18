@@ -76,10 +76,7 @@ static inline bool tokenize(const char* str, size_t str_length, const char* deli
             break;
     }
 
-    if (out.size() <= 0)
-        return false;
-
-    return true;
+    return !out.empty();
 }
 
 struct StringLineHeader

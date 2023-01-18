@@ -444,6 +444,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				m_deceleration_ticks = 0;
 				m_flags = 0;
 				m_maximum_counter = blam_ticks_real_to_integer((float)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2);
+				// m_maximum_counter = (float)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2;
 
 				if (unk_distance1 > k_valid_real_epsilon)
 				{
@@ -527,7 +528,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					float direction_magnitude_from_normalization = normalize3d(&direction_of_current_translational_velocity);
 
 					bool melee_allow_deceleration = (float)m_deceleration_ticks < k_deceleration_ticks_real
-						|| (float)(m_maximum_counter - m_melee_tick) > k_deceleration_ticks_real;
+						|| (float)(m_maximum_counter - m_melee_tick) > k_deceleration_ticks_real
 						;
 
 					if (!m_started_decelerating)

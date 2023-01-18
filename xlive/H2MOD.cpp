@@ -77,20 +77,21 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
-		if (!DATUM_IS_NONE(damage_data->creator_datum) && damage_data->field_10 != -1)
+		if (!DATUM_IS_NONE(damage_data->creator_datum) 
+			&& damage_data->field_10 != -1)
 		{
 			LOG_TRACE_GAME(
-				"{} {} {} {} {} {} {} {}",
+				"{} {} {:X} {:X} {:X} {:X} {:X} {:X} {:X} {:X}",
 				__FUNCTION__,
 				damage_data->flags,
-				IntToString<int>(damage_data->damage_tag_index, std::hex),
-				IntToString<int>(damage_data->creator_datum, std::hex),
-				IntToString<int>(damage_data->field_10, std::hex), //TODO reverse what field_10 is
-				IntToString<int>(damage_data->field_14, std::hex),
-				IntToString<int>(damage_data->field_18, std::hex),
-				IntToString<int>(damage_data->field_1C, std::hex),
-				IntToString<int>(damage_data->field_24, std::hex),
-				IntToString<int>(damage_data->field_28, std::hex)
+				damage_data->damage_tag_index,
+				damage_data->creator_datum,
+				damage_data->field_10, //TODO reverse what field_10 is
+				damage_data->field_14,
+				damage_data->field_18,
+				damage_data->field_1C,
+				damage_data->field_24,
+				damage_data->field_28
 			);
 			p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 		}
@@ -413,7 +414,7 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 
 update_player_score_t p_update_player_score;
 
-void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, datum playerIdx, int a3, int a4, int a5, char a6)
+void __fastcall OnPlayerScore(void* thisptr, DWORD _edx, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
@@ -883,10 +884,10 @@ int get_active_count_from_bitflags(short teams_bit_flags)
 bool __cdecl should_start_pregame_countdown_hook()
 {
 	// dedicated server only
-	auto p_should_start_pregame_countdown_hook = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
+	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
 
 	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
-	if (!p_should_start_pregame_countdown_hook()
+	if (!p_should_start_pregame_countdown()
 		|| !NetworkSession::LocalPeerIsSessionLeader())
 		return false; 
 
