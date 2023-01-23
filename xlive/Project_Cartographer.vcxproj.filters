@@ -157,6 +157,7 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
+    <ClCompile Include="Blam\Engine\Objects\ObjectTypes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -505,6 +506,7 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectTypes.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
