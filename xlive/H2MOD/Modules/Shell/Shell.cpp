@@ -71,6 +71,13 @@ bool __cdecl _Shell::IsGameMinimized()
 	return p_game_is_minimized();
 }
 
+void _Shell::csmemset(char* dst, int a2, unsigned a3)
+{
+	typedef void(__cdecl* csmemset_t)(void* a1, int a2, unsigned int a3);
+	auto p_csmemset = Memory::GetAddress<csmemset_t>(0x287BA9);
+	p_csmemset(dst, a2, a3);
+}
+
 LARGE_INTEGER _Shell::QPCGetStartupCounter()
 {
 	return startupCounter;

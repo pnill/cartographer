@@ -29,6 +29,7 @@ NtWaitForSingleObject(
 namespace _Shell
 {
 	bool IsGameMinimized();
+	void csmemset(char* dst, int a2, unsigned int a3);
 
 	void Initialize();
 	void FileErrorDialog(int fpErrNo);

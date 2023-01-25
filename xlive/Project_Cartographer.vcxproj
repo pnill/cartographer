@@ -244,6 +244,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
+    <ClCompile Include="Blam\Engine\Objects\ObjectGloals.cpp" />
     <ClCompile Include="Blam\Engine\Objects\ObjectTypes.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
@@ -555,6 +556,7 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
+    <ClInclude Include="Blam\Engine\Objects\ObjectGlobals.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectTypes.h" />
     <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />

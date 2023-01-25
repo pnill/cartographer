@@ -1,12 +1,13 @@
 #pragma once
+#include "ObjectPlacementData.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 
 #define G_MAX_OBJECT_TYPE_IHERITENCE 3
 class __declspec(align(4)) c_object_type_definition
 {
 	typedef void (*initialize_gamestate_data_t)();
-	typedef bool (*object_new_t)(datum, int, int);
-	typedef void (*object_adjust_placement_t)(datum);
+	typedef bool (*object_new_t)(datum, s_object_placement_data*, bool*);
+	typedef void (*object_adjust_placement_t)(s_object_placement_data*);
 	typedef void (*disconnect_from_structure_bsp_t)(datum);
 	typedef void (*object_delete_t)(datum, int);
 	typedef void (*unknown38_t)(datum);
@@ -16,6 +17,7 @@ class __declspec(align(4)) c_object_type_definition
 	typedef void (*unknown7C_t)(datum, int, int);
 	typedef void (*object_move_t)(datum);
 	typedef void (*object_can_activate_t)(datum, int, int);
+	typedef void (*object_process_node_t)(datum, int, int);
 public:
 	const char* name;
 	int group_tag;
@@ -48,7 +50,7 @@ public:
 	void* unknown68;
 	void* unknown6C;
 	void* unknown70;
-	void* unknown74;
+	object_process_node_t process_node_matricies;
 	void* unknown78;
 	unknown7C_t unknown7C;
 	void* unknown80;
@@ -58,6 +60,7 @@ public:
 
 	static c_object_type_definition** get_object_type_definitions();
 	static c_object_type_definition* get_game_object_type_definition(datum object_datum);
+	static c_object_type_definition* get_tag_type_definition(datum tag_datum);
 };
 
 CHECK_STRUCT_SIZE(c_object_type_definition, 0xC8);

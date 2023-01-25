@@ -59,6 +59,24 @@ enum e_object_type : signed char
 	creature,
 };
 
+enum e_object_type_flags
+{
+	_object_is_biped = 0x1,
+	_object_is_vehicle = 0x2,
+	_object_is_weapon = 0x4,
+	_object_is_equipment = 0x8,
+	_object_is_garbage = 0x10,
+	_object_is_projectile = 0x20,
+	_object_is_scenery = 0x40,
+	_object_is_machine = 0x80,
+	_object_is_control = 0x100,
+	_object_is_light_fixture = 0x200,
+	_object_is_sound_scenery = 0x400,
+	_object_is_crate = 0x800,
+	_object_is_creature = 0x1000,
+};
+
+
 enum e_unit_weapons
 {
 	PrimaryWeapon,
@@ -94,17 +112,21 @@ struct s_object_data_definition
 {
 	datum tag_definition_index;
 	DWORD object_flags;
-	char gap_8[4];
+	byte unk_8[4];
 	datum next_index;
 	datum current_weapon_datum;		//maybe attachment or child
 	datum parent_datum;
 	WORD unit_in_vehicle_flag;
 	INT16 placement_index;
-	char gap_1C[12];
+	BYTE gap_1C[8];
+	DWORD field_24;
 	DWORD location[2];
 	real_point3d center;
 	float radius;
-	DWORD gap_3[9];
+	real_point3d field_40;
+	float field_4C;
+	BYTE gap_50[16];
+	DWORD field_60;
 	real_point3d position;
 	real_vector3d orientation;
 	real_vector3d up;
@@ -114,12 +136,14 @@ struct s_object_data_definition
 	datum unique_id;
 	__int16 origin_bsp_index;
 	e_object_type object_type;//TODO: confirm if its object_type or object_type_flags
-	char gap_AB[1];
+	byte field_AB;
 	__int16 name_list_index;
-	char gap_5[1];
+	byte structure_bsp_index;
 	char netgame_equipment_index;
-	char placement_policy;
-	char gap_6[3];
+	byte placement_policy;
+	byte field_b1;
+	byte field_b2;
+	byte field_b3;
 	datum havok_datum;
 	char gap_B8[8];
 	WORD field_C0;
@@ -142,12 +166,17 @@ struct s_object_data_definition
 	DWORD gap_F4[4];
 	WORD shield_stun_ticks;
 	WORD body_stun_ticks;
-	char gap_108[2];
+	byte byte_108;
+	byte byte_109;
 	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
 	PAD(8);
 	__int16 node_buffer_size;
 	__int16 nodes_offset;
-	PAD(20);
+	PAD(4);
+	WORD field_11C;
+	WORD object_attachments_block_offset;
+	PAD(10);
+	WORD object_animations_block_offset;
 	// PAD(32);
 };
 #pragma pack(pop)

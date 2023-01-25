@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
+#include "Blam/Engine/Objects/Objects.h"
 #include "Blam\Math\BlamMath.h"
 
 /*********************************************************************
@@ -12,7 +13,8 @@
 #pragma pack(push,1)
 struct s_object_group_definition :TagGroup<'obje'>
 {
-	PAD(0x2);//0x0
+	e_object_type object_type;
+	byte unk_1;
 	enum class e_object_flags : __int16
 	{
 		does_not_cast_shadow = FLAG(0),

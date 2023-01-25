@@ -8,7 +8,9 @@ struct s_object_placement_data
 	DWORD unique_id;//0x4
 	DWORD origin_bsp_index;//0x8
 	string_id variant_name;//0xC
-	DWORD unk_10;//0x10
+	WORD unk_10;
+	BYTE unk_11;
+	BYTE unk_12;
 	BYTE placement_policy;//0x14
 	BYTE unk_15;//0x15
 	WORD unk_16;//0x16
@@ -24,15 +26,18 @@ struct s_object_placement_data
 	int team_index;
 	DWORD field_68;
 	DWORD field_6C;
-	DWORD field_70;
+	WORD field_70;
+	WORD field_72;
 	DWORD active_change_colors_mask;
 	real_color_rgb change_colors[4];
-	PAD(8);
+	DWORD unk_A8;
+	DWORD unk_AC;
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;
 	WORD field_B4;
 	WORD field_B6;
 	DWORD field_B8;
-	PAD(8);
+	char field_BC;
+	PAD(7);
 };
 CHECK_STRUCT_SIZE(s_object_placement_data, 0xC4);
