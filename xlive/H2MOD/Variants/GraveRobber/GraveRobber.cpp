@@ -52,14 +52,14 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	{
 		s_object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
+		create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 
 		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
-		datum new_object_datum = Engine::Objects::object_new(&nObject);
+		datum new_object_datum = object_new(&nObject);
 		if (!DATUM_IS_NONE(new_object_datum))
-			Engine::Objects::simulation_action_object_create(new_object_datum);
+			simulation_action_object_create(new_object_datum);
 	}
 }
 

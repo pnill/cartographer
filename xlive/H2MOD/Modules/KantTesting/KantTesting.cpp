@@ -592,7 +592,7 @@ namespace KantTesting
 						p_location = &placement_data->location;
 					}
 
-					Engine::Objects::object_reconnect_to_map(p_location, new_object_header_datum);
+					object_reconnect_to_map(p_location, new_object_header_datum);
 				}
 
 				object_postprocess_node_matrices(new_object_header_datum);
