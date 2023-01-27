@@ -5,28 +5,30 @@
 #include "Blam/Cache/TagGroups/device_definition.hpp"
 #include "Blam/Engine/Objects/ObjectGlobals.h"
 #include "Blam/Engine/Objects/ObjectTypes.h"
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_lightmap_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
-#include "Blam\Cache\TagGroups\weapon_definition.hpp"
-#include "Blam\Engine\Game\GameEngineGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Players\Players.h"
-#include "Blam\LazyBlam\LazyBlam.hpp"
-#include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam/Engine/scenario/scenario.h"
+#include "Blam/Engine/physics/collision_bsp.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Engine/Game/GameEngineGlobals.h"
+#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/Players/Players.h"
+#include "Blam/LazyBlam/LazyBlam.hpp"
+#include "H2MOD/Engine/Engine.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "Blam/Engine/Memory/bitstream.h"
+#include "Blam/Engine/Memory/bitstream.h"
 #include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "Util/Hooks/Hook.h"
 
 
 namespace KantTesting
@@ -39,10 +41,10 @@ namespace KantTesting
 	}
 	c_object_type_definition** object_types;
 
-	typedef bool(__cdecl* object_type_definition_object_new_evaluate_t)(datum object_datum, s_object_placement_data* a2, bool* a3);
-	object_type_definition_object_new_evaluate_t p_object_type_definition_object_new_evaluate;
+	typedef bool(__cdecl* object_type_new_t)(datum object_datum, s_object_placement_data* a2, bool* a3);
+	object_type_new_t p_object_type_definition_object_new_evaluate;
 
-	bool __cdecl object_type_definition_object_new_evaluate(datum object_datum, s_object_placement_data* a2, bool* a3)
+	bool __cdecl object_type_new(datum object_datum, s_object_placement_data* a2, bool* a3)
 	{
 		auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
 		bool result = true;
@@ -270,33 +272,24 @@ namespace KantTesting
 		p_attachments_new(object_datum);
 	}
 
-	bool sub_5317F9(char* a1, unsigned __int16 a2)
+	bool set_object_position_if_in_cluster(s_location* location, long object_datum)
 	{
-		typedef __int16(__cdecl* scenario_location_from_point_t)(char* a1, real_point3d* a2);
-		auto p_scenario_location_from_point = Memory::GetAddress< scenario_location_from_point_t>(0x281EE);
+		s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+		scenario_location_from_point(location, &object->object_origin_point);
 
-		typedef bool (__cdecl* collision_bsp_test_sphere_t)(int a1, __int16 a2, int a3, real_point3d* a4, float a5, int* a6);
-		auto p_collision_bsp_test_sphere = Memory::GetAddress< collision_bsp_test_sphere_t>(0xE9890);
+		if (location->cluster != 0xFFFF)
+			return true;
 
-		typedef char*(__cdecl* sub_42819D_t)(char* a1, int a2);
-		auto p_sub_42819D = Memory::GetAddress< sub_42819D_t>(0x2819D);
+		collision_bsp_test_sphere_result test_result;
+		auto g_collision_bsp = Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block*>(0x479E64);
+		collision_bsp_test_sphere(g_collision_bsp, 0, 0, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
 
-		auto object = object_get_fast_unsafe(a2);
-		p_scenario_location_from_point(a1, &object->field_40);
-
-		if (*((WORD*)a1 + 2) != 0xFFFF)
-			return *((WORD*)a1 + 2) != 0xFFFF;
-
-		int unk_buffer[1028];
-		auto dword_879E64 = Memory::GetAddress<int*>(0x479E64);
-		p_collision_bsp_test_sphere(*dword_879E64, 0, 0, &object->field_40, object->field_4C, unk_buffer);
-
-		if (unk_buffer[771])
-			p_sub_42819D(a1, unk_buffer[772]);
+		if (*(DWORD*)&test_result.gap[3080])
+			scenario_location_from_leaf(location, *(DWORD*)&test_result.gap[3084]);
 		else
-			p_scenario_location_from_point(a1, &object->position);
+			scenario_location_from_point(location, &object->position);
 
-		return *((WORD*)a1 + 2) != 0xFFFF;
+		return location->cluster != 0xFFFF;
 	}
 
 	typedef datum(__cdecl* object_new_t)(s_object_placement_data* placement_data);
@@ -411,10 +404,10 @@ namespace KantTesting
 		auto unk_placement_check = placement_data->unk_12 == 0xFF;
 		if (unk_placement_check)
 		{
-			++s_object_globals::get()->field_18;
+			++s_object_globals::get()->unique_id;
 			new_object->field_AB = 2;
 			new_object->origin_bsp_index = -1;
-			new_object->unique_id = s_object_globals::get()->field_18;
+			new_object->unique_id = s_object_globals::get()->unique_id;
 			new_object->placement_index = -1;
 			new_object->structure_bsp_index = p_structure_bsp_index();
 		}
@@ -535,17 +528,17 @@ namespace KantTesting
 
 		auto new_object_absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(new_object_header_datum);
 
-		auto intperolation_node_size = (!allow_interpolation) ? 0 : nodes_count * 32;
+		long intperolation_node_size = (!allow_interpolation) ? 0 : nodes_count * 32;
 
-		auto b_attachments = p_object_header_block_allocate(new_object_absolute_index, 284, 8 * new_object_tag->attachments.size, 0);
-		auto b_damage_sections = p_object_header_block_allocate(new_object_absolute_index, 0x120, 8 * damage_info_damage_sections_size, 0);
-		auto b_change_colors = p_object_header_block_allocate(new_object_absolute_index, 0x124, 24 * new_object_tag->change_colors.size, 0);
-		auto b_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x114, 52 * nodes_count, 0);
-		auto b_collision = p_object_header_block_allocate(new_object_absolute_index, 0x118, 10 * collision_regions_count, 0);
-		auto b_interpolation_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x110, intperolation_node_size, 0);
-		auto b_interpolation_nodes_2 = p_object_header_block_allocate(new_object_absolute_index, 0x10C, intperolation_node_size, 0);
-		auto b_animation = p_object_header_block_allocate(new_object_absolute_index, 0x128, ((valid_animation_maybe) ? 0x90 : 0), 1);
-		auto b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(DATUM_INDEX_TO_ABSOLUTE_INDEX(placement_data->tag_index));
+		bool b_attachments = p_object_header_block_allocate(new_object_absolute_index, 284, 8 * new_object_tag->attachments.size, 0);
+		bool b_damage_sections = p_object_header_block_allocate(new_object_absolute_index, 0x120, 8 * damage_info_damage_sections_size, 0);
+		bool b_change_colors = p_object_header_block_allocate(new_object_absolute_index, 0x124, 24 * new_object_tag->change_colors.size, 0);
+		bool b_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x114, 52 * nodes_count, 0);
+		bool b_collision = p_object_header_block_allocate(new_object_absolute_index, 0x118, 10 * collision_regions_count, 0);
+		bool b_interpolation_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x110, intperolation_node_size, 0);
+		bool b_interpolation_nodes_2 = p_object_header_block_allocate(new_object_absolute_index, 0x10C, intperolation_node_size, 0);
+		bool b_animation = p_object_header_block_allocate(new_object_absolute_index, 0x128, ((valid_animation_maybe) ? 0x90 : 0), 1);
+		bool b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(DATUM_INDEX_TO_ABSOLUTE_INDEX(placement_data->tag_index));
 
 		auto b_object_creation_valid = false;
 		if (b_attachments && b_damage_sections && b_change_colors && b_nodes && b_collision && b_interpolation_nodes && b_interpolation_nodes_2 && b_animation && b_havok)
@@ -570,7 +563,7 @@ namespace KantTesting
 				auto object_attachments_block = (char*)new_object + new_object->object_attachments_block_offset;
 				_Shell::csmemset(object_attachments_block, -1, 8 * ((unsigned int)(__int16)new_object->field_11C >> 3));
 			}
-			auto b_object_type_new = object_type_definition_object_new_evaluate(new_object_header_datum, placement_data, &unk_creation_bool);
+			auto b_object_type_new = object_type_new(new_object_header_datum, placement_data, &unk_creation_bool);
 			if (b_object_type_new)
 			{
 				auto b_object_flag_check = (new_object->object_flags & 0x20000) != 0;
@@ -591,13 +584,15 @@ namespace KantTesting
 				if (s_object_globals::get() && s_object_globals::get()->initialized)
 				{
 					byte unk_byte = 0;
-					int* p_unk_BC;
-					if (placement_data->field_B8 || (unk_byte = sub_5317F9(&placement_data->field_BC, new_object_header_datum), (placement_data->field_B8 = unk_byte) != 0))
-						p_unk_BC = (int*)&placement_data->field_BC;
-					else
-						p_unk_BC = 0;
+					s_location* p_location = nullptr;
+					if (placement_data->object_is_inside_cluster
+						|| (unk_byte = set_object_position_if_in_cluster(&placement_data->location, new_object_header_datum),
+							(placement_data->object_is_inside_cluster = unk_byte) != 0))
+					{
+						p_location = &placement_data->location;
+					}
 
-					p_object_reconnect_to_map(p_unk_BC, new_object_header_datum);
+					Engine::Objects::object_reconnect_to_map(p_location, new_object_header_datum);
 				}
 
 				object_postprocess_node_matrices(new_object_header_datum);

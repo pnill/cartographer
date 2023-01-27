@@ -123,8 +123,8 @@ struct s_object_data_definition
 	DWORD location[2];
 	real_point3d center;
 	float radius;
-	real_point3d field_40;
-	float field_4C;
+	real_point3d object_origin_point;
+	float shadow_sphere_radius;
 	BYTE gap_50[16];
 	DWORD field_60;
 	real_point3d position;
@@ -313,7 +313,12 @@ namespace Engine::Objects
 	datum object_new(s_object_placement_data* object_placement_data);
 	void apply_biped_object_definition_patches();
 	void simulation_action_object_create(datum object_idx);
-	void object_destroy(datum object_idx);
+	void object_delete(const datum object_idx);
+	void object_wake(const datum object_datum);
+	void __cdecl object_disconnect_from_map(const datum object_index);
+	void __cdecl object_reconnect_to_map(const void* location_struct, const datum object_index);
+	void object_compute_node_matrices_with_children(const datum object_datum);
+
 	int object_get_count();
 	int object_count_from_iter();
 }

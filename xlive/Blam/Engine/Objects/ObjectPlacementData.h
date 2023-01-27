@@ -2,6 +2,13 @@
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Math\BlamMath.h"
 
+struct s_location
+{
+	DWORD leaf_index;
+	WORD cluster;
+	WORD bsp_index;
+};
+
 struct s_object_placement_data
 {
 	datum tag_index;//0
@@ -36,8 +43,9 @@ struct s_object_placement_data
 	WORD loosened_constraints_flag;
 	WORD field_B4;
 	WORD field_B6;
-	DWORD field_B8;
-	char field_BC;
-	PAD(7);
+	bool object_is_inside_cluster;
+	BYTE unk_22;
+	WORD unk_23;
+	s_location location;
 };
 CHECK_STRUCT_SIZE(s_object_placement_data, 0xC4);

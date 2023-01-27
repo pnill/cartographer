@@ -14,7 +14,7 @@ struct s_object_globals
 	int field_C;
 	int field_10;
 	DWORD unk_game_time_store;
-	DWORD field_18;
+	DWORD unique_id;
 	real_color_rgb cinematic_ambient_color;
 	real_vector3d cimenatic_primary_light_vector_1;
 	float cimenatic_primary_light_unk1;

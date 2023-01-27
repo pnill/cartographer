@@ -1,15 +1,16 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Math/real_math.h"
 
 /*********************************************************************
 * name: scenario_structure_bsp
 * group_tag : sbsp
 * header size : 572
 * *********************************************************************/
-struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
+struct s_scenario_structure_bsp_group_definition : TagGroup<'sbsp'>
 {
 	struct s_import_info_block
 	{
@@ -50,13 +51,19 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	{
 		struct s_bsp_3d_nodes_block
 		{
-			PAD(0x8);//0x0
+			WORD plane;
+			byte front_child_lower;
+			byte front_child_mid;
+			byte front_child_upper;
+			byte back_child_lower;
+			byte back_child_mid;
+			byte back_child_upper;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_bsp_3d_nodes_block, 0x8);
 		tag_block<s_bsp_3d_nodes_block> bsp_3d_nodes;//0x0
 		struct s_planes_block
 		{
-			real_plane3d plane_distance;
+			real_plane3d plane;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_planes_block, 0x10);
 		tag_block<s_planes_block> planes;//0x8

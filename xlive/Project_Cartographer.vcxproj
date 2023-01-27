@@ -246,8 +246,11 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\Objects\ObjectGloals.cpp" />
     <ClCompile Include="Blam\Engine\Objects\ObjectTypes.cpp" />
+    <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
@@ -558,11 +561,14 @@
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectGlobals.h" />
     <ClInclude Include="Blam\Engine\Objects\ObjectTypes.h" />
+    <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />

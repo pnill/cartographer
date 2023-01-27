@@ -43,12 +43,55 @@ namespace Engine::Objects
 		return p_simulation_action_object_create(object_idx);
 	}
 
-	void object_destroy(datum object_idx)
+	void object_delete(const datum object_idx)
 	{
-		typedef void(__cdecl object_destroy_t)(datum);
-		auto p_object_destroy = Memory::GetAddress<object_destroy_t*>(0x136005);
+		typedef void(__cdecl* object_delete_t)(datum);
+		auto p_object_delete = Memory::GetAddress<object_delete_t>(0x136005, 0x124ED5);
 
-		p_object_destroy(object_idx);
+		p_object_delete(object_idx);
+	}
+
+	void object_wake(const datum object_datum)
+	{
+		typedef void(__cdecl* object_wake_t)(const datum object_datum);
+		auto object_wake = Memory::GetAddress<object_wake_t>(0x12FA1E, 0x11E8E1);
+
+		object_wake(object_datum);
+	}
+
+	void __cdecl object_disconnect_from_map(const datum object_index)
+	{
+		typedef void(__cdecl* object_disconnect_from_map_t)(const datum object_index);
+		auto object_disconnect_from_map = Memory::GetAddress<object_disconnect_from_map_t>(0x136226, 0x125136);
+
+		object_disconnect_from_map(object_index);
+	}
+
+	void __cdecl object_reconnect_to_map(const void* location_struct, const datum object_index)
+	{
+		typedef void(__cdecl* object_reconnect_to_map_t)(const void* location_struct, const datum object_index);
+		auto object_reconnect_to_map = Memory::GetAddress<object_reconnect_to_map_t>(0x1360CE, 0x124F9E);
+
+		object_reconnect_to_map(location_struct, object_index);
+	}
+
+	void object_compute_node_matrices_with_children(const datum object_datum)
+	{
+		typedef void(__cdecl* object_compute_node_matrices_non_recursive_t)(const datum object_datum);
+		auto object_compute_node_matrices_non_recursive = Memory::GetAddress<object_compute_node_matrices_non_recursive_t>(0x1353E6);
+		typedef bool(__cdecl* object_compute_node_matrices_locations_t)(const datum object_datum);
+		auto object_compute_node_matrices_locations = Memory::GetAddress<object_compute_node_matrices_locations_t>(0x1363D5);
+
+		const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+		s_object_data_definition* next_object = nullptr;
+		object_compute_node_matrices_non_recursive(object_datum);
+		object_compute_node_matrices_locations(object_datum);
+		for (unsigned long i = object->current_weapon_datum; i != -1; i = next_object->next_index)
+		{
+			next_object = object_get_fast_unsafe(i);
+			if (((1 << next_object->object_type) & 0x80u) == 0)
+				object_compute_node_matrices_with_children(i);
+		}
 	}
 
 #pragma region Biped variant patches
