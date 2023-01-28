@@ -244,8 +244,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
-    <ClCompile Include="Blam\Engine\Objects\ObjectGloals.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\ObjectTypes.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_gloals.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
@@ -256,7 +256,7 @@
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
@@ -559,8 +559,8 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectGlobals.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectTypes.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
@@ -680,8 +680,8 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
+    <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Engine\Game\GameOptions.h" />

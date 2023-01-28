@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "ObjectGlobals.h"
+#include "object_globals.h"
 
 s_object_globals* s_object_globals::get()
 {

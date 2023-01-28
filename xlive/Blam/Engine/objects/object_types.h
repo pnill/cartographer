@@ -1,5 +1,5 @@
 #pragma once
-#include "ObjectPlacementData.h"
+#include "object_placement.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 
 #define G_MAX_OBJECT_TYPE_IHERITENCE 3

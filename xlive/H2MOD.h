@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam\Engine\Objects\object_placement.h"
 
 #include "Blam\Engine\Game\GameOptions.h"
 #include "Blam\Engine\Players\Players.h"

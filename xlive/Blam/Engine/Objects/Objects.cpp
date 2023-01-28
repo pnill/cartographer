@@ -1,15 +1,15 @@
 #include "stdafx.h"
 
 #include "Objects.h"
-#include "ObjectTypes.h"
+#include "object_types.h"
 
 #include "Blam/Cache/TagGroups/device_definition.hpp"
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Engine/Memory/bitstream.h"
 #include "Blam/Engine/Objects/Objects.h"
-#include "Blam/Engine/Objects/ObjectGlobals.h"
-#include "Blam/Engine/Objects/ObjectTypes.h"
+#include "Blam/Engine/Objects/object_globals.h"
+#include "Blam/Engine/Objects/object_types.h"
 #include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/physics/bsp3d.h"
 #include "Blam/Engine/physics/collision_bsp.h"

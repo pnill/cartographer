@@ -104,7 +104,7 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -157,8 +157,6 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\ObjectTypes.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\ObjectGloals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -301,8 +299,8 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
+    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
+    <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="H2MOD.h" />
@@ -507,8 +505,11 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectTypes.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectGlobals.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

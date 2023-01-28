@@ -3,7 +3,7 @@
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\DataArray\DataArray.h"
 #include "Blam\Engine\Players\PlayerActions.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam\Engine\Objects\object_placement.h"
 
 enum e_object_team : BYTE
 {

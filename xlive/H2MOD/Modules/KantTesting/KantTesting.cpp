@@ -2,8 +2,8 @@
 
 #include "KantTesting.h"
 
-#include "Blam/Engine/Objects/ObjectGlobals.h"
-#include "Blam/Engine/Objects/ObjectTypes.h"
+#include "Blam/Engine/Objects/object_globals.h"
+#include "Blam/Engine/Objects/object_types.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/physics/collision_bsp.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
