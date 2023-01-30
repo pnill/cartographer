@@ -20,7 +20,7 @@ typedef void (*object_process_node_t)(datum, int, int);
 struct __declspec(align(4)) object_type_definition
 {
 	const char* name;
-	int group_tag;
+	blam_tag::tag_group_type group_tag;
 	__int16 datum_size;
 	__int16 placement_tag_block_offset;
 	__int16 palette_tag_block_offset;
@@ -62,5 +62,5 @@ CHECK_STRUCT_SIZE(object_type_definition, 0xC8);
 
 object_type_definition** get_object_type_definitions();
 object_type_definition* get_game_object_type_definition(datum object_datum);
-object_type_definition* object_type_from_group_tag(datum tag_datum);
+int object_type_from_group_tag(datum tag_datum);
 

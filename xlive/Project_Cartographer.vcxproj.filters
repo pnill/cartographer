@@ -157,6 +157,11 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />

@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "object_types.h"
-
 #include "objects.h"
+
+#include "H2MOD/Tags/TagInterface.h"
 
 object_type_definition** get_object_type_definitions()
 {
@@ -12,11 +13,15 @@ object_type_definition* get_game_object_type_definition(datum object_datum)
 {
 	return get_object_type_definitions()[object_get_fast_unsafe<s_object_data_definition>(object_datum)->object_type];
 }
-object_type_definition* object_type_from_group_tag(datum tag_datum)
+int object_type_from_group_tag(datum tag_index)
 {
-	typedef int(__cdecl* get_tag_type_definition_t)(datum tag_datum);
-	get_tag_type_definition_t p_get_tag_type_definition = Memory::GetAddress<get_tag_type_definition_t>(0x1863BB, 0);
-	auto b = p_get_tag_type_definition(tag_datum);
-	auto a =  get_object_type_definitions()[b];
-	return a;
+	int result;
+
+	result = 0;
+	while (get_object_type_definitions()[result]->group_tag != tags::get_tag_group_fast(tag_index))
+	{
+		if (++result >= 13)
+			return -1;
+	}
+	return result;
 }

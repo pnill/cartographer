@@ -201,6 +201,11 @@ namespace tags
 		return reinterpret_cast<T*>(&get_tag_data()[get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)].data_offset]);
 	}
 
+	inline blam_tag::tag_group_type get_tag_group_fast(datum tag)
+	{
+		return get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)].type.tag_type;
+	}
+
 	/*
 		Returns the tag datum or a null datum
 	*/
