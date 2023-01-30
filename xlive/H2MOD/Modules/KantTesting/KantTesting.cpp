@@ -38,12 +38,12 @@ namespace KantTesting
 		{
 		}
 	}
-	c_object_type_definition** object_types;
+	object_type_definition** object_types;
 
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
-			object_types = Memory::GetAddress<c_object_type_definition**>(0x41F560, 0x0);
+			object_types = Memory::GetAddress<object_type_definition**>(0x41F560, 0x0);
 			for (int i = 0; i < 13; i++)
 			{
 				auto c = *object_types[i];

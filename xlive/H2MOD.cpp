@@ -201,7 +201,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data nObject;
+		object_placement_data nObject;
 
 		create_new_placement_data(&nObject, weaponId, unit_datum, 0);
 
@@ -720,7 +720,7 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data object_placement;
+		object_placement_data object_placement;
 
 		create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
 

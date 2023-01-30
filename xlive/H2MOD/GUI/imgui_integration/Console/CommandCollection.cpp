@@ -694,7 +694,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 	{
 		try 
 		{
-			s_object_placement_data nObject;
+			object_placement_data nObject;
 			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
 			datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 			real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);

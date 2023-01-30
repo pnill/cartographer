@@ -50,7 +50,7 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 
 	if (biped_unit != NULL)
 	{
-		s_object_placement_data nObject;
+		object_placement_data nObject;
 
 		create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
 

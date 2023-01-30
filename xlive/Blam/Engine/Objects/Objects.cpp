@@ -20,7 +20,7 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
-void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
+void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
 {
 	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
 
@@ -32,11 +32,11 @@ void create_new_placement_data(s_object_placement_data* object_placement_data, d
 
 //Pass new placement data into Create_object_new
 /*
-datum object_new(s_object_placement_data* object_placement_data)
+datum object_new(object_placement_data* object_placement_data)
 {
 	LOG_TRACE_GAME("{}", __FUNCTION__);
 
-	typedef datum(__cdecl* object_new_t)(s_object_placement_data*);
+	typedef datum(__cdecl* object_new_t)(object_placement_data*);
 	auto p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
 
 	return p_object_new(object_placement_data);
@@ -102,12 +102,12 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 	}
 }
 
-typedef bool(__cdecl* object_type_new_t)(datum object_datum, s_object_placement_data* a2, bool* a3);
+typedef bool(__cdecl* object_type_new_t)(datum object_datum, object_placement_data* a2, bool* a3);
 object_type_new_t p_object_type_definition_object_new_evaluate;
 
-bool __cdecl object_type_new(datum object_datum, s_object_placement_data* a2, bool* a3)
+bool __cdecl object_type_new(datum object_datum, object_placement_data* a2, bool* a3)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	bool result = true;
 	auto header = get_objects_header(object_datum);
 	for (byte i = 0; i < 3; i++)
@@ -124,22 +124,18 @@ bool __cdecl object_type_new(datum object_datum, s_object_placement_data* a2, bo
 	return result;
 }
 
-typedef void(__cdecl* object_type_definitions_adjust_placement_evaluate_t)(s_object_placement_data* placement_data);
-object_type_definitions_adjust_placement_evaluate_t p_object_type_definitions_adjust_placement_evaluate;
-
-void __cdecl object_type_definitions_adjust_placement_evaluate(s_object_placement_data* placement_data)
+void __cdecl object_type_adjust_placement(object_placement_data* placement_data)
 {
-	auto object_type = c_object_type_definition::get_tag_type_definition(placement_data->tag_index);
-	for (byte i = 0; i < 3; i++)
+	object_type_definition* object_type = object_type_from_group_tag(placement_data->tag_index);
+	byte i = 0;
+
+	for (object_type_definition** current_object_type = object_type->base_object_types; object_type; current_object_type = &object_type->base_object_types[(__int16)i])
 	{
-		auto object_base_type = object_type->base_object_types[i];
-		if (object_base_type)
+		if (object_type->base_object_types[i]->adjust_placement)
 		{
-			if (object_base_type->adjust_placement)
-			{
-				object_base_type->adjust_placement(placement_data);
-			}
+			object_type->base_object_types[i]->adjust_placement(placement_data);
 		}
+		++i;
 	}
 }
 
@@ -148,7 +144,7 @@ object_type_definitions_disconnect_from_structure_bsp_evalulate_t p_object_type_
 
 void __cdecl object_type_definitions_disconnect_from_structure_bsp_evalulate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (byte i = 0; i < 3; i++)
 	{
 		auto object_base_type = object_type->base_object_types[i];
@@ -163,7 +159,7 @@ object_type_object_delete_evaluate_t p_object_type_object_delete_evaluate;
 
 void __cdecl object_type_object_delete_evaluate(datum object_datum, int a2)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -177,7 +173,7 @@ object_type_unknown38_t p_object_type_unknown38;
 
 void __cdecl object_type_unknown38_evaluate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -191,7 +187,7 @@ object_type_unknown7C_t p_object_type_unknown7C;
 
 void __cdecl object_type_unknown7C_evaluate(datum object_datum, int a2, int a3)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -205,7 +201,7 @@ object_type_unknown3C_t p_object_type_unknown3C;
 
 void __cdecl object_type_unknown3C_evaluate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -219,7 +215,7 @@ object_type_object_move_t p_object_type_object_move;
 
 void __cdecl object_type_object_move_evaluate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -233,7 +229,7 @@ object_type_object_can_activate_t p_object_type_object_can_activate;
 
 void __cdecl object_type_object_can_activate_evaluate(datum object_datum, int a2, int a3)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -247,7 +243,7 @@ object_type_assign_new_entity_t p_object_assign_new_entity;
 
 void __cdecl object_type_assign_new_entity_evaluate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -261,7 +257,7 @@ object_type_detach_gamestate_entity_t p_object_type_detach_gamestate_entity;
 
 void __cdecl object_type_detach_gamestate_entity_evaluate(datum object_datum)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -275,7 +271,7 @@ object_type_process_node_matrices_t p_object_type_process_node_matrices;
 
 void __cdecl object_type_process_node_matrices(datum object_datum, int node_count, int node_matracies)
 {
-	auto object_type = c_object_type_definition::get_game_object_type_definition(object_datum);
+	auto object_type = get_game_object_type_definition(object_datum);
 	for (auto object_base_type : object_type->base_object_types)
 	{
 		if (object_base_type)
@@ -357,10 +353,9 @@ bool set_object_position_if_in_cluster(s_location* location, long object_datum)
 	return location->cluster != 0xFFFF;
 }
 
-typedef datum(__cdecl* object_new_t)(s_object_placement_data* placement_data);
-object_new_t p_object_new;
-
-datum __cdecl object_new(s_object_placement_data* placement_data)
+//typedef datum(__cdecl* object_new_t)(object_placement_data* placement_data);
+//object_new_t p_object_new;
+datum __cdecl object_new(object_placement_data* placement_data)
 {
 	typedef datum(__cdecl* datum_header_new_t)(__int16 object_size);
 	auto p_datum_header_new = Memory::GetAddress<datum_header_new_t>(0x130AF6);
@@ -370,9 +365,6 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 
 	typedef bool(__cdecl* sub_531B0E_t)(unsigned __int16 a1, size_t* a2, size_t* a3);
 	auto p_sub_531B0E = Memory::GetAddress<sub_531B0E_t>(0x131B0E);
-
-	typedef void(__cdecl* sub_4276B9_t)(DWORD* a1);
-	auto p_sub_4276B9 = Memory::GetAddress<sub_4276B9_t>(0x276B9);
 
 	typedef void(__thiscall* sub_4F3B64_t)(char* this_ptr);
 	auto p_sub_4F3B64 = Memory::GetAddress<sub_4F3B64_t>(0xF3B64);
@@ -410,12 +402,6 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 	typedef void(__cdecl* sub_5323B3_t)(unsigned __int16 a1);
 	auto p_sub_5323B3 = Memory::GetAddress< sub_5323B3_t>(0x1323B3);
 
-	typedef void(__cdecl* object_compute_node_matrices_with_children_t)(datum a1);
-	auto p_object_compute_node_matrices_with_children = Memory::GetAddress< object_compute_node_matrices_with_children_t>(0x136924);
-
-	typedef void(__cdecl* object_reconnect_to_map_t)(const void* location_struct, const datum object_index);
-	auto p_object_reconnect_to_map = Memory::GetAddress<object_reconnect_to_map_t>(0x1360CE, 0x124F9E);
-
 	typedef void(__cdecl* effect_new_from_object_t)(int arg0, int* arg4, datum a1, float a4, float a5, int a6);
 	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
 
@@ -425,28 +411,24 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 	typedef void(__cdecl* sub_54BA87_t)(datum a1);
 	auto p_sub_54BA87 = Memory::GetAddress< sub_54BA87_t>(0x14BA87);
 
-	typedef void(__cdecl* object_delete_t)(datum a1);
-	auto p_object_delete_t = Memory::GetAddress< object_delete_t>(0x136005);
-
-	auto unk_placement_flag = (placement_data->object_placement_flags & 0x10) == 0;
 	auto unk_creation_bool = false;
-	if (unk_placement_flag)
+	if ((placement_data->object_placement_flags & 0x10) == 0)
 	{
-		if (placement_data->tag_index == DATUM_INDEX_NONE)
-			return DATUM_INDEX_NONE;
-		//object_type_definitions_adjust_placement_evaluate(placement_data);
+		if (placement_data->tag_index == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
+
+		object_type_adjust_placement(placement_data);
 	}
 	if (placement_data->tag_index == DATUM_INDEX_NONE)
 		return DATUM_INDEX_NONE;
 
 	auto new_object_tag = tags::get_tag_fast<s_object_group_definition>(placement_data->tag_index);
-	auto new_object_definition = c_object_type_definition::get_object_type_definitions()[(byte)new_object_tag->object_type];
+	auto new_object_definition = get_object_type_definitions()[(byte)new_object_tag->object_type];
 
 	s_model_group_definition* new_object_model_tag;
 	if (new_object_tag->model.TagIndex != DATUM_INDEX_NONE)
 		new_object_model_tag = tags::get_tag_fast<s_model_group_definition>(new_object_tag->model.TagIndex);
 
-	if (((1 << new_object_tag->object_type) & (_object_is_creature | _object_is_crate | _object_is_machine | _object_is_vehicle | _object_is_biped)) != 0)
+	if (((new_object_tag->object_type) & (_object_is_creature | _object_is_crate | _object_is_machine | _object_is_vehicle | _object_is_biped)) != 0)
 	{
 		typedef void(__cdecl* havok_memory_garbage_collect_t)();
 		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78);
@@ -510,9 +492,7 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 
 	new_object_header->unk__ = -1;
 
-	//This is some sort of internal struct but i can't be bothered to map it out right now
-
-	p_sub_4276B9(new_object->location);
+	scenario_invalidate_location(&new_object->location);
 
 	new_object->field_60 = -1;
 	new_object->parent_datum = DATUM_INDEX_NONE;
@@ -578,8 +558,8 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 			if (p_sub_4F59AD(unk_animation_structure, new_object_model_tag->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 			{
 				valid_animation_maybe = true;
-				allow_interpolation = ((1 << new_object_tag->object_type) & (_object_is_sound_scenery | _object_is_light_fixture | _object_is_control | _object_is_machine | _object_is_scenery | _object_is_projectile)) == 0;
-				if (((1 << new_object_tag->object_type) & (_object_is_light_fixture | _object_is_control | _object_is_machine)) != 0)
+				allow_interpolation = ((new_object_tag->object_type) & (_object_is_sound_scenery | _object_is_light_fixture | _object_is_control | _object_is_machine | _object_is_scenery | _object_is_projectile)) == 0;
+				if (((new_object_tag->object_type) & (_object_is_light_fixture | _object_is_control | _object_is_machine)) != 0)
 				{
 					if (((s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_flags::allow_interpolation)
 						allow_interpolation = true;
@@ -624,15 +604,17 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 		}
 		if (new_object_tag->attachments.size > 0)
 		{
-			auto object_attachments_block = (char*)new_object + new_object->object_attachments_block_offset;
-			memset(object_attachments_block, -1, 8 * ((unsigned int)(__int16)new_object->field_11C >> 3));
+			char* object_attachments_block = (char*)new_object + new_object->object_attachments_block_offset;
+			memset(object_attachments_block, -1, 8 * ((unsigned int)new_object->field_11C >> 3));
 		}
 		auto b_object_type_new = object_type_new(new_object_header_datum, placement_data, &unk_creation_bool);
 		if (b_object_type_new)
 		{
 			auto b_object_flag_check = (new_object->object_flags & 0x20000) != 0;
-			if (placement_data->object_placement_flags & 6 != 0)
+			if ((placement_data->object_placement_flags & 6) != 0)
+			{
 				new_object->object_flags &= ~0x20000u;
+			}
 
 			object_evaluate_placement_variant(new_object_header_datum, placement_data->variant_name);
 			p_sub_532F07(new_object_absolute_index, placement_data->unk_AC);
@@ -644,7 +626,7 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 			if (new_object->object_animations_block_offset != 0xFFFF)
 				p_sub_52FE4D(new_object_header_datum);
 
-			p_object_compute_node_matrices_with_children(new_object_header_datum);
+			object_compute_node_matrices_with_children(new_object_header_datum);
 			if (s_object_globals::get() && s_object_globals::get()->initialized)
 			{
 				byte unk_byte = 0;
@@ -690,9 +672,9 @@ datum __cdecl object_new(s_object_placement_data* placement_data)
 			}
 			if (!s_object_globals::get()->initialized)
 				return new_object_header_datum;
-			auto unk_12 = placement_data->unk_12;
-			if ((unk_12 & 2) == 0 && ((unk_12 & 4) == 0 || new_object->location[1] != 0xFFFF))
-				p_object_delete_t(new_object_header_datum);
+
+			if ((placement_data->unk_12 & 2) == 0 && ((placement_data->unk_12 & 4) == 0 || new_object->location.cluster != 0xFFFF))
+				object_delete(new_object_header_datum);
 			return new_object_header_datum;
 		}
 		object_type_unknown3C_evaluate(new_object_header_datum);
@@ -763,19 +745,24 @@ bool __stdcall c_simulation_unit_entity_definition_creation_decode_hook(void* th
 	return p_c_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 }
 
-int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, s_simulation_unit_creation_data* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
+int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx,
+	s_simulation_unit_creation_data* 
+	creation_data, 
+	int a2, 
+	int a3, 
+	object_placement_data* placement_data)
 {
 	// set the object placement data
-	object_placement_data->variant_name = creation_data->variant_name;
+	placement_data->variant_name = creation_data->variant_name;
 	if(*(byte*)((char*)creation_data + 0x10) != -1)
 	{
 		auto profile = reinterpret_cast<s_player::s_player_properties::s_player_profile*>((char*)creation_data + 0x10);
 		datum player_representation_datum = PlayerRepresentation::get_object_datum_from_representation(profile->player_character_type);
 		if (player_representation_datum != DATUM_INDEX_NONE)
-			object_placement_data->tag_index = player_representation_datum;
+			placement_data->tag_index = player_representation_datum;
 	}
 	//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
-	return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
+	return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, placement_data);
 }
 
 __declspec(naked) void c_simulation_object_entity_definition_object_create_object_to_stdcall()

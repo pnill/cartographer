@@ -9,7 +9,7 @@ struct s_location
 	WORD bsp_index;
 };
 
-struct s_object_placement_data
+struct object_placement_data
 {
 	datum tag_index;//0
 	DWORD unique_id;//0x4
@@ -48,4 +48,4 @@ struct s_object_placement_data
 	WORD unk_23;
 	s_location location;
 };
-CHECK_STRUCT_SIZE(s_object_placement_data, 0xC4);
+CHECK_STRUCT_SIZE(object_placement_data, 0xC4);

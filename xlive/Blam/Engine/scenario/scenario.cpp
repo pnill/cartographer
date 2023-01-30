@@ -4,9 +4,16 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "H2MOD/Tags/TagInterface.h"
 
+void __cdecl scenario_invalidate_location(s_location* object_location)
+{
+    short global_structure_bsp_index = *Memory::GetAddress<short*>(0x4119A4);
+    object_location->leaf_index = -1;
+    object_location->cluster = -1;
+    object_location->bsp_index = global_structure_bsp_index;
+}
+
 void __cdecl scenario_location_from_point(s_location* location, const real_point3d* point)
 {
-
     short global_structure_bsp_index = *Memory::GetAddress<short*>(0x4119A4);
     const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* global_bsp3d = Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block*>(0x479E60);
     const s_scenario_structure_bsp_group_definition* global_structure_bsp = Memory::GetAddress<s_scenario_structure_bsp_group_definition*>(0x479E6C);

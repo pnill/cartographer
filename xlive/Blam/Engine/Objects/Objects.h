@@ -120,7 +120,7 @@ struct s_object_data_definition
 	INT16 placement_index;
 	BYTE gap_1C[8];
 	DWORD field_24;
-	DWORD location[2];
+	s_location location;
 	real_point3d center;
 	float radius;
 	real_point3d object_origin_point;
@@ -173,7 +173,7 @@ struct s_object_data_definition
 	__int16 node_buffer_size;
 	__int16 nodes_offset;
 	PAD(4);
-	WORD field_11C;
+	short field_11C;
 	WORD object_attachments_block_offset;
 	PAD(10);
 	WORD object_animations_block_offset;
@@ -306,8 +306,8 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 
-void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
-datum object_new(s_object_placement_data* object_placement_data);
+void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
+datum object_new(object_placement_data* object_placement_data);
 void apply_biped_object_definition_patches();
 void simulation_action_object_create(datum object_idx);
 void object_delete(const datum object_idx);
