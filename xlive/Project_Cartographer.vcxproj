@@ -666,6 +666,7 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Util\curl-interface.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />

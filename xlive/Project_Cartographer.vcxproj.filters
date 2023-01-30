@@ -162,6 +162,7 @@
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -515,6 +516,7 @@
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
+    <ClInclude Include="Blam\Engine\structures\structures.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
