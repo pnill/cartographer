@@ -4,7 +4,7 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "H2MOD/Tags/TagInterface.h"
 
-void __cdecl scenario_invalidate_location(s_location* object_location)
+void __cdecl location_invalidate(s_location* object_location)
 {
     short global_structure_bsp_index = *Memory::GetAddress<short*>(0x4119A4);
     object_location->leaf_index = -1;

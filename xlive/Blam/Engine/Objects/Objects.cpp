@@ -6,6 +6,7 @@
 #include "Blam/Cache/TagGroups/device_definition.hpp"
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Engine/Memory/bitstream.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/objects/object_globals.h"
@@ -354,6 +355,28 @@ bool set_object_position_if_in_cluster(s_location* location, long object_datum)
 	return location->cluster != 0xFFFF;
 }
 
+bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum* mode_tag_index, datum* coll_tag_index)
+{
+	bool contains_prt_info = false;
+	const datum hlmt_tag_index = tags::get_tag_fast<s_object_group_definition>(object_get_fast_unsafe(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum))->tag_definition_index)->model.TagIndex;
+
+	if (hlmt_tag_index == DATUM_INDEX_NONE) { return has_prt_or_lighting_info; }
+
+	const s_model_group_definition* hlmt_model_definition = tags::get_tag_fast<s_model_group_definition>(hlmt_tag_index);
+	const datum render_model_tag_index = hlmt_model_definition->render_model.TagIndex;
+
+	if (render_model_tag_index == -1 || hlmt_model_definition->collision_model.TagIndex == -1) { return has_prt_or_lighting_info; }
+
+	const s_render_model_group_definition* render_model = tags::get_tag_fast<s_render_model_group_definition>(render_model_tag_index);
+
+	*mode_tag_index = render_model_tag_index;
+	*coll_tag_index = hlmt_model_definition->collision_model.TagIndex;
+
+	contains_prt_info = (render_model->prt_info.size <= 0 || render_model->section_render_leaves.size <= 0 ? false : true);
+
+	return contains_prt_info;
+}
+
 //typedef datum(__cdecl* object_new_t)(object_placement_data* placement_data);
 //object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
@@ -436,11 +459,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	datum object_header_datum = p_datum_header_new(new_object_type_definition->datum_size);
 
-	if (object_header_datum == DATUM_INDEX_NONE)
-		return DATUM_INDEX_NONE;
+	if (object_header_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }	
 
-	auto object_header = get_objects_header(object_header_datum);
-	auto object = object_get_fast_unsafe<s_object_data_definition>(object_header_datum);
+	s_object_header* object_header = get_objects_header(object_header_datum);
+	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_header_datum);
 
 	object_header->flags |= _object_header_being_deleted_bit;
 	object_header->type = new_object_tag->object_type;
@@ -464,34 +486,36 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	}
 
 	object->position = placement_data->position;
-	object->orientation = placement_data->orientation;
+	object->orientation = placement_data->forward;
 	object->up = placement_data->up;
 	object->translational_velocity = placement_data->translational_velocity;
 	object->angular_velocity = placement_data->angular_velocity;
 	object->scale = placement_data->scale;
 
 	if ((placement_data->object_placement_flags & 1) != 0)
+	{
 		object->object_flags |= 0x400u;
+	}
 	else
+	{
 		object->object_flags &= ~0x400u;
+	}
 
 	if (model_definition && model_definition->collision_model.TagIndex != DATUM_INDEX_NONE)
+	{
 		object->object_flags |= 0x200u;
+	}
 	else
+	{
 		object->object_flags &= ~0x200u;
+	}
 
-	size_t out_1;
-	size_t out_2;
+	datum mode_tag_index;
+	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_header_datum, &mode_tag_index, &coll_tag_index)) { object->object_flags |= has_prt_or_lighting_info; }
+	else { object->object_flags &= ~has_prt_or_lighting_info; }
 
-	if (p_sub_531B0E(object_header_datum, &out_1, &out_2))
-		object->object_flags |= 0x80000000;
-	else
-		object->object_flags &= ~0x80000000;
-
-	object_header->unk__ = -1;
-
-	scenario_invalidate_location(&object->location);
-
+	object_header->cluster_reference = -1;
+	location_invalidate(&object->location);
 	object->field_60 = -1;
 	object->parent_datum = DATUM_INDEX_NONE;
 	object->next_index = DATUM_INDEX_NONE;
@@ -501,14 +525,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->byte_108 = -1;
 	object->byte_109 = -1;
 	object->placement_policy = placement_data->placement_policy;
-	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow)
-		object->object_flags |= 0x10000u;
+	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow) { object->object_flags |= 0x10000u; }
 
 	if ((object->object_flags & 1) != 0)
 	{
 		object->object_flags &= ~1u;
-		if (s_object_globals::object_is_connected_to_map(object_header_datum))
-			s_object_globals::object_connect_lights_recursive(object_header_datum, 0, 1, 0, 0);
+		if (s_object_globals::object_is_connected_to_map(object_header_datum)) { s_object_globals::object_connect_lights_recursive(object_header_datum, 0, 1, 0, 0); }
 		s_object_globals::object_update_collision_culling(object_header_datum);
 	}
 	object->field_C2 = placement_data->field_70;

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\Players\PlayerActions.h"
-#include "Blam\Engine\Objects\object_placement.h"
+#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/objects/object_placement.h"
+#include "Blam/Engine/Players/PlayerActions.h"
+#include <wtypes.h>
 
 enum e_object_team : BYTE
 {
@@ -105,6 +106,11 @@ enum e_biped_physics_mode : BYTE
 	mode_posture,
 	mode_climbing,
 	mode_melee
+};
+
+enum e_object_data_flags : DWORD
+{
+	has_prt_or_lighting_info = 0x80000000,
 };
 
 #pragma pack(push, 1)
@@ -266,7 +272,7 @@ struct s_object_header {
 	__int16 datum_salt; //0x00
 	e_object_header_flag flags; // 0x02
 	e_object_type type; // 0x03
-	__int16 unk__;  // 0x04
+	__int16 cluster_reference;  // 0x04
 	__int16 object_data_size;  //0x06
 	char* object; //0x08 -
 };

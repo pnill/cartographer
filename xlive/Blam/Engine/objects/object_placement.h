@@ -23,7 +23,7 @@ struct object_placement_data
 	WORD unk_16;//0x16
 	DWORD object_placement_flags;//0x18
 	real_point3d position;//0x1C
-	real_vector3d orientation;//0x28
+	real_vector3d forward;//0x28
 	real_vector3d up;//0x34
 	real_point3d translational_velocity;//0x40
 	real_vector3d angular_velocity;//0x4C

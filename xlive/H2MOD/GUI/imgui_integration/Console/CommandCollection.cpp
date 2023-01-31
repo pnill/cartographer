@@ -716,7 +716,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 
 				if (rotation)
 				{
-					p_vector3d_from_euler_angles3d(&nObject.orientation, &nObject.up, rotation);
+					p_vector3d_from_euler_angles3d(&nObject.forward, &nObject.up, rotation);
 				}
 
 				if (!sameTeam)
