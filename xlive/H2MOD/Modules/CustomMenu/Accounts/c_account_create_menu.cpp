@@ -124,7 +124,7 @@ c_account_create_list::c_account_create_list(int _flags) :
 
 	s_data_array::data_make_valid(this->list_data_array);
 
-	for (unsigned int i = 0; i < this->list_data_array->datum_max_elements; i++) {
+	for (unsigned int i = 0; i < this->list_data_array->max_elements; i++) {
 		s_data_array::datum_new_in_range(this->list_data_array);
 	}
 

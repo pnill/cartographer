@@ -7,7 +7,7 @@
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
-    <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
+    <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
@@ -163,6 +163,8 @@
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\memory\data.cpp" />
+    <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -280,7 +282,7 @@
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
-    <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
+    <ClInclude Include="Blam\Engine\memory\bitstream.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
@@ -517,6 +519,8 @@
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\structures\structures.h" />
+    <ClInclude Include="Blam\Engine\memory\data.h" />
+    <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

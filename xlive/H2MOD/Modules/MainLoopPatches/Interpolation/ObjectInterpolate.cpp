@@ -58,7 +58,7 @@ namespace ObjectInterpolate
 		if (!Interpolation::ShouldInterpolate())
 			return;
 
-		s_data_iterator<s_object_header*> object_it(get_objects_header());
+		s_data_iterator<s_object_header*> object_it(get_object_header());
 
 		// check if we actually executed any ticks
 		if (!(time_globals::get_game_time() > 0))
@@ -102,7 +102,7 @@ namespace ObjectInterpolate
 			return;
 		}
 
-		s_data_iterator<s_object_header*> object_it(get_objects_header());
+		s_data_iterator<s_object_header*> object_it(get_object_header());
 
 		while (object_it.get_next_datum())
 		{

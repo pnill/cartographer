@@ -1,13 +1,14 @@
 #include "stdafx.h"
 
-#include "Objects.h"
+#include "objects.h"
 #include "object_types.h"
 
 #include "Blam/Cache/TagGroups/device_definition.hpp"
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Engine/Memory/bitstream.h"
+#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/objects/object_globals.h"
 #include "Blam/Engine/objects/object_types.h"
@@ -111,7 +112,7 @@ bool __cdecl object_type_new(datum object_datum, object_placement_data* a2, bool
 {
 	auto object_type = get_game_object_type_definition(object_datum);
 	bool result = true;
-	auto header = get_objects_header(object_datum);
+	auto header = get_object_header(object_datum);
 	for (byte i = 0; i < 3; i++)
 	{
 		auto object_base_type = object_type->base_object_types[i];
@@ -294,7 +295,7 @@ void object_evaluate_placement_variant(datum object_header_datum, string_id vari
 {
 	typedef byte(__cdecl* sub_52FE84_t)(unsigned __int16 a1, string_id a2);
 	auto p_sub_53FE84 = Memory::GetAddress<sub_52FE84_t>(0x12FE84);
-	auto object = (s_object_data_definition*)get_objects_header(object_header_datum)->object;
+	auto object = (s_object_data_definition*)get_object_header(object_header_datum)->object;
 
 	object->model_variant_id = p_sub_53FE84(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_header_datum), variant_index);
 }
@@ -325,7 +326,7 @@ void object_initialize_effects(datum object_datum)
 	typedef void(__cdecl* attachments_new_t)(datum a1);
 	auto p_attachments_new = Memory::GetAddress< attachments_new_t>(0x1348CA);
 
-	auto object_header = get_objects_header(object_datum);
+	auto object_header = get_object_header(object_datum);
 	auto object = (s_object_data_definition*)object_header->object;
 	if (object_header->type == projectile)
 		*((DWORD*)object_header->object + 55) = -1; ///??????
@@ -377,13 +378,33 @@ bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum
 	return contains_prt_info;
 }
 
+datum __cdecl object_header_new(__int16 object_data_size)
+{
+	s_memory_pool* object_table = Memory::GetAddress<s_memory_pool*>(0x4E4610);
+
+	const datum object_datum = datum_new(get_object_data_array());
+	if (object_datum == -1)
+		return object_datum;
+	if (s_object_header* object_header = get_object_header(object_datum); 
+		memory_pool_block_allocate_handle(object_table, &object_header->object, object_data_size, 0, 0))
+	{
+		s_object_data_definition* object = (s_object_data_definition*)object_header->object;
+		object_header->object_data_size = object_data_size;
+		memset(object, 0, object_data_size);
+		return object_datum;
+	}
+	else
+	{
+		datum_delete(get_object_data_array(), DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
+		return -1;
+	}
+	return object_datum;
+}
+
 //typedef datum(__cdecl* object_new_t)(object_placement_data* placement_data);
 //object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-	typedef datum(__cdecl* datum_header_new_t)(__int16 object_size);
-	auto p_datum_header_new = Memory::GetAddress<datum_header_new_t>(0x130AF6);
-
 	typedef bool(__cdecl* sub_531B0E_t)(unsigned __int16 a1, size_t* a2, size_t* a3);
 	auto p_sub_531B0E = Memory::GetAddress<sub_531B0E_t>(0x131B0E);
 
@@ -457,11 +478,11 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		p_havok_memory_garbage_collect();
 	}
 
-	datum object_header_datum = p_datum_header_new(new_object_type_definition->datum_size);
+	datum object_header_datum = object_header_new(new_object_type_definition->datum_size);
 
 	if (object_header_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }	
 
-	s_object_header* object_header = get_objects_header(object_header_datum);
+	s_object_header* object_header = get_object_header(object_header_datum);
 	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_header_datum);
 
 	object_header->flags |= _object_header_being_deleted_bit;
@@ -858,13 +879,13 @@ void apply_biped_object_definition_patches()
 
 int object_get_count()
 {
-	s_data_iterator object_it(get_objects_header());
+	s_data_iterator object_it(get_object_data_array());
 	return object_it.get_data_count();
 }
 
 int object_count_from_iter()
 {
-	s_data_iterator object_it(get_objects_header());
+	s_data_iterator object_it(get_object_data_array());
 	int count = 0;
 	while (object_it.get_next_datum())
 	{

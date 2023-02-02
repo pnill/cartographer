@@ -2,6 +2,7 @@
 
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/DataArray/DataArray.h"
+#include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/Players/PlayerActions.h"
 #include <wtypes.h>
@@ -175,15 +176,14 @@ struct s_object_data_definition
 	byte byte_108;
 	byte byte_109;
 	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
-	PAD(8);
+	byte pad0[8];
 	__int16 node_buffer_size;
 	__int16 nodes_offset;
-	PAD(4);
+	byte pad1[4];
 	short field_11C;
 	WORD object_attachments_block_offset;
-	PAD(10);
+	byte pad2[10];
 	WORD object_animations_block_offset;
-	// PAD(32);
 };
 #pragma pack(pop)
 CHECK_STRUCT_OFFSET(s_object_data_definition, node_buffer_size, 0x114);
@@ -274,27 +274,27 @@ struct s_object_header {
 	e_object_type type; // 0x03
 	__int16 cluster_reference;  // 0x04
 	__int16 object_data_size;  //0x06
-	char* object; //0x08 -
+	void* object; //0x08 -
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
 
-static s_data_array* get_objects_header()
+static s_data_array* get_object_data_array()
 {
 	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
 };
 
 // Gets the header of the object, containing some details
-static s_object_header* get_objects_header(datum object_idx)
+static s_object_header* get_object_header(datum object_idx)
 {
-	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)]);
+	s_data_array* objects_header = get_object_data_array();
+	return (s_object_header*)(&objects_header->data[objects_header->single_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)]);
 }
 
 // Get the object fast, with no validation from datum index
 template<typename T = s_object_data_definition>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	return (T*)get_objects_header(object_idx)->object;
+	return (T*)get_object_header(object_idx)->object;
 }
 
 static real_matrix4x3* get_object_nodes(datum object_idx, int* out_node_count)

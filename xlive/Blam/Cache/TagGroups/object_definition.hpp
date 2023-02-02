@@ -1,8 +1,8 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam/Engine/Objects/Objects.h"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Engine/objects/objects.h"
+#include "Blam/Math/BlamMath.h"
 
 /*********************************************************************
 * name: object

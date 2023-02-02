@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 template<typename T = int>
 struct s_bitflags
@@ -27,20 +27,20 @@ struct s_bitflags
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array
 {
-	char name[0x20];				// 0x0
-	int datum_max_elements;			// 0x20
-	int datum_element_size;			// 0x24
+	char name[32];					// 0x0
+	int max_elements;				// 0x20
+	int single_element_size;		// 0x24
 	BYTE alignment_bit;				// 0x28
 	bool is_valid;					// 0x29
 	WORD flags;						// 0x2A
 	char data_signature[4];			// 0x2C
 	void **allocator;				// 0x30
-	int bit_index_size;				// 0x34
-	int next_unused_index;					// 0x38
+	int last_free_index;				// 0x34
+	int next_index;					// 0x38
 	int total_elements_used;		// 0x3C 
-	int field_40;					// 0x40
+	__int16 next_datum;				// 0x40
 	char* data;						// 0x44
-	s_bitflags<> active_bit_mask;		// 0x48
+	s_bitflags<> active_bit_mask;	// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -80,12 +80,12 @@ public:
 
 	T* get_data_at_datum_index(datum datum_index) const
 	{
-		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)]);
+		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->single_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)]);
 	};
 
 	T* get_current_datum()
 	{
-		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * m_current_absolute_index]);
+		return reinterpret_cast<T*>(&m_data_array->data[m_data_array->single_element_size * m_current_absolute_index]);
 	}
 
 	T* get_next_datum()
@@ -97,11 +97,11 @@ public:
 		{
 			result = nullptr;
 			m_last_datum_index = DATUM_INDEX_NONE;
-			m_current_absolute_index = m_data_array->datum_max_elements;
+			m_current_absolute_index = m_data_array->max_elements;
 		}
 		else
 		{
-			result = reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * index]);
+			result = reinterpret_cast<T*>(&m_data_array->data[m_data_array->single_element_size * index]);
 			m_current_absolute_index = index;
 			m_last_datum_index = DATUM_INDEX_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
 		}
@@ -113,12 +113,12 @@ public:
 		if (index < 0)
 			return -1;
 
-		if (index >= m_data_array->next_unused_index)
+		if (index >= m_data_array->next_index)
 			return -1;
 
 		while (!m_data_array->active_bit_mask.test_bit(index))
 		{
-			if (++index >= m_data_array->next_unused_index)
+			if (++index >= m_data_array->next_index)
 				return -1;
 		}
 		return index;
