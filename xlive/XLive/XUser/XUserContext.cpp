@@ -59,7 +59,7 @@ static const std::unordered_map <int, std::string> game_mode_list
 void update_player_count()
 {
 	s_network_session* session = nullptr;
-	if (NetworkSession::GetCurrentNetworkSession(&session))
+	if (NetworkSession::GetActiveNetworkSession(&session))
 	{
 		DiscordInterface::SetPlayerCountInfo(
 			session->membership[0].player_count, 

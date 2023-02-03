@@ -75,7 +75,7 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		ImGui::Separator();
 
 		s_network_session* session;
-		if (NetworkSession::GetCurrentNetworkSession(&session))
+		if (NetworkSession::GetActiveNetworkSession(&session))
 		{
 			ImGui::Text("Network protocol: %s", session->get_game_network_protocol());
 		}

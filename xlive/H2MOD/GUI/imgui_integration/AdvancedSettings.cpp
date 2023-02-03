@@ -670,7 +670,7 @@ namespace ImGuiHandler {
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
 						{
-							for (auto i = 0; i < NetworkSession::GetCurrentNetworkSession()->membership[0].peer_count; i++)
+							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
 								NetworkMessage::SendAntiCheat(i);
 							}

@@ -132,6 +132,8 @@ bool engine_basic_init()
 		flags_array[e_startup_flags::allow_d3d_ex_version] = 1;
 	}
 
+	flags_array[e_startup_flags::disable_voice_chat] = 1;
+
 	int arg_count;
 	wchar_t** cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
 	if (cmd_line_args && arg_count > 1) {
@@ -201,29 +203,18 @@ bool engine_basic_init()
 	// Update 1/13/2022:
 	// initializes some interface that's used to download the network config from the bungie's website
 	// but just a stub in release
-	void(__cdecl * network_configuration_initialize)() = (void(__cdecl*)())(Memory::GetAddress(0x001a9de6));
-	network_configuration_initialize();
+	auto p_network_configuration_initialize = Memory::GetAddress<void(__cdecl*)()>(0x001a9de6);
+	p_network_configuration_initialize();
 
 	if (!LOG_CHECK(rasterizer_initialize()))
 		return false;
 
-	// does some weird stuff with sound, might setup volume
 	fn_c000285fd();
 
 	input_initialize();
 	sound_initialize();
 
-	struct FakePBuffer {
-		HANDLE id;
-		DWORD dwSize;
-		DWORD magic;
-		LPBYTE pbData;
-	};
-	//extern LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer **pBuffer);
-	//extern DWORD WINAPI XLivePBufferSetByte(FakePBuffer * pBuffer, DWORD offset, BYTE value);
-	LONG(__stdcall * XLivePBufferAllocate)(DWORD size, FakePBuffer * *pBuffer) = (LONG(__stdcall*)(DWORD, FakePBuffer**))Memory::GetAddress(0xe886);
-	DWORD(__stdcall * XLivePBufferSetByte)(FakePBuffer * pBuffer, DWORD offset, BYTE value) = (DWORD(__stdcall*)(FakePBuffer*, DWORD, BYTE))Memory::GetAddress(0xe880);
-	FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x00479e78);
+	FakePBuffer** var_c00479e78 = Memory::GetAddress<FakePBuffer**>(0x479E78);
 	XLivePBufferAllocate(2, var_c00479e78);
 	XLivePBufferSetByte(*var_c00479e78, 0, 0);
 	XLivePBufferSetByte(*var_c00479e78, 1, 0);
@@ -258,66 +249,66 @@ BOOL __cdecl is_init_flag_set(e_startup_flags id)
 void real_math_initialize()
 {
 	typedef int(__cdecl* real_math_initialize_t)();
-	auto p_real_math_initialize_impl = Memory::GetAddress<real_math_initialize_t>(0x000340d7);
-	p_real_math_initialize_impl();
+	auto p_real_math_initialize = Memory::GetAddress<real_math_initialize_t>(0x000340d7);
+	p_real_math_initialize();
 }
 
 void async_initialize()
 {
 	typedef int(__cdecl* async_initialize_t)();
-	auto p_async_initialize_impl = Memory::GetAddress<async_initialize_t>(0x00032ce5);
-	p_async_initialize_impl();
+	auto p_async_initialize = Memory::GetAddress<async_initialize_t>(0x00032ce5);
+	p_async_initialize();
 }
 
 bool gfwl_gamestore_initialize()
 {
 	typedef char(__cdecl* init_gfwl_gamestore_t)();
-	auto p_init_gfwl_gamestore_impl = Memory::GetAddress<init_gfwl_gamestore_t>(0x00202f3e);
-	return p_init_gfwl_gamestore_impl();
+	auto p_init_gfwl_gamestore = Memory::GetAddress<init_gfwl_gamestore_t>(0x00202f3e);
+	return p_init_gfwl_gamestore();
 }
 
 // not sure if this is all it does
 HANDLE init_data_checksum_info()
 {
 	typedef HANDLE(__cdecl* init_data_checksum_info_t)();
-	auto p_init_data_checksum_info_impl = Memory::GetAddress<init_data_checksum_info_t>(0x000388d3);
-	return p_init_data_checksum_info_impl();
+	auto p_init_data_checksum_info = Memory::GetAddress<init_data_checksum_info_t>(0x000388d3);
+	return p_init_data_checksum_info();
 }
 
 // returns memory
 void* runtime_state_initialize()
 {
 	typedef void* (__cdecl* runtime_state_init_t)();
-	auto p_runtime_state_init_impl = Memory::GetAddress<runtime_state_init_t>(0x00037ed5);
-	return p_runtime_state_init_impl();
+	auto p_runtime_state_init = Memory::GetAddress<runtime_state_init_t>(0x00037ed5);
+	return p_runtime_state_init();
 }
 
 void game_preferences_initialize()
 {
 	typedef void(__cdecl* game_preferences_initialize_t)();
-	auto p_global_preferences_initialize_impl = Memory::GetAddress<game_preferences_initialize_t>(0x325FD);
-	p_global_preferences_initialize_impl();
+	auto p_global_preferences_initialize = Memory::GetAddress<game_preferences_initialize_t>(0x325FD);
+	p_global_preferences_initialize();
 }
 
 void font_initialize()
 {
 	typedef void(__cdecl* font_initialize_t)();
-	auto p_font_initialize_impl = Memory::GetAddress<font_initialize_t>(0x00031dff);
-	p_font_initialize_impl();
+	auto p_font_initialize = Memory::GetAddress<font_initialize_t>(0x00031dff);
+	p_font_initialize();
 }
 
 bool tag_files_open()
 {
 	typedef bool(__cdecl* tag_files_open_t)();
-	auto p_tag_files_open_impl = Memory::GetAddress<tag_files_open_t>(0x30D58);
-	return p_tag_files_open_impl();
+	auto p_tag_files_open = Memory::GetAddress<tag_files_open_t>(0x30D58);
+	return p_tag_files_open();
 }
 
 void timing_initialize(int a1)
 {
-	typedef DWORD(__cdecl* init_timing_t)(int a1);
-	auto p_init_timing_impl = Memory::GetAddress<init_timing_t>(0x37E39);
-	p_init_timing_impl(a1);
+	typedef void(__cdecl* init_timing_t)(int a1);
+	auto p_init_timing = Memory::GetAddress<init_timing_t>(0x37E39);
+	p_init_timing(a1);
 }
 
 void game_state_initialize()

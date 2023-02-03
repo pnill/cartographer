@@ -34,10 +34,9 @@ namespace CustomVariantSettings
 	}
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
 	{
-		double gravity;
+		double gravity, gamespeed, ForcedFOV;
 		stream->data_decode_bits("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
 		data->gravity = gravity;
-		double gamespeed;
 		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
 		data->gameSpeed = gamespeed;
 		
@@ -45,7 +44,6 @@ namespace CustomVariantSettings
 		data->explosionPhysics = stream->data_decode_bool("Explosion Physics");
 		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("Hill Rotation", 8);
 		data->infiniteGrenades = stream->data_decode_bool("Infinite Grenades");
-		double ForcedFOV;
 		stream->data_decode_bits("Forced FOV", &ForcedFOV, sizeof(ForcedFOV) * CHAR_BIT);
 		data->forcedFOV = ForcedFOV;
 		return stream->overflow() == false;
@@ -58,7 +56,7 @@ namespace CustomVariantSettings
 
 	void SendCustomVariantSettings(int peerIndex)
 	{
-		s_network_session* session = NetworkSession::GetCurrentNetworkSession();
+		s_network_session* session = NetworkSession::GetActiveNetworkSession();
 		if (NetworkSession::LocalPeerIsSessionHost())
 		{
 			//TODO: Find and map out struct with current variant information.
@@ -70,8 +68,8 @@ namespace CustomVariantSettings
 				currentVariantSettings = customVariantSetting->second;
 				if (currentVariantSettings != defaultCustomVariantSettings) {
 					s_network_observer* observer = session->p_network_observer;
-					s_peer_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIndex);
-					if (peerIndex != -1 && !NetworkSession::PeerIndexLocal(peerIndex))
+					s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIndex);
+					if (peerIndex != -1 && !NetworkSession::IsPeerIndexLocal(peerIndex))
 					{
 						if (observer_channel->field_1)
 							observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
@@ -104,8 +102,8 @@ namespace CustomVariantSettings
 		//
 		//Anything to be done on host and client goes here.
 		//
-		s_physics_constants::get()->gravity = newVariantSettings->gravity * s_physics_constants::get_default_gravity();
 		time_globals::get()->game_speed = newVariantSettings->gameSpeed;
+		s_physics_constants::get()->gravity = newVariantSettings->gravity * s_physics_constants::get_default_gravity();
 		//mov [ecx+6], ax
 		static BYTE InfiniteAmmoMagazineASM[] = { 0x66, 0x89, 0x41, 0x06 };
 		//movss [edi+00000184],xmm0
@@ -196,14 +194,14 @@ namespace CustomVariantSettings
 		//
 		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
 		{
-			if (!NetworkSession::PeerIndexLocal(i))
+			if (!NetworkSession::IsPeerIndexLocal(i))
 				SendCustomVariantSettings(i);
 		}
 	}
 
 	typedef int(__cdecl get_next_hill_index_t)(int previousHill);
 	get_next_hill_index_t* p_get_next_hill_index;
-	signed int __cdecl get_next_hill_index(int previousHill)
+	int __cdecl get_next_hill_index(int previousHill)
 	{
 		static int currentPredefinedIndex = 0;
 		int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
@@ -211,27 +209,27 @@ namespace CustomVariantSettings
 		//Return -1 to tell the engine there is no koth hills on the map.
 		if (hillCount <= 0)
 			return -1;
-		switch(currentVariantSettings.hillRotation)
+		switch (currentVariantSettings.hillRotation)
 		{
-			case _sequential:
-				if (previousHill + 1 >= hillCount)
-					return 0;
-				return previousHill + 1;
-			case _reverse:
-				if (previousHill - 1 <= 0)
-					return hillCount;
-				return previousHill - 1;
-			case _predefined:
-				if (currentPredefinedIndex == 15)
-					currentPredefinedIndex = 0;
-				else if (currentVariantSettings.predefinedHillSet[currentPredefinedIndex + 1] == 0)
-					currentPredefinedIndex = 0;
-				else
-					++currentPredefinedIndex;
-				return currentVariantSettings.predefinedHillSet[currentPredefinedIndex] - 1;
-			default:
-			case _random:
-				return p_get_next_hill_index(previousHill);
+		case _sequential:
+			if (previousHill + 1 >= hillCount)
+				return 0;
+			return previousHill + 1;
+		case _reverse:
+			if (previousHill - 1 <= 0)
+				return hillCount;
+			return previousHill - 1;
+		case _predefined:
+			if (currentPredefinedIndex == 15)
+				currentPredefinedIndex = 0;
+			else if (currentVariantSettings.predefinedHillSet[currentPredefinedIndex + 1] == 0)
+				currentPredefinedIndex = 0;
+			else
+				++currentPredefinedIndex;
+			return currentVariantSettings.predefinedHillSet[currentPredefinedIndex] - 1;
+		default:
+		case _random:
+			return p_get_next_hill_index(previousHill);
 		}
 		//Just in case.
 		return -1;
@@ -239,9 +237,9 @@ namespace CustomVariantSettings
 
 	void ApplyHooks()
 	{
-		p_get_next_hill_index = Memory::GetAddress<get_next_hill_index_t*>(0x10DF1E, 0xDA4CE);
 		PatchCall(Memory::GetAddress(0x10FE1F, 0xDC3CF), get_next_hill_index);
 		PatchCall(Memory::GetAddress(0x10FE55, 0xDC405), get_next_hill_index);
+		p_get_next_hill_index = Memory::GetAddress<get_next_hill_index_t*>(0x10DF1E, 0xDA4CE);
 	}
 
 	void Initialize()

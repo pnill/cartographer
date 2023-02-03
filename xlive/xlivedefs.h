@@ -608,3 +608,14 @@ typedef struct _STRING_VERIFY_RESPONSE {
 #pragma pack( pop )
 
 BOOL WINAPI XCloseHandle(HANDLE hObject);
+
+// === replacement ===
+struct FakePBuffer {
+	HANDLE id;
+	DWORD dwSize;
+	DWORD magic;
+	LPBYTE pbData;
+};
+
+LONG WINAPI XLivePBufferAllocate(DWORD size, FakePBuffer** pBuffer);
+DWORD WINAPI XLivePBufferSetByte(FakePBuffer* pBuffer, DWORD offset, BYTE value);

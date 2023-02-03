@@ -12,30 +12,35 @@ enum e_map_status;
 enum e_network_session_state;
 
 struct s_network_session;
-struct s_player_information;
-struct s_peer_observer_channel;
+struct s_session_membership;
+struct s_membership_player;
+struct s_membership_peer;
+struct s_session_observer_channel;
+
+#define NETWORK_SESSION_PEERS_MAX (16 + 1)
 
 namespace NetworkSession
 {
 	// network session getters and misc
 	s_network_session* GetNetworkSessions();
-	s_network_session* GetCurrentNetworkSession();
-	bool GetCurrentNetworkSession(s_network_session** outSession);
+	s_network_session* GetActiveNetworkSession();
+	bool GetActiveNetworkSession(s_network_session** outSession);
 	e_network_session_state GetLocalSessionState();
 	int GetPeerIndexFromNetworkAddress(network_address* address);
 	bool GetMapFileLocation(wchar_t* buffer, size_t size);
 
 	bool LocalPeerIsSessionHost();
+	bool LocalPeerIsSessionLeader();
 	bool LocalPeerIsEstablished();
 
 	// peer functions
 	int GetPeerCount();
 	int GetLocalPeerIndex();
-	bool PeerIndexLocal(int peerIdx);
+	bool IsPeerIndexLocal(int peerIdx);
 	IN_ADDR GetLocalNetworkAddress();
 	void KickPeer(int peerIdx);
 	void EndGame();
-	s_peer_observer_channel* GetPeerObserverChannel(int peerIdx);
+	s_session_observer_channel* GetPeerObserverChannel(int peerIdx);
 
 	// peer-player functions
 	int GetPeerIndex(int playerIdx);
@@ -50,16 +55,15 @@ namespace NetworkSession
 
 	int GetPlayerCount();
 	const wchar_t* GetPlayerName(int playerIdx);
-	int GetPlayerIdByName(const wchar_t* playerName);
 	unsigned long long GetPlayerId(int playerIdx);
 
 	int GetPlayerTeam(int playerIdx);
 	int GetPeerIndexFromId(unsigned long long xuid);
-	s_player_information* GetPlayerInformation(int playerIdx);
+	s_membership_player* GetPlayerInformation(int playerIdx);
 
 	wchar_t* GetGameVariantName();
 
-	bool VariantIsTeamPlay();
+	bool IsVariantTeamPlay();
 	void LeaveSession();
 }
 
@@ -89,70 +93,30 @@ enum e_map_status : int
 };
 
 #pragma pack(push, 1)
-struct s_peer_information
-{
-	XNADDR address;
-	BYTE gap_24[4];
-	wchar_t name[16];
-	wchar_t peer_session_name[32];
-	e_map_status map_status;
-	unsigned int map_progress_percentage;
-	char field_70;
-	BYTE gap_71[3];
-	char field_74;
-	BYTE gap_75[3];
-	unsigned int nat_type;
-	unsigned int connectivity_mask;
-	unsigned int latency_min;
-	unsigned int latency_est;
-	unsigned int latency_max;
-	BYTE gap_9C[68];
-	DWORD field_F0;
-	DWORD field_F4;
-	DWORD gets_incremented_unk;
-	signed int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
-};
-CHECK_STRUCT_SIZE(s_peer_information, 268);
-
-struct s_peer_observer_channel
+struct s_session_observer_channel
 {
 	bool field_0;
 	bool field_1;
 	char pad[2];
-	signed int observer_index;
+	int observer_index;
 	int membership_update_number;
 	int parameters_update_number;
 	int virtual_couch_update_number;
 	int vote_update_number;
 	int field_18;
 };
+CHECK_STRUCT_SIZE(s_session_observer_channel, 28);
 
-struct s_player_information
-{
-	unsigned long long identifier; // -0xA
-	int peer_index; // -0x8
-	int peer_user_index; // -0x4
-	WORD player_flags; // 0x0
-	bool properties_valid;
-	char pad[1];
-	unsigned int controller_index;
-	s_player::s_player_properties properties;
-	s_player::s_player_properties player_properties_1;
-	unsigned int player_voice;
-	unsigned int player_text_chat;
-};
-CHECK_STRUCT_SIZE(s_player_information, 296);
-
-struct s_virtual_couch
+struct s_session_virtual_couch
 {
 	DWORD incremental_update_number;
 	bool exists;
 	XSESSION_INFO xsession_info;
 	char pad[3];
 	DWORD xuid_count;
-	unsigned long long player_ids[16];
+	unsigned long long player_ids[ENGINE_MAX_PLAYERS];
 };
-CHECK_STRUCT_SIZE(s_virtual_couch, 200);
+CHECK_STRUCT_SIZE(s_session_virtual_couch, 200);
 
 struct s_session_parameters
 {
@@ -165,7 +129,7 @@ struct s_session_parameters
 	char pad_1[3];
 	DWORD party_privacy;
 	int max_peers;
-	signed int max_party_players;
+	int max_party_players;
 	int gap_4C84;
 	int field_4C88;
 	int field_4C8C;
@@ -203,20 +167,61 @@ struct s_session_vote
 };
 CHECK_STRUCT_SIZE(s_session_vote, 160);
 
-struct s_membership_information
+struct s_membership_peer
+{
+	XNADDR secure_address;
+	BYTE gap_24[4];
+	wchar_t name[16];
+	wchar_t peer_session_name[32];
+	e_map_status map_status;
+	unsigned int map_progress_percentage;
+	char field_70;
+	BYTE gap_71[3];
+	char field_74;
+	BYTE gap_75[3];
+	unsigned int nat_type;
+	unsigned int connectivity_mask;
+	unsigned int latency_min;
+	unsigned int latency_est;
+	unsigned int latency_max;
+	BYTE gap_9C[68];
+	DWORD field_F0;
+	DWORD field_F4;
+	DWORD update_number;
+	int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
+};
+CHECK_STRUCT_SIZE(s_membership_peer, 268);
+
+struct s_membership_player
+{
+	unsigned long long identifier; // -0xA
+	int peer_index; // -0x8
+	int peer_user_index; // -0x4
+	WORD player_flags; // 0x0
+	bool properties_valid;
+	char pad[1];
+	unsigned int controller_index;
+	s_player::s_player_properties properties[2];
+	unsigned int player_voice;
+	unsigned int player_text_chat;
+};
+CHECK_STRUCT_OFFSET(s_membership_player, controller_index, 20);
+CHECK_STRUCT_SIZE(s_membership_player, 296);
+
+struct s_session_membership
 {
 	DWORD update_number; // 0x70
-	int session_leader_index; // 0x74
+	int session_leader_peer_index; // 0x74
 	unsigned long long dedicated_server_xuid; // 0x78
 	int xbox_session_leader_peer_index; // 0x80
 	int peer_count; // 0x84
-	s_peer_information peer_data[17]; // 0x88
+	s_membership_peer peers[NETWORK_SESSION_PEERS_MAX]; // 0x88
 	int player_count; // 0x1254
 	DWORD players_active_mask; // 0x1258
-	s_player_information player_data[ENGINE_MAX_PLAYERS]; // 0x125C
+	s_membership_player players[ENGINE_MAX_PLAYERS]; // 0x125C
 	DWORD unk;
 };
-CHECK_STRUCT_SIZE(s_membership_information, 9328);
+CHECK_STRUCT_SIZE(s_session_membership, 9328);
 
 struct s_network_session
 {
@@ -234,17 +239,17 @@ struct s_network_session
 	XNKEY xnkey;
 	char pad[3];
 	int xnkey_index;
-	signed int field_60;
+	int field_60;
 	int session_host_peer_index;
 	int elected_host_peer_index;
 	DWORD field_6C;
-	s_membership_information membership[2]; // 0x70
-	s_virtual_couch virtual_couch[2];
+	s_session_membership membership[2]; // 0x70
+	s_session_virtual_couch virtual_couch[2];
 	s_session_vote voting_data[2]; // unused
 	BYTE gap_4B84[64];
 	s_session_parameters parameters[2];
 	int local_peer_index;
-	s_peer_observer_channel peer_observer_channels[17];
+	s_session_observer_channel observer_channels[NETWORK_SESSION_PEERS_MAX];
 	e_network_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;
@@ -283,15 +288,15 @@ struct s_network_session
 	DWORD field_7930;
 	DWORD field_7934;
 	DWORD field_7938;
-	signed int field_793C;
-	signed int field_7940;
-	signed int field_7944;
-	signed int field_7948;
-	signed int field_794C;
-	signed int field_7950;
-	signed int field_7954;
-	signed int field_7958;
-	signed int field_795C;
+	int field_793C;
+	int field_7940;
+	int field_7944;
+	int field_7948;
+	int field_794C;
+	int field_7950;
+	int field_7954;
+	int field_7958;
+	int field_795C;
 	DWORD field_7960;
 	DWORD field_7964;
 	DWORD field_7968;
@@ -317,5 +322,6 @@ struct s_network_session
 	}
 };
 CHECK_STRUCT_SIZE(s_network_session, 31624);
-CHECK_STRUCT_OFFSET(s_network_session, parameters[0].max_party_players, 0x4C80);
+CHECK_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
+CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)

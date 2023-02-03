@@ -77,20 +77,21 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
-		if (!DATUM_IS_NONE(damage_data->creator_datum) && damage_data->field_10 != -1)
+		if (!DATUM_IS_NONE(damage_data->creator_datum) 
+			&& damage_data->field_10 != -1)
 		{
 			LOG_TRACE_GAME(
-				"{} {} {} {} {} {} {} {}",
+				"{} {} {:X} {:X} {:X} {:X} {:X} {:X} {:X} {:X}",
 				__FUNCTION__,
 				damage_data->flags,
-				IntToString<int>(damage_data->damage_tag_index, std::hex),
-				IntToString<int>(damage_data->creator_datum, std::hex),
-				IntToString<int>(damage_data->field_10, std::hex), //TODO reverse what field_10 is
-				IntToString<int>(damage_data->field_14, std::hex),
-				IntToString<int>(damage_data->field_18, std::hex),
-				IntToString<int>(damage_data->field_1C, std::hex),
-				IntToString<int>(damage_data->field_24, std::hex),
-				IntToString<int>(damage_data->field_28, std::hex)
+				damage_data->damage_tag_index,
+				damage_data->creator_datum,
+				damage_data->field_10, //TODO reverse what field_10 is
+				damage_data->field_14,
+				damage_data->field_18,
+				damage_data->field_1C,
+				damage_data->field_24,
+				damage_data->field_28
 			);
 			p_object_cause_damage(damage_data, damaged_object_indexes, a4, a5, a6, a7);
 		}
@@ -144,11 +145,11 @@ int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5,
 	return p_show_error_screen(a1, widget_type, a3, a4, a5, a6);
 }
 
-typedef signed int(__cdecl* wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
+typedef int(__cdecl* wcsncpy_s_hook_t)(int a1, unsigned int a2, wchar_t* a3, int a4);
 wcsncpy_s_hook_t p_wcsncpy_s_hook;
 
 //lets you follow the call path of any string that is displayed (in a debugger)
-signed int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
+int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
@@ -393,10 +394,10 @@ void __cdecl OnPlayerDeath(datum playerIdx)
 }
 
 /* This is technically closer to object death than player-death as it impacts anything with health at all. */
-typedef char(__cdecl* object_deplete_body_internal_t)(datum unit_datum_index, int a2, bool a3, bool a4);
+typedef void(__cdecl* object_deplete_body_internal_t)(datum unit_datum_index, int a2, bool a3, bool a4);
 object_deplete_body_internal_t p_object_deplete_body_internal;
 
-char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
+void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 {
 	//LOG_TRACE_GAME("OnPlayerDeath(unit_datum_index: %08X, a2: %08X, a3: %08X, a4: %08X)", unit_datum_index,a2,a3,a4);
 
@@ -405,17 +406,15 @@ char __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_before, unit_datum_index, *(datum*)(a2));
 	CustomVariantHandler::OnObjectDamage(ExecTime::_preEventExec, unit_datum_index, a2, a3, a4);
 
-	bool ret = p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
+	p_object_deplete_body_internal(unit_datum_index, a2, a3, a4);
 
 	CustomVariantHandler::OnObjectDamage(ExecTime::_postEventExec, unit_datum_index, a2, a3, a4);
 	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
-
-	return ret;
 }
 
 update_player_score_t p_update_player_score;
 
-void __fastcall OnPlayerScore(void* thisptr, BYTE _edx, datum playerIdx, int a3, int a4, int a5, char a6)
+void __fastcall OnPlayerScore(void* thisptr, DWORD _edx, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
@@ -640,7 +639,7 @@ change_team_t p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
-	s_network_session* session = NetworkSession::GetCurrentNetworkSession();
+	s_network_session* session = NetworkSession::GetActiveNetworkSession();
 
 	// prevent team switch in the pregame lobby, when the game already started
 	if (session) {
@@ -753,8 +752,8 @@ float get_device_acceleration_scale(datum device_datum)
 	return acceleration_scale;
 }
 
-typedef int(__cdecl *tdevice_touch)(datum device_datum, datum unit_datum);
-tdevice_touch pdevice_touch;
+typedef int(__cdecl *device_touch_t)(datum device_datum, datum unit_datum);
+device_touch_t pdevice_touch;
 
 bool device_active = true;
 // This happens whenever a player activates a device control.
@@ -846,7 +845,7 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 
 typedef int(__cdecl* get_next_hill_index_t)(int previousHill);
 get_next_hill_index_t p_get_next_hill_index;
-signed int __cdecl get_next_hill_index(int previousHill)
+int __cdecl get_next_hill_index(int previousHill)
 {
 	int hillCount = *Memory::GetAddress<int*>(0x4dd0a8, 0x5008e8);
 	if (previousHill + 1 >= hillCount) 
@@ -860,13 +859,13 @@ signed int __cdecl get_next_hill_index(int previousHill)
 
 void H2MOD::ApplyFirefightHooks()
 {
-	pdevice_touch = (tdevice_touch)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
+	pdevice_touch = (device_touch_t)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
-typedef void(__cdecl set_screen_bounds_t)(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
+typedef void(__cdecl set_screen_bounds_t)(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
 set_screen_bounds_t* p_set_screen_bounds;
 
-void __cdecl set_screen_bounds(signed int a1, signed int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
+void __cdecl set_screen_bounds(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
 {
 	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
 }
@@ -885,10 +884,11 @@ int get_active_count_from_bitflags(short teams_bit_flags)
 bool __cdecl should_start_pregame_countdown_hook()
 {
 	// dedicated server only
-	auto p_should_start_pregame_countdown_hook = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
+	auto p_should_start_pregame_countdown = Memory::GetAddress<decltype(&should_start_pregame_countdown_hook)>(0x0, 0xBC2A);
 
 	// if the game already thinks the game timer doesn't need to start, return false and skip any processing
-	if (!p_should_start_pregame_countdown_hook())
+	if (!p_should_start_pregame_countdown()
+		|| !NetworkSession::LocalPeerIsSessionLeader())
 		return false; 
 
 	bool minimumPlayersConditionMet = true;
@@ -910,11 +910,11 @@ bool __cdecl should_start_pregame_countdown_hook()
 		return false;
 
 	if (H2Config_even_shuffle_teams
-		&& NetworkSession::VariantIsTeamPlay())
+		&& NetworkSession::IsVariantTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
 		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetCurrentNetworkSession());
+		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
 		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_object_team_end);
 
@@ -1039,8 +1039,6 @@ void H2MOD::ApplyHooks() {
 
 	ApplyFirefightHooks();
 
-	ProjectileFix::ApplyPatches();
-
 	//Guardian Patch
 	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
@@ -1160,6 +1158,7 @@ void H2MOD::Initialize()
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();
+	ProjectileFix::ApplyPatches();
 	H2X::ApplyPatches();
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();

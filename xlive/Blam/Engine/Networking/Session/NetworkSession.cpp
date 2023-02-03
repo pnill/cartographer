@@ -5,7 +5,7 @@
 
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
-	return (NetworkSession::GetCurrentNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
+	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
 }
 
 std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
@@ -13,7 +13,7 @@ std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
 	std::vector<unsigned long long> activePlayerIdList;
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
-		for (auto playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
+		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIdx))
 			{
@@ -46,12 +46,12 @@ s_network_session* NetworkSession::GetNetworkSessions()
 	return *Memory::GetAddress<s_network_session**>(0x51C474, 0x520B94);
 }
 
-s_network_session* NetworkSession::GetCurrentNetworkSession()
+s_network_session* NetworkSession::GetActiveNetworkSession()
 {
 	return *Memory::GetAddress<s_network_session**>(0x420FE8, 0x3C40D0);
 }
 
-bool NetworkSession::GetCurrentNetworkSession(s_network_session** outSession)
+bool NetworkSession::GetActiveNetworkSession(s_network_session** outSession)
 {
 	typedef bool(__cdecl* get_lobby_globals_t)(s_network_session**);
 	return Memory::GetAddress<get_lobby_globals_t>(0x1AD736, 0x1A66B3)(outSession);
@@ -59,12 +59,12 @@ bool NetworkSession::GetCurrentNetworkSession(s_network_session** outSession)
 
 e_network_session_state NetworkSession::GetLocalSessionState()
 {
-	return GetCurrentNetworkSession()->local_session_state;
+	return GetActiveNetworkSession()->local_session_state;
 }
 
 bool NetworkSession::LocalPeerIsSessionHost()
 {
-	e_network_session_state state = GetCurrentNetworkSession()->local_session_state;
+	e_network_session_state state = GetActiveNetworkSession()->local_session_state;
 
 	return state == _network_session_state_host_established
 		|| state == _network_session_state_host_disband
@@ -72,9 +72,14 @@ bool NetworkSession::LocalPeerIsSessionHost()
 		|| state == _network_session_state_host_reestablish;
 }
 
+bool NetworkSession::LocalPeerIsSessionLeader()
+{
+	return GetActiveNetworkSession()->membership[0].session_leader_peer_index == GetLocalPeerIndex();
+}
+
 bool NetworkSession::LocalPeerIsEstablished()
 {
-	e_network_session_state state = GetCurrentNetworkSession()->local_session_state;
+	e_network_session_state state = GetActiveNetworkSession()->local_session_state;
 
 	switch (state)
 	{
@@ -103,7 +108,7 @@ int NetworkSession::GetPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef int(__thiscall* get_peer_index_from_network_address_t)(s_network_session* session, network_address* address);
 	auto p_get_peer_index_from_network_address = Memory::GetAddress<get_peer_index_from_network_address_t>(0x1C71DF, 0x19E9CF);
-	return p_get_peer_index_from_network_address(GetCurrentNetworkSession(), address);
+	return p_get_peer_index_from_network_address(GetActiveNetworkSession(), address);
 }
 
 bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
@@ -111,27 +116,27 @@ bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
 	// host-only
 	typedef bool(__thiscall* get_map_file_location_t)(s_network_session* session, wchar_t* buffer, size_t size);
 	auto p_get_map_file_location = Memory::GetAddress<get_map_file_location_t>(0x1C5678, 0x19CD4A);
-	return p_get_map_file_location(GetCurrentNetworkSession(), buffer, size);
+	return p_get_map_file_location(GetActiveNetworkSession(), buffer, size);
 }
 
 int NetworkSession::GetPeerCount()
 {
-	return GetCurrentNetworkSession()->membership[0].peer_count;
+	return GetActiveNetworkSession()->membership[0].peer_count;
 }
 
 int NetworkSession::GetLocalPeerIndex()
 {
-	return GetCurrentNetworkSession()->local_peer_index;
+	return GetActiveNetworkSession()->local_peer_index;
 }
 
-bool NetworkSession::PeerIndexLocal(int peerIdx)
+bool NetworkSession::IsPeerIndexLocal(int peerIdx)
 {
 	return GetLocalPeerIndex() == peerIdx;
 }
 
 IN_ADDR NetworkSession::GetLocalNetworkAddress()
 {
-	return GetCurrentNetworkSession()->membership[0].peer_data[GetLocalPeerIndex()].address.inaOnline;
+	return GetActiveNetworkSession()->membership[0].peers[GetLocalPeerIndex()].secure_address.inaOnline;
 }
 
 int NetworkSession::GetPeerIndex(int playerIdx)
@@ -141,30 +146,17 @@ int NetworkSession::GetPeerIndex(int playerIdx)
 
 int NetworkSession::GetPlayerCount()
 {
-	return GetCurrentNetworkSession()->membership[0].player_count;
+	return GetActiveNetworkSession()->membership[0].player_count;
 }
 
-s_player_information* NetworkSession::GetPlayerInformation(int playerIdx)
+s_membership_player* NetworkSession::GetPlayerInformation(int playerIdx)
 {
-	return &GetCurrentNetworkSession()->membership[0].player_data[playerIdx];
-}
-
-int NetworkSession::GetPlayerIdByName(const wchar_t* name)
-{
-	if (GetPlayerCount() > 0)
-	{
-		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
-		{
-			if (PlayerIsActive(playerIdx) && wcscmp(GetPlayerName(playerIdx), name) == 0)
-				return playerIdx;
-		}
-	}
-	return NONE;
+	return &GetActiveNetworkSession()->membership[0].players[playerIdx];
 }
 
 const wchar_t* NetworkSession::GetPlayerName(int playerIdx)
 {
-	return GetPlayerInformation(playerIdx)->properties.player_name;
+	return GetPlayerInformation(playerIdx)->properties[0].player_name;
 }
 
 unsigned long long NetworkSession::GetPlayerId(int playerIdx)
@@ -174,7 +166,7 @@ unsigned long long NetworkSession::GetPlayerId(int playerIdx)
 
 int NetworkSession::GetPlayerTeam(int playerIdx)
 {
-	return GetPlayerInformation(playerIdx)->properties.player_team;
+	return GetPlayerInformation(playerIdx)->properties[0].player_team;
 }
 
 int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
@@ -198,7 +190,7 @@ void NetworkSession::KickPeer(int peerIdx)
 	if (peerIdx < GetPeerCount())
 	{
 		LOG_TRACE_GAME("{} - about to kick peer index = {}", __FUNCTION__, peerIdx);
-		p_game_session_boot(NetworkSession::GetCurrentNetworkSession(), peerIdx, true);
+		p_game_session_boot(NetworkSession::GetActiveNetworkSession(), peerIdx, true);
 	}
 }
 
@@ -209,19 +201,19 @@ void NetworkSession::EndGame()
 	p_end_game();
 }
 
-s_peer_observer_channel* NetworkSession::GetPeerObserverChannel(int peerIdx)
+s_session_observer_channel* NetworkSession::GetPeerObserverChannel(int peerIdx)
 {
-	return &GetCurrentNetworkSession()->peer_observer_channels[peerIdx];
+	return &GetActiveNetworkSession()->observer_channels[peerIdx];
 }
 
 wchar_t* NetworkSession::GetGameVariantName()
 {
-	return GetCurrentNetworkSession()->parameters[0].game_variant.variant_name;
+	return GetActiveNetworkSession()->parameters[0].game_variant.variant_name;
 }
 
-bool NetworkSession::VariantIsTeamPlay()
+bool NetworkSession::IsVariantTeamPlay()
 {
-	return GetCurrentNetworkSession()->parameters[0].game_variant.is_team_play();
+	return GetActiveNetworkSession()->parameters[0].game_variant.is_team_play();
 }
 
 void NetworkSession::LeaveSession()

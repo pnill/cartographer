@@ -193,29 +193,6 @@ void ServerConsole::SendCommand(wchar_t** command, int split_commands_size, char
 		LogToDedicatedServerConsole(L"\r\n");
 }
 
-
-void ServerConsole::SendCommand2(int argCount, wchar_t* command, wchar_t* argument, ...)
-{
-	typedef int(__cdecl* ProcessCommand_t)(wchar_t** commandArray, int argumentCount, char a3);
-	auto p_process_command = Memory::GetAddress<ProcessCommand_t>(0, 0x1CCFC);
-
-	std::vector<wchar_t*> commandVector;
-	int size = 0;
-	commandVector.push_back(command);
-	va_list arguments;
-	va_start(arguments, argument);
-	while (argument)
-	{
-		commandVector.push_back(argument);
-		size++;
-		if (size == argCount) break;
-		argument = va_arg(arguments, wchar_t*);
-	}
-
-	size++;
-	SendCommand(commandVector.data(), size, 1);
-}
-
 void ServerConsole::AddVip(std::wstring gamerTag)
 {
 	p_kablam_vip_add(gamerTag.c_str());

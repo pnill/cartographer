@@ -87,4 +87,4 @@ private:
 
 };
 
-extern MapManager* mapManager;
+extern std::unique_ptr<MapManager> mapManager;

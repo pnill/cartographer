@@ -194,32 +194,32 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_win32.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_demo.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -230,6 +230,14 @@
     <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="3rdparty\imgui\imconfig.h" />
+    <ClInclude Include="3rdparty\imgui\imgui.h" />
+    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
@@ -401,14 +409,6 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
     <ClInclude Include="3rdparty\discord\discord_register.h" />
     <ClInclude Include="3rdparty\discord\discord_rpc.h" />
-    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
-    <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="3rdparty\imgui\imconfig.h" />
-    <ClInclude Include="3rdparty\imgui\imgui.h" />
-    <ClInclude Include="3rdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h" />

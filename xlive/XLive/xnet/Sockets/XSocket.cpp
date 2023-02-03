@@ -393,8 +393,11 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		&& xnIp->GetConnectStatus() != XNET_CONNECT_STATUS_LOST)
 	{
 		sockaddr_in sendToAddr;
+		ZeroMemory(&sendToAddr, sizeof(sendToAddr));
+
 		sendToAddr.sin_family = AF_INET;
-		sendToAddr.sin_addr.s_addr = xnIp->GetOnlineIpAddr().s_addr;
+		sendToAddr.sin_addr = xnIp->GetOnlineIpAddr();
+		sendToAddr.sin_port = inTo->sin_port;
 
 		// check if the online ip address is the same as the local one
 		// and if the online ip address of the connection is 0, fall back to LAN address
@@ -402,7 +405,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 		if (xnIp->GetOnlineIpAddr().s_addr == gXnIpMgr.GetLocalUserXn()->GetOnlineIpAddr().s_addr
 			|| xnIp->GetOnlineIpAddr().s_addr == 0)
 		{
-			sendToAddr.sin_addr.s_addr = xnIp->GetLanIpAddr().s_addr;
+			sendToAddr.sin_addr = xnIp->GetLanIpAddr();
 		}
 
 		switch (ntohs(inTo->sin_port))
