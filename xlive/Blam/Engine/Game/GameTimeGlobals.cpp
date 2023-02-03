@@ -38,6 +38,11 @@ int time_globals::seconds_to_ticks_round(float s)
 	return blam_ticks_real_to_integer((float)get()->ticks_per_second * s);
 }
 
+float time_globals::ticks_to_seconds(int ticks)
+{
+	return get()->seconds_per_tick * ticks;
+}
+
 int time_globals::get_ticks_difference()
 {
 	return (get()->ticks_per_second / 30);
