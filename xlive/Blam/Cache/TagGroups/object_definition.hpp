@@ -47,12 +47,48 @@ struct s_object_group_definition :TagGroup<'obje'>
 	e_lightmap_shadow_mode lightmap_shadow_mode;//0x18
 	enum class e_sweetener_size : __int8
 	{
-		small = 0,
+		_small = 0,
 		medium = 1,
 		large = 2,
 	};
 	e_sweetener_size sweetener_size;//0x1A
-	PAD(0x5);//0x1B
+	byte unk1B;
+	enum class e_runtime_flags : __int32
+	{
+		runtime_change_colors_allowed = FLAG(0),
+		bit_1 = FLAG(1),
+		bit_2 = FLAG(2),
+		bit_3 = FLAG(3),
+		bit_4 = FLAG(4),
+		bit_5 = FLAG(5),
+		bit_6 = FLAG(6),
+		bit_7 = FLAG(7),
+		bit_8 = FLAG(8),
+		bit_9 = FLAG(9),
+		bit_10 = FLAG(10),
+		bit_11 = FLAG(11),
+		bit_12 = FLAG(12),
+		bit_13 = FLAG(13),
+		bit_14 = FLAG(14),
+		bit_15 = FLAG(15),
+		bit_16 = FLAG(16),
+		bit_17 = FLAG(17),
+		bit_18 = FLAG(18),
+		bit_19 = FLAG(19),
+		bit_20 = FLAG(20),
+		bit_21 = FLAG(21),
+		bit_22 = FLAG(22),
+		bit_23 = FLAG(23),
+		bit_24 = FLAG(24),
+		bit_25 = FLAG(25),
+		bit_26 = FLAG(26),
+		bit_27 = FLAG(27),
+		bit_28 = FLAG(28),
+		bit_29 = FLAG(29),
+		bit_30 = FLAG(30),
+		bit_31 = FLAG(31),
+	};
+	e_runtime_flags runtime_flags;
 	float dynamic_light_sphere_radius;//0x20
 	real_point3d dynamic_light_sphere_offset;//0x24
 	string_id default_model_variant;//0x30
@@ -71,12 +107,12 @@ struct s_object_group_definition :TagGroup<'obje'>
 		};
 		e_ai_flags ai_flags;//0x0
 		string_id ai_type_name;//0x4
-		PAD(0x4);//0x8
+		DWORD unk8;
 		enum class e_ai_size : __int16
 		{
 			default = 0,
 			tiny = 1,
-			small = 2,
+			_small = 2,
 			medium = 3,
 			large = 4,
 			huge = 5,

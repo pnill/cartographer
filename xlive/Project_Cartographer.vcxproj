@@ -563,6 +563,7 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
+    <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />

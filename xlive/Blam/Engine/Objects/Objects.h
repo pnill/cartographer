@@ -3,6 +3,7 @@
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/Players/PlayerActions.h"
 #include <wtypes.h>
@@ -119,14 +120,14 @@ struct s_object_data_definition
 {
 	datum tag_definition_index;
 	DWORD object_flags;
-	byte unk_8[4];
+	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;		//maybe attachment or child
 	datum parent_datum;
 	WORD unit_in_vehicle_flag;
 	INT16 placement_index;
 	BYTE gap_1C[8];
-	DWORD field_24;
+	DWORD foreground_emblem;
 	s_location location;
 	real_point3d center;
 	float radius;
@@ -154,9 +155,9 @@ struct s_object_data_definition
 	datum havok_datum;
 	char gap_B8[8];
 	WORD field_C0;
-	WORD field_C2;
-	DWORD field_C4;
-	DWORD field_C8;
+	WORD damage_owner_unk3;
+	DWORD damage_owner_unk1;
+	DWORD damage_owner_unk2;
 	unsigned int field_CC;
 	__int16 field_D0;
 	BYTE model_variant_id;//hlmt variant tag_block index

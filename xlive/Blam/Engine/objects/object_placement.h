@@ -1,6 +1,7 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/objects/damage.h"
+#include "Blam/Math/BlamMath.h"
 
 struct s_location
 {
@@ -28,16 +29,14 @@ struct object_placement_data
 	real_point3d translational_velocity;//0x40
 	real_vector3d angular_velocity;//0x4C
 	float scale;//0x58
-	datum player_index;
+	int player_index;
 	DWORD field_60;
 	int team_index;
-	DWORD field_68;
-	DWORD field_6C;
-	WORD field_70;
+	s_damage_owner damage_owner;
 	WORD field_72;
 	DWORD active_change_colors_mask;
 	real_color_rgb change_colors[4];
-	DWORD unk_A8;
+	DWORD foreground_emblem;
 	DWORD unk_AC;
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;

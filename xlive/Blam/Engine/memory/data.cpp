@@ -10,6 +10,7 @@ bool next_index_range_checks(const s_data_array* data, datum* new_next_index)
 	*new_next_index = data->next_index;
 	if (data->next_index == -1)
 		return true;
+	return false;
 }
 
 datum __cdecl datum_new(s_data_array* data)

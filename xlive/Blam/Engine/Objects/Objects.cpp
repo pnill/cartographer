@@ -444,7 +444,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	typedef void(__cdecl* sub_5323B3_t)(unsigned __int16 a1);
 	auto p_sub_5323B3 = Memory::GetAddress< sub_5323B3_t>(0x1323B3);
 
-	typedef void(__cdecl* effect_new_from_object_t)(int arg0, int* arg4, datum a1, float a4, float a5, int a6);
+	typedef void(__cdecl* effect_new_from_object_t)(int arg0, s_damage_owner* arg4, datum a1, float a4, float a5, int a6);
 	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
 
 	typedef int(__cdecl* sub_66CFDD_t)(datum a1);
@@ -554,9 +554,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		if (s_object_globals::object_is_connected_to_map(object_header_datum)) { s_object_globals::object_connect_lights_recursive(object_header_datum, 0, 1, 0, 0); }
 		s_object_globals::object_update_collision_culling(object_header_datum);
 	}
-	object->field_C2 = placement_data->field_70;
-	object->field_C4 = placement_data->field_68;
-	object->field_C8 = placement_data->field_6C;
+	object->damage_owner_unk3 = placement_data->damage_owner.unk3;
+	object->damage_owner_unk1 = placement_data->damage_owner.unk1;
+	object->damage_owner_unk2 = placement_data->damage_owner.unk2;
 	object->model_variant_id = -1;
 	object->field_CC = -1;
 	object->field_D0 = -1;
@@ -662,7 +662,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			p_sub_5310F9(new_object_absolute_index, placement_data->active_change_colors_mask, placement_data->change_colors);
 			p_object_initialize_vitality(object_header_datum, 0, 0);
 			p_object_compute_change_colors(object_header_datum);
-			object->field_24 = placement_data->unk_A8;
+			object->foreground_emblem = placement_data->foreground_emblem;
 
 			if (object->object_animations_block_offset != 0xFFFF)
 				p_sub_52FE4D(object_header_datum);
@@ -670,11 +670,11 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_compute_node_matrices_with_children(object_header_datum);
 			if (s_object_globals::get() && s_object_globals::get()->initialized)
 			{
-				byte unk_byte = 0;
+				byte object_is_inside_cluster = 0;
 				s_location* p_location = nullptr;
 				if (placement_data->object_is_inside_cluster
-					|| (unk_byte = set_object_position_if_in_cluster(&placement_data->location, object_header_datum),
-						(placement_data->object_is_inside_cluster = unk_byte) != 0))
+					|| (object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_header_datum),
+						placement_data->object_is_inside_cluster = object_is_inside_cluster))
 				{
 					p_location = &placement_data->location;
 				}
@@ -696,7 +696,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_type_unknown38_evaluate(object_header_datum);
 
 			if (new_object_tag->creation_effect.TagIndex != DATUM_INDEX_NONE)
-				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, (int*)&placement_data->field_68, object_header_datum, 0, 0, 0);
+				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_header_datum, 0, 0, 0);
 
 			p_sub_66CFDD(object_header_datum);
 
