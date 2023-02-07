@@ -35,4 +35,5 @@ struct s_object_globals
 	static void object_connect_lights_recursive(datum header_datum, int a2, int a3, char a4, char a5);
 	static void object_update_collision_culling(datum header_datum);
 	static void object_wake(datum object_datum);
+	static bool object_globals_initialized();
 };

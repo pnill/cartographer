@@ -22,19 +22,23 @@ datum __cdecl datum_new(s_data_array* data)
 	if (const datum next_index = data->next_index; last_free_index >= next_index) { next_index_range_checks(data, &next_idx); }
 	else
 	{
-		while (((1 << (last_free_index & 0x1F)) & data->active_bit_mask.m_flags[last_free_index >> 5]) != 0)
+		bool b_is_found = false;
+		while (((1 << (last_free_index & 0x1F)) & data->active_bit_mask.m_flags[last_free_index >> 5]) != 0 && !b_is_found)
 		{
+
 			if (++last_free_index >= next_index)
 			{
 				next_index_range_checks(data, &next_idx);
-				goto END_OF_INDEX_CHECKS;
+				b_is_found = true;
 			}
 		}
-		next_idx = last_free_index;
-		if (last_free_index == DATUM_INDEX_NONE) { next_index_range_checks(data, &next_idx); }
+		if (!b_is_found)
+		{
+			next_idx = last_free_index;
+			if (last_free_index == DATUM_INDEX_NONE) { next_index_range_checks(data, &next_idx); }
+		}
 	}
 	
-END_OF_INDEX_CHECKS:
 	object_header = (s_object_header*)&data->data[next_idx * data->single_element_size];
 	data->active_bit_mask.m_flags[next_idx >> 5] |= 1 << (next_idx & 0x1F);
 	++data->total_elements_used;

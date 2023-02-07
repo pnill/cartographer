@@ -154,7 +154,7 @@ struct s_object_data_definition
 	byte field_b3;
 	datum havok_datum;
 	char gap_B8[8];
-	WORD field_C0;
+	WORD flags_C0;
 	WORD damage_owner_unk3;
 	DWORD damage_owner_unk1;
 	DWORD damage_owner_unk2;
@@ -177,14 +177,22 @@ struct s_object_data_definition
 	byte byte_108;
 	byte byte_109;
 	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
-	byte pad0[8];
+	__int16 original_orientation_size;
+	__int16 original_orientation_offset;
+	__int16 node_orientation_size;
+	__int16 node_orientation_offset;
 	__int16 node_buffer_size;
 	__int16 nodes_offset;
-	byte pad1[4];
-	short field_11C;
-	WORD object_attachments_block_offset;
-	byte pad2[10];
-	WORD object_animations_block_offset;
+	__int16 collision_regions_size;
+	__int16 collision_regions_offset;
+	__int16 object_attachments_block_size;
+	__int16 object_attachments_block_offset;
+	__int16 damage_sections_block_size;
+	__int16 damage_sections_block_offset;
+	__int16 change_color_size;
+	__int16 change_color_offset;
+	__int16 animation_manager_size;
+	__int16 animation_manager_offset;
 };
 #pragma pack(pop)
 CHECK_STRUCT_OFFSET(s_object_data_definition, node_buffer_size, 0x114);
@@ -259,11 +267,12 @@ CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 
 enum e_object_header_flag :BYTE
 {
+	_object_header_none = 0x0,
 	_object_header_active_bit = 0x1,
 	_object_header_requires_motion_bit = 0x2,
-	object_header_flags_4 = 0x4,
+	_object_header_flags_4 = 0x4,
 	_object_header_being_deleted_bit = 0x8,
-	object_header_flags_10 = 0x10,
+	_object_header_flags_10 = 0x10,
 	_object_header_connected_to_map_bit = 0x20,
 	_object_header_child_bit = 0x40,
 };

@@ -15,7 +15,7 @@ struct s_object_group_definition :TagGroup<'obje'>
 {
 	e_object_type object_type;
 	byte unk_1;
-	enum class e_object_flags : __int16
+	enum e_object_flags : __int16
 	{
 		does_not_cast_shadow = FLAG(0),
 		search_cardinal_direction_lightmaps_on_failure = FLAG(1),
@@ -211,8 +211,8 @@ struct s_object_group_definition :TagGroup<'obje'>
 		tag_block<s_change_colors_block_initial_permutations_block> initial_permutations;//0x0
 		struct s_change_colors_functions_block
 		{
-			PAD(0x4);//0x0
-			enum class e_colors_function_scale_flags : __int32
+			unsigned long next_function_block;	// This value is stupid and dumb
+			enum e_colors_function_scale_flags : __int32
 			{
 				blend_in_hsv = FLAG(0),
 				more_colors = FLAG(1),

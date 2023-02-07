@@ -165,6 +165,8 @@
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
+    <ClCompile Include="Blam\Engine\math\color_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -522,6 +524,8 @@
     <ClInclude Include="Blam\Engine\memory\data.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
+    <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
+    <ClInclude Include="Blam\Engine\math\color_math.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

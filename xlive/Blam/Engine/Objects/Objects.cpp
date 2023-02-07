@@ -7,9 +7,11 @@
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
+#include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/objects/object_early_movers.h"
 #include "Blam/Engine/objects/object_globals.h"
 #include "Blam/Engine/objects/object_types.h"
 #include "Blam/Engine/Players/Players.h"
@@ -120,7 +122,7 @@ bool __cdecl object_type_new(datum object_datum, object_placement_data* a2, bool
 			if (object_base_type->object_new)
 			{
 				result = result && object_base_type->object_new(object_datum, a2, a3);
-				if (header->flags & e_object_header_flag::object_header_flags_10 != 0)
+				if (header->flags & e_object_header_flag::_object_header_flags_10 != 0)
 					LOG_INFO_GAME("{}", header->flags);
 			}
 	}
@@ -401,13 +403,146 @@ datum __cdecl object_header_new(__int16 object_data_size)
 	return object_datum;
 }
 
-//typedef datum(__cdecl* object_new_t)(object_placement_data* placement_data);
-//object_new_t p_object_new;
+
+
+// Not 100% sure this function works correctly 
+// CHECK THIS BEFORE RELEASING
+// Computes the new change color values of an object 
+// Used for objects with the functions datablock set inside the change color tagblock
+bool __cdecl object_compute_change_colors(datum object_datum)
+{
+	// I really don't wanna get into this can of worms yet...
+	typedef bool(__cdecl* object_get_function_value_simple_t)(int object_datum, string_id function_name, float* function_value);
+	auto p_object_get_function_value_simple = Memory::GetAddress<object_get_function_value_simple_t>(0x133005, 0x121ED5);
+
+
+	const s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
+	const s_object_group_definition* obje_definition = tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index);
+
+	if ((obje_definition->runtime_flags & s_object_group_definition::e_runtime_flags::runtime_change_colors_allowed) == 0) { return false; }
+
+	real_color_rgb* object_change_colors = (real_color_rgb*)((char*)object + object->change_color_offset);
+	int number_of_change_colors = (object->change_color_size / sizeof(real_color_rgb)) / 2;
+	if (number_of_change_colors <= 0) { return false; }
+
+	real_color_rgb* color = &object_change_colors[number_of_change_colors];
+
+	for (long i = 0; i < number_of_change_colors; ++i)
+	{
+		s_object_group_definition::s_change_colors_block* change_color_definition = nullptr;
+		if (obje_definition->change_colors.data != -1) { change_color_definition = obje_definition->change_colors[i]; }
+
+		color->red = object_change_colors->red;
+		color->green = object_change_colors->green;
+		color->blue = object_change_colors->blue;
+		
+		// Loop through function blocks inside change color block
+		// This has been edited from the original since the original one was stupid and referenced a pre-processed value within the tagblock itself for the new tagblock index
+		// Turns out Halo 3 dosent do any of this garbage so referenced that when rewriting this
+		// Long story short we just loop through every block instead now
+		const s_object_group_definition::s_change_colors_block::s_change_colors_functions_block * function_definition = nullptr;
+		if (change_color_definition->functions.size > 0)
+		{
+			string_id function_name = NULL;
+
+			// Interpolates colours by function type (if it exists)
+			for (int j = 0; j < change_color_definition->functions.size; ++j)
+			{
+				function_definition = change_color_definition->functions[j];
+				function_name = function_definition[j].scale_by;
+
+				if (function_name.is_valid())
+				{
+					float function_value;
+					if (!p_object_get_function_value_simple(object_datum, function_name, &function_value)) { function_value = 0.0; }
+					
+					rgb_colors_interpolate(
+						color,
+						function_definition[j].scale_flags,
+						&function_definition[j].color_lower_bound,
+						&function_definition[j].color_upper_bound,
+						function_value);
+				}
+			}
+
+			// Interpolates colours by function type (if it exists)
+			for (int j = 0; j < change_color_definition->functions.size; ++j)
+			{
+				function_definition = change_color_definition->functions[j];
+
+				function_name = function_definition[j].darken_by;
+				if (function_name.is_valid())
+				{
+					float function_value;
+					if (!p_object_get_function_value_simple(object_datum, function_name, &function_value)) { function_value = 0.0; }
+					color->red   *= function_value;
+					color->green *= function_value;
+					color->blue  *= function_value;
+				}
+			}
+		}
+
+		float red;
+		float green;
+		float blue;
+		red = color->red;
+		if (color->red >= 0.0)
+		{
+			if (red > 1.0)
+				red = 1.0;
+		}
+		else
+		{
+			red = 0.0;
+		}
+		color->red = red;
+		green = color->green;
+		if (green >= 0.0)
+		{
+			if (green > 1.0)
+				green = 1.0;
+		}
+		else
+		{
+			green = 0.0;
+		}
+		color->green = green;
+		blue = color->blue;
+		if (blue >= 0.0)
+		{
+			if (blue > 1.0)
+				blue = 1.0;
+		}
+		else
+		{
+			blue = 0.0;
+		}
+		color->blue = blue;
+		++color;
+	}
+	return true;
+}
+
+void free_object_memory(unsigned __int16 a1)
+{
+	typedef int(__cdecl* memory_pool_block_free_t)(s_memory_pool* memory_pool, void** payload_data);
+	auto p_memory_pool_block_free = Memory::GetAddress<memory_pool_block_free_t>(0x8BD80, 0x81924);
+
+	s_memory_pool* object_table = Memory::GetAddress<s_memory_pool*>(0x4E4610);
+
+	s_object_header* object_header = get_object_header(a1);
+	object_header->flags = _object_header_none;
+	if (object_header->object != nullptr)
+	{
+		p_memory_pool_block_free(object_table, &object_header->object);
+	}
+	datum_delete(get_object_data_array(), a1);
+}
+
+typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
+p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-	typedef bool(__cdecl* sub_531B0E_t)(unsigned __int16 a1, size_t* a2, size_t* a3);
-	auto p_sub_531B0E = Memory::GetAddress<sub_531B0E_t>(0x131B0E);
-
 	typedef void(__thiscall* sub_4F3B64_t)(char* this_ptr);
 	auto p_sub_4F3B64 = Memory::GetAddress<sub_4F3B64_t>(0xF3B64);
 
@@ -435,14 +570,14 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	typedef void(__cdecl* object_initialize_vitality_t)(datum a1, float* a2, float* a3);
 	auto p_object_initialize_vitality = Memory::GetAddress<object_initialize_vitality_t>(0x175A62);
 
-	typedef char(__cdecl* object_compute_change_colors_t)(datum a1);
-	auto p_object_compute_change_colors = Memory::GetAddress<object_compute_change_colors_t>(0x13456E);
+	//typedef char(__cdecl* object_compute_change_colors_t)(datum a1);
+	//auto p_object_compute_change_colors = Memory::GetAddress<object_compute_change_colors_t>(0x13456E);
 
 	typedef void(__cdecl* sub_52FE4D_t)(datum a1);
-	auto p_sub_52FE4D = Memory::GetAddress<sub_52FE4D_t>(0x12FE4D);
+	auto p_object_reset_interpolation = Memory::GetAddress<sub_52FE4D_t>(0x12FE4D);
 
 	typedef void(__cdecl* sub_5323B3_t)(unsigned __int16 a1);
-	auto p_sub_5323B3 = Memory::GetAddress< sub_5323B3_t>(0x1323B3);
+	auto p_connect_objects_havok_component_to_world = Memory::GetAddress< sub_5323B3_t>(0x1323B3);
 
 	typedef void(__cdecl* effect_new_from_object_t)(int arg0, s_damage_owner* arg4, datum a1, float a4, float a5, int a6);
 	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
@@ -450,10 +585,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	typedef int(__cdecl* sub_66CFDD_t)(datum a1);
 	auto p_sub_66CFDD = Memory::GetAddress< sub_66CFDD_t>(0x26CFDD);
 
-	typedef void(__cdecl* sub_54BA87_t)(datum a1);
-	auto p_sub_54BA87 = Memory::GetAddress< sub_54BA87_t>(0x14BA87);
-
-	auto unk_creation_bool = false;
 	if ((placement_data->object_placement_flags & 0x10) == 0)
 	{
 		if (placement_data->tag_index == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
@@ -478,12 +609,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		p_havok_memory_garbage_collect();
 	}
 
-	datum object_header_datum = object_header_new(new_object_type_definition->datum_size);
+	datum object_datum = object_header_new(new_object_type_definition->datum_size);
 
-	if (object_header_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }	
+	if (object_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }	
 
-	s_object_header* object_header = get_object_header(object_header_datum);
-	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_header_datum);
+	s_object_header* object_header = get_object_header(object_datum);
+	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 
 	object_header->flags |= _object_header_being_deleted_bit;
 	object_header->type = new_object_tag->object_type;
@@ -532,7 +663,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	}
 
 	datum mode_tag_index;
-	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_header_datum, &mode_tag_index, &coll_tag_index)) { object->object_flags |= has_prt_or_lighting_info; }
+	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_datum, &mode_tag_index, &coll_tag_index)) { object->object_flags |= has_prt_or_lighting_info; }
 	else { object->object_flags &= ~has_prt_or_lighting_info; }
 
 	object_header->cluster_reference = -1;
@@ -546,13 +677,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->byte_108 = -1;
 	object->byte_109 = -1;
 	object->placement_policy = placement_data->placement_policy;
-	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow) { object->object_flags |= 0x10000u; }
+	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow)  { object->object_flags |= 0x10000u; }
 
 	if ((object->object_flags & 1) != 0)
 	{
 		object->object_flags &= ~1u;
-		if (s_object_globals::object_is_connected_to_map(object_header_datum)) { s_object_globals::object_connect_lights_recursive(object_header_datum, 0, 1, 0, 0); }
-		s_object_globals::object_update_collision_culling(object_header_datum);
+		if (s_object_globals::object_is_connected_to_map(object_datum)) { s_object_globals::object_connect_lights_recursive(object_datum, 0, 1, 0, 0); }
+		s_object_globals::object_update_collision_culling(object_datum);
 	}
 	object->damage_owner_unk3 = placement_data->damage_owner.unk3;
 	object->damage_owner_unk1 = placement_data->damage_owner.unk1;
@@ -560,12 +691,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->model_variant_id = -1;
 	object->field_CC = -1;
 	object->field_D0 = -1;
-	object->field_C0 = 0;
+	object->flags_C0 = 0;
 
-	if ((placement_data->unk_12 & 8) != 0)
-		object->field_C0 |= 0x100u;
+	if ((placement_data->object_placement_flags & 8) != 0)
+		object->flags_C0 |= 0x100u;
 	else
-		object->field_C0 &= ~0x100u;
+		object->flags_C0 &= ~0x100u;
 
 	object->havok_datum = -1;
 	object->simulation_entity_index = -1;
@@ -579,26 +710,25 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	char unk_animation_structure[145];
 
 	bool allow_interpolation = false;
-	bool valid_animation_maybe = false;
+	bool valid_animation_manager = false;
 
 	if (model_definition)
 	{
-		if (model_definition->nodes.size >= 1)
-			nodes_count = model_definition->nodes.size;
-		if (model_definition->collision_regions.size >= 1)
-			collision_regions_count = model_definition->collision_regions.size;
+		if (model_definition->nodes.size >= 1) { nodes_count = model_definition->nodes.size; }
+		if (model_definition->collision_regions.size >= 1) { collision_regions_count = model_definition->collision_regions.size;}
 
-		if (model_definition->new_damage_info.size > 0 && model_definition->new_damage_info.data != -1)
+		if (model_definition->new_damage_info.size > 0 && model_definition->new_damage_info.data != -1) 
+		{ 
 			damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.size;
+		}
 
 		if (model_definition->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-
 			unk_animation_structure[144] = 0;
 			p_sub_4F3B64(unk_animation_structure);
 			if (p_sub_4F59AD(unk_animation_structure, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 			{
-				valid_animation_maybe = true;
+				valid_animation_manager = true;
 				allow_interpolation = ((new_object_tag->object_type) & (_object_is_sound_scenery | _object_is_light_fixture | _object_is_control | _object_is_machine | _object_is_scenery | _object_is_projectile)) == 0;
 				if (((new_object_tag->object_type) & (_object_is_light_fixture | _object_is_control | _object_is_machine)) != 0)
 				{
@@ -611,34 +741,44 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		}
 	}
 
-	auto new_object_absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_header_datum);
+	auto new_object_absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum);
 
-	long intperolation_node_size = (!allow_interpolation) ? 0 : nodes_count * 32;
+	long original_orientations = (!allow_interpolation) ? 0 : nodes_count * 32;
 
-	bool b_attachments = p_object_header_block_allocate(new_object_absolute_index, 284, 8 * new_object_tag->attachments.size, 0);
-	bool b_damage_sections = p_object_header_block_allocate(new_object_absolute_index, 0x120, 8 * damage_info_damage_sections_size, 0);
-	bool b_change_colors = p_object_header_block_allocate(new_object_absolute_index, 0x124, 24 * new_object_tag->change_colors.size, 0);
-	bool b_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x114, 52 * nodes_count, 0);
-	bool b_collision = p_object_header_block_allocate(new_object_absolute_index, 0x118, 10 * collision_regions_count, 0);
-	bool b_interpolation_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x110, intperolation_node_size, 0);
-	bool b_interpolation_nodes_2 = p_object_header_block_allocate(new_object_absolute_index, 0x10C, intperolation_node_size, 0);
-	bool b_animation = p_object_header_block_allocate(new_object_absolute_index, 0x128, ((valid_animation_maybe) ? 0x90 : 0), 1);
+	bool b_attachments = p_object_header_block_allocate(new_object_absolute_index, 284, (short)(8 * new_object_tag->attachments.size), 0);
+	bool b_damage_sections = p_object_header_block_allocate(new_object_absolute_index, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
+	bool b_change_colors = p_object_header_block_allocate(new_object_absolute_index, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
+	bool b_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x114, (short)(52 * nodes_count), 0);
+	bool b_collision = p_object_header_block_allocate(new_object_absolute_index, 0x118, (short)(10 * collision_regions_count), 0);
+	bool b_interpolation_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x110, (short)original_orientations, 0);
+	bool b_interpolation_nodes_2 = p_object_header_block_allocate(new_object_absolute_index, 0x10C,(short)original_orientations, 0);
+	bool b_animation = p_object_header_block_allocate(new_object_absolute_index, 0x128, (valid_animation_manager != 0 ? 0x90 : 0), 1);
 	bool b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(DATUM_INDEX_TO_ABSOLUTE_INDEX(placement_data->tag_index));
 
-	auto b_object_creation_valid = false;
-	if (b_attachments && b_damage_sections && b_change_colors && b_nodes && b_collision && b_interpolation_nodes && b_interpolation_nodes_2 && b_animation && b_havok)
-		b_object_creation_valid = true;
-	else
-		unk_creation_bool = true;
-
-	if (b_object_creation_valid)
+	bool unk_creation_bool = false;
+	bool graph_reset = false;
+	if (b_attachments && 
+		b_damage_sections && 
+		b_change_colors && 
+		b_nodes && 
+		b_collision && 
+		b_interpolation_nodes && 
+		b_interpolation_nodes_2 && 
+		b_animation && 
+		b_havok)
 	{
-		if (valid_animation_maybe)
-		{
-			auto object_animations_block = ((char*)object + object->object_animations_block_offset);
+		graph_reset = true;
+	}
+	else { unk_creation_bool = true; }
 
-			p_sub_4f31E7(object_animations_block);
-			if (p_sub_4F59AD(object_animations_block, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+	if (graph_reset)
+	{
+		if (valid_animation_manager)
+		{
+			auto c_animation_manager = ((char*)object + object->animation_manager_offset);
+
+			p_sub_4f31E7(c_animation_manager);
+			if (p_sub_4F59AD(c_animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 				object->object_flags |= 0x800u;
 			else
 				object->object_flags &= ~0x800u;
@@ -646,10 +786,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		if (new_object_tag->attachments.size > 0)
 		{
 			char* object_attachments_block = (char*)object + object->object_attachments_block_offset;
-			memset(object_attachments_block, -1, 8 * ((unsigned int)object->field_11C >> 3));
+			memset(object_attachments_block, -1, 8 * ((unsigned int)object->object_attachments_block_size >> 3));
 		}
-		auto b_object_type_new = object_type_new(object_header_datum, placement_data, &unk_creation_bool);
-		if (b_object_type_new)
+
+		if (object_type_new(object_datum, placement_data, &unk_creation_bool))
 		{
 			auto b_object_flag_check = (object->object_flags & 0x20000) != 0;
 			if ((placement_data->object_placement_flags & 6) != 0)
@@ -657,69 +797,63 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				object->object_flags &= ~0x20000u;
 			}
 
-			object_evaluate_placement_variant(object_header_datum, placement_data->variant_name);
+			object_evaluate_placement_variant(object_datum, placement_data->variant_name);
 			p_sub_532F07(new_object_absolute_index, placement_data->unk_AC);
 			p_sub_5310F9(new_object_absolute_index, placement_data->active_change_colors_mask, placement_data->change_colors);
-			p_object_initialize_vitality(object_header_datum, 0, 0);
-			p_object_compute_change_colors(object_header_datum);
+			p_object_initialize_vitality(object_datum, 0, 0);
+			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 
-			if (object->object_animations_block_offset != 0xFFFF)
-				p_sub_52FE4D(object_header_datum);
+			if (object->animation_manager_offset != 0xFFFF)
+				p_object_reset_interpolation(object_datum);
 
-			object_compute_node_matrices_with_children(object_header_datum);
+			object_compute_node_matrices_with_children(object_datum);
 			if (s_object_globals::get() && s_object_globals::get()->initialized)
 			{
 				byte object_is_inside_cluster = 0;
 				s_location* p_location = nullptr;
 				if (placement_data->object_is_inside_cluster
-					|| (object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_header_datum),
+					|| (object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum),
 						placement_data->object_is_inside_cluster = object_is_inside_cluster))
 				{
 					p_location = &placement_data->location;
 				}
 
 
-				object_reconnect_to_map(p_location, object_header_datum);
+				object_reconnect_to_map(p_location, object_datum);
 			}
 
-			object_postprocess_node_matrices(object_header_datum);
-			s_object_globals::object_wake(object_header_datum);
+			object_postprocess_node_matrices(object_datum);
+			s_object_globals::object_wake(object_datum);
 
-			if ((placement_data->unk_12 & 0x20) != 0)
-				object->field_C0 |= 2u;
+			if ((placement_data->object_placement_flags & 0x20) != 0)
+				object->flags_C0 |= 2u;
 			else
-				object->field_C0 &= ~2u;
+				object->flags_C0 &= ~2u;
 
-			p_sub_5323B3(new_object_absolute_index);
-			object_initialize_effects(object_header_datum);
-			object_type_unknown38_evaluate(object_header_datum);
+			p_connect_objects_havok_component_to_world(new_object_absolute_index);
+			object_initialize_effects(object_datum);
+			object_type_unknown38_evaluate(object_datum);
 
 			if (new_object_tag->creation_effect.TagIndex != DATUM_INDEX_NONE)
-				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_header_datum, 0, 0, 0);
+				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0, 0, 0);
 
-			p_sub_66CFDD(object_header_datum);
+			p_sub_66CFDD(object_datum);
 
-			if (b_object_flag_check)
-				object->object_flags |= 0x20000u;
-			else
-				object->object_flags &= ~0x20000u;
+			(b_object_flag_check ? object->object_flags |= 0x20000u : object->object_flags &= ~0x20000u);				
 
-			p_sub_54BA87(object_header_datum);
+			object_early_mover_new(object_datum);
 
-			if ((object->object_flags & 0x20000) == 0 || (object_header->flags & _object_header_active_bit) != 0)
-			{
-				return object_header_datum;
-			}
-			if (!s_object_globals::get()->initialized)
-				return object_header_datum;
+			if ((object->object_flags & 0x20000) == 0 || (object_header->flags & _object_header_active_bit) != 0) { return object_datum; }
 
-			if ((placement_data->unk_12 & 2) == 0 && ((placement_data->unk_12 & 4) == 0 || object->location.cluster != 0xFFFF))
-				object_delete(object_header_datum);
-			return object_header_datum;
+			if (!s_object_globals::object_globals_initialized()) { return object_datum; }
+
+			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 || object->location.cluster != 0xFFFF)) { object_delete(object_datum);}
+			return object_datum;
 		}
-		object_type_unknown3C_evaluate(object_header_datum);
+		object_type_unknown3C_evaluate(object_datum);
 	}
+	free_object_memory(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
 	return -1;
 }
 
@@ -875,6 +1009,12 @@ void apply_biped_object_definition_patches()
 	// Hooks the part of the unit spawn from simulation that handles setting their color data in order to ensure AI do not have their color overridden
 	PatchCall(Memory::GetAddress(0x1F9E34, 0x1E3B9C), set_unit_color_data_hook);
 	p_set_unit_color_data = Memory::GetAddress<set_unit_color_data_t>(0x6E5C3, 0x6D1BF);
+
+
+	DETOUR_BEGIN();
+	DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
+	DETOUR_COMMIT();
+
 }
 
 int object_get_count()
