@@ -35,7 +35,7 @@ struct s_data_array
 	WORD flags;						// 0x2A
 	char data_signature[4];			// 0x2C
 	void **allocator;				// 0x30
-	int last_free_index;				// 0x34
+	int last_free_index;			// 0x34
 	int next_index;					// 0x38
 	int total_elements_used;		// 0x3C 
 	__int16 next_datum;				// 0x40

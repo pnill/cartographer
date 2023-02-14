@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "objects.h"
+#include "object_early_movers.h"
+#include "object_globals.h"
 #include "object_types.h"
 
 #include "Blam/Cache/TagGroups/device_definition.hpp"
@@ -10,10 +12,6 @@
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/memory/memory_pool.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/objects/object_early_movers.h"
-#include "Blam/Engine/objects/object_globals.h"
-#include "Blam/Engine/objects/object_types.h"
 #include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/physics/bsp3d.h"
 #include "Blam/Engine/physics/collision_bsp.h"
@@ -96,202 +94,16 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 	auto object_compute_node_matrices_locations = Memory::GetAddress<object_compute_node_matrices_locations_t>(0x1363D5);
 
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
-	s_object_data_definition* next_object = nullptr;
+	s_object_data_definition const* next_object = nullptr;
 	object_compute_node_matrices_non_recursive(object_datum);
 	object_compute_node_matrices_locations(object_datum);
 	for (unsigned long i = object->current_weapon_datum; i != -1; i = next_object->next_index)
 	{
 		next_object = object_get_fast_unsafe(i);
-		if (((1 << next_object->object_type) & 0x80u) == 0)
+		if ((next_object->object_type & _object_is_machine) == 0)
 			object_compute_node_matrices_with_children(i);
 	}
 }
-
-typedef bool(__cdecl* object_type_new_t)(datum object_datum, object_placement_data* a2, bool* a3);
-object_type_new_t p_object_type_definition_object_new_evaluate;
-
-bool __cdecl object_type_new(datum object_datum, object_placement_data* a2, bool* a3)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	bool result = true;
-	auto header = get_object_header(object_datum);
-	for (byte i = 0; i < 3; i++)
-	{
-		auto object_base_type = object_type->base_object_types[i];
-		if (object_base_type)
-			if (object_base_type->object_new)
-			{
-				result = result && object_base_type->object_new(object_datum, a2, a3);
-				if (header->flags & e_object_header_flag::_object_header_flags_10 != 0)
-					LOG_INFO_GAME("{}", header->flags);
-			}
-	}
-	return result;
-}
-
-void object_type_adjust_placement(object_placement_data* placement_data)
-{
-	object_type_definition* object_type = get_object_type_definitions()[object_type_from_group_tag(placement_data->tag_index)];
-	byte i = 0;
-
-	for (object_type_definition** current_object_type = object_type->base_object_types; *current_object_type; current_object_type = &object_type->base_object_types[(__int16)i])
-	{
-		if ((*current_object_type)->adjust_placement) 
-		{ 
-			(*current_object_type)->adjust_placement(placement_data);
-		}
-		++i;
-	}
-}
-
-typedef void(__cdecl* object_type_definitions_disconnect_from_structure_bsp_evalulate_t)(datum object_datum);
-object_type_definitions_disconnect_from_structure_bsp_evalulate_t p_object_type_definitions_disconnect_from_structure_bsp_evalulate;
-
-void __cdecl object_type_definitions_disconnect_from_structure_bsp_evalulate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (byte i = 0; i < 3; i++)
-	{
-		auto object_base_type = object_type->base_object_types[i];
-		if (object_base_type)
-			if (object_base_type->disconnect_from_structure_bsp)
-				object_base_type->disconnect_from_structure_bsp(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_object_delete_evaluate_t)(datum object_datum, int a2);
-object_type_object_delete_evaluate_t p_object_type_object_delete_evaluate;
-
-void __cdecl object_type_object_delete_evaluate(datum object_datum, int a2)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->object_delete)
-				object_base_type->object_delete(object_datum, a2);
-	}
-}
-
-typedef void(__cdecl* object_type_unknown38_t)(datum object_datum);
-object_type_unknown38_t p_object_type_unknown38;
-
-void __cdecl object_type_unknown38_evaluate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->unknown38)
-				object_base_type->unknown38(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_unknown7C_t)(datum object_datum, int a2, int a3);
-object_type_unknown7C_t p_object_type_unknown7C;
-
-void __cdecl object_type_unknown7C_evaluate(datum object_datum, int a2, int a3)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->unknown7C)
-				object_base_type->unknown7C(object_datum, a2, a3);
-	}
-}
-
-typedef void(__cdecl* object_type_unknown3C_t)(datum object_datum);
-object_type_unknown3C_t p_object_type_unknown3C;
-
-void __cdecl object_type_unknown3C_evaluate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->unknown3C)
-				object_base_type->unknown3C(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_object_move_t)(datum object_datum);
-object_type_object_move_t p_object_type_object_move;
-
-void __cdecl object_type_object_move_evaluate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->object_move)
-				object_base_type->object_move(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_object_can_activate_t)(datum object_datum, int a2, int a3);
-object_type_object_can_activate_t p_object_type_object_can_activate;
-
-void __cdecl object_type_object_can_activate_evaluate(datum object_datum, int a2, int a3)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->object_can_activate)
-				object_base_type->object_can_activate(object_datum, a2, a3);
-	}
-}
-
-typedef void(__cdecl* object_type_assign_new_entity_t)(datum object_datum);
-object_type_assign_new_entity_t p_object_assign_new_entity;
-
-void __cdecl object_type_assign_new_entity_evaluate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->assign_new_entity)
-				object_base_type->assign_new_entity(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_detach_gamestate_entity_t)(datum object_datum);
-object_type_detach_gamestate_entity_t p_object_type_detach_gamestate_entity;
-
-void __cdecl object_type_detach_gamestate_entity_evaluate(datum object_datum)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->detach_entity)
-				object_base_type->detach_entity(object_datum);
-	}
-}
-
-typedef void(__cdecl* object_type_process_node_matrices_t)(datum object_datum, int node_count, int node_matracies);
-object_type_process_node_matrices_t p_object_type_process_node_matrices;
-
-void __cdecl object_type_process_node_matrices(datum object_datum, int node_count, int node_matracies)
-{
-	auto object_type = get_game_object_type_definition(object_datum);
-	for (auto object_base_type : object_type->base_object_types)
-	{
-		if (object_base_type)
-			if (object_base_type->detach_entity)
-				object_base_type->process_node_matricies(object_datum, node_count, node_matracies);
-	}
-}
-
-template<class T> inline T operator~ (T a) { return (T)~(int)a; }
-template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
-template<class T> inline bool operator& (T a, T b) { return ((int)a & (int)b != 0); }
-template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
-template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
-template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
-template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
 
 void object_evaluate_placement_variant(datum object_header_datum, string_id variant_index)
 {
@@ -302,20 +114,20 @@ void object_evaluate_placement_variant(datum object_header_datum, string_id vari
 	object->model_variant_id = p_sub_53FE84(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_header_datum), variant_index);
 }
 
-void object_postprocess_node_matrices(datum object_datum)
+void object_postprocess_node_matrices(unsigned short object_index)
 {
-	auto object = object_get_fast_unsafe(object_datum);
+	auto object = object_get_fast_unsafe(object_index);
 	auto object_tag = tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index);
 	if (object_tag->model.TagIndex != DATUM_INDEX_NONE)
 	{
 		auto model_tag = tags::get_tag_fast<s_model_group_definition>(object_tag->model.TagIndex);
-		if (model_tag->render_model.TagIndex != DATUM_INDEX_NONE && model_tag->render_model.TagIndex != DATUM_INDEX_NONE)
+		if (model_tag->render_model.TagIndex != DATUM_INDEX_NONE && model_tag->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			typedef int(__cdecl* object_get_node_matrices_t)(unsigned __int16 a1, int* a2);
+			typedef real_matrix4x3*(__cdecl* object_get_node_matrices_t)(unsigned __int16 a1, int* a2);
 			auto p_object_get_node_matrices = Memory::GetAddress<object_get_node_matrices_t>(0x12FCA5);
 			int node_count = 0;
-			int node_matricies = p_object_get_node_matrices(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum), &node_count);
-			object_type_process_node_matrices(object_datum, node_count, node_matricies);
+			real_matrix4x3* node_matricies = p_object_get_node_matrices(object_index, &node_count);
+			object_type_postprocess_node_matrices(object_index, node_count, node_matricies);
 		}
 	}
 }
@@ -363,12 +175,12 @@ bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum
 	bool contains_prt_info = false;
 	const datum hlmt_tag_index = tags::get_tag_fast<s_object_group_definition>(object_get_fast_unsafe(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum))->tag_definition_index)->model.TagIndex;
 
-	if (hlmt_tag_index == DATUM_INDEX_NONE) { return has_prt_or_lighting_info; }
+	if (hlmt_tag_index == DATUM_INDEX_NONE) { return true; }
 
 	const s_model_group_definition* hlmt_model_definition = tags::get_tag_fast<s_model_group_definition>(hlmt_tag_index);
 	const datum render_model_tag_index = hlmt_model_definition->render_model.TagIndex;
 
-	if (render_model_tag_index == -1 || hlmt_model_definition->collision_model.TagIndex == -1) { return has_prt_or_lighting_info; }
+	if (render_model_tag_index == -1 || hlmt_model_definition->collision_model.TagIndex == -1) { return true; }
 
 	const s_render_model_group_definition* render_model = tags::get_tag_fast<s_render_model_group_definition>(render_model_tag_index);
 
@@ -382,13 +194,13 @@ bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum
 
 datum __cdecl object_header_new(__int16 object_data_size)
 {
-	s_memory_pool* object_table = Memory::GetAddress<s_memory_pool*>(0x4E4610);
+	s_memory_pool** object_table = Memory::GetAddress<s_memory_pool**>(0x4E4610);
 
 	const datum object_datum = datum_new(get_object_data_array());
+	s_object_header* object_header = get_object_header(object_datum);
 	if (object_datum == -1)
 		return object_datum;
-	if (s_object_header* object_header = get_object_header(object_datum); 
-		memory_pool_block_allocate_handle(object_table, &object_header->object, object_data_size, 0, 0))
+	if (memory_pool_block_allocate_handle(*object_table, &object_header->object, object_data_size, 0, 0))
 	{
 		s_object_data_definition* object = (s_object_data_definition*)object_header->object;
 		object_header->object_data_size = object_data_size;
@@ -531,7 +343,7 @@ void free_object_memory(unsigned __int16 a1)
 	s_memory_pool* object_table = Memory::GetAddress<s_memory_pool*>(0x4E4610);
 
 	s_object_header* object_header = get_object_header(a1);
-	object_header->flags = _object_header_none;
+	object_header->flags = (e_object_header_flag)0;
 	if (object_header->object != nullptr)
 	{
 		p_memory_pool_block_free(object_table, &object_header->object);
@@ -594,7 +406,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	if (placement_data->tag_index == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
 
 	const s_object_group_definition* new_object_tag = tags::get_tag_fast<s_object_group_definition>(placement_data->tag_index);
-	const object_type_definition* new_object_type_definition = get_object_type_definitions()[(byte)new_object_tag->object_type];
+	const object_type_definition* new_object_type_definition = object_type_definition_get((e_object_type)new_object_tag->object_type);
 
 	const s_model_group_definition* model_definition = nullptr;
 	if (new_object_tag->model.TagIndex != DATUM_INDEX_NONE)
@@ -602,7 +414,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		model_definition = tags::get_tag_fast<s_model_group_definition>(new_object_tag->model.TagIndex);
 	}
 
-	if (((new_object_tag->object_type) & (_object_is_creature | _object_is_crate | _object_is_machine | _object_is_vehicle | _object_is_biped)) != 0)
+	if ((new_object_tag->object_type) & (e_object_type::creature | e_object_type::crate | e_object_type::machine | e_object_type::vehicle | e_object_type::biped))
 	{
 		typedef void(__cdecl* havok_memory_garbage_collect_t)();
 		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78);
@@ -611,16 +423,16 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	datum object_datum = object_header_new(new_object_type_definition->datum_size);
 
-	if (object_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }	
+	if (object_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
 
 	s_object_header* object_header = get_object_header(object_datum);
 	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 
-	object_header->flags |= _object_header_being_deleted_bit;
-	object_header->type = new_object_tag->object_type;
+	object_header->flags |= e_object_header_flag::_object_header_being_deleted_bit;
+	object_header->type = (e_object_type)new_object_tag->object_type;
 	object->tag_definition_index = placement_data->tag_index;
 
-	if (placement_data->origin_bsp_index == 0xFF)
+	if (placement_data->origin_bsp_index == -1)
 	{
 		++s_object_globals::get()->unique_id;
 		object->field_AB = 2;
@@ -633,7 +445,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	{
 		object->unique_id = placement_data->unique_id;
 		object->origin_bsp_index = (short)placement_data->origin_bsp_index;
-		object->placement_index = placement_data->unk_10;
+		object->placement_index = (short)placement_data->placement_index;
 		object->structure_bsp_index = (byte)placement_data->origin_bsp_index;
 	}
 
@@ -644,27 +456,30 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->angular_velocity = placement_data->angular_velocity;
 	object->scale = placement_data->scale;
 
-	if ((placement_data->object_placement_flags & 1) != 0)
+	if (placement_data->object_placement_flags & 1)
 	{
-		object->object_flags |= 0x400u;
+		object->object_flags |= object_data_flag_0x400;
 	}
 	else
 	{
-		object->object_flags &= ~0x400u;
+		object->object_flags &= ~object_data_flag_0x400;
 	}
 
 	if (model_definition && model_definition->collision_model.TagIndex != DATUM_INDEX_NONE)
 	{
-		object->object_flags |= 0x200u;
+		object->object_flags |= object_data_flag_has_collision;
 	}
 	else
 	{
-		object->object_flags &= ~0x200u;
+		object->object_flags &= ~object_data_flag_has_collision;
 	}
 
 	datum mode_tag_index;
-	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_datum, &mode_tag_index, &coll_tag_index)) { object->object_flags |= has_prt_or_lighting_info; }
-	else { object->object_flags &= ~has_prt_or_lighting_info; }
+	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_datum, &mode_tag_index, &coll_tag_index)) 
+	{ 
+		object->object_flags |= object_data_flag_has_prt_or_lighting_info; 
+	}
+	else { object->object_flags &= ~object_data_flag_has_prt_or_lighting_info; }
 
 	object_header->cluster_reference = -1;
 	location_invalidate(&object->location);
@@ -677,11 +492,14 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->byte_108 = -1;
 	object->byte_109 = -1;
 	object->placement_policy = placement_data->placement_policy;
-	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow)  { object->object_flags |= 0x10000u; }
+	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow) 
+	{ 
+		object->object_flags |= object_data_flag_object_does_not_cast_shadow; 
+	}
 
-	if ((object->object_flags & 1) != 0)
+	if (object->object_flags & object_data_flag_0x1)
 	{
-		object->object_flags &= ~1u;
+		object->object_flags &= ~object_data_flag_0x1;
 		if (s_object_globals::object_is_connected_to_map(object_datum)) { s_object_globals::object_connect_lights_recursive(object_datum, 0, 1, 0, 0); }
 		s_object_globals::object_update_collision_culling(object_datum);
 	}
@@ -700,14 +518,14 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	object->havok_datum = -1;
 	object->simulation_entity_index = -1;
-	object->field_D8 = 0;
+	object->b_attached_to_simulation = 0;
 	object->destroyed_constraints_flag = placement_data->destroyed_constraints_flag;
 	object->loosened_constraints_flag = placement_data->loosened_constraints_flag;
 
 	size_t nodes_count = 1;
 	size_t collision_regions_count = 1;
 	size_t damage_info_damage_sections_size = 0;
-	char unk_animation_structure[145];
+	char animation_manager[144];
 
 	bool allow_interpolation = false;
 	bool valid_animation_manager = false;
@@ -724,20 +542,26 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 		if (model_definition->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			unk_animation_structure[144] = 0;
-			p_sub_4F3B64(unk_animation_structure);
-			if (p_sub_4F59AD(unk_animation_structure, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+			int test = 0;
+			p_sub_4F3B64(animation_manager);
+			if (p_sub_4F59AD(animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 			{
 				valid_animation_manager = true;
-				allow_interpolation = ((new_object_tag->object_type) & (_object_is_sound_scenery | _object_is_light_fixture | _object_is_control | _object_is_machine | _object_is_scenery | _object_is_projectile)) == 0;
-				if (((new_object_tag->object_type) & (_object_is_light_fixture | _object_is_control | _object_is_machine)) != 0)
+				allow_interpolation = (new_object_tag->object_type & 
+					e_object_type::sound_scenery | 
+						e_object_type::light_fixture | 
+						e_object_type::control | 
+						e_object_type::machine | 
+						e_object_type::scenery | 
+						e_object_type::projectile) == 0;
+				if (new_object_tag->object_type & e_object_type::light_fixture | e_object_type::control | e_object_type::machine)
 				{
 					if (((s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_flags::allow_interpolation)
 						allow_interpolation = true;
 				}
 			}
-			unk_animation_structure[144] = -1;
-			p_sub_4F3240(unk_animation_structure);
+			test = -1;
+			p_sub_4F3240(animation_manager);
 		}
 	}
 
@@ -779,9 +603,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			p_sub_4f31E7(c_animation_manager);
 			if (p_sub_4F59AD(c_animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
-				object->object_flags |= 0x800u;
+				object->object_flags |= object_data_flag_0x800;
 			else
-				object->object_flags &= ~0x800u;
+				object->object_flags &= ~object_data_flag_0x800;
 		}
 		if (new_object_tag->attachments.size > 0)
 		{
@@ -794,13 +618,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			auto b_object_flag_check = (object->object_flags & 0x20000) != 0;
 			if ((placement_data->object_placement_flags & 6) != 0)
 			{
-				object->object_flags &= ~0x20000u;
+				object->object_flags &= ~object_data_flag_0x20000;
 			}
 
 			object_evaluate_placement_variant(object_datum, placement_data->variant_name);
 			p_sub_532F07(new_object_absolute_index, placement_data->unk_AC);
 			p_sub_5310F9(new_object_absolute_index, placement_data->active_change_colors_mask, placement_data->change_colors);
-			p_object_initialize_vitality(object_datum, 0, 0);
+			p_object_initialize_vitality(object_datum, nullptr, nullptr);
 			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 
@@ -833,14 +657,14 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			p_connect_objects_havok_component_to_world(new_object_absolute_index);
 			object_initialize_effects(object_datum);
-			object_type_unknown38_evaluate(object_datum);
+			object_type_create_children(object_datum);
 
 			if (new_object_tag->creation_effect.TagIndex != DATUM_INDEX_NONE)
 				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0, 0, 0);
 
 			p_sub_66CFDD(object_datum);
 
-			(b_object_flag_check ? object->object_flags |= 0x20000u : object->object_flags &= ~0x20000u);				
+			(b_object_flag_check ? object->object_flags |= object_data_flag_0x20000 : object->object_flags &= ~object_data_flag_0x20000);
 
 			object_early_mover_new(object_datum);
 
@@ -851,7 +675,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 || object->location.cluster != 0xFFFF)) { object_delete(object_datum);}
 			return object_datum;
 		}
-		object_type_unknown3C_evaluate(object_datum);
+		object_type_delete(object_datum);
 	}
 	free_object_memory(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
 	return -1;

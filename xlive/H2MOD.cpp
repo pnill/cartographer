@@ -8,6 +8,7 @@
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\objects\object_types.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"

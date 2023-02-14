@@ -1,10 +1,10 @@
 #pragma once
+#include "damage.h"
+#include "object_placement.h"
 
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/damage.h"
-#include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/Players/PlayerActions.h"
 #include <wtypes.h>
 
@@ -62,7 +62,7 @@ enum e_object_type : signed char
 	creature,
 };
 
-enum e_object_type_flags
+enum e_object_type_flags : WORD
 {
 	_object_is_biped = 0x1,
 	_object_is_vehicle = 0x2,
@@ -112,14 +112,28 @@ enum e_biped_physics_mode : BYTE
 
 enum e_object_data_flags : DWORD
 {
-	has_prt_or_lighting_info = 0x80000000,
+	object_data_flag_0x1 = FLAG(0),
+	object_data_flag_has_collision = FLAG(9),
+	object_data_flag_0x400 = FLAG(10),
+	object_data_flag_0x800 = FLAG(11),
+	object_data_flag_object_does_not_cast_shadow = FLAG(16),
+	object_data_flag_0x20000 = FLAG(17),
+	object_data_flag_is_child_object = FLAG(26),
+	object_data_flag_has_prt_or_lighting_info = FLAG(31)
 };
+inline e_object_data_flags operator~ (e_object_data_flags a) { return (e_object_data_flags)~(int)a; }
+inline e_object_data_flags operator| (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a | (int)b); }
+inline e_object_data_flags operator& (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a & (int)b); }
+inline e_object_data_flags operator^ (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a ^ (int)b); }
+inline e_object_data_flags& operator|= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a |= (int)b); }
+inline e_object_data_flags& operator&= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a &= (int)b); }
+inline e_object_data_flags& operator^= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a ^= (int)b); }
 
 #pragma pack(push, 1)
 struct s_object_data_definition
 {
 	datum tag_definition_index;
-	DWORD object_flags;
+	e_object_data_flags object_flags;
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;		//maybe attachment or child
@@ -133,7 +147,8 @@ struct s_object_data_definition
 	float radius;
 	real_point3d object_origin_point;
 	float shadow_sphere_radius;
-	BYTE gap_50[16];
+	real_point3d dynamic_light_sphere_offset;
+	float dynamic_light_sphere_radius;
 	DWORD field_60;
 	real_point3d position;
 	real_vector3d orientation;
@@ -163,7 +178,7 @@ struct s_object_data_definition
 	BYTE model_variant_id;//hlmt variant tag_block index
 	char gap_D3;
 	unsigned int simulation_entity_index;
-	char field_D8;
+	bool b_attached_to_simulation;
 	char gap_D9[7];
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;
@@ -265,17 +280,23 @@ CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 
 
 
-enum e_object_header_flag :BYTE
+enum e_object_header_flag : BYTE
 {
-	_object_header_none = 0x0,
-	_object_header_active_bit = 0x1,
-	_object_header_requires_motion_bit = 0x2,
-	_object_header_flags_4 = 0x4,
-	_object_header_being_deleted_bit = 0x8,
-	_object_header_flags_10 = 0x10,
-	_object_header_connected_to_map_bit = 0x20,
-	_object_header_child_bit = 0x40,
+	_object_header_active_bit = FLAG(0),
+	_object_header_requires_motion_bit = FLAG(1),
+	_object_header_flags_4 = FLAG(2),
+	_object_header_being_deleted_bit = FLAG(3),
+	_object_header_flags_10 = FLAG(4),
+	_object_header_connected_to_map_bit = FLAG(5),
+	_object_header_child_bit = FLAG(6)
 };
+inline e_object_header_flag operator~ (e_object_header_flag a) { return (e_object_header_flag)~(int)a; }
+inline e_object_header_flag operator| (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a | (int)b); }
+inline e_object_header_flag operator& (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a & (int)b); }
+inline e_object_header_flag operator^ (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a ^ (int)b); }
+inline e_object_header_flag& operator|= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a |= (int)b); }
+inline e_object_header_flag& operator&= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a &= (int)b); }
+inline e_object_header_flag& operator^= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a ^= (int)b); }
 
 
 struct s_object_header {

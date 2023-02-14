@@ -11,7 +11,7 @@
 struct s_device_group_definition :TagGroup<'devi'>
 {
 	s_object_group_definition objectTag;
-	enum class e_flags : __int32
+	enum e_flags : __int32
 	{
 		position_loops = FLAG(0),
 		unused = FLAG(1),

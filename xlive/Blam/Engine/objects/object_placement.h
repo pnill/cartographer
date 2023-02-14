@@ -16,9 +16,7 @@ struct object_placement_data
 	DWORD unique_id;//0x4
 	DWORD origin_bsp_index;//0x8
 	string_id variant_name;//0xC
-	WORD unk_10;
-	BYTE unk_11;
-	BYTE unk_12;
+	DWORD placement_index;
 	BYTE placement_policy;//0x14
 	BYTE unk_15;//0x15
 	WORD unk_16;//0x16
@@ -30,7 +28,7 @@ struct object_placement_data
 	real_vector3d angular_velocity;//0x4C
 	float scale;//0x58
 	int player_index;
-	DWORD field_60;
+	datum unit_datum;
 	int team_index;
 	s_damage_owner damage_owner;
 	WORD field_72;

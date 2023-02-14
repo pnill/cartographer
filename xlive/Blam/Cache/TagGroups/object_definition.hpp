@@ -13,8 +13,7 @@
 #pragma pack(push,1)
 struct s_object_group_definition :TagGroup<'obje'>
 {
-	e_object_type object_type;
-	byte unk_1;
+	WORD object_type;	// WORD instead of a byte for some reason but stores index of the object rather than the 
 	enum e_object_flags : __int16
 	{
 		does_not_cast_shadow = FLAG(0),
@@ -53,7 +52,7 @@ struct s_object_group_definition :TagGroup<'obje'>
 	};
 	e_sweetener_size sweetener_size;//0x1A
 	byte unk1B;
-	enum class e_runtime_flags : __int32
+	enum e_runtime_flags : __int32
 	{
 		runtime_change_colors_allowed = FLAG(0),
 		bit_1 = FLAG(1),
@@ -249,7 +248,6 @@ struct s_object_group_definition :TagGroup<'obje'>
 	TAG_BLOCK_SIZE_ASSERT(s_predicted_resources_block, 0x8);
 	tag_block<s_predicted_resources_block> predicted_resources;//0xB4
 };
-
 TAG_GROUP_SIZE_ASSERT(s_object_group_definition, 0xBC);
 #pragma pack(pop)
 
