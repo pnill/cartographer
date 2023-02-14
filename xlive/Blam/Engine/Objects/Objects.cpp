@@ -556,7 +556,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						e_object_type::projectile) == 0;
 				if (new_object_tag->object_type & e_object_type::light_fixture | e_object_type::control | e_object_type::machine)
 				{
-					if (((s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_flags::allow_interpolation)
+					if (((s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation)
 						allow_interpolation = true;
 				}
 			}

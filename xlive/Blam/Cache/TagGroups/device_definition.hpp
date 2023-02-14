@@ -11,13 +11,13 @@
 struct s_device_group_definition :TagGroup<'devi'>
 {
 	s_object_group_definition objectTag;
-	enum e_flags : __int32
+	enum e_device_group_flags : __int32
 	{
-		position_loops = FLAG(0),
-		unused = FLAG(1),
-		allow_interpolation = FLAG(2),
+		e_device_group_flag_position_loops = FLAG(0),
+		e_device_group_flag_unused = FLAG(1),
+		e_device_group_flag_allow_interpolation = FLAG(2),
 	};
-	e_flags flags;//0xBC
+	e_device_group_flags flags;//0xBC
 	float power_transition_time;//0xC0
 	float power_acceleration_time;//0xC4
 	float position_transition_time;//0xC8
