@@ -231,7 +231,7 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 	const s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 	const s_object_group_definition* obje_definition = tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index);
 
-	if ((obje_definition->runtime_flags & s_object_group_definition::e_runtime_flags::runtime_change_colors_allowed) == 0) { return false; }
+	if ((obje_definition->runtime_flags & s_object_group_definition::e_object_group_runtime_runtime_change_colors_allowed) == 0) { return false; }
 
 	real_color_rgb* object_change_colors = (real_color_rgb*)((char*)object + object->change_color_offset);
 	int number_of_change_colors = (object->change_color_size / sizeof(real_color_rgb)) / 2;
