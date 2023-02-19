@@ -1,10 +1,9 @@
 #pragma once
-#include "objects.h"
-#include "object_placement.h"
-
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Math/real_math.h"
+
 typedef void (*type_initialize_gamestate_data_t)();
 typedef bool (*type_object_new_t)(datum, object_placement_data*, bool*);
 typedef void (*type_object_adjust_placement_t)(object_placement_data*);
@@ -26,6 +25,23 @@ typedef void (*type_preprocess_root_node_matrix_t)(datum, real_matrix4x3*);
 typedef void (*type_process_node_matricies_t)(datum, int, real_matrix4x3*);
 typedef void (*type_object_reset_t)(datum);
 typedef void (*type_notify_impulse_sound_t)(datum, int, int);
+
+enum e_object_type : signed char
+{
+	biped = 0,
+	vehicle,
+	weapon,
+	equipment,
+	garbage,
+	projectile,
+	scenery,
+	machine,
+	control,
+	light_fixture,
+	sound_scenery,
+	crate,
+	creature,
+};
 
 #define G_MAX_OBJECT_TYPE_IHERITENCE 3
 struct object_type_definition

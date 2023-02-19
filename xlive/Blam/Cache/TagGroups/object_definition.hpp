@@ -13,7 +13,7 @@
 #pragma pack(push,1)
 struct s_object_group_definition :TagGroup<'obje'>
 {
-	WORD object_type;	// WORD instead of a byte for some reason but stores index of the object rather than the 
+	WORD object_type;
 	enum e_object_flags : __int16
 	{
 		does_not_cast_shadow = FLAG(0),

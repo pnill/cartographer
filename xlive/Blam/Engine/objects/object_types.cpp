@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "object_types.h"
+#include "objects.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 
@@ -15,7 +16,7 @@ object_type_definition* object_type_definition_get(e_object_type object_type)
 
 object_type_definition* get_game_object_type_definition(datum object_datum)
 {
-	return object_type_definition_get(object_get_fast_unsafe<s_object_data_definition>(object_datum)->object_type);
+	return object_type_definition_get((e_object_type)object_get_fast_unsafe<s_object_data_definition>(object_datum)->placement_info.object_type);
 }
 
 int object_type_from_group_tag(datum tag_index)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Math/BlamMath.h"
 
 struct s_object_globals
 {
@@ -32,7 +32,7 @@ struct s_object_globals
 
 	static s_object_globals* get();
 	static bool object_is_connected_to_map(datum header_datum);
-	static void object_connect_lights_recursive(datum header_datum, int a2, int a3, char a4, char a5);
+	static void object_connect_lights_recursive(datum header_datum, char a2, char a3, char a4, char a5);
 	static void object_update_collision_culling(datum header_datum);
 	static void object_wake(datum object_datum);
 	static bool object_globals_initialized();

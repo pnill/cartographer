@@ -1,9 +1,8 @@
 #include "stdafx.h"
-
 #include "objects.h"
+
 #include "object_early_movers.h"
 #include "object_globals.h"
-#include "object_types.h"
 
 #include "Blam/Cache/TagGroups/device_definition.hpp"
 #include "Blam/Cache/TagGroups/object_definition.hpp"
@@ -100,7 +99,7 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 	for (unsigned long i = object->current_weapon_datum; i != -1; i = next_object->next_index)
 	{
 		next_object = object_get_fast_unsafe(i);
-		if ((next_object->object_type & _object_is_machine) == 0)
+		if ((next_object->placement_info.object_type & _object_is_machine) == 0)
 			object_compute_node_matrices_with_children(i);
 	}
 }
@@ -114,7 +113,7 @@ void object_evaluate_placement_variant(datum object_header_datum, string_id vari
 	object->model_variant_id = p_sub_53FE84(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_header_datum), variant_index);
 }
 
-void object_postprocess_node_matrices(unsigned short object_index)
+void object_postprocess_node_matrices(datum object_index)
 {
 	auto object = object_get_fast_unsafe(object_index);
 	auto object_tag = tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index);
@@ -123,7 +122,7 @@ void object_postprocess_node_matrices(unsigned short object_index)
 		auto model_tag = tags::get_tag_fast<s_model_group_definition>(object_tag->model.TagIndex);
 		if (model_tag->render_model.TagIndex != DATUM_INDEX_NONE && model_tag->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			typedef real_matrix4x3*(__cdecl* object_get_node_matrices_t)(unsigned __int16 a1, int* a2);
+			typedef real_matrix4x3*(__cdecl* object_get_node_matrices_t)(datum, int* a2);
 			auto p_object_get_node_matrices = Memory::GetAddress<object_get_node_matrices_t>(0x12FCA5);
 			int node_count = 0;
 			real_matrix4x3* node_matricies = p_object_get_node_matrices(object_index, &node_count);
@@ -141,16 +140,20 @@ void object_initialize_effects(datum object_datum)
 	auto p_attachments_new = Memory::GetAddress< attachments_new_t>(0x1348CA);
 
 	auto object_header = get_object_header(object_datum);
-	auto object = (s_object_data_definition*)object_header->object;
+	s_object_data_definition* object = (s_object_data_definition*)object_header->object;
 	if (object_header->type == projectile)
-		*((DWORD*)object_header->object + 55) = -1; ///??????
+	{
+		object->object_projectile_datum = -1;
+	}
 	else
+	{
 		p_widgets_new(object_datum);
+	}
 
 	p_attachments_new(object_datum);
 }
 
-bool set_object_position_if_in_cluster(s_location* location, long object_datum)
+bool set_object_position_if_in_cluster(s_location* location, const datum object_datum)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	scenario_location_from_point(location, &object->object_origin_point);
@@ -194,13 +197,13 @@ bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum
 
 datum __cdecl object_header_new(__int16 object_data_size)
 {
-	s_memory_pool** object_table = Memory::GetAddress<s_memory_pool**>(0x4E4610);
+	s_memory_pool* object_table = *Memory::GetAddress<s_memory_pool**>(0x4E4610);
 
 	const datum object_datum = datum_new(get_object_data_array());
 	s_object_header* object_header = get_object_header(object_datum);
 	if (object_datum == -1)
 		return object_datum;
-	if (memory_pool_block_allocate_handle(*object_table, &object_header->object, object_data_size, 0, 0))
+	if (memory_pool_block_allocate_handle(object_table, &object_header->object, object_data_size, 0, 0))
 	{
 		s_object_data_definition* object = (s_object_data_definition*)object_header->object;
 		object_header->object_data_size = object_data_size;
@@ -355,29 +358,29 @@ typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
 p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-	typedef void(__thiscall* sub_4F3B64_t)(char* this_ptr);
-	auto p_sub_4F3B64 = Memory::GetAddress<sub_4F3B64_t>(0xF3B64);
+	typedef void(__thiscall* sub_4F3B64_t)(byte* this_ptr);
+	auto c_animation_manager__c_animation_manager = Memory::GetAddress<sub_4F3B64_t>(0xF3B64);
 
-	typedef bool(__thiscall* sub_4F59AD_t)(char* this_ptr, int a2, int a3, char a4);
-	auto p_sub_4F59AD = Memory::GetAddress<sub_4F59AD_t>(0xF59AD);
+	typedef bool(__thiscall* sub_4F59AD_t)(byte* this_ptr, int a2, int a3, char a4);
+	auto c_animation_manager__reset_graph = Memory::GetAddress<sub_4F59AD_t>(0xF59AD);
 
-	typedef void(__thiscall* sub_4F3240_t)(char* this_ptr);
-	auto p_sub_4F3240 = Memory::GetAddress<sub_4F3240_t>(0xf3240);
+	typedef void(__thiscall* sub_4F3240_t)(byte* this_ptr);
+	auto c_animation_manager__destructor_c_animation_manager = Memory::GetAddress<sub_4F3240_t>(0xf3240);
 
-	typedef bool(__cdecl* object_header_block_allocate_t)(unsigned __int16 a1, __int16 a2, __int16 a3, char a4);
+	typedef bool(__cdecl* object_header_block_allocate_t)(datum a1, __int16 a2, __int16 a3, char a4);
 	auto p_object_header_block_allocate = Memory::GetAddress<object_header_block_allocate_t>(0x130BC6);
 
-	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(unsigned __int16 a1);
+	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(datum a1);
 	auto p_havok_can_allocate_space_for_instance_of_object_definition = Memory::GetAddress<havok_can_allocate_space_for_instance_of_object_definition_t>(0x9FE55);
 
-	typedef void(__thiscall* sub_4F31E7_t)(char* this_ptr);
-	auto p_sub_4f31E7 = Memory::GetAddress<sub_4F31E7_t>(0xF31E7);
+	typedef void(__thiscall* sub_4F31E7_t)(byte* this_ptr);
+	auto c_animation_manager__initialize = Memory::GetAddress<sub_4F31E7_t>(0xF31E7);
 
-	typedef void(__cdecl* sub_532F07_t)(unsigned __int16 arg0, int arg4);
-	auto p_sub_532F07 = Memory::GetAddress<sub_532F07_t>(0x132F07);
+	typedef void(__cdecl* sub_532F07_t)(datum arg0, int arg4);
+	auto update_object_region_information = Memory::GetAddress<sub_532F07_t>(0x132F07);
 
-	typedef char(__cdecl* sub_5310F9_t)(unsigned __int16 a1, int a2, real_color_rgb* a3);
-	auto p_sub_5310F9 = Memory::GetAddress<sub_5310F9_t>(0x1310F9);
+	typedef char(__cdecl* sub_5310F9_t)(datum a1, int a2, real_color_rgb* a3);
+	auto p_object_set_initial_change_colors = Memory::GetAddress<sub_5310F9_t>(0x1310F9);
 
 	typedef void(__cdecl* object_initialize_vitality_t)(datum a1, float* a2, float* a3);
 	auto p_object_initialize_vitality = Memory::GetAddress<object_initialize_vitality_t>(0x175A62);
@@ -388,7 +391,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	typedef void(__cdecl* sub_52FE4D_t)(datum a1);
 	auto p_object_reset_interpolation = Memory::GetAddress<sub_52FE4D_t>(0x12FE4D);
 
-	typedef void(__cdecl* sub_5323B3_t)(unsigned __int16 a1);
+	typedef void(__cdecl* sub_5323B3_t)(datum a1);
 	auto p_connect_objects_havok_component_to_world = Memory::GetAddress< sub_5323B3_t>(0x1323B3);
 
 	typedef void(__cdecl* effect_new_from_object_t)(int arg0, s_damage_owner* arg4, datum a1, float a4, float a5, int a6);
@@ -406,7 +409,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	if (placement_data->tag_index == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
 
 	const s_object_group_definition* new_object_tag = tags::get_tag_fast<s_object_group_definition>(placement_data->tag_index);
-	const object_type_definition* new_object_type_definition = object_type_definition_get((e_object_type)new_object_tag->object_type);
+	const object_type_definition* object_type_definition = object_type_definition_get((e_object_type)new_object_tag->object_type);
 
 	const s_model_group_definition* model_definition = nullptr;
 	if (new_object_tag->model.TagIndex != DATUM_INDEX_NONE)
@@ -414,14 +417,19 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		model_definition = tags::get_tag_fast<s_model_group_definition>(new_object_tag->model.TagIndex);
 	}
 
-	if ((new_object_tag->object_type) & (e_object_type::creature | e_object_type::crate | e_object_type::machine | e_object_type::vehicle | e_object_type::biped))
+	if (FLAG(new_object_tag->object_type) & 
+		(FLAG(e_object_type::creature) | 
+			FLAG(e_object_type::crate) | 
+			FLAG(e_object_type::machine) | 
+			FLAG(e_object_type::vehicle) | 
+			FLAG(e_object_type::biped)) != 0)
 	{
 		typedef void(__cdecl* havok_memory_garbage_collect_t)();
 		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78);
 		p_havok_memory_garbage_collect();
 	}
 
-	datum object_datum = object_header_new(new_object_type_definition->datum_size);
+	datum object_datum = object_header_new(object_type_definition->datum_size);
 
 	if (object_datum == DATUM_INDEX_NONE) { return DATUM_INDEX_NONE; }
 
@@ -432,11 +440,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object_header->type = (e_object_type)new_object_tag->object_type;
 	object->tag_definition_index = placement_data->tag_index;
 
-	if (placement_data->origin_bsp_index == -1)
+	if (placement_data->placement_info.placement_type == UCHAR_MAX)
 	{
 		++s_object_globals::get()->unique_id;
-		object->field_AB = 2;
-		object->origin_bsp_index = -1;
+		object->placement_info.object_type = (e_object_type)new_object_tag->object_type;
+		object->placement_info.placement_type = 2;
+		object->placement_info.origin_bsp_index = -1;
 		object->unique_id = s_object_globals::get()->unique_id;
 		object->placement_index = -1;
 		object->structure_bsp_index = (byte)get_global_structure_bsp_index();
@@ -444,9 +453,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	else
 	{
 		object->unique_id = placement_data->unique_id;
-		object->origin_bsp_index = (short)placement_data->origin_bsp_index;
+		object->placement_info = placement_data->placement_info;
 		object->placement_index = (short)placement_data->placement_index;
-		object->structure_bsp_index = (byte)placement_data->origin_bsp_index;
+		object->structure_bsp_index = (byte)placement_data->placement_info.origin_bsp_index;
 	}
 
 	object->position = placement_data->position;
@@ -525,7 +534,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	size_t nodes_count = 1;
 	size_t collision_regions_count = 1;
 	size_t damage_info_damage_sections_size = 0;
-	char animation_manager[144];
+	byte animation_manager[144];
 
 	bool allow_interpolation = false;
 	bool valid_animation_manager = false;
@@ -543,41 +552,41 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		if (model_definition->animation.TagIndex != DATUM_INDEX_NONE)
 		{
 			int test = 0;
-			p_sub_4F3B64(animation_manager);
-			if (p_sub_4F59AD(animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+			c_animation_manager__c_animation_manager(animation_manager);
+			if (c_animation_manager__reset_graph(animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 			{
 				valid_animation_manager = true;
-				allow_interpolation = (new_object_tag->object_type & 
-					e_object_type::sound_scenery | 
-						e_object_type::light_fixture | 
-						e_object_type::control | 
-						e_object_type::machine | 
-						e_object_type::scenery | 
-						e_object_type::projectile) == 0;
-				if (new_object_tag->object_type & e_object_type::light_fixture | e_object_type::control | e_object_type::machine)
+				allow_interpolation = (FLAG(new_object_tag->object_type) &
+					FLAG(e_object_type::sound_scenery) | 
+					FLAG(e_object_type::light_fixture) |
+					FLAG(e_object_type::control) |
+					FLAG(e_object_type::machine) |
+					FLAG(e_object_type::scenery) |
+					FLAG(e_object_type::projectile)) != 0;
+
+				// allow interpolation if object is device and device flags include interpolation
+				if ((FLAG(new_object_tag->object_type) & e_object_type::light_fixture | e_object_type::control | e_object_type::machine) != 0
+					&& (((const s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation) != 0)
 				{
-					if (((s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation)
-						allow_interpolation = true;
+					allow_interpolation = true;
 				}
 			}
 			test = -1;
-			p_sub_4F3240(animation_manager);
+			c_animation_manager__destructor_c_animation_manager(animation_manager);
 		}
 	}
 
-	auto new_object_absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum);
+	long original_orientations = (!allow_interpolation ? 0 : nodes_count * 32);
 
-	long original_orientations = (!allow_interpolation) ? 0 : nodes_count * 32;
-
-	bool b_attachments = p_object_header_block_allocate(new_object_absolute_index, 284, (short)(8 * new_object_tag->attachments.size), 0);
-	bool b_damage_sections = p_object_header_block_allocate(new_object_absolute_index, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
-	bool b_change_colors = p_object_header_block_allocate(new_object_absolute_index, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
-	bool b_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x114, (short)(52 * nodes_count), 0);
-	bool b_collision = p_object_header_block_allocate(new_object_absolute_index, 0x118, (short)(10 * collision_regions_count), 0);
-	bool b_interpolation_nodes = p_object_header_block_allocate(new_object_absolute_index, 0x110, (short)original_orientations, 0);
-	bool b_interpolation_nodes_2 = p_object_header_block_allocate(new_object_absolute_index, 0x10C,(short)original_orientations, 0);
-	bool b_animation = p_object_header_block_allocate(new_object_absolute_index, 0x128, (valid_animation_manager != 0 ? 0x90 : 0), 1);
-	bool b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(DATUM_INDEX_TO_ABSOLUTE_INDEX(placement_data->tag_index));
+	bool b_attachments = p_object_header_block_allocate(object_datum, 0x11C, (short)(8 * new_object_tag->attachments.size), 0);
+	bool b_damage_sections = p_object_header_block_allocate(object_datum, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
+	bool b_change_colors = p_object_header_block_allocate(object_datum, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
+	bool b_nodes = p_object_header_block_allocate(object_datum, 0x114, (short)(52 * nodes_count), 0);
+	bool b_collision = p_object_header_block_allocate(object_datum, 0x118, (short)(10 * collision_regions_count), 0);
+	bool b_interpolation_nodes = p_object_header_block_allocate(object_datum, 0x110, (short)original_orientations, 4);
+	bool b_interpolation_nodes_2 = p_object_header_block_allocate(object_datum, 0x10C,(short)original_orientations, 4);
+	bool b_animation = p_object_header_block_allocate(object_datum, 0x128, (valid_animation_manager ? 144 : 0), 0);
+	bool b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
 	bool unk_creation_bool = false;
 	bool graph_reset = false;
@@ -599,17 +608,17 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	{
 		if (valid_animation_manager)
 		{
-			auto c_animation_manager = ((char*)object + object->animation_manager_offset);
+			byte* c_animation_manager = ((byte*)object + object->animation_manager_offset);
 
-			p_sub_4f31E7(c_animation_manager);
-			if (p_sub_4F59AD(c_animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+			c_animation_manager__initialize(c_animation_manager);
+			if (c_animation_manager__reset_graph(c_animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 				object->object_flags |= object_data_flag_0x800;
 			else
 				object->object_flags &= ~object_data_flag_0x800;
 		}
 		if (new_object_tag->attachments.size > 0)
 		{
-			char* object_attachments_block = (char*)object + object->object_attachments_block_offset;
+			byte* object_attachments_block = (byte*)object + object->object_attachments_block_offset;
 			memset(object_attachments_block, -1, 8 * ((unsigned int)object->object_attachments_block_size >> 3));
 		}
 
@@ -622,24 +631,24 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			}
 
 			object_evaluate_placement_variant(object_datum, placement_data->variant_name);
-			p_sub_532F07(new_object_absolute_index, placement_data->unk_AC);
-			p_sub_5310F9(new_object_absolute_index, placement_data->active_change_colors_mask, placement_data->change_colors);
+			update_object_region_information(object_datum, placement_data->region_index);
+			p_object_set_initial_change_colors(object_datum, placement_data->active_change_colors_mask, placement_data->change_colors);
 			p_object_initialize_vitality(object_datum, nullptr, nullptr);
 			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 
-			if (object->animation_manager_offset != 0xFFFF)
+			if (object->animation_manager_offset != DATUM_INDEX_NONE)
 				p_object_reset_interpolation(object_datum);
 
 			object_compute_node_matrices_with_children(object_datum);
 			if (s_object_globals::get() && s_object_globals::get()->initialized)
 			{
-				byte object_is_inside_cluster = 0;
+				
 				s_location* p_location = nullptr;
-				if (placement_data->object_is_inside_cluster
-					|| (object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum),
-						placement_data->object_is_inside_cluster = object_is_inside_cluster))
+				if (byte object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum); 
+					placement_data->object_is_inside_cluster || object_is_inside_cluster)
 				{
+					placement_data->object_is_inside_cluster = object_is_inside_cluster;
 					p_location = &placement_data->location;
 				}
 
@@ -655,7 +664,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			else
 				object->flags_C0 &= ~2u;
 
-			p_connect_objects_havok_component_to_world(new_object_absolute_index);
+			p_connect_objects_havok_component_to_world(object_datum);
 			object_initialize_effects(object_datum);
 			object_type_create_children(object_datum);
 
@@ -672,13 +681,17 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if (!s_object_globals::object_globals_initialized()) { return object_datum; }
 
-			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 || object->location.cluster != 0xFFFF)) { object_delete(object_datum);}
+			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 
+				|| object->location.cluster != 0xFFFF)) 
+			{ 
+				object_delete(object_datum);
+			}
 			return object_datum;
 		}
 		object_type_delete(object_datum);
 	}
 	free_object_memory(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
-	return -1;
+	return DATUM_INDEX_NONE;
 }
 
 #pragma region Biped variant patches

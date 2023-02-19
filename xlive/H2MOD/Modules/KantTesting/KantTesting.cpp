@@ -2,31 +2,31 @@
 
 #include "KantTesting.h"
 
-#include "Blam/Engine/Objects/object_globals.h"
-#include "Blam/Engine/Objects/object_types.h"
-#include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Engine/physics/collision_bsp.h"
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Game/GameEngineGlobals.h"
-#include "Blam/Engine/Game/GameGlobals.h"
-#include "Blam/Engine/Players/Players.h"
-#include "Blam/LazyBlam/LazyBlam.hpp"
-#include "H2MOD/Engine/Engine.h"
+//#include "Blam/Engine/Objects/object_globals.h"
+//#include "Blam/Engine/Objects/object_types.h"
+//#include "Blam/Engine/physics/collision_bsp.h"
+//#include "Blam/Engine/scenario/scenario.h"
+//#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+//#include "Blam/Cache/TagGroups/biped_definition.hpp"
+//#include "Blam/Cache/TagGroups/globals_definition.hpp"
+//#include "Blam/Cache/TagGroups/model_definition.hpp"
+//#include "Blam/Cache/TagGroups/scenario_definition.hpp"
+//#include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
+//#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+//#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+//#include "Blam/Engine/Game/GameEngineGlobals.h"
+//#include "Blam/Engine/Game/GameGlobals.h"
+//#include "Blam/Engine/Players/Players.h"
+//#include "Blam/LazyBlam/LazyBlam.hpp"
+//#include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Blam/Engine/Memory/bitstream.h"
-#include "Blam/Engine/Memory/bitstream.h"
-#include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
-#include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+//#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+//#include "Blam/Engine/Memory/bitstream.h"
+//#include "Blam/Engine/Memory/bitstream.h"
+//#include "H2MOD/Modules/Shell/Shell.h"
+//#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+//#include "H2MOD/Tags/MetaExtender.h"
+//#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/Hooks/Hook.h"
 
 
@@ -38,18 +38,10 @@ namespace KantTesting
 		{
 		}
 	}
-	object_type_definition** object_types;
 
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
-			object_types = Memory::GetAddress<object_type_definition**>(0x41F560, 0x0);
-			for (int i = 0; i < 13; i++)
-			{
-				auto c = *object_types[i];
-				auto a = std::string(c.name);
-				LOG_ERROR_FUNC("{}", a);
-			}
 
 			DETOUR_BEGIN();
 			//DETOUR_ATTACH(p_object_type_definition_object_new_evaluate, Memory::GetAddress<object_type_definition_object_new_evaluate_t>(0x185BAE, 0x0), object_type_definition_object_new_evaluate);

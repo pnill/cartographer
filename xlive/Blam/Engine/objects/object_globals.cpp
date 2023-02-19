@@ -13,10 +13,10 @@ bool s_object_globals::object_is_connected_to_map(datum header_datum)
 	return p_object_is_connected_to_map(header_datum);
 }
 
-void s_object_globals::object_connect_lights_recursive(datum header_datum, int a2, int a3, char a4, char a5)
+void s_object_globals::object_connect_lights_recursive(datum header_datum, char a2, char a3, char a4, char a5)
 {
-	typedef void(__cdecl* object_connect_lights_recursive_t)(int a1, int a2, int a3, char a4, char a5);
-	auto p_object_connect_lights_recursive = Memory::GetAddress<object_connect_lights_recursive_t>(0x134A78);
+	typedef void(__cdecl* object_connect_lights_recursive_t)(int a1, char a2, char a3, char a4, char a5);
+	auto p_object_connect_lights_recursive = Memory::GetAddress<object_connect_lights_recursive_t>(0x134A78, 0x123948);
 	p_object_connect_lights_recursive(header_datum, a2, a3, a4, a5);
 }
 

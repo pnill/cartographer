@@ -1,6 +1,7 @@
 #pragma once
 #include "damage.h"
 #include "object_placement.h"
+#include "object_types.h"
 
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/DataArray/DataArray.h"
@@ -43,23 +44,6 @@ enum e_object_team : BYTE
 
 	// Shared
 	None = 255
-};
-
-enum e_object_type : signed char
-{
-	biped = 0,
-	vehicle,
-	weapon,
-	equipment,
-	garbage,
-	projectile,
-	scenery,
-	machine,
-	control,
-	light_fixture,
-	sound_scenery,
-	crate,
-	creature,
 };
 
 enum e_object_type_flags : WORD
@@ -157,9 +141,7 @@ struct s_object_data_definition
 	real_vector3d angular_velocity;
 	float scale;
 	datum unique_id;
-	__int16 origin_bsp_index;
-	e_object_type object_type;//TODO: confirm if its object_type or object_type_flags
-	byte field_AB;
+	s_placement_info placement_info;
 	__int16 name_list_index;
 	byte structure_bsp_index;
 	char netgame_equipment_index;
@@ -179,7 +161,8 @@ struct s_object_data_definition
 	char gap_D3;
 	unsigned int simulation_entity_index;
 	bool b_attached_to_simulation;
-	char gap_D9[7];
+	char gap_D9[3];
+	datum object_projectile_datum;
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;
 	float body_max_vitality;

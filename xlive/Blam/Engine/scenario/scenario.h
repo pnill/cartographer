@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/physics/bsp3d.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/structures/structures.h"
 #include "Blam/Math/real_math.h"
 
 enum class e_placement_flags : __int32
@@ -78,6 +78,6 @@ struct s_scenario_object : s_scenario_group_placement_object_block
 	WORD valid_multiplayer_games;
 };
 
-void __cdecl location_invalidate(s_location* object_location);
-void __cdecl scenario_location_from_point(s_location* bsp_point, const real_point3d* point);
-void __cdecl scenario_location_from_leaf(s_location* location, DWORD leaf_index);
+void location_invalidate(s_location* object_location);
+void scenario_location_from_point(s_location* bsp_point, const real_point3d* point);
+void scenario_location_from_leaf(s_location* location, DWORD leaf_index);

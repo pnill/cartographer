@@ -1,20 +1,24 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/objects/damage.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/structures/structures.h"
+#include "Blam/Math/real_math.h"
+#include <wtypes.h>
 
-struct s_location
+struct s_placement_info
 {
-	DWORD leaf_index;
-	WORD cluster;
-	WORD bsp_index;
+	WORD origin_bsp_index;
+	// THIS PIECE OF SHIT GARBAGE WONT LET ME USE THE e_object_type ENUM ON THIS CRAP BECAUSE OF HEADER BULLSHIT CRAP
+	// MADE THIS A BYTE BECAUSE SCREW YOU I WANT THIS TO WORK
+	byte object_type;
+	byte placement_type;
 };
 
 struct object_placement_data
 {
 	datum tag_index;//0
 	DWORD unique_id;//0x4
-	DWORD origin_bsp_index;//0x8
+	s_placement_info placement_info;//0x8
 	string_id variant_name;//0xC
 	DWORD placement_index;
 	BYTE placement_policy;//0x14
@@ -35,7 +39,7 @@ struct object_placement_data
 	DWORD active_change_colors_mask;
 	real_color_rgb change_colors[4];
 	DWORD foreground_emblem;
-	DWORD unk_AC;
+	DWORD region_index;
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;
 	WORD field_B4;
