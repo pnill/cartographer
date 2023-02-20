@@ -301,6 +301,9 @@ void H2Tweaks::ApplyPatches() {
 
 		// set the additional pcr time
 		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+
+		// fix human turret variant setting not working on dedicated servers
+		WriteValue<int>(Memory::GetAddress(0x0, 0x3557FC), 1);
 	}
 	else {//is client
 
