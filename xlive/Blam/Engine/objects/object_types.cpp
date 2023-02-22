@@ -144,17 +144,20 @@ void __cdecl object_type_move(datum object_datum)
 typedef void(__cdecl* object_type_object_can_activate_t)(datum object_datum, int a2, int a3);
 object_type_object_can_activate_t p_object_type_object_can_activate;
 
-void __cdecl object_type_compute_activation(datum object_datum, int a2, int a3)
+bool __cdecl object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
 {
+	bool result = false;
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
-	for (byte i = 0; object_type->base_object_types[i]; i++)
+	for (byte i = 0; object_type->base_object_types[i] || !result; i++)
 	{
-		if (object_type->base_object_types[i]->object_can_activate)
+		if (object_type->base_object_types[i]->object_compute_activation)
 		{
-			object_type->base_object_types[i]->object_can_activate(object_datum, a2, a3);
+			result = object_type->base_object_types[i]->object_compute_activation(object_datum, a2, a3);
 		}
 	}
+
+	return result;
 }
 
 typedef void(__cdecl* object_type_assign_new_entity_t)(datum object_datum);

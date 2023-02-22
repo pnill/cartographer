@@ -13,7 +13,7 @@ void object_early_mover_new(datum object_index)
     if ((tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index)->object_flags & s_object_group_definition::e_object_flags::early_mover) != 0
          && s_object_early_movers_globals::get()->object_index_count < 32)
     {
-        object->flags_C0 |= 8u;
+        object->physics_flags |= _object_is_early_mover_bit;
         s_object_early_movers_globals::get()->early_mover_objects[s_object_early_movers_globals::get()->object_index_count++] = object_index;
     }
 }

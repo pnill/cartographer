@@ -526,6 +526,7 @@
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

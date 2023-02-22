@@ -16,9 +16,10 @@ void location_invalidate(s_location* object_location)
 // Figure this out later
 void scenario_location_from_point(s_location* location, const real_point3d* point)
 {
-    typedef int(__cdecl* scenario_location_from_point_t)(s_location* bsp_point, real_point3d* point);
+    typedef int(__cdecl* scenario_location_from_point_t)(s_location* bsp_point, const real_point3d* point);
     scenario_location_from_point_t p_scenario_location_from_point = Memory::GetAddress<scenario_location_from_point_t>(0x281EE);
-
+    p_scenario_location_from_point(location, point);
+    
     /*
     typedef int(__cdecl* bsp3d_test_point_t)(const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp, int starting_index, const real_point3d* point);
     auto p_bsp3d_test_point = Memory::GetAddress<bsp3d_test_point_t>(0x76EFF);
@@ -34,7 +35,7 @@ void scenario_location_from_point(s_location* location, const real_point3d* poin
     }
     else
     {
-        int leaf_index = bsp3d_test_point(global_collision_bsp, 0, point);
+        int leaf_index = p_bsp3d_test_point(global_collision_bsp, 0, point);
         location->leaf_index = leaf_index;
         if (leaf_index == -1)
         {

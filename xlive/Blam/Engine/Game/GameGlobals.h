@@ -30,7 +30,6 @@ struct s_game_globals
 	WORD pvs_object_is_set;
 	datum pvs_object_datum;
 
-
 	static s_game_globals* get();
 	static bool map_initialized();
 	static s_game_options* get_game_options();

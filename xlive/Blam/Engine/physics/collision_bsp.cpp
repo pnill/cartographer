@@ -28,5 +28,5 @@ bool __cdecl collision_bsp_test_sphere(s_scenario_structure_bsp_group_definition
 	*(DWORD*)&test_result->gap[1024] = 0;
 	*(DWORD*)&test_result->gap[2052] = 0;
 	p_test_sphere_results(&buffer, 0);
-	return test_result > 0 || *(int*)&test_result->gap[1024] > 0 || *(int*)&test_result->gap[2052] > 0;
+	return test_result->unk0 > 0 || *(int*)&test_result->gap[1024] > 0 || *(int*)&test_result->gap[2052] > 0;
 }

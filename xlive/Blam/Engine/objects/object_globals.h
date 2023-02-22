@@ -9,7 +9,7 @@ struct s_object_globals
 	bool do_garbage_collection;
 	bool do_garbage_collection_unsafe;
 	bool objects_updating;
-	int active_objects_maybe;
+	int active_garbage_object_count;
 	int field_8;
 	int field_C;
 	int field_10;

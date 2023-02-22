@@ -97,11 +97,14 @@ enum e_biped_physics_mode : BYTE
 enum e_object_data_flags : DWORD
 {
 	object_data_flag_0x1 = FLAG(0),
+	object_data_flag_0x100 = FLAG(8),
 	object_data_flag_has_collision = FLAG(9),
 	object_data_flag_0x400 = FLAG(10),
 	object_data_flag_0x800 = FLAG(11),
 	object_data_flag_object_does_not_cast_shadow = FLAG(16),
 	object_data_flag_0x20000 = FLAG(17),
+	object_data_flag_0x40000 = FLAG(18),
+	object_data_flag_0x200000 = FLAG(21),
 	object_data_flag_is_child_object = FLAG(26),
 	object_data_flag_has_prt_or_lighting_info = FLAG(31)
 };
@@ -112,6 +115,25 @@ inline e_object_data_flags operator^ (e_object_data_flags a, e_object_data_flags
 inline e_object_data_flags& operator|= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a |= (int)b); }
 inline e_object_data_flags& operator&= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a &= (int)b); }
 inline e_object_data_flags& operator^= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a ^= (int)b); }
+
+enum e_object_physics_flags : WORD
+{
+	_object_allocated_havok_component_bit = FLAG(0),
+	_object_physics_flag_0x2 = FLAG(1),
+	_object_is_early_mover_bit = FLAG(3),
+	_object_is_early_mover_child_bit = FLAG(4),
+	_object_connected_to_physics_bit = FLAG(6),
+	_object_physics_flag_0x100 = FLAG(8),
+};
+
+inline e_object_physics_flags operator~ (e_object_physics_flags a) { return (e_object_physics_flags)~(int)a; }
+inline e_object_physics_flags operator| (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a | (int)b); }
+inline e_object_physics_flags operator& (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a & (int)b); }
+inline e_object_physics_flags operator^ (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a ^ (int)b); }
+inline e_object_physics_flags& operator|= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a |= (int)b); }
+inline e_object_physics_flags& operator&= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a &= (int)b); }
+inline e_object_physics_flags& operator^= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a ^= (int)b); }
+
 
 #pragma pack(push, 1)
 struct s_object_data_definition
@@ -133,7 +155,7 @@ struct s_object_data_definition
 	float shadow_sphere_radius;
 	real_point3d dynamic_light_sphere_offset;
 	float dynamic_light_sphere_radius;
-	DWORD field_60;
+	DWORD first_cluster_reference;
 	real_point3d position;
 	real_vector3d orientation;
 	real_vector3d up;
@@ -151,7 +173,7 @@ struct s_object_data_definition
 	byte field_b3;
 	datum havok_datum;
 	char gap_B8[8];
-	WORD flags_C0;
+	e_object_physics_flags physics_flags;
 	WORD damage_owner_unk3;
 	DWORD damage_owner_unk1;
 	DWORD damage_owner_unk2;
@@ -266,8 +288,8 @@ CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 enum e_object_header_flag : BYTE
 {
 	_object_header_active_bit = FLAG(0),
-	_object_header_requires_motion_bit = FLAG(1),
-	_object_header_flags_4 = FLAG(2),
+	_object_header_awake_bit = FLAG(1),
+	_object_header_requires_motion_bit = FLAG(2),
 	_object_header_being_deleted_bit = FLAG(3),
 	_object_header_flags_10 = FLAG(4),
 	_object_header_connected_to_map_bit = FLAG(5),
@@ -281,16 +303,24 @@ inline e_object_header_flag& operator|= (e_object_header_flag& a, e_object_heade
 inline e_object_header_flag& operator&= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a &= (int)b); }
 inline e_object_header_flag& operator^= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a ^= (int)b); }
 
-
 struct s_object_header {
-	__int16 datum_salt; //0x00
-	e_object_header_flag flags; // 0x02
-	e_object_type type; // 0x03
-	__int16 cluster_reference;  // 0x04
-	__int16 object_data_size;  //0x06
-	void* object; //0x08 -
+	__int16 datum_salt;
+	e_object_header_flag flags;
+	e_object_type object_type;
+	__int16 cluster_index;
+	__int16 object_data_size;
+	void* object;
 };
 CHECK_STRUCT_SIZE(s_object_header, 0xC);
+
+struct s_object_payload
+{
+	WORD object_type;
+	WORD cull_flags;
+	real_point3d origin_point;
+	float bounding_sphere_radius;
+};
+CHECK_STRUCT_SIZE(s_object_payload, 0x14);
 
 static s_data_array* get_object_data_array()
 {
@@ -333,7 +363,7 @@ void simulation_action_object_create(datum object_idx);
 void object_delete(const datum object_idx);
 void object_wake(const datum object_datum);
 void __cdecl object_disconnect_from_map(const datum object_index);
-void __cdecl object_reconnect_to_map(const void* location_struct, const datum object_index);
+void __cdecl object_reconnect_to_map(const s_location* location_struct, const datum object_index);
 void object_compute_node_matrices_with_children(const datum object_datum);
 
 int object_get_count();

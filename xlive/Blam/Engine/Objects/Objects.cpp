@@ -15,6 +15,7 @@
 #include "Blam/Engine/physics/bsp3d.h"
 #include "Blam/Engine/physics/collision_bsp.h"
 #include "Blam/Engine/scenario/scenario.h"
+#include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structures.h"
 #include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -72,17 +73,169 @@ void object_wake(const datum object_datum)
 void __cdecl object_disconnect_from_map(const datum object_index)
 {
 	typedef void(__cdecl* object_disconnect_from_map_t)(const datum object_index);
-	auto object_disconnect_from_map = Memory::GetAddress<object_disconnect_from_map_t>(0x136226, 0x125136);
+	auto object_disconnect_from_map = Memory::GetAddress<object_disconnect_from_map_t>(0x136266, 0x125136);
 
 	object_disconnect_from_map(object_index);
 }
 
-void __cdecl object_reconnect_to_map(const void* location_struct, const datum object_index)
+void __cdecl object_activate(const datum object_index)
 {
-	typedef void(__cdecl* object_reconnect_to_map_t)(const void* location_struct, const datum object_index);
-	auto object_reconnect_to_map = Memory::GetAddress<object_reconnect_to_map_t>(0x1360CE, 0x124F9E);
+	typedef void(__cdecl* object_activate_t)(const datum object_index);
+	auto object_activate = Memory::GetAddress<object_activate_t>(0x13204A);
 
-	object_reconnect_to_map(location_struct, object_index);
+	object_activate(object_index);
+}
+
+void __cdecl object_deactivate(const datum object_index)
+{
+	typedef void(__cdecl* object_deactivate_t)(const datum object_index);
+	auto object_deactivate = Memory::GetAddress<object_deactivate_t>(0x1320B8);
+	object_deactivate(object_index);
+}
+
+void __cdecl object_cleanup_havok(const datum object_index)
+{
+	typedef void(__cdecl* object_cleanup_havok_t)(const datum object_index);
+	auto object_cleanup_havok = Memory::GetAddress<object_cleanup_havok_t>(0xA2778);
+	object_cleanup_havok(object_index);
+}
+
+bool __cdecl simulation_query_object_is_predicted(const datum object_index)
+{
+	typedef bool(__cdecl* simulation_query_object_is_predicted_t)(const datum object_index);
+	auto simulation_query_object_is_predicted = Memory::GetAddress<simulation_query_object_is_predicted_t>(0x1B6494);
+	return simulation_query_object_is_predicted(object_index);
+}
+
+bool object_can_activate_in_cluster(datum object_datum, DWORD* cluster_activation)
+{
+	bool result = false;
+	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	s_object_header* object_header = get_object_header(object_datum);
+
+	if ((object->object_flags & 2) != 0)
+		return true;
+	if ((FLAG(object_header->object_type) & FLAG(_object_is_machine)) != 0 && object_type_compute_activation(object_datum, cluster_activation, &result) || object_header->cluster_index == -1)
+	{
+		return result;
+	}
+	return (FLAG(object_header->cluster_index & 0x1F) & cluster_activation[object_header->cluster_index >> 5]) != 0;
+}
+
+void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
+{
+	typedef WORD (__cdecl* collision_compute_object_cull_flags_t)(datum object_index);
+	auto p_collision_compute_object_cull_flags = Memory::GetAddress<collision_compute_object_cull_flags_t>(0xCBE87);
+
+	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	WORD cull_flags = 0;
+	if ((object->object_flags & object_data_flag_has_collision) != 0)
+		cull_flags = p_collision_compute_object_cull_flags(object_datum);
+
+	cluster_payload->object_type = object->placement_info.object_type;
+	cluster_payload->cull_flags = cull_flags;
+	cluster_payload->origin_point = object->object_origin_point;
+	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
+}
+
+void __cdecl object_reconnect_to_map(const s_location* location, const datum object_datum)
+{
+	typedef void(__cdecl* cluster_partition_reconnect_t)(
+		cluster_partition* partition,
+		datum object_datum,
+		DWORD* first_cluster_reference,
+		real_point3d* position,
+		float radius,
+		s_location* location,
+		void* cluster_bitvector,
+		int payload_size,
+		void* payload,
+		bool* cluster_overflow);
+	auto p_cluster_partition_reconnect = Memory::GetAddress<cluster_partition_reconnect_t>(0x37A13E);
+
+	typedef void(__cdecl* object_connect_lights_recursive_t)(
+		datum object_datum,
+		bool disconnect_this_object,
+		bool reconnect_this_object,
+		bool reconnect_child_objects,
+		bool show_this_object);
+	auto p_object_connect_lights_recursive = Memory::GetAddress<object_connect_lights_recursive_t>(0x134A78);
+
+	typedef DWORD*(__cdecl* game_get_cluster_activation_t)();
+	auto p_game_get_cluster_activation = Memory::GetAddress<game_get_cluster_activation_t>(0x499FD);
+
+
+	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	s_object_header* object_header = get_object_header(object_datum);
+	bool cluster_index_is_null = object_header->cluster_index == 0xFFFF;
+	s_location scnr_location;
+
+	if (!location)
+	{
+		scenario_location_from_point(&scnr_location, &object->object_origin_point);
+		if (scnr_location.cluster == 0xFFFF)
+		{
+			scenario_location_from_point(&scnr_location, &object->position);
+		}
+	}
+
+	if (scnr_location.cluster == 0xFFFF)
+	{
+		object->object_flags |= object_data_flag_0x40000;
+	}
+	else
+	{
+		object->location = *location;
+		object->object_flags &= ~object_data_flag_0x40000;
+	}
+	DWORD cluster_bitvector[8];
+	bool cluster_overflow = false;
+	if ((object->object_flags & object_data_flag_0x200000) == 0)
+	{
+		memset(cluster_bitvector, -1, 64);
+	}
+
+	s_object_payload payload;
+	get_object_payload(object_datum, &payload);
+	cluster_partition noncollideable_object_cluster_partition = *Memory::GetAddress<cluster_partition*>(0x4E45F8);
+	cluster_partition collideable_object_cluster_partition = *Memory::GetAddress<cluster_partition*>(0x4E4604);
+
+
+	cluster_partition* partition = &collideable_object_cluster_partition;
+	if ((object->object_flags & object_data_flag_has_collision) == 0)
+		partition = &noncollideable_object_cluster_partition;
+
+	p_cluster_partition_reconnect(
+		partition,
+		object_datum,
+		&object->first_cluster_reference,
+		&object->object_origin_point,
+		object->shadow_sphere_radius,
+		&object->location,
+		cluster_bitvector,
+		20,
+		&payload,
+		&cluster_overflow);
+
+	object->object_flags |= object_data_flag_0x100;
+	object_header->flags |= _object_header_child_bit;
+	p_object_connect_lights_recursive(object_datum, false, true, false, false);
+	
+	if (DWORD* cluster_activation = p_game_get_cluster_activation(); 
+		object_can_activate_in_cluster(object_datum, cluster_activation))
+	{
+		object_activate(object_datum);
+	}
+	else if ((object->object_flags & object_data_flag_0x20000) == 0 || simulation_query_object_is_predicted(object_datum))
+	{
+		object_deactivate(object_datum);
+	}
+	else
+	{
+		object_delete(object_datum);
+	}
+	if (cluster_index_is_null && object_header->cluster_index != 0xFFFF)
+		object_cleanup_havok(object_datum);
 }
 
 void object_compute_node_matrices_with_children(const datum object_datum)
@@ -141,7 +294,7 @@ void object_initialize_effects(datum object_datum)
 
 	auto object_header = get_object_header(object_datum);
 	s_object_data_definition* object = (s_object_data_definition*)object_header->object;
-	if (object_header->type == projectile)
+	if (object_header->object_type == projectile)
 	{
 		object->object_projectile_datum = -1;
 	}
@@ -437,9 +590,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 
 	object_header->flags |= e_object_header_flag::_object_header_being_deleted_bit;
-	object_header->type = (e_object_type)new_object_tag->object_type;
+	object_header->object_type = (e_object_type)new_object_tag->object_type;
 	object->tag_definition_index = placement_data->tag_index;
 
+	// If placement type is null then make it use the default placement type
 	if (placement_data->placement_info.placement_type == UCHAR_MAX)
 	{
 		++s_object_globals::get()->unique_id;
@@ -490,9 +644,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	}
 	else { object->object_flags &= ~object_data_flag_has_prt_or_lighting_info; }
 
-	object_header->cluster_reference = -1;
+	object_header->cluster_index = -1;
 	location_invalidate(&object->location);
-	object->field_60 = -1;
+	object->first_cluster_reference = -1;
 	object->parent_datum = DATUM_INDEX_NONE;
 	object->next_index = DATUM_INDEX_NONE;
 	object->current_weapon_datum = DATUM_INDEX_NONE;
@@ -518,16 +672,16 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->model_variant_id = -1;
 	object->field_CC = -1;
 	object->field_D0 = -1;
-	object->flags_C0 = 0;
+	object->physics_flags = (e_object_physics_flags)0;
 
 	if ((placement_data->object_placement_flags & 8) != 0)
-		object->flags_C0 |= 0x100u;
+		object->physics_flags |= _object_physics_flag_0x100;
 	else
-		object->flags_C0 &= ~0x100u;
+		object->physics_flags &= ~_object_physics_flag_0x100;
 
 	object->havok_datum = -1;
 	object->simulation_entity_index = -1;
-	object->b_attached_to_simulation = 0;
+	object->b_attached_to_simulation = false;
 	object->destroyed_constraints_flag = placement_data->destroyed_constraints_flag;
 	object->loosened_constraints_flag = placement_data->loosened_constraints_flag;
 
@@ -652,7 +806,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					p_location = &placement_data->location;
 				}
 
-
 				object_reconnect_to_map(p_location, object_datum);
 			}
 
@@ -660,9 +813,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			s_object_globals::object_wake(object_datum);
 
 			if ((placement_data->object_placement_flags & 0x20) != 0)
-				object->flags_C0 |= 2u;
+				object->physics_flags |= _object_physics_flag_0x2;
 			else
-				object->flags_C0 &= ~2u;
+				object->physics_flags &= ~_object_physics_flag_0x2;
 
 			p_connect_objects_havok_component_to_world(object_datum);
 			object_initialize_effects(object_datum);

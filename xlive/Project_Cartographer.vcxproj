@@ -589,6 +589,7 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Enums\HaloStrings.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
