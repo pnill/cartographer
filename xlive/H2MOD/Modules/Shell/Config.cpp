@@ -724,12 +724,12 @@ void ReadH2Config() {
 					case 0:
 						H2Config_experimental_fps = _rendering_mode_none;
 						break;
-					case 1:
+					/*case 1:
 						H2Config_experimental_fps = _rendering_mode_old;
 						break;
 					case 2:
 						H2Config_experimental_fps = _rendering_mode_new;
-						break;
+						break;*/
 					case 3:
 						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
 				}

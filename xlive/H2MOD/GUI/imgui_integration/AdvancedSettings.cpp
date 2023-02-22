@@ -261,10 +261,10 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10 && H2Config_fps_limit != 0)
+						if (H2Config_fps_limit < 10)
 							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 2048)
-							H2Config_fps_limit = 2048;
+						if (H2Config_fps_limit > 144)
+							H2Config_fps_limit = 144;
 					}
 
 					ImGui::SameLine();
@@ -311,11 +311,21 @@ namespace ImGuiHandler {
 					}
 					ImGui::NextColumn();
 					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine), GetString(render_patch) };
+					const char* r_items[] = { GetString(render_none), GetString(render_patch) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 4))
+					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
 					{
-						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
+						switch(g_experimental)
+						{
+							default:
+							case 0:
+								H2Config_experimental_fps = _rendering_mode_none;
+								break;
+							case 1:
+								H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
+								break;
+						}
+						//H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
 					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
@@ -1126,8 +1136,6 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::experimental_rendering_tooltip] =
 				"This will change how the game handles rendering, requires a restart to take effect."
 				"\n\nNone: Default behavior of the game, will not work past 60FPS"
-				"\n\nCinematic: Tricks the game into rending in cinematic mode"
-				"\n\nEngine: Forces the unused native engine interpolation"
 				"\n\nOriginal: Forces the original framerate limiter used in the original game, tied to tickrate";
 			string_table[0][e_advanced_string::render_none] = "None";
 			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
@@ -1290,8 +1298,6 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::experimental_rendering_tooltip] =
 				"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto."
 				"\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS "
-				"\n\nCinematic: Hace que el juego se desgarre en modo cinemático"
-				"\n\nEngine: Fuerza la interpolación del motor nativo no utilizado"
 				"\n\nOriginal: fuerza el limitador de FPS original utilizado en el juego original, vinculado a la velocidad de tick ";
 			string_table[4][e_advanced_string::render_none] = "Ninguno";
 			string_table[4][e_advanced_string::render_cinematic] = "Fuerza Cinematográfica";
