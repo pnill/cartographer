@@ -108,13 +108,7 @@ enum e_object_data_flags : DWORD
 	object_data_flag_is_child_object = FLAG(26),
 	object_data_flag_has_prt_or_lighting_info = FLAG(31)
 };
-inline e_object_data_flags operator~ (e_object_data_flags a) { return (e_object_data_flags)~(int)a; }
-inline e_object_data_flags operator| (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a | (int)b); }
-inline e_object_data_flags operator& (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a & (int)b); }
-inline e_object_data_flags operator^ (e_object_data_flags a, e_object_data_flags b) { return (e_object_data_flags)((int)a ^ (int)b); }
-inline e_object_data_flags& operator|= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a |= (int)b); }
-inline e_object_data_flags& operator&= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a &= (int)b); }
-inline e_object_data_flags& operator^= (e_object_data_flags& a, e_object_data_flags b) { return (e_object_data_flags&)((int&)a ^= (int)b); }
+ENUM_OPERATORS(e_object_data_flags, DWORD)
 
 enum e_object_physics_flags : WORD
 {
@@ -125,14 +119,8 @@ enum e_object_physics_flags : WORD
 	_object_connected_to_physics_bit = FLAG(6),
 	_object_physics_flag_0x100 = FLAG(8),
 };
+ENUM_OPERATORS(e_object_physics_flags, WORD)
 
-inline e_object_physics_flags operator~ (e_object_physics_flags a) { return (e_object_physics_flags)~(int)a; }
-inline e_object_physics_flags operator| (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a | (int)b); }
-inline e_object_physics_flags operator& (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a & (int)b); }
-inline e_object_physics_flags operator^ (e_object_physics_flags a, e_object_physics_flags b) { return (e_object_physics_flags)((int)a ^ (int)b); }
-inline e_object_physics_flags& operator|= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a |= (int)b); }
-inline e_object_physics_flags& operator&= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a &= (int)b); }
-inline e_object_physics_flags& operator^= (e_object_physics_flags& a, e_object_physics_flags b) { return (e_object_physics_flags&)((int&)a ^= (int)b); }
 
 
 #pragma pack(push, 1)
@@ -295,13 +283,7 @@ enum e_object_header_flag : BYTE
 	_object_header_connected_to_map_bit = FLAG(5),
 	_object_header_child_bit = FLAG(6)
 };
-inline e_object_header_flag operator~ (e_object_header_flag a) { return (e_object_header_flag)~(int)a; }
-inline e_object_header_flag operator| (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a | (int)b); }
-inline e_object_header_flag operator& (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a & (int)b); }
-inline e_object_header_flag operator^ (e_object_header_flag a, e_object_header_flag b) { return (e_object_header_flag)((int)a ^ (int)b); }
-inline e_object_header_flag& operator|= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a |= (int)b); }
-inline e_object_header_flag& operator&= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a &= (int)b); }
-inline e_object_header_flag& operator^= (e_object_header_flag& a, e_object_header_flag b) { return (e_object_header_flag&)((int&)a ^= (int)b); }
+ENUM_OPERATORS(e_object_header_flag, BYTE)
 
 struct s_object_header {
 	__int16 datum_salt;

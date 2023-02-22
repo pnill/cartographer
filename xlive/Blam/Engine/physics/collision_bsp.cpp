@@ -10,7 +10,7 @@ bool __cdecl collision_bsp_test_sphere(s_scenario_structure_bsp_group_definition
 {
 	// I will reverse you later my sweet prince
 	typedef void(__cdecl* test_sphere_results_t)(test_sphere_result_buffer* buffer, int starting_index);
-	auto p_test_sphere_results = Memory::GetAddress<test_sphere_results_t>(0xE9890);
+	auto p_test_sphere_results = Memory::GetAddress<test_sphere_results_t>(0xE918C);
 
 
 	test_sphere_result_buffer buffer; // [esp+0h] [ebp-228h] BYREF
