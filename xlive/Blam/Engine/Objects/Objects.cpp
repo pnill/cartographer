@@ -188,7 +188,7 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 		object->location = *location;
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
-	DWORD cluster_bitvector[8];
+	DWORD cluster_bitvector[16];
 	bool cluster_overflow = false;
 	if ((object->object_flags & object_data_flag_0x200000) == 0)
 	{
