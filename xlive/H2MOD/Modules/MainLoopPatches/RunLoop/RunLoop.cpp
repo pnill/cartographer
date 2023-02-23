@@ -277,13 +277,7 @@ bool __cdecl cinematic_in_progress_hook()
 
 	switch (experimental_rendering_mode)
 	{
-	case _rendering_mode_old:
-		// TODO: get_game_life_cycle is only used with networked sessions, meaning this will not work in single player
-		// and i keep it this way because the EventHandler in UncappedFPS2.cpp uses the game's life cycle as well
-		return p_cinematic_is_running() || Engine::get_game_life_cycle() == _life_cycle_in_game || _Shell::IsGameMinimized();
-
 	// these two options disable the hacks that hired gun added to the main loop
-	case _rendering_mode_new:
 	case _rendering_mode_original_game_frame_limit:
 		return true;
 
@@ -315,8 +309,6 @@ bool __cdecl should_limit_framerate_hook()
 	case _rendering_mode_original_game_frame_limit:
 		return false; // e_render_original_game_frame_limit handles frame limit in MainGameTime.cpp
 	case _rendering_mode_none:
-	case _rendering_mode_new:
-	case _rendering_mode_old:
 	default:
 		return (_Shell::IsGameMinimized() || b_XboxTick);
 	}
@@ -673,18 +665,6 @@ void InitRunLoop() {
 
 		switch (experimental_rendering_mode)
 		{
-		case _rendering_mode_old:
-			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
-			UncappedFPS2::Init();
-			break;
-		case _rendering_mode_new:
-			PatchCall(Memory::GetAddress(0x39E64), alt_main_game_loop_hook);
-			//PatchCall(Memory::GetAddress(0x39e64), game_main_loop);
-			QueryPerformanceFrequency(&freq);
-			//Remove original render call
-			NopFill(Memory::GetAddress(0x39DAA), 5);
-			break;
-
 		case _rendering_mode_original_game_frame_limit:
 			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			MainGameTime::ApplyPatches();
