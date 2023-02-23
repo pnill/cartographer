@@ -112,7 +112,7 @@ void __cdecl object_type_notify_impulse_sound(datum object_datum, int a2, int a3
 	}
 }
 
-void __cdecl object_type_delete(datum object_datum)
+void object_type_delete(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 

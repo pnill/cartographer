@@ -34,7 +34,7 @@ void s_object_globals::object_wake(datum object_datum)
 	p_object_wake(object_datum);
 }
 
-bool s_object_globals::object_globals_initialized()
+bool s_object_globals::objects_can_connect_to_map()
 {
 	return get() && get()->initialized;
 }

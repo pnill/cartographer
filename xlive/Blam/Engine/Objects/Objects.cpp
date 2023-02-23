@@ -167,7 +167,7 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	s_object_header* object_header = get_object_header(object_datum);
-	bool cluster_index_is_null = object_header->cluster_index == 0xFFFF;
+	bool cluster_index_is_null = (object_header->cluster_index == -1);
 	s_location scnr_location;
 
 	if (!location)
@@ -186,11 +186,12 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 	else
 	{
 		object->location = *location;
+		object_header->cluster_index = scnr_location.cluster;
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
 	DWORD cluster_bitvector[16];
 	bool cluster_overflow = false;
-	if ((object->object_flags & object_data_flag_0x200000) == 0)
+	if ((object->object_flags & object_data_flag_0x200000) != 0)
 	{
 		memset(cluster_bitvector, -1, 64);
 	}
@@ -316,7 +317,7 @@ bool set_object_position_if_in_cluster(s_location* location, const datum object_
 
 	collision_bsp_test_sphere_result test_result;
 	auto g_collision_bsp = Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block*>(0x479E64);
-	collision_bsp_test_sphere(g_collision_bsp, 0, 0, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
+	collision_bsp_test_sphere(g_collision_bsp, 0, nullptr, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
 
 	if (*(DWORD*)&test_result.gap[3080])
 		scenario_location_from_leaf(location, *(DWORD*)&test_result.gap[3084]);
@@ -326,25 +327,25 @@ bool set_object_position_if_in_cluster(s_location* location, const datum object_
 	return location->cluster != 0xFFFF;
 }
 
-bool __cdecl object_has_has_prt_or_lighting_info(const datum object_datum, datum* mode_tag_index, datum* coll_tag_index)
+// Sets the mode_tag_index and coll_tag_index parameters (if they exist)
+// Returns whether or not the render model has PRT or Lighting Info
+bool object_render_model_has_prt_info(const datum object_datum, datum* mode_tag_index, datum* coll_tag_index)
 {
-	bool contains_prt_info = false;
 	const datum hlmt_tag_index = tags::get_tag_fast<s_object_group_definition>(object_get_fast_unsafe(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum))->tag_definition_index)->model.TagIndex;
 
-	if (hlmt_tag_index == DATUM_INDEX_NONE) { return true; }
+	if (hlmt_tag_index == DATUM_INDEX_NONE) { return false; }
 
 	const s_model_group_definition* hlmt_model_definition = tags::get_tag_fast<s_model_group_definition>(hlmt_tag_index);
 	const datum render_model_tag_index = hlmt_model_definition->render_model.TagIndex;
 
-	if (render_model_tag_index == -1 || hlmt_model_definition->collision_model.TagIndex == -1) { return true; }
+	if (render_model_tag_index == -1 || hlmt_model_definition->collision_model.TagIndex == -1) { return false; }
 
 	const s_render_model_group_definition* render_model = tags::get_tag_fast<s_render_model_group_definition>(render_model_tag_index);
 
 	*mode_tag_index = render_model_tag_index;
 	*coll_tag_index = hlmt_model_definition->collision_model.TagIndex;
 
-	contains_prt_info = (render_model->prt_info.size <= 0 || render_model->section_render_leaves.size <= 0 ? false : true);
-
+	bool contains_prt_info = (render_model->prt_info.size <= 0 || render_model->section_render_leaves.size <= 0 ? false : true);
 	return contains_prt_info;
 }
 
@@ -637,8 +638,8 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		object->object_flags &= ~object_data_flag_has_collision;
 	}
 
-	datum mode_tag_index;
-	if (datum coll_tag_index; object_has_has_prt_or_lighting_info(object_datum, &mode_tag_index, &coll_tag_index)) 
+	// tag_indexes arent actually used, they're just passed into the function but aren't used
+	if (datum tag_indexes[2]; object_render_model_has_prt_info(object_datum, &tag_indexes[0], &tag_indexes[1]) == true)
 	{ 
 		object->object_flags |= object_data_flag_has_prt_or_lighting_info; 
 	}
@@ -795,14 +796,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				p_object_reset_interpolation(object_datum);
 
 			object_compute_node_matrices_with_children(object_datum);
-			if (s_object_globals::get() && s_object_globals::get()->initialized)
+			if (s_object_globals::objects_can_connect_to_map())
 			{
 				
 				s_location* p_location = nullptr;
-				if (byte object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum); 
-					placement_data->object_is_inside_cluster || object_is_inside_cluster)
+				placement_data->object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum);
+				if (placement_data->object_is_inside_cluster)
 				{
-					placement_data->object_is_inside_cluster = object_is_inside_cluster;
 					p_location = &placement_data->location;
 				}
 
@@ -832,7 +832,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if ((object->object_flags & 0x20000) == 0 || (object_header->flags & _object_header_active_bit) != 0) { return object_datum; }
 
-			if (!s_object_globals::object_globals_initialized()) { return object_datum; }
+			if (!s_object_globals::objects_can_connect_to_map()) { return object_datum; }
 
 			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 
 				|| object->location.cluster != 0xFFFF)) 
