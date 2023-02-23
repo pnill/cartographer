@@ -315,17 +315,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(100));
 					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
 					{
-						switch(g_experimental)
-						{
-							default:
-							case 0:
-								H2Config_experimental_fps = _rendering_mode_none;
-								break;
-							case 1:
-								H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
-								break;
-						}
-						//H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
+						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
 					}
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));

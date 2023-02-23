@@ -45,8 +45,6 @@ enum e_override_texture_resolution : int
 enum H2Config_Experimental_Rendering_Mode : byte
 {
 	_rendering_mode_none,
-	_rendering_mode_old,
-	_rendering_mode_new,
 	_rendering_mode_original_game_frame_limit
 };
 
