@@ -235,7 +235,10 @@ namespace ControllerInput
 	void ControllerInput::SetSensitiviy(float value)
 	{
 		if (Memory::IsDedicatedServer()) return;
-		if (value == 0) return;
+		if (value == 0.0f) return;
+
+		value = blam_max(value - 1.0f, 0.0f);
+
 		*Memory::GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
 		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis
 	}
