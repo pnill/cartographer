@@ -73,7 +73,7 @@ struct s_scenario_object : s_scenario_group_placement_object_block
 	D3DCOLOR quaternary_color;
 	WORD pathfinding_policy;
 	WORD lightmapping_policy;
-	tag_block<> pathfinding_references;
+	tag_block<> pathfinding_references;		// TODO setup properly
 	WORD unk;
 	WORD valid_multiplayer_games;
 };

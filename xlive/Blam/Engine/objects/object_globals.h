@@ -13,7 +13,7 @@ struct s_object_globals
 	int field_8;
 	int field_C;
 	int field_10;
-	DWORD unk_game_time_store;
+	DWORD total_game_time_ticks;
 	DWORD unique_id;
 	real_color_rgb cinematic_ambient_color;
 	real_vector3d cimenatic_primary_light_vector_1;
@@ -28,12 +28,12 @@ struct s_object_globals
 	char object_custom_animations_hold_on_last_frame;
 	bool object_custom_animations_prevent_lipsync_head_movement;
 	bool enable_warthog_turret_light;
-	bool field_83;
+	bool pad83;
 
 	static s_object_globals* get();
 	static bool object_is_connected_to_map(datum header_datum);
 	static void object_connect_lights_recursive(datum header_datum, char a2, char a3, char a4, char a5);
 	static void object_update_collision_culling(datum header_datum);
-	static void object_wake(datum object_datum);
 	static bool objects_can_connect_to_map();
 };
+CHECK_STRUCT_SIZE(s_object_globals, 0x84);

@@ -110,12 +110,12 @@ bool __cdecl simulation_query_object_is_predicted(const datum object_index)
 bool object_can_activate_in_cluster(datum object_datum, DWORD* cluster_activation)
 {
 	bool result = false;
-	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
-	s_object_header* object_header = get_object_header(object_datum);
+	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	const s_object_header* object_header = get_object_header(object_datum);
 
 	if ((object->object_flags & 2) != 0)
 		return true;
-	if ((FLAG(object_header->object_type) & FLAG(_object_is_machine)) != 0 && object_type_compute_activation(object_datum, cluster_activation, &result) || object_header->cluster_index == -1)
+	if ((FLAG(object_header->object_type) & FLAG(machine)) != 0 && object_type_compute_activation(object_datum, cluster_activation, &result) || object_header->cluster_index == -1)
 	{
 		return result;
 	}
@@ -138,7 +138,7 @@ void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
 	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
 }
 
-void __cdecl object_reconnect_to_map(const s_location* location, const datum object_datum)
+void __cdecl object_reconnect_to_map(s_location* location, const datum object_datum)
 {
 	typedef void(__cdecl* cluster_partition_reconnect_t)(
 		cluster_partition* partition,
@@ -164,7 +164,6 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 	typedef DWORD*(__cdecl* game_get_cluster_activation_t)();
 	auto p_game_get_cluster_activation = Memory::GetAddress<game_get_cluster_activation_t>(0x499FD);
 
-
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	s_object_header* object_header = get_object_header(object_datum);
 	bool cluster_index_is_null = (object_header->cluster_index == -1);
@@ -173,20 +172,21 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 	if (!location)
 	{
 		scenario_location_from_point(&scnr_location, &object->object_origin_point);
-		if (scnr_location.cluster == 0xFFFF)
+		location = &scnr_location;
+		if (location->cluster == 0xFFFF)
 		{
 			scenario_location_from_point(&scnr_location, &object->position);
 		}
 	}
 
-	if (scnr_location.cluster == 0xFFFF)
+	if (location->cluster == 0xFFFF)
 	{
 		object->object_flags |= object_data_flag_0x40000;
 	}
 	else
 	{
 		object->location = *location;
-		object_header->cluster_index = scnr_location.cluster;
+		object_header->cluster_index = location->cluster;
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
 	DWORD cluster_bitvector[16];
@@ -200,7 +200,6 @@ void __cdecl object_reconnect_to_map(const s_location* location, const datum obj
 	get_object_payload(object_datum, &payload);
 	cluster_partition noncollideable_object_cluster_partition = *Memory::GetAddress<cluster_partition*>(0x4E45F8);
 	cluster_partition collideable_object_cluster_partition = *Memory::GetAddress<cluster_partition*>(0x4E4604);
-
 
 	cluster_partition* partition = &collideable_object_cluster_partition;
 	if ((object->object_flags & object_data_flag_has_collision) == 0)
@@ -253,7 +252,7 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 	for (unsigned long i = object->current_weapon_datum; i != -1; i = next_object->next_index)
 	{
 		next_object = object_get_fast_unsafe(i);
-		if ((next_object->placement_info.object_type & _object_is_machine) == 0)
+		if ((FLAG(next_object->placement_info.object_type) & FLAG(machine)) == 0)
 			object_compute_node_matrices_with_children(i);
 	}
 }
@@ -309,6 +308,14 @@ void object_initialize_effects(datum object_datum)
 
 bool set_object_position_if_in_cluster(s_location* location, const datum object_datum)
 {
+	typedef void(__cdecl* collision_bsp_test_sphere_t)(s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
+		__int16 flags,
+		void* breakable_surface_set,
+		real_point3d* point,
+		float scale,
+		collision_bsp_test_sphere_result* test_result);
+	auto p_collision_bsp_test_sphere = Memory::GetAddress<collision_bsp_test_sphere_t>(0xE9890);
+
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	scenario_location_from_point(location, &object->object_origin_point);
 
@@ -316,11 +323,11 @@ bool set_object_position_if_in_cluster(s_location* location, const datum object_
 		return true;
 
 	collision_bsp_test_sphere_result test_result;
-	auto g_collision_bsp = Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block*>(0x479E64);
-	collision_bsp_test_sphere(g_collision_bsp, 0, nullptr, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
+	auto g_collision_bsp = *Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block**>(0x479E64);
+	p_collision_bsp_test_sphere(g_collision_bsp, 0, nullptr, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
 
-	if (*(DWORD*)&test_result.gap[3080])
-		scenario_location_from_leaf(location, *(DWORD*)&test_result.gap[3084]);
+	if (test_result.stack_depth)
+		scenario_location_from_leaf(location, test_result.buffer3[0]);
 	else
 		scenario_location_from_point(location, &object->position);
 
@@ -810,7 +817,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			}
 
 			object_postprocess_node_matrices(object_datum);
-			s_object_globals::object_wake(object_datum);
+			object_wake(object_datum);
 
 			if ((placement_data->object_placement_flags & 0x20) != 0)
 				object->physics_flags |= _object_physics_flag_0x2;
@@ -822,7 +829,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_type_create_children(object_datum);
 
 			if (new_object_tag->creation_effect.TagIndex != DATUM_INDEX_NONE)
-				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0, 0, 0);
+				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0.0f, 0.0f, 0);
 
 			p_sub_66CFDD(object_datum);
 

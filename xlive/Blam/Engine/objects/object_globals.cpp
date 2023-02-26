@@ -27,13 +27,6 @@ void s_object_globals::object_update_collision_culling(datum header_datum)
 	p_object_update_collision_culling(header_datum);
 }
 
-void s_object_globals::object_wake(datum object_datum)
-{
-	typedef void(__cdecl* object_wake_t)(datum object_datum);
-	auto p_object_wake = Memory::GetAddress<object_wake_t>(0x12FA1E);
-	p_object_wake(object_datum);
-}
-
 bool s_object_globals::objects_can_connect_to_map()
 {
 	return get() && get()->initialized;

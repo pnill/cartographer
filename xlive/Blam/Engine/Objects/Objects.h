@@ -46,24 +46,6 @@ enum e_object_team : BYTE
 	None = 255
 };
 
-enum e_object_type_flags : WORD
-{
-	_object_is_biped = 0x1,
-	_object_is_vehicle = 0x2,
-	_object_is_weapon = 0x4,
-	_object_is_equipment = 0x8,
-	_object_is_garbage = 0x10,
-	_object_is_projectile = 0x20,
-	_object_is_scenery = 0x40,
-	_object_is_machine = 0x80,
-	_object_is_control = 0x100,
-	_object_is_light_fixture = 0x200,
-	_object_is_sound_scenery = 0x400,
-	_object_is_crate = 0x800,
-	_object_is_creature = 0x1000,
-};
-
-
 enum e_unit_weapons
 {
 	PrimaryWeapon,
@@ -94,7 +76,7 @@ enum e_biped_physics_mode : BYTE
 	mode_melee
 };
 
-enum e_object_data_flags : DWORD
+enum e_object_data_flags : int
 {
 	object_data_flag_0x1 = FLAG(0),
 	object_data_flag_0x100 = FLAG(8),

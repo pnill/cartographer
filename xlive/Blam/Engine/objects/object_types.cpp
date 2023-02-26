@@ -149,7 +149,7 @@ bool __cdecl object_type_compute_activation(datum object_datum, DWORD* a2, bool*
 	bool result = false;
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
-	for (byte i = 0; object_type->base_object_types[i] || !result; i++)
+	for (byte i = 0; object_type->base_object_types[i] && !result; i++) 
 	{
 		if (object_type->base_object_types[i]->object_compute_activation)
 		{
