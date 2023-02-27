@@ -79,16 +79,22 @@ enum e_biped_physics_mode : BYTE
 enum e_object_data_flags : int
 {
 	object_data_flag_0x1 = FLAG(0),
-	object_data_flag_0x100 = FLAG(8),
-	object_data_flag_has_collision = FLAG(9),
+	_object_has_attached_lights_bit = FLAG(5),
+	_object_has_attached_looping_sounds_bit = FLAG(5),
+	_object_has_unattached_lights_bit = FLAG(6),
+	_object_in_limbo_bit = FLAG(7),
+	_object_connected_to_map_bit = FLAG(8),
+	_object_has_collision_bit = FLAG(9),
 	object_data_flag_0x400 = FLAG(10),
 	object_data_flag_0x800 = FLAG(11),
-	object_data_flag_object_does_not_cast_shadow = FLAG(16),
+	_object_garbage_bit = FLAG(14),
+	_object_does_not_cast_shadow_bit = FLAG(16),
 	object_data_flag_0x20000 = FLAG(17),
 	object_data_flag_0x40000 = FLAG(18),
 	object_data_flag_0x200000 = FLAG(21),
-	object_data_flag_is_child_object = FLAG(26),
-	object_data_flag_has_prt_or_lighting_info = FLAG(31)
+	_object_has_override_bit = FLAG(25),
+	_object_is_child_object = FLAG(26),
+	_object_has_prt_or_lighting_info = FLAG(31)
 };
 ENUM_OPERATORS(e_object_data_flags, DWORD)
 
@@ -103,6 +109,11 @@ enum e_object_physics_flags : WORD
 };
 ENUM_OPERATORS(e_object_physics_flags, WORD)
 
+enum e_object_damage_flags : WORD
+{
+	_object_is_dead_bit = FLAG(2),
+};
+ENUM_OPERATORS(e_object_damage_flags, WORD)
 
 
 #pragma pack(push, 1)
@@ -166,7 +177,7 @@ struct s_object_data_definition
 	WORD body_stun_ticks;
 	byte byte_108;
 	byte byte_109;
-	WORD field_10A;		//(field_10A & 4) != 0 -- > object_is_dead
+	e_object_damage_flags object_damage_flags;		//(object_damage_flags & 4) != 0 -- > object_is_dead
 	__int16 original_orientation_size;
 	__int16 original_orientation_offset;
 	__int16 node_orientation_size;
@@ -175,10 +186,10 @@ struct s_object_data_definition
 	__int16 nodes_offset;
 	__int16 collision_regions_size;
 	__int16 collision_regions_offset;
-	__int16 object_attachments_block_size;
-	__int16 object_attachments_block_offset;
-	__int16 damage_sections_block_size;
-	__int16 damage_sections_block_offset;
+	__int16 object_attachments_size;
+	__int16 object_attachments_offset;
+	__int16 damage_sections_size;
+	__int16 damage_sections_offset;
 	__int16 change_color_size;
 	__int16 change_color_offset;
 	__int16 animation_manager_size;
@@ -238,18 +249,18 @@ CHECK_STRUCT_SIZE(s_unit_data_definition, 0x360);
 
 struct s_biped_data_definition : s_unit_data_definition
 {
-	PAD(0x3F4 - sizeof(s_unit_data_definition));
-	e_biped_physics_mode biped_mode;//0x3F4
-	PAD(0x480 - 0x3F5);
+	byte gap0[148];
+	e_biped_physics_mode biped_mode; //0x3F4
+	byte gap1[139];
 
 	// NEW DATA
 	string_id variant_name;
 };
-CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
+CHECK_STRUCT_SIZE(s_biped_data_definition, sizeof(s_unit_data_definition) + 288 + 4);
 
 struct s_weapon_data_definition : s_object_data_definition
 {
-	PAD(0x25C - sizeof(s_object_data_definition));
+	byte gap[304];
 };
 CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 
@@ -280,7 +291,7 @@ CHECK_STRUCT_SIZE(s_object_header, 0xC);
 struct s_object_payload
 {
 	WORD object_type;
-	WORD cull_flags;
+	WORD object_collision_cull_flags;
 	real_point3d origin_point;
 	float bounding_sphere_radius;
 };

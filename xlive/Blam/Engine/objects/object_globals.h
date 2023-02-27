@@ -31,9 +31,6 @@ struct s_object_globals
 	bool pad83;
 
 	static s_object_globals* get();
-	static bool object_is_connected_to_map(datum header_datum);
-	static void object_connect_lights_recursive(datum header_datum, char a2, char a3, char a4, char a5);
-	static void object_update_collision_culling(datum header_datum);
 	static bool objects_can_connect_to_map();
 };
 CHECK_STRUCT_SIZE(s_object_globals, 0x84);

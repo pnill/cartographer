@@ -107,6 +107,27 @@ bool __cdecl simulation_query_object_is_predicted(const datum object_index)
 	return simulation_query_object_is_predicted(object_index);
 }
 
+bool object_is_connected_to_map(datum header_datum)
+{
+	typedef bool(__cdecl* object_is_connected_to_map_t)(datum header_datum);
+	auto p_object_is_connected_to_map = Memory::GetAddress<object_is_connected_to_map_t>(0x132922);
+	return p_object_is_connected_to_map(header_datum);
+}
+
+void object_connect_lights_recursive(datum header_datum, char a2, char a3, char a4, char a5)
+{
+	typedef void(__cdecl* object_connect_lights_recursive_t)(int a1, char a2, char a3, char a4, char a5);
+	auto p_object_connect_lights_recursive = Memory::GetAddress<object_connect_lights_recursive_t>(0x134A78, 0x123948);
+	p_object_connect_lights_recursive(header_datum, a2, a3, a4, a5);
+}
+
+void object_update_collision_culling(datum header_datum)
+{
+	typedef void(__cdecl* object_update_collision_culling_t)(datum header_datum);
+	auto p_object_update_collision_culling = Memory::GetAddress<object_update_collision_culling_t>(0x1324E9);
+	p_object_update_collision_culling(header_datum);
+}
+
 bool object_can_activate_in_cluster(datum object_datum, DWORD* cluster_activation)
 {
 	bool result = false;
@@ -128,12 +149,12 @@ void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
 	auto p_collision_compute_object_cull_flags = Memory::GetAddress<collision_compute_object_cull_flags_t>(0xCBE87);
 
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
-	WORD cull_flags = 0;
-	if ((object->object_flags & object_data_flag_has_collision) != 0)
-		cull_flags = p_collision_compute_object_cull_flags(object_datum);
+	WORD object_collision_cull_flags = 0;
+	if ((object->object_flags & _object_has_collision_bit) != 0)
+		object_collision_cull_flags = p_collision_compute_object_cull_flags(object_datum);
 
 	cluster_payload->object_type = object->placement_info.object_type;
-	cluster_payload->cull_flags = cull_flags;
+	cluster_payload->object_collision_cull_flags = object_collision_cull_flags;
 	cluster_payload->origin_point = object->object_origin_point;
 	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
 }
@@ -202,7 +223,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 	cluster_partition collideable_object_cluster_partition = *Memory::GetAddress<cluster_partition*>(0x4E4604);
 
 	cluster_partition* partition = &collideable_object_cluster_partition;
-	if ((object->object_flags & object_data_flag_has_collision) == 0)
+	if ((object->object_flags & _object_has_collision_bit) == 0)
 		partition = &noncollideable_object_cluster_partition;
 
 	p_cluster_partition_reconnect(
@@ -217,7 +238,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 		&payload,
 		&cluster_overflow);
 
-	object->object_flags |= object_data_flag_0x100;
+	object->object_flags |= _object_in_limbo_bit;
 	object_header->flags |= _object_header_child_bit;
 	p_object_connect_lights_recursive(object_datum, false, true, false, false);
 	
@@ -308,14 +329,6 @@ void object_initialize_effects(datum object_datum)
 
 bool set_object_position_if_in_cluster(s_location* location, const datum object_datum)
 {
-	typedef void(__cdecl* collision_bsp_test_sphere_t)(s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
-		__int16 flags,
-		void* breakable_surface_set,
-		real_point3d* point,
-		float scale,
-		collision_bsp_test_sphere_result* test_result);
-	auto p_collision_bsp_test_sphere = Memory::GetAddress<collision_bsp_test_sphere_t>(0xE9890);
-
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	scenario_location_from_point(location, &object->object_origin_point);
 
@@ -324,7 +337,7 @@ bool set_object_position_if_in_cluster(s_location* location, const datum object_
 
 	collision_bsp_test_sphere_result test_result;
 	auto g_collision_bsp = *Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block**>(0x479E64);
-	p_collision_bsp_test_sphere(g_collision_bsp, 0, nullptr, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
+	collision_bsp_test_sphere(g_collision_bsp, 0, nullptr, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
 
 	if (test_result.stack_depth)
 		scenario_location_from_leaf(location, test_result.buffer3[0]);
@@ -405,9 +418,6 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 
 	for (long i = 0; i < number_of_change_colors; ++i)
 	{
-		s_object_group_definition::s_change_colors_block* change_color_definition = nullptr;
-		if (obje_definition->change_colors.data != -1) { change_color_definition = obje_definition->change_colors[i]; }
-
 		color->red = object_change_colors->red;
 		color->green = object_change_colors->green;
 		color->blue = object_change_colors->blue;
@@ -417,14 +427,14 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 		// Turns out Halo 3 dosent do any of this garbage so referenced that when rewriting this
 		// Long story short we just loop through every block instead now
 		const s_object_group_definition::s_change_colors_block::s_change_colors_functions_block * function_definition = nullptr;
-		if (change_color_definition->functions.size > 0)
+		if (obje_definition->change_colors[i]->functions.size > 0)
 		{
 			string_id function_name = NULL;
 
 			// Interpolates colours by function type (if it exists)
-			for (int j = 0; j < change_color_definition->functions.size; ++j)
+			for (int j = 0; j < obje_definition->change_colors[i]->functions.size; ++j)
 			{
-				function_definition = change_color_definition->functions[j];
+				function_definition = obje_definition->change_colors[i]->functions[j];
 				function_name = function_definition[j].scale_by;
 
 				if (function_name.is_valid())
@@ -442,9 +452,9 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 			}
 
 			// Interpolates colours by function type (if it exists)
-			for (int j = 0; j < change_color_definition->functions.size; ++j)
+			for (int j = 0; j < obje_definition->change_colors[i]->functions.size; ++j)
 			{
-				function_definition = change_color_definition->functions[j];
+				function_definition = obje_definition->change_colors[i]->functions[j];
 
 				function_name = function_definition[j].darken_by;
 				if (function_name.is_valid())
@@ -583,7 +593,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			FLAG(e_object_type::crate) | 
 			FLAG(e_object_type::machine) | 
 			FLAG(e_object_type::vehicle) | 
-			FLAG(e_object_type::biped)) != 0)
+			FLAG(e_object_type::biped)))
 	{
 		typedef void(__cdecl* havok_memory_garbage_collect_t)();
 		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78);
@@ -636,21 +646,22 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		object->object_flags &= ~object_data_flag_0x400;
 	}
 
+	// Can we collide
 	if (model_definition && model_definition->collision_model.TagIndex != DATUM_INDEX_NONE)
 	{
-		object->object_flags |= object_data_flag_has_collision;
+		object->object_flags |= _object_has_collision_bit;
 	}
 	else
 	{
-		object->object_flags &= ~object_data_flag_has_collision;
+		object->object_flags &= ~_object_has_collision_bit;
 	}
 
-	// tag_indexes arent actually used, they're just passed into the function but aren't used
+	// tag_indexes arent actually used, they're just passed into the function but aren't used later on
 	if (datum tag_indexes[2]; object_render_model_has_prt_info(object_datum, &tag_indexes[0], &tag_indexes[1]) == true)
 	{ 
-		object->object_flags |= object_data_flag_has_prt_or_lighting_info; 
+		object->object_flags |= _object_has_prt_or_lighting_info;
 	}
-	else { object->object_flags &= ~object_data_flag_has_prt_or_lighting_info; }
+	else { object->object_flags &= ~_object_has_prt_or_lighting_info; }
 
 	object_header->cluster_index = -1;
 	location_invalidate(&object->location);
@@ -665,14 +676,14 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->placement_policy = placement_data->placement_policy;
 	if (new_object_tag->object_flags & s_object_group_definition::e_object_flags::does_not_cast_shadow) 
 	{ 
-		object->object_flags |= object_data_flag_object_does_not_cast_shadow; 
+		object->object_flags |= _object_does_not_cast_shadow_bit; 
 	}
 
 	if (object->object_flags & object_data_flag_0x1)
 	{
 		object->object_flags &= ~object_data_flag_0x1;
-		if (s_object_globals::object_is_connected_to_map(object_datum)) { s_object_globals::object_connect_lights_recursive(object_datum, 0, 1, 0, 0); }
-		s_object_globals::object_update_collision_culling(object_datum);
+		if (object_is_connected_to_map(object_datum)) { object_connect_lights_recursive(object_datum, 0, 1, 0, 0); }
+		object_update_collision_culling(object_datum);
 	}
 	object->damage_owner_unk3 = placement_data->damage_owner.unk3;
 	object->damage_owner_unk1 = placement_data->damage_owner.unk1;
@@ -713,7 +724,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 		if (model_definition->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			int test = 0;
+			int unk = 0;
 			c_animation_manager__c_animation_manager(animation_manager);
 			if (c_animation_manager__reset_graph(animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
 			{
@@ -727,13 +738,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					FLAG(e_object_type::projectile)) != 0;
 
 				// allow interpolation if object is device and device flags include interpolation
-				if ((FLAG(new_object_tag->object_type) & e_object_type::light_fixture | e_object_type::control | e_object_type::machine) != 0
-					&& (((const s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation) != 0)
+				if ((FLAG(new_object_tag->object_type) & e_object_type::light_fixture | e_object_type::control | e_object_type::machine)
+					&& (((const s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation))
 				{
 					allow_interpolation = true;
 				}
 			}
-			test = -1;
+			unk = -1;
 			c_animation_manager__destructor_c_animation_manager(animation_manager);
 		}
 	}
@@ -778,10 +789,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			else
 				object->object_flags &= ~object_data_flag_0x800;
 		}
+
+		// Clear attachment block
 		if (new_object_tag->attachments.size > 0)
 		{
-			byte* object_attachments_block = (byte*)object + object->object_attachments_block_offset;
-			memset(object_attachments_block, -1, 8 * ((unsigned int)object->object_attachments_block_size >> 3));
+			byte* object_attachments_block = (byte*)object + object->object_attachments_offset;
+			memset(object_attachments_block, -1, object->object_attachments_size);
 		}
 
 		if (object_type_new(object_datum, placement_data, &unk_creation_bool))
