@@ -167,6 +167,9 @@
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
+    <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -527,6 +530,9 @@
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
+    <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

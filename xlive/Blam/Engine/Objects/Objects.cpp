@@ -8,6 +8,7 @@
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
+#include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/memory/memory_pool.h"
@@ -529,23 +530,11 @@ typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
 p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-	typedef void(__thiscall* sub_4F3B64_t)(byte* this_ptr);
-	auto c_animation_manager__c_animation_manager = Memory::GetAddress<sub_4F3B64_t>(0xF3B64);
-
-	typedef bool(__thiscall* sub_4F59AD_t)(byte* this_ptr, int a2, int a3, char a4);
-	auto c_animation_manager__reset_graph = Memory::GetAddress<sub_4F59AD_t>(0xF59AD);
-
-	typedef void(__thiscall* sub_4F3240_t)(byte* this_ptr);
-	auto c_animation_manager__destructor_c_animation_manager = Memory::GetAddress<sub_4F3240_t>(0xf3240);
-
 	typedef bool(__cdecl* object_header_block_allocate_t)(datum a1, __int16 a2, __int16 a3, char a4);
 	auto p_object_header_block_allocate = Memory::GetAddress<object_header_block_allocate_t>(0x130BC6);
 
 	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(datum a1);
 	auto p_havok_can_allocate_space_for_instance_of_object_definition = Memory::GetAddress<havok_can_allocate_space_for_instance_of_object_definition_t>(0x9FE55);
-
-	typedef void(__thiscall* sub_4F31E7_t)(byte* this_ptr);
-	auto c_animation_manager__initialize = Memory::GetAddress<sub_4F31E7_t>(0xF31E7);
 
 	typedef void(__cdecl* sub_532F07_t)(datum arg0, int arg4);
 	auto update_object_region_information = Memory::GetAddress<sub_532F07_t>(0x132F07);
@@ -569,7 +558,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
 
 	typedef int(__cdecl* sub_66CFDD_t)(datum a1);
-	auto p_sub_66CFDD = Memory::GetAddress< sub_66CFDD_t>(0x26CFDD);
+	auto p_sub_66CFDD = Memory::GetAddress<sub_66CFDD_t>(0x26CFDD);
 
 	if ((placement_data->object_placement_flags & 0x10) == 0)
 	{
@@ -707,7 +696,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	size_t nodes_count = 1;
 	size_t collision_regions_count = 1;
 	size_t damage_info_damage_sections_size = 0;
-	byte animation_manager[144];
 
 	bool allow_interpolation = false;
 	bool valid_animation_manager = false;
@@ -724,32 +712,29 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 		if (model_definition->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			int unk = 0;
-			c_animation_manager__c_animation_manager(animation_manager);
-			if (c_animation_manager__reset_graph(animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+			c_animation_manager animation_manager;
+			if (animation_manager.reset_graph(model_definition->animation.TagIndex, new_object_tag->model.TagIndex, true))
 			{
 				valid_animation_manager = true;
-				allow_interpolation = (FLAG(new_object_tag->object_type) &
+				allow_interpolation = !(FLAG(new_object_tag->object_type) &
 					FLAG(e_object_type::sound_scenery) | 
 					FLAG(e_object_type::light_fixture) |
 					FLAG(e_object_type::control) |
 					FLAG(e_object_type::machine) |
 					FLAG(e_object_type::scenery) |
-					FLAG(e_object_type::projectile)) != 0;
+					FLAG(e_object_type::projectile));
 
 				// allow interpolation if object is device and device flags include interpolation
 				if ((FLAG(new_object_tag->object_type) & e_object_type::light_fixture | e_object_type::control | e_object_type::machine)
-					&& (((const s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation))
+					&& (((const s_device_group_definition*)new_object_tag)->flags & s_device_group_definition::e_device_group_flag_allow_interpolation) != 0)
 				{
 					allow_interpolation = true;
 				}
 			}
-			unk = -1;
-			c_animation_manager__destructor_c_animation_manager(animation_manager);
 		}
 	}
 
-	long original_orientations = (!allow_interpolation ? 0 : nodes_count * 32);
+	long original_orientations = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 	bool b_attachments = p_object_header_block_allocate(object_datum, 0x11C, (short)(8 * new_object_tag->attachments.size), 0);
 	bool b_damage_sections = p_object_header_block_allocate(object_datum, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
@@ -781,10 +766,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	{
 		if (valid_animation_manager)
 		{
-			byte* c_animation_manager = ((byte*)object + object->animation_manager_offset);
+			c_animation_manager* animation_manager = (c_animation_manager*)((byte*)object + object->animation_manager_offset);
 
-			c_animation_manager__initialize(c_animation_manager);
-			if (c_animation_manager__reset_graph(c_animation_manager, model_definition->animation.TagIndex, new_object_tag->model.TagIndex, 1))
+			animation_manager->initialize();
+			if (animation_manager->reset_graph(model_definition->animation.TagIndex, new_object_tag->model.TagIndex, true))
 				object->object_flags |= object_data_flag_0x800;
 			else
 				object->object_flags &= ~object_data_flag_0x800;
@@ -854,8 +839,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if (!s_object_globals::objects_can_connect_to_map()) { return object_datum; }
 
-			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 
-				|| object->location.cluster != 0xFFFF)) 
+			if (!(placement_data->object_placement_flags & 2) && (!(placement_data->object_placement_flags & 4) || object->location.cluster != 0xFFFF)) 
 			{ 
 				object_delete(object_datum);
 			}
