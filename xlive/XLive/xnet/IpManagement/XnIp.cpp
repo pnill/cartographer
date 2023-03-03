@@ -387,7 +387,7 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 			// TODO:
 		case XnIp_ConnectionPing:
 		case XnIp_ConnectionPong:
-			LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, reqPacket->data.reqType);
+			LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, (int)reqPacket->data.reqType);
 			break;
 
 		default:
@@ -403,7 +403,7 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("{} - secure connection cannot be established!" __FUNCTION__);
+		LOG_TRACE_NETWORK("{} - secure connection cannot be established!", __FUNCTION__);
 		LogConnectionsErrorDetails(recvAddr, ret, &reqPacket->data.xnkid);
 		// TODO: send back the connection cannot be established
 	}
@@ -462,10 +462,11 @@ int XnIpManager::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADD
 			LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, i, htonl(i | randIdentifier));
 
 			newXnIp->m_connectionId.s_addr = htonl(i | randIdentifier);
+			newXnIp->m_valid = true;
+
 			newXnIp->UpdateInteractionTimeHappened();
 			newXnIp->SetConnectStatus(XNET_CONNECT_STATUS_IDLE);
 			newXnIp->m_pckStats.PckDataSampleUpdate();
-			newXnIp->m_valid = true;
 
 			if (outIpIdentifier)
 				*outIpIdentifier = newXnIp->GetConnectionId();
@@ -551,9 +552,9 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 
 		// TODO FIXME: for a small subset of players pXnIpAlreadyRegistered->connectionNonceOtherSide is different from reqPacket->data.nonceKey when connection attempt is in progress
 		// causing the connection to fail
-		bool connectionIdMismatch = (reqPacket != nullptr
+		bool connectionIdMismatch = reqPacket != nullptr
 			&& registeredConnection->m_endpointNonceValid
-			&& memcmp(registeredConnection->m_endpointNonce, reqPacket->data.nonceKey, sizeof(XnIp::m_nonce)));
+			&& memcmp(registeredConnection->m_endpointNonce, reqPacket->data.nonceKey, sizeof(XnIp::m_nonce));
 
 		if (connectionIdMismatch)
 		{
@@ -596,7 +597,7 @@ int XnIpManager::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 	{
 		if (!memcmp(m_XnKeyPairs[i].xnkid.ab, pxnkid->ab, sizeof(XNKID::ab)))
 		{
-			if (m_XnKeyPairs[i].bValid == true)
+			if (m_XnKeyPairs[i].bValid)
 			{
 				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!",
 					__FUNCTION__,

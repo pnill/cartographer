@@ -319,13 +319,16 @@ public:
 
 	bool IsValid(IN_ADDR identifier) const
 	{
-		if (identifier.s_addr != GetConnectionId().s_addr)
+		bool valid = m_valid
+			&& identifier.s_addr == GetConnectionId().s_addr;
+
+		if (!valid)
 		{
-			LOG_CRITICAL_NETWORK("{} - connection identifier different {:X} != {:X}", __FUNCTION__, identifier.s_addr, GetConnectionId().s_addr);
+			LOG_CRITICAL_NETWORK("{} - m_valid: {} or {:X} != {:X}", __FUNCTION__, m_valid, identifier.s_addr, GetConnectionId().s_addr);
 			return false;
 		}
 
-		return m_valid && identifier.s_addr == GetConnectionId().s_addr;
+		return valid;
 	}
 
 	void UpdateInteractionTimeHappened()
