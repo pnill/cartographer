@@ -79,7 +79,10 @@ enum e_biped_physics_mode : BYTE
 enum e_object_data_flags : int
 {
 	object_data_flag_0x1 = FLAG(0),
-	_object_has_attached_lights_bit = FLAG(5),
+	object_data_flag_0x2 = FLAG(1),
+	object_data_flag_0x4 = FLAG(2),
+	object_data_flag_0x8 = FLAG(3),
+	_object_has_attached_lights_bit = FLAG(4),
 	_object_has_attached_looping_sounds_bit = FLAG(5),
 	_object_has_unattached_lights_bit = FLAG(6),
 	_object_in_limbo_bit = FLAG(7),
@@ -87,16 +90,28 @@ enum e_object_data_flags : int
 	_object_has_collision_bit = FLAG(9),
 	object_data_flag_0x400 = FLAG(10),
 	object_data_flag_0x800 = FLAG(11),
+	object_data_flag_0x1000 = FLAG(12),
+	object_data_flag_0x2000 = FLAG(13),
 	_object_garbage_bit = FLAG(14),
+	object_data_flag_0x8000 = FLAG(15),
 	_object_does_not_cast_shadow_bit = FLAG(16),
 	object_data_flag_0x20000 = FLAG(17),
 	object_data_flag_0x40000 = FLAG(18),
+	object_data_flag_0x80000 = FLAG(19),
+	object_data_flag_0x100000 = FLAG(20),
 	object_data_flag_0x200000 = FLAG(21),
+	object_data_flag_0x400000 = FLAG(22),
+	object_data_flag_0x800000 = FLAG(23),
+	object_data_flag_0x1000000 = FLAG(24),
 	_object_has_override_bit = FLAG(25),
 	_object_is_child_object = FLAG(26),
+	object_data_flag_0x8000000 = FLAG(27),
+	object_data_flag_0x10000000 = FLAG(28),
+	object_data_flag_0x20000000 = FLAG(29),
+	object_data_flag_0x40000000 = FLAG(30),
 	_object_has_prt_or_lighting_info = FLAG(31)
 };
-ENUM_OPERATORS(e_object_data_flags, DWORD)
+ENUM_OPERATORS(e_object_data_flags, int)
 
 enum e_object_physics_flags : WORD
 {
@@ -126,7 +141,7 @@ struct s_object_data_definition
 	datum current_weapon_datum;		//maybe attachment or child
 	datum parent_datum;
 	WORD unit_in_vehicle_flag;
-	INT16 placement_index;
+	__int16 placement_index;
 	BYTE gap_1C[8];
 	DWORD foreground_emblem;
 	s_location location;
@@ -153,12 +168,13 @@ struct s_object_data_definition
 	byte field_b2;
 	byte field_b3;
 	datum havok_datum;
-	char gap_B8[8];
+	datum early_mover_index;
+	DWORD unkBC;
 	e_object_physics_flags physics_flags;
 	WORD damage_owner_unk3;
 	DWORD damage_owner_unk1;
 	DWORD damage_owner_unk2;
-	unsigned int field_CC;
+	DWORD field_CC;
 	__int16 field_D0;
 	BYTE model_variant_id;//hlmt variant tag_block index
 	char gap_D3;
@@ -175,8 +191,8 @@ struct s_object_data_definition
 	DWORD gap_F4[4];
 	WORD shield_stun_ticks;
 	WORD body_stun_ticks;
-	byte byte_108;
-	byte byte_109;
+	char byte_108;
+	char byte_109;
 	e_object_damage_flags object_damage_flags;		//(object_damage_flags & 4) != 0 -- > object_is_dead
 	__int16 original_orientation_size;
 	__int16 original_orientation_offset;

@@ -32,7 +32,7 @@ int object_type_from_group_tag(datum tag_index)
 	return result;
 }
 
-bool __cdecl object_type_new(datum object_datum, object_placement_data* placement_data, bool* some_bool)
+bool object_type_new(datum object_datum, object_placement_data* placement_data, bool* some_bool)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 	bool object_created = true;
@@ -60,7 +60,7 @@ void object_type_adjust_placement(object_placement_data* placement_data)
 	}
 }
 
-void __cdecl object_type_dispose_from_old_structure_bsp(datum object_datum)
+void object_type_dispose_from_old_structure_bsp(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -73,7 +73,7 @@ void __cdecl object_type_dispose_from_old_structure_bsp(datum object_datum)
 	}
 }
 
-void __cdecl object_type_place(datum object_datum, s_scenario_object* object)
+void object_type_place(datum object_datum, s_scenario_object* object)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -86,7 +86,7 @@ void __cdecl object_type_place(datum object_datum, s_scenario_object* object)
 	}
 }
 
-void __cdecl object_type_create_children(datum object_datum)
+void object_type_create_children(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -99,7 +99,7 @@ void __cdecl object_type_create_children(datum object_datum)
 	}
 }
 
-void __cdecl object_type_notify_impulse_sound(datum object_datum, int a2, int a3)
+void  object_type_notify_impulse_sound(datum object_datum, int a2, int a3)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -125,10 +125,10 @@ void object_type_delete(datum object_datum)
 	}
 }
 
-typedef void(__cdecl* object_type_object_move_t)(datum object_datum);
+typedef void(* object_type_object_move_t)(datum object_datum);
 object_type_object_move_t p_object_type_object_move;
 
-void __cdecl object_type_move(datum object_datum)
+void  object_type_move(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -141,10 +141,7 @@ void __cdecl object_type_move(datum object_datum)
 	}
 }
 
-typedef void(__cdecl* object_type_object_can_activate_t)(datum object_datum, int a2, int a3);
-object_type_object_can_activate_t p_object_type_object_can_activate;
-
-bool __cdecl object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
+bool  object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
 {
 	bool result = false;
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
@@ -160,10 +157,8 @@ bool __cdecl object_type_compute_activation(datum object_datum, DWORD* a2, bool*
 	return result;
 }
 
-typedef void(__cdecl* object_type_assign_new_entity_t)(datum object_datum);
-object_type_assign_new_entity_t p_object_assign_new_entity;
 
-void __cdecl object_type_attach_gamestate_entity(datum object_datum)
+void  object_type_attach_gamestate_entity(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -176,7 +171,7 @@ void __cdecl object_type_attach_gamestate_entity(datum object_datum)
 	}
 }
 
-void __cdecl object_type_detach_gamestate_entity(datum object_datum)
+void  object_type_detach_gamestate_entity(datum object_datum)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -189,7 +184,7 @@ void __cdecl object_type_detach_gamestate_entity(datum object_datum)
 	}
 }
 
-void __cdecl object_type_handle_deleted_object(datum object_datum, int a2)
+void  object_type_handle_deleted_object(datum object_datum, int a2)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
@@ -202,10 +197,7 @@ void __cdecl object_type_handle_deleted_object(datum object_datum, int a2)
 	}
 }
 
-typedef void(__cdecl* object_type_process_node_matrices_t)(datum object_datum, int node_count, int node_matracies);
-object_type_process_node_matrices_t p_object_type_process_node_matrices;
-
-void __cdecl object_type_postprocess_node_matrices(datum object_datum, int node_count, real_matrix4x3* node_matracies)
+void  object_type_postprocess_node_matrices(datum object_datum, int node_count, real_matrix4x3* node_matracies)
 {
 	object_type_definition* object_type = get_game_object_type_definition(object_datum);
 

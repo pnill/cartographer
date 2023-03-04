@@ -3,7 +3,7 @@
 struct s_location
 {
 	DWORD leaf_index;
-	WORD cluster;
+	short cluster;
 	WORD bsp_index;
 };
 

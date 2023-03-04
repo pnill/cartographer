@@ -5,6 +5,7 @@
 
 class c_animation_manager
 {
+public:
 	c_animation_channel channel1;
 	c_animation_channel channel2;
 	c_animation_channel channel3;
@@ -16,7 +17,6 @@ class c_animation_manager
 	int animation_string_ids[4];
 	DWORD unk80;
 
-public:
 	c_animation_manager();
 	~c_animation_manager();
 	void initialize();
