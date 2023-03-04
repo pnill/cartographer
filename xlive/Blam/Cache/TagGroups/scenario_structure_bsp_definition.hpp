@@ -51,13 +51,21 @@ struct s_scenario_structure_bsp_group_definition : TagGroup<'sbsp'>
 	{
 		struct s_bsp_3d_nodes_block
 		{
-			WORD plane;
+			short plane;
 			byte front_child_lower;
 			byte front_child_mid;
 			byte front_child_upper;
 			byte back_child_lower;
 			byte back_child_mid;
 			byte back_child_upper;
+
+			BLAM_MATH_INL int get_child_index(bool back_child) const
+			{
+				if (back_child)
+					return *(__int64*)this >> 40;			// Returns back child lower
+				else
+					return *(__int64*)this << 24 >> 40;		// Returns front child lower but then does some bitshift magic to see if it references a child index it's used before?
+			}
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_bsp_3d_nodes_block, 0x8);
 		tag_block<s_bsp_3d_nodes_block> bsp_3d_nodes;//0x0
