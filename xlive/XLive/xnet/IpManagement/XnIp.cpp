@@ -365,13 +365,14 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 	connectionIdentifier.s_addr = 0;
 
 	int ret = CreateOrGetXnIpIdentifierFromPacket(&reqPacket->data.xnaddr, &reqPacket->data.xnkid, reqPacket, &connectionIdentifier);
-	// if CreateXnIpIdentifierFromPacket is successful, we created another connection or we returned an already present one
 
+	// if CreateOrGetXnIpIdentifierFromPacket is successful, another connection spot has been created
+	// or an existing one is present
 	if (ret == 0)
 	{
 		// TODO: get rid of H2v only sockets
 
-		if (connectionIdentifier.s_addr == INADDR_LOOPBACK)
+		if (connectionIdentifier.s_addr == XnIp_LOOPBACK_ADDR_NL)
 			return;
 
 		XnIp* xnIp = GetConnection(connectionIdentifier);
@@ -493,13 +494,13 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 
 	if (!memcmp(localConnectionInfo->m_xnaddr.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)))
 	{
-		// some retarded games use the MAC address as a unique player identifier
+		// some retarded games use the MAC address as the unique player identifier
 		// but in 2020 we want to connect from the same PC multiple game instances, and this has become a unique account identifier
-		// but even then, we cant allow xbox addresses with the same abEnet identifier
+		// but even then, we cannot allow xbox addresses with the same abEnet identifier
 		LOG_CRITICAL_NETWORK("{} - the specified XNADDR is the same with the local one, aborting connection.", __FUNCTION__);
 		LOG_CRITICAL_NETWORK("{} - local abEnet: {} == packet abEnet: {}",
 			__FUNCTION__, ByteToHexStr(localConnectionInfo->m_xnaddr.abEnet, 6), ByteToHexStr(pxna->abEnet, 6));
-		outIpIdentifier->s_addr = IPADDR_LOOPBACK;
+		outIpIdentifier->s_addr = XnIp_LOOPBACK_ADDR_NL;
 		return 0;
 	}
 

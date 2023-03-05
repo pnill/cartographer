@@ -17,7 +17,8 @@ extern const char broadcastStrHdr[XNIP_MAX_PCK_STR_HDR_LEN];
 
 #define XnIp_ConnectionTimeOut (15 * 1000) // msec
 
-#define IPADDR_LOOPBACK (htonl(0x7F000001)) // 127.0.0.1
+// Network long LOOPBACK address
+#define XnIp_LOOPBACK_ADDR_NL (htonl(INADDR_LOOPBACK)) // 127.0.0.1
 
 #define XNIP_FLAG(_bit) (1<<(_bit))
 #define XNIP_SET_BIT(_val, _bit) ((_val) |= XNIP_FLAG((_bit)))
