@@ -24,14 +24,14 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
-void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
+void object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, void* damage_owner)
 {
-	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
+	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, damage_owner);
 
-	typedef void(__cdecl* object_placement_data_new_t)(void*, datum, datum, int);
+	typedef void(__cdecl* object_placement_data_new_t)(void*, datum, datum, void*);
 	auto p_object_placement_data_new = Memory::GetAddress<object_placement_data_new_t>(0x132163, 0x121033);
 
-	p_object_placement_data_new(object_placement_data, object_definition_idx, object_owner_idx, a4);
+	p_object_placement_data_new(object_placement_data, object_definition_idx, object_owner_idx, damage_owner);
 }
 
 //Pass new placement data into Create_object_new
@@ -164,6 +164,24 @@ void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
 	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
 }
 
+void* object_header_block_get(int object_datum, const object_header_block_reference* reference)
+{
+	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
+}
+
+void* object_header_block_get_with_count(int object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count)
+{
+	void* object_header = nullptr;
+
+	*element_count = 0;
+	if (reference->offset != 0xFFFF)
+	{
+		object_header = object_header_block_get(object_datum, reference);
+		*element_count = reference->size / element_size;
+	}
+	return object_header;
+}
+
 void __cdecl object_reconnect_to_map(s_location* location, const datum object_datum)
 {
 	typedef void(__cdecl* cluster_partition_reconnect_t)(
@@ -286,13 +304,10 @@ void update_object_variant_index(datum object_header_datum, string_id variant_in
 	object->model_variant_id = object_lookup_variant_index_from_name(object_header_datum, variant_index);
 }
 
-real_matrix4x3* object_get_node_matricies(datum object_datum, int* node_matricies_count)
+real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count)
 {
-	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
-	*node_matricies_count = object->node_buffer_size / 52;
-	return (real_matrix4x3*)((byte*)object + object->nodes_offset);
+	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
-
 
 void object_postprocess_node_matrices(datum object_index)
 {
@@ -303,8 +318,8 @@ void object_postprocess_node_matrices(datum object_index)
 		auto model_tag = tags::get_tag_fast<s_model_group_definition>(object_tag->model.TagIndex);
 		if (model_tag->render_model.TagIndex != DATUM_INDEX_NONE && model_tag->animation.TagIndex != DATUM_INDEX_NONE)
 		{
-			int node_count = 0;
-			real_matrix4x3* node_matricies = object_get_node_matricies(object_index, &node_count);
+			DWORD node_count = 0;
+			real_matrix4x3* node_matricies = object_get_node_matrices(object_index, &node_count);
 			object_type_postprocess_node_matrices(object_index, node_count, node_matricies);
 		}
 	}
@@ -397,8 +412,6 @@ datum __cdecl object_header_new(__int16 object_data_size)
 	return object_datum;
 }
 
-
-
 // Not 100% sure this function works correctly 
 // CHECK THIS BEFORE RELEASING
 // Computes the new change color values of an object 
@@ -415,8 +428,9 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 
 	if ((obje_definition->runtime_flags & s_object_group_definition::e_object_group_runtime_runtime_change_colors_allowed) == 0) { return false; }
 
-	real_color_rgb* object_change_colors = (real_color_rgb*)((char*)object + object->change_color_offset);
-	int number_of_change_colors = (object->change_color_size / sizeof(real_color_rgb)) / 2;
+	DWORD number_of_change_colors = 0;
+	real_color_rgb* object_change_colors = (real_color_rgb*)object_header_block_get_with_count(object_datum, &object->change_color_block, sizeof(real_color_rgb), &number_of_change_colors);
+	
 	if (number_of_change_colors <= 0) { return false; }
 
 	real_color_rgb* color = &object_change_colors[number_of_change_colors];
@@ -527,7 +541,7 @@ void free_object_memory(unsigned __int16 a1)
 void object_reset_interpolation(datum object_datum)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
-	c_animation_manager* animation_manager = (c_animation_manager*)((byte*)object + object->animation_manager_offset);
+	c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_datum, &object->animation_manager_block);
 
 	animation_manager->interpolator_control_1.disable();
 	object_wake(object_datum);
@@ -850,7 +864,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	{
 		if (valid_animation_manager)
 		{
-			c_animation_manager* animation_manager = (c_animation_manager*)((byte*)object + object->animation_manager_offset);
+			c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_datum, &object->animation_manager_block);
 
 			animation_manager->initialize();
 			if (animation_manager->reset_graph(model_definition->animation.TagIndex, new_object_tag->model.TagIndex, true))
@@ -859,11 +873,17 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				object->object_flags &= ~object_data_flag_0x800;
 		}
 
-		// Clear attachment block
+		// Null attachment block
 		if (new_object_tag->attachments.size > 0)
 		{
-			byte* object_attachments_block = (byte*)object + object->object_attachments_offset;
-			memset(object_attachments_block, -1, object->object_attachments_size);
+			DWORD attachments_count;
+			s_object_group_definition::s_attachments_block* object_attachments_block = (s_object_group_definition::s_attachments_block*)object_header_block_get_with_count(
+				object_datum,
+				&object->object_attachments_block,
+				sizeof(s_object_group_definition::s_attachments_block),
+				&attachments_count);
+
+			memset(&object_attachments_block, -1, sizeof(s_object_group_definition::s_attachments_block) * attachments_count);
 		}
 
 		if (object_type_new(object_datum, placement_data, &unk_creation_bool))
@@ -881,13 +901,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 
-			if (object->animation_manager_offset != DATUM_INDEX_NONE)
+			if (object->animation_manager_block.offset != DATUM_INDEX_NONE)
 				object_reset_interpolation(object_datum);
 
 			object_compute_node_matrices_with_children(object_datum);
 			if (s_object_globals::objects_can_connect_to_map())
 			{
-				
 				s_location* p_location = nullptr;
 				placement_data->object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_datum);
 				if (placement_data->object_is_inside_cluster)

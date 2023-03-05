@@ -130,6 +130,11 @@ enum e_object_damage_flags : WORD
 };
 ENUM_OPERATORS(e_object_damage_flags, WORD)
 
+struct object_header_block_reference
+{
+	short size;
+	short offset;
+};
 
 #pragma pack(push, 1)
 struct s_object_data_definition
@@ -194,26 +199,16 @@ struct s_object_data_definition
 	char byte_108;
 	char byte_109;
 	e_object_damage_flags object_damage_flags;		//(object_damage_flags & 4) != 0 -- > object_is_dead
-	__int16 original_orientation_size;
-	__int16 original_orientation_offset;
-	__int16 node_orientation_size;
-	__int16 node_orientation_offset;
-	__int16 node_buffer_size;
-	__int16 nodes_offset;
-	__int16 collision_regions_size;
-	__int16 collision_regions_offset;
-	__int16 object_attachments_size;
-	__int16 object_attachments_offset;
-	__int16 damage_sections_size;
-	__int16 damage_sections_offset;
-	__int16 change_color_size;
-	__int16 change_color_offset;
-	__int16 animation_manager_size;
-	__int16 animation_manager_offset;
+	object_header_block_reference original_orientation_block;
+	object_header_block_reference node_orientation_block;
+	object_header_block_reference nodes_block;
+	object_header_block_reference collision_regions_block;
+	object_header_block_reference object_attachments_block;
+	object_header_block_reference damage_sections_block;
+	object_header_block_reference change_color_block;
+	object_header_block_reference animation_manager_block;
 };
 #pragma pack(pop)
-CHECK_STRUCT_OFFSET(s_object_data_definition, node_buffer_size, 0x114);
-CHECK_STRUCT_OFFSET(s_object_data_definition, nodes_offset, 0x116);
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
 struct s_unit_data_definition : s_object_data_definition
@@ -281,7 +276,6 @@ struct s_weapon_data_definition : s_object_data_definition
 CHECK_STRUCT_SIZE(s_weapon_data_definition, 0x25C);
 
 
-
 enum e_object_header_flag : BYTE
 {
 	_object_header_active_bit = FLAG(0),
@@ -332,13 +326,6 @@ static T* object_get_fast_unsafe(datum object_idx)
 	return (T*)get_object_header(object_idx)->object;
 }
 
-static real_matrix4x3* get_object_nodes(datum object_idx, int* out_node_count)
-{
-	auto object = object_get_fast_unsafe(object_idx);
-	*out_node_count = object->node_buffer_size / sizeof(real_matrix4x3);
-	return (real_matrix4x3*)((char*)object + object->nodes_offset);
-}
-
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
 template<typename T = s_object_data_definition>
 static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
@@ -347,7 +334,9 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 
-void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
+void object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, void* damage_owner);
+void* object_header_block_get(int object_datum, const object_header_block_reference* reference);
+void* object_header_block_get_with_count(int object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
 datum object_new(object_placement_data* object_placement_data);
 void apply_biped_object_definition_patches();
 void simulation_action_object_create(datum object_idx);
@@ -356,6 +345,7 @@ void object_wake(const datum object_datum);
 void __cdecl object_disconnect_from_map(const datum object_index);
 void __cdecl object_reconnect_to_map(const s_location* location_struct, const datum object_index);
 void object_compute_node_matrices_with_children(const datum object_datum);
+real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
 
 int object_get_count();
 int object_count_from_iter();

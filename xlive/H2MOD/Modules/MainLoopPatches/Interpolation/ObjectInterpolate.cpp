@@ -39,7 +39,7 @@ namespace ObjectInterpolate
 		{
 			int object_node_count;
 			s_object_interpolation* object_state = &object_states[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)];
-			real_matrix4x3* object_nodes = get_object_nodes(object_idx, &object_node_count);
+			real_matrix4x3* object_nodes = object_get_node_matrices(object_idx, &object_node_count);
 			bool ret = object_state->valid 
 				&& object_state->object_idx == object_idx 
 				&& object_state->node_count == object_node_count
@@ -58,7 +58,7 @@ namespace ObjectInterpolate
 		if (!Interpolation::ShouldInterpolate())
 			return;
 
-		s_data_iterator<s_object_header*> object_it(get_object_header());
+		s_data_iterator<s_object_header*> object_it(get_object_data_array());
 
 		// check if we actually executed any ticks
 		if (!(time_globals::get_game_time() > 0))
@@ -84,7 +84,7 @@ namespace ObjectInterpolate
 			}
 
 			int object_node_count;
-			real_matrix4x3* object_nodes = get_object_nodes(object_it.get_current_datum_index(), &object_node_count);
+			real_matrix4x3* object_nodes = object_get_node_matrices(object_it.get_current_datum_index(), &object_node_count);
 			/*if (object_node_count > OBJECT_MAX_NODES)
 				DBGBREAK();*/
 
@@ -102,7 +102,7 @@ namespace ObjectInterpolate
 			return;
 		}
 
-		s_data_iterator<s_object_header*> object_it(get_object_header());
+		s_data_iterator<s_object_header*> object_it(get_object_data_array());
 
 		while (object_it.get_next_datum())
 		{
@@ -138,12 +138,12 @@ namespace ObjectInterpolate
 
 		if (!Interpolation::ShouldInterpolate())
 		{
-			return get_object_nodes(object_idx, out_node_count);
+			return object_get_node_matrices(object_idx, out_node_count);
 		}
 		
 		if (!SameObject(object_idx))
 		{
-			real_matrix4x3* ret = get_object_nodes(object_idx, out_node_count);
+			real_matrix4x3* ret = object_get_node_matrices(object_idx, out_node_count);
 			CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
 			output->AddStringFmt(StringFlag_None, "object interpolate: %x mismatch, cached object idx: %x, state valid: %d, node count: %d, cached: %d, node ptr: %#010x, cached: %#010x", 
 				object_idx, object_state->object_idx, object_state->valid, *out_node_count, object_state->node_count, object_state->node_ptr, ret);
@@ -151,7 +151,7 @@ namespace ObjectInterpolate
 		}
 		
 		int node_count;
-		real_matrix4x3* current_object_nodes = get_object_nodes(object_idx, &node_count);
+		real_matrix4x3* current_object_nodes = object_get_node_matrices(object_idx, &node_count);
 
 		for (int i = 0; i < object_state->node_count; i++)
 			matrix4x3_interpolate(&object_state->previous_node_position[i], &current_object_nodes[i], Interpolation::GetInterpolateTime(), &object_state->interpolated_nodes[i]);

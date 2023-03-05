@@ -204,7 +204,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	{
 		object_placement_data nObject;
 
-		create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		object_placement_data_new(&nObject, weaponId, unit_datum, nullptr);
 
 		datum object_idx = object_new(&nObject);
 
@@ -723,7 +723,7 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 	{
 		object_placement_data object_placement;
 
-		create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
+		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, nullptr);
 
 		datum object_idx = object_new(&object_placement);
 		if (!DATUM_IS_NONE(object_idx))
