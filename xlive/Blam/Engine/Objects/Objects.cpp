@@ -380,8 +380,8 @@ datum __cdecl object_header_new(__int16 object_data_size)
 
 	const datum object_datum = datum_new(get_object_data_array());
 	s_object_header* object_header = get_object_header(object_datum);
-	if (object_datum == -1)
-		return object_datum;
+	if (object_datum == DATUM_INDEX_NONE) { return object_datum; }
+
 	if (memory_pool_block_allocate_handle(object_table, &object_header->object, object_data_size, 0, 0))
 	{
 		s_object_data_definition* object = (s_object_data_definition*)object_header->object;
@@ -473,42 +473,36 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 			}
 		}
 
-		float red;
-		float green;
-		float blue;
-		red = color->red;
-		if (color->red >= 0.0)
+		if (color->red >= 0.0f)
 		{
-			if (red > 1.0)
-				red = 1.0;
+			if (color->red > 1.0f)
+				color->red = 1.0f;
 		}
 		else
 		{
-			red = 0.0;
+			color->red = 0.0f;
 		}
-		color->red = red;
-		green = color->green;
-		if (green >= 0.0)
+
+		if (color->green >= 0.0f)
 		{
-			if (green > 1.0)
-				green = 1.0;
+			if (color->green > 1.0f)
+				color->green = 1.0f;
 		}
 		else
 		{
-			green = 0.0;
+			color->green = 0.0f;
 		}
-		color->green = green;
-		blue = color->blue;
-		if (blue >= 0.0)
+
+		if (color->blue >= 0.0f)
 		{
-			if (blue > 1.0)
-				blue = 1.0;
+			if (color->blue > 1.0f)
+				color->blue = 1.0f;
 		}
 		else
 		{
-			blue = 0.0;
+			color->blue = 0.0f;
 		}
-		color->blue = blue;
+
 		++color;
 	}
 	return true;
@@ -539,6 +533,77 @@ void object_reset_interpolation(datum object_datum)
 	object_wake(object_datum);
 }
 
+// Gets new damage info block from the model tag related to the object datum
+s_model_group_definition::s_new_damage_info_block* object_get_damage_info(const datum object_datum)
+{
+	if (object_datum == -1) { return nullptr; }
+
+	const datum hlmt_datum = tags::get_tag_fast<s_object_group_definition>(object_get_fast_unsafe(object_datum)->tag_definition_index)->model.TagIndex;
+
+	if (hlmt_datum == -1) { return nullptr; }
+
+	const s_model_group_definition* hlmt_definition = tags::get_tag_fast<s_model_group_definition>(hlmt_datum);
+
+	if (hlmt_definition->new_damage_info.size <= 0)
+	{
+		return nullptr;
+	}
+
+	if (hlmt_definition->new_damage_info.data != -1)
+	{
+		return hlmt_definition->new_damage_info[0];
+	}
+
+	return nullptr;
+}
+
+void object_initialize_vitality(const datum object_datum, const float* new_vitality, const float* new_shield_vitality)
+{
+	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	const s_model_group_definition::s_new_damage_info_block* damage_info = object_get_damage_info(object_datum);
+
+	float current_shield_vitality = 0.0f;
+	float maximum_body_vitality = 0.0f;
+	float maximum_shield_vitality = 0.0f;
+	float current_body_vitality = 1.0f;
+
+	// if damage info block is valid
+	if (damage_info)
+	{
+		maximum_body_vitality = damage_info->maximum_vitality;
+		maximum_shield_vitality = damage_info->maximum_shield_vitality;
+	}
+
+	// Set new vitality if one is passed to the function
+	if (new_vitality)
+	{
+		maximum_body_vitality = *new_vitality;
+	}
+
+	// Set new shield vitality if one is passed to the function
+	if (new_shield_vitality)
+	{
+		maximum_shield_vitality = *new_shield_vitality;
+	}
+	
+	// Make sure body vitality isn't negative
+	if (maximum_body_vitality <= 0.0f)
+	{
+		current_body_vitality = 0.0f;
+	}
+
+	// If max shield vitality is greater than 0 set our shields to full
+	if (maximum_shield_vitality > 0.0f)
+	{
+		current_shield_vitality = 1.0f;
+	}
+
+	object->body_max_vitality = maximum_body_vitality;
+	object->shield_max_vitality = maximum_shield_vitality;
+	object->body_current_vitality = current_body_vitality;
+	object->shield_current_vitality = current_shield_vitality;
+}
+
 typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
 p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
@@ -554,9 +619,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	typedef char(__cdecl* sub_5310F9_t)(datum a1, int a2, real_color_rgb* a3);
 	auto p_object_set_initial_change_colors = Memory::GetAddress<sub_5310F9_t>(0x1310F9);
-
-	typedef void(__cdecl* object_initialize_vitality_t)(datum a1, float* a2, float* a3);
-	auto p_object_initialize_vitality = Memory::GetAddress<object_initialize_vitality_t>(0x175A62);
 
 	//typedef char(__cdecl* object_compute_change_colors_t)(datum a1);
 	//auto p_object_compute_change_colors = Memory::GetAddress<object_compute_change_colors_t>(0x13456E);
@@ -815,7 +877,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			update_object_variant_index(object_datum, placement_data->variant_name);
 			update_object_region_information(object_datum, placement_data->region_index);
 			p_object_set_initial_change_colors(object_datum, placement_data->active_change_colors_mask, placement_data->change_colors);
-			p_object_initialize_vitality(object_datum, nullptr, nullptr);
+			object_initialize_vitality(object_datum, nullptr, nullptr);
 			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 

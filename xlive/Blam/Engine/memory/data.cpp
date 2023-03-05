@@ -63,7 +63,7 @@ datum __cdecl datum_new(s_data_array* data)
 	return next_idx | (object_header->datum_salt << 16);
 }
 
-void __cdecl datum_delete(s_data_array* data_array, unsigned __int16 index)
+void datum_delete(s_data_array* data_array, unsigned __int16 index)
 {
 	s_object_header* object;
 

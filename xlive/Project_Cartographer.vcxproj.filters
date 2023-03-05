@@ -170,6 +170,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -533,6 +534,7 @@
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
+    <ClInclude Include="Blam\Engine\math\real_math.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

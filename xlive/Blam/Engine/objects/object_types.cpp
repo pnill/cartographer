@@ -125,8 +125,6 @@ void object_type_delete(datum object_datum)
 	}
 }
 
-typedef void(* object_type_object_move_t)(datum object_datum);
-object_type_object_move_t p_object_type_object_move;
 
 void  object_type_move(datum object_datum)
 {

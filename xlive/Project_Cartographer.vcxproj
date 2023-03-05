@@ -250,10 +250,12 @@
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\IceCreamFlavor\IceCreamFlavor.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />

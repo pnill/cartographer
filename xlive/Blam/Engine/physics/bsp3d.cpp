@@ -2,12 +2,8 @@
 #include "bsp3d.h"
 
 #include "Blam/Cache/DataTypes/TagBlock.h"
+#include "Blam/Engine/math/real_math.h"
 #include "H2MOD/Tags/TagInterface.h"
-
-float BLAM_MATH_INL plane3d_distance_to_point(const real_plane3d* plane, const real_point3d* point)
-{
-    return ((((point->x * plane->normal.i) + (point->y * plane->normal.j)) + (point->z * plane->normal.k)) - plane->distance);
-}
 
 int bsp3d_test_point(const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp, int starting_index, const real_point3d* point)
 {

@@ -15,9 +15,6 @@ void location_invalidate(s_location* object_location)
 
 void scenario_location_from_point(s_location* location, const real_point3d* point)
 {
-    typedef int(__cdecl* bsp3d_test_point_t)(const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp, int starting_index, const real_point3d* point);
-    auto p_bsp3d_test_point = Memory::GetAddress<bsp3d_test_point_t>(0x76EFF);
-
     short global_structure_bsp_index = *Memory::GetAddress<short*>(0x4119A4);
     const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* global_collision_bsp = *Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block**>(0x479E60);
     const s_scenario_structure_bsp_group_definition* global_structure_bsp = *Memory::GetAddress<s_scenario_structure_bsp_group_definition**>(0x479E6C);
