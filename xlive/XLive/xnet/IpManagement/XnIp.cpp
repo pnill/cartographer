@@ -365,13 +365,14 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 	connectionIdentifier.s_addr = 0;
 
 	int ret = CreateOrGetXnIpIdentifierFromPacket(&reqPacket->data.xnaddr, &reqPacket->data.xnkid, reqPacket, &connectionIdentifier);
-	// if CreateXnIpIdentifierFromPacket is successful, we created another connection or we returned an already present one
 
+	// if CreateOrGetXnIpIdentifierFromPacket is successful, another connection spot has been created
+	// or an existing one is present
 	if (ret == 0)
 	{
 		// TODO: get rid of H2v only sockets
 
-		if (connectionIdentifier.s_addr == INADDR_LOOPBACK)
+		if (connectionIdentifier.s_addr == XnIp_LOOPBACK_ADDR_NL)
 			return;
 
 		XnIp* xnIp = GetConnection(connectionIdentifier);
@@ -387,7 +388,7 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 			// TODO:
 		case XnIp_ConnectionPing:
 		case XnIp_ConnectionPong:
-			LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, reqPacket->data.reqType);
+			LOG_CRITICAL_NETWORK("{} - unimplemented request type: {}", __FUNCTION__, (int)reqPacket->data.reqType);
 			break;
 
 		default:
@@ -403,7 +404,7 @@ void XnIpManager::HandleXNetRequestPacket(XSocket* xsocket, const XNetRequestPac
 	}
 	else
 	{
-		LOG_TRACE_NETWORK("{} - secure connection cannot be established!" __FUNCTION__);
+		LOG_TRACE_NETWORK("{} - secure connection cannot be established!", __FUNCTION__);
 		LogConnectionsErrorDetails(recvAddr, ret, &reqPacket->data.xnkid);
 		// TODO: send back the connection cannot be established
 	}
@@ -462,10 +463,11 @@ int XnIpManager::RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADD
 			LOG_INFO_NETWORK("{} - new connection index {}, identifier {:X}", __FUNCTION__, i, htonl(i | randIdentifier));
 
 			newXnIp->m_connectionId.s_addr = htonl(i | randIdentifier);
+			newXnIp->m_valid = true;
+
 			newXnIp->UpdateInteractionTimeHappened();
 			newXnIp->SetConnectStatus(XNET_CONNECT_STATUS_IDLE);
 			newXnIp->m_pckStats.PckDataSampleUpdate();
-			newXnIp->m_valid = true;
 
 			if (outIpIdentifier)
 				*outIpIdentifier = newXnIp->GetConnectionId();
@@ -492,13 +494,13 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 
 	if (!memcmp(localConnectionInfo->m_xnaddr.abEnet, pxna->abEnet, sizeof(XNADDR::abEnet)))
 	{
-		// some retarded games use the MAC address as a unique player identifier
+		// some retarded games use the MAC address as the unique player identifier
 		// but in 2020 we want to connect from the same PC multiple game instances, and this has become a unique account identifier
-		// but even then, we cant allow xbox addresses with the same abEnet identifier
+		// but even then, we cannot allow xbox addresses with the same abEnet identifier
 		LOG_CRITICAL_NETWORK("{} - the specified XNADDR is the same with the local one, aborting connection.", __FUNCTION__);
 		LOG_CRITICAL_NETWORK("{} - local abEnet: {} == packet abEnet: {}",
 			__FUNCTION__, ByteToHexStr(localConnectionInfo->m_xnaddr.abEnet, 6), ByteToHexStr(pxna->abEnet, 6));
-		outIpIdentifier->s_addr = IPADDR_LOOPBACK;
+		outIpIdentifier->s_addr = XnIp_LOOPBACK_ADDR_NL;
 		return 0;
 	}
 
@@ -551,9 +553,9 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 
 		// TODO FIXME: for a small subset of players pXnIpAlreadyRegistered->connectionNonceOtherSide is different from reqPacket->data.nonceKey when connection attempt is in progress
 		// causing the connection to fail
-		bool connectionIdMismatch = (reqPacket != nullptr
+		bool connectionIdMismatch = reqPacket != nullptr
 			&& registeredConnection->m_endpointNonceValid
-			&& memcmp(registeredConnection->m_endpointNonce, reqPacket->data.nonceKey, sizeof(XnIp::m_nonce)));
+			&& memcmp(registeredConnection->m_endpointNonce, reqPacket->data.nonceKey, sizeof(XnIp::m_nonce));
 
 		if (connectionIdMismatch)
 		{
@@ -596,7 +598,7 @@ int XnIpManager::RegisterKey(XNKID* pxnkid, XNKEY* pxnkey)
 	{
 		if (!memcmp(m_XnKeyPairs[i].xnkid.ab, pxnkid->ab, sizeof(XNKID::ab)))
 		{
-			if (m_XnKeyPairs[i].bValid == true)
+			if (m_XnKeyPairs[i].bValid)
 			{
 				LOG_TRACE_NETWORK("{} - XnKeyPair: xnkid {}, xnkey: {} already registered!",
 					__FUNCTION__,
