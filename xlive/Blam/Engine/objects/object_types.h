@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 typedef void (*type_initialize_gamestate_data_t)();
 typedef bool (*type_object_new_t)(datum, object_placement_data*, bool*);

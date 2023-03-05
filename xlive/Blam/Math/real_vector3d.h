@@ -1,6 +1,6 @@
 #pragma once
 
-#include "real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 float magnitude3d(const real_vector3d* v1);
 void add_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out);

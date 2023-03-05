@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Common/Common.h"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 struct collision_bsp_test_sphere_result
 {

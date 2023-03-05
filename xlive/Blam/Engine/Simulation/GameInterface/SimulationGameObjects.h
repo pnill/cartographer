@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 struct s_simulation_object_state_data
 {

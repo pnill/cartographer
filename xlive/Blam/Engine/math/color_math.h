@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Cache/TagGroups/object_definition.hpp"
 
 struct real_hsv_color

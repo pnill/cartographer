@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/structures/structures.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include <wtypes.h>
 
 struct s_placement_info
