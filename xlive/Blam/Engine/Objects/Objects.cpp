@@ -63,12 +63,23 @@ void object_delete(const datum object_idx)
 	p_object_delete(object_idx);
 }
 
+// Wakes object by adding the _object_header_awake_bit to every object and all parents of that object
 void object_wake(const datum object_datum)
 {
-	typedef void(__cdecl* object_wake_t)(const datum object_datum);
-	auto object_wake = Memory::GetAddress<object_wake_t>(0x12FA1E, 0x11E8E1);
+	s_object_header* object_header = get_object_header(object_datum);
+	if ((object_header->flags & object_data_flag_0x2) == 0 && object_datum != DATUM_INDEX_NONE)
+	{
+		datum current_object_datum = object_datum;
 
-	object_wake(object_datum);
+		s_object_data_definition* object = nullptr;
+		do
+		{
+			object = object_get_fast_unsafe(current_object_datum);
+			object_header->flags |= _object_header_awake_bit;
+			current_object_datum = object->parent_datum;
+		} 
+		while (current_object_datum != DATUM_INDEX_NONE);
+	}
 }
 
 void __cdecl object_disconnect_from_map(const datum object_index)
@@ -883,7 +894,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				sizeof(s_object_group_definition::s_attachments_block),
 				&attachments_count);
 
-			memset(&object_attachments_block, -1, sizeof(s_object_group_definition::s_attachments_block) * attachments_count);
+			memset(object_attachments_block, -1, sizeof(s_object_group_definition::s_attachments_block) * attachments_count);
 		}
 
 		if (object_type_new(object_datum, placement_data, &unk_creation_bool))
