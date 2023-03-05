@@ -101,9 +101,9 @@ struct XNetRequestPacket
 
 struct XnKeyPair
 {
-	bool bValid;
-	XNKID xnkid;
-	XNKEY xnkey;
+	bool m_valid;
+	XNKID m_xnkid;
+	XNKEY m_xnkey;
 };
 
 struct XnIpPckTransportStats
@@ -402,7 +402,7 @@ public:
 
 	// Connection data getters 
 	XnIp* GetConnection(const IN_ADDR ina) const;
-	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier);
+	int GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, const sockaddr_in* addr, IN_ADDR* outConnectionIdentifier) const;
 
 	// Miscellaneous
 	void ClearLostConnections();
@@ -421,7 +421,7 @@ public:
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr);
 
 	// XnIp handling function
-	XnIp* XnIpLookUp(const XNADDR* pxna, const XNKID* xnkid);
+	XnIp* XnIpLookup(const XNADDR* pxna, const XNKID* xnkid) const;
 	int CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const XNKID* xnkid, const XNetRequestPacket* reqPacket, IN_ADDR* outIpIdentifier);
 	int RegisterNewXnIp(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* outIpIdentifier);
 	void UnregisterXnIpIdentifier(const IN_ADDR ina);
@@ -429,25 +429,25 @@ public:
 	// Key functions
 	int RegisterKey(XNKID*, XNKEY*);
 	void UnregisterKey(const XNKID* xnkid);
-	XnKeyPair* GetKeyPair(const XNKID* xnkid);
+	XnKeyPair* KeyPairLookup(const XNKID* xnkid) const;
 	
 	// Logging 
-	void LogConnectionsToConsole(ConsoleLog* output);
-	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey);
+	void LogConnectionsToConsole(ConsoleLog* output) const;
+	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const;
 
 	// XNet startup parameters
-	int GetMaxXnConnections() { return m_startupParams.cfgSecRegMax; }
-	int GetReqQoSBufferSize() { return m_startupParams.cfgQosDataLimitDiv4 * 4; }
-	int GetMaxXnKeyPairs() { return m_startupParams.cfgKeyRegMax; }
-	int GetMinSockRecvBufferSizeInBytes() { return m_startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
-	int GetMinSockSendBufferSizeInBytes() { return m_startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
+	int GetMaxXnConnections()				const { return m_startupParams.cfgSecRegMax; }
+	int GetReqQoSBufferSize()				const { return m_startupParams.cfgQosDataLimitDiv4 * 4; }
+	int GetMaxXnKeyPairs()					const { return m_startupParams.cfgKeyRegMax; }
+	int GetMinSockRecvBufferSizeInBytes()	const { return m_startupParams.cfgSockDefaultRecvBufsizeInK * SOCK_K_UNIT; }
+	int GetMinSockSendBufferSizeInBytes()	const { return m_startupParams.cfgSockDefaultSendBufsizeInK * SOCK_K_UNIT; }
 
-	int GetRegisteredKeyCount()
+	int GetRegisteredKeyCount() const
 	{
 		int keysCount = 0;
 		for (int i = 0; i < GetMaxXnKeyPairs(); i++)
 		{
-			if (m_XnKeyPairs[i].bValid)
+			if (m_XnKeyPairs[i].m_valid)
 			{
 				keysCount++;
 			}
