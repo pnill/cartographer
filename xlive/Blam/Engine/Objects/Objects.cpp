@@ -11,7 +11,6 @@
 #include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/memory/bitstream.h"
-#include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/physics/bsp3d.h"
 #include "Blam/Engine/physics/collision_bsp.h"
@@ -402,13 +401,11 @@ bool object_render_model_has_prt_info(const datum object_datum, datum* mode_tag_
 
 datum __cdecl object_header_new(__int16 object_data_size)
 {
-	s_memory_pool* object_table = *Memory::GetAddress<s_memory_pool**>(0x4E4610);
-
 	const datum object_datum = datum_new(get_object_data_array());
 	s_object_header* object_header = get_object_header(object_datum);
 	if (object_datum == DATUM_INDEX_NONE) { return object_datum; }
 
-	if (memory_pool_block_allocate_handle(object_table, &object_header->object, object_data_size, 0, 0))
+	if (memory_pool_block_allocate_handle(get_object_table(), &object_header->object, object_data_size, 0, 0))
 	{
 		s_object_data_definition* object = (s_object_data_definition*)object_header->object;
 		object_header->object_data_size = object_data_size;
@@ -538,13 +535,11 @@ void free_object_memory(unsigned __int16 a1)
 	typedef int(__cdecl* memory_pool_block_free_t)(s_memory_pool* memory_pool, void** payload_data);
 	auto p_memory_pool_block_free = Memory::GetAddress<memory_pool_block_free_t>(0x8BD80, 0x81924);
 
-	s_memory_pool* object_table = Memory::GetAddress<s_memory_pool*>(0x4E4610);
-
 	s_object_header* object_header = get_object_header(a1);
 	object_header->flags = (e_object_header_flag)0;
 	if (object_header->object != nullptr)
 	{
-		p_memory_pool_block_free(object_table, &object_header->object);
+		p_memory_pool_block_free(get_object_table(), &object_header->object);
 	}
 	datum_delete(get_object_data_array(), a1);
 }
@@ -629,13 +624,48 @@ void object_initialize_vitality(const datum object_datum, const float* new_vital
 	object->shield_current_vitality = current_shield_vitality;
 }
 
+
+bool object_header_block_allocate(const datum object_datum, const __int16 size, const __int16 padded_size, const __int16 alignment_bits)
+{
+	s_object_header* object_header = get_object_header(object_datum);
+	if (padded_size)
+	{
+		int alignment_minus_one = (1 << alignment_bits) - 1;
+		unsigned int alignment_plus_pad = alignment_minus_one + padded_size;
+		if (memory_pool_block_reallocate_handle(
+			get_object_table(),
+			(s_object_data_definition*)&object_header->object,
+			(char*)(alignment_plus_pad + object_header->object_data_size),
+			nullptr,
+			nullptr))
+		{
+			__int16 object_data_size = object_header->object_data_size;
+			object_header->object_data_size = alignment_plus_pad + object_data_size;
+			object_header_block_reference* main_object_header_block = (object_header_block_reference*)((byte*)object_get_fast_unsafe(object_datum) + size);
+
+			main_object_header_block->offset = ~(WORD)alignment_minus_one & (alignment_minus_one + object_data_size);
+			main_object_header_block->size = padded_size;
+			memset((byte*)object_header->object + object_data_size, 0, alignment_plus_pad);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		object_header_block_reference* object_header_block = (object_header_block_reference*)((char*)object_header->object + size);
+		object_header_block->offset = -1;
+		object_header_block->size = 0;
+		return true;
+	}
+}
+
 typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
 p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-	typedef bool(__cdecl* object_header_block_allocate_t)(datum a1, __int16 a2, __int16 a3, char a4);
-	auto p_object_header_block_allocate = Memory::GetAddress<object_header_block_allocate_t>(0x130BC6);
-
 	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(datum a1);
 	auto p_havok_can_allocate_space_for_instance_of_object_definition = Memory::GetAddress<havok_can_allocate_space_for_instance_of_object_definition_t>(0x9FE55);
 
@@ -842,34 +872,18 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	long original_orientations = (!allow_interpolation ? 0 : 32 * nodes_count);
 
-	bool b_attachments = p_object_header_block_allocate(object_datum, 0x11C, (short)(8 * new_object_tag->attachments.size), 0);
-	bool b_damage_sections = p_object_header_block_allocate(object_datum, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
-	bool b_change_colors = p_object_header_block_allocate(object_datum, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
-	bool b_nodes = p_object_header_block_allocate(object_datum, 0x114, (short)(52 * nodes_count), 0);
-	bool b_collision = p_object_header_block_allocate(object_datum, 0x118, (short)(10 * collision_regions_count), 0);
-	bool b_interpolation_nodes = p_object_header_block_allocate(object_datum, 0x110, (short)original_orientations, 4);
-	bool b_interpolation_nodes_2 = p_object_header_block_allocate(object_datum, 0x10C,(short)original_orientations, 4);
-	bool b_animation = p_object_header_block_allocate(object_datum, 0x128, (valid_animation_manager ? 144 : 0), 0);
-	bool b_havok = p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
-	bool unk_creation_bool = false;
-	bool graph_reset = false;
-	if (b_attachments && 
-		b_damage_sections && 
-		b_change_colors && 
-		b_nodes && 
-		b_collision && 
-		b_interpolation_nodes && 
-		b_interpolation_nodes_2 && 
-		b_animation && 
-		b_havok)
-	{
-		graph_reset = true;
-	}
-	else 
-	{ 
-		unk_creation_bool = true; 
-	}
+	bool graph_reset = object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::object_attachments_block), (short)(8 * new_object_tag->attachments.size), 0);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x114, (short)(52 * nodes_count), 0);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::collision_regions_block), (short)(10 * collision_regions_count), 0);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::original_orientation_block), (short)original_orientations, 4);		// Node Orientations
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x110, (short)original_orientations, 4);
+	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x128, (short)(valid_animation_manager ? 144 : 0), 0);
+	graph_reset = graph_reset && p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
+
+	bool unk_creation_bool = !graph_reset;
 
 	if (graph_reset)
 	{

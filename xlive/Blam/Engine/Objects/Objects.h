@@ -6,6 +6,7 @@
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/Players/PlayerActions.h"
 #include <wtypes.h>
 
@@ -209,6 +210,7 @@ struct s_object_data_definition
 	object_header_block_reference animation_manager_block;
 };
 #pragma pack(pop)
+CHECK_STRUCT_OFFSET(s_object_data_definition, original_orientation_block, 0x10C);
 CHECK_STRUCT_SIZE(s_object_data_definition, 0x12C);
 
 struct s_unit_data_definition : s_object_data_definition
@@ -306,6 +308,11 @@ struct s_object_payload
 	float bounding_sphere_radius;
 };
 CHECK_STRUCT_SIZE(s_object_payload, 0x14);
+
+static s_memory_pool* get_object_table()
+{
+	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
+};
 
 static s_data_array* get_object_data_array()
 {

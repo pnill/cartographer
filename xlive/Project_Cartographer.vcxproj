@@ -258,6 +258,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
+    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
@@ -271,7 +272,6 @@
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
-    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
@@ -575,8 +575,10 @@
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
+    <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
@@ -698,8 +700,6 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
-    <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
