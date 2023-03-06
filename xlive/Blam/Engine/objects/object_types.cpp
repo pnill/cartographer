@@ -34,7 +34,7 @@ int object_type_from_group_tag(datum tag_index)
 
 bool object_type_new(datum object_datum, object_placement_data* placement_data, bool* some_bool)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 	bool object_created = true;
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
@@ -49,7 +49,7 @@ bool object_type_new(datum object_datum, object_placement_data* placement_data, 
 
 void object_type_adjust_placement(object_placement_data* placement_data)
 {
-	object_type_definition* object_type = get_object_type_definitions()[object_type_from_group_tag(placement_data->tag_index)];
+	const object_type_definition* object_type = get_object_type_definitions()[object_type_from_group_tag(placement_data->tag_index)];
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -62,7 +62,7 @@ void object_type_adjust_placement(object_placement_data* placement_data)
 
 void object_type_dispose_from_old_structure_bsp(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -75,7 +75,7 @@ void object_type_dispose_from_old_structure_bsp(datum object_datum)
 
 void object_type_place(datum object_datum, s_scenario_object* object)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -88,7 +88,7 @@ void object_type_place(datum object_datum, s_scenario_object* object)
 
 void object_type_create_children(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; ++i)
 	{
@@ -101,7 +101,7 @@ void object_type_create_children(datum object_datum)
 
 void  object_type_notify_impulse_sound(datum object_datum, int a2, int a3)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -114,7 +114,7 @@ void  object_type_notify_impulse_sound(datum object_datum, int a2, int a3)
 
 void object_type_delete(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -128,7 +128,7 @@ void object_type_delete(datum object_datum)
 
 void  object_type_move(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -142,7 +142,7 @@ void  object_type_move(datum object_datum)
 bool  object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
 {
 	bool result = false;
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i] && !result; i++) 
 	{
@@ -158,7 +158,7 @@ bool  object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
 
 void  object_type_attach_gamestate_entity(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -171,7 +171,7 @@ void  object_type_attach_gamestate_entity(datum object_datum)
 
 void  object_type_detach_gamestate_entity(datum object_datum)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -184,7 +184,7 @@ void  object_type_detach_gamestate_entity(datum object_datum)
 
 void  object_type_handle_deleted_object(datum object_datum, int a2)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{
@@ -197,7 +197,7 @@ void  object_type_handle_deleted_object(datum object_datum, int a2)
 
 void  object_type_postprocess_node_matrices(datum object_datum, int node_count, real_matrix4x3* node_matracies)
 {
-	object_type_definition* object_type = get_game_object_type_definition(object_datum);
+	const object_type_definition* object_type = get_game_object_type_definition(object_datum);
 
 	for (byte i = 0; object_type->base_object_types[i]; i++)
 	{

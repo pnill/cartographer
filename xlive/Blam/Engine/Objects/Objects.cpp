@@ -70,12 +70,10 @@ void object_wake(const datum object_datum)
 	{
 		datum current_object_datum = object_datum;
 
-		s_object_data_definition* object = nullptr;
 		do
 		{
-			object = object_get_fast_unsafe(current_object_datum);
 			object_header->flags |= _object_header_awake_bit;
-			current_object_datum = object->parent_datum;
+			current_object_datum = object_get_fast_unsafe(current_object_datum)->parent_datum;
 		} 
 		while (current_object_datum != DATUM_INDEX_NONE);
 	}
@@ -118,14 +116,22 @@ bool __cdecl simulation_query_object_is_predicted(const datum object_index)
 	return simulation_query_object_is_predicted(object_index);
 }
 
-bool object_is_connected_to_map(datum object_datum)
+bool object_is_connected_to_map(const datum object_datum)
 {
-	typedef bool(__cdecl* object_is_connected_to_map_t)(datum header_datum);
-	auto p_object_is_connected_to_map = Memory::GetAddress<object_is_connected_to_map_t>(0x132922);
-	return p_object_is_connected_to_map(object_datum);
+	datum current_object_datum = object_datum;
+
+	if (object_datum != DATUM_INDEX_NONE)
+	{
+		do
+		{
+			current_object_datum = object_get_fast_unsafe(current_object_datum)->parent_datum;
+		} 
+		while (current_object_datum != DATUM_INDEX_NONE);
+	}
+	return get_object_header(current_object_datum)->flags &= _object_header_connected_to_map_bit;
 }
 
-void object_connect_lights_recursive(datum object_datum,
+void object_connect_lights_recursive(const datum object_datum,
 	bool disconnect_this_object,
 	bool reconnect_this_object,
 	bool reconnect_child_objects,
@@ -136,14 +142,14 @@ void object_connect_lights_recursive(datum object_datum,
 	p_object_connect_lights_recursive(object_datum, disconnect_this_object, reconnect_this_object, reconnect_child_objects, show_this_object);
 }
 
-void object_update_collision_culling(datum object_datum)
+void object_update_collision_culling(const datum object_datum)
 {
-	typedef void(__cdecl* object_update_collision_culling_t)(datum object_datum);
+	typedef void(__cdecl* object_update_collision_culling_t)(const datum object_datum);
 	auto p_object_update_collision_culling = Memory::GetAddress<object_update_collision_culling_t>(0x1324E9);
 	p_object_update_collision_culling(object_datum);
 }
 
-bool object_can_activate_in_cluster(datum object_datum, DWORD* cluster_activation)
+bool object_can_activate_in_cluster(const datum object_datum, DWORD* cluster_activation)
 {
 	bool result = false;
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
@@ -158,7 +164,7 @@ bool object_can_activate_in_cluster(datum object_datum, DWORD* cluster_activatio
 	return (FLAG(object_header->cluster_index & 0x1F) & cluster_activation[object_header->cluster_index >> 5]) != 0;
 }
 
-void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
+void get_object_payload(const datum object_datum, s_object_payload* cluster_payload)
 {
 	typedef WORD (__cdecl* collision_compute_object_cull_flags_t)(datum object_index);
 	auto p_collision_compute_object_cull_flags = Memory::GetAddress<collision_compute_object_cull_flags_t>(0xCBE87);
@@ -174,12 +180,12 @@ void get_object_payload(datum object_datum, s_object_payload* cluster_payload)
 	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
 }
 
-void* object_header_block_get(int object_datum, const object_header_block_reference* reference)
+void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference)
 {
 	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
 }
 
-void* object_header_block_get_with_count(int object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count)
+void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count)
 {
 	void* object_header = nullptr;
 
@@ -297,7 +303,7 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 	s_object_data_definition const* next_object = nullptr;
 	object_compute_node_matrices_non_recursive(object_datum);
 	object_compute_node_matrices_locations(object_datum);
-	for (unsigned long i = object->current_weapon_datum; i != -1; i = next_object->next_index)
+	for (datum i = object->current_weapon_datum; i != -1; i = next_object->next_index)
 	{
 		next_object = object_get_fast_unsafe(i);
 		if ((FLAG(next_object->placement_info.object_type) & FLAG(machine)) == 0)
@@ -530,23 +536,23 @@ bool __cdecl object_compute_change_colors(datum object_datum)
 	return true;
 }
 
-void free_object_memory(unsigned __int16 a1)
+void free_object_memory(const datum object_datum)
 {
 	typedef int(__cdecl* memory_pool_block_free_t)(s_memory_pool* memory_pool, void** payload_data);
 	auto p_memory_pool_block_free = Memory::GetAddress<memory_pool_block_free_t>(0x8BD80, 0x81924);
 
-	s_object_header* object_header = get_object_header(a1);
+	s_object_header* object_header = get_object_header(object_datum);
 	object_header->flags = (e_object_header_flag)0;
 	if (object_header->object != nullptr)
 	{
 		p_memory_pool_block_free(get_object_table(), &object_header->object);
 	}
-	datum_delete(get_object_data_array(), a1);
+	datum_delete(get_object_data_array(), DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
 }
 
 void object_reset_interpolation(datum object_datum)
 {
-	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
+	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_datum, &object->animation_manager_block);
 
 	animation_manager->interpolator_control_1.disable();
@@ -678,7 +684,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	//typedef char(__cdecl* object_compute_change_colors_t)(datum a1);
 	//auto p_object_compute_change_colors = Memory::GetAddress<object_compute_change_colors_t>(0x13456E);
 
-	typedef void(__cdecl* object_reconnect_to_physics_t)(datum a1);
+	typedef void(__cdecl* object_reconnect_to_physics_t)(datum object_datum);
 	auto p_object_reconnect_to_physics = Memory::GetAddress< object_reconnect_to_physics_t>(0x1323B3);
 
 	typedef void(__cdecl* effect_new_from_object_t)(datum effect_tag_index,
@@ -690,7 +696,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		const void* effect_vector_field);
 	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
 
-	typedef int(__cdecl* sub_66CFDD_t)(datum a1);
+	typedef void(__cdecl* sub_66CFDD_t)(datum object_datum);
 	auto p_sub_66CFDD = Memory::GetAddress<sub_66CFDD_t>(0x26CFDD);
 
 	if ((placement_data->object_placement_flags & 0x10) == 0)
@@ -873,19 +879,27 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	long original_orientations = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 
-	bool graph_reset = object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::object_attachments_block), (short)(8 * new_object_tag->attachments.size), 0);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x120, (short)(8 * damage_info_damage_sections_size), 0);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x124, (short)(24 * new_object_tag->change_colors.size), 0);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x114, (short)(52 * nodes_count), 0);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::collision_regions_block), (short)(10 * collision_regions_count), 0);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::original_orientation_block), (short)original_orientations, 4);		// Node Orientations
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x110, (short)original_orientations, 4);
-	graph_reset = graph_reset && object_header_block_allocate(object_datum, 0x128, (short)(valid_animation_manager ? 144 : 0), 0);
-	graph_reset = graph_reset && p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
+	bool b_can_create_object = 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::object_attachments_block), (short)(8 * new_object_tag->attachments.size), 0);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::damage_sections_block), (short)(8 * damage_info_damage_sections_size), 0);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::change_color_block), (short)(24 * new_object_tag->change_colors.size), 0);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::nodes_block), (short)(52 * nodes_count), 0);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::collision_regions_block), (short)(10 * collision_regions_count), 0);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::node_orientation_block), (short)original_orientations, 4);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::original_orientation_block), (short)original_orientations, 4);
+	b_can_create_object = b_can_create_object && 
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::animation_manager_block), (short)(valid_animation_manager ? 144 : 0), 0);
+	b_can_create_object = b_can_create_object && p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
-	bool unk_creation_bool = !graph_reset;
+	bool b_out_of_objects = !b_can_create_object;
 
-	if (graph_reset)
+	if (b_can_create_object)
 	{
 		if (valid_animation_manager)
 		{
@@ -911,7 +925,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			memset(object_attachments_block, -1, sizeof(s_object_group_definition::s_attachments_block) * attachments_count);
 		}
 
-		if (object_type_new(object_datum, placement_data, &unk_creation_bool))
+		if (object_type_new(object_datum, placement_data, &b_out_of_objects))
 		{
 			bool b_object_flag_check = (object->object_flags & object_data_flag_0x20000) != 0;
 			if ((placement_data->object_placement_flags & 6) != 0)
@@ -957,7 +971,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			if (new_object_tag->creation_effect.TagIndex != DATUM_INDEX_NONE)
 				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0.0f, 0.0f, nullptr, nullptr);
 
-			p_sub_66CFDD(object_datum);
+			if (!Memory::IsDedicatedServer()) { p_sub_66CFDD(object_datum); }
 
 			if (b_object_flag_check)
 				object->object_flags |= object_data_flag_0x20000;
@@ -970,7 +984,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if (!s_object_globals::objects_can_connect_to_map()) { return object_datum; }
 
-			if ((placement_data->object_placement_flags & 2) == 0 && ((placement_data->object_placement_flags & 4) == 0 || object->location.cluster != 0xFFFF)) 
+			if ((placement_data->object_placement_flags & 2) == 0 && ( (placement_data->object_placement_flags & 4) == 0 || object->location.cluster != -1) ) 
 			{ 
 				object_delete(object_datum);
 			}
@@ -978,7 +992,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		}
 		object_type_delete(object_datum);
 	}
-	free_object_memory(DATUM_INDEX_TO_ABSOLUTE_INDEX(object_datum));
+	free_object_memory(object_datum);
 	return DATUM_INDEX_NONE;
 }
 

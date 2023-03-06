@@ -56,7 +56,7 @@ struct object_type_definition
 	void* dispose_gamestate_data;//();
 	void* initialize_gamestate_for_new_map;// ();
 	void* dispose_gamestate_from_old_map;// ();
-	void* new_object_placenment_data;// (datum onject_datum, object_placement_data* placement_data);
+	void* new_object_placement_data;// (datum onject_datum, object_placement_data* placement_data);
 	type_dispose_from_old_structure_bsp_t dispose_from_old_structure_bsp;// (datum object_datum);
 	type_object_adjust_placement_t adjust_placement;// (datum object_datum);
 	type_object_new_t object_new;
