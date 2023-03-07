@@ -157,7 +157,7 @@ struct s_object_data_definition
 	float shadow_sphere_radius;
 	real_point3d dynamic_light_sphere_offset;
 	float dynamic_light_sphere_radius;
-	DWORD first_cluster_reference;
+	int first_cluster_reference;
 	real_point3d position;
 	real_vector3d orientation;
 	real_vector3d up;

@@ -200,19 +200,6 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 
 void object_reconnect_to_map(const s_location* location, const datum object_datum)
 {
-	typedef void(__cdecl* cluster_partition_reconnect_t)(
-		cluster_partition* partition,
-		datum object_datum,
-		DWORD* first_cluster_reference,
-		real_point3d* position,
-		float radius,
-		s_location* location,
-		void* cluster_bitvector,
-		int payload_size,
-		void* payload,
-		bool* cluster_overflow);
-	auto p_cluster_partition_reconnect = Memory::GetAddress<cluster_partition_reconnect_t>(0x37A13E);
-
 	typedef DWORD*(__cdecl* game_get_cluster_activation_t)();
 	auto p_game_get_cluster_activation = Memory::GetAddress<game_get_cluster_activation_t>(0x499FD);
 
@@ -243,11 +230,11 @@ void object_reconnect_to_map(const s_location* location, const datum object_datu
 		object_header->cluster_index = location->cluster;
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
-	DWORD cluster_bitvector[16];
+	s_game_cluster_bit_vectors cluster_bitvector[16];
 	bool cluster_overflow = false;
 	if (!((object->object_flags & object_data_flag_0x200000) == 0))
 	{
-		memset(cluster_bitvector, -1, 4 * ((signed int)(get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
+		memset(&cluster_bitvector, -1, 4 * ((signed int)(get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
 	}
 
 	s_object_payload payload;
@@ -257,7 +244,7 @@ void object_reconnect_to_map(const s_location* location, const datum object_datu
 	if ((object->object_flags & _object_has_collision_bit) == 0)
 		partition = Memory::GetAddress<cluster_partition*>(0x4E45F8);
 
-	p_cluster_partition_reconnect(
+	cluster_partition_reconnect(
 		partition,
 		object_datum,
 		&object->first_cluster_reference,

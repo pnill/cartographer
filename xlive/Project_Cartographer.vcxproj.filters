@@ -168,10 +168,12 @@
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\reference_lists.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -537,6 +539,7 @@
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\objects\objects.h" />
+    <ClInclude Include="Blam\Engine\objects\reference_lists.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
