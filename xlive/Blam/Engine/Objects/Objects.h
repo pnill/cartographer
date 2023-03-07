@@ -283,10 +283,10 @@ enum e_object_header_flag : BYTE
 	_object_header_active_bit = FLAG(0),
 	_object_header_awake_bit = FLAG(1),
 	_object_header_requires_motion_bit = FLAG(2),
-	_object_header_being_deleted_bit = FLAG(3),
-	_object_header_flags_10 = FLAG(4),
-	_object_header_connected_to_map_bit = FLAG(5),
-	_object_header_child_bit = FLAG(6)
+	_object_header_flags_8 = FLAG(3),
+	_object_header_being_deleted_bit = FLAG(4),
+	_object_header_connected_to_map_bit = FLAG(6),
+	_object_header_child_bit = FLAG(7)
 };
 ENUM_OPERATORS(e_object_header_flag, BYTE)
 
@@ -342,15 +342,15 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 }
 
 void object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, void* damage_owner);
-void* object_header_block_get(int object_datum, const object_header_block_reference* reference);
-void* object_header_block_get_with_count(int object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
+void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
+void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
 datum object_new(object_placement_data* object_placement_data);
 void apply_biped_object_definition_patches();
 void simulation_action_object_create(datum object_idx);
 void object_delete(const datum object_idx);
 void object_wake(const datum object_datum);
-void __cdecl object_disconnect_from_map(const datum object_index);
-void __cdecl object_reconnect_to_map(const s_location* location_struct, const datum object_index);
+void object_disconnect_from_map(const datum object_index);
+void object_reconnect_to_map(const s_location* location_struct, const datum object_index);
 void object_compute_node_matrices_with_children(const datum object_datum);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
 

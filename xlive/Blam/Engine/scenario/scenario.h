@@ -1,6 +1,5 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/structures/structures.h"
 #include "Blam/Engine/math/real_math.h"
 
 enum class e_placement_flags : __int32
@@ -42,6 +41,13 @@ enum e_active_change_colors : __int32
 	secondary = FLAG(1),
 	tertiary = FLAG(2),
 	quaternary = FLAG(3),
+};
+
+struct s_location
+{
+	DWORD leaf_index;
+	short cluster;
+	WORD bsp_index;
 };
 
 struct s_scenario_group_placement_object_block

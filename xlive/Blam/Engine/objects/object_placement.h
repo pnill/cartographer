@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/objects/damage.h"
-#include "Blam/Engine/structures/structures.h"
+#include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/math/real_math.h"
 #include <wtypes.h>
 

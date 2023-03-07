@@ -66,7 +66,7 @@ void object_delete(const datum object_idx)
 void object_wake(const datum object_datum)
 {
 	s_object_header* object_header = get_object_header(object_datum);
-	if ((object_header->flags & object_data_flag_0x2) == 0 && object_datum != DATUM_INDEX_NONE)
+	if ((object_header->flags & _object_header_awake_bit) == 0 && object_datum != DATUM_INDEX_NONE)
 	{
 		datum current_object_datum = object_datum;
 
@@ -79,7 +79,7 @@ void object_wake(const datum object_datum)
 	}
 }
 
-void __cdecl object_disconnect_from_map(const datum object_index)
+void object_disconnect_from_map(const datum object_index)
 {
 	typedef void(__cdecl* object_disconnect_from_map_t)(const datum object_index);
 	auto object_disconnect_from_map = Memory::GetAddress<object_disconnect_from_map_t>(0x136266, 0x125136);
@@ -198,7 +198,7 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 	return object_header;
 }
 
-void __cdecl object_reconnect_to_map(s_location* location, const datum object_datum)
+void object_reconnect_to_map(const s_location* location, const datum object_datum)
 {
 	typedef void(__cdecl* cluster_partition_reconnect_t)(
 		cluster_partition* partition,
@@ -247,7 +247,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 	bool cluster_overflow = false;
 	if (!((object->object_flags & object_data_flag_0x200000) == 0))
 	{
-		memset(cluster_bitvector, -1, 64);
+		memset(cluster_bitvector, -1, 4 * ((signed int)(get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
 	}
 
 	s_object_payload payload;
@@ -270,7 +270,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 		&cluster_overflow);
 
 	object->object_flags |= _object_connected_to_map_bit;
-	object_header->flags |= _object_header_child_bit;
+	object_header->flags |= _object_header_connected_to_map_bit;
 	object_connect_lights_recursive(object_datum, false, true, false, false);
 	
 	if (DWORD* cluster_activation = p_game_get_cluster_activation(); 
@@ -286,7 +286,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 	{
 		object_delete(object_datum);
 	}
-	if (cluster_index_is_null && object_header->cluster_index != 0xFFFF)
+	if (cluster_index_is_null && object_header->cluster_index != -1)
 	{
 		object_cleanup_havok(object_datum);
 	}
@@ -735,7 +735,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	s_object_header* object_header = get_object_header(object_datum);
 	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 
-	object_header->flags |= e_object_header_flag::_object_header_being_deleted_bit;
+	object_header->flags |= e_object_header_flag::_object_header_flags_8;
 	object_header->object_type = (e_object_type)new_object_tag->object_type;
 	object->tag_definition_index = placement_data->tag_index;
 
@@ -876,7 +876,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		}
 	}
 
-	long original_orientations = (!allow_interpolation ? 0 : 32 * nodes_count);
+	short original_orientations = (!allow_interpolation ? 0 : 32 * (short)nodes_count);
 
 
 	bool b_can_create_object = 
@@ -890,9 +890,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	b_can_create_object = b_can_create_object && 
 		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::collision_regions_block), (short)(10 * collision_regions_count), 0);
 	b_can_create_object = b_can_create_object && 
-		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::node_orientation_block), (short)original_orientations, 4);
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::node_orientation_block), original_orientations, 4);
 	b_can_create_object = b_can_create_object && 
-		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::original_orientation_block), (short)original_orientations, 4);
+		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::original_orientation_block), original_orientations, 4);
 	b_can_create_object = b_can_create_object && 
 		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::animation_manager_block), (short)(valid_animation_manager ? 144 : 0), 0);
 	b_can_create_object = b_can_create_object && p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
