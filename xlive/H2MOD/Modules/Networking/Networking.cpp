@@ -39,9 +39,11 @@ int __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
 		return -1; 
 }
 
-// with GFWL this abOnline/abEnet data was present on startup, but with our impl we don't have the abOnline/abEnet data on startup
-// so we just patch it to always update it instead of getting it only on startup
-void PatchabEnetUpdate()
+// with GFWL the abEnet address could be provided on startup, 
+// not so much with our impl that requires you to log in to populate the data
+// and H2v populates some data with it just on startup
+// thus apply a patch to always update it
+void MachineIDUpdatePatch()
 {
 	PatchCall(Memory::GetAddress(0x1B583F, 0x195C79), Memory::GetAddress(0x1B5DF3, 0x19622D));
 	WriteJmpTo(Memory::GetAddress(0x1AC1B6, 0x1A6B6F), Memory::GetAddress(0x1B5DF3, 0x19622D));
@@ -52,11 +54,9 @@ void PatchabEnetUpdate()
 	}
 }
 
-void CustomNetwork::ApplyPatches() {
-	DWORD serializeParametersUpdatePacketOffset = 0x1EDC41;
-
-	PatchabEnetUpdate();
-
+void CustomNetwork::ApplyPatches() 
+{
+	MachineIDUpdatePatch();
 	OverridePackets::ApplyGamePatches();
 	NetworkMessage::ApplyGamePatches();
 

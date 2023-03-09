@@ -24,15 +24,6 @@ bool _online_netcode_use_local_network_time = true;
 #	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
 
-// TODO:
-int __cdecl network_time_get()
-{
-	typedef int(__cdecl* network_time_get_t)();
-	auto p_network_time_get = Memory::GetAddressRelative<network_time_get_t>(0x0);
-
-	return p_network_time_get();
-}
-
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
 {
@@ -156,9 +147,9 @@ void s_network_observer::sendNetworkMessage(int session_index, int observer_inde
 
 bool __cdecl is_network_observer_mode_managed()
 {
-	// or in other terms this verifies if the network protocol is LIVE (aka managed)
-	// this is used for host migration happening on game start (that causes the short delay when the game starts in a p2p session)
-	// which is disabled in LAN mode
+	// or in other terms this checks if the network protocol is LIVE
+	// it is used for migrating the host before starting the game (which causes the short delay when the game starts in a p2p session)
+	// in LAN mode it's disabled
 	return false;
 }
 
@@ -387,6 +378,9 @@ void s_network_observer::ApplyGamePatches()
 #endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
+	// disable forced host migration in P2P games
+	// this is using the XNet QoS probes to select a preferred host with a possible better connection
+	// which is not really available anymore with cartographer, since the QoS probes are not that accurate anymore
 	if (!Memory::IsDedicatedServer())
 	{
 		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);
