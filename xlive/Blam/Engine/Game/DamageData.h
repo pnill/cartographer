@@ -12,8 +12,8 @@ struct s_damage_data
 	datum creator_datum;			// 0xC
 	signed __int16 field_10;		// 0x10
 	BYTE gap_12[2];					// 0x12
-	signed int field_14;			// 0x14
-	signed int field_18;			// 0x18
+	int field_14;			// 0x14
+	int field_18;			// 0x18
 	int field_1C;					// 0x1C
 	BYTE gap_20[4];					// 0x20
 	DWORD field_24;					// 0x24

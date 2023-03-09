@@ -505,7 +505,9 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 		// but even then, we cannot allow xbox addresses with the same abEnet identifier
 		LOG_CRITICAL_NETWORK("{} - the specified XNADDR is the same with the local one, aborting connection.", __FUNCTION__);
 		LOG_CRITICAL_NETWORK("{} - local abEnet: {} == packet abEnet: {}",
-			__FUNCTION__, ByteToHexStr(localConnectionInfo->m_xnaddr.abEnet, 6), ByteToHexStr(pxna->abEnet, 6));
+			__FUNCTION__, 
+			ByteToHexStr(localConnectionInfo->m_xnaddr.abEnet, 6), 
+			ByteToHexStr(pxna->abEnet, 6));
 		outIpIdentifier->s_addr = XnIp_LOOPBACK_ADDR_NL;
 		return 0;
 	}
@@ -518,7 +520,8 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 	bool fromPacket = reqPacket != nullptr;
 	bool isAlreadyRegistered = registeredConnection != nullptr;
 
-	const auto registerConnection = [this](const XNADDR* pxna, 
+	const auto registerConnection = [this](
+		const XNADDR* pxna, 
 		const XNKID* pxnkid, 
 		IN_ADDR* outIpId, 
 		bool fromPacket, 

@@ -37,7 +37,7 @@ public:
 	/* Called on scenario cleanup/exit */
 	virtual void cleanup();
 	virtual int unk_function_4();
-	virtual int unk_function_5(signed int arg1);
+	virtual int unk_function_5(int arg1);
 	virtual void unk_function_players_1(int arg1);
 	virtual void update_player__maybe__maybe_spawn(int arg1);
 	virtual void unk_function_8(int arg1);
@@ -60,19 +60,19 @@ public:
 	virtual void unk_function_23(int arg1);
 	virtual void unk_function_24(int arg1, int arg2);
 	virtual int unk_function_25(int arg1, int arg2);
-	virtual int unk_function_26(signed int arg1, int arg2, signed int arg3);
+	virtual int unk_function_26(int arg1, int arg2, int arg3);
 	virtual int unk_function_27();
 	virtual bool is_team_enemy(e_object_team team_a, e_object_team team_b);
 	virtual void unk_function_29(int arg1);
-	virtual void unk_function_30(signed int arg1, int arg2, signed int arg3);
-	virtual void unk_function_31(int arg1, int arg2, char arg3, signed int arg4);
-	virtual int unk_function_32(signed int arg1, int arg2, signed int arg3);
+	virtual void unk_function_30(int arg1, int arg2, int arg3);
+	virtual void unk_function_31(int arg1, int arg2, char arg3, int arg4);
+	virtual int unk_function_32(int arg1, int arg2, int arg3);
 	virtual void unk_function_33(int arg1, int arg2);
 	virtual int unk_function_34(int arg1, int arg2);
 	virtual bool unk_function_35(int arg1);
-	virtual int unk_function_36(int arg1, signed int arg2);
+	virtual int unk_function_36(int arg1, int arg2);
 	virtual void unk_function_37(int arg1);
-	virtual int unk_function_38(int arg1, signed int arg2);
+	virtual int unk_function_38(int arg1, int arg2);
 	virtual bool should_garbage_collect(int arg1);
 	virtual void unk_function_40();
 	virtual void unk_function_41();
