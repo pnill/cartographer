@@ -16,15 +16,6 @@ void cluster_partition_reconnect(cluster_partition* partition,
 	const void* payload,
 	bool* cluster_overflow)
 {
-	typedef short(__cdecl* cluster_partition_reconnect_t)(
-		short cluster_reference,
-		const real_point3d* position,
-		const float radius,
-		const short cluster_count,
-		short* intersected_indices,
-		short* intersected_references);
-	auto p_structure_clusters_in_sphere = Memory::GetAddress<cluster_partition_reconnect_t>(0xB3997);
-
 	short clusters_in_sphere;
 	short intersected_references;
 	short cluster_reference[MAXIMUM_CLUSTERS_PER_DATUM];
@@ -35,7 +26,7 @@ void cluster_partition_reconnect(cluster_partition* partition,
 	}
 	else
 	{
-		clusters_in_sphere = p_structure_clusters_in_sphere(location->cluster, position, radius, MAXIMUM_CLUSTERS_PER_DATUM, cluster_reference, &intersected_references);
+		clusters_in_sphere = structure_clusters_in_sphere(location->cluster, position, radius, MAXIMUM_CLUSTERS_PER_DATUM, cluster_reference, &intersected_references);
 	}
 
 	*cluster_overflow = intersected_references > clusters_in_sphere;
