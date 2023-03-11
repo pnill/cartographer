@@ -8,7 +8,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
-void BirthdayOnMapLoad()
+void birthday_event_map_load()
 {
 	// Carto Shared Tags
 	datum bday_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", blam_tag::tag_group_type::scenery, "carto_shared");
@@ -30,17 +30,17 @@ void BirthdayOnMapLoad()
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
 			hlmt_chief_datum != DATUM_INDEX_NONE) 
 		{
-			AddHat(hlmt_chief_datum, bday_hat_datum);
+			add_hat_to_model(hlmt_chief_datum, bday_hat_datum);
 		}
 		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 			hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
 		{
-			AddHat(hlmt_chief_mp_datum, bday_hat_datum);
+			add_hat_to_model(hlmt_chief_mp_datum, bday_hat_datum);
 		}
 		datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 		if (hlmt_elite_datum != DATUM_INDEX_NONE)
 		{
-			AddHat(hlmt_elite_datum, bday_hat_datum, true);
+			add_hat_to_model(hlmt_elite_datum, bday_hat_datum, true);
 		}
 	}
 
@@ -53,7 +53,7 @@ void BirthdayOnMapLoad()
 		bday_cake_datum = tag_loader::ResolveNewDatum(bday_cake_datum);
 		fp_bday_cake_datum = tag_loader::ResolveNewDatum(fp_bday_cake_datum);
 
-		ReplaceFirstAndThirdPersonModelFromWeapon(ball_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
-		ReplaceFirstAndThirdPersonModelFromWeapon(bomb_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
+		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
+		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_bday_cake_datum, bday_cake_datum);
 	}
 }

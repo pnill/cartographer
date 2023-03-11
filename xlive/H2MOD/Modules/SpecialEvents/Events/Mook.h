@@ -1,3 +1,3 @@
 #pragma once
 
-void MookMaddnessOnMapLoad();
+void mook_event_map_load();

@@ -14,7 +14,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
-void ChristmasOnMapLoad()
+void christmas_event_map_load()
 {
 	// Halo 2 tags
 	datum sword_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\melee\\energy_blade\\energy_blade");
@@ -47,24 +47,24 @@ void ChristmasOnMapLoad()
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
 			hlmt_chief_datum != DATUM_INDEX_NONE) 
 		{
-			AddHatAndBeard(hlmt_chief_datum, santa_hat_datum, beard_datum);
+			add_hat_and_beard_to_model(hlmt_chief_datum, santa_hat_datum, beard_datum);
 		}
 		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
 			hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
 		{
-			AddHatAndBeard(hlmt_chief_mp_datum, santa_hat_datum, beard_datum);
+			add_hat_and_beard_to_model(hlmt_chief_mp_datum, santa_hat_datum, beard_datum);
 		}
 		if (datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
 			hlmt_elite_datum != DATUM_INDEX_NONE)
 		{
-			AddHatAndBeard(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
+			add_hat_and_beard_to_model(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 		}
 
 		if (datum flood_datum = PlayerRepresentation::get_object_datum_from_representation(s_player::e_character_type::Flood);
 			!DATUM_IS_NONE(flood_datum))
 		{
 			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
-			AddHatAndBeard(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);
+			add_hat_and_beard_to_model(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);
 		}
 	}
 	if (!DATUM_IS_NONE(snow_datum))
@@ -152,7 +152,7 @@ void ChristmasOnMapLoad()
 		present_datum = tag_loader::ResolveNewDatum(present_datum);
 		fp_present_datum = tag_loader::ResolveNewDatum(fp_present_datum);
 
-		ReplaceFirstAndThirdPersonModelFromWeapon(ball_weapon_datum, fp_present_datum, present_datum);
-		ReplaceFirstAndThirdPersonModelFromWeapon(bomb_weapon_datum, fp_present_datum, present_datum);
+		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_present_datum, present_datum);
+		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_present_datum, present_datum);
 	}
 }

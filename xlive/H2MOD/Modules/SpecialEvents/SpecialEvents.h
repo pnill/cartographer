@@ -1,6 +1,6 @@
 #pragma once
 
-enum e_event_type
+enum e_special_event_type
 {
 	_no_event,
 	_christmas,
@@ -9,5 +9,5 @@ enum e_event_type
 	_halloween,
 	_birthday
 };
-e_event_type getCurrentSpecialEvent();
-void LoadSpecialEvent();
+e_special_event_type get_current_special_event();
+void load_special_event();

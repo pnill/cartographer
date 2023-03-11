@@ -10,7 +10,7 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // Add new marker for elites
-void AddNewMarkers()
+void add_special_event_markers()
 {
 	auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 	if (!DATUM_IS_NONE(mode_elite_datum))
@@ -34,8 +34,7 @@ void AddNewMarkers()
 	}
 }
 
-
-void ReplaceFirstAndThirdPersonModelFromWeapon(datum weapon_datum, datum fp_model_datum, datum _3p_model_datum)
+void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_datum, datum _3p_model_datum)
 {
 	auto weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(weapon_datum);
 	weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
@@ -47,7 +46,7 @@ void ReplaceFirstAndThirdPersonModelFromWeapon(datum weapon_datum, datum fp_mode
 
 }
 
-void AddHat(datum player_hlmt_datum, datum hat_scenery_datum, bool is_elite)
+void add_hat_to_model(datum player_hlmt_datum, datum hat_scenery_datum, bool is_elite)
 {
 	auto hlmt = tags::get_tag_fast<s_model_group_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];
@@ -57,9 +56,9 @@ void AddHat(datum player_hlmt_datum, datum hat_scenery_datum, bool is_elite)
 	hat->child_object.TagIndex = hat_scenery_datum;
 }
 
-void AddHatAndBeard(datum player_hlmt_datum, datum hat_scenery_datum, datum beard_scenery_datum, bool is_elite)
+void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum, datum beard_scenery_datum, bool is_elite)
 {
-	AddHat(player_hlmt_datum, hat_scenery_datum, is_elite);
+	add_hat_to_model(player_hlmt_datum, hat_scenery_datum, is_elite);
 
 	auto hlmt = tags::get_tag_fast<s_model_group_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];

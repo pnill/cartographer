@@ -11,7 +11,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
-void PaddysOnMapLoad()
+void paddy_event_map_load()
 {
 	datum paddy_hat_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\stpat_hat", blam_tag::tag_group_type::scenery, "carto_shared");
 	datum paddy_beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\beard", blam_tag::tag_group_type::scenery, "carto_shared");
@@ -35,15 +35,15 @@ void PaddysOnMapLoad()
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
 			hlmt_chief_datum != DATUM_INDEX_NONE) 
 		{
-			AddHatAndBeard(hlmt_chief_datum, paddy_hat_datum, paddy_beard_datum);
+			add_hat_and_beard_to_model(hlmt_chief_datum, paddy_hat_datum, paddy_beard_datum);
 		}
 		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp"); hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
 		{
-			AddHatAndBeard(hlmt_chief_mp_datum, paddy_hat_datum, paddy_beard_datum);
+			add_hat_and_beard_to_model(hlmt_chief_mp_datum, paddy_hat_datum, paddy_beard_datum);
 		}
 		if (datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp"); hlmt_elite_datum != DATUM_INDEX_NONE)
 		{
-			AddHatAndBeard(hlmt_elite_datum, paddy_hat_datum, paddy_beard_datum, true);
+			add_hat_and_beard_to_model(hlmt_elite_datum, paddy_hat_datum, paddy_beard_datum, true);
 		}
 
 		// Replace ball and bomb with the pot of gold

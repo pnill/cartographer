@@ -1,3 +1,3 @@
 #pragma once
 
-void ChristmasOnMapLoad();
+void christmas_event_map_load();

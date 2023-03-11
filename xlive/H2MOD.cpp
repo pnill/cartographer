@@ -494,11 +494,11 @@ s_data_array* H2MOD::get_actor_table()
 	return *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
-void H2MOD::toggle_xbox_tickrate(s_game_options* game_options, bool toggle)
+void H2MOD::toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
-	game_options->tickrate = toggle ? 30 : 60;
-	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)game_options->tickrate);
-	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", game_options->tickrate);
+	options->tickrate = toggle ? 30 : 60;
+	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)options->tickrate);
+	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->tickrate);
 }
 
 void H2MOD::toggle_ai_multiplayer(bool toggle)
@@ -509,7 +509,7 @@ void H2MOD::toggle_ai_multiplayer(bool toggle)
 typedef bool(__cdecl *map_cache_load_t)(s_game_options* map_load_settings);
 map_cache_load_t p_map_cache_load;
 
-bool __cdecl OnMapLoad(s_game_options* game_options)
+bool __cdecl OnMapLoad(s_game_options* options)
 {
 	static bool resetAfterMatch = false;
 
@@ -519,15 +519,15 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 		WriteValue(Memory::GetAddress(0x41F6B1), 0);
 	}
 
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, game_options->m_engine_type);
-	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, game_options);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_before, options->engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_preEventExec, options);
 
-	bool result = p_map_cache_load(game_options);
+	bool result = p_map_cache_load(options);
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
 	// set the engine type
-	h2mod->SetCurrentEngineType(game_options->m_engine_type);
+	h2mod->SetCurrentEngineType(options->engine_type);
 	tags::run_callbacks();
 
 	H2Tweaks::SetScreenRefreshRate();
@@ -544,7 +544,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
-	h2mod->toggle_xbox_tickrate(game_options, false);
+	h2mod->toggle_xbox_tickrate(options, false);
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
@@ -568,7 +568,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			addDebugText("Engine type: Multiplayer");
-			LoadSpecialEvent();
+			load_special_event();
 
 			for (const auto& gametype_it : GametypesMap)
 			{
@@ -579,7 +579,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 				}
 			}
 
-			h2mod->toggle_xbox_tickrate(game_options, b_XboxTick);
+			h2mod->toggle_xbox_tickrate(options, b_XboxTick);
 			if (!b_XboxTick)
 			{
 				H2X::ApplyMapLoadPatches(b_H2X);
@@ -607,8 +607,8 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 		resetAfterMatch = true;
 	}
 
-	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, game_options->m_engine_type);
-	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, game_options);
+	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->engine_type);
+	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
 	return result;
 }
 

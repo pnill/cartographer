@@ -1,3 +1,3 @@
 #pragma once
 
-void BirthdayOnMapLoad();
+void birthday_event_map_load();

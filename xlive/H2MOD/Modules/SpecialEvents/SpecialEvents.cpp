@@ -14,8 +14,8 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // This function gets the current date and time
-std::time_t getEpochTime(int year, const std::wstring& dateTime)
-	{
+std::time_t get_epoch_time(int year, const std::wstring& dateTime)
+{
 	// Let's consider we are getting all the input in
 	// this format: '2014-07-25T20:17:22Z' (T denotes
 	// start of Time part, Z denotes UTC zone).
@@ -41,13 +41,13 @@ std::time_t getEpochTime(int year, const std::wstring& dateTime)
 }
 
 // This function checks if the current date passed is in the current week.
-bool CheckEventWeek(std::wstring date)
+bool check_special_event_week(std::wstring date)
 {
 	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 	time_t tt = std::chrono::system_clock::to_time_t(now);
 	tm utc_tm = *gmtime(&tt);
 
-	time_t pat = getEpochTime(utc_tm.tm_year, date.append(L"T00:00:00Z"));
+	time_t pat = get_epoch_time(utc_tm.tm_year, date.append(L"T00:00:00Z"));
 	tm utc_pat = *gmtime(&pat);
 
 	int a, b = 0;
@@ -57,68 +57,68 @@ bool CheckEventWeek(std::wstring date)
 }
 
 // This function checks if the current date matches the one passed.
-bool CheckEventDate(std::wstring date)
+bool check_special_event_date(std::wstring date)
 {
 	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 	time_t tt = std::chrono::system_clock::to_time_t(now);
 	tm utc_tm = *gmtime(&tt);
 
-	time_t pat = getEpochTime(utc_tm.tm_year, date.append(L"T00:00:00Z"));
+	time_t pat = get_epoch_time(utc_tm.tm_year, date.append(L"T00:00:00Z"));
 	tm utc_pat = *gmtime(&pat);
 
 	return utc_tm.tm_yday == utc_pat.tm_yday;
 }
 
-	// Enables event if the current date and time line up with an event time
-e_event_type getCurrentSpecialEvent()
+// Enables event if the current date and time line up with an event time
+e_special_event_type get_current_special_event()
 {
 	if (H2Config_no_events)
 		return _no_event;
 
 #ifndef NDEBUG
 	if (H2Config_forced_event != _no_event)
-		return (e_event_type)H2Config_forced_event;
+		return (e_special_event_type)H2Config_forced_event;
 #endif
-	if (CheckEventWeek(L"3-17"))
+	if (check_special_event_week(L"3-17"))
 		return _st_paddys;
 
-	if (CheckEventWeek(L"12-24") || CheckEventWeek(L"12-30") || CheckEventWeek(L"1-4"))
+	if (check_special_event_week(L"12-24") || check_special_event_week(L"12-30") || check_special_event_week(L"1-4"))
 		return _christmas;
 
 	// One time event
 	/*if (CheckIfEventTime(L"4-12"))
 			return _mook_maddness;*/
 
-	if (CheckEventWeek(L"10-20") || CheckEventWeek(L"10-27") || CheckEventDate(L"10-31"))
+	if (check_special_event_week(L"10-20") || check_special_event_week(L"10-27") || check_special_event_date(L"10-31"))
 		return _halloween;
 
-	if (CheckEventDate(L"11-08") || CheckEventDate(L"11-09") || CheckEventDate(L"11-10"))
+	if (check_special_event_date(L"11-08") || check_special_event_date(L"11-09") || check_special_event_date(L"11-10"))
 		return _birthday;
 
 	return _no_event;
 }
 
-void LoadSpecialEvent()
+void load_special_event()
 {
 	if (tag_loader::Map_exists("carto_shared"))
 	{
-		AddNewMarkers();
-		switch (getCurrentSpecialEvent())
+		add_special_event_markers();
+		switch (get_current_special_event())
 		{
 		case _christmas:
-			ChristmasOnMapLoad();
+			christmas_event_map_load();
 			break;
 		case _st_paddys:
-			PaddysOnMapLoad();
+			paddy_event_map_load();
 			break;
 		case _mook_maddness:
-			MookMaddnessOnMapLoad();
+			mook_event_map_load();
 			break;
 		case _halloween:
-			HalloweenOnMapLoad();
+			halloween_event_map_load();
 			break;
 		case _birthday:
-			BirthdayOnMapLoad();
+			birthday_event_map_load();
 			break;
 		default:
 			// Do nothing

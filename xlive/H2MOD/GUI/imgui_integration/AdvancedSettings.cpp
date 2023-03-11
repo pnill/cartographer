@@ -840,7 +840,7 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
-					if (getCurrentSpecialEvent() == e_event_type::_halloween) {
+					if (get_current_special_event() == e_special_event_type::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
@@ -1040,30 +1040,30 @@ namespace ImGuiHandler {
 					static int event_type = H2Config_forced_event;
 					if (ImGui::CollapsingHeader("Events"))
 					{
-						if (ImGui::RadioButton("None", &event_type, e_event_type::_no_event))
+						if (ImGui::RadioButton("None", &event_type, e_special_event_type::_no_event))
 						{
-							H2Config_forced_event = (int)e_event_type::_no_event;
+							H2Config_forced_event = (int)e_special_event_type::_no_event;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("Christmas", &event_type, e_event_type::_christmas))
+						if (ImGui::RadioButton("Christmas", &event_type, e_special_event_type::_christmas))
 						{
-							H2Config_forced_event = (int)e_event_type::_christmas;
+							H2Config_forced_event = (int)e_special_event_type::_christmas;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("St Paddys", &event_type, e_event_type::_st_paddys))
+						if (ImGui::RadioButton("St Paddys", &event_type, e_special_event_type::_st_paddys))
 						{
-							H2Config_forced_event = (int)e_event_type::_st_paddys;
+							H2Config_forced_event = (int)e_special_event_type::_st_paddys;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("Mook Madness", &event_type, e_event_type::_mook_maddness))
+						if (ImGui::RadioButton("Mook Madness", &event_type, e_special_event_type::_mook_maddness))
 						{
-							H2Config_forced_event = (int)e_event_type::_mook_maddness;
+							H2Config_forced_event = (int)e_special_event_type::_mook_maddness;
 						}
 
-						if (ImGui::RadioButton("Halloween", &event_type, e_event_type::_halloween))
+						if (ImGui::RadioButton("Halloween", &event_type, e_special_event_type::_halloween))
 						{
-							H2Config_forced_event = (int)e_event_type::_halloween;
+							H2Config_forced_event = (int)e_special_event_type::_halloween;
 						}ImGui::SameLine();
-						if (ImGui::RadioButton("Birthday", &event_type, e_event_type::_birthday))
+						if (ImGui::RadioButton("Birthday", &event_type, e_special_event_type::_birthday))
 						{
-							H2Config_forced_event = (int)e_event_type::_birthday;
+							H2Config_forced_event = (int)e_special_event_type::_birthday;
 						}
 
 					}

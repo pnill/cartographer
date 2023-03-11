@@ -99,7 +99,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 	}
 }
 
-void HalloweenOnMapLoad()
+void halloween_event_map_load()
 {
 	// Load specific tags from shared and modify placements depending on the map being played
 	const s_cache_header* cache_header = tags::get_cache_header();

@@ -1,3 +1,3 @@
 #pragma once
 
-void PaddysOnMapLoad();
+void paddy_event_map_load();

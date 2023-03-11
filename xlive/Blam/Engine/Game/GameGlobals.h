@@ -12,7 +12,7 @@ struct s_game_globals
 	char field_5;
 	char field_6;
 	char field_7;
-	s_game_options game_options;
+	s_game_options options;
 	char game_in_progress;
 	char game_is_lost;
 	byte pad0[2];
