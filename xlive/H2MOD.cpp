@@ -1134,7 +1134,7 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		SpecialEvents::Initialize();
+		InitializeSpecialEvents();
 		ImGuiHandler::WeaponOffsets::Initialize();
 #ifndef NDEBUG
 		ObserverMode::Initialize();

@@ -152,6 +152,12 @@
     <ClCompile Include="3rdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="3rdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Halloween.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -481,8 +487,8 @@
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
     <ClInclude Include="Blam\Math\real_matrix4x3.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Lockout.h" />
-    <ClInclude Include="H2MOD\Modules\SpecialEvents\MapObjectPlacements\Halloween\Coagulation.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
@@ -495,6 +501,12 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Birthday.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Christmas.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
+    <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -132,7 +132,7 @@ namespace PlayerRepresentation
 			if (player_properties->profile.player_character_type == s_player::e_character_type::Dervish)
 				player_properties->profile.player_character_type = s_player::e_character_type::Elite;
 
-			if(SpecialEvents::getCurrentEvent() != SpecialEvents::_halloween)
+			if(getCurrentSpecialEvent() != e_event_type::_halloween)
 			{
 				if (player_properties->profile.player_character_type == s_player::e_character_type::Skeleton)
 					player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
@@ -177,7 +177,7 @@ namespace PlayerRepresentation
 
 		if (h2mod->GetEngineType() == _multiplayer) 
 		{
-			if (H2Config_spooky_boy && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !Memory::IsDedicatedServer())
+			if (H2Config_spooky_boy && getCurrentSpecialEvent() == e_event_type::_halloween && !Memory::IsDedicatedServer())
 				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
@@ -185,7 +185,7 @@ namespace PlayerRepresentation
 			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			auto skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
-			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && !H2Config_no_events)
+			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && getCurrentSpecialEvent() == e_event_type::_halloween && !H2Config_no_events)
 			{
 				tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
@@ -282,7 +282,7 @@ namespace PlayerRepresentation
 					if (!DATUM_IS_NONE(lmao_datum))
 					{
 						auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
-						new_object->parent_marker = HaloString::HS_HEAD;
+						new_object->parent_marker = e_global_string_ids::HS_HEAD;
 						new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						new_object->child_object.TagIndex = lmao_datum;
 					}
