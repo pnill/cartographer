@@ -528,7 +528,6 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 
 	// set the engine type
 	h2mod->SetCurrentEngineType(game_options->m_engine_type);
-
 	tags::run_callbacks();
 
 	H2Tweaks::SetScreenRefreshRate();
@@ -569,6 +568,7 @@ bool __cdecl OnMapLoad(s_game_options* game_options)
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
 			addDebugText("Engine type: Multiplayer");
+			LoadSpecialEvent();
 
 			for (const auto& gametype_it : GametypesMap)
 			{
@@ -1134,7 +1134,6 @@ void H2MOD::Initialize()
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
-		InitializeSpecialEvents();
 		ImGuiHandler::WeaponOffsets::Initialize();
 #ifndef NDEBUG
 		ObserverMode::Initialize();

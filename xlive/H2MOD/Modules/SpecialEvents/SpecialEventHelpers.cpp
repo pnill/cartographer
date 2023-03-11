@@ -38,12 +38,12 @@ void AddNewMarkers()
 void ReplaceFirstAndThirdPersonModelFromWeapon(datum weapon_datum, datum fp_model_datum, datum _3p_model_datum)
 {
 	auto weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(weapon_datum);
+	weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
 	weapon->first_person[0]->first_person_model.TagIndex = fp_model_datum;
 	weapon->first_person[1]->first_person_model.TagIndex = fp_model_datum;
 
 	datum model_datum = weapon->model.TagIndex;
-	auto model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(model_datum);
-	model->render_model.TagIndex = _3p_model_datum;
+	tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(model_datum)->render_model.TagIndex = _3p_model_datum;
 
 }
 

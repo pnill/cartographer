@@ -102,7 +102,7 @@ namespace PlayerRepresentation
 
 	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* player_properties)
 	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->m_options.m_engine_type);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->game_options.m_engine_type);
 		if (s_game_globals::game_is_campaign())
 		{
 			p_network_session_player_profile_recieve(player_index, player_properties);

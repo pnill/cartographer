@@ -14,7 +14,7 @@ bool s_game_globals::map_initialized()
 
 s_game_options* s_game_globals::get_game_options()
 {
-	return &get()->m_options;
+	return &get()->game_options;
 }
 
 s_game_variant* s_game_globals::get_game_variant()

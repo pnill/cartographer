@@ -10,4 +10,4 @@ enum e_event_type
 	_birthday
 };
 e_event_type getCurrentSpecialEvent();
-void InitializeSpecialEvents();
+void LoadSpecialEvent();

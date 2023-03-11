@@ -1,6 +1,6 @@
 #pragma once
-
-#include "Blam\Engine\Game\GameOptions.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/Game/GameOptions.h"
 
 #pragma pack(push,1)
 struct s_game_globals
@@ -12,21 +12,23 @@ struct s_game_globals
 	char field_5;
 	char field_6;
 	char field_7;
-	s_game_options m_options;
+	s_game_options game_options;
 	char game_in_progress;
 	char game_is_lost;
-	PAD(2);
+	byte pad0[2];
 	int ticks_to_reset_game;
 	BYTE game_options_related;	//need better name
-	PAD(3);
+	byte pad1[3];
 	DWORD field_119C;		//stores 7 * game_ticks_per_second at game_finish
 	DWORD field_11A0;
-	PAD(68);
-	DWORD field_11E8;
-	PAD(126);
-	WORD field_126A;
-	PAD(3);
-	char field_0;
+	DWORD field_11A4;
+	byte pvs0[64];
+	byte pvs1[64];
+	DWORD cluster_activation[16];
+	byte enable_scripted_camera_pvs;
+	byte pad4;
+	WORD pvs_object_is_set;
+	datum pvs_object_datum;
 
 
 	static s_game_globals* get();

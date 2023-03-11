@@ -101,89 +101,86 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 
 void HalloweenOnMapLoad()
 {
-	if (s_game_globals::game_is_multiplayer())
+	// Load specific tags from shared and modify placements depending on the map being played
+	const s_cache_header* cache_header = tags::get_cache_header();
+	auto scnr = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
+	auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scnr->structure_bsps[0]->structure_bsp.TagIndex);
+	if (!strcmp(cache_header->name, "coagulation"))
 	{
-		// Load specific tags from shared and modify placements depending on the map being played
-		const s_cache_header* cache_header = tags::get_cache_header();
-		auto scnr = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-		auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scnr->structure_bsps[0]->structure_bsp.TagIndex);
-		if (!strcmp(cache_header->name, "coagulation"))
+		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
+		sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
+		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
+		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
+		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
+		large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", blam_tag::tag_group_type::scenery, "carto_shared");
+
+		tag_loader::Load_tag(pump_datum, true, "carto_shared");
+		tag_loader::Load_tag(candle_datum, true, "carto_shared");
+		tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
+		tag_loader::Load_tag(sky_datum, true, "carto_shared");
+		tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
+		tag_loader::Push_Back();
+
+		// OG Halo 2 Coag lightmap
+		datum ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap,
+			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
+
+		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
+		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
+		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
+		large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
+		lbitm_datum = tag_loader::ResolveNewDatum(lbitm_datum);
+		sky_datum = tag_loader::ResolveNewDatum(sky_datum);
+
+		LOG_INFO_GAME("{:x}", candle_datum);
+		LOG_INFO_GAME("{:x}", candle_fire_datum);
+		LOG_INFO_GAME("{:x}", pump_datum);
+		LOG_INFO_GAME("{:x}", lbitm_datum);
+		LOG_INFO_GAME("{:x}", sky_datum);
+
+		if (!DATUM_IS_NONE(sky_datum))
 		{
-			lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
-			sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
-			candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-			candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-			pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
-			large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", blam_tag::tag_group_type::scenery, "carto_shared");
-
-			tag_loader::Load_tag(pump_datum, true, "carto_shared");
-			tag_loader::Load_tag(candle_datum, true, "carto_shared");
-			tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
-			tag_loader::Load_tag(sky_datum, true, "carto_shared");
-			tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
-			tag_loader::Push_Back();
-
-			// OG Halo 2 Coag lightmap
-			datum ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap,
-				"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
-
-			candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-			candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-			pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-			large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
-			lbitm_datum = tag_loader::ResolveNewDatum(lbitm_datum);
-			sky_datum = tag_loader::ResolveNewDatum(sky_datum);
-
-			LOG_INFO_GAME("{:x}", candle_datum);
-			LOG_INFO_GAME("{:x}", candle_fire_datum);
-			LOG_INFO_GAME("{:x}", pump_datum);
-			LOG_INFO_GAME("{:x}", lbitm_datum);
-			LOG_INFO_GAME("{:x}", sky_datum);
-
-			if (!DATUM_IS_NONE(sky_datum))
-			{
-				scnr->skies[0]->sky.TagIndex = sky_datum;
-			}
-			if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
-			{
-				auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
-				ltmp->lightmap_groups[0]->bitmap_group.TagIndex = lbitm_datum;
-				sbps->decorators_block.size = 0;
-				sbps->decorators_block.data = 0;
-			}
-
-			// Add items to scenario
-			if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum) && !DATUM_IS_NONE(large_candle_datum))
-			{
-				EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
-				// We execute this after a bluescreen since our new objects arent recreated automatically
-				EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
-			}
+			scnr->skies[0]->sky.TagIndex = sky_datum;
 		}
-		else if (!strcmp(cache_header->name, "lockout"))
+		if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
 		{
-			candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-			candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-			pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
+			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+			ltmp->lightmap_groups[0]->bitmap_group.TagIndex = lbitm_datum;
+			sbps->decorators_block.size = 0;
+			sbps->decorators_block.data = 0;
+		}
 
-			tag_loader::Load_tag(pump_datum, true, "carto_shared");
-			tag_loader::Load_tag(candle_datum, true, "carto_shared");
-			tag_loader::Push_Back();
+		// Add items to scenario
+		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum) && !DATUM_IS_NONE(large_candle_datum))
+		{
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
+			// We execute this after a bluescreen since our new objects arent recreated automatically
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
+		}
+	}
+	else if (!strcmp(cache_header->name, "lockout"))
+	{
+		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
+		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
+		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
 
-			candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-			candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-			pump_datum = tag_loader::ResolveNewDatum(pump_datum);
+		tag_loader::Load_tag(pump_datum, true, "carto_shared");
+		tag_loader::Load_tag(candle_datum, true, "carto_shared");
+		tag_loader::Push_Back();
 
-			LOG_INFO_GAME("{:x}", candle_datum);
-			LOG_INFO_GAME("{:x}", candle_fire_datum);
-			LOG_INFO_GAME("{:x}", pump_datum);
+		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
+		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
+		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
 
-			if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
-			{
-				EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
-				// We execute this after a bluescreen since our new objects arent recreated automatically
-				EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
-			}
+		LOG_INFO_GAME("{:x}", candle_datum);
+		LOG_INFO_GAME("{:x}", candle_fire_datum);
+		LOG_INFO_GAME("{:x}", pump_datum);
+
+		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
+		{
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
+			// We execute this after a bluescreen since our new objects arent recreated automatically
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
 		}
 	}
 }

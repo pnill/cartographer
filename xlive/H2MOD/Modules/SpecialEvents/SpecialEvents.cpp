@@ -98,27 +98,30 @@ e_event_type getCurrentSpecialEvent()
 	return _no_event;
 }
 
-void InitializeSpecialEvents()
+void LoadSpecialEvent()
 {
 	if (tag_loader::Map_exists("carto_shared"))
 	{
-		tags::on_map_load(AddNewMarkers);
+		AddNewMarkers();
 		switch (getCurrentSpecialEvent())
 		{
 		case _christmas:
-			tags::on_map_load(ChristmasOnMapLoad);
+			ChristmasOnMapLoad();
 			break;
 		case _st_paddys:
-			tags::on_map_load(PaddysOnMapLoad);
+			PaddysOnMapLoad();
 			break;
 		case _mook_maddness:
-			tags::on_map_load(MookMaddnessOnMapLoad);
+			MookMaddnessOnMapLoad();
 			break;
 		case _halloween:
-			tags::on_map_load(HalloweenOnMapLoad);
+			HalloweenOnMapLoad();
 			break;
 		case _birthday:
-			tags::on_map_load(BirthdayOnMapLoad);
+			BirthdayOnMapLoad();
+			break;
+		default:
+			// Do nothing
 			break;
 		}
 	}
