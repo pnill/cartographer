@@ -11,7 +11,7 @@ struct s_game_state_header
 	char game_build[32];
 	int map_checksum;
 	int field_12C;
-	s_game_options m_options;
+	s_game_options options;
 	int active_bsp_index;
 	int field_12BC;
 	int field_12C0;

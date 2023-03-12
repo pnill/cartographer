@@ -196,7 +196,7 @@ void Infection::preSpawnServerSetup() {
 			}
 		}
 		else {
-			if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+			if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
@@ -211,7 +211,7 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+	if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
 	else
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);

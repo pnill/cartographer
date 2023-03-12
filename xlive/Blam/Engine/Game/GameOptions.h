@@ -26,8 +26,8 @@ enum e_engine_type : int
 #pragma pack(push,1)
 struct s_game_options
 {
-	e_engine_type m_engine_type;
-	e_game_simulation m_simulation_type;
+	e_engine_type engine_type;
+	e_game_simulation simulation_type;
 	char field_5;
 	bool session_host_is_dedicated;
 	char filed_7;
@@ -49,7 +49,7 @@ struct s_game_options
 	char coop;
 	char field_29D;
 	char gap29E[2];
-	s_game_variant m_game_variant;
+	s_game_variant game_variant;
 	DWORD menu_context;
 	DWORD machine_flags;
 	DWORD machines;

@@ -1,9 +1,9 @@
 #pragma once
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
+#include "../SpecialEventHelpers.h"
 
 #define HALLOWEEN_LOCKOUT_OBJECT_COUNT 23
 
-const SpecialEvents::s_event_scenery_placement lockout_scen_places[HALLOWEEN_LOCKOUT_OBJECT_COUNT]{
+const s_event_scenery_placement lockout_scen_places[HALLOWEEN_LOCKOUT_OBJECT_COUNT]{
 	{0, 0, {1.755f, -2.273151f, -7.6f}, {-1.5f, 0.f, 0.f}, 1.f},
 	{0, 0, {1.755f, -0.529916f, -7.6f}, {-1.5f, 0.f, 0.f}, 1.f},
 	{0, 0, {-0.826575f, 2.75f, -7.6f}, {0.f, 0.f, 0.f}, 1.f},

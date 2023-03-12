@@ -167,7 +167,7 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 	case ExecTime::_postEventExec:
 		LOG_TRACE_GAME("[h2mod-infection] Peer host init");
 
-		switch (gameOptions->m_engine_type)
+		switch (gameOptions->engine_type)
 		{
 			// cleanup when loading main menu
 		case _multiplayer:

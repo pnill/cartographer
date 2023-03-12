@@ -14,32 +14,32 @@ bool s_game_globals::map_initialized()
 
 s_game_options* s_game_globals::get_game_options()
 {
-	return &get()->m_options;
+	return &get()->options;
 }
 
 s_game_variant* s_game_globals::get_game_variant()
 {
-	return &get_game_options()->m_game_variant;
+	return &get_game_options()->game_variant;
 }
 
 bool s_game_globals::game_is_campaign()
 {
-	return get_game_options()->m_engine_type == e_engine_type::_single_player;
+	return get_game_options()->engine_type == e_engine_type::_single_player;
 }
 
 bool s_game_globals::game_is_multiplayer()
 {
-	return get_game_options()->m_engine_type == e_engine_type::_multiplayer;
+	return get_game_options()->engine_type == e_engine_type::_multiplayer;
 }
 
 bool s_game_globals::game_is_mainmenu()
 {
-	return get_game_options()->m_engine_type == e_engine_type::_main_menu;
+	return get_game_options()->engine_type == e_engine_type::_main_menu;
 }
 
 bool s_game_globals::game_is_predicted()
 {
-	return get_game_options()->m_simulation_type == _game_simulation_distributed_client;
+	return get_game_options()->simulation_type == _game_simulation_distributed_client;
 }
 
 bool s_game_globals::game_is_in_progress()
