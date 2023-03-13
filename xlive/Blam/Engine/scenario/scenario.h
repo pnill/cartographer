@@ -2,45 +2,45 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/math/real_math.h"
 
-enum class e_placement_flags : __int32
+enum e_placement_flags : __int32
 {
-	not_automatically = FLAG(0),
-	unused = FLAG(1),
-	unused1 = FLAG(2),
-	unused2 = FLAG(3),
-	lock_type_to_env_object = FLAG(4),
-	lock_transform_to_env_object = FLAG(5),
-	never_placed = FLAG(6),
-	lock_name_to_env_object = FLAG(7),
-	create_at_rest = FLAG(8),
+	_placement_flag_not_automatically_bit = FLAG(0),
+	_placement_flag_not_on_easy_bit = FLAG(1),
+	_placement_flag_not_on_normal_bit = FLAG(2),
+	_placement_flag_not_on_hard_bit = FLAG(3),
+	_placement_flag_lock_type_to_env_object_bit = FLAG(4),
+	_placement_flag_lock_transform_to_env_object_bit = FLAG(5),
+	_placement_flag_never_placed_bit = FLAG(6),
+	_placement_flag_lock_name_to_env_object_bit = FLAG(7),
+	_placement_flag_create_at_rest_bit = FLAG(8),
 };
 
 enum e_transform_flags : __int16
 {
-	mirrored = FLAG(0),
+	_transform_flag_mirrored_bit = FLAG(0),
 };
 
 enum e_source : __int8
 {
-	structure = FLAG(0),
-	editor = FLAG(1),
-	dynamic = FLAG(2),
-	legacy = FLAG(3),
+	source_structure = 0,
+	source_editor = 1,
+	source_dynamic = 2,
+	source_legacy = 3,
 };
 
 enum e_bsp_policy : __int8
 {
-	default = FLAG(0),
-	always_placed = FLAG(1),
-	manual_bsp_placement = FLAG(2),
+	_bsp_policy_default_bit = FLAG(0),
+	_bsp_policy_always_placed_bit = FLAG(1),
+	_bsp_policy_manual_bsp_placement_bit = FLAG(2),
 };
 
 enum e_active_change_colors : __int32
 {
-	primary = FLAG(0),
-	secondary = FLAG(1),
-	tertiary = FLAG(2),
-	quaternary = FLAG(3),
+	_active_change_colors_primary_bit = FLAG(0),
+	_active_change_colors_secondary_bit = FLAG(1),
+	_active_change_colors_tertiary_bit = FLAG(2),
+	_active_change_colors_quaternary_bit = FLAG(3),
 };
 
 struct s_location
