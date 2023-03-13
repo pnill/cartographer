@@ -36,7 +36,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 
-		s_object_placement_data placement;
+		object_placement_data placement;
 
 		auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 		auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
@@ -50,25 +50,25 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				switch (scen_place.type)
 				{
 				case 0:
-					Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+					object_placement_data_new(&placement, pump_datum, -1, 0);
 					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 					break;
 				case 1:
-					Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+					object_placement_data_new(&placement, candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				case 2:
-					Engine::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
+					object_placement_data_new(&placement, large_candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
+				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
-				Engine::Objects::object_new(&placement);
+				object_new(&placement);
 			}
 		}
 		else if (!strcmp(cache_header->name, "lockout"))
@@ -79,21 +79,21 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				switch (scen_place.type)
 				{
 				case 0:
-					Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+					object_placement_data_new(&placement, pump_datum, -1, 0);
 					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 					break;
 				case 1:
-					Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+					object_placement_data_new(&placement, candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
+				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
-				Engine::Objects::object_new(&placement);
+				object_new(&placement);
 			}
 		}
 	}
