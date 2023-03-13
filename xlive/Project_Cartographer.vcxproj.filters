@@ -121,7 +121,6 @@
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
-    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
@@ -334,7 +333,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
-    <ClInclude Include="Util\ClipboardAPI.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Debug\Debug.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
