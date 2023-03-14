@@ -28,7 +28,7 @@ bool _online_netcode_use_local_network_time = true;
 int __cdecl network_time_get()
 {
 	typedef int(__cdecl* network_time_get_t)();
-	auto p_network_time_get = Memory::GetAddressRelative<network_time_get_t>(0x0);
+	network_time_get_t p_network_time_get = Memory::GetAddressRelative<network_time_get_t>(0x0);
 
 	return p_network_time_get();
 }
@@ -149,7 +149,7 @@ void __cdecl initialize_network_observer_configuration()
 void s_network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
 	typedef void(__thiscall* observer_channel_send_message_t)(s_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
-	auto p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message_t>(0x1BED40, 0x1B8C1A);
+	observer_channel_send_message_t p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message_t>(0x1BED40, 0x1B8C1A);
 
 	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
 }
@@ -233,7 +233,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	BYTE* out_voice_chat_data_buffer)
 {
 	typedef bool(__thiscall* channel_should_send_packet_t)(s_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
-	auto p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
+	channel_should_send_packet_t p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
 
 	int observer_index = -1;
 	for (int i = 0; i < 16; i++)
@@ -253,9 +253,9 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	s_observer_channel* observer_channel = &this->observer_channels[observer_index];
 
 	// we modify the network channel paramters to force the network tickrate
-	const auto _temp_network_rate					= observer_channel->net_rate_managed_stream;
-	const auto _temp_network_bandwidth_per_stream	= observer_channel->net_managed_stream_bandwidth;
-	const auto _temp_network_window_size			= observer_channel->net_managed_stream_window_size;
+	const float _temp_network_rate					= observer_channel->net_rate_managed_stream;
+	const int	_temp_network_bandwidth_per_stream	= observer_channel->net_managed_stream_bandwidth;
+	const DWORD _temp_network_window_size			= observer_channel->net_managed_stream_window_size;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 #	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true

@@ -15,7 +15,7 @@ BYTE g_network_message_type_collection[e_network_message_type_collection::_netwo
 void register_network_message(void *network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
 	typedef void(__thiscall* register_packet_t)(void *, int, const char*, int, int, int, void*, void*, void*);
-	auto register_packet = reinterpret_cast<register_packet_t>(Memory::GetAddress(0x1E81D6, 0x1CA199));
+	register_packet_t register_packet = reinterpret_cast<register_packet_t>(Memory::GetAddress(0x1E81D6, 0x1CA199));
 	return register_packet(network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
@@ -86,7 +86,7 @@ bool __cdecl decode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* 
 void register_custom_network_message(void* network_messages)
 {
 	typedef void(__cdecl* register_test_packet_t)(void* network_messages);
-	auto p_register_test_message = Memory::GetAddress<register_test_packet_t>(0x1ECE05, 0x1CD7BE);
+	register_test_packet_t p_register_test_message = Memory::GetAddress<register_test_packet_t>(0x1ECE05, 0x1CD7BE);
 
 	p_register_test_message(network_messages);
 
@@ -187,7 +187,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			if (received_data->map_download_id != NONE)
 			{
-				auto map_download_query = mapManager->GetDownloadQueryById(received_data->map_download_id);
+				std::shared_ptr<MapDownloadQuery> map_download_query = mapManager->GetDownloadQueryById(received_data->map_download_id);
 				if (map_download_query != nullptr)
 				{
 					map_download_query->SetMapNameToDownload(received_data->file_name);
@@ -247,7 +247,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	{
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
 		{
-			auto recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
+			CustomVariantSettings::s_variantSettings* recieved_data = (CustomVariantSettings::s_variantSettings*)packet;
 			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
 		}
 		break;
@@ -259,7 +259,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
 		{
-			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
+			int peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, peer_index, EventHandler::NetworkPlayerEventType::remove);
 		}
 		break; // don't return, leave the game to update state
@@ -287,7 +287,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
 		{
-			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
+			int peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);
 			NetworkMessage::SendAntiCheat(peer_index);
 		}

@@ -28,7 +28,7 @@ namespace EngineHooks
 	game_life_cycle_update p_game_life_cycle_update;
 	void GameLifeCycleUpdate()
 	{
-		auto gameLifeCycleData = Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
+		byte* gameLifeCycleData = Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
 		p_game_life_cycle_update(gameLifeCycleData);
 
 		e_game_life_cycle currentLifeCycle = *(e_game_life_cycle*)(gameLifeCycleData);

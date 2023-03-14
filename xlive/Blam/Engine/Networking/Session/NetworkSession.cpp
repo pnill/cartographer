@@ -107,15 +107,15 @@ bool NetworkSession::LocalPeerIsEstablished()
 int NetworkSession::GetPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef int(__thiscall* get_peer_index_from_network_address_t)(s_network_session* session, network_address* address);
-	auto p_get_peer_index_from_network_address = Memory::GetAddress<get_peer_index_from_network_address_t>(0x1C71DF, 0x19E9CF);
+	get_peer_index_from_network_address_t p_get_peer_index_from_network_address = Memory::GetAddress<get_peer_index_from_network_address_t>(0x1C71DF, 0x19E9CF);
 	return p_get_peer_index_from_network_address(GetActiveNetworkSession(), address);
 }
 
+// host-only
 bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
 {
-	// host-only
 	typedef bool(__thiscall* get_map_file_location_t)(s_network_session* session, wchar_t* buffer, size_t size);
-	auto p_get_map_file_location = Memory::GetAddress<get_map_file_location_t>(0x1C5678, 0x19CD4A);
+	get_map_file_location_t p_get_map_file_location = Memory::GetAddress<get_map_file_location_t>(0x1C5678, 0x19CD4A);
 	return p_get_map_file_location(GetActiveNetworkSession(), buffer, size);
 }
 
@@ -185,7 +185,7 @@ int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
 void NetworkSession::KickPeer(int peerIdx)
 {
 	typedef void(__thiscall* game_session_boot_t)(s_network_session*, int, bool);
-	auto p_game_session_boot = Memory::GetAddress<game_session_boot_t>(0x1CCE9B);
+	game_session_boot_t p_game_session_boot = Memory::GetAddress<game_session_boot_t>(0x1CCE9B);
 
 	if (peerIdx < GetPeerCount())
 	{
@@ -197,7 +197,7 @@ void NetworkSession::KickPeer(int peerIdx)
 void NetworkSession::EndGame()
 {
 	typedef void(__cdecl* end_game_t)();
-	auto p_end_game = Memory::GetAddress<end_game_t>(0x215470, 0x197F32);
+	end_game_t p_end_game = Memory::GetAddress<end_game_t>(0x215470, 0x197F32);
 	p_end_game();
 }
 
@@ -227,11 +227,11 @@ void NetworkSession::LeaveSession()
 		*Memory::GetAddress<bool*>(0x978BAC) = true;
 
 		typedef void(__cdecl* load_main_menu_with_context_t)(int context);
-		auto p_load_main_menu_with_context = Memory::GetAddress<load_main_menu_with_context_t>(0x08EAF);
+		load_main_menu_with_context_t p_load_main_menu_with_context = Memory::GetAddress<load_main_menu_with_context_t>(0x08EAF);
 		p_load_main_menu_with_context(0);
 	}
 
 	typedef int(__cdecl* leave_game_type_t)(int a1);
-	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
+	leave_game_type_t p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
 	p_leave_session(0);
 }

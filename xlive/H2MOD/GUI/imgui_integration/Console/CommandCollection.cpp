@@ -68,7 +68,7 @@ void CommandCollection::InitializeCommandsMap()
 	InitializeCommandsMap_initialized = true;
 
 	atexit([]() -> void {
-		for (auto command : commandTable)
+		for (ConsoleCommand* command : commandTable)
 		{
 		}
 
@@ -81,7 +81,7 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 {
 	std::scoped_lock(commandInsertMtx);
 
-	for (auto command : commandTable)
+	for (ConsoleCommand* command : commandTable)
 	{
 		if (!strcmp(newCommand->GetName(), command->GetName()))
 		{
@@ -97,7 +97,7 @@ ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& nam
 {
 	std::scoped_lock(commandInsertMtx);
 
-	for (auto command : commandTable)
+	for (ConsoleCommand* command : commandTable)
 	{
 		if (!strcmp(name.c_str(), command->GetName()))
 			return dynamic_cast<ConsoleVarCommand*>(command);
@@ -123,7 +123,7 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, ComVar* varPtr
 int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	auto var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
+	ComVarTPtr<bool*>* var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
 
 	std::string exception;
 	if (!var->SetValFromStr(tokens[1], 10, exception))
@@ -301,7 +301,7 @@ int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, Co
 	}
 
 	std::wstring fileNameToDownload(std::wstring(tokens[1].begin(), tokens[1].end()));
-	auto downloadQuery = mapManager->AddDownloadQuery(fileNameToDownload);
+	std::shared_ptr<MapDownloadQuery> downloadQuery = mapManager->AddDownloadQuery(fileNameToDownload);
 	downloadQuery->StartMapDownload(); // since we have the map name, start the download
 	return 0;
 }
@@ -329,7 +329,7 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 	if (!singleCommandHelp)
 		output->Output(StringFlag_None, "# available commands: ");
 
-	for (auto command_entry : CommandCollection::commandTable)
+	for (ConsoleCommand* command_entry : CommandCollection::commandTable)
 	{
 		if (singleCommandHelp && _strnicmp(command_entry->GetName(), commandToHelp->c_str(), commandToHelp->length()) != 0)
 			continue;
@@ -426,7 +426,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 
 	for (int peerIdx = 0; peerIdx < NetworkSession::GetPeerCount(); peerIdx++)
 	{
-		auto peer_observer_channel = &observer->observer_channels[session->observer_channels[peerIdx].observer_index];
+		const s_observer_channel* peer_observer_channel = &observer->observer_channels[session->observer_channels[peerIdx].observer_index];
 
 		std::wstring peerNameWide(session->membership[0].peers[peerIdx].name);
 		std::string peerName(peerNameWide.begin(), peerNameWide.end());
@@ -672,7 +672,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	blam_tag tagType = blam_tag::from_string(tokens[2]);
 	std::string mapName = tokens[3];
 
-	auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
+	datum tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
 	tag_loader::Load_tag(tagDatum, true, mapName);
 	tag_loader::Push_Back();
 	output->Output(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
@@ -688,7 +688,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, datum playerIdx, float randomMultiplier, bool sameTeam) 
 {
 	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_point3d* orient);
-	auto p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
+	set_orientation_t p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
 
 	for (int i = 0; i < count; i++) 
 	{

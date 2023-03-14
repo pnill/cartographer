@@ -18,7 +18,7 @@ namespace Engine::Objects
 		LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
 
 		typedef void(__cdecl* object_placement_data_new_t)(void*, datum, datum, int);
-		auto p_object_placement_data_new = Memory::GetAddress<object_placement_data_new_t>(0x132163, 0x121033);
+		object_placement_data_new_t p_object_placement_data_new = Memory::GetAddress<object_placement_data_new_t>(0x132163, 0x121033);
 
 		p_object_placement_data_new(object_placement_data, object_definition_idx, object_owner_idx, a4);
 	}
@@ -29,7 +29,7 @@ namespace Engine::Objects
 		LOG_TRACE_GAME("{}", __FUNCTION__);
 
 		typedef datum(__cdecl* object_new_t)(s_object_placement_data*);
-		auto p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
+		object_new_t p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
 
 		return p_object_new(object_placement_data);
 	}
@@ -38,15 +38,15 @@ namespace Engine::Objects
 	void simulation_action_object_create(datum object_idx)
 	{
 		typedef void(__cdecl* simulation_action_object_create_t)(datum);
-		auto p_simulation_action_object_create = Memory::GetAddress<simulation_action_object_create_t>(0x1B8D14, 0x1B2C44);
+		simulation_action_object_create_t p_simulation_action_object_create = Memory::GetAddress<simulation_action_object_create_t>(0x1B8D14, 0x1B2C44);
 
 		return p_simulation_action_object_create(object_idx);
 	}
 
 	void object_destroy(datum object_idx)
 	{
-		typedef void(__cdecl object_destroy_t)(datum);
-		auto p_object_destroy = Memory::GetAddress<object_destroy_t*>(0x136005);
+		typedef void(__cdecl* object_destroy_t)(datum);
+		object_destroy_t p_object_destroy = Memory::GetAddress<object_destroy_t>(0x136005);
 
 		p_object_destroy(object_idx);
 	}
@@ -65,8 +65,9 @@ namespace Engine::Objects
 
 	void __cdecl update_object_variant_index_hook(datum object_idx, int variant_index)
 	{
-		auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
+		typedef int(__cdecl* resolve_variant_index_to_new_variant_t)(datum, int);
+		resolve_variant_index_to_new_variant_t p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<resolve_variant_index_to_new_variant_t>(0x52FE84, 0x51ED47);
+		s_object_data_definition* object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
 
 		object->model_variant_id = p_resolve_variant_index_to_new_variant(object_idx, variant_index);
 		// update the biped variant index
@@ -117,10 +118,10 @@ namespace Engine::Objects
 	int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, s_simulation_unit_creation_data* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
 	{
 		// set the object placement data
-		object_placement_data->variant_name = creation_data->variant_name;
-		if(*(byte*)((char*)creation_data + 0x10) != -1)
+		if(creation_data != nullptr)
 		{
-			auto profile = reinterpret_cast<s_player::s_player_properties::s_player_profile*>((char*)creation_data + 0x10);
+			object_placement_data->variant_name = creation_data->variant_name;
+			s_player::s_player_properties::s_player_profile* profile = &creation_data->profile;
 			datum player_representation_datum = PlayerRepresentation::get_object_datum_from_representation(profile->player_character_type);
 			if (player_representation_datum != DATUM_INDEX_NONE)
 				object_placement_data->tag_index = player_representation_datum;
@@ -145,7 +146,7 @@ namespace Engine::Objects
 
 	bool __cdecl set_unit_color_data_hook(int a1, unsigned __int16 a2, int a3)
 	{
-		auto object_creation_data = (s_simulation_unit_creation_data*)(a1 - 0x10);
+		s_simulation_unit_creation_data* object_creation_data = (s_simulation_unit_creation_data*)(a1 - 0x10);
 		int object_permutation_idx = object_creation_data->variant_name.get_packed();
 
 		//if (object_permutation_index == 0)
@@ -157,11 +158,12 @@ namespace Engine::Objects
 
 	void __stdcall object_build_creation_data_hook(datum object_idx, s_simulation_unit_creation_data* object_creation_data)
 	{
-		auto p_object_build_creation_data = Memory::GetAddress<void(__stdcall*)(datum, void*)>(0x1F24ED, 0x1DD586);
+		typedef void(__stdcall* object_build_creation_data_t)(datum, void*);
+		object_build_creation_data_t p_object_build_creation_data = Memory::GetAddress<object_build_creation_data_t>(0x1F24ED, 0x1DD586);
 
 		p_object_build_creation_data(object_idx, object_creation_data);
 
-		auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
+		const s_biped_data_definition* object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
 
 		object_creation_data->variant_name = object->variant_name;
 

@@ -53,7 +53,7 @@ bool ConsoleCommand::ExecCommand(const char* command_line, size_t command_line_l
 
 	if (CheckArgs(&command_data, command_line, tokens))
 	{
-		if (const auto* varCommand = dynamic_cast<const ConsoleVarCommand*>(command))
+		if (const ConsoleVarCommand* varCommand = dynamic_cast<const ConsoleVarCommand*>(command))
 		{
 			command_data.commandVar = varCommand->m_var_ptr;
 			command->p_exec_command_cb(tokens, command_data);
@@ -78,7 +78,7 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
 	if (tokenize(command_line, command_line_length, " ", command_first_tokens))
 	{
 		ConsoleCommand* command = nullptr;
-		for (auto command_entry : CommandCollection::commandTable)
+		for (ConsoleCommand* command_entry : CommandCollection::commandTable)
 		{
 			size_t cmp_max = (std::max)(strlen(command_entry->GetName()), command_first_tokens[0].length());
 			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), cmp_max) == 0)

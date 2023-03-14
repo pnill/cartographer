@@ -601,7 +601,7 @@ namespace ImGuiHandler {
 					ImGui::TextWrapped("To use this you must have your games controller layout SET TO DEFAULT. Changing the drop down for the specific action will remap the button to the new one");
 					ImGui::NewLine();
 					ImGui::Columns(3, NULL, false);
-					for (auto i = 0; i < 14; i++)
+					for (byte i = 0; i < 14; i++)
 					{
 						ImGui::Text(button_items[i]);
 						ImGui::PushItemWidth(ImGui::GetColumnWidth());
@@ -1017,7 +1017,7 @@ namespace ImGuiHandler {
 					}
 					if (ImGui::CollapsingHeader("Raster Layers")) {
 						ImGui::Columns(4, NULL, false);
-						for (auto i = 0; i < 25; i++)
+						for (byte i = 0; i < 25; i++)
 						{
 							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
 							{
@@ -1030,7 +1030,7 @@ namespace ImGuiHandler {
 					if (ImGui::CollapsingHeader("Render Geometries"))
 					{
 						ImGui::Columns(4, NULL, false);
-						for (auto i = 0; i < 24; i++)
+						for (byte i = 0; i < 24; i++)
 						{
 							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
 							ImGui::NextColumn();
@@ -1090,9 +1090,9 @@ namespace ImGuiHandler {
 		{
 			WORD Buttons[14];
 			H2Config_CustomLayout.ToArray(Buttons);
-			for (auto i = 0; i < 14; i++)
+			for (byte i = 0; i < 14; i++)
 			{
-				for (auto j = 0; j < 14; j++)
+				for (byte j = 0; j < 14; j++)
 				{
 					if (button_values[j] == Buttons[i])
 						button_placeholders[i] = j;

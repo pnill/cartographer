@@ -251,7 +251,7 @@ static s_data_array* get_objects_header()
 // Gets the header of the object, containing some details
 static s_object_header* get_objects_header(datum object_idx)
 {
-	auto objects_header = get_objects_header();
+	s_data_array* objects_header = get_objects_header();
 	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)]);
 }
 
@@ -264,7 +264,7 @@ static T* object_get_fast_unsafe(datum object_idx)
 
 static real_matrix4x3* get_object_nodes(datum object_idx, int* out_node_count)
 {
-	auto object = object_get_fast_unsafe(object_idx);
+	const s_object_data_definition* object = object_get_fast_unsafe(object_idx);
 	*out_node_count = object->node_buffer_size / sizeof(real_matrix4x3);
 	return (real_matrix4x3*)((char*)object + object->nodes_offset);
 }
@@ -273,7 +273,8 @@ static real_matrix4x3* get_object_nodes(datum object_idx, int* out_node_count)
 template<typename T = s_object_data_definition>
 static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
 {
-	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
+	typedef char*(__cdecl* object_try_and_get_and_verify_type_t)(datum, int);
+	object_try_and_get_and_verify_type_t p_object_try_and_get_and_verify_type = Memory::GetAddress<object_try_and_get_and_verify_type_t>(0x1304E3, 0x11F3A6);
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 

@@ -33,8 +33,8 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 			*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
 		}
 
-		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
-		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
+		typedef void(__cdecl *set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
+		set_orientation_t p_set_orientation = Memory::GetAddress<set_orientation_t>(0x3347B);
 
 		s_object_placement_data placement;
 
@@ -64,7 +64,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
+				p_set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
@@ -89,7 +89,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
+				p_set_orientation(&placement.orientation, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
