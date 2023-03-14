@@ -330,7 +330,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Util\ClipboardAPI.cpp" />
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
@@ -708,7 +707,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
-    <ClInclude Include="Util\ClipboardAPI.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Debug\Debug.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
