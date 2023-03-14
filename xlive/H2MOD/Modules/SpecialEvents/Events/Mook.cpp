@@ -22,7 +22,7 @@ void mook_event_map_load()
 
 		mook_ball_weapon_datum = tag_loader::ResolveNewDatum(mook_ball_weapon_datum);
 
-		auto mook_ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(mook_ball_weapon_datum, true);
+		s_weapon_group_definition* mook_ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(mook_ball_weapon_datum, true);
 
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->model.TagIndex, mook_ball_weapon->model.TagIndex);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->model.TagIndex, mook_ball_weapon->model.TagIndex);

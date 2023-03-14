@@ -162,7 +162,7 @@ struct blam_tag
 		a[1] = string[2];
 		a[2] = string[1];
 		a[3] = string[0];
-		auto result = blam_tag(tag_group_type(*(int*)a));
+		blam_tag result = blam_tag(tag_group_type(*(int*)a));
 		return result;
 	}
 

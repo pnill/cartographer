@@ -175,7 +175,6 @@ public:
 private:
 	static bool failAlerted;
 	static h2log* console;
-	static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> string_convert;
 
 	std::string sname;
 	std::wstring wname;

@@ -7,65 +7,17 @@
 #include "..\Transport\NetworkChannel.h"
 #include "..\Transport\NetworkObserver.h"
 
-// forward declarations
-enum e_map_status;
-enum e_network_session_state;
-
-struct s_network_session;
-struct s_session_membership;
-struct s_membership_player;
-struct s_membership_peer;
-struct s_session_observer_channel;
-
 #define NETWORK_SESSION_PEERS_MAX (16 + 1)
 
-namespace NetworkSession
+enum e_map_status : int
 {
-	// network session getters and misc
-	s_network_session* GetNetworkSessions();
-	s_network_session* GetActiveNetworkSession();
-	bool GetActiveNetworkSession(s_network_session** outSession);
-	e_network_session_state GetLocalSessionState();
-	int GetPeerIndexFromNetworkAddress(network_address* address);
-	bool GetMapFileLocation(wchar_t* buffer, size_t size);
-
-	bool LocalPeerIsSessionHost();
-	bool LocalPeerIsSessionLeader();
-	bool LocalPeerIsEstablished();
-
-	// peer functions
-	int GetPeerCount();
-	int GetLocalPeerIndex();
-	bool IsPeerIndexLocal(int peerIdx);
-	IN_ADDR GetLocalNetworkAddress();
-	void KickPeer(int peerIdx);
-	void EndGame();
-	s_session_observer_channel* GetPeerObserverChannel(int peerIdx);
-
-	// peer-player functions
-	int GetPeerIndex(int playerIdx);
-
-	// player functions
-	
-	/* Use this to verify if a player is currently active in the network session */
-	/* Otherwise you will wonder why you don't get the right data/player index etc. */
-	bool PlayerIsActive(int playerIdx);
-	std::vector<unsigned long long> GetActivePlayerIdList();
-	std::vector<int> GetActivePlayerIndicesList();
-
-	int GetPlayerCount();
-	const wchar_t* GetPlayerName(int playerIdx);
-	unsigned long long GetPlayerId(int playerIdx);
-
-	int GetPlayerTeam(int playerIdx);
-	int GetPeerIndexFromId(unsigned long long xuid);
-	s_membership_player* GetPlayerInformation(int playerIdx);
-
-	wchar_t* GetGameVariantName();
-
-	bool IsVariantTeamPlay();
-	void LeaveSession();
-}
+	_network_session_map_status_none,
+	_network_session_map_status_unable_to_precache,
+	_network_session_map_status_precaching,
+	_network_session_map_status_precached,
+	_network_session_map_status_loaded,
+	_network_session_map_status_downloading
+};
 
 enum e_network_session_state : int
 {
@@ -80,16 +32,6 @@ enum e_network_session_state : int
 	_network_session_state_host_reestablish,
 	_network_session_state_election,
 	_network_session_state_dead
-};
-
-enum e_map_status : int
-{
-	_network_session_map_status_none,
-	_network_session_map_status_unable_to_precache,
-	_network_session_map_status_precaching,
-	_network_session_map_status_precached,
-	_network_session_map_status_loaded,
-	_network_session_map_status_downloading
 };
 
 #pragma pack(push, 1)
@@ -325,3 +267,51 @@ CHECK_STRUCT_SIZE(s_network_session, 31624);
 CHECK_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
 CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)
+
+namespace NetworkSession
+{
+	// network session getters and misc
+	s_network_session* GetNetworkSessions();
+	s_network_session* GetActiveNetworkSession();
+	bool GetActiveNetworkSession(s_network_session** outSession);
+	e_network_session_state GetLocalSessionState();
+	int GetPeerIndexFromNetworkAddress(network_address* address);
+	bool GetMapFileLocation(wchar_t* buffer, size_t size);
+
+	bool LocalPeerIsSessionHost();
+	bool LocalPeerIsSessionLeader();
+	bool LocalPeerIsEstablished();
+
+	// peer functions
+	int GetPeerCount();
+	int GetLocalPeerIndex();
+	bool IsPeerIndexLocal(int peerIdx);
+	IN_ADDR GetLocalNetworkAddress();
+	void KickPeer(int peerIdx);
+	void EndGame();
+	s_session_observer_channel* GetPeerObserverChannel(int peerIdx);
+
+	// peer-player functions
+	int GetPeerIndex(int playerIdx);
+
+	// player functions
+
+	/* Use this to verify if a player is currently active in the network session */
+	/* Otherwise you will wonder why you don't get the right data/player index etc. */
+	bool PlayerIsActive(int playerIdx);
+	std::vector<unsigned long long> GetActivePlayerIdList();
+	std::vector<int> GetActivePlayerIndicesList();
+
+	int GetPlayerCount();
+	const wchar_t* GetPlayerName(int playerIdx);
+	unsigned long long GetPlayerId(int playerIdx);
+
+	int GetPlayerTeam(int playerIdx);
+	int GetPeerIndexFromId(unsigned long long xuid);
+	s_membership_player* GetPlayerInformation(int playerIdx);
+
+	wchar_t* GetGameVariantName();
+
+	bool IsVariantTeamPlay();
+	void LeaveSession();
+}
