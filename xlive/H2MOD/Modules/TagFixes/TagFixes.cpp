@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "TagFixes.h"
 
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/biped_definition.h"
 #include "Blam/Cache/TagGroups/light_definition.h"
-#include "Blam/Cache/TagGroups/shader_definition.hpp"
-#include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
+#include "Blam/Cache/TagGroups/shader_definition.h"
+#include "Blam/Cache/TagGroups/sound_classes_definition.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"

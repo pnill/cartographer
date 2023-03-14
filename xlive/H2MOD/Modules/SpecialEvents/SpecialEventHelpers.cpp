@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.h"
+#include "Blam/Cache/TagGroups/render_model_definition.h"
+#include "Blam/Cache/TagGroups/weapon_definition.h"
 #include "Blam/Enums/HaloStrings.h"
 
 #include "H2MOD/Tags/MetaExtender.h"

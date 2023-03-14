@@ -12,7 +12,7 @@
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Utils\Utils.h"
 #include "H2MOD\Tags\TagInterface.h"
-#include "Blam\Cache\TagGroups\bitmap_definition.hpp"
+#include "Blam\Cache\TagGroups\bitmap_definition.h"
 #include "Util\Hooks\Hook.h"
 
 #define _USE_MATH_DEFINES

@@ -2,7 +2,7 @@
 #include "Blam\Cache\CacheHeader.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\BlamTag.h"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.h"
 #include "Blam\Common\Common.h"
 
 namespace tags

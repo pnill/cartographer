@@ -3,14 +3,14 @@
 #include "tag_loader.h"
 #include "Blam\Common\Common.h"
 #include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenery_definition.hpp"
+#include "Blam\Cache\TagGroups\model_definition.h"
+#include "Blam\Cache\TagGroups\scenery_definition.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 #include "H2MOD\Tags\MetaExtender.h"
 #include "Util\filesys.h"
 #include "Util\Hooks\Hook.h"
 
-#include "Blam/Cache/TagGroups/weather_system_definition.hpp"
+#include "Blam/Cache/TagGroups/weather_system_definition.h"
 #include "Blam/Engine/DataArray/TagDataIterator.h"
 
 //contains some game functions that returns HANDLE

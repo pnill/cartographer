@@ -2,7 +2,7 @@
 
 #include "OverridePackets.h"
 #include "H2MOD\Engine\Engine.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\EventHandler\EventHandler.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Util\Hooks\Hook.h"

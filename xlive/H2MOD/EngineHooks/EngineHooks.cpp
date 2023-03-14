@@ -2,7 +2,7 @@
 
 #include "EngineHooks.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\EventHandler\EventHandler.h"
 #include "Util\Hooks\Hook.h"
 
 #ifndef _CARTOGRAPHER_DLL_CONF

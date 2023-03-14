@@ -3,7 +3,7 @@
 #include "Birthday.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.h"
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

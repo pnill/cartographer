@@ -9,7 +9,7 @@
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\Stats\StatsHandler.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\EventHandler\EventHandler.h"
 #include "H2MOD\Modules\Input\ControllerInput.h"
 #include "H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h"
 #include "H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h"

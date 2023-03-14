@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "PlayerRepresentation.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam\Cache\TagGroups\biped_definition.h"
+#include "Blam\Cache\TagGroups\model_definition.h"
+#include "Blam\Cache\TagGroups\scenario_definition.h"
 #include "Blam\Engine\Game\GameEngineGlobals.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"

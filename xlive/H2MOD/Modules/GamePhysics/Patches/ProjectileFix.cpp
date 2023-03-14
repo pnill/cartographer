@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "ProjectileFix.h"
-#include "Blam/Cache/TagGroups/projectile_definition.hpp"
+#include "Blam/Cache/TagGroups/projectile_definition.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "Blam/Engine/Objects/Objects.h"
 #include "Blam/Math/BlamMath.h"

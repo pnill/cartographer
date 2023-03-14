@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.h"
 
 #include "TagInterface.h"
 

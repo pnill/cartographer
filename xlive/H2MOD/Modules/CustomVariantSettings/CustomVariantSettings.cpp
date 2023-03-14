@@ -11,7 +11,7 @@
 #include "Blam\Engine\Memory\bitstream.h"
 
 #include "H2MOD.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
+#include "H2MOD\Modules\EventHandler\EventHandler.h"
 #include "H2MOD\Modules\HudElements\HudElements.h"
 #include "H2MOD\Utils\Utils.h"
 #include "Util\Hooks\Hook.h"

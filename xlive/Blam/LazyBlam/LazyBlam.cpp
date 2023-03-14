@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "LazyBlam.hpp"
+#include "LazyBlam.h"
 #include "H2MOD\Utils\Utils.h"
 #include "Util\filesys.h"
 

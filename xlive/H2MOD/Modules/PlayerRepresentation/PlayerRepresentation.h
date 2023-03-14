@@ -1,6 +1,6 @@
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\StringID.h"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.h"
 #include "Blam\Engine\Players\Players.h"
 
 namespace PlayerRepresentation

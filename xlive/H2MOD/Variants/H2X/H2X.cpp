@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "H2X.h"
 
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.h"
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "Blam/Engine/Game/GameTimeGlobals.h"
 #include "H2MOD.h"

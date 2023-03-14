@@ -4,7 +4,7 @@
 
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Cache\TagGroups\character_definition.hpp"
+#include "Blam\Cache\TagGroups\character_definition.h"
 
 #include "Blam\Engine\Actor\Actor.h"
 #include "Blam\Engine\Objects\Objects.h"

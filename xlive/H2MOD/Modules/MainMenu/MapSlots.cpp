@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include  "MapSlots.h"
-#include "Blam\Cache\TagGroups\globals_definition.hpp"
+#include "Blam\Cache\TagGroups\globals_definition.h"
 #include "H2MOD.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
 #include "Util\filesys.h"

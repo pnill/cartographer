@@ -3,7 +3,7 @@
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "Blam\Cache\DataTypes\TagBlock.h"
 #include "Blam\Cache\DataTypes\TagRef.h"
-#include "Blam\Cache\TagGroups.hpp"
+#include "Blam\Cache\TagGroups.h"
 #include "Blam\Common\Common.h"
 #include "Blam\Math\real_math.h"
 

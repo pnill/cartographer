@@ -3,11 +3,11 @@
 #include "Christmas.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/biped_definition.h"
+#include "Blam/Cache/TagGroups/model_definition.h"
+#include "Blam/Cache/TagGroups/scenario_definition.h"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.h"
+#include "Blam/Cache/TagGroups/weapon_definition.h"
 
 #include "Blam/Engine/Game/GameGlobals.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"

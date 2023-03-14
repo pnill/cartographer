@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "EventHandler.hpp"
+#include "EventHandler.h"
 
 std::map<EventType, std::vector<EventCallback>> event_map =
 {
