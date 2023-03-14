@@ -1,52 +1,49 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Math\BlamMath.h"
-
-/*********************************************************************
-* name: user_interface_shared_globals
-* group_tag : wigl
-* header size : 452
-* *********************************************************************/
+#include "Blam/Common/Common.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Math/BlamMath.h"
+#include "Util/Memory.h"
+#include <wtypes.h>
 
 #pragma pack(push,1)
-struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
+struct user_interface_shared_globals :TagGroup<'wigl'>
 {
-	PAD(0x44);//0x0
-	float overlayed_screen_alpha_mod;//0x44
-	__int16 inc_text_update_period;//0x48
-	__int16 inc_text_block_character;//0x4A
-	float callout_text_scale;//0x4C
-	real_color_argb progress_bar_color;//0x50
-	float near_clip_plane_distance;//0x60
-	float projection_plane_distance;//0x64
-	float far_clip_plane_distance;//0x68
-	real_color_argb overlayed_interface_color;//0x6C
-	PAD(0xC);//0x7C
+	DWORD unk0[19];
+	float overlayed_screen_alpha_mod;
+	__int16 inc_text_update_period;
+	__int16 inc_text_block_character;
+	float callout_text_scale;
+	real_color_argb progress_bar_color;
+	float near_clip_plane_distance;
+	float projection_plane_distance;
+	float far_clip_plane_distance;
+	real_color_argb overlayed_interface_color;
+	DWORD unk7C[3];
 	struct s_errors_block
 	{
-		string_id category_name;//0x0
-		enum class e_flags : __int16
+		string_id category_name;
+		enum e_flags : short
 		{
 			use_large_dialog = FLAG(0),
 		};
-		e_flags flags;//0x4
-		enum class e_default_button : __int8
+		e_flags flags;
+		enum e_default_button : byte
 		{
 			no_default = 0,
 			default_ok = 1,
 			default_cancel = 2,
 		};
-		e_default_button default_button;//0x6
-		PAD(0x1);//0x7
-		tag_reference string_tag;//0x8
-		string_id default_title;//0x10
-		string_id default_message;//0x14
-		string_id default_ok;//0x18
-		string_id default_cancel;//0x1C
-		struct s_error_block_block
+		e_default_button default_button;
+		byte pad;
+		tag_reference string_tag;
+		string_id default_title;
+		string_id default_message;
+		string_id default_ok;
+		string_id default_cancel;
+		struct s_ui_error
 		{
-			enum class e_error : __int32
+			enum e_error : int
 			{
 				error_unknown = 0,
 				error_generic = 1,
@@ -303,122 +300,103 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 				choose_new_checkpoint_location_checkpoints_exist_locally = 252,
 				xxx = 253,
 			};
-			e_error error;//0x0
-			enum class e_flags : __int16
+			e_error error;
+			enum e_flags : short
 			{
 				use_large_dialog = FLAG(0),
 			};
-			e_flags flags;//0x4
-			enum class e_default_button : __int8
+			e_flags flags;
+			enum e_default_button : byte
 			{
 				no_default = 0,
 				default_ok = 1,
 				default_cancel = 2,
 			};
-			e_default_button default_button;//0x6
-			PAD(0x1);//0x7
-			string_id title;//0x8
-			string_id message;//0xC
-			string_id ok;//0x10
-			string_id cancel;//0x14
+			e_default_button default_button;
+			byte unk_7[1];
+			string_id title;
+			string_id message;
+			string_id ok;
+			string_id cancel;
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_error_block_block, 0x18);
-		tag_block<s_error_block_block> error_block;//0x20
+		TAG_BLOCK_SIZE_ASSERT(s_ui_error, 24);
+		tag_block<s_ui_error> error_block;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_errors_block, 0x28);
-	tag_block<s_errors_block> errors;//0x88
-	tag_reference cursor_sound_tag;//0x90
-	tag_reference selection_sound_tag;//0x98
-	tag_reference error_sound_tag;//0xA0
-	tag_reference advancing_sound_tag;//0xA8
-	tag_reference retreating_sound_tag;//0xB0
-	tag_reference initial_login_sound_tag;//0xB8
-	tag_reference vkbd_sound_tag;//0xC0
-	tag_reference vkbd_char_insertion_sound_tag;//0xC8
-	tag_reference online_notification_sound_tag;//0xD0
-	tag_reference tabbed_view_pane_tabbing_sound_tag;//0xD8
-	tag_reference pregame_count_down_sound_tag;//0xE0
-	PAD(0x8);//0xE8
-	tag_reference matchmaking_advance_sound_tag;//0xF0
-	PAD(0x8 * 3);//0xF8	
-	tag_reference global_bitmaps_tag;//0x110
-	tag_reference unicode_string_list_tag;//0x118
-	struct s_screen_animations_block
+	tag_block<s_errors_block> errors;
+	tag_reference cursor_sound_tag;
+	tag_reference selection_sound_tag;
+	tag_reference error_sound_tag;
+	tag_reference advancing_sound_tag;
+	tag_reference retreating_sound_tag;
+	tag_reference initial_login_sound_tag;
+	tag_reference vkbd_sound_tag;
+	tag_reference vkbd_char_insertion_sound_tag;
+	tag_reference online_notification_sound_tag;
+	tag_reference tabbed_view_pane_tabbing_sound_tag;
+	tag_reference pregame_count_down_sound_tag;
+	tag_reference unkE8;
+	tag_reference matchmaking_advance_sound_tag;
+	tag_reference unkF8;
+	tag_reference unk100;
+	tag_reference unk108;
+	tag_reference global_bitmaps_tag;
+	tag_reference unicode_string_list_tag;
+	struct s_animation_reference
 	{
-		enum class e_flags : __int32
+		enum e_flags : __int32
 		{
 			unused = FLAG(0),
 		};
-		e_flags flags;//0x0
+		e_flags flags;
 
-		struct {
-			__int32 animation_period;//0x4
-			struct s_keyframes_block
+		struct s_keyframes_block
+		{
+			DWORD pad;
+			float alpha;
+			real_point3d position;
+		};
+		TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
+
+		int intro_animationPeriodMilliseconds;
+		tag_block<s_keyframes_block> primary_intro_transition;
+
+		DWORD pad[4];
+
+		int outro_animationPeriodMilliseconds;
+		tag_block<s_keyframes_block> primary_intro_transition;
+
+		DWORD pad[4];
+
+		struct s_ambient_animation
+		{
+			int animation_period_miliseconds;
+			enum e_ambient_animation_looping_style : short
 			{
-				PAD(0x4);//0x0
-				float alpha;//0x4
-				float position_x;//0x8
-				float position_y;//0xC
-				float position_z;//0x10
+				_ambient_animation_looping_style_none = 0,
+				_ambient_animation_looping_style_reverse_loop = 1,
+				_ambient_animation_looping_style_loop = 2,
+				_ambient_animation_looping_style_dont_loop = 3,
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
-			tag_block<s_keyframes_block> keyframes;//0x8
+			e_ambient_animation_looping_style ambient_animation_looping_style;
+			WORD unk22;
+			tag_block<s_keyframes_block> keyframes;
+		};
+		s_ambient_animation ambient_animation;
 
-		}primary_intro;
-		
-		struct{
-
-			__int32 animation_period;//0x10
-			struct s_keyframes_block
-			{
-				PAD(0x4);//0x0
-				float alpha;//0x4
-				float position_x;//0x8
-				float position_y;//0xC
-				float position_z;//0x10
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
-			tag_block<s_keyframes_block> keyframes;//0x14
-
-		}primary_outro;
-		
-		struct {
-
-			__int32 animation_period;//0x1C
-			enum class e_ambient_animation_looping_style : __int16
-			{
-				none = 0,
-				reverse_loop = 1,
-				loop = 2,
-				dont_loop = 3,
-			};
-			e_ambient_animation_looping_style ambient_animation_looping_style;//0x20
-			PAD(0x2);//0x22
-			struct s_keyframes_block
-			{
-				PAD(0x4);//0x0
-				float alpha;//0x4
-				float position_x;//0x8
-				float position_y;//0xC
-				float position_z;//0x10
-			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
-			tag_block<s_keyframes_block> keyframes;//0x24
-
-		}ambient_animation;
-
+		DWORD pad[4];
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_screen_animations_block, 0x2C);
-	tag_block<s_screen_animations_block> screen_animations;//0x120
-	struct s_shape_groups_block
+	TAG_BLOCK_SIZE_ASSERT(s_animation_reference, 0x38);
+	tag_block<s_animation_reference> screen_animations;
+	struct s_shape_group_reference
 	{
 		struct s_shapes_block
 		{
-			enum class e_flags : __int32
+			enum class e_flags : int
 			{
 				unused = FLAG(0),
 			};
-			e_flags flags;//0x0
+			e_flags flags;
 			enum class e_animation_index : __int16
 			{
 				none = 0,
@@ -487,29 +465,30 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 				NUM_62 = 63,
 				NUM_63 = 64,
 			};
-			e_animation_index animation_index;//0x4
-			__int16 intro_animation_delay_milliseconds;//0x6
-			real_color_argb color;//0x8
+			e_animation_index animation_index;
+			__int16 intro_animation_delay_milliseconds;
+			real_color_argb color;
 			struct s_points_block
 			{
-				__int16 coordinates_x;//0x0
-				__int16 coordinates_y;//0x2
+				__int16 coordinates_x;
+				__int16 coordinates_y;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_points_block, 0x4);
-			tag_block<s_points_block> points;//0x18
-			__int16 render_depth_bias;//0x20
-			PAD(0xE);//0x22
+			tag_block<s_points_block> points;
+			__int16 render_depth_bias;
+			WORD pad22[7];
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_shapes_block, 0x30);
-		tag_block<s_shapes_block> shapes;//0x0
+		tag_block<s_shapes_block> shapes;
+
 		struct s_model_scene_blocks_block
 		{
-			enum class e_flags : __int32
+			enum e_flags : int
 			{
 				unused = FLAG(0),
 			};
-			e_flags flags;//0x0
-			enum class e_animation_index : __int16
+			e_flags flags;
+			enum e_animation_index : short
 			{
 				none = 0,
 				NUM_00 = 1,
@@ -577,42 +556,43 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 				NUM_62 = 63,
 				NUM_63 = 64,
 			};
-			e_animation_index animation_index;//0x4
-			__int16 intro_animation_delay_milliseconds;//0x6
-			__int16 render_depth_bias;//0x8
-			PAD(0x2);//0xA
+			e_animation_index animation_index;
+			__int16 intro_animation_delay_milliseconds;
+			__int16 render_depth_bias;
+			WORD unkA;
 			struct s_objects_block
 			{
-				tag_string32 name;//0x0
+				tag_string32 name;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_objects_block, 0x20);
-			tag_block<s_objects_block> objects;//0xC
+			tag_block<s_objects_block> objects;
 			struct s_lights_block
 			{
-				tag_string32 name;//0x0
+				tag_string32 name;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_lights_block, 0x20);
-			tag_block<s_lights_block> lights;//0x14
-			PAD(0xC);//0x1C
-			real_point3d camera_position;//0x28			
-			float fov_degress;//0x34
-			rect2d ui_viewport;//0x38			
-			string_id unused_intro_anim;//0x40
-			string_id unused_outro_anim;//0x44
-			string_id unused_ambient_anim;//0x48
+			tag_block<s_lights_block> lights;
+			real_vector3d animation_scale_factor;
+			real_point3d camera_position;		
+			float fov_degress;
+			rect2d ui_viewport;
+			string_id unused_intro_anim;
+			string_id unused_outro_anim;
+			string_id unused_ambient_anim;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_model_scene_blocks_block, 0x4C);
-		tag_block<s_model_scene_blocks_block> model_scene_blocks;//0x8
+
+		tag_block<s_model_scene_blocks_block> model_scene_blocks;
 		struct s_bitmap_blocks_block
 		{
-			enum class e_flags : __int32
+			enum e_flags : __int32
 			{
 				ignore_for_list_skin_size_calculation = FLAG(0),
 				swap_on_relative_list_position = FLAG(1),
 				render_as_progress_bar = FLAG(2),
 			};
-			e_flags flags;//0x0
-			enum class e_animation_index : __int16
+			e_flags flags;
+			enum class e_animation_index : short
 			{
 				none = 0,
 				NUM_00 = 1,
@@ -680,69 +660,67 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 				NUM_62 = 63,
 				NUM_63 = 64,
 			};
-			e_animation_index animation_index;//0x4
-			__int16 intro_animation_delay_milliseconds;//0x6
-			enum class e_bitmap_blend_method : __int16
+			e_animation_index animation_index;
+			__int16 intro_animation_delay_milliseconds;
+			enum e_bitmap_blend_method : short
 			{
 				standard = 0,
 				multiply = 1,
 				unused = 2,
 			};
-			e_bitmap_blend_method bitmap_blend_method;//0x8
-			__int16 initial_sprite_frame;//0xA
-			__int16 topleft_x;//0xC
-			__int16 topleft_y;//0xE
-			float horiz_texture_wrapssecond;//0x10
-			float vert_texture_wrapssecond;//0x14
-			tag_reference bitmap_tag;//0x18
-			__int16 render_depth_bias;//0x20
-			PAD(0x2);//0x22
-			float sprite_animation_speed_fps;//0x24
-			__int16 progress_bottomleft_x;//0x28
-			__int16 progress_bottomleft_y;//0x2A
-			string_id string_identifier;//0x2C
-			float progress_scale_i;//0x30
-			float progress_scale_j;//0x34
+			e_bitmap_blend_method bitmap_blend_method;
+			__int16 initial_sprite_frame;
+			__int16 topleft_x;
+			__int16 topleft_y;
+			float horiz_texture_wrapssecond;
+			float vert_texture_wrapssecond;
+			tag_reference bitmap_tag;
+			__int16 render_depth_bias;
+			WORD unk22;
+			float sprite_animation_speed_fps;
+			__int16 progress_bottomleft_x;
+			__int16 progress_bottomleft_y;
+			string_id string_identifier;
+			float progress_scale_i;
+			float progress_scale_j;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_bitmap_blocks_block, 0x38);
-		tag_block<s_bitmap_blocks_block> bitmap_blocks;//0x10
+		tag_block<s_bitmap_blocks_block> bitmap_blocks;
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_shape_groups_block, 0x18);
-	tag_block<s_shape_groups_block> shape_groups;//0x128
+	TAG_BLOCK_SIZE_ASSERT(s_shape_group_reference, 0x18);
+	tag_block<s_shape_group_reference> shape_groups;
 	struct s_animations_block
 	{
-		PAD(0x4);//0x0
-		__int32 animation_period;//0x4
+		DWORD unk0;
+		int animation_period_miliseconds;
 		struct s_interpolated_keyframes_block
 		{
-			__int32 start_transition_index;//0x0
-			float alpha;//0x4
-			float position_x;//0x8
-			float position_y;//0xC
-			float position_z;//0x10
+			__int32 start_transition_index;
+			float alpha;
+			real_point3d position;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_interpolated_keyframes_block, 0x14);
-		tag_block<s_interpolated_keyframes_block> interpolated_keyframes;//0x8
+		tag_block<s_interpolated_keyframes_block> interpolated_keyframes;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_animations_block, 0x10);
-	tag_block<s_animations_block> animations;//0x130
+	tag_block<s_animations_block> animations;
 	struct s_list_item_skins_block
 	{
-		tag_reference list_item_skins;//0x0
+		tag_reference list_item_skins;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_list_item_skins_block, 0x8);
-	tag_block<s_list_item_skins_block> list_item_skins;//0x138
-	tag_reference button_key_type_strings;//0x140
-	tag_reference game_type_strings;//0x148
-	tag_reference NUM_;//0x150
+	tag_block<s_list_item_skins_block> list_item_skins;
+	tag_reference button_key_type_strings;
+	tag_reference game_type_strings;
+	tag_reference unk150;
 	struct s_skill_mappings_block
 	{
-		__int16 skill_bounds_lower;//0x0
-		__int16 skill_bounds_upper;//0x2
+		__int16 skill_bounds_lower;
+		__int16 skill_bounds_upper;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_skill_mappings_block, 0x4);
-	tag_block<s_skill_mappings_block> skill_mappings;//0x158
-	enum class e_full_screen_header_text_font : __int16
+	tag_block<s_skill_mappings_block> skill_mappings;
+	enum e_full_screen_header_text_font : short
 	{
 		terminal = 0,
 		body_text = 1,
@@ -757,8 +735,8 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		main_menu_font = 10,
 		text_chat_font = 11,
 	};
-	e_full_screen_header_text_font full_screen_header_text_font;//0x160
-	enum class e_large_dialog_header_text_font : __int16
+	e_full_screen_header_text_font full_screen_header_text_font;
+	enum e_large_dialog_header_text_font : short
 	{
 		terminal = 0,
 		body_text = 1,
@@ -773,8 +751,8 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		main_menu_font = 10,
 		text_chat_font = 11,
 	};
-	e_large_dialog_header_text_font large_dialog_header_text_font;//0x162
-	enum class e_half_dialog_header_text_font : __int16
+	e_large_dialog_header_text_font large_dialog_header_text_font;
+	enum e_half_dialog_header_text_font : short
 	{
 		terminal = 0,
 		body_text = 1,
@@ -789,8 +767,8 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		main_menu_font = 10,
 		text_chat_font = 11,
 	};
-	e_half_dialog_header_text_font half_dialog_header_text_font;//0x164
-	enum class e_qtr_dialog_header_text_font : __int16
+	e_half_dialog_header_text_font half_dialog_header_text_font;
+	enum  e_qtr_dialog_header_text_font : short
 	{
 		terminal = 0,
 		body_text = 1,
@@ -805,36 +783,36 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		main_menu_font = 10,
 		text_chat_font = 11,
 	};
-	e_qtr_dialog_header_text_font qtr_dialog_header_text_font;//0x166
-	real_color_argb default_text_color;//0x168
-	rect2d full_screen_header_text_bounds;//0x178
+	e_qtr_dialog_header_text_font qtr_dialog_header_text_font;
+	real_color_argb default_text_color;
+	rect2d full_screen_header_text_bounds;
 
-	rect2d full_screen_button_key_text_bounds;//0x180
+	rect2d full_screen_button_key_text_bounds;
 
-	rect2d large_dialog_header_text_bounds;//0x188
+	rect2d large_dialog_header_text_bounds;
 
-	rect2d large_dialog_button_key_text_bounds;//0x190
+	rect2d large_dialog_button_key_text_bounds;
 
-	rect2d half_dialog_header_text_bounds;//0x198
+	rect2d half_dialog_header_text_bounds;
 
-	rect2d half_dialog_button_key_text_bounds;//0x1A0
+	rect2d half_dialog_button_key_text_bounds;
 
-	rect2d qtr_dialog_header_text_bounds;//0x1A8
+	rect2d qtr_dialog_header_text_bounds;
 
-	rect2d qtr_dialog_button_key_text_bounds;//0x1B0
+	rect2d qtr_dialog_button_key_text_bounds;
 
-	tag_reference main_menu_music;//0x1B8
-	__int32 music_fade_time;//0x1C0
+	tag_reference main_menu_music;
+	int music_fade_time;
 };
-TAG_GROUP_SIZE_ASSERT(s_user_interface_shared_globals_group_definition, 0x1C4);
+TAG_GROUP_SIZE_ASSERT(user_interface_shared_globals, 0x1C4);
 #pragma pack(pop)
 
-/* gets the current loaded user_interface_shared_globals tag aka wigl  */
-s_user_interface_shared_globals_group_definition *get_user_interface_shared_globals_ptr()
+/* gets the current loaded user_interface_shared_globals tag*/
+user_interface_shared_globals *get_user_interface_shared_globals_ptr()
 {
 	//dives into globals/globals tag and gets the block "Interface Tags"
 	//from there checks current scnr type and itself returns a pointer for the correct one
-	typedef s_user_interface_shared_globals_group_definition*(_cdecl wgtz_get_user_interface_shared_globals)();
+	typedef user_interface_shared_globals*(_cdecl wgtz_get_user_interface_shared_globals)();
 	auto pwgtz_get_user_interface_shared_globals = Memory::GetAddress<wgtz_get_user_interface_shared_globals*>(0x20BB89, 0x1F2CC6);
 	return pwgtz_get_user_interface_shared_globals();
 }
