@@ -92,7 +92,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 	if (pXii->pD3D)
 	{
 		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
-		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
+		D3DPRESENT_PARAMETERS* d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 		XLiveRendering::Initialize(d3dpp->hDeviceWindow);
 	}
 	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
@@ -490,15 +490,15 @@ void XLiveThrottleFramerate(int maxFramerate)
 	LARGE_INTEGER deltaCounter;
 	QueryPerformanceFrequency(&frequency); 
 
-	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
+	long long minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
 
 	QueryPerformanceCounter(&deltaCounter);
 	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
-	auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
+	long long deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
 
 	if (deltaTimeUs < minFrameTimeUs)
 	{
-		auto sleepTimeUs = minFrameTimeUs - deltaTimeUs;
+		long long sleepTimeUs = minFrameTimeUs - deltaTimeUs;
 
 		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
 		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;

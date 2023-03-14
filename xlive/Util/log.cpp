@@ -31,7 +31,7 @@ h2log* h2log::create(const std::string &name, std::wstring &filename, bool shoul
 {
 	if (shouldCreateLog)
 	{
-		auto new_h2log = new h2log(name);
+		h2log* new_h2log = new h2log(name);
 		// try opening file to check permissions
 		FILE* fp = _wfopen(filename.c_str(), L"a+");
 		if (fp)
@@ -59,7 +59,7 @@ h2log* h2log::create_console(const std::string &name, bool shouldCreateLog, int 
 {
 	if (shouldCreateLog)
 	{
-		auto new_h2log = new h2log(name);
+		h2log* new_h2log = new h2log(name);
 		new_h2log->isConsole = true;
 
 		if (console == nullptr) // first time console setup

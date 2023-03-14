@@ -605,7 +605,7 @@ int stripWhitespace(wchar_t *inputStr) {
 
 void pushHostLobby() {
 	typedef bool(__cdecl* should_send_broadcast_reply_t)(void* session);
-	auto p_should_send_broadcast_reply = Memory::GetAddress<should_send_broadcast_reply_t>(0x1ADA7B, 0x1A69DB);
+	should_send_broadcast_reply_t p_should_send_broadcast_reply = Memory::GetAddress<should_send_broadcast_reply_t>(0x1ADA7B, 0x1A69DB);
 
 	if (p_should_send_broadcast_reply(NULL))
 	{
@@ -650,6 +650,6 @@ int TimeElapsedMS(int startms)
 
 bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
 {
-	auto a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
+	std::basic_string a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
 	return a == file_type;
 }

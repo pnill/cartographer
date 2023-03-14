@@ -45,7 +45,7 @@ std::string IntToString(T t, std::ios_base & (*f)(std::ios_base&) = std::dec)
 template<class T>
 std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
 {
-	auto out = IntToString(t, f);
+	T out = IntToString(t, f);
 	return std::wstring(out.begin(), out.end());
 }
 

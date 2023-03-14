@@ -60,7 +60,7 @@ namespace CustomVariantSettings
 		if (NetworkSession::LocalPeerIsSessionHost())
 		{
 			//TODO: Find and map out struct with current variant information.
-			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
+			std::wstring VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
 
 			auto customVariantSetting = customVariantSettingsMap.find(VariantName);
 			if (customVariantSetting != customVariantSettingsMap.end())
@@ -192,7 +192,7 @@ namespace CustomVariantSettings
 		//
 		//Anything host related before the game starts goes here.
 		//
-		for (auto i = 0; i < NetworkSession::GetPeerCount(); i++)
+		for (byte i = 0; i < NetworkSession::GetPeerCount(); i++)
 		{
 			if (!NetworkSession::IsPeerIndexLocal(i))
 				SendCustomVariantSettings(i);

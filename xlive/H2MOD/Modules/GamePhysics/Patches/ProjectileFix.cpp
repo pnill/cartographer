@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
 #include "ProjectileFix.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Math\BlamMath.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Cache/TagGroups/projectile_definition.hpp"
+#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/Objects/Objects.h"
+#include "Blam/Math/BlamMath.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
@@ -159,12 +160,12 @@ void ProjectileFix::ApplyProjectileVelocity()
 {
 	for (auto& proj_tuple : weapon_projectiles)
 	{
-		auto proj_datum = tags::find_tag(blam_tag::tag_group_type::projectile, std::get<0>(proj_tuple));
-		BYTE* projectile_tag_data = tags::get_tag<blam_tag::tag_group_type::projectile, BYTE>(proj_datum);
+		datum proj_datum = tags::find_tag(blam_tag::tag_group_type::projectile, std::get<0>(proj_tuple));
+		s_projectile_group_definition* projectile_tag_data = tags::get_tag_fast<s_projectile_group_definition>(proj_datum);
 		if (projectile_tag_data != nullptr)
 		{
-			*(float*)(projectile_tag_data + 380) = std::get<1>(proj_tuple);
-			*(float*)(projectile_tag_data + 384) = std::get<2>(proj_tuple);
+			projectile_tag_data->initial_velocity = std::get<1>(proj_tuple);
+			projectile_tag_data->final_velocity = std::get<2>(proj_tuple);
 		}
 	}
 }

@@ -157,7 +157,7 @@ int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
 {
 	typedef int(__cdecl* get_local_player_index_t)(int controller_index); 
-	auto p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
+	get_local_player_index_t p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
 	return p_get_local_player_index(controller_index); 
 }
 
@@ -287,10 +287,10 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	{
 		// not sure what these flags are, but this is called when picking up grenades
 		typedef void(__cdecl* entity_set_unk_flags_t)(datum objectIndex, int flags);
-		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
+		entity_set_unk_flags_t p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
 
 		typedef void(__cdecl* unit_add_grenade_to_inventory_send_t)(datum unitDatumIndex, datum equipamentTagIndex);
-		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
+		unit_add_grenade_to_inventory_send_t p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
 		if (!s_game_globals::game_is_predicted())
@@ -329,7 +329,7 @@ void H2MOD::disable_sounds(int sound_flags)
 
 			if (multiplayerGlobalsTag->runtime.size)
 			{
-				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
+				s_multiplayer_globals_group_definition::s_runtime_block* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
@@ -654,7 +654,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 {
 	// we only use player index 0 due to no splitscreen support but whatever
 	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
+	update_player_profile_t p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
 
 	p_change_local_team(local_player_index, team_index);
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
@@ -663,7 +663,7 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
 {
 	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
+	update_player_profile_t p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
 	unsigned long low = tag & 0xFFFFFFFF;
 	*(unsigned long*)Memory::GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
 	p_update_player_profile(local_player_index);
@@ -792,7 +792,7 @@ void H2MOD::team_player_indicator_visibility(bool toggle)
 void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
 {
 	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
-	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
+	game_mode_engine_draw_team_indicators_t p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
 
 	if (h2mod->drawTeamIndicators)
 		p_game_mode_engine_draw_team_indicators(local_user_render_idx);

@@ -43,7 +43,7 @@ namespace ImGuiHandler
 		// TODO add these to some container
 		if (g_network_stats_overlay)
 			return true;
-		for (auto& window : imgui_windows)
+		for (ImGuiHandler::s_imgui_window& window : imgui_windows)
 		{
 			if (window.doRender)
 				return true;
@@ -79,7 +79,7 @@ namespace ImGuiHandler
 		ImGui::NewFrame();
 
 		ShowNetworkStatsOverlay(&g_network_stats_overlay);
-		for (auto& window : imgui_windows)
+		for (ImGuiHandler::s_imgui_window& window : imgui_windows)
 		{
 			if (window.doRender)
 			{
@@ -96,7 +96,7 @@ namespace ImGuiHandler
 	{
 		bool keep_game_input_blocked = false;
 
-		for (auto& window : imgui_windows)
+		for (ImGuiHandler::s_imgui_window& window : imgui_windows)
 		{
 			if (window.name == name)
 			{
@@ -130,7 +130,7 @@ namespace ImGuiHandler
 	{
 		if (name == "net_metrics" && g_network_stats_overlay)
 			return true;
-		for (auto& window : imgui_windows)
+		for (ImGuiHandler::s_imgui_window& window : imgui_windows)
 		{
 			if (window.name == name)
 				return window.doRender;
@@ -172,9 +172,11 @@ namespace ImGuiHandler
 	}
 	float WidthPercentage(float percent)
 	{
-		auto Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		float Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		if (ImGui::GetColumnsCount() > 1)
+		{
 			Width = ImGui::GetColumnWidth();
+		}
 
 		return Width * (percent / 100.0f);
 	}

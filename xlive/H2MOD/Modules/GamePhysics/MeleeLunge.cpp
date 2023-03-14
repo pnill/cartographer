@@ -68,10 +68,10 @@ float melee_lunge_get_tick_count(float distance, float max_speed_per_tick)
 void object_get_localized_velocity(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity)
 {
 	typedef bool(__cdecl* object_get_early_mover_local_space_velocity)(datum object_index, real_vector3d *translational_velocity, bool not_force_get_localized_velocity);
-	auto p_object_get_early_mover_local_space_velocity = Memory::GetAddressRelative<object_get_early_mover_local_space_velocity>(0x54C17C);
+	object_get_early_mover_local_space_velocity p_object_get_early_mover_local_space_velocity = Memory::GetAddressRelative<object_get_early_mover_local_space_velocity>(0x54C17C);
 
 	typedef void(__cdecl* object_get_velocities)(datum object_indee, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
-	auto p_object_get_velocities = Memory::GetAddressRelative<object_get_velocities>(0x532BDE);
+	object_get_velocities p_object_get_velocities = Memory::GetAddressRelative<object_get_velocities>(0x532BDE);
 
 	real_vector3d early_mover_velocity = {};
 

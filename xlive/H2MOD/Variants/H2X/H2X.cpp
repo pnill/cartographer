@@ -8,7 +8,8 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
-const H2X::h2x_mod_info weapons[] =
+#define WEAPON_ARRAY_SIZE 11
+const H2X::h2x_mod_info weapons[WEAPON_ARRAY_SIZE] =
 {
 	{ "objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", 0.535f, 0.5f, 0, false },
 	{ "objects\\weapons\\rifle\\battle_rifle\\battle_rifle", 0.295f, 0.26f, 0, false },
@@ -40,16 +41,17 @@ float __cdecl game_seconds_to_ticks_real_weapon_adjust(float s)
 
 void H2X::ApplyMapLoadPatches(bool enable)
 {
-	for (auto& weapon : weapons)
+	for (byte i = 0; i < WEAPON_ARRAY_SIZE; ++i)
 	{
-		float rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
-		datum weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+		const h2x_mod_info* weapon = &weapons[WEAPON_ARRAY_SIZE];
+		float rof = (enable ? weapon->h2x_rate_of_fire : weapon->original_rate_of_fire);
+		const datum weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon->tag_string);
 		if (weapon_datum != DATUM_INDEX_NONE)
 		{
 			s_weapon_group_definition* weapon_tag = tags::get_tag_fast<s_weapon_group_definition>(weapon_datum);
-			weapon.rounds_per_second_based ?
-				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second_upper = rof : 
-				weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time = rof;
+			weapon->rounds_per_second_based ?
+				weapon_tag->barrels[weapon->barrel_data_block_index]->rounds_per_second_upper = rof : 
+				weapon_tag->barrels[weapon->barrel_data_block_index]->fire_recovery_time = rof;
 		}
 	}
 }
