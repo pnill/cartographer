@@ -2,9 +2,9 @@
 
 #include "TagDataIterator.h"
 
-datum s_tag_data_iterator::get_next_datum()
+datum tag_iterator_next(tag_iterator* iterator)
 {
-	typedef datum(__cdecl t_get_next_datum)(s_tag_data_iterator* it);
-	auto p_get_next_datum = Memory::GetAddress<t_get_next_datum*>(0x3172C);
-	return  p_get_next_datum(this);
+	typedef datum(__cdecl* tag_iterator_next_t)(tag_iterator* it);
+	tag_iterator_next_t p_tag_iterator_next = Memory::GetAddress<tag_iterator_next_t>(0x3172C, 0x255DC);
+	return  p_tag_iterator_next(iterator);
 }

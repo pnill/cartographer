@@ -30,7 +30,7 @@ struct bitstream
 
 	void init(void* buffer, DWORD data_length);
 	void init(void* buffer, DWORD data_length, DWORD data_size_alignment);
-	void begin_writing(DWORD data_size_alignment);
+	void begin_writing(DWORD data_size_alignment, int unk1 = 0, int unk2 = 0);
 	void finish_writing(void*out_space_left_in_bits);
 	bool overflow();
 	DWORD get_space_left_in_bits();

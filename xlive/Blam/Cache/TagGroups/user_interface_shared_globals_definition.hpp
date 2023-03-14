@@ -812,7 +812,7 @@ user_interface_shared_globals *get_user_interface_shared_globals_ptr()
 {
 	//dives into globals/globals tag and gets the block "Interface Tags"
 	//from there checks current scnr type and itself returns a pointer for the correct one
-	typedef user_interface_shared_globals*(_cdecl wgtz_get_user_interface_shared_globals)();
-	auto pwgtz_get_user_interface_shared_globals = Memory::GetAddress<wgtz_get_user_interface_shared_globals*>(0x20BB89, 0x1F2CC6);
+	typedef user_interface_shared_globals*(_cdecl* get_user_interface_shared_globals_t)();
+	get_user_interface_shared_globals_t pwgtz_get_user_interface_shared_globals = Memory::GetAddress<get_user_interface_shared_globals_t>(0x20BB89, 0x1F2CC6);
 	return pwgtz_get_user_interface_shared_globals();
 }
