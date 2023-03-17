@@ -335,3 +335,10 @@ static void scale_interpolate(float previous_scale, float current_scale, float f
 }
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
+
+__int16 projection_from_vector3d(const real_vector3d* vector);
+bool projection_sign_from_vector3d(const real_vector3d* vector, short projection);
+void project_point3d(const real_point3d* point, const short projection, const bool a3, real_point2d* out);
+float magnitude_squared2d(const real_point2d* point);
+float cross_product2d(const real_vector2d* p1, const real_vector2d* p2);
+void vector_from_points2d(const real_point2d* initial_point, const real_point2d* new_point, real_vector2d* vector);
