@@ -5,7 +5,8 @@
 
 #define MAXIMUM_CLUSTERS_PER_DATUM 256
 
-void cluster_partition_reconnect(cluster_partition* partition,
+void __cdecl cluster_partition_reconnect(
+	cluster_partition* partition,
 	const datum object_datum,
 	int* first_cluster_reference,
 	const real_point3d* position,
@@ -30,12 +31,12 @@ void cluster_partition_reconnect(cluster_partition* partition,
 	}
 
 	*cluster_overflow = intersected_references > clusters_in_sphere;
-	if (clusters_in_sphere > 0)
+	
+	
+	for (DWORD i = 0; i < clusters_in_sphere; i++)
 	{
-		for (DWORD i = 0; i < clusters_in_sphere; i++)
-		{
-			reference_list_add(partition->array1, first_cluster_reference, cluster_reference[i], 0, 0);
-			reference_list_add(partition->array0, &partition->cluster_references[cluster_reference[i]], object_datum, payload_size, payload);
-		}
+		short current_cluster_reference = cluster_reference[i];
+		reference_list_add(partition->array1, first_cluster_reference, current_cluster_reference, 0, nullptr);
+		reference_list_add(partition->array0, &partition->cluster_references[current_cluster_reference], object_datum, payload_size, payload);
 	}
 }

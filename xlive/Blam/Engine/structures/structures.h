@@ -25,17 +25,22 @@ struct s_structure_globals
 };
 #pragma pack(pop)
 
+const short global_projection3d_mappings[18] = { 2, 1, 0, 1, 2, 0, 0, 2, 1, 2, 0, 1, 1, 0, 2, 0, 1, 2 };
+const short global_projection3d_inverse_mappings[18] = { 2, 1, 0, 2, 0, 1, 0, 2, 1, 1, 2, 0, 1, 0, 2, 0, 1, 2 };
+
 __int16 get_global_structure_bsp_index();
 s_scenario_structure_bsp_group_definition* get_global_structure_bsp();
+s_scenario_structure_bsp_group_definition::s_collision_bsp_block* get_global_collision_bsp();
 
 __int16 structure_clusters_in_bitvector(const s_game_cluster_bit_vectors* cluster_bitvector, short maximum_clusters, short* intersected_indices, short* out_actual_cluster_count);
-__int16 __cdecl structure_clusters_in_sphere_recursive(
+__int16 structure_clusters_in_sphere_recursive(
 	const short cluster_reference,
 	const real_point3d* position,
 	const float radius,
 	const short cluster_count,
 	short* intersected_indices);
-short structure_clusters_in_sphere(__int16 cluster_reference,
+short structure_clusters_in_sphere(
+	const short cluster_reference,
 	const real_point3d* position,
 	const float radius,
 	const short cluster_count,
