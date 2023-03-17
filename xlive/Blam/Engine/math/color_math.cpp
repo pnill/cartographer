@@ -95,7 +95,7 @@ void __cdecl rgb_colors_interpolate(real_color_rgb* rgb_result,
 
 
     one_minus_multiplier = 1.0f - multiplier;
-    if ((scale_flags & s_object_group_definition::s_change_colors_block::s_change_colors_functions_block::e_colors_function_scale_flags::blend_in_hsv) != 0)
+    if ((scale_flags & s_object_group_definition::s_change_colors_block::s_change_colors_functions_block::e_colors_function_scale_flags::_colors_function_scale_flags_blend_in_hsv_bit) != 0)
     {
         real_rgb_color_to_real_hsv_color(rgb_lower_bound, &hsv_lower_bound);
         real_rgb_color_to_real_hsv_color(rgb_upper_bound, &hsv_upper_bound);
