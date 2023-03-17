@@ -15,7 +15,6 @@ void location_invalidate(s_location* object_location)
 void scenario_location_from_point(s_location* location, const real_point3d* point)
 {
     short global_structure_bsp_index = get_global_structure_bsp_index();
-    const s_scenario_structure_bsp_group_definition::s_collision_bsp_block* global_collision_bsp = *Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block**>(0x479E60);
 
     if (global_structure_bsp_index == -1)
     {
@@ -24,7 +23,7 @@ void scenario_location_from_point(s_location* location, const real_point3d* poin
     }
     else
     {
-        int leaf_index = bsp3d_test_point(global_collision_bsp, 0, point);
+        int leaf_index = bsp3d_test_point(get_global_collision_bsp(), 0, point);
         location->leaf_index = leaf_index;
         if (leaf_index == -1)
         {
