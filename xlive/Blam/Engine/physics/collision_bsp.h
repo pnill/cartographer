@@ -3,16 +3,22 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Engine/math/real_math.h"
 
+struct collision_bsp_test_buffer
+{
+	DWORD leaf_index;
+	DWORD unk[255];
+};
+
 struct collision_bsp_test_sphere_result
 {
 	int count_buffer0;
-	DWORD buffer0[256];
+	collision_bsp_test_buffer buffer0;
 	int count_buffer1;
-	DWORD buffer1[256];
+	collision_bsp_test_buffer buffer1;
 	int count_buffer2;
-	DWORD buffer2[256];
+	collision_bsp_test_buffer buffer2;
 	int stack_depth;
-	DWORD buffer3[256];
+	collision_bsp_test_buffer buffer3;
 };
 CHECK_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);
 

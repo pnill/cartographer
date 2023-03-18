@@ -5,43 +5,56 @@
 
 bool next_index_range_checks(const s_data_array* data, datum* new_next_index)
 {
-	if (data->next_index >= data->max_elements)
-		return true;
+	if (data->next_index >= data->max_elements) { return true; }
+
 	*new_next_index = data->next_index;
-	if (data->next_index == -1)
-		return true;
+	
+	if (data->next_index == -1) { return true; }
+
 	return false;
 }
 
 // This function sucks
 datum __cdecl datum_new(s_data_array* data)
 {
-	datum next_idx; // ebx
-
+	bool b_found = false;
+	datum next_idx;
 	datum last_free_index = data->last_free_index;
-	const datum next_index = data->next_index;
-	if (last_free_index >= next_index) 
-	{ 
-		if (next_index_range_checks(data, &next_idx) == -1) { return -1; }
+
+	if (last_free_index >= data->next_index)
+	{
+		b_found = true;
+	}
+
+	if (!b_found)
+	{
+		while (((1 << (last_free_index & 0x1F)) & data->active_bit_mask.m_flags[last_free_index >> 5]) != 0)
+		{
+			if (++last_free_index >= data->next_index)
+			{
+				b_found = true;
+				break;
+			}
+		}
+
+		if (!b_found)
+		{
+			next_idx = last_free_index;
+		}
+	}
+	
+	if (b_found)
+	{
+		if (next_index_range_checks(data, &next_idx)) { return DATUM_INDEX_NONE; }
 	}
 	else
 	{
-		bool b_is_found = false;
-		while (((1 << (last_free_index & 0x1F)) & data->active_bit_mask.m_flags[last_free_index >> 5]) != 0 && !b_is_found)
+		if (last_free_index == -1)
 		{
-
-			if (++last_free_index >= next_index)
-			{
-				if (next_index_range_checks(data, &next_idx) == -1) { return -1; }
-				b_is_found = true;
-			}
-		}
-		if (!b_is_found)
-		{
-			next_idx = last_free_index;
-			if (last_free_index == DATUM_INDEX_NONE && next_index_range_checks(data, &next_idx) == -1) { return -1; }
+			if (next_index_range_checks(data, &next_idx)) { return DATUM_INDEX_NONE; }
 		}
 	}
+	
 	
 	s_object_header* object_header = (s_object_header*)&data->data[next_idx * data->single_element_size];
 	data->active_bit_mask.m_flags[next_idx >> 5] |= 1 << (next_idx & 0x1F);
@@ -63,19 +76,19 @@ datum __cdecl datum_new(s_data_array* data)
 	return next_idx | (object_header->datum_salt << 16);
 }
 
-void datum_delete(s_data_array* data_array, unsigned __int16 index)
+void __cdecl datum_delete(s_data_array* data_array, datum index)
 {
 	s_object_header* object;
 
-	object = (s_object_header*)&data_array->data[index * data_array->single_element_size];
+	object = (s_object_header*)&data_array->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(index) * data_array->single_element_size];
 	if ((data_array->flags & 8) != 0) { memset(object, 186, data_array->single_element_size); }
 
-	data_array->active_bit_mask.m_flags[index >> 5] &= ~(1 << (index & 0x1F));
+	data_array->active_bit_mask.m_flags[DATUM_INDEX_TO_ABSOLUTE_INDEX(index) >> 5] &= ~(1 << (index & 0x1F));
 	object->datum_salt = 0;
 
-	if (index < data_array->last_free_index)
-		data_array->last_free_index = index;
-	if (index + 1 == data_array->next_index)
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(index) < data_array->last_free_index)
+		data_array->last_free_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(index);
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(index) + 1 == data_array->next_index)
 	{
 		do
 		{
