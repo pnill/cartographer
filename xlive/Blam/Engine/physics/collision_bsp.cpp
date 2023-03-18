@@ -3,7 +3,7 @@
 
 bool __cdecl collision_bsp_test_sphere(
 	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
-	__int16 flags, 
+	short flags, 
 	void* breakable_surface_set, 
 	real_point3d* point,
 	float scale, 

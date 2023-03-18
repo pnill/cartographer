@@ -46,3 +46,8 @@ bool s_game_globals::game_is_in_progress()
 {
 	return get() && get()->game_in_progress;
 }
+
+DWORD* s_game_globals::game_get_cluster_activation()
+{
+	return get()->cluster_activation;
+}

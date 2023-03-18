@@ -1163,7 +1163,7 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	apply_biped_object_definition_patches();
+	apply_object_hooks();
 	StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");

@@ -345,7 +345,7 @@ void object_placement_data_new(object_placement_data* object_placement_data, dat
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
 datum object_new(object_placement_data* object_placement_data);
-void apply_biped_object_definition_patches();
+void apply_object_hooks();
 void simulation_action_object_create(datum object_idx);
 void object_delete(const datum object_idx);
 void object_wake(const datum object_datum);
@@ -354,5 +354,6 @@ void object_reconnect_to_map(const s_location* location_struct, const datum obje
 void object_compute_node_matrices_with_children(const datum object_datum);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
 
+void update_biped_object_variant_data(datum object_idx, string_id variant_stringid);
 int object_get_count();
 int object_count_from_iter();
