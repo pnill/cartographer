@@ -303,7 +303,7 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 
 typedef void(__cdecl* object_reconnect_to_map_hook_t)();
 object_reconnect_to_map_hook_t p_object_reconnect_to_map_hook;
-void __cdecl object_reconnect_to_map(s_location* location, const datum object_datum)
+void object_reconnect_to_map(s_location* location, const datum object_datum)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	s_object_header* object_header = get_object_header(object_datum);
@@ -334,10 +334,12 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
+	s_game_cluster_bit_vectors* p_cluster_bitvector = nullptr;
 	bool cluster_overflow = false;
 	if (!((object->object_flags & object_data_flag_0x200000) == 0))
 	{
 		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
+		p_cluster_bitvector = cluster_bitvector;
 	}
 
 	s_object_payload payload;
@@ -368,7 +370,7 @@ void __cdecl object_reconnect_to_map(s_location* location, const datum object_da
 		&object->object_origin_point,
 		object->shadow_sphere_radius,
 		&object->location,
-		cluster_bitvector,
+		p_cluster_bitvector,
 		20,
 		&payload,
 		&cluster_overflow);
@@ -451,7 +453,7 @@ void update_object_variant_index(datum object_datum, string_id variant_index)
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	object->model_variant_id = object_lookup_variant_index_from_name(object_datum, variant_index);
 
-	// update the biped variant index (THIS IS AS CARTO ADDITION)
+	// update the biped variant index (THIS IS A CARTO ADDITION)
 	update_biped_object_variant_data(object_datum, variant_index);
 }
 
@@ -1272,7 +1274,7 @@ void apply_object_hooks()
 
 
 	DETOUR_BEGIN();
-	//DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
+	DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
 
 	typedef void(__cdecl* cluster_partition_reconnect_t)(cluster_partition* partition,
 		int object_datum,
@@ -1317,8 +1319,8 @@ void apply_object_hooks()
 	DETOUR_ATTACH(p_object_reconnect_to_map_hook, Memory::GetAddress<object_reconnect_to_map_hook_t>(0x1360CE), object_reconnect_to_map_hook);
 	//p_object_reconnect_to_map_hook = Memory::GetAddress<object_reconnect_to_map_hook_t>(0x1360CE);
 	
-	//DETOUR_ATTACH(p_object_can_activate_in_cluster, Memory::GetAddress<object_can_activate_in_cluster_t>(0x131FD1), object_can_activate_in_cluster_hook);
 	p_object_can_activate_in_cluster = Memory::GetAddress<object_can_activate_in_cluster_t>(0x131FD1);
+	DETOUR_ATTACH(p_object_can_activate_in_cluster, Memory::GetAddress<object_can_activate_in_cluster_t>(0x131FD1), object_can_activate_in_cluster_hook);
 	
 	//DETOUR_ATTACH(p_get_object_payload, Memory::GetAddress<get_object_payload_t>(0x132426), get_object_payload_hook);
 	p_get_object_payload = Memory::GetAddress<get_object_payload_t>(0x132426);
