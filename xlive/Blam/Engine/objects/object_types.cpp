@@ -139,7 +139,7 @@ void  object_type_move(datum object_datum)
 	}
 }
 
-bool  object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3)
+bool object_type_compute_activation(datum object_datum, s_game_cluster_bit_vectors* a2, bool* a3)
 {
 	bool result = false;
 	const object_type_definition* object_type = get_game_object_type_definition(object_datum);

@@ -270,6 +270,7 @@
     <ClCompile Include="Blam\Engine\Players\Players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
@@ -597,6 +598,7 @@
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
     <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />

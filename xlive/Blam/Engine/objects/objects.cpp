@@ -16,6 +16,7 @@
 #include "Blam/Engine/physics/bsp3d.h"
 #include "Blam/Engine/physics/collision_bsp.h"
 #include "Blam/Engine/scenario/scenario.h"
+#include "Blam/Engine/Simulation/simulation.h"
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structures.h"
 #include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
@@ -134,13 +135,6 @@ void __cdecl object_cleanup_havok(const datum object_datum)
 	object_cleanup_havok(object_datum);
 }
 
-bool __cdecl simulation_query_object_is_predicted(const datum object_index)
-{
-	typedef bool(__cdecl* simulation_query_object_is_predicted_t)(const datum object_index);
-	auto simulation_query_object_is_predicted = Memory::GetAddress<simulation_query_object_is_predicted_t>(0x1B6494);
-	return simulation_query_object_is_predicted(object_index);
-}
-
 typedef bool(__cdecl* object_is_connected_to_map_t)(const datum object_datum);
 object_is_connected_to_map_t p_object_is_connected_to_map;
 bool __cdecl object_is_connected_to_map(const datum object_datum)
@@ -158,18 +152,24 @@ bool __cdecl object_is_connected_to_map(const datum object_datum)
 	return get_object_header(current_object_datum)->flags &= _object_header_connected_to_map_bit;
 }
 
-void object_connect_lights_recursive(const datum object_datum,
+void __cdecl object_connect_lights_recursive(const datum object_datum,
 	bool disconnect_this_object,
 	bool reconnect_this_object,
 	bool reconnect_child_objects,
 	bool show_this_object)
 {
-	typedef void(__cdecl* object_connect_lights_recursive_t)(int a1, bool a2, bool a3, bool a4, bool a5);
+	typedef void(__cdecl* object_connect_lights_recursive_t)(const datum object_datum,
+		bool disconnect_this_object,
+		bool reconnect_this_object,
+		bool reconnect_child_objects,
+		bool show_this_object);
 	auto p_object_connect_lights_recursive = Memory::GetAddress<object_connect_lights_recursive_t>(0x134A78, 0x123948);
 	p_object_connect_lights_recursive(object_datum, disconnect_this_object, reconnect_this_object, reconnect_child_objects, show_this_object);
 }
 
 
+typedef void(__cdecl* get_object_payload_t)(const datum object_datum, s_object_payload* cluster_payload);
+get_object_payload_t p_get_object_payload;
 void get_object_payload(const datum object_datum, s_object_payload* cluster_payload)
 {
 	typedef WORD(__cdecl* collision_compute_object_cull_flags_t)(short object_index);
@@ -188,6 +188,29 @@ void get_object_payload(const datum object_datum, s_object_payload* cluster_payl
 	cluster_payload->bounding_sphere_radius = object->shadow_sphere_radius;
 }
 
+__declspec(naked) void get_object_payload_hook()
+{
+	__asm
+	{
+		push edi
+		push ecx
+		call get_object_payload
+		add esp, 8
+		ret
+	}
+}
+
+
+__declspec(naked) void __cdecl original_get_object_payload_hook(const datum object_datum, s_object_payload* cluster_activation)
+{
+	__asm
+	{
+		mov edi, [esp + 8]
+		mov ecx, [esp + 4]
+		call p_get_object_payload
+		ret
+	}
+}
 typedef void(__cdecl* object_update_collision_culling_t)(const datum object_datum);
 object_update_collision_culling_t p_object_update_collision_culling;
 void __cdecl object_update_collision_culling(const datum object_datum)
@@ -217,7 +240,9 @@ void __cdecl object_update_collision_culling(const datum object_datum)
 	}
 }
 
-bool object_can_activate_in_cluster(const datum object_datum, DWORD* cluster_activation)
+typedef bool(__cdecl* object_can_activate_in_cluster_t)(const datum object_datum, DWORD* cluster_activation);
+object_can_activate_in_cluster_t p_object_can_activate_in_cluster;
+bool object_can_activate_in_cluster(const datum object_datum, s_game_cluster_bit_vectors* cluster_activation)
 {
 	bool result = false;
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
@@ -231,7 +256,31 @@ bool object_can_activate_in_cluster(const datum object_datum, DWORD* cluster_act
 	{
 		return result;
 	}
-	return (FLAG(object_header->cluster_index & 0x1F) & cluster_activation[object_header->cluster_index >> 5]) != 0;
+	return (FLAG(object_header->cluster_index & 0x1F) & cluster_activation[object_header->cluster_index >> 5].cluster_bitvector) != 0;
+}
+
+
+__declspec(naked) void object_can_activate_in_cluster_hook()
+{
+	__asm
+	{
+		push edi
+		push edx
+		call object_can_activate_in_cluster
+		add esp, 8
+		ret
+	}
+}
+
+__declspec(naked) bool __cdecl original_object_can_activate_in_cluster_hook(const datum object_datum, s_game_cluster_bit_vectors* cluster_activation)
+{
+	__asm
+	{
+		mov edi, [esp + 8]	// move cluster_activation into edi
+		mov edx, [esp + 4]	// move object_datum into edx
+		call p_object_can_activate_in_cluster
+		ret
+	}
 }
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference)
@@ -252,44 +301,47 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 	return object_header;
 }
 
-void object_reconnect_to_map(const s_location* location, const datum object_datum)
+typedef void(__cdecl* object_reconnect_to_map_hook_t)();
+object_reconnect_to_map_hook_t p_object_reconnect_to_map_hook;
+void __cdecl object_reconnect_to_map(s_location* location, const datum object_datum)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	s_object_header* object_header = get_object_header(object_datum);
 	bool cluster_index_is_null = object_header->cluster_index == -1;
 	s_location scnr_location;
+	s_location* p_scnr_location = location;
 
 	if (!location)
 	{
 		scenario_location_from_point(&scnr_location, &object->object_origin_point);
-		location = &scnr_location;
-		if (location->cluster == -1)
+		p_scnr_location = &scnr_location;
+		if (scnr_location.cluster == -1)
 		{
 			scenario_location_from_point(&scnr_location, &object->position);
 		}
 	}
 
-	if (location->cluster == -1)
+	if (p_scnr_location->cluster == -1)
 	{
 		object->object_flags |= object_data_flag_0x40000;
 	}
 	else
 	{
-		object->location.leaf_index = location->leaf_index;
-		object->location.cluster = location->cluster;
-		object->location.bsp_index = location->bsp_index;
-		object_header->cluster_index = location->cluster;
+		object->location.leaf_index = p_scnr_location->leaf_index;
+		object->location.cluster = p_scnr_location->cluster;
+		object->location.bsp_index = p_scnr_location->bsp_index;
+		object_header->cluster_index = p_scnr_location->cluster;
 		object->object_flags &= ~object_data_flag_0x40000;
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
 	bool cluster_overflow = false;
 	if (!((object->object_flags & object_data_flag_0x200000) == 0))
 	{
-		memset(&cluster_bitvector, -1, 4 * ((signed int)(get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
+		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
 	}
 
 	s_object_payload payload;
-	get_object_payload(object_datum, &payload);
+	original_get_object_payload_hook(object_datum, &payload);
 
 	cluster_partition* partition = Memory::GetAddress<cluster_partition*>(0x4E4604);
 	if ((object->object_flags & _object_has_collision_bit) == 0)
@@ -297,7 +349,19 @@ void object_reconnect_to_map(const s_location* location, const datum object_datu
 		partition = Memory::GetAddress<cluster_partition*>(0x4E45F8);
 	}
 
-	cluster_partition_reconnect(
+	typedef void(__cdecl* cluster_partition_reconnect_t)(cluster_partition* partition,
+		const datum object_datum,
+		int* first_cluster_reference,
+		const real_point3d* position,
+		const float radius,
+		const s_location* location,
+		const s_game_cluster_bit_vectors* cluster_bitvector,
+		const int payload_size,
+		const void* payload,
+		bool* cluster_overflow);
+	cluster_partition_reconnect_t p_cluster_partition_reconnect = Memory::GetAddress<cluster_partition_reconnect_t>(0x37A13E, 0x0);
+
+	p_cluster_partition_reconnect(
 		partition,
 		object_datum,
 		&object->first_cluster_reference,
@@ -313,8 +377,8 @@ void object_reconnect_to_map(const s_location* location, const datum object_datu
 	object_header->flags |= _object_header_connected_to_map_bit;
 	object_connect_lights_recursive(object_datum, false, true, false, false);
 	
-	if (DWORD* cluster_activation = s_game_globals::game_get_cluster_activation();
-		object_can_activate_in_cluster(object_datum, cluster_activation))
+	if (s_game_cluster_bit_vectors* cluster_activation = s_game_globals::game_get_cluster_activation();
+		original_object_can_activate_in_cluster_hook(object_datum, cluster_activation))
 	{
 		object_activate(object_datum);
 	}
@@ -336,13 +400,24 @@ __declspec(naked) void object_reconnect_to_map_hook()
 {
 	__asm
 	{
-		mov ecx, [esp + 0x6C]
-		push ecx //push object_index as second param
-		push eax  // push location struct as first param
+		mov ecx, [esp + 4]
+		push ecx	
+		push eax	// push location struct as first param
 		call object_reconnect_to_map
-		pop ecx //push object_index as second param
-		pop eax  // push location struct as first param
-		mov ecx, [esp - 0x6C]
+		add esp, 8
+		ret
+	}
+}
+
+__declspec(naked) void __cdecl original_object_reconnect_to_map_hook(s_location* location, const datum object_datum)
+{
+	__asm
+	{
+		mov ecx, [esp + 8]	// move object_datum into ecx
+		mov eax, [esp + 4]	// move location into eax
+		push ecx			// push ecx onto the stack
+		call p_object_reconnect_to_map_hook
+		add esp, 4			// cleanup the stack from our previous push
 		ret
 	}
 }
@@ -1032,9 +1107,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_wake(object_datum);
 
 			if ((placement_data->object_placement_flags & 0x20) != 0)
+			{
 				object->physics_flags |= _object_physics_flag_0x2;
+			}
 			else
+			{
 				object->physics_flags &= ~_object_physics_flag_0x2;
+			}
 
 			p_object_reconnect_to_physics(object_datum);
 			object_initialize_effects(object_datum);
@@ -1193,7 +1272,7 @@ void apply_object_hooks()
 
 
 	DETOUR_BEGIN();
-	DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
+	//DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
 
 	typedef void(__cdecl* cluster_partition_reconnect_t)(cluster_partition* partition,
 		int object_datum,
@@ -1235,18 +1314,20 @@ void apply_object_hooks()
 	DETOUR_ATTACH(p_object_render_model_has_prt_info, Memory::GetAddress<object_render_model_has_prt_info_t>(0x131B0E), object_render_model_has_prt_info);
 	DETOUR_ATTACH(p_object_is_connected_to_map, Memory::GetAddress<object_is_connected_to_map_t>(0x132922), object_is_connected_to_map);
 
-	//typedef void(__cdecl* object_reconnect_to_map_hook_t)();
-	//object_reconnect_to_map_hook_t p_object_reconnect_to_map_hook;
-	//DETOUR_ATTACH(p_object_reconnect_to_map_hook, , object_reconnect_to_map_hook);
-	//WriteJmpTo(Memory::GetAddress<object_reconnect_to_map_hook_t>(0x1360CE), object_reconnect_to_map_hook);
+	DETOUR_ATTACH(p_object_reconnect_to_map_hook, Memory::GetAddress<object_reconnect_to_map_hook_t>(0x1360CE), object_reconnect_to_map_hook);
+	//p_object_reconnect_to_map_hook = Memory::GetAddress<object_reconnect_to_map_hook_t>(0x1360CE);
+	
+	//DETOUR_ATTACH(p_object_can_activate_in_cluster, Memory::GetAddress<object_can_activate_in_cluster_t>(0x131FD1), object_can_activate_in_cluster_hook);
+	p_object_can_activate_in_cluster = Memory::GetAddress<object_can_activate_in_cluster_t>(0x131FD1);
+	
+	//DETOUR_ATTACH(p_get_object_payload, Memory::GetAddress<get_object_payload_t>(0x132426), get_object_payload_hook);
+	p_get_object_payload = Memory::GetAddress<get_object_payload_t>(0x132426);
 
 	DETOUR_ATTACH(p_object_compute_node_matrices_with_children, Memory::GetAddress<object_compute_node_matrices_with_children_t>(0x136924), object_compute_node_matrices_with_children);
 	DETOUR_ATTACH(p_object_wake, Memory::GetAddress<object_wake_t>(0x12FA1E), object_wake);
-	//DETOUR_ATTACH(p_object_wake, Memory::GetAddress<object_wake_t>(0x12FA1E), );
 
 	
 	DETOUR_COMMIT();
-
 }
 
 int object_get_count()

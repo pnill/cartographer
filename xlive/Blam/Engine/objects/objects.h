@@ -350,7 +350,7 @@ void simulation_action_object_create(datum object_idx);
 void object_delete(const datum object_idx);
 void object_wake(const datum object_datum);
 void object_disconnect_from_map(const datum object_index);
-void object_reconnect_to_map(const s_location* location_struct, const datum object_index);
+void __cdecl object_reconnect_to_map(s_location* location_struct, const datum object_index);
 void object_compute_node_matrices_with_children(const datum object_datum);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
 

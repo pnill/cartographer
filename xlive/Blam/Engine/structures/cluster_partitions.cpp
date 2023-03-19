@@ -2,6 +2,7 @@
 #include "cluster_partitions.h"
 
 #include "Blam/Engine/objects/reference_lists.h"
+#include "Blam/Engine/structures/structures.h"
 
 #define MAXIMUM_CLUSTERS_PER_DATUM 256
 

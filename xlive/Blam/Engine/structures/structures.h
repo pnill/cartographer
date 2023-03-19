@@ -1,10 +1,6 @@
 #pragma once
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-
-struct s_game_cluster_bit_vectors
-{
-	int cluster_bitvector;
-};
+#include "cluster_partitions.h"
 
 #pragma pack(push, 1)
 struct s_structure_globals
@@ -32,18 +28,7 @@ __int16 get_global_structure_bsp_index();
 s_scenario_structure_bsp_group_definition* get_global_structure_bsp();
 s_scenario_structure_bsp_group_definition::s_collision_bsp_block* get_global_collision_bsp();
 
-__int16 structure_clusters_in_bitvector(const s_game_cluster_bit_vectors* cluster_bitvector, short maximum_clusters, short* intersected_indices, short* out_actual_cluster_count);
-__int16 structure_clusters_in_sphere_recursive(
-	const short cluster_reference,
-	const real_point3d* position,
-	const float radius,
-	const short cluster_count,
-	short* intersected_indices);
-short structure_clusters_in_sphere(
-	const short cluster_reference,
-	const real_point3d* position,
-	const float radius,
-	const short cluster_count,
-	short* intersected_indices,
-	short* intersected_references);
+short structure_clusters_in_bitvector(const s_game_cluster_bit_vectors* cluster_bitvector, short maximum_clusters, short* intersected_indices, short* out_actual_cluster_count);
+short structure_clusters_in_sphere_recursive(const short cluster_reference, const real_point3d* position,	const float radius, const short cluster_count, short* intersected_indices);
+short structure_clusters_in_sphere(const short cluster_reference, const real_point3d* position, const float radius, const short cluster_count, short* intersected_indices, short* intersected_references);
 

@@ -175,6 +175,7 @@
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\objects\reference_lists.cpp" />
     <ClCompile Include="Blam\Engine\math\convex_hulls.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -542,6 +543,7 @@
     <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\objects\reference_lists.h" />
     <ClInclude Include="Blam\Engine\math\convex_hulls.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

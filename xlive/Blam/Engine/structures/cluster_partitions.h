@@ -2,7 +2,11 @@
 #include "Blam/Engine/DataArray/DataArray.h"
 #include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Engine/structures/structures.h"
+
+struct s_game_cluster_bit_vectors
+{
+	int cluster_bitvector;
+};
 
 struct cluster_partition
 {

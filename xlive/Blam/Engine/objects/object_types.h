@@ -1,8 +1,9 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Engine/math/real_math.h"
+#include "Blam/Engine/structures/cluster_partitions.h"
 
 typedef void (*type_initialize_gamestate_data_t)();
 typedef bool (*type_object_new_t)(datum, object_placement_data*, bool*);
@@ -16,7 +17,7 @@ typedef void (*type_attach_gamestate_entity_t)(datum);
 typedef void (*type_detach_gamestate_entity_t)(datum);
 typedef void (*type_handle_deleted_object_t)(datum, int);
 typedef void (*type_object_move_t)(datum);
-typedef bool (*type_object_compute_activation_t)(datum, DWORD*, bool*);
+typedef bool (*type_object_compute_activation_t)(datum, s_game_cluster_bit_vectors*, bool*);
 typedef bool (*type_compute_function_value_t)(datum, string_id, float*, bool*);
 typedef bool (*type_handle_parent_destroyed_t)(datum);
 typedef void (*type_fix_transform_t)(datum, real_point3d*, real_vector3d*, real_vector3d*);
@@ -99,7 +100,7 @@ void object_type_create_children(datum object_datum);
 void object_type_notify_impulse_sound(datum object_datum, int a2, int a3);
 void object_type_delete(datum object_datum);
 void object_type_move(datum object_datum);
-bool object_type_compute_activation(datum object_datum, DWORD* a2, bool* a3);
+bool object_type_compute_activation(datum object_datum, s_game_cluster_bit_vectors* a2, bool* a3);
 void object_type_attach_gamestate_entity(datum object_datum);
 void object_type_detach_gamestate_entity(datum object_datum);
 void object_type_postprocess_node_matrices(datum object_datum, int node_count, real_matrix4x3* node_matracies);
