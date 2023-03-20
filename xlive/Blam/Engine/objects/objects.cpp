@@ -146,7 +146,7 @@ void object_connect_lights_recursive(const datum object_datum,
 	p_object_connect_lights_recursive(object_datum, disconnect_this_object, reconnect_this_object, reconnect_child_objects, show_this_object);
 }
 
-
+// Gets important info about the object and populates the s_object_payload argument with the appropriate data
 void get_object_payload(const datum object_datum, s_object_payload* cluster_payload)
 {
 	typedef WORD(__cdecl* collision_compute_object_cull_flags_t)(short object_index);
@@ -227,6 +227,7 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 	return object_header;
 }
 
+// Reconnects an object to the current bsp that's loaded
 void object_reconnect_to_map(s_location* location, const datum object_datum)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
@@ -453,11 +454,8 @@ datum object_header_new(__int16 object_data_size)
 	return object_datum;
 }
 
-// Not 100% sure this function works correctly 
-// CHECK THIS BEFORE RELEASING
 // Computes the new change color values of an object 
 // Used for objects with the functions datablock set inside the change color tagblock
-// TODO fix this function
 bool object_compute_change_colors(datum object_datum)
 {
 	// I really don't wanna get into this can of worms yet...
@@ -465,23 +463,22 @@ bool object_compute_change_colors(datum object_datum)
 	auto p_object_get_function_value_simple = Memory::GetAddress<object_get_function_value_simple_t>(0x133005, 0x121ED5);
 
 
-	const s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
+	s_object_data_definition* object = object_get_fast_unsafe<s_object_data_definition>(object_datum);
 	const s_object_group_definition* obje_definition = tags::get_tag_fast<s_object_group_definition>(object->tag_definition_index);
 
 	if ((obje_definition->runtime_flags & s_object_group_definition::e_object_group_runtime_runtime_change_colors_allowed) == 0) { return false; }
 
 	DWORD number_of_change_colors = 0;
-	real_color_rgb* object_change_colors = (real_color_rgb*)object_header_block_get_with_count(object_datum, &object->change_color_block, sizeof(real_color_rgb), &number_of_change_colors);
+	real_color_rgb* object_block_change_colors = (real_color_rgb*)object_header_block_get_with_count(object_datum, &object->change_color_block, sizeof(real_color_rgb), &number_of_change_colors);
 	
 	if (number_of_change_colors <= 0) { return false; }
-
-	real_color_rgb* color = &object_change_colors[number_of_change_colors];
-
-	for (long i = 0; i < number_of_change_colors; ++i)
+	
+	DWORD half_of_cc_count = number_of_change_colors >> 1;
+	
+	for (DWORD i = 0; i < half_of_cc_count; ++i)
 	{
-		color->red = object_change_colors->red;
-		color->green = object_change_colors->green;
-		color->blue = object_change_colors->blue;
+		real_color_rgb* current_change_color = &object_block_change_colors[half_of_cc_count + i];
+		*current_change_color = object_block_change_colors[i];
 		
 		// Loop through function blocks inside change color block
 		// This has been edited from the original since the original one was stupid and referenced a pre-processed value within the tagblock itself for the new tagblock index
@@ -504,7 +501,7 @@ bool object_compute_change_colors(datum object_datum)
 					if (!p_object_get_function_value_simple(object_datum, function_name, &function_value)) { function_value = 0.0; }
 					
 					rgb_colors_interpolate(
-						color,
+						current_change_color,
 						function_definition[j].scale_flags,
 						&function_definition[j].color_lower_bound,
 						&function_definition[j].color_upper_bound,
@@ -522,44 +519,42 @@ bool object_compute_change_colors(datum object_datum)
 				{
 					float function_value;
 					if (!p_object_get_function_value_simple(object_datum, function_name, &function_value)) { function_value = 0.0; }
-					color->red   *= function_value;
-					color->green *= function_value;
-					color->blue  *= function_value;
+					current_change_color->red   *= function_value;
+					current_change_color->green *= function_value;
+					current_change_color->blue  *= function_value;
 				}
 			}
 		}
 
-		if (color->red >= 0.0f)
+		if (current_change_color->red >= 0.0f)
 		{
-			if (color->red > 1.0f)
-				color->red = 1.0f;
+			if (current_change_color->red > 1.0f)
+				current_change_color->red = 1.0f;
 		}
 		else
 		{
-			color->red = 0.0f;
+			current_change_color->red = 0.0f;
 		}
 
-		if (color->green >= 0.0f)
+		if (current_change_color->green >= 0.0f)
 		{
-			if (color->green > 1.0f)
-				color->green = 1.0f;
+			if (current_change_color->green > 1.0f)
+				current_change_color->green = 1.0f;
 		}
 		else
 		{
-			color->green = 0.0f;
+			current_change_color->green = 0.0f;
 		}
 
-		if (color->blue >= 0.0f)
+		if (current_change_color->blue >= 0.0f)
 		{
-			if (color->blue > 1.0f)
-				color->blue = 1.0f;
+			if (current_change_color->blue > 1.0f)
+				current_change_color->blue = 1.0f;
 		}
 		else
 		{
-			color->blue = 0.0f;
+			current_change_color->blue = 0.0f;
 		}
-
-		++color;
 	}
 	return true;
 }
@@ -611,6 +606,8 @@ s_model_group_definition::s_new_damage_info_block* object_get_damage_info(const 
 	return nullptr;
 }
 
+// Initializes health and shields for the given object based on two floats passed to it
+// If the floats for vitality are nullptrs we just initialize them to the default values in the damage info block in the model tag
 void object_initialize_vitality(const datum object_datum, const float* new_vitality, const float* new_shield_vitality)
 {
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
@@ -658,6 +655,7 @@ void object_initialize_vitality(const datum object_datum, const float* new_vital
 	object->shield_current_vitality = current_shield_vitality;
 }
 
+// Allocates memory for object header blocks within an object data struct
 bool object_header_block_allocate(const datum object_datum, const short size, const short padded_size, const short alignment_bits)
 {
 	s_object_header* object_header = get_object_header(object_datum);
@@ -697,6 +695,7 @@ bool object_header_block_allocate(const datum object_datum, const short size, co
 
 typedef datum(__cdecl* p_object_new_t)(object_placement_data* placement_data);
 p_object_new_t p_object_new;
+// Creates a new object
 datum __cdecl object_new(object_placement_data* placement_data)
 {
 	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(datum a1);
@@ -707,9 +706,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	typedef char(__cdecl* sub_5310F9_t)(datum a1, int a2, real_color_rgb* a3);
 	auto p_object_set_initial_change_colors = Memory::GetAddress<sub_5310F9_t>(0x1310F9);
-
-	typedef char(__cdecl* object_compute_change_colors_t)(datum a1);
-	auto p_object_compute_change_colors = Memory::GetAddress<object_compute_change_colors_t>(0x13456E);
 
 	typedef void(__cdecl* object_reconnect_to_physics_t)(datum object_datum);
 	auto p_object_reconnect_to_physics = Memory::GetAddress< object_reconnect_to_physics_t>(0x1323B3);
@@ -905,7 +901,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 	short original_orientations = (!allow_interpolation ? 0 : 32 * (short)nodes_count);
 
-
+	// Allocate object header blocks
 	bool b_can_create_object = 
 		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::object_attachments_block), (short)(8 * new_object_tag->attachments.size), 0);
 	b_can_create_object = b_can_create_object && 
@@ -924,6 +920,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		object_header_block_allocate(object_datum, offsetof(s_object_data_definition, s_object_data_definition::animation_manager_block), (short)(valid_animation_manager ? 144 : 0), 0);
 	b_can_create_object = b_can_create_object && p_havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
+	// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 	bool b_out_of_objects = !b_can_create_object;
 
 	if (b_can_create_object)
@@ -964,7 +961,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			update_object_region_information(object_datum, placement_data->region_index);
 			p_object_set_initial_change_colors(object_datum, placement_data->active_change_colors_mask, placement_data->change_colors);
 			object_initialize_vitality(object_datum, nullptr, nullptr);
-			p_object_compute_change_colors(object_datum);
+			object_compute_change_colors(object_datum);
 			object->foreground_emblem = placement_data->foreground_emblem;
 
 			if (object->animation_manager_block.offset != DATUM_INDEX_NONE)
@@ -973,6 +970,8 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			}
 
 			object_compute_node_matrices_with_children(object_datum);
+
+			// If the object (can) connect to the map we make sure it gets connected
 			if (s_object_globals::objects_can_connect_to_map())
 			{
 				s_location* p_location = nullptr;
@@ -1006,12 +1005,18 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				p_effect_new_from_object(new_object_tag->creation_effect.TagIndex, &placement_data->damage_owner, object_datum, 0.0f, 0.0f, nullptr, nullptr);
 			}
 
+			// Not 100% sure what this function does but it has to do with occlusion
+			// This function is nulled out on the dedi
 			if (!Memory::IsDedicatedServer()) { p_sub_66CFDD(object_datum); }
 
 			if (b_object_flag_check)
+			{
 				object->object_flags |= object_data_flag_0x20000;
+			}
 			else
+			{
 				object->object_flags &= ~object_data_flag_0x20000;
+			}
 
 			object_early_mover_new(object_datum);
 
