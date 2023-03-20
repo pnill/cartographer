@@ -272,6 +272,7 @@
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />

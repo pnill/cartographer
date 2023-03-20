@@ -24,7 +24,7 @@ struct s_structure_globals
 const short global_projection3d_mappings[18] = { 2, 1, 0, 1, 2, 0, 0, 2, 1, 2, 0, 1, 1, 0, 2, 0, 1, 2 };
 const short global_projection3d_inverse_mappings[18] = { 2, 1, 0, 2, 0, 1, 0, 2, 1, 1, 2, 0, 1, 0, 2, 0, 1, 2 };
 
-__int16 get_global_structure_bsp_index();
+short get_global_structure_bsp_index();
 s_scenario_structure_bsp_group_definition* get_global_structure_bsp();
 s_scenario_structure_bsp_group_definition::s_collision_bsp_block* get_global_collision_bsp();
 

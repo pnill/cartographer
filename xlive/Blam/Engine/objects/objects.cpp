@@ -843,7 +843,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	object->damage_owner_unk1 = placement_data->damage_owner.unk1;
 	object->damage_owner_unk2 = placement_data->damage_owner.unk2;
 	object->model_variant_id = -1;
-	object->field_CC = -1;
+	object->cached_object_render_state_index = -1;
 	object->field_D0 = -1;
 	object->physics_flags = (e_object_physics_flags)0;
 
