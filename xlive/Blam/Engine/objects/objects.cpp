@@ -80,7 +80,7 @@ void object_disconnect_from_map(const datum object_index)
 void object_activate(const datum object_datum)
 {
 	typedef void(__cdecl* havok_object_activate_t)(const datum object_datum);
-	auto p_havok_object_activate = Memory::GetAddress<havok_object_activate_t>(0xA040F);
+	auto p_havok_object_activate = Memory::GetAddress<havok_object_activate_t>(0xA040F, 0x9266F);
 
 
 	s_object_header* object_header = get_object_header(object_datum);
@@ -105,14 +105,14 @@ void object_activate(const datum object_datum)
 void __cdecl object_deactivate(const datum object_datum)
 {
 	typedef void(__cdecl* object_deactivate_t)(const datum object_index);
-	auto object_deactivate = Memory::GetAddress<object_deactivate_t>(0x1320B8);
+	auto object_deactivate = Memory::GetAddress<object_deactivate_t>(0x1320B8, 0x120F88);
 	object_deactivate(object_datum);
 }
 
 void __cdecl object_cleanup_havok(const datum object_datum)
 {
 	typedef void(__cdecl* object_cleanup_havok_t)(const datum object_index);
-	auto object_cleanup_havok = Memory::GetAddress<object_cleanup_havok_t>(0xA2778);
+	auto object_cleanup_havok = Memory::GetAddress<object_cleanup_havok_t>(0xA2778, 0x949D8);
 	object_cleanup_havok(object_datum);
 }
 
@@ -150,7 +150,7 @@ void object_connect_lights_recursive(const datum object_datum,
 void get_object_payload(const datum object_datum, s_object_payload* cluster_payload)
 {
 	typedef WORD(__cdecl* collision_compute_object_cull_flags_t)(short object_index);
-	auto p_collision_compute_object_cull_flags = Memory::GetAddress<collision_compute_object_cull_flags_t>(0xCBE87);
+	auto p_collision_compute_object_cull_flags = Memory::GetAddress<collision_compute_object_cull_flags_t>(0xCBE87, 0x8C1A7);
 
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	WORD object_collision_cull_flags = 0;
@@ -173,7 +173,7 @@ void object_update_collision_culling(const datum object_datum)
 		int cluster_reference,
 		unsigned int payload_size,
 		s_object_payload* payload);
-	auto p_cluster_partition_update_payload = Memory::GetAddress<cluster_partition_update_payload_t>(0x1324E9);
+	auto p_cluster_partition_update_payload = Memory::GetAddress<cluster_partition_update_payload_t>(0x37A24F, 0x324FBF);
 
 	s_object_payload payload;
 
@@ -184,7 +184,7 @@ void object_update_collision_culling(const datum object_datum)
 	{
 		get_object_payload(object_datum, &payload);
 		p_cluster_partition_update_payload(
-			*Memory::GetAddress<cluster_partition**>(0x4E4604),
+			Memory::GetAddress<cluster_partition*>(0x4E4604, 0x50C8D4),
 			object_datum,
 			object->first_cluster_reference,
 			20u,
@@ -270,10 +270,10 @@ void object_reconnect_to_map(s_location* location, const datum object_datum)
 	s_object_payload payload;
 	get_object_payload(object_datum, &payload);
 
-	cluster_partition* partition = Memory::GetAddress<cluster_partition*>(0x4E4604);
+	cluster_partition* partition = Memory::GetAddress<cluster_partition*>(0x4E4604, 0x50C8D4);
 	if ((object->object_flags & _object_has_collision_bit) == 0)
 	{
-		partition = Memory::GetAddress<cluster_partition*>(0x4E45F8);
+		partition = Memory::GetAddress<cluster_partition*>(0x4E45F8, 0x50C8C8);
 	}
 
 	cluster_partition_reconnect(
@@ -314,9 +314,9 @@ void object_reconnect_to_map(s_location* location, const datum object_datum)
 void object_compute_node_matrices_with_children(const datum object_datum)
 {
 	typedef void(__cdecl* object_compute_node_matrices_non_recursive_t)(const datum object_datum);
-	auto object_compute_node_matrices_non_recursive = Memory::GetAddress<object_compute_node_matrices_non_recursive_t>(0x1353E6);
+	auto object_compute_node_matrices_non_recursive = Memory::GetAddress<object_compute_node_matrices_non_recursive_t>(0x1353E6, 0x1242B6);
 	typedef bool(__cdecl* object_compute_node_matrices_locations_t)(const datum object_datum);
-	auto object_compute_node_matrices_locations = Memory::GetAddress<object_compute_node_matrices_locations_t>(0x1363D5);
+	auto object_compute_node_matrices_locations = Memory::GetAddress<object_compute_node_matrices_locations_t>(0x1363D5, 0x1252A5);
 
 	const s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	s_object_data_definition const* next_object = nullptr;
@@ -333,7 +333,7 @@ void object_compute_node_matrices_with_children(const datum object_datum)
 void update_object_variant_index(datum object_datum, string_id variant_index)
 {
 	typedef byte(__cdecl* object_lookup_variant_index_from_name_t)(datum a1, string_id a2);
-	auto object_lookup_variant_index_from_name = Memory::GetAddress<object_lookup_variant_index_from_name_t>(0x12FE84);
+	auto object_lookup_variant_index_from_name = Memory::GetAddress<object_lookup_variant_index_from_name_t>(0x12FE84, 0x11ED47);
 
 	s_object_data_definition* object = object_get_fast_unsafe(object_datum);
 	object->model_variant_id = object_lookup_variant_index_from_name(object_datum, variant_index);
@@ -699,16 +699,16 @@ p_object_new_t p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
 	typedef bool(__cdecl* havok_can_allocate_space_for_instance_of_object_definition_t)(datum a1);
-	auto p_havok_can_allocate_space_for_instance_of_object_definition = Memory::GetAddress<havok_can_allocate_space_for_instance_of_object_definition_t>(0x9FE55);
+	auto p_havok_can_allocate_space_for_instance_of_object_definition = Memory::GetAddress<havok_can_allocate_space_for_instance_of_object_definition_t>(0x9FE55, 0x920B5);
 
 	typedef void(__cdecl* sub_532F07_t)(datum arg0, int arg4);
-	auto update_object_region_information = Memory::GetAddress<sub_532F07_t>(0x132F07);
+	auto update_object_region_information = Memory::GetAddress<sub_532F07_t>(0x132F07, 0x121DD7);
 
-	typedef char(__cdecl* sub_5310F9_t)(datum a1, int a2, real_color_rgb* a3);
-	auto p_object_set_initial_change_colors = Memory::GetAddress<sub_5310F9_t>(0x1310F9);
+	typedef D3DCOLOR(__cdecl* sub_5310F9_t)(datum a1, int a2, real_color_rgb* a3);
+	auto p_object_set_initial_change_colors = Memory::GetAddress<sub_5310F9_t>(0x1310F9, 0x11FFBD);
 
 	typedef void(__cdecl* object_reconnect_to_physics_t)(datum object_datum);
-	auto p_object_reconnect_to_physics = Memory::GetAddress< object_reconnect_to_physics_t>(0x1323B3);
+	auto p_object_reconnect_to_physics = Memory::GetAddress< object_reconnect_to_physics_t>(0x1323B3, 0x121282);
 	
 	typedef void(__cdecl* effect_new_from_object_t)(datum effect_tag_index,
 		s_damage_owner* damage_owner,
@@ -717,7 +717,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		float a5,
 		const real_color_rgb* color,
 		const void* effect_vector_field);
-	auto p_effect_new_from_object = Memory::GetAddress< effect_new_from_object_t>(0xAADCE);
+	auto p_effect_new_from_object = Memory::GetAddress<effect_new_from_object_t>(0xAADCE, 0x9CE4E);
 
 	typedef void(__cdecl* sub_66CFDD_t)(datum object_datum);
 	auto p_sub_66CFDD = Memory::GetAddress<sub_66CFDD_t>(0x26CFDD);
@@ -747,7 +747,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			FLAG(e_object_type::biped))) != 0)
 	{
 		typedef void(__cdecl* havok_memory_garbage_collect_t)();
-		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78);
+		havok_memory_garbage_collect_t p_havok_memory_garbage_collect = Memory::GetAddress<havok_memory_garbage_collect_t>(0xF7F78, 0xDEDB3);
 		p_havok_memory_garbage_collect();
 	}
 
@@ -1159,7 +1159,7 @@ void apply_object_hooks()
 
 
 	DETOUR_BEGIN();
-	DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7), object_new);
+	DETOUR_ATTACH(p_object_new, Memory::GetAddress<p_object_new_t>(0x136CA7, 0x125B77), object_new);
 	DETOUR_COMMIT();
 }
 

@@ -180,7 +180,7 @@ struct s_object_data_definition
 	WORD damage_owner_unk3;
 	DWORD damage_owner_unk1;
 	DWORD damage_owner_unk2;
-	DWORD field_CC;
+	DWORD cached_object_render_state_index;
 	__int16 field_D0;
 	BYTE model_variant_id;//hlmt variant tag_block index
 	char gap_D3;
