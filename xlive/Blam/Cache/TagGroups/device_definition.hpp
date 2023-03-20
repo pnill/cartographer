@@ -13,9 +13,9 @@ struct s_device_group_definition :TagGroup<'devi'>
 	s_object_group_definition objectTag;
 	enum e_device_group_flags : __int32
 	{
-		e_device_group_flag_position_loops = FLAG(0),
-		e_device_group_flag_unused = FLAG(1),
-		e_device_group_flag_allow_interpolation = FLAG(2),
+		_device_group_flag_position_loops = FLAG(0),
+		_device_group_flag_unused = FLAG(1),
+		_device_group_flag_allow_interpolation = FLAG(2),
 	};
 	e_device_group_flags flags;//0xBC
 	float power_transition_time;//0xC0
