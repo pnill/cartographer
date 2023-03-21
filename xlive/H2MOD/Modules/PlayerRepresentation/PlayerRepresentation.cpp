@@ -166,7 +166,7 @@ namespace PlayerRepresentation
 
 		if (Engine::get_game_mode_engine()
 			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
-			&& (player_properties->player_team && !(s_game_engine_globals::get()->Unk1 & FLAG(player_properties->player_team))))
+			&& (player_properties->player_team && !(s_game_engine_globals::get()->fieldA & FLAG(player_properties->player_team))))
 		{
 			player_properties->player_team = e_object_team::None;
 		}
