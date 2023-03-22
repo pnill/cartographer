@@ -453,7 +453,7 @@ void CXNetQoS::Listener()
 		m_ListenSocket = INVALID_SOCKET;
 	}
 
-	for (DWORD i = 0; i < ARRAYSIZE(m_WsaEvents); i++)
+	for (int i = 0; i < ARRAYSIZE(m_WsaEvents); i++)
 	{
 		WSACloseEvent(m_WsaEvents[i]);
 		m_WsaEvents[i] = WSA_INVALID_EVENT;

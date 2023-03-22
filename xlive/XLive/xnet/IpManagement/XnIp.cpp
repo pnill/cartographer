@@ -92,8 +92,6 @@ void XnIpManager::LogConnectionsToConsole(ConsoleLog* output) const
 					"		Index: " + std::to_string(i) + " " +
 					"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
 					"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
-					"Packets sent avg/sec: " + std::to_string(pckStats->pckAvgSentPerSec) + " " +
-					"Packets recvd avg/sec: " + std::to_string(pckStats->pckAvgRecvdPerSec) + " " +
 					"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
 					"Connection initiator: " + (xnIp->InitiatedConnectRequest() ? "yes" : "no") + " " +
 					"Time since last interaction: " + std::to_string((float)(_Shell::QPCToTimeNowMsec() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +

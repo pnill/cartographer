@@ -58,7 +58,7 @@ bool H2Config_xDelay = true;
 bool H2Config_hiresfix = false;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
-bool H2Config_d3dex = false;
+bool H2Config_d3d9ex = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
@@ -463,7 +463,7 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_sens", std::to_string(H2Config_controller_sens).c_str());
 
@@ -789,7 +789,7 @@ void ReadH2Config() {
 				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
 				H2Config_hiresfix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
-				H2Config_d3dex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
+				H2Config_d3d9ex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 				H2Config_hide_ingame_chat = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
 			

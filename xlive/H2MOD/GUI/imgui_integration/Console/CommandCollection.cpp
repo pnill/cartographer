@@ -24,7 +24,7 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex, 
+DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3d9ex, 
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
 	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);

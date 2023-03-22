@@ -155,7 +155,7 @@ bool __cdecl is_network_observer_mode_managed()
 
 void s_network_observer::ResetNetworkPreferences()
 {
-	// clear the network bandwidth preferences so they won't cause issues
+	// reset the network bandwidth preferences
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preference_size);
 }
 
@@ -302,13 +302,6 @@ void s_network_observer::ForceConstantNetworkRate()
 	// unless original XNet transport layer had packet compression but even then it's rather dumb
 	// or maybe the UDP protocol has something like that, no idea
 	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
-
-	// time patches, use the locked time at the start of netweork_send instead of the frame time delta
-	BYTE instr_offset_1[] = { 0x2C };
-	//WriteBytes(Memory::GetAddressRelative(0x5BF145, 0x5B901F) + 0x3, instr_offset_1, sizeof(instr_offset_1));
-
-	BYTE instr_offset_2[] = { 0x08, 0x07, 0x00, 0x00 };
-	// WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
 }
 
 void s_network_observer::ApplyGamePatches()

@@ -5,7 +5,7 @@ enum e_startup_flags : int
 	windowed,
 	disable_voice_chat,
 	nosound,
-	allow_d3d_ex_version, // allows the d3d ex version to be used instead
+	d3d9ex_enabled, // allows the d3d ex version to be used instead
 	disable_hardware_vertex_processing, // force hardware vertex processing off
 	novsync,
 	unk6, // squad browser/xlive/ui?

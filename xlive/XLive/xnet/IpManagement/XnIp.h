@@ -115,9 +115,6 @@ struct XnIpPckTransportStats
 	unsigned int pckBytesSent;
 	unsigned int pckBytesRecvd;
 
-	unsigned int pckAvgSentPerSec;
-	unsigned int pckAvgRecvdPerSec;
-
 	unsigned int pckSentPerSec[XNIP_MAX_NET_STATS_SAMPLES];
 	unsigned int pckBytesSentPerSec[XNIP_MAX_NET_STATS_SAMPLES];
 
@@ -139,8 +136,6 @@ struct XnIpPckTransportStats
 			pckBytesSent = 0;
 			pckBytesRecvd = 0;
 
-			pckAvgSentPerSec = 0;
-			pckAvgRecvdPerSec = 0;
 			pckSentPerSecIdx = 0;
 			pckRecvdPerSecIdx = 0;
 			pckCurrentSendPerSecIdx = -1;

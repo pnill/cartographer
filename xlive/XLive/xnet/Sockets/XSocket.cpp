@@ -246,7 +246,8 @@ BOOL WINAPI XSocketWSACancelOverlappedIO(HANDLE hFile)
 	return CancelIo(hFile);
 }
 
-int XSocket::winsock_read_socket(LPWSABUF lpBuffers, 
+int XSocket::winsock_read_socket(
+	LPWSABUF lpBuffers, 
 	DWORD dwBufferCount,
 	LPDWORD lpNumberOfBytesRecvd,
 	LPDWORD lpFlags,
