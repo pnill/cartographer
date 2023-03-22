@@ -706,8 +706,6 @@ void close_cache_header(HANDLE* map_handle)
 	close_cache_header_impl(map_handle);
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-
 int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
 {
 	s_cache_header header;
@@ -747,10 +745,12 @@ int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_ent
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
-		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+		if (strnlen_s(header.name, sizeof(header.name)) > 0) 
+		{
+			MultiByteToWideChar(CP_ACP, 0, header.name, -1, &fallback_name[0], sizeof(header.name) - 1);
 		}
-		else {
+		else 
+		{
 			std::wstring full_file_name = file_name;
 			auto start = full_file_name.find_last_of('\\');
 			fallback_name = full_file_name.substr(start != std::wstring::npos ? start : 0, full_file_name.find_last_not_of('.'));

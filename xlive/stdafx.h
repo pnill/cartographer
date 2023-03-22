@@ -33,7 +33,6 @@
 #include <wincrypt.h>
 #include <mmsystem.h>
 #include <windef.h>
-#include <codecvt>
 
 // game input
 #include <xinput.h>

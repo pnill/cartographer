@@ -18,6 +18,8 @@ DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERL
 }
 
 /* This should be cleaned up and moved to an H2MODs module instead of being defined here. */
+// TODO rewrite discord integration to use the game SDK rather than the old rpc
+// TODO rewrite code so it grabs the internal map name and the actual map name automatically instead of using a map
 static const std::unordered_map <std::string, std::string> singleplayer_maps
 {
 	{ "00a_introduction", "The Heretic" },
@@ -71,18 +73,17 @@ void update_player_count()
 	}
 }
 
-std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string getEnglishMapName()
 {
-	wchar_t* englishMapName = Memory::GetAddress<wchar_t*>(0x97737C);
-	return  wstring_to_string.to_bytes(englishMapName);
+	std::wstring englishMapName = Memory::GetAddress<wchar_t*>(0x97737C);
+	return std::string(englishMapName.begin(), englishMapName.end());;
 }
 
 std::string getVariantName()
 {
 	std::wstring variant = NetworkSession::GetGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
-	return wstring_to_string.to_bytes(variant);
+	return std::string(variant.begin(), variant.end());
 }
 
 std::string gamemode_id_to_string(int id)
@@ -137,7 +138,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 		}
 
-		std::string map_name = wstring_to_string.to_bytes(map_name_wide);
+		std::string map_name = std::string(map_name_wide.begin(), map_name_wide.end());
+
 		LOG_TRACE_GAME(L"[Discord] map_name: {}", map_name_wide.c_str());
 
 		switch (static_cast<ContextPresence>(dwContextValue)) {
@@ -146,7 +148,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			std::wstring map_name_wide = Memory::GetAddress<wchar_t*>(0x46DD88);
 			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
 
-			std::string map_name = wstring_to_string.to_bytes(map_name_wide);
+			std::string map_name = std::string(map_name_wide.begin(), map_name_wide.end());
 
 			std::string level_name = map_name;
 			auto it = singleplayer_maps.find(map_name);

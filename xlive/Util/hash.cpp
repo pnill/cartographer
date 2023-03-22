@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "hash.h"
 
 bool hash_open_file(const wchar_t *file_name, HANDLE &file)
@@ -24,7 +23,7 @@ bool hash_do_file_hashing(HANDLE file, HCRYPTHASH hash, DWORD flags, long long l
 	if (len == 0) {
 		len = LONG_MAX;
 	}
-	BYTE file_chunk[file_chunk_size];
+	BYTE* file_chunk = (BYTE*)_malloca(file_chunk_size);
 	DWORD len_to_read = min(file_chunk_size, len);
 	DWORD bytes_read = 0;
 	while (LOG_CHECK(ReadFile(file, file_chunk, len_to_read,
@@ -32,18 +31,24 @@ bool hash_do_file_hashing(HANDLE file, HCRYPTHASH hash, DWORD flags, long long l
 	{
 		if (bytes_read == 0)
 		{
+			_freea(file_chunk);
 			return true;
 		}
 
 		if (!LOG_CHECK(CryptHashData(hash, file_chunk, bytes_read, flags)))
 		{
+			_freea(file_chunk);
 			return false;
 		}
 		len = len - bytes_read;
 		if (len <= 0)
+		{
+			_freea(file_chunk);
 			return true;
+		}
 		len_to_read = min(file_chunk_size, len);
 	}
+	_freea(file_chunk);
 	return true;
 }
 
@@ -107,12 +112,11 @@ bool hashes::calc_file_md5(const std::wstring &filename, std::string &checksum_o
 	return false;
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 bool hashes::calc_file_md5(const std::string &filename, BYTE *checksum, size_t &checksum_len, long long len_read)
 {
-	return hashes::calc_file_md5(wstring_to_string.from_bytes(filename), checksum, checksum_len, len_read);
+	return hashes::calc_file_md5(std::wstring(filename.begin(), filename.end()), checksum, checksum_len, len_read);
 }
 bool hashes::calc_file_md5(const std::string &filename, std::string &checksum_out, long long len_read)
 {
-	return hashes::calc_file_md5(wstring_to_string.from_bytes(filename), checksum_out, len_read);
+	return hashes::calc_file_md5(std::wstring(filename.begin(), filename.end()), checksum_out, len_read);
 }
