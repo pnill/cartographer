@@ -19,8 +19,12 @@ namespace lazy_blam
 
 	bool lazy_blam::init_cache_file(std::string map_name)
 	{
-		maps_dir = GetExeDirectoryNarrow() + "\\maps";
-		mods_dir = GetExeDirectoryNarrow() + "\\mods";
+		maps_dir = get_exe_directory_narrow();
+		maps_dir + "\\maps";
+
+		mods_dir = get_exe_directory_narrow();
+		mods_dir + "\\mods";
+
 		if (FileTypeCheck(map_name, "map"))
 			map_file = mods_dir + "\\maps\\" + map_name;
 		else

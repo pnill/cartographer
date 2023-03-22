@@ -238,7 +238,10 @@ void InitLocalAppData() {
 	if (H2AppDataLocal == nullptr) {
 		int appdatabuflen = wcslen(H2ProcessFilePath) + 1;
 		H2AppDataLocal = (wchar_t*)calloc(appdatabuflen, sizeof(wchar_t));
-		wcscpy_s(H2AppDataLocal, appdatabuflen, H2ProcessFilePath);
+		if (H2AppDataLocal != nullptr)
+		{
+			wcscpy_s(H2AppDataLocal, appdatabuflen, H2ProcessFilePath);
+		}
 		addDebugText("ERROR: Could not find AppData Local. Using Process File Path:");
 		addDebugText(H2AppDataLocal);
 	}
@@ -287,20 +290,21 @@ void InitH2Startup() {
 	H2IsDediServer = Memory::IsDedicatedServer();
 
 	_Shell::Initialize();
+	set_exe_directory();
 
 	int ArgCnt;
 	LPWSTR* ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCnt);
 	H2ProcessFilePath = (wchar_t*)calloc(wcslen(ArgList[0]) + 1, sizeof(wchar_t));
 	int rtncodepath = GetWidePathFromFullWideFilename(ArgList[0], H2ProcessFilePath);
 	if (rtncodepath == -1) {
-		std::wstring path = GetExeDirectoryWide();
+		std::wstring path = get_exe_directory();
 		path.append(L"\\");
 		H2ProcessFilePath = (wchar_t*)calloc(path.length() + 1, sizeof(wchar_t));
 		_swprintf(H2ProcessFilePath, path.c_str());
 	}
 
 	// fix the game not finding the files it needs if the current directory is not the install directory
-	SetCurrentDirectoryW(GetExeDirectoryWide().c_str());
+	SetCurrentDirectoryW(get_exe_directory());
 	//If H2ProcessFilePath is empty (Server Console Mode?) set to working directory
 	
 	InitLocalAppData();

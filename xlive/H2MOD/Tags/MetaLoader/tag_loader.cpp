@@ -1451,7 +1451,7 @@ void Initialise_tag_loader()
 {
 	tag_loader::new_Tables = new tags::tag_instance[_MAX_TAG_TABLE_SIZE_];
 
-	std::string game_dir(GetExeDirectoryNarrow());
+	std::string game_dir(get_exe_directory_narrow());
 	std::string def_maps_loc = game_dir + "\\maps";
 
 

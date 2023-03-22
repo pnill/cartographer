@@ -22,7 +22,7 @@ namespace MapSlots
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		std::string game_dir(GetExeDirectoryNarrow());
+		std::string game_dir(get_exe_directory_narrow());
 		std::string def_maps_loc = game_dir + "\\maps";
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 		for (const auto& map : AddedMaps)
