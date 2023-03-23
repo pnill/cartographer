@@ -2,7 +2,7 @@
 
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Engine\Game\GameOptions.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam\Engine\Objects\object_placement.h"
 
 namespace Engine
 {

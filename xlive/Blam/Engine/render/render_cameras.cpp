@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "H2MOD\Modules\Shell\Config.h"
-
 #include "render_cameras.h"
+
+#include "H2MOD\Modules\Shell\Config.h"
 
 typedef void(__cdecl render_camera_build_projection_t)(s_camera*, float*, real_matrix4x3*);
 render_camera_build_projection_t* p_render_camera_build_projection;

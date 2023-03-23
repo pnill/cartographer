@@ -8,6 +8,7 @@
 #include "Blam\Engine\Memory\bitstream.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\objects\object_types.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Game\DamageData.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
@@ -201,11 +202,11 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data nObject;
+		object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		object_placement_data_new(&nObject, weaponId, unit_datum, nullptr);
 
-		datum object_idx = Engine::Objects::object_new(&nObject);
+		datum object_idx = object_new(&nObject);
 
 		if (bReset)
 			Engine::Unit::remove_equipment(unit_datum);
@@ -720,11 +721,11 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data object_placement;
+		object_placement_data object_placement;
 
-		Engine::Objects::create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
+		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, nullptr);
 
-		datum object_idx = Engine::Objects::object_new(&object_placement);
+		datum object_idx = object_new(&object_placement);
 		if (!DATUM_IS_NONE(object_idx))
 		{
 			Engine::Unit::remove_equipment(unit_datum);
@@ -740,7 +741,7 @@ float get_device_acceleration_scale(datum device_datum)
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
 
 	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
+	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_object_data_array()->data + device_gamestate_offset * 4 + 8);
 	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
 
 	__int16 device_control_index = device_control_datum & 0xFFFF;
@@ -1162,7 +1163,7 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	Engine::Objects::apply_biped_object_definition_patches();
+	apply_object_hooks();
 	StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");

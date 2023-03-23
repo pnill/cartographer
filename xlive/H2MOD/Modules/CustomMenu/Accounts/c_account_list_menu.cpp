@@ -96,7 +96,7 @@ c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _de
 
 	s_data_array::data_make_valid(account_list_data);
 
-	for (unsigned int i = 0; i < this->list_data_array->datum_max_elements; i++) {
+	for (unsigned int i = 0; i < this->list_data_array->max_elements; i++) {
 		s_data_array::datum_new_in_range(this->list_data_array);
 	}
 

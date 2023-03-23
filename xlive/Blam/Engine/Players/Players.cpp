@@ -26,7 +26,7 @@ s_player* s_player::GetPlayer(int playerIndex)
 	{
 		return nullptr;
 	}
-	return (s_player*)&GetArray()->data[playerIndex * GetArray()->datum_element_size];
+	return (s_player*)&GetArray()->data[playerIndex * GetArray()->single_element_size];
 }
 
 e_object_team s_player::GetTeam(int playerIndex)

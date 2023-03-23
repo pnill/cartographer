@@ -17,7 +17,7 @@ float get_device_power_transition_time(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-	BYTE* game_state_objects_header_table = (BYTE*)get_objects_header()->data;
+	BYTE* game_state_objects_header_table = (BYTE*)get_object_data_array()->data;
 
 	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);
@@ -38,7 +38,7 @@ datum get_device_open_up_weapon_datum(datum device_datum)
 {
 	DWORD tag_data = (DWORD)tags::get_tag_data();
 	DWORD global_tag_instances = (DWORD)tags::get_tag_instances();
-	BYTE* game_state_objects_header_table = (BYTE*)get_objects_header()->data;
+	BYTE* game_state_objects_header_table = (BYTE*)get_object_data_array()->data;
 
 	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
 	DWORD device_gamestate_datum_pointer = *(DWORD*)(game_state_objects_header_table + device_gamestate_offset * 4 + 8);

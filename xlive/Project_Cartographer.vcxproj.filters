@@ -7,7 +7,7 @@
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
-    <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
+    <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
@@ -104,7 +104,6 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -157,6 +156,26 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\memory\data.cpp" />
+    <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
+    <ClCompile Include="Blam\Engine\math\color_math.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
+    <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\reference_lists.cpp" />
+    <ClCompile Include="Blam\Engine\math\convex_hulls.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -274,7 +293,7 @@
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
-    <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
+    <ClInclude Include="Blam\Engine\memory\bitstream.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
@@ -299,8 +318,6 @@
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
-    <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
     <ClInclude Include="H2MOD.h" />
@@ -410,7 +427,6 @@
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
     <ClInclude Include="Blam\Math\integer_math.h" />
-    <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
@@ -505,6 +521,29 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario.h" />
+    <ClInclude Include="Blam\Engine\structures\structures.h" />
+    <ClInclude Include="Blam\Engine\memory\data.h" />
+    <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
+    <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
+    <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
+    <ClInclude Include="Blam\Engine\math\real_math.h" />
+    <ClInclude Include="Blam\Engine\objects\damage.h" />
+    <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\objects\objects.h" />
+    <ClInclude Include="Blam\Engine\objects\reference_lists.h" />
+    <ClInclude Include="Blam\Engine\math\convex_hulls.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

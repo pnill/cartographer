@@ -1,5 +1,5 @@
 
-#include "Blam\Math\real_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam\Cache\TagGroups\weapon_definition.hpp"
 
 struct s_weapon_custom_offset {
