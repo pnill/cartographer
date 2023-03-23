@@ -8,9 +8,7 @@
 struct s_placement_info
 {
 	WORD origin_bsp_index;
-	// THIS PIECE OF SHIT GARBAGE WONT LET ME USE THE e_object_type ENUM ON THIS CRAP BECAUSE OF HEADER BULLSHIT CRAP
-	// MADE THIS A BYTE BECAUSE SCREW YOU I WANT THIS TO WORK
-	byte object_type;
+	byte object_type;	// this is supposed to be the enum e_object_type
 	byte placement_type;
 };
 
