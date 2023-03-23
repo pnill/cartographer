@@ -179,6 +179,8 @@ struct real_plane3d
 };
 CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(float));
 
+float plane3d_distance_to_point(const real_plane3d* plane, const real_point3d* point);
+
 struct real_quaternion
 {
 	union
@@ -269,9 +271,9 @@ struct real_matrix4x3
 		auto ii = rotation.i * is, jj = rotation.j * js, kk = rotation.k * ks;
 		auto ij = rotation.i * js, ik = rotation.i * ks, jk = rotation.j * ks;
 
-		forward =	{ 1.0f - (jj + kk),  ij - kw,            ik + jw };
-		left =		{ ij + kw,           1.0f - (ii + kk),   jk - iw };
-		up =		{ ik - jw,           jk + iw,            1.0f - (ii + jj) };
+		forward = { 1.0f - (jj + kk),  ij - kw,            ik + jw };
+		left = { ij + kw,           1.0f - (ii + kk),   jk - iw };
+		up = { ik - jw,           jk + iw,            1.0f - (ii + jj) };
 	}
 };
 CHECK_STRUCT_SIZE(real_matrix4x3, 52);
@@ -309,7 +311,7 @@ struct real_color_rgb
 		blue(_blue)
 	{}
 
-	real_color_rgb(const real_color_argb &colour) :
+	real_color_rgb(const real_color_argb& colour) :
 		red(colour.red),
 		green(colour.green),
 		blue(colour.blue)
@@ -333,3 +335,10 @@ static void scale_interpolate(float previous_scale, float current_scale, float f
 }
 
 static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
+
+__int16 projection_from_vector3d(const real_vector3d* vector);
+bool projection_sign_from_vector3d(const real_vector3d* vector, short projection);
+void project_point3d(const real_point3d* point, const short projection, const bool a3, real_point2d* out);
+float magnitude_squared2d(const real_point2d* point);
+float cross_product2d(const real_vector2d* p1, const real_vector2d* p2);
+void vector_from_points2d(const real_point2d* initial_point, const real_point2d* new_point, real_vector2d* vector);
