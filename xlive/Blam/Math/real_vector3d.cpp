@@ -96,8 +96,6 @@ float normalize3d(real_vector3d* v1)
 	scale_vector3d(v1, 1.0f / length, v1);
 
 	return length;
-
-	// return Memory::GetAddressRelative<float(__cdecl*)(real_vector3d*)>(0x429359, 0x4273B0)(v1);
 }
 
 bool limit3d(real_vector3d* v, float limit)
