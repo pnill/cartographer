@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/Game/GameOptions.h"
+#include "Blam/Engine/structures/structures.h"
 
 #pragma pack(push,1)
 struct s_game_globals
@@ -24,12 +25,11 @@ struct s_game_globals
 	DWORD field_11A4;
 	byte pvs0[64];
 	byte pvs1[64];
-	DWORD cluster_activation[16];
+	s_game_cluster_bit_vectors cluster_activation[16];
 	byte enable_scripted_camera_pvs;
 	byte pad4;
 	WORD pvs_object_is_set;
 	datum pvs_object_datum;
-
 
 	static s_game_globals* get();
 	static bool map_initialized();
@@ -41,6 +41,8 @@ struct s_game_globals
 	static bool game_is_in_progress();
 
 	static bool game_is_predicted();
+
+	static s_game_cluster_bit_vectors* game_get_cluster_activation();
 };
 CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
 #pragma pack(pop)
