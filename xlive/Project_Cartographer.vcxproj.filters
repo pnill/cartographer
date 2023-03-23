@@ -156,7 +156,6 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Mook.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
-    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\physics\bsp3d.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
@@ -169,13 +168,14 @@
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\math\convex_hulls.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="Blam\Engine\objects\reference_lists.cpp" />
-    <ClCompile Include="Blam\Engine\math\convex_hulls.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -521,8 +521,6 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Mook.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
-    <ClInclude Include="Blam\Engine\objects\object_types.h" />
-    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\physics\bsp3d.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
@@ -535,6 +533,10 @@
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\math\convex_hulls.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
@@ -542,8 +544,6 @@
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\objects\reference_lists.h" />
-    <ClInclude Include="Blam\Engine\math\convex_hulls.h" />
-    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
