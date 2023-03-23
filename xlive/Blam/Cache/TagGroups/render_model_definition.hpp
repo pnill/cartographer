@@ -126,7 +126,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 			compressed_secondary_texcoord = FLAG(2),
 		};
 		e_geometry_compression_flags geometry_compression_flags;//0x1A
-		struct s_NUM__block
+		struct s_compression_info
 		{
 			float position_bounds_x_lower;//0x0
 			float position_bounds_x_upper;//0x4
@@ -143,8 +143,8 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 			float secondary_texcoord_bounds_y_lower;//0x30
 			float secondary_texcoord_bounds_y_upper;//0x34
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
-		tag_block<s_NUM__block> NUM_;//0x1C
+		TAG_BLOCK_SIZE_ASSERT(s_compression_info, 0x38);
+		tag_block<s_compression_info> NUM_;//0x1C
 		__int8 hardware_node_count;//0x24
 		__int8 node_map_size;//0x25
 		__int16 software_plane_count;//0x26

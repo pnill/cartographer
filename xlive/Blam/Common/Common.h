@@ -32,6 +32,16 @@
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
 
+#define ENUM_OPERATORS(enum, type) \
+	inline enum operator~ (enum a) { return (enum)~(type)a; } \
+	inline enum operator| (enum a, enum b) { return (enum)((type)a | (type)b); } \
+	inline enum operator& (enum a, enum b) { return (enum)((type)a & (type)b); } \
+	inline enum operator^ (enum a, enum b) { return (enum)((type)a ^ (type)b); } \
+	inline enum& operator|= (enum& a, enum b) { return (enum&)((type&)a |= (type)b); } \
+	inline enum& operator&= (enum& a, enum b) { return (enum&)((type&)a &= (type)b); } \
+	inline enum& operator^= (enum& a, enum b) { return (enum&)((type&)a ^= (type)b); }
+
+
 /// Creates a mask out of a count number of flags
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
 

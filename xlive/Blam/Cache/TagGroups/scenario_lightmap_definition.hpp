@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam\Cache\DataTypes\BlamDataTypes.h"
 #include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Math\real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: scenario_structure_lightmap
@@ -82,7 +82,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				compressed_secondary_texcoord = FLAG(2),
 			};
 			e_geometry_compression_flags geometry_compression_flags;//0x16
-			struct s_NUM__block
+			struct s_compression_info
 			{
 				float position_bounds_x_lower;//0x0
 				float position_bounds_x_upper;//0x4
@@ -99,8 +99,8 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				float secondary_texcoord_bounds_y_lower;//0x30
 				float secondary_texcoord_bounds_y_upper;//0x34
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
-			tag_block<s_NUM__block> NUM_;//0x18
+			TAG_BLOCK_SIZE_ASSERT(s_compression_info, 0x38);
+			tag_block<s_compression_info> NUM_;//0x18
 			__int8 hardware_node_count;//0x20
 			__int8 node_map_size;//0x21
 			__int16 software_plane_count;//0x22
@@ -296,7 +296,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				compressed_secondary_texcoord = FLAG(2),
 			};
 			e_geometry_compression_flags geometry_compression_flags;//0x16
-			struct s_NUM__block
+			struct s_compression_info
 			{
 				float position_bounds_x_lower;//0x0
 				float position_bounds_x_upper;//0x4
@@ -313,8 +313,8 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				float secondary_texcoord_bounds_y_lower;//0x30
 				float secondary_texcoord_bounds_y_upper;//0x34
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
-			tag_block<s_NUM__block> NUM_;//0x18
+			TAG_BLOCK_SIZE_ASSERT(s_compression_info, 0x38);
+			tag_block<s_compression_info> NUM_;//0x18
 			__int8 hardware_node_count;//0x20
 			__int8 node_map_size;//0x21
 			__int16 software_plane_count;//0x22

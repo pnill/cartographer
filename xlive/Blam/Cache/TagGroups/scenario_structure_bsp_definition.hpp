@@ -1,15 +1,17 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Engine/math/real_math.h"
+#include <wtypes.h>
 
 /*********************************************************************
 * name: scenario_structure_bsp
 * group_tag : sbsp
 * header size : 572
 * *********************************************************************/
-struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
+struct s_scenario_structure_bsp_group_definition : TagGroup<'sbsp'>
 {
 	struct s_import_info_block
 	{
@@ -50,13 +52,27 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	{
 		struct s_bsp_3d_nodes_block
 		{
-			PAD(0x8);//0x0
+			short plane;
+			byte front_child_lower;
+			byte front_child_mid;
+			byte front_child_upper;
+			byte back_child_lower;
+			byte back_child_mid;
+			byte back_child_upper;
+
+			BLAM_MATH_INL int get_child_index(bool back_child) const
+			{
+				if (back_child)
+					return *(__int64*)this >> 40;			// Returns back child lower
+				else
+					return *(__int64*)this << 24 >> 40;		// Returns front child lower but then does some bitshift magic to see if it references a child index it's used before?
+			}
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_bsp_3d_nodes_block, 0x8);
 		tag_block<s_bsp_3d_nodes_block> bsp_3d_nodes;//0x0
 		struct s_planes_block
 		{
-			real_plane3d plane_distance;
+			real_plane3d plane;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_planes_block, 0x10);
 		tag_block<s_planes_block> planes;//0x8
@@ -163,14 +179,12 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	data_block cluster_data;//0x54
 	struct s_cluster_portals_block
 	{
-		__int16 back_cluster;//0x0
-		__int16 front_cluster;//0x2
-		__int32 plane_index;//0x4
-		float centroid_x;//0x8
-		float centroid_y;//0xC
-		float centroid_z;//0x10
-		float bounding_radius;//0x14
-		enum class e_flags : __int32
+		__int16 back_cluster;
+		__int16 front_cluster;
+		__int32 plane_index;
+		real_point3d centroid;
+		float bounding_radius;
+		enum e_flags : __int32
 		{
 			ai_cannot_hear_through_this = FLAG(0),
 			oneway = FLAG(1),
@@ -179,12 +193,10 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 			oneway_reversed = FLAG(4),
 			no_one_can_hear_through_this = FLAG(5),
 		};
-		e_flags flags;//0x18
+		e_flags flags;
 		struct s_vertices_block
 		{
-			float point_x;//0x0
-			float point_y;//0x4
-			float point_z;//0x8
+			real_point3d point;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0xC);
 		tag_block<s_vertices_block> vertices;//0x1C
@@ -280,96 +292,98 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 		PAD(0x4);//0x20
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_detail_objects_block, 0x24);
-	tag_block<s_detail_objects_block> detail_objects;//0x94
+	tag_block<s_detail_objects_block> detail_objects;
 	struct s_clusters_block
 	{
-		__int16 total_vertex_count;//0x0
-		__int16 total_triangle_count;//0x2
-		__int16 total_part_count;//0x4
-		__int16 shadowcasting_triangle_count;//0x6
-		__int16 shadowcasting_part_count;//0x8
-		__int16 opaque_point_count;//0xA
-		__int16 opaque_vertex_count;//0xC
-		__int16 opaque_part_count;//0xE
-		__int8 opaque_max_nodesvertex;//0x10
-		__int8 transparent_max_nodesvertex;//0x11
-		__int16 shadowcasting_rigid_triangle_count;//0x12
-		enum class e_geometry_classification : __int16
+		WORD total_vertex_count;
+		WORD total_triangle_count;
+		WORD total_part_count;
+		WORD shadowcasting_triangle_count;
+		WORD shadowcasting_part_count;
+		WORD opaque_point_count;
+		WORD opaque_vertex_count;
+		WORD opaque_part_count;
+		byte opaque_max_nodesvertex;
+		byte transparent_max_nodesvertex;
+		WORD shadowcasting_rigid_triangle_count;
+		enum e_geometry_classification : __int16
 		{
-			worldspace = 0,
-			rigid = 1,
-			rigid_boned = 2,
-			skinned = 3,
-			unsupported_reimport = 4,
+			_geometry_classification_worldspace_bit = FLAG(0),
+			_geometry_classification_rigid_bit = FLAG(1),
+			_geometry_classification_rigid_boned_bit = FLAG(2),
+			_geometry_classification_skinned_bit = FLAG(3),
+			_geometry_classification_unsupported_reimport_bit = FLAG(4),
 		};
-		e_geometry_classification geometry_classification;//0x14
-		enum class e_geometry_compression_flags : __int16
+		e_geometry_classification geometry_classification;
+		enum e_geometry_compression_flags : __int16
 		{
-			compressed_position = FLAG(0),
-			compressed_texcoord = FLAG(1),
-			compressed_secondary_texcoord = FLAG(2),
+			_geometry_compression_compressed_position_bit = FLAG(0),
+			_geometry_compression_compressed_texcoord_bit = FLAG(1),
+			_geometry_compression_compressed_secondary_texcoord_bit = FLAG(2),
 		};
-		e_geometry_compression_flags geometry_compression_flags;//0x16
-		struct s_NUM__block
+		e_geometry_compression_flags geometry_compression_flags;
+		struct s_compression_info
 		{
-			float position_bounds_x_lower;//0x0
-			float position_bounds_x_upper;//0x4
-			float position_bounds_y_lower;//0x8
-			float position_bounds_y_upper;//0xC
-			float position_bounds_z_lower;//0x10
-			float position_bounds_z_upper;//0x14
-			float texcoord_bounds_x_lower;//0x18
-			float texcoord_bounds_x_upper;//0x1C
-			float texcoord_bounds_y_lower;//0x20
-			float texcoord_bounds_y_upper;//0x24
-			float secondary_texcoord_bounds_x_lower;//0x28
-			float secondary_texcoord_bounds_x_upper;//0x2C
-			float secondary_texcoord_bounds_y_lower;//0x30
-			float secondary_texcoord_bounds_y_upper;//0x34
+			float position_bounds_x_lower;
+			float position_bounds_x_upper;
+			float position_bounds_y_lower;
+			float position_bounds_y_upper;
+			float position_bounds_z_lower;
+			float position_bounds_z_upper;
+			float texcoord_bounds_x_lower;
+			float texcoord_bounds_x_upper;
+			float texcoord_bounds_y_lower;
+			float texcoord_bounds_y_upper;
+			float secondary_texcoord_bounds_x_lower;
+			float secondary_texcoord_bounds_x_upper;
+			float secondary_texcoord_bounds_y_lower;
+			float secondary_texcoord_bounds_y_upper;
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
-		tag_block<s_NUM__block> NUM_;//0x18
-		__int8 hardware_node_count;//0x20
-		__int8 node_map_size;//0x21
-		__int16 software_plane_count;//0x22
-		__int16 total_subpart_cont;//0x24
-		enum class e_section_lighting_flags : __int16
+		TAG_BLOCK_SIZE_ASSERT(s_compression_info, 0x38);
+		tag_block<s_compression_info> compression_info;
+		byte hardware_node_count;
+		byte node_map_size;
+		WORD software_plane_count;
+		WORD total_subpart_cont;
+		enum e_section_lighting_flags : __int16
 		{
-			has_lm_texcoords = FLAG(0),
-			has_lm_inc_rad = FLAG(1),
-			has_lm_colors = FLAG(2),
-			has_lm_prt = FLAG(3),
+			_section_lighting_has_lm_texcoords_bit = FLAG(0),
+			_section_lighting_has_lm_inc_rad_bit = FLAG(1),
+			_section_lighting_has_lm_colors_bit = FLAG(2),
+			_section_lighting_has_lm_prt_bit = FLAG(3),
 		};
-		e_section_lighting_flags section_lighting_flags;//0x26
-		__int32 block_offset;//0x28
-		__int32 block_size;//0x2C
-		__int32 section_data_size;//0x30
-		__int32 resource_data_size;//0x34
+		e_section_lighting_flags section_lighting_flags;
+		__int32 block_offset;
+		__int32 block_size;
+		__int32 section_data_size;
+		__int32 resource_data_size;
 		struct s_resources_block
 		{
-			enum class e_type : __int8
+			enum e_type : __int8	
 			{
 				tag_block = 0,
 				tag_data = 1,
 				vertex_buffer = 2,
 			};
-			e_type type;//0x0
-			PAD(0x3);//0x1
-			__int16 primary_locator;//0x4
-			__int16 secondary_locator;//0x6
-			__int32 resource_data_size;//0x8
-			__int32 resource_data_offset;//0xC
+			e_type type;
+			byte pad0;
+			WORD pad1;
+			__int16 primary_locator;
+			__int16 secondary_locator;
+			DWORD resource_data_size;
+			DWORD resource_data_offset;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_resources_block, 0x10);
-		tag_block<s_resources_block> resources;//0x38
-		PAD(0x4);//0x40
-		__int16 owner_tag_section_offset;//0x44
-		PAD(0x6);//0x46
+		tag_block<s_resources_block> resources;
+		datum owner_tag;
+		short owner_tag_section_offset;
+		short pad;
+		__int32 pad1;
 		struct s_cluster_data_block
 		{
 			struct s_parts_block
 			{
-				enum class e_type : __int16
+				enum e_type : __int16
 				{
 					not_drawn = 0,
 					opaque_shadow_only = 1,
@@ -378,8 +392,8 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 					transparent = 4,
 					lightmap_only = 5,
 				};
-				e_type type;//0x0
-				enum class e_flags : __int16
+				e_type type;
+				enum e_flags : __int16
 				{
 					decalable = FLAG(0),
 					new_part_types = FLAG(1),
@@ -387,132 +401,127 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 					override_triangle_list = FLAG(3),
 					ignored_by_lightmapper = FLAG(4),
 				};
-				e_flags flags;//0x2
-				__int16 material;//0x4
-				__int16 strip_start_index;//0x6
-				__int16 strip_length;//0x8
-				__int16 first_subpart_index;//0xA
-				__int16 subpart_count;//0xC
-				__int8 max_nodesvertex;//0xE
-				__int8 contributing_compound_node_count;//0xF
-				float position_x;//0x10
-				float position_y;//0x14
-				float position_z;//0x18
-				__int8 node_index_0;//0x1C
-				__int8 node_index_1;//0x1D
-				__int8 node_index_2;//0x1E
-				__int8 node_index_3;//0x1F
-				float node_weight_0;//0x20
-				float node_weight_1;//0x24
-				float node_weight_2;//0x28
-				float lod_mipmap_magic_number;//0x2C
-				PAD(0x18);//0x30
+				e_flags flags;
+				__int16 material;
+				__int16 strip_start_index;
+				__int16 strip_length;
+				__int16 first_subpart_index;
+				__int16 subpart_count;
+				__int8 max_nodesvertex;
+				__int8 contributing_compound_node_count;
+				real_point3d position;
+				__int8 node_index_0;
+				__int8 node_index_1;
+				__int8 node_index_2;
+				__int8 node_index_3;
+				float node_weight_0;
+				float node_weight_1;
+				float node_weight_2;
+				float lod_mipmap_magic_number;
+				DWORD pad[6];
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_parts_block, 0x48);
-			tag_block<s_parts_block> parts;//0x0
+			tag_block<s_parts_block> parts;
 			struct s_subparts_block
 			{
-				__int16 indices_start_index;//0x0
-				__int16 indices_length;//0x2
-				__int16 visibility_bounds_index;//0x4
-				__int16 part_index;//0x6
+				__int16 indices_start_index;
+				__int16 indices_length;
+				__int16 visibility_bounds_index;
+				__int16 part_index;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_subparts_block, 0x8);
 			tag_block<s_subparts_block> subparts;//0x8
 			struct s_visibility_bounds_block
 			{
-				float position_x;//0x0
-				float position_y;//0x4
-				float position_z;//0x8
+				real_point3d position;
 				float radius;//0xC
 				__int8 node_0;//0x10
-				PAD(0x3);//0x11
+				byte pad[3];
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_visibility_bounds_block, 0x14);
 			tag_block<s_visibility_bounds_block> visibility_bounds;//0x10
 			struct s_raw_vertices_block
 			{
-				float position_x;//0x0
-				float position_y;//0x4
-				float position_z;//0x8
-				__int32 node_index_old_0;//0xC
-				__int32 node_index_old_1;//0x10
-				__int32 node_index_old_2;//0x14
-				__int32 node_index_old_3;//0x18
-				float node_weight_0;//0x1C
-				float node_weight_1;//0x20
-				float node_weight_2;//0x24
-				float node_weight_3;//0x28
-				__int32 node_index_new_0;//0x2C
-				__int32 node_index_new_1;//0x30
-				__int32 node_index_new_2;//0x34
-				__int32 node_index_new_3;//0x38
-				__int32 use_new_node_indices;//0x3C
-				__int32 adjusted_compound_node_index;//0x40
-				float texcoord_x;//0x44
-				float texcoord_y;//0x48
-				PAD(0x30);//0x4C
-				float secondary_texcoord_x;//0x7C
-				float secondary_texcoord_y;//0x80
-				real_color_rgb primary_lightmap_color;//0x84
-				float primary_lightmap_texcoord_x;//0x90
-				float primary_lightmap_texcoord_y;//0x94
-				PAD(0x2C);//0x98
+				real_point3d position;
+				__int32 old_node_index_0;
+				__int32 old_node_index_1;
+				__int32 old_node_index_2;
+				__int32 old_node_index_3;
+				float node_weight_0;
+				float node_weight_1;
+				float node_weight_2;
+				float node_weight_3;
+				__int32 new_node_index_0;
+				__int32 new_node_index_1;
+				__int32 new_node_index_2;
+				__int32 new_node_index_3;
+				__int32 use_new_node_indices;
+				__int32 adjusted_compound_node_index;
+				real_point2d texcoord;
+				real_vector3d normal;
+				real_vector3d binormal;
+				real_vector3d tangent;
+				real_vector3d anisotropic_binormal;
+				real_point2d secondary_texcoord;
+				real_color_rgb primary_lightmap_color;
+				real_point2d primary_lightmap_texcoord;
+				real_vector3d primary_lightmap_incident_direction;
+				DWORD unk[8];
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_raw_vertices_block, 0xC4);
-			tag_block<s_raw_vertices_block> raw_vertices;//0x18
+			tag_block<s_raw_vertices_block> raw_vertices;
 			struct s_strip_indices_block
 			{
-				__int16 index;//0x0
+				__int16 index;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
-			tag_block<s_strip_indices_block> strip_indices;//0x20
-			data_block visibility_mopp_code;//0x28
+			tag_block<s_strip_indices_block> strip_indices;
+			data_block visibility_mopp_code;
 			struct s_mopp_reorder_table_block
 			{
-				__int16 index;//0x0
+				__int16 index;
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_mopp_reorder_table_block, 0x2);
-			tag_block<s_mopp_reorder_table_block> mopp_reorder_table;//0x30
+			tag_block<s_mopp_reorder_table_block> mopp_reorder_table;
 			struct s_vertex_buffers_block
 			{
-				PAD(0x20);//0x0
+				__int32 vertex_buffer;
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_vertex_buffers_block, 0x20);
-			tag_block<s_vertex_buffers_block> vertex_buffers;//0x38
-			PAD(0x4);//0x40
+			TAG_BLOCK_SIZE_ASSERT(s_vertex_buffers_block, 4);
+			tag_block<s_vertex_buffers_block> vertex_buffers;
+			DWORD unk;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_cluster_data_block, 0x44);
-		tag_block<s_cluster_data_block> cluster_data;//0x4C
-		float bounds_x_lower;//0x54
-		float bounds_x_upper;//0x58
-		float bounds_y_lower;//0x5C
-		float bounds_y_upper;//0x60
-		float bounds_z_lower;//0x64
-		float bounds_z_upper;//0x68
-		__int8 scenario_sky_index;//0x6C
-		__int8 media_index;//0x6D
-		__int8 scenario_visible_sky_index;//0x6E
-		__int8 scenario_atmospheric_fog_index;//0x6F
-		__int8 planar_fog_designator;//0x70
-		__int8 visible_fog_plane_index;//0x71
-		__int16 background_sound;//0x72
-		__int16 sound_environment;//0x74
-		__int16 weather;//0x76
-		__int16 transition_structure_bsp;//0x78
-		PAD(0x6);//0x7A
-		enum class e_flags : __int16
+		tag_block<s_cluster_data_block> cluster_data;
+		float bounds_x_lower;
+		float bounds_x_upper;
+		float bounds_y_lower;
+		float bounds_y_upper;
+		float bounds_z_lower;
+		float bounds_z_upper;
+		__int8 scenario_sky_index;
+		__int8 media_index;
+		__int8 scenario_visible_sky_index;
+		__int8 scenario_atmospheric_fog_index;
+		__int8 planar_fog_designator;
+		__int8 visible_fog_plane_index;
+		__int16 background_sound;
+		__int16 sound_environment;
+		__int16 weather;
+		__int16 transition_structure_bsp;
+		WORD unk[3];
+		enum e_structure_cluster_flags : __int16
 		{
-			oneway_portal = FLAG(0),
-			door_portal = FLAG(1),
-			postprocessed_geometry = FLAG(2),
-			is_the_sky = FLAG(3),
+			_structure_cluster_oneway_portal_bit = FLAG(0),
+			_structure_cluster_door_portal_bit = FLAG(1),
+			_structure_cluster_postprocessed_geometry_bit = FLAG(2),
+			_structure_cluster_is_the_sky_bit = FLAG(3),
 		};
-		e_flags flags;//0x80
-		PAD(0x2);//0x82
+		e_structure_cluster_flags flags;
+		byte pad2[2];
 		struct s_predicted_resources_block
 		{
-			enum class e_type : __int16
+			enum e_type : __int16
 			{
 				bitmap = 0,
 				sound = 1,
@@ -524,35 +533,35 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 				lightmap_cluster_bitmaps = 7,
 				lightmap_instance_bitmaps = 8,
 			};
-			e_type type;//0x0
-			__int16 resource_index;//0x2
-			__int32 tag_index;//0x4
+			e_type type;
+			__int16 resource_index;
+			datum tag_index;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_predicted_resources_block, 0x8);
-		tag_block<s_predicted_resources_block> predicted_resources;//0x84
+		tag_block<s_predicted_resources_block> predicted_resources;
 		struct s_portals_block
 		{
-			__int16 portal_index;//0x0
+			__int16 portal_index;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_portals_block, 0x2);
-		tag_block<s_portals_block> portals;//0x8C
-		__int32 checksum_from_structure;//0x94
+		tag_block<s_portals_block> portals;
+		__int32 checksum_from_structure;
 		struct s_instanced_geometry_indices_block
 		{
-			__int16 instanced_geometry_index;//0x0
+			__int16 instanced_geometry_index;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_instanced_geometry_indices_block, 0x2);
-		tag_block<s_instanced_geometry_indices_block> instanced_geometry_indices;//0x98
+		tag_block<s_instanced_geometry_indices_block> instanced_geometry_indices;
 		struct s_index_reorder_table_block
 		{
-			__int16 index;//0x0
+			__int16 index;
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_index_reorder_table_block, 0x2);
-		tag_block<s_index_reorder_table_block> index_reorder_table;//0xA0
-		data_block collision_mopp_code;//0xA8
+		tag_block<s_index_reorder_table_block> index_reorder_table;
+		data_block collision_mopp_code;
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_clusters_block, 0xB0);
-	tag_block<s_clusters_block> clusters;//0x9C
+	tag_block<s_clusters_block> clusters;
 	struct s_materials_block
 	{
 		tag_reference old_shader;//0x0
@@ -1363,7 +1372,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 			compressed_secondary_texcoord = FLAG(2),
 		};
 		e_geometry_compression_flags geometry_compression_flags;//0x16
-		struct s_NUM__block
+		struct s_compression_info
 		{
 			float position_bounds_x_lower;//0x0
 			float position_bounds_x_upper;//0x4
@@ -1380,8 +1389,8 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 			float secondary_texcoord_bounds_y_lower;//0x30
 			float secondary_texcoord_bounds_y_upper;//0x34
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
-		tag_block<s_NUM__block> NUM_;//0x18
+		TAG_BLOCK_SIZE_ASSERT(s_compression_info, 0x38);
+		tag_block<s_compression_info> NUM_;//0x18
 		__int8 hardware_node_count;//0x20
 		__int8 node_map_size;//0x21
 		__int16 software_plane_count;//0x22

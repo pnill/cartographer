@@ -5,7 +5,7 @@
 #include "Blam\Cache\DataTypes\TagRef.h"
 #include "Blam\Cache\TagGroups.hpp"
 #include "Blam\Common\Common.h"
-#include "Blam\Math\real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: light

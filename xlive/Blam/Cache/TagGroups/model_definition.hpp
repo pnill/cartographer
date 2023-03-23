@@ -480,7 +480,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_targets_block, 0x1C);
 	tag_block<s_targets_block> targets;//0x68
-	struct s_NUM__block
+	struct s_collision_regions_block
 	{
 		string_id name;//0x0
 		__int8 collision_region_index;//0x4
@@ -500,9 +500,9 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 		TAG_BLOCK_SIZE_ASSERT(s_permutations_block, 0x8);
 		tag_block<s_permutations_block> permutations;//0x8
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x10);
-	tag_block<s_NUM__block> NUM_;//0x70
-	struct s_NUM__block_1
+	TAG_BLOCK_SIZE_ASSERT(s_collision_regions_block, 0x10);
+	tag_block<s_collision_regions_block> collision_regions;//0x70
+	struct s_nodes_block
 	{
 		string_id name;//0x0
 		__int16 parent_node;//0x4
@@ -520,8 +520,8 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 		float default_inverse_position_y;//0x54
 		float default_inverse_position_z;//0x58
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_NUM__block_1, 0x5C);
-	tag_block<s_NUM__block_1> NUM_1;//0x78
+	TAG_BLOCK_SIZE_ASSERT(s_nodes_block, 0x5C);
+	tag_block<s_nodes_block> nodes;//0x78
 	PAD(0x4);//0x80
 	struct s_model_object_data_block
 	{
