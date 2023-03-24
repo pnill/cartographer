@@ -1,5 +1,4 @@
 #pragma once
-#include <wtypes.h>
 
 class c_interpolator_control
 {
