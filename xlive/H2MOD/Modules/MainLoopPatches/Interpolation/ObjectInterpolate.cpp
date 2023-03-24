@@ -10,7 +10,7 @@
 
 #include "Blam\Math\BlamMath.h"
 #include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam/Engine/memory/data.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 

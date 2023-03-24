@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Engine\DataArray\DataArray.h"
+#include "Blam/Engine/memory/data.h"
 #include "Blam\Engine\Objects\Objects.h"
 
 #define ENGINE_MAX_PLAYERS 16
