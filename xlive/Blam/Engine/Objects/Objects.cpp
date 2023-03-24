@@ -4,7 +4,7 @@
 
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\memory\bitstream.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h"

@@ -5,7 +5,7 @@
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\memory\bitstream.h"
 #include "Blam\Engine\Game\GameGlobals.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\FileSystem\FiloInterface.h"

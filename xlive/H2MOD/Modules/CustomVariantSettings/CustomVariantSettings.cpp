@@ -2,13 +2,13 @@
 
 #include "CustomVariantSettings.h"
 
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\memory\bitstream.h"
 #include "Blam\Engine\Game\GameTimeGlobals.h"
 #include "Blam\Engine\Game\PhysicsConstants.h"
 #include "Blam\Engine\Players\PlayerControls.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\memory\bitstream.h"
 
 #include "H2MOD.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
