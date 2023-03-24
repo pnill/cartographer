@@ -229,7 +229,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
-    <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
     <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
@@ -551,7 +551,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
-    <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Game\DamageData.h" />
     <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />

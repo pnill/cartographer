@@ -11,7 +11,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
-#include "Blam/Engine/DataArray/TagDataIterator.h"
+#include "Blam/Engine/cache/cache_files.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function
