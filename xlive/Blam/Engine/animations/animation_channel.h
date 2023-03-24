@@ -4,15 +4,15 @@
 class c_animation_channel
 {
 	int unk0;
-	__int16 unk4;
-	__int16 unk6;
+	short unk4;
+	short unk6;
 	int unk8;
 	char unkC;
 	char unkD;
-	__int16 unkE;
+	short unkE;
 	char unk10;
 	char unk11;
-	__int16 unk12;
+	short unk12;
 	float unk14;
 	float unk18;
 	float unk1C;

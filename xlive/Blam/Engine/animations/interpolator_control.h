@@ -10,7 +10,8 @@ class c_interpolator_control
 
 public:
 	c_interpolator_control();
-	~c_interpolator_control();
+	~c_interpolator_control() = default;
+
 	void disable();
 	void set_interpolation_type(byte value);
 };

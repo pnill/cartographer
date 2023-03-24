@@ -18,7 +18,7 @@ public:
 	DWORD unk80;
 
 	c_animation_manager();
-	~c_animation_manager();
+	~c_animation_manager() = default;
 	void initialize();
 	bool reset_graph(datum jmad_tag_index, datum hlmt_tag_index, bool some_bool);
 };

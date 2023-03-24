@@ -9,11 +9,6 @@ c_interpolator_control::c_interpolator_control()
 	this->unk3 = 0;
 }
 
-c_interpolator_control::~c_interpolator_control()
-{
-
-}
-
 void c_interpolator_control::disable()
 {
 	this->unk0 = 0;

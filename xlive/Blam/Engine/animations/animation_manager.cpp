@@ -7,8 +7,6 @@ c_animation_manager::c_animation_manager()
   c_animation_manager::initialize();
 }
 
-c_animation_manager::~c_animation_manager() = default;
-
 void c_animation_manager::initialize()
 {
     this->channel1.initialize();
