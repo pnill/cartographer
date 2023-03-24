@@ -6,7 +6,7 @@
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Cache\TagGroups\character_definition.hpp"
 
-#include "Blam\Engine\Actor\Actor.h"
+#include "Blam\Engine\ai\actors.h"
 #include "Blam\Engine\Objects\Objects.h"
 #include "H2MOD\Tags\TagInterface.h"
 
@@ -21,7 +21,7 @@ FireFight::FireFight()
 void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
-	s_data_iterator<Actor> actorIt(h2mod->get_actor_table());
+	s_data_iterator<actor> actorIt(h2mod->get_actor_table());
 	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(e_object_type::biped));
 
 	if (actorObject != NULL)
