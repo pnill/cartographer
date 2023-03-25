@@ -252,7 +252,7 @@
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
-    <ClCompile Include="Blam\Engine\Players\Players.cpp" />
+    <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
@@ -679,8 +679,8 @@
     <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\objects\objects.h" />
-    <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
-    <ClInclude Include="Blam\Engine\Players\Players.h" />
+    <ClInclude Include="Blam\Engine\game\player_control.h" />
+    <ClInclude Include="Blam\Engine\game\players.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="H2MOD.h" />

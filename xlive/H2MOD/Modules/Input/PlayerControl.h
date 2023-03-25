@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam\Engine\Players\PlayerActions.h"
 #include "Blam\Engine\Networking\PlayerMotion.h"
-#include "Blam\Engine\Players\PlayerControls.h"
+#include "Blam/Engine/game/player_control.h"
 
 namespace PlayerControl
 {

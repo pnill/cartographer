@@ -6,7 +6,7 @@
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "Blam\Engine\Players\Players.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam\Enums\HaloStrings.h"
 
 #include "H2MOD\Engine\Engine.h"
