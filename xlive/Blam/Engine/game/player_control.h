@@ -1,6 +1,31 @@
 #pragma once
-#include "Blam\Math\BlamMath.h"
-#include "Blam/Engine/Simulation/SimulationWorld.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/game/aim_assist.h"
+#include "Blam/Math/real_math.h"
+
+#pragma pack(push, 1)
+struct player_action
+{
+	int control_flag0;
+	int control_flag1;
+	real_euler_angles2d facing;
+	real_point2d throttle;
+	float trigger;
+	float secondary_trigger;
+	DWORD action_flags;
+	WORD weapon_set_identifier;
+	BYTE primary_weapon_index;
+	BYTE secondary_weapon_index;
+	WORD grenade_index;
+	WORD zoom_level;
+	int interaction_type;
+	int interaction_object;
+	int melee_target_unit;
+	s_aim_assist_targetting_data aim_assist_data;
+	int unk;
+};
+CHECK_STRUCT_SIZE(player_action, 0x60);
+#pragma pack(pop)
 
 struct s_player_control
 {
