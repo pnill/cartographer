@@ -562,7 +562,6 @@
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
-    <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerActions.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />

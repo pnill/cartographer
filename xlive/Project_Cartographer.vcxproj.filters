@@ -479,7 +479,6 @@
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
-    <ClInclude Include="Blam\Engine\Players\LocalPlayers.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
     <ClInclude Include="Blam\Math\real_matrix4x3.h" />
