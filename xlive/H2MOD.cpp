@@ -9,7 +9,7 @@
 #include "Blam/Engine/game/GameGlobals.h"
 #include "Blam/Engine/game/GameTimeGlobals.h"
 #include "Blam\FileSystem\FiloInterface.h"
-#include "Blam/Engine/game/DamageData.h"
+#include "Blam/Engine/objects/damage.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
 #include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"

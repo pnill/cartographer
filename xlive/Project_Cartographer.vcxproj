@@ -233,7 +233,7 @@
     <ClCompile Include="Blam\Engine\game\GameEngineGlobals.cpp" />
     <ClCompile Include="Blam\Engine\game\GameGlobals.cpp" />
     <ClCompile Include="Blam\Engine\game\GameTimeGlobals.cpp" />
-    <ClCompile Include="Blam\Engine\game\PhysicsConstants.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
@@ -552,12 +552,12 @@
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
-    <ClInclude Include="Blam\Engine\game\DamageData.h" />
+    <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\GameEngineGlobals.h" />
     <ClInclude Include="Blam\Engine\game\GameGlobals.h" />
-    <ClInclude Include="Blam\Engine\game\GameState.h" />
-    <ClInclude Include="Blam\Engine\game\GameVariant.h" />
-    <ClInclude Include="Blam\Engine\game\PhysicsConstants.h" />
+    <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
+    <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
@@ -675,7 +675,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Engine\game\HaloScript.h" />
+    <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\objects\objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />

@@ -103,7 +103,7 @@
     <ClCompile Include="Util\curl-interface.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
-    <ClCompile Include="Blam\Engine\Game\PhysicsConstants.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\Engine\Engine.cpp" />
@@ -119,7 +119,6 @@
     <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
-    <ClCompile Include="Blam\Engine\DataArray\TagDataIterator.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
@@ -160,6 +159,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -273,7 +273,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Common\Common.h" />
-    <ClInclude Include="Blam\Engine\DataArray\DataArray.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
@@ -300,8 +299,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
     <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
-    <ClInclude Include="Blam\Engine\Game\HaloScript.h" />
-    <ClInclude Include="Blam\Engine\Objects\ObjectPlacementData.h" />
+    <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
     <ClInclude Include="Blam\Engine\Players\Players.h" />
@@ -381,7 +379,7 @@
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
-    <ClInclude Include="Blam\Engine\Game\DamageData.h" />
+    <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="Blam\Enums\HaloStrings.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
@@ -397,7 +395,7 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\cfg\helpers-inl.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
-    <ClInclude Include="Blam\Engine\Game\PhysicsConstants.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
     <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
@@ -423,8 +421,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
-    <ClInclude Include="Blam\Engine\Game\GameVariant.h" />
-    <ClInclude Include="Blam\Engine\Game\GameState.h" />
+    <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
+    <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
@@ -445,7 +443,6 @@
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
-    <ClInclude Include="Blam\Engine\DataArray\TagDataIterator.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
@@ -511,6 +508,9 @@
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_files.h" />
+    <ClInclude Include="Blam\Engine\memory\data.h" />
+    <ClInclude Include="Blam\Engine\objects\object_placement.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
