@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam\Math\BlamMath.h"
-#include "Blam/Engine/Players/PlayerActions.h"
+#include "Blam/Engine/Simulation/SimulationWorld.h"
 
 struct s_player_control
 {
@@ -10,7 +10,7 @@ struct s_player_control
 	int field_C;
 	int field_10;
 	int field_14;
-	s_player_actions actions;
+	player_action actions;
 	char gap_78[4];
 	DWORD action_context;
 	char gap_80[31];

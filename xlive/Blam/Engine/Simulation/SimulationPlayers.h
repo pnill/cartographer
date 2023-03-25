@@ -26,6 +26,6 @@ struct s_simulation_player
 	bool m_active;
 	PAD(2);
 	unsigned int start_commit_ticks;
-	s_player_actions actions;
+	player_action actions;
 };
 CHECK_STRUCT_SIZE(s_simulation_player, 0x88);

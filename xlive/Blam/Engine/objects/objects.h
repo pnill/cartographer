@@ -2,7 +2,7 @@
 
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/Players/PlayerActions.h"
+#include "Blam/Engine/Simulation/SimulationWorld.h"
 #include "Blam/Engine/objects/object_placement.h"
 
 enum e_object_team : BYTE
