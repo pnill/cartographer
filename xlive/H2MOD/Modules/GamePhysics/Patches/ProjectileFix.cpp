@@ -1,11 +1,12 @@
 #include "stdafx.h"
-
 #include "ProjectileFix.h"
+
 #include "Blam/Engine/game/GameTimeGlobals.h"
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Math\BlamMath.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/objects/Objects.h"
+
+#include "Blam/Math/BlamMath.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "Util/Hooks/Hook.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST

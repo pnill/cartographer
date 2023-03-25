@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/memory/data.h"
-#include "Blam\Engine\Objects\Objects.h"
+#include "Blam/Engine/objects/objects.h"
 
 #define ENGINE_MAX_PLAYERS 16
 
