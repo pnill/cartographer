@@ -10,7 +10,7 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Players/Players.h"
 #include "Blam/Engine/Objects/Objects.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"

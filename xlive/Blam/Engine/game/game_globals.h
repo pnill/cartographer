@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/Game/GameOptions.h"
+#include "Blam/Engine/game/game_options.h"
 
 #pragma pack(push,1)
 struct s_game_globals

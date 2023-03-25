@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/game/GameOptions.h"
+#include "Blam/Engine/game/game_options.h"
 #include "Blam/Engine/objects/object_placement.h"
 
 namespace Engine

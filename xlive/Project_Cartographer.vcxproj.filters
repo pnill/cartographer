@@ -89,7 +89,7 @@
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameTimeGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_time.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
@@ -115,8 +115,8 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameGlobals.cpp" />
-    <ClCompile Include="Blam\Engine\Game\GameEngineGlobals.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
@@ -298,7 +298,7 @@
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
-    <ClInclude Include="Blam\Engine\Game\GameTimeGlobals.h" />
+    <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
     <ClInclude Include="Blam\Engine\Players\PlayerControls.h" />
@@ -364,7 +364,7 @@
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
-    <ClInclude Include="Blam\Engine\Game\GameOptions.h" />
+    <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_screen_widget_definition.hpp" />
@@ -416,8 +416,8 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
-    <ClInclude Include="Blam\Engine\Game\GameGlobals.h" />
-    <ClInclude Include="Blam\Engine\Game\GameEngineGlobals.h" />
+    <ClInclude Include="Blam\Engine\game\game_globals.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />

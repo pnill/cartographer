@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Mouseinput.h"
-#include "Blam/Engine/game/GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "GunGame.h"
-#include "Blam/Engine/game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD.h"

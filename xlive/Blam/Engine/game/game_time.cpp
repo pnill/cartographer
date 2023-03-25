@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "GameTimeGlobals.h"
+#include "game_time.h"
 #include "Blam/Math/BlamMath.h"
 
 #include <float.h>

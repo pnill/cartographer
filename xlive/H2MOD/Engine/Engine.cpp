@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Engine.h"
-#include "Blam/Engine/game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 
 namespace Engine
 {
