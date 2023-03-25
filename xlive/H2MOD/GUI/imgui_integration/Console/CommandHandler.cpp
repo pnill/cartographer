@@ -103,7 +103,7 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
     return ret;
 }
 
-ConsoleVarCommand::ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr, CommandFlags _flags)
+ConsoleVarCommand::ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, IComVar* _var_ptr, CommandFlags _flags)
     : ConsoleCommand(_name, _var_description, _min_parameter_count, _max_parameter_count, _callback, _flags | CommandFlag_SetsVariable)
 {
     m_var_ptr = _var_ptr;

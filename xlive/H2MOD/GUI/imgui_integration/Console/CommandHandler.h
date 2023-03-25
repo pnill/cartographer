@@ -22,7 +22,7 @@ public:
 struct ConsoleCommandCtxData
 {
     ConsoleLog* strOutput;
-    ComVar* commandVar;
+    IComVar* commandVar;
     ExecuteCommandCallbackT* execCmdCb;
     const ConsoleCommand* consoleCommandData;
 };
@@ -101,11 +101,11 @@ private:
 class ConsoleVarCommand final : public ConsoleCommand
 {
 public:
-    ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, ComVar* _var_ptr = nullptr, CommandFlags _flags = CommandFlag_None);
+    ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, IComVar* _var_ptr = nullptr, CommandFlags _flags = CommandFlag_None);
     
     ~ConsoleVarCommand() override = default;
 
-    void UpdateVarPtr(ComVar* varPtr)
+    void UpdateVarPtr(IComVar* varPtr)
     {
         m_var_ptr = varPtr;
     }
@@ -116,7 +116,7 @@ public:
         return m_var_str;
     }
 
-    ComVar* m_var_ptr;
+    IComVar* m_var_ptr;
     char m_var_str[1024];
 
 private:
