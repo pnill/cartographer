@@ -2,8 +2,7 @@
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/objects.h"
 
-#define ENGINE_MAX_PLAYERS 16
-#define ENGINE_MAX_LOCAL_PLAYERS 4
+#define k_maximum_players 16
 
 #pragma pack(push, 1)
 struct s_player
@@ -267,10 +266,6 @@ struct s_player
 };
 CHECK_STRUCT_SIZE(s_player, 0x204);
 #pragma pack(pop)
-
-bool local_user_has_player(int user_index);
-datum local_user_get_player_idx(int user_index);
-
 
 class PlayerIterator : public s_data_iterator<s_player>
 {

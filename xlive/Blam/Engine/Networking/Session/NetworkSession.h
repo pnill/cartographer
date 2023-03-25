@@ -114,7 +114,7 @@ struct s_session_virtual_couch
 	XSESSION_INFO xsession_info;
 	char pad[3];
 	DWORD xuid_count;
-	unsigned long long player_ids[ENGINE_MAX_PLAYERS];
+	unsigned long long player_ids[k_maximum_players];
 };
 CHECK_STRUCT_SIZE(s_session_virtual_couch, 200);
 
@@ -218,7 +218,7 @@ struct s_session_membership
 	s_membership_peer peers[NETWORK_SESSION_PEERS_MAX]; // 0x88
 	int player_count; // 0x1254
 	DWORD players_active_mask; // 0x1258
-	s_membership_player players[ENGINE_MAX_PLAYERS]; // 0x125C
+	s_membership_player players[k_maximum_players]; // 0x125C
 	DWORD unk;
 };
 CHECK_STRUCT_SIZE(s_session_membership, 9328);

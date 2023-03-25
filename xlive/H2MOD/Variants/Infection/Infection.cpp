@@ -64,7 +64,7 @@ void Infection::sendTeamChange()
 	{
 		if (NetworkSession::GetPlayerCount() > 0)
 		{
-			for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+			for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 			{
 				if (NetworkSession::PlayerIsActive(playerIndex))
 				{

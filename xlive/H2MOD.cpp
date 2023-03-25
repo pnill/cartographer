@@ -969,7 +969,7 @@ void vip_lock(e_game_life_cycle state)
 	}
 	if(state == _life_cycle_in_game)
 	{
-		for (int i = 0; i < ENGINE_MAX_PLAYERS; i++)
+		for (int i = 0; i < k_maximum_players; i++)
 		{
 			if (NetworkSession::PlayerIsActive(i))
 				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));

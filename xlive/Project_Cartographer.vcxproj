@@ -233,6 +233,7 @@
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
+    <ClCompile Include="Blam\Engine\game\local_players.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
@@ -251,6 +252,7 @@
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
+    <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
