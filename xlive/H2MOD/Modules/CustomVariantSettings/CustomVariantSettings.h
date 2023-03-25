@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Engine\Game\PhysicsConstants.h"
+#include "Blam/Engine/game/PhysicsConstants.h"
 #include "Blam\Engine\memory\bitstream.h"
 
 namespace CustomVariantSettings

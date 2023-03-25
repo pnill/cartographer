@@ -3,8 +3,8 @@
 #include "CustomVariantSettings.h"
 
 #include "Blam\Engine\memory\bitstream.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Game\PhysicsConstants.h"
+#include "Blam/Engine/game/GameTimeGlobals.h"
+#include "Blam/Engine/game/PhysicsConstants.h"
 #include "Blam\Engine\Players\PlayerControls.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"

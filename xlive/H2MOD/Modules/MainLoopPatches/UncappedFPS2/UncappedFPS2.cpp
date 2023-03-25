@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "UncappedFPS2.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/GameTimeGlobals.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Util\Hooks\Hook.h"

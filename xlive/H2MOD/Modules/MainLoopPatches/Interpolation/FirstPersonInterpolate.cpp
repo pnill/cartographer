@@ -8,7 +8,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/GameTimeGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Players\LocalPlayers.h"
 

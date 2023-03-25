@@ -2,7 +2,7 @@
 
 #include "FireFight.h"
 
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/GameGlobals.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Cache\TagGroups\character_definition.hpp"
 

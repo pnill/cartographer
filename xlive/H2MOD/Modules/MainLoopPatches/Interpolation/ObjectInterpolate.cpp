@@ -12,7 +12,7 @@
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/GameTimeGlobals.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 

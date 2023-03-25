@@ -3,7 +3,7 @@
 #include "Blam\Engine\Objects\Objects.h"
 #include "Blam\Engine\Objects\ObjectPlacementData.h"
 
-#include "Blam\Engine\Game\GameOptions.h"
+#include "Blam/Engine/game/GameOptions.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Common\Common.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"

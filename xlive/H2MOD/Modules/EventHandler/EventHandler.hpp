@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam\Common\Common.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/GameGlobals.h"
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
 #include "H2MOD\Modules\Shell\ServerConsole.h"
 

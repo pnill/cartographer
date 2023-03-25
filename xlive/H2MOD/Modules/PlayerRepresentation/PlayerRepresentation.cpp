@@ -4,8 +4,8 @@
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
-#include "Blam\Engine\Game\GameEngineGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/GameEngineGlobals.h"
+#include "Blam/Engine/game/GameGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Enums\HaloStrings.h"
 

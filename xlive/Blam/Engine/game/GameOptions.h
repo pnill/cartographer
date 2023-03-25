@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam\Common\Common.h"
-#include "Blam\Engine\Game\GameVariant.h"
+#include "Blam/Engine/game/GameVariant.h"
 
 enum e_game_simulation : __int8
 {
