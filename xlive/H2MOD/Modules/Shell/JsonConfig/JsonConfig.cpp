@@ -55,117 +55,126 @@ public:
         // Check if the key exists in the document
         if (!doc_.HasMember(key)) {
             if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key];
+                const Value& v = defaultValues_[key];
+                if constexpr (std::is_same_v<T, bool>) {
+                    return v.GetBool();
+                }
+                else if constexpr (std::is_same_v<T, int>) {
+                    return v.GetInt();
+                }
+                else if constexpr (std::is_same_v<T, unsigned>) {
+                    return v.GetUint();
+                }
+                else if constexpr (std::is_same_v < T, float>) {
+                    return v.GetFloat();
+                }
+                else if constexpr (std::is_same_v<T, std::string>) {
+                    return v.GetString();
+                }
+                else {
+                    // Unsupported type
+                    static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
+                }
             }
-			return defaultValue;
+            return defaultValue;
         }
 
         const Value& v = doc_[key];
-        // Check if the value has the correct data type
-        if (!v.Is<T>()) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key];
-            }
-            return defaultValue;
+        // Use if constexpr to conditionally compile code based on T
+        if constexpr (std::is_same_v<T, bool>) {
+            return v.GetBool();
         }
-        // If the value exists and has the correct data type, return it
-        return v.Get<T>();
+        else if constexpr (std::is_same_v<T, int>) {
+            return v.GetInt();
+        }
+        else if constexpr (std::is_same_v<T, unsigned>) {
+            return v.GetUint();
+        }
+        else if constexpr (std::is_same_v < T, float> ) {
+            return v.GetFloat();
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
+            return v.GetString();
+        }
+        else {
+            // Unsupported type
+            static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
+        }
     }
 
-    // Specialization for float
-    template<>
-    float get<float>(const char* key, float defaultValue) {
-        if (!doc_.HasMember(key)) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetFloat();
-            }
-        }
-        const Value& v = doc_[key];
-        if (!v.IsFloat()) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetFloat();
-            }
-        }
-        return v.GetFloat();
-    }
-    template<>
-    std::string get(const char* key, std::string defaultValue) {
-        if (!doc_.HasMember(key)) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetString();
-            }
-            return defaultValue;
-        }
-        const Value& v = doc_[key];
-        if (!v.IsString()) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetString();
-            }
-            return defaultValue;
-        }
-        return v.GetString();
-    }
-    template<>
-    int get(const char* key, int defaultValue) {
-        if (!doc_.HasMember(key)) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetInt();
-            }
-            return defaultValue;
-        }
-        const Value& v = doc_[key];
-        if (!v.IsInt()) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
-                return defaultValues_[key].GetInt();
-            }
-            return defaultValue;
-        }
-        return v.GetInt();
-    }
     template<typename T>
     void set(const char* key, T value) {
         // Check if the key already exists in the document
         if (doc_.HasMember(key)) {
-            doc_[key].Set<T>(value);
+            if constexpr (std::is_same_v<T, bool>) {
+                doc_[key].SetBool(value);
+            }
+            else if constexpr (std::is_same_v<T, int>) {
+                doc_[key].SetInt(value);
+            }
+            else if constexpr (std::is_same_v<T, unsigned>) {
+                doc_[key].SetUint(value);
+            }
+            else if constexpr (std::is_same_v<T, float>) {
+                doc_[key].SetFloat(value);
+            }
+            else if constexpr (std::is_same_v<T, std::string>) {
+                //RapidJson handles std string strangely..
+                doc_.RemoveMember(key);
+                Value k(key, doc_.GetAllocator());
+                Value v(value.c_str(), value.size(), doc_.GetAllocator());
+                doc_.AddMember(k, v, doc_.GetAllocator());
+            }
+            else if constexpr(std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
+                //This is 100% not the right way but I cannot figure out why I can't do it the correct way
+            	//doc_[key].SetString(value, doc_.GetAllocator());
+
+
+            	doc_.RemoveMember(key);
+                Value k(key, doc_.GetAllocator());
+                std::string temp(value);
+                Value v(temp.c_str(), temp.size(), doc_.GetAllocator());
+                doc_.AddMember(k, v, doc_.GetAllocator());
+            }
+            else {
+                // Unsupported type
+                static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
+            }
         }
         else {
             // If the key does not exist in the document, add a new key-value pair to the document
-            doc_.AddMember(Value(key, doc_.GetAllocator()).Move(), Value(value), doc_.GetAllocator());
-        }
+            Value k(key, doc_.GetAllocator());
+            if constexpr (std::is_same_v<T, bool>) {
+                doc_.AddMember(k, value, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, int>) {
+                doc_.AddMember(k, value, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, unsigned>) {
+                doc_.AddMember(k, value, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, float>) {
+                doc_.AddMember(k, value, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, std::string>) {
+                Value v(value.c_str(), value.size(), doc_.GetAllocator());
+                doc_.AddMember(k, v, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
+                //This is 100% not the right way but I cannot figure out why I can't do it the correct way
+                //doc_.AddMember(k, value, doc_.GetAllocator());
+                //Should work but it doesn't...
 
-    }
-    // Specialization for float
-    template<>
-    void set(const char* key, float value) {
-        if (doc_.HasMember(key)) {
-            doc_[key].SetFloat(value);
-        }
-        else {
-            doc_.AddMember(Value(key, doc_.GetAllocator()).Move(), value, doc_.GetAllocator());
-        }
-
-    }
-    template<>
-    void set(const char* key, std::string value) {
-        Value v(value.c_str(), doc_.GetAllocator());
-        if (doc_.HasMember(key)) {
-            doc_[key].SetString(v.GetString(), doc_.GetAllocator());
-        }
-        else {
-            doc_.AddMember(Value(key, doc_.GetAllocator()).Move(), v, doc_.GetAllocator());
+                std::string temp(value);
+                Value v(temp.c_str(), temp.size(), doc_.GetAllocator());
+                doc_.AddMember(k, v, doc_.GetAllocator());
+            }
+            else {
+                // Unsupported type
+                static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
+            }
         }
     }
-    template<>
-    void set(const char* key, int value) {
-        Value v(value);
-        if (doc_.HasMember(key)) {
-            doc_[key].SetInt(value);
-        }
-        else {
-            doc_.AddMember(Value(key, doc_.GetAllocator()).Move(), v, doc_.GetAllocator());
-        }
-    }
-
     template<typename T>
     void setDefaultValue(const char* key, T value) {
         defaultValues_[key] = value;

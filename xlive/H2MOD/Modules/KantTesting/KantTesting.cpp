@@ -52,12 +52,13 @@ namespace KantTesting
 
 		config.set<int>("test_int", 20);
 		config.set<float>("test_float", 123.0f);
-		config.set<std::string>("test_string", "123456");
+		config.set("test_string", "123456");
 		config.set("test_int2", 20);
 		config.set("test_float2", 123.0f);
 
 		//need to make it so can pass char* and wchar_t*
-		config.set("test_string2", std::string("123456"));
+		config.set("test_string_std", std::string("123456"));
+
 		config.save();
 
 		LOG_INFO_GAME("hmmm");
