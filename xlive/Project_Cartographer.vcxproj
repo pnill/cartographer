@@ -301,6 +301,7 @@
     <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\JsonConfig\JsonConfig.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Shell.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
@@ -623,6 +624,7 @@
     <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\JsonConfig\JsonConfig.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Shell.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
