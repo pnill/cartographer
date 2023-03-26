@@ -161,6 +161,7 @@
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
+    <ClCompile Include="Blam\Engine\interface\interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -512,6 +513,7 @@
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\interface\interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
