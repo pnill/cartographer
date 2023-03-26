@@ -8,7 +8,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include "Blam\Math\BlamMath.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/GameTimeGlobals.h"
 #include "Blam\Engine\Players\Players.h"
 #include "Blam\Engine\Players\LocalPlayers.h"
 
@@ -23,7 +23,7 @@ namespace FirstPersonInterpolate
 			datum unit_idx = DATUM_INDEX_NONE;
 			datum player_idx = DATUM_INDEX_NONE;
 			real_vector3d previous_position;
-		} local_players_states[ENGINE_MAX_LOCAL_PLAYERS];
+		} local_players_states[k_number_of_controllers];
 
 		void unit_get_camera_position(datum unit_idx, real_point3d* out_position)
 		{
@@ -53,7 +53,7 @@ namespace FirstPersonInterpolate
 			return;
 		}
 
-		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+		for (int i = 0; i < k_number_of_controllers; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -96,7 +96,7 @@ namespace FirstPersonInterpolate
 			return;
 
 		// basic checks, verify if player died, if unit has changed etc. after a game tick update
-		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+		for (int i = 0; i < k_number_of_controllers; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -130,7 +130,7 @@ namespace FirstPersonInterpolate
 		if (DATUM_IS_NONE(unit_idx))
 			return;
 
-		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+		for (int i = 0; i < k_number_of_controllers; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -163,7 +163,7 @@ namespace FirstPersonInterpolate
 
 	void Reset()
 	{
-		for (int i = 0; i < ENGINE_MAX_LOCAL_PLAYERS; i++)
+		for (int i = 0; i < k_number_of_controllers; i++)
 		{
 			ResetPlayer(i);
 		}

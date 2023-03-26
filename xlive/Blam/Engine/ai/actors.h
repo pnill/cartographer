@@ -7,9 +7,9 @@
    For now, we only know where the character datum which was used to create the actor is.
 */
 
-struct Actor {
+struct actor {
 	BYTE pad[0x54];
 	datum character_datum;
 	BYTE pad2[0x840];
 };
-CHECK_STRUCT_SIZE(Actor, 0x898);
+CHECK_STRUCT_SIZE(actor, 0x898);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 
 enum e_skulls
 {

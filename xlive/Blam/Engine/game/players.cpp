@@ -17,7 +17,7 @@ s_data_array* s_player::GetArray()
 
 bool s_player::IndexValid(int playerIndex)
 {
-	return playerIndex >= 0 && playerIndex < ENGINE_MAX_PLAYERS;
+	return playerIndex >= 0 && playerIndex < k_maximum_players;
 }
 
 s_player* s_player::GetPlayer(int playerIndex)

@@ -2,8 +2,8 @@
 #include "H2X.h"
 
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Engine/Game/GameGlobals.h"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"

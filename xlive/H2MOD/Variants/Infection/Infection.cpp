@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -64,7 +64,7 @@ void Infection::sendTeamChange()
 	{
 		if (NetworkSession::GetPlayerCount() > 0)
 		{
-			for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+			for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 			{
 				if (NetworkSession::PlayerIsActive(playerIndex))
 				{

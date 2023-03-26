@@ -1,8 +1,8 @@
 #pragma once
-#include "Blam\Engine\DataArray\DataArray.h"
-#include "Blam\Engine\Objects\Objects.h"
+#include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/objects/objects.h"
 
-#define ENGINE_MAX_PLAYERS 16
+#define k_maximum_players 16
 
 #pragma pack(push, 1)
 struct s_player

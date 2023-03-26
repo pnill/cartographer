@@ -5,14 +5,14 @@
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Engine\Memory\bitstream.h"
-#include "Blam\Engine\Game\GameGlobals.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam\Engine\memory\bitstream.h"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam\FileSystem\FiloInterface.h"
-#include "Blam\Engine\Game\DamageData.h"
+#include "Blam/Engine/objects/damage.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
+#include "Blam/Engine/game/cheats.h"
 #include "H2MOD\Discord\DiscordInterface.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
@@ -969,7 +969,7 @@ void vip_lock(e_game_life_cycle state)
 	}
 	if(state == _life_cycle_in_game)
 	{
-		for (int i = 0; i < ENGINE_MAX_PLAYERS; i++)
+		for (int i = 0; i < k_maximum_players; i++)
 		{
 			if (NetworkSession::PlayerIsActive(i))
 				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));

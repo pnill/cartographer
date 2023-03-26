@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
+#include "Blam/Engine/game/cheats.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
