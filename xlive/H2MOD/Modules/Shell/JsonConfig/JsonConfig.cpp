@@ -136,7 +136,7 @@ public:
     }
     // Specialization for float
     template<>
-    void set<float>(const char* key, float value) {
+    void set(const char* key, float value) {
         if (doc_.HasMember(key)) {
             doc_[key].SetFloat(value);
         }
