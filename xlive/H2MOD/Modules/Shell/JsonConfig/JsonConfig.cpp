@@ -71,6 +71,12 @@ public:
                 else if constexpr (std::is_same_v<T, std::string>) {
                     return v.GetString();
                 }
+                else if constexpr (std::is_same_v<T, real_point3d>) {
+                    auto x = v[0].GetFloat();
+                    auto y = v[1].GetFloat();
+                    auto z = v[2].GetFloat();
+                    return real_point3d(x, y, z);
+                }
                 else {
                     // Unsupported type
                     static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
@@ -96,6 +102,12 @@ public:
         else if constexpr (std::is_same_v<T, std::string>) {
             return v.GetString();
         }
+        else if constexpr (std::is_same_v<T, real_point3d>){
+            auto x = v[0].GetFloat();
+            auto y = v[1].GetFloat();
+            auto z = v[2].GetFloat();
+            return real_point3d(x, y, z);
+        }
         else {
             // Unsupported type
             static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
@@ -119,22 +131,17 @@ public:
                 doc_[key].SetFloat(value);
             }
             else if constexpr (std::is_same_v<T, std::string>) {
-                //RapidJson handles std string strangely..
-                doc_.RemoveMember(key);
-                Value k(key, doc_.GetAllocator());
-                Value v(value.c_str(), value.size(), doc_.GetAllocator());
-                doc_.AddMember(k, v, doc_.GetAllocator());
+                doc_[key].SetString(value.c_str(), doc_.GetAllocator());
             }
             else if constexpr(std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
-                //This is 100% not the right way but I cannot figure out why I can't do it the correct way
-            	//doc_[key].SetString(value, doc_.GetAllocator());
-
-
-            	doc_.RemoveMember(key);
-                Value k(key, doc_.GetAllocator());
-                std::string temp(value);
-                Value v(temp.c_str(), temp.size(), doc_.GetAllocator());
-                doc_.AddMember(k, v, doc_.GetAllocator());
+                doc_[key].SetString(StringRef(value));
+            }
+            else if constexpr(std::is_same_v<T, real_point3d>) {
+                Value vals = doc_[key].GetArray();
+                doc_[key].Clear();
+                doc_[key].PushBack(value.x, doc_.GetAllocator());
+                doc_[key].PushBack(value.y, doc_.GetAllocator());
+                doc_[key].PushBack(value.z, doc_.GetAllocator());
             }
             else {
                 // Unsupported type
@@ -161,13 +168,14 @@ public:
                 doc_.AddMember(k, v, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
-                //This is 100% not the right way but I cannot figure out why I can't do it the correct way
-                //doc_.AddMember(k, value, doc_.GetAllocator());
-                //Should work but it doesn't...
-
-                std::string temp(value);
-                Value v(temp.c_str(), temp.size(), doc_.GetAllocator());
-                doc_.AddMember(k, v, doc_.GetAllocator());
+                doc_.AddMember(k, StringRef(value), doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, real_point3d>) {
+                Value vals(rapidjson::kArrayType);
+                vals.PushBack(value.x, doc_.GetAllocator());
+                vals.PushBack(value.y, doc_.GetAllocator());
+                vals.PushBack(value.z, doc_.GetAllocator());
+                doc_.AddMember(k, vals, doc_.GetAllocator());
             }
             else {
                 // Unsupported type

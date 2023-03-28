@@ -55,7 +55,10 @@ namespace KantTesting
 		config.set("test_string", "123456");
 		config.set("test_int2", 20);
 		config.set("test_float2", 123.0f);
+		auto bb = real_point3d(1, 2, 3);
+		config.set("test_point3d", bb);
 
+		auto tpoint = config.get<real_point3d>("test_point3d");
 		//need to make it so can pass char* and wchar_t*
 		config.set("test_string_std", std::string("123456"));
 
