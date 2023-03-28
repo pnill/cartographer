@@ -234,6 +234,7 @@
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
+    <ClCompile Include="Blam\Engine\interface\interface.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
@@ -253,9 +254,11 @@
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\interface\interface.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
@@ -567,6 +570,7 @@
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />

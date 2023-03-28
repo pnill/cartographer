@@ -132,27 +132,6 @@ extern LPDIRECT3DDEVICE9 pDevice;
 
 static bool shouldQuitMainLoop = false;
 
-DWORD* get_scenario_global_address() {
-	return Memory::GetAddress<DWORD*>(0x479e74);
-}
-
-int get_scenario_volume_count() {
-	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
-	return volume_count;
-}
-
-void kill_volume_disable(int volume_id) {
-	void(__cdecl* kill_volume_disable)(int volume_id);
-	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
-	kill_volume_disable(volume_id);
-}
-
-void kill_volume_enable(int volume_id) {
-	void(__cdecl* kill_volume_enable)(int volume_id);
-	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
-	kill_volume_enable(volume_id);
-}
-
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {

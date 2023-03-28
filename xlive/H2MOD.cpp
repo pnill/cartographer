@@ -6,6 +6,7 @@
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Engine\memory\bitstream.h"
+#include "Blam/Engine/interface/interface.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam\FileSystem\FiloInterface.h"
@@ -1024,6 +1025,7 @@ void H2MOD::ApplyHooks() {
 	DETOUR_BEGIN();
 
 	EngineHooks::ApplyHooks();
+	apply_interface_hooks();
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);

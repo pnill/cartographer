@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
+#include "Blam/Engine/interface/interface.h"
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/game/local_players.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -39,7 +41,7 @@ namespace ImGuiHandler {
 			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
-
+			bool split_vertical = true;
 			const char* button_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Left Thumb","Right Thumb","Left Bumper","Right Bumper","A","B","X","Y" };
 			const char* action_items[] = { "Dpad Up","Dpad Down","Dpad Left","Dpad Right","Start","Back","Crouch","Zoom","Flashlight","Switch Grenades","Jump","Melee","Reload","Switch Weapons" };
 			const WORD button_values[] = { 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 4096, 8192, 16384, 32768 };
@@ -1074,6 +1076,90 @@ namespace ImGuiHandler {
 							GSCustomMenuCall_Language();
 						}
 					}
+					if (ImGui::CollapsingHeader("Splitscreen Testing"))
+					{
+						if (ImGui::Button("Go to Coop Menu"))
+						{
+							NopFill(Memory::GetAddress(0x244F0A), 4);
+							NopFill(Memory::GetAddress(0x244F0E), 4);
+							NopFill(Memory::GetAddress(0x244F15), 4);
+
+							typedef void(__cdecl initiate_lobby_type_t)(int a1);
+							auto p_initiate_lobby_type = Memory::GetAddress<initiate_lobby_type_t*>(0x217138);
+
+							p_initiate_lobby_type(0);
+						}
+
+						ImGui::PushItemWidth(120);
+
+						TextVerticalPad("Player Toggle");
+						ImGui::SameLine(170);
+						TextVerticalPad("Controller Index");
+						ImGui::SameLine(320);
+						TextVerticalPad("Controller Mapping");
+						ImGui::SameLine(500);
+						TextVerticalPad("User Mapping");
+
+						TextVerticalPad("1");
+						ImGui::SameLine(60);
+						ImGui::Checkbox("##LP1", &get_local_player_properties(0)->profile_toggle);
+						if (ImGui::IsItemEdited() && get_local_player_properties(0)->profile_toggle) { get_local_player_properties(0)->player_identifier.unk2 = 1; }
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_1", &s_player::GetPlayer(0)->controller_index, 0, 0);
+						ImGui::SameLine(320);
+						ImGui::InputInt("##CM_1", (int*)&s_players_globals::get()->player_controller_mapping[0], 0, 0);
+
+						ImGui::SameLine(500);
+						ImGui::InputInt("##UM_1", (int*)&s_players_globals::get()->player_user_mapping[0], 0, 0);
+
+						TextVerticalPad("2");
+						ImGui::SameLine(60);
+						ImGui::Checkbox("##LP2", &get_local_player_properties(1)->profile_toggle);
+						if (ImGui::IsItemEdited() && get_local_player_properties(1)->profile_toggle) { get_local_player_properties(1)->player_identifier.unk2 = 2; }
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_2", &s_player::GetPlayer(1)->controller_index, 0, 0);
+						ImGui::SameLine(320);
+						ImGui::InputInt("##CM_2", (int*)&s_players_globals::get()->player_controller_mapping[1], 0, 0);
+
+						ImGui::SameLine(500);
+						ImGui::InputInt("##UM_2", (int*)&s_players_globals::get()->player_user_mapping[1], 0, 0);
+
+
+						TextVerticalPad("3");
+						ImGui::SameLine(60);
+						ImGui::Checkbox("##LP3", &get_local_player_properties(2)->profile_toggle);
+						if (ImGui::IsItemEdited() && get_local_player_properties(2)->profile_toggle) { get_local_player_properties(2)->player_identifier.unk2 = 3; }
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_3", &s_player::GetPlayer(2)->controller_index, 0, 0);
+						ImGui::SameLine(320);
+						ImGui::InputInt("##CM_3", (int*)&s_players_globals::get()->player_controller_mapping[2], 0, 0);
+
+						ImGui::SameLine(500);
+						ImGui::InputInt("##UM_3", (int*)&s_players_globals::get()->player_user_mapping[2], 0, 0);
+
+						TextVerticalPad("4");
+						ImGui::SameLine(60);
+						ImGui::Checkbox("##LP4", &get_local_player_properties(3)->profile_toggle);
+						if (ImGui::IsItemEdited() && get_local_player_properties(3)->profile_toggle) { get_local_player_properties(3)->player_identifier.unk2 = 4; }
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_4", &s_player::GetPlayer(3)->controller_index, 0, 0);
+						ImGui::SameLine(320);
+						ImGui::InputInt("##CM_4", (int*)&s_players_globals::get()->player_controller_mapping[3], 0, 0);
+
+						ImGui::SameLine(500);
+						ImGui::InputInt("##UM_4", (int*)&s_players_globals::get()->player_user_mapping[3], 0, 0);
+
+
+						TextVerticalPad("Vertical Screen Split");
+						ImGui::SameLine(480);
+						ImGui::Checkbox("##Vertical Screen Split", &split_vertical);
+						if (ImGui::IsItemEdited())
+						{
+							set_display_type((e_display_type)split_vertical);
+						}
+
+						ImGui::PopItemWidth();
+					}	
 				}
 #endif
 			}
