@@ -1090,32 +1090,38 @@ namespace ImGuiHandler {
 							p_initiate_lobby_type(0);
 						}
 
-						ImGui::PushItemWidth(180);
+						ImGui::PushItemWidth(120);
 
 						TextVerticalPad("Player Toggle");
-						ImGui::SameLine(240);
-						TextVerticalPad("Player Controller Mapping");
-						ImGui::SameLine(480);
-						TextVerticalPad("Player User Mapping");
+						ImGui::SameLine(170);
+						TextVerticalPad("Controller Index");
+						ImGui::SameLine(320);
+						TextVerticalPad("Controller Mapping");
+						ImGui::SameLine(500);
+						TextVerticalPad("User Mapping");
 
 						TextVerticalPad("1");
 						ImGui::SameLine(60);
 						ImGui::Checkbox("##LP1", &get_local_player_properties(0)->profile_toggle);
 						if (ImGui::IsItemEdited() && get_local_player_properties(0)->profile_toggle) { get_local_player_properties(0)->player_identifier.unk2 = 1; }
-						ImGui::SameLine(240);
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_1", &s_player::GetPlayer(0)->controller_index, 0, 0);
+						ImGui::SameLine(320);
 						ImGui::InputInt("##CM_1", (int*)&s_players_globals::get()->player_controller_mapping[0], 0, 0);
 
-						ImGui::SameLine(480);
+						ImGui::SameLine(500);
 						ImGui::InputInt("##UM_1", (int*)&s_players_globals::get()->player_user_mapping[0], 0, 0);
 
 						TextVerticalPad("2");
 						ImGui::SameLine(60);
 						ImGui::Checkbox("##LP2", &get_local_player_properties(1)->profile_toggle);
 						if (ImGui::IsItemEdited() && get_local_player_properties(1)->profile_toggle) { get_local_player_properties(1)->player_identifier.unk2 = 2; }
-						ImGui::SameLine(240);
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_2", &s_player::GetPlayer(1)->controller_index, 0, 0);
+						ImGui::SameLine(320);
 						ImGui::InputInt("##CM_2", (int*)&s_players_globals::get()->player_controller_mapping[1], 0, 0);
 
-						ImGui::SameLine(480);
+						ImGui::SameLine(500);
 						ImGui::InputInt("##UM_2", (int*)&s_players_globals::get()->player_user_mapping[1], 0, 0);
 
 
@@ -1123,20 +1129,24 @@ namespace ImGuiHandler {
 						ImGui::SameLine(60);
 						ImGui::Checkbox("##LP3", &get_local_player_properties(2)->profile_toggle);
 						if (ImGui::IsItemEdited() && get_local_player_properties(2)->profile_toggle) { get_local_player_properties(2)->player_identifier.unk2 = 3; }
-						ImGui::SameLine(240);
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_3", &s_player::GetPlayer(2)->controller_index, 0, 0);
+						ImGui::SameLine(320);
 						ImGui::InputInt("##CM_3", (int*)&s_players_globals::get()->player_controller_mapping[2], 0, 0);
 
-						ImGui::SameLine(480);
+						ImGui::SameLine(500);
 						ImGui::InputInt("##UM_3", (int*)&s_players_globals::get()->player_user_mapping[2], 0, 0);
 
 						TextVerticalPad("4");
 						ImGui::SameLine(60);
 						ImGui::Checkbox("##LP4", &get_local_player_properties(3)->profile_toggle);
 						if (ImGui::IsItemEdited() && get_local_player_properties(3)->profile_toggle) { get_local_player_properties(3)->player_identifier.unk2 = 4; }
-						ImGui::SameLine(240);
+						ImGui::SameLine(170);
+						ImGui::InputInt("##CI_4", &s_player::GetPlayer(3)->controller_index, 0, 0);
+						ImGui::SameLine(320);
 						ImGui::InputInt("##CM_4", (int*)&s_players_globals::get()->player_controller_mapping[3], 0, 0);
 
-						ImGui::SameLine(480);
+						ImGui::SameLine(500);
 						ImGui::InputInt("##UM_4", (int*)&s_players_globals::get()->player_user_mapping[3], 0, 0);
 
 
