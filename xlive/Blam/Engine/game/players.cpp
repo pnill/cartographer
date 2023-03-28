@@ -101,6 +101,11 @@ unsigned long long s_player::GetId(int playerIndex)
 	return GetPlayer(playerIndex)->identifier;
 }
 
+s_players_globals* s_players_globals::get()
+{
+	return *Memory::GetAddress<s_players_globals**>(0x4A825C, 0x4D64C0);
+}
+
 PlayerIterator::PlayerIterator() 
 	: s_data_iterator(s_player::GetArray())
 {

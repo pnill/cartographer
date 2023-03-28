@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/Simulation/MachineID.h"
 
 #define k_maximum_players 16
 
@@ -265,6 +266,40 @@ struct s_player
 	static unsigned long long GetId(int playerIndex);
 };
 CHECK_STRUCT_SIZE(s_player, 0x204);
+
+struct s_players_globals
+{
+	int players_in_game_count;
+	bool all_players_dead;
+	bool any_players_dead;
+	bool input_disabled;
+	bool disable_movement;
+	__int16 player_user_count;
+	__int16 player_controller_count;
+	DWORD player_user_mapping[4];
+	DWORD player_controller_mapping[4];
+	int machine_valid_mask;
+	s_machine_array machine_list;
+	byte unk94;
+	byte unk95;
+	bool unk_bool_96;
+	s_machine_identifier unk_machine_id;
+	byte unk_A5;
+	s_machine_identifier local_machine_identifier;
+	__int16 coop_respawn_hud_message_type;
+	bool unk_bool_A6;
+	byte unk_A7;
+	int respawn_time;
+	__int16 unk_AC;
+	__int16 unk_AE;
+	__int16 unk_B0;
+	__int16 pad2;
+	int object_index;
+	byte end_padding[128];
+
+	static s_players_globals* get();
+};
+CHECK_STRUCT_SIZE(s_players_globals, 0x138);
 #pragma pack(pop)
 
 class PlayerIterator : public s_data_iterator<s_player>
