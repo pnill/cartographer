@@ -252,12 +252,7 @@ void Infection::removeUnwantedItems()
 	for (DWORD i = 0; i < scenario->netgame_equipment.size; i++)
 	{
 		auto netgame_equipment = scenario->netgame_equipment[i];
-		if (netgame_equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection 
-			|| netgame_equipment->classification == s_scenario_group_definition::s_netgame_equipment_block::e_classification::primary_flying
-			|| netgame_equipment->classification == s_scenario_group_definition::s_netgame_equipment_block::e_classification::primary_heavy_land
-			|| netgame_equipment->classification == s_scenario_group_definition::s_netgame_equipment_block::e_classification::primary_light_land
-			|| netgame_equipment->classification == s_scenario_group_definition::s_netgame_equipment_block::e_classification::secondary_heavy_land
-			|| netgame_equipment->classification == s_scenario_group_definition::s_netgame_equipment_block::e_classification::secondary_light_land)
+		if (netgame_equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
 		{
 			netgame_equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
 			netgame_equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
