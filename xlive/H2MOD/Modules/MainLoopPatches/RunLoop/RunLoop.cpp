@@ -235,6 +235,15 @@ void __cdecl main_game_loop_hook() {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
+typedef void(_cdecl* main_loop_body_t)();
+main_loop_body_t p_main_loop_body_dedi;
+void __cdecl main_loop_body_dedi() 
+{
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
+	p_main_loop_body_dedi();
+	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
+}
+
 static char __cdecl dedicated_server_should_quit_hook() {
 	if (!shouldQuitMainLoop)
 		CartographerMainLoop();
@@ -627,7 +636,10 @@ void InitRunLoop() {
 	addDebugText("Pre RunLoop hooking.");
 	if (H2IsDediServer) {
 		addDebugText("Hooking loop & shutdown Function");
+		p_main_loop_body_dedi = Memory::GetAddress<main_loop_body_t>(0x0, 0xBFDE);
+
 		PatchCall(Memory::GetAddress(0x0, 0xc6cb), dedicated_server_should_quit_hook);
+		PatchCall(Memory::GetAddress(0x0, 0xC684), main_loop_body_dedi);
 	}
 	else {
 		addDebugText("Hooking loop Function");

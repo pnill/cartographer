@@ -209,7 +209,7 @@ void Infection::onGameTick()
 				human_count++;
 
 		}
-		if(human_count == 0 && zombie_count >= 1)
+		if(human_count == 0 && zombie_count > 1)
 		{
 			ticks_without_any_humans++;
 		}
