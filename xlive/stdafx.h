@@ -60,6 +60,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
+#include <Util\remove_all_ptr.h>
 
 #include <d3d9.h>
 #include <d3dx9.h>

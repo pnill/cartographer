@@ -37,7 +37,7 @@ Console::Console() :
 	}
 
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
-	console_opacity_var_cmd.UpdateVarPtr((ComVar*)&m_console_opacity);
+	console_opacity_var_cmd.UpdateVarPtr((IComVar*)&m_console_opacity);
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
 	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, Console::clear_cb));
 }

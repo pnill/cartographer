@@ -20,13 +20,13 @@ struct bitstream
 	DWORD m_data_size_bytes;
 	DWORD m_data_size_alignment;
 	e_bitstream_state state;
-	signed int m_current_bit_position;
+	int m_current_bit_position;
 	bool is_debug_stream;
 	BYTE gap_14[3];
-	signed int m_position_stack_depth;
+	int m_position_stack_depth;
 	DWORD stack[4];
-	signed int field_2C;
-	signed int field_30;
+	int field_2C;
+	int field_30;
 
 	void init(void* buffer, DWORD data_length);
 	void init(void* buffer, DWORD data_length, DWORD data_size_alignment);
@@ -49,8 +49,8 @@ struct bitstream
 	float data_decode_quantized_real(const char* name, float min_value, float max_value, int size_in_bits, char exact_midpoint);
 	void data_encode_unit_vector(const char* name, real_vector3d* vector);
 	void data_decode_unit_vector(const char* name, real_vector3d* out_vector);
-	void data_encode_signed_integer(const char* name, signed int value, unsigned int size_in_bits);
-	signed int data_decode_signed_integer(const char* name, unsigned int size_in_bits);
+	void data_encode_signed_integer(const char* name, int value, unsigned int size_in_bits);
+	int data_decode_signed_integer(const char* name, unsigned int size_in_bits);
 	void data_encode_axes(const char* name, real_vector3d* forward, real_vector3d* up);
 	void data_decode_axes(const char* name, real_vector3d* out_forward, real_vector3d* out_up);
 	void data_encode_vector(const char* name, real_vector3d* vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);

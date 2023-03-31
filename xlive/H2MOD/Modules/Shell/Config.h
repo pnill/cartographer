@@ -86,7 +86,7 @@ extern __int16 H2Config_refresh_rate;
 extern bool H2Config_hiresfix;
 extern bool H2Config_shader_lod_max;
 extern bool H2Config_light_suppressor;
-extern bool H2Config_d3dex;
+extern bool H2Config_d3d9ex;
 extern float H2Config_crosshair_offset;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;

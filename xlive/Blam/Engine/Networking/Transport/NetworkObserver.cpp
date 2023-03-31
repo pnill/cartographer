@@ -24,15 +24,6 @@ bool _online_netcode_use_local_network_time = true;
 #	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
 
-// TODO:
-int __cdecl network_time_get()
-{
-	typedef int(__cdecl* network_time_get_t)();
-	auto p_network_time_get = Memory::GetAddressRelative<network_time_get_t>(0x0);
-
-	return p_network_time_get();
-}
-
 // LIVE netcode research
 void __cdecl initialize_network_observer_configuration()
 {
@@ -156,15 +147,15 @@ void s_network_observer::sendNetworkMessage(int session_index, int observer_inde
 
 bool __cdecl is_network_observer_mode_managed()
 {
-	// or in other terms this verifies if the network protocol is LIVE (aka managed)
-	// this is used for host migration happening on game start (that causes the short delay when the game starts in a p2p session)
-	// which is disabled in LAN mode
+	// or in other terms this checks if the network protocol is LIVE
+	// it is used for migrating the host before starting the game (which causes the short delay when the game starts in a p2p session)
+	// in LAN mode it's disabled
 	return false;
 }
 
 void s_network_observer::ResetNetworkPreferences()
 {
-	// clear the network bandwidth preferences so they won't cause issues
+	// reset the network bandwidth preferences
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preference_size);
 }
 
@@ -311,13 +302,6 @@ void s_network_observer::ForceConstantNetworkRate()
 	// unless original XNet transport layer had packet compression but even then it's rather dumb
 	// or maybe the UDP protocol has something like that, no idea
 	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
-
-	// time patches, use the locked time at the start of netweork_send instead of the frame time delta
-	BYTE instr_offset_1[] = { 0x2C };
-	//WriteBytes(Memory::GetAddressRelative(0x5BF145, 0x5B901F) + 0x3, instr_offset_1, sizeof(instr_offset_1));
-
-	BYTE instr_offset_2[] = { 0x08, 0x07, 0x00, 0x00 };
-	// WriteBytes(Memory::GetAddressRelative(0x5BF14B, 0x5B9025) + 0x2, instr_offset_2, sizeof(instr_offset_2));
 }
 
 void s_network_observer::ApplyGamePatches()
@@ -387,6 +371,9 @@ void s_network_observer::ApplyGamePatches()
 #endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
+	// disable forced host migration in P2P games
+	// this is using the XNet QoS probes to select a preferred host with a possible better connection
+	// which is not really available anymore with cartographer, since the QoS probes are not that accurate anymore
 	if (!Memory::IsDedicatedServer())
 	{
 		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);

@@ -24,15 +24,15 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-DECL_ComVarCommandPtr(d3d9ex_var, bool*, &H2Config_d3dex, 
+ComVarFromPtr(d3d9ex_var, bool*, &H2Config_d3d9ex, 
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
-DECL_ComVarCommandPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
+ComVarFromPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
 	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
-DECL_ComVarCommandPtr(og_frame_limiter_var, bool*, &MainGameTime::fps_limiter_enabled,
+ComVarFromPtr(og_frame_limiter_var, bool*, &MainGameTime::fps_limiter_enabled,
 	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
-DECL_ComVarCommandPtr(display_xyz_var, bool*, &displayXyz,
+ComVarFromPtr(display_xyz_var, bool*, &displayXyz,
 	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
 // don't forget to add '_cmd' after the name, 
@@ -107,7 +107,7 @@ ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& nam
 }
 
 // in case your variable needs to be set/updated
-void CommandCollection::SetVarCommandPtr(const std::string& name, ComVar* varPtr)
+void CommandCollection::SetVarCommandPtr(const std::string& name, IComVar* varPtr)
 {
 	ConsoleVarCommand* varCmdPtr = GetVarCommandByName(name);
 	if (varCmdPtr != nullptr)
@@ -123,7 +123,7 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, ComVar* varPtr
 int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	auto var = reinterpret_cast<ComVarTPtr<bool*>*>(cbData.commandVar);
+	auto var = reinterpret_cast<ComVarT<bool*>*>(cbData.commandVar);
 
 	std::string exception;
 	if (!var->SetValFromStr(tokens[1], 10, exception))
@@ -256,7 +256,7 @@ int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, 
 int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	ComVarT<int> peerIdxVar;
+	ComVar<int> peerIdxVar;
 	std::string exception;
 
 	do
@@ -457,7 +457,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 {
 	ConsoleLog* output = cbData.strOutput;
 
-	ComVarT<int> value; 
+	ComVar<int> value; 
 	std::string exception;
 
 	do 
@@ -491,7 +491,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = cbData.strOutput;
-	ComVarT<bool> warpFixVar;
+	ComVar<bool> warpFixVar;
 
 	if (Memory::IsDedicatedServer()) {
 		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
@@ -513,7 +513,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = cbData.strOutput;
-	ComVarT<datum> datumIdx;
+	ComVar<datum> datumIdx;
 
 	std::string exception;
 	if (!datumIdx.SetValFromStr(tokens[1], 0, exception))
@@ -554,10 +554,10 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	// spawn object_name count same_team near_player x y z i j k
 
 	datum objectDatum = DATUM_INDEX_NONE;
-	ComVarT<int> count;
-	ComVarT<float> varPos[3];
-	ComVarT<float> varRotation[3];
-	ComVarT<bool> sameTeam, nearPlayerSpawn;
+	ComVar<int> count;
+	ComVar<float> varPos[3];
+	ComVar<float> varRotation[3];
+	ComVar<bool> sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
 	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));

@@ -31,7 +31,7 @@ struct c_game_engine_vtable
 	c_engine_func_proto_ptr(setup_scenario, unsigned __int8);
 	c_engine_func_proto_ptr(cleanup, void);
 	c_engine_func_proto_ptr(unk_function_4, int);
-	c_engine_func_proto_ptr(unk_function_5, int, signed int arg1);
+	c_engine_func_proto_ptr(unk_function_5, int, int arg1);
 	c_engine_func_proto_ptr(unk_function_players_1, void, int arg1);
 	c_engine_func_proto_ptr(update_player__maybe__maybe_spawn, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_8, void, int arg1);
@@ -52,19 +52,19 @@ struct c_game_engine_vtable
 	c_engine_func_proto_ptr(unk_function_23, void, int arg1);
 	c_engine_func_proto_ptr(unk_function_24, void, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_25, int, int arg1, int arg2);
-	c_engine_func_proto_ptr(unk_function_26, int, signed int arg1, int arg2, signed int arg3);
+	c_engine_func_proto_ptr(unk_function_26, int, int arg1, int arg2, int arg3);
 	c_engine_func_proto_ptr(unk_function_27, int);
 	c_engine_func_proto_ptr(is_team_enemy, int, BYTE team_a, BYTE team_b);
 	c_engine_func_proto_ptr(unk_function_29, void, int arg1);
-	c_engine_func_proto_ptr(unk_function_30, void, signed int arg1, int arg2, signed int arg3);
-	c_engine_func_proto_ptr(unk_function_31, void, int arg1, int arg2, char arg3, signed int arg4);
-	c_engine_func_proto_ptr(unk_function_32, int, signed int arg1, int arg2, signed int arg3);
+	c_engine_func_proto_ptr(unk_function_30, void, int arg1, int arg2, int arg3);
+	c_engine_func_proto_ptr(unk_function_31, void, int arg1, int arg2, char arg3, int arg4);
+	c_engine_func_proto_ptr(unk_function_32, int, int arg1, int arg2, int arg3);
 	c_engine_func_proto_ptr(unk_function_33, void, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_34, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_35, bool, int arg1);
-	c_engine_func_proto_ptr(unk_function_36, int, int arg1, signed int arg2);
+	c_engine_func_proto_ptr(unk_function_36, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(unk_function_37, void, int arg1);
-	c_engine_func_proto_ptr(unk_function_38, int, int arg1, signed int arg2);
+	c_engine_func_proto_ptr(unk_function_38, int, int arg1, int arg2);
 	c_engine_func_proto_ptr(should_garbage_collect, bool, int arg1);
 	c_engine_func_proto_ptr(unk_function_40, void);
 	c_engine_func_proto_ptr(unk_function_41, void);
@@ -145,7 +145,7 @@ c_engine_func_proto(unk_function_4_wrapper, int)
 	return GET_ENGINE()->unk_function_4();
 }
 
-c_engine_func_proto(unk_function_5_wrapper, int, signed int arg1)
+c_engine_func_proto(unk_function_5_wrapper, int, int arg1)
 {
 	return GET_ENGINE()->unk_function_5(arg1);
 }
@@ -233,7 +233,7 @@ c_engine_func_proto(unk_function_25_wrapper, int, int arg1, int arg2)
 {
 	return GET_ENGINE()->unk_function_25(arg1, arg2);
 }
-c_engine_func_proto(unk_function_26_wrapper, int, signed int arg1, int arg2, signed int arg3)
+c_engine_func_proto(unk_function_26_wrapper, int, int arg1, int arg2, int arg3)
 {
 	return GET_ENGINE()->unk_function_26(arg1, arg2, arg3);
 }
@@ -249,15 +249,15 @@ c_engine_func_proto(unk_function_29_wrapper, void, int arg1)
 {
 	GET_ENGINE()->unk_function_29(arg1);
 }
-c_engine_func_proto(unk_function_30_wrapper, void, signed int arg1, int arg2, signed int arg3)
+c_engine_func_proto(unk_function_30_wrapper, void, int arg1, int arg2, int arg3)
 {
 	GET_ENGINE()->unk_function_30(arg1, arg2, arg3);
 }
-c_engine_func_proto(unk_function_31_wrapper, void, int arg1, int arg2, char arg3, signed int arg4)
+c_engine_func_proto(unk_function_31_wrapper, void, int arg1, int arg2, char arg3, int arg4)
 {
 	GET_ENGINE()->unk_function_31(arg1, arg2, arg3, arg4);
 }
-c_engine_func_proto(unk_function_32_wrapper, int, signed int arg1, int arg2, signed int arg3)
+c_engine_func_proto(unk_function_32_wrapper, int, int arg1, int arg2, int arg3)
 {
 	return GET_ENGINE()->unk_function_32(arg1, arg2, arg3);
 }
@@ -273,7 +273,7 @@ c_engine_func_proto(unk_function_35_wrapper, bool, int arg1)
 {
 	return GET_ENGINE()->unk_function_35(arg1);
 }
-c_engine_func_proto(unk_function_36_wrapper, int, int arg1, signed int arg2)
+c_engine_func_proto(unk_function_36_wrapper, int, int arg1, int arg2)
 {
 	return GET_ENGINE()->unk_function_36(arg1, arg2);
 }
@@ -281,7 +281,7 @@ c_engine_func_proto(unk_function_37_wrapper, void, int arg1)
 {
 	return GET_ENGINE()->unk_function_37(arg1);
 }
-c_engine_func_proto(unk_function_38_wrapper, int, int arg1, signed int arg2)
+c_engine_func_proto(unk_function_38_wrapper, int, int arg1, int arg2)
 {
 	return GET_ENGINE()->unk_function_38(arg1, arg2);
 }
@@ -359,7 +359,7 @@ int c_game_engine_base::unk_function_4()
 {
 	return call_c_base_func(unk_function_4);
 }
-int c_game_engine_base::unk_function_5(signed int arg1)
+int c_game_engine_base::unk_function_5(int arg1)
 {
 	return call_c_base_func(unk_function_5, arg1);
 }
@@ -445,7 +445,7 @@ int c_game_engine_base::unk_function_25(int arg1, int arg2)
 {
 	return call_c_base_func(unk_function_25, arg1, arg2);
 }
-int c_game_engine_base::unk_function_26(signed int arg1, int arg2, signed int arg3)
+int c_game_engine_base::unk_function_26(int arg1, int arg2, int arg3)
 {
 	return call_c_base_func(unk_function_26, arg1, arg2, arg3);
 }
@@ -461,15 +461,15 @@ void c_game_engine_base::unk_function_29(int arg1)
 {
 	return call_c_base_func(unk_function_29, arg1);
 }
-void c_game_engine_base::unk_function_30(signed int arg1, int arg2, signed int arg3)
+void c_game_engine_base::unk_function_30(int arg1, int arg2, int arg3)
 {
 	return call_c_base_func(unk_function_30, arg1, arg2, arg3);
 }
-void c_game_engine_base::unk_function_31(int arg1, int arg2, char arg3, signed int arg4)
+void c_game_engine_base::unk_function_31(int arg1, int arg2, char arg3, int arg4)
 {
 	return call_c_base_func(unk_function_31, arg1, arg2, arg3, arg4);
 }
-int c_game_engine_base::unk_function_32(signed int arg1, int arg2, signed int arg3)
+int c_game_engine_base::unk_function_32(int arg1, int arg2, int arg3)
 {
 	return call_c_base_func(unk_function_32, arg1, arg2, arg3);
 }
@@ -485,7 +485,7 @@ bool c_game_engine_base::unk_function_35(int arg1)
 {
 	return call_c_base_func(unk_function_35, arg1);
 }
-int c_game_engine_base::unk_function_36(int arg1, signed int arg2)
+int c_game_engine_base::unk_function_36(int arg1, int arg2)
 {
 	return call_c_base_func(unk_function_36, arg1, arg2);
 }
@@ -493,7 +493,7 @@ void c_game_engine_base::unk_function_37(int arg1)
 {
 	return call_c_base_func(unk_function_37, arg1);
 }
-int c_game_engine_base::unk_function_38(int arg1, signed int arg2)
+int c_game_engine_base::unk_function_38(int arg1, int arg2)
 {
 	return call_c_base_func(unk_function_38, arg1, arg2);
 }

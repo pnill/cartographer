@@ -41,7 +41,7 @@ namespace MeleeFix
 	typedef int(__cdecl melee_get_time_to_target_t)(unsigned __int16 object_index);
 	melee_get_time_to_target_t* p_melee_get_time_to_target;
 
-	typedef void(__cdecl melee_damage_t)(int object_index, signed int melee_type, char unk2, float unk3);
+	typedef void(__cdecl melee_damage_t)(int object_index, int melee_type, char unk2, float unk3);
 	melee_damage_t* p_melee_damage;
 
 	typedef void (__cdecl send_melee_damage_simulation_event_t)(int a1, int a2, int arg8);
