@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Tweaks.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"

@@ -1,15 +1,17 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Tags/TagInterface.h"
@@ -22,6 +24,7 @@ std::vector<unsigned long long> Infection::zombieIdentifiers;
 bool initialSpawn;
 bool infectedPlayed;
 int zombiePlayerIndex = NONE;
+int ticks_without_any_humans = 0;
 const wchar_t* infectionSoundTable[e_language_ids::_lang_id_end][e_infection_sounds::_infection_end]
 {
 	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
@@ -61,7 +64,7 @@ void Infection::sendTeamChange()
 	{
 		if (NetworkSession::GetPlayerCount() > 0)
 		{
-			for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+			for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 			{
 				if (NetworkSession::PlayerIsActive(playerIndex))
 				{
@@ -193,7 +196,7 @@ void Infection::preSpawnServerSetup() {
 			}
 		}
 		else {
-			if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+			if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
@@ -208,7 +211,7 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+	if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
 	else
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
@@ -222,6 +225,41 @@ void Infection::setPlayerAsZombie(int playerIndex) {
 	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
 }
 
+void Infection::onGameTick()
+{
+	if(Engine::get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
+	{
+		PlayerIterator playerIt;
+		int human_count = 0;
+		int zombie_count = 0;
+		while (playerIt.get_next_active_player())
+		{
+			XUID playerIdentifier = playerIt.get_current_player_id();
+			bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+
+			if (isZombie)
+				zombie_count++;
+			else
+				human_count++;
+
+		}
+		if(human_count == 0 && zombie_count >= 1)
+		{
+			ticks_without_any_humans++;
+		}
+		else
+		{
+			ticks_without_any_humans = 0;
+		}
+
+		if(time_globals::ticks_to_seconds(ticks_without_any_humans) > 5.0f)
+		{
+			NetworkSession::EndGame();
+		}
+	}
+}
+
+
 void Infection::Initialize()
 {
 	LOG_TRACE_GAME("{} - infection initialization!");
@@ -232,7 +270,10 @@ void Infection::Initialize()
 	if (NetworkSession::LocalPeerIsSessionHost()) {
 		Infection::InitHost();
 
+		ticks_without_any_humans = 0;
 		zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
+		EventHandler::register_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_before);
+
 		LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombiePlayerIndex);
 		if (zombiePlayerIndex == NONE) {
 			LOG_TRACE_GAME("[h2mod-infection] Failed selecting a zombie!");
@@ -249,6 +290,11 @@ void Infection::Initialize()
 void Infection::Dispose()
 {
 	LOG_TRACE_GAME("{} - infection dispose!");
+
+	if(NetworkSession::LocalPeerIsSessionHost())
+	{
+		EventHandler::remove_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_before);
+	}
 
 	Infection::resetWeaponInteractionAndEmblems();
 	if (!s_game_globals::game_is_predicted()) {

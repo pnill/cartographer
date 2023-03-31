@@ -4,7 +4,7 @@
 
 #include "Util\Memory.h"
 
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

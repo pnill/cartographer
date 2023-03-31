@@ -721,17 +721,14 @@ void ReadH2Config() {
 				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")))
 				{
 					default:
+						//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
+						H2Config_fps_limit = 60;
 					case 0:
 						H2Config_experimental_fps = _rendering_mode_none;
 						break;
 					case 1:
-						H2Config_experimental_fps = _rendering_mode_old;
-						break;
-					case 2:
-						H2Config_experimental_fps = _rendering_mode_new;
-						break;
-					case 3:
 						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
+						break;
 				}
 				
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
+#include "Blam/Engine/game/cheats.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"
 #include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
@@ -261,10 +261,10 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10 && H2Config_fps_limit != 0)
+						if (H2Config_fps_limit < 10)
 							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 2048)
-							H2Config_fps_limit = 2048;
+						if (H2Config_fps_limit > 144)
+							H2Config_fps_limit = 144;
 					}
 
 					ImGui::SameLine();
@@ -311,9 +311,9 @@ namespace ImGuiHandler {
 					}
 					ImGui::NextColumn();
 					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_cinematic), GetString(render_engine), GetString(render_patch) };
+					const char* r_items[] = { GetString(render_none), GetString(render_patch) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 4))
+					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
 					{
 						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
 					}
@@ -840,7 +840,7 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(no_events_tooltip));
 
-					if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween) {
+					if (get_current_special_event() == e_special_event_type::_halloween) {
 						TextVerticalPad(GetString(skeleton_biped));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
 						ImGui::Checkbox("##spooky_scary", &H2Config_spooky_boy);
@@ -1040,30 +1040,30 @@ namespace ImGuiHandler {
 					static int event_type = H2Config_forced_event;
 					if (ImGui::CollapsingHeader("Events"))
 					{
-						if (ImGui::RadioButton("None", &event_type, SpecialEvents::e_event_type::_no_event))
+						if (ImGui::RadioButton("None", &event_type, e_special_event_type::_no_event))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_no_event;
+							H2Config_forced_event = (int)e_special_event_type::_no_event;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("Christmas", &event_type, SpecialEvents::e_event_type::_christmas))
+						if (ImGui::RadioButton("Christmas", &event_type, e_special_event_type::_christmas))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_christmas;
+							H2Config_forced_event = (int)e_special_event_type::_christmas;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("St Paddys", &event_type, SpecialEvents::e_event_type::_st_paddys))
+						if (ImGui::RadioButton("St Paddys", &event_type, e_special_event_type::_st_paddys))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_st_paddys;
+							H2Config_forced_event = (int)e_special_event_type::_st_paddys;
 						} ImGui::SameLine();
-						if (ImGui::RadioButton("Mook Madness", &event_type, SpecialEvents::e_event_type::_mook_maddness))
+						if (ImGui::RadioButton("Mook Madness", &event_type, e_special_event_type::_mook_maddness))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_mook_maddness;
+							H2Config_forced_event = (int)e_special_event_type::_mook_maddness;
 						}
 
-						if (ImGui::RadioButton("Halloween", &event_type, SpecialEvents::e_event_type::_halloween))
+						if (ImGui::RadioButton("Halloween", &event_type, e_special_event_type::_halloween))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_halloween;
+							H2Config_forced_event = (int)e_special_event_type::_halloween;
 						}ImGui::SameLine();
-						if (ImGui::RadioButton("Birthday", &event_type, SpecialEvents::e_event_type::_birthday))
+						if (ImGui::RadioButton("Birthday", &event_type, e_special_event_type::_birthday))
 						{
-							H2Config_forced_event = (int)SpecialEvents::e_event_type::_birthday;
+							H2Config_forced_event = (int)e_special_event_type::_birthday;
 						}
 
 					}
@@ -1126,8 +1126,6 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::experimental_rendering_tooltip] =
 				"This will change how the game handles rendering, requires a restart to take effect."
 				"\n\nNone: Default behavior of the game, will not work past 60FPS"
-				"\n\nCinematic: Tricks the game into rending in cinematic mode"
-				"\n\nEngine: Forces the unused native engine interpolation"
 				"\n\nOriginal: Forces the original framerate limiter used in the original game, tied to tickrate";
 			string_table[0][e_advanced_string::render_none] = "None";
 			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
@@ -1290,8 +1288,6 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::experimental_rendering_tooltip] =
 				"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto."
 				"\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS "
-				"\n\nCinematic: Hace que el juego se desgarre en modo cinemático"
-				"\n\nEngine: Fuerza la interpolación del motor nativo no utilizado"
 				"\n\nOriginal: fuerza el limitador de FPS original utilizado en el juego original, vinculado a la velocidad de tick ";
 			string_table[4][e_advanced_string::render_none] = "Ninguno";
 			string_table[4][e_advanced_string::render_cinematic] = "Fuerza Cinematográfica";

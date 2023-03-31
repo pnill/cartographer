@@ -1,7 +1,7 @@
 #pragma once
 // ReSharper disable CppInconsistentNaming
 
-enum HaloString : unsigned int
+enum e_global_string_ids : unsigned int
 {
 	NUM_NULL = 0x0,
 	HS_NUM_0 = 0x100030A,

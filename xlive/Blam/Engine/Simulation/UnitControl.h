@@ -1,6 +1,7 @@
 #pragma once
-#include "Blam\Engine\Players\PlayerActions.h"
-#include "Blam\Cache\DataTypes\StringID.h"
+#include "Blam/Cache/DataTypes/StringID.h"
+#include "Blam/Engine/game/aim_assist.h"
+#include "Blam/Math/real_math.h"
 
 struct s_unit_control_data
 {

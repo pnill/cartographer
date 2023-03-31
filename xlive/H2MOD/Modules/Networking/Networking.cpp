@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Networking.h"
-#include "Blam\Engine\Memory\bitstream.h"
+#include "Blam\Engine\memory\bitstream.h"
 #include "OverridePackets\OverridePackets.h"
 
 #include "Util\Hooks\Hook.h"

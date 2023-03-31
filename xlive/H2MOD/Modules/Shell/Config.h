@@ -15,7 +15,7 @@ void ReadH2Config();
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               6
 #define DLL_VERSION_REVISION            7
-#define DLL_VERSION_BUILD				7
+#define DLL_VERSION_BUILD				8
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -45,8 +45,6 @@ enum e_override_texture_resolution : int
 enum H2Config_Experimental_Rendering_Mode : byte
 {
 	_rendering_mode_none,
-	_rendering_mode_old,
-	_rendering_mode_new,
 	_rendering_mode_original_game_frame_limit
 };
 

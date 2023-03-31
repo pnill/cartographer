@@ -4,8 +4,8 @@
 
 #include "Util\Hooks\Hook.h"
 
-#include "Blam\Engine\Game\GameTimeGlobals.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_time.h"
 
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"

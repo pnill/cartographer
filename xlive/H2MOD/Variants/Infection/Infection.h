@@ -74,6 +74,7 @@ public:
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);
+	static void onGameTick();
 	static int calculateZombiePlayerIndex();
 private:
 	static std::vector<unsigned long long> zombieIdentifiers;

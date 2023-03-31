@@ -5,7 +5,7 @@
 #include "H2MOD\Tags\TagInterface.h"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
 
-#include "Blam\Engine\Players\Players.h"
+#include "Blam/Engine/game/players.h"
 
 extern void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index);
 
