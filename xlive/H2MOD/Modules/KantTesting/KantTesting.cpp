@@ -36,35 +36,35 @@ namespace KantTesting
 	
 	void Initialize()
 	{
-		json_config config(L"test.json");
-		config.defaultValues_["float"] = 1.0f;
-		config.defaultValues_["int"] = 10;
-		config.defaultValues_["string"] = "string";
+		//json_config config(L"test.json");
+		//config.defaultValues_["float"] = 1.0f;
+		//config.defaultValues_["int"] = 10;
+		//config.defaultValues_["string"] = "string";
 
-		int c_int = config.get<int>("int", 99);
-		float c_float = config.get<float>("float", 99.0f);
-		std::string c_string = config.get<std::string>("string", "default_string");
+		//int c_int = config.get<int>("int", 99);
+		//float c_float = config.get<float>("float", 99.0f);
+		//std::string c_string = config.get<std::string>("string", "default_string");
 
 
-		int c_intb = config.get<int>("int");
-		float c_floatb = config.get<float>("float");
-		std::string c_stringb = config.get<std::string>("string" );
+		//int c_intb = config.get<int>("int");
+		//float c_floatb = config.get<float>("float");
+		//std::string c_stringb = config.get<std::string>("string" );
 
-		config.set<int>("test_int", 20);
-		config.set<float>("test_float", 123.0f);
-		config.set("test_string", "123456");
-		config.set("test_int2", 20);
-		config.set("test_float2", 123.0f);
-		auto bb = real_point3d(1, 2, 3);
-		config.set("test_point3d", bb);
+		//config.set<int>("test_int", 20);
+		//config.set<float>("test_float", 123.0f);
+		//config.set("test_string", "123456");
+		//config.set("test_int2", 20);
+		//config.set("test_float2", 123.0f);
+		//auto bb = real_point3d(1, 2, 3);
+		//config.set("test_point3d", bb);
 
-		auto tpoint = config.get<real_point3d>("test_point3d");
-		//need to make it so can pass char* and wchar_t*
-		config.set("test_string_std", std::string("123456"));
+		//auto tpoint = config.get<real_point3d>("test_point3d");
+		////need to make it so can pass char* and wchar_t*
+		//config.set("test_string_std", std::string("123456"));
 
-		config.save();
+		//config.save();
 
-		LOG_INFO_GAME("hmmm");
+		//LOG_INFO_GAME("hmmm");
 		if (ENABLEKANTTEST) {
 		//	if (!Memory::isDedicatedServer())
 			//{

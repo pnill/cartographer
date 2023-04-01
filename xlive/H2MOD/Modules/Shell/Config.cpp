@@ -9,9 +9,12 @@
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Utils\Utils.h"
 #include "Util\SimpleIni.h"
+#include "JsonConfig/JsonConfig.h"
+#include "JsonConfig/JsonConfig.cpp"
 
 #pragma region Config IO
 const wchar_t* H2ConfigFilenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
+const wchar_t* H2ConfigJsonFilenames[] = { L"%wshalo2config%d.json", L"%wsh2serverconfig%d.json" };
 
 std::string H2ConfigVersionNumber("1");
 std::string H2ConfigVersionSection("H2ConfigurationVersion:" + H2ConfigVersionNumber);
@@ -927,10 +930,145 @@ void ReadH2Config() {
 }
 #pragma endregion
 
+void UpgradeConfig()
+{
+	addDebugText("Reading H2Configuration file...");
+
+	int readInstanceIdFile = _Shell::GetInstanceId();
+	wchar_t local[1024];
+	wcscpy_s(local, ARRAYSIZE(local), H2AppDataLocal);
+	H2Config_isConfigFileAppDataLocal = false;
+
+	errno_t err = 0;
+	FILE* fileConfig = nullptr;
+	wchar_t fileConfigPath[1024];
+	wchar_t jsonPath[1024];
+
+	if (FlagFilePathConfig) {
+		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
+		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
+	}
+	else {
+		do {
+			wchar_t* checkFilePath = H2ProcessFilePath;
+			if (H2Config_isConfigFileAppDataLocal) {
+				checkFilePath = local;
+			}
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
+			swprintf(jsonPath, ARRAYSIZE(jsonPath), H2ConfigJsonFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
+			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
+			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
+
+			if (err) {
+				addDebugText("H2Configuration file does not exist, error code: 0x%x", err);
+			}
+			H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+			if (err && !H2Config_isConfigFileAppDataLocal) {
+				--readInstanceIdFile;
+			}
+		} while (err && readInstanceIdFile > 0);
+		H2Config_isConfigFileAppDataLocal = !H2Config_isConfigFileAppDataLocal;
+	}
+	if (err) {
+		addDebugText("ERROR: No H2Configuration files could be found!");
+		CMForce_Update = true;
+		H2Config_isConfigFileAppDataLocal = true;
+	}
+	else {
+		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
+
+		if (!H2IsDediServer) {
+			extern int current_language_main;
+			extern int current_language_sub;
+			H2Config_language.code_main = current_language_main;
+			H2Config_language.code_variant = current_language_sub;
+		}
+
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		SI_Error rc = ini.LoadFile(fileConfig);
+		if (rc < 0)
+		{
+			addDebugText("ini.LoadFile() failed with error: %d while trying to read configuration file!", (int)rc);
+		}
+		else
+		{
+			json_config json(jsonPath);
+
+
+
+			json["cartographer"].set("h2portable", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", false));
+			json["cartographer"].set("base_port", ini.GetLongValue(H2ConfigVersionSection.c_str(), "base_port", H2Config_base_port));
+			json["cartographer"].set("upnp", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "upnp", true));
+			json["cartographer"].set("debug_log", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log));
+			json["cartographer"].set("debug_log_level", ini.GetLongValue(H2ConfigVersionSection.c_str(), "debug_log_level", H2Config_debug_log_level));
+			json["cartographer"].set("debug_log_console", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console));
+			json["cartographer"].set("wan_ip", ini.GetValue(H2ConfigVersionSection.c_str(), "wan_ip"));
+			json["cartographer"].set("lan_ip", ini.GetValue(H2ConfigVersionSection.c_str(), "lan_ip"));
+			json["cartographer"].set("discord_enable", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable));
+			json["cartographer"].set("language_label_capture", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing));
+			json["cartographer"].set("enable_xdelay", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay));
+			json["cartographer"].set("language_code", ini.GetValue(H2ConfigVersionSection.c_str(), "language_code", "-1x0"));
+			
+			json["game"].set("skip_intro", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro));
+			
+			
+			json["game"]["video"].set("fps_limit", ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit));
+			json["game"]["video"].set("static_lod_scale", ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state));
+			json["game"]["video"].set("field_of_view", ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view));
+			json["game"]["video"].set("vehicle_field_of_view", ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view));
+			json["game"]["video"].set("static_fp_fov", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false));
+			json["game"]["video"].set("experimental_rendering", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")));
+			json["game"]["video"].set("refresh_rate", ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate));
+
+			std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
+			if (crosshair_offset_str != "NaN")
+				json["game"]["hud"].set("crosshair_offset", std::stof(crosshair_offset_str));
+			else
+				json["game"]["hud"].set("crosshair_offset", 0.138f);
+
+			std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
+			if (crosshair_scale_str != "NaN")
+				json["game"]["hud"].set("crosshair_scale", std::stof(crosshair_scale_str));
+			else
+				json["game"]["hud"].set("crosshair_scale", 1.0f);
+
+			json["game"]["input"].set("raw_mouse_input", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input));
+			std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
+			json["game"]["input"].set("mouse_raw_scale", std::stof(raw_mouse_scale_str));
+
+			
+			json["game"]["input"].set("mouse_uniform_sens", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform));
+
+			std::string mouse_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_sens", "0"));
+			json["game"]["input"].set("mouse_sens", std::stof(mouse_sens_str));
+
+			std::string controller_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_sens", "0"));
+			json["game"]["input"].set("controller_sens", std::stof(controller_sens_str));
+
+			json["game"]["input"].set("controller_modern", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern));
+			json["game"]["input"].set("deadzone_type", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")));
+
+			std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.518"));
+			std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.518"));
+			std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
+			json["game"]["input"].set("deadzone_axial_x", std::stof(deadzone_axial_x));
+			json["game"]["input"].set("deadzone_axial_y", std::stof(deadzone_axial_y));
+			json["game"]["input"].set("deadzone_radial", std::stof(deadzone_radial));
+
+			json.save();
+
+			LOG_INFO_GAME("ASDF");
+		}
+	}
+}
+
 #pragma region Config Init/Deinit
 void InitH2Config() {
 	H2Config_disable_ingame_keyboard = _Shell::GetInstanceId() > 1 ? true : false;
-	ReadH2Config();
+	UpgradeConfig();
+	//ReadH2Config();
 }
 void DeinitH2Config() {
 	SaveH2Config();

@@ -2,16 +2,22 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 #include <rapidjson/prettywriter.h>
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
 #include "rapidjson/writer.h"
-
+#include "rapidjson/pointer.h"
 using namespace rapidjson;
 
 class json_config {
+
+private:
+    std::wstring filename_;
+    Document doc_;
+    std::vector<std::string> key_path;
 public:
     json_config(const std::wstring& filename)
         : filename_(filename), doc_(load(filename)) {}
@@ -30,6 +36,7 @@ public:
         }
         IStreamWrapper isw(ifs);
         Document d;
+        d.SetObject();
         d.ParseStream(isw);
         return d;
     }
@@ -42,6 +49,36 @@ public:
         doc_.Accept(writer);
     }
 
+    rapidjson::Value* get_current_pointer(std::vector<std::string> path)
+    {
+        if (path.empty()) {
+            return Pointer("").Get(doc_);
+        }
+
+        rapidjson::Value* value = Pointer("").Get(doc_);
+        for (const auto& element : path) 
+        {
+            if (value->IsObject()) {
+                if (!value->HasMember(element.c_str())) {
+                    rapidjson::Value key;
+                    key.SetString(element.c_str(), doc_.GetAllocator());
+                    value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), doc_.GetAllocator());
+                }
+                value = &((*value)[element.c_str()]);
+            }
+            else {
+                return nullptr;
+            }
+        }
+        return value;
+    }
+
+    json_config& operator[](const char* key)
+    {
+        key_path.push_back(key);
+        return *this;
+    }
+
     // A Map to store default variables for the current instance of the class.
     //
 	// json_config h2config(config.json);
@@ -50,20 +87,25 @@ public:
     std::unordered_map<std::string, Value> defaultValues_;
 
 
+
     template<typename T>
     T get(const char* key, T defaultValue = T{}) {
         // Check if the key exists in the document
-        if (!doc_.HasMember(key)) {
+
+        Value* current_object = get_current_pointer(key_path);
+        key_path.clear();
+
+        if (!current_object->HasMember(key)) {
             if (defaultValues_.find(key) != defaultValues_.end()) {
                 const Value& v = defaultValues_[key];
                 if constexpr (std::is_same_v<T, bool>) {
                     return v.GetBool();
                 }
-                else if constexpr (std::is_same_v<T, int>) {
+                else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
                     return v.GetInt();
                 }
                 else if constexpr (std::is_same_v<T, unsigned>) {
-                    return v.GetUint();
+                	return v.GetUint();
                 }
                 else if constexpr (std::is_same_v < T, float>) {
                     return v.GetFloat();
@@ -85,12 +127,12 @@ public:
             return defaultValue;
         }
 
-        const Value& v = doc_[key];
+        const Value& v = (*current_object)[key];
         // Use if constexpr to conditionally compile code based on T
         if constexpr (std::is_same_v<T, bool>) {
             return v.GetBool();
         }
-        else if constexpr (std::is_same_v<T, int>) {
+        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
             return v.GetInt();
         }
         else if constexpr (std::is_same_v<T, unsigned>) {
@@ -116,32 +158,37 @@ public:
 
     template<typename T>
     void set(const char* key, T value) {
+
+        Value* current_object = get_current_pointer(key_path);
+        key_path.clear();
+
+
         // Check if the key already exists in the document
-        if (doc_.HasMember(key)) {
+        if (current_object->HasMember(key)) {
             if constexpr (std::is_same_v<T, bool>) {
-                doc_[key].SetBool(value);
+                (*current_object)[key].SetBool(value);
             }
-            else if constexpr (std::is_same_v<T, int>) {
-                doc_[key].SetInt(value);
+            else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
+                (*current_object)[key].SetInt(value);
             }
             else if constexpr (std::is_same_v<T, unsigned>) {
-                doc_[key].SetUint(value);
+                (*current_object)[key].SetUint(value);
             }
             else if constexpr (std::is_same_v<T, float>) {
-                doc_[key].SetFloat(value);
+                (*current_object)[key].SetFloat(value);
             }
             else if constexpr (std::is_same_v<T, std::string>) {
-                doc_[key].SetString(value.c_str(), doc_.GetAllocator());
+                (*current_object)[key].SetString(value.c_str(), doc_.GetAllocator());
             }
             else if constexpr(std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
-                doc_[key].SetString(StringRef(value));
+                (*current_object)[key].SetString(StringRef(value));
             }
             else if constexpr(std::is_same_v<T, real_point3d>) {
-                Value vals = doc_[key].GetArray();
-                doc_[key].Clear();
-                doc_[key].PushBack(value.x, doc_.GetAllocator());
-                doc_[key].PushBack(value.y, doc_.GetAllocator());
-                doc_[key].PushBack(value.z, doc_.GetAllocator());
+                Value vals = (*current_object)[key].GetArray();
+                (*current_object)[key].Clear();
+                (*current_object)[key].PushBack(value.x, doc_.GetAllocator());
+                (*current_object)[key].PushBack(value.y, doc_.GetAllocator());
+                (*current_object)[key].PushBack(value.z, doc_.GetAllocator());
             }
             else {
                 // Unsupported type
@@ -152,30 +199,30 @@ public:
             // If the key does not exist in the document, add a new key-value pair to the document
             Value k(key, doc_.GetAllocator());
             if constexpr (std::is_same_v<T, bool>) {
-                doc_.AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, doc_.GetAllocator());
             }
-            else if constexpr (std::is_same_v<T, int>) {
-                doc_.AddMember(k, value, doc_.GetAllocator());
+            else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
+                current_object->AddMember(k, value, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, unsigned>) {
-                doc_.AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, float>) {
-                doc_.AddMember(k, value, doc_.GetAllocator());
+                current_object->AddMember(k, value, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, std::string>) {
                 Value v(value.c_str(), value.size(), doc_.GetAllocator());
-                doc_.AddMember(k, v, doc_.GetAllocator());
+                current_object->AddMember(k, v, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
-                doc_.AddMember(k, StringRef(value), doc_.GetAllocator());
+                current_object->AddMember(k, StringRef(value), doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, real_point3d>) {
                 Value vals(rapidjson::kArrayType);
                 vals.PushBack(value.x, doc_.GetAllocator());
                 vals.PushBack(value.y, doc_.GetAllocator());
                 vals.PushBack(value.z, doc_.GetAllocator());
-                doc_.AddMember(k, vals, doc_.GetAllocator());
+                current_object->AddMember(k, vals, doc_.GetAllocator());
             }
             else {
                 // Unsupported type
@@ -188,7 +235,4 @@ public:
         defaultValues_[key] = value;
     }
 
-private:
-    std::wstring filename_;
-    Document doc_;
 };
