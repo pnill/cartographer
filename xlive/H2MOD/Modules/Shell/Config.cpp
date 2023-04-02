@@ -1016,7 +1016,7 @@ void UpgradeConfig()
 			json["game"].set("melee_fix", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix));
 			json["game"].set("no_events", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events));
 			json["game"].set("skeleton_biped", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy));
-			json["game"].set("forced_event", ini.GetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event));
+			//json["game"].set("forced_event", ini.GetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event));
 			
 			json["game"]["video"].set("fps_limit", ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit));
 			json["game"]["video"].set("static_lod_scale", ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state));
