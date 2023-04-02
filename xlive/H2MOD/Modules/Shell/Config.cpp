@@ -1011,8 +1011,12 @@ void UpgradeConfig()
 			json["cartographer"].set("enable_xdelay", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay));
 			json["cartographer"].set("language_code", ini.GetValue(H2ConfigVersionSection.c_str(), "language_code", "-1x0"));
 			
-			json["game"].set("skip_intro", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro));
 			
+			json["game"].set("skip_intro", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro));
+			json["game"].set("melee_fix", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix));
+			json["game"].set("no_events", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events));
+			json["game"].set("skeleton_biped", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy));
+			json["game"].set("forced_event", ini.GetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event));
 			
 			json["game"]["video"].set("fps_limit", ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit));
 			json["game"]["video"].set("static_lod_scale", ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state));
@@ -1021,6 +1025,13 @@ void UpgradeConfig()
 			json["game"]["video"].set("static_fp_fov", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false));
 			json["game"]["video"].set("experimental_rendering", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")));
 			json["game"]["video"].set("refresh_rate", ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate));
+			json["game"]["video"].set("shader_lod_max", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max));
+			json["game"]["video"].set("light_suppressor", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor));
+			json["game"]["video"].set("hires_fix", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix));
+			json["game"]["video"].set("d3dex", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex));
+			json["game"]["video"].set("override_shadows", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_shadows", "1")));
+			json["game"]["video"].set("override_water", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_water", "1")));
+
 
 			std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 			if (crosshair_offset_str != "NaN")
@@ -1034,29 +1045,64 @@ void UpgradeConfig()
 			else
 				json["game"]["hud"].set("crosshair_scale", 1.0f);
 
-			json["game"]["input"].set("raw_mouse_input", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input));
+			json["game"]["hud"].set("hide_ingame_chat", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat));
+
+
 			std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
-			json["game"]["input"].set("mouse_raw_scale", std::stof(raw_mouse_scale_str));
-
-			
-			json["game"]["input"].set("mouse_uniform_sens", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform));
-
 			std::string mouse_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_sens", "0"));
+			json["game"]["input"].set("raw_mouse_input", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input));
+			json["game"]["input"].set("mouse_raw_scale", std::stof(raw_mouse_scale_str));
+			json["game"]["input"].set("mouse_uniform_sens", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform));
 			json["game"]["input"].set("mouse_sens", std::stof(mouse_sens_str));
+			json["game"]["input"].set("disable_ingame_keyboard", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard));
+			json["game"]["input"].set("hotkey_help", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp));
+			json["game"]["input"].set("hotkey_align_window", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow));
+			json["game"]["input"].set("hotkey_window_mode", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode));
+			json["game"]["input"].set("hotkey_hide_ingame_chat", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat));
+			json["game"]["input"].set("hotkey_guide", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide));
+			json["game"]["input"].set("hotkey_console", ini.GetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole));
+
 
 			std::string controller_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_sens", "0"));
-			json["game"]["input"].set("controller_sens", std::stof(controller_sens_str));
-
-			json["game"]["input"].set("controller_modern", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern));
-			json["game"]["input"].set("deadzone_type", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")));
-
 			std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.518"));
 			std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.518"));
 			std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
+			json["game"]["input"].set("controller_sens", std::stof(controller_sens_str));
+			json["game"]["input"].set("controller_modern", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern));
+			json["game"]["input"].set("deadzone_type", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")));
 			json["game"]["input"].set("deadzone_axial_x", std::stof(deadzone_axial_x));
 			json["game"]["input"].set("deadzone_axial_y", std::stof(deadzone_axial_y));
 			json["game"]["input"].set("deadzone_radial", std::stof(deadzone_radial));
+			json["game"]["input"].set("controller_layout", std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
 
+
+			const char* server_name = ini.GetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
+			const char* server_playlist = ini.GetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
+			const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
+			const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
+			const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
+			std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
+			if (server_name) 
+				strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
+			if (server_playlist)
+				strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
+			if (login_identifier)
+				strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
+			if (login_password)
+				strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+			
+
+			json["server"].set("server_name", H2Config_dedi_server_name);
+			json["server"].set("server_playlist", H2Config_dedi_server_playlist);
+			json["server"].set("additional_pcr_time", ini.GetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time));
+			json["server"].set("minimum_player_start", ini.GetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start));
+			json["server"].set("vip_lock", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock));
+			json["server"].set("shuffle_even_teams", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams));
+			json["server"].set("koth_random", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random));
+			json["server"].set("login_identifier", H2Config_login_identifier);
+			json["server"].set("login_password", H2Config_login_password);
+			json["server"].set("teams_enabled_bit_flags", team_bit_mask);
+			json["server"].set("enable_anti_cheat", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled));
 			json.save();
 
 			LOG_INFO_GAME("ASDF");
