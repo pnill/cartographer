@@ -49,27 +49,37 @@ public:
         doc_.Accept(writer);
     }
 
-    rapidjson::Value* get_current_pointer(std::vector<std::string> path)
+    Value* get_current_pointer()
     {
-        if (path.empty()) {
+        // Check if path is empty, if so, return a pointer to the root document object
+        if (key_path.empty()) {
             return Pointer("").Get(doc_);
         }
 
-        rapidjson::Value* value = Pointer("").Get(doc_);
-        for (const auto& element : path) 
+        // Obtain a pointer to the root document object
+        Value* value = Pointer("").Get(doc_);
+
+        // Iterate through each element in the path vector
+        for (const auto& element : key_path)
         {
+            // Check if the current value is an object
             if (value->IsObject()) {
+                // If the current element is not a member of the object, add a new member with the given name
                 if (!value->HasMember(element.c_str())) {
-                    rapidjson::Value key;
+                    Value key;
                     key.SetString(element.c_str(), doc_.GetAllocator());
                     value->AddMember(key, rapidjson::Value(rapidjson::kObjectType), doc_.GetAllocator());
                 }
+                // Update the value pointer to point to the member with the given name
                 value = &((*value)[element.c_str()]);
             }
             else {
+                // If the current value is not an object, return a null pointer
                 return nullptr;
             }
         }
+
+        // Return a pointer to the final value object in the path
         return value;
     }
 
@@ -92,7 +102,7 @@ public:
     T get(const char* key, T defaultValue = T{}) {
         // Check if the key exists in the document
 
-        Value* current_object = get_current_pointer(key_path);
+        Value* current_object = get_current_pointer();
         key_path.clear();
 
         if (!current_object->HasMember(key)) {
@@ -159,7 +169,7 @@ public:
     template<typename T>
     void set(const char* key, T value) {
 
-        Value* current_object = get_current_pointer(key_path);
+        Value* current_object = get_current_pointer();
         key_path.clear();
 
 
