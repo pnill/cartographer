@@ -22,6 +22,9 @@ bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const BYTE* buffer, size_t size);
+
 char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u);
 void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len);
 char* wcstombs2r(wchar_t* text);

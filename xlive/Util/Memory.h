@@ -68,6 +68,3 @@ public:
 	static bool dedicatedServer;
 };
 
-// utilites
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
-std::string ByteToHexStr(const BYTE* buffer, size_t size);
