@@ -49,10 +49,6 @@ std::wstring IntToWString(T t, std::ios_base & (*f)(std::ios_base&))
 	return std::wstring(out.begin(), out.end());
 }
 
-//some utility functions below
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems);
-std::vector<std::string> split(const std::string &s, char delim);
-
 int stripWhitespace(wchar_t *inputStr);
 int GetCurrentTimeMS();
 int TimeElapsedMS(int startms);
