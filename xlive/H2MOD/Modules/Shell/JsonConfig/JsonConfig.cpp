@@ -138,6 +138,9 @@ public:
                 else if constexpr (std::is_same_v<T, std::string>) {
                     return v.GetString();
                 }
+                else if constexpr (std::is_same_v<T, const char*>) {
+                    return v.GetString();
+                }
                 else if constexpr (std::is_same_v<T, real_point3d>) {
                     auto x = v[0].GetFloat();
                     auto y = v[1].GetFloat();
@@ -173,6 +176,9 @@ public:
             return v.GetFloat();
         }
         else if constexpr (std::is_same_v<T, std::string>) {
+            return v.GetString();
+        }
+        else if constexpr (std::is_same_v<T, const char*>) {
             return v.GetString();
         }
         else if constexpr (std::is_same_v<T, real_point3d>) {

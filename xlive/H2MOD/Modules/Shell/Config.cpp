@@ -1116,8 +1116,61 @@ void ReadH2Config() {
 			json["game"]["input"].get("deadzone_axial_y", &H2Config_Deadzone_A_Y, H2Config_Deadzone_A_Y);
 			json["game"]["input"].get("deadzone_radial", &H2Config_Deadzone_Radial, H2Config_Deadzone_Radial);
 			H2Config_CustomLayout.FromString(json["game"]["input"].get<std::string>("controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768"));
-			//json["game"]["input"].get("controller_layout", &H2Config_CustomLayout, H2Config_CustomLayout);
 
+			auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
+			auto server_playlist = json["server"].get<const char*>("server_playlist", "");
+			auto login_identifier = json["server"].get<const char*>("login_identifier", "");
+			auto login_password = json["server"].get<const char*>("login_password", "");
+			if (server_name)
+				strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
+			if (server_playlist)
+				strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
+			if (login_identifier)
+				strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
+			if (login_password)
+				strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
+
+			json["server"].get("additional_pcr_time", &H2Config_additional_pcr_time, H2Config_additional_pcr_time);
+			json["server"].get("minimum_player_start", &H2Config_minimum_player_start, H2Config_minimum_player_start);
+			json["server"].get("vip_lock", &H2Config_vip_lock, H2Config_vip_lock);
+			json["server"].get("shuffle_even_teams", &H2Config_even_shuffle_teams, H2Config_even_shuffle_teams);
+			json["server"].get("koth_random", &H2Config_koth_random, H2Config_koth_random);
+			json["server"].get("enable_anti_cheat", &H2Config_anti_cheat_enabled, H2Config_anti_cheat_enabled);
+
+			auto team_bit_mask = json["server"].get<std::string>("teams_enabled_bit_flags", H2Config_team_bit_flags_str);
+			if (!team_bit_mask.empty())
+			{
+				strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
+				H2Config_team_bit_flags = 0;
+				memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
+
+				size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
+				size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
+
+				const char team_bit_to_find[] = "01";
+				size_t occurance_offset;
+				occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, 0);
+
+				// TODO move to function
+				// validate first
+				if (true_bit_value_count + false_bit_value_count == 8
+					&& occurance_offset != std::string::npos)
+				{
+					// then loop
+					for (int i = 0; i < 8; i++)
+					{
+						if (team_bit_mask.at(occurance_offset) == '1') // check if the team is enabled
+						{
+							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
+							H2Config_team_flag_array[i] = true;
+						}
+
+						occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, occurance_offset + 1);
+						if (occurance_offset == std::string::npos)
+							break;
+					}
+				}
+			}
 
 			LOG_INFO_GAME("ASDF");
 
@@ -1491,7 +1544,6 @@ void UpgradeConfig()
 				const char* server_playlist = ini.GetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				const char* login_password = ini.GetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
-				const char* stats_authkey = ini.GetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey);
 				std::string team_bit_mask(ini.GetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str));
 				if (server_name)
 					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
