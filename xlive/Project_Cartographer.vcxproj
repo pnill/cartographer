@@ -351,7 +351,7 @@
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\FileSystem\FiloInterface.cpp">
+    <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -683,7 +683,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
-    <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
+    <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />

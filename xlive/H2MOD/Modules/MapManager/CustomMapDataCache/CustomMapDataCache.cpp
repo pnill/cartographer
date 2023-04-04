@@ -4,7 +4,7 @@
 
 #include "H2MOD\Tags\TagInterface.h"
 #include "Blam/Engine/memory/data.h"
-#include "Blam\FileSystem\FiloInterface.h"
+#include "Blam/Engine/tag_files/files_windows.h"
 
 #include "Util\Hooks\Hook.h"
 

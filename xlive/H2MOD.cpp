@@ -8,7 +8,7 @@
 #include "Blam\Engine\memory\bitstream.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam\FileSystem\FiloInterface.h"
+#include "Blam/Engine/tag_files/files_windows.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"

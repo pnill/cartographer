@@ -2,7 +2,7 @@
 
 #include "Tweaks.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam\FileSystem\FiloInterface.h"
+#include "Blam/Engine/tag_files/files_windows.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
 #include "H2MOD\Modules\Shell\Config.h"
