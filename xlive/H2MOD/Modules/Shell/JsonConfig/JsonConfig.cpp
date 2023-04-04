@@ -12,6 +12,13 @@
 #include "rapidjson/pointer.h"
 using namespace rapidjson;
 
+enum json_config_error : int
+{
+	success,
+    file_open_error,
+    json_parse_error
+};
+
 class json_config {
 
 private:
@@ -20,25 +27,27 @@ private:
     std::vector<std::string> key_path;
 public:
     json_config(const std::wstring& filename)
-        : filename_(filename), doc_(load(filename)) {}
+        : filename_(filename) {}
 
-    Document load(const std::wstring& filename) {
-        std::ifstream ifs(filename);
+    json_config_error load() {
+        std::ifstream ifs(filename_);
         if (!ifs) {
             // The file does not exist, so create it.
-            std::ofstream ofs(filename);
+            std::ofstream ofs(filename_);
             if (!ofs) {
                 throw std::runtime_error("Failed to create file");
             }
             ofs << "{}";  // Initialize with an empty JSON object.
             ofs.close();
-            ifs.open(filename);
+            ifs.open(filename_);
         }
         IStreamWrapper isw(ifs);
         Document d;
-        d.SetObject();
-        d.ParseStream(isw);
-        return d;
+        doc_.SetObject();
+        if (doc_.ParseStream(isw).HasParseError())
+            return json_config_error::json_parse_error;
+
+        return json_config_error::success;
     }
 
     void save() {
@@ -91,7 +100,7 @@ public:
 
     // A Map to store default variables for the current instance of the class.
     //
-	// json_config h2config(config.json);
+    // json_config h2config(config.json);
     // h2config.defaultValues_["crosshair_offset"] = NaN
     //
     std::unordered_map<std::string, Value> defaultValues_;
@@ -115,7 +124,13 @@ public:
                     return v.GetInt();
                 }
                 else if constexpr (std::is_same_v<T, unsigned>) {
-                	return v.GetUint();
+                    return v.GetUint();
+                }
+                else if constexpr (std::is_same_v<T, short>) {
+                    return static_cast<short>(v.GetInt());
+                }
+                else if constexpr (std::is_same_v<T, unsigned short>) {
+                    return static_cast<unsigned short>(v.GetUint());
                 }
                 else if constexpr (std::is_same_v < T, float>) {
                     return v.GetFloat();
@@ -148,13 +163,19 @@ public:
         else if constexpr (std::is_same_v<T, unsigned>) {
             return v.GetUint();
         }
-        else if constexpr (std::is_same_v < T, float> ) {
+        else if constexpr (std::is_same_v<T, short>) {
+            return static_cast<short>(v.GetInt());
+        }
+        else if constexpr (std::is_same_v<T, unsigned short>) {
+            return static_cast<unsigned short>(v.GetUint());
+        }
+        else if constexpr (std::is_same_v < T, float>) {
             return v.GetFloat();
         }
         else if constexpr (std::is_same_v<T, std::string>) {
             return v.GetString();
         }
-        else if constexpr (std::is_same_v<T, real_point3d>){
+        else if constexpr (std::is_same_v<T, real_point3d>) {
             auto x = v[0].GetFloat();
             auto y = v[1].GetFloat();
             auto z = v[2].GetFloat();
@@ -164,6 +185,13 @@ public:
             // Unsupported type
             static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
         }
+    }
+
+    template<typename T>
+    void get(const char* key, T* out_variable, T defaultValue = T{})
+    {
+        T val = get(key, defaultValue);
+        *out_variable = val;
     }
 
     template<typename T>
@@ -181,7 +209,11 @@ public:
             else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
                 (*current_object)[key].SetInt(value);
             }
-            else if constexpr (std::is_same_v<T, unsigned>) {
+            else if constexpr (std::is_same_v<T, short>) {
+                static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
+                (*current_object)[key].SetInt(value);
+            }
+            else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
                 (*current_object)[key].SetUint(value);
             }
             else if constexpr (std::is_same_v<T, float>) {
@@ -214,7 +246,11 @@ public:
             else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
                 current_object->AddMember(k, value, doc_.GetAllocator());
             }
-            else if constexpr (std::is_same_v<T, unsigned>) {
+            else if constexpr (std::is_same_v<T, short>) {
+                static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
+                current_object->AddMember(k, value, doc_.GetAllocator());
+            }
+            else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
                 current_object->AddMember(k, value, doc_.GetAllocator());
             }
             else if constexpr (std::is_same_v<T, float>) {
