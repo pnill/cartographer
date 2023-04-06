@@ -23,51 +23,44 @@ class Memory
 public:
 	static void Initialize();
 
-	static void SetBaseAddress(DWORD base, bool isDedicatedServer)
-	{
-		baseAddress = base;
-		dedicatedServer = isDedicatedServer;
-	}
-	
-	// gets base address
 	static DWORD GetAddress()
 	{
-		return baseAddress;
+		return GetBaseAddress();
 	}
 
 	static DWORD GetAddress(DWORD client, DWORD server = 0)
 	{
-		return baseAddress + (dedicatedServer ? server : client);
+		return GetBaseAddress() + (IsDedicatedServer() ? server : client);
 	}
 
 	template <typename T = void*>
 	static T GetAddress(DWORD client, DWORD server = 0)
 	{
-		return reinterpret_cast<T>(baseAddress + (dedicatedServer ? server : client));
+		return reinterpret_cast<T>((DWORD)GetAddress(client, server));
 	}
 
-	/*
-		Gets the memory address from address relative to executable base image address
-		Set your IDB base address to BASE_IMAGE_ADDRESS_HALO2 (0x00400000) and you can copy the file offset directly 
-		Should ease the job of getting addresses
-	*/
 	static DWORD GetAddressRelative(DWORD client, DWORD server = 0)
 	{
-		return baseAddress + (dedicatedServer ? (server - BASE_IMAGE_ADDRESS_H2SERVER) : (client - BASE_IMAGE_ADDRESS_HALO2));
+		return GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER);
 	}
 
 	template <typename T = void*>
 	static T GetAddressRelative(DWORD client, DWORD server = 0)
 	{
-		return reinterpret_cast<T>(baseAddress + (dedicatedServer ? (server - BASE_IMAGE_ADDRESS_H2SERVER) : (client - BASE_IMAGE_ADDRESS_HALO2)));
+		return reinterpret_cast<T>((DWORD)GetAddress(client - BASE_IMAGE_ADDRESS_HALO2, server - BASE_IMAGE_ADDRESS_H2SERVER));
 	}
 
+	static void SetBaseAddress(DWORD base, bool isDedicatedServer)
+	{
+		baseAddress = base;
+		dedicatedServer = isDedicatedServer;
+	}
+
+	// gets base address
+	static DWORD GetBaseAddress() { return baseAddress; }
 	static bool IsDedicatedServer() { return dedicatedServer; }
 
 	static DWORD baseAddress;
 	static bool dedicatedServer;
 };
 
-// utilites
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
-std::string ByteToHexStr(const BYTE* buffer, size_t size);
