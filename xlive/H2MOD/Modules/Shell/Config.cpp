@@ -54,7 +54,7 @@ H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Ax
 float H2Config_Deadzone_A_X = 26.0f;
 float H2Config_Deadzone_A_Y = 26.0f;
 float H2Config_Deadzone_Radial = 1.0f;
-float H2Config_crosshair_offset = NAN;
+float H2Config_crosshair_offset = 0.138f;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -123,485 +123,100 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigJsonFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigJsonFilenames[H2IsDediServer], H2AppDataLocal, _Shell::GetInstanceId());
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
-	FILE* fileConfig = nullptr;
-	errno_t err = _wfopen_s(&fileConfig, fileConfigPath, L"wb");
 
-	if (err != 0) {
-		_Shell::FileErrorDialog(err);
-		addDebugText("ERROR: Unable to write H2Configuration file!");
+	json_config json(fileConfigPath);
+
+	auto rc = json.load();
+
+	if (rc < 0) {
+		addDebugText("json.load() failed with error: %d while trying to read configuration file!", (int)rc);
 	}
-	else {
-#pragma region Put Data To File
-		CSimpleIniA ini;
-		ini.SetUnicode();
+	else 
+	{
+		json["cartographer"].set("h2portable", H2Portable);
+		json["cartographer"].set("base_port", H2Config_base_port);
+		json["cartographer"].set("upnp", H2Config_upnp_enable);
+		json["cartographer"].set("enable_xdelay", H2Config_xDelay);
+		json["cartographer"].set("debug_log", H2Config_debug_log);
+		json["cartographer"].set("debug_log_level", H2Config_debug_log_level);
+		json["cartographer"].set("debug_log_console", H2Config_debug_log_console);
+		json["cartographer"].set("language_label_capture", H2Config_custom_labels_capture_missing);
+		json["cartographer"].set("discord_enable", H2Config_discord_enable);
+		std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
+		json["cartographer"].set("language_code", lang_str);
 
-		std::fstream iniStringBuffer(fileConfig);
-		iniStringBuffer <<
-			"#--- Halo 2 Project Cartographer Configuration File ---"
-			"\n\n"
-			"# h2portable Options:"
-			"\n# 0 - Config files are read from executable's launch directory then AppDataLocal if missing. Will write to AppDataLocal if not read from the execution directory."
-			"\n# 1 - All config files are read and written to the executable's launch directory (however will still scan and read from AppDataLocal if missing)."
-			"\n\n"
-			"# base_port Options:"
-			"\n# <1 - 65526> - The port the game binds to including any of the nine (9) afterward: UDP and/or TCP (Upper limit: 65535 - 9 = 65526)."
-			"\n\n"
+		if (!H2IsDediServer)
+		{
+			json["game"].set("skip_intro", H2Config_skip_intro);
+			json["game"].set("melee_fix", H2Config_melee_fix);
+			json["game"].set("no_events", H2Config_no_events);
+			json["game"].set("skeleton_biped", H2Config_spooky_boy);
 
-			"# wan_ip Options:"
-			"\n# lan_ip Options:"
-			"\n# This option is used for when you cannot join games hosted on the same local network due to NAT issues."
-			"\n# Configuring these settings for an internal network address avoids the requirement for that host user to port forward."
-			"\n# <IPv4> - External IP Address of the local / internal network user you are trying to connect to. If blank, the External IP returned from the Master Login is used."
-			"\n# <IPv4> - Internal IP Address of the local / internal network user you are trying to connect to."
-			"\n\n"
-			;
+			json["game"]["video"].set("fps_limit", H2Config_fps_limit);
+			json["game"]["video"].set("static_lod_scale", H2Config_static_lod_state);
+			json["game"]["video"].set("field_of_view", H2Config_field_of_view);
+			json["game"]["video"].set("vehicle_field_of_view", H2Config_vehicle_field_of_view);
+			json["game"]["video"].set("static_fp_fov", H2Config_static_first_person);
+			json["game"]["video"].set("experimental_rendering", (int)H2Config_experimental_fps);
+			json["game"]["video"].set("refresh_rate", H2Config_refresh_rate);
+			json["game"]["video"].set("shader_lod_max", H2Config_shader_lod_max);
+			json["game"]["video"].set("light_suppressor", H2Config_light_suppressor);
+			json["game"]["video"].set("hires_fix", H2Config_hiresfix);
+			json["game"]["video"].set("d3dex", H2Config_d3dex);
+			json["game"]["video"].set("override_shadows", (int)H2Config_Override_Shadows);
+			json["game"]["video"].set("override_water", (int)H2Config_Override_Water);
 
-		if (!H2IsDediServer) {
-			iniStringBuffer <<
-				"# language_code Options (Client):"
-				"\n# <main>x<variant> - Sets the main/custom language for the game."
-				"\n# --- <main> ---"
-				"\n# -1 - System Default"
-				"\n# 0  - English"
-				"\n# 1  - Japanese"
-				"\n# 2  - German"
-				"\n# 3  - French"
-				"\n# 4  - Spanish"
-				"\n# 5  - Italian"
-				"\n# 6  - Korean"
-				"\n# 7  - Chinese"
-				"\n# --- <variant> ---"
-				"\n# 0  - Default"
-				"\n\n"
+			json["game"]["hud"].set("crosshair_offset", H2Config_crosshair_offset);
+			json["game"]["hud"].set("crosshair_scale", H2Config_crosshair_scale);
+			json["game"]["hud"].set("hide_ingame_chat", H2Config_hide_ingame_chat);
 
-				"# language_label_capture Options (Client):"
-				"\n# Capture new labels not in the custom language file under the language currently in use."
-				"\n# 0 - Ignore listening for unrecorded labels."
-				"\n# 1 - Listen for and record any labels/strings not seen before."
-				"\n\n"
-
-				"# skip_intro Options (Client):"
-				"\n# 0 - Normal Intro."
-				"\n# 1 - No Intro."
-				"\n\n"
-
-				"# raw_mouse_input Options (Client):"
-				"\n# 0 - Default mouse input handling (includes mouse acceleration)."
-				"\n# 1 - Mouse input does not have input acceleration."
-				"\n\n"
-
-				"# discord_enable Options (Client):"
-				"\n# 0 - Disables Discord Rich Presence."
-				"\n# 1 - Enables Discord Rich Presence."
-				"\n\n"
-
-				/*
-				"# controller_aim_assist Options (Client):"
-				"\n# 0 - Disables aim assist for controllers."
-				"\n# 1 - Enables aim assist for controllers."
-				"\n\n"
-				*/
-
-				"# fps_limit Options (Client):"
-				"\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game."
-				"\n\n"
-
-				"# static_lod_state Options (Client):"
-				"\n# 0 - Disables the Level of Detail level enforcement for models."
-				"\n# The following describes each Level of Detail setting:"
-				"\n# 1 - L1 - Very Low"
-				"\n# 2 - L2 - Low"
-				"\n# 3 - L3 - Medium"
-				"\n# 4 - L4 - High"
-				"\n# 5 - L5 - Very High"
-				"\n# 6 - L6 - Cinematic"
-				"\n\n"
-
-				"# field_of_view Options (Client):"
-				"\n# <uint 0 to 110> - 0 disables the built in FoV adjustment. >0 is the FoV set value."
-				"\n\n"
-
-				"# refresh_rates Options (Client):"
-				"\n# <uint 0 to 240> - 0 disables the built in refresh rate adjustment. >0 is the refresh rate set value."
-				"\n\n"
-
-				"# mouse_sens Options (Client):"
-				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
-				"\n\n"
-
-				"# hiresfix Options (Client):"
-				"\n# 0 - Disable hiresfix. User is not running the game at a resolution above 1920x1200"
-				"\n# 1 - Enable hiresfix. User is running the game at a resolution above 1920x1200"
-				"\n\n"
-
-				"# Force Max Shader LOD Options (Client):"
-				"\n# 0 - Disable shader_lod_max patch. game uses default shader lod settings"
-				"\n# 1 - Enable shader_lod_max patch. game uses highest quality shaders at all times"
-				"\n\n"
-
-				"# Disable Light Suppresion Options (Client):"
-				"\n# 0 - Disable light_suppressor patch. game suppresses lights when multiple of them are onscreen"
-				"\n# 1 - Enable light_suppressor patch. game dosen't suppress lights when multiple of them are onscreen"
-				"\n\n"
-
-				"# d3dex Options (Client):"
-				"\n# 0 - NOTE: If your game crashes on startup, consider disabling this. If it's not enabled, seek for help."
-				"\n# 0 - Disable D3D9Ex version of D3D9."
-				"\n# 1 - Enable D3D9Ex version of D3D9."
-				"\n\n"
-
-				"# controller_sens Options (Client):"
-				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
-				"\n\n"
-
-				"# crosshair_offset Options (Client):"
-				"\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment."
-				"\n\n"
-
-				"# disable_ingame_keyboard Options (Client):"
-				"\n# 0 - Normal Game Controls."
-				"\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus."
-				"\n\n"
-
-				"# hide_ingame_chat Options (Client):"
-				"\n# 0 - In-game chat is displayed normally."
-				"\n# 1 - In-game chat is hidden."
-				"\n\n";
+			json["game"]["input"].set("raw_mouse_input", H2Config_raw_input);
+			json["game"]["input"].set("mouse_raw_scale", H2Config_raw_mouse_scale);
+			json["game"]["input"].set("mouse_uniform_sens", H2Config_mouse_uniform);
+			json["game"]["input"].set("disalbe_ingame_keyboard", H2Config_disable_ingame_keyboard);
+			json["game"]["input"].set("hotkey_help", H2Config_hotkeyIdHelp);
+			json["game"]["input"].set("hotkey_align_window", H2Config_hotkeyIdAlignWindow);
+			json["game"]["input"].set("hotkey_window_mode", H2Config_hotkeyIdWindowMode);
+			json["game"]["input"].set("hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat);
+			json["game"]["input"].set("hotkey_guide", H2Config_hotkeyIdGuide);
+			json["game"]["input"].set("hotkey_console", H2Config_hotkeyIdConsole);
+			json["game"]["input"].set("controller_sens", H2Config_controller_sens);
+			json["game"]["input"].set("contoller_modern", H2Config_controller_modern);
+			json["game"]["input"].set("deadzone_type", (int)H2Config_Controller_Deadzone);
+			json["game"]["input"].set("deadzone_axial_x", H2Config_Deadzone_A_X);
+			json["game"]["input"].set("deadzone_axial_y", H2Config_Deadzone_A_Y);
+			json["game"]["input"].set("deadzone_radial", H2Config_Deadzone_Radial);
+			json["game"]["input"].set("controller_layout", H2Config_CustomLayout.ToString());
 		}
-
-		iniStringBuffer <<
-			"# enable_xdelay Options:"
-			"\n# 0 - Non-host players cannot delay the game start countdown timer."
-			"\n# 1 - Non-host players can delay the game start countdown timer (native default)."
-			"\n\n";
-
-		/*
-		if (H2IsDediServer) {
-			iniStringBuffer <<
-				"# mp_explosion_physics Options (Server):"
-				"\n# 0 - Explosions do not push players or vehicles they drive."
-				"\n# 1 - Enables explosion physics for players in the game."
-				"\n\n"
-
-				"# mp_sputnik Options (Server):"
-				"\n# 0 - Sputnik skull is off."
-				"\n# 1 - Sputnik skull is on for all players."
-				"\n\n"
-
-				"# mp_grunt_bday_party Options (Server):"
-				"\n# 0 - Grunt Birthday Party skull is off."
-				"\n# 1 - Grunt Birthday Party skull is on for all players."
-				"\n\n"
-
-				"# grenade_chain_react Options (Server):"
-				"\n# 0 - Grenades do not chain react in multiplayer."
-				"\n# 1 - Grenades chain react in multiplayer."
-				"\n\n"
-
-				"# banshee_bomb Options (Server):"
-				"\n# 0 - Players cannot use the Banshee Bomb in multiplayer."
-				"\n# 1 - Players can use the Banshee Bomb in multiplayer."
-				"\n\n",
-
-				"# mp_blind Options (Server):"
-				"\n# 0 - Players do not have missing HUD or First Person elements."
-				"\n# 1 - Players cannot see their HUD."
-				"\n# 2 - Players cannot see their First Person Model."
-				"\n# 3 - Players cannot see their HUD or First Person Model."
-				"\n\n"
-
-				"# banshee_bomb Options (Server):"
-				"\n# 0 - Players cannot use their Flashlight in multiplayer."
-				"\n# 1 - Players can use their Flashlight in multiplayer."
-				"\n\n";
+		if (H2IsDediServer)
+		{
+			json["server"].set("server_name", H2Config_dedi_server_name);
+			json["server"].set("server_playlist", H2Config_dedi_server_playlist);
+			json["server"].set("login_identifier", H2Config_login_identifier);
+			json["server"].set("login_password", H2Config_login_password);
+			json["server"].set("additional_pcr_time", H2Config_additional_pcr_time);
+			json["server"].set("minimum_player_start", H2Config_minimum_player_start);
+			json["server"].set("vip_lock", H2Config_vip_lock);
+			json["server"].set("shuffle_even_teams", H2Config_even_shuffle_teams);
+			json["server"].set("koth_random", H2Config_koth_random);
+			json["server"].set("enable_anti_cheat", H2Config_anti_cheat_enabled);
+			json["server"].set("teams_enabled_bit_flags", H2Config_team_bit_flags_str);
 		}
-		*/
-
-		iniStringBuffer <<
-			"# debug_log Options:"
-			"\n# 0 - Disables logging."
-			"\n# 1 - Enables logging."
-			"\n\n"
-
-			"# debug_log_level Options:"
-			"\n# 0 - Trace, tell me *everything*."
-			"\n# 1 - Debug, give me the dirty details."
-			"\n# 2 - Info, occasionally helpful information."
-			"\n# 3 - Warning, what probably shouldn't be happening."
-			"\n# 4 - Error, bad news only, please."
-			"\n# 5 - Critical, I only want to see death and destruction."
-			"\n\n"
-
-			"# debug_log_console Options:"
-			"\n# 0 - Disables console window logging."
-			"\n# 1 - Enables console window logging, will display all output from all loggers."
-			"\n\n";
-
-		if (H2IsDediServer) {
-			iniStringBuffer <<
-				"# server_name Options (Server):"
-				"\n# Sets the name of the server up to 15 characters long."
-				"\n# Leave blank/empty for no effect."
-				"\n\n"
-
-				"# server_playlist Options (Server):"
-				"\n# Sets the playlist of the server up to 255 characters long."
-				"\n# Leave blank/empty for no effect."
-				"\n\n"
-
-				"# login_identifier Options (Server):"
-				"\n# The email or username used to login to an account."
-				"\n# Note: Server accounts *should not* be signed into multiple times concurrently *unless* it is all on the same computer (i.e. only exempt when running multiple server instances)."
-				"\n\n"
-
-				"# login_password Options (Server):"
-				"\n# The password used to login to the defined account."
-				"\n\n"
-
-				"# additional_pcr_time Options (Server):"
-				"\n# By default, 25 seconds are added to post game carnage time from the playlist setting."
-				"\n# Now you have the possibility to change it to your preference."
-				"\n\n"
-        
-		        "# minimum_player_start options (Server):"
-		        "\n# Changes the starting behaviour of the countdown, setting this to any value (1-16) will cause the"
-		        "\n# Server to not start until the player count is equal to or above the given value. A value of 0 will disable this setting."
-		        "\n\n"
-
-				"# vip_lock (Server):"
-				"\n# This flag tells the server to lock the game to VIP mode when the game starts"
-				"\n# Players who are in the lobby when the game starts are added to VIP and can rejoin if there are connection issues"
-				"\n# The VIP list will be cleared when the lobby reaches Post game"
-				"\n\n"
-
-				"# shuffle_even_teams (Server):"
-				"\n# This flag tells the server to force even and shuffle teams before starting"
-				"\n# The server will automatically organize teams before starting if the game is uneven"
-				"\n# This setting is dependent on the settings for team_enable_bit_flags and the servers current max players."
-				"\n# The server will attempt to fill each team with an equal amount of players for every enabled team."
-				"\n# As an example if the server allows 8 players to join and has 2 teams enabled it will place 4 players in each team before the game can start"
-				"\n# If you configure these settings to not line up to an equal amount of players on each team it will not start."
-				"\n# As an example if you set the player count to 4 and have 3 teams enabled you will never get an even amount of players on each team."
-				"\n\n"
-
-				"# koth_random (Server):"
-				"\n# This flag tells which behaviour the koth will use for getting the next hill"
-				"\n# True (default) will have the server select the hill randomly"
-				"\n# false will have the server select the hill in order"
-				"\n\n"
-
-				"# enable_anti_cheat (Server):"
-				"\n# This flag will enable anti-cheat on your server."
-				"\n\n";
-      
-		}
-
-		if (!H2IsDediServer) {
-			iniStringBuffer <<
-				"# hotkey_... Options (Client):"
-				"\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form."
-				"\n# The codes in hexadecimal (base-16) form can be found here:"
-				"\n# https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx"
-				"\n\n"
-
-				"# crosshair_... size Options (Client):"
-				"\n# 0 - Disables the crosshair width/height from being displayed."
-				"\n# 1 - Default width/height size "
-				"\n# Anything above 1 will change the width/height to the indicated size"
-				"\n# The size can range from a minimum of 0 to a maximum of 65535"
-				"\n\n";
-		}
-
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "h2portable", H2Portable);
-		ini.SetLongValue(H2ConfigVersionSection.c_str(), "base_port", H2Config_base_port);
-
-		ini.SetValue(H2ConfigVersionSection.c_str(), "wan_ip", H2Config_str_wan);
-
-		ini.SetValue(H2ConfigVersionSection.c_str(), "lan_ip", H2Config_str_lan);
-
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "upnp", H2Config_upnp_enable);
-
-		if (!H2IsDediServer) {
-			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
-			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
-		}
-
-		if (!H2IsDediServer) {
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
-
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_aim_assist", H2Config_controller_aim_assist);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_sens", std::to_string(H2Config_controller_sens).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
-			
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
-			ini.SetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", std::to_string(H2Config_experimental_fps).c_str());
-
-			if (FloatIsNaN(H2Config_crosshair_offset)) {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
-			}
-			else {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", std::to_string(H2Config_crosshair_offset).c_str());
-			}
-			if(FloatIsNaN(H2Config_crosshair_scale))
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN");
-			}
-			else
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
-			}
-			if(FloatIsNaN(H2Config_raw_mouse_scale))
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25");
-			}
-			else
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", std::to_string(H2Config_raw_mouse_scale).c_str());
-			}
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
-			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 #ifndef NDEBUG
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "forced_event", H2Config_forced_event);
+		json["development"].set("forced_event", H2Config_forced_event);
 #endif
-		}
-
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
-
-		/*
-		if (H2IsDediServer) {
-			fputs("\nmp_explosion_physics = ", fileConfig); fputs(AdvLobbySettings_mp_explosion_physics ? "1" : "0", fileConfig);
-
-			fputs("\nmp_sputnik = ", fileConfig); fputs(AdvLobbySettings_mp_sputnik ? "1" : "0", fileConfig);
-
-			fputs("\nmp_grunt_bday_party = ", fileConfig); fputs(AdvLobbySettings_mp_grunt_bday_party ? "1" : "0", fileConfig);
-
-			fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
-
-			fputs("\nbanshee_bomb = ", fileConfig); fputs(AdvLobbySettings_banshee_bomb ? "1" : "0", fileConfig);
-
-			char tmpChar[2] = { '0' + AdvLobbySettings_mp_blind, 0 };
-			fputs("\nmp_blind = ", fileConfig); fputs(tmpChar, fileConfig);
-
-			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
-		}*/
-
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log);
-
-		ini.SetLongValue(H2ConfigVersionSection.c_str(), "debug_log_level", H2Config_debug_log_level);
-
-		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
-
-		if (H2IsDediServer) {
-			ini.SetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "minimum_player_start", H2Config_minimum_player_start);
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "additional_pcr_time", H2Config_additional_pcr_time);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "login_password", H2Config_login_password);
-			ini.SetValue(H2ConfigVersionSection.c_str(), "stats_auth_key", H2Config_stats_authkey,
-				"# DO NOT CHANGE THIS OR YOUR SERVER WILL NO LONGER TRACK STATS");
-			ini.SetValue(H2ConfigVersionSection.c_str(), "teams_enabled_bit_flags", H2Config_team_bit_flags_str, 
-				"# teams_enabled_bit_flags (Server)"
-				"\n# By default, the game reads team bitflags from the current map."
-				"\n# With this option, you can enable which teams are enabled."
-				"\n# Each bit corresponds to a team. Example bellow where we disable Blue, Green and Pink teams:"
-				"\n# Teams:   Red  Blue  Yellow  Green  Purple  Orange  Brown  Pink"
-				"\n#           |     |     |       |       |       |      |      |  "
-				"\n#          \\/    \\/    \\/      \\/      \\/      \\/     \\/     \\/  "
-				"\n#           1  -  0  -  1   -   0   -   1   -   1  -   1  -  0"
-				"\n");
-		}
-
-		if (!H2IsDediServer) {
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_window_mode", H2Config_hotkeyIdWindowMode, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdWindowMode)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_hide_ingame_chat", H2Config_hotkeyIdToggleHideIngameChat, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdToggleHideIngameChat)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_guide", H2Config_hotkeyIdGuide, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdGuide)).c_str());
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_console", H2Config_hotkeyIdConsole, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdConsole)).c_str());
-		}
-
-		ini.SaveFile(fileConfig);
-
-		fputs("\n", fileConfig);
-#pragma endregion
-		fclose(fileConfig);
+		json.save();
 	}
 
 	addDebugText("End saving H2Configuration file.");
 }
-
-#pragma endregion
 
 void ReadH2Config() {
 	addDebugText("Reading H2Configuration file...");

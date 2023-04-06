@@ -116,16 +116,13 @@ public:
 
         Value& v = (*current_object)[key];
         if (!current_object->HasMember(key)) {
-            if (defaultValues_.find(key) != defaultValues_.end()) {
+            if (defaultValues_.find(key) != defaultValues_.end())
                 v = defaultValues_[key];
-            }
             else
-            {
                 return defaultValue;
-            }
         }
 
-        if constexpr (std::is_same_v<T, bool>) {
+    	if constexpr (std::is_same_v<T, bool>) {
             return v.GetBool();
         }
         else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
@@ -169,7 +166,7 @@ public:
     }
 
     template<typename T>
-    void set(const char* key, T value) {
+    void set(const char* key, T value, bool auto_save = false) {
 
         Value* current_object = get_current_pointer();
         key_path.clear();
@@ -190,7 +187,7 @@ public:
 				(*current_object)[key].SetInt(value);
         }
         else if constexpr (std::is_same_v<T, short>) {
-            static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
+            //static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
             if(is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
             else
@@ -244,6 +241,9 @@ public:
             // Unsupported type
             static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
         }
+
+        if (auto_save)
+            save();
     }
     template<typename T>
     void setDefaultValue(const char* key, T value) {
