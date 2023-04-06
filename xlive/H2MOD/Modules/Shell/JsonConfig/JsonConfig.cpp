@@ -114,49 +114,17 @@ public:
         Value* current_object = get_current_pointer();
         key_path.clear();
 
+        Value& v = (*current_object)[key];
         if (!current_object->HasMember(key)) {
             if (defaultValues_.find(key) != defaultValues_.end()) {
-                const Value& v = defaultValues_[key];
-                if constexpr (std::is_same_v<T, bool>) {
-                    return v.GetBool();
-                }
-                else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
-                    return v.GetInt();
-                }
-                else if constexpr (std::is_same_v<T, unsigned>) {
-                    return v.GetUint();
-                }
-                else if constexpr (std::is_same_v<T, short>) {
-                    return static_cast<short>(v.GetInt());
-                }
-                else if constexpr (std::is_same_v<T, unsigned short>) {
-                    return static_cast<unsigned short>(v.GetUint());
-                }
-                else if constexpr (std::is_same_v < T, float>) {
-                    return v.GetFloat();
-                }
-                else if constexpr (std::is_same_v<T, std::string>) {
-                    return v.GetString();
-                }
-                else if constexpr (std::is_same_v<T, const char*>) {
-                    return v.GetString();
-                }
-                else if constexpr (std::is_same_v<T, real_point3d>) {
-                    auto x = v[0].GetFloat();
-                    auto y = v[1].GetFloat();
-                    auto z = v[2].GetFloat();
-                    return real_point3d(x, y, z);
-                }
-                else {
-                    // Unsupported type
-                    static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
-                }
+                v = defaultValues_[key];
             }
-            return defaultValue;
+            else
+            {
+                return defaultValue;
+            }
         }
 
-        const Value& v = (*current_object)[key];
-        // Use if constexpr to conditionally compile code based on T
         if constexpr (std::is_same_v<T, bool>) {
             return v.GetBool();
         }
@@ -206,80 +174,75 @@ public:
         Value* current_object = get_current_pointer();
         key_path.clear();
 
+        bool is_new = !current_object->HasMember(key);
+        Value k(key, doc_.GetAllocator());
 
-        // Check if the key already exists in the document
-        if (current_object->HasMember(key)) {
-            if constexpr (std::is_same_v<T, bool>) {
-                (*current_object)[key].SetBool(value);
-            }
-            else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
-                (*current_object)[key].SetInt(value);
-            }
-            else if constexpr (std::is_same_v<T, short>) {
-                static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
-                (*current_object)[key].SetInt(value);
-            }
-            else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
-                (*current_object)[key].SetUint(value);
-            }
-            else if constexpr (std::is_same_v<T, float>) {
-                (*current_object)[key].SetFloat(value);
-            }
-            else if constexpr (std::is_same_v<T, std::string>) {
-                (*current_object)[key].SetString(value.c_str(), doc_.GetAllocator());
-            }
-            else if constexpr(std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
-                (*current_object)[key].SetString(StringRef(value));
-            }
-            else if constexpr(std::is_same_v<T, real_point3d>) {
-                Value vals = (*current_object)[key].GetArray();
-                (*current_object)[key].Clear();
-                (*current_object)[key].PushBack(value.x, doc_.GetAllocator());
-                (*current_object)[key].PushBack(value.y, doc_.GetAllocator());
-                (*current_object)[key].PushBack(value.z, doc_.GetAllocator());
-            }
-            else {
-                // Unsupported type
-                static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
-            }
+        if constexpr (std::is_same_v<T, bool>) {
+            if(is_new)
+                current_object->AddMember(k, value, doc_.GetAllocator());
+            else
+				(*current_object)[key].SetBool(value);
         }
-        else {
-            // If the key does not exist in the document, add a new key-value pair to the document
-            Value k(key, doc_.GetAllocator());
-            if constexpr (std::is_same_v<T, bool>) {
+        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
+            if(is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
+            else
+				(*current_object)[key].SetInt(value);
+        }
+        else if constexpr (std::is_same_v<T, short>) {
+            static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
+            if(is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, short>) {
-                static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
+            else
+				(*current_object)[key].SetInt(value);
+        }
+        else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
+            if (is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
+            else
+        		(*current_object)[key].SetUint(value);
+        }
+        else if constexpr (std::is_same_v<T, float>) {
+            if (is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, float>) {
-                current_object->AddMember(k, value, doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, std::string>) {
+            else
+                (*current_object)[key].SetFloat(value);
+        }
+        else if constexpr (std::is_same_v<T, std::string>) {
+            if (is_new)
+            {
                 Value v(value.c_str(), value.size(), doc_.GetAllocator());
                 current_object->AddMember(k, v, doc_.GetAllocator());
             }
-            else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
+            else
+                (*current_object)[key].SetString(value.c_str(), doc_.GetAllocator());
+        }
+        else if constexpr (std::is_same_v<T, const char*> || std::is_same_v<T, char*>) {
+            if (is_new)
                 current_object->AddMember(k, StringRef(value), doc_.GetAllocator());
-            }
-            else if constexpr (std::is_same_v<T, real_point3d>) {
+            else
+                (*current_object)[key].SetString(StringRef(value));
+        }
+        else if constexpr (std::is_same_v<T, real_point3d>) {
+            if (is_new)
+            {
                 Value vals(rapidjson::kArrayType);
                 vals.PushBack(value.x, doc_.GetAllocator());
                 vals.PushBack(value.y, doc_.GetAllocator());
                 vals.PushBack(value.z, doc_.GetAllocator());
                 current_object->AddMember(k, vals, doc_.GetAllocator());
             }
-            else {
-                // Unsupported type
-                static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
+            else 
+            {
+                (*current_object)[key].Clear();
+                (*current_object)[key].PushBack(value.x, doc_.GetAllocator());
+                (*current_object)[key].PushBack(value.y, doc_.GetAllocator());
+                (*current_object)[key].PushBack(value.z, doc_.GetAllocator());
             }
+        }
+        else {
+            // Unsupported type
+            static_assert(sizeof(T) == 0, "Unsupported type in json_config::set()");
         }
     }
     template<typename T>
