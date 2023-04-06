@@ -92,7 +92,8 @@ e_special_event_type get_current_special_event()
 	if (check_special_event_week(L"10-20") || check_special_event_week(L"10-27") || check_special_event_date(L"10-31"))
 		return _halloween;
 
-	if (check_special_event_date(L"11-08") || check_special_event_date(L"11-09") || check_special_event_date(L"11-10"))
+	if (check_special_event_date(L"11-08") || check_special_event_date(L"11-09") || check_special_event_date(L"11-10") || 
+	    check_special_event_date(L"5-30") || check_special_event_date(L"5-31") || check_special_event_date(L"6-01"))
 		return _birthday;
 
 	return _no_event;

@@ -169,7 +169,10 @@ namespace TagFixes
 			for (auto& light_item : lights)
 			{
 				auto light = tags::get_tag_fast<s_light_group_definition>(light_item.first);
-				light->flags |= s_light_group_definition::e_flags::light_framerate_killer;
+				// Disabled since it caused issues where certain lights wouldnt render randomly
+				// TODO figure out why it does this at some other point in time
+				// light->flags |= s_light_group_definition::e_flags::light_framerate_killer;
+
 				light->flags |= s_light_group_definition::e_flags::multiplayer_override;
 			}
 		}
