@@ -61,7 +61,7 @@ bool H2Config_xDelay = true;
 bool H2Config_hiresfix = false;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
-bool H2Config_d3dex = false;
+bool H2Config_d3d9ex = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
@@ -169,7 +169,7 @@ void SaveH2Config() {
 			json["game"]["video"].set("shader_lod_max", H2Config_shader_lod_max);
 			json["game"]["video"].set("light_suppressor", H2Config_light_suppressor);
 			json["game"]["video"].set("hires_fix", H2Config_hiresfix);
-			json["game"]["video"].set("d3dex", H2Config_d3dex);
+			json["game"]["video"].set("d3dex", H2Config_d3d9ex);
 			json["game"]["video"].set("override_shadows", (int)H2Config_Override_Shadows);
 			json["game"]["video"].set("override_water", (int)H2Config_Override_Water);
 
@@ -334,7 +334,7 @@ void ReadH2Config() {
 				json["game"]["video"].get("shader_lod_max", &H2Config_shader_lod_max, H2Config_shader_lod_max);
 				json["game"]["video"].get("light_suppressor", &H2Config_light_suppressor, H2Config_light_suppressor);
 				json["game"]["video"].get("hires_fix", &H2Config_hiresfix, H2Config_hiresfix);
-				json["game"]["video"].get("d3dex", &H2Config_d3dex, H2Config_d3dex);
+				json["game"]["video"].get("d3dex", &H2Config_d3d9ex, H2Config_d3d9ex);
 
 				switch (json["game"]["video"].get<int>("override_shadows", 1))
 				{
@@ -581,7 +581,7 @@ void UpgradeConfig()
 				json["game"]["video"].set("shader_lod_max", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max));
 				json["game"]["video"].set("light_suppressor", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor));
 				json["game"]["video"].set("hires_fix", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix));
-				json["game"]["video"].set("d3dex", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3dex));
+				json["game"]["video"].set("d3dex", ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex));
 				json["game"]["video"].set("override_shadows", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_shadows", "1")));
 				json["game"]["video"].set("override_water", std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "override_water", "1")));
 
