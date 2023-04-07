@@ -18,7 +18,7 @@ RECT rectScreenOriginal;
 
 
 //Leveraging this call to unset the controller state
-typedef void(__cdecl sub_B524F7_t)(signed int a1);
+typedef void(__cdecl sub_B524F7_t)(int a1);
 sub_B524F7_t* p_sub_B524F7;
 
 __int16 last_user_index;
@@ -36,7 +36,7 @@ unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 	return result;
 }
 
-void __cdecl sub_B524F7(signed int a1)
+void __cdecl sub_B524F7(int a1)
 {
 	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;

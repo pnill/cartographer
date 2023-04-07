@@ -62,7 +62,7 @@ private:
 
 public:
     static std::string                 windowName;
-    ComVarT<float>                     m_console_opacity;
+    ComVar<float>                      m_console_opacity;
 
     Console();
     ~Console() = default;

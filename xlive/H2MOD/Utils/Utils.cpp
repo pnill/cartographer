@@ -578,21 +578,6 @@ int TrimRemoveConsecutiveSpaces(char* text) {
 	return text_pos;//new length
 }
 
-std::vector<std::string> &split(const std::string &s, char delim, std::vector<std::string> &elems) {
-	std::stringstream ss(s);
-	std::string item;
-	while (std::getline(ss, item, delim)) {
-		elems.push_back(item);
-	}
-	return elems;
-}
-
-std::vector<std::string> split(const std::string &s, char delim) {
-	std::vector<std::string> elems;
-	split(s, delim, elems);
-	return elems;
-}
-
 int stripWhitespace(wchar_t *inputStr) {
 	wchar_t *start;
 	start = inputStr;
@@ -652,4 +637,52 @@ bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
 {
 	auto a = file_path.substr(file_path.find_last_of('.') + 1, file_path.length() - file_path.find_last_of('.') - 1);
 	return a == file_type;
+}
+
+// use this only if input is expected to always be properly formated
+// preper format means it only contains only these characters: '01234556789ABCDEFabcdef' and no (pre/su)fixes
+void HexStrToBytesUnsafe(const char* hexStr, size_t hexStrLen, BYTE* byteBuf, size_t bufLen)
+{
+	// ASCII character index map to hex value
+	static const BYTE lutStrToHex[] = {
+		0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  0,  0,  0,  0,
+		0,  0,  0,  10,  11,  12,  13,  14,  15,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
+		0,  0,  0,  0,  0,  0,  0,  10,  11,  12,  13,  14,  15
+	};
+
+	const BYTE* byteBufEnd = byteBuf + bufLen;
+	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
+	// continue only if string is at least 1
+	if (hexStrLen >= 1u)
+	{
+		bool hexStrOddLen = !!(hexStrLen % 2);
+		const char tmpBuf1[3] = { '0', hexStr[0], '\0' };
+		const char* HexStrBeg = hexStrOddLen ? tmpBuf1 : &hexStr[0];
+
+		for (int strIdx = 0; strIdx < hexStrLen && byteBuf < byteBufEnd; )
+		{
+			*byteBuf++ = (BYTE)((lutStrToHex[HexStrBeg[strIdx++] - '0'] << 4) | (lutStrToHex[HexStrBeg[strIdx++] - '0']));
+			HexStrBeg = hexStr; // get the next byte
+		}
+	}
+}
+
+// TODO: this function checks the input hexStr before converting it to bytes
+// hence being slower if we don't trust the input
+void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
+	size_t hexStrLen = hexStr.length();
+	HexStrToBytesUnsafe(hexStr.c_str(), hexStrLen, byteBuf, bufLen);
+}
+
+std::string ByteToHexStr(const BYTE* buffer, size_t size) {
+	std::stringstream str;
+	str.setf(std::ios_base::hex, std::ios::basefield);
+	str.setf(std::ios_base::uppercase);
+	str.fill('0');
+
+	for (size_t i = 0; i < size; i++) {
+		str << std::setw(2) << (unsigned short)(BYTE)buffer[i];
+	}
+	return str.str();
 }

@@ -216,6 +216,7 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 
 	case XPRIVILEGE_PRESENCE:
 		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PRESCENCE", dwUserIndex, privilegeType);
+		break;
 
 	case XPRIVILEGE_USER_CREATED_CONTENT:
 		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - USER_CREATED_CONTENT", dwUserIndex, privilegeType);

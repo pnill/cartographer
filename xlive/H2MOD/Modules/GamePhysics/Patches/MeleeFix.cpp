@@ -41,7 +41,7 @@ namespace MeleeFix
 	typedef int(__cdecl melee_get_time_to_target_t)(unsigned __int16 object_index);
 	melee_get_time_to_target_t* p_melee_get_time_to_target;
 
-	typedef void(__cdecl melee_damage_t)(int object_index, signed int melee_type, char unk2, float unk3);
+	typedef void(__cdecl melee_damage_t)(int object_index, int melee_type, char unk2, float unk3);
 	melee_damage_t* p_melee_damage;
 
 	typedef void (__cdecl send_melee_damage_simulation_event_t)(int a1, int a2, int arg8);
@@ -145,9 +145,9 @@ namespace MeleeFix
 			}*/
 			
 			// this is used only for sword
-			if (melee_type == HaloString::HS_MELEE_DASH || melee_type == HaloString::HS_MELEE_DASH_AIRBORNE)
+			if (melee_type == e_global_string_ids::HS_MELEE_DASH || melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE)
 			{
-				float melee_max_duration = melee_type == HaloString::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
+				float melee_max_duration = melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
 				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || p_melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;

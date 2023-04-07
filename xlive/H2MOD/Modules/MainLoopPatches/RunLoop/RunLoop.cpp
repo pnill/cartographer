@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "RunLoop.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\GUI\XLiveRendering.h"
@@ -20,6 +20,8 @@
 #include "XLive\xnet\IpManagement\XnIp.h"
 
 #include "Util\Hooks\Hook.h"
+
+// TODO Move most of this logic to Blam/Engine/main/main.cpp
 
 #define TIMER_RESOLUTION_MS 1
 
@@ -130,29 +132,6 @@ rumble_update_t p_rumble_update;
 
 extern LPDIRECT3DDEVICE9 pDevice;
 
-static bool shouldQuitMainLoop = false;
-
-DWORD* get_scenario_global_address() {
-	return Memory::GetAddress<DWORD*>(0x479e74);
-}
-
-int get_scenario_volume_count() {
-	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
-	return volume_count;
-}
-
-void kill_volume_disable(int volume_id) {
-	void(__cdecl* kill_volume_disable)(int volume_id);
-	kill_volume_disable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3ab8);
-	kill_volume_disable(volume_id);
-}
-
-void kill_volume_enable(int volume_id) {
-	void(__cdecl* kill_volume_enable)(int volume_id);
-	kill_volume_enable = (void(__cdecl*)(int))((char*)H2BaseAddr + 0xb3a64);
-	kill_volume_enable(volume_id);
-}
-
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
@@ -243,31 +222,22 @@ void __cdecl rasterizer_present_hook(int a1) {
 	XLiveThrottleFramerate(H2Config_fps_limit);
 }
 
-void (__cdecl* p_main_game_loop)();
-void __cdecl main_game_loop_hook() {
-	if (!shouldQuitMainLoop)
-		CartographerMainLoop();
+typedef void(_cdecl* main_loop_body_t)();
+main_loop_body_t p_main_loop_body;
+void __cdecl main_loop_body() {
+	CartographerMainLoop();
 
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_before);
-	mapManager->MapDownloadUpdateTick();
-	// update local user network stats
-	gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();
-	p_main_game_loop();
+	if (!Memory::IsDedicatedServer())
+	{
+		mapManager->MapDownloadUpdateTick();
+		gXnIpMgr.GetLocalUserXn()->m_pckStats.PckDataSampleUpdate();	// update local user network stats
+	}
+	p_main_loop_body();
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
-static char __cdecl dedicated_server_should_quit_hook() {
-	if (!shouldQuitMainLoop)
-		CartographerMainLoop();
-	
-	bool& dedicated_server_quit = *Memory::GetAddress<bool*>(0x0, 0x4A7083);
-
-	//original test - if game should shutdown
-	return dedicated_server_quit;
-}
-
 extern bool b_XboxTick;
-
 // we disable some broken code added by hired gun, that is also disabled while running a cinematic 
 // this should fix the built in frame limiter (while minimized)
 // as well as the game speeding up while minimized
@@ -551,8 +521,7 @@ void __cdecl alt_main_game_loop_hook()
 	if (tick_time >= time_globals::get()->seconds_per_tick || !init)
 	{
 		QueryPerformanceCounter(&start_tick);
-		if (!shouldQuitMainLoop)
-			CartographerMainLoop();
+		CartographerMainLoop();
 		init = true;
 
 		DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
@@ -646,13 +615,14 @@ void InitRunLoop() {
 	LOG_INFO_GAME("{} - initializing", __FUNCTION__);
 
 	addDebugText("Pre RunLoop hooking.");
+	p_main_loop_body = Memory::GetAddress<main_loop_body_t>(0x399CC, 0xBFDE);
+	PatchCall(Memory::GetAddress(0x39E64, 0xC684), main_loop_body);
+
 	if (H2IsDediServer) {
 		addDebugText("Hooking loop & shutdown Function");
-		PatchCall(Memory::GetAddress(0x0, 0xc6cb), dedicated_server_should_quit_hook);
 	}
 	else {
 		addDebugText("Hooking loop Function");
-		p_main_game_loop = Memory::GetAddress<decltype(p_main_game_loop)>(0x399CC);
 
 		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
@@ -666,14 +636,12 @@ void InitRunLoop() {
 		switch (experimental_rendering_mode)
 		{
 		case _rendering_mode_original_game_frame_limit:
-			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			MainGameTime::ApplyPatches();
 			MainGameTime::fps_limiter_enabled = true;
 			break;
 
 		case _rendering_mode_none:
 		default:
-			PatchCall(Memory::GetAddress(0x39E64), main_game_loop_hook);
 			break;
 		} // switch (experimental_rendering_mode)
 

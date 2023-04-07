@@ -2,7 +2,7 @@
 
 #include "tag_loader.h"
 #include "Blam\Common\Common.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenery_definition.hpp"
 #include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
@@ -11,7 +11,7 @@
 #include "Util\Hooks\Hook.h"
 
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
-#include "Blam/Engine/DataArray/TagDataIterator.h"
+#include "Blam/Engine/cache/cache_files.h"
 
 //contains some game functions that returns HANDLE
 namespace global_handle_function

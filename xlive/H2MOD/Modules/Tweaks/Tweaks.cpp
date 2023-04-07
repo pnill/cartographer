@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Tweaks.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam\FileSystem\FiloInterface.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD\Modules\Accounts\AccountLogin.h"
@@ -301,6 +301,9 @@ void H2Tweaks::ApplyPatches() {
 
 		// set the additional pcr time
 		WriteValue<BYTE>(Memory::GetAddress(0, 0xE590) + 2, H2Config_additional_pcr_time);
+
+		// fix human turret variant setting not working on dedicated servers
+		WriteValue<int>(Memory::GetAddress(0x0, 0x3557FC), 1);
 	}
 	else {//is client
 
@@ -411,32 +414,6 @@ void H2Tweaks::ApplyPatches() {
 
 void H2Tweaks::DisposePatches() {
 
-}
-
-static DWORD* get_scenario_global_address() {
-	return Memory::GetAddress<DWORD*>(0x479e74);
-}
-
-static int get_scenario_volume_count() {
-	int volume_count = *(int*)(*get_scenario_global_address() + 0x108);
-	return volume_count;
-}
-
-static void kill_volume_disable(int volume_id) {
-	auto p_kill_volume_disable = Memory::GetAddress<void(__cdecl*)(int volume_id)>(0xb3ab8);
-	p_kill_volume_disable(volume_id);
-}
-
-void H2Tweaks::toggleKillVolumes(bool enable) {
-	if (enable)
-		return;
-
-	//TODO 'bool enable'
-	if (!Memory::IsDedicatedServer() && NetworkSession::LocalPeerIsSessionHost()) {
-		for (int i = 0; i < get_scenario_volume_count(); i++) {
-			kill_volume_disable(i);
-		}
-	}
 }
 
 void H2Tweaks::SetScreenRefreshRate() {

@@ -2,7 +2,7 @@
 
 #include "HudElements.h"
 
-#include "Blam\Engine\IceCreamFlavor\IceCreamFlavor.h"
+#include "Blam/Engine/game/cheats.h"
 #include "Blam\Engine\render\render_cameras.h"
 #include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"

@@ -1,12 +1,14 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam/Engine/Game/GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/scenario/scenario.h"
+
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
-#include "Blam/Engine/Game/GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD/Engine/Engine.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -64,7 +66,7 @@ void Infection::sendTeamChange()
 	{
 		if (NetworkSession::GetPlayerCount() > 0)
 		{
-			for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+			for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 			{
 				if (NetworkSession::PlayerIsActive(playerIndex))
 				{
@@ -122,42 +124,6 @@ void Infection::InitHost() {
 	//Applying SpeedCheck fix
 	h2mod->set_unit_speed_patch(true);
 
-	// Remove unwanted items in infection
-	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
-	for each (auto itemcollection in itemcollections)
-	{
-		std::string item_name = tags::get_tag_name(itemcollection.first);
-		if (item_name.find("multiplayer\\powerups") != std::string::npos ||
-			item_name == "multiplayer\\single_weapons\\frag_grenades" ||
-			item_name == "multiplayer\\single_weapons\\plasma_grenades")
-		{
-			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
-
-			datum shotgun_ammo_equip_datum = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
-			for (int i = 0; i < itmc->item_permutations.size; i++)
-			{
-				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
-				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
-			}
-		}
-	}
-	
-	//Replace vehicles with shotguns
-	auto scenarios = tags::find_tags(blam_tag::tag_group_type::scenario);
-	for(auto &scenario_ : scenarios)
-	{
-		auto scenario = tags::get_tag<blam_tag::tag_group_type::scenario, s_scenario_group_definition>(scenario_.first);
-		for(auto i = 0; i < scenario->netgame_equipment.size; i++)
-		{
-			auto equipment = scenario->netgame_equipment[i];
-			if(equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
-			{
-				equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-				equipment->itemvehicle_collection.TagIndex = DATUM_INDEX_NONE;
-			}
-		}
-	}
-
 	LOG_TRACE_GAME("[h2mod-infection] Host init resetting zombie player data status");
 	Infection::resetZombiePlayerStatus();
 }
@@ -196,7 +162,7 @@ void Infection::preSpawnServerSetup() {
 			}
 		}
 		else {
-			if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+			if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
@@ -211,7 +177,7 @@ void Infection::preSpawnServerSetup() {
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
-	if (SpecialEvents::getCurrentEvent() == SpecialEvents::_halloween && H2Config_spooky_boy)
+	if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
 	else
 		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
@@ -243,7 +209,7 @@ void Infection::onGameTick()
 				human_count++;
 
 		}
-		if(human_count == 0 && zombie_count >= 1)
+		if(human_count == 0 && zombie_count > 1)
 		{
 			ticks_without_any_humans++;
 		}
@@ -259,10 +225,46 @@ void Infection::onGameTick()
 	}
 }
 
+void Infection::removeUnwantedItems()
+{
+	const datum shotgun_ammo_equip_datum = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+
+	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
+	for each (auto itemcollection in itemcollections)
+	{
+		std::string item_name = tags::get_tag_name(itemcollection.first);
+		if (item_name.find("multiplayer\\powerups") != std::string::npos ||
+			item_name == "multiplayer\\single_weapons\\frag_grenades" ||
+			item_name == "multiplayer\\single_weapons\\plasma_grenades")
+		{
+			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
+
+			for (int i = 0; i < itmc->item_permutations.size; i++)
+			{
+				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
+				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
+			}
+		}
+	}
+
+	//Replace vehicles with shotgun ammo
+	s_scenario_group_definition* scenario = get_global_scenario();
+	for (DWORD i = 0; i < scenario->netgame_equipment.size; i++)
+	{
+		auto netgame_equipment = scenario->netgame_equipment[i];
+		if (netgame_equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
+		{
+			netgame_equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
+			netgame_equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+			netgame_equipment->itemvehicle_collection.TagIndex = DATUM_INDEX_NONE;
+		}
+	}
+}
 
 void Infection::Initialize()
 {
 	LOG_TRACE_GAME("{} - infection initialization!");
+	removeUnwantedItems();
 
 	if (!Memory::IsDedicatedServer())
 		Infection::InitClient();

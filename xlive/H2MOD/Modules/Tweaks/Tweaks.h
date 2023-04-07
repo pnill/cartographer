@@ -11,7 +11,6 @@ struct ui_text_bounds
 namespace H2Tweaks {
 	void ApplyPatches();
 	void DisposePatches();
-	void toggleKillVolumes(bool enable);
 	void SetScreenRefreshRate();
 	void SunflareFix();
 	void WarpFix(bool enable);

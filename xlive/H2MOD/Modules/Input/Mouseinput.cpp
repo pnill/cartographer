@@ -1,18 +1,16 @@
 #include "stdafx.h"
 
 #include "Mouseinput.h"
-#include "Blam\Engine\Game\GameTimeGlobals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "Util\Hooks\Hook.h"
 
 bool b_raw_init = false;
 DWORD base;
-DWORD rtnAddr = 0;
 DIMOUSESTATE* ms;
 float* dx;
 float* dy;
 BYTE assmNop[8] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-DWORD dwBack;
 
 BYTE o_SetDX[8];
 BYTE o_SetDY[8];
@@ -27,7 +25,7 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 	if (H2Config_raw_input)
 	{
 		if (!b_raw_init) {
-			MouseInput::SetSensitivity(1);
+			MouseInput::SetSensitivity(1.0f);
 			WriteBytes(base + 0x627CC, assmNop, 8);
 			WriteBytes(base + 0x62802, assmNop, 8);
 			WriteBytes(base + 0x627E7, assmNop, 8);
@@ -57,21 +55,25 @@ char* MouseInput::GetMouseState()
 
 void MouseInput::SetSensitivity(float value)
 {
-	
-	if (value == 0)
+	if (value == 0.0f)
 		return;
-	float t_value = value;
 	if (H2Config_raw_input)
-		t_value = 1;
-	*Memory::GetAddress<float*>(0x4A89B0) = 50.0f + 20.0f * t_value; //x-axis
-	if(!H2Config_mouse_uniform)
-		*Memory::GetAddress<float*>(0x4A89B4) = 25.0f + 10.0f * t_value; //y-axis
+		value = 1.0f;
+
+	value = blam_max(value - 1.0f, 0.0f);
+
+	*Memory::GetAddress<float*>(0x4A89B0) = (80.0f + 20.0f * value) - 30.0f; //x-axis
+
+	//y-axis
+	if (H2Config_mouse_uniform)
+		*Memory::GetAddress<float*>(0x4A89B4) = (80.0f + 20.0f * value) - 30.0f;
 	else
-		*Memory::GetAddress<float*>(0x4A89B4) = 50.0f + 20.0f * t_value; //y-axis
+		*Memory::GetAddress<float*>(0x4A89B4) = (40.0f + 10.0f * value) - 15.0f;
 }
 
 void MouseInput::Initialize()
 {
+	// DWORD dwBack;
 	base = Memory::GetAddress(0x0);
 	ms = (DIMOUSESTATE*)(base + 0x47A570);
 	dx = (float*)(base + 0x4AE610);

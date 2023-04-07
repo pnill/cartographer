@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Blam\Engine\Objects\Objects.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/objects/object_placement.h"
 
-#include "Blam\Engine\Game\GameOptions.h"
-#include "Blam\Engine\Players\Players.h"
+#include "Blam/Engine/game/game_options.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam\Common\Common.h"
 #include "H2MOD\Modules\Tweaks\Tweaks.h"
 
@@ -67,7 +67,7 @@ public:
 	void SetCurrentEngineType(e_engine_type value) { engineType = value; }
 
 	void toggle_ai_multiplayer(bool toggle);
-	void toggle_xbox_tickrate(s_game_options* game_options, bool toggle);
+	void toggle_xbox_tickrate(s_game_options* options, bool toggle);
 
 	bool drawTeamIndicators = true;
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Engine\Game\GameOptions.h"
-#include "Blam\Engine\Objects\ObjectPlacementData.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/game/game_options.h"
+#include "Blam/Engine/objects/object_placement.h"
 
 namespace Engine
 {
@@ -14,7 +14,7 @@ namespace Engine
 	namespace Unit
 	{
 		void __cdecl remove_equipment(datum unit_idx);
-		signed int __cdecl inventory_next_weapon(datum unit_idx);
+		int __cdecl inventory_next_weapon(datum unit_idx);
 		bool __cdecl assign_equipment_to_unit(datum unit_idx, datum object_idx, short a3);
 	}
 }

@@ -128,10 +128,7 @@ bool engine_basic_init()
 	init_data_checksum_info();
 	runtime_state_initialize();
 
-	if (H2Config_d3dex) {
-		flags_array[e_startup_flags::allow_d3d_ex_version] = 1;
-	}
-
+	flags_array[e_startup_flags::d3d9ex_enabled] = H2Config_d3d9ex;
 	flags_array[e_startup_flags::disable_voice_chat] = 1;
 
 	int arg_count;
@@ -286,8 +283,8 @@ void* runtime_state_initialize()
 void game_preferences_initialize()
 {
 	typedef void(__cdecl* game_preferences_initialize_t)();
-	auto p_global_preferences_initialize = Memory::GetAddress<game_preferences_initialize_t>(0x325FD);
-	p_global_preferences_initialize();
+	auto p_game_preferences_initialize = Memory::GetAddress<game_preferences_initialize_t>(0x325FD);
+	p_game_preferences_initialize();
 }
 
 void font_initialize()

@@ -646,7 +646,7 @@ const char* StatsHandler::buildPostGameCarnageReportJson()
 	//Players
 	int playerCount = 0;
 	WValue Players(rapidjson::kArrayType);
-	for (int i = 0; i < ENGINE_MAX_PLAYERS; i++)
+	for (int i = 0; i < k_maximum_players; i++)
 	{
 		int calcBaseOffset = baseOffset + (i * 0x94);
 		auto playerId = *Memory::GetAddress<unsigned long long*>(0, calcBaseOffset);
@@ -659,7 +659,7 @@ const char* StatsHandler::buildPostGameCarnageReportJson()
 		WValue Player(rapidjson::kObjectType);
 
 		auto Gamertag = Memory::GetAddress<wchar_t*>(0, calcBaseOffset + 0xA);
-		for (int j = 0; j < ENGINE_MAX_PLAYERS; j++)
+		for (int j = 0; j < k_maximum_players; j++)
 		{
 			auto tGamertag = Memory::GetAddress<wchar_t*>(0, PCROffset + (j * 0x110));
 			if (!_wcsnicmp(Gamertag, tGamertag, XUSER_MAX_NAME_LENGTH))
@@ -991,7 +991,7 @@ void StatsHandler::sendRankChangeFromDocument(std::shared_ptr<rapidjson::Documen
 		BYTE rank = std::stoi(doc->operator[](i)["Rank"].GetString(), 0);
 		long long playerIdentifier = std::stoll(doc->operator[](i)["XUID"].GetString(), &sz, 0);
 
-		for (int j = 0; j < ENGINE_MAX_PLAYERS; j++)
+		for (int j = 0; j < k_maximum_players; j++)
 		{
 			if (NetworkSession::PlayerIsActive(j))
 			{

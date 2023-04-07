@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "NetworkSession.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
@@ -13,7 +13,7 @@ std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
 	std::vector<unsigned long long> activePlayerIdList;
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
+		for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIdx))
 			{
@@ -31,7 +31,7 @@ std::vector<int> NetworkSession::GetActivePlayerIndicesList()
 	std::vector<int> activePlayersIndices;
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
-		for (int playerIndex = 0; playerIndex < ENGINE_MAX_PLAYERS; playerIndex++)
+		for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
 				activePlayersIndices.emplace_back(playerIndex);
@@ -173,7 +173,7 @@ int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
 {
 	if (GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < ENGINE_MAX_PLAYERS; playerIdx++)
+		for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
 		{
 			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
 				return GetPeerIndex(playerIdx);

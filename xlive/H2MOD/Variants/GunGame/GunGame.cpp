@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "GunGame.h"
-#include "Blam\Engine\Game\GameGlobals.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
@@ -167,7 +167,7 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 	case ExecTime::_postEventExec:
 		LOG_TRACE_GAME("[h2mod-infection] Peer host init");
 
-		switch (gameOptions->m_engine_type)
+		switch (gameOptions->engine_type)
 		{
 			// cleanup when loading main menu
 		case _multiplayer:
