@@ -13,7 +13,6 @@
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam\LazyBlam\LazyBlam.hpp"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\memory\bitstream.h"

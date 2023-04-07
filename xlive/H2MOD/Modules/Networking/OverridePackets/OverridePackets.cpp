@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "OverridePackets.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Engine\memory\bitstream.h"

@@ -6,6 +6,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/physics/physics_constants.h"
 #include "Blam/Engine/game/player_control.h"
+#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Engine\memory\bitstream.h"

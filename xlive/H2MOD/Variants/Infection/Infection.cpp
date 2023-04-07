@@ -9,7 +9,9 @@
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
 #include "Blam/Engine/game/game_time.h"
-#include "H2MOD/Engine/Engine.h"
+#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "Blam/Engine/units/units.h"
+
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -193,7 +195,7 @@ void Infection::setPlayerAsZombie(int playerIndex) {
 
 void Infection::onGameTick()
 {
-	if(Engine::get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
+	if(get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
 	{
 		PlayerIterator playerIt;
 		int human_count = 0;
@@ -381,7 +383,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 				}
 				else {
 					// take away zombie's weapons
-					Engine::Unit::remove_equipment(playerUnitDatum);
+					unit_delete_all_weapons(playerUnitDatum);
 				}
 			}
 		}

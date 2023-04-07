@@ -4,7 +4,7 @@
 
 #include "Blam/Engine/game/cheats.h"
 #include "Blam\Engine\render\render_cameras.h"
-#include "H2MOD\Engine\Engine.h"
+#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
 #include "H2MOD\Modules\Input\KeyboardInput.h"
@@ -30,7 +30,7 @@ static bool RenderIngameChat() {
 		return true;
 	}
 
-	else if (h2mod->GetEngineType() != _main_menu && Engine::get_game_life_cycle() == _life_cycle_in_game) {
+	else if (h2mod->GetEngineType() != _main_menu && get_game_life_cycle() == _life_cycle_in_game) {
 		//Enable chat in engine mode and game state mp.
 		return false;
 	}

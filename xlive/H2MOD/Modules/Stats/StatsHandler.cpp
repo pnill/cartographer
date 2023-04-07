@@ -178,7 +178,7 @@ void StatsHandler::server_command_event(ServerConsole::e_server_console_commands
 		|| !Status.StatsEnabled)
 		return;
 
-	if (command == ServerConsole::skip && Engine::get_game_life_cycle() == _life_cycle_in_game)
+	if (command == ServerConsole::skip && get_game_life_cycle() == _life_cycle_in_game)
 	{
 		invalidateMatch(true);
 	}
@@ -970,8 +970,8 @@ void StatsHandler::playerJoinEvent(int peerIndex)
 	// but only in the post game carnage report/pregame
 	// ranks will update at the end of the game
 
-	if (Engine::get_game_life_cycle() != _life_cycle_pre_game
-		&& Engine::get_game_life_cycle() != _life_cycle_post_game)
+	if (get_game_life_cycle() != _life_cycle_pre_game
+		&& get_game_life_cycle() != _life_cycle_post_game)
 		return;
 
 	auto activePlayerIdList = std::make_shared<std::vector<unsigned long long>>(NetworkSession::GetActivePlayerIdList());

@@ -5,11 +5,11 @@
 #include "Blam\Cache\TagGroups\model_definition.hpp"
 #include "Blam\Cache\TagGroups\scenario_definition.hpp"
 #include "Blam/Engine/game/game_engine.h"
+#include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam\Enums\HaloStrings.h"
 
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
 #include "H2MOD\Tags\MetaExtender.h"
@@ -164,7 +164,7 @@ namespace PlayerRepresentation
 		if (player_properties->bungie_user_role <= 7)
 			player_properties->bungie_user_role = 7;
 
-		if (Engine::get_game_mode_engine()
+		if (current_game_engine()
 			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
 			&& (player_properties->player_team && !(s_game_engine_globals::get()->fieldA & FLAG(player_properties->player_team))))
 		{

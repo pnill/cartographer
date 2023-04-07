@@ -2,7 +2,6 @@
 
 #include "ImGui_ConsoleImpl.h"
 #include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\Modules\MapManager\MapManager.h"
 #include "H2MOD\Tags\MetaLoader\tag_loader.h"
