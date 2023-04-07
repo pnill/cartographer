@@ -304,20 +304,21 @@ void ReadH2Config() {
 					H2Config_language.code_variant = stol(code_variant_substr);
 				}
 			}
-
-			json["game"].get("skip_intro", &H2Config_skip_intro, H2Config_skip_intro);
-			json["game"].get("melee_fix", &H2Config_melee_fix, H2Config_melee_fix);
-			json["game"].get("no_events", &H2Config_no_events, H2Config_no_events);
-			json["game"].get("skeleton_biped", &H2Config_spooky_boy, H2Config_spooky_boy);
-
-			json["game"]["video"].get("fps_limit", &H2Config_fps_limit, H2Config_fps_limit);
-			json["game"]["video"].get("static_lod_scale", &H2Config_static_lod_state, H2Config_static_lod_state);
-			json["game"]["video"].get("field_of_view", &H2Config_field_of_view, H2Config_field_of_view);
-			json["game"]["video"].get("vehicle_field_of_view", &H2Config_vehicle_field_of_view, H2Config_vehicle_field_of_view);
-			json["game"]["video"].get("static_fp_fov", &H2Config_static_first_person, false);
-
-			switch(json["game"]["video"].get<int>("experimental_rendering", 0))
+			if (!H2IsDediServer)
 			{
+				json["game"].get("skip_intro", &H2Config_skip_intro, H2Config_skip_intro);
+				json["game"].get("melee_fix", &H2Config_melee_fix, H2Config_melee_fix);
+				json["game"].get("no_events", &H2Config_no_events, H2Config_no_events);
+				json["game"].get("skeleton_biped", &H2Config_spooky_boy, H2Config_spooky_boy);
+
+				json["game"]["video"].get("fps_limit", &H2Config_fps_limit, H2Config_fps_limit);
+				json["game"]["video"].get("static_lod_scale", &H2Config_static_lod_state, H2Config_static_lod_state);
+				json["game"]["video"].get("field_of_view", &H2Config_field_of_view, H2Config_field_of_view);
+				json["game"]["video"].get("vehicle_field_of_view", &H2Config_vehicle_field_of_view, H2Config_vehicle_field_of_view);
+				json["game"]["video"].get("static_fp_fov", &H2Config_static_first_person, false);
+
+				switch (json["game"]["video"].get<int>("experimental_rendering", 0))
+				{
 				default:
 					//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
 					H2Config_fps_limit = 60;
@@ -327,16 +328,16 @@ void ReadH2Config() {
 				case 1:
 					H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
 					break;
-			}
+				}
 
-			json["game"]["video"].get("refresh_rate", &H2Config_refresh_rate, H2Config_refresh_rate);
-			json["game"]["video"].get("shader_lod_max", &H2Config_shader_lod_max, H2Config_shader_lod_max);
-			json["game"]["video"].get("light_suppressor", &H2Config_light_suppressor, H2Config_light_suppressor);
-			json["game"]["video"].get("hires_fix", &H2Config_hiresfix, H2Config_hiresfix);
-			json["game"]["video"].get("d3dex", &H2Config_d3dex, H2Config_d3dex);
-			
-			switch (json["game"]["video"].get<int>("override_shadows", 1))
-			{
+				json["game"]["video"].get("refresh_rate", &H2Config_refresh_rate, H2Config_refresh_rate);
+				json["game"]["video"].get("shader_lod_max", &H2Config_shader_lod_max, H2Config_shader_lod_max);
+				json["game"]["video"].get("light_suppressor", &H2Config_light_suppressor, H2Config_light_suppressor);
+				json["game"]["video"].get("hires_fix", &H2Config_hiresfix, H2Config_hiresfix);
+				json["game"]["video"].get("d3dex", &H2Config_d3dex, H2Config_d3dex);
+
+				switch (json["game"]["video"].get<int>("override_shadows", 1))
+				{
 				case 0:
 					H2Config_Override_Shadows = e_override_texture_resolution::tex_low;
 					break;
@@ -350,9 +351,9 @@ void ReadH2Config() {
 				case 3:
 					H2Config_Override_Shadows = e_override_texture_resolution::tex_ultra;
 					break;
-			}
-			switch (json["game"]["video"].get<int>("override_water", 1))
-			{
+				}
+				switch (json["game"]["video"].get<int>("override_water", 1))
+				{
 				case 0:
 					H2Config_Override_Water = e_override_texture_resolution::tex_low;
 					break;
@@ -366,27 +367,27 @@ void ReadH2Config() {
 				case 3:
 					H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 					break;
-			}
+				}
 
-			json["game"]["hud"].get("crosshair_offset", &H2Config_crosshair_offset, 0.138f);
-			json["game"]["hud"].get("crosshair_scale", &H2Config_crosshair_scale, 1.f);
-			json["game"]["hud"].get("hide_ingame_chat", &H2Config_hide_ingame_chat, H2Config_hide_ingame_chat);
+				json["game"]["hud"].get("crosshair_offset", &H2Config_crosshair_offset, 0.138f);
+				json["game"]["hud"].get("crosshair_scale", &H2Config_crosshair_scale, 1.f);
+				json["game"]["hud"].get("hide_ingame_chat", &H2Config_hide_ingame_chat, H2Config_hide_ingame_chat);
 
-			json["game"]["input"].get("raw_mouse_input", &H2Config_raw_input, H2Config_raw_input);
-			json["game"]["input"].get("mouse_raw_scale", &H2Config_raw_mouse_scale, H2Config_raw_mouse_scale);
-			json["game"]["input"].get("mouse_uniform_sens", &H2Config_mouse_uniform, H2Config_mouse_uniform);
-			json["game"]["input"].get("disable_ingame_keyboard", &H2Config_disable_ingame_keyboard, H2Config_disable_ingame_keyboard);
-			json["game"]["input"].get("hotkey_help", &H2Config_hotkeyIdHelp, H2Config_hotkeyIdHelp);
-			json["game"]["input"].get("hotkey_align_window", &H2Config_hotkeyIdAlignWindow, H2Config_hotkeyIdAlignWindow);
-			json["game"]["input"].get("hotkey_window_mode", &H2Config_hotkeyIdWindowMode, H2Config_hotkeyIdWindowMode);
-			json["game"]["input"].get("hotkey_hide_ingame_chat", &H2Config_hotkeyIdToggleHideIngameChat, H2Config_hotkeyIdToggleHideIngameChat);
-			json["game"]["input"].get("hotkey_guide", &H2Config_hotkeyIdGuide, H2Config_hotkeyIdGuide);
-			json["game"]["input"].get("hotkey_console", &H2Config_hotkeyIdConsole, H2Config_hotkeyIdConsole);
-			json["game"]["input"].get("controller_sens", &H2Config_controller_sens, H2Config_controller_sens);
-			json["game"]["input"].get("controller_modern", &H2Config_controller_modern, H2Config_controller_modern);
+				json["game"]["input"].get("raw_mouse_input", &H2Config_raw_input, H2Config_raw_input);
+				json["game"]["input"].get("mouse_raw_scale", &H2Config_raw_mouse_scale, H2Config_raw_mouse_scale);
+				json["game"]["input"].get("mouse_uniform_sens", &H2Config_mouse_uniform, H2Config_mouse_uniform);
+				json["game"]["input"].get("disable_ingame_keyboard", &H2Config_disable_ingame_keyboard, H2Config_disable_ingame_keyboard);
+				json["game"]["input"].get("hotkey_help", &H2Config_hotkeyIdHelp, H2Config_hotkeyIdHelp);
+				json["game"]["input"].get("hotkey_align_window", &H2Config_hotkeyIdAlignWindow, H2Config_hotkeyIdAlignWindow);
+				json["game"]["input"].get("hotkey_window_mode", &H2Config_hotkeyIdWindowMode, H2Config_hotkeyIdWindowMode);
+				json["game"]["input"].get("hotkey_hide_ingame_chat", &H2Config_hotkeyIdToggleHideIngameChat, H2Config_hotkeyIdToggleHideIngameChat);
+				json["game"]["input"].get("hotkey_guide", &H2Config_hotkeyIdGuide, H2Config_hotkeyIdGuide);
+				json["game"]["input"].get("hotkey_console", &H2Config_hotkeyIdConsole, H2Config_hotkeyIdConsole);
+				json["game"]["input"].get("controller_sens", &H2Config_controller_sens, H2Config_controller_sens);
+				json["game"]["input"].get("controller_modern", &H2Config_controller_modern, H2Config_controller_modern);
 
-			switch(json["game"]["input"].get<int>("deadzone_type", 0))
-			{
+				switch (json["game"]["input"].get<int>("deadzone_type", 0))
+				{
 				default:
 				case 0:
 					H2Config_Controller_Deadzone = Axial;
@@ -397,68 +398,71 @@ void ReadH2Config() {
 				case 2:
 					H2Config_Controller_Deadzone = Both;
 					break;
+				}
+
+				json["game"]["input"].get("deadzone_axial_x", &H2Config_Deadzone_A_X, H2Config_Deadzone_A_X);
+				json["game"]["input"].get("deadzone_axial_y", &H2Config_Deadzone_A_Y, H2Config_Deadzone_A_Y);
+				json["game"]["input"].get("deadzone_radial", &H2Config_Deadzone_Radial, H2Config_Deadzone_Radial);
+				H2Config_CustomLayout.FromString(json["game"]["input"].get<std::string>("controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768"));
 			}
 
-			json["game"]["input"].get("deadzone_axial_x", &H2Config_Deadzone_A_X, H2Config_Deadzone_A_X);
-			json["game"]["input"].get("deadzone_axial_y", &H2Config_Deadzone_A_Y, H2Config_Deadzone_A_Y);
-			json["game"]["input"].get("deadzone_radial", &H2Config_Deadzone_Radial, H2Config_Deadzone_Radial);
-			H2Config_CustomLayout.FromString(json["game"]["input"].get<std::string>("controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768"));
-
-			auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
-			auto server_playlist = json["server"].get<const char*>("server_playlist", "");
-			auto login_identifier = json["server"].get<const char*>("login_identifier", "");
-			auto login_password = json["server"].get<const char*>("login_password", "");
-			if (server_name)
-				strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
-			if (server_playlist)
-				strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
-			if (login_identifier)
-				strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
-			if (login_password)
-				strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
-
-			json["server"].get("additional_pcr_time", &H2Config_additional_pcr_time, H2Config_additional_pcr_time);
-			json["server"].get("minimum_player_start", &H2Config_minimum_player_start, H2Config_minimum_player_start);
-			json["server"].get("vip_lock", &H2Config_vip_lock, H2Config_vip_lock);
-			json["server"].get("shuffle_even_teams", &H2Config_even_shuffle_teams, H2Config_even_shuffle_teams);
-			json["server"].get("koth_random", &H2Config_koth_random, H2Config_koth_random);
-			json["server"].get("enable_anti_cheat", &H2Config_anti_cheat_enabled, H2Config_anti_cheat_enabled);
-
-			auto team_bit_mask = json["server"].get<std::string>("teams_enabled_bit_flags", H2Config_team_bit_flags_str);
-			if (!team_bit_mask.empty())
+			if (H2IsDediServer)
 			{
-				strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
-				H2Config_team_bit_flags = 0;
-				memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
+				auto server_name = json["server"].get<const char*>("server_name", "Halo 2 Server");
+				auto server_playlist = json["server"].get<const char*>("server_playlist", "");
+				auto login_identifier = json["server"].get<const char*>("login_identifier", "");
+				auto login_password = json["server"].get<const char*>("login_password", "");
+				if (server_name)
+					strncpy(H2Config_dedi_server_name, server_name, XUSER_MAX_NAME_LENGTH);
+				if (server_playlist)
+					strncpy(H2Config_dedi_server_playlist, server_playlist, sizeof(H2Config_dedi_server_playlist));
+				if (login_identifier)
+					strncpy(H2Config_login_identifier, login_identifier, sizeof(H2Config_login_identifier));
+				if (login_password)
+					strncpy(H2Config_login_password, login_password, sizeof(H2Config_login_password));
 
-				size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
-				size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
+				json["server"].get("additional_pcr_time", &H2Config_additional_pcr_time, H2Config_additional_pcr_time);
+				json["server"].get("minimum_player_start", &H2Config_minimum_player_start, H2Config_minimum_player_start);
+				json["server"].get("vip_lock", &H2Config_vip_lock, H2Config_vip_lock);
+				json["server"].get("shuffle_even_teams", &H2Config_even_shuffle_teams, H2Config_even_shuffle_teams);
+				json["server"].get("koth_random", &H2Config_koth_random, H2Config_koth_random);
+				json["server"].get("enable_anti_cheat", &H2Config_anti_cheat_enabled, H2Config_anti_cheat_enabled);
 
-				const char team_bit_to_find[] = "01";
-				size_t occurance_offset;
-				occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, 0);
-
-				// TODO move to function
-				// validate first
-				if (true_bit_value_count + false_bit_value_count == 8
-					&& occurance_offset != std::string::npos)
+				auto team_bit_mask = json["server"].get<std::string>("teams_enabled_bit_flags", H2Config_team_bit_flags_str);
+				if (!team_bit_mask.empty())
 				{
-					// then loop
-					for (int i = 0; i < 8; i++)
-					{
-						if (team_bit_mask.at(occurance_offset) == '1') // check if the team is enabled
-						{
-							H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
-							H2Config_team_flag_array[i] = true;
-						}
+					strncpy_s(H2Config_team_bit_flags_str, sizeof(H2Config_team_bit_flags_str), team_bit_mask.c_str(), 15);
+					H2Config_team_bit_flags = 0;
+					memset(H2Config_team_flag_array, 0, sizeof(H2Config_team_flag_array));
 
-						occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, occurance_offset + 1);
-						if (occurance_offset == std::string::npos)
-							break;
+					size_t true_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '1');
+					size_t false_bit_value_count = std::count(team_bit_mask.begin(), team_bit_mask.end(), '0');
+
+					const char team_bit_to_find[] = "01";
+					size_t occurance_offset;
+					occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, 0);
+
+					// TODO move to function
+					// validate first
+					if (true_bit_value_count + false_bit_value_count == 8
+						&& occurance_offset != std::string::npos)
+					{
+						// then loop
+						for (int i = 0; i < 8; i++)
+						{
+							if (team_bit_mask.at(occurance_offset) == '1') // check if the team is enabled
+							{
+								H2Config_team_bit_flags |= FLAG(i); // if so, enable the flag
+								H2Config_team_flag_array[i] = true;
+							}
+
+							occurance_offset = team_bit_mask.find_first_of(team_bit_to_find, occurance_offset + 1);
+							if (occurance_offset == std::string::npos)
+								break;
+						}
 					}
 				}
 			}
-
 #ifndef NDEBUG
 			json["development"].get("forced_event", &H2Config_forced_event, H2Config_forced_event);
 #endif
