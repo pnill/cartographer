@@ -269,13 +269,13 @@ BOOL WINAPI CryptUnprotectDataHook(
 	return TRUE;
 }
 
-char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+char filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
 {
 	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
 
 	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
-		FiloInterface::change_size(file_ptr, 0);
-	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
+		file_change_size(file_ptr, 0);
+	return file_write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
 static BOOL (WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;

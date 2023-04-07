@@ -111,21 +111,21 @@ bool __thiscall s_custom_map_data::remove_marked_for_deletion()
 
 bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s_custom_map_file_cache* custom_map_data_cache, DWORD custom_map_data_cache_buffer_size)
 {
-	filo cache_file;
+	s_file_reference cache_file;
 
 	bool success = false;
 	bool invalid_file = false;
 	DWORD open_file_error_code;
 	const __int16 filo_open_file_flags = 0
-		| FILO_FILE_SEQUENTIAL_SCAN
-		| FILO_READ_FILE
+		| FILE_REFERENCE_FILE_SEQUENTIAL_SCAN
+		| FILE_REFERENCE_READ_FILE
 		;
 
-	FiloInterface::filo_init(&cache_file, path, false);
+	file_reference_create_from_path(&cache_file, path, false);
 
 	do 
 	{
-		if (!FiloInterface::open(&cache_file, filo_open_file_flags, &open_file_error_code))
+		if (!file_open(&cache_file, filo_open_file_flags, &open_file_error_code))
 		{
 			LOG_TRACE_GAME("{} - failed to open custom map data cache file!",
 				__FUNCTION__);
@@ -134,7 +134,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 		}
 
 		// first we read the header
-		if (!FiloInterface::read(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache), true))
+		if (!file_read(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache), true))
 		{
 			invalid_file = true;
 			LOG_TRACE_GAME("{} - failed to read custom map data cache file header!",
@@ -163,7 +163,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 		// if signature matches, read the cache contents
 		DWORD file_custom_map_entries_size = custom_map_data_cache->entries_count * sizeof(s_custom_map_entry);
 
-		if (!FiloInterface::read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
+		if (!file_read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
 		{
 			LOG_TRACE_GAME("{} - failed reading custom map data cache file!",
 				__FUNCTION__);
@@ -178,11 +178,11 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 
 	} while (0);
 
-	if (open_file_error_code == FILO_OPEN_FILE_ERROR_SUCCESS)
+	if (open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_SUCCESS)
 	{
-		FiloInterface::close(&cache_file);
+		file_close(&cache_file);
 		if (invalid_file)
-			FiloInterface::delete_existing(&cache_file);
+			file_delete(&cache_file);
 	}
 
 	if (success)
@@ -199,20 +199,20 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 
 bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_custom_map_file_cache* custom_map_data_cache)
 {
-	filo cache_file;
+	s_file_reference cache_file;
 
 	bool success = false;
-	DWORD open_file_error_code = FILO_OPEN_FILE_ERROR_UNKONWN;
+	DWORD open_file_error_code = FILE_REFERENCE_OPEN_FILE_ERROR_UNKONWN;
 	const __int16 filo_open_file_flags = 0
-		| FILO_WRITE_FILE
+		| FILE_REFERENCE_WRITE_FILE
 		;
 
-	FiloInterface::filo_init(&cache_file, path, false);
-	bool create_file_success = FiloInterface::create_file_or_directory(&cache_file);
+	file_reference_create_from_path(&cache_file, path, false);
+	bool create_file_success = file_create(&cache_file);
 
 	do 
 	{
-		if (!FiloInterface::open(&cache_file, filo_open_file_flags, &open_file_error_code))
+		if (!file_open(&cache_file, filo_open_file_flags, &open_file_error_code))
 		{
 			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}",
 				__FUNCTION__, open_file_error_code);
@@ -220,9 +220,9 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 			break;
 		}
 
-		FiloInterface::set_file_attribute_hidden(&cache_file, true);
+		file_set_hidden(&cache_file, true);
 		
-		if (!FiloInterface::write(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache) + sizeof(s_custom_map_entry) * custom_map_data_cache->entries_count))
+		if (!file_write(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache) + sizeof(s_custom_map_entry) * custom_map_data_cache->entries_count))
 		{
 			LOG_ERROR_GAME("{} - failed to write custom map cache to file!",
 				__FUNCTION__);
@@ -233,7 +233,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 		LOG_TRACE_GAME("{} - saved custom map data cache, map count: {}, buffer size: {}",
 			__FUNCTION__, custom_map_data_cache->entries_count, sizeof(s_custom_map_file_cache) + sizeof(s_custom_map_entry) * custom_map_data_cache->entries_count);
 
-		if (!FiloInterface::set_end_of_file(&cache_file))
+		if (!file_set_eof(&cache_file))
 		{
 			LOG_ERROR_GAME("{} - failed to set custom map cache file size!",
 				__FUNCTION__);
@@ -246,11 +246,11 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 	} while (0);
 
 
-	if (open_file_error_code == FILO_OPEN_FILE_ERROR_SUCCESS)
+	if (open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_SUCCESS)
 	{
-		FiloInterface::close(&cache_file);
+		file_close(&cache_file);
 	}
-	else if (!create_file_success && open_file_error_code == FILO_OPEN_FILE_ERROR_NOT_FOUND)
+	else if (!create_file_success && open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_NOT_FOUND)
 	{
 		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!"
 			__FUNCTION__);
