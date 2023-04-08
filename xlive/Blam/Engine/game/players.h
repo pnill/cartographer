@@ -160,7 +160,9 @@ struct s_player
 
 	enum flags : int
 	{
-		player_inactive = 9,
+		// _player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
+		_player_inactive = 1, // this might also represent something else, like player left
+		_player_first_spawn = 3,
 	};
 
 	struct s_player_properties
@@ -203,7 +205,7 @@ struct s_player
 	WORD flags;
 	unsigned long long identifier;
 	DWORD player_creation_tick;
-	BYTE abNet[6];
+	BYTE machine_identifier[6]; // also known as abEnet
 	__int16 machine_index;
 	int unk_user_index_2;
 	int unk_user_index;
