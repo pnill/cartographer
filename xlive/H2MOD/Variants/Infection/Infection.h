@@ -66,6 +66,7 @@ public:
 
 	static void InitClient();
 	static void InitHost();
+	static bool shouldEndGame();
 	static void preSpawnServerSetup();
 	static void resetWeaponInteractionAndEmblems();
 	static void sendTeamChange();

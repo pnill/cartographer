@@ -26,7 +26,7 @@ std::vector<unsigned long long> Infection::zombieIdentifiers;
 bool initialSpawn;
 bool infectedPlayed;
 int zombiePlayerIndex = NONE;
-int ticks_without_any_humans = 0;
+int last_time_at_game_should_not_end = 0;
 const wchar_t* infectionSoundTable[e_language_ids::_lang_id_end][e_infection_sounds::_infection_end]
 {
 	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
@@ -129,6 +129,28 @@ void Infection::InitHost() {
 	Infection::resetZombiePlayerStatus();
 }
 
+bool Infection::shouldEndGame()
+{
+	int humanCount, zombieCount, playerCount;
+	humanCount = zombieCount = playerCount = 0;
+	PlayerIterator playerIt;
+	while (playerIt.get_next_active_player())
+	{
+		int currentPlayerIndex = playerIt.get_current_player_index();
+		unsigned long long playerIdentifier = playerIt.get_current_player_id();
+		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+
+		if (isZombie)
+			zombieCount++;
+		else
+			humanCount++;
+
+		playerCount++;
+	}
+
+	return playerCount > 1 && (zombieCount == 0 || humanCount == 0);
+}
+
 void Infection::resetWeaponInteractionAndEmblems() {
 	LOG_TRACE_GAME("[h2mod-infection] Resetting weapons interactions and emblem visibility");
 	h2mod->disable_weapon_pickup(true);
@@ -140,15 +162,16 @@ void Infection::preSpawnServerSetup() {
 	/*
 		Game state players should be initialized when we are about to spawn a player
 	*/
-	int humanCount = 0;
-	int playerCount = 0;
+	
 	PlayerIterator playerIt;
 	while (playerIt.get_next_active_player())
 	{
 		int currentPlayerIndex = playerIt.get_current_player_index();
 		unsigned long long playerIdentifier = playerIt.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
-		if (s_player::GetTeam(currentPlayerIndex) == ZOMBIE_TEAM && isZombie == false) {
+
+		bool zombie_team_status_human = isZombie == false && s_player::GetTeam(currentPlayerIndex) == ZOMBIE_TEAM;
+		if (zombie_team_status_human) {
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
 			setZombiePlayerStatus(playerIdentifier);
 			isZombie = true;
@@ -167,14 +190,8 @@ void Infection::preSpawnServerSetup() {
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
 			else
 				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
-			humanCount++;
 		}
-		playerCount++;
 	}
-
-	// end the game if all humans are dead
-	if (humanCount == 0 && playerCount > 1)
-		NetworkSession::EndGame();
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
@@ -196,32 +213,23 @@ void Infection::onGameTick()
 {
 	if(Engine::get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
 	{
-		PlayerIterator playerIt;
-		int human_count = 0;
-		int zombie_count = 0;
-		while (playerIt.get_next_active_player())
+		if (time_globals::get_game_time() > 0)
 		{
-			XUID playerIdentifier = playerIt.get_current_player_id();
-			bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
+			bool should_end_game = shouldEndGame();
 
-			if (isZombie)
-				zombie_count++;
-			else
-				human_count++;
+			// check if the current game should be ended
+			if (!should_end_game)
+			{
+				// and update the time if it shouldn't be
+				last_time_at_game_should_not_end = time_globals::get_game_time();
+			}
 
-		}
-		if(human_count == 0 && zombie_count > 1)
-		{
-			ticks_without_any_humans++;
-		}
-		else
-		{
-			ticks_without_any_humans = 0;
-		}
-
-		if(time_globals::ticks_to_seconds(ticks_without_any_humans) > 5.0f)
-		{
-			NetworkSession::EndGame();
+			// check the difference between game time now
+			// if the time wasn't updated for more than 5 seconds, end the game
+			if (time_globals::ticks_to_seconds(time_globals::get_game_time() - last_time_at_game_should_not_end) > 5.0f)
+			{
+				NetworkSession::EndGame();
+			}
 		}
 	}
 }
@@ -273,9 +281,9 @@ void Infection::Initialize()
 	if (NetworkSession::LocalPeerIsSessionHost()) {
 		Infection::InitHost();
 
-		ticks_without_any_humans = 0;
+		last_time_at_game_should_not_end = 0;
 		zombiePlayerIndex = Infection::calculateZombiePlayerIndex();
-		EventHandler::register_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_before);
+		EventHandler::register_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_after);
 
 		LOG_TRACE_GAME("[h2mod-infection] Peer host calculated zombie index {}", zombiePlayerIndex);
 		if (zombiePlayerIndex == NONE) {
@@ -296,7 +304,7 @@ void Infection::Dispose()
 
 	if(NetworkSession::LocalPeerIsSessionHost())
 	{
-		EventHandler::remove_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_before);
+		EventHandler::remove_callback(onGameTick, EventType::game_loop, EventExecutionType::execute_after);
 	}
 
 	Infection::resetWeaponInteractionAndEmblems();
