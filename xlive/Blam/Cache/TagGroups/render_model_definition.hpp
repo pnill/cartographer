@@ -25,16 +25,16 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 	struct s_import_info_block
 	{
 		__int32 build;//0x0
-		tag_string256 version;//0x4
-		tag_string32 import_date;//0x104
-		tag_string32 culprit;//0x124
+		static_string256 version;//0x4
+		static_string32 import_date;//0x104
+		static_string32 culprit;//0x124
 		PAD(0x60);//0x144
-		tag_string32 import_time;//0x1A4
+		static_string32 import_time;//0x1A4
 		PAD(0x4);//0x1C4
 		struct s_files_block
 		{
-			tag_string256 path;//0x0
-			tag_string32 modification_date;//0x100
+			static_string256 path;//0x0
+			static_string32 modification_date;//0x100
 			PAD(0x60);//0x120
 			__int32 checksum;//0x180
 			__int32 size;//0x184
@@ -481,7 +481,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 	tag_block<s_materials_block> materials;//0x60
 	struct s_errors_block
 	{
-		tag_string256 name;//0x0
+		static_string256 name;//0x0
 		enum class e_report_type : __int16
 		{
 			silent = 0,
@@ -520,7 +520,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 			};
 			e_flags flags;//0x2
 			data_block text;//0x4
-			tag_string32 source_filename;//0xC
+			static_string32 source_filename;//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block
 			{

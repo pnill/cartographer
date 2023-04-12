@@ -78,7 +78,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			always_active = FLAG(3),
 		};
 		e_flags flags;//0x0
-		tag_string32 name;//0x4
+		static_string32 name;//0x4
 		float period;//0x24
 		__int16 scale_period_by;//0x28
 		enum class e_function : __int16
@@ -159,8 +159,8 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			generic = 0,
 		};
 		e_type type;//0xC
-		tag_string32 name;//0x10
-		tag_string256 comment;//0x30
+		static_string32 name;//0x10
+		static_string256 comment;//0x30
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x130);
 	tag_block<s_comments_block> comments;//0x38
@@ -178,7 +178,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_dont_use_environment_objects__block> dont_use_environment_objects;//0x40
 	struct s_object_names_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_type : __int16
 		{
 			biped = 0,
@@ -681,7 +681,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_weapon_palette_block> weapon_palette;//0x98
 	struct s_device_groups_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		float initial_value;//0x20
 		enum class e_flags : __int32
 		{
@@ -1193,7 +1193,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_light_volumes_palette_block> light_volumes_palette;//0xF0
 	struct s_player_starting_profile_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		float starting_health_damage;//0x20
 		float starting_shield_damage;//0x24
 		tag_reference primary_weapon;//0x28
@@ -1296,7 +1296,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_kill_trigger_volumes_block> kill_trigger_volumes;//0x108
 	struct s_recorded_animations_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		__int8 version;//0x20
 		__int8 raw_animation_data;//0x21
 		__int8 unit_control_data_version;//0x22
@@ -1503,7 +1503,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_style_palette_block> style_palette;//0x150
 	struct s_squad_groups_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		__int16 parent;//0x20
 		__int16 initial_orders;//0x22
 	};
@@ -1511,7 +1511,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_squad_groups_block> squad_groups;//0x158
 	struct s_squads_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_flags : __int32
 		{
 			unused = FLAG(0),
@@ -1633,19 +1633,19 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 				flying = 2,
 			};
 			e_initial_movement_mode initial_movement_mode;//0x3E
-			tag_string32 placement_script;//0x40
+			static_string32 placement_script;//0x40
 			PAD(0x4);//0x60
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_starting_locations_block, 0x64);
 		tag_block<s_starting_locations_block> starting_locations;//0x48
-		tag_string32 placement_script;//0x50
+		static_string32 placement_script;//0x50
 		PAD(0x4);//0x70
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_squads_block, 0x74);
 	tag_block<s_squads_block> squads;//0x160
 	struct s_zones_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_flags : __int32
 		{
 			manual_bsp_index = FLAG(0),
@@ -1679,7 +1679,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		tag_block<s_firing_positions_block> firing_positions;//0x28
 		struct s_areas_block
 		{
-			tag_string32 name;//0x0
+			static_string32 name;//0x0
 			enum class e_area_flags : __int32
 			{
 				vehicle_area = FLAG(0),
@@ -2103,7 +2103,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_ai_pathfinding_data_block> ai_pathfinding_data;//0x180
 	struct s_ai_animation_references_block
 	{
-		tag_string32 animation_name;//0x0
+		static_string32 animation_name;//0x0
 		tag_reference animation_graph;//0x20
 		PAD(0xC);//0x28
 	};
@@ -2111,21 +2111,21 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_ai_animation_references_block> ai_animation_references;//0x188
 	struct s_ai_script_references_block
 	{
-		tag_string32 script_name;//0x0
+		static_string32 script_name;//0x0
 		PAD(0x8);//0x20
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_ai_script_references_block, 0x28);
 	tag_block<s_ai_script_references_block> ai_script_references;//0x190
 	struct s_ai_recording_references_block
 	{
-		tag_string32 recording_name;//0x0
+		static_string32 recording_name;//0x0
 		PAD(0x8);//0x20
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_ai_recording_references_block, 0x28);
 	tag_block<s_ai_recording_references_block> ai_recording_references;//0x198
 	struct s_ai_conversations_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_flags : __int16
 		{
 			stop_if_death = FLAG(0),
@@ -2148,7 +2148,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			__int16 use_this_object;//0x8
 			__int16 set_new_name;//0xA
 			PAD(0x18);//0xC
-			tag_string32 encounter_name;//0x24
+			static_string32 encounter_name;//0x24
 			PAD(0x10);//0x44
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_participants_block, 0x54);
@@ -2194,7 +2194,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	data_block script_string_data;//0x1B0
 	struct s_scripts_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_script_type : __int16
 		{
 			startup = 0,
@@ -2278,7 +2278,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_scripts_block> scripts;//0x1B8
 	struct s_globals_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_type : __int16
 		{
 			unparsed = 0,
@@ -2358,7 +2358,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_references_block> references;//0x1C8
 	struct s_source_files_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		data_block source;//0x20
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_source_files_block, 0x28);
@@ -2367,10 +2367,10 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	{
 		struct s_point_sets_block
 		{
-			tag_string32 name;//0x0
+			static_string32 name;//0x0
 			struct s_points_block
 			{
-				tag_string32 name;//0x0
+				static_string32 name;//0x0
 				float position_x;//0x20
 				float position_y;//0x24
 				float position_z;//0x28
@@ -2400,7 +2400,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	struct s_cutscene_flags_block
 	{
 		PAD(0x4);//0x0
-		tag_string32 name;//0x4
+		static_string32 name;//0x4
 		float position_x;//0x24
 		float position_y;//0x28
 		float position_z;//0x2C
@@ -2424,7 +2424,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			ignore_target_updates = 3,
 		};
 		e_type type;//0x2
-		tag_string32 name;//0x4
+		static_string32 name;//0x4
 		float position_x;//0x24
 		float position_y;//0x28
 		float position_z;//0x2C
@@ -2713,7 +2713,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_script_expressions_block> script_expressions;//0x238
 	struct s_orders_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		__int16 style;//0x20
 		PAD(0x2);//0x22
 		enum class e_flags : __int32
@@ -2739,7 +2739,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		};
 		e_force_combat_status force_combat_status;//0x28
 		PAD(0x2);//0x2A
-		tag_string32 entry_script;//0x2C
+		static_string32 entry_script;//0x2C
 		PAD(0x2);//0x4C
 		__int16 follow_squad;//0x4E
 		float follow_radius;//0x50
@@ -2875,7 +2875,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_orders_block> orders;//0x240
 	struct s_triggers_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		enum class e_trigger_flags : __int32
 		{
 			latch_on_when_triggered = FLAG(0),
@@ -2921,7 +2921,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 			float x;//0x8
 			__int16 trigger_volume;//0xC
 			PAD(0x2);//0xE
-			tag_string32 exit_condition_script;//0x10
+			static_string32 exit_condition_script;//0x10
 			__int16 NUM_;//0x30
 			PAD(0x2);//0x32
 			enum class e_flags : __int32
@@ -2937,7 +2937,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_triggers_block> triggers;//0x248
 	struct s_background_sound_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference background_sound;//0x20
 		tag_reference inside_cluster_sound;//0x28
 		PAD(0x14);//0x30
@@ -2960,7 +2960,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_background_sound_palette_block> background_sound_palette;//0x250
 	struct s_sound_environment_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference sound_environment;//0x20
 		float cutoff_distance;//0x28
 		float interpolation_speed;//0x2C
@@ -2970,14 +2970,14 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	tag_block<s_sound_environment_palette_block> sound_environment_palette;//0x258
 	struct s_weather_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference weather_system;//0x20
 		PAD(0x24);//0x28
 		tag_reference wind;//0x4C
 		PAD(0xC);//0x54
 		float wind_magnitude;//0x60
 		PAD(0x4);//0x64
-		tag_string32 wind_scale_function;//0x68
+		static_string32 wind_scale_function;//0x68
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_weather_palette_block, 0x88);
 	tag_block<s_weather_palette_block> weather_palette;//0x260
@@ -3620,7 +3620,7 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 	struct s_editor_folders_block
 	{
 		__int32 parent_folder;//0x0
-		tag_string256 name;//0x4
+		static_string256 name;//0x4
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_editor_folders_block, 0x104);
 	tag_block<s_editor_folders_block> editor_folders;//0x390
@@ -3640,25 +3640,25 @@ struct s_scenario_group_definition :TagGroup<'scnr'>
 		{
 			__int32 map_id;//0x0
 			tag_reference bitmap;//0x4
-			tag_unicode32 english_name;//0xC
-			tag_unicode32 japanese_name;//0x4C
-			tag_unicode32 german_name;//0x8C
-			tag_unicode32 french_name;//0xCC
-			tag_unicode32 spanish_name;//0x10C
-			tag_unicode32 italian_name;//0x14C
-			tag_unicode32 korean_name;//0x18C
-			tag_unicode32 chinese_name;//0x1CC
-			tag_unicode32 portuguese_name;//0x20C
-			tag_unicode128 english_description;//0x24C
-			tag_unicode128 japanese_description;//0x34C
-			tag_unicode128 german_description;//0x44C
-			tag_unicode128 french_description;//0x54C
-			tag_unicode128 spanish_description;//0x64C
-			tag_unicode128 italian_description;//0x74C
-			tag_unicode128 korean_description;//0x84C
-			tag_unicode128 chinese_description;//0x94C
-			tag_unicode128 portuguese_description;//0xA4C
-			tag_string256 path;//0xB4C
+			static_wchar_string32 english_name;//0xC
+			static_wchar_string32 japanese_name;//0x4C
+			static_wchar_string32 german_name;//0x8C
+			static_wchar_string32 french_name;//0xCC
+			static_wchar_string32 spanish_name;//0x10C
+			static_wchar_string32 italian_name;//0x14C
+			static_wchar_string32 korean_name;//0x18C
+			static_wchar_string32 chinese_name;//0x1CC
+			static_wchar_string32 portuguese_name;//0x20C
+			static_wchar_string128 english_description;//0x24C
+			static_wchar_string128 japanese_description;//0x34C
+			static_wchar_string128 german_description;//0x44C
+			static_wchar_string128 french_description;//0x54C
+			static_wchar_string128 spanish_description;//0x64C
+			static_wchar_string128 italian_description;//0x74C
+			static_wchar_string128 korean_description;//0x84C
+			static_wchar_string128 chinese_description;//0x94C
+			static_wchar_string128 portuguese_description;//0xA4C
+			static_string256 path;//0xB4C
 			__int32 sort_order;//0xC4C
 			enum class e_flags : __int8
 			{
