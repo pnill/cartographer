@@ -1,13 +1,12 @@
 #pragma once
-
-#include "BlamPrimitiveType.h"
-
+#include "Blam/Common/Common.h"
 /*********************************************************************
 * string_id
 * 4 BYTE Special Tag Structure for String Values
 * Index 3 Bytes
 * Length 1 Byte
 **********************************************************************/
+
 struct string_id
 {
 	string_id() = default;

@@ -677,8 +677,8 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
+    <ClInclude Include="Blam\Engine\tag_files\string_ids.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
