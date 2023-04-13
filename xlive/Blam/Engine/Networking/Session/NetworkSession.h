@@ -1,11 +1,10 @@
 #pragma once
 
-#include "..\NetworkCommon.h"
-
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "..\Transport\NetworkChannel.h"
-#include "..\Transport\NetworkObserver.h"
+#include "Blam/Engine/Networking/NetworkCommon.h"
+#include "Blam/Engine/Networking/Transport/NetworkChannel.h"
+#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
 // forward declarations
 enum e_map_status;
@@ -222,6 +221,55 @@ struct s_session_membership
 	DWORD unk;
 };
 CHECK_STRUCT_SIZE(s_session_membership, 9328);
+
+struct s_player_identifier
+{
+	DWORD unk1;
+	DWORD unk2;
+};
+CHECK_STRUCT_SIZE(s_player_identifier, 8);
+
+struct s_session_interface_user
+{
+	char user_exists;
+	s_player_identifier network_user_identifier;
+	BYTE gap_B[3];
+	DWORD controller_index;
+	s_player::s_player_properties properties;
+	DWORD player_voice_exists;
+	DWORD player_text_chat_exists;
+	DWORD field_9C[2];
+	BYTE gap_A4[16];
+	char field_b4[4];
+};
+CHECK_STRUCT_SIZE(s_session_interface_user, 0xB8);
+
+struct s_session_interface_globals
+{
+	char initialised;
+	BYTE gap_1;
+	wchar_t m_machine_name[16];
+	wchar_t m_session_name[32];
+	BYTE m_qos_active;
+	BYTE gap_63;
+	BYTE gap_64[16];
+	DWORD m_upstream_bandwidth_bps;
+	DWORD m_downstream_bandwidth_bps;
+	BYTE gap_7C[8];
+	DWORD m_nat_type;
+	DWORD field_88;
+	DWORD field_8C;
+	DWORD field_90;
+	int current_map_progress_percentage;
+	s_session_interface_user users[4];
+	DWORD session_connection_identifiers[6];
+	s_game_variant variants[2];
+	BYTE gap_5F0[68];
+	DWORD m_sessions_manager;
+	
+	static s_session_interface_globals* get();
+};
+CHECK_STRUCT_SIZE(s_session_interface_globals, 0x638);
 
 struct s_network_session
 {
