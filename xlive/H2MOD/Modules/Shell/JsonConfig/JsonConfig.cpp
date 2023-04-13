@@ -1,14 +1,9 @@
 #include "stdafx.h"
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <utility>
 #include <rapidjson/prettywriter.h>
 
 #include "rapidjson/document.h"
 #include "rapidjson/istreamwrapper.h"
 #include "rapidjson/ostreamwrapper.h"
-#include "rapidjson/writer.h"
 #include "rapidjson/pointer.h"
 using namespace rapidjson;
 
@@ -113,23 +108,29 @@ public:
 
         Value* current_object = get_current_pointer();
         key_path.clear();
-
-        Value& v = (*current_object)[key];
+        Value v;
+        auto it = defaultValues_.find(key);
         if (!current_object->HasMember(key)) {
-            if (defaultValues_.find(key) != defaultValues_.end())
-                v = defaultValues_[key];
-            else
+            if (it == defaultValues_.end())
                 return defaultValue;
+        	v = defaultValues_[key];
         }
 
-    	if constexpr (std::is_same_v<T, bool>) {
-            return v.GetBool();
-        }
-        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
-            return v.GetInt();
-        }
-        else if constexpr (std::is_same_v<T, unsigned>) {
-            return v.GetUint();
+        v = (*current_object)[key];
+
+    	constexpr bool is_rapidjson_type_v =
+            std::is_same_v<T, bool> ||
+            std::is_same_v<T, int> ||
+            std::is_same_v<T, long> ||
+            std::is_same_v<T, unsigned> ||
+            std::is_same_v<T, int64_t> ||
+            std::is_same_v<T, uint64_t> ||
+            std::is_same_v<T, double> ||
+            std::is_same_v<T, float> ||
+            std::is_same_v<T, const char*>;
+
+        if constexpr (is_rapidjson_type_v) {
+            return v.Get<T>();
         }
         else if constexpr (std::is_same_v<T, short>) {
             return static_cast<short>(v.GetInt());
@@ -137,13 +138,7 @@ public:
         else if constexpr (std::is_same_v<T, unsigned short>) {
             return static_cast<unsigned short>(v.GetUint());
         }
-        else if constexpr (std::is_same_v < T, float>) {
-            return v.GetFloat();
-        }
         else if constexpr (std::is_same_v<T, std::string>) {
-            return v.GetString();
-        }
-        else if constexpr (std::is_same_v<T, const char*>) {
             return v.GetString();
         }
         else if constexpr (std::is_same_v<T, real_point3d>) {
@@ -174,36 +169,35 @@ public:
         bool is_new = !current_object->HasMember(key);
         Value k(key, doc_.GetAllocator());
 
-        if constexpr (std::is_same_v<T, bool>) {
-            if(is_new)
+        constexpr bool is_rapidjson_type_v =
+            std::is_same_v<T, bool> ||
+            std::is_same_v<T, int> ||
+            std::is_same_v<T, long> ||
+            std::is_same_v<T, unsigned> ||
+            std::is_same_v<T, int64_t> ||
+            std::is_same_v<T, uint64_t> ||
+            std::is_same_v<T, double> ||
+            std::is_same_v<T, float>;
+			//Not included due to the requirement of creating a String Reference for the string.
+    		//std::is_same_v<T, const char*>;
+
+        if constexpr (is_rapidjson_type_v) {
+            if (is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
             else
-				(*current_object)[key].SetBool(value);
-        }
-        else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
-            if(is_new)
-                current_object->AddMember(k, value, doc_.GetAllocator());
-            else
-				(*current_object)[key].SetInt(value);
+                (*current_object)[key].Set<T>(value);
         }
         else if constexpr (std::is_same_v<T, short>) {
-            //static_assert(value > SHRT_MAX && value < SHRT_MIN, "attempted to set a short value outside of bounds");
             if(is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
             else
 				(*current_object)[key].SetInt(value);
         }
-        else if constexpr (std::is_same_v<T, unsigned> || std::is_same_v<T, unsigned short>) {
+        else if constexpr (std::is_same_v<T, unsigned short>) {
             if (is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
             else
         		(*current_object)[key].SetUint(value);
-        }
-        else if constexpr (std::is_same_v<T, float>) {
-            if (is_new)
-                current_object->AddMember(k, value, doc_.GetAllocator());
-            else
-                (*current_object)[key].SetFloat(value);
         }
         else if constexpr (std::is_same_v<T, std::string>) {
             if (is_new)

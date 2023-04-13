@@ -54,7 +54,7 @@ H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Ax
 float H2Config_Deadzone_A_X = 26.0f;
 float H2Config_Deadzone_A_Y = 26.0f;
 float H2Config_Deadzone_Radial = 1.0f;
-float H2Config_crosshair_offset = 0.138f;
+float H2Config_crosshair_offset = 0.165f;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -180,7 +180,7 @@ void SaveH2Config() {
 			json["game"]["input"].set("raw_mouse_input", H2Config_raw_input);
 			json["game"]["input"].set("mouse_raw_scale", H2Config_raw_mouse_scale);
 			json["game"]["input"].set("mouse_uniform_sens", H2Config_mouse_uniform);
-			json["game"]["input"].set("disalbe_ingame_keyboard", H2Config_disable_ingame_keyboard);
+			json["game"]["input"].set("disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 			json["game"]["input"].set("hotkey_help", H2Config_hotkeyIdHelp);
 			json["game"]["input"].set("hotkey_align_window", H2Config_hotkeyIdAlignWindow);
 			json["game"]["input"].set("hotkey_window_mode", H2Config_hotkeyIdWindowMode);
@@ -188,7 +188,7 @@ void SaveH2Config() {
 			json["game"]["input"].set("hotkey_guide", H2Config_hotkeyIdGuide);
 			json["game"]["input"].set("hotkey_console", H2Config_hotkeyIdConsole);
 			json["game"]["input"].set("controller_sens", H2Config_controller_sens);
-			json["game"]["input"].set("contoller_modern", H2Config_controller_modern);
+			json["game"]["input"].set("controller_modern", H2Config_controller_modern);
 			json["game"]["input"].set("deadzone_type", (int)H2Config_Controller_Deadzone);
 			json["game"]["input"].set("deadzone_axial_x", H2Config_Deadzone_A_X);
 			json["game"]["input"].set("deadzone_axial_y", H2Config_Deadzone_A_Y);
