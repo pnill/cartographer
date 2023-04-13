@@ -141,7 +141,7 @@ public:
         }
         else if constexpr (std::is_same_v<T, short>) {
             if(v.Is<int>())
-				return static_cast<short>(v.GetInt());
+                return static_cast<short>(v.GetInt());
 
             if (defaultValue == T{} && it != defaultValues_.end())
                 return static_cast<short>(defaultValues_[key].GetInt());
@@ -150,7 +150,7 @@ public:
         }
         else if constexpr (std::is_same_v<T, unsigned short>) {
             if(v.Is<unsigned int>())
-        		return static_cast<unsigned short>(v.GetUint());
+                return static_cast<unsigned short>(v.GetUint());
 
         	if (defaultValue == T{} && it != defaultValues_.end())
                 return static_cast<unsigned short>(defaultValues_[key].GetUint());
@@ -159,7 +159,7 @@ public:
         }
         else if constexpr (std::is_same_v<T, std::string>) {
             if(v.Is<const char*>())
-				return v.GetString();
+                return v.GetString();
 
             if (defaultValue == T{} && it != defaultValues_.end())
                 return defaultValues_[key].GetString();
