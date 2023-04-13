@@ -109,13 +109,14 @@ public:
         Value* current_object = get_current_pointer();
         key_path.clear();
         Value v;
+
         auto it = defaultValues_.find(key);
         if (!current_object->HasMember(key)) {
             if (it == defaultValues_.end())
                 return defaultValue;
         	v = defaultValues_[key];
         }
-
+        
         v = (*current_object)[key];
 
     	constexpr bool is_rapidjson_type_v =
@@ -130,22 +131,57 @@ public:
             std::is_same_v<T, const char*>;
 
         if constexpr (is_rapidjson_type_v) {
-            return v.Get<T>();
+            if (v.Is<T>())
+                return v.Get<T>();
+
+            if (defaultValue == T{} && it != defaultValues_.end())
+                return defaultValues_[key].Get<T>();
+
+            return defaultValue;
         }
         else if constexpr (std::is_same_v<T, short>) {
-            return static_cast<short>(v.GetInt());
+            if(v.Is<int>())
+				return static_cast<short>(v.GetInt());
+
+            if (defaultValue == T{} && it != defaultValues_.end())
+                return static_cast<short>(defaultValues_[key].GetInt());
+
+            return defaultValue;
         }
         else if constexpr (std::is_same_v<T, unsigned short>) {
-            return static_cast<unsigned short>(v.GetUint());
+            if(v.Is<unsigned int>())
+        		return static_cast<unsigned short>(v.GetUint());
+
+        	if (defaultValue == T{} && it != defaultValues_.end())
+                return static_cast<unsigned short>(defaultValues_[key].GetUint());
+
+            return defaultValue;
         }
         else if constexpr (std::is_same_v<T, std::string>) {
-            return v.GetString();
+            if(v.Is<const char*>())
+				return v.GetString();
+
+            if (defaultValue == T{} && it != defaultValues_.end())
+                return defaultValues_[key].GetString();
+
+            return defaultValue;
         }
         else if constexpr (std::is_same_v<T, real_point3d>) {
-            auto x = v[0].GetFloat();
-            auto y = v[1].GetFloat();
-            auto z = v[2].GetFloat();
-            return real_point3d(x, y, z);
+            if (v[0].Is<float>() && v[1].Is<float>() && v[2].Is<float>()) {
+                auto x = v[0].GetFloat();
+                auto y = v[1].GetFloat();
+                auto z = v[2].GetFloat();
+                return real_point3d(x, y, z);
+            }
+
+            if (defaultValue == T{} && it != defaultValues_.end())
+            {
+                auto x = defaultValues_[key][0].GetFloat();
+                auto y = defaultValues_[key][1].GetFloat();
+                auto z = defaultValues_[key][2].GetFloat();
+                return real_point3d(x, y, z);
+            }
+            return defaultValue;
         }
         else {
             // Unsupported type
