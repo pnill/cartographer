@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "NetworkSession.h"
+
 #include "Blam/Engine/game/game_globals.h"
 
 bool NetworkSession::PlayerIsActive(int playerIdx)
@@ -234,4 +234,14 @@ void NetworkSession::LeaveSession()
 	typedef int(__cdecl* leave_game_type_t)(int a1);
 	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
 	p_leave_session(0);
+}
+
+s_session_interface_globals* s_session_interface_globals::get()
+{
+	return Memory::GetAddress<s_session_interface_globals*>(0x51A590, 0x520408);
+}
+
+s_session_interface_user* get_session_interface_user_properties(byte controller_index)
+{
+	return &s_session_interface_globals::get()->users[controller_index];
 }

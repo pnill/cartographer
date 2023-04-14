@@ -8,13 +8,13 @@
 #include "Blam\Engine\memory\bitstream.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam\FileSystem\FiloInterface.h"
+#include "Blam/Engine/tag_files/files_windows.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
 #include "Blam\Cache\TagGroups\multiplayer_globals_definition.hpp"
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/units/units.h"
 #include "H2MOD\Discord\DiscordInterface.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\EngineHooks\EngineHooks.h"
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
@@ -208,9 +208,9 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 		datum object_idx = Engine::Objects::object_new(&nObject);
 
 		if (bReset)
-			Engine::Unit::remove_equipment(unit_datum);
+			unit_delete_all_weapons(unit_datum);
 
-		Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
+		unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
 	}
 }
 
@@ -297,7 +297,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		{
 			// delete all weapons if required
 			if (resetEquipment)
-				Engine::Unit::remove_equipment(unit_datum_index);
+				unit_delete_all_weapons(unit_datum_index);
 
 			// set grenade count
 			*(BYTE*)(unit_object + 0x252 + type) = count;
@@ -587,7 +587,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			}
 
 			h2mod->toggle_ai_multiplayer(true);
-			if (Engine::get_game_life_cycle() == _life_cycle_in_game)
+			if (get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client
 				//MapChecksumSync::SendState();
@@ -644,7 +644,7 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 	// prevent team switch in the pregame lobby, when the game already started
 	if (session) {
 		if ((session->parameters[0].session_mode == 4
-			&& Engine::get_game_life_cycle() == _life_cycle_pre_game))
+			&& get_game_life_cycle() == _life_cycle_pre_game))
 			return;
 	}
 	p_change_local_team(localPlayerIndex, teamIndex);
@@ -727,8 +727,8 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 		datum object_idx = Engine::Objects::object_new(&object_placement);
 		if (!DATUM_IS_NONE(object_idx))
 		{
-			Engine::Unit::remove_equipment(unit_datum);
-			Engine::Unit::assign_equipment_to_unit(unit_datum, object_idx, 1);
+			unit_delete_all_weapons(unit_datum);
+			unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
 		}
 	}
 }

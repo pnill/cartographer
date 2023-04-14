@@ -14,16 +14,16 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	struct s_import_info_block
 	{
 		__int32 build;//0x0
-		tag_string256 version;//0x4
-		tag_string32 import_date;//0x104
-		tag_string32 culprit;//0x124
+		static_string256 version;//0x4
+		static_string32 import_date;//0x104
+		static_string32 culprit;//0x124
 		PAD(0x60);//0x144
-		tag_string32 import_time;//0x1A4
+		static_string32 import_time;//0x1A4
 		PAD(0x4);//0x1C4
 		struct s_files_block
 		{
-			tag_string256 path;//0x0
-			tag_string32 modification_date;//0x100
+			static_string256 path;//0x0
+			static_string32 modification_date;//0x100
 			PAD(0x60);//0x120
 			__int32 checksum;//0x180
 			__int32 size;//0x184
@@ -210,14 +210,14 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	PAD(0x18);//0x6C
 	struct s_weather_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference weather_system;//0x20
 		PAD(0x24);//0x28
 		tag_reference wind;//0x4C
 		PAD(0xC);//0x54
 		float wind_magnitude;//0x60
 		PAD(0x4);//0x64
-		tag_string32 wind_scale_function;//0x68
+		static_string32 wind_scale_function;//0x68
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_weather_palette_block, 0x88);
 	tag_block<s_weather_palette_block> weather_palette;//0x84
@@ -948,7 +948,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	tag_block<s_pathfinding_edges_block> pathfinding_edges;//0xCC
 	struct s_background_sound_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference background_sound;//0x20
 		tag_reference inside_cluster_sound;//0x28
 		PAD(0x14);//0x30
@@ -971,7 +971,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	tag_block<s_background_sound_palette_block> background_sound_palette;//0xD4
 	struct s_sound_environment_palette_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		tag_reference sound_environment;//0x20
 		float cutoff_distance;//0x28
 		float interpolation_speed;//0x2C
@@ -982,7 +982,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	data_block sound_pas_data;//0xE4
 	struct s_markers_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		PAD(0xC);//0x20
 		float rotation_w;//0x2C
 		float position_x;//0x30
@@ -1007,7 +1007,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	tag_block<s_environment_object_palette_block> environment_object_palette;//0xFC
 	struct s_environment_objects_block
 	{
-		tag_string32 name;//0x0
+		static_string32 name;//0x0
 		PAD(0xC);//0x20
 		float rotation_w;//0x2C
 		float translation_x;//0x30
@@ -1017,7 +1017,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 		PAD(0x2);//0x3E
 		__int32 unique_id;//0x40
 		unsigned __int32 exported_object_type;//0x44
-		tag_string32 scenario_object_name;//0x48
+		static_string32 scenario_object_name;//0x48
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_environment_objects_block, 0x68);
 	tag_block<s_environment_objects_block> environment_objects;//0x104
@@ -1072,7 +1072,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 	tag_block<s_leaf_map_connections_block> leaf_map_connections;//0x120
 	struct s_errors_block
 	{
-		tag_string256 name;//0x0
+		static_string256 name;//0x0
 		enum class e_report_type : __int16
 		{
 			silent = 0,
@@ -1111,7 +1111,7 @@ struct s_scenario_structure_bsp_group_definition :TagGroup<'sbsp'>
 			};
 			e_flags flags;//0x2
 			data_block text;//0x4
-			tag_string32 source_filename;//0xC
+			static_string32 source_filename;//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block
 			{

@@ -46,3 +46,8 @@ bool s_game_globals::game_is_in_progress()
 {
 	return get() && get()->game_in_progress;
 }
+
+e_engine_type get_current_engine_type()
+{
+	return s_game_globals::get()->options.engine_type;
+}

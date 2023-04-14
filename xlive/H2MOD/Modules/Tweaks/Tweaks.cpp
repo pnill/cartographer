@@ -1,22 +1,24 @@
 #include "stdafx.h"
-
 #include "Tweaks.h"
+
 #include "Blam/Engine/game/game_time.h"
-#include "Blam\FileSystem\FiloInterface.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\CustomResolutions\CustomResolutions.h"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "H2MOD\Variants\VariantMPGameEngine.h"
-#include "Util\Hooks\Hook.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\MapManager\MapManager.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/tag_files/files_windows.h"
+
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "H2MOD/Modules/CustomResolutions/CustomResolutions.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/MapManager/MapManager.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
+#include "H2MOD/Utils/Utils.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Variants/VariantMPGameEngine.h"
+
+#include "Util/Hooks/Hook.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
 #pragma region Done_Tweaks
 
@@ -269,13 +271,13 @@ BOOL WINAPI CryptUnprotectDataHook(
 	return TRUE;
 }
 
-char filo_write__encrypted_data_hook(filo* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+char filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
 {
 	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
 
 	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
-		FiloInterface::change_size(file_ptr, 0);
-	return FiloInterface::write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
+		file_change_size(file_ptr, 0);
+	return file_write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
 }
 
 static BOOL (WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;

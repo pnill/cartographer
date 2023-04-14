@@ -22,7 +22,7 @@
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\FileSystem\FiloInterface.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
@@ -105,8 +105,6 @@
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
-    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
-    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
@@ -163,6 +161,10 @@
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\units\units.cpp" />
+    <ClCompile Include="Blam\Engine\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -300,7 +302,7 @@
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
-    <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
+    <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\Objects\Objects.h" />
@@ -400,7 +402,6 @@
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
-    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="Blam\Cache\CacheHeader.h" />
@@ -516,6 +517,10 @@
     <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
+    <ClInclude Include="Blam\Engine\units\units.h" />
+    <ClInclude Include="Blam\Engine\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
+    <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

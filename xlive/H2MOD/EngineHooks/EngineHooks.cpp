@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "EngineHooks.h"
-#include "H2MOD.h"
+#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Util\Hooks\Hook.h"
 

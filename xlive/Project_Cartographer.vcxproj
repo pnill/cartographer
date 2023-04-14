@@ -231,9 +231,12 @@
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
+    <ClCompile Include="Blam\Engine\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
@@ -252,19 +255,21 @@
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
-    <ClCompile Include="H2MOD\Engine\Engine.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
-    <ClCompile Include="H2MOD\Engine\Unit.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
@@ -346,7 +351,7 @@
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\FileSystem\FiloInterface.cpp">
+    <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -582,6 +587,7 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Enums\HaloStrings.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
@@ -592,7 +598,6 @@
     <ClInclude Include="Blam\Math\real_matrix4x3.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\Engine\Engine.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
@@ -672,13 +677,13 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
+    <ClInclude Include="Blam\Engine\tag_files\string_ids.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
-    <ClInclude Include="Blam\FileSystem\FiloInterface.h" />
+    <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />

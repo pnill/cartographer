@@ -46,14 +46,3 @@ static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagbloc
 
 #define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
 static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
-
-enum e_game_life_cycle : int
-{
-	_life_cycle_none,
-	_life_cycle_pre_game,
-	_life_cycle_start_game,
-	_life_cycle_in_game,
-	_life_cycle_post_game,
-	_life_cycle_joining,
-	_life_cycle_matchmaking
-};

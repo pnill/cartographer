@@ -44,3 +44,5 @@ struct s_game_globals
 };
 CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
 #pragma pack(pop)
+
+e_engine_type get_current_engine_type();

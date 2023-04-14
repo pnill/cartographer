@@ -1,7 +1,6 @@
 #pragma once
 
 #include "H2MOD.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\EventHandler\EventHandler.hpp"
 #include "Blam\Engine\Networking\Session\NetworkSession.h"
 #include "rapidjson\document.h"

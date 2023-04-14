@@ -2,5 +2,5 @@
 #pragma once
 struct s_machine_identifier
 {
-	char gap[6];
+	byte machine_identifier[6];
 };

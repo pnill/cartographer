@@ -5,7 +5,6 @@
 #include "H2MOD\Modules\Shell\Shell.h"
 #include "H2MOD\Modules\Shell\Config.h"
 #include "H2MOD\GUI\XLiveRendering.h"
-#include "H2MOD\Engine\Engine.h"
 #include "H2MOD\Modules\Shell\Startup\Startup.h"
 #include "H2MOD\Modules\Stats\StatsHandler.h"
 #include "H2MOD\Modules\CustomMenu\CustomMenu.h"

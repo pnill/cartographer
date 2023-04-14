@@ -1,5 +1,6 @@
 #pragma once
 
+// TODO figure out where to move this
 struct ui_text_bounds
 {
 	short top;
