@@ -696,10 +696,10 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-typedef bool(__cdecl* fn_c000bd114_t)(e_skulls);
+typedef bool(__cdecl* fn_c000bd114_t)(e_skull_type);
 fn_c000bd114_t p_fn_c000bd114;
 
-bool __cdecl fn_c000bd114_IsSkullEnabled(e_skulls skull_index)
+bool __cdecl fn_c000bd114_IsSkullEnabled(e_skull_type skull_index)
 {
 	return ice_cream_flavor_available(skull_index);
 }
@@ -1042,6 +1042,8 @@ void H2MOD::ApplyHooks() {
 	//Guardian Patch
 	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
+
+	apply_cheat_hooks();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

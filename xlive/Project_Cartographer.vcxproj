@@ -230,6 +230,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
+    <ClCompile Include="Blam\Engine\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />

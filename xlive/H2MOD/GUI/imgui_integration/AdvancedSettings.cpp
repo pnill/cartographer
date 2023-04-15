@@ -1,21 +1,22 @@
 #include "stdafx.h"
 
 #include "Blam/Engine/game/cheats.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Modules\GamePhysics\Patches\MeleeFix.h"
-#include "H2MOD\Modules\HudElements\HudElements.h"
-#include "H2MOD\Modules\Input\Mouseinput.h"
-#include "H2MOD\Modules\RenderHooks\RenderHooks.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+
+#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
+#include "H2MOD/Modules/HudElements/HudElements.h"
+#include "H2MOD/Modules/Input/Mouseinput.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "Util/Hooks/Hook.h"
 
 #ifndef NDEBUG
-#include "H2MOD\Modules\DirectorHooks\DirectorHooks.h"
-#include "H2MOD\Modules\ObserverMode\ObserverMode.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
+#include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Utils/Utils.h"
 #endif
 
 #include "imgui.h"
@@ -691,12 +692,12 @@ namespace ImGuiHandler {
 						}
 						ImGui::Columns(1);
 						ImGui::Separator();
-						bool* skulls = ice_cream_flavor_state();
 						ImGui::Columns(3, NULL, false);
 
+						// TODO Remove this and replace with proper menu when selecting a map (WIP)
 						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAnger", &skulls[_anger]);
+						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[skull_type_anger]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_anger_tooltip));
 
@@ -704,7 +705,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAssassins", &skulls[_assassians]);
+						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[skull_type_assassians]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_assassins_tooltip));
 
@@ -712,7 +713,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlackEye", &skulls[_black_eye]);
+						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[skull_type_black_eye]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_black_eye_tooltip));
 
@@ -720,7 +721,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlind", &skulls[_blind]);
+						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[skull_type_blind]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_blind_tooltip));
 
@@ -728,7 +729,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullCatch", &skulls[_catch]);
+						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[skull_type_catch]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_catch_tooltip));
 
@@ -736,7 +737,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullEnvy", &skulls[_envy]);
+						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[skull_type_envy]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_envy_tooltip));
 
@@ -744,7 +745,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullFamine", &skulls[_famine]);
+						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[skull_type_famine]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_famine_tooltip));
 
@@ -752,7 +753,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGhost", &skulls[_ghost]);
+						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[skull_type_ghost]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_ghost_tooltip));
 
@@ -760,7 +761,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGBP", &skulls[_grunt_birthday_party]);
+						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[skull_type_grunt_birthday_party]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_grunt_tooltip));
 
@@ -768,7 +769,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIron", &skulls[_iron]);
+						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[skull_type_iron]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iron_tooltip));
 
@@ -776,7 +777,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIWHBYD", &skulls[_IWHBYD]);
+						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[skull_type_IWHBYD]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iwbyd_tooltip));
 
@@ -784,7 +785,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullMythic", &skulls[_mythic]);
+						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[skull_type_mythic]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_mythic_tooltip));
 
@@ -792,7 +793,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullSputnik", &skulls[_sputnik]);
+						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[skull_type_sputnik]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_sputnik_tooltip));
 
@@ -800,7 +801,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullThunderstorm", &skulls[_thunderstorm]);
+						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[skull_type_thunderstorm]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_thunderstorm_tooltip));
 
@@ -808,7 +809,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullWhuppopatamus", &skulls[_whuppopotamus]);
+						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[skull_type_whuppopotamus]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_whuppopotamus_tooltip));
 
@@ -1207,7 +1208,7 @@ namespace ImGuiHandler {
 				"\n or use your flashlight.";
 			string_table[0][e_advanced_string::skull_catch] = "Catch";
 			string_table[0][e_advanced_string::skull_catch_tooltip] =
-				"A.I. will throw more grenades. Also] = everybody will drop two grenades"
+				"A.I. will throw more grenades. Also, everybody will drop two grenades"
 				"\n of their kind Flood will drop grenades depending on whether"
 				"\n they're human or Covenant.";
 			string_table[0][e_advanced_string::skull_envy] = "Envy";

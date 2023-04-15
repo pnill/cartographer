@@ -1,5 +1,4 @@
 #pragma once
-// ReSharper disable CppInconsistentNaming
 
 enum e_global_string_ids : unsigned int
 {
