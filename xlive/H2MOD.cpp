@@ -690,14 +690,6 @@ __declspec(naked) void calculate_model_lod_detour()
 	}
 }
 
-typedef bool(__cdecl* fn_c000bd114_t)(e_skull_type);
-fn_c000bd114_t p_fn_c000bd114;
-
-bool __cdecl fn_c000bd114_IsSkullEnabled(e_skull_type skull_index)
-{
-	return ice_cream_flavor_available(skull_index);
-}
-
 bool GrenadeChainReactIsEngineMPCheck() {
 	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
 }
@@ -1084,8 +1076,6 @@ void H2MOD::ApplyHooks() {
 
 		// set max model quality to L6
 		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
-
-		DETOUR_ATTACH(p_fn_c000bd114, Memory::GetAddress<fn_c000bd114_t>(0xbd114), fn_c000bd114_IsSkullEnabled);
 
 		PatchCall(Memory::GetAddress(0x182d6d), GrenadeChainReactIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);

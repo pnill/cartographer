@@ -1,6 +1,6 @@
 #pragma once
 
-#define SKULL_COUNT 16
+#define k_skull_count 16
 
 //	Explanation about the Cow Bell and Whuppopotamus skull incase anyone else gets confused by how it's originally setup
 //	=============================================================================================================================================

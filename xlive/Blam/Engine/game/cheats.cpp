@@ -15,8 +15,8 @@ ice_cream_flavor_available_t p_ice_cream_flavor_available;
 typedef void(__cdecl* ice_cream_activation_t)(unsigned int skull);
 ice_cream_activation_t p_ice_cream_activation;
 
-bool skull_enabled[SKULL_COUNT] = { false };
-const string_id skull_string_ids[SKULL_COUNT] =
+bool skull_enabled[k_skull_count] = { };
+const string_id skull_string_ids[k_skull_count] =
 {
 	HS_UNLOCKED_EXTRA_1,	// Envy
 	HS_UNLOCKED_EXTRA_2,	// Grunt Birthday Party
@@ -40,21 +40,21 @@ const string_id skull_string_ids[SKULL_COUNT] =
 
 bool __cdecl ice_cream_flavor_available(const e_skull_type skull)
 {
-	return skull < SKULL_COUNT && s_game_globals::game_is_campaign() && skull_enabled[skull];
+	return skull < k_skull_count && s_game_globals::game_is_campaign() && skull_enabled[skull];
 }
 
 void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 {
 	typedef void(__cdecl* hud_clear_messages_t)();
-	hud_clear_messages_t p_hud_clear_messages = Memory::GetAddress<hud_clear_messages_t>(0x22CE83, 0x206863);
+	auto p_hud_clear_messages = Memory::GetAddress<hud_clear_messages_t>(0x22CE83, 0x206863);
 	typedef int(__cdecl* players_first_active_user_t)();
-	players_first_active_user_t p_players_first_active_user = Memory::GetAddress<players_first_active_user_t>(0x5343F, 0x5B973);
+	auto p_players_first_active_user = Memory::GetAddress<players_first_active_user_t>(0x5343F, 0x5B973);
 	typedef int(__cdecl* display_generic_hud_string_t)(int controller_index, string_id string_id);
-	display_generic_hud_string_t p_display_generic_hud_string = Memory::GetAddress<display_generic_hud_string_t>(0x22DEA4, 0x206BB7);
+	auto p_display_generic_hud_string = Memory::GetAddress<display_generic_hud_string_t>(0x22DEA4, 0x206BB7);
 	typedef int(__cdecl* scripted_player_effect_screen_fade_in_t)(float r, float g, float b, __int16 ticks);
-	scripted_player_effect_screen_fade_in_t p_scripted_player_effect_screen_fade_in = Memory::GetAddress<scripted_player_effect_screen_fade_in_t>(0xA402C, 0x9628C);
+	auto p_scripted_player_effect_screen_fade_in = Memory::GetAddress<scripted_player_effect_screen_fade_in_t>(0xA402C, 0x9628C);
 	typedef int(__cdecl* unspatialized_impulse_sound_new_t)(datum sound_datum, float scale);
-	unspatialized_impulse_sound_new_t p_unspatialized_impulse_sound_new = Memory::GetAddress<unspatialized_impulse_sound_new_t>(0x8836C, 0x7F173);
+	auto p_unspatialized_impulse_sound_new = Memory::GetAddress<unspatialized_impulse_sound_new_t>(0x8836C, 0x7F173);
 
 	int user_index;
 	s_globals_group_definition* g_globals_tag = tags::get_matg_globals_ptr();
@@ -62,7 +62,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 	datum sound_datum;
 	string_id skull_string_id;
 
-	if (skull < SKULL_COUNT && !skull_enabled[skull])
+	if (skull < k_skull_count && !skull_enabled[skull])
 	{
 		skull_enabled[skull] = true;
 		p_hud_clear_messages();
