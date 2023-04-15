@@ -1,20 +1,20 @@
 #include "stdafx.h"
 
 #include "PlayerRepresentation.h"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
-#include "Blam\Cache\TagGroups\model_definition.hpp"
-#include "Blam\Cache\TagGroups\scenario_definition.hpp"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
+#include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam/Engine/tag_files/global_string_ids.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\SpecialEvents\SpecialEvents.h"
-#include "H2MOD\Tags\MetaExtender.h"
-#include "H2MOD\Tags\MetaLoader\tag_loader.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 #include "Util\Hooks\Hook.h"
 
@@ -282,7 +282,7 @@ namespace PlayerRepresentation
 					if (!DATUM_IS_NONE(lmao_datum))
 					{
 						auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
-						new_object->parent_marker = e_global_string_ids::HS_HEAD;
+						new_object->parent_marker = e_global_string_id::HS_HEAD;
 						new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 						new_object->child_object.TagIndex = lmao_datum;
 					}

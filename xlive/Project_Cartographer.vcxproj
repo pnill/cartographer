@@ -589,7 +589,7 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
-    <ClInclude Include="Blam\Enums\HaloStrings.h" />
+    <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
     <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
@@ -678,7 +678,7 @@
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Engine\tag_files\string_ids.h" />
+    <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />

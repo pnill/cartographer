@@ -1,11 +1,11 @@
 #include "stdafx.h"
-
 #include "MeleeFix.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "Util\Hooks\Hook.h"
-#include "Blam\Enums\HaloStrings.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\GamePhysics\MeleeLunge.h"
+
+#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "Util/Hooks/Hook.h"
 
 #include <float.h>
 #if (!defined(_M_FP_FAST)) || !_M_FP_FAST
@@ -145,9 +145,9 @@ namespace MeleeFix
 			}*/
 			
 			// this is used only for sword
-			if (melee_type == e_global_string_ids::HS_MELEE_DASH || melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE)
+			if (melee_type == e_global_string_id::HS_MELEE_DASH || melee_type == e_global_string_id::HS_MELEE_DASH_AIRBORNE)
 			{
-				float melee_max_duration = melee_type == e_global_string_ids::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
+				float melee_max_duration = melee_type == e_global_string_id::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
 				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || p_melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;

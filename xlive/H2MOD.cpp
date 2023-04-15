@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "Blam\Enums\HaloStrings.h"
+#include "Blam/Engine/tag_files/global_string_ids.h"
 #include "Blam\Cache\TagGroups\biped_definition.hpp"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam\Cache\TagGroups\model_definition.hpp"

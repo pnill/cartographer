@@ -1,6 +1,6 @@
 #pragma once
 
-enum e_global_string_ids : unsigned int
+enum e_global_string_id : unsigned int
 {
 	NUM_NULL = 0x0,
 	HS_NUM_0 = 0x100030A,

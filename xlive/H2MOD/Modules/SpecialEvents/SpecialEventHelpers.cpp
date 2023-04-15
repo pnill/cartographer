@@ -4,7 +4,7 @@
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
-#include "Blam/Enums/HaloStrings.h"
+#include "Blam/Engine/tag_files/global_string_ids.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -51,7 +51,7 @@ void add_hat_to_model(datum player_hlmt_datum, datum hat_scenery_datum, bool is_
 	auto hlmt = tags::get_tag_fast<s_model_group_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];
 	auto hat = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(variant->objects));
-	hat->parent_marker = (is_elite == false ? string_id(e_global_string_ids::HS_HEAD) : new_elite_head_marker);
+	hat->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
 	hat->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 	hat->child_object.TagIndex = hat_scenery_datum;
 }
@@ -63,7 +63,7 @@ void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum
 	auto hlmt = tags::get_tag_fast<s_model_group_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];
 	auto beard = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(variant->objects));
-	beard->parent_marker = (is_elite == false ? string_id(e_global_string_ids::HS_HEAD) : new_elite_head_marker);
+	beard->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
 	beard->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 	beard->child_object.TagIndex = beard_scenery_datum;
 }

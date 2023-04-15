@@ -1,5 +1,5 @@
 #include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "Blam/Engine/tag_files/string_ids.h"
+#include "Blam/Engine/tag_files/string_id.h"
 #include "Blam\Cache\TagGroups\globals_definition.hpp"
 #include "Blam/Engine/game/players.h"
 
