@@ -1,14 +1,7 @@
 #pragma once
-
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/objects/object_placement.h"
-
 #include "Blam/Engine/game/game_options.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam\Common\Common.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-
-#include "H2MOD\Variants\Variants.h"
+#include "Blam/Engine/objects/objects.h"
 
 enum e_sound_type
 {

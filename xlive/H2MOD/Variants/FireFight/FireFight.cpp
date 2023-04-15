@@ -1,16 +1,16 @@
 #include "stdafx.h"
-
 #include "FireFight.h"
 
+#include "Blam/Cache/TagGroups/character_definition.hpp"
+#include "Blam/Engine/ai/actors.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Cache\TagGroups\character_definition.hpp"
-
-#include "Blam\Engine\ai\actors.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
-#include "H2MOD\Tags\TagInterface.h"
 
 #include "H2MOD.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Variants/FireFight/DeviceShop/DeviceShop.h"
+
 
 DeviceShop* deviceShop = new DeviceShop();
 

@@ -11,6 +11,7 @@
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "Util/Hooks/Hook.h"
 
 #ifndef NDEBUG
