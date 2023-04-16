@@ -4,9 +4,9 @@
 //version -1.1:improvement in extended meta loading logic
 ///
 #pragma once
-#include "Blam\Cache\DataTypes\BlamTag.h"
+#include "Blam/Cache/DataTypes/BlamTag.h"
 #include"stdafx.h"
-#include"tinyxml\tinyxml2.h"
+#include"tinyxml/tinyxml2.h"
 
 namespace meta_struct
 {

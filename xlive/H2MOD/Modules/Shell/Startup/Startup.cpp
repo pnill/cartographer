@@ -2,22 +2,22 @@
 
 #include "Startup.h"
 #include "WinMainH2.h"
-#include "..\Config.h"
-#include "..\Shell.h"
+#include "../Config.h"
+#include "../Shell.h"
 
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Networking\Networking.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Tweaks\Tweaks.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Modules\Updater\Updater.h"
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/Accounts/Accounts.h"
+#include "H2MOD/Modules/Networking/Networking.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Tweaks/Tweaks.h"
+#include "H2MOD/Utils/Utils.h"
+#include "H2MOD/Modules/Updater/Updater.h"
 
-#include "..\Debug\Debug.h"
+#include "../Debug/Debug.h"
 
-#include "Util\filesys.h"
-#include "Util\hash.h"
-#include "Util\Hooks\Hook.h"
+#include "Util/filesys.h"
+#include "Util/hash.h"
+#include "Util/Hooks/Hook.h"
 
 namespace filesystem = std::filesystem;
 

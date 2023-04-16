@@ -3,7 +3,7 @@
 // Network Observer
 //	- manages network bandwidth based on network conditions
 
-#include "..\NetworkCommon.h"
+#include "../NetworkCommon.h"
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Utils/Utils.h"
 
 namespace MetaExtender
 {

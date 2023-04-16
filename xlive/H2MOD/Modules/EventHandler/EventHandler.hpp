@@ -2,8 +2,8 @@
 
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
-#include "H2MOD\Modules\Shell\ServerConsole.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "H2MOD/Modules/Shell/ServerConsole.h"
 
 /*
  * To Setup a new Event you need to add an enum to EventType above the none enum

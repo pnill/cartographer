@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Math/BlamMath.h"
 
 #pragma pack(push,1)
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 /*********************************************************************
 * name: ai_mission_dialogue

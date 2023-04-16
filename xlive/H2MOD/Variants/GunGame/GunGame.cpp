@@ -2,11 +2,11 @@
 
 #include "GunGame.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "Blam\Engine\Networking\Session\NetworkSession.h"
-#include "Blam\Engine\Networking\NetworkMessageTypeCollection.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
 
-#include "Util\ReadIniArguments.h"
+#include "Util/ReadIniArguments.h"
 
 using namespace NetworkSession;
 

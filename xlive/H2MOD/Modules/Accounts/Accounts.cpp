@@ -2,13 +2,13 @@
 
 #include "Accounts.h"
 
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "H2MOD\Utils\Utils.h"
-#include "Util\SimpleIni.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/SimpleIni.h"
 
 #pragma region Config IO
 const wchar_t H2AccountsFilename[] = L"%wshalo2accounts.ini";

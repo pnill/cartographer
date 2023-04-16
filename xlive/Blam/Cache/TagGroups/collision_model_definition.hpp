@@ -1,11 +1,11 @@
 #pragma once
 #include "stdafx.h"
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "Blam\Cache\DataTypes\Strings.h"
-#include "Blam\Cache\TagGroups.hpp"
-#include "Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp"
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/Strings.h"
+#include "Blam/Cache/TagGroups.hpp"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+#include "Blam/Math/BlamMath.h"
 
 #pragma pack(push,1)
 struct s_collision_model_block

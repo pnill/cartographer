@@ -4,11 +4,11 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/game/GameTimeGlobals.h"
-#include "Blam\Engine\Players\LocalPlayers.h"
+#include "Blam/Engine/Players/LocalPlayers.h"
 
 #include "FirstPersonInterpolate.h"
 #include "ObjectInterpolate.h"

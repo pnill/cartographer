@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Common\Common.h"
+#include "Blam/Common/Common.h"
 
 struct s_file_reference
 {

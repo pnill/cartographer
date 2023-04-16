@@ -3,16 +3,16 @@
 
 #include "Blam/Engine/memory/data.h"
 
-#include "H2MOD\Modules\Accounts\Accounts.h"
-#include "H2MOD\Modules\Accounts\AccountLogin.h"
-#include "H2MOD\Modules\UI\XboxLiveTaskProgress.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD/Modules/Accounts/Accounts.h"
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "..\CustomLanguage.h"
+#include "../CustomLanguage.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Utils/Utils.h"
 
 static bool accountRemoveMode;
 bool c_account_list_menu::accountingGoBackToList = false;

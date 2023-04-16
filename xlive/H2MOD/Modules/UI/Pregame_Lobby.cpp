@@ -2,7 +2,7 @@
 
 #include "Pregame_Lobby.h"
 #include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 void c_pregame_lobby_menu::ApplyPatches()
 {

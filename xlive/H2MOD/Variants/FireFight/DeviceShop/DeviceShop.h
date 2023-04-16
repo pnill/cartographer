@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 enum e_item_type {
 	_generic_item,

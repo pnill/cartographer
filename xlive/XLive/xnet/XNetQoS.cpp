@@ -3,9 +3,9 @@
 #include <MSWSock.h>
 #include <WS2tcpip.h>
 #include "xnet.h"
-#include "XLive\xnet\XNetQoS.h"
-#include "IpManagement\XnIp.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "XLive/xnet/XNetQoS.h"
+#include "IpManagement/XnIp.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 using namespace std::chrono_literals;
 

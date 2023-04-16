@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\MapManager.h"
+#include "../MapManager.h"
 
 #define MAX_MAP_NAME_SIZE 32
 #define MAX_MAP_FILE_PATH_SIZE (255 + 1)

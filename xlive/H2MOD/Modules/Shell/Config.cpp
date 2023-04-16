@@ -2,13 +2,13 @@
 
 #include "Config.h"
 
-#include "H2MOD\Modules\Shell\Shell.h"
-#include "H2MOD\Modules\CustomMenu\CustomMenu.h"
-#include "H2MOD\Modules\Updater\Updater.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Utils\Utils.h"
-#include "Util\SimpleIni.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "H2MOD/Modules/Updater/Updater.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/SimpleIni.h"
 
 #pragma region Config IO
 const wchar_t* H2ConfigFilenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };

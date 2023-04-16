@@ -3,7 +3,7 @@
 #include "NetworkObserver.h"
 #include "NetworkChannel.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 s_network_observer_configuration* g_network_configuration;
 

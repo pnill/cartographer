@@ -1,7 +1,7 @@
 #pragma once
 #ifndef XUSERPROPERTY_H
 #define XUSERPROPERTY_H
-#include "XLive\XUser\XUser.h"
+#include "XLive/XUser/XUser.h"
 
 typedef struct _XUSER_PROPERTY
 {

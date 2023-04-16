@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\NetworkCommon.h"
+#include "../NetworkCommon.h"
 #include "NetworkObserver.h"
 
 struct alignas(8) s_network_channel

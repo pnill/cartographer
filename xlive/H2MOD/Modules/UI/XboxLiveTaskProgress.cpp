@@ -2,7 +2,7 @@
 
 #include "XboxLiveTaskProgress.h"
 #include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 void c_xbox_live_task_progress_menu::Open(void* callback)
 {

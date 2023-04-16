@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 template<typename T = int>
 struct s_bitflags

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "VariantMPGameEngine.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
 
 std::unordered_map<size_t, c_game_engine_base*> custom_engines;
 // returns the custom engine for a given engine pointer

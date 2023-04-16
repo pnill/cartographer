@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "Networking.h"
-#include "Blam\Engine\memory\bitstream.h"
-#include "OverridePackets\OverridePackets.h"
+#include "Blam/Engine/memory/bitstream.h"
+#include "OverridePackets/OverridePackets.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 // stub qos lookup function in-game between peers in a network session
 int __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)

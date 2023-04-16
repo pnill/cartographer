@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "MachineID.h"
 
 enum e_simulation_view_type : __int16

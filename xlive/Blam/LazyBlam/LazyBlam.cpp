@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "LazyBlam.hpp"
-#include "H2MOD\Utils\Utils.h"
-#include "Util\filesys.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/filesys.h"
 
 namespace lazy_blam
 {

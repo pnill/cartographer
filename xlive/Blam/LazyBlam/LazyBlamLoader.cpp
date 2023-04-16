@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
 #include "LazyBlam.hpp"
-#include "Blam\Cache\TagGroups\object_definition.hpp"
-#include "Blam\Cache\TagGroups\weapon_definition.hpp"
-#include "Blam\Cache\TagGroups\unit_definition.hpp"
-#include "Blam\Cache\TagGroups\biped_definition.hpp"
+#include "Blam/Cache/TagGroups/object_definition.hpp"
+#include "Blam/Cache/TagGroups/weapon_definition.hpp"
+#include "Blam/Cache/TagGroups/unit_definition.hpp"
+#include "Blam/Cache/TagGroups/biped_definition.hpp"
 
 #define L_BLAM_LOADER_LOAD_BLOCK(tag_block) \
 		if (tag_block.size > 0 && tag_block.data > 0) \

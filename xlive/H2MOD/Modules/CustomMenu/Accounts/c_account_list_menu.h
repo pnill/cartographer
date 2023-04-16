@@ -2,9 +2,9 @@
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
 
-#include "..\c_brightness_menu.h"
-#include "..\CustomMenuGlobals.h"
-#include "..\CustomLanguage.h"
+#include "../c_brightness_menu.h"
+#include "../CustomMenuGlobals.h"
+#include "../CustomLanguage.h"
 
 class c_account_edit_list : public c_list_widget
 {

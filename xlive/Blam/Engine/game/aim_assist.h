@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam\Cache\DataTypes\BlamPrimitiveType.h"
+#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 
 struct s_aim_assist_targetting_data
 {

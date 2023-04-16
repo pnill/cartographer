@@ -1,14 +1,14 @@
 #include "stdafx.h"
 
 #include "KeyboardInput.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\GUI\XLiveRendering.h"
-#include "H2MOD\GUI\ImGui_Integration\ImGui_Handler.h"
-#include "H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Utils\Utils.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/GUI/XLiveRendering.h"
+#include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
+#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Utils/Utils.h"
+#include "Util/Hooks/Hook.h"
 
 
 extern LPDIRECT3DDEVICE9 pDevice;

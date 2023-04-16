@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam\Engine\Networking\NetworkPrimitiveTypes.h"
-#include "H2MOD\Modules\Networking\Memory\bitstream.h"
+#include "Blam/Engine/Networking/NetworkPrimitiveTypes.h"
+#include "H2MOD/Modules/Networking/Memory/bitstream.h"
 
 enum e_simulation_event_type
 {

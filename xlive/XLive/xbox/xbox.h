@@ -1,6 +1,6 @@
 #pragma once
 
-#include "..\XUser\XUser.h"
+#include "../XUser/XUser.h"
 
 #define CUSTOMACTION_FLAG_CLOSESUI      1
 

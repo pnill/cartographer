@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam\Cache\DataTypes\BlamDataTypes.h"
-#include "H2MOD\Variants\VariantSystem.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "H2MOD/Variants/VariantSystem.h"
 
 extern class DeviceShop* deviceShop;
 

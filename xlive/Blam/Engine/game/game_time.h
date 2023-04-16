@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam\Common\Common.h"
+#include "Blam/Common/Common.h"
 
 //size: 0x24
 struct time_globals

@@ -6,9 +6,9 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
-#include "Blam\Math\BlamMath.h"
+#include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/object_placement.h"

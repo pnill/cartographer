@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "c_virtual_keyboard_menu.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Utils/Utils.h"
 
 #include "CustomLanguage.h"
 

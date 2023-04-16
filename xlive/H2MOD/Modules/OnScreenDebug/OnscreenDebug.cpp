@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
 bool initialisedDebugText = false;
 

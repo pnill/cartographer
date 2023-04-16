@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "Blam\Common\Common.h"
+#include "Blam/Common/Common.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "imgui.h"
 #include "imgui_handler.h"
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 namespace ImGuiHandler
 {

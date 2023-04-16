@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam\Common\Common.h"
-#include "Blam\Engine\Networking\PlayerPrediction.h"
+#include "Blam/Common/Common.h"
+#include "Blam/Engine/Networking/PlayerPrediction.h"
 
 enum e_network_memory_block : __int16
 {

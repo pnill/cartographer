@@ -3,7 +3,7 @@
 #include "upnp.h"
 #include <miniupnpc/upnpcommands.h>
 
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 /* Ripped from ED thanks guys - PermaNull*/
 ModuleUPnP::ModuleUPnP()

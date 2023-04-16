@@ -8,7 +8,7 @@
 #include <string>
 #include <time.h>
 
-#include "..\Shell.h"
+#include "../Shell.h"
 
 #define crash_reports_path "\\halo2_crash_reports\\"
 

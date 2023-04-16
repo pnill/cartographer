@@ -1,6 +1,6 @@
 #pragma once
 #include "MachineID.h"
-#include "Blam\Engine\Players\PlayerActions.h"
+#include "Blam/Engine/Players/PlayerActions.h"
 
 enum e_simulation_player_type   //TODO: determine actual names for this enum field
 {

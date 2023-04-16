@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "XSocket.h"
-#include "XLive\xnet\upnp.h"
-#include "XLive\xnet\Sockets\XSocket.h"
-#include "XLive\xnet\IpManagement\XnIp.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "XLive/xnet/upnp.h"
+#include "XLive/xnet/Sockets/XSocket.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
-#include "XLive\xnet\net_utils.h"
+#include "XLive/xnet/net_utils.h"
 
-#include "..\IpManagement\XnIp.h"
+#include "../IpManagement/XnIp.h"
 
 #include <MSWSock.h>
 

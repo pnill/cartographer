@@ -2,7 +2,7 @@
 
 #include "XSession.h"
 
-#include "XLive\xnet\IpManagement\XnIp.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 

@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #include "Utils.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include <sys\timeb.h>
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include <sys/timeb.h>
 
 int FindLineStart(FILE* fp, int lineStrLen) {
 	int fp_offset_orig = ftell(fp);

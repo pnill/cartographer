@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 #define CONSOLE_CLAMP(V, MN, MX)     ((V) < (MN) ? (MN) : (V) > (MX) ? (MX) : (V))
 

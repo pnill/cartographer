@@ -2,15 +2,15 @@
 
 #include "imgui_handler.h"
 #include "H2MOD.h"
-#include "H2MOD\Modules\Input\PlayerControl.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
+#include "Util/Hooks/Hook.h"
 
 #include "imgui.h"
-#include "backends\imgui_impl_dx9.h"
-#include "backends\imgui_impl_win32.h"
+#include "backends/imgui_impl_dx9.h"
+#include "backends/imgui_impl_win32.h"
 
 #include "ImGui_CartographerStyle.h"
-#include "Console\ImGui_ConsoleImpl.h"
+#include "Console/ImGui_ConsoleImpl.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
 namespace ImGuiHandler

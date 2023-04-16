@@ -2,11 +2,11 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
-#include "H2MOD\Tags\TagInterface.h"
+#include "H2MOD/Tags/TagInterface.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

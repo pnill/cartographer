@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "H2MOD\Modules\Shell\Config.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 #include "render_cameras.h"
 

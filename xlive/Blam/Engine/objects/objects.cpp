@@ -2,13 +2,13 @@
 
 #include "objects.h"
 
-#include "Util\Hooks\Hook.h"
+#include "Util/Hooks/Hook.h"
 
-#include "Blam\Engine\memory\bitstream.h"
+#include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h"
+#include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 
 namespace Engine::Objects
 {

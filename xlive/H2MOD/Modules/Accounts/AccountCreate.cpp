@@ -2,10 +2,10 @@
 
 #include "AccountCreate.h"
 
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\CustomMenu\CustomLanguage.h"
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
+#include "H2MOD/Utils/Utils.h"
 
 #include "H2MOD/Modules/CustomMenu/c_error_menu.h"
 

@@ -2,8 +2,8 @@
 
 #include "EngineHooks.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "H2MOD\Modules\EventHandler\EventHandler.hpp"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/EventHandler/EventHandler.hpp"
+#include "Util/Hooks/Hook.h"
 
 #ifndef _CARTOGRAPHER_DLL_CONF
 // DO NOT USE VERSIONS ABOVE USHORT_MAX - 1 (above 65534) OR BELLOW 0 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "curl\curl.h"
+#include "curl/curl.h"
 
 // curl errors
 #define ERROR_CODE_CURL_SOCKET_FAILED -40

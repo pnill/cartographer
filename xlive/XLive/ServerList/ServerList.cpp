@@ -1,15 +1,15 @@
 #include "stdafx.h"
 
 #include "ServerList.h"
-#include "H2MOD\Modules\OnScreenDebug\OnScreenDebug.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\Accounts\Accounts.h"
+#include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Accounts/Accounts.h"
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 
-#include "..\xnet\IpManagement\XnIp.h"
+#include "../xnet/IpManagement/XnIp.h"
 
-#include "H2MOD\Utils\Utils.h"
+#include "H2MOD/Utils/Utils.h"
 
 using namespace rapidjson;
 

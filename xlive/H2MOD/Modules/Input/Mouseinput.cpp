@@ -2,8 +2,8 @@
 
 #include "Mouseinput.h"
 #include "Blam/Engine/game/game_time.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "Util\Hooks\Hook.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "Util/Hooks/Hook.h"
 
 bool b_raw_init = false;
 DWORD base;

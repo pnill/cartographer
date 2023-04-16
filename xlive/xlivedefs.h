@@ -1,6 +1,6 @@
 #pragma once
-#include "XLive\XUser\XUserProperty.h"
-#include "XLive\XUser\XUserContext.h"
+#include "XLive/XUser/XUserProperty.h"
+#include "XLive/XUser/XUserContext.h"
 
 //typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
 //typedef unsigned long DWORD_PTR;

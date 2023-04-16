@@ -1,7 +1,7 @@
 #pragma once
 
-#include "..\CustomMenuGlobals.h"
-#include "..\c_brightness_menu.h"
+#include "../CustomMenuGlobals.h"
+#include "../c_brightness_menu.h"
 
 #include "c_account_list_menu.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"

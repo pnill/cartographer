@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 
-#include "XLive\XAM\xam.h"
-#include "XLive\ServerList\ServerList.h"
-#include "XLive\achievements\XAchievements.h"
+#include "XLive/XAM/xam.h"
+#include "XLive/ServerList/ServerList.h"
+#include "XLive/achievements/XAchievements.h"
 
 HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;

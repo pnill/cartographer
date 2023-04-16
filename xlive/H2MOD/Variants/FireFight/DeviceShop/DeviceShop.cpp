@@ -2,8 +2,8 @@
 
 #include "DeviceShop.h"
 #include "H2MOD.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
+#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "Blam/Engine/game/players.h"
 

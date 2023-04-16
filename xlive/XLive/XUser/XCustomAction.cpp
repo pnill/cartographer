@@ -2,7 +2,7 @@
 
 #include "XCustomAction.h"
 
-#include "XLive\xbox\xbox.h"
+#include "XLive/xbox/xbox.h"
 
 // #472
 int WINAPI XCustomSetAction(DWORD dwActionIndex, LPCWSTR szActionText, DWORD dwFlags)
