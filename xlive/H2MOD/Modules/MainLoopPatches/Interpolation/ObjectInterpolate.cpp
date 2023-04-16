@@ -1,20 +1,16 @@
 #include "stdafx.h"
-
 #include "ObjectInterpolate.h"
-
 #include "Interpolation.h"
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
-
-#include "Util/Hooks/Hook.h"
-
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/game/local_players.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam/Math/BlamMath.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/object_placement.h"
-#include "Blam/Engine/game/GameTimeGlobals.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+#include "Util/Hooks/Hook.h"
+
 
 #define OBJECT_MAX_NODES (255)
 #define OBJECT_GAME_STATE_MAX_COUNT (2048)
