@@ -1,19 +1,20 @@
 #include "stdafx.h"
-
 #include "HudElements.h"
 
+#include "Blam/Cache/TagGroups/bitmap_definition.hpp"
 #include "Blam/Engine/game/cheats.h"
-#include "Blam\Engine\render\render_cameras.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "H2MOD\Modules\Shell\Config.h"
-#include "H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h"
-#include "H2MOD\Modules\Input\KeyboardInput.h"
-#include "H2MOD\Modules\OnScreenDebug\OnscreenDebug.h"
-#include "H2MOD\Modules\Shell\Startup\Startup.h"
-#include "H2MOD\Utils\Utils.h"
-#include "H2MOD\Tags\TagInterface.h"
-#include "Blam\Cache\TagGroups\bitmap_definition.hpp"
-#include "Util\Hooks\Hook.h"
+#include "Blam/Engine/render/render_cameras.h"
+
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Utils/Utils.h"
+#include "H2MOD/Tags/TagInterface.h"
+
+#include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -52,7 +53,7 @@ static bool __cdecl RenderHudCheck(unsigned int a1)
 	DWORD new_hud_globals = *(DWORD*)(H2BaseAddr + 0x9770F4);
 	float& hud_opacity = *(float*)(new_hud_globals + 0x228); // set the opacity
 
-	if (!b_showHUD || ice_cream_flavor_available(_blind))
+	if (!b_showHUD || ice_cream_flavor_available(skull_type_blind))
 	{
 		hud_opacity = 0.f;
 		hud_opacity_reset = false;

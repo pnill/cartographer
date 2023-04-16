@@ -165,6 +165,7 @@
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="Blam\Engine\game\cheats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -296,8 +297,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\StringID.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\Strings.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
     <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups.hpp" />
@@ -386,7 +385,7 @@
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
-    <ClInclude Include="Blam\Enums\HaloStrings.h" />
+    <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
     <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
@@ -521,6 +520,8 @@
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
