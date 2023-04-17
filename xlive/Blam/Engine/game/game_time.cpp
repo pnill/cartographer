@@ -3,10 +3,7 @@
 #include "game_time.h"
 #include "Blam/Math/BlamMath.h"
 
-#include <float.h>
-#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
-#pragma fenv_access (on)
-#endif
+FLOATING_POINT_ENV_ACCESS();
 
 time_globals* time_globals::get()
 {

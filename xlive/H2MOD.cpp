@@ -41,11 +41,7 @@
 #include "H2MOD/Variants/Variants.h"
 #include "Util/Hooks/Hook.h"
 
-#include <float.h>
-
-#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
-#pragma fenv_access (on)
-#endif
+FLOATING_POINT_ENV_ACCESS();
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 

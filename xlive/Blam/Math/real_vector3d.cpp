@@ -2,9 +2,7 @@
 
 #include "real_vector3d.h"
 
-#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
-#pragma fenv_access (on)
-#endif
+FLOATING_POINT_ENV_ACCESS();
 
  //weird function but matches game's code
 long double square_root(float f)
