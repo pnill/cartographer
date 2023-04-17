@@ -1,16 +1,13 @@
 #include "stdafx.h"
-
 #include "FirstPersonInterpolate.h"
 #include "Interpolation.h"
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
-
-#include "Util/Hooks/Hook.h"
-
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/game/local_players.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam/Math/BlamMath.h"
-#include "Blam/Engine/game/GameTimeGlobals.h"
-#include "Blam/Engine/Players/Players.h"
-#include "Blam/Engine/Players/LocalPlayers.h"
+#include "Util/Hooks/Hook.h"
 
 namespace FirstPersonInterpolate
 {

@@ -1,24 +1,26 @@
 #include "stdafx.h"
-
 #include "RunLoop.h"
+
 #include "Blam/Engine/game/game_time.h"
-#include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
+
 #include "H2MOD/GUI/XLiveRendering.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Input/ControllerInput.h"
+#include "H2MOD/Modules/MainLoopPatches/Interpolation/Interpolation.h"
 #include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Utils/Utils.h"
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 #include "Util/Hooks/Hook.h"
+#include "XLive/xnet/IpManagement/XnIp.h"
+
 
 // TODO Move most of this logic to Blam/Engine/main/main.cpp
 
@@ -636,6 +638,9 @@ void InitRunLoop() {
 		{
 		case _rendering_mode_original_game_frame_limit:
 			MainGameTime::ApplyPatches();
+#if GAME_FRAME_INTERPOLATOR_ENABLED
+			Interpolation::ApplyPatches();
+#endif
 			MainGameTime::fps_limiter_enabled = true;
 			break;
 
