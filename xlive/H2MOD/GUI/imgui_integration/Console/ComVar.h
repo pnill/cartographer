@@ -28,7 +28,7 @@ class ComVarT : public IComVar
 {
 	using baseTypeT = typename std::remove_all_pointers<T>::type;
 
-	static_assert(!std::is_same_v<std::remove_all_pointers<T>, T>
+	static_assert(!std::is_same_v<baseTypeT, T>
 		// not caring about the const versions, they shouldn't be const in the first place
 		// || !std::is_same<const std::remove_all_pointers<T>, T>::value
 		// || !std::is_same<std::remove_all_pointers<T> const, T>::value
