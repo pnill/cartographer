@@ -166,6 +166,7 @@
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -522,6 +523,7 @@
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

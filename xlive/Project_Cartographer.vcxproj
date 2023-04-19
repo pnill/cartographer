@@ -227,6 +227,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
