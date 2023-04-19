@@ -43,6 +43,7 @@
 #include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 //#include <Objbase.h>
 //#include <Shlwapi.h>
 #include <set>
@@ -93,6 +94,12 @@ extern std::random_device rd;
 #pragma endregion
 
 #define STRINGIFY(x) #x
+
+#if ((!defined(_M_FP_FAST)) || !_M_FP_FAST)
+#define FLOATING_POINT_ENV_ACCESS() _Pragma("fenv_access (on)")
+#else
+#define FLOATING_POINT_ENV_ACCESS()
+#endif
 
 // use this macro to define _time and _clock namespaces
 #define CHRONO_DEFINE_TIME_AND_CLOCK() \

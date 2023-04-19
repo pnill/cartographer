@@ -8,10 +8,7 @@
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include <float.h>
-#if (!defined(_M_FP_FAST)) || !_M_FP_FAST
-#pragma fenv_access (on)
-#endif
+FLOATING_POINT_ENV_ACCESS();
 
 extern bool b_XboxTick;
 
