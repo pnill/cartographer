@@ -14,7 +14,7 @@ struct tag_block
 	{
 		return sizeof(T);
 	}
-	T *begin()
+	T *begin() const
 	{
 		if (this->data != NONE)
 		{
@@ -25,7 +25,7 @@ struct tag_block
 		return nullptr;
 	}
 
-	T* end()
+	T* end() const
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (this->begin())
@@ -34,7 +34,7 @@ struct tag_block
 			return nullptr;
 	}
 
-	T* operator[](size_t index)
+	T* operator[](size_t index) const
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)

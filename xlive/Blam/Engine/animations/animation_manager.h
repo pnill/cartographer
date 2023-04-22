@@ -11,7 +11,7 @@ public:
 	c_animation_channel channel3;
 	c_interpolator_control interpolator_control_0;
 	c_interpolator_control interpolator_control_1;
-	DWORD animation_tag_index;
+	datum jmad_tag_datum;
 	WORD animation_manager_flags;
 	WORD unk6E;
 	int animation_string_ids[4];
