@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "animation_channel.h"
 
+#include "Blam/Engine/tag_files/global_string_ids.h"
 
 c_animation_id::c_animation_id() 
 { 
@@ -40,7 +41,7 @@ bool c_animation_id::operator==(c_animation_id* animation_id)
 
 c_animation_channel::c_animation_channel()
 {
-	this->create();
+	this->reset();
 };
 
 c_animation_channel::~c_animation_channel()
@@ -48,15 +49,15 @@ c_animation_channel::~c_animation_channel()
 	this->unk10 = 0;
 }
 
-void c_animation_channel::create()
+void c_animation_channel::reset()
 {
 	this->unk1C = 0.0;
 	this->unk10 = 0;
 	this->unk11 = 0;
-	this->unk12 = 0;
+	this->flags = 0;
 	this->unk18 = 1.0;
 	this->unk14 = 0;
-	this->animation_string = -1;
+	this->animation_string = HS_ID_NONE;
 	this->unkC = -1;
 	this->unkD = -1;
 	this->unkE = -1;
@@ -64,5 +65,5 @@ void c_animation_channel::create()
 
 void c_animation_channel::initialize()
 {
-	this->create();
+	this->reset();
 }

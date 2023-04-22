@@ -28,7 +28,7 @@ class c_animation_channel
 	short unkE;
 	char unk10;
 	char unk11;
-	short unk12;
+	short flags;
 	float unk14;
 	float unk18;
 	float unk1C;
@@ -36,6 +36,6 @@ class c_animation_channel
 public:
 	c_animation_channel();
 	~c_animation_channel();
-	void create();
+	void reset();
 	void initialize();
 };
