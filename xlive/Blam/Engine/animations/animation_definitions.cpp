@@ -4,6 +4,27 @@
 #include "H2MOD/Tags/TagInterface.h"
 
 
+const DWORD* c_model_animation_runtime_data::get_left_arm_nodes() const
+{
+	return this->left_arm_nodes;
+}
+
+const DWORD* c_model_animation_runtime_data::get_right_arm_nodes() const
+{
+	return this->right_arm_nodes;
+}
+
+s_animation_inheritence* c_model_animation_runtime_data::get_animation_inhertence(byte index) const
+{
+	return this->inheritence_list[index];
+}
+
+s_weapon_class_listing* c_model_animation_runtime_data::get_weapon_list(byte index) const
+{
+	return this->weapon_list[index];
+}
+
+
 const animation_graph_node* c_animation_graph_resources::get_node(const byte node_index) const
 {
 	return this->skeleton_nodes[node_index];

@@ -63,23 +63,14 @@ class c_model_animation_runtime_data
     tag_block<s_animation_inheritence> inheritence_list;
     tag_block<s_weapon_class_listing> weapon_list;
 
-    DWORD left_arm_nodes_1;
-    DWORD left_arm_nodes_2;
-    DWORD left_arm_nodes_3;
-    DWORD left_arm_nodes_4;
-    DWORD left_arm_nodes_5;
-    DWORD left_arm_nodes_6;
-    DWORD left_arm_nodes_7;
-    DWORD left_arm_nodes_8;
+    DWORD left_arm_nodes[8];
+    DWORD right_arm_nodes[8];
 
-    DWORD right_arm_nodes_1;
-    DWORD right_arm_nodes_2;
-    DWORD right_arm_nodes_3;
-    DWORD right_arm_nodes_4;
-    DWORD right_arm_nodes_5;
-    DWORD right_arm_nodes_6;
-    DWORD right_arm_nodes_7;
-    DWORD right_arm_nodes_8;
+public:
+    s_animation_inheritence* get_animation_inhertence(byte index) const;
+    s_weapon_class_listing* get_weapon_list(byte index) const;
+    const DWORD* get_left_arm_nodes() const;
+    const DWORD* get_right_arm_nodes() const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_runtime_data, 80);
 
@@ -485,6 +476,7 @@ class c_animation_mode
     string_id label;
     tag_block<c_weapon_class> weapon_class;
     tag_block<s_animation_ik_point> mode_ik;
+
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_mode, 20);
 
@@ -530,6 +522,11 @@ class c_model_animation_graph_contents
     // Explaination("SPECIAL CASE ANIMS", "")
     tag_block<c_vehicle_suspension> vehicle_suspension;
     tag_block<s_object_overlay> object_overlays;
+
+public:
+    c_animation_mode* get_mode() const;
+    c_vehicle_suspension* get_vehicle_suspension() const;
+    s_object_overlay* object_overlay() const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_graph_contents, 24);
 
