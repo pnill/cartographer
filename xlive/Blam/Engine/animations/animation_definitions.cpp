@@ -3,6 +3,12 @@
 
 #include "H2MOD/Tags/TagInterface.h"
 
+
+const animation_graph_node* c_animation_graph_resources::get_node(const byte node_index) const
+{
+	return this->skeleton_nodes[node_index];
+}
+
 size_t c_animation_graph_resources::get_node_count() const
 { 
 	return this->skeleton_nodes.size; 
@@ -24,7 +30,7 @@ short c_model_animation::find_first_key_of_type(const e_frame_event_type event_t
 		}
 	}
 
-	return DATUM_INDEX_NONE;
+	return -1;
 }
 
 short c_model_animation::find_first_sound_event(s_sound_event* sound_event) const
@@ -167,9 +173,42 @@ string_id c_model_animation::get_string_id() const
 }
 
 
+byte c_model_animation_graph::find_node(const string_id string) const
+{
+	const byte node_count = this->get_node_count();
+	for (size_t i = 0; i < node_count; ++i)
+	{
+		if (string == this->get_node(i)->name)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+byte c_model_animation_graph::find_node_with_flags(const e_node_model_flags flags) const
+{
+	const byte node_count = this->get_node_count();
+	for (size_t i = 0; i < node_count; ++i)
+	{
+		if ((this->get_node(i)->model_flags & flags) == flags)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
 const c_model_animation_graph* c_model_animation_graph::get(const datum tag_datum_index) const
 {
 	return tags::get_tag_fast<const c_model_animation_graph>(tag_datum_index);
+}
+
+const animation_graph_node* c_model_animation_graph::get_node(const byte node_index) const
+{
+	return this->resources.get_node(node_index);
 }
 
 c_model_animation_graph* c_model_animation_graph::get_writable(const datum tag_datum_index) const

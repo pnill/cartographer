@@ -83,14 +83,14 @@ class c_model_animation_runtime_data
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_runtime_data, 80);
 
-enum e_model_flags : byte
+enum e_node_model_flags : byte
 {
-    model_flag_primary_model = FLAG(0),
-    model_flag_secondary_model = FLAG(1),
-    model_flag_local_root = FLAG(2),
-    model_flag_left_hand = FLAG(3),
-    model_flag_right_hand = FLAG(4),
-    model_flag_left_arm_member = FLAG(5),
+    node_model_flag_primary_model = FLAG(0),
+    node_model_flag_secondary_model = FLAG(1),
+    node_model_flag_local_root = FLAG(2),
+    node_model_flag_left_hand = FLAG(3),
+    node_model_flag_right_hand = FLAG(4),
+    node_model_flag_left_arm_member = FLAG(5),
 };
 
 enum e_node_joint_flags : byte
@@ -107,7 +107,7 @@ struct animation_graph_node
     short first_child_node_index;
     short parent_node_index;
 
-    e_model_flags model_flags;
+    e_node_model_flags model_flags;
     e_node_joint_flags node_joint_flags;
 
     real_vector3d baseVector;
@@ -375,6 +375,7 @@ class c_animation_graph_resources
     tag_block<c_model_animation> animations;
 
 public:
+    const animation_graph_node* get_node(byte node_index) const;
     size_t get_node_count() const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_graph_resources, 52);
@@ -532,6 +533,9 @@ class c_model_animation_graph_contents
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_graph_contents, 24);
 
+
+// TODO label and implement the rest of the member functions for this class
+// There's a lot of them and they're not currently needed
 class c_model_animation_graph : TagGroup<'jmad'>
 {
     c_animation_graph_resources resources;
@@ -549,8 +553,12 @@ class c_model_animation_graph : TagGroup<'jmad'>
     tag_block<s_additional_node_data> additional_node_data;
 
 public:
+    byte find_node(const string_id string) const;
+    byte find_node_with_flags(const e_node_model_flags flags) const;
+
     const c_model_animation_graph* get(const datum tag_datum_index) const;
     c_model_animation_graph* get_writable(const datum tag_datum_index) const;
+    const animation_graph_node* get_node(const byte node_index) const;
     short get_node_count() const;
 };
 TAG_GROUP_SIZE_ASSERT(c_model_animation_graph, 172);
