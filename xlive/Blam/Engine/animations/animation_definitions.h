@@ -158,12 +158,12 @@ struct animation_aiming_screen_bounds
 };
 TAG_BLOCK_SIZE_ASSERT(animation_aiming_screen_bounds, 24);
 
-struct animation_blend_screen_block
+struct s_animation_blend_screen
 {
     string_id label;
-    animation_aiming_screen_bounds aimingScreen;
+    animation_aiming_screen_bounds aiming_screen;
 };
-TAG_BLOCK_SIZE_ASSERT(animation_blend_screen_block, 28);
+TAG_BLOCK_SIZE_ASSERT(s_animation_blend_screen, 28);
 
 enum e_animation_type : byte
 {
@@ -229,6 +229,15 @@ class c_animation_data_sizes
     short field_6;
     int field_8;
     int field_12;
+
+public:
+    byte get_field0() { return field_0; }
+    byte get_field1() { return field_1; }
+    short get_field2() { return field_2; }
+    short get_field4() { return field_4; }
+    short get_field6() { return field_6; }
+    int get_field8() { return field_8; }
+    int get_field12() { return field_12; }
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_data_sizes, 16);
 
@@ -362,12 +371,24 @@ class c_animation_graph_resources
     tag_block<animation_graph_node> skeleton_nodes;
     tag_block<animation_graph_sound_reference> sound_references;
     tag_block<animation_graph_effect_reference> effect_references;
-    tag_block<animation_blend_screen_block> blend_screens;
+    tag_block<s_animation_blend_screen> blend_screens;
     tag_block<c_model_animation> animations;
 
 public:
+    const c_model_animation* get_animation(c_animation_id animation_id) const;
+    size_t get_animation_count() const;
+    e_animation_graph_resources_flags get_animation_graph_resources_flags() const;
+    const s_animation_blend_screen* get_blend_screen(DWORD index) const;
+    size_t get_blend_screen_count() const;
+    short get_codec_pack() const;
+    const animation_graph_effect_reference* get_effect_reference(byte node_index) const;
+    size_t get_effect_reference_count() const;
+    e_inheritance_flags get_inheritance_flags() const;
     const animation_graph_node* get_node(byte node_index) const;
     size_t get_node_count() const;
+    const animation_graph_sound_reference* get_sound_reference(byte node_index) const;
+    size_t get_sound_reference_count() const;
+    tag_reference get_parent_graph() const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_graph_resources, 52);
 

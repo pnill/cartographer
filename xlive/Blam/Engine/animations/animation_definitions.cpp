@@ -24,6 +24,51 @@ s_weapon_class_listing* c_model_animation_runtime_data::get_weapon_list(byte ind
 	return this->weapon_list[index];
 }
 
+const c_model_animation* c_animation_graph_resources::get_animation(c_animation_id animation_id) const
+{
+	return this->animations[animation_id.index()];
+}
+
+size_t c_animation_graph_resources::get_animation_count() const
+{
+	return this->animations.size;
+}
+
+e_animation_graph_resources_flags c_animation_graph_resources::get_animation_graph_resources_flags() const
+{
+	return this->animation_graph_resources_flags;
+}
+
+const s_animation_blend_screen* c_animation_graph_resources::get_blend_screen(DWORD index) const
+{
+	return this->blend_screens[index];
+}
+
+size_t c_animation_graph_resources::get_blend_screen_count() const
+{
+	return this->blend_screens.size;
+}
+
+short c_animation_graph_resources::get_codec_pack() const
+{
+	return this->animation_codec_pack;
+}
+
+const animation_graph_effect_reference* c_animation_graph_resources::get_effect_reference(byte node_index) const
+{
+	return this->effect_references[node_index];
+}
+
+size_t c_animation_graph_resources::get_effect_reference_count() const
+{
+	return this->effect_references.size;
+}
+
+
+e_inheritance_flags c_animation_graph_resources::get_inheritance_flags() const
+{
+	return this->inheritance_flags;
+}
 
 const animation_graph_node* c_animation_graph_resources::get_node(const byte node_index) const
 {
@@ -33,6 +78,21 @@ const animation_graph_node* c_animation_graph_resources::get_node(const byte nod
 size_t c_animation_graph_resources::get_node_count() const
 { 
 	return this->skeleton_nodes.size; 
+}
+
+const animation_graph_sound_reference* c_animation_graph_resources::get_sound_reference(byte node_index) const
+{
+	return this->sound_references[node_index];
+}
+
+size_t c_animation_graph_resources::get_sound_reference_count() const
+{
+	return this->sound_references.size;
+}
+
+tag_reference c_animation_graph_resources::get_parent_graph() const
+{
+	return this->parent_animation_graph;
 }
 
 bool c_model_animation::animation_is_world_relative() const
