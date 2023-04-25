@@ -30,5 +30,5 @@ public:
 	bool enabled();
 	bool finished();
 	void disable();
-	void set_interpolation_type(e_interpolation_type value);
+	void set_interpolation_type(e_interpolation_type interpolation_type);
 };

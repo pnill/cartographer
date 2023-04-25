@@ -58,7 +58,7 @@ bool c_animation_manager::reset_graph(datum jmad_tag_index, datum hlmt_tag_index
 
     c_animation_manager__set_goal(this, HS_DEFAULT, HS_DEFAULT, HS_DEFAULT, HS_DEFAULT, 791u, 63);
     this->interpolator_control_1.disable();
-    this->interpolator_control_1.set_interpolation_type(1);
+    this->interpolator_control_1.set_interpolation_type(interpolation_type_ease_in_ease_out);
     this->interpolator_control_0.disable();
     this->unk6E = 0;
     this->unk80 = 0;
