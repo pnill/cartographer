@@ -53,10 +53,11 @@ void c_animation_channel::reset()
 {
 	this->unk1C = 0.0;
 	this->unk10 = 0;
-	this->unk11 = 0;
-	this->flags = 0;
-	this->unk18 = 1.0;
-	this->unk14 = 0;
+	this->animation_state_flags = (e_animation_state_flag_bits)0;
+	this->frame_event_types_1 = (e_animation_frame_event_types)0;
+	this->unk18 = 1.0f;
+	this->frame_event_types_2 = (e_animation_frame_event_types)0;
+	this->frame_event_types_3 = (e_animation_frame_event_types)0;
 	this->animation_string = HS_ID_NONE;
 	this->unkC = -1;
 	this->unkD = -1;

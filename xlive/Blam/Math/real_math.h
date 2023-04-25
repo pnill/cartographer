@@ -329,6 +329,7 @@ CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
 
 class c_quantized_orientation
 {
+public:
 	short rotation_x;
 	short rotation_y;
 	short rotation_z;

@@ -18,6 +18,16 @@ public:
 	bool operator==(c_animation_id* animation_id);
 };
 
+enum e_animation_state_flag_bits : byte
+{
+	// TODO populate flags
+};
+
+enum e_animation_frame_event_types : WORD
+{
+	// TODO populate flags
+};
+
 class c_animation_channel
 {
 	c_animation_id animation_id_0;
@@ -27,9 +37,10 @@ class c_animation_channel
 	char unkD;
 	short unkE;
 	char unk10;
-	char unk11;
-	short flags;
-	float unk14;
+	e_animation_state_flag_bits animation_state_flags;
+	e_animation_frame_event_types frame_event_types_1;
+	e_animation_frame_event_types frame_event_types_2;
+	e_animation_frame_event_types frame_event_types_3;
 	float unk18;
 	float unk1C;
 
@@ -39,3 +50,4 @@ public:
 	void reset();
 	void initialize();
 };
+CHECK_STRUCT_SIZE(c_animation_channel, 0x20);
