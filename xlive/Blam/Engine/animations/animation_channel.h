@@ -17,15 +17,21 @@ public:
 
 	bool operator==(c_animation_id* animation_id);
 };
+CHECK_STRUCT_SIZE(c_animation_id, 4);
 
+// TODO populate flags
 enum e_animation_state_flag_bits : byte
 {
-	// TODO populate flags
+	animation_state_none = 0,
+	animation_state_paused = FLAG(1),
 };
 
+// TODO populate flags
 enum e_animation_frame_event_types : WORD
 {
-	// TODO populate flags
+	animation_frame_event_type_none = 0,
+	animation_frame_event_type_autoplay = FLAG(0),
+	animation_frame_event_type_looping = FLAG(1),
 };
 
 class c_animation_channel

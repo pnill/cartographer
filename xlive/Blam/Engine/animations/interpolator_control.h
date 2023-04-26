@@ -12,8 +12,9 @@ enum e_interpolation_type : byte
 
 enum e_interpolator_control_flags : byte
 {
+	interpolator_control_flag_none = 0,
 	interpolator_control_flag_0 = FLAG(0),
-	interpolator_control_flag_finished = FLAG(1)
+	interpolator_control_finished = FLAG(1)
 };
 
 class c_interpolator_control
@@ -32,3 +33,4 @@ public:
 	void disable();
 	void set_interpolation_type(e_interpolation_type interpolation_type);
 };
+CHECK_STRUCT_SIZE(c_interpolator_control, 4);
