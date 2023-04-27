@@ -380,6 +380,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 				return SOCKET_ERROR;
 			}
 		}
+		packet->~XBroadcastPacket();
 		return 0;
 	}
 
