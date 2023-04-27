@@ -1,6 +1,6 @@
 #pragma once
 #include "animation_channel.h"
-#include "interpolator_control.h"
+#include "animation_interpolation.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 class c_animation_manager

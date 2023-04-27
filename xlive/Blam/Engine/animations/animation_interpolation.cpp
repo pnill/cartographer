@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "interpolator_control.h"
+#include "animation_interpolation.h"
 
 c_interpolator_control::c_interpolator_control()
 {
