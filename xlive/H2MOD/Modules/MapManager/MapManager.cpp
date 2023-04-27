@@ -372,7 +372,7 @@ bool MapManager::GetMapFilename(std::wstring& buffer) {
 		NetworkSession::GetMapFileLocation(map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
-		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
+		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L'\\');
 		std::size_t mapNameOffsetEnd = unicodeMapFileLocation.find_last_not_of(L'.');
 		std::wstring filename = unicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
 		if (!filename.empty()) {
