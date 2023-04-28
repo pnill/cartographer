@@ -418,9 +418,6 @@ MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _down
 	SetMapNameToDownload(_mapToDownload);
 }
 
-MapDownloadQuery::~MapDownloadQuery() {
-}
-
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }

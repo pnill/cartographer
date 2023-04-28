@@ -269,7 +269,7 @@ struct s_player
 CHECK_STRUCT_SIZE(s_player, 0x204);
 #pragma pack(pop)
 
-class PlayerIterator : public s_data_iterator<s_player>
+class PlayerIterator : private s_data_iterator<s_player>
 {
 public:
 

@@ -10,7 +10,7 @@ struct s_bitflags
 	// only power of 2 sized types
 	static_assert(sizeof(T) > 0 && (sizeof(T) & (sizeof(T) - 1)) == 0);
 
-	bool test_bit(int index)
+	bool test_bit(int index) const
 	{
 		return (m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1))) != 0;
 	}
@@ -66,10 +66,6 @@ public:
 		m_data_array(_data_array),
 		m_current_absolute_index(NONE),
 		m_last_datum_index(DATUM_INDEX_NONE)
-	{
-	}
-
-	~s_data_iterator()
 	{
 	}
 

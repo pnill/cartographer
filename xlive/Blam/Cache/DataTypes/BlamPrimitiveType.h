@@ -9,7 +9,7 @@ typedef float real;
 
 typedef unsigned int datum;
 
-#define DATUM_INDEX_NONE ((unsigned int)(NONE))
+#define DATUM_INDEX_NONE ((datum)(NONE))
 
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)((_absolute_index) | ((_salt) << 16))
 

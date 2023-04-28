@@ -7,7 +7,7 @@
 class MapDownloadQuery {
 public:
 	MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId);
-	~MapDownloadQuery();
+	~MapDownloadQuery() = default;
 
 	void SetMapNameToDownload(const std::wstring& mapNameToDownload);
 	void SetMapNameToDownload(const wchar_t* mapNameToDownload);
@@ -31,6 +31,9 @@ public:
 private:
 	std::atomic<bool> m_forceStopDownload = false;
 	int m_downloadPercentage = 0;
+
+	MapDownloadQuery(const MapDownloadQuery& other) = delete;
+	MapDownloadQuery(MapDownloadQuery&& other) = delete;
 };
 
 /**
