@@ -10,3 +10,5 @@ namespace KeyboardInput
 	
 	unsigned char GetGameKbState(__int16 keycode);
 }
+
+void hotkeyFuncToggleHideIngameChat();

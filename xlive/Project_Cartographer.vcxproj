@@ -236,6 +236,12 @@
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_control.cpp" />
+    <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
+    <ClCompile Include="Blam\Engine\interface\first_person_weapons.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud.cpp" />
+    <ClCompile Include="Blam\Engine\interface\motion_sensor.cpp" />
+    <ClCompile Include="Blam\Engine\interface\new_hud.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
@@ -258,6 +264,11 @@
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
+    <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
+    <ClInclude Include="Blam\Engine\interface\hud.h" />
+    <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
@@ -300,7 +311,6 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
@@ -627,7 +637,6 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
-    <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />

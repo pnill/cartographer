@@ -3,8 +3,14 @@
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/interface/motion_sensor.h"
+#include "Blam/Engine/interface/first_person_camera.h"
+#include "Blam/Engine/interface/first_person_weapons.h"
+#include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
+#include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Discord/DiscordInterface.h"
@@ -16,7 +22,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
@@ -553,7 +558,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
-		HudElements::OnMapLoad();
+		hud_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
@@ -1026,6 +1031,13 @@ void H2MOD::ApplyHooks() {
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	apply_cheat_hooks();
+
+	hud_apply_patches();
+	new_hud_apply_patches();
+	motion_sensor_apply_patches();
+	render_cameras_apply_patches();
+	first_person_camera_apply_patches();
+	first_person_weapons_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

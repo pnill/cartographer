@@ -21,3 +21,10 @@ bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_d
 	auto passign_equipment_to_unit = Memory::GetAddress<assign_equipment_to_unit_t>(0x1442AA, 0x1330FA);
 	return passign_equipment_to_unit(unit_datum_index, weapon_datum_index, weapon_addition_method);
 }
+
+float __cdecl unit_get_field_of_view(const datum unit_datum_index, const float unit_camera_field_of_view, const s_player_action_weapons weapon_index)
+{
+	typedef float(__cdecl* unit_get_field_of_view_t)(const datum unit_datum_index, const float unit_camera_field_of_view, const s_player_action_weapons weapon_index);
+	unit_get_field_of_view_t p_unit_get_field_of_view = Memory::GetAddress<unit_get_field_of_view_t>(0x1414AC, 0x1302FB);
+	return p_unit_get_field_of_view(unit_datum_index, unit_camera_field_of_view, weapon_index);
+}
