@@ -1,11 +1,14 @@
 #include "stdafx.h"
 
 #include "WinMainH2.h"
-#include "../Shell.h"
-#include "../Config.h"
+
+#include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h"""
 #include "H2MOD/Utils/Utils.h"
 
-#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 #include "Util/Hooks/Hook.h"
 
 const static int max_monitor_count = 9;
@@ -70,6 +73,8 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
 	
+	hud_apply_pre_winproc_patches();
+
 	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc_hook); // g_WndProc_ptr
 
 	if (!LOG_CHECK(InitPCCInfo()))

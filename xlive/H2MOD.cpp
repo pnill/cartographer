@@ -1032,6 +1032,11 @@ void H2MOD::ApplyHooks() {
 
 	apply_cheat_hooks();
 
+	if (H2Config_hiresfix)
+	{
+		high_res_fix();
+	}
+
 	hud_apply_patches();
 	new_hud_apply_patches();
 	motion_sensor_apply_patches();

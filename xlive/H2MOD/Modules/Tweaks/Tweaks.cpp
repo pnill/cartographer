@@ -98,53 +98,6 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	return result;
 }
 
-
-typedef void(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
-Video_HUDSizeUpdate_t Video_HUDSizeUpdate_orig;
-
-const float maxHUDTextScale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
-const float maxUiScaleFonts = 1.049f; // >= 1.25 will make text disappear
-
-void Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
-{
-	Video_HUDSizeUpdate_orig(hudSize, safeArea);
-
-	float* HUD_TextScale = Memory::GetAddress<float*>(0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
-	if (*HUD_TextScale > maxHUDTextScale)
-	{
-		// textScale = resolution_height * 0.0010416667
-		// but if it's too large the game won't render it some reason (max seems to be around 1.4, 1.3 when sword icon is in the text?)
-		// lets just set it to the largest known good value for now, until the cause of large text sizes being hidden is figured out
-		*HUD_TextScale = maxHUDTextScale;
-	}
-
-	// UI_Scale was updated just before we were called, so lets fix it real quick...
-	float* UI_Scale = Memory::GetAddress<float*>(0xA3E424);
-	if (*UI_Scale > maxUiScaleFonts)
-	{
-		// uiScale = resolution_height * 0.00083333335f
-		// at higher resolutions text starts being cut off (pretty much any UI_Scale above 1 will result in text cut-off)
-		// the sub_671B02_hook below fixes that by scaling the width of the element by UI_Scale (which the game doesn't do for some reason...)
-		// however fonts will stop being rendered if the UI_Scale is too large (>= ~1.25)
-		// so this'll make sure UI_Scale doesn't go above 1.249, but will result in the UI being drawn smaller
-		*UI_Scale = maxUiScaleFonts;
-	}
-}
-
-typedef int(__cdecl *sub_671B02_t)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
-sub_671B02_t p_sub_671B02;
-
-int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8)
-{
-	float UI_Scale = *Memory::GetAddress<float*>(0xA3E424);
-	if (a2 && a2 != a1) // if a2 == a1 then this is a chapter name which scaling seems to break, so skip those ones
-	{
-		short width = a2->right - a2->left;
-		a2->right = a2->left + (short)((float)width * UI_Scale); // scale width by UI_Scale, stops text elements from being cut-off when UI_Scale > 1
-	}
-	return p_sub_671B02(a1, a2, a3, a4, a5, a6, a7, a8);
-}
-
 bool __cdecl is_remote_desktop()
 {
 	LOG_TRACE_FUNC("check disabled");
@@ -315,14 +268,6 @@ void H2Tweaks::ApplyPatches() {
 		if (!H2Config_skip_intro && IntroHQ) {
 			BYTE assmIntroHQ[] = { 0xEB };
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
-		}
-
-		if (H2Config_hiresfix) {
-			// HUD text size fix for higher resolutions
-			Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_t)DetourFunc(Memory::GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
-
-			// menu text fix for higher resolutions
-			p_sub_671B02 = (sub_671B02_t)DetourFunc(Memory::GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
 		}
 
 		// adds support for more monitor resolutions
