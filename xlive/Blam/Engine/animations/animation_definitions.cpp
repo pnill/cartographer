@@ -142,7 +142,7 @@ e_animation_type c_model_animation::get_animation_type() const
 
 float c_model_animation::get_authored_duration() const
 {
-	return this->frame_count * 0.0333333333f;
+	return this->frame_count * (1.0f / 30.0f);
 }
 
 
