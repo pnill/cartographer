@@ -3,7 +3,7 @@
 
 #include "Util/Hooks/Hook.h"
 
-#define SIZE_MULTIPLIER 1
+#define k_radar_size_multiplier 1
 
 void radar_patch()
 {
@@ -21,5 +21,5 @@ void motion_sensor_apply_patches()
 void motion_sensor_fix_size()
 {
 	float og_res = *Memory::GetAddress<float*>(0x3E6A9C);
-	WriteValue<float_t>(Memory::GetAddress(0x3E6A9C), og_res * SIZE_MULTIPLIER);
+	WriteValue<float>(Memory::GetAddress(0x3E6A9C), og_res * k_radar_size_multiplier);
 }

@@ -12,7 +12,7 @@ static float original_hud_text_scale;
 
 // This controls the scale for hud when we implement the redrawn hud
 // ex. a value of 0.25 would allow us to use hud bitmaps that are 4x larger (resolution wise) than the old ones
-static float hud_upscale_size = 1.0f;
+#define k_hud_upscale_size 1.0f
 
 // Used to grab the default crosshair size before we modify it
 typedef void(__cdecl* update_hud_elements_display_settings_t)(int new_hud_size, int new_safe_area);
@@ -24,17 +24,18 @@ void __cdecl update_hud_elements_display_settings_hook(const int new_hud_size, c
 	original_hud_text_scale = *Memory::GetAddress<float*>(0x46402C);
 	original_crosshair_text_scale = *Memory::GetAddress<float*>(0x464028);
 	
+	set_hud_size(1.0f);
 	set_crosshair_size(H2Config_crosshair_scale);
 }
 
 void set_hud_size(const float size)
 {
-	WriteValue(Memory::GetAddress(0x46402C, 0x0), original_hud_text_scale * size * hud_upscale_size);
+	*Memory::GetAddress<float*>(0x46402C, 0x0) = original_hud_text_scale * size * k_hud_upscale_size;
 }
 
 void set_crosshair_size(const float size)
 {
-	WriteValue(Memory::GetAddress(0x464028, 0x0), original_crosshair_text_scale * size * hud_upscale_size);
+	*Memory::GetAddress<float*>(0x464028, 0x0) = original_crosshair_text_scale * size * k_hud_upscale_size;
 }
 
 void set_crosshair_offset(const float offset)
@@ -52,6 +53,7 @@ void hud_patches_on_map_load()
 
 	set_crosshair_size(H2Config_crosshair_scale);
 	set_crosshair_offset(H2Config_crosshair_offset);
+	set_hud_size(1.0f);
 }
 
 void hud_apply_patches()

@@ -9,7 +9,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "Util/Hooks/Hook.h"
 
-static bool b_showHUD = true;
+bool show_hud = true;
 
 bool render_ingame_chat_check() 
 {
@@ -39,7 +39,7 @@ bool __cdecl render_hud_check(unsigned int a1)
 	static bool hud_opacity_reset = true;
 	s_new_hud_globals* new_hud_globals = Memory::GetAddress<s_new_hud_globals*>(0x9770F4);
 
-	if (!b_showHUD || ice_cream_flavor_available(skull_type_blind))
+	if (!show_hud || ice_cream_flavor_available(skull_type_blind))
 	{
 		new_hud_globals->hud_opacity = 0.0f;
 		hud_opacity_reset = false;
@@ -56,7 +56,7 @@ bool __cdecl render_hud_check(unsigned int a1)
 
 void toggle_hud(bool state)
 {
-	b_showHUD = state;
+	show_hud = state;
 }
 
 void new_hud_apply_patches()

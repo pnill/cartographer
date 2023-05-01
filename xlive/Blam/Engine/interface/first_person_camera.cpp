@@ -14,8 +14,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-static bool b_showHUD = true;
-
 bool fov_overridden = false;
 float overridden_fov_radians;
 
@@ -36,7 +34,7 @@ void observer_set_suggested_field_of_view(const float fov)
 	{
 		calculated_radians_FOV = currentVariantSettings.forcedFOV * M_PI / 180.0f;
 	}
-	WriteValue(Memory::GetAddress(0x413780, 0x3B5300), calculated_radians_FOV);
+	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = calculated_radians_FOV;
 }
 
 
