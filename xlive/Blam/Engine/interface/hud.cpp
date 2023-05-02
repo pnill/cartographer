@@ -2,7 +2,6 @@
 #include "hud.h"
 
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Cache/TagGroups/bitmap_definition.hpp"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
@@ -11,6 +10,9 @@
 
 static float original_crosshair_text_scale;
 static float original_hud_scale;
+
+// Seperated value for the scale of the crosshair
+static float crosshair_size = 1.0f;
 
 // This controls the scale for hud when we implement the redrawn hud
 // ex. a value of 4.0 would allow us to use hud bitmaps that are 4x larger (resolution wise) than the old ones
@@ -88,49 +90,9 @@ void set_crosshair_and_text_size(const float size)
 	*Memory::GetAddress<float*>(0x464028, 0x0) = original_crosshair_text_scale * size * (1 / k_hud_upscale_size);
 }
 
-void set_crosshair_size(float size, bool map_load_context)
+void set_crosshair_size(float size)
 {
-	static bool crosshairInit = false;
-	static point2d* defaultCrosshairSizes = nullptr;
-
-	if (Memory::IsDedicatedServer())
-		return;
-
-	// if we are in a "map_load_context", save default crosshair size and delete if we previously saved something
-	if (map_load_context)
-	{
-		if (defaultCrosshairSizes != nullptr)
-		{
-			delete[] defaultCrosshairSizes;
-			defaultCrosshairSizes = nullptr;
-		}
-		crosshairInit = false;
-	}
-
-	if (h2mod->GetEngineType() != e_engine_type::_main_menu) {
-		auto hud_reticles_datum = tags::find_tag(blam_tag::tag_group_type::bitmap, "ui\\hud\\bitmaps\\new_hud\\crosshairs\\hud_reticles");
-		if (hud_reticles_datum != DATUM_INDEX_NONE)
-		{
-			auto hud_reticles_data = tags::get_tag_fast<bitmap_definition>(hud_reticles_datum);
-
-			for (auto i = 0; i < hud_reticles_data->bitmaps.size; i++)
-			{
-				if (!crosshairInit)
-				{
-					if (defaultCrosshairSizes == nullptr) defaultCrosshairSizes = new point2d[hud_reticles_data->bitmaps.size];
-
-					defaultCrosshairSizes[i] = hud_reticles_data->bitmaps[i]->size;
-				}
-
-				hud_reticles_data->bitmaps[i]->size = point2d
-				{
-					(short)round(defaultCrosshairSizes[i].x * size * k_hud_upscale_size),
-					(short)round(defaultCrosshairSizes[i].y * size * k_hud_upscale_size)
-				};
-			}
-			crosshairInit = true;
-		}
-	}
+	crosshair_size = size * original_crosshair_text_scale;
 }
 
 void set_crosshair_offset(const float offset)
@@ -146,7 +108,7 @@ void hud_patches_on_map_load()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	set_crosshair_size(H2Config_crosshair_scale, true);
+	set_crosshair_size(H2Config_crosshair_scale);
 	set_crosshair_offset(H2Config_crosshair_offset);
 	set_hud_size(1.0f);
 }
@@ -168,7 +130,11 @@ void hud_apply_pre_winmain_patches()
 
 	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18, 0x0);
 
+	// Replace all calls to update_hud_elements_display_settings with our hook
 	PatchCall(Memory::GetAddress(0x25E1FC, 0x0), update_hud_elements_display_settings_hook);
 	PatchCall(Memory::GetAddress(0x264058, 0x0), update_hud_elements_display_settings_hook);
 	PatchCall(Memory::GetAddress(0x26406F, 0x0), update_hud_elements_display_settings_hook);
+
+	// Replace the crosshair and text scale global with our own just for the crosshair
+	WriteValue(Memory::GetAddress(0x222F9F + 4), &crosshair_size);
 }
