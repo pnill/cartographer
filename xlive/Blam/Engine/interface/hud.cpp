@@ -16,6 +16,12 @@ static float original_hud_scale;
 // ex. a value of 4.0 would allow us to use hud bitmaps that are 4x larger (resolution wise) than the old ones
 #define k_hud_upscale_size 1.0f
 
+// you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
+#define max_crosshair_text_scale 1080.0f * 0.0010416667f 
+// >= 1.25 will make text disappear
+#define max_ui_scale 1.049f 
+
+
 // Used to grab the default crosshair size before we modify it
 typedef void(__cdecl* update_hud_elements_display_settings_t)(int new_hud_size, int new_safe_area);
 update_hud_elements_display_settings_t p_update_hud_elements_display_settings;
@@ -35,8 +41,6 @@ void __cdecl update_hud_elements_display_settings_hook(const int new_hud_size, c
 	set_crosshair_size(H2Config_crosshair_scale);
 }
 
-const float max_crosshair_text_scale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
-const float max_ui_scale = 1.049f; // >= 1.25 will make text disappear
 void high_res_fix()
 {
 	if (original_crosshair_text_scale > max_crosshair_text_scale)
@@ -158,7 +162,13 @@ void hud_apply_patches()
 	}
 }
 
-void hud_apply_pre_winproc_patches()
+void hud_apply_pre_winmain_patches()
 {
-	DETOUR_ATTACH(p_update_hud_elements_display_settings, Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18, 0x0), update_hud_elements_display_settings_hook);
+	if (Memory::IsDedicatedServer()) { return; }
+
+	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18, 0x0);
+
+	PatchCall(Memory::GetAddress(0x25E1FC, 0x0), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x264058, 0x0), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x26406F, 0x0), update_hud_elements_display_settings_hook);
 }

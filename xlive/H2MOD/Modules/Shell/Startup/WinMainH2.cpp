@@ -6,7 +6,7 @@
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h"""
+#include "H2MOD/Modules/Shell/Shell.h""
 #include "H2MOD/Utils/Utils.h"
 
 #include "Util/Hooks/Hook.h"
@@ -73,8 +73,6 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
 	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
 	
-	hud_apply_pre_winproc_patches();
-
 	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc_hook); // g_WndProc_ptr
 
 	if (!LOG_CHECK(InitPCCInfo()))
@@ -93,6 +91,9 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 
 	// mess around with xlive (not calling XLiveInitialize etc)
 	WriteValue<BYTE>(Memory::GetAddress(0x4FAD98), 1);
+
+	// Apply patches for the hud that need to be applied before WinMain is called
+	hud_apply_pre_winmain_patches();
 
 	// intialize some basic game subsystems
 	if (LOG_CHECK(engine_basic_init()))

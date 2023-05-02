@@ -8,4 +8,4 @@ void set_crosshair_size(float size, bool map_load_context = false);
 void set_crosshair_offset(const float offset);
 void hud_patches_on_map_load();
 void hud_apply_patches();
-void hud_apply_pre_winproc_patches();
+void hud_apply_pre_winmain_patches();
