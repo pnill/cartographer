@@ -171,6 +171,7 @@
     <ClCompile Include="Blam\Engine\interface\first_person_weapons.cpp" />
     <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\game\player_control.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -531,6 +532,7 @@
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

@@ -10,6 +10,7 @@
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
+#include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
 #include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/units/units.h"
 
@@ -849,14 +850,6 @@ void H2MOD::ApplyFirefightHooks()
 	pdevice_touch = (device_touch_t)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
-typedef void(__cdecl set_screen_bounds_t)(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
-set_screen_bounds_t* p_set_screen_bounds;
-
-void __cdecl set_screen_bounds(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
-{
-	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
-}
-
 int get_active_count_from_bitflags(short teams_bit_flags)
 {
 	int count = 0;
@@ -1032,11 +1025,6 @@ void H2MOD::ApplyHooks() {
 
 	apply_cheat_hooks();
 
-	if (H2Config_hiresfix)
-	{
-		high_res_fix();
-	}
-
 	hud_apply_patches();
 	new_hud_apply_patches();
 	motion_sensor_apply_patches();
@@ -1056,6 +1044,8 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
+		lens_flare_fix();
+
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		//Shader display hook
@@ -1098,8 +1088,6 @@ void H2MOD::ApplyHooks() {
 
 		// Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		p_set_screen_bounds = Memory::GetAddress<set_screen_bounds_t*>(0x264979);
-		// PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}

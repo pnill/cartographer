@@ -289,8 +289,6 @@ void H2Tweaks::ApplyPatches() {
 		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
 		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
 
-		H2Tweaks::SunflareFix();
-
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
 
@@ -370,16 +368,6 @@ void H2Tweaks::SetScreenRefreshRate() {
 			refresh_redirected = true;
 		}
 	}
-}
-
-void H2Tweaks::SunflareFix()
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	//rasterizer_near_clip_distance <real>
-	//Changed from game default of 0.06 to 0.0601
-	WriteValue<float>(Memory::GetAddress(0x468150), 0.0601f);
 }
 
 void H2Tweaks::WarpFix(bool enable)
