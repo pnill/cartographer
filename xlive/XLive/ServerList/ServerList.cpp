@@ -85,8 +85,8 @@ static size_t BasicStrDownloadCb(void *contents, size_t size, size_t nmemb, void
 
 static size_t ServerlistDownloadWriteCb(void* contents, size_t size, size_t nmemb, void* userp)
 {
-	auto* buffer = reinterpret_cast<std::string*>(userp);
-	buffer->append((char*)contents, size * nmemb);
+	auto& buffer = *reinterpret_cast<std::string*>(userp);
+	buffer.append((char*)contents, size * nmemb);
 	return size * nmemb;
 }
 
@@ -341,7 +341,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 				wcscpy(*stringBuffer, str.c_str());
 
-				tProperty.value.string.cbData = wcsnlen(*stringBuffer, 64) * sizeof(WCHAR) + 2;
+				tProperty.value.string.cbData = (wcsnlen(*stringBuffer, 64) + 1) * sizeof(WCHAR);
 				tProperty.value.string.pwszData = *stringBuffer;
 
 				*stringBuffer = (WCHAR*)((BYTE*)(*stringBuffer) + X_PROPERTY_UNICODE_BUFFER_SIZE);
@@ -367,17 +367,17 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		for (auto property : propertiesWritten)
 		{
 			int i = 0;
-			bool foundMatch = false;
+			bool matchFound = false;
 			for (; i < m_searchPropertiesIdCount; i++)
 			{
 				if (m_pSearchPropertyIds[i] == property)
 				{
-					foundMatch = true;
+					matchFound = true;
 					break;
 				}
 			}
 
-			if (!foundMatch)
+			if (!matchFound)
 			{
 				LOG_ERROR_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
 			}
@@ -483,13 +483,13 @@ void CServerList::EnumerateFromHttp()
 		CHRONO_DEFINE_TIME_AND_CLOCK();
 
 		m_pageItemsFoundCount = 0;
-		_clock::time_point beforePauseTp = _clock::now();
+		_clock::time_point tpBeforePause = _clock::now();
 
 		while (m_operationOnPause)
 		{
 			Sleep(100);
 
-			if (_clock::now() - beforePauseTp > 5s)
+			if (_clock::now() - tpBeforePause > 5s)
 			{
 				m_cancelOperation = true;
 				break;

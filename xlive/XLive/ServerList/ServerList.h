@@ -26,7 +26,7 @@
 #define XUSER_PROPERTY_USERNAME_2			0x4000822C
 #define XUSER_PROPERTY_XUID                 0x2000822F
 
-#define X_PROPERTY_UNICODE_BUFFER_SIZE				(sizeof(WCHAR) * 64 + 2) // 2 bytes for NULL character
+#define X_PROPERTY_UNICODE_BUFFER_SIZE				(sizeof(WCHAR) * (64 + 1)) // +1 for NULL
 #define XLOCATOR_DEDICATEDSERVER_PROPERTY_START     0x200
 
 // These properties are used for search only.
