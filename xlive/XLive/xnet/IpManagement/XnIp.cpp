@@ -533,7 +533,7 @@ int XnIpManager::CreateOrGetXnIpIdentifierFromPacket(const XNADDR* pxna, const X
 		return 0;
 	}
 
-	// HACK: clear lost connections (if any) before attempting at creating another one
+	// HACK: clear lost connections (if any) before attempting to create another one
 	ClearLostConnections();
 
 	XnIp* existingConnection = XnIpLookup(pxna, pxnkid);

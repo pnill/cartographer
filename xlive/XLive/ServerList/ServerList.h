@@ -125,7 +125,12 @@ public:
 	int GetItemLeftCount();
 	int GetValidItemsFoundCount();
 
-	void CancelOperation() { m_cancelOperation = true; }
+	void CancelOperation() {
+		// before canceling the operation 
+		// first wait for the i/o to finish
+		std::lock_guard lg(m_ioWriteMutex);
+		m_cancelOperation = true;
+	}
 
 	void EnumerateFromHttp();
 	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
@@ -149,7 +154,7 @@ public:
 	std::atomic<int> m_operationState = OperationPending;
 
 	int m_itemsPerPageCount;
-	std::atomic<int> m_pageItemsFoundCount;
+	std::atomic<int> m_pageItemsFoundCount = 0;
 	
 	DWORD m_searchPropertiesIdCount = 0;
 	DWORD* m_pSearchPropertyIds = nullptr;
@@ -164,15 +169,19 @@ public:
 
 	// mainly used for resource discard
 	std::mutex m_itemQueryMutex;
+	std::mutex m_ioWriteMutex;
 
-	std::thread m_searchThread;
+private:
+	bool ShouldCancelOperation() 
+	{
+		return m_cancelOperation;
+	}
 
-// #pragma region ServerListQuery
-#pragma endregion 
+#pragma endregion ServerListQuery
 
 	static std::mutex addServerMutex;
 	static std::mutex removeServerMutex;
 	static std::mutex getServerCountsMutex;
 };
 
-extern std::unordered_map<HANDLE, CServerList*> serverListRequests;
+extern std::vector<std::pair<HANDLE, CServerList*>> serverListRequests;
