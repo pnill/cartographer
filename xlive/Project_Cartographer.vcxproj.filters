@@ -156,7 +156,7 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
-    <ClCompile Include="Blam\Engine\animations\interpolator_control.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\game\local_players.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
@@ -166,6 +166,7 @@
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -507,7 +508,7 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
-    <ClInclude Include="Blam\Engine\animations\interpolator_control.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_interpolation.h" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
@@ -522,6 +523,7 @@
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
