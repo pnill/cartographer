@@ -179,9 +179,9 @@ std::string GetVKeyCodeString(int vkey) {
 
 void PadCStringWithChar(char* strToPad, size_t toFullLength, char c) {
 	for (size_t i = strlen(strToPad); i < toFullLength - 1; i++) {
-		memset(strToPad + i, c, sizeof(char));
+		strToPad[i] = c;
 	}
-	SecureZeroMemory(strToPad + toFullLength - 1, sizeof(char));
+	strToPad[toFullLength - 1] = '\0';
 }
 
 int GetWidePathFromFullWideFilename(const wchar_t* filepath, wchar_t* rtnpath) {
@@ -639,50 +639,94 @@ bool FileTypeCheck(const std::string& file_path, const std::string& file_type)
 	return a == file_type;
 }
 
-// use this only if input is expected to always be properly formated
-// preper format means it only contains only these characters: '01234556789ABCDEFabcdef' and no (pre/su)fixes
-void HexStrToBytesUnsafe(const char* hexStr, size_t hexStrLen, BYTE* byteBuf, size_t bufLen)
+// possible format: '0Xx01234556789ABCDEFabcdefHh'
+bool HexStrToBytes(const char* hexStr, size_t hexStrLen, uint8_t* outByteBuf, size_t outBufLen)
 {
 	// ASCII character index map to hex value
-	static const BYTE lutStrToHex[] = {
-		0,   1,   2,   3,   4,   5,   6,   7,   8,   9,  0,  0,  0,  0,
-		0,  0,  0,  10,  11,  12,  13,  14,  15,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
-		0,  0,  0,  0,  0,  0,  0,  10,  11,  12,  13,  14,  15
+	static const uint8_t lutStrToHex[23] = {
+		0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0,
+		0, 0, 0, 10, 11, 12, 13, 14, 15
 	};
 
-	const BYTE* byteBufEnd = byteBuf + bufLen;
-	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
-	// continue only if string is at least 1
-	if (hexStrLen >= 1u)
+	if (hexStr == NULL
+		|| outByteBuf == NULL)
 	{
-		bool hexStrOddLen = !!(hexStrLen % 2);
-		const char tmpBuf1[3] = { '0', hexStr[0], '\0' };
-		const char* HexStrBeg = hexStrOddLen ? tmpBuf1 : &hexStr[0];
-
-		for (int strIdx = 0; strIdx < hexStrLen && byteBuf < byteBufEnd; )
-		{
-			*byteBuf++ = (BYTE)((lutStrToHex[HexStrBeg[strIdx++] - '0'] << 4) | (lutStrToHex[HexStrBeg[strIdx++] - '0']));
-			HexStrBeg = hexStr; // get the next byte
-		}
+		return false;
 	}
+
+	const uint8_t* byteBufEnd = outByteBuf + outBufLen;
+	hexStrLen = hexStrLen != 0u ? hexStrLen : strlen(hexStr);
+
+	// handle prefixes
+	if (hexStrLen > 2
+		&& hexStr[0] == '0' && (hexStr[1] == 'x' || hexStr[1] == 'X'))
+	{
+		hexStr += 2;
+		hexStrLen -= 2;
+	}
+
+	// handle suffixes
+	if (hexStrLen > 1
+		&& (hexStr[hexStrLen - 1] == 'h' || (hexStr[hexStrLen - 1] == 'H')))
+	{
+		hexStrLen -= 1;
+	}
+
+	// continue only if string is at least 1
+	if (!(hexStrLen >= 1u))
+	{
+		return false;
+	}
+
+	bool hexStrOddLen = (hexStrLen % 2) != 0;
+	const char tmpBuf1[3] = { '0', hexStr[0], '\0' };
+	const char* hexStrBeg = &hexStr[0];
+	if (hexStrOddLen)
+	{
+		// if we're dealing with a odd hex string bytes number
+		// just add the 0 in front
+		hexStrLen += 1;
+		hexStrBeg = tmpBuf1;
+	}
+
+	// check if we have enough byte buffer
+	if (hexStrLen / 2 > outBufLen)
+	{
+		return false;
+	}
+
+	bool result_success = true;
+	for (size_t i = 0; i < hexStrLen; i += 2)
+	{
+		int upper = toupper(hexStrBeg[i]);
+		int lower = toupper(hexStrBeg[i + 1]);
+
+		if (!isxdigit(upper) || !isxdigit(lower))
+		{
+			result_success = false;
+			break;
+		}
+
+		*outByteBuf++ = (uint8_t)((lutStrToHex[upper - '0'] << 4) | (lutStrToHex[lower - '0']));
+		hexStrBeg = hexStr; // get to the next byte, remember this might be on tmpBuf1 ptr if we're dealing with hexStrOddLen
+	}
+
+	return result_success;
 }
 
 // TODO: this function checks the input hexStr before converting it to bytes
 // hence being slower if we don't trust the input
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen) {
-	size_t hexStrLen = hexStr.length();
-	HexStrToBytesUnsafe(hexStr.c_str(), hexStrLen, byteBuf, bufLen);
+bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen) {
+	return HexStrToBytes(hexStr.c_str(), hexStr.length(), byteBuf, bufLen);
 }
 
-std::string ByteToHexStr(const BYTE* buffer, size_t size) {
+std::string ByteToHexStr(const uint8_t* buffer, size_t size) {
 	std::stringstream str;
-	str.setf(std::ios_base::hex, std::ios::basefield);
-	str.setf(std::ios_base::uppercase);
 	str.fill('0');
-
+	str.setf(std::ios_base::uppercase);
+	str.setf(std::ios_base::hex, std::ios::basefield);
 	for (size_t i = 0; i < size; i++) {
-		str << std::setw(2) << (unsigned short)(BYTE)buffer[i];
+		str << std::setw(2) << (uint16_t)buffer[i];
 	}
 	return str.str();
 }

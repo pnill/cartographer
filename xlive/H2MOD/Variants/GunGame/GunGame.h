@@ -6,6 +6,8 @@
 class GunGame : public ICustomGameVariant
 {
 public:
+	GunGame();
+	virtual ~GunGame() = default;
 	virtual void Initialize() override;
 	virtual void Dispose() override;
 	virtual CustomVariantId GetVariantId() override;
@@ -14,7 +16,6 @@ public:
 	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) override;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
-
 
 	// unused bellow
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override
@@ -28,14 +29,10 @@ public:
 
 	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
 
-	GunGame();
-	~GunGame() {  };
-
 	static void ReadWeaponLevels();
 	static void InitWeaponLevels();
 	static void ResetPlayerLevels();
 
 	static std::unordered_map<int, datum> levelWeapon;
 	static std::unordered_map<unsigned long long, int> gungamePlayers;
-
 };

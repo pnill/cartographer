@@ -67,7 +67,7 @@ void object_get_localized_velocity(datum object_index, real_vector3d* translatio
 	typedef bool(__cdecl* object_get_early_mover_local_space_velocity)(datum object_index, real_vector3d *translational_velocity, bool not_force_get_localized_velocity);
 	auto p_object_get_early_mover_local_space_velocity = Memory::GetAddressRelative<object_get_early_mover_local_space_velocity>(0x54C17C);
 
-	typedef void(__cdecl* object_get_velocities)(datum object_indee, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
+	typedef void(__cdecl* object_get_velocities)(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
 	auto p_object_get_velocities = Memory::GetAddressRelative<object_get_velocities>(0x532BDE);
 
 	real_vector3d early_mover_velocity = {};
@@ -132,9 +132,7 @@ NOTES:
 */
 
 #define FINISH_DECELERATION(flags)									\
-	if ((flags) > 0) {												\
-		m_flags |= (flags);											\
-	}																\
+	m_flags |= (flags);											\
 	m_time_to_target_in_ticks = 0;									\
 	physics_output->translational_velocity = *current_velocity;
 

@@ -21,8 +21,8 @@ extern const char broadcastStrHdr[XNIP_MAX_PCK_STR_HDR_LEN];
 #define XnIp_LOOPBACK_ADDR_NL (htonl(INADDR_LOOPBACK)) // 127.0.0.1
 
 #define XNIP_FLAG(_bit) (1<<(_bit))
-#define XNIP_SET_BIT(_val, _bit) ((_val) |= XNIP_FLAG((_bit)))
-#define XNIP_TEST_BIT(_val, _bit) (((_val) & XNIP_FLAG((_bit))) != 0)
+#define XNIP_SET_BIT(_flags, _bit, _value) ((_value) ? ((_flags) |= XNIP_FLAG((_bit))) : ((_flags) &= ~(XNIP_FLAG(_bit))))
+#define XNIP_TEST_BIT(_flags, _bit) (((_flags) & XNIP_FLAG((_bit))) != 0)
 
 enum eXnip_ConnectRequestType : int
 {
@@ -39,7 +39,6 @@ enum eXnip_ConnectRequestType : int
 enum eXnIp_ConnectionRequestBitFlags
 {
 	XnIp_HasEndpointNATData = 0,
-
 };
 
 enum class H2v_sockets : int
@@ -108,7 +107,7 @@ struct XnKeyPair
 
 struct XnIpPckTransportStats
 {
-	bool bInit;
+	bool initialized;
 
 	unsigned int pckSent;
 	unsigned int pckRecvd;
@@ -128,9 +127,9 @@ struct XnIpPckTransportStats
 
 	void PckDataSampleUpdate()
 	{
-		if (!bInit)
+		if (!initialized)
 		{
-			bInit = true;
+			initialized = true;
 			pckSent = 0;
 			pckRecvd = 0;
 			pckBytesSent = 0;
@@ -225,8 +224,9 @@ struct XnIp
 	enum eXnIp_Flags
 	{
 		XnIp_ConnectDeclareConnectedRequestSent,
+		XnIp_ReconnectionAttempt,
 	};
-	DWORD flags;
+	int m_flags;
 
 #pragma region NAT handling
 
@@ -289,12 +289,12 @@ public:
 
 	void PckStatsReset()
 	{
-		m_pckStats.bInit = false;
+		m_pckStats.initialized = false;
 	}
 
 	bool PckGetStats(const XnIpPckTransportStats** outPckStats) const
 	{
-		if (m_pckStats.bInit)
+		if (m_pckStats.initialized)
 		{
 			*outPckStats = &m_pckStats;
 			return true;
@@ -357,9 +357,19 @@ public:
 		return GetConnectStatus() == XNET_CONNECT_STATUS_CONNECTED;
 	}
 
+	bool ConnectStatusPending() const
+	{
+		return GetConnectStatus() == XNET_CONNECT_STATUS_PENDING;
+	}
+
 	bool ConnectStatusLost() const
 	{
 		return GetConnectStatus() == XNET_CONNECT_STATUS_LOST;
+	}
+
+	bool ConnectionTimedOut() const 
+	{
+		return _Shell::QPCToTimeNowMsec() - m_lastConnectionInteractionTime >= XnIp_ConnectionTimeOut;
 	}
 
 	static int GetConnectionIndex(IN_ADDR connectionId);
@@ -367,6 +377,7 @@ public:
 	void SaveNatInfo(XSocket* xsocket, const sockaddr_in* addr);
 	void HandleConnectionPacket(XSocket* xsocket, const XNetRequestPacket* reqPacket, const sockaddr_in* recvAddr, LPDWORD lpBytesRecvdCount);
 	void HandleDisconnectPacket(XSocket* xsocket, const XNetRequestPacket* disconnectReqPck, const sockaddr_in* recvAddr); // TODO:
+	void UpdateNonceKeyFromPacket(const XNetRequestPacket* reqPacket);
 
 	/* sends a request over the socket to the other socket end, with the same identifier */
 	void SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType);

@@ -114,17 +114,19 @@ int WINAPI XSocketIOCTLSocket(SOCKET s, long cmd, u_long *argp)
 	LOG_TRACE_NETWORK("XSocketIOCTLSocket() - cmd: {}", IOCTLSocket_cmd_string(cmd).c_str());
 	int ret = ioctlsocket(xsocket->winSockHandle, cmd, argp);
 
-	if (ret == NO_ERROR
-		&& cmd == FIONBIO
-		&& *argp)
+	if (ret == NO_ERROR)
 	{
-		LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
-		// set socket send/recv buffers size, but only if the socket isn't blocking
-		xsocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
-		xsocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());
+		if (cmd == FIONBIO
+			&& *argp)
+		{
+			LOG_TRACE_NETWORK("XSocketIOCTLSocket() - setting default buffer size for non-blocking socket.");
+			// set socket send/recv buffers size, but only if the socket isn't blocking
+			xsocket->SetBufferSize(SO_SNDBUF, gXnIpMgr.GetMinSockSendBufferSizeInBytes());
+			xsocket->SetBufferSize(SO_RCVBUF, gXnIpMgr.GetMinSockRecvBufferSizeInBytes());
 
-		// remove last error even if we didn't successfuly increased the recv/send buffer size
-		WSASetLastError(0);
+			// remove last error even if we didn't successfuly increased the recv/send buffer size
+			WSASetLastError(0);
+		}
 	}
 
 	return ret;
@@ -380,6 +382,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 				return SOCKET_ERROR;
 			}
 		}
+		packet->~XBroadcastPacket();
 		return 0;
 	}
 
@@ -391,7 +394,7 @@ int WINAPI XSocketWSASendTo(SOCKET s, LPWSABUF lpBuffers, DWORD dwBufferCount, L
 
 	XnIp* xnIp = gXnIpMgr.GetConnection(inTo->sin_addr);
 	if (xnIp != nullptr
-		&& xnIp->GetConnectStatus() != XNET_CONNECT_STATUS_LOST)
+		&& !xnIp->ConnectStatusLost())
 	{
 		sockaddr_in sendToAddr;
 		ZeroMemory(&sendToAddr, sizeof(sendToAddr));
