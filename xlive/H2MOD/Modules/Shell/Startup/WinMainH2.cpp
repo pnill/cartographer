@@ -2,7 +2,6 @@
 
 #include "WinMainH2.h"
 
-#include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -91,9 +90,6 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 
 	// mess around with xlive (not calling XLiveInitialize etc)
 	WriteValue<BYTE>(Memory::GetAddress(0x4FAD98), 1);
-
-	// Apply patches for the hud that need to be applied before WinMain is called
-	hud_apply_pre_winmain_patches();
 
 	// intialize some basic game subsystems
 	if (LOG_CHECK(engine_basic_init()))

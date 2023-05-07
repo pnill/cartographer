@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
+#include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
@@ -269,6 +270,9 @@ void H2Tweaks::ApplyPatches() {
 			BYTE assmIntroHQ[] = { 0xEB };
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
 		}
+
+		// Apply patches for the hud that need to be applied before WinMain is called
+		hud_apply_pre_winmain_patches();
 
 		// adds support for more monitor resolutions
 		CustomResolution::Initialize();

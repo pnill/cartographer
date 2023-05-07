@@ -28,7 +28,7 @@ static float crosshair_size = 1.0f;
 typedef void(__cdecl* update_hud_elements_display_settings_t)(int new_hud_size, int new_safe_area);
 update_hud_elements_display_settings_t p_update_hud_elements_display_settings;
 
-void __cdecl update_hud_elements_display_settings_hook(const int new_hud_size, const int new_safe_area)
+void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new_safe_area)
 {
 	p_update_hud_elements_display_settings(new_hud_size, new_safe_area);
 	original_hud_scale = *Memory::GetAddress<float*>(0x46402C);
@@ -80,12 +80,12 @@ int __cdecl render_text_wrapper_hook(rect2d* a1, rect2d* a2, int a3, int a4, int
 	return p_render_text_wrapper(a1, a2, a3, a4, a5, a6, a7, a8);
 }
 
-void set_hud_size(const float size)
+void set_hud_size(float size)
 {
 	*Memory::GetAddress<float*>(0x46402C, 0x0) = original_hud_scale * size *  (1 / k_hud_upscale_size);
 }
 
-void set_crosshair_and_text_size(const float size)
+void set_crosshair_and_text_size(float size)
 {
 	*Memory::GetAddress<float*>(0x464028, 0x0) = original_crosshair_text_scale * size * (1 / k_hud_upscale_size);
 }
@@ -95,7 +95,7 @@ void set_crosshair_size(float size)
 	crosshair_size = size * original_crosshair_text_scale;
 }
 
-void set_crosshair_offset(const float offset)
+void set_crosshair_offset(float offset)
 {
 	if (!FloatIsNaN(offset))
 	{
@@ -131,10 +131,10 @@ void hud_apply_pre_winmain_patches()
 	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18, 0x0);
 
 	// Replace all calls to update_hud_elements_display_settings with our hook
-	PatchCall(Memory::GetAddress(0x25E1FC, 0x0), update_hud_elements_display_settings_hook);
-	PatchCall(Memory::GetAddress(0x264058, 0x0), update_hud_elements_display_settings_hook);
-	PatchCall(Memory::GetAddress(0x26406F, 0x0), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x25E1FC), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x264058), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x26406F), update_hud_elements_display_settings_hook);
 
 	// Replace the crosshair and text scale global with our own just for the crosshair
-	WriteValue(Memory::GetAddress(0x222F9F + 4), &crosshair_size);
+	WritePointer(Memory::GetAddress(0x222F9F + 4), &crosshair_size);
 }
