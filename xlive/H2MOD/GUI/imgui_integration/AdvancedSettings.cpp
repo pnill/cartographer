@@ -1,12 +1,15 @@
 #include "stdafx.h"
 
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/interface/new_hud.h"
+#include "Blam/Engine/interface/first_person_camera.h"
+#include "Blam/Engine/interface/first_person_weapons.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -126,7 +129,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderInt("##PlayerFOV1", &H2Config_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						HudElements::setFOV();
+						player_control_set_field_of_view(H2Config_field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputInt("##PlayerFOV2", &H2Config_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
@@ -136,13 +139,13 @@ namespace ImGuiHandler {
 						if (H2Config_field_of_view < 45)
 							H2Config_field_of_view = 45;
 
-						HudElements::setFOV();
+						player_control_set_field_of_view(H2Config_field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
 						H2Config_field_of_view = 78.0f;
-						HudElements::setFOV();
+						player_control_set_field_of_view(H2Config_field_of_view);
 					}
 					ImGui::PopItemWidth();
 
@@ -152,7 +155,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						HudElements::setVehicleFOV();
+						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
@@ -162,13 +165,13 @@ namespace ImGuiHandler {
 						if (H2Config_vehicle_field_of_view < 45)
 							H2Config_vehicle_field_of_view = 45;
 
-						HudElements::setVehicleFOV();
+						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
 						H2Config_vehicle_field_of_view = 78.0f;
-						HudElements::setVehicleFOV();
+						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 					}
 					ImGui::PopItemWidth();
 
@@ -177,7 +180,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						HudElements::setCrosshairPos();
+						set_crosshair_offset(H2Config_crosshair_offset);
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
@@ -186,13 +189,13 @@ namespace ImGuiHandler {
 						if (H2Config_crosshair_offset < 0)
 							H2Config_crosshair_offset = 0;
 
-						HudElements::setCrosshairPos();
+						set_crosshair_offset(H2Config_crosshair_offset);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "Crosshair3"), b2_size))
 					{
 						H2Config_crosshair_offset = 0.138f;
-						HudElements::setCrosshairPos();
+						set_crosshair_offset(H2Config_crosshair_offset);
 					}
 					ImGui::PopItemWidth();
 
@@ -201,7 +204,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						HudElements::setCrosshairSize();
+						set_crosshair_size(H2Config_crosshair_scale);
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
@@ -209,13 +212,13 @@ namespace ImGuiHandler {
 							H2Config_crosshair_scale = 2;
 						if (H2Config_crosshair_scale < 0)
 							H2Config_crosshair_scale = 0;
-						HudElements::setCrosshairSize();
+						set_crosshair_size(H2Config_crosshair_scale);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "CrosshairSize3"), b2_size))
 					{
 						H2Config_crosshair_scale = 1;
-						HudElements::setCrosshairSize();
+						set_crosshair_size(H2Config_crosshair_scale);
 					}
 					ImGui::PopItemWidth();
 
@@ -237,11 +240,11 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_hud), &g_showHud);
 					if (ImGui::IsItemEdited())
-						HudElements::ToggleHUD(g_showHud);
+						toggle_hud(g_showHud);
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_first_person), &g_showFP);
 					if (ImGui::IsItemEdited())
-						HudElements::ToggleFirstPerson(g_showFP);
+						toggle_first_person(g_showFP);
 					ImGui::Columns(1);
 					ImGui::NewLine();
 				}

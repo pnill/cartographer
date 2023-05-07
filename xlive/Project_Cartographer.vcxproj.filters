@@ -75,7 +75,6 @@
     <ClCompile Include="XLive\XUser\XUserContext.cpp" />
     <ClCompile Include="XLive\XUser\XUserProperty.cpp" />
     <ClCompile Include="XLive\XStorage\XStorage.cpp" />
-    <ClCompile Include="H2MOD\Modules\HudElements\HudElements.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
@@ -167,6 +166,13 @@
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud.cpp" />
+    <ClCompile Include="Blam\Engine\interface\motion_sensor.cpp" />
+    <ClCompile Include="Blam\Engine\interface\new_hud.cpp" />
+    <ClCompile Include="Blam\Engine\interface\first_person_weapons.cpp" />
+    <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_control.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -363,7 +369,6 @@
     <ClInclude Include="XLive\XUser\XUserContext.h" />
     <ClInclude Include="XLive\XUser\XUserProperty.h" />
     <ClInclude Include="XLive\XStorage\XStorage.h" />
-    <ClInclude Include="H2MOD\Modules\HudElements\HudElements.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
@@ -524,6 +529,13 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
+    <ClInclude Include="Blam\Engine\interface\hud.h" />
+    <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\interface\new_hud.h" />
+    <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
+    <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

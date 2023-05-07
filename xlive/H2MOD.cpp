@@ -3,8 +3,15 @@
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/interface/motion_sensor.h"
+#include "Blam/Engine/interface/first_person_camera.h"
+#include "Blam/Engine/interface/first_person_weapons.h"
+#include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
+#include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
+#include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Discord/DiscordInterface.h"
@@ -16,7 +23,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Input/Mouseinput.h"
@@ -553,7 +559,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
-		HudElements::OnMapLoad();
+		hud_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
@@ -844,14 +850,6 @@ void H2MOD::ApplyFirefightHooks()
 	pdevice_touch = (device_touch_t)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
-typedef void(__cdecl set_screen_bounds_t)(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale);
-set_screen_bounds_t* p_set_screen_bounds;
-
-void __cdecl set_screen_bounds(int a1, int a2, __int16 a3, __int16 a4, __int16 a5, __int16 a6, float a7, float res_scale)
-{
-	p_set_screen_bounds(a1, a2, a3, a4, a5, a6, a7, 1.5f);
-}
-
 int get_active_count_from_bitflags(short teams_bit_flags)
 {
 	int count = 0;
@@ -1027,6 +1025,13 @@ void H2MOD::ApplyHooks() {
 
 	apply_cheat_hooks();
 
+	hud_apply_patches();
+	new_hud_apply_patches();
+	motion_sensor_apply_patches();
+	render_cameras_apply_patches();
+	first_person_camera_apply_patches();
+	first_person_weapons_apply_patches();
+
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
@@ -1039,6 +1044,8 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
+		lens_flare_fix();
+
 		/* These hooks are only built for the client, don't enable them on the server! */
 
 		//Shader display hook
@@ -1081,8 +1088,6 @@ void H2MOD::ApplyHooks() {
 
 		// Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
-		p_set_screen_bounds = Memory::GetAddress<set_screen_bounds_t*>(0x264979);
-		// PatchCall(GetAddress(0x25E1E5), set_screen_bounds);
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
 	}

@@ -1,20 +1,17 @@
 #include "stdafx.h"
-
 #include "CustomVariantSettings.h"
 
+#include "Blam/Engine/interface/first_person_camera.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/physics/physics_constants.h"
 #include "Blam/Engine/game/player_control.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/physics/physics_constants.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/HudElements/HudElements.h"
-#include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
 CustomVariantSettings::s_variantSettings currentVariantSettings;
@@ -141,8 +138,8 @@ namespace CustomVariantSettings
 
 			if (newVariantSettings->forcedFOV != 0)
 			{
-				HudElements::setFOV();
-				HudElements::setVehicleFOV();
+				player_control_set_field_of_view(newVariantSettings->forcedFOV);
+				observer_set_suggested_field_of_view(newVariantSettings->forcedFOV);
 			}
 		}
 
