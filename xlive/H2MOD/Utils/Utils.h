@@ -22,8 +22,8 @@ bool isInteger(std::wstring myString);
 ///IP is char array size 100
 int HostnameToIp(char* hostname, char* ip);
 
-void HexStrToBytes(const std::string& hexStr, BYTE* byteBuf, size_t bufLen);
-std::string ByteToHexStr(const BYTE* buffer, size_t size);
+bool HexStrToBytes(const std::string& hexStr, uint8_t* byteBuf, size_t bufLen);
+std::string ByteToHexStr(const uint8_t* buffer, size_t size);
 
 char* encode_rfc3986(const char* label_literal, size_t label_literal_length = 0u);
 void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len);
@@ -62,12 +62,12 @@ class FrequencyLimiter
 	using _time = std::chrono::high_resolution_clock;
 
 public:
-	FrequencyLimiter(unsigned int _frequency) :
-		m_maxUpdateRateHz(_frequency)
+	FrequencyLimiter(unsigned int _frequency_per_sec) :
+		m_maxUpdateRateHz(_frequency_per_sec)
 	{
-		m_initialUpdate = true;
 		lastTime = _time::now();
 		m_maxUpdateRateMsec = std::chrono::milliseconds(int(1000.f / (float)m_maxUpdateRateHz));
+		m_initialUpdate = true;
 	}
 
 	bool ShouldUpdate()
@@ -91,7 +91,7 @@ public:
 
 private:
 	bool m_initialUpdate;
-	unsigned int m_maxUpdateRateHz; // update the cursor each 8 milliseconds
+	unsigned int m_maxUpdateRateHz;
 	std::chrono::milliseconds m_maxUpdateRateMsec;
 	_time::time_point lastTime;
 };

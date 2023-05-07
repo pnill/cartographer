@@ -47,10 +47,10 @@ struct string_id
 
 	void operator = (const uint32_t &Value);
 	void operator = (const string_id &string_id);
-	bool operator == (const uint32_t &Value);
-	bool operator == (const string_id &string_id);
-	bool operator != (const uint32_t &Value);
-	bool operator != (const string_id &string_id);
+	bool operator == (const uint32_t &Value) const;
+	bool operator == (const string_id &string_id) const;
+	bool operator != (const uint32_t &Value) const;
+	bool operator != (const string_id &string_id) const;
 private:
 	uint32_t value;
 
@@ -66,19 +66,19 @@ inline void string_id::operator=(const string_id &string_id)
 {
 	this->value = string_id.value;
 }
-inline bool string_id::operator== (const uint32_t &Value)
+inline bool string_id::operator== (const uint32_t &Value) const
 {
 	return this->value == Value;
 }
-inline bool string_id::operator== (const string_id &string_id)
+inline bool string_id::operator== (const string_id &string_id) const
 {
-	return this->value = string_id.value;
+	return this->value == string_id.value;
 }
-inline bool string_id::operator!= (const uint32_t &Value)
+inline bool string_id::operator!= (const uint32_t &Value) const
 {
 	return this->value != Value;
 }
-inline bool string_id::operator!= (const string_id &string_id)
+inline bool string_id::operator!= (const string_id &string_id) const
 {
 	return this->value != string_id.value;
 }

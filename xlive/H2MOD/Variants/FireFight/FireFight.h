@@ -8,6 +8,8 @@ extern class DeviceShop* deviceShop;
 class FireFight : public ICustomGameVariant
 {
 public:
+	FireFight();
+	virtual ~FireFight() = default;
 	virtual void Initialize() override;
 	virtual void Dispose() override;
 	virtual CustomVariantId GetVariantId();
@@ -26,8 +28,6 @@ public:
 
 	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
 
-	FireFight();
-	~FireFight();
 
 	static void KilledAI(datum killedAi, datum killerPlayerIdx);
 };
