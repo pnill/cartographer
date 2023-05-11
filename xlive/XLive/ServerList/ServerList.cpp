@@ -93,13 +93,17 @@ void BadServer(unsigned long long xuid, const char* log_catch)
 
 DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequredPropertiesIDs, DWORD* outStringBufferSize)
 {
-	if (cItems > 0)
+	if (!(cItems > 0))
 	{
-		unsigned int stringProperties = 0;
+		if (outStringBufferSize)
+			*outStringBufferSize = 0;
+		return 0;
+	}
 
-		DWORD result = (DWORD)((sizeof(XLOCATOR_SEARCHRESULT) * cItems) + (cItems * sizeof(XUSER_PROPERTY) * cRequiredPropertyIDs));
+	unsigned int stringProperties = 0;
+	DWORD result = (DWORD)((sizeof(XLOCATOR_SEARCHRESULT) * cItems) + (cItems * sizeof(XUSER_PROPERTY) * cRequiredPropertyIDs));
 
-		if (pRequredPropertiesIDs)
+	if (pRequredPropertiesIDs)
 		{
 			for (int i = 0; i < cRequiredPropertyIDs; i++)
 			{
@@ -117,15 +121,7 @@ DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPro
 			LOG_TRACE_XLIVE("{} : stringBufferSize: {}, stringBufferSize2: {}, cItems: {}, stringCount: {}", __FUNCTION__, *outStringBufferSize, (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties), cItems, stringProperties);
 		}
 
-		return result;
-	}
-	else
-	{
-		if (outStringBufferSize)
-			*outStringBufferSize = 0;
-
-		return 0;
-	}
+	return result;
 }
 
 int CServerList::GetItemLeftCount()
@@ -298,7 +294,6 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 			continue;
 		}
 
-		// temporary memory
 		XUSER_PROPERTY userProperty;
 		ZeroMemory(&userProperty, sizeof(XUSER_PROPERTY));
 
@@ -348,7 +343,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 		case XUSER_DATA_TYPE_BINARY:
 		case XUSER_DATA_TYPE_DATETIME:
-			LOG_WARNING_XLIVE("{} - property id: {} with unimplemented data type: 0x{:X}",
+			LOG_WARNING_XLIVE("{} - property id: 0x{:X} with unimplemented data type: {}",
 				__FUNCTION__,
 				propertyId,
 				propertyType
@@ -386,6 +381,22 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	return result;
 }
 
+void ServerlistWorkerThread(CServerList* serverListQuery)
+{
+	serverListQuery->EnumerateFromHttp();
+
+	// hacky/unsafe as fuck, because we delete the resource
+	// while still practically in the class' execution ctx 
+	// to avoid the need of a garbage collector
+	// as long as no member of the function is accesed after this
+	// releases the resources, it should be fine
+	RemoveServerListQueryByPtr(serverListQuery);
+	// avoid deleting the resource if in use by another thread
+	serverListQuery->m_itemQueryMutex.lock();
+	delete serverListQuery;
+	return;
+}
+
 void CServerList::EnumerateFromHttp()
 {
 	CURL* curl;
@@ -396,20 +407,6 @@ void CServerList::EnumerateFromHttp()
 	int itemsLeftToDownload, validItemsFound = 0;
 
 	std::string serverlist_url(cartographerURL + "/live/server_list.php");
-
-	auto cleanup = [this]()
-	{
-		// hacky/unsafe as fuck, because we delete the resource
-		// while still practically in the class' execution ctx 
-		// to avoid the need of a garbage collector
-		// as long as no member of the function is accesed after this
-		// releases the resources, it should be fine
-		RemoveServerListQueryByPtr(this);
-		// avoid deleting the resource if in use somewhere else (by another thread)
-		m_itemQueryMutex.lock();
-		delete this;
-		return;
-	};
 
 	m_pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	m_pOverlapped->InternalHigh = 0;
@@ -424,8 +421,6 @@ void CServerList::EnumerateFromHttp()
 		m_pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		m_pOverlapped->InternalHigh = 0;
 		m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
-
-		cleanup();
 		return;
 	}
 
@@ -451,8 +446,6 @@ void CServerList::EnumerateFromHttp()
 		m_pOverlapped->InternalHigh = 0;
 		m_pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_INSUFFICIENT_BUFFER);
 		LOG_ERROR_XLIVE("{} - insufficient buffer for I/O operation!", __FUNCTION__);
-
-		cleanup();
 		return;
 	}
 
@@ -621,8 +614,6 @@ void CServerList::EnumerateFromHttp()
 
 	addDebugText(L"Serverlist: found %d server(s)", validItemsFound);
 	LOG_TRACE_XLIVE("{} - found a total of: {} servers", __FUNCTION__, validItemsFound);
-
-	cleanup();
 	return;
 }
 
@@ -636,6 +627,7 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 	curl = curl_interface_init_no_verify();
 	if (curl) {
+		rapidjson::Document document;
 		std::string url(cartographerURL + "/live/dedicount.php");
 
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -644,7 +636,6 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 		res = curl_easy_perform(curl);
 		curl_easy_cleanup(curl);
 
-		rapidjson::Document document;
 		document.Parse(readBuffer.c_str());
 
 		if (document.HasMember("public_count"))
@@ -675,7 +666,7 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 		serverListQuery->m_operationState = OperationIncomplete;
 		serverListQuery->SetNewPageBuffer(cbBuffer, pvBuffer);
 		serverListQuery->m_pOverlapped = pOverlapped;
-		std::thread(&CServerList::EnumerateFromHttp, serverListQuery).detach();
+		std::thread(&ServerlistWorkerThread, serverListQuery).detach();
 		break;
 
 	case OperationIncomplete:
