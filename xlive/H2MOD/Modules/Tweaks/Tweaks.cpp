@@ -154,7 +154,7 @@ bool __cdecl is_remote_desktop()
 	return false;
 }
 
-class test_engine : public c_game_engine_base
+class c_test_engine : public c_game_engine_base
 {
 	bool is_team_enemy(int team_a, int team_b)
 	{
@@ -171,7 +171,7 @@ class test_engine : public c_game_engine_base
 	}
 
 };
-test_engine g_test_engine;
+c_test_engine g_test_engine;
 
 void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* physics_output,
@@ -272,7 +272,7 @@ BOOL WINAPI CryptUnprotectDataHook(
 	return TRUE;
 }
 
-char filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+bool __cdecl filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
 {
 	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
 

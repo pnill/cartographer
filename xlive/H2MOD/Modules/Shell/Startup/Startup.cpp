@@ -5,6 +5,7 @@
 #include "../Config.h"
 #include "../Shell.h"
 
+#include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Networking/Networking.h"
@@ -275,6 +276,11 @@ void ServerStartupFixes()
 	
 }
 
+VOID CALLBACK UpdateDiscordStateTimerCb(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+	update_player_count();
+}
+
 ///Before the game window appears
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
@@ -371,6 +377,17 @@ void InitH2Startup() {
 	InitCustomMenu();
 	extern void InitRunLoop();
 	InitRunLoop();
+	H2MOD::Initialize();
+
+	if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
+		// Discord init
+		static UINT_PTR discord_update_timer = NULL;
+		DiscordInterface::SetDetails("Startup");
+		DiscordInterface::Init();
+		discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
+		atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
+	}
+
 	addDebugText("ProcessStartup finished.");
 }
 

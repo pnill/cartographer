@@ -24,7 +24,6 @@
 #define BYTESOF(a, b) ((a) * sizeof(b))
 
 extern HMODULE hThis;
-extern CRITICAL_SECTION d_lock;
 
 extern h2log *xlive_log;
 extern h2log *h2mod_log;

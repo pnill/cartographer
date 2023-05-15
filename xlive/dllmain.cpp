@@ -5,7 +5,6 @@
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
-CRITICAL_SECTION d_lock;
 
 std::wstring dlcbasepath;
 //CHAR g_profileDirectory[512] = "Profiles";
@@ -58,17 +57,11 @@ void InitInstance()
 	if (!init)
 	{
 		init = true;
-		InitializeCriticalSection(&d_lock);
 
 		HeapDebugInitialize();
 		H2DedicatedServerStartup();
 
 		dlcbasepath = L"DLC";
-
-		H2MOD::Initialize();
-
-		//extern GunGame* gunGame;
-		//gunGame->readWeaponLevels();
 	}
 }
 
@@ -88,7 +81,6 @@ void ExitInstance()
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif
-	DeleteCriticalSection(&d_lock);
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 

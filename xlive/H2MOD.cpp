@@ -7,7 +7,6 @@
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/units/units.h"
 
-#include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
@@ -184,7 +183,7 @@ BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
 	return (BYTE*)object_get_fast_unsafe(unit_datum);
 }
 
-void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
+void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
@@ -197,7 +196,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool bReset)
 
 		datum object_idx = Engine::Objects::object_new(&nObject);
 
-		if (bReset)
+		if (resetLoadout)
 			unit_delete_all_weapons(unit_datum);
 
 		unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
@@ -1096,11 +1095,6 @@ void H2MOD::ApplyHooks() {
 	DETOUR_COMMIT();
 }
 
-VOID CALLBACK UpdateDiscordStateTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
-{
-	update_player_count();
-}
-
 void H2MOD::Initialize()
 {
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
@@ -1121,12 +1115,6 @@ void H2MOD::Initialize()
 		ObserverMode::Initialize();
 #endif
 		TEST_N_DEF(PC3);
-		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
-			// Discord init
-			DiscordInterface::SetDetails("Startup");
-			DiscordInterface::Init();
-			SetTimer(NULL, 0, 5000, UpdateDiscordStateTimer);
-		}
 	}
 	else
 	{
