@@ -1,7 +1,10 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
+#include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
@@ -60,6 +63,15 @@ void InitInstance()
 
 		HeapDebugInitialize();
 		H2DedicatedServerStartup();
+
+		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
+			// Discord init
+			static UINT_PTR discord_update_timer = NULL;
+			DiscordInterface::Init();
+			discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
+			atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
+			DiscordInterface::SetDetails("Startup");
+		}
 
 		dlcbasepath = L"DLC";
 	}
