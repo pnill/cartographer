@@ -25,3 +25,4 @@ public:
 	}
 };
 
+VOID CALLBACK UpdateDiscordStateTimerCb(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
