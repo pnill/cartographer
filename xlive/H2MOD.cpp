@@ -1073,6 +1073,13 @@ void __cdecl rasterizer_update_video_settings(int width, int height, __int16 a3,
 		ui_text_label_scaling = scale;
 }
 
+// a1 might be the font id or something
+int __cdecl ui_text_get_font_size(int a1)
+{
+	auto p_ui_text_font_get_size = Memory::GetAddress<int(__cdecl*)(int)>(0x31865);
+	return (int)((float)p_ui_text_font_get_size(a1) * *hud_scale_factor);
+}
+
 void ApplyResFix()
 {
 	ui_scale_factor = Memory::GetAddress<float*>(0xA3E424);
@@ -1086,6 +1093,8 @@ void ApplyResFix()
 
 	PatchCall(Memory::GetAddress(0x22CFFD), ui_get_text_bounds_and_position_hook);
 	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemets_anchor_hook);
+
+	PatchCall(Memory::GetAddress(0x6AE0D), ui_text_get_font_size);
 
 	DETOUR_ATTACH(p_rasterizer_update_video_settings, Memory::GetAddress<rasterizer_update_video_settings_t>(0x264979), rasterizer_update_video_settings);
 }
