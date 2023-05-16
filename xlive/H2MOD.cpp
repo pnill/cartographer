@@ -15,6 +15,7 @@
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/render/render_cameras.h"
+#include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
@@ -1096,6 +1097,7 @@ void H2MOD::ApplyHooks() {
 		rasterizer_settings_apply_hooks();
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
+		font_group_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
