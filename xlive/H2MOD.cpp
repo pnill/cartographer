@@ -995,99 +995,6 @@ void __cdecl aim_assist_targeting_clear_hook(int target_data)
 	}
 }
 
-
-float* ui_scale_factor;
-float* hud_scale_factor;
-float* hud_size_factor;
-float ui_text_label_scaling = 0.0f;
-
-// this seems to compute the required space to display the text?
-void __cdecl ui_get_text_bounds_and_position_hook(int a1, int a2, int a3, int a4, float scale)
-{
-	typedef void(__cdecl* ui_get_text_size_t)(int, int, int, int, float);
-	auto p_ui_get_text_size = Memory::GetAddress<ui_get_text_size_t>(0x99D97);
-
-	scale = *hud_scale_factor;
-	p_ui_get_text_size(a1, a2, a3, a4, scale);
-}
-
-void __cdecl ui_get_hud_elemets_anchor_hook(int type, float* out)
-{
-	float safe_area = *Memory::GetAddress<float*>(0x9770F0);
-	BYTE* camera_data = Memory::GetAddress<BYTE*>(0x4E66C8);
-	rect2d* window_view_frame_bounds = (rect2d*)(camera_data + 0x38);
-	// float scale_factor = blam_max(1.0f, *hud_scale_factor);
-	float scale_factor = *hud_scale_factor;
-
-	typedef void(__cdecl* ui_get_hud_elemets_anchor_t)(int, float*);
-	auto p_ui_get_hud_elemets_anchor = Memory::GetAddress<ui_get_hud_elemets_anchor_t>(0x223969);
-
-	switch (type)
-	{
-	case 1:
-		out[0] = (float)window_view_frame_bounds->left + safe_area;
-		out[1] = (float)window_view_frame_bounds->top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
-		break;
-	default:
-		p_ui_get_hud_elemets_anchor(type, out);
-		break;
-	}
-}
-
-__declspec(naked) void ui_hud_left_messaging_top_scale()
-{
-	__asm
-	{
-		// sp: 1938h
-		// mov     dl, [esp + 27h]
-		// add     esp, 12
-
-		fild[esp + 18h]
-		push eax
-		mov eax, [hud_scale_factor]
-		fmul[eax]
-		pop eax
-		fisttp[esp + 18h]
-
-		// original code
-		mov     ecx, ebx
-		imul    ecx, 4E0h
-		retn
-	}
-}
-
-typedef void(__cdecl* rasterizer_update_video_settings_t)(int, int, __int16, __int16, __int16, __int16, float, float);
-rasterizer_update_video_settings_t p_rasterizer_update_video_settings;
-
-void __cdecl rasterizer_update_video_settings(int width, int height, __int16 a3, __int16 a4, __int16 a5, __int16 a6,
-	float scale,
-	float window_scale)
-{
-	p_rasterizer_update_video_settings(width, height, a3, a4, a5, a6, scale, window_scale);
-
-	if (scale > 1.0f)
-		ui_text_label_scaling = 1.f / scale;
-	else
-		ui_text_label_scaling = scale;
-}
-
-void ApplyResFix()
-{
-	ui_scale_factor = Memory::GetAddress<float*>(0xA3E424);
-	hud_scale_factor = Memory::GetAddress<float*>(0x464028);
-	hud_size_factor = Memory::GetAddress<float*>(0x46402C);
-
-	WritePointer(Memory::GetAddress(0x2305AC) + 4, &ui_text_label_scaling);
-	WritePointer(Memory::GetAddress(0x23066A) + 4, &ui_text_label_scaling);
-
-	Codecave(Memory::GetAddress(0x22D29E), ui_hud_left_messaging_top_scale, 3);
-
-	PatchCall(Memory::GetAddress(0x22CFFD), ui_get_text_bounds_and_position_hook);
-	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemets_anchor_hook);
-
-	DETOUR_ATTACH(p_rasterizer_update_video_settings, Memory::GetAddress<rasterizer_update_video_settings_t>(0x264979), rasterizer_update_video_settings);
-}
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1182,8 +1089,6 @@ void H2MOD::ApplyHooks() {
 		PlayerControl::ApplyHooks();
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
-
-		ApplyResFix();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
