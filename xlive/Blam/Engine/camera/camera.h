@@ -1,7 +1,6 @@
 #pragma once
 #include "Blam/Math/BlamMath.h"
 
-#pragma pack(push, 1)
 struct s_camera
 {
 	real_point3d point;
@@ -25,5 +24,7 @@ struct s_camera
 	float frustum_multiplier_x;
 	float frustum_multiplier_y;
 };
-#pragma pack(pop)
+CHECK_STRUCT_SIZE(s_camera, 0x74);
 
+// Get global camera data
+s_camera* get_global_camera();

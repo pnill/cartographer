@@ -4,14 +4,18 @@
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"
 #include "Blam/Engine/interface/first_person_camera.h"
 #include "Blam/Engine/interface/first_person_weapons.h"
 #include "Blam/Engine/interface/new_hud.h"
+#include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
+#include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/render/render_cameras.h"
+#include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
@@ -1089,6 +1093,11 @@ void H2MOD::ApplyHooks() {
 		PlayerControl::ApplyHooks();
 		
 		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
+
+		rasterizer_settings_apply_hooks();
+		user_interface_text_apply_hooks();
+		hud_messaging_apply_hooks();
+		font_group_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

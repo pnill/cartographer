@@ -83,7 +83,6 @@ extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
 extern __int16 H2Config_refresh_rate;
-extern bool H2Config_hiresfix;
 extern bool H2Config_shader_lod_max;
 extern bool H2Config_light_suppressor;
 extern bool H2Config_d3d9ex;

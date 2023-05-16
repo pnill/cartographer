@@ -231,6 +231,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
+    <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
@@ -241,8 +242,11 @@
     <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\interface\first_person_weapons.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud_messaging.cpp" />
     <ClCompile Include="Blam\Engine\interface\motion_sensor.cpp" />
     <ClCompile Include="Blam\Engine\interface\new_hud.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
@@ -269,16 +273,21 @@
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
+    <ClInclude Include="Blam\Engine\interface\hud_messaging.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_settings.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
@@ -580,6 +589,7 @@
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
@@ -602,6 +612,7 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />

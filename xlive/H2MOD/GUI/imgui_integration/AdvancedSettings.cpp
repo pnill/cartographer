@@ -204,7 +204,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(80));
 					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 					if (ImGui::IsItemEdited())
-						set_crosshair_size(H2Config_crosshair_scale);
+						set_crosshair_scale(H2Config_crosshair_scale);
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
@@ -212,13 +212,13 @@ namespace ImGuiHandler {
 							H2Config_crosshair_scale = 2;
 						if (H2Config_crosshair_scale < 0)
 							H2Config_crosshair_scale = 0;
-						set_crosshair_size(H2Config_crosshair_scale);
+						set_crosshair_scale(H2Config_crosshair_scale);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "CrosshairSize3"), b2_size))
 					{
 						H2Config_crosshair_scale = 1;
-						set_crosshair_size(H2Config_crosshair_scale);
+						set_crosshair_scale(H2Config_crosshair_scale);
 					}
 					ImGui::PopItemWidth();
 
@@ -337,13 +337,6 @@ namespace ImGuiHandler {
 					ImGui::Checkbox(GetString(light_suppressor), &H2Config_light_suppressor);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
-
-					//Hires Fix
-
-					ImGui::Checkbox(GetString(hires_fix), &H2Config_hiresfix);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(hires_fix_tooltip));
-
 
 					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
 					//if (ImGui::IsItemHovered())
