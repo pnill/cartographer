@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
+#include "Blam/Engine/camera/camera.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -59,6 +61,29 @@ void toggle_hud(bool state)
 	show_hud = state;
 }
 
+// Hook for ui_get_hud_elements for modifying the hud anchor for text
+void __cdecl ui_get_hud_elemets_anchor_hook(int type, float* out)
+{
+	float safe_area = *Memory::GetAddress<float*>(0x9770F0);
+	s_camera* camera_data = get_global_camera();
+
+	float scale_factor = *get_crosshair_and_text_size();
+
+	typedef void(__cdecl* ui_get_hud_elemets_anchor_t)(int, float*);
+	auto p_ui_get_hud_elemets_anchor = Memory::GetAddress<ui_get_hud_elemets_anchor_t>(0x223969);
+
+	switch (type)
+	{
+	case 1:
+		out[0] = (float)camera_data->window_bounds.left + safe_area;
+		out[1] = (float)camera_data->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
+		break;
+	default:
+		p_ui_get_hud_elemets_anchor(type, out);
+		break;
+	}
+}
+
 void new_hud_apply_patches()
 {
 	if (Memory::IsDedicatedServer()) { return; }
@@ -75,4 +100,7 @@ void new_hud_apply_patches()
 
 	// Redirect ice_cream_flavor_available call 
 	PatchCall(Memory::GetAddress(0x223955), render_hud_check);
+
+	// Hook ui_get_hud_elements for modifying the hud anchor for text
+	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemets_anchor_hook);
 }

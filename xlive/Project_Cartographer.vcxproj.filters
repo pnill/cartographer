@@ -173,7 +173,11 @@
     <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\game\player_control.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud_messaging.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -537,6 +541,10 @@
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface.h" />
+    <ClInclude Include="Blam\Engine\interface\hud_messaging.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
