@@ -67,7 +67,7 @@ void __cdecl ui_get_hud_elemets_anchor_hook(int type, float* out)
 	float safe_area = *Memory::GetAddress<float*>(0x9770F0);
 	s_camera* camera_data = get_global_camera();
 
-	float scale_factor = *get_crosshair_and_text_size();
+	float scale_factor = *get_secondary_hud_scale();
 
 	typedef void(__cdecl* ui_get_hud_elemets_anchor_t)(int, float*);
 	auto p_ui_get_hud_elemets_anchor = Memory::GetAddress<ui_get_hud_elemets_anchor_t>(0x223969);

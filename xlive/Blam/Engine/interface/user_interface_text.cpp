@@ -23,7 +23,7 @@ void __cdecl ui_get_text_bounds_and_position_hook(int a1, wchar_t* string, int a
 	typedef void(__cdecl* ui_get_text_size_t)(int, wchar_t*, int, int, float);
 	auto p_ui_get_text_size = Memory::GetAddress<ui_get_text_size_t>(0x99D97);
 
-	p_ui_get_text_size(a1, string, a3, a4, *get_crosshair_and_text_size());
+	p_ui_get_text_size(a1, string, a3, a4, *get_secondary_hud_scale());
 }
 
 void user_interface_text_apply_hooks()

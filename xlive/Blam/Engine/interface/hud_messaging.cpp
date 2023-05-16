@@ -31,6 +31,6 @@ __declspec(naked) void ui_hud_left_messaging_top_scale()
 
 void hud_messaging_apply_hooks()
 {
-	p_text_scale_factor = get_crosshair_and_text_size();
+	p_text_scale_factor = get_secondary_hud_scale();
 	Codecave(Memory::GetAddress(0x22D29E), ui_hud_left_messaging_top_scale, 3);
 }
