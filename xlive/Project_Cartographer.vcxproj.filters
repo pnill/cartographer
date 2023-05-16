@@ -173,6 +173,7 @@
     <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\game\player_control.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
+    <ClCompile Include="Blam\Engine\camera\camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />

@@ -1,9 +1,8 @@
 #pragma once
 
-void high_res_fix();
-
 void set_hud_size(float size);
 void set_crosshair_and_text_size(float size);
+float* get_crosshair_and_text_size();
 void set_crosshair_size(float size);
 void set_crosshair_offset(float offset);
 void hud_patches_on_map_load();

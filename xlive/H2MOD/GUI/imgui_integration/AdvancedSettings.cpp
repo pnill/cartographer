@@ -338,13 +338,6 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
 
-					//Hires Fix
-
-					ImGui::Checkbox(GetString(hires_fix), &H2Config_hiresfix);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(hires_fix_tooltip));
-
-
 					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
 					//if (ImGui::IsItemHovered())
 					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
