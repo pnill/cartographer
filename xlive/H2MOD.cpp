@@ -54,13 +54,13 @@ FLOATING_POINT_ENV_ACCESS();
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
-bool b_H2X = false;
-bool b_XboxTick = false;
+bool H2XFirerateEnabled = false;
+bool xboxTickrateEnabled = false;
 
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
-	{ L"h2x", b_H2X },
-	{ L"ogh2", b_XboxTick },
+	{ L"h2x", H2XFirerateEnabled },
+	{ L"ogh2", xboxTickrateEnabled },
 };
 
 #pragma region engine calls
@@ -431,7 +431,7 @@ void __fastcall OnPlayerScore(void* thisptr, DWORD _edx, datum playerIdx, int a3
 }
 
 // Client Sided Patch
-void H2MOD::disable_weapon_pickup(bool bEnable)
+void H2MOD::disable_weapon_pickup(bool enable)
 {
 	static BYTE oldBytes[5];
 	static BYTE oldBytesRead = false;
@@ -443,7 +443,7 @@ void H2MOD::disable_weapon_pickup(bool bEnable)
 		oldBytesRead = true;
 	}
 
-	if (bEnable) 
+	if (enable)
 	{
 		WriteBytes(address, oldBytes, sizeof(oldBytes));
 	}
@@ -578,10 +578,10 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
-			h2mod->toggle_xbox_tickrate(options, b_XboxTick);
-			if (!b_XboxTick)
+			h2mod->toggle_xbox_tickrate(options, xboxTickrateEnabled);
+			if (!xboxTickrateEnabled)
 			{
-				H2X::ApplyMapLoadPatches(b_H2X);
+				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
@@ -988,7 +988,7 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 void __cdecl aim_assist_targeting_clear_hook(int target_data)
 {
 	if (!s_game_globals::game_is_campaign()
-		&& !b_XboxTick)
+		&& !xboxTickrateEnabled)
 	{
 		*(DWORD*)(target_data) = -1;
 		*(DWORD*)(target_data + 4) = -1;

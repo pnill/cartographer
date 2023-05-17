@@ -9,7 +9,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
-bool b_firstSpawn;
+bool firstPlayerSpawn;
 const wchar_t* headhunterSoundTable[e_language_ids::_lang_id_end][e_graverobber_sounds::_graverobber_end]
 {
 	{SND_HEADHUNTER_EN, SND_SKULL_SCORED_EN},
@@ -37,10 +37,10 @@ void GraveRobber::TriggerSound(e_graverobber_sounds sound, int sleep)
 
 void GraveRobber::SpawnPlayerClientSetup()
 {
-	if (b_firstSpawn)
+	if (firstPlayerSpawn)
 	{
 		TriggerSound(_snd_head_hunter, 1000);
-		b_firstSpawn = false;
+		firstPlayerSpawn = false;
 	}
 }
 
@@ -100,7 +100,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 void GraveRobber::InitializeClient()
 {
 	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
-	b_firstSpawn = true;
+	firstPlayerSpawn = true;
 }
 
 void GraveRobber::Initialize()

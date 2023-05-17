@@ -14,7 +14,7 @@
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
-extern bool b_XboxTick;
+extern bool xboxTickrateEnabled;
 
 bool MainGameTime::fps_limiter_enabled = false;
 

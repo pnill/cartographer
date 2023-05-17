@@ -35,12 +35,17 @@ void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new
 
 void set_primary_hud_scale(float scale)
 {
-	*Memory::GetAddress<float*>(0x46402C, 0x0) = original_primary_hud_scale * scale *  (1 / k_hud_upscale_size);
+	*get_primary_hud_scale() = original_primary_hud_scale * scale * (1.f / k_hud_upscale_size);
 }
 
 void set_secondary_hud_scale(float scale)
 {
-	*Memory::GetAddress<float*>(0x464028, 0x0) = original_secondary_hud_scale * scale * (1 / k_hud_upscale_size);
+	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * (1.f / k_hud_upscale_size);
+}
+
+float* get_primary_hud_scale()
+{
+	return Memory::GetAddress<float*>(0x46402C);
 }
 
 float* get_secondary_hud_scale()
@@ -50,7 +55,7 @@ float* get_secondary_hud_scale()
 
 void set_crosshair_scale(float scale)
 {
-	crosshair_scale = scale * original_secondary_hud_scale;
+	crosshair_scale = original_secondary_hud_scale * scale;
 }
 
 void set_crosshair_offset(float offset)
@@ -82,7 +87,7 @@ void hud_apply_pre_winmain_patches()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18, 0x0);
+	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18);
 
 	// Replace all calls to update_hud_elements_display_settings with our hook
 	PatchCall(Memory::GetAddress(0x25E1FC), update_hud_elements_display_settings_hook);
@@ -90,5 +95,5 @@ void hud_apply_pre_winmain_patches()
 	PatchCall(Memory::GetAddress(0x26406F), update_hud_elements_display_settings_hook);
 
 	// Replace the crosshair and text scale global with our own just for the crosshair
-	WritePointer(Memory::GetAddress(0x222F9F + 4), &crosshair_scale);
+	WritePointer(Memory::GetAddress(0x222F9F) + 4, &crosshair_scale);
 }

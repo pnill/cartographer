@@ -4,18 +4,18 @@
 #include "Blam/Engine/game/cheats.h"
 #include "Util/Hooks/Hook.h"
 
-bool b_showFirstPerson = true;
+bool showFirstPerson = true;
 
 typedef bool(__cdecl* render_first_person_check_t)(e_skull_type skull_type);
 
 bool __cdecl render_first_person_check(e_skull_type skull_type)
 {
-	return ice_cream_flavor_available(skull_type) || !b_showFirstPerson;
+	return ice_cream_flavor_available(skull_type) || !showFirstPerson;
 }
 
 void toggle_first_person(bool state)
 {
-	b_showFirstPerson = state;
+	showFirstPerson = state;
 }
 
 void first_person_weapons_apply_patches()

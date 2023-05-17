@@ -23,7 +23,7 @@ float observer_suggested_field_of_view()
 	return *Memory::GetAddress<float*>(0x413780, 0x3B5300);
 }
 
-void observer_set_suggested_field_of_view(const float fov)
+void observer_set_suggested_field_of_view(float fov)
 {
 	float calculated_radians_FOV;
 	if (currentVariantSettings.forcedFOV == 0)
@@ -38,7 +38,7 @@ void observer_set_suggested_field_of_view(const float fov)
 }
 
 
-void player_control_set_field_of_view(const float fov) 
+void player_control_set_field_of_view(float fov) 
 {
 	fov_overridden = true;
 	overridden_fov_radians = fov * M_PI / 180.0f;
