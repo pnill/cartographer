@@ -3,11 +3,11 @@
 
 #include "Util/Hooks/Hook.h"
 
-#define k_radar_size_multiplier 1
+#define k_radar_size_multiplier 1.f
 
 void radar_patch()
 {
-	WriteValue<byte>(Memory::GetAddress(0x2849C4, 0x0), (byte)D3DBLEND_INVSRCCOLOR);
+	WriteValue<byte>(Memory::GetAddress(0x2849C4), (byte)D3DBLEND_INVSRCCOLOR);
 }
 
 void motion_sensor_apply_patches()

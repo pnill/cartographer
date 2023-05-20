@@ -13,7 +13,7 @@
 
 bool show_hud = true;
 
-bool render_ingame_chat_check() 
+bool __cdecl render_ingame_chat_check() 
 {
 	if (H2Config_hide_ingame_chat) 
 	{

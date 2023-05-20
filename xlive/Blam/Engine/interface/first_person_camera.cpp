@@ -25,16 +25,16 @@ float observer_suggested_field_of_view()
 
 void observer_set_suggested_field_of_view(float fov)
 {
-	float calculated_radians_FOV;
+	float final_fov_rad;
 	if (currentVariantSettings.forcedFOV == 0)
 	{
-		calculated_radians_FOV = fov * M_PI / 180.0f;
+		final_fov_rad = fov * M_PI / 180.0f;
 	}
 	else
 	{
-		calculated_radians_FOV = currentVariantSettings.forcedFOV * M_PI / 180.0f;
+		final_fov_rad = currentVariantSettings.forcedFOV * M_PI / 180.0f;
 	}
-	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = calculated_radians_FOV;
+	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 }
 
 
