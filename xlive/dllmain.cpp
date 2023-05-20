@@ -53,6 +53,21 @@ void HeapDebugInitialize()
 #endif
 }
 
+void DiscordInitialize()
+{
+	if (Memory::IsDedicatedServer()
+		|| !H2Config_discord_enable
+		|| _Shell::GetInstanceId() > 1)
+		return;
+
+	// Discord init
+	static UINT_PTR discord_update_timer = NULL;
+	DiscordInterface::Init();
+	discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
+	atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
+	DiscordInterface::SetDetails("Startup");
+}
+
 void InitInstance()
 {
 	static bool init = false;
@@ -64,14 +79,7 @@ void InitInstance()
 		HeapDebugInitialize();
 		H2DedicatedServerStartup();
 
-		if (H2Config_discord_enable && _Shell::GetInstanceId() == 1) {
-			// Discord init
-			static UINT_PTR discord_update_timer = NULL;
-			DiscordInterface::Init();
-			discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
-			atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
-			DiscordInterface::SetDetails("Startup");
-		}
+		DiscordInitialize();
 
 		dlcbasepath = L"DLC";
 	}
