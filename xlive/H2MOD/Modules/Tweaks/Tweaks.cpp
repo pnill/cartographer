@@ -180,7 +180,7 @@ DWORD WINAPI timeGetTime_hook()
 	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
 	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
 	// don't start exactly from 0 (60 min)
-	return (DWORD)((1000 * 60 * 60) + timeNow);
+	return (DWORD)(PROCESS_SYSTEM_TIME_STARTUP_OFFSET + timeNow);
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 

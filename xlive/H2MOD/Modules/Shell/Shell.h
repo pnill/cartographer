@@ -1,5 +1,7 @@
 #pragma once
 
+#define PROCESS_SYSTEM_TIME_STARTUP_OFFSET (1000 * 60 * 60)
+
 // _Shell because Shell namespace causes compile errors for some reason
 
 typedef
