@@ -280,6 +280,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
@@ -577,7 +578,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />

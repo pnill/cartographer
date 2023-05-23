@@ -550,6 +550,7 @@
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

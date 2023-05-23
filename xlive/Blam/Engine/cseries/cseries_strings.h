@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-
 /*********************************************************************
 * static_string
 * Storing and Manipulating Character Sequences(Basic String)
@@ -92,13 +90,11 @@ template<int T>
 inline void static_string<T>::operator= (const char* Value)
 {
 	strcpy(this->text, Value);
-	//this->text = Value;
 }
 template<int T>
 inline void static_string<T>::operator= (const static_string Value)
 {
 	strcpy(this->text, Value.text);
-	//this->text = Value.text;
 }
 
 template<int T>
@@ -111,11 +107,9 @@ template<int T>
 inline void static_wchar_string<T>::operator= (const wchar_t* Value)
 {
 	wcscpy(this->text, Value);
-	//this->text = Value;
 }
 template<int T>
 inline void static_wchar_string<T>::operator= (const static_wchar_string Value)
 {
 	wcscpy(this->text, Value.text);
-	//this->text = Value.text;
 }
