@@ -1,10 +1,10 @@
 #include "stdafx.h"
+#include "screen_multiplayer_pregame_lobby.h"
 
-#include "Pregame_Lobby.h"
 #include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 
-void c_pregame_lobby_menu::ApplyPatches()
+void c_screen_multiplayer_pregame_lobby::ApplyPatches()
 {
 	if (h2mod->GetEngineType() != _main_menu) return;
 

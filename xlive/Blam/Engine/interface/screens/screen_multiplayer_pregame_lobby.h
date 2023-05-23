@@ -1,6 +1,6 @@
 #pragma once
 
-class c_pregame_lobby_menu
+class c_screen_multiplayer_pregame_lobby
 {
 public:
 	static void ApplyPatches();
