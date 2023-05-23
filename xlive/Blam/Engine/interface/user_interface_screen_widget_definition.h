@@ -721,10 +721,10 @@ struct s_player_block_reference
     point2d bottomleft;
     e_table_order table_order;
     byte maximum_player_count;
-    byte rowCount;
-    byte columnCount;
-    short rowHeight;
-    short columnWidth;
+    byte row_count;
+    byte column_count;
+    short row_height;
+    short column_width;
 }; 
 TAG_BLOCK_SIZE_ASSERT(s_player_block_reference, 24);
 
@@ -738,24 +738,24 @@ struct s_window_pane_reference
     tag_block<s_button_widget_reference> buttons;
 
     // Explaination("List Definition", "If the pane contains a list, define it here")
-    tag_block<s_list_reference> listBlock;
+    tag_block<s_list_reference> list_block;
 
     // Explaination("OBSOLETE Table View Definition", "If the pane contains a table-view, define it here")
-    tag_block<s_table_view_list_reference_OBSOLETE> tableView;
+    tag_block<s_table_view_list_reference_OBSOLETE> table_view;
 
     // Explaination("Flavor Item Blocks", "Define additional flavor items here")
-    tag_block<s_text_block_reference> textBlocks;
+    tag_block<s_text_block_reference> text_blocks;
 
-    tag_block<s_bitmap_block_reference> bitmapBlocks;
+    tag_block<s_bitmap_block_reference> bitmap_blocks;
 
-    tag_block<s_ui_model_scene_reference> modelSceneBlocks;
+    tag_block<s_ui_model_scene_reference> model_scene_blocks;
 
     // Explaination("UNUSED", "these are all OBSOLETE")
-    tag_block<s_text_value_pair_block_UNUSED> textvalueBlocks;
+    tag_block<s_text_value_pair_block_UNUSED> textvalue_blocks;
 
-    tag_block<s_hud_block_reference> hudBlocks;
+    tag_block<s_hud_block_reference> hud_blocks;
 
-    tag_block<s_player_block_reference> playerBlocks;
+    tag_block<s_player_block_reference> player_blocks;
 };
 TAG_BLOCK_SIZE_ASSERT(s_window_pane_reference, 0x4C);
 
