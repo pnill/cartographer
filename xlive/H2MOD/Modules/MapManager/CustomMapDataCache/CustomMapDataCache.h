@@ -28,14 +28,15 @@ struct s_custom_map_id
 	wchar_t map_name[MAX_MAP_NAME_SIZE];
 	BYTE map_sha256_hash[SHA256_HASH_SIZE];
 };
-static_assert(sizeof(s_custom_map_id) == 32 + sizeof(wchar_t) * 32);
+static_assert(sizeof(s_custom_map_id) == SHA256_HASH_SIZE + sizeof(wchar_t) * MAX_MAP_NAME_SIZE);
 
-struct alignas(4) s_custom_map_entry
+#pragma pack(push, 4)
+struct s_custom_map_entry
 {
 	BYTE map_sha256_hash[SHA256_HASH_SIZE];
 	wchar_t map_name[MAX_MAP_NAME_SIZE]; // actually the name displayed
 	wchar_t field_60[9][128];
-	BYTE* preview_bitmap_header[2]; // i think one header has the compressed thumbnail, and the other the uncompressed one
+	BYTE* preview_bitmap_header[2]; // one header might have the compressed thumbnail, and the other the uncompressed one
 	BYTE gap_968[16];
 	LONGLONG preview_bitmap_id; // used for bitmap cache file
 	wchar_t file_path[MAX_MAP_FILE_PATH_SIZE];
@@ -43,10 +44,10 @@ struct alignas(4) s_custom_map_entry
 	bool entry_marked_for_deletion; // marks entry for deletion
 	BYTE field_B88[7];
 };
+#pragma pack(pop)
 static_assert(sizeof(s_custom_map_entry) == 0xB90);
 static_assert(offsetof(s_custom_map_entry, preview_bitmap_header) == 0x960);
 
-#pragma pack(push, 1)
 struct s_custom_map_entry_linked_list
 {
 	s_custom_map_entry_linked_list* next;
@@ -56,10 +57,8 @@ struct s_custom_map_entry_linked_list
 	int async_task_id;
 	bool map_valid;
 	bool task_finished;
-	BYTE field_BA2[2];
 	DWORD field_BA4;
 };
-#pragma pack(pop)
 static_assert(sizeof(s_custom_map_entry_linked_list) == 0xBA8);
 
 // disable non-standard zero-sized array in struct/union warning
@@ -75,7 +74,7 @@ struct s_custom_map_file_cache
 };
 #pragma warning(default : 4200)
 
-#pragma pack(push, 1)
+#pragma pack(push, 4)
 struct s_custom_map_data
 {
 	// we don't re-implement this from scratch, thus we re-use it
@@ -145,8 +144,8 @@ struct s_custom_map_data
 private:
 	void __thiscall remove_entry_by_index(int idx);
 };
-static_assert(sizeof(s_custom_map_data) == 0x24444);
 #pragma pack(pop)
+static_assert(sizeof(s_custom_map_data) == 0x24444);
 
 s_custom_map_data* getCustomMapData();
 const wchar_t* getCustomMapFolderPath();

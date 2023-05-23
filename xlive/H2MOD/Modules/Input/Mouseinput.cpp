@@ -5,7 +5,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
 
-bool b_raw_init = false;
+bool rawInputInit = false;
 DWORD base;
 DIMOUSESTATE* ms;
 float* dx;
@@ -24,25 +24,25 @@ char __cdecl mouse_input(int local_player_index, void *data, int a4, float *a5, 
 	time_globals* time = time_globals::get();
 	if (H2Config_raw_input)
 	{
-		if (!b_raw_init) {
+		if (!rawInputInit) {
 			MouseInput::SetSensitivity(1.0f);
 			WriteBytes(base + 0x627CC, assmNop, 8);
 			WriteBytes(base + 0x62802, assmNop, 8);
 			WriteBytes(base + 0x627E7, assmNop, 8);
-			b_raw_init = true;
+			rawInputInit = true;
 		}
 		*dx = time->seconds_per_tick * (float)ms->lX * -(H2Config_raw_mouse_scale / 100);
 		*dy = time->seconds_per_tick * (float)ms->lY * -(H2Config_raw_mouse_scale / 100);
 	}
 	else
 	{
-		if (b_raw_init)
+		if (rawInputInit)
 		{
 			MouseInput::SetSensitivity(H2Config_mouse_sens);
 			WriteBytes(base + 0x627CC, o_SetDX, 8);
 			WriteBytes(base + 0x62802, o_SetDY, 8);
 			WriteBytes(base + 0x627E7, o_SetDX2, 8);
-			b_raw_init = false;
+			rawInputInit = false;
 		}
 	}
 	return p_mouse_input(local_player_index, data, a4, a5, a6, a7);

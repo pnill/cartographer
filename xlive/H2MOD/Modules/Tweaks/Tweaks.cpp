@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
+#include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomResolutions/CustomResolutions.h"
-#include "H2MOD/Modules/HudElements/HudElements.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -101,60 +99,13 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	return result;
 }
 
-
-typedef void(*Video_HUDSizeUpdate_t)(int hudSize, int safeArea);
-Video_HUDSizeUpdate_t Video_HUDSizeUpdate_orig;
-
-const float maxHUDTextScale = 1080 * 0.0010416667f; // you'd think we could use 1200 since that's the games normal max resolution, but seems 1200 still hides some text :(
-const float maxUiScaleFonts = 1.049f; // >= 1.25 will make text disappear
-
-void Video_HUDSizeUpdate_hook(int hudSize, int safeArea)
-{
-	Video_HUDSizeUpdate_orig(hudSize, safeArea);
-
-	float* HUD_TextScale = Memory::GetAddress<float*>(0x464028); // gets set by the Video_HUDSizeUpdate_orig call above, affects HUD text and crosshair size
-	if (*HUD_TextScale > maxHUDTextScale)
-	{
-		// textScale = resolution_height * 0.0010416667
-		// but if it's too large the game won't render it some reason (max seems to be around 1.4, 1.3 when sword icon is in the text?)
-		// lets just set it to the largest known good value for now, until the cause of large text sizes being hidden is figured out
-		*HUD_TextScale = maxHUDTextScale;
-	}
-
-	// UI_Scale was updated just before we were called, so lets fix it real quick...
-	float* UI_Scale = Memory::GetAddress<float*>(0xA3E424);
-	if (*UI_Scale > maxUiScaleFonts)
-	{
-		// uiScale = resolution_height * 0.00083333335f
-		// at higher resolutions text starts being cut off (pretty much any UI_Scale above 1 will result in text cut-off)
-		// the sub_671B02_hook below fixes that by scaling the width of the element by UI_Scale (which the game doesn't do for some reason...)
-		// however fonts will stop being rendered if the UI_Scale is too large (>= ~1.25)
-		// so this'll make sure UI_Scale doesn't go above 1.249, but will result in the UI being drawn smaller
-		*UI_Scale = maxUiScaleFonts;
-	}
-}
-
-typedef int(__cdecl *sub_671B02_t)(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8);
-sub_671B02_t p_sub_671B02;
-
-int __cdecl sub_671B02_hook(ui_text_bounds* a1, ui_text_bounds* a2, int a3, int a4, int a5, float a6, int a7, int a8)
-{
-	float UI_Scale = *Memory::GetAddress<float*>(0xA3E424);
-	if (a2 && a2 != a1) // if a2 == a1 then this is a chapter name which scaling seems to break, so skip those ones
-	{
-		short width = a2->right - a2->left;
-		a2->right = a2->left + (short)((float)width * UI_Scale); // scale width by UI_Scale, stops text elements from being cut-off when UI_Scale > 1
-	}
-	return p_sub_671B02(a1, a2, a3, a4, a5, a6, a7, a8);
-}
-
 bool __cdecl is_remote_desktop()
 {
 	LOG_TRACE_FUNC("check disabled");
 	return false;
 }
 
-class test_engine : public c_game_engine_base
+class c_test_engine : public c_game_engine_base
 {
 	bool is_team_enemy(int team_a, int team_b)
 	{
@@ -171,7 +122,7 @@ class test_engine : public c_game_engine_base
 	}
 
 };
-test_engine g_test_engine;
+c_test_engine g_test_engine;
 
 void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* physics_output,
@@ -228,7 +179,8 @@ DWORD WINAPI timeGetTime_hook()
 
 	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
 	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-	return (DWORD)timeNow;
+	// don't start exactly from 0 (60 min)
+	return (DWORD)(PROCESS_SYSTEM_TIME_STARTUP_OFFSET + timeNow);
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 
@@ -271,7 +223,7 @@ BOOL WINAPI CryptUnprotectDataHook(
 	return TRUE;
 }
 
-char filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
+bool __cdecl filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD nNumberOfBytesToWrite, LPVOID lpBuffer)
 {
 	DWORD file_size = GetFileSize(file_ptr->handle, NULL);
 
@@ -320,13 +272,8 @@ void H2Tweaks::ApplyPatches() {
 			WriteBytes(Memory::GetAddress(0x221C29), assmIntroHQ, 1);
 		}
 
-		if (H2Config_hiresfix) {
-			// HUD text size fix for higher resolutions
-			Video_HUDSizeUpdate_orig = (Video_HUDSizeUpdate_t)DetourFunc(Memory::GetAddress<BYTE*>(0x264A18), (BYTE*)Video_HUDSizeUpdate_hook, 7);
-
-			// menu text fix for higher resolutions
-			p_sub_671B02 = (sub_671B02_t)DetourFunc(Memory::GetAddress<BYTE*>(0x271B02), (BYTE*)sub_671B02_hook, 5);
-		}
+		// Apply patches for the hud that need to be applied before WinMain is called
+		hud_apply_pre_winmain_patches();
 
 		// adds support for more monitor resolutions
 		CustomResolution::Initialize();
@@ -346,10 +293,6 @@ void H2Tweaks::ApplyPatches() {
 		//hook the gui popup for when the player is booted.
 		sub_20E1D8 = Memory::GetAddress<int(__cdecl*)(int, int, int, int, int, int)>(0x20E1D8);
 		PatchCall(Memory::GetAddress(0x21754C), &sub_20E1D8_boot);
-
-		HudElements::Init();
-
-		H2Tweaks::SunflareFix();
 
 		// patch to show game details menu in NETWORK serverlist too
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
@@ -430,16 +373,6 @@ void H2Tweaks::SetScreenRefreshRate() {
 			refresh_redirected = true;
 		}
 	}
-}
-
-void H2Tweaks::SunflareFix()
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	//rasterizer_near_clip_distance <real>
-	//Changed from game default of 0.06 to 0.0601
-	WriteValue<float>(Memory::GetAddress(0x468150), 0.0601f);
 }
 
 void H2Tweaks::WarpFix(bool enable)

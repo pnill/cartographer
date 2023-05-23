@@ -12,14 +12,14 @@
 
 BYTE g_network_message_type_collection[e_network_message_type_collection::_network_message_type_collection_end * 32];
 
-void register_network_message(void *network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
+void register_network_message(void* network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
-	typedef void(__thiscall* register_packet_t)(void *, int, const char*, int, int, int, void*, void*, void*);
+	typedef void(__thiscall* register_packet_t)(void*, int, const char*, int, int, int, void*, void*, void*);
 	auto register_packet = reinterpret_cast<register_packet_t>(Memory::GetAddress(0x1E81D6, 0x1CA199));
 	return register_packet(network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
-const char* GetNetworkMessageName(int enumVal) 
+const char* GetNetworkMessageName(int enumVal)
 {
 	return network_message_type_collection_name[enumVal];
 }
@@ -109,23 +109,23 @@ void register_custom_network_message(void* network_messages)
 		(void*)CustomVariantSettings::EncodeVariantSettings, (void*)CustomVariantSettings::DecodeVariantSettings, NULL);
 }
 
-typedef void(__stdcall *handle_out_of_band_message_t)(void *thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet);
+typedef void(__stdcall* handle_out_of_band_message_t)(void* thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet);
 handle_out_of_band_message_t p_handle_out_of_band_message;
 
-void __stdcall handle_out_of_band_message_hook(void *thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet)
+void __stdcall handle_out_of_band_message_hook(void* thisx, network_address* address, e_network_message_type_collection message_type, int a4, void* packet)
 {
 	/* surprisingly the game doesn't use this too much, pretty much for request-join and time-sync packets */
-	LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}", 
+	LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}",
 		__FUNCTION__, GetNetworkMessageName(message_type), NetworkSession::GetPeerIndexFromNetworkAddress(address));
 
 	if (!MessageIsCustom(message_type))
 		p_handle_out_of_band_message(thisx, address, message_type, a4, packet);
 }
 
-typedef void(__stdcall *handle_channel_message_t)(void *thisx, int network_channel_index, e_network_message_type_collection message_type, int dynamic_data_size, void* packet);
+typedef void(__stdcall* handle_channel_message_t)(void* thisx, int network_channel_index, e_network_message_type_collection message_type, int dynamic_data_size, void* packet);
 handle_channel_message_t p_handle_channel_message;
 
-void __stdcall handle_channel_message_hook(void *thisx, int network_channel_index, e_network_message_type_collection message_type, int dynamic_data_size, void* packet)
+void __stdcall handle_channel_message_hook(void* thisx, int network_channel_index, e_network_message_type_collection message_type, int dynamic_data_size, void* packet)
 {
 	/*
 		This handles received in-band data
@@ -140,7 +140,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 	case _request_map_filename:
 	{
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
-		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on handle_channel_message_hook request-map-filename from XUID: {}", 
+		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on handle_channel_message_hook request-map-filename from XUID: {}",
 			received_data->player_id);
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
 			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
@@ -161,7 +161,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 					wcsncpy_s(data.file_name, map_filename.c_str(), map_filename.length());
 					data.map_download_id = received_data->map_download_id;
 
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] sending map file name packet to player id: {}, peer index: {}, map name: {}, download id {}", 
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] sending map file name packet to player id: {}, peer index: {}, map name: {}, download id {}",
 						received_data->player_id,
 						peer_index, map_filename.c_str(), received_data->map_download_id);
 
@@ -172,7 +172,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				}
 				else
 				{
-					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] no map file name found, abort sending packet! player id: {}, peer idx: {} map filename: {}", 
+					LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] no map file name found, abort sending packet! player id: {}, peer idx: {} map filename: {}",
 						received_data->player_id, peer_index, map_filename.c_str());
 				}
 			}
@@ -197,13 +197,13 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 				else
 				{
 					// unlikely
-					LOG_TRACE_NETWORK("[H2MOD-CustomMessage] - query with id {:X} hasn't been found!", 
+					LOG_TRACE_NETWORK("[H2MOD-CustomMessage] - query with id {:X} hasn't been found!",
 						received_data->map_download_id);
 					break;
 				}
 			}
 
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] - received map name: {}, no download ID", 
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] - received map name: {}, no download ID",
 				received_data->file_name);
 		}
 		break;
@@ -214,7 +214,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", 
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}",
 				received_data->team_index);
 			h2mod->set_local_team_index(0, received_data->team_index);
 		}
@@ -226,7 +226,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
 		{
 			s_rank_change* recieved_data = (s_rank_change*)packet;
-			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}", 
+			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}",
 				recieved_data->rank);
 			h2mod->set_local_rank(recieved_data->rank);
 		}
@@ -242,7 +242,7 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 		}
 		break;
 	}
-	
+
 	case _custom_variant_settings:
 	{
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
@@ -271,12 +271,12 @@ void __stdcall handle_channel_message_hook(void *thisx, int network_channel_inde
 
 	if (peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
 	{
-		LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}, address: {:x}", 
+		LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}, address: {:x}",
 			__FUNCTION__, GetNetworkMessageName(message_type), NetworkSession::GetPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
 	}
 	else
 	{
-		LOG_ERROR_NETWORK("{} - Received message: {} from network channel: {} that maybe shouldn't have been received", 
+		LOG_ERROR_NETWORK("{} - Received message: {} from network channel: {} possibly invalid payload or type",
 			__FUNCTION__, GetNetworkMessageName(message_type), network_channel_index);
 	}
 

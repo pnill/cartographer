@@ -1,5 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+#include "Blam/Engine/game/player_control.h"
 
 enum e_weapon_addition_method : short
 {
@@ -16,3 +17,4 @@ enum e_weapon_addition_method : short
 void __cdecl unit_delete_all_weapons(datum unit_datum_index);
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method);
+float __cdecl unit_get_field_of_view(const datum unit_datum_index, const float unit_camera_field_of_view, const s_player_action_weapons weapon_indexes);

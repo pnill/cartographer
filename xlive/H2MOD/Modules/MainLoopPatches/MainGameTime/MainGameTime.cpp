@@ -14,7 +14,7 @@
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
-extern bool b_XboxTick;
+extern bool xboxTickrateEnabled;
 
 bool MainGameTime::fps_limiter_enabled = false;
 
@@ -111,8 +111,10 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	main_time_globals = s_main_time_globals::get();
 	game_time = s_game_globals::game_is_in_progress() ? time_globals::get_game_time() : 0;
 
-	QueryPerformanceFrequency(&counterFrq);
-	_timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
+	// QueryPerformanceFrequency(&counterFrq);
+	// TODO: fixme, time offset breaks this
+	// also cleanup
+	// _timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
 
 	// TranslateMessage()
 	// TODO move to function and cleanup
@@ -126,8 +128,9 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	}
 	else
 	{
-		QueryPerformanceCounter(&currentCounter);
-		_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+		//QueryPerformanceCounter(&currentCounter);
+		//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+		_currentTimeMsec = timeGetTime();
 		dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
@@ -150,8 +153,9 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 					// Sleep is not precise since Windows is not a RTOS
 					Sleep(iMsSleep);
 
-					QueryPerformanceCounter(&currentCounter);
-					_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+					// QueryPerformanceCounter(&currentCounter);
+					//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+					_currentTimeMsec = timeGetTime();
 					dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
 				}
 			}
@@ -159,16 +163,18 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 			{
 				Sleep(15u);
 
-				QueryPerformanceCounter(&currentCounter);
-				_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+				// QueryPerformanceCounter(&currentCounter);
+				//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+				_currentTimeMsec = timeGetTime();
 				dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
 			}
 		}
 	}
 
 	dtSec = blam_min(dtSec, 10.f);
-	QueryPerformanceCounter(&currentCounter);
-	_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+	// QueryPerformanceCounter(&currentCounter);
+	// _currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
+	_currentTimeMsec = timeGetTime();
 	if (fixed_time_step)
 		_currentTimeMsec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0f);
 	main_time_globals->last_time_ms = _currentTimeMsec;

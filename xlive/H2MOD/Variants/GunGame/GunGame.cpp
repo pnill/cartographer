@@ -83,8 +83,6 @@ void GunGame::ReadWeaponLevels()
 		}
 
 #ifdef __DEBUG
-		LOG_TRACE_GAME("[GunGame] : {}", b_GunGame);
-
 		LOG_TRACE_GAME("[GunGame] - weapon_one: {}", weapon_one);
 		LOG_TRACE_GAME("[GunGame] - weapon_two: {}", weapon_two);
 		LOG_TRACE_GAME("[GunGame] - weapon_three: {}", weapon_three);

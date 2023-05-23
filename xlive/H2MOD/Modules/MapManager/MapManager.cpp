@@ -372,7 +372,7 @@ bool MapManager::GetMapFilename(std::wstring& buffer) {
 		NetworkSession::GetMapFileLocation(map_file_location, sizeof(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
-		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L"\\");
+		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L'\\');
 		std::size_t mapNameOffsetEnd = unicodeMapFileLocation.find_last_not_of(L'.');
 		std::wstring filename = unicodeMapFileLocation.substr(mapNameOffset + 1, mapNameOffsetEnd);
 		if (!filename.empty()) {
@@ -416,9 +416,6 @@ MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _down
 {
 	id = _downloadId;
 	SetMapNameToDownload(_mapToDownload);
-}
-
-MapDownloadQuery::~MapDownloadQuery() {
 }
 
 size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {

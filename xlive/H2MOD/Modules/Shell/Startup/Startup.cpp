@@ -371,6 +371,8 @@ void InitH2Startup() {
 	InitCustomMenu();
 	extern void InitRunLoop();
 	InitRunLoop();
+	H2MOD::Initialize();
+
 	addDebugText("ProcessStartup finished.");
 }
 

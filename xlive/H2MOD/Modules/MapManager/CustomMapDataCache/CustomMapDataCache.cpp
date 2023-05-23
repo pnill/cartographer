@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
@@ -428,7 +427,7 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_file_path(co
 			new_custom_map_entries_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
 			{
-				if (out_custom_map_entries_count > matching_count_found)
+				if (matching_count_found < out_custom_map_entries_count)
 					out_custom_map_entries[matching_count_found] = &new_custom_map_entries_buffer[i];
 			}
 
@@ -460,7 +459,7 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_sha256_hash(
 			new_custom_map_entries_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
 			{
-				if (out_custom_map_entries_count > matching_count_found)
+				if (matching_count_found < out_custom_map_entries_count)
 					out_custom_map_entries[matching_count_found] = &new_custom_map_entries_buffer[i];
 			}
 
@@ -492,7 +491,7 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_map_name_and
 			new_custom_map_entries_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
 			{
-				if (out_custom_map_entries_count > matching_count_found)
+				if (matching_count_found < out_custom_map_entries_count)
 					out_custom_map_entries[matching_count_found] = &new_custom_map_entries_buffer[i];
 			}
 
@@ -524,7 +523,7 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_map_name(con
 			new_custom_map_entries_buffer[i].entry_marked_for_deletion = false;
 			if (out_custom_map_entries)
 			{
-				if (out_custom_map_entries_count > matching_count_found)
+				if (matching_count_found < out_custom_map_entries_count)
 					out_custom_map_entries[matching_count_found] = &new_custom_map_entries_buffer[i];
 			}
 
@@ -786,7 +785,7 @@ bool __thiscall s_custom_map_data::add_custom_map_entry_by_map_file_path(const w
 
 void __thiscall s_custom_map_data::initialize()
 {
-	last_preview_bitmap_index = 0ll;
+	last_preview_bitmap_index = 0;
 	custom_map_count = 0;
 	custom_map_lock = new CRITICAL_SECTION;
 	InitializeCriticalSection(custom_map_lock);

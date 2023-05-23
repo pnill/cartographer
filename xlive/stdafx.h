@@ -13,15 +13,6 @@
 #define XINPUT_USE_9_1_0
 #define DIRECTINPUT_VERSION 0x0800
 
-#ifdef _DEBUG
-#define _SECURE_SCL 1
-#include <crtdbg.h>
-#endif
-
-#ifdef NDEBUG
-#define _SECURE_SCL 0
-#endif
-
 #define TEST_N_DEF(TEST)
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers

@@ -15,7 +15,7 @@ void ReadH2Config();
 #define DLL_VERSION_MAJOR               0
 #define DLL_VERSION_MINOR               6
 #define DLL_VERSION_REVISION            7
-#define DLL_VERSION_BUILD				8
+#define DLL_VERSION_BUILD				9
 
 #define DLL_VERSION            DLL_VERSION_MAJOR, DLL_VERSION_MINOR, DLL_VERSION_REVISION, DLL_VERSION_BUILD
 #define STRINGIZE2(s) #s
@@ -83,7 +83,6 @@ extern float H2Config_Deadzone_A_X;
 extern float H2Config_Deadzone_A_Y;
 extern float H2Config_Deadzone_Radial;
 extern __int16 H2Config_refresh_rate;
-extern bool H2Config_hiresfix;
 extern bool H2Config_shader_lod_max;
 extern bool H2Config_light_suppressor;
 extern bool H2Config_d3d9ex;

@@ -327,6 +327,18 @@ struct real_color_rgb
 };
 CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
 
+class c_quantized_orientation
+{
+public:
+	short rotation_x;
+	short rotation_y;
+	short rotation_z;
+	short rotation_w;
+	real_point3d default_translation;
+	float default_scale;
+};
+CHECK_STRUCT_SIZE(c_quantized_orientation, 24);
+
 static void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale)
 {
 	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);

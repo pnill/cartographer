@@ -3,6 +3,12 @@
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Math/real_math.h"
 
+struct s_player_action_weapons
+{
+	BYTE primary_weapon_index;
+	BYTE secondary_weapon_index;
+};
+
 #pragma pack(push, 1)
 struct player_action
 {
@@ -14,8 +20,7 @@ struct player_action
 	float secondary_trigger;
 	DWORD action_flags;
 	WORD weapon_set_identifier;
-	BYTE primary_weapon_index;
-	BYTE secondary_weapon_index;
+	s_player_action_weapons weapon_indexes;
 	WORD grenade_index;
 	WORD zoom_level;
 	int interaction_type;
@@ -29,7 +34,7 @@ CHECK_STRUCT_SIZE(player_action, 0x60);
 
 struct s_player_control
 {
-	datum slave_object;
+	datum unit_datum_index;
 	int control_flag;
 	int field_8;
 	int field_C;
@@ -47,13 +52,15 @@ CHECK_STRUCT_SIZE(s_player_control, 0xB0);
 
 struct s_player_control_globals
 {
-	char initialized;
-	char Pad1[3];
+	bool initialized;
+	char pad_1[3];
 	int field_4;
 	int field_8;
 	int field_C;
 	bool disableCamera;
 	PAD(7);
 	s_player_control local_players[4];
+
+	static s_player_control_globals* get();
 };
 CHECK_STRUCT_SIZE(s_player_control_globals, 0x2D8);

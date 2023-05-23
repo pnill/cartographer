@@ -1,6 +1,6 @@
 #pragma once
 #include "animation_channel.h"
-#include "interpolator_control.h"
+#include "animation_interpolation.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 class c_animation_manager
@@ -11,10 +11,10 @@ public:
 	c_animation_channel channel3;
 	c_interpolator_control interpolator_control_0;
 	c_interpolator_control interpolator_control_1;
-	DWORD animation_tag_index;
+	datum jmad_tag_datum;
 	WORD animation_manager_flags;
 	WORD unk6E;
-	int animation_string_ids[4];
+	string_id animation_string_ids[4];
 	DWORD unk80;
 
 	c_animation_manager();
@@ -22,3 +22,4 @@ public:
 	void initialize();
 	bool reset_graph(datum jmad_tag_index, datum hlmt_tag_index, bool some_bool);
 };
+CHECK_STRUCT_SIZE(c_animation_manager, 0x84);

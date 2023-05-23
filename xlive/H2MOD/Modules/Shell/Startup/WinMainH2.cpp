@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
 #include "WinMainH2.h"
-#include "../Shell.h"
-#include "../Config.h"
-#include "H2MOD/Utils/Utils.h"
 
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/Shell.h""
+#include "H2MOD/Utils/Utils.h"
+
 #include "Util/Hooks/Hook.h"
 
 const static int max_monitor_count = 9;

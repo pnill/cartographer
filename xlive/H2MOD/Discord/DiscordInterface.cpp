@@ -116,6 +116,11 @@ static void handleDiscordJoinRequest(const DiscordJoinRequest* request)
 {
 }
 
+VOID CALLBACK UpdateDiscordStateTimerCb(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
+	update_player_count();
+}
+
 void DiscordInterface::Init()
 {
 	inited = true;

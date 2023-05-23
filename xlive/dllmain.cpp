@@ -1,11 +1,13 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
+#include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
-CRITICAL_SECTION d_lock;
 
 std::wstring dlcbasepath;
 //CHAR g_profileDirectory[512] = "Profiles";
@@ -51,6 +53,21 @@ void HeapDebugInitialize()
 #endif
 }
 
+void DiscordInitialize()
+{
+	if (Memory::IsDedicatedServer()
+		|| !H2Config_discord_enable
+		|| _Shell::GetInstanceId() > 1)
+		return;
+
+	// Discord init
+	static UINT_PTR discord_update_timer = NULL;
+	DiscordInterface::Init();
+	discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
+	atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
+	DiscordInterface::SetDetails("Startup");
+}
+
 void InitInstance()
 {
 	static bool init = false;
@@ -58,17 +75,13 @@ void InitInstance()
 	if (!init)
 	{
 		init = true;
-		InitializeCriticalSection(&d_lock);
 
 		HeapDebugInitialize();
 		H2DedicatedServerStartup();
 
+		DiscordInitialize();
+
 		dlcbasepath = L"DLC";
-
-		H2MOD::Initialize();
-
-		//extern GunGame* gunGame;
-		//gunGame->readWeaponLevels();
 	}
 }
 
@@ -88,7 +101,6 @@ void ExitInstance()
 	LeaveCriticalSection(&log_section);
 	DeleteCriticalSection(&log_section);
 #endif
-	DeleteCriticalSection(&d_lock);
 	TerminateProcess(GetCurrentProcess(), 0);
 }
 

@@ -24,7 +24,7 @@ enum e_static_lod : DWORD
 	cinematic
 };
 
-void call_give_player_weapon(int PlayerIndex, datum WeaponId, bool bReset);
+void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout);
 typedef void(__thiscall* update_player_score_t)(void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
 
 class H2MOD
@@ -52,7 +52,7 @@ public:
 	void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
 	void disable_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
-	void disable_weapon_pickup(bool b_Enable);
+	void disable_weapon_pickup(bool enable);
 	void set_local_rank(BYTE rank);
 	void cine_start_tex();
 

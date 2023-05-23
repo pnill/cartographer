@@ -55,7 +55,6 @@ float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
-bool H2Config_hiresfix = false;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
 bool H2Config_d3d9ex = false;
@@ -457,8 +456,6 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
-
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
@@ -785,7 +782,6 @@ void ReadH2Config() {
 
 				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
-				H2Config_hiresfix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hires_fix", H2Config_hiresfix);
 				H2Config_d3d9ex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 				H2Config_hide_ingame_chat = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);

@@ -29,6 +29,7 @@ public:
 	// on map load can be used as Initialize
 	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) = 0;
 
+	virtual ~IGameEngineEvent() = default;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) = 0;
@@ -39,6 +40,7 @@ public:
 class ICustomGameVariant : public IGameEngineEvent
 {
 public:
+	virtual ~ICustomGameVariant() = default;
 	virtual void Initialize() = 0;
 	virtual void Dispose() = 0;
 	virtual CustomVariantId GetVariantId() = 0;

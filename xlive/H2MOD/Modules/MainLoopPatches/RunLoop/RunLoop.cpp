@@ -238,7 +238,7 @@ void __cdecl main_loop_body() {
 	EventHandler::GameLoopEventExecute(EventExecutionType::execute_after);
 }
 
-extern bool b_XboxTick;
+extern bool xboxTickrateEnabled;
 // we disable some broken code added by hired gun, that is also disabled while running a cinematic 
 // this should fix the built in frame limiter (while minimized)
 // as well as the game speeding up while minimized
@@ -254,7 +254,7 @@ bool __cdecl cinematic_in_progress_hook()
 
 	case _rendering_mode_none:
 	default:
-		return p_cinematic_is_running() || b_XboxTick || _Shell::IsGameMinimized();
+		return p_cinematic_is_running() || xboxTickrateEnabled || _Shell::IsGameMinimized();
 	}
 
 	return false;
@@ -281,7 +281,7 @@ bool __cdecl should_limit_framerate_hook()
 		return false; // e_render_original_game_frame_limit handles frame limit in MainGameTime.cpp
 	case _rendering_mode_none:
 	default:
-		return (_Shell::IsGameMinimized() || b_XboxTick);
+		return (_Shell::IsGameMinimized() || xboxTickrateEnabled);
 	}
 
 	return false;
