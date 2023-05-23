@@ -2,6 +2,7 @@
 #include "Tweaks.h"
 
 #include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
@@ -10,7 +11,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"

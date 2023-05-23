@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "XboxLiveTaskProgress.h"
+#include "screen_xbox_live_task_progress_dialog.h"
 #include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 

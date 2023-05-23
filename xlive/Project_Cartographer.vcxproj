@@ -357,7 +357,7 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
-    <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
@@ -687,7 +687,7 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
-    <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />

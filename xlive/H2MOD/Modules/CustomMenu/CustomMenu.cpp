@@ -3,7 +3,10 @@
 #include "CustomMenu.h"
 #include "CustomLanguage.h"
 
+#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+
+
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Accounts/AccountCreate.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
@@ -11,7 +14,6 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Tags/TagInterface.h"
