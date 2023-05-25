@@ -10,6 +10,7 @@
 #include "Blam/Engine/interface/first_person_weapons.h"
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/user_interface_text.h"
+#include "Blam/Engine/interface/screens/screens_patches.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
@@ -563,6 +564,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
+		screens_apply_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{

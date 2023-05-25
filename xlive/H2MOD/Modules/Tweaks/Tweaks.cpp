@@ -2,7 +2,6 @@
 #include "Tweaks.h"
 
 #include "Blam/Engine/interface/hud.h"
-#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
@@ -12,7 +11,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
 #include "Util/Hooks/Hook.h"
@@ -298,9 +296,6 @@ void H2Tweaks::ApplyPatches() {
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
 
 		WriteJmpTo(Memory::GetAddress(0x39EA2), is_remote_desktop);
-
-		//tags::on_map_load(fix_shaders_nvidia);
-		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(Memory::GetAddress(0x41F650), false);

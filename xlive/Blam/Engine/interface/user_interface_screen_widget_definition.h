@@ -184,7 +184,7 @@ enum e_screen_id : short
     screen_id_edit_item_options = 165,
     screen_id_edit_indicator_options = 166,
     screen_id_virtual_keyboard = 167,
-    screen_id_custom_game_menu = 168,
+    screen_id_custom_game_menu_168 = 168,
     screen_id_slayer_quick_options = 169,
     screen_id_koth_quick_options = 170,
     screen_id_race_quick_options = 171,
@@ -571,7 +571,7 @@ TAG_BLOCK_SIZE_ASSERT(s_table_view_list_reference_OBSOLETE, 40);
 #define k_maximum_number_of_text_blocks 64
 struct s_text_block_reference
 {
-    e_text_flags textFlags;
+    e_text_flags text_flags;
     e_animation_index animation_index;
     short intro_animation_delay_milliseconds;
     short pad0;
@@ -604,7 +604,7 @@ struct s_bitmap_block_reference
 {
     e_bitmap_block_reference_flags flags;
     e_animation_index animation_index;
-
+    short intro_animation_delay_milliseconds;
     e_bitmap_blend_method bitmap_blend_method;
     short initial_sprite_frame;
     point2d topleft;

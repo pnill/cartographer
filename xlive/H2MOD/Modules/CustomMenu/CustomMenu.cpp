@@ -1112,7 +1112,7 @@ static bool CMButtonHandler_AccountEdit(int button_id) {
 			c_account_list_menu::accountingGoBackToList = false;
 			c_account_list_menu::UpdateAccountingActiveHandle(true);
 			hThreadLogin = CreateThread(NULL, 0, ThreadLogin, (LPVOID)-1, 0, NULL);
-			c_xbox_live_task_progress_menu::Open(xbox_live_task_progress_callback);
+			c_xbox_live_task_progress_menu::open(xbox_live_task_progress_callback);
 			close_menu = true;
 		}
 	}
