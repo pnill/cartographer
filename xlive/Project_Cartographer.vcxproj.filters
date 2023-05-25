@@ -180,6 +180,7 @@
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screens_patches.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_esrb_warning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -550,6 +551,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

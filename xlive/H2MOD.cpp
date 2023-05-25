@@ -1101,6 +1101,7 @@ void H2MOD::ApplyHooks() {
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
+		screens_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
