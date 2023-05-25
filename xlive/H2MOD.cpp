@@ -545,6 +545,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
 	h2mod->toggle_xbox_tickrate(options, false);
+	screens_apply_patches_on_map_load();
+
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
@@ -564,7 +566,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
-		screens_apply_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
