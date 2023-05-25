@@ -14,18 +14,13 @@ void c_xbox_live_task_progress_menu::open(void* update_function)
 
 void c_xbox_live_task_progress_menu::apply_patches()
 {
-	const char task_progress_dialog_tag_path[] = "ui\\screens\\game_shell\\xbox_live\\task_progress_dialog\\task_progress_dialog";
-
-	datum task_progress_dialog_datum_index = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, task_progress_dialog_tag_path);
-	
+	// Get tag definition
+	datum task_progress_dialog_datum_index = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, "ui\\screens\\game_shell\\xbox_live\\task_progress_dialog\\task_progress_dialog");
 	if (task_progress_dialog_datum_index == DATUM_INDEX_NONE) { return;	}
-
 	s_user_interface_screen_widget_definition* task_progress_dialog_definition = tags::get_tag_fast<s_user_interface_screen_widget_definition>(task_progress_dialog_datum_index);
 	
-	// If data is null ABORT
+	// Sanity checks
 	if (task_progress_dialog_definition == nullptr) { return; }
-
-	// If there's no pane tagblock ABORT
 	if (task_progress_dialog_definition->panes.size == 0) { return; }
 
 	s_window_pane_reference* pane_definition = task_progress_dialog_definition->panes[0];
