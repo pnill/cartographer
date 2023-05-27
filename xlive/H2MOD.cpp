@@ -545,16 +545,20 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
 	h2mod->toggle_xbox_tickrate(options, false);
-	screens_apply_patches_on_map_load();
 
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
 
-	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
+	if (options->engine_type == e_engine_type::_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
-		UIRankPatch();
+		if (!Memory::IsDedicatedServer())
+		{
+			UIRankPatch();
+			screens_apply_patches_on_map_load();
+		}
+
 		MetaExtender::free_tag_blocks();
 	}
 	else
@@ -1101,7 +1105,7 @@ void H2MOD::ApplyHooks() {
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
-		screens_apply_hooks();
+		screens_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
