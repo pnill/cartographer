@@ -6,11 +6,8 @@
 
 #include "Util/Hooks/Hook.h"
 
-void UIRankPatch() {
-
-	if (h2mod->GetEngineType() != _main_menu || Memory::IsDedicatedServer())
-		return;
-
+void UIRankPatch() 
+{
 	//BYTE PlayerLevel = -1;								//eventually this will pull level from webserver
 	//DWORD PlayerLevelPCR = -1;						//eventually this will pull level from webserver
 	//WriteValue(H2BaseAddr + 0x1B2C2F, PlayerLevel);			//sets player level in pregame lobby

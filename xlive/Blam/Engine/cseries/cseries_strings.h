@@ -1,5 +1,4 @@
 #pragma once
-
 /*********************************************************************
 * static_string
 * Storing and Manipulating Character Sequences(Basic String)
@@ -8,7 +7,7 @@
 template<int length>
 struct static_string
 {
-	char Text[length];
+	char text[length];
 	std::string get_static_string();
 	void operator = (const char* Value);
 	void operator = (const static_string Value);
@@ -51,7 +50,7 @@ typedef static_string<512> static_string512;
 template<int length>
 struct static_wchar_string
 {
-	wchar_t Text[length];
+	wchar_t text[length];
 	std::wstring get_static_string();
 	void operator = (const wchar_t* Value);
 	void operator = (const static_wchar_string Value);
@@ -82,39 +81,35 @@ typedef static_wchar_string<128> static_wchar_string128;
 typedef static_wchar_string<256> static_wchar_string256;
 
 template<int T>
-inline std::string  static_string<T>::get_static_string()
+inline std::string static_string<T>::get_static_string()
 {
-	std::string k = this->Text;
+	std::string k = this->text;
 	return k;
 }
 template<int T>
 inline void static_string<T>::operator= (const char* Value)
 {
-	strcpy(this->Text, Value);
-	//this->Text = Value;
+	strcpy(this->text, Value);
 }
 template<int T>
 inline void static_string<T>::operator= (const static_string Value)
 {
-	strcpy(this->Text, Value.Text);
-	//this->Text = Value.Text;
+	strcpy(this->text, Value.text);
 }
 
 template<int T>
-inline std::wstring  static_wchar_string<T>::get_static_string()
+inline std::wstring static_wchar_string<T>::get_static_string()
 {
-	std::wstring k = this->Text;
+	std::wstring k = this->text;
 	return k;
 }
 template<int T>
 inline void static_wchar_string<T>::operator= (const wchar_t* Value)
 {
-	wcscpy(this->Text, Value);
-	//this->Text = Value;
+	wcscpy(this->text, Value);
 }
 template<int T>
 inline void static_wchar_string<T>::operator= (const static_wchar_string Value)
 {
-	wcscpy(this->Text, Value.Text);
-	//this->Text = Value.Text;
+	wcscpy(this->text, Value.text);
 }

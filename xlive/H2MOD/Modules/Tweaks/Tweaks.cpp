@@ -10,9 +10,7 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/UI/XboxLiveTaskProgress.h"
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
 #include "Util/Hooks/Hook.h"
@@ -278,13 +276,6 @@ void H2Tweaks::ApplyPatches() {
 		// adds support for more monitor resolutions
 		CustomResolution::Initialize();
 
-		//Disables the ESRB warning (only occurs for English Language).
-		//disables the one if no intro vid occurs.
-		WriteValue<bool>(Memory::GetAddress(0x411030), 0);
-
-		//disables the one after the intro video, by removing 0x40 flag from 0x7C6 bitmask
-		WriteValue(Memory::GetAddress(0x39948 + 2), 0x7C6 & ~FLAG(6));
-
 		//Set the LAN Server List Ping Frequency (milliseconds).
 		//WriteValue(Memory::GetAddress(0x001e9a89), 3000);
 		//Set the LAN Server List Delete Entry After (milliseconds).
@@ -298,9 +289,6 @@ void H2Tweaks::ApplyPatches() {
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
 
 		WriteJmpTo(Memory::GetAddress(0x39EA2), is_remote_desktop);
-
-		//tags::on_map_load(fix_shaders_nvidia);
-		tags::on_map_load(c_xbox_live_task_progress_menu::ApplyPatches);
 
 		// disable cloth debugging that writes to cloth.txt
 		WriteValue<bool>(Memory::GetAddress(0x41F650), false);

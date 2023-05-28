@@ -10,6 +10,7 @@
 #include "Blam/Engine/interface/first_person_weapons.h"
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/user_interface_text.h"
+#include "Blam/Engine/interface/screens/screens_patches.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
@@ -544,14 +545,20 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
 	h2mod->toggle_xbox_tickrate(options, false);
+
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
 
-	if (h2mod->GetEngineType() == e_engine_type::_main_menu)
+	if (options->engine_type == e_engine_type::_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
-		UIRankPatch();
+		if (!Memory::IsDedicatedServer())
+		{
+			UIRankPatch();
+			screens_apply_patches_on_map_load();
+		}
+
 		MetaExtender::free_tag_blocks();
 	}
 	else
@@ -1098,6 +1105,7 @@ void H2MOD::ApplyHooks() {
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
+		screens_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

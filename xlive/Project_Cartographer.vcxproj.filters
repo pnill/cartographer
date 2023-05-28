@@ -12,8 +12,6 @@
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
-    <ClCompile Include="H2MOD\Modules\UI\Pregame_Lobby.cpp" />
-    <ClCompile Include="H2MOD\Modules\UI\XboxLiveTaskProgress.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
@@ -179,6 +177,10 @@
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_messaging.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screens_patches.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_esrb_warning.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -279,7 +281,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\hud_globals_definition.hpp" />
+    <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
@@ -301,8 +303,6 @@
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
-    <ClInclude Include="H2MOD\Modules\UI\Pregame_Lobby.h" />
-    <ClInclude Include="H2MOD\Modules\UI\XboxLiveTaskProgress.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
@@ -383,7 +383,6 @@
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\user_interface_screen_widget_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
@@ -547,6 +546,12 @@
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\hud_messaging.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
+    <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
