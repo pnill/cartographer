@@ -39,7 +39,7 @@ bool __cdecl render_ingame_chat_check()
 bool __cdecl render_hud_check(unsigned int a1)
 {
 	static bool hud_opacity_reset = true;
-	s_new_hud_globals* new_hud_globals = Memory::GetAddress<s_new_hud_globals*>(0x9770F4);
+	s_new_hud_globals* new_hud_globals = *Memory::GetAddress<s_new_hud_globals**>(0x9770F4);
 
 	if (!show_hud || ice_cream_flavor_available(skull_type_blind))
 	{
