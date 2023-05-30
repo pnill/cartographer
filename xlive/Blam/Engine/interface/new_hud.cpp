@@ -11,8 +11,6 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "Util/Hooks/Hook.h"
 
-bool show_hud = true;
-
 s_new_hud_engine_globals* get_new_hud_engine_globals()
 {
 	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4);
