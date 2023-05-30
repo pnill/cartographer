@@ -6,17 +6,6 @@
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include <wtypes.h>
 
-
-enum e_hud_anchor : short
-{
-	hud_anchor_top_left = 0,
-	hud_anchor_top_right = 1,
-	hud_anchor_bottom_left = 2,
-	hud_anchor_bottom_right = 3,
-	hud_anchor_center = 4,
-	hud_anchor_crosshair = 5,
-};
-
 enum e_scaling_flags : short
 {
 	scaling_flag_dont_scale_offset = FLAG(0),
@@ -91,10 +80,9 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	short pad_32;
 	int pad_34[5];
 
-	// bitm
-	tag_reference fullscreen_font;	// Unused since font packages are used in halo 2 and up
-	// bitm
-	tag_reference splitscreen_font;	// Unused since font packages are used in halo 2 and up
+	// 2 below fields are unused since font packages are used in halo 2 and up
+	tag_reference fullscreen_font;		// bitm
+	tag_reference splitscreen_font;		// bitm
 
 	float up_time;
 	float fade_time;
@@ -103,12 +91,9 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	real_color_argb text_color;
 	float text_spacing;
 
-	// unic
-	tag_reference item_message_text;
-	// bitm
-	tag_reference icon_bitmap;
-	// unic
-	tag_reference alternate_icon_text;
+	tag_reference item_message_text;	// unic
+	tag_reference icon_bitmap;			// bitm
+	tag_reference alternate_icon_text;	// unic
 
 	tag_block<icon_hud_element_definition> button_icons;
 
@@ -126,8 +111,10 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	int pad_C0;
 
 	// Explaination("Other hud messaging data", "")
-	// (hmt )
-	tag_reference hud_messages;	// this is unused
+
+	// This is unused
+	tag_reference hud_messages;	// hmt
+
 
 	// Explaination("Objective colors", "")
 	pixel32 hud_messaging_data_default_color;
@@ -203,16 +190,14 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	float time_out_flash_length;					// time of each flash
 	pixel32 time_out_disabled_color;
 	int padding_354[11];
-	// bitm
-	tag_reference carnage_report_bitmap;
+	tag_reference carnage_report_bitmap;	// bitm
 
 	// Explaination("Hud crap that wouldn't fit anywhere else", "")
 	short loading_begin_text;
 	short loading_end_text;
 	short checkpoint_begin_text;
 	short checkpoint_end_text;
-	// snd!
-	tag_reference checkpoint_sound;
+	tag_reference checkpoint_sound;			// snd!
 
 	int pad_398[24];
 
