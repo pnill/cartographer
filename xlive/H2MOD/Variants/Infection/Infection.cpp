@@ -181,7 +181,7 @@ void Infection::preSpawnServerSetup() {
 
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::GetName(currentPlayerIndex));
 		if (isZombie) {
-			s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Flood);
+			s_player::SetUnitBipedType(currentPlayerIndex, character_type_flood);
 			if (s_player::GetTeam(currentPlayerIndex) != ZOMBIE_TEAM) {
 				if (NetworkSession::LocalPeerIsSessionHost())
 					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
@@ -189,23 +189,23 @@ void Infection::preSpawnServerSetup() {
 		}
 		else {
 			if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
-				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Skeleton);
+				s_player::SetUnitBipedType(currentPlayerIndex, character_type_skeleton);
 			else
-				s_player::SetUnitBipedType(currentPlayerIndex, s_player::e_character_type::Spartan);
+				s_player::SetUnitBipedType(currentPlayerIndex, character_type_spartan);
 		}
 	}
 }
 
 void Infection::setPlayerAsHuman(int playerIndex) {
 	if (get_current_special_event() == e_special_event_type::_halloween && H2Config_spooky_boy)
-		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Skeleton);
+		s_player::SetUnitBipedType(playerIndex, character_type_skeleton);
 	else
-		s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Spartan);
+		s_player::SetUnitBipedType(playerIndex, character_type_spartan);
 	s_player::SetBipedSpeed(playerIndex, 1.0f);
 }
 
 void Infection::setPlayerAsZombie(int playerIndex) {
-	s_player::SetUnitBipedType(playerIndex, s_player::e_character_type::Flood);
+	s_player::SetUnitBipedType(playerIndex, character_type_flood);
 	s_player::SetBipedSpeed(playerIndex, 1.1f);
 
 	call_give_player_weapon(playerIndex, e_weapons_datum_index::energy_blade, 1);
@@ -372,7 +372,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 				if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
 					LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 					h2mod->set_local_team_index(0, ZOMBIE_TEAM);
-					s_player::SetUnitBipedType(absPlayerIdx, s_player::e_character_type::Flood);
+					s_player::SetUnitBipedType(absPlayerIdx, character_type_flood);
 				}
 				else {
 					//if not, then this is a new zombie
@@ -431,7 +431,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
 				{
 					LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}", absPlayerIdx);
-					s_player::SetUnitBipedType(absPlayerIdx, s_player::e_character_type::Flood);
+					s_player::SetUnitBipedType(absPlayerIdx, character_type_flood);
 				}
 			}
 		}
@@ -466,7 +466,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 
 				else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-					s_player::SetUnitBipedType(absPlayerIdx, s_player::e_character_type::Flood);
+					s_player::SetUnitBipedType(absPlayerIdx, character_type_flood);
 					h2mod->disable_weapon_pickup(false);
 					h2mod->team_player_indicator_visibility(true);
 				}

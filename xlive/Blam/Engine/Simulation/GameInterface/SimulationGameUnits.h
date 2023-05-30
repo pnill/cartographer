@@ -27,7 +27,7 @@ CHECK_STRUCT_SIZE(s_simulation_unit_state_data, 0xF8);
 struct s_simulation_unit_creation_data
 {
 	s_simulation_object_creation_data object;
-	s_player::s_player_properties::s_player_profile profile;
+	s_player_profile profile;
 	PAD(8);
 	WORD team;
 	PAD(2);

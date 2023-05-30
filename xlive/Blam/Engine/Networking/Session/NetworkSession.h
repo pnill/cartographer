@@ -200,7 +200,7 @@ struct s_membership_player
 	bool properties_valid;
 	char pad[1];
 	unsigned int controller_index;
-	s_player::s_player_properties properties[2];
+	s_player_properties properties[2];
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
@@ -235,7 +235,7 @@ struct s_session_interface_user
 	s_player_identifier network_user_identifier;
 	BYTE gap_B[3];
 	DWORD controller_index;
-	s_player::s_player_properties properties;
+	s_player_properties properties;
 	DWORD player_voice_exists;
 	DWORD player_text_chat_exists;
 	DWORD field_9C[2];

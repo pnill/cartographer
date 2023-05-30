@@ -21,16 +21,16 @@
 namespace PlayerRepresentation
 {
 	//Non-zero index based value for the count of valid representation types
-	std::map<s_player::e_character_type, byte> type_map
+	std::map<e_character_type, byte> type_map
 	{
-		{s_player::e_character_type::MasterChief, 0},
-		{s_player::e_character_type::Dervish, 1},
-		{s_player::e_character_type::Spartan, 2},
-		{s_player::e_character_type::Elite, 3},
+		{character_type_masterchief, 0},
+		{character_type_dervish, 1},
+		{character_type_spartan, 2},
+		{character_type_elite, 3},
 	};
 
 	BYTE current_representation_count = 4;
-	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, s_player::e_character_type type, string_id variant)
+	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
 	{
 		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
 
@@ -67,7 +67,7 @@ namespace PlayerRepresentation
 	}
 
 
-	s_globals_group_definition::s_player_representation_block* clone_representation(int index, s_player::e_character_type newType)
+	s_globals_group_definition::s_player_representation_block* clone_representation(int index, e_character_type newType)
 	{
 		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
 		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
@@ -86,7 +86,7 @@ namespace PlayerRepresentation
 		return globals->player_representation[index];
 	}
 
-	datum get_object_datum_from_representation(s_player::e_character_type representation_index)
+	datum get_object_datum_from_representation(e_character_type representation_index)
 	{
 		auto game_globals = tags::get_matg_globals_ptr();
 		if (game_globals != nullptr)
@@ -97,10 +97,10 @@ namespace PlayerRepresentation
 		return DATUM_INDEX_NONE;
 	}
 
-	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player::s_player_properties* a2);
+	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player_properties* a2);
 	network_session_player_profile_recieve_t* p_network_session_player_profile_recieve;
 
-	void __cdecl network_session_player_profile_recieve(int player_index, s_player::s_player_properties* player_properties)
+	void __cdecl network_session_player_profile_recieve(int player_index, s_player_properties* player_properties)
 	{
 		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.engine_type);
 		if (s_game_globals::game_is_campaign())
@@ -127,18 +127,18 @@ namespace PlayerRepresentation
 		}
 		else if (s_game_globals::game_is_multiplayer())
 		{
-			if (player_properties->profile.player_character_type == s_player::e_character_type::MasterChief)
-				player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
-			if (player_properties->profile.player_character_type == s_player::e_character_type::Dervish)
-				player_properties->profile.player_character_type = s_player::e_character_type::Elite;
+			if (player_properties->profile_traits.profile.player_character_type == character_type_masterchief)
+				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
+			if (player_properties->profile_traits.profile.player_character_type == character_type_dervish)
+				player_properties->profile_traits.profile.player_character_type = character_type_elite;
 
 			if(get_current_special_event() != e_special_event_type::_halloween)
 			{
-				if (player_properties->profile.player_character_type == s_player::e_character_type::Skeleton)
-					player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
+				if (player_properties->profile_traits.profile.player_character_type == character_type_skeleton)
+					player_properties->profile_traits.profile.player_character_type = character_type_spartan;
 			}
 			else if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
-				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
+				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
 
 			/*if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
 				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
@@ -146,8 +146,8 @@ namespace PlayerRepresentation
 			if (usersSignInInfo[0].xuid == )
 				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
 
-			if ((byte)player_properties->profile.player_character_type > current_representation_count)
-				player_properties->profile.player_character_type = s_player::e_character_type::Spartan;
+			if ((byte)player_properties->profile_traits.profile.player_character_type > current_representation_count)
+				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
 		}
 
 		if ((byte)player_properties->player_displayed_skill != -1)
@@ -158,8 +158,8 @@ namespace PlayerRepresentation
 			if ((byte)player_properties->player_overall_skill < 0)
 				player_properties->player_overall_skill = 0;
 
-		if (player_properties->player_handicap_level > s_player::e_handicap::Severe)
-			player_properties->player_handicap_level = s_player::e_handicap::Severe;
+		if (player_properties->player_handicap_level > handicap_severe)
+			player_properties->player_handicap_level = handicap_severe;
 
 		if (player_properties->bungie_user_role <= 7)
 			player_properties->bungie_user_role = 7;
@@ -178,7 +178,7 @@ namespace PlayerRepresentation
 		if (h2mod->GetEngineType() == _multiplayer) 
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
-				*Memory::GetAddress<s_player::e_character_type*>(0x51A67C) = s_player::e_character_type::Skeleton;
+				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
@@ -192,13 +192,13 @@ namespace PlayerRepresentation
 				tag_loader::Load_tag(skele_datum, true, "carto_shared");
 				tag_loader::Push_Back();
 				auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-				add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, s_player::e_character_type::Skeleton);
+				add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, character_type_skeleton);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = skele_new_datum;
 			}
 			else
 			{
-				clone_representation(2, s_player::e_character_type::Skeleton);
+				clone_representation(2, character_type_skeleton);
 			}
 			auto flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
 			auto flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
@@ -209,13 +209,13 @@ namespace PlayerRepresentation
 				tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 				tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 				tag_loader::Push_Back();
-				add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), s_player::e_character_type::Flood);
+				add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), character_type_flood);
 				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
 				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
 			}
 			else
 			{
-				clone_representation(3, s_player::e_character_type::Flood);
+				clone_representation(3, character_type_flood);
 			}
 
 			// Create copy of default variant for chief and add lmao object to head
@@ -287,7 +287,7 @@ namespace PlayerRepresentation
 						new_object->child_object.TagIndex = lmao_datum;
 					}
 				}
-				add_representation(-1, -1, -1, s_player::e_character_type::Lmao, new_variant->name);
+				add_representation(-1, -1, -1, character_type_lmao, new_variant->name);
 			}
 		}
 	}

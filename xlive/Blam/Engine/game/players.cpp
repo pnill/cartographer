@@ -47,13 +47,13 @@ void s_player::SetTeam(int playerIndex, e_object_team team)
 	GetPlayer(playerIndex)->properties[0].player_team = team;
 }
 
-void s_player::SetUnitBipedType(int playerIndex, s_player::e_character_type bipedType)
+void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)
 {
 	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].profile.player_character_type = bipedType;
+	GetPlayer(playerIndex)->properties[0].profile_traits.profile.player_character_type = bipedType;
 }
 
 void s_player::SetUnitBipedType(int playerIndex, byte representationIndex)
@@ -62,7 +62,7 @@ void s_player::SetUnitBipedType(int playerIndex, byte representationIndex)
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].profile.player_character_type = (e_character_type)representationIndex;
+	GetPlayer(playerIndex)->properties[0].profile_traits.profile.player_character_type = (e_character_type)representationIndex;
 }
 
 void s_player::SetBipedSpeed(int playerIndex, float speed)
@@ -112,7 +112,7 @@ bool PlayerIterator::get_next_active_player()
 
 	while (m_current_player)
 	{
-		if (!TEST_FLAG(m_current_player->flags, s_player::flags::_player_inactive))
+		if (!TEST_FLAG(m_current_player->flags, player_flag_player_inactive))
 			break;
 
 		m_current_player = get_next_datum();

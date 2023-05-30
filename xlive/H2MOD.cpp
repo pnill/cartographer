@@ -467,7 +467,7 @@ void H2MOD::set_local_rank(BYTE rank)
 		initialized = true;
 	}
 
-	s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
+	s_player_properties* local_player_properties = Memory::GetAddress<s_player_properties*>(0x51A638);
 
 	local_player_properties->player_overall_skill = rank;
 	local_player_properties->player_displayed_skill = rank;

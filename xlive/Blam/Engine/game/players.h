@@ -4,202 +4,216 @@
 
 #define k_maximum_players 16
 
+enum e_player_color : byte
+{
+	player_color_white,
+	player_color_steel,
+	player_color_red,
+	player_color_orange,
+	player_color_gold,
+	player_color_olive,
+	player_color_green,
+	player_color_sage,
+	player_color_cyan,
+	player_color_teal,
+	player_color_colbat,
+	player_color_blue,
+	player_color_violet,
+	player_color_purple,
+	player_color_pink,
+	player_color_crimson,
+	player_color_brown,
+	player_color_tan
+};
+
+enum e_character_type : byte
+{
+	character_type_masterchief = 0,
+	character_type_dervish = 1,
+	character_type_spartan = 2,
+	character_type_elite = 3,
+	character_type_skeleton = 4,
+	character_type_flood = 5,
+	character_type_lmao = 6
+};
+
+enum e_emblem_foreground : byte
+{
+	emblem_foreground_seventh_column = 0,
+	emblem_foreground_bullseye = 1,
+	emblem_foreground_vortex = 2,
+	emblem_foreground_halt = 3,
+	emblem_foreground_spartan = 4,
+	emblem_foreground_da_bomb = 5,
+	emblem_foreground_trinity = 6,
+	emblem_foreground_delta = 7,
+	emblem_foreground_rampancy = 8,
+	emblem_foreground_sergeant = 9,
+	emblem_foreground_phenoix = 10,
+	emblem_foreground_champion = 11,
+	emblem_foreground_jolly_roger = 12,
+	emblem_foreground_marathon = 13,
+	emblem_foreground_cube = 14,
+	emblem_foreground_radioactive = 15,
+	emblem_foreground_smiley = 16,
+	emblem_foreground_frowney = 17,
+	emblem_foreground_spearhead = 18,
+	emblem_foreground_sol = 19,
+	emblem_foreground_waypoint = 20,
+	emblem_foreground_ying_yang = 21,
+	emblem_foreground_helmet = 22,
+	emblem_foreground_triad = 23,
+	emblem_foreground_grunt_symbol = 24,
+	emblem_foreground_cleave = 25,
+	emblem_foreground_thor = 26,
+	emblem_foreground_skull_king = 27,
+	emblem_foreground_triplicate = 28,
+	emblem_foreground_subnova = 29,
+	emblem_foreground_flaming_ninja = 30,
+	emblem_foreground_doubleCresent = 31,
+	emblem_foreground_spades = 32,
+	emblem_foreground_clubs = 33,
+	emblem_foreground_diamonds = 34,
+	emblem_foreground_hearts = 35,
+	emblem_foreground_wasp = 36,
+	emblem_foreground_mark_of_shame = 37,
+	emblem_foreground_snake = 38,
+	emblem_foreground_hawk = 39,
+	emblem_foreground_lips = 40,
+	emblem_foreground_capsule = 41,
+	emblem_foreground_cancel = 42,
+	emblem_foreground_gas_mask = 43,
+	emblem_foreground_grenade = 44,
+	emblem_foreground_tsanta = 45,
+	emblem_foreground_race = 46,
+	emblem_foreground_valkyire = 47,
+	emblem_foreground_drone = 48,
+	emblem_foreground_grunt = 49,
+	emblem_foreground_grunt_head = 50,
+	emblem_foreground_brute_head = 51,
+	emblem_foreground_runes = 52,
+	emblem_foreground_trident = 53,
+	emblem_foreground_number0 = 54,
+	emblem_foreground_number1 = 55,
+	emblem_foreground_number2 = 56,
+	emblem_foreground_number3 = 57,
+	emblem_foreground_number4 = 58,
+	emblem_foreground_number5 = 59,
+	emblem_foreground_number6 = 60,
+	emblem_foreground_number7 = 61,
+	emblem_foreground_number8 = 62,
+	emblem_foreground_number9 = 63
+};
+
+enum e_emblem_background : BYTE
+{
+	emblem_background_solid = 0,
+	emblem_background_vertical_split = 1,
+	emblem_background_horizontal_split1 = 2,
+	emblem_background_horizontal_split2 = 3,
+	emblem_background_vertical_gradient = 4,
+	emblem_background_horizontal_gradient = 5,
+	emblem_background_triple_column = 6,
+	emblem_background_triple_row = 7,
+	emblem_background_quadrants1 = 8,
+	emblem_background_quadrants2 = 9,
+	emblem_background_diagonal_slice = 10,
+	emblem_background_cleft = 11,
+	emblem_background_x1 = 12,
+	emblem_background_x2 = 13,
+	emblem_background_dircle = 14,
+	emblem_background_diamond = 15,
+	emblem_background_cross = 16,
+	emblem_background_square = 17,
+	emblem_background_dual_half_circle = 18,
+	emblem_background_triangle = 19,
+	emblem_background_diagonal_quadrant = 20,
+	emblem_background_three_quaters = 21,
+	emblem_background_quarter = 22,
+	emblem_background_four_rows1 = 23,
+	emblem_background_four_rows2 = 24,
+	emblem_background_split_circle = 25,
+	emblem_background_one_third = 26,
+	emblem_background_two_thirds = 27,
+	emblem_background_upper_field = 28,
+	emblem_background_top_and_bottom = 29,
+	emblem_background_center_stripe = 30,
+	emblem_background_left_and_right = 31
+};
+
+enum e_emblem_toggle : byte
+{
+	emblem_toggle_off = 0,
+	emblem_toggle_on
+};
+
+enum e_handicap : byte
+{
+	handicap_none = 0,
+	handicap_minor = 1,
+	handicap_moderate = 2,
+	handicap_severe = 3
+};
+
+enum e_player_flags : int
+{
+	// player_flag_player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
+	player_flag_player_inactive = 1, // this might also represent something else, like player left
+	player_flag_player_first_spawn = 3,
+};
+
+struct s_player_profile
+{
+	e_player_color primary_color;
+	e_player_color secondary_color;
+	e_player_color tertiary_color;
+	e_player_color quaternary_color;
+	e_character_type player_character_type;
+	e_emblem_foreground foreground_emblem;
+	e_emblem_background background_emblem;
+	char emblem_flags;
+};
+CHECK_STRUCT_SIZE(s_player_profile, 8);
+
+struct s_player_profile_traits
+{
+	s_player_profile profile;
+	int unk_48;
+	int unk_4C;
+};
+CHECK_STRUCT_SIZE(s_player_profile_traits, 16);
+
+struct s_clan_identifiers
+{
+	DWORD ID_1;
+	DWORD ID_2;
+	DWORD ID_3;
+};
+CHECK_STRUCT_SIZE(s_clan_identifiers, 12);
+
+struct s_player_properties
+{
+	wchar_t player_name[16];
+	char unk[32];
+
+	s_player_profile_traits profile_traits;
+	wchar_t clan_name[16];
+	s_clan_identifiers clan_identifiers;
+
+	e_object_team player_team;
+	e_handicap player_handicap_level;
+	byte player_displayed_skill;
+	byte player_overall_skill;
+	char player_is_griefer;
+	char bungie_user_role;
+	char achievement_flags;
+	byte unk2;
+};
+CHECK_STRUCT_SIZE(s_player_properties, 132);
+
 #pragma pack(push, 1)
 struct s_player
 {
-	enum class e_color : BYTE
-	{
-		White,
-		Steel,
-		Red,
-		Orange,
-		Gold,
-		Olive,
-		Green,
-		Sage,
-		Cyan,
-		Teal,
-		Colbat,
-		Blue,
-		Violet,
-		Purple,
-		Pink,
-		Crimson,
-		Brown,
-		Tan
-	};
-
-	enum class e_character_type : BYTE
-	{
-		MasterChief = 0,
-		Dervish = 1,
-		Spartan = 2,
-		Elite = 3,
-		Skeleton = 4,
-		Flood = 5,
-		Lmao = 6
-	};
-
-	enum class e_emblem_foreground : BYTE
-	{
-		SeventhColumn = 0,
-		Bullseye = 1,
-		Vortex = 2,
-		Halt = 3,
-		Spartan = 4,
-		DaBomb = 5,
-		Trinity = 6,
-		Delta = 7,
-		Rampancy = 8,
-		Sergeant = 9,
-		Phenoix = 10,
-		Champion = 11,
-		JollyRoger = 12,
-		Marathon = 13,
-		Cube = 14,
-		Radioactive = 15,
-		Smiley = 16,
-		Frowney = 17,
-		Spearhead = 18,
-		Sol = 19,
-		Waypoint = 20,
-		YingYang = 21,
-		Helmet = 22,
-		Triad = 23,
-		GruntSymbol = 24,
-		Cleave = 25,
-		Thor = 26,
-		SkullKing = 27,
-		Triplicate = 28,
-		Subnova = 29,
-		FlamingNinja = 30,
-		DoubleCresent = 31,
-		Spades = 32,
-		Clubs = 33,
-		Diamonds = 34,
-		Hearts = 35,
-		Wasp = 36,
-		MarkOfShame = 37,
-		Snake = 38,
-		Hawk = 39,
-		Lips = 40,
-		Capsule = 41,
-		Cancel = 42,
-		GasMask = 43,
-		Grenade = 44,
-		Tsanta = 45,
-		Race = 46,
-		Valkyire = 47,
-		Drone = 48,
-		Grunt = 49,
-		GruntHead = 50,
-		BruteHead = 51,
-		Runes = 52,
-		Trident = 53,
-		Number0 = 54,
-		Number1 = 55,
-		Number2 = 56,
-		Number3 = 57,
-		Number4 = 58,
-		Number5 = 59,
-		Number6 = 60,
-		Number7 = 61,
-		Number8 = 62,
-		Number9 = 63
-	};
-
-	enum class e_emblem_background : BYTE
-	{
-		Solid = 0,
-		VerticalSplit = 1,
-		HorizontalSplit1 = 2,
-		HorizontalSplit2 = 3,
-		VerticalGradient = 4,
-		HorizontalGradient = 5,
-		TripleColumn = 6,
-		TripleRow = 7,
-		Quadrants1 = 8,
-		Quadrants2 = 9,
-		DiagonalSlice = 10,
-		Cleft = 11,
-		X1 = 12,
-		X2 = 13,
-		Circle = 14,
-		Diamond = 15,
-		Cross = 16,
-		Square = 17,
-		DualHalfCircle = 18,
-		Triangle = 19,
-		DiagonalQuadrant = 20,
-		ThreeQuaters = 21,
-		Quarter = 22,
-		FourRows1 = 23,
-		FourRows2 = 24,
-		SplitCircle = 25,
-		OneThird = 26,
-		TwoThirds = 27,
-		UpperField = 28,
-		TopandBottom = 29,
-		CenterStripe = 30,
-		LeftandRight = 31
-	};
-
-	enum class e_emblem_toggle : BYTE
-	{
-		Off = 0,
-		On
-	};
-
-	enum class e_handicap : BYTE
-	{
-		None = 0,
-		Minor = 1,
-		Moderate = 2,
-		Severe = 3
-	};
-
-	enum flags : int
-	{
-		// _player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
-		_player_inactive = 1, // this might also represent something else, like player left
-		_player_first_spawn = 3,
-	};
-
-	struct s_player_properties
-	{
-		wchar_t player_name[16];
-		char unk[32];
-
-		struct s_player_profile
-		{
-			e_color primary_color;
-			e_color secondary_color;
-			e_color tertiary_color;
-			e_color quaternary_color;
-			e_character_type player_character_type;
-			e_emblem_foreground foreground_emblem;
-			e_emblem_background background_emblem;
-			char emblem_flags;
-		} profile;
-
-		BYTE gap48[8];
-		wchar_t clan_name[16];
-		struct {
-			DWORD ID_1;
-			DWORD ID_2;
-			DWORD ID_3;
-		} clan_identifiers;
-
-		e_object_team player_team;
-		e_handicap player_handicap_level;
-		byte player_displayed_skill;
-		byte player_overall_skill;
-		char player_is_griefer;
-		char bungie_user_role;
-		char achievement_flags;
-		byte unk2;
-	};
-	CHECK_STRUCT_SIZE(s_player_properties, 132);
 
 	WORD datum_salt;
 	WORD flags;
@@ -251,7 +265,7 @@ struct s_player
 
 	/*
 	- TO NOTE: 
-	- This functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
+	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/Networking/Session)
 	*/
 
 	static s_data_array* GetArray();
@@ -259,14 +273,14 @@ struct s_player
 	static s_player* GetPlayer(int playerIndex);
 	static e_object_team GetTeam(int playerIndex);
 	static void SetTeam(int playerIndex, e_object_team team);
-	static void SetUnitBipedType(int playerIndex, s_player::e_character_type bipedType);
+	static void SetUnitBipedType(int playerIndex, e_character_type bipedType);
 	static void SetUnitBipedType(int playerIndex, byte representationIndex);
 	static void SetBipedSpeed(int playerIndex, float speed);
 	static const wchar_t* GetName(int playerIndex);
 	static datum GetPlayerUnitDatumIndex(int playerIndex);
 	static unsigned long long GetId(int playerIndex);
 };
-CHECK_STRUCT_SIZE(s_player, 0x204);
+CHECK_STRUCT_SIZE(s_player, 516);
 #pragma pack(pop)
 
 class PlayerIterator : private s_data_iterator<s_player>
