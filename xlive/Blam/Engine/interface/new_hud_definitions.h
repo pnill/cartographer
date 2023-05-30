@@ -514,6 +514,6 @@ struct s_new_hud_definition : TagGroup<'nhdt'>
     tag_block<s_hud_bitmap_widget_definition> bitmap_widgets;
     tag_block<s_hud_text_widget_definition> text_widgets;
     s_new_hud_dashlight_data dashlight_data;
-    tag_block<> screen_effect_widgets;
+    tag_block<s_hud_screen_effect_widget_definition> screen_effect_widgets;
 };
 TAG_GROUP_SIZE_ASSERT(s_new_hud_definition, 40);
