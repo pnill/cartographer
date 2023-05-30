@@ -13,6 +13,11 @@
 
 bool show_hud = true;
 
+s_new_hud_engine_globals* get_new_hud_engine_globals()
+{
+	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4);
+}
+
 bool __cdecl render_ingame_chat_check() 
 {
 	if (H2Config_hide_ingame_chat) 
@@ -34,31 +39,6 @@ bool __cdecl render_ingame_chat_check()
 		//original test - if is campaign
 		return true;
 	}
-}
-
-bool __cdecl render_hud_check(unsigned int a1)
-{
-	static bool hud_opacity_reset = true;
-	s_new_hud_globals* new_hud_globals = *Memory::GetAddress<s_new_hud_globals**>(0x9770F4);
-
-	if (!show_hud || ice_cream_flavor_available(skull_type_blind))
-	{
-		new_hud_globals->hud_opacity = 0.0f;
-		hud_opacity_reset = false;
-	}
-	else if (!hud_opacity_reset)
-	{
-		new_hud_globals->hud_opacity = 1.0f;
-		hud_opacity_reset = true;
-	}
-
-	return false;
-}
-
-
-void toggle_hud(bool state)
-{
-	show_hud = state;
 }
 
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
@@ -97,9 +77,6 @@ void new_hud_apply_patches()
 	// Redirects the is_campaign call that the in-game chat renderer makes so we can show/hide it as we like.
 	PatchCall(Memory::GetAddress(0x22667B), render_ingame_chat_check);
 	PatchCall(Memory::GetAddress(0x226628), render_ingame_chat_check);
-
-	// Redirect ice_cream_flavor_available call 
-	PatchCall(Memory::GetAddress(0x223955), render_hud_check);
 
 	// Hook ui_get_hud_elements for modifying the hud anchor for text
 	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemets_anchor_hook);
