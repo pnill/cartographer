@@ -50,6 +50,8 @@ void XnIpManager::Initialize(const XNetStartupParams* netStartupParams)
 
 	if (m_startupParams.cfgSockDefaultSendBufsizeInK <= 0)
 		m_startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
+
+	XNetRandom(NULL, 0);
 }
 
 XnIp* XnIpManager::GetConnection(const IN_ADDR ina) const
