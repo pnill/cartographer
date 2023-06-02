@@ -156,7 +156,7 @@ bool __cdecl is_network_observer_mode_managed()
 void s_network_observer::ResetNetworkPreferences()
 {
 	// reset the network bandwidth preferences
-	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preference_size);
+	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preferences_size);
 }
 
 bool __thiscall s_network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
@@ -240,7 +240,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	if (observer_index == -1)
 		return false;
 
-	s_network_channel* network_channel = s_network_channel::Get(network_channel_index);
+	s_network_channel* network_channel = s_network_channel::get(network_channel_index);
 	s_observer_channel* observer_channel = &this->observer_channels[observer_index];
 
 	// we modify the network channel paramters to force the network tickrate
@@ -255,7 +255,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	if (observer_channel->managed_stream)
 	{
 		// check if we're host
-		if (network_channel->isSimulationAuthority())
+		if (network_channel->is_simulation_authority())
 		{
 			observer_channel->net_rate_managed_stream = _online_netcode_server_rate_real;
 			observer_channel->net_managed_stream_bandwidth = _online_netcode_server_max_bandwidth_per_channel;

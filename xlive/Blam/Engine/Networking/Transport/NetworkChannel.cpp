@@ -2,7 +2,7 @@
 
 #include "NetworkChannel.h"
 
-s_network_channel* s_network_channel::Get(int channelIdx)
+s_network_channel* s_network_channel::get(int channelIdx)
 {
 	s_network_channel* network_channels = *Memory::GetAddress<s_network_channel**>(0x4FADBC, 0x525274);
 	return &network_channels[channelIdx];
