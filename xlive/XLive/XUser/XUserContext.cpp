@@ -2,6 +2,7 @@
 
 #include "XUserContext.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "Blam/Engine/game/game_engine.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -124,8 +125,6 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	if (dwContextId == X_CONTEXT_PRESENCE)
 	{
 		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {}", dwContextValue);
-		int GameGlobals = *Memory::GetAddress<int*>(0x482D3C);
-		int GameEngineGlobals = *Memory::GetAddress<int*>(0x4BF8F8);
 
 		std::wstring map_name_wide = Memory::GetAddress<wchar_t*>(0x46DAE8);
 		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L"\\") + 1);
@@ -168,13 +167,11 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		case ContextPresence::network_in_game:
 		case ContextPresence::live_in_game:
 		{
-			int game_engine_type = *reinterpret_cast<BYTE*>(GameEngineGlobals + 0xC54);
-
 			DiscordInterface::SetGameState(
 				map_name,
 				"Multiplayer",
 				getEnglishMapName(),
-				gamemode_id_to_string(game_engine_type),
+				gamemode_id_to_string(s_game_engine_globals::get()->game_engine_index),
 				getVariantName()
 			);
 			update_player_count();

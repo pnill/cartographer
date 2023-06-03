@@ -1617,7 +1617,7 @@ int __cdecl sub_23f6b7(int a1)
 {
 	if (UserSignedIn(0)) {
 		XUserSignOut(0);
-		UpdateConnectionStatus();
+		UpdateMasterLoginStatus();
 	}
 	return psub_23f6b7(a1);
 }

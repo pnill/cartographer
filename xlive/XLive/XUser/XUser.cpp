@@ -12,7 +12,7 @@ extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 bool signInChanged[4];
 XUSER_SIGNIN_INFO usersSignInInfo[4];
 
-bool SignInStatusChanged()
+bool UserSignInChanged()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -47,6 +47,14 @@ bool UserSignedOnline(DWORD dwUserIndex)
 	return false;
 }
 
+XUSER_SIGNIN_INFO* UserGetSignInInfo(DWORD dwUserIndex)
+{
+	if (dwUserIndex != 0)
+		dwUserIndex = 0;
+
+	return &usersSignInInfo[dwUserIndex];
+}
+
 void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
 {
 	// GFWL supports only 1 user logged in at the time
@@ -61,7 +69,9 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 		GetAchievements(xuid);
 	}
 	else
+	{
 		usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
+	}
 
 	usersSignInInfo[dwUserIndex].xuid = xuid;
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
@@ -132,6 +142,7 @@ XUSER_SIGNIN_STATE WINAPI XUserGetSigninState(DWORD dwUserIndex)
 
 	default:
 		ret = eXUserSigninState_NotSignedIn;
+		break;
 	}
 
 	return ret;
@@ -428,12 +439,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	if (!UserSignedOnline(dwUserIndex))
 		return ERROR_NOT_FOUND;
 
-	BOOL async;
-
-	if (pOverlapped)
-		async = TRUE;
-	else
-		async = FALSE;
+	BOOL async = pOverlapped != NULL;
 
 	if (pcbResults)
 	{
@@ -579,7 +585,7 @@ DWORD WINAPI XUserReadProfileSettings(DWORD dwTitleId, DWORD dwUserIndex, DWORD 
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
 		pOverlapped->InternalHigh = *pcbResults;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
+		pOverlapped->dwExtendedError = 0;
 
 		Check_Overlapped(pOverlapped);
 
@@ -664,8 +670,8 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 	if (pOverlapped)
 	{
 		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-		pOverlapped->InternalLow = 0;
+		pOverlapped->InternalHigh = 0;
+		pOverlapped->dwExtendedError = 0;
 
 
 		Check_Overlapped(pOverlapped);

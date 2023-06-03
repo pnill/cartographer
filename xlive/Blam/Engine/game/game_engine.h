@@ -9,8 +9,9 @@ struct s_game_engine_globals
 	byte gapC[216];
 	float unk_local_player_hud_field[4];
 	byte gapF4[2912];
-	DWORD game_engine_index;
+	int game_engine_index;
 	byte gapC58[132];
+
 	static s_game_engine_globals* get();
 };
 #pragma pack(pop)
