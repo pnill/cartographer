@@ -262,7 +262,6 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
@@ -270,6 +269,7 @@
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_interpolation.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
