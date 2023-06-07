@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
@@ -1059,8 +1060,6 @@ void H2MOD::ApplyHooks() {
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
 
-		PatchCall(Memory::GetAddress(0x169E59), aim_assist_targeting_clear_hook);
-
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
 
@@ -1096,6 +1095,7 @@ void H2MOD::ApplyHooks() {
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
 		screens_apply_patches();
+		aim_assist_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

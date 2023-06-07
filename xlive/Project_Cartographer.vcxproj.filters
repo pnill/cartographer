@@ -182,6 +182,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screens_patches.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_esrb_warning.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
