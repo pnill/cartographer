@@ -218,7 +218,7 @@ struct bitmap_data
     int lod3_size;
     DWORD unk1[3];
     tag_reference parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
-    DWORD unk1[3];
+    DWORD unk2[3];
     int low_detail_offset;
     int low_detail_size;
     e_bitmap_data_format low_detail_format;

@@ -58,6 +58,11 @@ std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 bool H2XFirerateEnabled = false;
 bool xboxTickrateEnabled = false;
 
+bool get_xbox_tickrate_bool()
+{
+	return xboxTickrateEnabled;
+}
+
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", H2XFirerateEnabled },
@@ -989,21 +994,6 @@ void H2MOD::RegisterEvents()
 int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 {
 	return 805; // return the id of the last level
-}
-
-// sword-flying target clear patch
-void __cdecl aim_assist_targeting_clear_hook(int target_data)
-{
-	if (!s_game_globals::game_is_campaign()
-		&& !xboxTickrateEnabled)
-	{
-		*(DWORD*)(target_data) = -1;
-		*(DWORD*)(target_data + 4) = -1;
-		*(DWORD*)(target_data + 8) = -1;
-		*(WORD*)(target_data + 24) = 0;
-		*(DWORD*)(target_data + 28) = 0;
-		*(DWORD*)(target_data + 32) = 0;
-	}
 }
 
 void H2MOD::ApplyHooks() {

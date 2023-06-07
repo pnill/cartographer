@@ -24,6 +24,7 @@ enum e_static_lod : DWORD
 	cinematic
 };
 
+bool get_xbox_tickrate_bool();
 void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout);
 typedef void(__thiscall* update_player_score_t)(void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
 
@@ -54,7 +55,6 @@ public:
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool enable);
 	void set_local_rank(BYTE rank);
-	void cine_start_tex();
 
 	e_engine_type GetEngineType() { return engineType; }
 	void SetCurrentEngineType(e_engine_type value) { engineType = value; }

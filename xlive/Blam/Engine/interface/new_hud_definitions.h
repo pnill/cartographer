@@ -474,7 +474,7 @@ CHECK_STRUCT_SIZE(s_new_hud_dashlight_data, 8);
 
 enum e_screen_effect_widget_flags : short
 {
-    screen_effect_widget_flag_unused = FLAG(0),
+    screen_effect_widget_flag_unused = FLAG(0)
 };
 
 struct s_screen_effect_bonus_struct_block

@@ -64,7 +64,6 @@ struct s_waypoint_arrows_block
 };
 TAG_BLOCK_SIZE_ASSERT(s_waypoint_arrows_block, 104);
 
-#pragma pack(push,1)
 struct hud_globals_definition : TagGroup<'hudg'>
 {
 	// Explaination("Messaging parameters", "")
@@ -203,7 +202,6 @@ struct hud_globals_definition : TagGroup<'hudg'>
 
 	s_new_hud_globals new_globals;
 };
-#pragma pack(pop)
 TAG_GROUP_SIZE_ASSERT(hud_globals_definition, 1160);
 
 // gets the current loaded hud globals tag
