@@ -13,8 +13,11 @@
 #define ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT -13
 #define SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT 7
 
-void UpdateConnectionStatus();
+int GetMasterState();
+const char* GetMasterStateStr();
+void UpdateMasterLoginStatus(bool developer = false);
+void UpdateMasterStatus(int state, const char* state_str, ...);
 bool HandleGuiLogin(char* token, char* identifier, char* password, int* master_login_interpret_result);
-char ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn);
+int ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* machineUID, const char* abOnline, bool onlineSignIn, bool developer = false);
 
 extern bool AccountEdit_remember;

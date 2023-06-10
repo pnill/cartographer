@@ -6,6 +6,7 @@
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
 
+#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -28,9 +29,7 @@ LPDIRECT3DDEVICE9 pDevice;
 
 IDirect3DTexture9* Primitive = NULL;
 
-int masterState = 0;
 char* buildText = nullptr;
-char* serverStatus = nullptr;
 
 const char CompileDate[] = __DATE__;
 const char CompileTime[] = __TIME__;
@@ -85,9 +84,9 @@ LPDIRECT3DTEXTURE9 Texture_Interface;
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 {
-	InitInstance();
-
 	LOG_TRACE_XLIVE("XLiveInitializeEx()");
+
+	InitInstance();
 
 	if (pXii->pD3D)
 	{
@@ -95,6 +94,9 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
 		XLiveRendering::Initialize(d3dpp->hDeviceWindow);
 	}
+
+	UpdateMasterStatus(-1, "Status: Initializing");
+
 	LOG_TRACE_XLIVE("XLiveInitializeEx() - dwVersion = {0:x}", dwVersion);
 	return 0;
 }
@@ -387,9 +389,6 @@ void XLiveRendering::Initialize(HWND hWnd)
 {
 	InitFontsIfRequired();
 
-	serverStatus = new char[256];
-	snprintf(serverStatus, 256, "Status: Initializing....");
-
 	buildText = new char[256];
 	snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 
@@ -442,7 +441,7 @@ static void set_max_system_timer_resolution(bool enabled)
 }
 
 // TODO: move to _Shell or somewhere else?
-void XLiveThrottleFramerate(int maxFramerate) 
+void XLiveThrottleFramerate(int desiredFramerate) 
 {
 	static LARGE_INTEGER lastCounter;
 	static int lastFrameSetting = -1;
@@ -451,16 +450,16 @@ void XLiveThrottleFramerate(int maxFramerate)
 	const int threadWaitTimePercentage = 90;
 	static HANDLE hFrameLimitTimer = NULL;
 
-	if (maxFramerate <= 0)
+	if (desiredFramerate <= 0)
 	{
-		lastFrameSetting = maxFramerate;
+		lastFrameSetting = desiredFramerate;
 		frameLimiterInitialized = false;
 		return;
 	}
 
-	if (lastFrameSetting != maxFramerate)
+	if (lastFrameSetting != desiredFramerate)
 	{
-		lastFrameSetting = maxFramerate;
+		lastFrameSetting = desiredFramerate;
 		frameLimiterInitialized = false;
 	}
 
@@ -490,7 +489,7 @@ void XLiveThrottleFramerate(int maxFramerate)
 	LARGE_INTEGER deltaCounter;
 	QueryPerformanceFrequency(&frequency); 
 
-	auto minFrameTimeUs = (long long)(1000000.0 / (double)maxFramerate);
+	auto minFrameTimeUs = (long long)(1000000.0 / (double)desiredFramerate);
 
 	QueryPerformanceCounter(&deltaCounter);
 	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
@@ -569,22 +568,32 @@ int WINAPI XLiveRender()
 			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
 			int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
 
-			DWORD gameGlobals = *Memory::GetAddress<DWORD*>(0x482D3C, 0x4CB520);
-			DWORD gameEngine = *(DWORD*)(gameGlobals + 0x8);
-			bool paused_or_in_menus = (*Memory::GetAddress<BYTE*>(0x47A568) != 0);
+			bool game_is_main_menu = s_game_globals::get()->game_is_mainmenu();
+			bool paused_or_in_menus = *Memory::GetAddress<bool*>(0x47A568) != 0;
 
-			if (gameEngine == 3 || (gameEngine != 3 && paused_or_in_menus)) {
+			if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
 				drawText(0, 0, COLOR_WHITE, buildText, smallFont);
-				if (masterState == 0)
-					drawText(0, 15, COLOR_WHITE, serverStatus, smallFont);
-				else if (masterState == 1)
-					drawText(0, 15, COLOR_GREY, serverStatus, smallFont);
-				else if (masterState == 2)
-					drawText(0, 15, COLOR_RED, serverStatus, smallFont);
-				else if (masterState == 10)
-					drawText(0, 15, COLOR_GREEN, serverStatus, smallFont);
 
-				if(H2Config_anti_cheat_enabled)
+				D3DCOLOR masterStateColor;
+				switch (GetMasterState())
+				{
+				case -1:
+				case 0:
+					masterStateColor = COLOR_WHITE;
+					break;
+				case 1:
+					masterStateColor = COLOR_GREY;
+					break;
+				case 10:
+					masterStateColor = COLOR_GREEN;
+					break;
+				default:
+					masterStateColor = COLOR_RED;
+					break;
+				}
+				drawText(0, 15, masterStateColor, GetMasterStateStr(), smallFont);
+
+				if (H2Config_anti_cheat_enabled)
 					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
 				else
 					drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);

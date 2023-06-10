@@ -104,7 +104,7 @@ public:
 	static void AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped);
 
 #pragma region ServerListQuery
-	HANDLE Handle = INVALID_HANDLE_VALUE;
+	HANDLE m_handle = INVALID_HANDLE_VALUE;
 
 	CServerList(DWORD _cItemsPerPage, DWORD _cSearchPropertiesIDs, DWORD* _pSearchProperties)
 	{

@@ -21,7 +21,7 @@
 #endif
 
 // network heap size
-#define k_network_preference_size 108
+#define k_network_preferences_size 108
 
 // default: 1048576
 #define k_network_heap_size 10485760 
@@ -117,7 +117,7 @@ struct alignas(8) s_observer_channel
 	DWORD unmanaged_stream_bandwidth;
 	float net_rate_unmanaged_stream;
 	DWORD unmanaged_stream_window_size;
-	BYTE managed_stream;
+	bool managed_stream;
 	BYTE field_6A5;
 	bool simulation_attached;
 	bool simulation_authority;

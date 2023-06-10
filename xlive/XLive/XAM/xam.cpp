@@ -93,7 +93,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		if (notify_xlive_ui != -1)
 			dwMsgFilter = XN_SYS_UI;
 
-		else if (SignInStatusChanged())
+		else if (UserSignInChanged())
 			dwMsgFilter = XN_SYS_SIGNINCHANGED;
 
 		// ex. GTA IV - recheck DLC containers
