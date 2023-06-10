@@ -1,23 +1,19 @@
 #include "stdafx.h"
 #include "hud.h"
+#include "new_hud_definitions.h"
 
+#include "Blam/Common/Common.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/TagInterface.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
+#define k_redraw_map_name "ui_redraw"
+
 static float original_primary_hud_scale;
 static float original_secondary_hud_scale;
-
-// Seperated value for the scale of the crosshair
-static float crosshair_scale = 1.0f;
-
-// This controls the scale for hud when we implement the redrawn hud
-// ex. a value of 4.0 would allow us to use hud bitmaps that are 4x larger (resolution wise) than the old ones
-#define k_hud_upscale_size 1.0f
-
 
 // Used to grab the default crosshair size before we modify it
 typedef void(__cdecl* update_hud_elements_display_settings_t)(int new_hud_size, int new_safe_area);
@@ -30,17 +26,17 @@ void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new
 	original_secondary_hud_scale = *Memory::GetAddress<float*>(0x464028);
 
 	set_primary_hud_scale(1.0f);
-	set_crosshair_scale(H2Config_crosshair_scale);
+	set_secondary_hud_scale(1.0f);
 }
 
 void set_primary_hud_scale(float scale)
 {
-	*get_primary_hud_scale() = original_primary_hud_scale * scale * (1.f / k_hud_upscale_size);
+	*get_primary_hud_scale() = original_primary_hud_scale * scale * (1.f / k_primary_upscale_size);
 }
 
 void set_secondary_hud_scale(float scale)
 {
-	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * (1.f / k_hud_upscale_size);
+	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * (1.f / k_primary_upscale_size);
 }
 
 float* get_primary_hud_scale()
@@ -51,11 +47,6 @@ float* get_primary_hud_scale()
 float* get_secondary_hud_scale()
 {
 	return Memory::GetAddress<float*>(0x464028);
-}
-
-void set_crosshair_scale(float scale)
-{
-	crosshair_scale = original_secondary_hud_scale * scale;
 }
 
 void set_crosshair_offset(float offset)
@@ -71,16 +62,9 @@ void hud_patches_on_map_load()
 {
 	if (Memory::IsDedicatedServer()) { return; }
 
-	set_crosshair_scale(H2Config_crosshair_scale);
 	set_crosshair_offset(H2Config_crosshair_offset);
 	set_primary_hud_scale(1.0f);
-}
-
-void hud_apply_patches()
-{
-	if (Memory::IsDedicatedServer()) { return; }
-
-
+	set_secondary_hud_scale(1.0f);
 }
 
 void hud_apply_pre_winmain_patches()
@@ -93,7 +77,4 @@ void hud_apply_pre_winmain_patches()
 	PatchCall(Memory::GetAddress(0x25E1FC), update_hud_elements_display_settings_hook);
 	PatchCall(Memory::GetAddress(0x264058), update_hud_elements_display_settings_hook);
 	PatchCall(Memory::GetAddress(0x26406F), update_hud_elements_display_settings_hook);
-
-	// Replace the crosshair and text scale global with our own just for the crosshair
-	WritePointer(Memory::GetAddress(0x222F9F) + 4, &crosshair_scale);
 }

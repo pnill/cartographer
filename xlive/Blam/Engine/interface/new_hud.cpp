@@ -1,16 +1,21 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
+#include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
-#include "Blam/Engine/game/cheats.h"
-#include "Blam/Engine/game/players.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "Blam/Math/integer_math.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
+#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
+
+std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums
+std::vector<point2d> crosshair_original_bitmap_sizes;	// We use point2d struct to store the original resolutions (x as width and y as height)
 
 s_new_hud_engine_globals* get_new_hud_engine_globals()
 {
@@ -19,7 +24,7 @@ s_new_hud_engine_globals* get_new_hud_engine_globals()
 
 bool __cdecl render_ingame_chat_check() 
 {
-	if (H2Config_hide_ingame_chat) 
+	if (H2Config_hide_ingame_chat)
 	{
 		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
 		if (s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) 
@@ -29,7 +34,7 @@ bool __cdecl render_ingame_chat_check()
 		return true;
 	}
 
-	else if (h2mod->GetEngineType() != _main_menu && get_game_life_cycle() == _life_cycle_in_game) 
+	else if (!s_game_globals::game_is_mainmenu() && get_game_life_cycle() == _life_cycle_in_game)
 	{
 		//Enable chat in engine mode and game state mp.
 		return false;
@@ -41,7 +46,7 @@ bool __cdecl render_ingame_chat_check()
 }
 
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
-void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor type, real_bounds* bounds)
+void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bounds)
 {
 	float safe_area = *Memory::GetAddress<float*>(0x9770F0);
 	s_camera* camera_data = get_global_camera();
@@ -51,16 +56,113 @@ void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor type, real_bounds* bound
 	typedef void(__cdecl* ui_get_hud_elemets_anchor_t)(e_hud_anchor, real_bounds*);
 	auto p_ui_get_hud_elemet_bounds = Memory::GetAddress<ui_get_hud_elemets_anchor_t>(0x223969);
 
-	switch (type)
+	switch (anchor)
 	{
 	case hud_anchor_weapon_hud:
 		bounds->lower = (float)camera_data->window_bounds.left + safe_area;
-		bounds->upper= (float)camera_data->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
+		bounds->upper = (float)camera_data->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
 		break;
 	default:
-		p_ui_get_hud_elemet_bounds(type, bounds);
+		p_ui_get_hud_elemet_bounds(anchor, bounds);
 		break;
 	}
+}
+
+
+// We scale crosshairs by adjusting the bitmap data size in the bitmap tag
+// It dosen't seem to actually downscale the bitmap since the data loaded still remains the same
+void set_crosshair_scale(float scale)
+{
+	size_t bitmap_size_vector_index = 0;
+
+	// Loops through every bitmap datum in the vector that's considered a crosshair
+	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	{
+		// Grab the bitmap definition
+		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
+
+		// Loop through every bitmap inside the bitmap tag
+		for (size_t j = 0; j < bitm_definition->bitmaps.size; ++j)
+		{
+			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
+			point2d original_bitmap_size = crosshair_original_bitmap_sizes[bitmap_size_vector_index];
+
+			// Multiply bitmap size by scale and then by the upscale size
+			// We do (1 /k_secondary_upscale_size) in the calculations since we need to scale down the bitmap depending on the resolution increase
+			// Example: the bitmap provided is supposed to be 4 times larger in size compared to the original so we need to scale it down by (1/4) so 0.25
+			bitmap_data_block->width_pixels = original_bitmap_size.x * scale * (1 / k_crosshair_upscale_size);
+			bitmap_data_block->height_pixels = original_bitmap_size.y * scale * (1 / k_crosshair_upscale_size);
+
+			++bitmap_size_vector_index;
+		}
+	}
+}
+
+// Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
+void initialize_crosshair_bitmap_data()
+{
+	crosshair_original_bitmap_sizes.clear();
+
+	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	{
+		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
+		for (size_t j = 0; j < bitm_definition->bitmaps.size; ++j)
+		{
+			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
+			point2d bitmap_size = { bitmap_data_block->width_pixels, bitmap_data_block->height_pixels };
+			crosshair_original_bitmap_sizes.push_back(bitmap_size);
+		}
+	}
+}
+
+// Checks if the vector contains the datum provided so we don't have duplicate datums in the vector
+bool crosshair_bitmap_vector_contains_datum(datum tag_datum)
+{
+	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	{
+		if (crosshair_bitmap_datums[i] == tag_datum)
+		{
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+// Gets all bitmap tags that are referenced as a crosshair from the new_hud_definition tags
+// Intended to grab all bitmaps referenced as crosshairs rather than just the original ones
+void get_crosshair_bitmap_datums()
+{
+	// Clear all datums from previous map file
+	crosshair_bitmap_datums.clear();
+
+	// Get all nhdt tags
+	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(blam_tag::tag_group_type::newhuddefinition);
+	for each (auto nhdt_tag in new_hud_definition_tags)
+	{
+		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(nhdt_tag.first);
+
+		// Loop through every bitmap widget in the nhdt definition
+		for (byte i = 0; i < nhdt_definition->bitmap_widgets.size; ++i)
+		{
+			s_hud_bitmap_widget_definition* bitmap_widget_definition = nhdt_definition->bitmap_widgets[i];
+
+			if (bitmap_widget_definition->widget_inputs.input_1 == hud_input_type_unit_autoaimed && 
+				bitmap_widget_definition->anchor == hud_anchor_crosshair && 
+				!crosshair_bitmap_vector_contains_datum(bitmap_widget_definition->bitmap.TagIndex))
+			{
+				crosshair_bitmap_datums.push_back(bitmap_widget_definition->bitmap.TagIndex);
+			}
+		}
+	}
+
+}
+
+void initialize_crosshair_scale()
+{
+	get_crosshair_bitmap_datums();
+	initialize_crosshair_bitmap_data();
+	set_crosshair_scale(H2Config_crosshair_scale);
 }
 
 void new_hud_apply_patches()
@@ -79,4 +181,9 @@ void new_hud_apply_patches()
 
 	// Hook ui_get_hud_elements for modifying the hud anchor for text
 	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemet_bounds_hook);
+}
+
+void new_hud_patches_on_map_load()
+{
+	initialize_crosshair_scale();
 }

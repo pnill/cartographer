@@ -576,6 +576,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
+		new_hud_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
@@ -1026,7 +1027,6 @@ void H2MOD::ApplyHooks() {
 
 	apply_cheat_hooks();
 
-	hud_apply_patches();
 	new_hud_apply_patches();
 	motion_sensor_apply_patches();
 	render_cameras_apply_patches();
