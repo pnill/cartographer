@@ -74,11 +74,11 @@ struct alignas(8) s_network_channel
 	LARGE_INTEGER field_E0;
 	char gap[10];
 
-	static s_network_channel* Get(int channelIndex);
+	static s_network_channel* get(int channelIndex);
 	bool GetNetworkAddressFromNetworkChannel(network_address* out_addr);
 
-	bool hasSimulationInterface() { return simulation_interface != nullptr; }
-	bool isSimulationAuthority() { return hasSimulationInterface() && *(bool*)((BYTE*)simulation_interface + 48); }
+	bool has_simulation_interface() { return simulation_interface != nullptr; }
+	bool is_simulation_authority() { return has_simulation_interface() && *(bool*)((BYTE*)simulation_interface + 48); }
 };
 CHECK_STRUCT_SIZE(s_network_channel, 248);
 

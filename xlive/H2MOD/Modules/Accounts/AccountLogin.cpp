@@ -12,50 +12,81 @@
 
 #include "XLive/xnet/upnp.h"
 
+#define MASTER_STATE_STR_SIZE 256
+int masterState = -1;
+char* masterStateStr = NULL;
 bool AccountEdit_remember = true;
 
-#pragma region h2master_login
-
-typedef LONG NTSTATUS, *PNTSTATUS;
-#define STATUS_SUCCESS (0x00000000)
+#pragma region Halo 2 Master Login
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);
 
-void UpdateConnectionStatus() {
-	extern int masterState;
-	extern char* serverStatus;
+int GetMasterState()
+{
+	return masterState;
+}
+
+const char* GetMasterStateStr()
+{
+	return masterStateStr;
+}
+
+void UpdateMasterStatus(int new_state, const char* state_str, ...)
+{
+	va_list v;
+	va_start(v, state_str);
+	masterState = new_state;
+	if (!Memory::IsDedicatedServer())
+	{
+		if (masterStateStr)
+			delete[] masterStateStr;
+		masterStateStr = new char[MASTER_STATE_STR_SIZE];
+		vsnprintf(masterStateStr, MASTER_STATE_STR_SIZE, state_str, v);
+	}
+	va_end(v);
+}
+
+void UpdateMasterLoginStatus(bool developer) {
+	
 	if (UserSignedOnline(0)) {
-		masterState = 10;
-		if (!Memory::IsDedicatedServer())
-			snprintf(serverStatus, 256, "Status: Online");
+		const char* statusStr = "Status: Online";
+		if (developer)
+			statusStr = "Status: Developer";
+		UpdateMasterStatus(10, statusStr);
 	}
-	else if (UserSignedInLocally(0))
-	{
-		masterState = 2;
-		if (!Memory::IsDedicatedServer())
-			snprintf(serverStatus, 256, "Status: Locally signed in");
+	else if (UserSignedInLocally(0)) {
+		UpdateMasterStatus(2, "Status: Locally signed in");
 	}
-	else
-	{
-		masterState = 2;
-		if (!Memory::IsDedicatedServer())
-			snprintf(serverStatus, 256, "Status: Offline");
+	else {
+		UpdateMasterStatus(2, "Status: Offline");
 	}
 }
 
-char ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* abEnet, const char* abOnline, bool onlineSignIn) {
+int ConfigureUserDetails(const char* username, const char* login_token, unsigned long long xuid, unsigned long xnaddr, unsigned long lanaddr, const char* machineUID, const char* abOnline, bool online_signin, bool developer) {
 
-	if (strlen(username) <= 0 || xuid == 0 || strnlen(abEnet, 12) != 12 || strnlen(abOnline, 40) != 40) {
+	bool xuidValid = xuid != 0;
+	size_t usernameLen = strnlen(username, XUSER_NAME_SIZE);
+	bool usernameValid = (usernameLen > 0 && usernameLen <= XUSER_MAX_NAME_LENGTH);
+	bool machineUIdValid = strnlen(machineUID, 12 + 1) == 12;
+	bool onlineIdValid = strnlen(abOnline, 40 + 1) == 40;
+
+	// validation
+	if (!xuidValid
+		|| !usernameValid
+		|| !machineUIdValid
+		|| !onlineIdValid
+		)
+	{
+		addDebugText("Login data invalid!");
 		return 0;
 	}
 
-	char result = strlen(login_token) == 32 ? 1 : 2;
+	int result = strlen(login_token) == 32 ? 1 : 2;
 
-	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, abEnet, abOnline, onlineSignIn);
+	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	UpdateMasterLoginStatus(developer);
 
-	UpdateConnectionStatus();
-
-	if (onlineSignIn) {
+	if (online_signin) {
 		if (!Memory::IsDedicatedServer())
 			ForwardPorts();
 	}
@@ -64,11 +95,11 @@ char ConfigureUserDetails(const char* username, const char* login_token, unsigne
 		free(H2CurrentAccountLoginToken);
 	}
 	if (result == 1) {
-		H2CurrentAccountLoginToken = (char*)calloc(33, sizeof(char));
-		snprintf(H2CurrentAccountLoginToken, 33, login_token);
+		H2CurrentAccountLoginToken = (char*)calloc(32 + 1, sizeof(char));
+		snprintf(H2CurrentAccountLoginToken, 32 + 1, login_token);
 	}
 	else {
-		H2CurrentAccountLoginToken = 0;
+		H2CurrentAccountLoginToken = NULL;
 	}
 
 	//FIXME - remove the handle again after they sign out. display an error - yes no window when it's taken when you click on it.
@@ -99,18 +130,16 @@ char ConfigureUserDetails(const char* username, const char* login_token, unsigne
 }
 
 static int InterpretMasterLogin(char* response_content, char* prev_login_token) {
-	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
+	int result = 0;
 
-	char username[XUSER_NAME_SIZE] = { "" };
-	char login_token[33] = { "" };
-	unsigned long long xuid = 0;
-	unsigned long saddr = 0;
+	char username[XUSER_NAME_SIZE] = {};
+	char login_token[32 + 1] = {};
 	unsigned long xnaddr = 0;
-	char abEnet[13] = { "" };
-	char abOnline[41] = { "" };
+	unsigned long long xuid = 0;
+	char machineUID[12 + 1] = {};
+	char abOnline[40 + 1] = {};
 
-
-	char tempstr1[129] = { "" };
+	char tempstr1[128 + 1] = {};
 	int tempint1 = -1;
 	unsigned long long templlu1 = 0;
 	unsigned int tempuint1 = 0;
@@ -122,7 +151,6 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		char* fileLine = (char*)malloc((index_next - index_current + 1) * sizeof(char));
 		memcpy(fileLine, index_current, index_next - index_current);
 		fileLine[index_next - index_current] = 0;
-
 
 		if (sscanf(fileLine, "return_code=%d", &tempint1) == 1) {
 			addDebugText("Return code is: %d", tempint1);
@@ -136,7 +164,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 128, tempName);
+			snprintf(tempstr1, 128 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -154,7 +182,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 45, tempName);
+			snprintf(tempstr1, 128 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -177,7 +205,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 45, tempName);
+			snprintf(tempstr1, 128 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -188,13 +216,13 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			unsigned long resolvedAddr;
 			if ((resolvedAddr = inet_addr(tempstr1)) != INADDR_NONE || strcmp(tempstr1, "255.255.255.255") == 0) {
-				//addDebugText("H2Master Relay IP is: %s", tempstr1);
+				//addDebugText("H2 master relay IP is: %s", tempstr1);
 				H2Config_master_ip = resolvedAddr;
 			}
 		}
 		else if (sscanf(fileLine, "login_master_relay_port=%d", &tempint1) == 1) {
 			if (tempint1 >= 0) {
-				//addDebugText("H2Master Relay Port is: %d", tempint1);
+				//addDebugText("H2 master relay port is: %d", tempint1);
 				H2Config_master_port_relay = tempint1;
 			}
 		}
@@ -203,7 +231,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 33, tempName);
+			snprintf(tempstr1, 32 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -213,8 +241,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) == 32) {
-				//addDebugText("Login Token is: %s", tempstr1);
-				strncpy(login_token, tempstr1, 33);
+				//addDebugText("Login token is: %s", tempstr1);
+				strncpy(login_token, tempstr1, 32 + 1);
 			}
 		}
 		else if (strstr(fileLine, "login_username=")) {
@@ -232,7 +260,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) > 0) {
-				addDebugText("Login Username is: %s", tempstr1);
+				addDebugText("Login username is: %s", tempstr1);
 				strncpy_s(username, tempstr1, XUSER_MAX_NAME_LENGTH);
 			}
 		}
@@ -242,18 +270,12 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				xuid = templlu1;
 			}
 		}
-		else if (sscanf(fileLine, "login_secure_addr=%x", &tempulong) == 1) {
-			if (tempulong > 0) {
-				//addDebugText("User saddr is: %08zx", tempulong);
-				saddr = tempulong;
-			}
-		}
 		else if (strstr(fileLine, "login_abEnet=")) {
 			char* tempName = fileLine + strlen("login_abEnet=");
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 13, tempName);
+			snprintf(tempstr1, 12 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -263,8 +285,8 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 				}
 			}
 			if (strlen(tempstr1) == 12) {
-				//addDebugText("Login abEnet is: %s", tempstr1);
-				strncpy(abEnet, tempstr1, 13);
+				//addDebugText("Login machineUID is: %s", tempstr1);
+				strncpy(machineUID, tempstr1, 12 + 1);
 			}
 		}
 		else if (strstr(fileLine, "login_abOnline=")) {
@@ -272,7 +294,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			while (isspace(*tempName)) {
 				tempName++;
 			}
-			snprintf(tempstr1, 41, tempName);
+			snprintf(tempstr1, 40 + 1, tempName);
 			for (int j = strlen(tempstr1) - 1; j > 0; j--) {
 				if (isspace(tempstr1[j])) {
 					tempstr1[j] = 0;
@@ -283,7 +305,7 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 			}
 			if (strlen(tempstr1) == 40) {
 				//addDebugText("Login abOnline is: %s", tempstr1);
-				strncpy(abOnline, tempstr1, 41);
+				strncpy(abOnline, tempstr1, 40 + 1);
 			}
 		}
 
@@ -291,44 +313,41 @@ static int InterpretMasterLogin(char* response_content, char* prev_login_token) 
 		index_current = index_next + 4;
 	}
 
-	if (result > 0) {
-		int result_details;
-		if (result_details = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, abEnet, abOnline, true)) {
-			//allow no login_token from backend in DB emergencies / random logins.
-			if (result_details == 1) {
-				if (prev_login_token) {
-					if (H2AccountArrayLoginToken && H2AccountCount > 0) {
-						for (int i = 0; i < H2AccountCount; i++) {
-							if (H2AccountArrayLoginToken[i] && strcmp(H2AccountArrayLoginToken[i], prev_login_token) == 0) {
-								if (H2AccountArrayUsername[i]) {
-									free(H2AccountArrayUsername[i]);
-								}
-								H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
-								strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
-								snprintf(H2AccountArrayLoginToken[i], 33, login_token);
-								break;
+	if (result <= 0) {
+		return result;
+	}
+
+	int user_configure_result = ConfigureUserDetails(username, login_token, xuid, xnaddr, H2Config_ip_lan, machineUID, abOnline, true, result == 4);
+	if (user_configure_result != 0) {
+		//allow no login_token from backend in DB emergencies / random logins.
+		if (user_configure_result == 1) {
+			if (prev_login_token) {
+				if (H2AccountArrayLoginToken && H2AccountCount > 0) {
+					for (int i = 0; i < H2AccountCount; i++) {
+						if (H2AccountArrayLoginToken[i] && strncmp(H2AccountArrayLoginToken[i], prev_login_token, 32) == 0) {
+							if (H2AccountArrayUsername[i]) {
+								free(H2AccountArrayUsername[i]);
 							}
+							H2AccountArrayUsername[i] = (char*)calloc(XUSER_NAME_SIZE, sizeof(char));
+							strncpy_s(H2AccountArrayUsername[i], XUSER_NAME_SIZE, username, XUSER_MAX_NAME_LENGTH);
+							snprintf(H2AccountArrayLoginToken[i], 32 + 1, login_token);
+							break;
 						}
 					}
 				}
-				else {
-					if (AccountEdit_remember) {
-						H2AccountAccountAdd(username, login_token);
-					}
-				}
 			}
-			if (!H2IsDediServer) {
-				extern char* serverStatus;
-				if (result == 4) {
-					snprintf(serverStatus, 256, "Status: Developer");
+			else {
+				if (AccountEdit_remember) {
+					H2AccountAccountAdd(username, login_token);
 				}
 			}
 		}
-		else {
-			result = ERROR_CODE_ACCOUNT_DATA;
-		}
-	}
 
+	}
+	else {
+		result = ERROR_CODE_ACCOUNT_DATA;
+	}
+	
 	return result;
 }
 
@@ -507,7 +526,7 @@ HRESULT WINAPI XLiveSignout(PXOVERLAPPED pXOverlapped)
 
 	return S_OK;
 }
-#pragma endregion
+#pragma endregion Online Server Sign-in
 
-#pragma endregion
+#pragma endregion Halo 2 Master Login
 

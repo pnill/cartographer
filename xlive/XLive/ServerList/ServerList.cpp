@@ -38,7 +38,8 @@ CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 		{
 			// ugly af but it'll do for now
 			// don't forget to UNLOCK after when you finish working with this
-			// mainly used to prevent the i/o 
+			// mainly used to prevent the worker thread from discarding the memory
+			// when the game attempts to retrieve info about the query
 			if (lock)
 				request.second->m_itemQueryMutex.lock();
 
@@ -49,11 +50,13 @@ CServerList* GetServerListQueryByHandle(HANDLE hHandle, bool lock)
 	return nullptr;
 }
 
-void RemoveServerListQueryByPtr(CServerList* serverListQuery)
+bool RemoveServerListQueryByPtr(CServerList* serverListQuery)
 {
 	// remove from the list, to note memory doesn't get released
 	// because async I/O might still be in progress
 	std::lock_guard lg(serverListRequestMutex);
+
+	bool removed = false;
 
 	for (auto it = serverListRequests.begin(); it != serverListRequests.end(); it++)
 	{
@@ -61,9 +64,12 @@ void RemoveServerListQueryByPtr(CServerList* serverListQuery)
 		{
 			XCloseHandle(it->first);
 			serverListRequests.erase(it);
+			removed = true;
 			break;
 		}
 	}
+
+	return removed;
 }
 
 void ServerListQueryCancelAll()
@@ -72,8 +78,8 @@ void ServerListQueryCancelAll()
 
 	for (auto& request : serverListRequests)
 	{
-		XCloseHandle(request.first);
 		request.second->CancelOperation();
+		XCloseHandle(request.first);
 	}
 
 	serverListRequests.clear();
@@ -228,7 +234,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 	HexStrToBytes(abOnline_str, searchResult.serverAddress.abOnline, sizeof(XNADDR::abOnline));
 #pragma endregion
 
-#pragma region Xbox Transport Security Keys Reading
+#pragma region Xbox Transport Security Keys Parsing
 	if (!doc.HasMember("xnkid"))
 	{
 		BadServer(xuid, "Missing Member: xnkid");
@@ -254,7 +260,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		return result;
 	}
 	HexStrToBytes(xnkey_str, searchResult.xnkey.ab, sizeof(XNKEY));
-#pragma endregion
+#pragma endregion Xbox Transport Security Keys Parsing
 
 	if (!doc.HasMember("xuid"))
 	{
@@ -366,7 +372,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 			if (!matchFound)
 			{
-				LOG_ERROR_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
+				LOG_WARNING_XLIVE("{} - couldn't find property: 0x{:X}", __FUNCTION__, m_pSearchPropertyIds[i]);
 			}
 		}
 
@@ -385,15 +391,21 @@ void ServerlistWorkerThread(CServerList* serverListQuery)
 {
 	serverListQuery->EnumerateFromHttp();
 
+	HANDLE handle = serverListQuery->m_handle;
+
 	// hacky/unsafe as fuck, because we delete the resource
 	// while still practically in the class' execution ctx 
 	// to avoid the need of a garbage collector
 	// as long as no member of the function is accesed after this
 	// releases the resources, it should be fine
+
 	RemoveServerListQueryByPtr(serverListQuery);
-	// avoid deleting the resource if in use by another thread
+
+	// delete the object only after the thread is about to exit
 	serverListQuery->m_itemQueryMutex.lock();
 	delete serverListQuery;
+
+	LOG_TRACE_XLIVE("{} - successfuly discarded serverlist query Id {:X} resources", __FUNCTION__, handle);
 	return;
 }
 
@@ -480,6 +492,7 @@ void CServerList::EnumerateFromHttp()
 			if (_clock::now() - tpBeforePause > 5s)
 			{
 				CancelOperation();
+				LOG_INFO_XLIVE("{} - resume I/O timeout reached, canceling!", __FUNCTION__);
 			}
 
 			if (ShouldCancelOperation())
@@ -488,7 +501,7 @@ void CServerList::EnumerateFromHttp()
 
 		if (ShouldCancelOperation())
 		{
-			LOG_INFO_NETWORK("{} - signaled to cancel I/0", __FUNCTION__);
+			LOG_INFO_XLIVE("{} - signaled to cancel I/0", __FUNCTION__);
 			break;
 		}
 
@@ -583,7 +596,7 @@ void CServerList::EnumerateFromHttp()
 					searchResultIdx++;
 				}
 
-				// this counter count even bad servers
+				// this counts even bad servers
 				itemsLeftToDownload--;
 				xuidStrWriteItemItr++;
 			}
@@ -613,13 +626,13 @@ void CServerList::EnumerateFromHttp()
 	curl_multi_cleanup(curl_mhandle);
 
 	addDebugText(L"Serverlist: found %d server(s)", validItemsFound);
-	LOG_TRACE_XLIVE("{} - found a total of: {} servers", __FUNCTION__, validItemsFound);
+	LOG_TRACE_XLIVE("{} - search Id: {:X} found a total of: {} servers", __FUNCTION__, m_handle, validItemsFound);
 	return;
 }
 
 void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 {
-	std::lock_guard<std::mutex> lg(getServerCountsMutex);
+	std::lock_guard lg(getServerCountsMutex);
 
 	CURL* curl;
 	CURLcode res;
@@ -671,7 +684,7 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 	case OperationIncomplete:
 		// update:
-		// this notifies the serverlist thread to download the next serverlist `page`
+		// this notifies the serverlist thread to download the next serverlist "page"
 
 		if (serverListQuery->GetItemLeftCount() > 0)
 		{
@@ -696,13 +709,14 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 	case OperationFailed:
 	case OperationFinished:
-		// this query has finished, release resources and report back to the game
+		// this query has finished, report back to the game
 		// TODO maybe add support to release the resources in the thread after a timeout
 		// in case the game doesn't check for the state anymore
 		pOverlapped->InternalLow = ERROR_NO_MORE_FILES;
 		pOverlapped->InternalHigh = 0;
 		pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_NO_MORE_FILES);
 		serverListQuery->CancelOperation();
+		LOG_INFO_XLIVE("{} - query Id: {:X} I/O finished, removing query from list", __FUNCTION__, serverListQuery->m_handle);
 
 		RemoveServerListQueryByPtr(serverListQuery);
 		break;
@@ -719,7 +733,7 @@ DWORD CServerList::Enumerate(HANDLE hHandle, DWORD cbBuffer, CHAR* pvBuffer, PXO
 
 void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 {
-	std::lock_guard<std::mutex> lk(removeServerMutex);
+	std::lock_guard lk(removeServerMutex);
 
 	CURL* curl;
 	CURLcode res;
@@ -760,7 +774,7 @@ void CServerList::RemoveServer(PXOVERLAPPED pOverlapped)
 
 void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, XNKEY xnkey, DWORD dwMaxPublicSlots, DWORD dwMaxPrivateSlots, DWORD dwFilledPublicSlots, DWORD dwFilledPrivateSlots, DWORD cProperties, PXUSER_PROPERTY pProperties, PXOVERLAPPED pOverlapped)
 {
-	std::lock_guard<std::mutex> lk(addServerMutex);
+	std::lock_guard lk(addServerMutex);
 
 	CURL* curl;
 	CURLcode res;
@@ -950,9 +964,9 @@ DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequire
 		cItems = XLOCATOR_SERVER_PAGE_MAX_ITEMS;
 
 	CServerList* serverListRequest = new CServerList(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs);
-	*phEnum = serverListRequest->Handle = CreateMutex(NULL, NULL, NULL);
+	*phEnum = serverListRequest->m_handle = CreateMutex(NULL, NULL, NULL);
 	*pcbBuffer = ComputeXLocatorServerEnumeratorBufferSize(cItems, cRequiredPropertyIDs, pRequiredPropertyIDs, nullptr);
-	serverListRequests.push_back(std::make_pair(serverListRequest->Handle, serverListRequest));
+	serverListRequests.push_back(std::make_pair(serverListRequest->m_handle, serverListRequest));
 
 	LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
 

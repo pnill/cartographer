@@ -69,11 +69,11 @@ void __cdecl update_keyboard_buttons_state_hook(BYTE *a1, WORD *a2, BYTE *a3, bo
 	}
 }
 
-typedef char(__cdecl *hookChangePrivacy_t)(int);
-hookChangePrivacy_t p_hookChangePrivacy;
-char __cdecl HookChangePrivacy(int privacy) {
-	char result =
-		p_hookChangePrivacy(privacy);
+typedef bool(__cdecl* session_change_party_visibility_t)(int);
+session_change_party_visibility_t p_session_change_party_visibility;
+bool __cdecl session_change_party_privacy_hook(int privacy) {
+	bool result =
+		p_session_change_party_visibility(privacy);
 	if (result == 1 && privacy == 0) {
 		pushHostLobby();
 	}
@@ -89,7 +89,7 @@ int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6) {
 	if (a2 == 0xb9) {
 		//boot them offline.
 		XUserSignOut(0);
-		UpdateConnectionStatus();
+		UpdateMasterLoginStatus();
 		H2Config_master_ip = inet_addr("127.0.0.1");
 		H2Config_master_port_relay = 2001;
 	}

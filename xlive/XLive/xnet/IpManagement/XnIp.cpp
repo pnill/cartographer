@@ -50,6 +50,8 @@ void XnIpManager::Initialize(const XNetStartupParams* netStartupParams)
 
 	if (m_startupParams.cfgSockDefaultSendBufsizeInK <= 0)
 		m_startupParams.cfgSockDefaultSendBufsizeInK = SOCK_UDP_MIN_SEND_BUFFER_K_UNITS;
+
+	XNetRandom(NULL, 0);
 }
 
 XnIp* XnIpManager::GetConnection(const IN_ADDR ina) const
@@ -290,7 +292,7 @@ int XnIpManager::GetEstablishedConnectionIdentifierByRecvAddr(XSocket* xsocket, 
 	return WSAEINVAL;
 }
 
-void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline)
+void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* machineUID, const char* abOnline)
 {
 	SecureZeroMemory(&m_ipLocal, sizeof(m_ipLocal));
 
@@ -315,8 +317,13 @@ void XnIpManager::SetupLocalConnectionInfo(unsigned long xnaddr, unsigned long l
 	}
 
 	m_ipLocal.m_xnaddr.inaOnline.s_addr = xnaddr;
+	// create rc4 state from machine id key to build the abEnet
+	XECRYPT_RC4_STATE rc4_engine_state;
+	XeCryptRc4Key(&rc4_engine_state, (BYTE*)machineUID, sizeof(XNADDR::abEnet) * 2);
+
 	m_ipLocal.m_xnaddr.wPortOnline = htons(baseport);
-	HexStrToBytes(std::string(abEnet, sizeof(XNADDR::abEnet) * 2), m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
+	XeCryptRc4Ecb(&rc4_engine_state, m_ipLocal.m_xnaddr.abEnet, sizeof(m_ipLocal.m_xnaddr.abEnet));
+	//HexStrToBytes(std::string(machineUID, sizeof(XNADDR::abEnet) * 2), m_ipLocal.m_xnaddr.abEnet, sizeof(XNADDR::abEnet));
 	HexStrToBytes(std::string(abOnline, sizeof(XNADDR::abOnline) * 2), m_ipLocal.m_xnaddr.abOnline, sizeof(XNADDR::abOnline));
 	m_ipLocal.m_pckStats.PckDataSampleUpdate();
 
