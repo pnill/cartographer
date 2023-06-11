@@ -43,7 +43,7 @@ std::wstring ModulePathW(HMODULE hModule = NULL)
 
 void HeapDebugInitialize()
 {
-#if HEAP_DEBUG
+#if CART_HEAP_DEBUG
 	int CurrentFlags;
 	CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
 	CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;

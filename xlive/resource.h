@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by xliveless.rc
+// Used by Resource.rc
 //
 #define IDD_XSHOWKEYBOARDUI             101
 #define IDD_XSHOWMESSAGEBOXUI_3         102

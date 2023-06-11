@@ -4,7 +4,7 @@
 //
 #pragma once
 
-#define HEAP_DEBUG 0
+#define CARTOGRAPHER_HEAP_DEBUG 0
 
 #define WINVER _WIN32_WINNT_VISTA
 #define _WIN32_WINNT _WIN32_WINNT_VISTA
@@ -12,6 +12,8 @@
 // sets the dinput/xinput version, Halo 2 uses the older 9.1.0 version and DirectInput 0x0800
 #define XINPUT_USE_9_1_0
 #define DIRECTINPUT_VERSION 0x0800
+
+#include "version.h"
 
 #define TEST_N_DEF(TEST)
 
@@ -83,8 +85,6 @@ extern std::random_device rd;
 #pragma region Warnings as errors
 #pragma warning(error: 4700)
 #pragma endregion
-
-#define STRINGIFY(x) #x
 
 #if ((!defined(_M_FP_FAST)) || !_M_FP_FAST)
 #define FLOATING_POINT_ENV_ACCESS() _Pragma("fenv_access (on)")

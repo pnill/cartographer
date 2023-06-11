@@ -1,4 +1,5 @@
 #pragma once
+
 #include "XLive/XUser/XUserProperty.h"
 #include "XLive/XUser/XUserContext.h"
 
