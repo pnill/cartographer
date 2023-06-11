@@ -56,15 +56,15 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				switch (scen_place.type)
 				{
 				case 0:
-					Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+					create_new_placement_data(&placement, pump_datum, -1, 0);
 					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 					break;
 				case 1:
-					Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+					create_new_placement_data(&placement, candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				case 2:
-					Engine::Objects::create_new_placement_data(&placement, large_candle_datum, -1, 0);
+					create_new_placement_data(&placement, large_candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				}
@@ -74,7 +74,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				placement.scale = scen_place.scale;
 
 				// Create the new object
-				Engine::Objects::object_new(&placement);
+				object_new(&placement);
 			}
 		}
 		else if (!strcmp(cache_header->name, "lockout"))
@@ -85,11 +85,11 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				switch (scen_place.type)
 				{
 				case 0:
-					Engine::Objects::create_new_placement_data(&placement, pump_datum, -1, 0);
+					create_new_placement_data(&placement, pump_datum, -1, 0);
 					placement.variant_name = pump_hmlt->variants[scen_place.variant_id]->name.get_packed();
 					break;
 				case 1:
-					Engine::Objects::create_new_placement_data(&placement, candle_datum, -1, 0);
+					create_new_placement_data(&placement, candle_datum, -1, 0);
 					placement.variant_name = 0;
 					break;
 				}
@@ -99,7 +99,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				placement.scale = scen_place.scale;
 
 				// Create the new object
-				Engine::Objects::object_new(&placement);
+				object_new(&placement);
 			}
 		}
 	}

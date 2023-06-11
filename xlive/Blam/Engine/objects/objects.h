@@ -195,16 +195,12 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 
-// TODO remove
-namespace Engine::Objects
-{
-	void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
-	datum object_new(s_object_placement_data* object_placement_data);
-	void apply_biped_object_definition_patches();
-	void simulation_action_object_create(datum object_idx);
-	void object_destroy(datum object_idx);
-	int object_get_count();
-	int object_count_from_iter();
-}
+void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
+datum object_new(s_object_placement_data* object_placement_data);
+void apply_biped_object_definition_patches();
+void simulation_action_object_create(datum object_idx);
+void object_destroy(datum object_idx);
+int object_get_count();
+int object_count_from_iter();
 
 datum object_get_damage_owner(datum damaged_unit_index);

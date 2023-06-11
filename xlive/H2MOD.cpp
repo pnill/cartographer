@@ -186,9 +186,9 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 	{
 		s_object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		create_new_placement_data(&nObject, weaponId, unit_datum, 0);
 
-		datum object_idx = Engine::Objects::object_new(&nObject);
+		datum object_idx = object_new(&nObject);
 
 		if (resetLoadout)
 			unit_delete_all_weapons(unit_datum);
@@ -673,9 +673,9 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 	{
 		s_object_placement_data object_placement;
 
-		Engine::Objects::create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
+		create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
 
-		datum object_idx = Engine::Objects::object_new(&object_placement);
+		datum object_idx = object_new(&object_placement);
 		if (!DATUM_IS_NONE(object_idx))
 		{
 			unit_delete_all_weapons(unit_datum);
@@ -1091,7 +1091,7 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	Engine::Objects::apply_biped_object_definition_patches();
+	apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");
