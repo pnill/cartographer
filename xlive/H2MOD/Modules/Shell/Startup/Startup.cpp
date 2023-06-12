@@ -279,8 +279,7 @@ void ServerStartupFixes()
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
 
-	Debug::Init();
-
+	Debug::Initialize();
 	Memory::Initialize();
 
 	H2BaseAddr = Memory::GetAddress();

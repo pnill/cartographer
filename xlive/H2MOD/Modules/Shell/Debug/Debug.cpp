@@ -15,7 +15,7 @@
 
 using namespace Debug;
 
-LPTOP_LEVEL_EXCEPTION_FILTER exception_filter = nullptr;
+LPTOP_LEVEL_EXCEPTION_FILTER pfn_PreviousExceptionFilter = NULL;
 
 LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
@@ -88,8 +88,8 @@ LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* Excepti
 	LOG_TRACE_GAME("Halo 2 has crashed and a dump file has been saved to \"{}\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
-	if (exception_filter)
-		return exception_filter(ExceptionInfo);
+	if (pfn_PreviousExceptionFilter)
+		return pfn_PreviousExceptionFilter(ExceptionInfo);
 	else
 		return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -103,9 +103,9 @@ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_
 static_assert(std::is_same_v<decltype(&SetUnhandledExceptionFilterHook), decltype(&SetUnhandledExceptionFilter)>,
 	"invalid type of RedirectedSetUnhandledExceptionFilter");
 
-void Debug::Init()
+void Debug::Initialize()
 {
-	exception_filter = SetUnhandledExceptionFilter(Debug::UnhandledExceptionCb);
+	pfn_PreviousExceptionFilter = SetUnhandledExceptionFilter(Debug::UnhandledExceptionCb);
 
 	// Credits: multitheftauto/mtasa-blue
 	// https://github.com/multitheftauto/mtasa-blue/blob/6c1f3184764aca0655b5b64fe88ca0a73b2b69c8/Client/core/CrashHandler.cpp#L102
@@ -114,14 +114,4 @@ void Debug::Init()
 	DETOUR_BEGIN();
 	DETOUR_ATTACH(pfn_SetUnhandledExceptionFilter, decltype(pfn_SetUnhandledExceptionFilter)(DetourFindFunction("kernel32.dll", "SetUnhandledExceptionFilter")), SetUnhandledExceptionFilterHook);
 	DETOUR_COMMIT();
-}
-
-void Debug::set_expection_filter(LPTOP_LEVEL_EXCEPTION_FILTER filter)
-{
-	exception_filter = filter;
-}
-
-LPTOP_LEVEL_EXCEPTION_FILTER Debug::get_expection_filter()
-{
-	return exception_filter;
 }
