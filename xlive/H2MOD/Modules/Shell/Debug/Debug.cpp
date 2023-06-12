@@ -9,26 +9,27 @@
 #include <time.h>
 
 #include "../Shell.h"
+#include "Util/Hooks/Hook.h"
 
-#define crash_reports_path "\\halo2_crash_reports\\"
+#define CRASH_REPORTS_PATH "\\halo2_crash_reports\\"
 
 using namespace Debug;
 
-LPTOP_LEVEL_EXCEPTION_FILTER exception_filter = nullptr;
+LPTOP_LEVEL_EXCEPTION_FILTER pfn_PreviousExceptionFilter = NULL;
 
-LONG WINAPI Debug::On_UnhandledException(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
+LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
 	// get documents path.
-	CHAR documents_path[MAX_PATH];
+	char documents_path[MAX_PATH];
 	SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents_path);
 
 	// get reports path.
-	char reports_path[512];
+	char reports_path[MAX_PATH];
 	_fullpath(reports_path, documents_path, sizeof(reports_path));
-	PathAppendA(reports_path, crash_reports_path);
+	PathAppendA(reports_path, CRASH_REPORTS_PATH);
 
 	// get exe name.
-	CHAR exe_path_buffer[MAX_PATH + 1];
+	CHAR exe_path_buffer[MAX_PATH];
 	GetModuleFileNameA(NULL, exe_path_buffer, sizeof(exe_path_buffer));
 	std::string exe_name = exe_path_buffer;
 	exe_name = exe_name.substr(exe_name.find_last_of('\\') + 1);
@@ -87,24 +88,30 @@ LONG WINAPI Debug::On_UnhandledException(_In_ struct _EXCEPTION_POINTERS* Except
 	LOG_TRACE_GAME("Halo 2 has crashed and a dump file has been saved to \"{}\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
-	if (exception_filter)
-		return exception_filter(ExceptionInfo);
+	if (pfn_PreviousExceptionFilter)
+		return pfn_PreviousExceptionFilter(ExceptionInfo);
 	else
 		return EXCEPTION_CONTINUE_SEARCH;
 }
-static_assert(std::is_same<decltype(&Debug::On_UnhandledException), LPTOP_LEVEL_EXCEPTION_FILTER>::value, "invalid exception handler declaration");
+static_assert(std::is_same<decltype(&Debug::UnhandledExceptionCb), LPTOP_LEVEL_EXCEPTION_FILTER>::value, "invalid exception handler declaration");
 
-void Debug::Init()
+LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI* pfn_SetUnhandledExceptionFilter)(LPTOP_LEVEL_EXCEPTION_FILTER);
+LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_EXCEPTION_FILTER pfnFilter)
 {
-	exception_filter = SetUnhandledExceptionFilter(Debug::On_UnhandledException);
+	return 0;
 }
+static_assert(std::is_same_v<decltype(&SetUnhandledExceptionFilterHook), decltype(&SetUnhandledExceptionFilter)>,
+	"invalid type of RedirectedSetUnhandledExceptionFilter");
 
-void Debug::set_expection_filter(LPTOP_LEVEL_EXCEPTION_FILTER filter)
+void Debug::Initialize()
 {
-	exception_filter = filter;
-}
+	pfn_PreviousExceptionFilter = SetUnhandledExceptionFilter(Debug::UnhandledExceptionCb);
 
-LPTOP_LEVEL_EXCEPTION_FILTER Debug::get_expection_filter()
-{
-	return exception_filter;
+	// Credits: multitheftauto/mtasa-blue
+	// https://github.com/multitheftauto/mtasa-blue/blob/6c1f3184764aca0655b5b64fe88ca0a73b2b69c8/Client/core/CrashHandler.cpp#L102
+	// Stop the OS from turning off our handler
+	// Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
+	DETOUR_BEGIN();
+	DETOUR_ATTACH(pfn_SetUnhandledExceptionFilter, decltype(pfn_SetUnhandledExceptionFilter)(DetourFindFunction("kernel32.dll", "SetUnhandledExceptionFilter")), SetUnhandledExceptionFilterHook);
+	DETOUR_COMMIT();
 }
