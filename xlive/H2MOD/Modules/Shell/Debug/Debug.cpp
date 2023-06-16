@@ -11,11 +11,54 @@
 #include "../Shell.h"
 #include "Util/Hooks/Hook.h"
 
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+
 #define CRASH_REPORTS_PATH "\\halo2_crash_reports\\"
 
 using namespace Debug;
 
 LPTOP_LEVEL_EXCEPTION_FILTER pfn_PreviousExceptionFilter = NULL;
+
+bool ShouldIncludeModuleCodeSeg(const WCHAR* fullPath)
+{
+	bool ret = false;
+
+	if (wcsstr(fullPath, L"xlive.dll"))
+		ret = true;
+
+	return ret;
+}
+
+BOOL WINAPI MinidumpInfoCb(
+	_Inout_ PVOID CallbackParam,
+	_In_    PMINIDUMP_CALLBACK_INPUT CallbackInput,
+	_Inout_ PMINIDUMP_CALLBACK_OUTPUT CallbackOutput
+)
+{
+	switch (CallbackInput->CallbackType)
+	{
+	case ModuleCallback:
+		if (ShouldIncludeModuleCodeSeg(CallbackInput->Module.FullPath))
+		{
+			CallbackOutput->ModuleWriteFlags |= (ModuleWriteDataSeg | ModuleWriteCodeSegs);
+			addDebugText(L"added code segments and data segments to minidump of module: ");
+			addDebugText(L"	%ws", CallbackInput->Module.FullPath);
+		}
+		else
+		{
+			if ((CallbackOutput->ModuleWriteFlags & ModuleWriteCodeSegs) == 0)
+			{
+				addDebugText(L"skipped code segment of module:");
+				addDebugText(L"	%ws", CallbackInput->Module.FullPath);
+			}
+		}
+		break;
+	default:
+		break;
+	}
+
+	return TRUE;
+}
 
 LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
@@ -64,6 +107,10 @@ LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* Excepti
 	aMiniDumpInfo.ExceptionPointers = ExceptionInfo;
 	aMiniDumpInfo.ClientPointers = TRUE;
 
+	MINIDUMP_CALLBACK_INFORMATION minidumpCallbackinfo;
+	minidumpCallbackinfo.CallbackParam = NULL;
+	minidumpCallbackinfo.CallbackRoutine = &MinidumpInfoCb;
+
 	MiniDumpWriteDump(GetCurrentProcess(),
 		GetCurrentProcessId(),
 		dump_file,
@@ -72,7 +119,7 @@ LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* Excepti
 			),
 		&aMiniDumpInfo,
 		NULL,
-		NULL);
+		&minidumpCallbackinfo);
 
 	CloseHandle(dump_file);
 
@@ -85,7 +132,7 @@ LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* Excepti
 		_Shell::OpenMessageBox(NULL, MB_ICONERROR, "Crash!", message.c_str());
 	}
 
-	LOG_TRACE_GAME("Halo 2 has crashed and a dump file has been saved to \"{}\".", dump_file_name.c_str());
+	addDebugText("Halo 2 has crashed and a dump file has been saved to \"%s\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
 	if (pfn_PreviousExceptionFilter)
