@@ -59,7 +59,7 @@ std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 bool H2XFirerateEnabled = false;
 bool xboxTickrateEnabled = false;
 
-bool get_xbox_tickrate_bool()
+bool xbox_tickrate_is_enabled()
 {
 	return xboxTickrateEnabled;
 }
