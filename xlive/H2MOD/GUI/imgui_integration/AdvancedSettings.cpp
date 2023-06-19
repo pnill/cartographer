@@ -194,7 +194,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "Crosshair3"), b2_size))
 					{
-						H2Config_crosshair_offset = 0.138f;
+						H2Config_crosshair_offset = 0.165f;
 						set_crosshair_offset(H2Config_crosshair_offset);
 					}
 					ImGui::PopItemWidth();
