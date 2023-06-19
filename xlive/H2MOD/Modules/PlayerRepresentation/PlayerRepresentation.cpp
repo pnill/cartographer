@@ -97,16 +97,42 @@ namespace PlayerRepresentation
 		return DATUM_INDEX_NONE;
 	}
 
-	typedef void(__cdecl network_session_player_profile_recieve_t)(int player_index, s_player_properties* a2);
-	network_session_player_profile_recieve_t* p_network_session_player_profile_recieve;
+	void __cdecl player_validate_extra_characters_type(int player_index, s_player_properties* player_properties)
+	{
+		if (player_properties->profile_traits.profile.player_character_type == character_type_masterchief)
+			player_properties->profile_traits.profile.player_character_type = character_type_spartan;
+		if (player_properties->profile_traits.profile.player_character_type == character_type_dervish)
+			player_properties->profile_traits.profile.player_character_type = character_type_elite;
 
-	void __cdecl network_session_player_profile_recieve(int player_index, s_player_properties* player_properties)
+		if (get_current_special_event() != e_special_event_type::_halloween)
+		{
+			if (player_properties->profile_traits.profile.player_character_type == character_type_skeleton)
+				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
+		}
+		else
+		{
+			if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
+
+			player_properties->profile_traits.profile.player_character_type = character_type_skeleton;
+		}
+
+		if ((byte)player_properties->profile_traits.profile.player_character_type > current_representation_count)
+			player_properties->profile_traits.profile.player_character_type = character_type_spartan;
+	}
+
+	typedef void(__cdecl player_properties_validate_configuration_t)(int, s_player_properties*);
+	player_properties_validate_configuration_t* p_player_properties_validate_configuration;
+
+	void __cdecl player_properties_validate_configuration_hook(int player_index, s_player_properties* player_properties)
 	{
 		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.engine_type);
+
+		auto player_biped_type = player_properties->profile_traits.profile.player_character_type;
+		p_player_properties_validate_configuration(player_index, player_properties);
+		
 		if (s_game_globals::game_is_campaign())
 		{
-			p_network_session_player_profile_recieve(player_index, player_properties);
-			return;
 			/*auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
 			int v5 = 0;
@@ -124,53 +150,57 @@ namespace PlayerRepresentation
 				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
 					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
 			}*/
+			return;
 		}
 		else if (s_game_globals::game_is_multiplayer())
 		{
-			if (player_properties->profile_traits.profile.player_character_type == character_type_masterchief)
-				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-			if (player_properties->profile_traits.profile.player_character_type == character_type_dervish)
-				player_properties->profile_traits.profile.player_character_type = character_type_elite;
-
-			if(get_current_special_event() != e_special_event_type::_halloween)
-			{
-				if (player_properties->profile_traits.profile.player_character_type == character_type_skeleton)
-					player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-			}
-			else if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
-				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
-
-			/*if(s_player::getPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))->identifier == 0x000462d3a1e02a34)
-				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
-			/*LOG_INFO_GAME("[{}]{:x}", __FUNCTION__, usersSignInInfo[0].xuid);
-			if (usersSignInInfo[0].xuid == )
-				a2->profile.player_character_type = (s_player::e_character_type)type_map[s_player::e_character_type::Kant];*/
-
-			if ((byte)player_properties->profile_traits.profile.player_character_type > current_representation_count)
-				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-		}
-
-		if ((byte)player_properties->player_displayed_skill != -1)
-			if ((byte)player_properties->player_displayed_skill < 0)
-				player_properties->player_displayed_skill = 0;
-
-		if ((byte)player_properties->player_overall_skill != -1)
-			if ((byte)player_properties->player_overall_skill < 0)
-				player_properties->player_overall_skill = 0;
-
-		if (player_properties->player_handicap_level > handicap_severe)
-			player_properties->player_handicap_level = handicap_severe;
-
-		if (player_properties->bungie_user_role <= 7)
-			player_properties->bungie_user_role = 7;
-
-		if (current_game_engine()
-			&& s_game_globals::get()->get_game_variant()->game_engine_flags & FLAG(e_game_engine_flags::_game_engine_teams_bit)
-			&& (player_properties->player_team && !(s_game_engine_globals::get()->fieldA & FLAG(player_properties->player_team))))
-		{
-			player_properties->player_team = e_object_team::None;
+			// reset the player biped type to what was previously in the field
+			player_properties->profile_traits.profile.player_character_type = player_biped_type;
+			// then go through our multiplayer player properties filters
+			player_validate_extra_characters_type(player_index, player_properties);
 		}
 	}
+
+	// no params because actually "usercall"
+	void* p_player_representation_get;
+
+	// calls the original player representation get function
+	void player_representatio_get_orig_fn(int player_index, int* out_variant_index, int* a3)
+	{
+		__asm {
+			mov eax, a3
+			push eax
+			mov ebx, out_variant_index
+			mov eax, player_index
+			call p_player_representation_get
+			add esp, 4
+		}
+	}
+
+	void __cdecl player_representation_get(datum player_datum, int* out_variant_index, int* a3)
+	{
+		int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
+		s_player* player = s_player::GetPlayer(player_index);
+
+		player_validate_extra_characters_type(player_index, &player->properties[0]);
+		player_representatio_get_orig_fn(player_datum, out_variant_index, a3);
+	}
+
+	__declspec(naked) void player_representation_get_to_cdecl()
+	{
+		__asm {
+			push eax
+			mov eax, [esp + 4h + 4h]
+			push eax // a3
+			push ebx // out_variant
+			mov eax, [esp + 8h]
+			push eax // player index
+			call player_representation_get
+			add esp, 10h // clear 16 bytes to esp == ret addr
+			retn
+		}
+	}
+
 	void OnMapLoad()
 	{
 		current_representation_count = 4;
@@ -228,22 +258,7 @@ namespace PlayerRepresentation
 				new_variant->name = 0xABABABA;
 				new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
 				new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
-				new_variant->runtime_model_region_0 = base_variant->runtime_model_region_0;
-				new_variant->runtime_model_region_1 = base_variant->runtime_model_region_1;
-				new_variant->runtime_model_region_2 = base_variant->runtime_model_region_2;
-				new_variant->runtime_model_region_3 = base_variant->runtime_model_region_3;
-				new_variant->runtime_model_region_4 = base_variant->runtime_model_region_4;
-				new_variant->runtime_model_region_5 = base_variant->runtime_model_region_5;
-				new_variant->runtime_model_region_6 = base_variant->runtime_model_region_6;
-				new_variant->runtime_model_region_7 = base_variant->runtime_model_region_7;
-				new_variant->runtime_model_region_8 = base_variant->runtime_model_region_8;
-				new_variant->runtime_model_region_9 = base_variant->runtime_model_region_9;
-				new_variant->runtime_model_region_10 = base_variant->runtime_model_region_10;
-				new_variant->runtime_model_region_11 = base_variant->runtime_model_region_11;
-				new_variant->runtime_model_region_12 = base_variant->runtime_model_region_12;
-				new_variant->runtime_model_region_13 = base_variant->runtime_model_region_13;
-				new_variant->runtime_model_region_14 = base_variant->runtime_model_region_14;
-				new_variant->runtime_model_region_15 = base_variant->runtime_model_region_15;
+				memcpy(new_variant->runtime_model_regions, base_variant->runtime_model_regions, sizeof(new_variant->runtime_model_regions));
 				for (auto i = 0; i < base_variant->regions.size; i++)
 				{
 					auto region = base_variant->regions[i];
@@ -261,11 +276,7 @@ namespace PlayerRepresentation
 						new_permutation->model_permutation_index = permutation->model_permutation_index;
 						new_permutation->flags = permutation->flags;
 						new_permutation->probability_0 = permutation->probability_0;
-						new_permutation->runtime_permutation_index_0 = permutation->runtime_permutation_index_0;
-						new_permutation->runtime_permutation_index_1 = permutation->runtime_permutation_index_1;
-						new_permutation->runtime_permutation_index_2 = permutation->runtime_permutation_index_2;
-						new_permutation->runtime_permutation_index_3 = permutation->runtime_permutation_index_3;
-						new_permutation->runtime_permutation_index_4 = permutation->runtime_permutation_index_4;
+						memcpy(new_permutation->runtime_permutations, permutation->runtime_permutations, sizeof(new_permutation->runtime_permutations));
 						new_permutation->unk_1 = permutation->unk_1;
 						new_permutation->unk2 = permutation->unk2;
 						new_permutation->unk3 = permutation->unk3;
@@ -293,10 +304,15 @@ namespace PlayerRepresentation
 	}
 	void ApplyHooks()
 	{
-		p_network_session_player_profile_recieve = Memory::GetAddress<network_session_player_profile_recieve_t*>(0x52F23);
-		PatchCall(Memory::GetAddress(0x5509E, 0x5d596), network_session_player_profile_recieve);
-		//Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
-		WriteValue<byte>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
+		p_player_properties_validate_configuration = Memory::GetAddress<player_properties_validate_configuration_t*>(0x52F23, 0x5B41B);
+		PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_properties_validate_configuration_hook);
+		
+		p_player_representation_get = Memory::GetAddress<void*>(0x53895, 0x5BD8D);
+		PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
+		PatchCall(Memory::GetAddress(0x53969, 0x5BE61), player_representation_get_to_cdecl);
+
+		// Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
+		WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
 	}
 
 	void Initialize()

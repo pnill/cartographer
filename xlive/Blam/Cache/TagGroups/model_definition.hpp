@@ -38,22 +38,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 	struct s_variants_block
 	{
 		string_id name;//0x0
-		byte runtime_model_region_0;
-		byte runtime_model_region_1;
-		byte runtime_model_region_2;
-		byte runtime_model_region_3;
-		byte runtime_model_region_4;
-		byte runtime_model_region_5;
-		byte runtime_model_region_6;
-		byte runtime_model_region_7;
-		byte runtime_model_region_8;
-		byte runtime_model_region_9;
-		byte runtime_model_region_10;
-		byte runtime_model_region_11;
-		byte runtime_model_region_12;
-		byte runtime_model_region_13;
-		byte runtime_model_region_14;
-		byte runtime_model_region_15;
+		byte runtime_model_regions[16];
 		struct s_regions_block
 		{
 			string_id region_name;//0x0
@@ -107,11 +92,7 @@ struct s_model_group_definition : TagGroup<'hlmt'>
 				};
 				TAG_BLOCK_SIZE_ASSERT(s_states_block, 0x18);
 				tag_block<s_states_block> states;//0xC
-				byte runtime_permutation_index_0;
-				byte runtime_permutation_index_1;
-				byte runtime_permutation_index_2;
-				byte runtime_permutation_index_3;
-				byte runtime_permutation_index_4;
+				byte runtime_permutations[5];
 				byte unk_1;
 				__int16 unk2;
 				__int16 unk3;
