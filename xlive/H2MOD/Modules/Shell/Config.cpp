@@ -232,11 +232,6 @@ void SaveH2Config() {
 				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
 				"\n\n"
 
-				"# hiresfix Options (Client):"
-				"\n# 0 - Disable hiresfix. User is not running the game at a resolution above 1920x1200"
-				"\n# 1 - Enable hiresfix. User is running the game at a resolution above 1920x1200"
-				"\n\n"
-
 				"# Force Max Shader LOD Options (Client):"
 				"\n# 0 - Disable shader_lod_max patch. game uses default shader lod settings"
 				"\n# 1 - Enable shader_lod_max patch. game uses highest quality shaders at all times"
