@@ -51,7 +51,7 @@ H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Ax
 float H2Config_Deadzone_A_X = 26.0f;
 float H2Config_Deadzone_A_Y = 26.0f;
 float H2Config_Deadzone_Radial = 1.0f;
-float H2Config_crosshair_offset = 0.165f;
+float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -726,6 +726,8 @@ void ReadH2Config() {
 				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
 				if (crosshair_offset_str != "NaN")
 					H2Config_crosshair_offset = std::stof(crosshair_offset_str);
+				else
+					H2Config_crosshair_offset = 0.138f;
 
 				std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
 				if (crosshair_scale_str != "NaN")
