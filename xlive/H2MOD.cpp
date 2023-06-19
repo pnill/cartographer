@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
@@ -57,6 +58,11 @@ std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
 bool H2XFirerateEnabled = false;
 bool xboxTickrateEnabled = false;
+
+bool xbox_tickrate_is_enabled()
+{
+	return xboxTickrateEnabled;
+}
 
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
@@ -467,7 +473,7 @@ void H2MOD::set_local_rank(BYTE rank)
 		initialized = true;
 	}
 
-	s_player::s_player_properties* local_player_properties = Memory::GetAddress<s_player::s_player_properties*>(0x51A638);
+	s_player_properties* local_player_properties = Memory::GetAddress<s_player_properties*>(0x51A638);
 
 	local_player_properties->player_overall_skill = rank;
 	local_player_properties->player_displayed_skill = rank;
@@ -570,6 +576,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
+		new_hud_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
 		{
@@ -991,21 +998,6 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
-// sword-flying target clear patch
-void __cdecl aim_assist_targeting_clear_hook(int target_data)
-{
-	if (!s_game_globals::game_is_campaign()
-		&& !xboxTickrateEnabled)
-	{
-		*(DWORD*)(target_data) = -1;
-		*(DWORD*)(target_data + 4) = -1;
-		*(DWORD*)(target_data + 8) = -1;
-		*(WORD*)(target_data + 24) = 0;
-		*(DWORD*)(target_data + 28) = 0;
-		*(DWORD*)(target_data + 32) = 0;
-	}
-}
-
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -1035,7 +1027,6 @@ void H2MOD::ApplyHooks() {
 
 	apply_cheat_hooks();
 
-	hud_apply_patches();
 	new_hud_apply_patches();
 	motion_sensor_apply_patches();
 	render_cameras_apply_patches();
@@ -1068,8 +1059,6 @@ void H2MOD::ApplyHooks() {
 		// DETOUR_ATTACH(p_load_wgit, Memory::GetAddress<load_wgit_t>(0x2106A2), OnWgitLoad);
 
 		DETOUR_ATTACH(p_show_error_screen, Memory::GetAddress<show_error_screen_t>(0x20E15A), showErrorScreen);
-
-		PatchCall(Memory::GetAddress(0x169E59), aim_assist_targeting_clear_hook);
 
 		//TODO: expensive, use for debugging/searching
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
@@ -1106,6 +1095,7 @@ void H2MOD::ApplyHooks() {
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
 		screens_apply_patches();
+		aim_assist_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

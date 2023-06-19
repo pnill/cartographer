@@ -240,7 +240,7 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_hud), &g_showHud);
 					if (ImGui::IsItemEdited())
-						toggle_hud(g_showHud);
+						get_new_hud_engine_globals()->show_hud = g_showHud;
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_first_person), &g_showFP);
 					if (ImGui::IsItemEdited())

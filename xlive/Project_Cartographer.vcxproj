@@ -232,6 +232,7 @@
     <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
+    <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
     <ClCompile Include="Blam\Engine\game\cheats.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
@@ -250,6 +251,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
@@ -261,7 +263,6 @@
     <ClInclude Include="3rdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="3rdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="3rdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\bitmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
@@ -269,6 +270,7 @@
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_interpolation.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
@@ -286,6 +288,7 @@
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
+    <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
@@ -573,7 +576,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\new_hud_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_definition.hpp" />

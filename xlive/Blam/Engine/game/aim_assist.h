@@ -13,3 +13,5 @@ struct s_aim_assist_targetting_data
 	float secondary_auto_aim_level;
 };
 CHECK_STRUCT_SIZE(s_aim_assist_targetting_data, 0x24);
+
+void aim_assist_apply_patches();
