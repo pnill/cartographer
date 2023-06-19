@@ -14,9 +14,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-bool fov_overridden = false;
+bool player_control_fov_overridden = false;
 float overridden_fov_radians;
-
 
 float observer_suggested_field_of_view()
 {
@@ -25,6 +24,9 @@ float observer_suggested_field_of_view()
 
 void observer_set_suggested_field_of_view(float fov)
 {
+	// Don't change the fov if it's 0 or greater than 110
+	if (fov <= 0 || fov > 110) return;
+
 	float final_fov_rad;
 	if (currentVariantSettings.forcedFOV == 0)
 	{
@@ -40,7 +42,10 @@ void observer_set_suggested_field_of_view(float fov)
 
 void player_control_set_field_of_view(float fov) 
 {
-	fov_overridden = true;
+	// Don't change the fov if it's 0 or greater than 110
+	if (fov <= 0 || fov > 110) return;
+
+	player_control_fov_overridden = true;
 	overridden_fov_radians = fov * M_PI / 180.0f;
 }
 
@@ -57,7 +62,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 		{
 			fov = currentVariantSettings.forcedFOV;
 		}
-		else if (fov_overridden)
+		else if (player_control_fov_overridden)
 		{
 			fov = overridden_fov_radians;
 		}
