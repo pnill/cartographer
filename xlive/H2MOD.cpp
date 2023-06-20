@@ -1088,7 +1088,7 @@ void H2MOD::ApplyHooks() {
 		// Initialise_tag_loader();
 		PlayerControl::ApplyHooks();
 		
-		PatchCall(Memory::GetAddressRelative(0x6422C8), get_last_single_player_level_id_unlocked_from_profile);
+		PatchCall(Memory::GetAddress(0x2422C8), get_last_single_player_level_id_unlocked_from_profile);
 
 		rasterizer_settings_apply_hooks();
 		user_interface_text_apply_hooks();
