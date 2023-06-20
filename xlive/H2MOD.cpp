@@ -673,15 +673,6 @@ void H2MOD::set_local_team_index(int local_player_index, int team_index)
 	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
-void H2MOD::set_local_clan_tag(int local_player_index, unsigned long long tag)
-{
-	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
-	unsigned long low = tag & 0xFFFFFFFF;
-	*(unsigned long*)Memory::GetAddress(0x51A6A8 + (0xB8 * local_player_index)) = low;
-	p_update_player_profile(local_player_index);
-}
-
 void __cdecl print_to_console(const char* output)
 {
 	std::string finalOutput("[HSC Print] "); finalOutput += output;

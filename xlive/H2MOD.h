@@ -48,7 +48,6 @@ public:
 	BYTE get_unit_team_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);
 	void set_local_team_index(int local_player_index, int team);
-	void set_local_clan_tag(int local_player_index, unsigned long long tag);
 	BYTE get_local_team_index();
 	void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
 	void disable_sounds(int sound);
