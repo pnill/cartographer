@@ -2,6 +2,7 @@
 
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/input/controllers.h"
 #include "Blam/Engine/Networking/NetworkCommon.h"
 #include "Blam/Engine/Networking/Transport/NetworkChannel.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
@@ -231,7 +232,7 @@ CHECK_STRUCT_SIZE(s_player_identifier, 8);
 
 struct s_session_interface_user
 {
-	char user_exists;
+	bool user_exists;
 	s_player_identifier network_user_identifier;
 	BYTE gap_B[3];
 	DWORD controller_index;
@@ -373,3 +374,5 @@ CHECK_STRUCT_SIZE(s_network_session, 31624);
 CHECK_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
 CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)
+
+bool network_session_interface_set_local_user_character_type(e_controller_index controller_index, e_character_type character_type);
