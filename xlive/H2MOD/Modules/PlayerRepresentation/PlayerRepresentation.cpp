@@ -182,7 +182,8 @@ namespace PlayerRepresentation
 		int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 		s_player* player = s_player::GetPlayer(player_index);
 
-		player_validate_extra_characters_type(player_index, &player->properties[0]);
+		if (s_game_globals::game_is_multiplayer())
+			player_validate_extra_characters_type(player_index, &player->properties[0]);
 		player_representatio_get_orig_fn(player_datum, out_variant_index, a3);
 	}
 
@@ -308,8 +309,8 @@ namespace PlayerRepresentation
 		PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_properties_validate_configuration_hook);
 		
 		p_player_representation_get = Memory::GetAddress<void*>(0x53895, 0x5BD8D);
-		PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
 		PatchCall(Memory::GetAddress(0x53969, 0x5BE61), player_representation_get_to_cdecl);
+		PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
 
 		// Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
 		WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
