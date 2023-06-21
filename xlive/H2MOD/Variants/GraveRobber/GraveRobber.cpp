@@ -3,7 +3,7 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/game/local_players.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -86,7 +86,7 @@ void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
 
 	if (!Memory::IsDedicatedServer())
 	{
-		for (int i = 0; i < k_number_of_controllers; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
 			{

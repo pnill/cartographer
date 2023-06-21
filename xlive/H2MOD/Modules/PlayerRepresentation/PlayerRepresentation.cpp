@@ -114,9 +114,9 @@ namespace PlayerRepresentation
 		{
 			if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
 			{
-				for (byte i = controller_index_0; i <= controller_index_3; ++i)
+				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 				{
-					network_session_interface_set_local_user_character_type((e_controller_index)i, character_type_skeleton);
+					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
 				}
 			}
 
@@ -216,9 +216,9 @@ namespace PlayerRepresentation
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
 			{
-				for (byte i = controller_index_0; i <= controller_index_3; ++i)
+				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
 				{
-					network_session_interface_set_local_user_character_type((e_controller_index)i, character_type_skeleton);
+					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
 				}
 			}
 
