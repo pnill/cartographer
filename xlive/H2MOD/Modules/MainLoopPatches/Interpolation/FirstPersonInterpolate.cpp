@@ -20,7 +20,7 @@ namespace FirstPersonInterpolate
 			datum unit_idx = DATUM_INDEX_NONE;
 			datum player_idx = DATUM_INDEX_NONE;
 			real_vector3d previous_position;
-		} local_players_states[k_number_of_controllers];
+		} local_players_states[k_number_of_users];
 
 		void unit_get_camera_position(datum unit_idx, real_point3d* out_position)
 		{
@@ -50,7 +50,7 @@ namespace FirstPersonInterpolate
 			return;
 		}
 
-		for (int i = 0; i < k_number_of_controllers; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -93,7 +93,7 @@ namespace FirstPersonInterpolate
 			return;
 
 		// basic checks, verify if player died, if unit has changed etc. after a game tick update
-		for (int i = 0; i < k_number_of_controllers; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -127,7 +127,7 @@ namespace FirstPersonInterpolate
 		if (DATUM_IS_NONE(unit_idx))
 			return;
 
-		for (int i = 0; i < k_number_of_controllers; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
@@ -160,7 +160,7 @@ namespace FirstPersonInterpolate
 
 	void Reset()
 	{
-		for (int i = 0; i < k_number_of_controllers; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			ResetPlayer(i);
 		}

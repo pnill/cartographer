@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "NetworkSession.h"
 
-#include "Blam/Engine/game/game_globals.h"
-
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
 	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
@@ -241,7 +239,21 @@ s_session_interface_globals* s_session_interface_globals::get()
 	return Memory::GetAddress<s_session_interface_globals*>(0x51A590, 0x520408);
 }
 
-s_session_interface_user* get_session_interface_user_properties(byte controller_index)
+s_session_interface_user* network_session_interface_get_local_user_properties(int user_index)
 {
-	return &s_session_interface_globals::get()->users[controller_index];
+	return &s_session_interface_globals::get()->users[user_index];
+}
+
+bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type)
+{
+	s_session_interface_user* user_properties = network_session_interface_get_local_user_properties(user_index);
+	
+	// Don't change the character type if the user doesn't exist
+	if (user_properties->user_exists)
+	{
+		user_properties->properties.profile_traits.profile.player_character_type = character_type;
+		return true;
+	}
+
+	return false;
 }

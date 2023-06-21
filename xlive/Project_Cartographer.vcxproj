@@ -275,6 +275,7 @@
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />

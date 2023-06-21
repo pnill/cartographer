@@ -12,6 +12,7 @@
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -29,8 +30,12 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		if (H2Config_spooky_boy) {
-			*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
+		if (H2Config_spooky_boy) 
+		{
+			for (byte user_index = 0; user_index < k_number_of_users; user_index++)
+			{
+				network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
+			}
 		}
 
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);

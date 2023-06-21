@@ -39,8 +39,8 @@ bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = e_static_lod::disable;
-int H2Config_field_of_view = 70;
-int H2Config_vehicle_field_of_view = 70;
+int H2Config_field_of_view = 78;
+int H2Config_vehicle_field_of_view = 78;
 __int16 H2Config_refresh_rate = 60;
 bool H2Config_static_first_person = false;
 float H2Config_mouse_sens = 0;
@@ -230,11 +230,6 @@ void SaveH2Config() {
 
 				"# mouse_sens Options (Client):"
 				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
-				"\n\n"
-
-				"# hiresfix Options (Client):"
-				"\n# 0 - Disable hiresfix. User is not running the game at a resolution above 1920x1200"
-				"\n# 1 - Enable hiresfix. User is running the game at a resolution above 1920x1200"
 				"\n\n"
 
 				"# Force Max Shader LOD Options (Client):"

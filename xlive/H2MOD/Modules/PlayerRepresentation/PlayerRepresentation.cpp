@@ -8,6 +8,7 @@
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -112,7 +113,12 @@ namespace PlayerRepresentation
 		else
 		{
 			if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
-				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
+			{
+				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
+				{
+					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
+				}
+			}
 
 			player_properties->profile_traits.profile.player_character_type = character_type_skeleton;
 		}
@@ -209,7 +215,12 @@ namespace PlayerRepresentation
 		if (h2mod->GetEngineType() == _multiplayer) 
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
-				*Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
+			{
+				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
+				{
+					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
+				}
+			}
 
 			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
