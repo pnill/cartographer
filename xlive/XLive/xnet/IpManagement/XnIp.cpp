@@ -812,7 +812,7 @@ void XnIp::SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType)
 	m_connectionPacketsSentCount++;
 
 	int ret = xsocket->UdpSend((char*)&reqPacket, sizeof(XNetRequestPacket), 0, (sockaddr*)&sendToAddr, sizeof(sendToAddr));
-	LOG_INFO_NETWORK("{} - secure packet sent socket handle: {}, connection index: {}, connection identifier: {:x}, n0nceKey: {}",
+	LOG_INFO_NETWORK("{} - request sent, socket handle: {}, connection index: {}, connection id: {:x}, n0nceKey: {}",
 		__FUNCTION__,
 		xsocket->winSockHandle,
 		XnIp::GetConnectionIndex(GetConnectionId()),

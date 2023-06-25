@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include "ServerList.h"
+#include "XLive/Cryptography/Rc4.h"
+
 #include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
@@ -110,22 +112,22 @@ DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPro
 	DWORD result = (DWORD)((sizeof(XLOCATOR_SEARCHRESULT) * cItems) + (cItems * sizeof(XUSER_PROPERTY) * cRequiredPropertyIDs));
 
 	if (pRequredPropertiesIDs)
+	{
+		for (int i = 0; i < cRequiredPropertyIDs; i++)
 		{
-			for (int i = 0; i < cRequiredPropertyIDs; i++)
-			{
-				if ((pRequredPropertiesIDs[i] & 0xF0000000) == 0x40000000) // check if we have string properties
-					++stringProperties;
-			}
+			if ((pRequredPropertiesIDs[i] & 0xF0000000) == 0x40000000) // check if we have string properties
+				++stringProperties;
 		}
+	}
 
-		// string buffers are max 64 wide strings characters (128 bytes) and the null character, so in total 65 characters (130 bytes)
-		result += (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
+	// string buffers are max 64 wide strings characters (128 bytes) and the null character, so in total 65 characters (130 bytes)
+	result += (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
 
-		if (outStringBufferSize)
-		{
-			*outStringBufferSize = (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
-			LOG_TRACE_XLIVE("{} : stringBufferSize: {}, stringBufferSize2: {}, cItems: {}, stringCount: {}", __FUNCTION__, *outStringBufferSize, (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties), cItems, stringProperties);
-		}
+	if (outStringBufferSize)
+	{
+		*outStringBufferSize = (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties);
+		LOG_TRACE_XLIVE("{} : stringBufferSize: {}, stringBufferSize2: {}, cItems: {}, stringCount: {}", __FUNCTION__, *outStringBufferSize, (X_PROPERTY_UNICODE_BUFFER_SIZE * cItems * stringProperties), cItems, stringProperties);
+	}
 
 	return result;
 }
@@ -218,7 +220,10 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		BadServer(xuid, "abEnet == NULL");
 		return result;
 	}
-	HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	// HexStrToBytes(abEnet_str, searchResult.serverAddress.abEnet, sizeof(XNADDR::abEnet));
+	XECRYPT_RC4_STATE rc4_engine_state;
+	XeCryptRc4Key(&rc4_engine_state, (BYTE*)abEnet_str, sizeof(XNADDR::abEnet) * 2);
+	XeCryptRc4Ecb(&rc4_engine_state, searchResult.serverAddress.abEnet, sizeof(searchResult.serverAddress.abEnet));
 
 	if (!doc.HasMember("abonline"))
 	{
@@ -780,6 +785,8 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 	CURLcode res;
 	std::string readBuffer;
 
+	XnIp* localUser = gXnIpMgr.GetLocalUserXn();
+
 	pOverlapped->InternalLow = ERROR_IO_INCOMPLETE;
 	pOverlapped->InternalHigh = 0; // this shouldn't even be checked by game's code, but for some reason it gets in Halo 2, InternalHIgh is used for enumerating data, where it holds how many elemets were retreived
 	pOverlapped->dwExtendedError = HRESULT_FROM_WIN32(ERROR_IO_INCOMPLETE);
@@ -801,8 +808,6 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		Value xnkey_val(kStringType);
 		xnkey_val.SetString(ByteToHexStr(xnkey.ab, sizeof(xnkey.ab)).c_str(), docAllocator);
 
-		XnIp* localUser = gXnIpMgr.GetLocalUserXn();
-
 		document.AddMember("token", token, docAllocator);
 		document.AddMember("xuid", Value().SetUint64(usersSignInInfo[dwUserIndex].xuid), docAllocator);
 		document.AddMember("dwServerType", Value().SetInt(dwServerType), docAllocator);
@@ -811,10 +816,8 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 		document.AddMember("dwMaxPrivateSlots", Value().SetInt(dwMaxPrivateSlots), docAllocator);
 		document.AddMember("dwMaxFilledPrivateSlots", Value().SetInt(dwFilledPrivateSlots), docAllocator);
 		document.AddMember("dwPort", Value().SetInt(H2Config_base_port), docAllocator);
-		if (localUser->m_valid)
-		{
-			document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
-		}
+		document.AddMember("lanaddr", Value().SetUint(localUser->m_xnaddr.ina.s_addr), docAllocator);
+
 		document.AddMember("xnkid", xnkid_val, docAllocator);
 		document.AddMember("xnkey", xnkey_val, docAllocator);
 		document.AddMember("cProperties", Value().SetInt(cProperties + 3), docAllocator);
@@ -855,7 +858,7 @@ void CServerList::AddServer(DWORD dwUserIndex, DWORD dwServerType, XNKID xnkid, 
 			document["pProperties"].PushBack(property, docAllocator);
 		}
 
-		char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
+		const char* name = strnlen_s(H2Config_dedi_server_name, XUSER_MAX_NAME_LENGTH) > 0 ? H2Config_dedi_server_name : usersSignInInfo[dwUserIndex].szUserName;
 
 		/* For whatever reason the game is currently refusing to send the servername or player profile name so we're going to send it ourselves.*/
 		Value serv_name_property(kObjectType);
@@ -895,6 +898,9 @@ DWORD WINAPI XLocatorServerAdvertise(DWORD dwUserIndex, DWORD dwServerType, XNKI
 	{
 		return -1;
 	}
+
+	if (!gXnIpMgr.GetLocalUserXn()->m_valid)
+		return -1;
 
 	std::thread(&CServerList::AddServer, dwUserIndex, dwServerType, xnkid, xnkey, dwMaxPublicSlots, dwMaxPrivateSlots, dwFilledPublicSlots, dwFilledPrivateSlots, cProperties, pProperties, pOverlapped).detach();
 	return HRESULT_FROM_WIN32(ERROR_IO_PENDING);
