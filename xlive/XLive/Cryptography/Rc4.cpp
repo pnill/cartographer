@@ -2,7 +2,7 @@
 
 #include "Rc4.h"
 
-void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, BYTE* key, DWORD key_size)
+void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, const BYTE* key, DWORD key_size)
 {
 	// Setup RC4 state
 	rc4_ctx->i = rc4_ctx->j = 0;

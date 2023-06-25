@@ -9,4 +9,4 @@ typedef struct {
 } XECRYPT_RC4_STATE;
 
 void XeCryptRc4Ecb(XECRYPT_RC4_STATE* rc4_ctx, BYTE* data, DWORD size);
-void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, BYTE* key, DWORD key_size);
+void XeCryptRc4Key(XECRYPT_RC4_STATE* rc4_ctx, const BYTE* key, DWORD key_size);
