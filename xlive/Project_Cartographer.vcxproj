@@ -622,6 +622,7 @@
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
@@ -647,6 +648,10 @@
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
+    <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
+    <ClInclude Include="Blam\Engine\structures\structures.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />

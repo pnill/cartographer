@@ -562,6 +562,7 @@
     <ClInclude Include="Blam\Engine\ai\path.h" />
     <ClInclude Include="Blam\Engine\ai\zone.h" />
     <ClInclude Include="Blam\Engine\ai\sector.h" />
+    <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\ai\sector_geometry.h" />
     <ClInclude Include="Blam\Engine\ai\sector_environment_objects.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
@@ -574,6 +575,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_hint_definitions.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="version.h" />
@@ -585,6 +587,7 @@
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
