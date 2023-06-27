@@ -555,6 +555,8 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
+    <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
