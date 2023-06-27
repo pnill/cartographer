@@ -3,11 +3,11 @@
 #include "PlayerRepresentation.h"
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -221,10 +221,10 @@ namespace PlayerRepresentation
 				}
 			}
 
-			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-			auto skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
-			auto skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
-			auto skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			scenario* scenario_definition = get_global_scenario();
+			datum skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
+			datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
+			datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
 			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && get_current_special_event() == e_special_event_type::_halloween && !H2Config_no_events)
 			{
@@ -232,10 +232,10 @@ namespace PlayerRepresentation
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_datum, true, "carto_shared");
 				tag_loader::Push_Back();
-				auto skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
+				datum skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
 				add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, character_type_skeleton);
-				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
-				new_def->tag = skele_new_datum;
+				s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
+				new_def->tag_datum = skele_new_datum;
 			}
 			else
 			{
@@ -251,8 +251,8 @@ namespace PlayerRepresentation
 				tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 				tag_loader::Push_Back();
 				add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), character_type_flood);
-				auto new_def = MetaExtender::add_tag_block2<s_scenario_group_definition::s_simulation_definition_table_block>((unsigned long)std::addressof(scen->simulation_definition_table));
-				new_def->tag = tag_loader::ResolveNewDatum(flood_datum);
+				s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
+				new_def->tag_datum = tag_loader::ResolveNewDatum(flood_datum);
 			}
 			else
 			{

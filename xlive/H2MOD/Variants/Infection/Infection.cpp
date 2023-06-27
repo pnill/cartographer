@@ -1,15 +1,14 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/scenario/scenario.h"
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -259,15 +258,15 @@ void Infection::removeUnwantedItems()
 	}
 
 	//Replace vehicles with shotgun ammo
-	s_scenario_group_definition* scenario = get_global_scenario();
-	for (DWORD i = 0; i < scenario->netgame_equipment.size; i++)
+	scenario* scenario_definition = get_global_scenario();
+	for (DWORD i = 0; i < scenario_definition->netgame_equipment.size; i++)
 	{
-		auto netgame_equipment = scenario->netgame_equipment[i];
-		if (netgame_equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
+		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
+		if (netgame_equipment->item_vehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
 		{
-			netgame_equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
-			netgame_equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-			netgame_equipment->itemvehicle_collection.TagIndex = DATUM_INDEX_NONE;
+			netgame_equipment->classification = netgame_item_classification_powerup;
+			netgame_equipment->item_vehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+			netgame_equipment->item_vehicle_collection.TagIndex = DATUM_INDEX_NONE;
 		}
 	}
 }

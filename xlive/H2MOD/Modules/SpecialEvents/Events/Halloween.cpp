@@ -6,7 +6,6 @@
 
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
@@ -14,6 +13,8 @@
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/scenario/scenario_definitions.h"
+
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaExtender.h"
@@ -108,8 +109,8 @@ void halloween_event_map_load()
 {
 	// Load specific tags from shared and modify placements depending on the map being played
 	const s_cache_header* cache_header = tags::get_cache_header();
-	auto scnr = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-	auto sbps = tags::get_tag_fast< s_scenario_structure_bsp_group_definition>(scnr->structure_bsps[0]->structure_bsp.TagIndex);
+	scenario* scenario_definition = tags::get_tag_fast<scenario>(tags::get_tags_header()->scenario_datum);
+	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.TagIndex);
 	if (!strcmp(cache_header->name, "coagulation"))
 	{
 		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
@@ -145,14 +146,17 @@ void halloween_event_map_load()
 
 		if (!DATUM_IS_NONE(sky_datum))
 		{
-			scnr->skies[0]->sky.TagIndex = sky_datum;
+			scenario_definition->skies[0]->TagIndex = sky_datum;
 		}
+
 		if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
 		{
 			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.TagIndex = lbitm_datum;
-			sbps->decorators_block.size = 0;
-			sbps->decorators_block.data = 0;
+
+			// Null out decorator block since the colour for them is separate from the lightmap colour
+			bsp_definition->decorators_block.size= 0;
+			bsp_definition->decorators_block.data = 0;
 		}
 
 		// Add items to scenario
