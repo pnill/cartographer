@@ -296,6 +296,7 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />

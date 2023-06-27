@@ -572,6 +572,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_orders.h" />
     <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\ai\ai_hint_definitions.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
