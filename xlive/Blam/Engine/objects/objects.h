@@ -41,7 +41,7 @@ enum e_object_team : BYTE
 	object_team_unused15 = 15,
 
 	// Shared
-	None = 255
+	object_team_none = 255
 };
 
 enum e_object_type : signed char
