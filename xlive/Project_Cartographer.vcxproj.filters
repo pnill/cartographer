@@ -555,8 +555,21 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
+    <ClInclude Include="Blam\Engine\ai\path_flying.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_mission_dialogue.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\ai\path.h" />
+    <ClInclude Include="Blam\Engine\ai\zone.h" />
+    <ClInclude Include="Blam\Engine\ai\sector.h" />
+    <ClInclude Include="Blam\Engine\ai\sector_geometry.h" />
+    <ClInclude Include="Blam\Engine\ai\sector_environment_objects.h" />
+    <ClInclude Include="Blam\Engine\ai\cl_engine.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_orders.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_hint_definitions.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
@@ -566,6 +579,7 @@
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_flocks.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
