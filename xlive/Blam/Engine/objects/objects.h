@@ -1,43 +1,44 @@
 #pragma once
-
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/Simulation/SimulationWorld.h"
 #include "Blam/Engine/objects/object_placement.h"
 
+#define k_maximum_objects_per_map 2048
+
 enum e_object_team : BYTE
 {
 	// MP
-	_object_team_red = 0,
-	_object_team_blue = 1,
-	_object_team_yellow = 2,
-	_object_team_green = 3,
-	_object_team_purple = 4,
-	_object_team_orange = 5,
-	_object_team_brown = 6,
-	_object_team_pink = 7,
-	_object_team_end = 8,
+	object_team_red = 0,
+	object_team_blue = 1,
+	object_team_yellow = 2,
+	object_team_green = 3,
+	object_team_purple = 4,
+	object_team_orange = 5,
+	object_team_brown = 6,
+	object_team_pink = 7,
+	object_team_neutral = 8,
 
 	// SP
-	Default = 0,
-	player = 1,
-	Human = 2,
-	Covenant = 3,
-	Flood = 4,
-	Sentinel = 5,
-	Heretic = 6,
-	Prophet = 7,
+	object_team_default = 0,
+	object_team_player = 1,
+	object_team_human = 2,
+	object_team_covenant = 3,
+	object_team_flood = 4,
+	object_team_sentinel = 5,
+	object_team_heretic = 6,
+	object_team_prophet = 7,
 
-	// unasigned team ids
-	Unused8 = 8,
-	Unused9 = 9,
-	Unused10 = 10,
-	Unused11 = 11,
-	Unused12 = 12,
-	Unused13 = 13,
-	Unused14 = 14,
-	Unused15 = 15,
+	// unassigned team ids
+	object_team_unused8 = 8,
+	object_team_unused9 = 9,
+	object_team_unused10 = 10,
+	object_team_unused11 = 11,
+	object_team_unused12 = 12,
+	object_team_unused13 = 13,
+	object_team_unused14 = 14,
+	object_team_unused15 = 15,
 
 	// Shared
 	None = 255
@@ -45,19 +46,20 @@ enum e_object_team : BYTE
 
 enum e_object_type : signed char
 {
-	biped = 0,
-	vehicle,
-	weapon,
-	equipment,
-	garbage,
-	projectile,
-	scenery,
-	machine,
-	control,
-	light_fixture,
-	sound_scenery,
-	crate,
-	creature,
+	object_type_biped = 0,
+	object_type_vehicle = 1,
+	object_type_weapon = 2,
+	object_type_equipment = 3,
+	object_type_garbage = 4,
+	object_type_projectile = 5,
+	object_type_scenery = 6,
+	object_type_machine = 7,
+	object_type_control = 8,
+	object_type_light_fixture = 9,
+	object_type_sound_scenery = 10,
+	object_type_crate = 11,
+	object_type_creature = 12,
+	object_type_none = -1
 };
 
 enum e_unit_weapons

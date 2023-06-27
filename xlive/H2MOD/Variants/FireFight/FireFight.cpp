@@ -22,7 +22,7 @@ void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
 	s_data_iterator<actor> actorIt(h2mod->get_actor_table());
-	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(e_object_type::biped));
+	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(object_type_biped));
 
 	if (actorObject != NULL)
 	{

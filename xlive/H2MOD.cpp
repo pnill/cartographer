@@ -128,7 +128,7 @@ int get_char_datum_from_actor(int actor_datum)
 /*This is to get the datum of the last player who damaged the datum/unit provided */
 int get_damage_owner(datum damaged_unit_index)
 {
-	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
+	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(object_type_biped) | FLAG(object_type_vehicle));
 	if (damaged_player_ptr)
 	{
 		return *(int*)(damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
@@ -242,7 +242,7 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE team_index = NONE;
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
 	if (unit_object != NULL)
 	{
 		team_index = *(BYTE*)(unit_object + 0x13C);
@@ -288,7 +288,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(e_object_type::biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
 	if (unit_object != NULL)
 	{
 		// not sure what these flags are, but this is called when picking up grenades
@@ -803,8 +803,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	const short red_versus_blue_teams = FLAG(_object_team_red) | FLAG(_object_team_blue);
-	const short infection_teams = FLAG(_object_team_red) | FLAG(_object_team_green);
+	const short red_versus_blue_teams = FLAG(object_team_red) | FLAG(object_team_blue);
+	const short infection_teams = FLAG(object_team_red) | FLAG(object_team_green);
 
 	std::wstring selected_map_file_name;
 
@@ -817,8 +817,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 		// infection overrides H2Config
 		// TODO get infection_teams through the interface
 		new_teams_enabled_flags = infection_teams;
-		if ((default_teams_enabled_flags & FLAG(_object_team_red)) == 0
-			|| (default_teams_enabled_flags & FLAG(_object_team_green)) == 0)
+		if ((default_teams_enabled_flags & FLAG(object_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(object_team_green)) == 0)
 		{
 			LOG_WARNING_FUNC(" - infection teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
@@ -829,8 +829,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 	{
 		// same with rvb, overrides H2Config
 		new_teams_enabled_flags = red_versus_blue_teams;
-		if ((default_teams_enabled_flags & FLAG(_object_team_red)) == 0
-			|| (default_teams_enabled_flags & FLAG(_object_team_blue)) == 0)
+		if ((default_teams_enabled_flags & FLAG(object_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(object_team_blue)) == 0)
 		{
 			LOG_WARNING_FUNC(" - RvB teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
@@ -863,7 +863,7 @@ void H2MOD::ApplyFirefightHooks()
 int get_active_count_from_bitflags(short teams_bit_flags)
 {
 	int count = 0;
-	for (int i = 0; i < _object_team_end; i++)
+	for (int i = 0; i < object_team_neutral; i++)
 	{
 		if (TEST_FLAG(teams_bit_flags, i))
 			count++;
@@ -906,7 +906,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_object_team_end);
+		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)object_team_neutral);
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
@@ -916,7 +916,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
-		for (int i = 0; i < _object_team_end; i++)
+		for (int i = 0; i < object_team_neutral; i++)
 		{
 			int currentTeamPlayers = 0;
 
