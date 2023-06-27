@@ -181,6 +181,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screens_patches.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_esrb_warning.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\decorators\decorator_definitions.cpp" />
     <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
@@ -563,6 +564,7 @@
     <ClInclude Include="Blam\Engine\ai\sector.h" />
     <ClInclude Include="Blam\Engine\ai\sector_geometry.h" />
     <ClInclude Include="Blam\Engine\ai\sector_environment_objects.h" />
+    <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\ai\cl_engine.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
@@ -580,6 +582,9 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\ai\ai_flocks.h" />
+    <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
+    <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
+    <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
