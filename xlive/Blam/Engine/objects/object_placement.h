@@ -2,6 +2,22 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Math/BlamMath.h"
 
+enum e_object_source : char
+{
+	object_source_structure = 0,
+	object_source_editor = 1,
+	object_source_dynamic = 2,
+	object_source_legacy = 3,
+	object_source_none = -1
+};
+
+enum e_bsp_policy : char
+{
+	bsp_policy_default = 0,
+	bsp_policy_always_placed = 1,
+	bsp_policy_manual_bsp_placement = 2
+};
+
 struct s_object_placement_data
 {
 	datum tag_index;//0
