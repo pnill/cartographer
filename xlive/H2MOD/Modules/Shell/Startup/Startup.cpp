@@ -5,6 +5,8 @@
 #include "../Config.h"
 #include "../Shell.h"
 
+#include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
+
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Networking/Networking.h"
@@ -12,8 +14,6 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Modules/Updater/Updater.h"
-
-#include "../Debug/Debug.h"
 
 #include "Util/filesys.h"
 #include "Util/hash.h"
@@ -279,7 +279,7 @@ void ServerStartupFixes()
 void InitH2Startup() {
 	InitializeCriticalSection(&log_section);
 
-	Debug::Initialize();
+	cseries_debug_initialize();
 	Memory::Initialize();
 
 	H2BaseAddr = Memory::GetAddress();
