@@ -57,7 +57,8 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
 		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
 	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
-	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden)
+	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -678,6 +679,15 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tagType.as_string(), mapName);
 	return 0;
+}
+
+int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	int* test = nullptr;
+#pragma warning( push )
+#pragma warning( disable : 6011 )
+	return *test++;
+#pragma warning( pop )
 }
 
 //////////////////////////////////////////////////////////////////////////
