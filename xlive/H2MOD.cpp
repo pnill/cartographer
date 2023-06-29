@@ -556,7 +556,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
 
-	if (options->engine_type == e_engine_type::_main_menu)
+	if (options->engine_type == engine_type_main_menu)
 	{
 		addDebugText("Engine type: Main-Menu");
 		if (!Memory::IsDedicatedServer())
@@ -578,7 +578,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		hud_patches_on_map_load();
 		new_hud_patches_on_map_load();
 
-		if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
+		if (h2mod->GetEngineType() == engine_type_multiplayer)
 		{
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
@@ -610,7 +610,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
 		}
-		else if (h2mod->GetEngineType() == e_engine_type::_single_player)
+		else if (h2mod->GetEngineType() == engine_type_single_player)
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
@@ -701,15 +701,15 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
+	return h2mod->GetEngineType() == engine_type_multiplayer;
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_multiplayer;
+	return h2mod->GetEngineType() == engine_type_multiplayer;
 }
 
 bool FlashlightIsEngineSPCheck() {
-	return h2mod->GetEngineType() == e_engine_type::_single_player;
+	return h2mod->GetEngineType() == engine_type_single_player;
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
@@ -755,7 +755,7 @@ bool device_active = true;
 // This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == e_engine_type::_multiplayer)
+	if (h2mod->GetEngineType() == engine_type_multiplayer)
 	{
 		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)

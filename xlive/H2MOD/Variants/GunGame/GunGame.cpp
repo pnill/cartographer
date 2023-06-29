@@ -167,7 +167,7 @@ void GunGame::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		switch (gameOptions->engine_type)
 		{
 			// cleanup when loading main menu
-		case _multiplayer:
+		case engine_type_multiplayer:
 			this->Initialize();
 			break;
 		/*case _main_menu:

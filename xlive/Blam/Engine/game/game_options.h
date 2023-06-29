@@ -16,11 +16,11 @@ enum e_game_simulation : __int8
 
 enum e_engine_type : int
 {
-	_single_player = 1,
-	_multiplayer,
-	_main_menu,
-	_mutiplayer_shared,
-	_single_player_shared
+	engine_type_single_player = 1,
+	engine_type_multiplayer = 2,
+	engine_type_main_menu = 3,
+	engine_type_mutiplayer_shared = 4,
+	engine_type_single_player_shared = 5
 };
 
 #pragma pack(push,1)

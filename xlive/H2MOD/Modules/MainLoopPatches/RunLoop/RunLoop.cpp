@@ -265,7 +265,7 @@ bool __cdecl cinematic_in_progress_hook()
 bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
 {
 	// don't limit the game framerate if we're single player and playing cinematics
-	if (h2mod->GetEngineType() == _single_player)
+	if (h2mod->GetEngineType() == engine_type_single_player)
 		return false;
 
 	return p_cinematic_is_running();

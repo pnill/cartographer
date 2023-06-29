@@ -24,17 +24,17 @@ s_game_variant* s_game_globals::get_game_variant()
 
 bool s_game_globals::game_is_campaign()
 {
-	return get_game_options()->engine_type == e_engine_type::_single_player;
+	return get_game_options()->engine_type == engine_type_single_player;
 }
 
 bool s_game_globals::game_is_multiplayer()
 {
-	return get_game_options()->engine_type == e_engine_type::_multiplayer;
+	return get_game_options()->engine_type == engine_type_multiplayer;
 }
 
 bool s_game_globals::game_is_mainmenu()
 {
-	return get_game_options()->engine_type == e_engine_type::_main_menu;
+	return get_game_options()->engine_type == engine_type_main_menu;
 }
 
 bool s_game_globals::game_is_predicted()

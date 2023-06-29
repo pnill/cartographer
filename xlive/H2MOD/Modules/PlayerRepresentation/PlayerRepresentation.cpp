@@ -212,7 +212,7 @@ namespace PlayerRepresentation
 	{
 		current_representation_count = 4;
 
-		if (h2mod->GetEngineType() == _multiplayer) 
+		if (h2mod->GetEngineType() == engine_type_multiplayer) 
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
 			{

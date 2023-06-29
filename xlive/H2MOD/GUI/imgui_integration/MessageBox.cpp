@@ -31,7 +31,7 @@ namespace ImGuiHandler
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 250), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 250), ImVec2(1920, 1080));
-			if (h2mod->GetEngineType() == _main_menu)
+			if (h2mod->GetEngineType() == engine_type_main_menu)
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin("Message", NULL, window_flags))
 			{
