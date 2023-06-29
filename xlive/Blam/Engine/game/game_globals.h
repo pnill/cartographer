@@ -1,35 +1,32 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/game/game_options.h"
+#define k_game_maximum_ragdolls 3
 
-#pragma pack(push,1)
 struct s_game_globals
 {
-	char initializing;
-	char map_active;
-	__int16 sbsp_index;
-	char field_4;
-	char field_5;
-	char field_6;
-	char field_7;
+	bool initializing;
+	bool map_active;
+	short active_structure_bsp_index;
+	int unused;
 	s_game_options options;
-	char game_in_progress;
-	char game_is_lost;
-	byte pad0[2];
+	bool game_in_progress;
+	bool game_is_lost;
+	short pad0;
 	int ticks_to_reset_game;
-	BYTE game_options_related;	//need better name
-	byte pad1[3];
-	DWORD field_119C;		//stores 7 * game_ticks_per_second at game_finish
-	DWORD field_11A0;
+	bool game_is_finished;
+	bool game_sounds_disabled;
+	short pad1;
+	DWORD ticks_till_end;
+	DWORD game_ragdoll_count;
 	DWORD field_11A4;
-	byte pvs0[64];
-	byte pvs1[64];
+	byte cluster_pvs[64];
+	byte cluster_pvs_local[64];
 	DWORD cluster_activation[16];
 	byte enable_scripted_camera_pvs;
-	byte pad4;
-	WORD pvs_object_is_set;
+	byte pad2;
+	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
-
 
 	static s_game_globals* get();
 	static bool map_initialized();
@@ -43,6 +40,5 @@ struct s_game_globals
 	static bool game_is_predicted();
 };
 CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
-#pragma pack(pop)
 
 e_engine_type get_current_engine_type();

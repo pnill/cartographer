@@ -9,7 +9,7 @@ s_game_globals* s_game_globals::get()
 
 bool s_game_globals::map_initialized()
 {
-	return get() && get()->map_active && get()->sbsp_index != 0xFFFF;
+	return get() && get()->map_active && get()->active_structure_bsp_index != 0xFFFF;
 }
 
 s_game_options* s_game_globals::get_game_options()
