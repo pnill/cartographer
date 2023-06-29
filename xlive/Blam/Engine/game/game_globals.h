@@ -8,23 +8,23 @@ struct s_game_globals
 	bool initializing;
 	bool map_active;
 	short active_structure_bsp_index;
-	int unused;
+	int unused_0;
 	s_game_options options;
 	bool game_in_progress;
 	bool game_is_lost;
-	short pad0;
+	short pad_0;
 	int ticks_to_reset_game;
 	bool game_is_finished;
 	bool game_sounds_disabled;
-	short pad1;
+	short pad_1;
 	DWORD ticks_till_end;
 	DWORD game_ragdoll_count;
-	DWORD field_11A4;
+	int unused_1;
 	byte cluster_pvs[64];
 	byte cluster_pvs_local[64];
 	DWORD cluster_activation[16];
 	byte enable_scripted_camera_pvs;
-	byte pad2;
+	byte pad_2;
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
 
