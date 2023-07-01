@@ -27,7 +27,7 @@ namespace KantTesting
 {
 	void MapLoad()
 	{
-		if (h2mod->GetEngineType() == engine_type_multiplayer)
+		if (h2mod->GetEngineType() == _game_mode_multiplayer)
 		{
 		}
 	}

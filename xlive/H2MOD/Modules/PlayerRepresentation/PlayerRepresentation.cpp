@@ -132,7 +132,7 @@ namespace PlayerRepresentation
 
 	void __cdecl player_properties_validate_configuration_hook(int player_index, s_player_properties* player_properties)
 	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.engine_type);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.game_mode);
 
 		auto player_biped_type = player_properties->profile_traits.profile.player_character_type;
 		p_player_properties_validate_configuration(player_index, player_properties);
@@ -212,7 +212,7 @@ namespace PlayerRepresentation
 	{
 		current_representation_count = 4;
 
-		if (h2mod->GetEngineType() == engine_type_multiplayer) 
+		if (h2mod->GetEngineType() == _game_mode_multiplayer) 
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
 			{

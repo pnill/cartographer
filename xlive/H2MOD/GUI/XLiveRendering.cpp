@@ -665,7 +665,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == engine_type_single_player)) {
+			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == _game_mode_campaign)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_active_player()) 

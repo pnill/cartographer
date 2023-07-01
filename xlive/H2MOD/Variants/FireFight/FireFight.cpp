@@ -87,7 +87,7 @@ void FireFight::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		switch (h2mod->GetEngineType())
 		{
 			// cleanup when loading main menu
-		case engine_type_multiplayer:
+		case _game_mode_multiplayer:
 			this->Initialize();
 			break;
 		/*case _main_menu:

@@ -214,7 +214,6 @@ CHECK_STRUCT_SIZE(s_player_properties, 132);
 #pragma pack(push, 1)
 struct s_player
 {
-
 	WORD datum_salt;
 	WORD flags;
 	unsigned long long identifier;

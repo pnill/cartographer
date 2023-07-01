@@ -41,4 +41,4 @@ struct s_game_globals
 };
 CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
 
-e_engine_type get_current_engine_type();
+e_game_mode get_current_engine_type();

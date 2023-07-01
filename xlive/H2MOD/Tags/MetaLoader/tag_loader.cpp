@@ -121,7 +121,7 @@ namespace tag_loader
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);
 
-		if (tags::get_cache_header()->type == engine_type_mutiplayer_shared || tags::get_cache_header()->type == engine_type_single_player_shared)
+		if (tags::get_cache_header()->type == _game_mode_mutiplayer_shared || tags::get_cache_header()->type == _game_mode_single_player_shared)
 		{
 			delete[] map_header;
 			return true;

@@ -84,7 +84,7 @@ namespace EventHandler
 	using GameLoopEventCallback = void(*)();
 	using ServerCommandEventCallback = void(*)(ServerConsole::e_server_console_commands command);
 	using PlayerControlEventCallback = void(*)(float* yaw, float* pitch);
-	using MapLoadEventCallback = void(*)(e_engine_type type);
+	using MapLoadEventCallback = void(*)(e_game_mode type);
 	using BlueScreenEventCallback = void(*)();
 	using PlayerSpawnEventCallback = void(*)(datum PlayerDatum);
 	using ObjectDamageEventCallback = void(*)(datum PlayerDatum, datum KillerDatum);

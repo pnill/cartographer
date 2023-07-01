@@ -131,10 +131,10 @@ void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 	case ExecTime::_postEventExec:
 		switch (h2mod->GetEngineType())
 		{
-		case engine_type_multiplayer:
+		case _game_mode_multiplayer:
 			this->Initialize();
 			break;
-		case engine_type_main_menu:
+		case _game_mode_ui_shell:
 			break;
 		default:
 			break;

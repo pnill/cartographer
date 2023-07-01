@@ -138,7 +138,7 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	
-	if (h2mod->GetEngineType() == engine_type_multiplayer 
+	if (h2mod->GetEngineType() == _game_mode_multiplayer 
 		&& !NetworkSession::LocalPeerIsSessionHost()) 
 	{
 		output->Output(StringFlag_None, "# only host can see xyz for now...");
@@ -565,7 +565,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	std::string objectName = tokens[tokenArgPos++];
 
-	if (h2mod->GetEngineType() == engine_type_main_menu) {
+	if (h2mod->GetEngineType() == _game_mode_ui_shell) {
 		output->Output(StringFlag_None, "# can only be used ingame");
 		return 0;
 	}
@@ -662,7 +662,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	ConsoleLog* output = cbData.strOutput;
 
 	if (!NetworkSession::LocalPeerIsSessionHost() 
-		&& h2mod->GetEngineType() != engine_type_single_player)
+		&& h2mod->GetEngineType() != _game_mode_campaign)
 	{
 		output->Output(StringFlag_None, "# can only be used by the session host");
 		return 0;

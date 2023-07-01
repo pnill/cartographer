@@ -2,9 +2,9 @@
 
 #include "random_math.h"
 
-s_random_math_globals* random_math_get_globals()
+s_random_math* random_math_get_globals()
 {
-	return *Memory::GetAddress<s_random_math_globals**>(0x4A8280, 0x4D2500);
+	return *Memory::GetAddress<s_random_math**>(0x4A8280, 0x4D2500);
 }
 
 DWORD random_math_get_seed()
