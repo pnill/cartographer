@@ -218,14 +218,16 @@ struct bitmap_data
     int lod3_size;
     DWORD unk1[3];
     tag_reference parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
-    DWORD unk2[3];
+    void* pixel_data_pointer;
+    int unk3;
+    int unk4;
     int low_detail_offset;
     int low_detail_size;
     e_bitmap_data_format low_detail_format;
     short low_detail_width;
     short low_detail_height;
     short low_detail_depth;
-    int unk3;
+    int* unk5;
 };
 TAG_BLOCK_SIZE_ASSERT(bitmap_data, 116);
 
@@ -306,5 +308,14 @@ struct bitmap_group
     char alpha_compression_quality;    // 1 means lossless, 127 means crappy
     char overlap;
     e_color_subsampling color_subsampling;
+
+    // Data specific to tag builds?
+    int unk_data_0;
+    int unk_data_1;
+    int unk_data_2;
+    int unk_data_3;
+    tag_block<> unk_block_60;
+    int unk_data_6;
+    int unk_data_7;
 };
-TAG_GROUP_SIZE_ASSERT(bitmap_group, 80);
+TAG_GROUP_SIZE_ASSERT(bitmap_group, 112);
