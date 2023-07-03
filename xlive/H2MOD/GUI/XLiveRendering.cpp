@@ -1,10 +1,11 @@
 #include "stdafx.h"
 
 #include "XLiveRendering.h"
-
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
+
+#include "Blam/Engine/game/game_globals.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"

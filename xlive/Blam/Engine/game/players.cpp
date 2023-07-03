@@ -112,7 +112,7 @@ bool PlayerIterator::get_next_active_player()
 
 	while (m_current_player)
 	{
-		if (!TEST_FLAG(m_current_player->flags, player_flag_player_inactive))
+		if (!TEST_FLAG(m_current_player->flags, _player_left_game_bit))
 			break;
 
 		m_current_player = get_next_datum();

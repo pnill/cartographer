@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Blam/Engine/game/players.h"
-#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/input/controllers.h"
 #include "Blam/Engine/Networking/NetworkCommon.h"
 #include "Blam/Engine/Networking/Transport/NetworkChannel.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
+#include "Blam/Engine/saved_games/game_variant.h"
 
 // forward declarations
 enum e_map_status;

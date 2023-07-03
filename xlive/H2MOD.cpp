@@ -502,9 +502,9 @@ s_data_array* H2MOD::get_actor_table()
 
 void H2MOD::toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
-	options->tickrate = toggle ? 30 : 60;
-	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)options->tickrate);
-	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->tickrate);
+	options->game_tick_rate = toggle ? 30 : 60;
+	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)options->game_tick_rate);
+	LOG_TRACE_GAME("[h2mod] set game options tickrate to {}", options->game_tick_rate);
 }
 
 void H2MOD::toggle_ai_multiplayer(bool toggle)
