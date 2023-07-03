@@ -1,4 +1,11 @@
 #pragma once
+
+#include "Blam/Engine/text/unicode.h"
+
+#define MAXIMUM_STRING_SIZE 262144
+
+size_t csstrnlen(char* string, size_t size);
+
 /*********************************************************************
 * static_string
 * Storing and Manipulating Character Sequences(Basic String)
@@ -8,7 +15,8 @@ template<int length>
 struct static_string
 {
 	char text[length];
-	std::string get_static_string();
+	char* get_string();
+	size_t length();
 	void operator = (const char* Value);
 	void operator = (const static_string Value);
 };
@@ -51,7 +59,8 @@ template<int length>
 struct static_wchar_string
 {
 	wchar_t text[length];
-	std::wstring get_static_string();
+	wchar_t* get_string();
+	size_t length();
 	void operator = (const wchar_t* Value);
 	void operator = (const static_wchar_string Value);
 };
@@ -81,11 +90,17 @@ typedef static_wchar_string<128> static_wchar_string128;
 typedef static_wchar_string<256> static_wchar_string256;
 
 template<int T>
-inline std::string static_string<T>::get_static_string()
+inline char* static_string<T>::get_string()
 {
-	std::string k = this->text;
-	return k;
+	return this->text;
 }
+
+template<int T>
+inline size_t static_string<T>::length()
+{
+	return csstrnlen(this->text, T);
+}
+
 template<int T>
 inline void static_string<T>::operator= (const char* Value)
 {
@@ -98,11 +113,17 @@ inline void static_string<T>::operator= (const static_string Value)
 }
 
 template<int T>
-inline std::wstring static_wchar_string<T>::get_static_string()
+inline wchar_t* static_wchar_string<T>::get_string()
 {
-	std::wstring k = this->text;
-	return k;
+	return this->text;
 }
+
+template<int T>
+inline size_t static_wchar_string<T>::length()
+{
+	return ustrnlen(this->text, T);
+}
+
 template<int T>
 inline void static_wchar_string<T>::operator= (const wchar_t* Value)
 {
