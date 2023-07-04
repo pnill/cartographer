@@ -321,3 +321,34 @@ struct s_persistent_campaign_player
 	WORD grenade_counts_mask;
 };
 CHECK_STRUCT_SIZE(s_persistent_campaign_player, 28);
+
+struct s_players_globals
+{
+	int players_in_game_count;
+	bool all_players_dead;
+	bool any_players_dead;
+	bool input_disabled;
+	bool disable_movement;
+	short player_user_count;
+	short player_controller_count;
+	datum player_user_mapping[4];
+	datum player_controller_mapping[4];
+	int machine_valid_mask;
+	s_machine_identifier machine_identifier[17];
+	bool local_machine_exists;
+	s_machine_identifier local_machine_identifier;
+	byte unk_A5[3];
+	int local_machine_index;
+	short coop_respawn_hud_message_type;
+	bool display_coop_respawn_message;
+	byte display_fail_respawn_message;
+	int respawn_time;
+	short bsp_switch_trigger_volume_index;
+	short unk_AE;
+	int player_datum_that_triggered_bsp_switch;
+	int teleported_unit_datum;
+	byte end_padding[128];
+};
+CHECK_STRUCT_SIZE(s_players_globals, 312);
+
+s_players_globals* get_players_globals();

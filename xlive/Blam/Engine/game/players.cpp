@@ -1,8 +1,6 @@
 #include "stdafx.h"
 
-#include "Players.h"
-
-#include "H2MOD.h"
+#include "players.h"
 
 /*
 	- TO NOTE:
@@ -139,4 +137,9 @@ wchar_t* PlayerIterator::get_current_player_name()
 unsigned long long PlayerIterator::get_current_player_id()
 {
 	return s_player::GetId(this->get_current_player_index());
+}
+
+s_players_globals* get_players_globals()
+{
+	return *Memory::GetAddress<s_players_globals**>(0x4A825C, 0x4D64C0);
 }
