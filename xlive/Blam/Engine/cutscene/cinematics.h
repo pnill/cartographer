@@ -32,3 +32,5 @@ struct s_cinematic_globals
 	float cinematic_title_time;
 	s_cinematic_globals_cutscene_flags cutscene_flags;
 };
+
+s_cinematic_globals* get_cinematic_globals();
