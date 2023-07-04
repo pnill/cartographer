@@ -160,7 +160,7 @@ enum e_handicap : byte
 enum e_player_flags : int
 {
 	// player_flag_player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
-	_player_left_game_bit = 1, // this might also represent something else, like player left
+	_player_left_game_bit = 1,
 	player_flag_player_first_spawn = 3,
 };
 
