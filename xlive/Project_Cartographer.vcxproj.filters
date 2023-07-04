@@ -51,7 +51,6 @@
     <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="Util\Base64.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\Debug\Debug.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
     <ClCompile Include="Util\Hooks\Detour.cpp" />
@@ -183,6 +182,11 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_esrb_warning.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
     <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
+    <ClCompile Include="Blam\Engine\text\unicode.cpp" />
+    <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -352,7 +356,6 @@
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Util\Base64.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\Debug\Debug.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
     <ClInclude Include="Util\Hooks\Detour.h" />
@@ -554,6 +557,13 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
+    <ClInclude Include="Blam\Engine\input\controllers.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
+    <ClInclude Include="Blam\Engine\text\unicode.h" />
+    <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
+    <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
