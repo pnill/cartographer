@@ -35,8 +35,8 @@ namespace CommandCollection
 	int KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	int InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
-	
 	int BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
+	int Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 
 	// misc
 	void ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, datum playerIdx, float randomMultiplier, bool sameTeam);

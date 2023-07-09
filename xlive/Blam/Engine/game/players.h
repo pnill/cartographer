@@ -1,6 +1,8 @@
 #pragma once
 #include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/objects/damage_reporting.h"
 #include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/Simulation/MachineID.h"
 
 #define k_maximum_players 16
 
@@ -158,7 +160,7 @@ enum e_handicap : byte
 enum e_player_flags : int
 {
 	// player_flag_player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
-	player_flag_player_inactive = 1, // this might also represent something else, like player left
+	_player_left_game_bit = 1,
 	player_flag_player_first_spawn = 3,
 };
 
@@ -214,15 +216,14 @@ CHECK_STRUCT_SIZE(s_player_properties, 132);
 #pragma pack(push, 1)
 struct s_player
 {
-
 	WORD datum_salt;
 	WORD flags;
 	unsigned long long identifier;
 	DWORD player_creation_tick;
-	BYTE machine_identifier[6]; // also known as abEnet
+	s_machine_identifier machine_identifier; // also known as abEnet
 	__int16 machine_index;
-	int unk_user_index_2;
-	int unk_user_index;
+	int machine_user_index;
+	int machine_controller_index;
 	int controller_index;
 	__int16 user_index;
 	__int16 player_bsp_location_index;
@@ -302,3 +303,52 @@ public:
 private:
 	s_player* m_current_player = nullptr;
 };
+
+struct s_persistent_weapon_data
+{
+	e_damage_reporting_type damage_reporting_type_0;
+	e_damage_reporting_type damage_reporting_type_1;
+	short field_4;
+	short field_6;
+};
+
+struct s_persistent_campaign_player
+{
+	bool initialized;
+	s_persistent_weapon_data weapon_0;
+	s_persistent_weapon_data weapon_1;
+	s_persistent_weapon_data weapon_2;
+	WORD grenade_counts_mask;
+};
+CHECK_STRUCT_SIZE(s_persistent_campaign_player, 28);
+
+struct s_players_globals
+{
+	int players_in_game_count;
+	bool all_players_dead;
+	bool any_players_dead;
+	bool input_disabled;
+	bool disable_movement;
+	short player_user_count;
+	short player_controller_count;
+	datum player_user_mapping[4];
+	datum player_controller_mapping[4];
+	int machine_valid_mask;
+	s_machine_identifier machine_identifier[17];
+	bool local_machine_exists;
+	s_machine_identifier local_machine_identifier;
+	byte unk_A5[3];
+	int local_machine_index;
+	short coop_respawn_hud_message_type;
+	bool display_coop_respawn_message;
+	byte display_fail_respawn_message;
+	int respawn_time;
+	short bsp_switch_trigger_volume_index;
+	short unk_AE;
+	int player_datum_that_triggered_bsp_switch;
+	int teleported_unit_datum;
+	byte end_padding[128];
+};
+CHECK_STRUCT_SIZE(s_players_globals, 312);
+
+s_players_globals* get_players_globals();

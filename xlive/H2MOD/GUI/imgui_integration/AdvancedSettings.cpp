@@ -660,7 +660,7 @@ namespace ImGuiHandler {
 			}
 			void HostSettings()
 			{
-				if (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::_single_player) {
+				if (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == _game_mode_campaign) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
 						ImGui::Columns(2, NULL, false);
@@ -943,7 +943,7 @@ namespace ImGuiHandler {
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
-			if (h2mod->GetEngineType() == _main_menu)
+			if (h2mod->GetEngineType() == _game_mode_ui_shell)
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_advanced_string::title), &open, window_flags))
 			{

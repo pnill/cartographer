@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Debug.h"
+#include "cseries_windows_debug_pc.h"
 
 #include <DbgHelp.h>
 #include <ShlObj.h>
@@ -8,14 +8,13 @@
 #include <string>
 #include <time.h>
 
-#include "../Shell.h"
 #include "Util/Hooks/Hook.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Shell.h"
 
 #define CRASH_REPORTS_PATH "\\halo2_crash_reports\\"
 
-using namespace Debug;
 
 LPTOP_LEVEL_EXCEPTION_FILTER pfn_PreviousExceptionFilter = NULL;
 
@@ -60,7 +59,7 @@ BOOL WINAPI MinidumpInfoCb(
 	return TRUE;
 }
 
-LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
+LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS* ExceptionInfo)
 {
 	// get documents path.
 	char documents_path[MAX_PATH];
@@ -140,7 +139,7 @@ LONG WINAPI Debug::UnhandledExceptionCb(_In_ struct _EXCEPTION_POINTERS* Excepti
 	else
 		return EXCEPTION_CONTINUE_SEARCH;
 }
-static_assert(std::is_same<decltype(&Debug::UnhandledExceptionCb), LPTOP_LEVEL_EXCEPTION_FILTER>::value, "invalid exception handler declaration");
+static_assert(std::is_same<decltype(&debug_unhandled_exception_cb), LPTOP_LEVEL_EXCEPTION_FILTER>::value, "invalid exception handler declaration");
 
 LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI* pfn_SetUnhandledExceptionFilter)(LPTOP_LEVEL_EXCEPTION_FILTER);
 LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_EXCEPTION_FILTER pfnFilter)
@@ -150,9 +149,9 @@ LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_
 static_assert(std::is_same_v<decltype(&SetUnhandledExceptionFilterHook), decltype(&SetUnhandledExceptionFilter)>,
 	"invalid type of RedirectedSetUnhandledExceptionFilter");
 
-void Debug::Initialize()
+void cseries_debug_initialize()
 {
-	pfn_PreviousExceptionFilter = SetUnhandledExceptionFilter(Debug::UnhandledExceptionCb);
+	pfn_PreviousExceptionFilter = SetUnhandledExceptionFilter(debug_unhandled_exception_cb);
 
 	// Credits: multitheftauto/mtasa-blue
 	// https://github.com/multitheftauto/mtasa-blue/blob/6c1f3184764aca0655b5b64fe88ca0a73b2b69c8/Client/core/CrashHandler.cpp#L102

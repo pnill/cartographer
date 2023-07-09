@@ -94,7 +94,7 @@ namespace MapSlots
 	}
 	void OnMapLoad()
 	{
-		if (h2mod->GetEngineType() == _main_menu)
+		if (h2mod->GetEngineType() == _game_mode_ui_shell)
 		{
 			if (!AddedMaps.empty())
 			{

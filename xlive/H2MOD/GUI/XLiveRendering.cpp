@@ -1,10 +1,11 @@
 #include "stdafx.h"
 
 #include "XLiveRendering.h"
-
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
+
+#include "Blam/Engine/game/game_globals.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -665,7 +666,7 @@ int WINAPI XLiveRender()
 			}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == e_engine_type::_single_player)) {
+			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || h2mod->GetEngineType() == _game_mode_campaign)) {
 				int text_y_coord = 60;
 				PlayerIterator playerIt;
 				while (playerIt.get_next_active_player()) 
