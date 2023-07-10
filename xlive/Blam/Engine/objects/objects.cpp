@@ -10,6 +10,28 @@
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "Util/Hooks/Hook.h"
 
+void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference)
+{
+	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
+}
+
+void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count)
+{
+	void* block;
+	if (reference->offset == -1)
+	{
+		block = 0;
+		*element_count = 0;
+	}
+	else
+	{
+		block = (void*)object_header_block_get(object_datum, reference);
+		*element_count = reference->size / element_size;
+	}
+
+	return block;
+}
+
 void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
 {
 	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
@@ -46,6 +68,11 @@ void object_destroy(datum object_idx)
 	auto p_object_destroy = Memory::GetAddress<object_destroy_t*>(0x136005);
 
 	p_object_destroy(object_idx);
+}
+
+real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count)
+{
+	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
 #pragma region Biped variant patches
