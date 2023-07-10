@@ -1,7 +1,8 @@
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/tag_files/string_id.h"
 
 namespace PlayerRepresentation
 {
@@ -24,5 +25,6 @@ namespace PlayerRepresentation
 	s_globals_group_definition::s_player_representation_block* clone_representation(int index, e_character_type newType);
 
 	datum get_object_datum_from_representation(e_character_type representation_index);
+	void OnMapLoad(s_game_options* options);
 	void Initialize();
 }

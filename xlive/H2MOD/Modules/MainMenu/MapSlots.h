@@ -2,6 +2,6 @@
 namespace MapSlots
 {
 	void OnMapLoad();
-	void ApplyHooks();
+	void map_slots_apply_dedi_hooks();
 	void Initialize();
 }

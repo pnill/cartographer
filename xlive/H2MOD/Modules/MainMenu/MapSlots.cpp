@@ -1,8 +1,7 @@
 #include "stdafx.h"
+#include "MapSlots.h"
 
-#include  "MapSlots.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "H2MOD.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/filesys.h"
 #include "Util/Hooks/Hook.h"
@@ -94,63 +93,59 @@ namespace MapSlots
 	}
 	void OnMapLoad()
 	{
-		if (h2mod->GetEngineType() == _game_mode_ui_shell)
+		if (AddedMaps.empty()) { return; }
+
+		//Load all the added maps bitmaps
+		LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+		for (const auto& item : BitmapsToLoad)
 		{
-			if (!AddedMaps.empty())
+			tag_loader::Load_tag(item.first, false, item.second);
+		}
+		tag_loader::Push_Back();
+
+		//Grab the globals tag
+		auto matg_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
+		BYTE* matg_data = tags::get_tag<blam_tag::tag_group_type::globals, BYTE>(matg_datum);
+
+		if (matg_data == nullptr) { return; }
+
+		//Grab the tag block for UI Level Data
+		auto* p_ui_levels = reinterpret_cast<tags::tag_data_block*>(matg_data + 0x178);
+		if (p_ui_levels->block_count > 0 && p_ui_levels->block_data_offset != -1)
+		{
+			auto ui_levels = tags::get_tag_data() + p_ui_levels->block_data_offset;
+			//Grab the tag block for Multiplayer Levels
+			auto* p_mul_levels = reinterpret_cast<tags::tag_data_block*>(ui_levels + 0x10);
+			if (p_mul_levels->block_count > 0 && p_mul_levels->block_data_offset != -1)
 			{
-				//Load all the added maps bitmaps
-				LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-				for (const auto& item : BitmapsToLoad)
-				{
-					tag_loader::Load_tag(item.first, false, item.second);
-				}
-				tag_loader::Push_Back();
+				auto mul_levels = tags::get_tag_data() + p_mul_levels->block_data_offset;
 
-				//Grab the globals tag
-				auto matg_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-				BYTE* matg_data = tags::get_tag<blam_tag::tag_group_type::globals, BYTE>(matg_datum);
-
-				if (matg_data != nullptr)
+				int i = 0;
+				for (const auto& newSlot : MapData)
 				{
-					//Grab the tag block for UI Level Data
-					auto* p_ui_levels = reinterpret_cast<tags::tag_data_block*>(matg_data + 0x178);
-					if (p_ui_levels->block_count > 0 && p_ui_levels->block_data_offset != -1)
+					if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
+						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.text);
+						auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i)));
+
+						//Write the data loaded from the maps into the unused slot
+						memcpy(slot, &newSlot, sizeof(newSlot));
+						//Resolve the loaded bitmap datum
+						slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
+						//Change the map id and sort ID so that the maps are 
+						//placed in order at the end of the list
+						slot->map_id = MapIndex + i;
+						slot->sort_order = MapIndex + i;
+						i++;
+					}
+					else
 					{
-						auto ui_levels = tags::get_tag_data() + p_ui_levels->block_data_offset;
-						//Grab the tag block for Multiplayer Levels
-						auto* p_mul_levels = reinterpret_cast<tags::tag_data_block*>(ui_levels + 0x10);
-						if (p_mul_levels->block_count > 0 && p_mul_levels->block_data_offset != -1)
-						{
-							auto mul_levels = tags::get_tag_data() + p_mul_levels->block_data_offset;
-
-							int i = 0;
-							for (const auto& newSlot : MapData)
-							{
-								if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
-									LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.text);
-									auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i)));
-
-									//Write the data loaded from the maps into the unused slot
-									memcpy(slot, &newSlot, sizeof(newSlot));
-									//Resolve the loaded bitmap datum
-									slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
-									//Change the map id and sort ID so that the maps are 
-									//placed in order at the end of the list
-									slot->map_id = MapIndex + i;
-									slot->sort_order = MapIndex + i;
-									i++;
-								}
-								else
-								{
-									LOG_ERROR_GAME("[Map Slots]: Max Multiplayer added slots reached");
-									break;
-								}
-							}
-						}
+						LOG_ERROR_GAME("[Map Slots]: Max Multiplayer added slots reached");
+						break;
 					}
 				}
 			}
 		}
+
 	}
 
 	//H2Server reads the level data from mainmenu.map
@@ -196,7 +191,7 @@ namespace MapSlots
 		return p_sub_map_slot(a1);
 	}
 
-	void ApplyHooks()
+	void map_slots_apply_dedi_hooks()
 	{
 		MapSlotCount = Memory::GetAddress<int*>(0, 0x41950C);
 		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
@@ -209,12 +204,9 @@ namespace MapSlots
 	{
 		AddedMaps.emplace_back("highplains.map");
 		AddedMaps.emplace_back("derelict.map");
-		//AddedMaps.emplace_back("salvation.map");
 		CacheMapData();
 
-		if (!Memory::IsDedicatedServer())
-			tags::on_map_load(OnMapLoad);
-		else
-			ApplyHooks();
+		if (Memory::IsDedicatedServer())
+			map_slots_apply_dedi_hooks();
 	}
 }

@@ -532,10 +532,9 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
-	// set the engine type
-	h2mod->SetCurrentEngineType(options->game_mode);
-	tags::run_callbacks();
+	PlayerRepresentation::OnMapLoad(options);
 
+	tags::run_callbacks();
 	H2Tweaks::SetScreenRefreshRate();
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
@@ -564,6 +563,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		addDebugText("Engine type: Main-Menu");
 		if (!Memory::IsDedicatedServer())
 		{
+			MapSlots::OnMapLoad();
 			UIRankPatch();
 			screens_apply_patches_on_map_load();
 		}
@@ -573,14 +573,14 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	else
 	{
 		wchar_t* variant_name = NetworkSession::GetGameVariantName();
-		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)h2mod->GetEngineType(), variant_name);
+		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
 
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
 
-		if (h2mod->GetEngineType() == _game_mode_multiplayer)
+		if (options->game_mode == _game_mode_multiplayer)
 		{
 			addDebugText("Engine type: Multiplayer");
 			load_special_event();
@@ -612,7 +612,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				CustomVariantHandler::GameVarianEnable(variant_name);
 			}
 		}
-		else if (h2mod->GetEngineType() == _game_mode_campaign)
+		else if (options->game_mode == _game_mode_campaign)
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
@@ -703,15 +703,15 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	return h2mod->GetEngineType() == _game_mode_multiplayer;
+	return s_game_globals::game_is_multiplayer();
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	return h2mod->GetEngineType() == _game_mode_multiplayer;
+	return s_game_globals::game_is_multiplayer();
 }
 
 bool FlashlightIsEngineSPCheck() {
-	return h2mod->GetEngineType() == _game_mode_campaign;
+	return s_game_globals::game_is_campaign();
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
@@ -757,7 +757,7 @@ bool device_active = true;
 // This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (h2mod->GetEngineType() == _game_mode_multiplayer)
+	if (s_game_globals::game_is_multiplayer())
 	{
 		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)

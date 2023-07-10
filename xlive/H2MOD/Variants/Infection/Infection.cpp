@@ -320,7 +320,7 @@ CustomVariantId Infection::GetVariantId()
 	return CustomVariantId::_id_infection;
 }
 
-void Infection::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
+void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 {
 	switch (execTime)
 	{
@@ -328,7 +328,7 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		break;
 
 	case ExecTime::_postEventExec:
-		switch (h2mod->GetEngineType())
+		switch (options->game_mode)
 		{
 			// cleanup when loading main menu
 		case _game_mode_multiplayer:

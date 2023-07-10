@@ -121,7 +121,7 @@ CustomVariantId GraveRobber::GetVariantId()
 	return CustomVariantId::_id_graverobber;
 }
 
-void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
+void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* options)
 {
 	switch (execTime)
 	{
@@ -129,7 +129,7 @@ void GraveRobber::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		break;
 
 	case ExecTime::_postEventExec:
-		switch (h2mod->GetEngineType())
+		switch (options->game_mode)
 		{
 		case _game_mode_multiplayer:
 			this->Initialize();

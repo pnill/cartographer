@@ -1,10 +1,10 @@
 #include "stdafx.h"
 
-#include "Blam/Common/Common.h"
-#include "H2MOD.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "imgui.h"
 #include "imgui_handler.h"
+
+#include "Blam/Engine/game/game_globals.h"
+#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "Util/Hooks/Hook.h"
 
 namespace ImGuiHandler
@@ -31,7 +31,7 @@ namespace ImGuiHandler
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 250), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 250), ImVec2(1920, 1080));
-			if (h2mod->GetEngineType() == _game_mode_ui_shell)
+			if (s_game_globals::game_is_mainmenu())
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin("Message", NULL, window_flags))
 			{

@@ -6,7 +6,6 @@
 #include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
-#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
@@ -208,11 +207,11 @@ namespace PlayerRepresentation
 		}
 	}
 
-	void OnMapLoad()
+	void OnMapLoad(s_game_options* options)
 	{
 		current_representation_count = 4;
 
-		if (h2mod->GetEngineType() == _game_mode_multiplayer) 
+		if (options->game_mode == _game_mode_multiplayer)
 		{
 			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
 			{
@@ -330,7 +329,6 @@ namespace PlayerRepresentation
 	void Initialize()
 	{
 		ApplyHooks();
-		tags::on_map_load(OnMapLoad);
 	}
 
 }

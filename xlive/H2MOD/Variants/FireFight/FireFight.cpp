@@ -76,7 +76,7 @@ void FireFight::OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bo
 	}
 }
 
-void FireFight::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
+void FireFight::OnMapLoad(ExecTime execTime, s_game_options* options)
 {
 	switch (execTime)
 	{
@@ -84,7 +84,7 @@ void FireFight::OnMapLoad(ExecTime execTime, s_game_options* gameOptions)
 		break;
 
 	case ExecTime::_postEventExec:
-		switch (h2mod->GetEngineType())
+		switch (options->game_mode)
 		{
 			// cleanup when loading main menu
 		case _game_mode_multiplayer:
