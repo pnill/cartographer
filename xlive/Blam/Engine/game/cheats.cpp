@@ -56,18 +56,17 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 	typedef int(__cdecl* unspatialized_impulse_sound_new_t)(datum sound_datum, float scale);
 	auto p_unspatialized_impulse_sound_new = Memory::GetAddress<unspatialized_impulse_sound_new_t>(0x8836C, 0x7F173);
 
-	int user_index;
 	s_globals_group_definition* g_globals_tag = tags::get_matg_globals_ptr();
-	const s_globals_group_definition::s_player_information_block* player_information_tagblock;
-	datum sound_datum;
-	string_id skull_string_id;
+	const s_globals_group_definition::s_player_information_block* player_information = g_globals_tag->player_information[0];
 
 	if (skull < k_skull_count && !skull_enabled[skull])
 	{
 		skull_enabled[skull] = true;
 		p_hud_clear_messages();
-		skull_string_id = skull_string_ids[skull];
-		user_index = p_players_first_active_user();
+		
+		string_id skull_string_id = skull_string_ids[skull];
+		int user_index = p_players_first_active_user();
+
 		p_display_generic_hud_string(user_index, skull_string_id);
 		p_scripted_player_effect_screen_fade_in(1.0, 1.0, 1.0, 20);
 
@@ -78,7 +77,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 			return; 
 		}
 
-		sound_datum = g_globals_tag->player_information[0]->ice_cream.TagIndex;
+		datum sound_datum = player_information->ice_cream.TagIndex;
 		if (sound_datum != DATUM_INDEX_NONE)
 		{
 			p_unspatialized_impulse_sound_new(sound_datum, 1.0);

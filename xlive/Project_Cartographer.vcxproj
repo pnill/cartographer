@@ -309,8 +309,6 @@
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
     <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
@@ -383,7 +381,6 @@
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -634,7 +631,6 @@
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
-    <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Math\integer_math.h" />
     <ClInclude Include="Blam\Math\real_math.h" />
@@ -713,7 +709,6 @@
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
-    <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\curl-interface.h" />
     <ClInclude Include="Util\Memory.h" />
