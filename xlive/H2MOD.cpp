@@ -556,7 +556,10 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	for (auto& gametype_it : GametypesMap)
 		gametype_it.second = false;
 
-	if (options->game_mode == _game_mode_ui_shell)
+	bool game_mode_ui_shell = options->game_mode == _game_mode_ui_shell;
+	new_hud_patches_on_map_load(game_mode_ui_shell);
+
+	if (game_mode_ui_shell)
 	{
 		addDebugText("Engine type: Main-Menu");
 		if (!Memory::IsDedicatedServer())
@@ -576,7 +579,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
 		hud_patches_on_map_load();
-		new_hud_patches_on_map_load();
 
 		if (h2mod->GetEngineType() == _game_mode_multiplayer)
 		{
