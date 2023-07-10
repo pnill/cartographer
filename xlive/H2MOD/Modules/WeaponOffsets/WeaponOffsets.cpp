@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-#include "H2MOD.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
-#include "Util/Hooks/Hook.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
+#include "Util/Hooks/Hook.h"
 
 namespace ImGuiHandler {
 	namespace WeaponOffsets {
@@ -118,7 +118,7 @@ namespace ImGuiHandler {
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 8));
 			ImGui::SetNextWindowSize(ImVec2(450, 320), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(410, 320), ImVec2(1920, 1080));
-			if (h2mod->GetEngineType() == _game_mode_ui_shell)
+			if (s_game_globals::game_is_mainmenu())
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_weapon_offsets_string::title), &open, window_flags))
 			{

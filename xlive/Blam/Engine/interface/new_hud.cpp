@@ -70,7 +70,7 @@ void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bou
 
 
 // We scale crosshairs by adjusting the bitmap data size in the bitmap tag
-// It dosen't seem to actually downscale the bitmap since the data loaded still remains the same
+// It doesn't seem to actually downscale the bitmap since the data loaded still remains the same
 void set_crosshair_scale(float scale)
 {
 	size_t bitmap_size_vector_index = 0;
@@ -101,8 +101,6 @@ void set_crosshair_scale(float scale)
 // Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
 void initialize_crosshair_bitmap_data()
 {
-	crosshair_original_bitmap_sizes.clear();
-
 	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
@@ -133,9 +131,6 @@ bool crosshair_bitmap_vector_contains_datum(datum tag_datum)
 // Intended to grab all bitmaps referenced as crosshairs rather than just the original ones
 void get_crosshair_bitmap_datums()
 {
-	// Clear all datums from previous map file
-	crosshair_bitmap_datums.clear();
-
 	// Get all nhdt tags
 	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(blam_tag::tag_group_type::newhuddefinition);
 	for each (auto nhdt_tag in new_hud_definition_tags)
@@ -158,8 +153,14 @@ void get_crosshair_bitmap_datums()
 
 }
 
-void initialize_crosshair_scale()
+void initialize_crosshair_scale(bool game_mode_ui_shell)
 {
+	// Clear data from previous map file
+	crosshair_bitmap_datums.clear();
+	crosshair_original_bitmap_sizes.clear();
+
+	if (game_mode_ui_shell) { return; }
+
 	get_crosshair_bitmap_datums();
 	initialize_crosshair_bitmap_data();
 	set_crosshair_scale(H2Config_crosshair_scale);
@@ -183,7 +184,9 @@ void new_hud_apply_patches()
 	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemet_bounds_hook);
 }
 
-void new_hud_patches_on_map_load()
+void new_hud_patches_on_map_load(bool game_mode_ui_shell)
 {
-	initialize_crosshair_scale();
+	if (Memory::IsDedicatedServer()) { return; }
+
+	initialize_crosshair_scale(game_mode_ui_shell);
 }

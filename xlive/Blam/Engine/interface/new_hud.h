@@ -37,4 +37,4 @@ s_new_hud_engine_globals* get_new_hud_engine_globals();
 
 void set_crosshair_scale(float scale);
 void new_hud_apply_patches();
-void new_hud_patches_on_map_load();
+void new_hud_patches_on_map_load(bool game_mode_ui_shell);

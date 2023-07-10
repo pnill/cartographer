@@ -55,16 +55,11 @@ public:
 	void disable_weapon_pickup(bool enable);
 	void set_local_rank(BYTE rank);
 
-	e_game_mode GetEngineType() { return engineType; }
-	void SetCurrentEngineType(e_game_mode value) { engineType = value; }
 
 	void toggle_ai_multiplayer(bool toggle);
 	void toggle_xbox_tickrate(s_game_options* options, bool toggle);
 
 	bool drawTeamIndicators = true;
-
-private:
-	e_game_mode engineType;
 };
 
 extern std::unique_ptr<H2MOD> h2mod;

@@ -35,7 +35,7 @@ public:
 	CustomVariantId GetVariantId();
 
 	// on map load can be used as Initialize
-	virtual void OnMapLoad(ExecTime execTime, s_game_options* gameOptions) override;
+	virtual void OnMapLoad(ExecTime execTime, s_game_options* options) override;
 	virtual void OnPlayerSpawn(ExecTime execTime, datum playerIdx) override;
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override {/*Unused*/ };
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
