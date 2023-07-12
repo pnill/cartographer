@@ -124,19 +124,6 @@ int get_char_datum_from_actor(int actor_datum)
 
 	return character_datum;
 }
-
-/*This is to get the datum of the last player who damaged the datum/unit provided */
-int get_damage_owner(datum damaged_unit_index)
-{
-	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
-	if (damaged_player_ptr)
-	{
-		return *(int*)(damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
-	}
-
-	return NONE;
-}
-
 #pragma endregion
 
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);

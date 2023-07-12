@@ -168,15 +168,15 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	const int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	const datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+	const int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	const datum unit_datum = s_player::GetPlayerUnitDatumIndex(player_index);
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-		if (!s_game_globals::game_is_predicted())
-			GraveRobber::SpawnSkull(playerUnitDatum);
+		if (!s_game_globals::game_is_predicted() && unit_datum != object_get_damage_owner(unit_datum))
+			GraveRobber::SpawnSkull(unit_datum);
 		break;
 
 	case ExecTime::_postEventExec:
