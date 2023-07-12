@@ -27,7 +27,7 @@ public:
 		return false;
 	}
 
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
+	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
 
 	static void ReadWeaponLevels();
 	static void InitWeaponLevels();

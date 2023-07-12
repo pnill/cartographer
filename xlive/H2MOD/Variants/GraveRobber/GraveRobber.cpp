@@ -3,6 +3,8 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_engine_util.h"
+#include "Blam/Engine/game/game_statborg.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
@@ -63,32 +65,31 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	}
 }
 
-extern update_player_score_t p_update_player_score;
+extern update_player_score_t p_c_game_statborg__adjust_player_stat;
 
-void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
+void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
-	typedef char* (__cdecl* get_score_data_t)();
-	auto p_get_score_data = Memory::GetAddress<get_score_data_t>(0x6B8A7, 0x6AD32);
-	
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 
-	if (DATUM_IS_NONE(skullDatum)) { return; }
+	if (DATUM_IS_NONE(skull_datum)) { return; }
 
-	char* player_score_data = p_get_score_data();
-	if (!player_score_data) { return; }
-
+	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!s_game_globals::game_is_predicted())
 	{
-		p_update_player_score(player_score_data, playerIdx, 0, 1, -1, 0);
+		p_c_game_statborg__adjust_player_stat(game_statborg, player_datum, 0, 1, -1, 0);
+		if (game_statborg->get_player_score_by_type(player_index, 0) == s_game_globals::get_game_variant()->score_to_win_round)
+		{
+			game_engine_end_round_with_winner(player_index, false);
+		}
 	}
 	
-	HaloScript::ObjectDestroy(skullDatum);
+	HaloScript::ObjectDestroy(skull_datum);
 
 	if (!Memory::IsDedicatedServer())
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
+			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == player_index)
 			{
 				TriggerSound(_snd_skull_scored, 500);
 				break;
@@ -187,7 +188,7 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
+bool GraveRobber::c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	bool handled = false;
 

@@ -120,10 +120,10 @@ bool CustomVariantHandler::OnAutoPickupHandler(ExecTime execTime, datum playerId
 	return false;
 }
 
-bool CustomVariantHandler::OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
+bool CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
 {
 	if (GetCurrentGameVariant() != nullptr)
-		return GetCurrentGameVariant()->OnPlayerScore(execTime, thisptr, playerIdx, a3, a4, a5, a6);
+		return GetCurrentGameVariant()->c_game_statborg__adjust_player_stat(execTime, thisptr, playerIdx, a3, a4, a5, a6);
 
 	return false;
 }

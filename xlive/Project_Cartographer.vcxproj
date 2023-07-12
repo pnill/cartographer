@@ -234,6 +234,7 @@
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
     <ClCompile Include="Blam\Engine\game\aim_assist.cpp" />
@@ -280,6 +281,7 @@
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
+    <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
