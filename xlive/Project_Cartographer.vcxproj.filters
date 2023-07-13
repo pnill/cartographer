@@ -103,9 +103,6 @@
     <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlam.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlamRebase.cpp" />
-    <ClCompile Include="Blam\LazyBlam\LazyBlamLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
@@ -187,6 +184,7 @@
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -419,8 +417,6 @@
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
     <ClInclude Include="Blam\Cache\CacheHeader.h" />
-    <ClInclude Include="Blam\LazyBlam\LazyBlam.hpp" />
-    <ClInclude Include="Blam\LazyBlam\TagTable.h" />
     <ClInclude Include="Blam\Cache\TagGroups\light_definition.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
@@ -564,6 +560,8 @@
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
+    <ClInclude Include="Blam\Engine\game\game_statborg.h" />
+    <ClInclude Include="Blam\Engine\Simulation\GameInterface\simulation_game_engine_player.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

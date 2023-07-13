@@ -620,6 +620,7 @@
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
+    <ClInclude Include="Blam\Engine\Simulation\GameInterface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
