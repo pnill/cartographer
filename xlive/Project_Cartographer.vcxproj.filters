@@ -562,6 +562,7 @@
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\Simulation\GameInterface\simulation_game_engine_player.h" />
+    <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

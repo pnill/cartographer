@@ -407,7 +407,7 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 
 update_player_score_t p_c_game_statborg__adjust_player_stat;
 
-void __fastcall c_game_statborg__adjust_player_stat(void* thisptr, DWORD _edx, datum playerIdx, int a3, int a4, int a5, char a6)
+void __fastcall c_game_statborg__adjust_player_stat(void* thisptr, DWORD _edx, datum player_datum, int statistic, int count, int game_result_statistic, char a6)
 {
 	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
 	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
@@ -418,10 +418,10 @@ void __fastcall c_game_statborg__adjust_player_stat(void* thisptr, DWORD _edx, d
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
 	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
 
-	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, playerIdx, a3, a4, a5, a6);
+	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, player_datum, statistic, count, game_result_statistic, a6);
 	if (!handled)
-		p_c_game_statborg__adjust_player_stat(thisptr, playerIdx, a3, a4, a5, a6);
-	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, playerIdx, a3, a4, a5, a6);
+		p_c_game_statborg__adjust_player_stat(thisptr, player_datum, statistic, count, game_result_statistic, a6);
+	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, player_datum, statistic, count, game_result_statistic, a6);
 }
 
 // Client Sided Patch

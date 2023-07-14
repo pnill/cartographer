@@ -77,7 +77,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	if (!s_game_globals::game_is_predicted())
 	{
 		p_c_game_statborg__adjust_player_stat(game_statborg, player_datum, 0, 1, -1, 0);
-		if (game_statborg->get_player_score_by_type(player_index, 0) == s_game_globals::get_game_variant()->score_to_win_round)
+		if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
 		{
 			game_engine_end_round_with_winner(player_index, false);
 		}

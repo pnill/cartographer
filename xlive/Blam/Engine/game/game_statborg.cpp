@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "game_statborg.h"
 
-short c_game_statborg::get_player_score_by_type(DWORD player_index, byte score_type)
+short c_game_statborg::get_player_stat(DWORD player_index, e_statborg_entry statborg_entry)
 {
-	return this->m_player_data[player_index].score[score_type];
+	return this->m_player_data[player_index].statistic[statborg_entry];
 }
 
 c_game_statborg* game_engine_get_statborg()
