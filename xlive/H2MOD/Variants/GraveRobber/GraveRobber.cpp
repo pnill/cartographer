@@ -12,6 +12,8 @@
 #include "H2MOD/Utils/Utils.h"
 
 bool firstPlayerSpawn;
+bool player_is_picking_up_skull = false;
+
 const wchar_t* headhunterSoundTable[e_language_ids::_lang_id_end][e_graverobber_sounds::_graverobber_end]
 {
 	{SND_HEADHUNTER_EN, SND_SKULL_SCORED_EN},
@@ -68,18 +70,33 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 
 void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
-	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
-
 	if (DATUM_IS_NONE(skull_datum)) { return; }
+
+	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
+	s_player* player = s_player::GetPlayer(player_index);
 
 	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!s_game_globals::game_is_predicted())
 	{
+		player_is_picking_up_skull = true;
 		game_statborg->adjust_player_stat(player_datum, statborg_entry_score, 1, -1, true);
-		if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
+		if (game_engine_has_teams())
 		{
-			game_engine_end_round_with_winner(player_index, false);
+			if (game_statborg->get_team_stat(player->properties[0].player_team, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
+			{
+				game_engine_end_round_with_winner(player_index, false);
+			}
 		}
+		else
+		{
+			if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
+			{
+				game_engine_end_round_with_winner(player->properties[0].player_team, false);
+			}
+
+		}
+
+		player_is_picking_up_skull = false;
 	}
 	
 	HaloScript::ObjectDestroy(skull_datum);
@@ -220,4 +237,9 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 	}
 
 	return handled;
+}
+
+bool graverobber_player_picking_up_skull()
+{
+	return player_is_picking_up_skull;
 }

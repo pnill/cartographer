@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "game_engine_util.h"
 
+#include "Blam/Engine/game/game_globals.h"
+
 int current_game_engine()
 {
 	typedef int(__cdecl* get_game_mode_engine_t)();
@@ -20,4 +22,14 @@ void game_engine_end_round_with_winner(DWORD player_index, bool unk_bool)
 	typedef void(__cdecl game_engine_end_round_with_winner_t)(DWORD player_index, bool unk_bool);
 	auto p_game_engine_end_round_with_winner = Memory::GetAddress<game_engine_end_round_with_winner_t*>(0x70A6F, 0x6F570);
 	p_game_engine_end_round_with_winner(player_index, unk_bool);
+}
+
+bool game_engine_has_teams()
+{
+	if (current_game_engine())
+	{
+		return s_game_globals::get_game_variant()->game_engine_flags & 1;
+	}
+
+	return false;
 }

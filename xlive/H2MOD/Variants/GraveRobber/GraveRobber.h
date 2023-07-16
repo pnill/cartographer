@@ -50,3 +50,5 @@ public:
 	static void TriggerSound(e_graverobber_sounds sound, int sleep);
 	static void SpawnPlayerClientSetup();
 };
+
+bool graverobber_player_picking_up_skull();

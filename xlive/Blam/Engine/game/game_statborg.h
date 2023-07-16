@@ -47,7 +47,9 @@ class c_game_statborg
 
 public:
 	void adjust_player_stat(datum player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat);
+	void adjust_team_stat(int team_index, e_statborg_entry statistic, short count, int game_result_statistic);
 	short get_player_stat(DWORD player_index, e_statborg_entry statborg_entry);
+	short get_team_stat(int team_index, e_statborg_entry statistic);
 
 };
 CHECK_STRUCT_SIZE(c_game_statborg, 0x294);
