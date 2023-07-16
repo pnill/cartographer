@@ -84,7 +84,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 		{
 			if (game_statborg->get_team_stat(player->properties[0].player_team, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
 			{
-				game_engine_end_round_with_winner(player_index, false);
+				game_engine_end_round_with_winner(player->properties[0].player_team, false);
 			}
 		}
 		else
