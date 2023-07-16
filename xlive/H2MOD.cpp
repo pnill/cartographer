@@ -468,7 +468,7 @@ s_data_array* H2MOD::get_actor_table()
 	return *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
-void H2MOD::toggle_xbox_tickrate(s_game_options* options, bool toggle)
+void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
 	options->game_tick_rate = toggle ? 30 : 60;
 	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)options->game_tick_rate);
@@ -517,7 +517,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
-	h2mod->toggle_xbox_tickrate(options, false);
+	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
@@ -562,7 +562,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
-			h2mod->toggle_xbox_tickrate(options, xboxTickrateEnabled);
+			toggle_xbox_tickrate(options, xboxTickrateEnabled);
 			if (!xboxTickrateEnabled)
 			{
 				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);

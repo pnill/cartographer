@@ -1,6 +1,4 @@
 #pragma once
-#include "Blam/Engine/game/game_options.h"
-#include "Blam/Engine/game/players.h"
 #include "Blam/Engine/objects/objects.h"
 
 enum e_sound_type
@@ -56,8 +54,6 @@ public:
 
 
 	void toggle_ai_multiplayer(bool toggle);
-	void toggle_xbox_tickrate(s_game_options* options, bool toggle);
-
 	bool drawTeamIndicators = true;
 };
 
