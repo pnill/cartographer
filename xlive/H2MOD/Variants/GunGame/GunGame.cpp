@@ -272,9 +272,9 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
+bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 	datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
 	unsigned long long playerId = GetPlayerId(absPlayerIdx);
 
@@ -287,7 +287,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisp
 		break;
 		
 	case ExecTime::_postEventExec:
-		if (a5 == 7 
+		if (game_results_statistic == 7
 			&& !s_game_globals::game_is_predicted())
 		{
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx));

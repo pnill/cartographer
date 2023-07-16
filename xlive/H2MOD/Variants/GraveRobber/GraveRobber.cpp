@@ -65,7 +65,6 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	}
 }
 
-extern update_player_score_t p_c_game_statborg__adjust_player_stat;
 
 void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
@@ -76,7 +75,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!s_game_globals::game_is_predicted())
 	{
-		p_c_game_statborg__adjust_player_stat(game_statborg, player_datum, 0, 1, -1, 0);
+		game_statborg->adjust_player_stat(player_datum, statborg_entry_score, 1, -1, true);
 		if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
 		{
 			game_engine_end_round_with_winner(player_index, false);
@@ -188,34 +187,11 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool GraveRobber::c_game_statborg__adjust_player_stat(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
+// Just return true since the player shouldn't be able to score normally
+// Only way to score is picking up skulls which is triggered in GraveRobber::PickupSkull
+bool GraveRobber::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	bool handled = false;
-
-	switch (execTime)
-	{
-	case ExecTime::_preEventExec:
-		// skip recording the score, until we pickup the skull
-		if (a5 == -1 || a5 == 7 || a5 == 9)
-		{
-			handled = true;
-		}
-		break;
-
-	case ExecTime::_postEventExec:
-		// skip recording the score, until we pickup the skull
-		if (a5 == -1 || a5 == 7 || a5 == 9)
-		{
-			handled = true;
-		}
-		break;
-
-	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
-		break;
-	}
-
-	return handled;
+	return true;
 }
 
 bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)

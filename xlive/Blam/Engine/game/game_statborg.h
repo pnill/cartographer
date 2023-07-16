@@ -10,9 +10,10 @@
 enum e_statborg_entry : int
 {
 	statborg_entry_score = 0,
+	statborg_entry_kill = 2,
 	statborg_entry_death = 3,
-	statborg_entry_kill = 7,
-	statborg_entry_assist = 8
+	statborg_entry_suicide = 4,
+	statborg_entry_assist = 6
 };
 
 struct s_statborg_player_data
@@ -45,9 +46,12 @@ class c_game_statborg
 	s_statborg_team_data m_team_data[k_multiplayer_team_count];
 
 public:
+	void adjust_player_stat(datum player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat);
 	short get_player_stat(DWORD player_index, e_statborg_entry statborg_entry);
 
 };
 CHECK_STRUCT_SIZE(c_game_statborg, 0x294);
 
 c_game_statborg* game_engine_get_statborg();
+
+void game_statborg_apply_patches();

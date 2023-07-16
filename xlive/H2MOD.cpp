@@ -405,25 +405,6 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 }
 
-update_player_score_t p_c_game_statborg__adjust_player_stat;
-
-void __fastcall c_game_statborg__adjust_player_stat(void* thisptr, DWORD _edx, datum player_datum, int statistic, int count, int game_result_statistic, char a6)
-{
-	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
-	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
-	// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	//20 / 10 / 2018 18:48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000002, a4 : 00000001, a5 : 00000007, a6 : 00000001)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	bool handled = CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_preEventExec, thisptr, player_datum, statistic, count, game_result_statistic, a6);
-	if (!handled)
-		p_c_game_statborg__adjust_player_stat(thisptr, player_datum, statistic, count, game_result_statistic, a6);
-	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, player_datum, statistic, count, game_result_statistic, a6);
-}
-
 // Client Sided Patch
 void H2MOD::disable_weapon_pickup(bool enable)
 {
@@ -1012,12 +993,12 @@ void H2MOD::ApplyHooks() {
 	render_cameras_apply_patches();
 	first_person_camera_apply_patches();
 	first_person_weapons_apply_patches();
-
+	game_statborg_apply_patches();
+	
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
-	DETOUR_ATTACH(p_c_game_statborg__adjust_player_stat, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), c_game_statborg__adjust_player_stat);
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 

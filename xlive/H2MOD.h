@@ -26,7 +26,6 @@ enum e_static_lod : DWORD
 
 bool xbox_tickrate_is_enabled();
 void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout);
-typedef void(__thiscall* update_player_score_t)(void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
 
 class H2MOD
 {
