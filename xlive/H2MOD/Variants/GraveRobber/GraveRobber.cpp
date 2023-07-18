@@ -3,6 +3,8 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_engine_util.h"
+#include "Blam/Engine/game/game_statborg.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
@@ -10,6 +12,8 @@
 #include "H2MOD/Utils/Utils.h"
 
 bool firstPlayerSpawn;
+bool player_is_picking_up_skull = false;
+
 const wchar_t* headhunterSoundTable[e_language_ids::_lang_id_end][e_graverobber_sounds::_graverobber_end]
 {
 	{SND_HEADHUNTER_EN, SND_SKULL_SCORED_EN},
@@ -63,32 +67,44 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	}
 }
 
-extern update_player_score_t p_update_player_score;
 
-void GraveRobber::PickupSkull(datum playerIdx, datum skullDatum)
+void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
-	typedef char* (__cdecl* get_score_data_t)();
-	auto p_get_score_data = Memory::GetAddress<get_score_data_t>(0x6B8A7, 0x6AD32);
-	
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	if (DATUM_IS_NONE(skull_datum)) { return; }
 
-	if (DATUM_IS_NONE(skullDatum)) { return; }
+	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
+	s_player* player = s_player::GetPlayer(player_index);
 
-	char* player_score_data = p_get_score_data();
-	if (!player_score_data) { return; }
-
+	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!s_game_globals::game_is_predicted())
 	{
-		p_update_player_score(player_score_data, playerIdx, 0, 1, -1, 0);
+		player_is_picking_up_skull = true;
+		game_statborg->adjust_player_stat(player_datum, statborg_entry_score, 1, -1, true);
+		if (game_engine_has_teams())
+		{
+			if (game_statborg->get_team_stat(player->properties[0].player_team, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
+			{
+				game_engine_end_round_with_winner(player->properties[0].player_team, false);
+			}
+		}
+		else
+		{
+			if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_game_globals::get_game_variant()->score_to_win_round)
+			{
+				game_engine_end_round_with_winner(player_datum, false);
+			}
+		}
+
+		player_is_picking_up_skull = false;
 	}
 	
-	HaloScript::ObjectDestroy(skullDatum);
+	HaloScript::ObjectDestroy(skull_datum);
 
 	if (!Memory::IsDedicatedServer())
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == absPlayerIdx)
+			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == player_index)
 			{
 				TriggerSound(_snd_skull_scored, 500);
 				break;
@@ -168,15 +184,15 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	const int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	const datum playerUnitDatum = s_player::GetPlayerUnitDatumIndex(absPlayerIdx);
+	const int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
+	const datum unit_datum = s_player::GetPlayerUnitDatumIndex(player_index);
 
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-		if (!s_game_globals::game_is_predicted())
-			GraveRobber::SpawnSkull(playerUnitDatum);
+		if (!s_game_globals::game_is_predicted() && unit_datum != object_get_damage_owner(unit_datum))
+			GraveRobber::SpawnSkull(unit_datum);
 		break;
 
 	case ExecTime::_postEventExec:
@@ -187,34 +203,11 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	}
 }
 
-bool GraveRobber::OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6)
+// Just return true since the player shouldn't be able to score normally
+// Only way to score is picking up skulls which is triggered in GraveRobber::PickupSkull
+bool GraveRobber::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat)
 {
-	bool handled = false;
-
-	switch (execTime)
-	{
-	case ExecTime::_preEventExec:
-		// skip recording the score, until we pickup the skull
-		if (a5 == -1 || a5 == 7 || a5 == 9)
-		{
-			handled = true;
-		}
-		break;
-
-	case ExecTime::_postEventExec:
-		// skip recording the score, until we pickup the skull
-		if (a5 == -1 || a5 == 7 || a5 == 9)
-		{
-			handled = true;
-		}
-		break;
-
-	default:
-		LOG_TRACE_GAME("{} - unknown execTime", __FUNCTION__);
-		break;
-	}
-
-	return handled;
+	return true;
 }
 
 bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx)
@@ -243,4 +236,9 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 	}
 
 	return handled;
+}
+
+bool graverobber_player_picking_up_skull()
+{
+	return player_is_picking_up_skull;
 }

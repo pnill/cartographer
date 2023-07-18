@@ -217,3 +217,9 @@ namespace Engine::Objects
 	}
 #pragma endregion
 }
+
+datum object_get_damage_owner(datum object_datum)
+{
+	s_object_data_definition* object = object_try_and_get_and_verify_type(object_datum, -1);
+	return object->damage_owner_object_datum;
+}

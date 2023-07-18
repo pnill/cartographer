@@ -124,19 +124,6 @@ int get_char_datum_from_actor(int actor_datum)
 
 	return character_datum;
 }
-
-/*This is to get the datum of the last player who damaged the datum/unit provided */
-int get_damage_owner(datum damaged_unit_index)
-{
-	char* damaged_player_ptr = (char*)object_try_and_get_and_verify_type(damaged_unit_index, FLAG(e_object_type::biped) | FLAG(e_object_type::vehicle));
-	if (damaged_player_ptr)
-	{
-		return *(int*)(damaged_player_ptr + 0xC8); // player_ptr/unit_ptr + 0xC8 = damaging player this works on vehicles/AI and such too.
-	}
-
-	return NONE;
-}
-
 #pragma endregion
 
 typedef int(__cdecl* show_error_screen_t)(int a1, int a2, int a3, __int16 a4, int a5, int a6);
@@ -418,25 +405,6 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 	EventHandler::ObjectDamageEventExecute(EventExecutionType::execute_after, unit_datum_index, *(datum*)(a2));
 }
 
-update_player_score_t p_update_player_score;
-
-void __fastcall OnPlayerScore(void* thisptr, DWORD _edx, datum playerIdx, int a3, int a4, int a5, char a6)
-{
-	//LOG_TRACE_GAME("update_player_score_hook ( thisptr: %08X, a2: %08X, a3: %08X, a4: %08X, a5: %08X, a6: %08X )", thisptr, a2, a3, a4, a5, a6);
-	//20/10/2018 18:46:51.541 update_player_score_hook ( thisptr: 3000595C, a2: 00000000, a3: 00000002, a4: 00000001, a5: 00000007, a6: 00000001 )
-	// / 10 / 2018 18:46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 46 : 51.541 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	//20 / 10 / 2018 18:48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000002, a4 : 00000001, a5 : 00000007, a6 : 00000001)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000001, a3 : 00000000, a4 : 00000001, a5 : FFFFFFFF, a6 : 00000000)
-	//	20 / 10 / 2018 18 : 48 : 39.756 update_player_score_hook(thisptr : 3000595C, a2 : 00000000, a3 : 00000003, a4 : 00000001, a5 : 00000009, a6: 00000001)
-
-	bool handled = CustomVariantHandler::OnPlayerScore(ExecTime::_preEventExec, thisptr, playerIdx, a3, a4, a5, a6);
-	if (!handled)
-		p_update_player_score(thisptr, playerIdx, a3, a4, a5, a6);
-	CustomVariantHandler::OnPlayerScore(ExecTime::_postEventExec, thisptr, playerIdx, a3, a4, a5, a6);
-}
-
 // Client Sided Patch
 void H2MOD::disable_weapon_pickup(bool enable)
 {
@@ -500,7 +468,7 @@ s_data_array* H2MOD::get_actor_table()
 	return *Memory::GetAddress<s_data_array**>(0xA965DC, 0x9A1C5C);
 }
 
-void H2MOD::toggle_xbox_tickrate(s_game_options* options, bool toggle)
+void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 {
 	options->game_tick_rate = toggle ? 30 : 60;
 	WriteValue<int>(Memory::GetAddress(0x264ABB, 0x1DB8B) + 1, (int)options->game_tick_rate);
@@ -549,7 +517,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 	// reset everything
 	h2mod->toggle_ai_multiplayer(false);
-	h2mod->toggle_xbox_tickrate(options, false);
+	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
 	for (auto& gametype_it : GametypesMap)
@@ -594,7 +562,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
-			h2mod->toggle_xbox_tickrate(options, xboxTickrateEnabled);
+			toggle_xbox_tickrate(options, xboxTickrateEnabled);
 			if (!xboxTickrateEnabled)
 			{
 				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);
@@ -1025,12 +993,12 @@ void H2MOD::ApplyHooks() {
 	render_cameras_apply_patches();
 	first_person_camera_apply_patches();
 	first_person_weapons_apply_patches();
-
+	game_statborg_apply_patches();
+	
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
 	DETOUR_ATTACH(p_map_cache_load, Memory::GetAddress<map_cache_load_t>(0x8F62, 0x1F35C), OnMapLoad);
-	DETOUR_ATTACH(p_update_player_score, Memory::GetAddress<update_player_score_t>(0xD03ED, 0x8C84C), OnPlayerScore);
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
