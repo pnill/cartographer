@@ -17,11 +17,11 @@ void game_engine_check_for_round_winner()
 	p_game_engine_check_for_round_winner();
 }
 
-void game_engine_end_round_with_winner(DWORD player_index, bool go_to_next_round)
+void game_engine_end_round_with_winner(DWORD player_datum_or_team_index, bool go_to_next_round)
 {
 	typedef void(__cdecl game_engine_end_round_with_winner_t)(DWORD player_index, bool unk_bool);
 	auto p_game_engine_end_round_with_winner = Memory::GetAddress<game_engine_end_round_with_winner_t*>(0x70A6F, 0x6F570);
-	p_game_engine_end_round_with_winner(player_index, go_to_next_round);
+	p_game_engine_end_round_with_winner(player_datum_or_team_index, go_to_next_round);
 }
 
 bool game_engine_has_teams()
