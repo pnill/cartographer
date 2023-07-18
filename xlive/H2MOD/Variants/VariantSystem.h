@@ -3,6 +3,7 @@
 #include "Blam/Common/Common.h"
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/game/game_options.h"
+#include "Blam/Engine/game/game_statborg.h"
 
 enum CustomVariantId
 {
@@ -34,7 +35,7 @@ public:
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) = 0;
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) = 0;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) = 0;
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) = 0;
+	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) = 0;
 };
 
 class ICustomGameVariant : public IGameEngineEvent
@@ -58,7 +59,7 @@ namespace CustomVariantHandler
 	void OnPlayerDeath(ExecTime execTime, datum playerIdx);
 	void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4);
 	bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx);
-	bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6);
+	bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat);
 	void DisposeGameVariant();
 	bool VariantEnabled(CustomVariantId variantId);
 

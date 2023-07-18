@@ -40,7 +40,7 @@ public:
 	virtual void OnObjectDamage(ExecTime execTime, datum unitDatumIdx, int a2, bool a3, bool a4) override {/*Unused*/ };
 	virtual void OnPlayerDeath(ExecTime execTime, datum playerIdx) override;
 	virtual bool OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum objectIdx) override;
-	virtual bool OnPlayerScore(ExecTime execTime, void* thisptr, datum playerIdx, int a3, int a4, int a5, char a6) override;
+	virtual bool c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat) override;
 
 	GraveRobber() = default;
 	virtual ~GraveRobber() = default;
@@ -50,3 +50,5 @@ public:
 	static void TriggerSound(e_graverobber_sounds sound, int sleep);
 	static void SpawnPlayerClientSetup();
 };
+
+bool graverobber_player_picking_up_skull();

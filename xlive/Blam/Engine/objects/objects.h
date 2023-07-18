@@ -128,7 +128,7 @@ struct s_object_data_definition
 	WORD field_C0;
 	WORD field_C2;
 	DWORD field_C4;
-	DWORD field_C8;
+	datum damage_owner_object_datum;
 	unsigned int field_CC;
 	__int16 field_D0;
 	BYTE model_variant_id;//hlmt variant tag_block index
@@ -291,3 +291,5 @@ namespace Engine::Objects
 	int object_get_count();
 	int object_count_from_iter();
 }
+
+datum object_get_damage_owner(datum damaged_unit_index);
