@@ -654,9 +654,6 @@ void InitRunLoop() {
 		// allow cinematics to run at 60 fps
 		PatchCall(Memory::GetAddress(0x97774), cinematics_in_progress_disable_framerate_cap_hook);
 		PatchCall(Memory::GetAddress(0x7C378), cinematics_in_progress_disable_framerate_cap_hook);
-
-		// stop Hold to Zoom.
-		NopFill(Memory::GetAddress(0x9355C), 4);
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
