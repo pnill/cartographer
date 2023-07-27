@@ -371,15 +371,6 @@ DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOO
 	return pOverlapped->InternalLow;
 }
 
-// #5003: XLiveUninitialize
-int WINAPI XLiveUninitialize()
-{
-    LOG_TRACE_XLIVE("XLiveUninitialize");
-    return 0;
-}
-
-
-
 // #5010: XLiveLess_5010
 int WINAPI XLiveRegisterDataSection(int a1, int a2, int a3)
 {

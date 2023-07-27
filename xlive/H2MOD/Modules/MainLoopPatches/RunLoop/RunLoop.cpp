@@ -131,8 +131,6 @@ sub_AF8716_t p_sub_AF8716;
 typedef void(__cdecl* rumble_update_t)(float dt);
 rumble_update_t p_rumble_update;
 
-extern LPDIRECT3DDEVICE9 pDevice;
-
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {

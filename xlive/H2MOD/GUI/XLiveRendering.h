@@ -54,8 +54,10 @@ static CONST D3DCOLOR COLOR_BLACK_TRANSPARENT = D3DCOLOR_ARGB(150, 0, 0, 0);
 
 namespace XLiveRendering
 {
-	void Initialize(HWND hWnd);
+	void InitializeD3D9(LPDIRECT3DDEVICE9 pD3D9Device, D3DPRESENT_PARAMETERS* presentParameters);
+	void D3D9ReleaseResources();
 };
 
 extern HWND H2hWnd;
+extern LPDIRECT3DDEVICE9 g_pD3DDevice9;
 

@@ -11,11 +11,8 @@
 #include "Util/Hooks/Hook.h"
 
 
-extern LPDIRECT3DDEVICE9 pDevice;
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 RECT rectScreenOriginal;
-
-
 
 //Leveraging this call to unset the controller state
 typedef void(__cdecl sub_B524F7_t)(int a1);
@@ -138,7 +135,7 @@ void hotkeyFuncAlignWindow() {
 	if (H2IsDediServer) {
 		return;
 	}
-	if (!pDevice || !H2hWnd) {
+	if (!g_pD3DDevice9 || !H2hWnd) {
 		return;
 	}
 	HMONITOR monitor = MonitorFromWindow(H2hWnd, MONITOR_DEFAULTTONEAREST);
@@ -150,7 +147,7 @@ void hotkeyFuncAlignWindow() {
 	int interval_width = monitor_width / 2;
 	int interval_height = monitor_height / 2;
 	D3DVIEWPORT9 pViewport;
-	pDevice->GetViewport(&pViewport);
+	g_pD3DDevice9->GetViewport(&pViewport);
 	int width = interval_width * round(pViewport.Width / (double)interval_width);
 	int height = interval_height * round(pViewport.Height / (double)interval_height);
 	RECT gameWindowRect;
@@ -169,7 +166,7 @@ void hotkeyFuncWindowMode() {
 	if (H2IsDediServer) {
 		return;
 	}
-	if (!pDevice || !H2hWnd) {
+	if (!g_pD3DDevice9 || !H2hWnd) {
 		return;
 	}
 	/*wchar_t title[255];
@@ -184,7 +181,7 @@ void hotkeyFuncWindowMode() {
 		RECT rectScreen;
 		GetWindowRect(H2hWnd, &rectScreen);
 		D3DVIEWPORT9 pViewport;
-		pDevice->GetViewport(&pViewport);
+		g_pD3DDevice9->GetViewport(&pViewport);
 		int width = pViewport.Width;
 		int height = pViewport.Height;
 		long borderPadX = 0;

@@ -26,7 +26,8 @@ bool displayXyz = false;
 bool doDrawIMGUI = false;
 
 HWND H2hWnd;
-LPDIRECT3DDEVICE9 pDevice;
+LPDIRECT3DDEVICE9 g_pD3DDevice9;
+D3DPRESENT_PARAMETERS g_d3dPresentParameters;
 
 IDirect3DTexture9* Primitive = NULL;
 
@@ -43,10 +44,10 @@ double largeSizeCurrentFontHeight = 0;
 double largeSizeFontHeight = 0;
 double normalSizeFontHeight = 0;
 
-LPD3DXFONT normalSizeFont = 0;
-LPD3DXFONT largeSizeFont = 0;
-LPD3DXFONT smallFont = 0;
-LPD3DXFONT haloFont = 0;
+LPD3DXFONT normalSizeFont = NULL;
+LPD3DXFONT largeSizeFont = NULL;
+LPD3DXFONT smallFont = NULL;
+LPD3DXFONT haloFont = NULL;
 
 struct vertex
 {
@@ -79,8 +80,55 @@ inline void BuildVertex(D3DXVECTOR4 xyzrhw, D3DCOLOR color, CVertexList* vertexL
 LPD3DXSPRITE pSprite;
 
 LPD3DXSPRITE Sprite_Interface;
-LPDIRECT3DTEXTURE9 Texture_Interface;
+LPDIRECT3DTEXTURE9 achievement_texture;
 
+void XLiveRendering::InitializeD3D9(LPDIRECT3DDEVICE9 pD3D9Device, D3DPRESENT_PARAMETERS* presentParameters)
+{
+	g_pD3DDevice9 = pD3D9Device;
+	// increase the Ref count
+	g_pD3DDevice9->AddRef();
+	memcpy(&g_d3dPresentParameters, presentParameters, sizeof(D3DPRESENT_PARAMETERS));
+
+	InitFontsIfRequired();
+
+	if (FAILED(D3DXCreateTextureFromFile(g_pD3DDevice9, L"sounds/h2pc_logo.png", &achievement_texture))) {
+		addDebugText("ERROR: Failed to create logo texture (for achievements).");
+	}
+
+	D3DXCreateSprite(g_pD3DDevice9, &Sprite_Interface);
+	ImGuiHandler::Initalize(g_pD3DDevice9, presentParameters->hDeviceWindow);
+}
+
+void XLiveRendering::D3D9ReleaseResources()
+{
+	if (g_pD3DDevice9) {
+		g_pD3DDevice9->Release();
+		g_pD3DDevice9 = NULL;
+	}
+
+	if (largeSizeFont) {
+		largeSizeFont->Release();
+		largeSizeFont = NULL;
+	}
+	
+	if (normalSizeFont) {
+		normalSizeFont->Release();
+		normalSizeFont = NULL;
+	}
+	
+	if (smallFont) {
+		smallFont->Release();
+		smallFont = NULL;
+	}
+	
+	if (Sprite_Interface) {
+		Sprite_Interface->Release();
+		Sprite_Interface = NULL;
+	}
+
+	ImGuiHandler::ReleaseTextures();
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+}
 
 // #5297: XLiveInitializeEx
 int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
@@ -89,11 +137,11 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 
 	InitInstance();
 
-	if (pXii->pD3D)
-	{
-		pDevice = (LPDIRECT3DDEVICE9)pXii->pD3D;
-		auto d3dpp = (D3DPRESENT_PARAMETERS*)pXii->pD3DPP;
-		XLiveRendering::Initialize(d3dpp->hDeviceWindow);
+	if (pXii->pD3D) {
+		XLiveRendering::InitializeD3D9((LPDIRECT3DDEVICE9)pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
+
+		buildText = new char[256];
+		snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
 	}
 
 	UpdateMasterStatus(-1, "Status: Initializing");
@@ -108,10 +156,19 @@ int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
 	return XLiveInitializeEx(pXii, 0);
 }
 
-// #5005: XLiveOnCreateDevice
-int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
+// #5003: XLiveUninitialize
+int WINAPI XLiveUninitialize()
 {
-	pDevice = pD3D;
+	LOG_TRACE_XLIVE("XLiveUninitialize");
+	
+	XLiveRendering::D3D9ReleaseResources();
+	return 0;
+}
+
+// #5005: XLiveOnCreateDevice
+int WINAPI XLiveOnCreateDevice(IUnknown* pD3D, VOID* vD3DPP)
+{
+	g_pD3DDevice9 = (LPDIRECT3DDEVICE9)pD3D;
 	
 	//pPresent = (HRESULT(WINAPI*)(LPDIRECT3DDEVICE9 pDevice, const RECT *pSourceRect, const RECT *pDestRect, HWND hDestWindowOverride, const RGNDATA* pDirtyRegion)) *(DWORD_PTR*)(pDevice+17);
 	//VirtualProtect((LPVOID)(pDevice + 17), sizeof(DWORD_PTR), PAGE_EXECUTE_READWRITE, &dwPresent);
@@ -122,10 +179,8 @@ int WINAPI XLiveOnCreateDevice(IDirect3DDevice9 *pD3D, VOID* vD3DPP)
 }
 
 // #5007: XLiveOnResetDevice
-int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
+int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP)
 {
-	//pFont->OnLostDevice();
-	//pFont->OnResetDevice();
 	largeSizeFont->OnLostDevice();
 	largeSizeFont->OnResetDevice();
 	normalSizeFont->OnLostDevice();
@@ -135,12 +190,13 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 	Sprite_Interface->OnLostDevice();
 	Sprite_Interface->OnResetDevice();
 
+	memcpy(&g_d3dPresentParameters, pD3DPP, sizeof(D3DPRESENT_PARAMETERS));
+
 	//Have to invalidate ImGUI on device reset, otherwise it hangs the device in a reset loop.
 	//https://github.com/ocornut/imgui/issues/1464#issuecomment-347469716
 
 	ImGuiHandler::ReleaseTextures();
 	ImGui_ImplDX9_InvalidateDeviceObjects();
-	//pDevice->Reset(pD3DPP);
 	//LOG_TRACE_XLIVE("XLiveOnResetDevice");
 	return 0;
 }
@@ -148,10 +204,9 @@ int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* vD3DPP)
 // #5006 XLiveOnDestroyDevice
 HRESULT WINAPI XLiveOnDestroyDevice()
 {
-	largeSizeFont->Release();
-	normalSizeFont->Release();
-	smallFont->Release();
-	Sprite_Interface->Release();
+	ImGuiHandler::ReleaseTextures();
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+	XLiveRendering::D3D9ReleaseResources();
 	
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
 	return S_OK;
@@ -181,8 +236,8 @@ void InitFontsIfRequired()
 	normalSizeFontHeight = 0.017 * verticalRes;
 	largeSizeFontHeight = 0.034 * verticalRes;
 
-	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, pDevice, true);
-	D3DXCreateFont(pDevice, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lucida Console", &smallFont);
+	InitalizeFont(L"Conduit ITC Medium", GetDirectoryFile(L"maps\\fonts\\conduit_itc_medium1.ttf"), largeSizeFontHeight, g_pD3DDevice9, true);
+	D3DXCreateFont(g_pD3DDevice9, 10, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Lucida Console", &smallFont);
 
 	if (!normalSizeFont || normalSizeFontHeight != normalSizeCurrentFontHeight) {
 		if (normalSizeFont)
@@ -190,17 +245,16 @@ void InitFontsIfRequired()
 			normalSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
+		D3DXCreateFont(g_pD3DDevice9, normalSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Verdana", &normalSizeFont);
 		normalSizeCurrentFontHeight = normalSizeFontHeight;
 	}
 
 	if (!largeSizeFont || largeSizeFontHeight != largeSizeCurrentFontHeight) {
-		if (largeSizeFont)
-		{
+		if (largeSizeFont) {
 			largeSizeFont->Release();
 		}
 
-		D3DXCreateFont(pDevice, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
+		D3DXCreateFont(g_pD3DDevice9, largeSizeFontHeight, 0, FW_NORMAL, 1, 0, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, ANTIALIASED_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Tahoma", &largeSizeFont);
 		largeSizeCurrentFontHeight = largeSizeFontHeight;
 	}
 
@@ -233,7 +287,7 @@ int getSpaceCharacterWidth(LPD3DXFONT pFont)
 void drawRect(int x, int y, int width, int height, DWORD Color)
 {
 	D3DRECT rec = { x, y, x + width, y + height };
-	pDevice->Clear(1, &rec, D3DCLEAR_TARGET, Color, 0, 0);
+	g_pD3DDevice9->Clear(1, &rec, D3DCLEAR_TARGET, Color, 0, 0);
 }
 
 void drawPrimitiveRect(FLOAT x, FLOAT y, FLOAT w, FLOAT h, D3DCOLOR color) {
@@ -245,21 +299,20 @@ void drawPrimitiveRect(FLOAT x, FLOAT y, FLOAT w, FLOAT h, D3DCOLOR color) {
 	BuildVertex(D3DXVECTOR4(x + w, y, 0, 1), color, vertexList, 3);
 
 	LPDIRECT3DSTATEBLOCK9 pStateBlock = NULL;
-	pDevice->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
+	g_pD3DDevice9->CreateStateBlock(D3DSBT_ALL, &pStateBlock);
 	pStateBlock->Capture();
-	pDevice->SetTexture(0, Primitive);
-	pDevice->SetPixelShader(NULL);
-	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	g_pD3DDevice9->SetTexture(0, Primitive);
+	g_pD3DDevice9->SetPixelShader(NULL);
+	g_pD3DDevice9->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pD3DDevice9->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pD3DDevice9->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
 	//pDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	g_pD3DDevice9->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	pDevice->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));
+	g_pD3DDevice9->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, vertexList, sizeof(CVertexList));
 
 	pStateBlock->Apply();
 	pStateBlock->Release();
-
 }
 
 IDirect3DVertexBuffer9* g_pVB = NULL;
@@ -305,8 +358,8 @@ void drawFilledBox(float x, float y, float w, float h, DWORD color)
 
 	unsigned short indexes[] = { 0, 1, 3, 1, 2, 3 };
 
-	pDevice->CreateVertexBuffer(4 * sizeof(vertex), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_DIFFUSE, D3DPOOL_DEFAULT, &g_pVB, NULL);
-	pDevice->CreateIndexBuffer(2 * sizeof(short), D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &g_pIB, NULL);
+	g_pD3DDevice9->CreateVertexBuffer(4 * sizeof(vertex), D3DUSAGE_WRITEONLY, D3DFVF_XYZRHW | D3DFVF_DIFFUSE, D3DPOOL_DEFAULT, &g_pVB, NULL);
+	g_pD3DDevice9->CreateIndexBuffer(2 * sizeof(short), D3DUSAGE_WRITEONLY, D3DFMT_INDEX16, D3DPOOL_DEFAULT, &g_pIB, NULL);
 
 	VOID* pVertices;
 	g_pVB->Lock(0, sizeof(V), (void**)&pVertices, 0);
@@ -318,17 +371,17 @@ void drawFilledBox(float x, float y, float w, float h, DWORD color)
 	memcpy(pIndex, indexes, sizeof(indexes));
 	g_pIB->Unlock();
 
-	pDevice->SetTexture(0, NULL);
-	pDevice->SetPixelShader(NULL);
-	pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	g_pD3DDevice9->SetTexture(0, NULL);
+	g_pD3DDevice9->SetPixelShader(NULL);
+	g_pD3DDevice9->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	g_pD3DDevice9->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	g_pD3DDevice9->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
-	pDevice->SetStreamSource(0, g_pVB, 0, sizeof(vertex));
-	pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-	pDevice->SetIndices(g_pIB);
+	g_pD3DDevice9->SetStreamSource(0, g_pVB, 0, sizeof(vertex));
+	g_pD3DDevice9->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+	g_pD3DDevice9->SetIndices(g_pIB);
 
-	pDevice->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 0, 2);
+	g_pD3DDevice9->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, 4, 0, 2);
 
 	g_pVB->Release();
 	g_pIB->Release();
@@ -384,23 +437,6 @@ bool achievement_freeze = false;
 int achievement_timer = 0;
 
 char* autoUpdateText = 0;
-
-
-void XLiveRendering::Initialize(HWND hWnd)
-{
-	InitFontsIfRequired();
-
-	buildText = new char[256];
-	snprintf(buildText, 256, "Project Cartographer (v%s) - Build Time: %s %s", DLL_VERSION_STR, CompileDate, CompileTime);
-
-	if (FAILED(D3DXCreateTextureFromFile(pDevice, L"sounds/h2pc_logo.png", &Texture_Interface)))
-	{
-		addDebugText("ERROR: Failed to create logo texture (for achievements).");
-	}
-
-	D3DXCreateSprite(pDevice, &Sprite_Interface);
-	ImGuiHandler::Initalize(pDevice, hWnd);
-}
 
 // #5001
 int WINAPI XLiveInput(XLIVE_INPUT_INFO* pPii)
@@ -548,163 +584,163 @@ void XLiveThrottleFramerate(int desiredFramerate)
 }
 
 // #5002: XLiveRender
-int WINAPI XLiveRender()
+HRESULT WINAPI XLiveRender()
 {
 	static std::mutex renderMtx;
 	std::lock_guard lg(renderMtx);
 
-	if (pDevice)
-	{
-		if (!FAILED(pDevice->TestCooperativeLevel()))
+	if (!g_pD3DDevice9) {
+		return E_UNEXPECTED;
+	}
+
+	if (FAILED(g_pD3DDevice9->TestCooperativeLevel())) {
+		return E_UNEXPECTED;
+	}
+
+	D3DVIEWPORT9 pViewport;
+	g_pD3DDevice9->GetViewport(&pViewport);
+
+	D3DDEVICE_CREATION_PARAMETERS cparams;
+	g_pD3DDevice9->GetCreationParameters(&cparams);
+	RECT gameWindowRect, gameWindowInnerRect;
+	GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
+	GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
+
+	int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
+	int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
+
+	bool game_is_main_menu = s_game_globals::get()->game_is_mainmenu();
+	bool paused_or_in_menus = *Memory::GetAddress<bool*>(0x47A568) != 0;
+
+	if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
+		drawText(0, 0, COLOR_WHITE, buildText, smallFont);
+
+		D3DCOLOR masterStateColor;
+		switch (GetMasterState())
 		{
-			D3DVIEWPORT9 pViewport;
-			pDevice->GetViewport(&pViewport);
+		case -1:
+		case 0:
+			masterStateColor = COLOR_WHITE;
+			break;
+		case 1:
+			masterStateColor = COLOR_GREY;
+			break;
+		case 10:
+			masterStateColor = COLOR_GREEN;
+			break;
+		default:
+			masterStateColor = COLOR_RED;
+			break;
+		}
+		drawText(0, 15, masterStateColor, GetMasterStateStr(), smallFont);
 
-			D3DDEVICE_CREATION_PARAMETERS cparams;
-			pDevice->GetCreationParameters(&cparams);
-			RECT gameWindowRect, gameWindowInnerRect;
-			GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
-			GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
+		if (H2Config_anti_cheat_enabled)
+			drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
+		else
+			drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);
+	}
 
-			int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
-			int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
+	//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
+	//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
 
-			bool game_is_main_menu = s_game_globals::get()->game_is_mainmenu();
-			bool paused_or_in_menus = *Memory::GetAddress<bool*>(0x47A568) != 0;
-
-			if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
-				drawText(0, 0, COLOR_WHITE, buildText, smallFont);
-
-				D3DCOLOR masterStateColor;
-				switch (GetMasterState())
-				{
-				case -1:
-				case 0:
-					masterStateColor = COLOR_WHITE;
-					break;
-				case 1:
-					masterStateColor = COLOR_GREY;
-					break;
-				case 10:
-					masterStateColor = COLOR_GREEN;
-					break;
-				default:
-					masterStateColor = COLOR_RED;
-					break;
-				}
-				drawText(0, 15, masterStateColor, GetMasterStateStr(), smallFont);
-
-				if (H2Config_anti_cheat_enabled)
-					drawText(0, 30, COLOR_GREEN, "Anti-Cheat: Enabled", smallFont);
-				else
-					drawText(0, 30, COLOR_RED, "Anti-Cheat: Disabled", smallFont);
-			}
-			
-			//drawPrimitiveRect(gameWindowWidth / 1.15, gameWindowHeight - 150, 250, 100, D3DCOLOR_ARGB(155, 41, 65, 129));
-			//drawText(gameWindowWidth / 1.13, gameWindowHeight - 145, COLOR_WHITE, "Points: 10,000", haloFont);
-	
 #pragma region Achievement Rendering		
-			if (!AchievementMap.empty())
+	if (!AchievementMap.empty()) {
+		auto it = AchievementMap.begin();
+		if (it->second == false)
+		{
+			h2mod->custom_sound_play(L"sounds/AchievementUnlocked.wav", 0);
+			it->second = true;
+		}
+
+		if (achievement_height >= 150)
+		{
+			achievement_freeze = true;
+		}
+		else
+			achievement_height = achievement_height + 2;
+
+		float scalar = 11.0f;
+		D3DXVECTOR3 position;
+		position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
+		position.y = (gameWindowHeight - achievement_height + 3) * scalar;
+
+		Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
+		D3DXVECTOR2 vCenter(0.0f, 0.0f);
+		D3DXVECTOR2 vScale((1 / scalar), (1 / scalar));
+		D3DXVECTOR2 vPosition(150.0f, 200.0f);
+		D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
+
+		D3DXMATRIX mat;
+
+		drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
+
+		size_t delim = it->first.find("|");
+		std::string achievement_title = it->first.substr(0, delim);
+		std::string achievement_desc = it->first.substr(delim + 1, it->first.size() - delim);
+
+		drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 25), COLOR_WHITE, achievement_title.c_str(), normalSizeFont);
+		drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 50), COLOR_WHITE, achievement_desc.c_str(), normalSizeFont);
+
+		D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
+		Sprite_Interface->SetTransform(&mat);
+
+		Sprite_Interface->Draw(achievement_texture, NULL, NULL, &position, 0xFFFFFFFF);
+		Sprite_Interface->End();
+
+		if (achievement_freeze == true)
+		{
+			if (achievement_timer >= 400)
 			{
-				auto it = AchievementMap.begin();
-				
-				if (it->second == false)
-				{
-					h2mod->custom_sound_play(L"sounds/AchievementUnlocked.wav", 0);
-					it->second = true;
-				}
-				
-				if (achievement_height >= 150)
-				{
-					achievement_freeze = true;
-				}
-				else
-					achievement_height = achievement_height + 2;		
-
-				float scalar = 11.0f;
-				D3DXVECTOR3 position;
-				position.x = (gameWindowWidth / 2 - 250 + 3) * scalar;
-				position.y = (gameWindowHeight - achievement_height + 3) * scalar;
-
-
-				Sprite_Interface->Begin(D3DXSPRITE_ALPHABLEND);
-				D3DXVECTOR2 vCenter(0.0f, 0.0f);
-				D3DXVECTOR2 vScale((1 / scalar), (1 / scalar));
-				D3DXVECTOR2 vPosition(150.0f, 200.0f);
-				D3DXVECTOR2 vRotationCenter(0.0f, 0.0f);
-
-				D3DXMATRIX mat;
-
-				drawPrimitiveRect(gameWindowWidth / 2 - 250, gameWindowHeight - achievement_height, 500, 100, D3DCOLOR_ARGB(155, 000, 000, 000));
-
-				size_t delim = it->first.find("|");
-				std::string achievement_title = it->first.substr(0, delim);
-				std::string achievement_desc = it->first.substr(delim+1, it->first.size() - delim);
-
-				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 25), COLOR_WHITE, achievement_title.c_str(), normalSizeFont);
-				drawText(gameWindowWidth / 2 - 100, gameWindowHeight - (achievement_height - 50), COLOR_WHITE, achievement_desc.c_str(), normalSizeFont);
-
-				D3DXMatrixTransformation2D(&mat, &vCenter, NULL, &vScale, NULL, NULL, NULL);
-				Sprite_Interface->SetTransform(&mat);
-
-				Sprite_Interface->Draw(Texture_Interface, NULL, NULL, &position, 0xFFFFFFFF);
-				Sprite_Interface->End();
-
-				if (achievement_freeze == true)
-				{
-					if (achievement_timer >= 400)
-					{
-						achievement_freeze = false;
-						achievement_timer = 0;
-						achievement_height = 0;
-						AchievementMap.erase(it);
-					}
-
-					achievement_timer++;
-				}
-
+				achievement_freeze = false;
+				achievement_timer = 0;
+				achievement_height = 0;
+				AchievementMap.erase(it);
 			}
+
+			achievement_timer++;
+		}
+
+	}
 #pragma endregion achievement rendering
 
-			if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || s_game_globals::game_is_campaign())) {
-				int text_y_coord = 60;
-				PlayerIterator playerIt;
-				while (playerIt.get_next_active_player()) 
-				{
-					real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-					s_biped_data_definition* biped_unit = (s_biped_data_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
-					if (player_position != nullptr) {
-						std::wstring playerNameWide(playerIt.get_current_player_name());
-						std::string playerName(playerNameWide.begin(), playerNameWide.end());
-						std::string xyzText = 
-							"Player name: " + playerName + 
-							", xyz = " + std::to_string(player_position->x) + " " 
-							+ std::to_string(player_position->y) + " " 
-							+ std::to_string(player_position->z) + " "
-							+ "Velocity: " + std::to_string(magnitude3d(&biped_unit->translational_velocity));
-						drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
-						text_y_coord += 15;
-					}
-				}
+	if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || s_game_globals::game_is_campaign())) {
+		int text_y_coord = 60;
+		PlayerIterator playerIt;
+		while (playerIt.get_next_active_player())
+		{
+			real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
+			s_biped_data_definition* biped_unit = (s_biped_data_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
+			if (player_position != nullptr) {
+				std::wstring playerNameWide(playerIt.get_current_player_name());
+				std::string playerName(playerNameWide.begin(), playerNameWide.end());
+				std::string xyzText =
+					"Player name: " + playerName +
+					", xyz = " + std::to_string(player_position->x) + " "
+					+ std::to_string(player_position->y) + " "
+					+ std::to_string(player_position->z) + " "
+					+ "Velocity: " + std::to_string(magnitude3d(&biped_unit->translational_velocity));
+				drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
+				text_y_coord += 15;
 			}
-
-			if (autoUpdateText) {
-				drawText(10, 60, COLOR_WHITE, autoUpdateText, normalSizeFont);
-			}
-			extern long long sizeOfDownload;
-			extern long long sizeOfDownloaded;
-			if (sizeOfDownload > 0) {
-				drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
-				drawBox(10, 52, ((sizeOfDownloaded * 100) / sizeOfDownload) * 2, 6, COLOR_GREEN, COLOR_GREEN);
-			}
-
-			ImGuiHandler::DrawImgui();
 		}
 	}
+
+	if (autoUpdateText) {
+		drawText(10, 60, COLOR_WHITE, autoUpdateText, normalSizeFont);
+	}
+	extern long long sizeOfDownload;
+	extern long long sizeOfDownloaded;
+	if (sizeOfDownload > 0) {
+		drawBox(10, 52, 200, 6, COLOR_RED, COLOR_RED);
+		drawBox(10, 52, ((sizeOfDownloaded * 100) / sizeOfDownload) * 2, 6, COLOR_GREEN, COLOR_GREEN);
+	}
+
+	ImGuiHandler::DrawImgui();
 
 	// limit framerate if needed
 	// UPDATE: frame limiting in XLiveRender adds input lag
 	// XLiveThrottleFramerate(H2Config_fps_limit);
-	return 0;
+
+	return S_OK;
 }
 
