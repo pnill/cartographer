@@ -75,17 +75,16 @@ bool ConsoleCommand::HandleCommandLine(const char* command_line, size_t command_
     bool ret = false;
 
 	std::vector<std::string> command_first_tokens;
-	if (tokenize(command_line, command_line_length, " ", command_first_tokens))
+	const char* delimiters = " ";
+	if (tokenize(command_line, command_line_length, delimiters, command_first_tokens))
 	{
 		ConsoleCommand* command = nullptr;
 		for (auto command_entry : CommandCollection::commandTable)
 		{
-			size_t cmp_max = (std::max)(strlen(command_entry->GetName()), command_first_tokens[0].length());
-			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), cmp_max) == 0)
-			{
-				command = command_entry;
-				break;
-			}
+			if (_strnicmp(command_entry->GetName(), command_first_tokens[0].c_str(), strlen(command_entry->GetName()) + 1) != 0)
+				continue;
+			command = command_entry;
+			break;
 		}
 
 		if (command != nullptr)
