@@ -15,8 +15,7 @@
 
 #define CRASH_REPORTS_PATH "\\halo2_crash_reports\\"
 
-
-LPTOP_LEVEL_EXCEPTION_FILTER pfn_PreviousExceptionFilter = NULL;
+LPTOP_LEVEL_EXCEPTION_FILTER pfn_SecondaryExceptionFilter = NULL;
 
 bool ShouldIncludeModuleCodeSeg(const WCHAR* fullPath)
 {
@@ -134,8 +133,8 @@ LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS* Except
 	addDebugText("Halo 2 has crashed and a dump file has been saved to \"%s\".", dump_file_name.c_str());
 
 	// pass through error to game/server code.
-	if (pfn_PreviousExceptionFilter)
-		return pfn_PreviousExceptionFilter(ExceptionInfo);
+	if (pfn_SecondaryExceptionFilter)
+		return pfn_SecondaryExceptionFilter(ExceptionInfo);
 	else
 		return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -144,20 +143,23 @@ static_assert(std::is_same<decltype(&debug_unhandled_exception_cb), LPTOP_LEVEL_
 LPTOP_LEVEL_EXCEPTION_FILTER(WINAPI* pfn_SetUnhandledExceptionFilter)(LPTOP_LEVEL_EXCEPTION_FILTER);
 LPTOP_LEVEL_EXCEPTION_FILTER WINAPI SetUnhandledExceptionFilterHook(LPTOP_LEVEL_EXCEPTION_FILTER pfnFilter)
 {
-	return 0;
+	LPTOP_LEVEL_EXCEPTION_FILTER pfn_OldExceptionFilter = pfn_SecondaryExceptionFilter;
+	pfn_SecondaryExceptionFilter = pfnFilter;
+	return pfn_OldExceptionFilter;
 }
 static_assert(std::is_same_v<decltype(&SetUnhandledExceptionFilterHook), decltype(&SetUnhandledExceptionFilter)>,
 	"invalid type of RedirectedSetUnhandledExceptionFilter");
 
 void cseries_debug_initialize()
 {
-	pfn_PreviousExceptionFilter = SetUnhandledExceptionFilter(debug_unhandled_exception_cb);
+	pfn_SecondaryExceptionFilter = SetUnhandledExceptionFilter(debug_unhandled_exception_cb);
 
 	// Credits: multitheftauto/mtasa-blue
 	// https://github.com/multitheftauto/mtasa-blue/blob/6c1f3184764aca0655b5b64fe88ca0a73b2b69c8/Client/core/CrashHandler.cpp#L102
 	// Stop the OS from turning off our handler
 	// Ref: http://www.codeproject.com/Articles/154686/SetUnhandledExceptionFilter-and-the-C-C-Runtime-Li
 	DETOUR_BEGIN();
-	DETOUR_ATTACH(pfn_SetUnhandledExceptionFilter, decltype(pfn_SetUnhandledExceptionFilter)(DetourFindFunction("kernel32.dll", "SetUnhandledExceptionFilter")), SetUnhandledExceptionFilterHook);
+	DETOUR_ATTACH(pfn_SetUnhandledExceptionFilter, 
+		decltype(pfn_SetUnhandledExceptionFilter)(DetourFindFunction("kernel32.dll", "SetUnhandledExceptionFilter")), SetUnhandledExceptionFilterHook);
 	DETOUR_COMMIT();
 }
