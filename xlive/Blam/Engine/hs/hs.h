@@ -1,142 +1,113 @@
 #pragma once
+#include "Blam/Common/Common.h"
+#define k_maximum_hs_globals_per_scenario 256
+#define k_maximum_hs_references_per_scenario 512
+#define k_maximum_hs_source_files_per_scenario 8
 
-enum class hs_type : WORD {
-	unparsed,
-	special_form,
-	function_name,
-	passthrough,
-	nothing,
-	boolean,
-	real,
-	hs_short,
-	hs_long,
-	string,
-	script,
-	string_id,
-	unit_seat_mapping,
-	trigger_volume,
-	cutscene_flag,
-	cutscene_camera_point,
-	cutscene_title,
-	cutscene_recording,
-	device_group,
-	ai,
-	ai_command_list,
-	ai_command_script,
-	ai_behavior,
-	ai_orders,
-	starting_profile,
-	conversation,
-	structure_bsp,
-	navpoint,
-	point_reference,
-	style,
-	hud_message,
-	object_list,
-	sound,
-	effect,
-	damage,
-	looping_sound,
-	animation_graph,
-	damage_effect,
-	object_definition,
-	bitmap,
-	shader,
-	render_model,
-	structure_definition,
-	lightmap_definition,
-	game_difficulty,
-	team,
-	actor_type,
-	hud_corner,
-	model_state,
-	network_event,
-	// objects
-	object,
-	unit,
-	vehicle,
-	weapon,
-	device,
-	scenery,
-	object_name,
-	unit_name,
-	vehicle_name,
-	weapon_name,
-	device_name,
-	scenery_name
+enum e_hs_script_type : short
+{
+	script_type_startup = 0,
+	script_type_dormant = 1,
+	script_type_continuous = 2,
+	script_type_static = 3,
+	script_type_stub = 4,
+	script_type_command_script = 5,
 };
 
-
-static std::unordered_map <const hs_type, std::string> hs_type_string{
-	{ hs_type::unparsed,	"unparsed" },
-	{ hs_type::special_form,	"special form" },
-	{ hs_type::function_name,	"function name" },
-	{ hs_type::passthrough,	"passthrough" },
-	{ hs_type::nothing,	"void" },
-	{ hs_type::boolean,	"boolean" },
-	{ hs_type::real,	"real" },
-	{ hs_type::hs_short,	"short" },
-	{ hs_type::hs_long,	"long" },
-	{ hs_type::string,	"string" },
-	{ hs_type::script,	"script" },
-	{ hs_type::string_id,	"string_id" },
-	{ hs_type::unit_seat_mapping,	"unit_seat_mapping" },
-	{ hs_type::trigger_volume,	"trigger_volume" },
-	{ hs_type::cutscene_flag,	"cutscene_flag" },
-	{ hs_type::cutscene_camera_point,	"cutscene_camera_point" },
-	{ hs_type::cutscene_title,	"cutscene_title" },
-	{ hs_type::cutscene_recording,	"cutscene_recording" },
-	{ hs_type::device_group,	"device_group" },
-	{ hs_type::ai,	"ai" },
-	{ hs_type::ai_command_list,	"ai_command_list" },
-	{ hs_type::ai_command_script,	"ai_command_script" },
-	{ hs_type::ai_behavior,	"ai_behavior" },
-	{ hs_type::ai_orders,	"ai_orders" },
-	{ hs_type::starting_profile,	"starting_profile" },
-	{ hs_type::conversation,	"conversation" },
-	{ hs_type::structure_bsp,	"structure_bsp" },
-	{ hs_type::navpoint,	"navpoint" },
-	{ hs_type::point_reference,	"point reference" },
-	{ hs_type::style,	"style" },
-	{ hs_type::hud_message,	"hud_message" },
-	{ hs_type::object_list,	"object_list" },
-	{ hs_type::sound,	"sound" },
-	{ hs_type::effect,	"effect" },
-	{ hs_type::damage,	"damage" },
-	{ hs_type::looping_sound,	"looping_sound" },
-	{ hs_type::animation_graph,	"animation_graph" },
-	{ hs_type::damage_effect,	"damage_effect" },
-	{ hs_type::object_definition,	"object_definition" },
-	{ hs_type::bitmap,	"bitmap" },
-	{ hs_type::shader,	"shader" },
-	{ hs_type::render_model,	"render model" },
-	{ hs_type::structure_definition,	"structure definition" },
-	{ hs_type::lightmap_definition,	"lightmap definition" },
-	{ hs_type::game_difficulty,	"game_difficulty" },
-	{ hs_type::team,	"team" },
-	{ hs_type::actor_type,	"actor_type" },
-	{ hs_type::hud_corner,	"hud_corner" },
-	{ hs_type::model_state,	"model_state" },
-	{ hs_type::network_event,	"network_event" },
-	// objects
-	{ hs_type::object,	"object" },
-	{ hs_type::unit,	"unit" },
-	{ hs_type::vehicle,	"vehicle" },
-	{ hs_type::weapon,	"weapon" },
-	{ hs_type::device,	"device" },
-	{ hs_type::scenery,	"scenery" },
-	{ hs_type::object_name,	"object_name" },
-	{ hs_type::unit_name,	"unit_name" },
-	{ hs_type::vehicle_name,	"vehicle_name" },
-	{ hs_type::weapon_name,	"weapon_name" },
-	{ hs_type::device_name,	"device_name" },
-	{ hs_type::scenery_name,	"scenery_name" },
+enum e_hs_type : WORD 
+{
+	hs_type_unparsed = 0,
+	hs_type_special_form,
+	hs_type_function_name,
+	hs_type_passthrough,
+	hs_type_nothing,
+	hs_type_boolean,
+	hs_type_real,
+	hs_type_hs_short,
+	hs_type_hs_long,
+	hs_type_string,
+	hs_type_script,
+	hs_type_string_id,
+	hs_type_unit_seat_mapping,
+	hs_type_trigger_volume,
+	hs_type_cutscene_flag,
+	hs_type_cutscene_camera_point,
+	hs_type_cutscene_title,
+	hs_type_cutscene_recording,
+	hs_type_device_group,
+	hs_type_ai,
+	hs_type_ai_command_list,
+	hs_type_ai_command_script,
+	hs_type_ai_behavior,
+	hs_type_ai_orders,
+	hs_type_starting_profile,
+	hs_type_conversation,
+	hs_type_structure_bsp,
+	hs_type_navpoint,
+	hs_type_point_reference,
+	hs_type_style,
+	hs_type_hud_message,
+	hs_type_object_list,
+	hs_type_sound,
+	hs_type_effect,
+	hs_type_damage,
+	hs_type_looping_sound,
+	hs_type_animation_graph,
+	hs_type_damage_effect,
+	hs_type_object_definition,
+	hs_type_bitmap,
+	hs_type_shader,
+	hs_type_render_model,
+	hs_type_structure_definition,
+	hs_type_lightmap_definition,
+	hs_type_game_difficulty,
+	hs_type_team,
+	hs_type_actor_type,
+	hs_type_hud_corner,
+	hs_type_model_state,
+	hs_type_network_event,
+	hs_type_object,
+	hs_type_unit,
+	hs_type_vehicle,
+	hs_type_weapon,
+	hs_type_device,
+	hs_type_scenery,
+	hs_type_object_name,
+	hs_type_unit_name,
+	hs_type_vehicle_name,
+	hs_type_weapon_name,
+	hs_type_device_name,
+	hs_type_scenery_name
 };
 
+// max count: k_maximum_hs_globals_per_scenario 256
+struct hs_global_internal
+{
+	static_string32 name;
+	e_hs_type type;
+	short pad;
+	datum initialization_expression_index;
+};
+TAG_BLOCK_SIZE_ASSERT(hs_global_internal, 40);
+
+// max count: k_maximum_hs_references_per_scenario 512
+struct hs_tag_reference
+{
+	tag_reference reference;	// any tag allowed
+};
+TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
+
+// max count: k_maximum_hs_source_files_per_scenario 8
+struct hs_source_file
+{
+	 static_string32 name;
+	 data_block source;		// DataSize: 262144
+};
+TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
 
 struct HaloScriptGlobal
 {
-	hs_type type;
+	e_hs_type type;
 	BYTE padding[2];
 	void* data;
 };
@@ -145,10 +116,10 @@ typedef void** (__cdecl* hs_func_impl)(int hs_opcode, void* script_engine, char 
 
 struct HaloScriptCommand
 {
-	hs_type type;
+	e_hs_type type;
 	WORD unk;
 	hs_func_impl func;
 	char* usage;
 	WORD arg_count;
-	hs_type arg_array[1]; // array size is dynamic, but always at least one
+	e_hs_type arg_array[1]; // array size is dynamic, but always at least one
 };

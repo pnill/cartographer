@@ -5,11 +5,11 @@
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/scenario/scenario.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -76,17 +76,16 @@ void christmas_event_map_load()
 
 		if (!DATUM_IS_NONE(snow_datum))
 		{
-			auto scen = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-			auto sbsp = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scen->structure_bsps[0]->structure_bsp.TagIndex);
+			auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(get_global_scenario()->structure_bsps[0]->structure_bsp.TagIndex);
 
-			auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(sbsp->weather_palette));
+			auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(bsp_definition->weather_palette));
 			weat_block->name = "snow_cs";
 			weat_block->weather_system.TagGroup = blam_tag::tag_group_type::weathersystem;
 			weat_block->weather_system.TagIndex = snow_datum;
 
-			for (auto& cluster : sbsp->clusters)
+			for (auto& cluster : bsp_definition->clusters)
 			{
-				cluster.weather = (short)sbsp->weather_palette.size - 1;
+				cluster.weather = (short)bsp_definition->weather_palette.size - 1;
 			}
 		}
 	}

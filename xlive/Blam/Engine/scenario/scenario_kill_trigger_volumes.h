@@ -1,4 +1,12 @@
 #pragma once
+#include "Blam/Common/Common.h"
+
+// max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
+struct s_scenario_kill_trigger_volume
+{
+    short trigger_volume;       // Block Index: scenario_trigger_volume
+};
+TAG_BLOCK_SIZE_ASSERT(s_scenario_kill_trigger_volume, 2);
 
 DWORD get_scenario_volume_count();
 void scenario_kill_trigger_volume_disable(int volume_id);

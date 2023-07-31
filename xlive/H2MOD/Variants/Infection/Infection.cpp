@@ -1,15 +1,14 @@
 #include "stdafx.h"
 
 #include "Infection.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/scenario/scenario.h"
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/units/units.h"
 
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -22,8 +21,8 @@
 
 std::vector<unsigned long long> Infection::zombieIdentifiers;
 
-#define HUMAN_TEAM _object_team_red
-#define ZOMBIE_TEAM _object_team_green
+#define HUMAN_TEAM object_team_red
+#define ZOMBIE_TEAM object_team_green
 
 bool initialSpawn;
 bool infectedPlayed;
@@ -259,15 +258,15 @@ void Infection::removeUnwantedItems()
 	}
 
 	//Replace vehicles with shotgun ammo
-	s_scenario_group_definition* scenario = get_global_scenario();
-	for (DWORD i = 0; i < scenario->netgame_equipment.size; i++)
+	scenario* scenario_definition = get_global_scenario();
+	for (DWORD i = 0; i < scenario_definition->netgame_equipment.size; i++)
 	{
-		auto netgame_equipment = scenario->netgame_equipment[i];
-		if (netgame_equipment->itemvehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
+		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
+		if (netgame_equipment->item_vehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
 		{
-			netgame_equipment->classification = s_scenario_group_definition::s_netgame_equipment_block::e_classification::powerup;
-			netgame_equipment->itemvehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-			netgame_equipment->itemvehicle_collection.TagIndex = DATUM_INDEX_NONE;
+			netgame_equipment->classification = netgame_item_classification_powerup;
+			netgame_equipment->item_vehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+			netgame_equipment->item_vehicle_collection.TagIndex = DATUM_INDEX_NONE;
 		}
 	}
 }
@@ -385,7 +384,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		// host code
 		if (!s_game_globals::game_is_predicted())
 		{
-			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
+			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));
 			if (unit_object) {
 				if (h2mod->get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
 					Infection::setZombiePlayerStatus(s_player::GetId(absPlayerIdx));
@@ -477,7 +476,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!s_game_globals::game_is_predicted())
 		{
 			LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", absPlayerIdx);
-			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(e_object_type::biped));
+			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 

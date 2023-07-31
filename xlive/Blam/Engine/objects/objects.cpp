@@ -53,7 +53,7 @@ namespace Engine::Objects
 #pragma region Biped variant patches
 	void update_biped_object_variant_data(datum object_idx, int variant_index)
 	{
-		s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(e_object_type::biped));
+		s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(object_type_biped));
 		// set this data only if we are dealing with a biped
 		if (biped_object != NULL)
 		{
