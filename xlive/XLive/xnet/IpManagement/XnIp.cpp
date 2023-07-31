@@ -1052,6 +1052,7 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 		return XNET_CONNECT_STATUS_LOST;
 	}
 	
+	// ### TODO FIXME the case described bellow is disabled (needs more research or proper implementation)
 	// check if we're either connected
 	// or not attempting to reconnect and STATUS PENDING
 	// this will prevent the game from recreating secure connections when the time out is reached
@@ -1060,12 +1061,13 @@ int WINAPI XNetGetConnectStatus(const IN_ADDR ina)
 	// while preventing connections from stalling after a failed attempt to recover connection
 	// from a previous successful connection that has been discarded in the meantime due to various reasons
 	if (xnIp->ConnectStatusConnected()
-		|| (xnIp->ConnectStatusPending() && !XNIP_TEST_BIT(xnIp->m_flags, XnIp::XnIp_ReconnectionAttempt))
+		//|| (xnIp->ConnectStatusPending() && !XNIP_TEST_BIT(xnIp->m_flags, XnIp::XnIp_ReconnectionAttempt))
 		)
 	{
 		xnIp->UpdateInteractionTimeHappened();
 	}
-	else if (xnIp->GetConnectStatus() < XNET_CONNECT_STATUS_CONNECTED
+	
+	if (xnIp->GetConnectStatus() < XNET_CONNECT_STATUS_CONNECTED
 		&& xnIp->ConnectionTimedOut())
 	{
 		return XNET_CONNECT_STATUS_LOST;
