@@ -1,13 +1,25 @@
 #pragma once
 
-#define DEFAULT_TOTAL_RESOLUTIONS 11
-#define TOTAL_RESOLUTIONS (DEFAULT_TOTAL_RESOLUTIONS + 5)
+#define k_max_display_option_count 64
 
-struct s_display_res
+enum e_display_aspect_ratio : int
 {
-	int res_x;
-	int res_y;
-	int unk; // not sure what this is, maybe it defines what type of res it is, i.e widescreen, 4:3 etc.
+	_aspect_ratio_4x3 = 0,
+	_aspect_ratio_16x9 = 1,
+	_aspect_ratio_16x10 = 2
+};
+
+struct s_aspect_ratio
+{
+	byte x;
+	byte y;
+};
+
+struct s_display_resolution
+{
+	DWORD width;
+	DWORD height;
+	e_display_aspect_ratio aspect_ratio;
 };
 
 struct s_video_settings
