@@ -1127,24 +1127,24 @@ TAG_BLOCK_SIZE_ASSERT(s_scenario_editor_folder, 260);
 
 struct s_ui_level_descriptions
 {
-    static_wchar_string32 english_name;
-    static_wchar_string32 japanese_name;
-    static_wchar_string32 german_name;
-    static_wchar_string32 french_name;
-    static_wchar_string32 spanish_name;
-    static_wchar_string32 italian_name;
-    static_wchar_string32 korean_name;
-    static_wchar_string32 chinese_name;
-    static_wchar_string32 portuguese_name;
-    static_wchar_string128 english_description;
-    static_wchar_string128 japanese_description;
-    static_wchar_string128 german_description;
-    static_wchar_string128 french_description;
-    static_wchar_string128 spanish_description;
-    static_wchar_string128 italian_description;
-    static_wchar_string128 korean_description;
-    static_wchar_string128 chinese_description;
-    static_wchar_string128 portuguese_description;
+    c_static_wchar_string32 english_name;
+    c_static_wchar_string32 japanese_name;
+    c_static_wchar_string32 german_name;
+    c_static_wchar_string32 french_name;
+    c_static_wchar_string32 spanish_name;
+    c_static_wchar_string32 italian_name;
+    c_static_wchar_string32 korean_name;
+    c_static_wchar_string32 chinese_name;
+    c_static_wchar_string32 portuguese_name;
+    c_static_wchar_string128 english_description;
+    c_static_wchar_string128 japanese_description;
+    c_static_wchar_string128 german_description;
+    c_static_wchar_string128 french_description;
+    c_static_wchar_string128 spanish_description;
+    c_static_wchar_string128 italian_description;
+    c_static_wchar_string128 korean_description;
+    c_static_wchar_string128 chinese_description;
+    c_static_wchar_string128 portuguese_description;
 };
 CHECK_STRUCT_SIZE(s_ui_level_descriptions, 2880);
 

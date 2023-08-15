@@ -71,11 +71,11 @@ namespace MapSlots
 					fin.read((char*)&newBlock, sizeof(s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block));
 
 					//Fix incase the maps level data is incorrectly setup
-					if (strlen(newBlock.path.text) == 0) {
+					if (strlen(newBlock.path.get_string()) == 0) {
 						fin.seekg(0x1C8);
 						char* buffer = new char[128];
 						fin.read(buffer, 128);
-						newBlock.path = buffer;
+						newBlock.path.set(buffer);
 					}
 
 					MapData.emplace_back(newBlock);
@@ -124,7 +124,7 @@ namespace MapSlots
 				for (const auto& newSlot : MapData)
 				{
 					if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
-						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.text);
+						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding %S", newSlot.english_name.get_string());
 						auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i)));
 
 						//Write the data loaded from the maps into the unused slot
@@ -164,7 +164,8 @@ namespace MapSlots
 		for (const auto& newSlot : MapData)
 		{
 			if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
-				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.english_name.text);
+				const wchar_t* map_name = newSlot.english_name.get_string();
+				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", );
 				auto slotAddr = Memory::GetAddress(0, 0x419510) + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i));
 				DWORD dwBack[2];
 				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
