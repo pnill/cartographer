@@ -9,11 +9,11 @@ template<size_t string_length>
 struct c_static_string
 {
 public:
-	char* clear() ;
-	const char* get_string() const;
-	char* get_buffer();
+	char* clear(void) ;
+	const char* get_string(void) const;
+	char* get_buffer(void);
 	char* set(const char* src);
-	size_t length() const;
+	size_t length(void) const;
 	char* append(const char* src);
 	int index_of(const char* src) const;
 	int next_index_of(const char* src, size_t starting_index) const;
@@ -27,11 +27,11 @@ template<size_t string_length>
 class c_static_wchar_string
 {
 public:
-	wchar_t* clear();
-	const wchar_t* get_string() const;
-	wchar_t* get_buffer();
+	wchar_t* clear(void);
+	const wchar_t* get_string(void) const;
+	wchar_t* get_buffer(void);
 	wchar_t* set(const wchar_t* src);
-	size_t length() const;
+	size_t length(void) const;
 	wchar_t* append(const wchar_t* src);
 	int index_of(const wchar_t* src) const;
 	int next_index_of(const wchar_t* src, size_t starting_index) const;
@@ -50,22 +50,22 @@ typedef c_static_wchar_string<32>  c_static_wchar_string32;
 typedef c_static_wchar_string<64>  c_static_wchar_string64;
 typedef c_static_wchar_string<128> c_static_wchar_string128;
 typedef c_static_wchar_string<256> c_static_wchar_string256;
-typedef c_static_wchar_string<MAX_PATH> c_static_wchar_string260;
+typedef c_static_wchar_string<MAX_PATH> c_static_wchar_string_max_path;
 
 template<size_t T>
-inline const char* c_static_string<T>::get_string() const
+inline const char* c_static_string<T>::get_string(void) const
 {
 	return this->text;
 }
 
 template<size_t T>
-inline char* c_static_string<T>::get_buffer()
+inline char* c_static_string<T>::get_buffer(void)
 {
 	return this->text;
 }
 
 template<size_t T>
-inline char* c_static_string<T>::clear()
+inline char* c_static_string<T>::clear(void)
 {
 	this->text[0] = '\0';
 	return this->text;
@@ -78,7 +78,7 @@ inline char* c_static_string<T>::set(const char* src)
 }
 
 template<size_t T>
-inline size_t c_static_string<T>::length() const
+inline size_t c_static_string<T>::length(void) const
 {
 	return csstrnlen(this->get_string(), T);
 }
@@ -137,19 +137,19 @@ int c_static_string<T>::last_index_of(const char* src) const
 }
 
 template<size_t T>
-inline const wchar_t* c_static_wchar_string<T>::get_string() const
+inline const wchar_t* c_static_wchar_string<T>::get_string(void) const
 {
 	return this->text;
 }
 
 template<size_t T>
-inline wchar_t* c_static_wchar_string<T>::get_buffer()
+inline wchar_t* c_static_wchar_string<T>::get_buffer(void)
 {
 	return this->text;
 }
 
 template<size_t T>
-inline wchar_t* c_static_wchar_string<T>::clear()
+inline wchar_t* c_static_wchar_string<T>::clear(void)
 {
 	this->text[0] = L'\0';
 	return this->text;
@@ -162,7 +162,7 @@ inline wchar_t* c_static_wchar_string<T>::set(const wchar_t* src)
 }
 
 template<size_t T>
-inline size_t c_static_wchar_string<T>::length() const
+inline size_t c_static_wchar_string<T>::length(void) const
 {
 	return ustrnlen(this->get_string(), T);
 }
