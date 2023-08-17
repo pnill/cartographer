@@ -13,6 +13,8 @@
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 #include "Blam/Engine/cache/cache_files.h"
 
+// TODO Cleanup
+
 //contains some game functions that returns HANDLE
 namespace global_handle_function
 {
@@ -1400,8 +1402,11 @@ bool _cdecl LoadTagsandMapBases(int a)
 		DWORD* TagTableStart = Memory::GetAddress<DWORD*>(0x47CD50);
 		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
 		///---------------TABLE EXTENSION  STUFF
-		memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
-		*TagTableStart = (DWORD)tag_loader::new_Tables;
+		if (*TagTableStart != NULL)
+		{
+			memcpy((BYTE*)tag_loader::new_Tables, (BYTE*)*TagTableStart, 0x3BA40);
+			*TagTableStart = (DWORD)tag_loader::new_Tables;
+		}
 	}
 
 
