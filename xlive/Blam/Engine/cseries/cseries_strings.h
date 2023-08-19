@@ -9,7 +9,13 @@ template<size_t string_length>
 struct c_static_string
 {
 public:
-	char* clear(void) ;
+	c_static_string()
+	{
+		this->text[0] = '\0';
+	}
+	~c_static_string() = default;
+
+	char* clear(void);
 	const char* get_string(void) const;
 	char* get_buffer(void);
 	char* set(const char* src);
@@ -27,6 +33,12 @@ template<size_t string_length>
 class c_static_wchar_string
 {
 public:
+	c_static_wchar_string()
+	{
+		this->text[0] = L'\0';
+	}
+	~c_static_wchar_string() = default;
+
 	wchar_t* clear(void);
 	const wchar_t* get_string(void) const;
 	wchar_t* get_buffer(void);
