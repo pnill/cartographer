@@ -188,6 +188,26 @@
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\minizip\unzip.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\minizip\zip.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\unzip.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\zip.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\adler32.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\compress.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\crc32.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\deflate.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\gzio.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\infblock.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\infcodes.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\inffast.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\inflate.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\inftrees.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\infutil.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\maketree.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\minigzip.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\trees.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\uncompr.c" />
+    <ClCompile Include="3rdparty\zlib-1.1.4\src\zutil.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -599,6 +619,25 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
+    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zconf.h" />
+    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zlib.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\include\zconf.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\include\zlib.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\minizip\unzip.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\minizip\zip.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\contrib\minizip\unzip.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\contrib\minizip\zip.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\deflate.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\infblock.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\infcodes.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\inffast.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\inffixed.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\inftrees.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\infutil.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\trees.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\zconf.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\zlib.h" />
+    <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
@@ -606,5 +645,7 @@
   <ItemGroup>
     <None Include="xlive.def" />
     <None Include="3rdparty\directx\include\d3dx9math.inl" />
+    <None Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\lib\libz-bcc.def" />
+    <None Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\lib\libz.def" />
   </ItemGroup>
 </Project>
