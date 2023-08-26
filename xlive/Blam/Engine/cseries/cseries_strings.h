@@ -5,6 +5,7 @@
 #define MAXIMUM_STRING_SIZE 262144
 
 size_t csstrnlen(char* string, size_t size);
+int csstricmp(const char* s1, const char* s2);
 
 /*********************************************************************
 * static_string

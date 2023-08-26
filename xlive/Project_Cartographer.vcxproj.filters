@@ -188,6 +188,10 @@
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_options.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_game.cpp" />
+    <ClCompile Include="Blam\Engine\game\game.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -599,6 +603,8 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
+    <ClInclude Include="Blam\Engine\main\main_game.h" />
+    <ClInclude Include="Blam\Engine\game\game.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
