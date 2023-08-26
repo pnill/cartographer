@@ -1,6 +1,8 @@
 #pragma once
 #include "Blam/Engine/game/game_options.h"
 
+#define k_campaign_difficulty_levels_count 4
+
 // Initialize options structure for the map_name command
 void main_game_initialize(void);
 
@@ -11,7 +13,7 @@ void main_game_launch_set_map_name(const char* map_name);
 void main_game_change(const s_game_options* options);
 
 // Set the difficulty for the map launched with the map_name command
-void game_set_difficulty(short difficulty);
+void main_game_launch_set_difficulty(short difficulty);
 
 // Set the splitscreen player count for the singleplayer map launched with the map_name command
 void main_game_launch_set_coop_player_count(int player_count);

@@ -36,9 +36,13 @@ void main_game_change(const s_game_options* options)
     return;
 }
 
-void game_set_difficulty(short difficulty)
+void main_game_launch_set_difficulty(short difficulty)
 {
-    if (difficulty < 4)
+    if (difficulty >= k_campaign_difficulty_levels_count || difficulty < 0)
+    {
+        LOG_ERROR_GAME("main_game_launch_set_difficulty: invalid difficulty {} (must be from 0-{})", difficulty, k_campaign_difficulty_levels_count - 1);
+    }
+    else
     {
         g_main_game_launch_options.difficulty = difficulty;
         g_main_game_launch_options.game_mode = _game_mode_campaign;
@@ -48,7 +52,11 @@ void game_set_difficulty(short difficulty)
 
 void main_game_launch_set_coop_player_count(int player_count)
 {
-    if (player_count <= k_number_of_users)
+    if (player_count > k_number_of_users || player_count < 1)
+    {
+        LOG_ERROR_GAME("main_game_launch_set_coop_player_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
+    }
+    else
     {
         g_main_game_launch_options.game_mode = _game_mode_campaign;
         g_main_game_launch_options.coop = player_count > 1;
@@ -59,7 +67,11 @@ void main_game_launch_set_coop_player_count(int player_count)
 
 void main_game_launch_set_multiplayer_splitscreen_count(int player_count)
 {
-    if (player_count <= k_number_of_users)
+    if (player_count > k_number_of_users || player_count < 1)
+    {
+        LOG_ERROR_GAME("main_game_launch_set_multiplayer_splitscreen_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
+    }
+    else
     {
         g_main_game_launch_options.game_mode = _game_mode_multiplayer;
         g_main_game_launch_user_count = player_count;
@@ -94,7 +106,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
     if (i == k_variant_count)
     {
-        LOG_ERROR_GAME("invalid variant name [%s] provided, defaulting to slayer", variant_name);
+        LOG_ERROR_GAME("invalid variant name [{}] provided, defaulting to slayer", variant_name);
         game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
     }
     else
@@ -109,13 +121,13 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 void main_game_launch_set_game_mode(int game_mode)
 {
-    if (game_mode < k_game_mode_count)
+    if (game_mode > k_game_mode_count || game_mode < _game_mode_campaign)
     {
-        g_main_game_launch_options.game_mode = (e_game_mode)game_mode;
+        LOG_ERROR_GAME("invalid game mode [{}] provided", game_mode);
     }
     else
     {
-        LOG_ERROR_GAME("invalid game mode [%d] provided", game_mode);
+        g_main_game_launch_options.game_mode = (e_game_mode)game_mode;
     }
     return;
 }
@@ -175,7 +187,7 @@ void main_game_launch_setup_game_mode_details(void)
     }
     default:
     {
-        LOG_ERROR_GAME("main_game_launch: unknown game mode %d!", g_main_game_launch_options.game_mode);
+        LOG_ERROR_GAME("main_game_launch: unknown game mode {}!", g_main_game_launch_options.game_mode);
     }
     }
     
