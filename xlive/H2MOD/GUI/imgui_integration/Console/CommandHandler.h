@@ -50,12 +50,12 @@ public:
         return m_command_description;
     }
 
-    int GetMinParameterCount() const
+    size_t GetMinParameterCount() const
     {
         return m_min_parameter_count;
     }
 
-	int GetMaxParameterCount() const
+    size_t GetMaxParameterCount() const
 	{
 		return m_max_parameter_count;
 	}
@@ -88,8 +88,8 @@ protected:
     CommandFlags m_flags;
     const char* m_name;
     const char* m_command_description;
-    int m_min_parameter_count;
-    int m_max_parameter_count;
+    size_t m_min_parameter_count;
+    size_t m_max_parameter_count;
     void* m_user_data;
 
 private:
