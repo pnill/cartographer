@@ -605,6 +605,7 @@
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
     <ClInclude Include="Blam\Engine\game\game.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

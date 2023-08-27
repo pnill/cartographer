@@ -2,6 +2,7 @@
 #include "main_game.h"
 
 #include "Blam/Engine/cache/cache_files.h"
+#include "Blam/Engine/cseries/cseries.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
@@ -38,7 +39,7 @@ void main_game_change(const s_game_options* options)
 
 void main_game_launch_set_difficulty(short difficulty)
 {
-    if (difficulty >= k_campaign_difficulty_levels_count || difficulty < 0)
+    if (!VALID_INDEX(difficulty, k_campaign_difficulty_levels_count))
     {
         LOG_ERROR_GAME("main_game_launch_set_difficulty: invalid difficulty {} (must be from 0-{})", difficulty, k_campaign_difficulty_levels_count - 1);
     }
@@ -52,7 +53,7 @@ void main_game_launch_set_difficulty(short difficulty)
 
 void main_game_launch_set_coop_player_count(int player_count)
 {
-    if (player_count > k_number_of_users || player_count < 1)
+    if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
     {
         LOG_ERROR_GAME("main_game_launch_set_coop_player_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
     }
@@ -67,7 +68,7 @@ void main_game_launch_set_coop_player_count(int player_count)
 
 void main_game_launch_set_multiplayer_splitscreen_count(int player_count)
 {
-    if (player_count > k_number_of_users || player_count < 1)
+    if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
     {
         LOG_ERROR_GAME("main_game_launch_set_multiplayer_splitscreen_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
     }
@@ -121,7 +122,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 void main_game_launch_set_game_mode(int game_mode)
 {
-    if (game_mode > k_game_mode_count || game_mode < _game_mode_campaign)
+    if (!IN_RANGE_INCLUSIVE(game_mode, 1, (int)k_game_mode_count - 1))
     {
         LOG_ERROR_GAME("invalid game mode [{}] provided", game_mode);
     }
