@@ -10,7 +10,7 @@
 
 #include "Util/Hooks/Hook.h"
 
-s_game_options g_main_game_launch_options;
+s_game_options g_main_game_launch_options = {};
 DWORD g_main_game_launch_user_count = 1;
 
 // Setup default values for the options structure depending on the game mode set
