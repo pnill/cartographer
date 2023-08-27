@@ -193,7 +193,7 @@ public:
 		va_list valist;
 		va_start(valist, fmt);
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-		if (buffer_size_needed != -1)
+		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{
@@ -209,7 +209,7 @@ public:
 	void AddStringFmt(StringHeaderFlags flags, const char* fmt, va_list valist)
 	{
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-		if (buffer_size_needed != -1)
+		if (buffer_size_needed)
 		{
 			if ((size_t)buffer_size_needed < m_line_buf_size)
 			{

@@ -11,12 +11,18 @@
 #include "Util/Hooks/Hook.h"
 
 s_game_options g_main_game_launch_options;
-DWORD g_main_game_launch_user_count;
+DWORD g_main_game_launch_user_count = 1;
 
 // Setup default values for the options structure depending on the game mode set
 void main_game_launch_setup_game_mode_details(void);
+// Perform validation on the game launch options for campaign
+void main_game_launch_set_campaign_details(void);
+// Perform validation on the game launch options for multiplayer
+void main_game_launch_set_multiplayer_details(void);
+// Set default details for the mainmenu
+void main_game_launch_set_ui_shell_details(void);
 
-void main_game_initialize()
+void main_game_initialize(void)
 {
     game_options_new(&g_main_game_launch_options);
     return;
@@ -133,68 +139,6 @@ void main_game_launch_set_game_mode(int game_mode)
     return;
 }
 
-void main_game_launch_setup_game_mode_details(void)
-{
-    switch (g_main_game_launch_options.game_mode)
-    {
-    case _game_mode_campaign:
-    {
-        if (g_main_game_launch_options.difficulty >= 0)
-        {
-            if (g_main_game_launch_options.difficulty > 3)
-            {
-                g_main_game_launch_options.difficulty = 3;
-            }
-        }
-        else
-        {
-            g_main_game_launch_options.difficulty = 0;
-        }
-
-        if (!g_main_game_launch_options.coop)
-        {
-            g_main_game_launch_user_count = 1;
-        }
-        else if (g_main_game_launch_user_count < 1)
-        {
-            g_main_game_launch_user_count = 1;
-        }
-        else if (g_main_game_launch_user_count > 2)
-        {
-            g_main_game_launch_user_count = 2;
-        }
-        break;
-    }
-    case _game_mode_multiplayer:
-    {
-        if (g_main_game_launch_user_count >= 1)
-        {
-            if (g_main_game_launch_user_count > k_number_of_users)
-            {
-                g_main_game_launch_user_count = k_number_of_users;
-            }
-        }
-        else
-        {
-            g_main_game_launch_user_count = 1;
-        }
-        break;
-    }
-    case _game_mode_ui_shell:
-    {
-        g_main_game_launch_user_count = 1;
-        g_main_game_launch_options.menu_context = 7;
-        break;
-    }
-    default:
-    {
-        LOG_ERROR_GAME("main_game_launch: unknown game mode {}!", g_main_game_launch_options.game_mode);
-    }
-    }
-    
-    return;
-}
-
 void main_game_launch(const char* map_name)
 {
     cache_file_map_clear_all_failures();
@@ -209,5 +153,93 @@ void main_game_apply_patches(void)
 {
     // Patch the empty function in the run_main_loop function with the proper function call
     PatchCall(Memory::GetAddress(0x39E38), main_game_initialize);
+    return;
+}
+
+void main_game_launch_setup_game_mode_details(void)
+{
+    switch (g_main_game_launch_options.game_mode)
+    {
+    case _game_mode_campaign:
+    {
+        main_game_launch_set_campaign_details();
+        break;
+    }
+    case _game_mode_multiplayer:
+    {
+        main_game_launch_set_multiplayer_details();
+        break;
+    }
+    case _game_mode_ui_shell:
+    {
+        main_game_launch_set_ui_shell_details();
+        break;
+    }
+    default:
+    {
+        LOG_ERROR_GAME("main_game_launch: unknown game mode {}!", g_main_game_launch_options.game_mode);
+    }
+    }
+
+    return;
+}
+
+void main_game_launch_set_campaign_details(void)
+{
+    if (!IN_RANGE_INCLUSIVE(g_main_game_launch_options.difficulty, 0, k_campaign_difficulty_levels_count))
+    {
+        // If higher than legendary set to legendary
+        if (g_main_game_launch_options.difficulty >= k_campaign_difficulty_levels_count)
+        {
+            g_main_game_launch_options.difficulty = 3;
+        }
+        // If lower than easy set to easy
+        else if (g_main_game_launch_options.difficulty < 0)
+        {
+            g_main_game_launch_options.difficulty = 0;
+        }
+    }
+
+
+    if (!IN_RANGE_INCLUSIVE(g_main_game_launch_user_count, 1, k_number_of_users))
+    {
+        g_main_game_launch_user_count = 1;
+    }
+    else if (!g_main_game_launch_options.coop)
+    {
+        g_main_game_launch_user_count = 1;
+    }
+
+    /*
+    // Removed this so we can campaign games with more than 4 local users
+    // 4 Player doesn't currently work in most campaign maps
+    else if (g_main_game_launch_user_count > 2)
+    {
+        g_main_game_launch_user_count = 2;
+    }
+    */
+    return;
+}
+
+void main_game_launch_set_multiplayer_details(void)
+{
+    if (!IN_RANGE_INCLUSIVE(g_main_game_launch_user_count, 1, k_number_of_users))
+    {
+        if (g_main_game_launch_user_count > k_number_of_users)
+        {
+            g_main_game_launch_user_count = k_number_of_users;
+        }
+        else if (g_main_game_launch_user_count < 1)
+        {
+            g_main_game_launch_user_count = 1;
+        }
+    }
+    return;
+}
+
+void main_game_launch_set_ui_shell_details(void)
+{
+    g_main_game_launch_user_count = 1;
+    g_main_game_launch_options.menu_context = 7;
     return;
 }
