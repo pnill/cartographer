@@ -11,3 +11,5 @@ struct alignas(4) s_tag_data_iterator
 	datum get_next_datum();
 };
 static_assert(sizeof(s_tag_data_iterator) == 20, "Size incorrect");
+
+void cache_file_map_clear_all_failures(void);

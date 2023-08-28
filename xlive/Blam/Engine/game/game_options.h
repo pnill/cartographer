@@ -24,7 +24,8 @@ enum e_game_mode : int
 	_game_mode_multiplayer = 2,
 	_game_mode_ui_shell = 3,
 	_game_mode_mutiplayer_shared = 4,
-	_game_mode_single_player_shared = 5
+	_game_mode_single_player_shared = 5,
+	k_game_mode_count
 };
 
 struct game_player_options
@@ -83,3 +84,6 @@ struct s_game_options
 };
 CHECK_STRUCT_SIZE(s_game_options, 4488);
 #pragma pack(pop)
+
+// Initializes game options
+void game_options_new(s_game_options* game_options);

@@ -12,6 +12,7 @@
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/interface/screens/screens_patches.h"
+#include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
@@ -1057,6 +1058,7 @@ void H2MOD::ApplyHooks() {
 		font_group_apply_hooks();
 		screens_apply_patches();
 		aim_assist_apply_patches();
+		main_game_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

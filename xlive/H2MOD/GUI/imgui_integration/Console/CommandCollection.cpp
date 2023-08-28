@@ -2,6 +2,7 @@
 #include "ImGui_ConsoleImpl.h"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
@@ -59,7 +60,13 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
 	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
 	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash)
+	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash),
+	new ConsoleCommand("map_name", "load a map with the following name, 1 parameter(s): <string>", 1, 1, CommandCollection::map_name),
+	new ConsoleCommand("game_difficulty", "set the difficulty when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_difficulty),
+	new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players),
+	new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer),
+	new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen),
+	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -768,4 +775,57 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 	{
 		Engine::Objects::object_destroy(objectDatumIdx);
 	}
+}
+
+int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	std::string name(tokens[1].begin(), tokens[1].end());
+	main_game_launch(name.c_str());
+	return 0;
+}
+
+int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> difficulty;
+	std::string exception;
+	difficulty.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_difficulty(difficulty.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> player_count;
+	std::string exception;
+	player_count.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_coop_player_count(player_count.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	main_game_launch_set_multiplayer_variant(tokens[1].c_str());
+	return 0;
+}
+
+int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> player_count;
+	std::string exception;
+	player_count.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_multiplayer_splitscreen_count(player_count.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> game_mode;
+	std::string exception;
+	game_mode.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_game_mode(game_mode.GetVal());
+	return 0;
 }

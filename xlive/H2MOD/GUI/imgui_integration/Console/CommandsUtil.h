@@ -81,7 +81,7 @@ static inline bool tokenize(const char* str, size_t str_length, const char* deli
 
 struct StringLineHeader
 {
-    int idx;
+    size_t idx;
     size_t size;
     StringHeaderFlags flags;
 };
@@ -193,12 +193,15 @@ public:
 		va_list valist;
 		va_start(valist, fmt);
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-		if (buffer_size_needed < m_line_buf_size)
+		if (buffer_size_needed)
 		{
-			char* buffer = (char*)_malloca(buffer_size_needed);
-			int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
-			AddString(flags, buffer, copied_characters);
-			_freea(buffer);
+			if ((size_t)buffer_size_needed < m_line_buf_size)
+			{
+				char* buffer = (char*)_malloca(buffer_size_needed);
+				int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+				AddString(flags, buffer, copied_characters);
+				_freea(buffer);
+			}
 		}
 		va_end(valist);
 	}
@@ -206,12 +209,15 @@ public:
 	void AddStringFmt(StringHeaderFlags flags, const char* fmt, va_list valist)
 	{
 		int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
-		if (buffer_size_needed < m_line_buf_size)
+		if (buffer_size_needed)
 		{
-			char* buffer = (char*)_malloca(buffer_size_needed);
-			int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
-			AddString(flags, buffer, copied_characters);
-			_freea(buffer);
+			if ((size_t)buffer_size_needed < m_line_buf_size)
+			{
+				char* buffer = (char*)_malloca(buffer_size_needed);
+				int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
+				AddString(flags, buffer, copied_characters);
+				_freea(buffer);
+			}
 		}
 	}
 
@@ -248,7 +254,7 @@ private:
 
 	// buffer details
 	// current position of the string
-	int m_buffer_idx;
+	size_t m_buffer_idx;
 	// header for each line of characters
 	std::vector<StringLineHeader> m_strings_headers;
 
