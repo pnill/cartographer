@@ -779,8 +779,7 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 
 int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	std::string name(tokens[1].begin(), tokens[1].end());
-	main_game_launch(name.c_str());
+	main_game_launch(tokens[1].c_str());
 	return 0;
 }
 

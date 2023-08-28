@@ -11,7 +11,7 @@
 #include "Util/Hooks/Hook.h"
 
 s_game_options g_main_game_launch_options = {};
-DWORD g_main_game_launch_user_count = 1;
+int g_main_game_launch_user_count = 1;
 
 // Setup default values for the options structure depending on the game mode set
 void main_game_launch_setup_game_mode_details(void);
@@ -37,7 +37,7 @@ void main_game_launch_set_map_name(const char* map_name)
 // TODO rewrite the obfuscated function
 void main_game_change(const s_game_options* options)
 {
-    typedef void(__stdcall* main_game_change_t)(const s_game_options*);
+    typedef void(__cdecl* main_game_change_t)(const s_game_options*);
     auto p_main_game_change = Memory::GetAddress<main_game_change_t>(0x89BA, 0x1E4EC);
     p_main_game_change(options);
     return;
