@@ -10,7 +10,7 @@ void main_game_initialize(void);
 void main_game_launch_set_map_name(const char* map_name);
 
 // Starts a new game with the options provided
-void main_game_change(const s_game_options* options);
+bool main_game_change(const s_game_options* options);
 
 // Set the difficulty for the map launched with the map_name command
 void main_game_launch_set_difficulty(short difficulty);
