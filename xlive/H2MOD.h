@@ -39,7 +39,6 @@ public:
 	datum get_player_datum_index_from_controller_index(int controller_index);
 	const wchar_t* get_local_player_name(int local_player_index);
 	real_point3d* get_player_unit_coords(int player_index);
-	s_data_array* get_actor_table();
 	float get_distance(int, int);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	BYTE get_unit_team_index(datum unit_datum_index);
