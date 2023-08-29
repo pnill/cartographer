@@ -772,8 +772,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 {
 	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
 	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	const short red_versus_blue_teams = FLAG(object_team_red) | FLAG(object_team_blue);
-	const short infection_teams = FLAG(object_team_red) | FLAG(object_team_green);
+	const short red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
+	const short infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
 
 	std::wstring selected_map_file_name;
 
@@ -786,8 +786,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 		// infection overrides H2Config
 		// TODO get infection_teams through the interface
 		new_teams_enabled_flags = infection_teams;
-		if ((default_teams_enabled_flags & FLAG(object_team_red)) == 0
-			|| (default_teams_enabled_flags & FLAG(object_team_green)) == 0)
+		if ((default_teams_enabled_flags & FLAG(_game_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(_game_team_green)) == 0)
 		{
 			LOG_WARNING_FUNC(" - infection teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
@@ -798,8 +798,8 @@ short __cdecl get_enabled_team_flags(s_network_session* session)
 	{
 		// same with rvb, overrides H2Config
 		new_teams_enabled_flags = red_versus_blue_teams;
-		if ((default_teams_enabled_flags & FLAG(object_team_red)) == 0
-			|| (default_teams_enabled_flags & FLAG(object_team_blue)) == 0)
+		if ((default_teams_enabled_flags & FLAG(_game_team_red)) == 0
+			|| (default_teams_enabled_flags & FLAG(_game_team_blue)) == 0)
 		{
 			LOG_WARNING_FUNC(" - RvB teams disabled in default enabled team flags");
 			if (MapManager::GetMapFilename(selected_map_file_name))
@@ -832,7 +832,7 @@ void H2MOD::ApplyFirefightHooks()
 int get_active_count_from_bitflags(short teams_bit_flags)
 {
 	int count = 0;
-	for (int i = 0; i < object_team_neutral; i++)
+	for (int i = 0; i < _game_team_neutral; i++)
 	{
 		if (TEST_FLAG(teams_bit_flags, i))
 			count++;
@@ -875,7 +875,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)object_team_neutral);
+		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_game_team_neutral);
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
@@ -885,7 +885,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
-		for (int i = 0; i < object_team_neutral; i++)
+		for (int i = 0; i < _game_team_neutral; i++)
 		{
 			int currentTeamPlayers = 0;
 

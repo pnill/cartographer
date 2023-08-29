@@ -7,7 +7,6 @@
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/FireFight/DeviceShop/DeviceShop.h"
 
@@ -21,7 +20,7 @@ FireFight::FireFight()
 void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
-	s_data_iterator<actor> actorIt(h2mod->get_actor_table());
+	s_data_iterator<s_actor> actorIt(get_actor_table());
 	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(object_type_biped));
 
 	if (actorObject != NULL)
@@ -29,7 +28,7 @@ void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 		datum actor_datum = actorObject->simulation_actor_index; // Grab the actor from the killed AI
 		if (!DATUM_IS_NONE(actor_datum)) // Ensure that it was valid
 		{
-			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->character_datum; // get the character tag datum assigned to the actor.
+			datum char_datum = actorIt.get_data_at_datum_index(actor_datum)->meta.character_tag_datum; // get the character tag datum assigned to the actor.
 			auto* character = tags::get_tag<blam_tag::tag_group_type::character, character_tag_group>(char_datum);
 
 			if (character && character->SwarmProperties.size > 0)
