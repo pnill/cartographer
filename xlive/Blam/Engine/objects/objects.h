@@ -7,7 +7,7 @@
 
 #define k_maximum_objects_per_map 2048
 
-enum e_object_team : BYTE
+enum e_game_team : short
 {
 	// MP
 	object_team_red = 0,
@@ -165,8 +165,8 @@ struct s_unit_data_definition : s_object_data_definition
 	datum simulation_actor_index;
 	DWORD unit_flags;		  //(unit_data->unit_flags & 8) != 0   -->active_camo_active
 							  //unit_data->unit_flags |= 2         -->unit_is_alive
-	e_object_team unit_team;
-	char pad[3];
+	e_game_team unit_team;
+	char pad[2];
 	datum controlling_player_index;
 	char gap_142[12];
 	DWORD control_flags;

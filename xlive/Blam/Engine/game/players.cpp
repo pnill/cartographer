@@ -26,22 +26,22 @@ s_player* s_player::GetPlayer(int playerIndex)
 	return (s_player*)&GetArray()->data[playerIndex * GetArray()->datum_element_size];
 }
 
-e_object_team s_player::GetTeam(int playerIndex)
+e_game_team s_player::GetTeam(int playerIndex)
 {
 	if (!IndexValid(playerIndex))
 	{
-		return (e_object_team)NONE;
+		return (e_game_team)NONE;
 	}
-	return GetPlayer(playerIndex)->properties[0].player_team;
+	return (e_game_team)GetPlayer(playerIndex)->properties[0].player_team;
 }
 
-void s_player::SetTeam(int playerIndex, e_object_team team)
+void s_player::SetTeam(int playerIndex, e_game_team team)
 {
 	if (!IndexValid(playerIndex))
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].player_team = team;
+	GetPlayer(playerIndex)->properties[0].player_team = (byte)team;
 }
 
 void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)

@@ -202,7 +202,7 @@ struct s_player_properties
 	wchar_t clan_name[16];
 	s_clan_identifiers clan_identifiers;
 
-	e_object_team player_team;
+	byte player_team;
 	e_handicap player_handicap_level;
 	byte player_displayed_skill;
 	byte player_overall_skill;
@@ -272,8 +272,8 @@ struct s_player
 	static s_data_array* GetArray();
 	static bool IndexValid(int playerIndex);
 	static s_player* GetPlayer(int playerIndex);
-	static e_object_team GetTeam(int playerIndex);
-	static void SetTeam(int playerIndex, e_object_team team);
+	static e_game_team GetTeam(int playerIndex);
+	static void SetTeam(int playerIndex, e_game_team team);
 	static void SetUnitBipedType(int playerIndex, e_character_type bipedType);
 	static void SetUnitBipedType(int playerIndex, byte representationIndex);
 	static void SetBipedSpeed(int playerIndex, float speed);
