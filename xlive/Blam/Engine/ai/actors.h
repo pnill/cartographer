@@ -1,4 +1,6 @@
 #pragma once
+#include "actor_firing_position.h"
+#include "actor_moving.h"
 #include "pathfinding_utilities.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
@@ -11,90 +13,21 @@
    For now, we only know where the character datum which was used to create the actor is.
 */
 
-
 // Unsure about the size for this struct...
-struct s_actor_meta
+struct actor_datum_struct_41C
 {
-	BYTE gap_0[4];
-	__int16 type;
-	byte gap_6;
-	bool swarm;
-	bool unk_bool_8;
-	bool active;
-	bool squadless;
-	bool force_active;
-	BYTE gap_B[4];
-	DWORD flee_firing_position_index;
-	int pathfinding_timeslice;
-	datum unit_index;
-	datum swarm_index;
-	DWORD field_20;
-	e_game_team unit_team;
-	BYTE gap_1C[2];
-	int field_28;
-	__int16 tick_count_2C;
-	BYTE gap_2E[2];
-	datum squad_index;
-	datum squad_to_migrate_to;
-	BYTE gap_38[6];
-	__int16 sbsp_index;
-	bool unk_bool_34;
-	BYTE gap_35[19];
-	datum character_tag_datum;
-	int field_58;
-	datum tracks[8];
-	datum clump_index;
-};
-
-struct s_actor
-{
-	s_actor_meta meta;
-	BYTE gap_80[4];
-	__int16 field_84;
-	__int16 field_86;
-	BYTE gap_88[8];
-	BYTE gap_90[160];
-	datum actor_datum;
-	BYTE gap_134[244];
-	bool blind;
-	bool unk_bool_229;
-	bool unk_bool_22A;
-	bool unk_bool_22B;
-	real_point3d position_22C;
-	real_point3d position_238;
-	BYTE gap_244[12];
-	s_location location;
-	BYTE gap_258[13];
-	bool underwater;
-	bool unk_bool_266;
-	bool unk_bool_267;
-	bool unk_bool_268;
-	bool unk_bool_269;
-	BYTE gap_26A[2];
-	datum root_object_datum;
-	__int16 field_270;
-	BYTE gap_272[2];
-	int field_274;
-	BYTE gap_270[192];
-	datum target_prop_index;
-	byte gap_33C[220];
-	int firing_position_ref;
-	byte gap_41C[100];
+	byte gap_0[52];
+	int field_34;
+	__int16 field_38;
+	byte gap_34[42];
 	bool unk_bool_480;
 	byte gap_481[43];
-	__int16 field_4AC;
-	bool unk_bool_4AD;
-	bool unk_bool_4AE;
-	DWORD field_4B0;
-	DWORD field_4B4;
-	c_ai_point3d ai_point_4B8;
-	int field_4C8;
-	DWORD field_4CC;
-	DWORD field_4D0;
-	bool unk_bool_4D4;
-	byte gap_4D5;
-	byte gap_4D6[14];
-	int field_4E4;
+};
+
+// Unsure about the size for this struct...
+struct actor_control_data
+{
+	int ignore_target_object_index;
 	bool unk_bool_4E8;
 	byte gap_4F0[3];
 	c_ai_point3d ai_point_4EC;
@@ -123,20 +56,186 @@ struct s_actor
 	__int16 field_656;
 	byte gap_658[44];
 	__int16 field_684;
-	__int16 field_686;
+	__int16 tick_count_686;
 	__int16 field_688;
 	__int16 field_68A;
 	DWORD field_68C;
-	byte gap_690[68];
-	real_vector3d field_6D4;
-	real_vector3d field_6E0;
-	real_vector3d field_6EC;
-	byte gap_6F8[194];
+	byte gap_690[16];
+	__int16 field_6A0;
+	byte gap_6A2[2];
+	datum field_6A4;
+	byte gap_6A8[8];
+	__int16 field_6B0;
+	byte gap_6B2[2];
+	datum field_6B4;
+	byte gap_6B8[26];
+	real_vector3d desired_facing_vector;
+	real_vector3d desired_aiming_vector;
+	real_vector3d desired_looking_vector;
+	byte gap_6F8[6];
+	__int16 fire_state;
+	byte gap_700[34];
+	__int16 current_fire_target_type;
+	datum current_fire_target_prop_index;
+	byte gap_728[136];
+	real_vector3d burst_aim_vector;
+};
+
+// Unsure about the size for this struct...
+struct actor_meta
+{
+	BYTE gap_0[4];
+	__int16 type;
+	bool unk_bool_6;
+	bool swarm;
+	bool unk_bool_8;
+	bool active;
+	bool squadless;
+	bool force_active;
+	BYTE gap_B[4];
+	DWORD flee_firing_position_index;
+	int pathfinding_timeslice;
+	datum unit_index;
+	datum swarm_index;
+	DWORD field_20;
+	e_game_team unit_team;
+	BYTE gap_1C[2];
+	int field_28;
+	__int16 tick_count_2C;
+	BYTE gap_2E[2];
+	datum squad_index;
+	datum squad_to_migrate_to;
+	BYTE gap_38[6];
+	__int16 sbsp_index;
+	bool unk_bool_34;
+	BYTE gap_41;
+	WORD field_42;
+	bool unk_bool_44;
+	BYTE gap_45;
+	WORD field_46;
+	BYTE gap_42[12];
+	datum character_tag_datum;
+	int field_58;
+	datum tracks[8];
+	datum clump_index;
+};
+
+// Unsure about the size for this struct...
+struct actor_datum_struct_90
+{
+	WORD behavior_info_index;
+	byte gap_0[62];
+};
+
+// Unsure about the size for this struct...
+struct actor_target
+{
+	datum target_prop_index;
+	byte gap_33C[8];
+	datum retreat_target_prop_index;
+};
+
+// Unsure about the size for this struct...
+struct actor_danger_zone
+{
+	__int16 danger_type;
+	__int16 field_35A;
+	bool unk_bool_35C;
+	byte gap_35D;
+	bool unk_bool_35E;
+	byte gap_35F;
+	datum object_index;
+};
+
+struct actor_datum
+{
+	actor_meta meta;
+	BYTE gap_80[4];
+	__int16 actor_status;
+	__int16 field_86;
+	BYTE gap_88[8];
+	actor_datum_struct_90 array_90[2];
+	BYTE gap_90[32];
+	datum actor_datum;
+	BYTE gap_134[92];
+	__int16 gap_90_array_size;
+	BYTE gap_192[150];
+	bool blind;
+	bool unk_bool_229;
+	bool unk_bool_22A;
+	bool unk_bool_22B;
+	real_point3d position_22C;
+	real_point3d current_position;
+	BYTE gap_244[12];
+	s_location location;
+	BYTE gap_258[12];
+	actor_input input;
+	float body_current_vitality;
+	float shield_current_vitality;
+	float field_2D8;
+	float field_2DC;
+	bool unk_bool_2E0;
+	BYTE gap_2E1[7];
+	int field_2E8;
+	__int16 field_2EC;
+	__int16 field_2EE;
+	bool unk_bool_2F0;
+	byte gap_2F1;
+	__int16 field_2F2;
+	__int16 field_2F4;
+	BYTE gap_2F6[10];
+	int field_300;
+	__int16 field_304;
+	WORD tick_count_306;
+	BYTE gap_308[32];
+	__int16 field_328;
+	BYTE gap_32A[2];
+	datum field_32C;
+	BYTE gap_330[7];
+	actor_target target;
+	int field_348;
+	byte gap_34C[12];
+	actor_danger_zone danger_zone;
+	byte gap_364[4];
+	datum field_368;
+	byte gap_36C[72];
+	datum field_3B4;
+	byte gap_3B8[60];
+	firing_position_ref firing_positions;
+	actor_datum_struct_41C some_struct_41C;
+	__int16 field_4AC;
+	bool unk_bool_4AE;
+	bool unk_bool_4AF;
+	DWORD field_4B0;
+	DWORD field_4B4;
+	c_ai_point3d ai_point_4B8;
+	int field_4C8;
+	DWORD field_4CC;
+	DWORD field_4D0;
+	bool unk_bool_4D4;
+	byte gap_4D5;
+	byte gap_4D6[14];
+	actor_control_data control;
 	float damage_modifier;
-	byte gap_7C0[168];
+	byte gap_7C0[32];
+	datum field_7E0;
+	int field_7E4;
+	byte gap_7E8[24];
+	string_id movement_mode;
+	datum field_804;
+	byte gap_808[16];
+	int field_818;
+	int field_81C;
+	real_vector3d vector_820;
+	int field_82C;
+	int field_830;
+	real_vector3d vector_834;
+	real_vector3d vector_840;
+	real_vector3d vector_84C;
+	byte gap_858[16];
 	datum cs_script_datum;
 	BYTE gap_86C[44];
 };
-CHECK_STRUCT_SIZE(s_actor, 0x898);
+CHECK_STRUCT_SIZE(actor_datum, 0x898);
 
 s_data_array* get_actor_table();

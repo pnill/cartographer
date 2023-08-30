@@ -278,6 +278,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
     <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
     <ClInclude Include="Blam\Engine\ai\ai_flocks.h" />
