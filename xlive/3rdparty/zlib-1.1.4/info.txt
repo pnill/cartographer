@@ -1,0 +1,2 @@
+This version of the zlib source code was taken from
+https://sourceforge.net/projects/gnuwin32/files/zlib/1.1.4/
