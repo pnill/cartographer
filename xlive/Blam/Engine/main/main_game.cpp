@@ -11,7 +11,7 @@
 #include "Util/Hooks/Hook.h"
 
 s_game_options g_main_game_launch_options = {};
-DWORD g_main_game_launch_user_count = 1;
+int g_main_game_launch_user_count = 1;
 
 // Setup default values for the options structure depending on the game mode set
 void main_game_launch_setup_game_mode_details(void);
@@ -35,12 +35,11 @@ void main_game_launch_set_map_name(const char* map_name)
 }
 
 // TODO rewrite the obfuscated function
-void main_game_change(const s_game_options* options)
+bool main_game_change(const s_game_options* options)
 {
-    typedef void(__stdcall* main_game_change_t)(const s_game_options*);
+    typedef bool(__cdecl* main_game_change_t)(const s_game_options*);
     auto p_main_game_change = Memory::GetAddress<main_game_change_t>(0x89BA, 0x1E4EC);
-    p_main_game_change(options);
-    return;
+    return p_main_game_change(options);
 }
 
 void main_game_launch_set_difficulty(short difficulty)
@@ -93,7 +92,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int player_count)
 
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
 {
-    s_variant_description_map variants[7];
+    s_variant_description_map variants[k_variant_count];
     variants[_game_variant_description_slayer] = { "slayer", _game_variant_description_slayer };
     variants[_game_variant_description_oddball] = { "oddball", _game_variant_description_oddball };
     variants[_game_variant_description_juggernaut] = { "juggernaut", _game_variant_description_juggernaut };
