@@ -21,6 +21,7 @@ enum e_game_variant_description_index : char
 	_game_variant_description_ctf = 4,
 	_game_variant_description_invasion = 5,
 	_game_variant_description_territories = 6,
+	k_variant_count
 };
 enum e_game_engine_flags
 {
@@ -242,6 +243,12 @@ enum e_juggernaut_engine_flags
 	_juggernaut_is_damage_resistant_bit = 6,
 };
 
+struct s_variant_description_map
+{
+	const char* name;
+	e_game_variant_description_index index;
+};
+
 #pragma pack(push,1)
 struct s_game_variant
 {
@@ -294,3 +301,5 @@ struct s_game_variant
 };
 CHECK_STRUCT_SIZE(s_game_variant, 0x130);
 #pragma pack(pop)
+
+void game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);

@@ -19,7 +19,7 @@ net_bandwidth_display_data get_net_bandwidth_display_data(unsigned int bytes_cou
 		"<unknown>",
 	};
 
-	net_bandwidth_display_data result = { bytes_count, network_bandwidth_measurement_unit[0] };
+	net_bandwidth_display_data result = { (float)bytes_count, network_bandwidth_measurement_unit[0] };
 
 	int bandwidth_measurement_unit_idx = 0;
 	while (result.val > 1000)

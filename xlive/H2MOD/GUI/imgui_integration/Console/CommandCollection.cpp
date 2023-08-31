@@ -2,6 +2,7 @@
 #include "ImGui_ConsoleImpl.h"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
@@ -42,24 +43,30 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	&display_xyz_var_cmd,
 	&network_stats_overlay_var_cmd,
 	new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd),
-	new ConsoleCommand("logpeers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
-	new ConsoleCommand("logplayers", "logs all players to console, 0 parameter(s)", 0, 0,CommandCollection::LogPlayersCmd),
-	new ConsoleCommand("kickpeer", "kicks peer from network session, 1 parameter(s): <int>: peer index", 1, 1, CommandCollection::KickPeerCmd),
-	new ConsoleCommand("leavesession", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd),
-	new ConsoleCommand("ishost", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd),
-	new ConsoleCommand("mapdownload", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd),
-	new ConsoleCommand("reloadmaps", "re-load custom map data cache into memory, 0 parameter(s)", 0, 0, CommandCollection::ReloadMapsCmd),
-	new ConsoleCommand("logmapfilename", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd),
-	new ConsoleCommand("requestmapfilename", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd),
-	new ConsoleCommand("maxplayers", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd),
-	new ConsoleCommand("deleteobject", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd),
-	new ConsoleCommand("warpfix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("logxnetconnections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
+	new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0,CommandCollection::LogPlayersCmd),
+	new ConsoleCommand("kick_peer", "kicks peer from network session, 1 parameter(s): <int>: peer index", 1, 1, CommandCollection::KickPeerCmd),
+	new ConsoleCommand("leave_session", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd),
+	new ConsoleCommand("is_host", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd),
+	new ConsoleCommand("map_download", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd),
+	new ConsoleCommand("reload_maps", "re-load custom map data cache into memory, 0 parameter(s)", 0, 0, CommandCollection::ReloadMapsCmd),
+	new ConsoleCommand("log_map_file_name", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd),
+	new ConsoleCommand("request_map_file", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd),
+	new ConsoleCommand("max_players", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd),
+	new ConsoleCommand("delete_object", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd),
+	new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
 	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
 		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
-	new ConsoleCommand("spawnreloadcommandlist", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
-	new ConsoleCommand("taginject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash)
+	new ConsoleCommand("spawn_reload_command_list", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
+	new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
+	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash),
+	new ConsoleCommand("map_name", "load a map with the following name, 1 parameter(s): <string>", 1, 1, CommandCollection::map_name),
+	new ConsoleCommand("game_difficulty", "set the difficulty when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_difficulty),
+	new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players),
+	new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer),
+	new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen),
+	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -768,4 +775,56 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 	{
 		Engine::Objects::object_destroy(objectDatumIdx);
 	}
+}
+
+int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	main_game_launch(tokens[1].c_str());
+	return 0;
+}
+
+int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> difficulty;
+	std::string exception;
+	difficulty.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_difficulty(difficulty.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> player_count;
+	std::string exception;
+	player_count.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_coop_player_count(player_count.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	main_game_launch_set_multiplayer_variant(tokens[1].c_str());
+	return 0;
+}
+
+int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> player_count;
+	std::string exception;
+	player_count.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_multiplayer_splitscreen_count(player_count.GetVal());
+	return 0;
+}
+
+int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ComVar<int> game_mode;
+	std::string exception;
+	game_mode.SetValFromStr(tokens[1], 10, exception);
+
+	main_game_launch_set_game_mode(game_mode.GetVal());
+	return 0;
 }

@@ -208,6 +208,10 @@
     <ClCompile Include="3rdparty\zlib-1.1.4\src\trees.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\uncompr.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\zutil.c" />
+    <ClCompile Include="Blam\Engine\game\game_options.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_game.cpp" />
+    <ClCompile Include="Blam\Engine\game\game.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -638,6 +642,9 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
+    <ClInclude Include="Blam\Engine\main\main_game.h" />
+    <ClInclude Include="Blam\Engine\game\game.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

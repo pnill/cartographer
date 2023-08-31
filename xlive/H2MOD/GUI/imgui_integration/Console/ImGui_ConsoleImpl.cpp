@@ -139,7 +139,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 		if (console_data->m_completion_data->Count > 0)
 			console_data->m_completion_data->SelectedCandidateIndex = 0;
 
-		for (int i = 0; i < completion_commands.size(); i++)
+		for (size_t i = 0; i < completion_commands.size(); i++)
 		{
 			ConsoleCommand* command = completion_commands[i];
 			memset(&console_data->m_completion_data->CompletionCandidate[i], 0, sizeof(ImGuiTextInputCompletionCandidate));
@@ -459,7 +459,7 @@ void Console::Draw(const char* title, bool* p_open)
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
-	for (int i = 0; i < GetMainOutput()->GetHeaderCount(); i++)
+	for (size_t i = 0; i < GetMainOutput()->GetHeaderCount(); i++)
 	{
 		// TODO add color support
 		char console_text_id[512];
