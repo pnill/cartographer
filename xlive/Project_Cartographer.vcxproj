@@ -331,8 +331,6 @@
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
-    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zconf.h" />
-    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zlib.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
