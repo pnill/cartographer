@@ -243,7 +243,7 @@ c_engine_func_proto(unk_function_27_wrapper, int)
 }
 c_engine_func_proto(is_team_enemy_wrapper, int, BYTE team_a, BYTE team_b)
 {
-	return GET_ENGINE()->is_team_enemy(static_cast<e_object_team>(team_a), static_cast<e_object_team>(team_b));
+	return GET_ENGINE()->is_team_enemy(static_cast<e_game_team>(team_a), static_cast<e_game_team>(team_b));
 }
 c_engine_func_proto(unk_function_29_wrapper, void, int arg1)
 {
@@ -453,7 +453,7 @@ int c_game_engine_base::unk_function_27()
 {
 	return call_c_base_func(unk_function_27);
 }
-bool c_game_engine_base::is_team_enemy(e_object_team team_a, e_object_team team_b)
+bool c_game_engine_base::is_team_enemy(e_game_team team_a, e_game_team team_b)
 {
 	return call_c_base_func(is_team_enemy, team_a, team_b);
 }

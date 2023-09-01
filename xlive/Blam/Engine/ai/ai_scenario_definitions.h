@@ -115,8 +115,7 @@ struct squad_definition
 {
     static_string32 name;
     e_squad_definition_flags flags;
-    e_object_team team;
-    byte object_team_pad;                   // above enum is listed as 16 bits in tagdef but actual enum is only 8, add pad to match size
+    e_game_team team;
     short parent;                           // Block index: squad_group_definition
     float squad_delay_time_seconds;
     short normal_diff_count;                // initial number of actors on normal difficulty

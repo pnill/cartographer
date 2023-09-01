@@ -291,6 +291,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
@@ -360,6 +361,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
     <ClInclude Include="Blam\Engine\ai\actor_moving.h" />
     <ClInclude Include="Blam\Engine\ai\ai_dialogue.h" />
     <ClInclude Include="Blam\Engine\ai\ai_flocks.h" />
@@ -369,6 +371,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\cl_engine.h" />
     <ClInclude Include="Blam\Engine\ai\path.h" />
+    <ClInclude Include="Blam\Engine\ai\pathfinding_utilities.h" />
     <ClInclude Include="Blam\Engine\ai\path_flying.h" />
     <ClInclude Include="Blam\Engine\ai\sector.h" />
     <ClInclude Include="Blam\Engine\ai\sector_environment_objects.h" />

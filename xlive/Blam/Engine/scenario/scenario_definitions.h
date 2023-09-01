@@ -679,7 +679,7 @@ struct scenario_player
     // cflt 
     real_point3d position;
     float facing_degrees;
-    e_object_team team_designator;
+    e_game_team team_designator;
     short bsp_index;
     e_item_spawn_game_type game_type_1;
     e_item_spawn_game_type game_type_2;
@@ -764,7 +764,7 @@ struct scenario_netpoint
 
     // filx
     e_netpoint_type type;
-    e_object_team team_designator;
+    e_game_team team_designator;
     e_scenario_netpoint_flags flags;
     string_id spawn_object_name;
     string_id spawn_marker_name;
