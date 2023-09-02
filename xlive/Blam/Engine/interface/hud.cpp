@@ -2,7 +2,7 @@
 #include "hud.h"
 #include "new_hud_definitions.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 
 #include "H2MOD/Modules/Shell/Config.h"

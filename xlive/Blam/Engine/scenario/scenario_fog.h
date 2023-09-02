@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Math/real_math.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/Simulation/UnitControl.h"
-#include "Blam/Common/Common.h"
+
 
 struct s_simulation_actor
 {

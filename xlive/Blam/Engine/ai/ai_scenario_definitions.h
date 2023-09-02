@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Math/real_math.h"

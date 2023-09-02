@@ -2,7 +2,7 @@
 #include "ai_scenario_definitions.h"
 #include "ai_orders.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/tag_files/string_id.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/tag_files/string_id.h"

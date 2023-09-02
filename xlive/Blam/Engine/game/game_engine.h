@@ -1,8 +1,8 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/game/game_statborg.h"
 
-#include "Blam/Common/Common.h"
+
 
 enum e_valid_multiplayer_games : short
 {

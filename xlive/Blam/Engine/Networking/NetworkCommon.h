@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+
 
 struct network_address
 {

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "tag_loader.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"

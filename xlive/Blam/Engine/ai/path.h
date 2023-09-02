@@ -4,7 +4,7 @@
 #include "sector_geometry.h"
 #include "sector_environment_objects.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/physics/collision_bsp.h"
 #include "Blam/Engine/structures/structures.h"

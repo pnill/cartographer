@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
+
 
 #define NONE -1
 

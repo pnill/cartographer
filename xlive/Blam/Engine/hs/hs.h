@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #define k_maximum_hs_globals_per_scenario 256
 #define k_maximum_hs_references_per_scenario 512
 #define k_maximum_hs_source_files_per_scenario 8

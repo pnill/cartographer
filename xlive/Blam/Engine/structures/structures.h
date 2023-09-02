@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagRef.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/cseries/cseries_strings.h"
 #include "Blam/Math/real_math.h"
 

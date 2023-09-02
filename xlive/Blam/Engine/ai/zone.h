@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/ai/path_flying.h"
 #include "Blam/Engine/cseries/cseries_strings.h"

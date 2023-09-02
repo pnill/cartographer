@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/game/players.h"
 

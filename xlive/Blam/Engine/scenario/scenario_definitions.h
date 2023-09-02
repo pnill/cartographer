@@ -3,7 +3,7 @@
 #include "scenario_interpolators.h"
 #include "scenario_kill_trigger_volumes.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Engine/ai/ai_flocks.h"

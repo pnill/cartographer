@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 
 // max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
 struct s_scenario_kill_trigger_volume
