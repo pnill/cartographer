@@ -7,14 +7,15 @@
 #include "Util/Hooks/Hook.h"
 
 // TODO Cleanup this code
+// TODO Add support for singleplayer maps in the future
+
+#define k_multiplayer_first_unused_slot 23
+#define k_max_map_slots 49
+#define k_multiplayer_size 3172
+#define k_starting_map_index 3000
 
 namespace MapSlots
 {
-	const int FIRST_UNUSED_SLOT = 23;
-	const int MAX_SLOTS = 49;
-	const int MULTIPLAYER_SIZE = 3172;
-
-	const int MapIndex = 3000;
 	std::vector<std::string> AddedMaps;
 	std::vector<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block> MapData;
 	std::map<datum, std::string> BitmapsToLoad;
@@ -125,9 +126,9 @@ namespace MapSlots
 				int i = 0;
 				for (const auto& newSlot : MapData)
 				{
-					if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
+					if (k_multiplayer_first_unused_slot + i < k_max_map_slots) {
 						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.get_string());
-						auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i)));
+						auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (k_multiplayer_size * (k_multiplayer_first_unused_slot + i)));
 
 						//Write the data loaded from the maps into the unused slot
 						memcpy(slot, &newSlot, sizeof(newSlot));
@@ -135,8 +136,8 @@ namespace MapSlots
 						slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
 						//Change the map id and sort ID so that the maps are 
 						//placed in order at the end of the list
-						slot->map_id = MapIndex + i;
-						slot->sort_order = MapIndex + i;
+						slot->map_id = k_starting_map_index + i;
+						slot->sort_order = k_starting_map_index + i;
 						i++;
 					}
 					else
@@ -165,9 +166,9 @@ namespace MapSlots
 		int i = 0;
 		for (const auto& newSlot : MapData)
 		{
-			if (FIRST_UNUSED_SLOT + i < MAX_SLOTS) {
+			if (k_multiplayer_first_unused_slot + i < k_max_map_slots) {
 				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.english_name.get_string());
-				auto slotAddr = Memory::GetAddress(0, 0x419510) + (MULTIPLAYER_SIZE * (FIRST_UNUSED_SLOT + i));
+				auto slotAddr = Memory::GetAddress(0, 0x419510) + (k_multiplayer_size * (k_multiplayer_first_unused_slot + i));
 				DWORD dwBack[2];
 				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
 				auto slot = reinterpret_cast<s_multiplayer_levels_block*>(slotAddr);
@@ -177,8 +178,8 @@ namespace MapSlots
 
 				//Change the map id and sort ID so that the maps are 
 				//placed in order at the end of the list
-				slot->map_id = MapIndex + i;
-				slot->sort_order = MapIndex + i;
+				slot->map_id = k_starting_map_index + i;
+				slot->sort_order = k_starting_map_index + i;
 				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, dwBack[0], &dwBack[1]);
 				i++;
 
