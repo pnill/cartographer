@@ -195,7 +195,7 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-		if (!s_game_globals::game_is_predicted())
+		if (!s_main_game_globals::game_is_predicted())
 		{
 			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
 			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
@@ -227,7 +227,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		// postspawn handler
 	case ExecTime::_postEventExec:
 		// host only (dedicated server and client)
-		if (!s_game_globals::game_is_predicted())
+		if (!s_main_game_globals::game_is_predicted())
 		{
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} player index: {}, player name: {1}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx));
 
@@ -288,7 +288,7 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 		
 	case ExecTime::_postEventExec:
 		if (game_results_statistic == 7
-			&& !s_game_globals::game_is_predicted())
+			&& !s_main_game_globals::game_is_predicted())
 		{
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - player index: {}, player name: {}", __FUNCTIONW__, absPlayerIdx, s_player::GetName(absPlayerIdx));
 

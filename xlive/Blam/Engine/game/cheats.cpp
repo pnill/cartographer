@@ -40,7 +40,7 @@ const string_id skull_string_ids[k_skull_count] =
 
 bool __cdecl ice_cream_flavor_available(const e_skull_type skull)
 {
-	return skull < k_skull_count && s_game_globals::game_is_campaign() && skull_enabled[skull];
+	return skull < k_skull_count && s_main_game_globals::game_is_campaign() && skull_enabled[skull];
 }
 
 void __cdecl ice_cream_flavor_stock(const e_skull_type skull)

@@ -275,7 +275,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
 
 		// send simulation update for grenades if we control the simulation
-		if (!s_game_globals::game_is_predicted())
+		if (!s_main_game_globals::game_is_predicted())
 		{
 			// delete all weapons if required
 			if (resetEquipment)
@@ -655,15 +655,15 @@ __declspec(naked) void calculate_model_lod_detour()
 }
 
 bool GrenadeChainReactIsEngineMPCheck() {
-	return s_game_globals::game_is_multiplayer();
+	return s_main_game_globals::game_is_multiplayer();
 }
 
 bool BansheeBombIsEngineMPCheck() {
-	return s_game_globals::game_is_multiplayer();
+	return s_main_game_globals::game_is_multiplayer();
 }
 
 bool FlashlightIsEngineSPCheck() {
-	return s_game_globals::game_is_campaign();
+	return s_main_game_globals::game_is_campaign();
 }
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
@@ -709,7 +709,7 @@ bool device_active = true;
 // This happens whenever a player activates a device control.
 int __cdecl device_touch(datum device_datum, datum unit_datum)
 {
-	if (s_game_globals::game_is_multiplayer())
+	if (s_main_game_globals::game_is_multiplayer())
 	{
 		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
 		if (get_device_acceleration_scale(device_datum) == 999.0f)

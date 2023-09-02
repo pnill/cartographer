@@ -3,7 +3,7 @@
 #include "Blam/Engine/game/game_options.h"
 #define k_game_maximum_ragdolls 3
 
-struct s_game_globals
+struct s_main_game_globals
 {
 	bool initializing;
 	bool map_active;
@@ -28,7 +28,7 @@ struct s_game_globals
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
 
-	static s_game_globals* get();
+	static s_main_game_globals* get();
 	static bool map_initialized();
 	static s_game_options* get_game_options();
 	static s_game_variant* get_game_variant();
@@ -39,6 +39,6 @@ struct s_game_globals
 
 	static bool game_is_predicted();
 };
-CHECK_STRUCT_SIZE(s_game_globals, 0x1270);
+CHECK_STRUCT_SIZE(s_main_game_globals, 0x1270);
 
 e_game_mode get_current_engine_type();

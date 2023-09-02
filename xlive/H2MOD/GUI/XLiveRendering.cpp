@@ -609,7 +609,7 @@ HRESULT WINAPI XLiveRender()
 	int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
 	int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
 
-	bool game_is_main_menu = s_game_globals::get()->game_is_mainmenu();
+	bool game_is_main_menu = s_main_game_globals::get()->game_is_mainmenu();
 	bool paused_or_in_menus = *Memory::GetAddress<bool*>(0x47A568) != 0;
 
 	if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
@@ -703,7 +703,7 @@ HRESULT WINAPI XLiveRender()
 	}
 #pragma endregion achievement rendering
 
-	if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || s_game_globals::game_is_campaign())) {
+	if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || s_main_game_globals::game_is_campaign())) {
 		int text_y_coord = 60;
 		PlayerIterator playerIt;
 		while (playerIt.get_next_active_player())

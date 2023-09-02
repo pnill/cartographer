@@ -131,12 +131,12 @@ namespace PlayerRepresentation
 
 	void __cdecl player_properties_validate_configuration_hook(int player_index, s_player_properties* player_properties)
 	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.game_mode);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_main_game_globals::get()->options.game_mode);
 
 		auto player_biped_type = player_properties->profile_traits.profile.player_character_type;
 		p_player_properties_validate_configuration(player_index, player_properties);
 		
-		if (s_game_globals::game_is_campaign())
+		if (s_main_game_globals::game_is_campaign())
 		{
 			/*auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
@@ -157,7 +157,7 @@ namespace PlayerRepresentation
 			}*/
 			return;
 		}
-		else if (s_game_globals::game_is_multiplayer())
+		else if (s_main_game_globals::game_is_multiplayer())
 		{
 			// reset the player biped type to what was previously in the field
 			player_properties->profile_traits.profile.player_character_type = player_biped_type;
@@ -187,7 +187,7 @@ namespace PlayerRepresentation
 		int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 		s_player* player = s_player::GetPlayer(player_index);
 
-		if (s_game_globals::game_is_multiplayer())
+		if (s_main_game_globals::game_is_multiplayer())
 			player_validate_extra_characters_type(player_index, &player->properties[0]);
 		player_representatio_get_orig_fn(player_datum, out_variant_index, a3);
 	}

@@ -34,7 +34,7 @@ bool __cdecl render_ingame_chat_check()
 		return true;
 	}
 
-	else if (!s_game_globals::game_is_mainmenu() && get_game_life_cycle() == _life_cycle_in_game)
+	else if (!s_main_game_globals::game_is_mainmenu() && get_game_life_cycle() == _life_cycle_in_game)
 	{
 		//Enable chat in engine mode and game state mp.
 		return false;

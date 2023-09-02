@@ -28,7 +28,7 @@ bool game_engine_has_teams()
 {
 	if (current_game_engine())
 	{
-		return s_game_globals::get_game_variant()->game_engine_flags & 1;
+		return s_main_game_globals::get_game_variant()->game_engine_flags & 1;
 	}
 
 	return false;
