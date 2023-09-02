@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/game/players.h"
 
 struct s_new_hud_globals_player_info

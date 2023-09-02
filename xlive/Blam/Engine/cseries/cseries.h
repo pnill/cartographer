@@ -40,6 +40,18 @@ static_assert(sizeof(real32) == 4);
 typedef double real64;
 static_assert(sizeof(real64) == 8);
 
+// 32-bit identifier: 16-bit index, 16-bit pseudounique "salt"
+// Imgui Console code doesn't compile if I make this a long type????
+typedef int datum;
+static_assert(sizeof(datum) == 4);
+
+#define NONE -1
+#define DATUM_INDEX_NONE ((datum)(NONE))
+#define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)((_absolute_index) | ((_salt) << 16))
+#define DATUM_IS_NONE(_datum_index) ((_datum_index) == DATUM_INDEX_NONE)
+#define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & 0xFFFF))
+#define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & 0xFFFF))
+
 #define NUMBEROF(_array) (sizeof(_array) / sizeof(_array[0]))
 #define IN_RANGE_INCLUSIVE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))

@@ -1,6 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-
 #include "hs.h"
 
 enum e_syntax_node_flags : WORD

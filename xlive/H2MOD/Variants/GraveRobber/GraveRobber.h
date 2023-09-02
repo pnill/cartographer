@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "H2MOD/Variants/VariantSystem.h"
 
 #define SND_HEADHUNTER_CH L"sounds/ch/headhunter.wav"

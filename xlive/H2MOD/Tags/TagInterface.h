@@ -1,6 +1,5 @@
 #pragma once
 #include "Blam/Cache/CacheHeader.h"
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Cache/DataTypes/BlamTag.h"
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
 
