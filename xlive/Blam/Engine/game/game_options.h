@@ -60,7 +60,7 @@ struct s_game_options
 	short pad_7E;
 	int campaign_id;						// This should always be 1, since there can be multiple "camapaigns". However, this isn't taken advantage of in the retail game 
 	int map_id;
-	c_static_wchar_string_max_path scenario_path;
+	c_static_wchar_string_260 scenario_path;
 	short initial_bsp_index;
 	short field_292;
 	bool load_level_only;

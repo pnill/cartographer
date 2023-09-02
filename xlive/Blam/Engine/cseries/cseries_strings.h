@@ -62,7 +62,7 @@ typedef c_static_wchar_string<32>  c_static_wchar_string32;
 typedef c_static_wchar_string<64>  c_static_wchar_string64;
 typedef c_static_wchar_string<128> c_static_wchar_string128;
 typedef c_static_wchar_string<256> c_static_wchar_string256;
-typedef c_static_wchar_string<MAX_PATH> c_static_wchar_string_max_path;
+typedef c_static_wchar_string<260> c_static_wchar_string_260;
 
 template<size_t T>
 inline const char* c_static_string<T>::get_string(void) const

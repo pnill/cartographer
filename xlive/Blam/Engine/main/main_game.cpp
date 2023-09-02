@@ -30,7 +30,7 @@ void main_game_initialize(void)
 
 void main_game_launch_set_map_name(const char* map_name)
 {
-    MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path.get_string(), 260);
+    MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path.get_buffer(), 260);
     return;
 }
 
