@@ -3,7 +3,7 @@
 
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"

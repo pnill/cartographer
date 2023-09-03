@@ -1,7 +1,7 @@
 #include "stdafx.h"
-
 #include "ControllerInput.h"
-#include "Blam/Engine/game/game_globals.h"
+
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"

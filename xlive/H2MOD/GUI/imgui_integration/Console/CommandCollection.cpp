@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"

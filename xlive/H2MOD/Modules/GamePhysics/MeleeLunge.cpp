@@ -1,12 +1,9 @@
 #include "stdafx.h"
-
 #include "MeleeLunge.h"
 
-#include "Util/Memory.h"
-
-#include "Blam/Engine/game/game_globals.h"
-
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Util/Memory.h"
 
 FLOATING_POINT_ENV_ACCESS();
 

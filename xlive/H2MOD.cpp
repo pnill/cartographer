@@ -4,6 +4,7 @@
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"

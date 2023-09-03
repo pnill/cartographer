@@ -1,5 +1,5 @@
 #include "Blam/Cache/TagGroups/globals_definition.hpp"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_options.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/tag_files/string_id.h"
 

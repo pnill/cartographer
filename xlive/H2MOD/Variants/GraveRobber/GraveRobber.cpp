@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "GraveRobber.h"
 
-#include "H2MOD.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_statborg.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"

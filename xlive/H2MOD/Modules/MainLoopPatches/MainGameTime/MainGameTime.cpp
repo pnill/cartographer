@@ -1,18 +1,15 @@
 #include "stdafx.h"
-
 #include "MainGameTime.h"
 
-#include "Util/Hooks/Hook.h"
-
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
+#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
-
-#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+#include "Util/Hooks/Hook.h"
 
 extern bool xboxTickrateEnabled;
 

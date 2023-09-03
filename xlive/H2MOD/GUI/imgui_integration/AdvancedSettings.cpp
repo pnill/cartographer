@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Blam/Engine/game/cheats.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/first_person_camera.h"
