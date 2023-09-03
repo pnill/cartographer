@@ -220,7 +220,7 @@ void NetworkSession::LeaveSession()
 	if (Memory::IsDedicatedServer())
 		return;
 
-	if (s_main_game_globals::game_is_mainmenu())
+	if (game_is_ui_shell())
 	{
 		// request_squad_browser
 		*Memory::GetAddress<bool*>(0x978BAC) = true;

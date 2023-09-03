@@ -54,7 +54,7 @@ namespace ControllerInput
 			if (InputDevice->error_level == 0)
 			{
 				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
-				if (get_game_life_cycle() == _life_cycle_in_game || get_current_engine_type() == _game_mode_campaign)
+				if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 				{
 					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 						controller_button |= H2Config_CustomLayout.DPAD_UP;

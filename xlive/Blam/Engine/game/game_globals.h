@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/game/game_options.h"
 #define k_game_maximum_ragdolls 3
 
@@ -27,18 +26,16 @@ struct s_main_game_globals
 	byte pad_2;
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
-
-	static s_main_game_globals* get();
-	static bool map_initialized();
-	static s_game_options* get_game_options();
-	static s_game_variant* get_game_variant();
-	static bool game_is_campaign();
-	static bool game_is_multiplayer();
-	static bool game_is_mainmenu();
-	static bool game_is_in_progress();
-
-	static bool game_is_predicted();
 };
 CHECK_STRUCT_SIZE(s_main_game_globals, 0x1270);
 
-e_game_mode get_current_engine_type();
+s_main_game_globals* get_main_game_globals(void);
+bool map_initialized(void);
+s_game_options* game_options_get(void);
+s_game_variant* current_game_variant(void);
+e_game_mode game_mode_get(void);
+bool game_is_campaign(void);
+bool game_is_multiplayer(void);
+bool game_is_ui_shell(void);
+bool game_in_progress(void);
+bool game_is_predicted(void);

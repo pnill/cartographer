@@ -8,7 +8,7 @@
 // sword-flying target clear patch
 void __cdecl aim_assist_targeting_clear_hook(s_aim_assist_targetting_data* target_data)
 {
-	if (!s_main_game_globals::game_is_campaign() && !xbox_tickrate_is_enabled())
+	if (!game_is_campaign() && !xbox_tickrate_is_enabled())
 	{
 		target_data->primary_auto_aim_level = 0.0;
 		target_data->secondary_auto_aim_level = 0.0;

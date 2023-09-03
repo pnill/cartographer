@@ -76,20 +76,20 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	s_player* player = s_player::GetPlayer(player_index);
 
 	c_game_statborg* game_statborg = game_engine_get_statborg();
-	if (!s_main_game_globals::game_is_predicted())
+	if (!game_is_predicted())
 	{
 		player_is_picking_up_skull = true;
 		game_statborg->adjust_player_stat(player_datum, statborg_entry_score, 1, -1, true);
 		if (game_engine_has_teams())
 		{
-			if (game_statborg->get_team_stat(player->properties[0].player_team, statborg_entry_score) == s_main_game_globals::get_game_variant()->score_to_win_round)
+			if (game_statborg->get_team_stat(player->properties[0].player_team, statborg_entry_score) == current_game_variant()->score_to_win_round)
 			{
 				game_engine_end_round_with_winner(player->properties[0].player_team, false);
 			}
 		}
 		else
 		{
-			if (game_statborg->get_player_stat(player_index, statborg_entry_score) == s_main_game_globals::get_game_variant()->score_to_win_round)
+			if (game_statborg->get_player_stat(player_index, statborg_entry_score) == current_game_variant()->score_to_win_round)
 			{
 				game_engine_end_round_with_winner(player_datum, false);
 			}
@@ -191,7 +191,7 @@ void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 	{
 	case ExecTime::_preEventExec:
 		// to note after the original function executes, the controlled unit by this player is set to NONE
-		if (!s_main_game_globals::game_is_predicted() && unit_datum != object_get_damage_owner(unit_datum))
+		if (!game_is_predicted() && unit_datum != object_get_damage_owner(unit_datum))
 			GraveRobber::SpawnSkull(unit_datum);
 		break;
 

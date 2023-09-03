@@ -109,7 +109,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	s_main_time_globals* main_time_globals;
 
 	main_time_globals = s_main_time_globals::get();
-	game_time = s_main_game_globals::game_is_in_progress() ? time_globals::get_game_time() : 0;
+	game_time = game_in_progress() ? time_globals::get_game_time() : 0;
 
 	// QueryPerformanceFrequency(&counterFrq);
 	// TODO: fixme, time offset breaks this

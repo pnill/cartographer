@@ -2,52 +2,52 @@
 
 #include "game_globals.h"
 
-s_main_game_globals* s_main_game_globals::get()
+s_main_game_globals* get_main_game_globals(void)
 {
 	return *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520);
 }
 
-bool s_main_game_globals::map_initialized()
+bool map_initialized(void)
 {
-	return get() && get()->map_active && get()->active_structure_bsp_index != 0xFFFF;
+	return get_main_game_globals() && get_main_game_globals()->map_active && get_main_game_globals()->active_structure_bsp_index != -1;
 }
 
-s_game_options* s_main_game_globals::get_game_options()
+s_game_options* game_options_get(void)
 {
-	return &get()->options;
+	return &get_main_game_globals()->options;
 }
 
-s_game_variant* s_main_game_globals::get_game_variant()
+s_game_variant* current_game_variant(void)
 {
-	return &get_game_options()->game_variant;
+	return &game_options_get()->game_variant;
 }
 
-bool s_main_game_globals::game_is_campaign()
+e_game_mode game_mode_get(void)
 {
-	return get_game_options()->game_mode == _game_mode_campaign;
+	return get_main_game_globals()->options.game_mode;
 }
 
-bool s_main_game_globals::game_is_multiplayer()
+bool game_is_campaign(void)
 {
-	return get_game_options()->game_mode == _game_mode_multiplayer;
+	return game_options_get()->game_mode == _game_mode_campaign;
 }
 
-bool s_main_game_globals::game_is_mainmenu()
+bool game_is_multiplayer(void)
 {
-	return get_game_options()->game_mode == _game_mode_ui_shell;
+	return game_options_get()->game_mode == _game_mode_multiplayer;
 }
 
-bool s_main_game_globals::game_is_predicted()
+bool game_is_ui_shell(void)
 {
-	return get_game_options()->simulation_type == _game_simulation_distributed_client;
+	return game_options_get()->game_mode == _game_mode_ui_shell;
 }
 
-bool s_main_game_globals::game_is_in_progress()
+bool game_is_predicted(void)
 {
-	return get() && get()->game_in_progress;
+	return game_options_get()->simulation_type == _game_simulation_distributed_client;
 }
 
-e_game_mode get_current_engine_type()
+bool game_in_progress(void)
 {
-	return s_main_game_globals::get()->options.game_mode;
+	return get_main_game_globals() && get_main_game_globals()->game_in_progress;
 }
