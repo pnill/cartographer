@@ -1,137 +1,245 @@
 #pragma once
-
 #include "Blam/Engine/text/unicode.h"
 
 #define MAXIMUM_STRING_SIZE 262144
 
 size_t csstrnlen(char* string, size_t size);
 int csstricmp(const char* s1, const char* s2);
-
-/*********************************************************************
-* static_string
-* Storing and Manipulating Character Sequences(Basic String)
-**********************************************************************/
-
-template<int length>
-struct static_string
+template<size_t string_length>
+struct c_static_string
 {
-	char text[length];
-	char* get_string();
-	size_t length();
-	void operator = (const char* Value);
-	void operator = (const static_string Value);
+public:
+	c_static_string()
+	{
+		this->text[0] = '\0';
+	}
+	~c_static_string() = default;
+
+	char* clear(void);
+	const char* get_string(void) const;
+	char* get_buffer(void);
+	char* set(const char* src);
+	size_t length(void) const;
+	char* append(const char* src);
+	int index_of(const char* src) const;
+	int next_index_of(const char* src, size_t starting_index) const;
+	int last_index_of(const char* src) const;
+
+private:
+	char text[string_length];
 };
 
-/*********************************************************************
-* static_string32
-* Storing and Manipulating Character Sequences (static_string<32>)
-**********************************************************************/
-typedef static_string<32>  static_string32;
-
-/*********************************************************************
-* static_string64
-* Storing and Manipulating Character Sequences(static_string<64>)
-**********************************************************************/
-typedef static_string<64>  static_string64;
-
-/*********************************************************************
-* static_string128
-* Storing and Manipulating Character Sequences(static_string<128>)
-**********************************************************************/
-typedef static_string<128> static_string128;
-
-/*********************************************************************
-* static_string256
-* Storing and Manipulating Character Sequences(static_string<256>)
-**********************************************************************/
-typedef static_string<256> static_string256;
-
-/*********************************************************************
-* static_string512
-* Storing and Manipulating Character Sequences(static_string<512>)
-**********************************************************************/
-typedef static_string<512> static_string512;
-
-/*********************************************************************
-* static_wchar_string
-* Storing and Manipulating Unicode Character Sequences(Wide static_string)
-**********************************************************************/
-template<int length>
-struct static_wchar_string
+template<size_t string_length>
+class c_static_wchar_string
 {
-	wchar_t text[length];
-	wchar_t* get_string();
-	size_t length();
-	void operator = (const wchar_t* Value);
-	void operator = (const static_wchar_string Value);
+public:
+	c_static_wchar_string()
+	{
+		this->text[0] = L'\0';
+	}
+	~c_static_wchar_string() = default;
+
+	wchar_t* clear(void);
+	const wchar_t* get_string(void) const;
+	wchar_t* get_buffer(void);
+	wchar_t* set(const wchar_t* src);
+	size_t length(void) const;
+	wchar_t* append(const wchar_t* src);
+	int index_of(const wchar_t* src) const;
+	int next_index_of(const wchar_t* src, size_t starting_index) const;
+	int last_index_of(const wchar_t* src) const;
+
+private:
+	wchar_t text[string_length];
 };
 
-/*********************************************************************
-* static_wchar_string32
-* Storing and Manipulating Unicode Character Sequences(static_wchar_string<32>)
-**********************************************************************/
-typedef static_wchar_string<32>  static_wchar_string32;
+typedef c_static_string<32>  static_string32;
+typedef c_static_string<64>  static_string64;
+typedef c_static_string<128> static_string128;
+typedef c_static_string<256> static_string256;
+typedef c_static_string<512> static_string512;
+typedef c_static_wchar_string<32>  c_static_wchar_string32;
+typedef c_static_wchar_string<64>  c_static_wchar_string64;
+typedef c_static_wchar_string<128> c_static_wchar_string128;
+typedef c_static_wchar_string<256> c_static_wchar_string256;
+typedef c_static_wchar_string<260> c_static_wchar_string_260;
 
-/*********************************************************************
-* static_wchar_string64
-* Storing and Manipulating Unicode Character Sequences(static_wchar_string<64>)
-**********************************************************************/
-typedef static_wchar_string<64>  static_wchar_string64;
-
-/*********************************************************************
-* static_wchar_string128
-* Storing and Manipulating Unicode Character Sequences(static_wchar_string<128>)
-**********************************************************************/
-typedef static_wchar_string<128> static_wchar_string128;
-
-/*********************************************************************
-* static_wchar_string256
-* Storing and Manipulating Unicode Character Sequences(static_wchar_string<256>)
-**********************************************************************/
-typedef static_wchar_string<256> static_wchar_string256;
-
-template<int T>
-inline char* static_string<T>::get_string()
+template<size_t T>
+inline const char* c_static_string<T>::get_string(void) const
 {
 	return this->text;
 }
 
-template<int T>
-inline size_t static_string<T>::length()
-{
-	return csstrnlen(this->text, T);
-}
-
-template<int T>
-inline void static_string<T>::operator= (const char* Value)
-{
-	strcpy(this->text, Value);
-}
-template<int T>
-inline void static_string<T>::operator= (const static_string Value)
-{
-	strcpy(this->text, Value.text);
-}
-
-template<int T>
-inline wchar_t* static_wchar_string<T>::get_string()
+template<size_t T>
+inline char* c_static_string<T>::get_buffer(void)
 {
 	return this->text;
 }
 
-template<int T>
-inline size_t static_wchar_string<T>::length()
+template<size_t T>
+inline char* c_static_string<T>::clear(void)
 {
-	return ustrnlen(this->text, T);
+	this->text[0] = '\0';
+	return this->text;
 }
 
-template<int T>
-inline void static_wchar_string<T>::operator= (const wchar_t* Value)
+template<size_t T>
+inline char* c_static_string<T>::set(const char* src)
 {
-	wcscpy(this->text, Value);
+	return csstrnzcpy(this->get_buffer(), src, T);
 }
-template<int T>
-inline void static_wchar_string<T>::operator= (const static_wchar_string Value)
+
+template<size_t T>
+inline size_t c_static_string<T>::length(void) const
 {
-	wcscpy(this->text, Value.text);
+	return csstrnlen(this->get_string(), T);
 }
+
+template<size_t T>
+char* c_static_string<T>::append(const char* src)
+{
+	return csstrnzcat(this->get_string(), src, T);
+}
+
+// Gets the index of the specified substring
+template<size_t T>
+int c_static_string<T>::index_of(const char* src) const
+{
+	return this->next_index_of(src, 0);
+}
+
+// Gets the next index of the specified substring at the starting index
+template<size_t T>
+int c_static_string<T>::next_index_of(const char* src, size_t starting_index) const
+{
+	int index;
+	const char* substring;
+
+	index = -1;
+	if (starting_index < this->length())
+	{
+		substring = strstr(this->get_string()[starting_index], src);
+		if (substring)
+		{
+			index = substring - this->get_string();
+		}
+	}
+	return index;
+}
+
+// Gets the last index of the specified substring
+template<size_t T>
+int c_static_string<T>::last_index_of(const char* src) const
+{
+	int index = -1;
+	do
+	{
+		int temp_index = this->next_index_of(src, index + 1);
+		if (temp_index != -1)
+		{
+			index = temp_index;
+		}
+		else
+		{
+			break;
+		}
+	} while (1);
+
+	return index;
+}
+
+template<size_t T>
+inline const wchar_t* c_static_wchar_string<T>::get_string(void) const
+{
+	return this->text;
+}
+
+template<size_t T>
+inline wchar_t* c_static_wchar_string<T>::get_buffer(void)
+{
+	return this->text;
+}
+
+template<size_t T>
+inline wchar_t* c_static_wchar_string<T>::clear(void)
+{
+	this->text[0] = L'\0';
+	return this->text;
+}
+
+template<size_t T>
+inline wchar_t* c_static_wchar_string<T>::set(const wchar_t* src)
+{
+	return ustrnzcpy(this->get_buffer(), src, T);
+}
+
+template<size_t T>
+inline size_t c_static_wchar_string<T>::length(void) const
+{
+	return ustrnlen(this->get_string(), T);
+}
+
+template<size_t T>
+wchar_t* c_static_wchar_string<T>::append(const wchar_t* src)
+{
+	wchar_t* result = ustrnzcat(this->get_buffer(), src, T);
+	result[T - 1] = 0;
+	return result;
+}
+
+// Gets the index of the specified substring
+template<size_t T>
+int c_static_wchar_string<T>::index_of(const wchar_t* src) const
+{
+	return this->next_index_of(src, 0);
+}
+
+// Gets the next index of the specified substring at the starting index
+template<size_t T>
+int c_static_wchar_string<T>::next_index_of(const wchar_t* src, size_t starting_index) const
+{
+	int index;
+	const wchar_t* substring;
+
+	index = -1;
+	if (starting_index < this->length())
+	{
+		substring = wcsstr(&this->get_string()[starting_index], src);
+		if (substring)
+		{
+			index = substring - this->get_string();
+		}
+	}
+	return index;
+}
+
+// Gets the last index of the specified substring
+template<size_t T>
+int c_static_wchar_string<T>::last_index_of(const wchar_t* src) const
+{
+	int index = -1;
+	do
+	{
+		int temp_index = this->next_index_of(src, index + 1);
+		if (temp_index != -1)
+		{
+			index = temp_index;
+		}
+		else
+		{
+			break;
+		}
+	} 
+	while (1);
+
+	return index;
+}
+
+// TODO add asserts in the future
+size_t csstrnlen(char* s, size_t size);
+
+// TODO add asserts in the future
+char* csstrnzcpy(char* dst, const char* src, size_t size);
+
+// TODO add asserts in the future
+char* csstrnzcat(char* s1, char const* s2, size_t size);

@@ -56,11 +56,11 @@ struct s_game_options
 	int random_seed;
 	bool is_custom_map;
 	byte field_1D;
-	static_wchar_string<48> custom_map_name;
+	c_static_wchar_string<48> custom_map_name;
 	short pad_7E;
 	int campaign_id;						// This should always be 1, since there can be multiple "camapaigns". However, this isn't taken advantage of in the retail game 
 	int map_id;
-	static_wchar_string<260> scenario_path;
+	c_static_wchar_string_260 scenario_path;
 	short initial_bsp_index;
 	short field_292;
 	bool load_level_only;

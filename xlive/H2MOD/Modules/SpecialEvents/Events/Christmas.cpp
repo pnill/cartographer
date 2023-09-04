@@ -79,7 +79,7 @@ void christmas_event_map_load()
 			auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(get_global_scenario()->structure_bsps[0]->structure_bsp.TagIndex);
 
 			auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(bsp_definition->weather_palette));
-			weat_block->name = "snow_cs";
+			weat_block->name.set("snow_cs");
 			weat_block->weather_system.TagGroup = blam_tag::tag_group_type::weathersystem;
 			weat_block->weather_system.TagIndex = snow_datum;
 

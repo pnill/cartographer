@@ -1162,24 +1162,24 @@ struct s_globals_group_definition :TagGroup<'matg'>
 		struct s_campaigns_block
 		{
 			__int32 campaign_id;//0x0
-			static_wchar_string32 english_name;//0x4
-			static_wchar_string32 japanese_name;//0x44
-			static_wchar_string32 german_name;//0x84
-			static_wchar_string32 french_name;//0xC4
-			static_wchar_string32 spanish_name;//0x104
-			static_wchar_string32 italian_name;//0x144
-			static_wchar_string32 korean_name;//0x184
-			static_wchar_string32 chinese_name;//0x1C4
-			static_wchar_string32 portuguese_name;//0x204
-			static_wchar_string128 english_description;//0x244
-			static_wchar_string128 japanese_description;//0x344
-			static_wchar_string128 german_description;//0x444
-			static_wchar_string128 french_description;//0x544
-			static_wchar_string128 spanish_description;//0x644
-			static_wchar_string128 italian_description;//0x744
-			static_wchar_string128 korean_description;//0x844
-			static_wchar_string128 chinese_description;//0x944
-			static_wchar_string128 portuguese_description;//0xA44
+			c_static_wchar_string32 english_name;//0x4
+			c_static_wchar_string32 japanese_name;//0x44
+			c_static_wchar_string32 german_name;//0x84
+			c_static_wchar_string32 french_name;//0xC4
+			c_static_wchar_string32 spanish_name;//0x104
+			c_static_wchar_string32 italian_name;//0x144
+			c_static_wchar_string32 korean_name;//0x184
+			c_static_wchar_string32 chinese_name;//0x1C4
+			c_static_wchar_string32 portuguese_name;//0x204
+			c_static_wchar_string128 english_description;//0x244
+			c_static_wchar_string128 japanese_description;//0x344
+			c_static_wchar_string128 german_description;//0x444
+			c_static_wchar_string128 french_description;//0x544
+			c_static_wchar_string128 spanish_description;//0x644
+			c_static_wchar_string128 italian_description;//0x744
+			c_static_wchar_string128 korean_description;//0x844
+			c_static_wchar_string128 chinese_description;//0x944
+			c_static_wchar_string128 portuguese_description;//0xA44
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_campaigns_block, 0xB44);
 		tag_block<s_campaigns_block> campaigns;//0x0
@@ -1188,24 +1188,24 @@ struct s_globals_group_definition :TagGroup<'matg'>
 			__int32 campaign_id;//0x0
 			__int32 map_id;//0x4
 			tag_reference bitmap;//0x8
-			static_wchar_string32 english_name;//0x10
-			static_wchar_string32 japanese_name;//0x50
-			static_wchar_string32 german_name;//0x90
-			static_wchar_string32 french_name;//0xD0
-			static_wchar_string32 spanish_name;//0x110
-			static_wchar_string32 italian_name;//0x150
-			static_wchar_string32 korean_name;//0x190
-			static_wchar_string32 chinese_name;//0x1D0
-			static_wchar_string32 portuguese_name;//0x210
-			static_wchar_string128 english_description;//0x250
-			static_wchar_string128 japanese_description;//0x350
-			static_wchar_string128 german_description;//0x450
-			static_wchar_string128 french_description;//0x550
-			static_wchar_string128 spanish_description;//0x650
-			static_wchar_string128 italian_description;//0x750
-			static_wchar_string128 korean_description;//0x850
-			static_wchar_string128 chinese_description;//0x950
-			static_wchar_string128 portuguese_description;//0xA50
+			c_static_wchar_string32 english_name;//0x10
+			c_static_wchar_string32 japanese_name;//0x50
+			c_static_wchar_string32 german_name;//0x90
+			c_static_wchar_string32 french_name;//0xD0
+			c_static_wchar_string32 spanish_name;//0x110
+			c_static_wchar_string32 italian_name;//0x150
+			c_static_wchar_string32 korean_name;//0x190
+			c_static_wchar_string32 chinese_name;//0x1D0
+			c_static_wchar_string32 portuguese_name;//0x210
+			c_static_wchar_string128 english_description;//0x250
+			c_static_wchar_string128 japanese_description;//0x350
+			c_static_wchar_string128 german_description;//0x450
+			c_static_wchar_string128 french_description;//0x550
+			c_static_wchar_string128 spanish_description;//0x650
+			c_static_wchar_string128 italian_description;//0x750
+			c_static_wchar_string128 korean_description;//0x850
+			c_static_wchar_string128 chinese_description;//0x950
+			c_static_wchar_string128 portuguese_description;//0xA50
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_campaign_levels_block, 0xB50);
 		tag_block<s_campaign_levels_block> campaign_levels;//0x8
@@ -1213,24 +1213,24 @@ struct s_globals_group_definition :TagGroup<'matg'>
 		{
 			__int32 map_id;//0x0
 			tag_reference bitmap;//0x4
-			static_wchar_string32 english_name;//0xC
-			static_wchar_string32 japanese_name;//0x4C
-			static_wchar_string32 german_name;//0x8C
-			static_wchar_string32 french_name;//0xCC
-			static_wchar_string32 spanish_name;//0x10C
-			static_wchar_string32 italian_name;//0x14C
-			static_wchar_string32 korean_name;//0x18C
-			static_wchar_string32 chinese_name;//0x1CC
-			static_wchar_string32 portuguese_name;//0x20C
-			static_wchar_string128 english_description;//0x24C
-			static_wchar_string128 japanese_description;//0x34C
-			static_wchar_string128 german_description;//0x44C
-			static_wchar_string128 french_description;//0x54C
-			static_wchar_string128 spanish_description;//0x64C
-			static_wchar_string128 italian_description;//0x74C
-			static_wchar_string128 korean_description;//0x84C
-			static_wchar_string128 chinese_description;//0x94C
-			static_wchar_string128 portuguese_description;//0xA4C
+			c_static_wchar_string32 english_name;//0xC
+			c_static_wchar_string32 japanese_name;//0x4C
+			c_static_wchar_string32 german_name;//0x8C
+			c_static_wchar_string32 french_name;//0xCC
+			c_static_wchar_string32 spanish_name;//0x10C
+			c_static_wchar_string32 italian_name;//0x14C
+			c_static_wchar_string32 korean_name;//0x18C
+			c_static_wchar_string32 chinese_name;//0x1CC
+			c_static_wchar_string32 portuguese_name;//0x20C
+			c_static_wchar_string128 english_description;//0x24C
+			c_static_wchar_string128 japanese_description;//0x34C
+			c_static_wchar_string128 german_description;//0x44C
+			c_static_wchar_string128 french_description;//0x54C
+			c_static_wchar_string128 spanish_description;//0x64C
+			c_static_wchar_string128 italian_description;//0x74C
+			c_static_wchar_string128 korean_description;//0x84C
+			c_static_wchar_string128 chinese_description;//0x94C
+			c_static_wchar_string128 portuguese_description;//0xA4C
 			static_string256 path;//0xB4C
 			__int32 sort_order;//0xC4C
 			enum class e_flags : __int8
