@@ -392,8 +392,10 @@
     <ClInclude Include="Blam\Engine\game\game.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
+    <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
