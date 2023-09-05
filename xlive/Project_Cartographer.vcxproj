@@ -410,6 +410,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
+    <ClInclude Include="Blam\Engine\main\level_definitions.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />

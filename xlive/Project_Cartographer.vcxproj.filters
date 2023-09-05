@@ -648,6 +648,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\ai\pathfinding_utilities.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
+    <ClInclude Include="Blam\Engine\main\level_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
