@@ -31,11 +31,11 @@ namespace PlayerRepresentation
 	};
 
 	BYTE current_representation_count = 4;
-	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
+	s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		s_game_globals* globals = scenario_get_game_globals();
 
-		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 		if (!DATUM_IS_NONE(fp_hands))
 		{
 			new_rep->first_person_hands.TagGroup = blam_tag::tag_group_type::rendermodel;
@@ -68,10 +68,10 @@ namespace PlayerRepresentation
 	}
 
 
-	s_globals_group_definition::s_player_representation_block* clone_representation(int index, e_character_type newType)
+	s_game_globals_player_representation* clone_representation(int index, e_character_type newType)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		s_game_globals* globals = scenario_get_game_globals();
+		auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 		new_rep->first_person_body = globals->player_representation[index]->first_person_body;
 		new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
 		new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
@@ -81,15 +81,14 @@ namespace PlayerRepresentation
 		return new_rep;
 	}
 
-	s_globals_group_definition::s_player_representation_block* get_representation(int index)
+	s_game_globals_player_representation* get_representation(int index)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		return globals->player_representation[index];
+		return scenario_get_game_globals()->player_representation[index];
 	}
 
 	datum get_object_datum_from_representation(e_character_type representation_index)
 	{
-		auto game_globals = tags::get_matg_globals_ptr();
+		s_game_globals* game_globals = scenario_get_game_globals();
 		if (game_globals != nullptr)
 		{
 			if (type_map.find(representation_index) != type_map.end())

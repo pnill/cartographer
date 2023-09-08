@@ -1,7 +1,4 @@
 #include "stdafx.h"
-
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
-
 #include "TagInterface.h"
 
 tags::tag_instance* tags::get_tag_instances()
@@ -12,11 +9,6 @@ tags::tag_instance* tags::get_tag_instances()
 char* tags::get_tag_data()
 {
 	return *Memory::GetAddress<char**>(0x47CD54, 0x4A29BC);
-}
-
-s_globals_group_definition* tags::get_matg_globals_ptr()
-{
-	return *Memory::GetAddress<s_globals_group_definition**>(0x479E70, 0x4A642C);
 }
 
 s_cache_header* tags::get_cache_header()

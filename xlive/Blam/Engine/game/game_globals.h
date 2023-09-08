@@ -519,7 +519,7 @@ struct s_game_globals_player_representation
     int32 pad[10];
     int32 pad1[30];
     tag_reference third_person_unit;    // unit
-    string_id thirdPersonVariant;
+    string_id third_person_variant;
 };
 TAG_BLOCK_SIZE_ASSERT(s_game_globals_player_representation, 188);
 
@@ -590,3 +590,5 @@ struct s_game_globals
     int32 pad1[63];
 };
 TAG_BLOCK_SIZE_ASSERT(s_game_globals, 644);
+
+s_game_globals* scenario_get_game_globals(void);

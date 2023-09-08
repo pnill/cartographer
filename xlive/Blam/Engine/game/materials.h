@@ -107,11 +107,11 @@ struct s_global_material_sweeteners_definition
     tag_reference effect_sweetener_large;		// effe
     tag_reference effect_sweetener_rolling;		// effe
     tag_reference effect_sweetener_grinding;	// effe
-    tag_reference effect_sweetenermelee;		// effe
+    tag_reference effect_sweetener_melee;		// effe
     tag_reference unknown1;
 
     // Explaination("sweetener inheritance flags", "when a sweetener inheritance flag is set the sound\effect is not inherited from the parent material.  If you leave the sweetener blank and set the flag than no effect\sound will play")
-	e_sweetener_inheritance_flags sweetenerInheritanceFlags;
+	e_sweetener_inheritance_flags sweetener_inheritance_flags;
 };
 
 // max count: k_maximum_material_types

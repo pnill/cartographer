@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "MapSlots.h"
 
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/main/level_definitions.h"
+
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/filesys.h"
 #include "Util/Hooks/Hook.h"
@@ -11,13 +13,12 @@
 
 #define k_multiplayer_first_unused_slot 23
 #define k_max_map_slots 49
-#define k_multiplayer_size 3172
 #define k_starting_map_index 3000
 
 namespace MapSlots
 {
 	std::vector<std::string> AddedMaps;
-	std::vector<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block> MapData;
+	std::vector<s_multiplayer_ui_level_definition> MapData;
 	std::map<datum, std::string> BitmapsToLoad;
 
 	void CacheMapData()
@@ -67,11 +68,11 @@ namespace MapSlots
 					fin.read((char*)&m_offset, 4);
 
 					temp = scnr_off + (m_offset - scnr_memaddr);
-					s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block newBlock;
+					s_multiplayer_ui_level_definition newBlock;
 
 					//The struct in the scenario is the same as the one inside the globals ui level data so just copy it into one
 					fin.seekg(temp);
-					fin.read((char*)&newBlock, sizeof(s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block));
+					fin.read((char*)&newBlock, sizeof(s_multiplayer_ui_level_definition));
 
 					//Fix incase the maps level data is incorrectly setup
 					if (strlen(newBlock.path.get_string()) == 0) {
@@ -106,38 +107,30 @@ namespace MapSlots
 		}
 		tag_loader::Push_Back();
 
-		//Grab the globals tag
-		auto matg_datum = tags::find_tag(blam_tag::tag_group_type::globals, "globals\\globals");
-		BYTE* matg_data = tags::get_tag<blam_tag::tag_group_type::globals, BYTE>(matg_datum);
-
-		if (matg_data == nullptr) { return; }
-
-		//Grab the tag block for UI Level Data
-		auto* p_ui_levels = reinterpret_cast<tags::tag_data_block*>(matg_data + 0x178);
-		if (p_ui_levels->block_count > 0 && p_ui_levels->block_data_offset != -1)
+		s_game_globals* globals = scenario_get_game_globals();
+		if (globals->ui_level_data.size > 0 && globals->ui_level_data.data != -1)
 		{
-			auto ui_levels = tags::get_tag_data() + p_ui_levels->block_data_offset;
-			//Grab the tag block for Multiplayer Levels
-			auto* p_mul_levels = reinterpret_cast<tags::tag_data_block*>(ui_levels + 0x10);
-			if (p_mul_levels->block_count > 0 && p_mul_levels->block_data_offset != -1)
+			s_ui_levels_definition* ui_levels = globals->ui_level_data[0];
+			if (ui_levels->multiplayer_levels.size > 0 && ui_levels->multiplayer_levels.data != -1)
 			{
-				auto mul_levels = tags::get_tag_data() + p_mul_levels->block_data_offset;
-
-				int i = 0;
-				for (const auto& newSlot : MapData)
+				int32 i = k_multiplayer_first_unused_slot;
+				for (const s_multiplayer_ui_level_definition& newSlot : MapData)
 				{
-					if (k_multiplayer_first_unused_slot + i < k_max_map_slots) {
-						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.english_name.get_string());
-						auto slot = reinterpret_cast<s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block*>(mul_levels + (k_multiplayer_size * (k_multiplayer_first_unused_slot + i)));
+					if (i < k_max_map_slots) 
+					{
+						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.level_descriptions.english_name.get_string());
+						s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[i];
 
 						//Write the data loaded from the maps into the unused slot
 						memcpy(slot, &newSlot, sizeof(newSlot));
 						//Resolve the loaded bitmap datum
 						slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
+						
 						//Change the map id and sort ID so that the maps are 
 						//placed in order at the end of the list
-						slot->map_id = k_starting_map_index + i;
-						slot->sort_order = k_starting_map_index + i;
+						int32 new_map_id = k_starting_map_index + i;
+						slot->map_id = new_map_id;
+						slot->sort_order = new_map_id;
 						i++;
 					}
 					else
@@ -161,17 +154,15 @@ namespace MapSlots
 	int* MapSlotCount;
 	int __cdecl store_multiplayer_level_data(int a1)
 	{
-		using s_multiplayer_levels_block = s_globals_group_definition::s_ui_level_data_block::s_multiplayer_levels_block;
-
 		int i = 0;
-		for (const auto& newSlot : MapData)
+		for (const s_multiplayer_ui_level_definition& newSlot : MapData)
 		{
-			if (k_multiplayer_first_unused_slot + i < k_max_map_slots) {
-				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.english_name.get_string());
-				auto slotAddr = Memory::GetAddress(0, 0x419510) + (k_multiplayer_size * (k_multiplayer_first_unused_slot + i));
+			if (k_multiplayer_first_unused_slot + i < k_max_map_slots) 
+			{
+				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.level_descriptions.english_name.get_string());
+				s_multiplayer_ui_level_definition* slot = &Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510)[k_multiplayer_first_unused_slot + i];
 				DWORD dwBack[2];
-				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
-				auto slot = reinterpret_cast<s_multiplayer_levels_block*>(slotAddr);
+				VirtualProtect(slot, 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
 				//Write the data loaded from the maps into the unused slot
 				memcpy(slot, &newSlot, sizeof(newSlot));
@@ -180,7 +171,7 @@ namespace MapSlots
 				//placed in order at the end of the list
 				slot->map_id = k_starting_map_index + i;
 				slot->sort_order = k_starting_map_index + i;
-				VirtualProtect(reinterpret_cast<LPVOID>(slotAddr), 3172, dwBack[0], &dwBack[1]);
+				VirtualProtect(slot, 3172, dwBack[0], &dwBack[1]);
 				i++;
 
 			}

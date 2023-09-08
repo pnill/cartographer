@@ -308,7 +308,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />

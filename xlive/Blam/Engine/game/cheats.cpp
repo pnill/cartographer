@@ -2,6 +2,7 @@
 #include "cheats.h"
 
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Tags/TagInterface.h"
 
@@ -55,8 +56,8 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 	typedef int(__cdecl* unspatialized_impulse_sound_new_t)(datum sound_datum, float scale);
 	auto p_unspatialized_impulse_sound_new = Memory::GetAddress<unspatialized_impulse_sound_new_t>(0x8836C, 0x7F173);
 
-	s_globals_group_definition* g_globals_tag = tags::get_matg_globals_ptr();
-	const s_globals_group_definition::s_player_information_block* player_information = g_globals_tag->player_information[0];
+	s_game_globals* g_globals_tag = scenario_get_game_globals();
+	const s_game_globals_player_information* player_information = g_globals_tag->player_information[0];
 
 	if (skull < k_skull_count && !skull_enabled[skull])
 	{
