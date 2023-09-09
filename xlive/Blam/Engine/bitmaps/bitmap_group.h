@@ -310,7 +310,7 @@ struct bitmap_group
     char overlap;
     e_color_subsampling color_subsampling;
 
-    // Data specific to tag builds?
+#ifdef TAGS_BUILD
     int unk_data_0;
     int unk_data_1;
     int unk_data_2;
@@ -318,5 +318,10 @@ struct bitmap_group
     tag_block<> unk_block_60;
     int unk_data_6;
     int unk_data_7;
+#endif
 };
+#ifdef TAGS_BUILD
 TAG_GROUP_SIZE_ASSERT(bitmap_group, 112);
+#else
+TAG_GROUP_SIZE_ASSERT(bitmap_group, 80);
+#endif
