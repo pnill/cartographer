@@ -12,6 +12,8 @@
 #include "Blam/Engine/text/text_group.h"
 #include "Blam/Math/real_math.h"
 
+#include "H2MOD/Tags/TagInterface.h"
+
 #define NUMBER_OF_GLOBAL_SOUNDS 2
 #define k_unit_grenade_types_count 2
 #define k_global_vertex_shader_count 32
@@ -594,3 +596,4 @@ struct s_game_globals
 TAG_BLOCK_SIZE_ASSERT(s_game_globals, 644);
 
 s_game_globals* scenario_get_game_globals(void);
+s_ui_levels_definition* game_globals_get_ui_levels(void);

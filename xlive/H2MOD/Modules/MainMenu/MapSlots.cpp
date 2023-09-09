@@ -8,6 +8,8 @@
 #include "Util/filesys.h"
 #include "Util/Hooks/Hook.h"
 
+// TODO Move to Blam/Engine/main/levels once the below are complete
+// TODO remove std:: references used in here
 // TODO Cleanup this code
 // TODO Add support for singleplayer maps in the future
 
@@ -95,6 +97,101 @@ namespace MapSlots
 			}
 		}
 	}
+
+	void add_new_multiplayer_map_slots_game(void)
+	{
+		s_ui_levels_definition* ui_levels = game_globals_get_ui_levels();
+		
+		if (ui_levels)
+		{
+			int32 i = k_multiplayer_first_unused_slot;
+			for (const s_multiplayer_ui_level_definition& newSlot : MapData)
+			{
+				if (i < k_max_map_slots)
+				{
+					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.english_name.get_string());
+					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[i];
+
+					//Write the data loaded from the maps into the unused slot
+					memcpy(slot, &newSlot, sizeof(newSlot));
+					//Resolve the loaded bitmap datum
+					slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
+
+					//Change the map id and sort ID so that the maps are 
+					//placed in order at the end of the list
+					int32 new_map_id = k_starting_map_index + i;
+					slot->map_id = new_map_id;
+					slot->sort_order = new_map_id;
+					i++;
+				}
+				else
+				{
+					LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+					break;
+				}
+			}
+		}
+
+		return;
+	}
+
+	int32 add_new_multiplayer_map_slots_server(void)
+	{
+		int32 added_map_count = 0;
+		for (const s_multiplayer_ui_level_definition& newSlot : MapData)
+		{
+			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
+			{
+				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.english_name.get_string());
+				s_multiplayer_ui_level_definition* slot = &Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510)[k_multiplayer_first_unused_slot + added_map_count];
+				DWORD dwBack[2];
+				VirtualProtect(slot, sizeof(*slot), PAGE_EXECUTE_READWRITE, &dwBack[0]);
+
+				//Write the data loaded from the maps into the unused slot
+				memcpy(slot, &newSlot, sizeof(newSlot));
+
+				//Change the map id and sort ID so that the maps are 
+				//placed in order at the end of the list
+				int32 new_map_id = k_starting_map_index + added_map_count;
+				slot->map_id = new_map_id;
+				slot->sort_order = new_map_id;
+				VirtualProtect(slot, sizeof(*slot), dwBack[0], &dwBack[1]);
+				added_map_count++;
+			}
+			else
+			{
+				LOG_TRACE_FUNC("Max Multiplayer added slots reached");
+				break;
+			}
+		}
+
+		return added_map_count;
+	}
+	
+	//H2Server reads the level data from mainmenu.map
+	/*typedef bool(__cdecl p_store_multiplayer_level_data)();
+	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
+
+	typedef int32(__cdecl sub_map_slot_t)(int32 a1);
+	sub_map_slot_t* p_sub_map_slot;
+
+	int32* MapSlotCount;
+	int32 __cdecl store_multiplayer_level_data(int32 a1)
+	{
+		*MapSlotCount += add_new_multiplayer_map_slots_server();
+
+		return p_sub_map_slot(a1);
+	}
+
+	void map_slots_apply_dedi_hooks()
+	{
+		MapSlotCount = Memory::GetAddress<int32*>(0, 0x41950C);
+		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
+		p_sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
+		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
+		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
+	}
+
 	void OnMapLoad()
 	{
 		if (AddedMaps.empty()) { return; }
@@ -106,92 +203,7 @@ namespace MapSlots
 			tag_loader::Load_tag(item.first, false, item.second);
 		}
 		tag_loader::Push_Back();
-
-		s_game_globals* globals = scenario_get_game_globals();
-		if (globals->ui_level_data.size > 0 && globals->ui_level_data.data != -1)
-		{
-			s_ui_levels_definition* ui_levels = globals->ui_level_data[0];
-			if (ui_levels->multiplayer_levels.size > 0 && ui_levels->multiplayer_levels.data != -1)
-			{
-				int32 i = k_multiplayer_first_unused_slot;
-				for (const s_multiplayer_ui_level_definition& newSlot : MapData)
-				{
-					if (i < k_max_map_slots) 
-					{
-						LOG_TRACE_GAME(L"[Map Slots]: OnMapLoad Adding {}", newSlot.level_descriptions.english_name.get_string());
-						s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[i];
-
-						//Write the data loaded from the maps into the unused slot
-						memcpy(slot, &newSlot, sizeof(newSlot));
-						//Resolve the loaded bitmap datum
-						slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
-						
-						//Change the map id and sort ID so that the maps are 
-						//placed in order at the end of the list
-						int32 new_map_id = k_starting_map_index + i;
-						slot->map_id = new_map_id;
-						slot->sort_order = new_map_id;
-						i++;
-					}
-					else
-					{
-						LOG_ERROR_GAME("[Map Slots]: Max Multiplayer added slots reached");
-						break;
-					}
-				}
-			}
-		}
-
-	}
-
-	//H2Server reads the level data from mainmenu.map
-	/*typedef bool(__cdecl p_store_multiplayer_level_data)();
-	p_store_multiplayer_level_data* c_store_multiplayer_level_data;*/
-
-	typedef int(__cdecl sub_map_slot_t)(int a1);
-	sub_map_slot_t* p_sub_map_slot;
-
-	int* MapSlotCount;
-	int __cdecl store_multiplayer_level_data(int a1)
-	{
-		int i = 0;
-		for (const s_multiplayer_ui_level_definition& newSlot : MapData)
-		{
-			if (k_multiplayer_first_unused_slot + i < k_max_map_slots) 
-			{
-				LOG_TRACE_GAME(L"[Map Slots]: store_mutliplayer_level_data Adding {}", newSlot.level_descriptions.english_name.get_string());
-				s_multiplayer_ui_level_definition* slot = &Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510)[k_multiplayer_first_unused_slot + i];
-				DWORD dwBack[2];
-				VirtualProtect(slot, 3172, PAGE_EXECUTE_READWRITE, &dwBack[0]);
-
-				//Write the data loaded from the maps into the unused slot
-				memcpy(slot, &newSlot, sizeof(newSlot));
-
-				//Change the map id and sort ID so that the maps are 
-				//placed in order at the end of the list
-				slot->map_id = k_starting_map_index + i;
-				slot->sort_order = k_starting_map_index + i;
-				VirtualProtect(slot, 3172, dwBack[0], &dwBack[1]);
-				i++;
-
-			}
-			else
-			{
-				LOG_ERROR_GAME("[Map Slots]: Max Multiplayer added slots reached");
-				break;
-			}
-		}
-		*MapSlotCount = *MapSlotCount + i;
-		return p_sub_map_slot(a1);
-	}
-
-	void map_slots_apply_dedi_hooks()
-	{
-		MapSlotCount = Memory::GetAddress<int*>(0, 0x41950C);
-		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
-		p_sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
-		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
-		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
+		add_new_multiplayer_map_slots_game();
 	}
 
 	void Initialize()
