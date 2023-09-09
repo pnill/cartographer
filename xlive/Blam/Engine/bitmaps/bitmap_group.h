@@ -195,7 +195,7 @@ struct bitmap_data
     byte depthPixels;                       // Depth is 1 for 2D textures and cube maps.
 
     e_more_bitmap_data_flags more_flags;
-    e_bitmap_type type;                // Determines bitmap "geometry."
+    e_bitmap_type type;                     // Determines bitmap "geometry."
     e_bitmap_data_format format;            // Determines how pixels are represented internally.
     e_bitmap_data_flags flags;
     point2d registration_point;

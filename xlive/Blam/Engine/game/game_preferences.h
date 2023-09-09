@@ -14,3 +14,4 @@ enum e_language : uint32
 	k_language_count
 };
 
+e_language get_current_language(void);

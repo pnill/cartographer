@@ -5,9 +5,11 @@
 
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
+#include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/main/level_definitions.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/tag_files/string_id.h"
+#include "Blam/Engine/text/text_group.h"
 #include "Blam/Math/real_math.h"
 
 #define NUMBER_OF_GLOBAL_SOUNDS 2
@@ -60,9 +62,9 @@ TAG_BLOCK_SIZE_ASSERT(s_sound_globals_definition, 36);
 // max count: 1
 struct s_ai_globals_gravemind_definition
 {
-    real32 minRetreatTimeSecs;
-    real32 idealRetreatTimeSecs;
-    real32 maxRetreatTimeSecs;
+    real32 min_retreat_time_secs;
+    real32 ideal_retreat_time_secs;
+    real32 max_retreat_time_Secs;
 };
 TAG_BLOCK_SIZE_ASSERT(s_ai_globals_gravemind_definition, 12);
 
@@ -362,7 +364,6 @@ TAG_BLOCK_SIZE_ASSERT(s_vertex_shader_reference, 8);
 struct s_game_globals_rasterizer_data
 {
     // Explaination("function textures", "Used internally by the rasterizer. (Do not change unless you know what you're doing!)")
-
     tag_reference distance_attenuation;     // bitm
     tag_reference vector_normalization;     // bitm
     tag_reference gradients;                // bitm
@@ -377,10 +378,7 @@ struct s_game_globals_rasterizer_data
     tag_block<s_vertex_shader_reference> global_vertex_shaders;
 
     // Explaination("default textures", "Used internally by the rasterizer - additive, multiplicative, detail, vector. (Do not change ever, period.)")
-    
-    tag_reference default_2d;       // bitm
-    tag_reference default_3d;       // bitm
-    tag_reference default_cube_map; // bitm
+    tag_reference default_textures[k_bitmap_type_count];    // bitm
 
     // Explaination("experimental textures", "Used internally by the rasterizer. (Used by Bernie's experimental shaders.)")
     tag_reference experimental_bitmap_0;    // bitm
@@ -536,7 +534,10 @@ struct s_game_globals_falling_damage
     tag_reference vehicle_killed_unit_damage_effect;            // jpt!
     tag_reference vehicle_collision_damage; // jpt!
     tag_reference flaming_death_damage;     // jpt!
-    int32 pad2[7];
+    int32 pad2[4];
+    real32 field_5C;
+    real32 field_60;
+    real32 unk_gravity_64;
 };
 TAG_BLOCK_SIZE_ASSERT(s_game_globals_falling_damage, 104);
 
@@ -587,7 +588,8 @@ struct s_game_globals
     // Explaination("Default global lighting", "")
     tag_reference default_global_lighting;  // gldf
 
-    int32 pad1[63];
+    // Populated during game startup
+    c_language_pack language_pack[k_language_count];
 };
 TAG_BLOCK_SIZE_ASSERT(s_game_globals, 644);
 

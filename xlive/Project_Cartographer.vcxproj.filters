@@ -209,6 +209,7 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -642,6 +643,7 @@
     <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
+    <ClInclude Include="Blam\Engine\text\text_group.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />
