@@ -114,17 +114,14 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 
 	bool success = false;
 	bool invalid_file = false;
-	DWORD open_file_error_code;
-	const __int16 filo_open_file_flags = 0
-		| FILE_REFERENCE_FILE_SEQUENTIAL_SCAN
-		| FILE_REFERENCE_READ_FILE
-		;
+	e_file_open_errors open_file_error_code;
 
 	file_reference_create_from_path(&cache_file, path, false);
+	e_file_open_flags flags = (e_file_open_flags)(_file_open_sequential_scan_bit | _permission_read_bit);
 
 	do 
 	{
-		if (!file_open(&cache_file, filo_open_file_flags, &open_file_error_code))
+		if (!file_open(&cache_file, flags, &open_file_error_code))
 		{
 			LOG_TRACE_GAME("{} - failed to open custom map data cache file!",
 				__FUNCTION__);
@@ -133,7 +130,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 		}
 
 		// first we read the header
-		if (!file_read(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache), true))
+		if (!file_read(&cache_file, sizeof(s_custom_map_file_cache), true, custom_map_data_cache))
 		{
 			invalid_file = true;
 			LOG_TRACE_GAME("{} - failed to read custom map data cache file header!",
@@ -162,7 +159,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 		// if signature matches, read the cache contents
 		DWORD file_custom_map_entries_size = custom_map_data_cache->entries_count * sizeof(s_custom_map_entry);
 
-		if (!file_read(&cache_file, custom_map_data_cache->entries, file_custom_map_entries_size, true))
+		if (!file_read(&cache_file, file_custom_map_entries_size, true, custom_map_data_cache->entries))
 		{
 			LOG_TRACE_GAME("{} - failed reading custom map data cache file!",
 				__FUNCTION__);
@@ -177,7 +174,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 
 	} while (0);
 
-	if (open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_SUCCESS)
+	if (open_file_error_code == _file_open_error_success)
 	{
 		file_close(&cache_file);
 		if (invalid_file)
@@ -201,17 +198,14 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 	s_file_reference cache_file;
 
 	bool success = false;
-	DWORD open_file_error_code = FILE_REFERENCE_OPEN_FILE_ERROR_UNKONWN;
-	const __int16 filo_open_file_flags = 0
-		| FILE_REFERENCE_WRITE_FILE
-		;
+	e_file_open_errors open_file_error_code = _file_open_error_unknown;
 
 	file_reference_create_from_path(&cache_file, path, false);
 	bool create_file_success = file_create(&cache_file);
 
 	do 
 	{
-		if (!file_open(&cache_file, filo_open_file_flags, &open_file_error_code))
+		if (!file_open(&cache_file, _permission_write_bit, &open_file_error_code))
 		{
 			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}",
 				__FUNCTION__, open_file_error_code);
@@ -221,7 +215,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 
 		file_set_hidden(&cache_file, true);
 		
-		if (!file_write(&cache_file, custom_map_data_cache, sizeof(s_custom_map_file_cache) + sizeof(s_custom_map_entry) * custom_map_data_cache->entries_count))
+		if (!file_write(&cache_file, sizeof(s_custom_map_file_cache) + sizeof(s_custom_map_entry) * custom_map_data_cache->entries_count, custom_map_data_cache))
 		{
 			LOG_ERROR_GAME("{} - failed to write custom map cache to file!",
 				__FUNCTION__);
@@ -245,11 +239,11 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_
 	} while (0);
 
 
-	if (open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_SUCCESS)
+	if (open_file_error_code == _file_open_error_success)
 	{
 		file_close(&cache_file);
 	}
-	else if (!create_file_success && open_file_error_code == FILE_REFERENCE_OPEN_FILE_ERROR_NOT_FOUND)
+	else if (!create_file_success && open_file_error_code == _file_open_error_not_found)
 	{
 		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!"
 			__FUNCTION__);
