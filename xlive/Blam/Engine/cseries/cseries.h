@@ -1,5 +1,8 @@
 #pragma once
 
+// 8-bit character that's specified as a multibyte utf8 string
+typedef char utf8;
+
 // 8-bit signed integer ranging from -128 to 127
 typedef signed char int8;
 static_assert(sizeof(int8) == 1);

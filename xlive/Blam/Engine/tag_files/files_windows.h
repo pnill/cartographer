@@ -1,15 +1,17 @@
 #pragma once
 
+#define FILE_REFERENCE_SIGNATURE "filo"
+
 struct s_file_reference
 {
 	unsigned long			signature;
 	unsigned short      	flags;
 	signed short     		location;
-	char                    path[256];
+	utf8                    path[256];
 	HANDLE		            handle;
 	HRESULT		            api_result;
 };
-static_assert(sizeof(s_file_reference) == 0x110, "Invalid 's_file_reference' struct size");
+static_assert(sizeof(s_file_reference) == 272, "Invalid 's_file_reference' struct size");
 
 enum FILE_REFERENCE_PATH_FLAGS : __int16
 {
@@ -33,7 +35,7 @@ enum e_file_open_flags : DWORD
 	k_number_of_file_open_flags = FLAG(9)		// originally called NUMBER_OF_FILE_OPEN_FLAGS but we change it to maintain "some" code consistency
 };
 
-enum e_file_open_errors : DWORD
+enum e_file_open_error : DWORD
 {
 	_file_open_error_success = 0,
 	_file_open_error_not_found = 1,
@@ -44,10 +46,10 @@ enum e_file_open_errors : DWORD
 	_file_open_error_unknown = 6,
 };
 
-s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const char* path, bool path_is_directory);
+s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory);
 
 /* Returns success */
-bool file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_errors* out_error_code);
+bool file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code);
 
 /* Returns success */
 bool file_close(s_file_reference* file_reference);
@@ -62,13 +64,13 @@ bool file_delete(s_file_reference* file_reference);
 On success the data read is written to data_buffer and the function returns true
 On failure, if hide_errors_from_user is set to false an error is displayed to the user and false is returned, if the number of bytes read doesn't match the requested amount ERROR_HANDLE_EOF is set
 */
-bool file_read(s_file_reference* file_reference, DWORD bytes_to_read, bool suppress_errors, LPVOID data_buffer);
+bool file_read(s_file_reference* file_reference, size_t bytes_to_read, bool suppress_errors, LPVOID data_buffer);
 
 /* Returns success */
 bool file_write(s_file_reference* file_reference, size_t data_size, LPVOID data);
 
 /* */
-bool file_get_size_low(s_file_reference* file_reference, DWORD* out_low_size);
+bool file_get_size(s_file_reference* file_reference, size_t* size);
 
 /* */
 bool file_set_eof(s_file_reference* file_reference);

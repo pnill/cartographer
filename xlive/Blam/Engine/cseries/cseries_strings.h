@@ -62,7 +62,7 @@ typedef c_static_wchar_string<32>  c_static_wchar_string32;
 typedef c_static_wchar_string<64>  c_static_wchar_string64;
 typedef c_static_wchar_string<128> c_static_wchar_string128;
 typedef c_static_wchar_string<256> c_static_wchar_string256;
-typedef c_static_wchar_string<260> c_static_wchar_string_260;
+typedef c_static_wchar_string<260> c_static_wchar_string260;
 
 template<size_t T>
 inline const char* c_static_string<T>::get_string(void) const
@@ -98,7 +98,10 @@ inline size_t c_static_string<T>::length(void) const
 template<size_t T>
 char* c_static_string<T>::append(const char* src)
 {
-	return csstrnzcat(this->get_string(), src, T);
+	char* result = csstrnzcat(this->get_buffer(), src, T);
+	result[T - 1] = 0;
+	return result;
+
 }
 
 // Gets the index of the specified substring

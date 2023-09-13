@@ -106,8 +106,8 @@ struct s_custom_map_data
 	void __thiscall mark_all_cached_maps_for_deletion();
 	bool __thiscall remove_marked_for_deletion();
 
-	bool read_custom_map_data_cache_from_file(const char* path, s_custom_map_file_cache* custom_map_data_cache, DWORD custom_map_data_cache_buffer_size);
-	bool write_custom_map_data_cache_to_file(const char* path, s_custom_map_file_cache* custom_map_data_cache);
+	bool read_custom_map_data_cache_from_file(const utf8* path, s_custom_map_file_cache* custom_map_data_cache, DWORD custom_map_data_cache_buffer_size);
+	bool write_custom_map_data_cache_to_file(const utf8* path, s_custom_map_file_cache* custom_map_data_cache);
 	void __thiscall save_custom_map_data();
 	void load_map_data_cache_from_file_cache(s_custom_map_file_cache* custom_map_file_cache);
 

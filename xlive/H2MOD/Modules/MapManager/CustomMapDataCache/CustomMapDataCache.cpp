@@ -108,13 +108,13 @@ bool __thiscall s_custom_map_data::remove_marked_for_deletion()
 	return maps_removed;
 }
 
-bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s_custom_map_file_cache* custom_map_data_cache, DWORD custom_map_data_cache_buffer_size)
+bool s_custom_map_data::read_custom_map_data_cache_from_file(const utf8* path, s_custom_map_file_cache* custom_map_data_cache, DWORD custom_map_data_cache_buffer_size)
 {
 	s_file_reference cache_file;
 
 	bool success = false;
 	bool invalid_file = false;
-	e_file_open_errors open_file_error_code;
+	e_file_open_error open_file_error_code;
 
 	file_reference_create_from_path(&cache_file, path, false);
 	e_file_open_flags flags = (e_file_open_flags)(_file_open_sequential_scan_bit | _permission_read_bit);
@@ -193,12 +193,12 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const char* path, s
 	return success;
 }
 
-bool s_custom_map_data::write_custom_map_data_cache_to_file(const char* path, s_custom_map_file_cache* custom_map_data_cache)
+bool s_custom_map_data::write_custom_map_data_cache_to_file(const utf8* path, s_custom_map_file_cache* custom_map_data_cache)
 {
 	s_file_reference cache_file;
 
 	bool success = false;
-	e_file_open_errors open_file_error_code = _file_open_error_unknown;
+	e_file_open_error open_file_error_code = _file_open_error_unknown;
 
 	file_reference_create_from_path(&cache_file, path, false);
 	bool create_file_success = file_create(&cache_file);
