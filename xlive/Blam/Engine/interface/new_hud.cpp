@@ -3,7 +3,7 @@
 
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/camera/camera.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
@@ -34,7 +34,7 @@ bool __cdecl render_ingame_chat_check()
 		return true;
 	}
 
-	else if (!s_game_globals::game_is_mainmenu() && get_game_life_cycle() == _life_cycle_in_game)
+	else if (!game_is_ui_shell() && get_game_life_cycle() == _life_cycle_in_game)
 	{
 		//Enable chat in engine mode and game state mp.
 		return false;

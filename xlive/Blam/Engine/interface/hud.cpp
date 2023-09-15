@@ -2,8 +2,8 @@
 #include "hud.h"
 #include "new_hud_definitions.h"
 
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/TagGroups/globals_definition.hpp"
+
+#include "Blam/Engine/game/game_globals.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -53,8 +53,7 @@ void set_crosshair_offset(float offset)
 {
 	if (!FloatIsNaN(offset))
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		globals->player_control[0]->crosshair_location.y = offset;
+		scenario_get_game_globals()->player_control[0]->crosshair_location.y = offset;
 	}
 }
 

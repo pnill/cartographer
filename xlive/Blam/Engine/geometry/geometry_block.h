@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Common/Common.h"
+
 #define MAXIMUM_RESOURCES_PER_GEOMETRY_BLOCK 1024
 
 enum e_geometry_resource_type : char

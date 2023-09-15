@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/math/function_definitions.h"
 #include "Blam/Engine/tag_files/string_id.h"
 

@@ -1,18 +1,15 @@
 #include "stdafx.h"
-
 #include "MainGameTime.h"
 
-#include "Util/Hooks/Hook.h"
-
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
+#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
-
-#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+#include "Util/Hooks/Hook.h"
 
 extern bool xboxTickrateEnabled;
 
@@ -109,7 +106,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	s_main_time_globals* main_time_globals;
 
 	main_time_globals = s_main_time_globals::get();
-	game_time = s_game_globals::game_is_in_progress() ? time_globals::get_game_time() : 0;
+	game_time = game_in_progress() ? time_globals::get_game_time() : 0;
 
 	// QueryPerformanceFrequency(&counterFrq);
 	// TODO: fixme, time offset breaks this

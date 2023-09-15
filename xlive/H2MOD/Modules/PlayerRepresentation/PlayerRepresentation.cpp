@@ -1,8 +1,9 @@
 #include "stdafx.h"
-
 #include "PlayerRepresentation.h"
+
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/model_definition.hpp"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/players.h"
@@ -30,11 +31,11 @@ namespace PlayerRepresentation
 	};
 
 	BYTE current_representation_count = 4;
-	s_globals_group_definition::s_player_representation_block* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
+	s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
+		s_game_globals* globals = scenario_get_game_globals();
 
-		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 		if (!DATUM_IS_NONE(fp_hands))
 		{
 			new_rep->first_person_hands.TagGroup = blam_tag::tag_group_type::rendermodel;
@@ -67,10 +68,10 @@ namespace PlayerRepresentation
 	}
 
 
-	s_globals_group_definition::s_player_representation_block* clone_representation(int index, e_character_type newType)
+	s_game_globals_player_representation* clone_representation(int index, e_character_type newType)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		auto new_rep = MetaExtender::add_tag_block2<s_globals_group_definition::s_player_representation_block>((unsigned long)std::addressof(globals->player_representation));
+		s_game_globals* globals = scenario_get_game_globals();
+		auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 		new_rep->first_person_body = globals->player_representation[index]->first_person_body;
 		new_rep->first_person_hands = globals->player_representation[index]->first_person_hands;
 		new_rep->third_person_unit = globals->player_representation[index]->third_person_unit;
@@ -80,15 +81,14 @@ namespace PlayerRepresentation
 		return new_rep;
 	}
 
-	s_globals_group_definition::s_player_representation_block* get_representation(int index)
+	s_game_globals_player_representation* get_representation(int index)
 	{
-		s_globals_group_definition* globals = tags::get_matg_globals_ptr();
-		return globals->player_representation[index];
+		return scenario_get_game_globals()->player_representation[index];
 	}
 
 	datum get_object_datum_from_representation(e_character_type representation_index)
 	{
-		auto game_globals = tags::get_matg_globals_ptr();
+		s_game_globals* game_globals = scenario_get_game_globals();
 		if (game_globals != nullptr)
 		{
 			if (type_map.find(representation_index) != type_map.end())
@@ -131,12 +131,12 @@ namespace PlayerRepresentation
 
 	void __cdecl player_properties_validate_configuration_hook(int player_index, s_player_properties* player_properties)
 	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, s_game_globals::get()->options.game_mode);
+		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, game_mode_get());
 
 		auto player_biped_type = player_properties->profile_traits.profile.player_character_type;
 		p_player_properties_validate_configuration(player_index, player_properties);
 		
-		if (s_game_globals::game_is_campaign())
+		if (game_is_campaign())
 		{
 			/*auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
 			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
@@ -157,7 +157,7 @@ namespace PlayerRepresentation
 			}*/
 			return;
 		}
-		else if (s_game_globals::game_is_multiplayer())
+		else if (game_is_multiplayer())
 		{
 			// reset the player biped type to what was previously in the field
 			player_properties->profile_traits.profile.player_character_type = player_biped_type;
@@ -187,7 +187,7 @@ namespace PlayerRepresentation
 		int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
 		s_player* player = s_player::GetPlayer(player_index);
 
-		if (s_game_globals::game_is_multiplayer())
+		if (game_is_multiplayer())
 			player_validate_extra_characters_type(player_index, &player->properties[0]);
 		player_representatio_get_orig_fn(player_datum, out_variant_index, a3);
 	}

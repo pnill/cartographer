@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/game/player_control.h"
 
 enum e_weapon_addition_method : short

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Math/real_math.h"
 #include "NetworkPrimitiveTypes.h"
 

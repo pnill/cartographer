@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Blam/Engine/game/cheats.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/first_person_camera.h"
@@ -661,7 +661,7 @@ namespace ImGuiHandler {
 			}
 			void HostSettings()
 			{
-				if (NetworkSession::LocalPeerIsSessionHost() || s_game_globals::game_is_campaign()) {
+				if (NetworkSession::LocalPeerIsSessionHost() || game_is_campaign()) {
 					if (ImGui::CollapsingHeader(GetString(host_campagin_settings)))
 					{
 						ImGui::Columns(2, NULL, false);
@@ -944,7 +944,7 @@ namespace ImGuiHandler {
 			//ImGui::PushFont(font2);
 			ImGui::SetNextWindowSize(ImVec2(650, 530), ImGuiCond_Appearing);
 			ImGui::SetNextWindowSizeConstraints(ImVec2(610, 530), ImVec2(1920, 1080));
-			if (s_game_globals::game_is_mainmenu())
+			if (game_is_ui_shell())
 				ImGui::SetNextWindowBgAlpha(1);
 			if (ImGui::Begin(GetString(e_advanced_string::title), &open, window_flags))
 			{

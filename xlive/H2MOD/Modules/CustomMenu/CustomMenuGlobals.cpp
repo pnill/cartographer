@@ -1,7 +1,8 @@
 #include "stdafx.h"
-
 #include "CustomMenuGlobals.h"
 #include "CustomLanguage.h"
+
+#include "Blam/Engine/game/game_globals.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 BYTE* ui_memory_pool_allocate(int size, int a2)
@@ -901,7 +902,7 @@ void __cdecl sub_3e3ac_CMLTD(int a1, int label_id, wchar_t* rtn_label, int label
 		char* v4 = &tags::get_tag_data()[tags::get_tag_instances()[a1 & 0xFFFF].data_offset];
 
 		sub_3e332(
-			(int)tags::get_matg_globals_ptr() + 28 * (v3 + 14),
+			(int)scenario_get_game_globals() + 28 * (v3 + 14),
 			label_id,
 			rtn_label,
 			label_menu_id,//*(WORD*)(v4 + 4 * (v3 + 14) - 40),

@@ -1,6 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Common/Common.h"
 
 #define k_maximum_hs_unit_seat_mappings 65536
 

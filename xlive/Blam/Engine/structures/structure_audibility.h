@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
 

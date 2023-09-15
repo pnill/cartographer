@@ -302,6 +302,7 @@
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
@@ -392,8 +393,10 @@
     <ClInclude Include="Blam\Engine\game\game.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
+    <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\local_players.h" />
+    <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
@@ -410,6 +413,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
+    <ClInclude Include="Blam\Engine\main\level_definitions.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
@@ -678,7 +682,6 @@
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Cache\CacheHeader.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
@@ -692,7 +695,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
@@ -715,7 +717,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
-    <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
@@ -757,6 +758,7 @@
     <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
+    <ClInclude Include="Blam\Engine\text\text_group.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />

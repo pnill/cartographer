@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
@@ -146,7 +146,7 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
 	
-	if (s_game_globals::game_is_multiplayer()
+	if (game_is_multiplayer()
 		&& !NetworkSession::LocalPeerIsSessionHost()) 
 	{
 		output->Output(StringFlag_None, "# only host can see xyz for now...");
@@ -573,7 +573,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	std::string objectName = tokens[tokenArgPos++];
 
-	if (s_game_globals::game_is_mainmenu()) {
+	if (game_is_ui_shell()) {
 		output->Output(StringFlag_None, "# can only be used ingame");
 		return 0;
 	}
@@ -670,7 +670,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	ConsoleLog* output = cbData.strOutput;
 
 	if (!NetworkSession::LocalPeerIsSessionHost() 
-		&& !s_game_globals::game_is_campaign())
+		&& !game_is_campaign())
 	{
 		output->Output(StringFlag_None, "# can only be used by the session host");
 		return 0;

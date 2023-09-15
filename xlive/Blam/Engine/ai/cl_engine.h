@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Math/real_math.h"
 
 enum e_cs_point_set_flags : int

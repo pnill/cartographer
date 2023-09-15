@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Blam/Common/Common.h"
-
 struct s_file_reference
 {
 	unsigned long			signature;

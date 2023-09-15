@@ -1,12 +1,9 @@
 #include "stdafx.h"
-
 #include "MeleeLunge.h"
 
-#include "Util/Memory.h"
-
-#include "Blam/Engine/game/game_globals.h"
-
+#include "Blam/Engine/game/game.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Util/Memory.h"
 
 FLOATING_POINT_ENV_ACCESS();
 
@@ -641,7 +638,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		// update_melee_parameters();
 
 		m_melee_tick++;
-		if (((!s_game_globals::game_is_campaign() && !xboxTickrateEnabled) && distance_between_havok_components > 5.0f)
+		if (((!game_is_campaign() && !xboxTickrateEnabled) && distance_between_havok_components > 5.0f)
 			|| force_leave_melee_lunge_physics
 			|| m_time_to_target_in_ticks <= 0
 			|| m_melee_tick >= (m_maximum_counter + 6)

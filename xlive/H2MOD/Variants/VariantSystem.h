@@ -1,7 +1,4 @@
 #pragma once
-
-#include "Blam/Common/Common.h"
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
 #include "Blam/Engine/game/game_options.h"
 #include "Blam/Engine/game/game_statborg.h"
 

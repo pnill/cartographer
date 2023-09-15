@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Math/BlamMath.h"
 
 #pragma pack(push, 1)
@@ -34,3 +32,22 @@ struct s_damage_data
 };
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(s_damage_data, 0x85);
+
+// max_count: LONG_MAX
+struct s_armor_modifier_definition
+{
+	string_id name;
+	real32 damage_multiplier;
+};
+TAG_BLOCK_SIZE_ASSERT(s_armor_modifier_definition, 8);
+
+// max_count: LONG_MAX
+struct s_damage_group_definition
+{
+	string_id name;
+	tag_block<s_armor_modifier_definition> armor_modifiers;
+	
+	// Runtime field?
+	int32 pad;
+};
+TAG_BLOCK_SIZE_ASSERT(s_damage_group_definition, 16);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 
 #define k_max_flight_references_per_area 10
 

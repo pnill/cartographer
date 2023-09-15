@@ -1,10 +1,9 @@
 #include "stdafx.h"
-
 #include "Infection.h"
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
@@ -309,7 +308,7 @@ void Infection::Dispose()
 	}
 
 	Infection::resetWeaponInteractionAndEmblems();
-	if (!s_game_globals::game_is_predicted()) {
+	if (!game_is_predicted()) {
 		h2mod->set_unit_speed_patch(false);
 	}
 }
@@ -382,7 +381,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		}
 
 		// host code
-		if (!s_game_globals::game_is_predicted())
+		if (!game_is_predicted())
 		{
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));
 			if (unit_object) {
@@ -435,7 +434,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			}
 		}
 
-		if (!s_game_globals::game_is_predicted())
+		if (!game_is_predicted())
 			Infection::preSpawnServerSetup();
 		break;
 
@@ -473,7 +472,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		}
 
 		// host only (both client/dedicated server)
-		if (!s_game_globals::game_is_predicted())
+		if (!game_is_predicted())
 		{
 			LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", absPlayerIdx);
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));

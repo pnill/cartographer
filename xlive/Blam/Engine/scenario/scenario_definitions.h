@@ -3,7 +3,7 @@
 #include "scenario_interpolators.h"
 #include "scenario_kill_trigger_volumes.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Engine/ai/ai_flocks.h"
@@ -22,6 +22,7 @@
 #include "Blam/Engine/hs/hs.h"
 #include "Blam/Engine/hs/hs_library_internal_runtime.h"
 #include "Blam/Engine/hs/hs_unit_seats.h"
+#include "Blam/Engine/main/level_definitions.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/objects/light_definitions.h"
 #include "Blam/Engine/objects/objects.h"
@@ -71,8 +72,6 @@
 #define k_maximum_decorator_sets_per_scenario 32
 #define k_maximum_structure_bsp_spherical_harmonic_lighting_points 32768
 #define k_maximum_scenario_editor_folders 32767
-#define k_maximum_number_of_campaign_maps 20
-#define k_maximum_number_of_multiplayer_maps 50
 #define k_maximum_screen_effect_references_per_scenario 16
 #define k_maximum_simulation_definition_table_elements_per_scenario 512
 
@@ -1124,73 +1123,6 @@ struct s_scenario_editor_folder
     static_string256 name;
 };
 TAG_BLOCK_SIZE_ASSERT(s_scenario_editor_folder, 260);
-
-struct s_ui_level_descriptions
-{
-    c_static_wchar_string32 english_name;
-    c_static_wchar_string32 japanese_name;
-    c_static_wchar_string32 german_name;
-    c_static_wchar_string32 french_name;
-    c_static_wchar_string32 spanish_name;
-    c_static_wchar_string32 italian_name;
-    c_static_wchar_string32 korean_name;
-    c_static_wchar_string32 chinese_name;
-    c_static_wchar_string32 portuguese_name;
-    c_static_wchar_string128 english_description;
-    c_static_wchar_string128 japanese_description;
-    c_static_wchar_string128 german_description;
-    c_static_wchar_string128 french_description;
-    c_static_wchar_string128 spanish_description;
-    c_static_wchar_string128 italian_description;
-    c_static_wchar_string128 korean_description;
-    c_static_wchar_string128 chinese_description;
-    c_static_wchar_string128 portuguese_description;
-};
-CHECK_STRUCT_SIZE(s_ui_level_descriptions, 2880);
-
-// max count: k_maximum_number_of_campaign_maps 20
-struct s_campaign_ui_level_definition
-{
-    int campaign_id;
-    int map_id;
-    tag_reference bitmap;   // bitm
-    s_ui_level_descriptions level_descriptions;
-};
-TAG_BLOCK_SIZE_ASSERT(s_campaign_ui_level_definition, 2896);
-
-enum e_multiplayer_ui_level_definition_flags : byte
-{
-    multiplayer_ui_level_definition_flag_unlockable = FLAG(0)
-};
-
-// max count: k_maximum_number_of_multiplayer_maps 50
-struct s_multiplayer_ui_level_definition
-{
-    int map_id;
-    tag_reference bitmap;   // bitm
-    s_ui_level_descriptions level_descriptions;
-    static_string256 path;
-    int sort_order;
-    e_multiplayer_ui_level_definition_flags flags;
-    char pad[3];
-    byte max_teams_none;
-    byte max_teams_ctf;
-    byte max_teams_slayer;
-    byte max_teams_oddball;
-    byte max_teams_koth;
-    byte max_teams_race;
-    byte max_teams_headhunter;
-    byte max_teams_juggernaut;
-    byte max_teams_territories;
-    byte max_teams_assault;
-    byte max_teams_stub_10;
-    byte max_teams_stub_11;
-    byte max_teams_stub_12;
-    byte max_teams_stub_13;
-    byte max_teams_stub_14;
-    byte max_teams_stub_15;
-};
-TAG_BLOCK_SIZE_ASSERT(s_multiplayer_ui_level_definition, 3172);
 
 // max count: 1
 struct s_scenario_level_data

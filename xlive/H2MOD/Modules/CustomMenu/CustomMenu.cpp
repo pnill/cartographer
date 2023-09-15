@@ -1630,57 +1630,7 @@ void GSCustomMenuCall_Obscure() {
 	//int WgitScreenfunctionPtr = (int)(H2BaseAddr + 0x00259dc0);//button layout
 	CallWgit(CustomMenu_Obscure);
 }
-
-
 #pragma endregion
-
-
-typedef void(__cdecl* tsub_bd137)(unsigned int);
-tsub_bd137 psub_bd137;
-void __cdecl sub_bd137(unsigned int skull_id) {
-	//psub_bd137(skull_id);
-
-	BYTE* (*sub_22CE83)() = (BYTE * (*)())((BYTE*)H2BaseAddr + 0x22CE83);
-	signed int(*sub_5343F)() = (signed int(*)())((BYTE*)H2BaseAddr + 0x5343F);
-	int(__cdecl * sub_22DEA4)(int, int) = (int(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x22DEA4);
-	DWORD(__cdecl * sub_A402C)(float, float, float, __int16) = (DWORD(__cdecl*)(float, float, float, __int16))((BYTE*)H2BaseAddr + 0xA402C);
-	DWORD(__cdecl * sub_8836C)(DWORD, float) = (DWORD(__cdecl*)(DWORD, float))((BYTE*)H2BaseAddr + 0x8836C);
-
-	BYTE* byte_4D8320 = (BYTE*)((char*)H2BaseAddr + 0x4D8320);
-	DWORD* dword_3BCAF8 = (DWORD*)((char*)H2BaseAddr + 0x3BCAF8);
-	DWORD dword_482290 = *(DWORD*)((char*)H2BaseAddr + 0x482290);
-
-	int v1; // ST0C_4
-	int v2; // eax
-	int v3; // eax
-	int v4; // ecx
-	unsigned int v5; // ecx
-
-	bool skull_activated = false;
-
-	if (skull_id == 0x6) {
-		skull_activated = blind_fp = blind_hud = true;
-	}
-	else if (skull_id <= 0xE && !byte_4D8320[skull_id]) {
-		byte_4D8320[skull_id] = 1;
-		skull_activated = true;
-	}
-
-	if (skull_activated) {
-		sub_22CE83();
-		v1 = dword_3BCAF8[skull_id];
-		v2 = sub_5343F();
-		sub_22DEA4(v2, v1);
-		sub_A402C(1.0f, 1.0f, 1.0f, 20);//r, g, b, flash length
-		v3 = *(DWORD*)(tags::get_matg_globals_ptr() + 308);
-		if (v3 != -1) {
-			v4 = v3 + dword_482290;
-			v5 = *(DWORD*)(v4 + 280);
-			if (v5 != -1)
-				sub_8836C(v5, 1.0f);//sound_id?, volume 1.0-2.9?
-		}
-	}
-}
 
 void InitCustomMenu() {
 
@@ -2050,8 +2000,6 @@ void InitCustomMenu() {
 	psub_23f6b7 = (tsub_23f6b7)DetourFunc((BYTE*)H2BaseAddr + 0x23f6b7, (BYTE*)sub_23f6b7, 7);
 
 	//psub_248beb = (tsub_248beb)DetourClassFunc((BYTE*)H2BaseAddr + 0x248beb, (BYTE*)sub_248beb, 8);
-
-	psub_bd137 = (tsub_bd137)DetourFunc((BYTE*)H2BaseAddr + 0xbd137, (BYTE*)sub_bd137, 5);
 
 	RefreshToggleIngameKeyboardControls();
 

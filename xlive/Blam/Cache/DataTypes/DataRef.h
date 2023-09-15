@@ -1,7 +1,5 @@
 #pragma once
 
-#include "BlamPrimitiveType.h"
-
 /*********************************************************************
 * data_block
 * 8 BYTE Tag Structure for any Data Block Field

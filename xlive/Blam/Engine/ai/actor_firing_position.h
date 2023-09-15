@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
+
 
 // Unsure about the size for this struct...
 struct firing_position_ref

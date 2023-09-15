@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 
-#include "Blam/Common/Common.h"
+
 #include "Blam/Math/real_math.h"
 #include "Blam/Engine/animations/animation_channel.h"
 #include "Blam/Engine/tag_files/string_id.h"

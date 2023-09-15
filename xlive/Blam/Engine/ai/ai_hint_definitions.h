@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Math/real_math.h"
 
 #define k_max_flight_hints_per_bsp 50

@@ -4,13 +4,13 @@
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Math/BlamMath.h"
 
-enum e_bitmap_type : short
+enum e_bitmap_tag_type : int16
 {
-    bitmap_type_2d_textures = 0,
-    bitmap_type_3d_textures = 1,
-    bitmap_type_cube_maps = 2,
-    bitmap_type_sprites = 3,
-    bitmap_type_interface_bitmaps = 4
+    _bitmap_tag_type_2d_textures = 0,
+    _bitmap_tag_type_3d_textures = 1,
+    _bitmap_tag_type_cube_maps = 2,
+    _bitmap_tag_type_sprites = 3,
+    _bitmap_tag_type_interface_bitmaps = 4
 };
 
 enum e_bitmap_format : short
@@ -83,6 +83,14 @@ enum e_force_format : short
     force_format_force_a4r4g4b4 = 6,
 };
 
+enum e_bitmap_type : int16
+{
+    _bitmap_type_2d = 0,
+    _bitmap_type_3d = 1,
+    _bitmap_type_cubemap = 2,
+    k_bitmap_type_count
+};
+
 #define MAXIMUM_SPRITES_PER_SEQUENCE 64
 struct bitmap_group_sprite
 {
@@ -112,13 +120,6 @@ enum e_more_bitmap_data_flags : byte
 {
     more_bitmap_data_flag_delete_from_cache_file = FLAG(0),
     more_bitmap_data_flag_bitmap_create_attempted = FLAG(1)
-};
-
-enum e_bitmap_data_type : short
-{
-    bitmap_data_type_2d_texture = 0,
-    bitmap_data_type_3d_texture = 1,
-    bitmap_data_type_cube_map = 2
 };
 
 enum e_bitmap_data_format : short
@@ -194,7 +195,7 @@ struct bitmap_data
     byte depthPixels;                       // Depth is 1 for 2D textures and cube maps.
 
     e_more_bitmap_data_flags more_flags;
-    e_bitmap_data_type type;                // Determines bitmap "geometry."
+    e_bitmap_type type;                     // Determines bitmap "geometry."
     e_bitmap_data_format format;            // Determines how pixels are represented internally.
     e_bitmap_data_flags flags;
     point2d registration_point;
@@ -248,7 +249,7 @@ struct bitmap_group
     * CUBE MAPS : Generated from each consecutive set of six 2D textures in each sequence, all faces of a cube map must be square and the same size.
     * SPRITES : Sprite texture pages will be generated.
     * INTERFACE BITMAPS : Similar to 2D TEXTURES but without mipmaps and without the power of 2 restriction.")]*/
-    e_bitmap_type type;
+    e_bitmap_tag_type type;
 
     /*[Explaination("Format", "Format controls how pixels will be stored internally:
 
@@ -309,7 +310,7 @@ struct bitmap_group
     char overlap;
     e_color_subsampling color_subsampling;
 
-    // Data specific to tag builds?
+#ifdef TAGS_BUILD
     int unk_data_0;
     int unk_data_1;
     int unk_data_2;
@@ -317,5 +318,10 @@ struct bitmap_group
     tag_block<> unk_block_60;
     int unk_data_6;
     int unk_data_7;
+#endif
 };
+#ifdef TAGS_BUILD
 TAG_GROUP_SIZE_ASSERT(bitmap_group, 112);
+#else
+TAG_GROUP_SIZE_ASSERT(bitmap_group, 80);
+#endif

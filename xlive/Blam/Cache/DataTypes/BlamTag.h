@@ -1,7 +1,5 @@
 #pragma once
 
-#include "BlamPrimitiveType.h"
-
 struct blam_tag
 {
 	enum class tag_group_type : __int32

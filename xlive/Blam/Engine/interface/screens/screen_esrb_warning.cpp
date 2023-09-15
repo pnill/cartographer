@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "screen_esrb_warning.h"
 
-#include "Blam/Common/Common.h"
+
 #include "Util/Hooks/Hook.h"
 
 void c_screen_esrb_warning::apply_patches()

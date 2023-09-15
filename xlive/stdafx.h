@@ -54,17 +54,20 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <filesystem>
-#include <Util/remove_all_ptr.h>
 
 #include <d3d9.h>
 #include <d3dx9.h>
 
+// Cartographer includes
+#include "Blam/Engine/cseries/cseries.h"
+#include "Util/curl-interface.h"
 #include "Util/log.h"
+#include "Util/Memory.h"
+#include "Util/remove_all_ptr.h"
+
 #include "xliveless.h"
 #include "xlivedefs.h"
 
-#include "Util/Memory.h"
-#include "Util/curl-interface.h"
 
 #if defined __has_include
 #  if __has_include ("CartographerDllConf.h")

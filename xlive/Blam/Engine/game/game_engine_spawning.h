@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Math/real_math.h"

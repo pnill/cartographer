@@ -188,8 +188,6 @@
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
-    <ClCompile Include="3rdparty\zlib-1.1.4\minizip\unzip.c" />
-    <ClCompile Include="3rdparty\zlib-1.1.4\minizip\zip.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\unzip.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\contrib\minizip\zip.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\adler32.c" />
@@ -203,8 +201,6 @@
     <ClCompile Include="3rdparty\zlib-1.1.4\src\inflate.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\inftrees.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\infutil.c" />
-    <ClCompile Include="3rdparty\zlib-1.1.4\src\maketree.c" />
-    <ClCompile Include="3rdparty\zlib-1.1.4\src\minigzip.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\trees.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\uncompr.c" />
     <ClCompile Include="3rdparty\zlib-1.1.4\src\zutil.c" />
@@ -213,6 +209,7 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -312,7 +309,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
@@ -324,7 +320,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="Blam\Common\Common.h" />
     <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
@@ -449,7 +444,6 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamPrimitiveType.h" />
     <ClInclude Include="Blam\Math\integer_math.h" />
     <ClInclude Include="Blam\Math\real_math.h" />
     <ClInclude Include="Blam\Math\BlamMath.h" />
@@ -624,8 +618,6 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
-    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zconf.h" />
-    <ClInclude Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\include\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\include\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\include\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\minizip\unzip.h" />
@@ -648,6 +640,10 @@
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\ai\pathfinding_utilities.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
+    <ClInclude Include="Blam\Engine\game\game_preferences.h" />
+    <ClInclude Include="Blam\Engine\game\materials.h" />
+    <ClInclude Include="Blam\Engine\main\level_definitions.h" />
+    <ClInclude Include="Blam\Engine\text\text_group.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

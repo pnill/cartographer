@@ -2,7 +2,7 @@
 #include "decorator_projected_decals.h"
 
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Common/Common.h"
+
 #include "Blam/Engine/geometry/geometry_block.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Math/real_math.h"

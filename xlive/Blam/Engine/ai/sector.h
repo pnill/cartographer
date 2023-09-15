@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Common/Common.h"
+
 
 enum e_pathfinding_sector_flags : short
 {

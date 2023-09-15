@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_engine_util.h"
 
-#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game.h"
 
 int current_game_engine()
 {
@@ -28,7 +28,7 @@ bool game_engine_has_teams()
 {
 	if (current_game_engine())
 	{
-		return s_game_globals::get_game_variant()->game_engine_flags & 1;
+		return current_game_variant()->game_engine_flags & 1;
 	}
 
 	return false;

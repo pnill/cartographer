@@ -1,8 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamPrimitiveType.h"
-#include "Blam/Common/Common.h"
 #include "Blam/Engine/Networking/NetworkPrimitiveTypes.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
 
 enum e_simulation_entity_type : __int16
 {

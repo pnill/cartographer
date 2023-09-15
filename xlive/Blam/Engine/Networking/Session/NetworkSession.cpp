@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "NetworkSession.h"
-#include "Blam/Engine/game/game_globals.h"
+
+#include "Blam/Engine/game/game.h"
 
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
@@ -220,7 +221,7 @@ void NetworkSession::LeaveSession()
 	if (Memory::IsDedicatedServer())
 		return;
 
-	if (s_game_globals::game_is_mainmenu())
+	if (game_is_ui_shell())
 	{
 		// request_squad_browser
 		*Memory::GetAddress<bool*>(0x978BAC) = true;
