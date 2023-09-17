@@ -62,13 +62,13 @@ namespace FirstPersonInterpolate
 				break;
 			}
 
-			if (!local_user_has_player(i))
+			if (!players_user_is_active(i))
 			{
 				ResetPlayer(i);
 				continue;
 			}
 
-			player_datum = local_user_get_player_idx(i);
+			player_datum = player_index_from_user_index(i);
 			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 			if (DATUM_IS_NONE(player_unit_datum))
@@ -101,9 +101,9 @@ namespace FirstPersonInterpolate
 			if (!camera_state->valid)
 				continue;
 			
-			if (local_user_has_player(i))
+			if (players_user_is_active(i))
 			{
-				player_datum = local_user_get_player_idx(i);
+				player_datum = player_index_from_user_index(i);
 				player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 				if (camera_state->unit_idx == player_unit_datum)
@@ -131,10 +131,10 @@ namespace FirstPersonInterpolate
 		{
 			datum player_datum, player_unit_datum;
 			s_camera_state* camera_state = &local_players_states[i];
-			if (!local_user_has_player(i))
+			if (!players_user_is_active(i))
 				continue;
 
-			player_datum = local_user_get_player_idx(i);
+			player_datum = player_index_from_user_index(i);
 			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
 
 			if (DATUM_IS_NONE(player_unit_datum))
