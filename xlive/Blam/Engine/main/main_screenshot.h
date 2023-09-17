@@ -11,9 +11,9 @@ struct s_screenshot_globals
 	bool dump_camera_data;
 	bool capture_cubemap;
 	bool camera_name_set;
-	int resolution_multiplier;
-	int fieldC;
-	char camera_name[256];
+	int32 resolution_multiplier;
+	int32 fieldC;
+	static_string256 camera_name;
 	bitmap_data* bloom_bitmap;
 };
 CHECK_STRUCT_SIZE(s_screenshot_globals, 276);
