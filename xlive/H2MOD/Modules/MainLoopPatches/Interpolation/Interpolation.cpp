@@ -7,7 +7,7 @@
 
 #include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/game/local_players.h"
+#include "Blam/Engine/game/players.h"
 
 #include "Util/Hooks/Hook.h"
 

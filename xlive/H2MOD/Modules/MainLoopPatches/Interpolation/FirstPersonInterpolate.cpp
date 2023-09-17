@@ -4,7 +4,6 @@
 
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 #include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/game/local_players.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Math/BlamMath.h"
 #include "Util/Hooks/Hook.h"

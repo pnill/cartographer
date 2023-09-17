@@ -352,3 +352,6 @@ struct s_players_globals
 CHECK_STRUCT_SIZE(s_players_globals, 312);
 
 s_players_globals* get_players_globals();
+
+datum __cdecl player_index_from_user_index(int32 user_index);
+bool __cdecl players_user_is_active(int32 user_index);
