@@ -314,7 +314,6 @@
     <ClCompile Include="Blam\Engine\game\game_engine_util.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
-    <ClCompile Include="Blam\Engine\game\local_players.cpp" />
     <ClCompile Include="Blam\Engine\game\player_control.cpp" />
     <ClCompile Include="Blam\Engine\interface\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\interface\first_person_weapons.cpp" />
@@ -395,7 +394,6 @@
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
-    <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />

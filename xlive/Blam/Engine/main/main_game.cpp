@@ -35,11 +35,9 @@ void main_game_launch_set_map_name(const char* map_name)
 }
 
 // TODO rewrite the obfuscated function
-bool main_game_change(const s_game_options* options)
+bool __cdecl main_game_change(const s_game_options* options)
 {
-    typedef bool(__cdecl* main_game_change_t)(const s_game_options*);
-    auto p_main_game_change = Memory::GetAddress<main_game_change_t>(0x89BA, 0x1E4EC);
-    return p_main_game_change(options);
+    return INVOKE(0x89BA, 0x1E4EC, main_game_change, options);
 }
 
 void main_game_launch_set_difficulty(short difficulty)

@@ -45,6 +45,13 @@ static_assert(sizeof(real64) == 8);
 typedef int datum;
 static_assert(sizeof(datum) == 4);
 
+// Invokes a function
+// ADDR_CLIENT: file offset in halo2.exe
+// ADDR_SERVER: file offset in h2server.exe
+// TYPE: function
+// __VA_ARGS__: arguments for the function we want to invoke
+#define INVOKE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<decltype(TYPE)*>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
+
 #define NONE -1
 #define DATUM_INDEX_NONE ((datum)(NONE))
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)((_absolute_index) | ((_salt) << 16))
