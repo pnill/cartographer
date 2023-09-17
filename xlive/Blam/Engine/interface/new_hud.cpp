@@ -27,7 +27,12 @@ void should_draw_hud_override_set(bool flag)
 
 s_new_hud_engine_globals* get_new_hud_engine_globals(void)
 {
-	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4);
+	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
+}
+
+s_hud_scripted_globals* get_hud_scripted_globals(void)
+{
+	return *Memory::GetAddress<s_hud_scripted_globals**>(0x9765CC, 0x99FBB4);
 }
 
 bool __cdecl render_ingame_chat_check() 

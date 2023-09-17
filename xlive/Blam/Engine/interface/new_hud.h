@@ -2,6 +2,14 @@
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
+struct s_hud_scripted_globals
+{
+	bool unused_bool;
+	bool show_help_text;
+	bool show_hud_messages;
+};
+CHECK_STRUCT_SIZE(s_hud_scripted_globals, 3);
+
 struct s_new_hud_globals_player_info
 {
 	real32 unk_0;
@@ -36,6 +44,7 @@ CHECK_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
+s_hud_scripted_globals* get_hud_scripted_globals(void);
 
 void set_crosshair_scale(float scale);
 void new_hud_apply_patches();
