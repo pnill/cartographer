@@ -20,6 +20,26 @@ LONG WINAPI debug_unhandled_exception_cb(_In_ struct _EXCEPTION_POINTERS* except
 	{
 		crash_window_create(reports_path.get_string(), zip_file_path.get_string());
 	}
+	else
+	{
+		// Delete temp report path after we read the data
+		SHFILEOPSTRUCT file_op = {
+				NULL,
+				FO_DELETE,
+				reports_path.get_string(),
+				L"",
+				FOF_NOCONFIRMATION |
+				FOF_NOERRORUI |
+				FOF_SILENT,
+				false,
+				0,
+				L"" };
+		int32 result = SHFileOperationW(&file_op);
+		if (result)
+		{
+			LOG_ERROR_FUNCW("SHFileOperationW failed to delete folder {} with error {}", reports_path.get_string(), result);
+		}
+	}
 
 	// pass through error to game/server code.
 	if (pfn_SecondaryExceptionFilter)
