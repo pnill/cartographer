@@ -64,22 +64,28 @@ bool file_delete(s_file_reference* file_reference);
 On success the data read is written to data_buffer and the function returns true
 On failure, if hide_errors_from_user is set to false an error is displayed to the user and false is returned, if the number of bytes read doesn't match the requested amount ERROR_HANDLE_EOF is set
 */
-bool file_read(s_file_reference* file_reference, size_t bytes_to_read, bool suppress_errors, LPVOID data_buffer);
+bool file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer);
 
 /* Returns success */
-bool file_write(s_file_reference* file_reference, size_t data_size, LPVOID data);
+bool file_write(s_file_reference* file_reference, uint32 data_size, void* data);
 
 /* */
-bool file_get_size(s_file_reference* file_reference, size_t* size);
+bool file_get_size(s_file_reference* file_reference, uint32* size);
 
 /* */
 bool file_set_eof(s_file_reference* file_reference);
 
 /* Can be used to truncate or extend an open file, returns success */
-bool file_change_size(s_file_reference* file_reference, LONG new_size);
+bool file_change_size(s_file_reference* file_reference, int32 new_size);
 
 /* */
 bool file_read_only(s_file_reference* file_reference, bool read_only);
 
 /* */
 bool file_set_hidden(s_file_reference* file_reference, bool hidden);
+
+// Add a file to a zip file using zlib
+// zip_file: zip file we want to add the file to
+// file_to_add: file reference for the file we want to add to the zip
+// path_in_zip: the file path (includes the filename) the file will be set as in the zip file
+bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip);

@@ -38,23 +38,23 @@ bool file_delete(s_file_reference* file_reference)
 	return p_file_delete(file_reference);
 }
 
-bool file_read(s_file_reference* file_reference, size_t bytes_to_read, bool suppress_errors, LPVOID data_buffer)
+bool file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer)
 {
-	typedef char(__cdecl* file_read_t)(s_file_reference*, size_t, bool, LPVOID);
+	typedef bool(__cdecl* file_read_t)(s_file_reference*, uint32, bool, void*);
 	auto p_file_read = Memory::GetAddress<file_read_t>(0x63C60, 0x65F3C);
 	return p_file_read(file_reference, bytes_to_read, suppress_errors, data_buffer);
 }
 
-bool file_write(s_file_reference* file_reference, size_t data_size, LPVOID data)
+bool file_write(s_file_reference* file_reference, uint32 data_size, void* data)
 {
-	typedef bool(__cdecl* file_write_t)(s_file_reference*, DWORD, LPVOID);
+	typedef bool(__cdecl* file_write_t)(s_file_reference*, uint32, void*);
 	auto p_file_write = Memory::GetAddress<file_write_t>(0x63CBC, 0x65F98);
 	return p_file_write(file_reference, data_size, data);
 }
 
-bool file_get_size(s_file_reference* file_reference, size_t* size)
+bool file_get_size(s_file_reference* file_reference, uint32* size)
 {
-	typedef bool(__cdecl* file_get_size_low_t)(s_file_reference*, size_t*);
+	typedef bool(__cdecl* file_get_size_low_t)(s_file_reference*, uint32*);
 	auto p_file_get_size_low = Memory::GetAddress<file_get_size_low_t>(0x63E10, 0x660EC);
 	return p_file_get_size_low(file_reference, size);
 }
@@ -72,7 +72,7 @@ bool file_set_eof(s_file_reference* file_reference)
 	return false;
 }
 
-bool file_change_size(s_file_reference* file_reference, LONG new_size)
+bool file_change_size(s_file_reference* file_reference, int32 new_size)
 {
 	if (file_reference->handle)
 	{
@@ -96,4 +96,68 @@ bool file_set_hidden(s_file_reference* file_reference, bool hidden)
 	typedef bool(__cdecl* file_set_hidden_t)(s_file_reference*, bool);
 	auto p_file_set_hidden = Memory::GetAddress<file_set_hidden_t>(0x63545, 0x65845);
 	return p_file_set_hidden(file_reference, hidden);
+}
+
+bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip)
+{
+	bool result = true;
+
+	if (zip_file)
+	{
+		e_file_open_flags flags = _permission_read_bit;
+		e_file_open_error error;
+
+		if (file_open(file_to_add, flags, &error))
+		{
+			uint32 file_size;
+			if (file_get_size(file_to_add, &file_size))
+			{
+				// Add minidump to zip file
+				if (zipOpenNewFileInZip(zip_file, path_in_zip, NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_BEST_COMPRESSION) == Z_OK)
+				{
+					void* file_data = malloc(file_size);
+					if (file_read(file_to_add, file_size, false, file_data))
+					{
+						if(zipWriteInFileInZip(zip_file, file_data, file_size) != Z_OK)
+						{
+							result = false;
+						}
+					}
+					else
+					{
+						result = false;
+					}
+
+					free(file_data);
+					if (zipCloseFileInZip(zip_file) != Z_OK)
+					{
+						result = false;
+					}
+				}
+				else
+				{
+					result = false;
+				}
+			}
+			else
+			{
+				result = false;
+			}
+
+			if (!file_close(file_to_add))
+			{
+				result = false;
+			}
+		}
+		else
+		{
+			result = false;
+		}
+	}
+	else
+	{
+		result = false;
+	}
+
+	return result;
 }
