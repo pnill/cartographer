@@ -20,6 +20,7 @@ public:
 	char* get_buffer(void);
 	char* set(const char* src);
 	size_t length(void) const;
+	size_t max_length(void) const;
 	char* append(const char* src);
 	int index_of(const char* src) const;
 	int next_index_of(const char* src, size_t starting_index) const;
@@ -44,6 +45,7 @@ public:
 	wchar_t* get_buffer(void);
 	wchar_t* set(const wchar_t* src);
 	size_t length(void) const;
+	size_t max_length(void) const;
 	wchar_t* append(const wchar_t* src);
 	int index_of(const wchar_t* src) const;
 	int next_index_of(const wchar_t* src, size_t starting_index) const;
@@ -57,6 +59,7 @@ typedef c_static_string<32>  static_string32;
 typedef c_static_string<64>  static_string64;
 typedef c_static_string<128> static_string128;
 typedef c_static_string<256> static_string256;
+typedef c_static_string<260> c_static_string260;
 typedef c_static_string<512> static_string512;
 typedef c_static_wchar_string<32>  c_static_wchar_string32;
 typedef c_static_wchar_string<64>  c_static_wchar_string64;
@@ -93,6 +96,12 @@ template<size_t T>
 inline size_t c_static_string<T>::length(void) const
 {
 	return csstrnlen(this->get_string(), T);
+}
+
+template<size_t T>
+inline size_t c_static_string<T>::max_length(void) const
+{
+	return T;
 }
 
 template<size_t T>
@@ -180,6 +189,12 @@ template<size_t T>
 inline size_t c_static_wchar_string<T>::length(void) const
 {
 	return ustrnlen(this->get_string(), T);
+}
+
+template<size_t T>
+inline size_t c_static_wchar_string<T>::max_length(void) const
+{
+	return T;
 }
 
 template<size_t T>
