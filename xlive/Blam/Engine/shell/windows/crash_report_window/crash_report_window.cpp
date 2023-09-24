@@ -81,6 +81,8 @@ void crash_window_create(const wchar_t* report_path, const wchar_t* archive_path
         NULL,
         NULL);
 
+    SetForegroundWindow(g_crash_report_window);
+
     while (GetMessage(&msg, NULL, 0, 0)) 
     {
         TranslateMessage(&msg);
@@ -349,10 +351,6 @@ void crash_window_wm_destroy()
 
 LRESULT CALLBACK crash_window_wnd_proc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    // Hack to always force the window to the foreground
-    // Not sure if we should change this
-    SetForegroundWindow(hwnd);
-
     switch (msg) 
     {
     case WM_CREATE:
