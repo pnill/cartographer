@@ -1,9 +1,11 @@
 #pragma once
-#include "Blam/Math/BlamMath.h"
+#include "object_placement.h"
+#include "object_types.h"
+
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/Simulation/SimulationWorld.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "Blam/Math/BlamMath.h"
 
 #define k_maximum_objects_per_map 2048
 
@@ -44,24 +46,6 @@ enum e_game_team : short
 	_game_team_none = -1
 };
 
-enum e_object_type : signed char
-{
-	object_type_biped = 0,
-	object_type_vehicle = 1,
-	object_type_weapon = 2,
-	object_type_equipment = 3,
-	object_type_garbage = 4,
-	object_type_projectile = 5,
-	object_type_scenery = 6,
-	object_type_machine = 7,
-	object_type_control = 8,
-	object_type_light_fixture = 9,
-	object_type_sound_scenery = 10,
-	object_type_crate = 11,
-	object_type_creature = 12,
-	object_type_none = -1
-};
-
 enum e_grenades : BYTE
 {
 	Fragmentation,
@@ -98,7 +82,7 @@ struct s_object_data_definition
 	float scale;
 	datum unique_id;
 	__int16 origin_bsp_index;
-	e_object_type object_type;//TODO: confirm if its object_type or object_type_flags
+	e_object_type object_type;
 	char gap_AB[1];
 	__int16 name_list_index;
 	char gap_5[1];
@@ -195,8 +179,8 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
 }
 
-void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
-datum object_new(s_object_placement_data* object_placement_data);
+void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
+datum object_new(object_placement_data* object_placement_data);
 void apply_biped_object_definition_patches();
 void simulation_action_object_create(datum object_idx);
 void object_destroy(datum object_idx);

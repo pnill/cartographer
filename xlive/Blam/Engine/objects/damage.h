@@ -1,7 +1,16 @@
 #pragma once
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Math/real_math.h"
 
 #pragma pack(push, 1)
+struct s_damage_owner
+{
+	DWORD unk1;
+	DWORD unk2;
+	WORD unk3;
+};
+CHECK_STRUCT_SIZE(s_damage_owner, 10);
+
 struct s_damage_data
 {
 	DWORD damage_tag_index;			// 0x0

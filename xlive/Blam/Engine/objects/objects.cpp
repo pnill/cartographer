@@ -10,7 +10,7 @@
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "Util/Hooks/Hook.h"
 
-void create_new_placement_data(s_object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
+void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
 {
 	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
 
@@ -21,14 +21,14 @@ void create_new_placement_data(s_object_placement_data* object_placement_data, d
 }
 
 //Pass new placement data into Create_object_new
-datum object_new(s_object_placement_data* object_placement_data)
+datum object_new(object_placement_data* placement_data)
 {
 	LOG_TRACE_GAME("{}", __FUNCTION__);
 
-	typedef datum(__cdecl* object_new_t)(s_object_placement_data*);
+	typedef datum(__cdecl* object_new_t)(object_placement_data*);
 	auto p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
 
-	return p_object_new(object_placement_data);
+	return p_object_new(placement_data);
 }
 
 //Pass datum from new object into object to sync
@@ -51,7 +51,7 @@ void object_destroy(datum object_idx)
 #pragma region Biped variant patches
 void update_biped_object_variant_data(datum object_idx, int variant_index)
 {
-	s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(e_object_type::biped));
+	s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(object_type_biped));
 	// set this data only if we are dealing with a biped
 	if (biped_object != NULL)
 	{
@@ -111,26 +111,26 @@ bool __stdcall c_simulation_unit_entity_definition_creation_decode_hook(void* th
 	return p_c_simulation_unit_entity_definition_decode(thisptr, creation_data_size, creation_data, stream);
 }
 
-int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, s_simulation_unit_creation_data* creation_data, int a2, int a3, s_object_placement_data* object_placement_data)
+int __stdcall c_simulation_object_entity_definition_object_create_object_hook(int thisx, s_simulation_unit_creation_data* creation_data, int a2, int a3, object_placement_data* placement_data)
 {
 	// set the object placement data
-	object_placement_data->variant_name = creation_data->variant_name;
+	placement_data->variant_name = creation_data->variant_name;
 	if (*(byte*)((char*)creation_data + 0x10) != -1)
 	{
 		// set the object placement data
-		object_placement_data->variant_name = creation_data->variant_name;
+		placement_data->variant_name = creation_data->variant_name;
 		if(*(byte*)((char*)creation_data + 0x10) != -1)
 		{
 			auto profile = reinterpret_cast<s_player_profile*>((char*)creation_data + 0x10);
 			datum player_representation_datum = PlayerRepresentation::get_object_datum_from_representation(profile->player_character_type);
 			if (player_representation_datum != DATUM_INDEX_NONE)
-				object_placement_data->tag_index = player_representation_datum;
+				placement_data->tag_index = player_representation_datum;
 		}
 		//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
-		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
+		return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, placement_data);
 	}
 	//addDebugText("creating object with variant index: %d", object_placement_data->variant_name);
-	return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, s_object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, object_placement_data);
+	return Memory::GetAddress<int(__thiscall*)(int, void*, int, int, object_placement_data*)>(0x1F32DB, 0x1DE374)(thisx, creation_data, a2, a3, placement_data);
 }
 
 __declspec(naked) void c_simulation_object_entity_definition_object_create_object_to_stdcall()
