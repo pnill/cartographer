@@ -151,7 +151,6 @@
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
-    <ClCompile Include="Blam\Engine\game\local_players.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
@@ -379,7 +378,7 @@
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
     <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="resources\resource.h" />
     <ClInclude Include="Util\Base64.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
@@ -549,7 +548,6 @@
     <ClInclude Include="Blam\Engine\memory\data.h" />
     <ClInclude Include="Blam\Engine\objects\object_placement.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
-    <ClInclude Include="Blam\Engine\game\local_players.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
@@ -654,14 +652,15 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
+    <ClInclude Include="resources\version_resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
+    <ResourceCompile Include="resources\Resource.rc" />
+    <ResourceCompile Include="resources\VersionRes.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xlive.def" />
     <None Include="3rdparty\directx\include\d3dx9math.inl" />
-    <None Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\lib\libz-bcc.def" />
-    <None Include="..\..\cartographer\xlive\3rdparty\zlib-1.1.4\lib\libz.def" />
+    <None Include="resources\Resource.aps" />
   </ItemGroup>
 </Project>
