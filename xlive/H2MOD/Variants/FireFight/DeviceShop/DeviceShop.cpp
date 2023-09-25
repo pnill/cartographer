@@ -1,7 +1,8 @@
 #include "stdafx.h"
 
 #include "DeviceShop.h"
-#include "H2MOD.h"
+
+#include "Blam/Engine/units/bipeds.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

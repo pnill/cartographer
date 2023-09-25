@@ -1,14 +1,17 @@
 #include "stdafx.h"
 #include "GraveRobber.h"
 
+#include "H2MOD.h"
+
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_statborg.h"
+#include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/units/bipeds.h"
+
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Utils/Utils.h"
 
 bool firstPlayerSpawn;
 bool player_is_picking_up_skull = false;
@@ -219,7 +222,7 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 	{
 	case ExecTime::_preEventExec:
 
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->item.object.tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 		{
 			GraveRobber::PickupSkull(playerIdx, objectIdx);
 			handled = true;

@@ -5,7 +5,7 @@
 #include "Blam/Engine/ai/actors.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/FireFight/DeviceShop/DeviceShop.h"

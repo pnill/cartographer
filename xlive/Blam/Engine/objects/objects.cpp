@@ -1,14 +1,14 @@
 #include "stdafx.h"
-
 #include "objects.h"
-
-#include "Util/Hooks/Hook.h"
 
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
+#include "Blam/Engine/units/bipeds.h"
+
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
+#include "Util/Hooks/Hook.h"
 
 namespace Engine::Objects
 {
