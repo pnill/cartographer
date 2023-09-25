@@ -940,6 +940,9 @@
     <ResourceCompile Include="resources\Resource.rc" />
     <ResourceCompile Include="resources\VersionRes.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\bitmaps\crash_window_header.bmp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

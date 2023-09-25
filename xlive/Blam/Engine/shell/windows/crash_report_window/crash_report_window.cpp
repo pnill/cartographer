@@ -7,6 +7,8 @@
 #include "Blam/Engine/text/unicode.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
+#include "resources/resource.h"
+
 #include "Util/filesys.h"
 
 #define k_id_edit 1
@@ -17,8 +19,6 @@
 
 #define k_crash_window_text_box_size_x 600
 #define k_crash_window_text_box_size_y 200
-
-#define k_crash_window_image_path L"\\mods\\images\\halo2logo.bmp"
 
 #define k_crash_window_name L"Crash Report for \"Halo 2: Project Cartographer\""
 #define k_crash_header_text L"Halo 2 has encountered a fatal error and needs to exit."
@@ -299,18 +299,15 @@ void crash_window_create_text(PAINTSTRUCT* ps, HDC hdc)
 
 void crash_window_wm_create(HWND hwnd)
 {
-    c_static_wchar_string260 directory;
-    GetCurrentDirectoryW(MAX_PATH, directory.get_buffer());
-    directory.append(k_crash_window_image_path);
-
     center_window(hwnd);
     crash_report_window_create_widgets(hwnd, k_crash_window_width, k_crash_window_height);
 
-    g_crash_hbitmap = (HBITMAP)LoadImageW(NULL, directory.get_string(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    // Load bitmap from windows resource
+    g_crash_hbitmap = LoadBitmapW(GetModuleHandleW(L"xlive.dll"), MAKEINTRESOURCEW(IDB_CRASH_WINDOW_HEADER_BITMAP));
 
     if (g_crash_hbitmap == NULL)
     {
-        LOG_ERROR_FUNCW("Failed to load image {}", k_crash_window_image_path);
+        LOG_ERROR_FUNCW("Failed to load header image");
     }
 
     return;
