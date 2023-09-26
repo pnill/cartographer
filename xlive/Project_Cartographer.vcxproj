@@ -933,7 +933,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="3rdparty\directx\include\d3dx9math.inl" />
-    <None Include="resources\Resource.aps" />
     <None Include="xlive.def" />
   </ItemGroup>
   <ItemGroup>
