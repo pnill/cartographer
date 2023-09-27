@@ -27,6 +27,11 @@
 #include <mmsystem.h>
 #include <windef.h>
 #include <codecvt>
+#include <DbgHelp.h>
+#include <ShlObj.h>
+#include <time.h>
+#include <psapi.h>
+#include <TlHelp32.h>
 
 // game input
 #include <xinput.h>
@@ -68,6 +73,8 @@
 #include "xliveless.h"
 #include "xlivedefs.h"
 
+
+#include <contrib/minizip/zip.h>
 
 #if defined __has_include
 #  if __has_include ("CartographerDllConf.h")

@@ -227,7 +227,7 @@ bool __cdecl filo_write__encrypted_data_hook(s_file_reference* file_ptr, DWORD n
 
 	if (file_size > nNumberOfBytesToWrite) // clear the file as unencrypted data is shorter then encrypted data.
 		file_change_size(file_ptr, 0);
-	return file_write(file_ptr, lpBuffer, nNumberOfBytesToWrite);
+	return file_write(file_ptr, nNumberOfBytesToWrite, lpBuffer);
 }
 
 static BOOL (WINAPI* p_IsDebuggerPresent)() = IsDebuggerPresent;

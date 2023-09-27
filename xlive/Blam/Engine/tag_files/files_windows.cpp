@@ -1,20 +1,20 @@
 #include "stdafx.h"
-
 #include "files_windows.h"
 
+// TODO create an extended version of s_file_reference that supports MAX_PATH and wide strings
 
-s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const std::string& path, bool path_is_directory)
+s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory)
 {
-	typedef s_file_reference* (__cdecl* file_reference_create_from_path_t)(s_file_reference*, const char*, bool);
+	typedef s_file_reference* (__cdecl* file_reference_create_from_path_t)(s_file_reference*, const utf8*, bool);
 	auto p_file_reference_create_from_path = Memory::GetAddress<file_reference_create_from_path_t>(0x8C409, 0x86D37);
-	return p_file_reference_create_from_path(file_reference, path.c_str(), path_is_directory);
+	return p_file_reference_create_from_path(file_reference, path, path_is_directory);
 }
 
-bool file_open(s_file_reference* file_reference, __int16 mode, DWORD* out_error_code)
+bool file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code)
 {
-	typedef bool(__cdecl* filo_open_t)(s_file_reference*, __int16, DWORD*);
-	auto p_file_open = Memory::GetAddress<filo_open_t>(0x638BF, 0x65BBF);
-	return p_file_open(file_reference, mode, out_error_code);
+	typedef bool(__cdecl* file_open_t)(s_file_reference*, e_file_open_flags, e_file_open_error*);
+	auto p_file_open = Memory::GetAddress<file_open_t>(0x638BF, 0x65BBF);
+	return p_file_open(file_reference, flags, out_error_code);
 }
 
 bool file_close(s_file_reference* file_reference)
@@ -38,25 +38,25 @@ bool file_delete(s_file_reference* file_reference)
 	return p_file_delete(file_reference);
 }
 
-bool file_read(s_file_reference* file_reference, LPVOID data_buffer, DWORD nNumberOfBytesToRead, bool suppress_errors)
+bool file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer)
 {
-	typedef char(__cdecl* file_read_t)(s_file_reference*, DWORD, bool, LPVOID);
+	typedef bool(__cdecl* file_read_t)(s_file_reference*, uint32, bool, void*);
 	auto p_file_read = Memory::GetAddress<file_read_t>(0x63C60, 0x65F3C);
-	return p_file_read(file_reference, nNumberOfBytesToRead, suppress_errors, data_buffer);
+	return p_file_read(file_reference, bytes_to_read, suppress_errors, data_buffer);
 }
 
-bool file_write(s_file_reference* file_reference, LPVOID data, size_t data_size)
+bool file_write(s_file_reference* file_reference, uint32 data_size, void* data)
 {
-	typedef bool(__cdecl* file_write_t)(s_file_reference*, DWORD, LPVOID);
+	typedef bool(__cdecl* file_write_t)(s_file_reference*, uint32, void*);
 	auto p_file_write = Memory::GetAddress<file_write_t>(0x63CBC, 0x65F98);
 	return p_file_write(file_reference, data_size, data);
 }
 
-bool file_get_size_low(s_file_reference* file_reference, DWORD* out_low_size)
+bool file_get_size(s_file_reference* file_reference, uint32* size)
 {
-	typedef bool(__cdecl* file_get_size_low_t)(s_file_reference*, DWORD*);
+	typedef bool(__cdecl* file_get_size_low_t)(s_file_reference*, uint32*);
 	auto p_file_get_size_low = Memory::GetAddress<file_get_size_low_t>(0x63E10, 0x660EC);
-	return p_file_get_size_low(file_reference, out_low_size);
+	return p_file_get_size_low(file_reference, size);
 }
 
 bool file_set_eof(s_file_reference* file_reference)
@@ -72,7 +72,7 @@ bool file_set_eof(s_file_reference* file_reference)
 	return false;
 }
 
-bool file_change_size(s_file_reference* file_reference, LONG new_size)
+bool file_change_size(s_file_reference* file_reference, int32 new_size)
 {
 	if (file_reference->handle)
 	{
@@ -87,13 +87,77 @@ bool file_change_size(s_file_reference* file_reference, LONG new_size)
 bool file_read_only(s_file_reference* file_reference, bool read_only)
 {
 	typedef bool(__cdecl* file_read_only_t)(s_file_reference*, bool);
-	auto p_filo_set_file_attribute_readonly = Memory::GetAddress<file_read_only_t>(0x6341D, 0x6571D);
-	return p_filo_set_file_attribute_readonly(file_reference, read_only);
+	auto p_file_read_only = Memory::GetAddress<file_read_only_t>(0x6341D, 0x6571D);
+	return p_file_read_only(file_reference, read_only);
 }
 
 bool file_set_hidden(s_file_reference* file_reference, bool hidden)
 {
 	typedef bool(__cdecl* file_set_hidden_t)(s_file_reference*, bool);
-	auto p_filo_set_file_attribute_hidden = Memory::GetAddress<file_set_hidden_t>(0x63545, 0x65845);
-	return p_filo_set_file_attribute_hidden(file_reference, hidden);
+	auto p_file_set_hidden = Memory::GetAddress<file_set_hidden_t>(0x63545, 0x65845);
+	return p_file_set_hidden(file_reference, hidden);
+}
+
+bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip)
+{
+	bool result = true;
+
+	if (zip_file)
+	{
+		e_file_open_flags flags = _permission_read_bit;
+		e_file_open_error error;
+
+		if (file_open(file_to_add, flags, &error))
+		{
+			uint32 file_size;
+			if (file_get_size(file_to_add, &file_size))
+			{
+				// Add minidump to zip file
+				if (zipOpenNewFileInZip(zip_file, path_in_zip, NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_BEST_COMPRESSION) == Z_OK)
+				{
+					void* file_data = malloc(file_size);
+					if (file_read(file_to_add, file_size, false, file_data))
+					{
+						if(zipWriteInFileInZip(zip_file, file_data, file_size) != Z_OK)
+						{
+							result = false;
+						}
+					}
+					else
+					{
+						result = false;
+					}
+
+					free(file_data);
+					if (zipCloseFileInZip(zip_file) != Z_OK)
+					{
+						result = false;
+					}
+				}
+				else
+				{
+					result = false;
+				}
+			}
+			else
+			{
+				result = false;
+			}
+
+			if (!file_close(file_to_add))
+			{
+				result = false;
+			}
+		}
+		else
+		{
+			result = false;
+		}
+	}
+	else
+	{
+		result = false;
+	}
+
+	return result;
 }

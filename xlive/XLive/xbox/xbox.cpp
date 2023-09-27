@@ -2,7 +2,7 @@
 
 #include "xbox.h"
 
-#include "resource.h"
+#include "resources/resource.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 

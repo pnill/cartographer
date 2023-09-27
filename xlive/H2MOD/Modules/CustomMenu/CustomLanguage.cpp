@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
+#include "Blam/Engine/text/unicode.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -613,15 +614,12 @@ string_id_to_wide_string_t p_string_id_to_wide_string;
 
 void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *output, int a4, int a5)
 {
-	typedef void(__cdecl* decode_utf8_to_wide_string)(char* input, wchar_t* output, size_t output_len);
-	auto p_decode_utf8_to_wide_string = Memory::GetAddress<decode_utf8_to_wide_string>(0x4C801);
-
 	wchar_t buffer[512];
 
 	if (*(BYTE*)(thisx + 0x18))
 	{
 		char* utf8_str = H2GetLabel(thisx, string_id, a4, a5);
-		p_decode_utf8_to_wide_string(utf8_str, buffer, 512);
+		utf8_string_to_wchar_string(utf8_str, buffer, 512);
 		if (string_id == 0x110023FD) // check if the string id is training_swaphold
 		{
 			// if it's the case, 
