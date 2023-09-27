@@ -21,8 +21,9 @@ enum e_unit_weapons
 	unit_weapons_dual_weild_weapon
 };
 
-struct s_unit_data_definition : s_object_data_definition
+struct s_unit_data_definition
 {
+	s_object_data_definition object;
 	char gap_12C[4];
 	DWORD field_130;
 	datum simulation_actor_index;

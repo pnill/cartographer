@@ -90,7 +90,7 @@ void update_biped_object_variant_data(datum object_idx, int variant_index)
 void __cdecl update_object_variant_index_hook(datum object_idx, int variant_index)
 {
 	auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-	auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
+	auto object = object_get_fast_unsafe<s_object_data_definition>(object_idx);
 
 	object->model_variant_id = p_resolve_variant_index_to_new_variant(object_idx, variant_index);
 	// update the biped variant index

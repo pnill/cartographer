@@ -59,7 +59,7 @@ enum e_weapon_index : WORD
 	DualWeild = 0x0201
 };
 
-enum e_object_data_flags : int
+enum e_object_data_flags : int32
 {
 	object_data_flag_0x1 = FLAG(0),
 	object_data_flag_0x2 = FLAG(1),
@@ -95,7 +95,7 @@ enum e_object_data_flags : int
 	_object_has_prt_or_lighting_info = FLAG(31)
 };
 
-enum e_object_physics_flags : WORD
+enum e_object_physics_flags : uint16
 {
 	_object_allocated_havok_component_bit = FLAG(0),
 	_object_physics_flag_0x2 = FLAG(1),
@@ -105,7 +105,7 @@ enum e_object_physics_flags : WORD
 	_object_physics_flag_0x100 = FLAG(8),
 };
 
-enum e_object_damage_flags : WORD
+enum e_object_damage_flags : uint16
 {
 	_object_is_dead_bit = FLAG(2),
 };
@@ -125,59 +125,60 @@ struct s_object_data_definition
 	datum next_index;
 	datum current_weapon_datum;
 	datum parent_datum;
-	WORD unit_in_vehicle_flag;
-	short placement_index;
-	byte gap_1C[8];
-	DWORD foreground_emblem;
+	uint16 unit_in_vehicle_flag;
+	int16 placement_index;
+	uint8 gap_1C[8];
+	uint32 foreground_emblem;
 	s_location location;
 	real_point3d center;
-	float radius;
+	real32 radius;
 	real_point3d object_origin_point;
-	float shadow_sphere_radius;
+	real32 shadow_sphere_radius;
 	real_point3d dynamic_light_sphere_offset;
-	float dynamic_light_sphere_radius;
-	int first_cluster_reference;
+	real32 dynamic_light_sphere_radius;
+	int32 first_cluster_reference;
 	real_point3d position;
-	real_vector3d orientation;
+	real_vector3d forward;
 	real_vector3d up;
 	real_point3d translational_velocity;
 	real_vector3d angular_velocity;
-	float scale;
+	real32 scale;
 	datum unique_id;
 	s_placement_info placement_info;
-	short name_list_index;
-	byte structure_bsp_index;
-	char netgame_equipment_index;
-	byte placement_policy;
-	byte field_b1;
-	byte field_b2;
-	byte field_b3;
+	int16 name_list_index;
+	uint8 structure_bsp_index;
+	int8 netgame_equipment_index;
+	e_bsp_policy placement_policy;
+	int8 field_b1;
+	int8 field_b2;
+	int8 field_b3;
 	datum havok_datum;
 	datum early_mover_index;
-	DWORD unkBC;
+	uint32 unkBC;
 	e_object_physics_flags physics_flags;
-	WORD damage_owner_unk3;
-	DWORD damage_owner_unk1;
+	uint16 damage_owner_unk3;
+	uint32 damage_owner_unk1;
 	datum damage_owner_object_datum;
-	DWORD cached_object_render_state_index;
-	short field_D0;
-	byte model_variant_id;					// hlmt variant tag_block index
-	char gap_D3;
+	uint32 cached_object_render_state_index;
+	int16 field_D0;
+	uint8 model_variant_id;					// hlmt variant tag_block index
+	int8 gap_D3;
 	datum simulation_entity_index;
 	bool attached_to_simulation;
-	char gap_D9[3];
+	int8 gap_D9[3];
 	datum object_projectile_datum;
-	WORD destroyed_constraints_flag;
-	WORD loosened_constraints_flag;
-	float body_max_vitality;
-	float shield_max_vitality;
-	float body_current_vitality;
-	float shield_current_vitality;
-	DWORD gap_F4[4];
-	WORD shield_stun_ticks;
-	WORD body_stun_ticks;
-	char byte_108;
-	char byte_109;
+	uint16 destroyed_constraints_flag;
+	uint16 loosened_constraints_flag;
+	real32 body_max_vitality;
+	real32 shield_max_vitality;
+	real32 body_current_vitality;
+	real32 shield_current_vitality;
+	uint32 gap_F4[3];
+	real32 field_100;
+	uint16 shield_stun_ticks;
+	uint16 body_stun_ticks;
+	int8 byte_108;
+	int8 byte_109;
 	e_object_damage_flags object_damage_flags;
 	object_header_block_reference original_orientation_block;
 	object_header_block_reference node_orientation_block;
@@ -201,12 +202,13 @@ enum e_object_header_flag : byte
 	_object_header_child_bit = FLAG(7)
 };
 
-struct s_object_header {
-	short datum_salt;
+struct s_object_header 
+{
+	int16 datum_salt;
 	e_object_header_flag flags;
 	e_object_type object_type;
-	short cluster_index;
-	short object_data_size;
+	int16 cluster_index;
+	int16 object_data_size;
 	void* object;
 };
 CHECK_STRUCT_SIZE(s_object_header, 12);

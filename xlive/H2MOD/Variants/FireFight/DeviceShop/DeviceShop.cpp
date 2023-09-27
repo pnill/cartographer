@@ -70,7 +70,7 @@ datum DeviceShop::GetItemDatum(datum device_datum)
 
 bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 {
-	s_biped_data_definition* playerUnit = object_get_fast_unsafe<s_biped_data_definition>(unit_datum);
+	s_unit_data_definition* playerUnit = object_get_fast_unsafe<s_unit_data_definition>(unit_datum);
 	datum playerIdx = playerUnit->controlling_player_index;
 	int playerAbsIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 

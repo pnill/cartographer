@@ -12,11 +12,19 @@ enum e_biped_physics_mode : uint8
 	_mode_melee = 6,
 	_mode_last = 7
 };
-struct s_biped_data_definition : s_unit_data_definition
+
+enum e_biped_flags : uint32
 {
-	PAD(0x3F4 - sizeof(s_unit_data_definition));
-	e_biped_physics_mode biped_mode;//0x3F4
-	PAD(0x480 - 0x3F5);
+
+};
+
+struct s_biped_data_definition
+{
+	s_unit_data_definition unit;
+	e_biped_flags biped_flags;
+	byte gap0[144];
+	e_biped_physics_mode biped_movement_type;
+	byte gap1[139];
 
 	// NEW DATA
 	string_id variant_name;

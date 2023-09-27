@@ -21,7 +21,7 @@ void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
 	s_data_iterator<actor_datum> actorIt(get_actor_table());
-	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(_object_type_biped));
+	auto actorObject = (s_unit_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(_object_type_biped));
 
 	if (actorObject != NULL)
 	{
