@@ -219,7 +219,7 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE team_index = NONE;
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
 	if (unit_object != NULL)
 	{
 		team_index = *(BYTE*)(unit_object + 0x13C);
@@ -265,7 +265,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
 	if (unit_object != NULL)
 	{
 		// not sure what these flags are, but this is called when picking up grenades

@@ -78,7 +78,7 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_cou
 #pragma region Biped variant patches
 void update_biped_object_variant_data(datum object_idx, int variant_index)
 {
-	s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(object_type_biped));
+	s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(_object_type_biped));
 	// set this data only if we are dealing with a biped
 	if (biped_object != NULL)
 	{
