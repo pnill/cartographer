@@ -3,35 +3,35 @@
 
 void c_object_identifier::clear()
 {
-	this->object_type = _object_type_none;
-	this->source = object_source_none;
-	this->origin_bsp_index = -1;
-	this->unique_id = -1;
+	this->m_object_type = _object_type_none;
+	this->m_source = (e_object_source)NONE;
+	this->m_origin_bsp_index = NONE;
+	this->m_unique_id = NONE;
 }
 
 void c_object_identifier::clear_for_deletion()
 {
-	this->source = object_source_none;
-	this->origin_bsp_index = -1;
-	this->unique_id = -1;
+	this->m_source = (e_object_source)NONE;
+	this->m_origin_bsp_index = NONE;
+	this->m_unique_id = NONE;
 }
 
 short c_object_identifier::get_origin_bsp()
 {
-	return this->origin_bsp_index;
+	return this->m_origin_bsp_index;
 }
 
 e_object_source c_object_identifier::get_source()
 {
-	return this->source;
+	return this->m_source;
 }
 
 e_object_type c_object_identifier::get_type()
 {
-	return this->object_type;
+	return this->m_object_type;
 }
 
 int c_object_identifier::get_unique_id()
 {
-	return this->unique_id;
+	return this->m_unique_id;
 }

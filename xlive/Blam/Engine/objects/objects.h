@@ -143,8 +143,7 @@ struct s_object_data_definition
 	real_point3d translational_velocity;
 	real_vector3d angular_velocity;
 	real32 scale;
-	datum unique_id;
-	s_placement_info placement_info;
+	c_object_identifier object_identifier;
 	int16 name_list_index;
 	uint8 structure_bsp_index;
 	int8 netgame_equipment_index;

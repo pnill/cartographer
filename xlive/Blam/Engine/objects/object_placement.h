@@ -1,18 +1,9 @@
 #pragma once
 #include "damage.h"
-#include "object_types.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Math/BlamMath.h"
-
-enum e_object_source : char
-{
-	object_source_structure = 0,
-	object_source_editor = 1,
-	object_source_dynamic = 2,
-	object_source_legacy = 3,
-	object_source_none = -1
-};
 
 enum e_bsp_policy : char
 {
@@ -28,18 +19,10 @@ struct s_location
 	WORD bsp_index;
 };
 
-struct s_placement_info
-{
-	WORD origin_bsp_index;
-	e_object_type object_type;
-	byte placement_type;
-};
-
 struct object_placement_data
 {
 	datum tag_index;
-	DWORD unique_id;
-	s_placement_info placement_info;
+	c_object_identifier object_identifier;
 	string_id variant_name;
 	DWORD placement_index;
 	BYTE placement_policy;
