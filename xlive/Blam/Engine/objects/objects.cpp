@@ -43,14 +43,9 @@ void create_new_placement_data(object_placement_data* object_placement_data, dat
 }
 
 //Pass new placement data into Create_object_new
-datum object_new(object_placement_data* placement_data)
+datum __cdecl object_new(object_placement_data* placement_data)
 {
-	LOG_TRACE_GAME("{}", __FUNCTION__);
-
-	typedef datum(__cdecl* object_new_t)(object_placement_data*);
-	auto p_object_new = Memory::GetAddress<object_new_t>(0x136CA7, 0x125B77);
-
-	return p_object_new(placement_data);
+	return INVOKE(0x136CA7, 0x125B77, object_new, placement_data);
 }
 
 //Pass datum from new object into object to sync

@@ -3,7 +3,7 @@
 
 void c_object_identifier::clear()
 {
-	this->m_object_type = _object_type_none;
+	this->m_object_type = (e_object_type)NONE;
 	this->m_source = (e_object_source)NONE;
 	this->m_origin_bsp_index = NONE;
 	this->m_unique_id = NONE;

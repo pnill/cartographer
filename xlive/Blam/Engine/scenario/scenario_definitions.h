@@ -1289,3 +1289,5 @@ struct scenario : TagGroup<'scnr'>
     tag_block<s_scenario_simulation_definition_table_element> simulation_definition_table;
 };
 TAG_GROUP_SIZE_ASSERT(scenario, 992);
+
+typedef s_scenario_scenery s_scenario_object;

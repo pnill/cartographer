@@ -337,6 +337,13 @@ public:
 };
 CHECK_STRUCT_SIZE(c_quantized_orientation, 24);
 
+struct real_orientation
+{
+	real_quaternion quaternion;
+	real_point3d position;
+	real32 scale;
+};
+
 static void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale)
 {
 	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);
