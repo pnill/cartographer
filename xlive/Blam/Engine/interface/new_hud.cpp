@@ -6,6 +6,7 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
+#include "Blam/Engine/main/main_screenshot.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam/Math/integer_math.h"
 
@@ -14,12 +15,24 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
+bool g_should_draw_hud_override = true;
 std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums
 std::vector<point2d> crosshair_original_bitmap_sizes;	// We use point2d struct to store the original resolutions (x as width and y as height)
 
-s_new_hud_engine_globals* get_new_hud_engine_globals()
+void should_draw_hud_override_set(bool flag)
 {
-	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4);
+	g_should_draw_hud_override = flag;
+	return;
+}
+
+s_new_hud_engine_globals* get_new_hud_engine_globals(void)
+{
+	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
+}
+
+s_hud_scripted_globals* get_hud_scripted_globals(void)
+{
+	return *Memory::GetAddress<s_hud_scripted_globals**>(0x9765CC, 0x99FBB4);
 }
 
 bool __cdecl render_ingame_chat_check() 
@@ -166,6 +179,20 @@ void initialize_crosshair_scale(bool game_mode_ui_shell)
 	set_crosshair_scale(H2Config_crosshair_scale);
 }
 
+// Checks if we shouldn't draw the hud
+bool new_hud_dont_draw(void)
+{
+	// Added check for get_new_hud_engine_globals()->show_hud since it will still render other parts of the hud if show_hud is set to false
+	// This does not match legacy behaviour, however the text for picking up weapons is a part of the hud so I assume this is a mistake from bungie
+	bool dont_draw_hud = !g_should_draw_hud_override;
+
+	bool original_check = get_screenshot_globals()->taking_screenshot || get_screenshot_globals()->resolution_multiplier > 1;
+
+	// If original check or show_hud check are true we don't draw the hud
+	// Otherwise return false so we show the hud
+	return (original_check || dont_draw_hud ? true : false);
+}
+
 void new_hud_apply_patches()
 {
 	if (Memory::IsDedicatedServer()) { return; }
@@ -182,6 +209,9 @@ void new_hud_apply_patches()
 
 	// Hook ui_get_hud_elements for modifying the hud anchor for text
 	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemet_bounds_hook);
+
+	// Hook new_hud_dont_draw so we can use another bool to make sure we don't draw any parts of the hud
+	PatchCall(Memory::GetAddress(0x2278B3), new_hud_dont_draw);
 }
 
 void new_hud_patches_on_map_load(bool game_mode_ui_shell)

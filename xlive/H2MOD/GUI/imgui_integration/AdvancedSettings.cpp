@@ -33,7 +33,7 @@ namespace ImGuiHandler {
 		namespace
 		{
 			float crosshairSize = 1.0f;
-			bool g_showHud = true;
+			bool should_show_hud = true;
 			bool g_showFP = true;
 			bool g_UncappedFPS = false;
 			int g_fpsLimit = 60;
@@ -239,9 +239,9 @@ namespace ImGuiHandler {
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(static_fp_tooltip));
 					ImGui::NextColumn();
-					ImGui::Checkbox(GetString(show_hud), &g_showHud);
+					ImGui::Checkbox(GetString(show_hud), &should_show_hud);
 					if (ImGui::IsItemEdited())
-						get_new_hud_engine_globals()->show_hud = g_showHud;
+						should_draw_hud_override_set(should_show_hud);
 					ImGui::NextColumn();
 					ImGui::Checkbox(GetString(show_first_person), &g_showFP);
 					if (ImGui::IsItemEdited())

@@ -1,37 +1,50 @@
 #pragma once
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+
+struct s_hud_scripted_globals
+{
+	bool unused_bool;
+	bool show_help_text;
+	bool show_hud_messages;
+};
+CHECK_STRUCT_SIZE(s_hud_scripted_globals, 3);
 
 struct s_new_hud_globals_player_info
 {
-	float unk_0;
-	float unk_4;
-	int unk_8;
-	byte unk_C[76];
+	real32 unk_0;
+	real32 unk_4;
+	int32 unk_8;
+	uint8 unk_C[76];
 	void* text_chat_widget;
-	byte unk_5C[36];
+	uint8 unk_5C[36];
 };
 CHECK_STRUCT_SIZE(s_new_hud_globals_player_info, 128);
 
 struct s_new_hud_engine_globals
 {
-	s_new_hud_globals_player_info player_data[4];
-	int field_200;
-	int field_204;
+	s_new_hud_globals_player_info player_data[k_number_of_users];
+	int32 field_200;
+	int32 field_204;
 	datum betraying_player_datum_index;
-	int gap_20C;
+	int32 gap_20C;
 	s_player_profile_traits default_profile_traits;
-	__int16 unk_220;
+	int16 unk_220;
 	bool show_hud;
 	bool flag_20D;			// initialized to 1 but unused?
 	bool flag_20E;			// initialized to 1 but unused?
 	bool connected_to_live;
-	byte gap_222[2];
-	float hud_opacity;
-	float unk_22C;
-	float unk_230;
+	int8 gap_222[2];
+	real32 hud_opacity;
+	real32 unk_22C;
+	real32 unk_230;
 };
 CHECK_STRUCT_SIZE(s_new_hud_engine_globals, 564);
-s_new_hud_engine_globals* get_new_hud_engine_globals();
+
+
+void should_draw_hud_override_set(bool flag);
+s_new_hud_engine_globals* get_new_hud_engine_globals(void);
+s_hud_scripted_globals* get_hud_scripted_globals(void);
 
 void set_crosshair_scale(float scale);
 void new_hud_apply_patches();
