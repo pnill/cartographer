@@ -125,7 +125,7 @@ struct s_object_data_definition
 	datum next_index;
 	datum current_weapon_datum;
 	datum parent_datum;
-	uint16 unit_in_vehicle_flag;
+	uint16 inhibited_flags;
 	int16 placement_index;
 	uint8 gap_1C[8];
 	uint32 foreground_emblem;

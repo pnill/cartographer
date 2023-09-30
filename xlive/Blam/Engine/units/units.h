@@ -34,13 +34,18 @@ enum e_unit_data_flags : int32
 	_unit_only_takes_damage_from_players_team = FLAG(31)
 };
 
+struct s_unit_304
+{
+	int8 gap_0[16];
+};
+
 struct s_unit_data_definition
 {
 	s_object_data_definition object;
-	char gap_12C[4];
+	int8 gap_12C[4];
 	datum actor_datum;
 	datum simulation_actor_index;
-	e_unit_data_flags unit_flags;
+	uint32 unit_flags;
 	e_game_team unit_team;
 	int8 pad[2];
 	datum controlling_player_index;
@@ -56,26 +61,31 @@ struct s_unit_data_definition
 	real_vector3d desired_looking;
 	real_vector3d looking_vector;
 	real_vector3d looking_vector_velocity;
-	uint32 field_1B0;
-	uint32 field_1B4;
-	uint32 field_1B8;
-	real_vector3d throttle;
+	int32 field_1B0;
+	int32 field_1B4;
+	int32 field_1B8;
+	real_vector3d vector_1BC;
 	int8 aiming_speed;
 	int8 gap_1C9[3];
 	real32 trigger;
 	real32 secondary_trigger;
 	s_aim_assist_targetting_data target_info;
-	int8 gap_1F8[18];
+	int32 field_1F8;
+	int32 field_1FC;
+	int32 flags_200;
+	int32 flags_204;
+	int8 gap_1F8[2];
 	uint8 left_eye_node_index;
 	uint8 right_eye_node_index;
 	uint8 horizontal_aiming_change;
 	int8 gap_20D;
 	int8 tick_count_20E;
-	int8 unk_bool_20F;
+	bool unk_bool_20F;
 	uint16 parent_seat_index;
 	int8 gap_212[10];
 	real32 mouth_aperture;
-	int8 gap_220[6];
+	int8 gap_220[4];
+	uint16 field_224;
 	int8 weapon_indices[2];
 	uint16 weapon_set_identifier;
 	int8 weapon_slots[2];
@@ -90,9 +100,12 @@ struct s_unit_data_definition
 	int8 field_256;
 	uint8 aiming_change;
 	int8 gap_256[4];
-	datum unit_index;
-	datum parent_unit_index;
-	int8 gap_260[10];
+	datum driver_index;
+	datum gunner_index;
+	datum field_264;
+	datum field_268;
+	bool unk_bool_26C;
+	int8 gap_260;
 	uint16 squad_index;
 	real32 driver_seat_power;
 	real32 gunner_seat_power;
@@ -104,7 +117,7 @@ struct s_unit_data_definition
 	int8 gap_290[24];
 	datum simulation_field_2B4;
 	uint16 simulation_field_2B8;
-	datum simulation_field_2BC;
+	datum simulation_player_index;
 	datum simulation_field_2C0;
 	real32 active_camo_power;
 	real32 field_2C8;
@@ -112,15 +125,22 @@ struct s_unit_data_definition
 	int8 active_camo_mode;
 	int8 field_2D1;
 	uint16 active_camo_time_ticks;
-	int8 gap_2D2[4];
+	uint8 gap_2D2[4];
 	real32 crouching;
-	int8 gap_2DC[108];
+	int16 field_2DC;
+	int16 field_2DE;
+	int32 field_2E0;
+	datum field_2E4;
+	datum field_2E8;
+	uint8 gap_2E4[24];
+	s_unit_304 field_304[4];
+	int32 field_344;
 	real32 boost_2D4;
-	real32 boost_2D8;
-	object_header_block_reference weapon_raised_animation_manager_block;
-	object_header_block_reference udlg_datum_index_block;
-	object_header_block_reference object_header_356;
-	object_header_block_reference object_header_35A;
+	real32 boost_dead_time;
+	object_header_block_reference weapon_raised_block;
+	object_header_block_reference udlg_block;
+	object_header_block_reference object_header_358;
+	int32 field_35C;
 };
 CHECK_STRUCT_SIZE(s_unit_data_definition, 864);
 
