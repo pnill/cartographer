@@ -25,7 +25,6 @@
 #include "Blam/Engine/main/level_definitions.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/objects/light_definitions.h"
-#include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Engine/sound/sound_scenery.h"
 #include "Blam/Engine/structures/cluster_partitions.h"

@@ -735,6 +735,7 @@
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
+    <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />

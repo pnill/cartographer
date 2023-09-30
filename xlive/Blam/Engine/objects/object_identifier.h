@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/objects/object_types.h"
+#include "object_type_list.h"
 
 enum e_object_source : int8
 {

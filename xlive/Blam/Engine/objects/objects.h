@@ -1,10 +1,9 @@
 #pragma once
 #include "object_placement.h"
-#include "object_types.h"
+#include "object_type_list.h"
 
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/Simulation/SimulationWorld.h"
 #include "Blam/Math/BlamMath.h"
 
 #define k_maximum_objects_per_map 2048
