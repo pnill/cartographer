@@ -81,7 +81,7 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_cou
 #pragma region Biped variant patches
 void update_biped_object_variant_data(datum object_idx, int variant_index)
 {
-	s_biped_data_definition* biped_object = (s_biped_data_definition*)object_try_and_get_and_verify_type(object_idx, FLAG(_object_type_biped));
+	biped_datum* biped_object = (biped_datum*)object_try_and_get_and_verify_type(object_idx, FLAG(_object_type_biped));
 	// set this data only if we are dealing with a biped
 	if (biped_object != NULL)
 	{
@@ -93,7 +93,7 @@ void update_biped_object_variant_data(datum object_idx, int variant_index)
 void __cdecl update_object_variant_index_hook(datum object_idx, int variant_index)
 {
 	auto p_resolve_variant_index_to_new_variant = Memory::GetAddressRelative<int(__cdecl*)(datum, int)>(0x52FE84, 0x51ED47);
-	auto object = object_get_fast_unsafe<s_object_data_definition>(object_idx);
+	auto object = object_get_fast_unsafe<object_datum>(object_idx);
 
 	object->model_variant_id = p_resolve_variant_index_to_new_variant(object_idx, variant_index);
 	// update the biped variant index
@@ -195,7 +195,7 @@ void __stdcall object_build_creation_data_hook(datum object_idx, s_simulation_un
 
 	p_object_build_creation_data(object_idx, object_creation_data);
 
-	auto object = object_get_fast_unsafe<s_biped_data_definition>(object_idx);
+	auto object = object_get_fast_unsafe<biped_datum>(object_idx);
 
 	object_creation_data->variant_name = object->variant_name;
 
@@ -207,7 +207,7 @@ void apply_biped_object_definition_patches()
 	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
 
 	// increase the data size for biped representation
-	WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(s_biped_data_definition));
+	WriteValue<unsigned short>(Memory::GetAddressRelative(0x81E9A8, 0x7C1EB8) + 8, sizeof(biped_datum));
 
 	// hook the function that updates the variant
 	WriteJmpTo(Memory::GetAddressRelative(0x52FED3, 0x51ED96), update_object_variant_index_to_cdecl);
@@ -252,8 +252,8 @@ int object_count_from_iter()
 }
 #pragma endregion
 
-datum object_get_damage_owner(datum object_datum)
+datum object_get_damage_owner(datum object_index)
 {
-	s_object_data_definition* object = object_try_and_get_and_verify_type(object_datum, -1);
+	object_datum* object = object_try_and_get_and_verify_type(object_index, -1);
 	return object->damage_owner_object_datum;
 }

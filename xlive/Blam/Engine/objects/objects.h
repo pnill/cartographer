@@ -138,7 +138,7 @@ struct s_object_header
 };
 CHECK_STRUCT_SIZE(s_object_header, 12);
 
-struct s_object_data_definition
+struct object_datum
 {
 	datum tag_definition_index;
 	e_object_data_flags object_flags;
@@ -209,7 +209,7 @@ struct s_object_data_definition
 	object_header_block_reference change_color_block;
 	object_header_block_reference animation_manager_block;
 };
-CHECK_STRUCT_SIZE(s_object_data_definition, 300);
+CHECK_STRUCT_SIZE(object_datum, 300);
 
 static s_data_array* get_objects_header()
 {
@@ -224,14 +224,14 @@ static s_object_header* get_objects_header(datum object_idx)
 }
 
 // Get the object fast, with no validation from datum index
-template<typename T = s_object_data_definition>
+template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
 	return (T*)get_objects_header(object_idx)->object;
 }
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
-template<typename T = s_object_data_definition>
+template<typename T = object_datum>
 static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
 {
 	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);

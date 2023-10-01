@@ -52,7 +52,7 @@ void GraveRobber::SpawnPlayerClientSetup()
 
 void GraveRobber::SpawnSkull(datum unit_datum)
 {
-	const s_object_data_definition* biped_unit = (s_object_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(_object_type_biped));
+	const object_datum* biped_unit = (object_datum*)object_try_and_get_and_verify_type(unit_datum, FLAG(_object_type_biped));
 
 	if (biped_unit != NULL)
 	{

@@ -68,9 +68,9 @@ datum DeviceShop::GetItemDatum(datum device_datum)
 	return get_device_open_up_weapon_datum(device_datum);
 }
 
-bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
+bool DeviceShop::BuyItem(datum device_datum, datum unit_index)
 {
-	s_unit_data_definition* playerUnit = object_get_fast_unsafe<s_unit_data_definition>(unit_datum);
+	unit_datum* playerUnit = object_get_fast_unsafe<unit_datum>(unit_index);
 	datum playerIdx = playerUnit->controlling_player_index;
 	int playerAbsIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
 
@@ -119,7 +119,7 @@ bool DeviceShop::BuyItem(datum device_datum, datum unit_datum)
 				debug_text.append(std::to_string(GetCost(device_datum)));
 
 				addDebugText(debug_text.c_str());
-				GiveWeapon(unit_datum, item_datum);
+				GiveWeapon(unit_index, item_datum);
 				break;
 			}
 		}

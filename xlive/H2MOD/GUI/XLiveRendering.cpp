@@ -709,7 +709,7 @@ HRESULT WINAPI XLiveRender()
 		while (playerIt.get_next_active_player())
 		{
 			real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-			s_object_data_definition* biped_unit = (s_object_data_definition*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
+			object_datum* biped_unit = (object_datum*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
 			if (player_position != nullptr) {
 				std::wstring playerNameWide(playerIt.get_current_player_name());
 				std::string playerName(playerNameWide.begin(), playerNameWide.end());

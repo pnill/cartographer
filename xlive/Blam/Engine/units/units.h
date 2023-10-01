@@ -39,9 +39,9 @@ struct s_unit_304
 	int8 gap_0[16];
 };
 
-struct s_unit_data_definition
+struct unit_datum
 {
-	s_object_data_definition object;
+	object_datum object;
 	int8 gap_12C[4];
 	datum actor_datum;
 	datum simulation_actor_index;
@@ -142,7 +142,7 @@ struct s_unit_data_definition
 	object_header_block_reference object_header_358;
 	int32 field_35C;
 };
-CHECK_STRUCT_SIZE(s_unit_data_definition, 864);
+CHECK_STRUCT_SIZE(unit_datum, 864);
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index);
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);

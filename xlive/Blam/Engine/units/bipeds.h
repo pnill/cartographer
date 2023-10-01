@@ -18,9 +18,9 @@ enum e_biped_flags : uint32
 
 };
 
-struct s_biped_data_definition
+struct biped_datum
 {
-	s_unit_data_definition unit;
+	unit_datum unit;
 	e_biped_flags biped_flags;
 	byte gap0[144];
 	e_biped_physics_mode biped_movement_type;
@@ -29,4 +29,4 @@ struct s_biped_data_definition
 	// NEW DATA
 	string_id variant_name;
 };
-CHECK_STRUCT_SIZE(s_biped_data_definition, 0x480 + 4);
+CHECK_STRUCT_SIZE(biped_datum, 0x480 + 4);
