@@ -241,13 +241,15 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
 
-void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4);
-datum object_new(object_placement_data* object_placement_data);
-void apply_biped_object_definition_patches();
-void simulation_action_object_create(datum object_idx);
-void object_destroy(datum object_idx);
+void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
+datum __cdecl object_new(object_placement_data* placement_data);
+void __cdecl simulation_action_object_create(datum object_idx);
+void __cdecl object_delete(datum object_idx);
+
 int object_get_count();
 int object_count_from_iter();
 
 datum object_get_damage_owner(datum damaged_unit_index);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
+
+void apply_biped_object_definition_patches();

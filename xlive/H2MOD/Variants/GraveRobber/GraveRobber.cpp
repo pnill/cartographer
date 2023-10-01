@@ -58,7 +58,7 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 	{
 		object_placement_data nObject;
 
-		create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
+		object_placement_data_new(&nObject, e_weapons_datum_index::ball, -1, 0);
 
 		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;

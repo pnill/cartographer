@@ -718,7 +718,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 			
 			if (!DATUM_IS_NONE(object_idx)) 
 			{
-				create_new_placement_data(&nObject, object_idx, -1, 0);
+				object_placement_data_new(&nObject, object_idx, -1, 0);
 
 				if (position)
 				{
@@ -773,7 +773,7 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 {
 	if (!DATUM_IS_NONE(objectDatumIdx))
 	{
-		object_destroy(objectDatumIdx);
+		object_delete(objectDatumIdx);
 	}
 }
 

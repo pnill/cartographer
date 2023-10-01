@@ -35,14 +35,10 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 	return block;
 }
 
-void create_new_placement_data(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, int a4)
+void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner)
 {
-	LOG_TRACE_GAME("{}: {:X}, object_owner: {:X}, unk: {:X})", __FUNCTION__, object_definition_idx, object_owner_idx, a4);
-
-	typedef void(__cdecl* object_placement_data_new_t)(void*, datum, datum, int);
-	auto p_object_placement_data_new = Memory::GetAddress<object_placement_data_new_t>(0x132163, 0x121033);
-
-	p_object_placement_data_new(object_placement_data, object_definition_idx, object_owner_idx, a4);
+	INVOKE(0x132163, 0x121033, object_placement_data_new, object_placement_data, object_definition_idx, object_owner_idx, damage_owner);
+	return;
 }
 
 //Pass new placement data into Create_object_new
@@ -65,20 +61,16 @@ datum __cdecl object_new(object_placement_data* placement_data)
 }
 
 //Pass datum from new object into object to sync
-void simulation_action_object_create(datum object_idx)
+void __cdecl simulation_action_object_create(datum object_idx)
 {
-	typedef void(__cdecl* simulation_action_object_create_t)(datum);
-	auto p_simulation_action_object_create = Memory::GetAddress<simulation_action_object_create_t>(0x1B8D14, 0x1B2C44);
-
-	return p_simulation_action_object_create(object_idx);
+	INVOKE(0x1B8D14, 0x1B2C44, simulation_action_object_create, object_idx);
+	return;
 }
 
-void object_destroy(datum object_idx)
+void __cdecl object_delete(datum object_idx)
 {
-	typedef void(__cdecl object_destroy_t)(datum);
-	auto p_object_destroy = Memory::GetAddress<object_destroy_t*>(0x136005);
-
-	p_object_destroy(object_idx);
+	INVOKE(0x136005, 0x124ED5, object_delete, object_idx);
+	return;
 }
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count)
