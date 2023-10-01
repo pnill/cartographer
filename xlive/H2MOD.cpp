@@ -17,7 +17,6 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
-#include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
@@ -1036,7 +1035,6 @@ void H2MOD::ApplyHooks() {
 		
 		PatchCall(Memory::GetAddress(0x2422C8), get_last_single_player_level_id_unlocked_from_profile);
 
-		rasterizer_settings_apply_hooks();
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();

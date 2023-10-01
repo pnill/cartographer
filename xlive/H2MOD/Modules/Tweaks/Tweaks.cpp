@@ -3,10 +3,10 @@
 
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/tag_files/files_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomResolutions/CustomResolutions.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -274,7 +274,7 @@ void H2Tweaks::ApplyPatches() {
 		hud_apply_pre_winmain_patches();
 
 		// adds support for more monitor resolutions
-		CustomResolution::Initialize();
+		rasterizer_settings_apply_hooks();
 
 		//Set the LAN Server List Ping Frequency (milliseconds).
 		//WriteValue(Memory::GetAddress(0x001e9a89), 3000);
