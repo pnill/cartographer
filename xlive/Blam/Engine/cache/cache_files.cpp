@@ -22,3 +22,8 @@ void cache_file_map_clear_all_failures(void)
 	p_cache_file_map_clear_all_failures();
 	return;
 }
+
+void* __cdecl tag_get_fast(datum tag_index)
+{
+	return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
+}

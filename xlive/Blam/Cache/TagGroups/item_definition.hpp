@@ -1,5 +1,6 @@
 #pragma once
-#include "object_definition.hpp"
+#include "Blam/Engine/objects/object_definition.h"
+#include "Blam/Cache/TagGroups.hpp"
 
 /*********************************************************************
 * name: item
@@ -10,7 +11,7 @@
 #pragma pack(push,1)
 struct s_item_group_definition :TagGroup<'item'>
 {
-	s_object_group_definition objectTag;
+	object_definition objectTag;
 	enum class e_flags : __int32
 	{
 		always_maintains_z_up = FLAG(0),

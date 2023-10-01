@@ -23,3 +23,6 @@ CHECK_STRUCT_SIZE(cache_file_tag_instance, 16);
 
 cache_file_tag_instance* global_tag_instances_get(void);
 void cache_file_map_clear_all_failures(void);
+
+// Get tag data from tag index
+void* __cdecl tag_get_fast(datum tag_index);

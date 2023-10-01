@@ -109,12 +109,34 @@ enum e_object_damage_flags : uint16
 	_object_is_dead_bit = FLAG(2),
 };
 
+enum e_object_header_flag : byte
+{
+	_object_header_active_bit = FLAG(0),
+	_object_header_awake_bit = FLAG(1),
+	_object_header_requires_motion_bit = FLAG(2),
+	_object_header_flags_8 = FLAG(3),
+	_object_header_being_deleted_bit = FLAG(4),
+	_object_header_connected_to_map_bit = FLAG(6),
+	_object_header_child_bit = FLAG(7)
+};
+
 struct object_header_block_reference
 {
 	short size;
 	short offset;
 };
 CHECK_STRUCT_SIZE(object_header_block_reference, 4);
+
+struct s_object_header
+{
+	int16 datum_salt;
+	e_object_header_flag flags;
+	e_object_type object_type;
+	int16 cluster_index;
+	int16 object_data_size;
+	void* object;
+};
+CHECK_STRUCT_SIZE(s_object_header, 12);
 
 struct s_object_data_definition
 {
@@ -188,28 +210,6 @@ struct s_object_data_definition
 	object_header_block_reference animation_manager_block;
 };
 CHECK_STRUCT_SIZE(s_object_data_definition, 300);
-
-enum e_object_header_flag : byte
-{
-	_object_header_active_bit = FLAG(0),
-	_object_header_awake_bit = FLAG(1),
-	_object_header_requires_motion_bit = FLAG(2),
-	_object_header_flags_8 = FLAG(3),
-	_object_header_being_deleted_bit = FLAG(4),
-	_object_header_connected_to_map_bit = FLAG(6),
-	_object_header_child_bit = FLAG(7)
-};
-
-struct s_object_header 
-{
-	int16 datum_salt;
-	e_object_header_flag flags;
-	e_object_type object_type;
-	int16 cluster_index;
-	int16 object_data_size;
-	void* object;
-};
-CHECK_STRUCT_SIZE(s_object_header, 12);
 
 static s_data_array* get_objects_header()
 {

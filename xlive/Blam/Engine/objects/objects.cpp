@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "objects.h"
 
+#include "object_definition.h"
 #include "object_types.h"
 
-#include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/cache/cache_files.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
 #include "Blam/Engine/units/bipeds.h"
 
@@ -46,6 +48,19 @@ void create_new_placement_data(object_placement_data* object_placement_data, dat
 //Pass new placement data into Create_object_new
 datum __cdecl object_new(object_placement_data* placement_data)
 {
+	/*
+	datum result = NONE;
+
+	if (!TEST_FLAG(placement_data->object_placement_flags, 0x10))
+	{
+		if (placement_data->tag_index == NONE) 
+		{
+			return result;
+		}
+
+		object_type_adjust_placement(placement_data);
+	}
+	*/
 	return INVOKE(0x136CA7, 0x125B77, object_new, placement_data);
 }
 

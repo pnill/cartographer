@@ -715,7 +715,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
@@ -734,6 +733,7 @@
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\object_definition.h" />
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
