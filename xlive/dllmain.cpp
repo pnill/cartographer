@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "H2MOD.h"
-#include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -55,17 +54,10 @@ void HeapDebugInitialize()
 
 void DiscordInitialize()
 {
-	if (Memory::IsDedicatedServer()
-		|| !H2Config_discord_enable
-		|| _Shell::GetInstanceId() > 1)
+	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || _Shell::GetInstanceId() > 1)
+	{
 		return;
-
-	// Discord init
-	static UINT_PTR discord_update_timer = NULL;
-	DiscordInterface::Init();
-	discord_update_timer = SetTimer(NULL, 0, 5000, UpdateDiscordStateTimerCb);
-	atexit([]() -> void { KillTimer(NULL, discord_update_timer); });
-	DiscordInterface::SetDetails("Startup");
+	}
 }
 
 void InitInstance()

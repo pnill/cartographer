@@ -727,7 +727,7 @@ int WINAPI XUserMuteListQuery (DWORD dwUserIndex, XUID XuidRemoteTalker, BOOL *p
 
 
 // #5315: XInviteGetAcceptedInfo
-int WINAPI XInviteGetAcceptedInfo (DWORD, DWORD)
+int WINAPI XInviteGetAcceptedInfo(DWORD dwUserIndex, XINVITE_INFO* pInfo)
 {
     LOG_TRACE_XLIVE("XInviteGetAcceptedInfo");
     return 1;

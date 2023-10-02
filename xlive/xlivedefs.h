@@ -593,6 +593,13 @@ typedef struct {
     DWORD dwPointsPrice;
 } XMARKETPLACE_CONTENTOFFER_INFO, *PXMARKETPLACE_CONTENTOFFER_INFO;
 
+typedef struct {
+    XUID xuidInvitee;
+    XUID xuidInviter;
+    DWORD dwTitleID;
+    XSESSION_INFO hostInfo;
+    BOOL fFromGameInvite;
+} XINVITE_INFO, * PXINVITE_INFO;
 
 
 typedef struct _STRING_DATA {
