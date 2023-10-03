@@ -53,6 +53,12 @@ public:
         doc_.Accept(writer);
     }
 
+    /// <summary>
+    /// Gets a pointer to the JSON Value associated with the current key path in the document.
+    /// If the key path is empty, returns a pointer to the root document object.
+    /// If any key in the path does not exist, it creates the necessary nested structure in the document.
+    /// </summary>
+    /// <returns>A pointer to the JSON Value associated with the current key path, or nullptr if the path is invalid.</returns>
     Value* get_current_pointer()
     {
         // Check if path is empty, if so, return a pointer to the root document object
@@ -101,7 +107,14 @@ public:
     std::unordered_map<std::string, Value> defaultValues_;
 
 
-
+    /// <summary>
+    /// Retrieves the value associated with the specified key from the JSON document, or a default value if the key is not found.
+    /// Specialization for a custom data type must be added to this function
+    /// </summary>
+    /// <typeparam name="T">Type of the value to retrieve.</typeparam>
+    /// <param name="key">The key to search for in the JSON document.</param>
+    /// <param name="defaultValue">The value to return if the key is not found (default is a default-constructed instance of the type).</param>
+    /// <returns>The value associated with the key if found, or the default value if the key is not found in the JSON document.</returns>
     template<typename T>
     T get(const char* key, T defaultValue = T{}) {
         // Check if the key exists in the document
@@ -130,6 +143,7 @@ public:
             std::is_same_v<T, float> ||
             std::is_same_v<T, const char*>;
 
+        //Test for all default supported rapidjson types
         if constexpr (is_rapidjson_type_v) {
             if (v.Is<T>())
                 return v.Get<T>();
@@ -139,6 +153,7 @@ public:
 
             return defaultValue;
         }
+        //specializations for non supported data types below
         else if constexpr (std::is_same_v<T, short>) {
             if(v.Is<int>())
                 return static_cast<short>(v.GetInt());
@@ -188,7 +203,15 @@ public:
             static_assert(sizeof(T) == 0, "Unsupported type in json_config::get()");
         }
     }
-
+    /// <summary>
+    /// Retrieves the value associated with the specified key from the JSON document and assigns it to the provided output variable. 
+    /// If the key is not found, the provided default value is assigned to the output variable.
+    /// </summary>
+    /// <typeparam name="T">Type of the value to retrieve and assign.</typeparam>
+    /// <param name="key">The key to search for in the JSON document.</param>
+    /// <param name="out_variable">Pointer to the variable where the retrieved value will be stored.</param>
+    /// <param name="defaultValue">The value to assign if the key is not found (default is a default-constructed instance of the type).</param>
+    /// <returns>None.</returns>
     template<typename T>
     void get(const char* key, T* out_variable, T defaultValue = T{})
     {
@@ -196,6 +219,16 @@ public:
         *out_variable = val;
     }
 
+    /// <summary>
+    /// Sets the specified key in the JSON document to the provided value. If the key already exists, its value is updated;
+    /// if not, a new key-value pair is created.
+    /// Specialization for a custom data type must be added to this function
+    /// </summary>
+    /// <typeparam name="T">Type of the value to be set.</typeparam>
+    /// <param name="key">The key to set in the JSON document.</param>
+    /// <param name="value">The value to be set for the specified key.</param>
+    /// <param name="auto_save">Optional parameter indicating whether to save the document automatically after setting the value (default is false).</param>
+    /// <returns>None.</returns>
     template<typename T>
     void set(const char* key, T value, bool auto_save = false) {
 
@@ -215,14 +248,18 @@ public:
             std::is_same_v<T, double> ||
             std::is_same_v<T, float>;
 			//Not included due to the requirement of creating a String Reference for the string.
+            //Removing the native support and using a specialization support to make them into std::strings
+            //is a lot less complicated and works better.
     		//std::is_same_v<T, const char*>;
 
+        //Test for all default supported rapidjson types
         if constexpr (is_rapidjson_type_v) {
             if (is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());
             else
                 (*current_object)[key].Set<T>(value);
         }
+        //specializations for non supported data types below
         else if constexpr (std::is_same_v<T, short>) {
             if(is_new)
                 current_object->AddMember(k, value, doc_.GetAllocator());

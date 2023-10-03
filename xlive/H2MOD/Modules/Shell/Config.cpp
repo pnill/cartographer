@@ -120,7 +120,15 @@ void SaveH2Config() {
 
 	wchar_t fileConfigPath[1024];
 	if (FlagFilePathConfig) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
+		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
+		size_t len = wcslen(fileConfigPath);
+		if (len >= 4 && wcsncmp(fileConfigPath + len - 4, L".ini", 4) == 0) {
+			wchar_t jsonPath[1024];
+			wcsncpy(jsonPath, FlagFilePathConfig, len - 4);
+			jsonPath[len - 4] = L'\0';
+			wcscat(jsonPath, L".json\0");
+			wcscpy_s(fileConfigPath, jsonPath);
+		}
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigJsonFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
@@ -172,7 +180,7 @@ void SaveH2Config() {
 			json["game"]["video"].set("d3dex", H2Config_d3d9ex);
 			json["game"]["video"].set("override_shadows", (int)H2Config_Override_Shadows);
 			json["game"]["video"].set("override_water", (int)H2Config_Override_Water);
-
+			
 			json["game"]["hud"].set("crosshair_offset", H2Config_crosshair_offset);
 			json["game"]["hud"].set("crosshair_scale", H2Config_crosshair_scale);
 			json["game"]["hud"].set("hide_ingame_chat", H2Config_hide_ingame_chat);
@@ -232,7 +240,21 @@ void ReadH2Config() {
 
 	if (FlagFilePathConfig) {
 		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		size_t len = wcslen(fileConfigPath);
+		if (len >= 4 && wcsncmp(fileConfigPath + len - 4, L".ini", 4) == 0) {
+			wchar_t jsonPath[1024];
+			wcsncpy(jsonPath, FlagFilePathConfig, len - 4);
+			jsonPath[len - 4] = L'\0';
+			wcscat(jsonPath, L".json\0");
+			wcscpy_s(fileConfigPath, jsonPath);
+			addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		}
+		else if (len >= 5 && wcsncmp(fileConfigPath + len - 5, L".json", 5) == 0) {
+			addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		}
+		else{
+			addDebugText(L"invalid ini path \"%ws\" continuing..", fileConfigPath);
+		}
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 	}
 	else {
@@ -281,7 +303,8 @@ void ReadH2Config() {
 			addDebugText("json.load() failed with error: %d while trying to read configuration file!", (int)rc);
 		}
 		else
-		{
+		{    addDebugText("Reading H2Configuration file...");
+
 			json["cartographer"].get("h2portable", &H2Portable, H2Portable);
 			json["cartographer"].get("base_port", &H2Config_base_port, H2Config_base_port);
 			json["cartographer"].get("upnp", &H2Config_upnp_enable, true);
@@ -291,7 +314,7 @@ void ReadH2Config() {
 			json["cartographer"].get("debug_log_console", &H2Config_debug_log_console, H2Config_debug_log_console);
 			json["cartographer"].get("language_label_capture", &H2Config_custom_labels_capture_missing, H2Config_custom_labels_capture_missing);
 			json["cartographer"].get("discord_enable", &H2Config_disable_ingame_keyboard, H2Config_discord_enable);
-
+			
 			auto language_code = json["cartographer"].get<std::string>("language_code", "-1x0");
 			if (!language_code.empty())
 			{
@@ -466,8 +489,6 @@ void ReadH2Config() {
 #ifndef NDEBUG
 			json["development"].get("forced_event", &H2Config_forced_event, H2Config_forced_event);
 #endif
-
-			LOG_INFO_GAME("ASDF");
 		}
 
 		if (!ownsConfigFile) {
@@ -497,8 +518,17 @@ void UpgradeConfig()
 
 	if (FlagFilePathConfig) {
 		wcscpy_s(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
-		addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		size_t len = wcslen(fileConfigPath);
+		if (len >= 4 && wcsncmp(fileConfigPath + len - 4, L".ini", 4) == 0) {
+			wcsncpy(jsonPath, fileConfigPath, len - 4);
+			wcscat(jsonPath, L".json");
+			addDebugText(L"Reading flag config: \"%ws\"", fileConfigPath);
+		}
+		else {
+			addDebugText(L"invalid ini path \"%ws\" continuing..", fileConfigPath);
+		}
 		err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
+
 	}
 	else {
 		do {
