@@ -304,6 +304,7 @@
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_guide.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_networking.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -858,6 +859,7 @@
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkRotation.h" />
