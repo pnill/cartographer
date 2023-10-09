@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "Blam/Engine/cartographer/discord/discord_interface.h"
+
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
@@ -52,12 +54,14 @@ void HeapDebugInitialize()
 #endif
 }
 
-void DiscordInitialize()
+void discord_initialize()
 {
-	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || _Shell::GetInstanceId() > 1)
+	if (!Memory::IsDedicatedServer() && H2Config_discord_enable)//&& _Shell::GetInstanceId() == 1)
 	{
-		return;
+		discord_game_status_create();
 	}
+
+	return;
 }
 
 void InitInstance()
@@ -71,7 +75,7 @@ void InitInstance()
 		HeapDebugInitialize();
 		H2DedicatedServerStartup();
 
-		DiscordInitialize();
+		discord_initialize();
 
 		dlcbasepath = L"DLC";
 	}
@@ -80,6 +84,10 @@ void InitInstance()
 extern CRITICAL_SECTION log_section;
 void ExitInstance()
 {
+	if (!Memory::IsDedicatedServer() && H2Config_discord_enable)//&& _Shell::GetInstanceId() == 1)
+	{
+		discord_game_status_dispose();
+	}
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
 	delete xlive_log;

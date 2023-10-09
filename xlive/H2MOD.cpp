@@ -480,6 +480,16 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
 			toggle_xbox_tickrate(options, true);
+			if ( H2Config_discord_enable)
+			{
+				int32 index = options->scenario_path.last_index_of(L"\\");
+				const wchar_t* scenario_name_wide = &options->scenario_path.get_string()[index + 1];
+				utf8 scenario_name[MAX_PATH];
+				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
+
+				context_update_map_info_campaign(options->map_id, scenario_name);
+				discord_interface_set_difficulty(options->difficulty);
+			}
 		}
 
 		resetAfterMatch = true;

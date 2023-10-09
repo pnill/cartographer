@@ -301,6 +301,7 @@
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_guide.cpp" />
     <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
@@ -857,6 +858,8 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
+    <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
+    <ClInclude Include="Blam\Engine\cartographer\discord\discord_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
     <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />

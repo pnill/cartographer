@@ -262,5 +262,3 @@ inline T verify_output(T output, const char *expression, const char *func_name, 
 #define LOG_ERROR_XLIVE()
 #define LOG_CRITICAL_XLIVE()
 #endif
-
-void update_player_count();
