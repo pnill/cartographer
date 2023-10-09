@@ -302,6 +302,7 @@
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -712,7 +713,6 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
-    <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
@@ -854,6 +854,8 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
+    <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
+    <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkRotation.h" />

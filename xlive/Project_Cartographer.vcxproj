@@ -402,6 +402,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
@@ -605,6 +606,7 @@
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
     <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
