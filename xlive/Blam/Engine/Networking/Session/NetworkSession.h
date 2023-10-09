@@ -381,6 +381,8 @@ ASSERT_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
 ASSERT_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)
 
+s_session_interface_user* session_interface_get_local_user_properties(int user_index);
+
 bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type);
 bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier);
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);

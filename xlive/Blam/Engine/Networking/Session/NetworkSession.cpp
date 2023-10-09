@@ -248,14 +248,14 @@ s_session_interface_globals* s_session_interface_globals::get()
 	return Memory::GetAddress<s_session_interface_globals*>(0x51A590, 0x520408);
 }
 
-s_session_interface_user* network_session_interface_get_local_user_properties(int user_index)
+s_session_interface_user* session_interface_get_local_user_properties(int user_index)
 {
 	return &s_session_interface_globals::get()->users[user_index];
 }
 
 bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type)
 {
-	s_session_interface_user* user_properties = network_session_interface_get_local_user_properties(user_index);
+	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
 	
 	// Don't change the character type if the user doesn't exist
 	if (user_properties->user_exists)
