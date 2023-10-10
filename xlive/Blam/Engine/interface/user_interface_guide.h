@@ -29,9 +29,9 @@ public:
 	char m_gap_10[1166];
 	s_user_interface_guide_state_manager_string m_strings[4];
 	char m_gap_5DC[12];
-	char m_field_5E8[28];
+	XOVERLAPPED m_xoverlapped;
 	int m_field_604;
-	char m_field_608;
+	bool m_unk_bool_608;
 	bool m_unk_bool_609;
 	char m_pad_609[6];
 };
