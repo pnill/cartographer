@@ -7,7 +7,7 @@
 #include "Blam/Engine/cache/cache_files.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/memory/bitstream.h"
-#include "Blam/Engine/Simulation/GameInterface/SimulationGameUnits.h"
+#include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"

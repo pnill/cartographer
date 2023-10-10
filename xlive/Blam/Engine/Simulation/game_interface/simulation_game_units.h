@@ -1,5 +1,5 @@
 #pragma once
-#include "SimulationGameObjects.h"
+#include "simulation_game_objects.h"
 #include "Blam/Engine/game/players.h"
 
 #define k_orignal_unit_creation_size  0x24
