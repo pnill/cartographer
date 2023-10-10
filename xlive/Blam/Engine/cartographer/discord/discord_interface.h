@@ -11,6 +11,8 @@ enum e_context_variant : uint32
 	_context_variant_assault = 6
 };
 
+bool* global_set_live_invite_accepted_flag_get(void);
+
 // Set small image for discord interface
 void discord_interface_set_small_image(const char* small_image, const char* small_text);
 

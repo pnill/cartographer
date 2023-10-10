@@ -7,6 +7,8 @@
 #include "XLive/ServerList/ServerList.h"
 #include "XLive/achievements/XAchievements.h"
 
+#include "Blam/Engine/interface/user_interface_guide.h"
+
 HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwFakeFriendsEnumerator = INVALID_HANDLE_VALUE;
@@ -730,6 +732,8 @@ int WINAPI XUserMuteListQuery (DWORD dwUserIndex, XUID XuidRemoteTalker, BOOL *p
 int WINAPI XInviteGetAcceptedInfo(DWORD dwUserIndex, XINVITE_INFO* pInfo)
 {
     LOG_TRACE_XLIVE("XInviteGetAcceptedInfo");
+	pInfo->hostInfo = user_interface_guide_state_manager_get()->m_xsession_info;
+	pInfo->fFromGameInvite = true;
     return 1;
 }
 

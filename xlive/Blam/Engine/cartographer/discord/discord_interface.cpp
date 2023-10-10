@@ -21,11 +21,17 @@ struct s_discord_data
 	DiscordUserId user_id;
 };
 
+volatile LONG g_should_stop = FALSE;
 HANDLE discord_thread = INVALID_HANDLE_VALUE;
-LONG g_should_stop = FALSE;
 DiscordActivity g_discord_activity = {};
 bool g_update_rich_presence = true;
+bool g_set_live_invite_accepted_flag = false;
 
+
+bool* global_set_live_invite_accepted_flag_get(void)
+{
+	return &g_set_live_invite_accepted_flag;
+}
 
 void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
 {
@@ -221,7 +227,6 @@ void DISCORD_CALLBACK on_user_updated(void* data)
 
 void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
 {
-
 	for (uint32 i = 0; i < 128; ++i)
 		LOG_INFO_FUNC("{}", secret[i]);
 
@@ -242,10 +247,10 @@ void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
 
 	c_user_interface_guide_state_manager* manager = user_interface_guide_state_manager_get();
 	memcpy(&manager->m_xsession_info, &session, sizeof(XSESSION_INFO));
-	manager->m_from_game_invite = 0;
-	manager->m_unk_bool_D = 0;
-
-	user_interface_networking_join_game(&manager->m_xsession_info, 0, true);
+	manager->m_from_game_invite = 1;
+	manager->m_unk_bool_D = true;
+	manager->m_unk_bool_F = false;
+	g_set_live_invite_accepted_flag = true; 
 	return;
 }
 
@@ -255,7 +260,7 @@ void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLeve
 	return;
 }
 
-DWORD WINAPI discord_thread_proc(LPVOID lpParam)
+unsigned __stdcall discord_thread_proc(void* pArguments)
 {
 	SetEnvironmentVariable(L"DISCORD_INSTANCE_ID", L"0");
 	uint32 result = 0;
@@ -305,7 +310,7 @@ DWORD WINAPI discord_thread_proc(LPVOID lpParam)
 
 void discord_game_status_create(void)
 {
-	discord_thread = CreateThread(NULL, 0, discord_thread_proc, NULL, 0, NULL);
+	discord_thread = (HANDLE)_beginthreadex(NULL, 0, &discord_thread_proc, NULL, 0, NULL);
 	return;
 }
 
@@ -313,5 +318,6 @@ void discord_game_status_dispose(void)
 {
 	InterlockedAdd(&g_should_stop, 1);
 	WaitForSingleObject(discord_thread, INFINITE);
+	CloseHandle(discord_thread);
 	return;
 }
