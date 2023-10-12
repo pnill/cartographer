@@ -183,11 +183,11 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data nObject;
+		object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, weaponId, unit_datum, 0);
+		object_placement_data_new(&nObject, weaponId, unit_datum, 0);
 
-		datum object_idx = Engine::Objects::object_new(&nObject);
+		datum object_idx = object_new(&nObject);
 
 		if (resetLoadout)
 			unit_delete_all_weapons(unit_datum);
@@ -218,7 +218,7 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
 {
 	BYTE team_index = NONE;
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
 	if (unit_object != NULL)
 	{
 		team_index = *(BYTE*)(unit_object + 0x13C);
@@ -264,7 +264,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(object_type_biped));
+	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
 	if (unit_object != NULL)
 	{
 		// not sure what these flags are, but this is called when picking up grenades
@@ -670,11 +670,11 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
 	if (!DATUM_IS_NONE(unit_datum))
 	{
-		s_object_placement_data object_placement;
+		object_placement_data object_placement;
 
-		Engine::Objects::create_new_placement_data(&object_placement, weapon_tag_index, unit_datum, 0);
+		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, 0);
 
-		datum object_idx = Engine::Objects::object_new(&object_placement);
+		datum object_idx = object_new(&object_placement);
 		if (!DATUM_IS_NONE(object_idx))
 		{
 			unit_delete_all_weapons(unit_datum);
@@ -1089,7 +1089,7 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	Engine::Objects::apply_biped_object_definition_patches();
+	apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");

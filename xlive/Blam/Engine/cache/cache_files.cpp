@@ -3,6 +3,11 @@
 
 #include "Blam/Engine/game/game_globals.h"
 
+cache_file_tag_instance* global_tag_instances_get(void)
+{
+	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);
+}
+
 datum s_tag_data_iterator::get_next_datum()
 {
 	typedef datum(__cdecl t_get_next_datum)(s_tag_data_iterator* it);
@@ -16,4 +21,9 @@ void cache_file_map_clear_all_failures(void)
 	auto p_cache_file_map_clear_all_failures = Memory::GetAddress<cache_file_map_clear_all_failures_t>(0x64551, 0x4C5A8);
 	p_cache_file_map_clear_all_failures();
 	return;
+}
+
+void* __cdecl tag_get_fast(datum tag_index)
+{
+	return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
 }

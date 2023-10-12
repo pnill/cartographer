@@ -1,5 +1,6 @@
 #pragma once
-#include "object_definition.hpp"
+#include "Blam/Engine/objects/object_definition.h"
+#include "Blam/Cache/TagGroups.hpp"
 
 /*********************************************************************
 * name: unit
@@ -10,7 +11,7 @@
 #pragma pack(push,1)
 struct s_unit_group_definition :TagGroup<'unit'>
 {
-	s_object_group_definition objectTag;
+	object_definition objectTag;
 	enum class e_unit_flags : __int32
 	{
 		circular_aiming = FLAG(0),

@@ -214,6 +214,7 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -316,7 +317,6 @@
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\object_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp" />
@@ -653,6 +653,12 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="resources\version_resource.h" />
+    <ClInclude Include="Blam\Engine\items\items.h" />
+    <ClInclude Include="Blam\Engine\items\weapons.h" />
+    <ClInclude Include="Blam\Engine\objects\object_definition.h" />
+    <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
+    <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\units\bipeds.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
@@ -661,6 +667,8 @@
   <ItemGroup>
     <None Include="xlive.def" />
     <None Include="3rdparty\directx\include\d3dx9math.inl" />
-    <None Include="resources\Resource.aps" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\bitmaps\crash_window_header.bmp" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 #pragma once
 
-enum e_predicted_resource_type : short
+enum e_predicted_resource_type : int16
 {
     predicted_resource_type_bitmap = 0,
     predicted_resource_type_sound = 1,
@@ -13,9 +13,11 @@ enum e_predicted_resource_type : short
     predicted_resource_type_lightmap_instance_bitmaps = 8
 };
 
+// max count: 2048
 struct predicted_resource
 {
     e_predicted_resource_type type;
-    short resource_index;
-    int tag_index;
+    int16 resource_index;
+    int32 tag_index;
 };
+TAG_GROUP_SIZE_ASSERT(predicted_resource, 8);

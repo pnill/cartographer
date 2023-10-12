@@ -5,7 +5,7 @@
 #include "Blam/Engine/ai/actors.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Variants/FireFight/DeviceShop/DeviceShop.h"
@@ -21,7 +21,7 @@ void FireFight::KilledAI(datum killedAi, datum killerPlayerIdx)
 {
 	int points = 0;
 	s_data_iterator<actor_datum> actorIt(get_actor_table());
-	auto actorObject = (s_biped_data_definition*)object_try_and_get_and_verify_type(killedAi, FLAG(object_type_biped));
+	auto actorObject = (unit_datum*)object_try_and_get_and_verify_type(killedAi, FLAG(_object_type_biped));
 
 	if (actorObject != NULL)
 	{

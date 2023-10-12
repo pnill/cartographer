@@ -1,14 +1,17 @@
 #include "stdafx.h"
 #include "GraveRobber.h"
 
+#include "H2MOD.h"
+
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_statborg.h"
+#include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/units/bipeds.h"
+
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Utils/Utils.h"
 
 bool firstPlayerSpawn;
 bool player_is_picking_up_skull = false;
@@ -49,20 +52,20 @@ void GraveRobber::SpawnPlayerClientSetup()
 
 void GraveRobber::SpawnSkull(datum unit_datum)
 {
-	const s_biped_data_definition* biped_unit = (s_biped_data_definition*)object_try_and_get_and_verify_type(unit_datum, FLAG(object_type_biped));
+	const object_datum* biped_unit = (object_datum*)object_try_and_get_and_verify_type(unit_datum, FLAG(_object_type_biped));
 
 	if (biped_unit != NULL)
 	{
-		s_object_placement_data nObject;
+		object_placement_data nObject;
 
-		Engine::Objects::create_new_placement_data(&nObject, e_weapons_datum_index::ball, -1, 0);
+		object_placement_data_new(&nObject, e_weapons_datum_index::ball, -1, 0);
 
 		nObject.position = biped_unit->position;
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
-		datum new_object_datum = Engine::Objects::object_new(&nObject);
+		datum new_object_datum = object_new(&nObject);
 		if (!DATUM_IS_NONE(new_object_datum))
-			Engine::Objects::simulation_action_object_create(new_object_datum);
+			simulation_action_object_create(new_object_datum);
 	}
 }
 
@@ -219,7 +222,7 @@ bool GraveRobber::OnAutoPickupHandler(ExecTime execTime, datum playerIdx, datum 
 	{
 	case ExecTime::_preEventExec:
 
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
+		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(weaponObject->item.object.tag_definition_index) == DATUM_INDEX_TO_ABSOLUTE_INDEX(e_weapons_datum_index::ball))
 		{
 			GraveRobber::PickupSkull(playerIdx, objectIdx);
 			handled = true;

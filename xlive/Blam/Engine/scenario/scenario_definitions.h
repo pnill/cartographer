@@ -25,7 +25,6 @@
 #include "Blam/Engine/main/level_definitions.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/objects/light_definitions.h"
-#include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Engine/sound/sound_scenery.h"
 #include "Blam/Engine/structures/cluster_partitions.h"
@@ -1289,3 +1288,5 @@ struct scenario : TagGroup<'scnr'>
     tag_block<s_scenario_simulation_definition_table_element> simulation_definition_table;
 };
 TAG_GROUP_SIZE_ASSERT(scenario, 992);
+
+typedef s_scenario_scenery s_scenario_object;

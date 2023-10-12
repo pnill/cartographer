@@ -383,7 +383,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		// host code
 		if (!game_is_predicted())
 		{
-			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));
+			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
 				if (h2mod->get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
 					Infection::setZombiePlayerStatus(s_player::GetId(absPlayerIdx));
@@ -475,7 +475,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!game_is_predicted())
 		{
 			LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}", absPlayerIdx);
-			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(object_type_biped));
+			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 

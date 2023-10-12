@@ -32,9 +32,9 @@ namespace ObjectInterpolate
 
 		bool SameObject(datum object_idx)
 		{
-			int object_node_count;
+			DWORD object_node_count;
 			s_object_interpolation* object_state = &object_states[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)];
-			real_matrix4x3* object_nodes = get_object_nodes(object_idx, &object_node_count);
+			real_matrix4x3* object_nodes = object_get_node_matrices(object_idx, &object_node_count);
 			bool ret = object_state->valid 
 				&& object_state->object_idx == object_idx 
 				&& object_state->node_count == object_node_count
@@ -78,8 +78,8 @@ namespace ObjectInterpolate
 				object_state->valid = true;
 			}
 
-			int object_node_count;
-			real_matrix4x3* object_nodes = get_object_nodes(object_it.get_current_datum_index(), &object_node_count);
+			DWORD object_node_count;
+			real_matrix4x3* object_nodes = object_get_node_matrices(object_it.get_current_datum_index(), &object_node_count);
 			/*if (object_node_count > OBJECT_MAX_NODES)
 				DBGBREAK();*/
 
@@ -127,26 +127,26 @@ namespace ObjectInterpolate
 		object_count--;
 	}
 
-	const real_matrix4x3* __cdecl object_get_node_matrices_hook(datum object_idx, int* out_node_count)
+	const real_matrix4x3* __cdecl object_get_node_matrices_hook(datum object_idx, DWORD* out_node_count)
 	{
 		s_object_interpolation* object_state = &object_states[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)];
 
 		if (!Interpolation::ShouldInterpolate())
 		{
-			return get_object_nodes(object_idx, out_node_count);
+			return object_get_node_matrices(object_idx, out_node_count);
 		}
 		
 		if (!SameObject(object_idx))
 		{
-			real_matrix4x3* ret = get_object_nodes(object_idx, out_node_count);
+			real_matrix4x3* ret = object_get_node_matrices(object_idx, out_node_count);
 			CircularStringBuffer* output = GetMainConsoleInstance()->GetTabOutput(_console_tab_logs);
 			output->AddStringFmt(StringFlag_None, "object interpolate: %x mismatch, cached object idx: %x, state valid: %d, node count: %d, cached: %d, node ptr: %#010x, cached: %#010x", 
 				object_idx, object_state->object_idx, object_state->valid, *out_node_count, object_state->node_count, object_state->node_ptr, ret);
 			return ret;
 		}
 		
-		int node_count;
-		real_matrix4x3* current_object_nodes = get_object_nodes(object_idx, &node_count);
+		DWORD node_count;
+		real_matrix4x3* current_object_nodes = object_get_node_matrices(object_idx, &node_count);
 
 		for (int i = 0; i < object_state->node_count; i++)
 			matrix4x3_interpolate(&object_state->previous_node_position[i], &current_object_nodes[i], Interpolation::GetInterpolateTime(), &object_state->interpolated_nodes[i]);

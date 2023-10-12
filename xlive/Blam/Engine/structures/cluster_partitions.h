@@ -6,6 +6,12 @@
 
 #define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 
+struct s_game_cluster_bit_vectors
+{
+    int32 cluster_bitvector;
+};
+CHECK_STRUCT_SIZE(s_game_cluster_bit_vectors, 4);
+
 // max count: MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 struct s_scenario_cluster_property
 {
