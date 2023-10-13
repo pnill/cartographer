@@ -5,11 +5,11 @@
 #include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Math/BlamMath.h"
 
-enum e_bsp_policy : char
+enum e_bsp_policy : int8
 {
-	bsp_policy_default = 0,
-	bsp_policy_always_placed = 1,
-	bsp_policy_manual_bsp_placement = 2
+	_bsp_policy_default = 0,
+	_bsp_policy_always_placed = 1,
+	_bsp_policy_manual_bsp_placement = 2
 };
 
 struct s_location
@@ -39,7 +39,6 @@ struct object_placement_data
 	datum unit_datum;
 	int team_index;
 	s_damage_owner damage_owner;
-	WORD field_72;
 	DWORD active_change_colors_mask;
 	real_color_rgb change_colors[4];
 	DWORD foreground_emblem;
