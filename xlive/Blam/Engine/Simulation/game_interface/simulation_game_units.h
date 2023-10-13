@@ -2,7 +2,7 @@
 #include "simulation_game_objects.h"
 #include "Blam/Engine/game/players.h"
 
-#define k_orignal_unit_creation_size  0x24
+#define k_orignal_unit_creation_size 36
 struct s_simulation_unit_state_data
 {
 	s_simulation_object_state_data object_state_data;
@@ -28,12 +28,12 @@ struct s_simulation_unit_creation_data
 {
 	s_simulation_object_creation_data object;
 	s_player_profile profile;
-	PAD(8);
-	WORD team;
-	PAD(2);
+	int32 field_18;
+	int32 field_1C;
+	e_game_team team;
+	int8 pad1[2];
 
 	//New data
 	string_id variant_name;
 };
-
-CHECK_STRUCT_SIZE(s_simulation_unit_creation_data, k_orignal_unit_creation_size + sizeof(string_id));
+CHECK_STRUCT_SIZE(s_simulation_unit_creation_data, (k_orignal_unit_creation_size + sizeof(string_id)));

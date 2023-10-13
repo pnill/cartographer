@@ -1,6 +1,6 @@
 #pragma once
-
 #include "Blam/Math/real_math.h"
+#include "Blam/Engine/tag_files/string_id.h"
 
 struct s_simulation_object_state_data
 {
@@ -35,5 +35,8 @@ struct s_simulation_object_creation_data
 	char emblem_info_foreground_index;
 	char emblem_info_background_index;
 	char emblem_info_flags;
+
+	// New data
+	//string_id variant;
 };
-CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 0x10);
+CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
