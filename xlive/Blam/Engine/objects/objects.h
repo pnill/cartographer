@@ -253,5 +253,3 @@ int object_count_from_iter();
 
 datum object_get_damage_owner(datum damaged_unit_index);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
-
-void apply_biped_object_definition_patches();

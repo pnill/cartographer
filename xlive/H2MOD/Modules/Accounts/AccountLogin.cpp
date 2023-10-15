@@ -17,6 +17,8 @@ int masterState = -1;
 char* masterStateStr = NULL;
 bool AccountEdit_remember = true;
 
+// TODO (Carefully) Cleanup and move
+
 #pragma region Halo 2 Master Login
 
 typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOW);

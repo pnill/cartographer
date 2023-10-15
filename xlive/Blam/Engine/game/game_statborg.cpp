@@ -4,35 +4,35 @@
 #include "H2MOD/Variants/Variants.h"
 #include "Util/Hooks/Hook.h"
 
-c_game_statborg* game_engine_get_statborg()
+c_game_statborg* __cdecl game_engine_get_statborg(void)
 {
-	typedef c_game_statborg* (__cdecl* game_engine_get_statborg_t)();
-	auto p_game_engine_get_statborg = Memory::GetAddress<game_engine_get_statborg_t>(0x6B8A7, 0x6AD32);
-	return p_game_engine_get_statborg();
+	return INVOKE(0x6B8A7, 0x6AD32, game_engine_get_statborg);
 }
 
-short c_game_statborg::get_player_stat(DWORD player_index, e_statborg_entry statborg_entry)
+int16 c_game_statborg::get_player_stat(int32 player_index, e_statborg_entry statborg_entry)
 {
 	return this->m_player_data[player_index].statistic[statborg_entry];
 }
 
-short c_game_statborg::get_team_stat(int team_index, e_statborg_entry statistic)
+int16 c_game_statborg::get_team_stat(int32 team_index, e_statborg_entry statistic)
 {
-	return this->m_team_data->statistic[statistic];
+	return this->m_team_data[team_index].statistic[statistic];
 }
 
-typedef void(__thiscall* adjust_player_stat_t)(c_game_statborg* statborg, datum player_datum, e_statborg_entry statistic, short count, int game_results_statistic, bool adjust_team_stat);
+typedef void(__thiscall* adjust_player_stat_t)(c_game_statborg* statborg, datum, e_statborg_entry, int16, int32, bool);
 adjust_player_stat_t p_c_game_statborg__adjust_player_stat;
-void c_game_statborg::adjust_player_stat(datum player_datum, e_statborg_entry statistic, short count, int game_result_statistic, bool adjust_team_stat)
+void c_game_statborg::adjust_player_stat(datum player_datum, e_statborg_entry statistic, int16 count, int32 game_result_statistic, bool adjust_team_stat)
 {
 	p_c_game_statborg__adjust_player_stat(this, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
+	return;
 }
 
-typedef void(__thiscall* adjust_team_stat_t)(c_game_statborg* statborg, int team_index, e_statborg_entry statistic, short count, int game_results_statistic);
+typedef void(__thiscall* adjust_team_stat_t)(c_game_statborg*, int32, e_statborg_entry, int16, int32);
 adjust_team_stat_t p_c_game_statborg__adjust_team_stat;
-void c_game_statborg::adjust_team_stat(int team_index, e_statborg_entry statistic, short count, int game_results_statistic)
+void c_game_statborg::adjust_team_stat(int32 team_index, e_statborg_entry statistic, int16 count, int32 game_result_statistic)
 {
-	p_c_game_statborg__adjust_team_stat(this, team_index, statistic, count, game_results_statistic);
+	p_c_game_statborg__adjust_team_stat(this, team_index, statistic, count, game_result_statistic);
+	return;
 }
 
 
@@ -44,6 +44,7 @@ void __fastcall c_game_statborg__adjust_player_stat(c_game_statborg* thisptr, DW
 	if (!handled)
 		p_c_game_statborg__adjust_player_stat(thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
 	CustomVariantHandler::c_game_statborg__adjust_player_stat(ExecTime::_postEventExec, thisptr, player_datum, statistic, count, game_result_statistic, adjust_team_stat);
+	return;
 }
 
 // Cartographer handler for adjust_team_stat member function
@@ -57,6 +58,7 @@ void __fastcall c_game_statborg__adjust_team_stat(c_game_statborg* statborg, DWO
 	}
 
 	statborg->adjust_team_stat(team_index, statistic, count, game_result_statistic);
+	return;
 }
 
 
@@ -64,4 +66,5 @@ void game_statborg_apply_patches()
 {
 	DETOUR_ATTACH(p_c_game_statborg__adjust_player_stat, Memory::GetAddress<adjust_player_stat_t>(0xD03ED, 0x8C84C), c_game_statborg__adjust_player_stat);
 	DETOUR_ATTACH(p_c_game_statborg__adjust_team_stat, Memory::GetAddress<adjust_team_stat_t>(0xD0252, 0x8C6B1), c_game_statborg__adjust_team_stat);
+	return;
 }

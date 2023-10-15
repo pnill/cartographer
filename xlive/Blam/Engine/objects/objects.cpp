@@ -78,12 +78,6 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_cou
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
-void apply_biped_object_definition_patches()
-{
-	LOG_INFO_GAME("{} - applying hooks", __FUNCTION__);
-
-}
-
 int object_get_count()
 {
 	s_data_iterator object_it(get_objects_header());
