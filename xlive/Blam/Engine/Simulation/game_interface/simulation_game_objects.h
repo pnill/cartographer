@@ -30,13 +30,13 @@ struct s_simulation_object_creation_data
 {
 	datum object_scenario_datum_index;
 	datum object_definition_index;
-	char multiplayer_spawn_monitor_index;
-	char gap_9[3];
-	char emblem_info_foreground_index;
-	char emblem_info_background_index;
-	char emblem_info_flags;
+	int8 multiplayer_spawn_monitor_index;
+	// unused padding
+	char pad[3];
 
-	// New data
-	//string_id variant;
+	s_emblem_info emblem_info;
+	
+	// Repurpose padding for variant index
+	int8 model_variant_id;
 };
 CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);

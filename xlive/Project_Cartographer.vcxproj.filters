@@ -659,6 +659,7 @@
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
+    <ClInclude Include="Blam\Engine\objects\emblems.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

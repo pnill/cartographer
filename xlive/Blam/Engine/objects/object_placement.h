@@ -1,8 +1,9 @@
 #pragma once
 #include "damage.h"
+#include "emblems.h"
+#include "object_identifier.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Math/BlamMath.h"
 
 enum e_bsp_policy : int8
@@ -41,7 +42,8 @@ struct object_placement_data
 	s_damage_owner damage_owner;
 	DWORD active_change_colors_mask;
 	real_color_rgb change_colors[4];
-	DWORD foreground_emblem;
+	s_emblem_info emblem_info;
+	int8 pad;
 	DWORD region_index;
 	WORD destroyed_constraints_flag;
 	WORD loosened_constraints_flag;

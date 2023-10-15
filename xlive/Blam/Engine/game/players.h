@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/damage_reporting.h"
+#include "Blam/Engine/objects/emblems.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/Simulation/MachineID.h"
 
@@ -39,116 +40,6 @@ enum e_character_type : byte
 	character_type_lmao = 6
 };
 
-enum e_emblem_foreground : byte
-{
-	emblem_foreground_seventh_column = 0,
-	emblem_foreground_bullseye = 1,
-	emblem_foreground_vortex = 2,
-	emblem_foreground_halt = 3,
-	emblem_foreground_spartan = 4,
-	emblem_foreground_da_bomb = 5,
-	emblem_foreground_trinity = 6,
-	emblem_foreground_delta = 7,
-	emblem_foreground_rampancy = 8,
-	emblem_foreground_sergeant = 9,
-	emblem_foreground_phenoix = 10,
-	emblem_foreground_champion = 11,
-	emblem_foreground_jolly_roger = 12,
-	emblem_foreground_marathon = 13,
-	emblem_foreground_cube = 14,
-	emblem_foreground_radioactive = 15,
-	emblem_foreground_smiley = 16,
-	emblem_foreground_frowney = 17,
-	emblem_foreground_spearhead = 18,
-	emblem_foreground_sol = 19,
-	emblem_foreground_waypoint = 20,
-	emblem_foreground_ying_yang = 21,
-	emblem_foreground_helmet = 22,
-	emblem_foreground_triad = 23,
-	emblem_foreground_grunt_symbol = 24,
-	emblem_foreground_cleave = 25,
-	emblem_foreground_thor = 26,
-	emblem_foreground_skull_king = 27,
-	emblem_foreground_triplicate = 28,
-	emblem_foreground_subnova = 29,
-	emblem_foreground_flaming_ninja = 30,
-	emblem_foreground_doubleCresent = 31,
-	emblem_foreground_spades = 32,
-	emblem_foreground_clubs = 33,
-	emblem_foreground_diamonds = 34,
-	emblem_foreground_hearts = 35,
-	emblem_foreground_wasp = 36,
-	emblem_foreground_mark_of_shame = 37,
-	emblem_foreground_snake = 38,
-	emblem_foreground_hawk = 39,
-	emblem_foreground_lips = 40,
-	emblem_foreground_capsule = 41,
-	emblem_foreground_cancel = 42,
-	emblem_foreground_gas_mask = 43,
-	emblem_foreground_grenade = 44,
-	emblem_foreground_tsanta = 45,
-	emblem_foreground_race = 46,
-	emblem_foreground_valkyire = 47,
-	emblem_foreground_drone = 48,
-	emblem_foreground_grunt = 49,
-	emblem_foreground_grunt_head = 50,
-	emblem_foreground_brute_head = 51,
-	emblem_foreground_runes = 52,
-	emblem_foreground_trident = 53,
-	emblem_foreground_number0 = 54,
-	emblem_foreground_number1 = 55,
-	emblem_foreground_number2 = 56,
-	emblem_foreground_number3 = 57,
-	emblem_foreground_number4 = 58,
-	emblem_foreground_number5 = 59,
-	emblem_foreground_number6 = 60,
-	emblem_foreground_number7 = 61,
-	emblem_foreground_number8 = 62,
-	emblem_foreground_number9 = 63
-};
-
-enum e_emblem_background : BYTE
-{
-	emblem_background_solid = 0,
-	emblem_background_vertical_split = 1,
-	emblem_background_horizontal_split1 = 2,
-	emblem_background_horizontal_split2 = 3,
-	emblem_background_vertical_gradient = 4,
-	emblem_background_horizontal_gradient = 5,
-	emblem_background_triple_column = 6,
-	emblem_background_triple_row = 7,
-	emblem_background_quadrants1 = 8,
-	emblem_background_quadrants2 = 9,
-	emblem_background_diagonal_slice = 10,
-	emblem_background_cleft = 11,
-	emblem_background_x1 = 12,
-	emblem_background_x2 = 13,
-	emblem_background_dircle = 14,
-	emblem_background_diamond = 15,
-	emblem_background_cross = 16,
-	emblem_background_square = 17,
-	emblem_background_dual_half_circle = 18,
-	emblem_background_triangle = 19,
-	emblem_background_diagonal_quadrant = 20,
-	emblem_background_three_quaters = 21,
-	emblem_background_quarter = 22,
-	emblem_background_four_rows1 = 23,
-	emblem_background_four_rows2 = 24,
-	emblem_background_split_circle = 25,
-	emblem_background_one_third = 26,
-	emblem_background_two_thirds = 27,
-	emblem_background_upper_field = 28,
-	emblem_background_top_and_bottom = 29,
-	emblem_background_center_stripe = 30,
-	emblem_background_left_and_right = 31
-};
-
-enum e_emblem_toggle : byte
-{
-	emblem_toggle_off = 0,
-	emblem_toggle_on
-};
-
 enum e_handicap : byte
 {
 	handicap_none = 0,
@@ -171,9 +62,7 @@ struct s_player_profile
 	e_player_color tertiary_color;
 	e_player_color quaternary_color;
 	e_character_type player_character_type;
-	e_emblem_foreground foreground_emblem;
-	e_emblem_background background_emblem;
-	char emblem_flags;
+	s_emblem_info emblem_info;
 };
 CHECK_STRUCT_SIZE(s_player_profile, 8);
 
@@ -196,7 +85,8 @@ CHECK_STRUCT_SIZE(s_clan_identifiers, 12);
 struct s_player_properties
 {
 	wchar_t player_name[16];
-	char unk[32];
+	int32 spawn_protection_time;
+	char unk[28];
 
 	s_player_profile_traits profile_traits;
 	wchar_t clan_name[16];
@@ -355,3 +245,6 @@ s_players_globals* get_players_globals();
 
 datum __cdecl player_index_from_user_index(int32 user_index);
 bool __cdecl players_user_is_active(int32 user_index);
+
+// gets required bits for player_appearance
+uint32 player_appearance_required_bits(void);
