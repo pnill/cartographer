@@ -25,8 +25,5 @@ struct biped_datum
 	byte gap0[144];
 	e_biped_physics_mode biped_movement_type;
 	byte gap1[139];
-
-	// NEW DATA
-	string_id variant_name;
 };
-CHECK_STRUCT_SIZE(biped_datum, 0x480 + 4);
+CHECK_STRUCT_SIZE(biped_datum, 0x480);

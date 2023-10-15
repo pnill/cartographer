@@ -163,3 +163,5 @@ struct s_multiplayer_event_response_definition
     tag_block<s_multiplayer_event_sound_response_definition> sound_permutations;
 };
 TAG_BLOCK_SIZE_ASSERT(s_multiplayer_event_response_definition, 0xA8);
+
+bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_color_rgb* change_colors);

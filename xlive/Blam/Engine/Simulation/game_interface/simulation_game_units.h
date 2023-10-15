@@ -1,15 +1,16 @@
 #pragma once
+#include "simulation_game_entities.h"
 #include "simulation_game_objects.h"
 #include "Blam/Engine/game/players.h"
 
-#define k_orignal_unit_creation_size 36
+
 struct s_simulation_unit_state_data
 {
 	s_simulation_object_state_data object_state_data;
-	WORD controlling_player_index;
-	WORD controlling_actor_index;
-	DWORD parent_vehicle_entity_index;
-	WORD parent_vehicle_seat;
+	short controlling_player_index;
+	short controlling_actor_index;
+	datum parent_vehicle_entity_index;
+	short parent_vehicle_seat;
 	WORD gap_9A;
 	real_vector3d desired_aiming_vector;
 	__int16 desired_weapon_set_identifier;
@@ -27,13 +28,10 @@ CHECK_STRUCT_SIZE(s_simulation_unit_state_data, 0xF8);
 struct s_simulation_unit_creation_data
 {
 	s_simulation_object_creation_data object;
-	s_player_profile profile;
-	int32 field_18;
-	int32 field_1C;
+	s_player_profile_traits profile_traits;
 	e_game_team team;
 	int8 pad1[2];
-
-	//New data
-	string_id variant_name;
 };
-CHECK_STRUCT_SIZE(s_simulation_unit_creation_data, (k_orignal_unit_creation_size + sizeof(string_id)));
+CHECK_STRUCT_SIZE(s_simulation_unit_creation_data, 36);
+
+void simulation_game_units_apply_patches(void);
