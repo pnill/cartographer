@@ -1,4 +1,5 @@
 #pragma once
+#include "emblems.h"
 #include "object_placement.h"
 #include "object_type_list.h"
 
@@ -149,7 +150,8 @@ struct object_datum
 	uint16 inhibited_flags;
 	int16 placement_index;
 	uint8 gap_1C[8];
-	uint32 foreground_emblem;
+	s_emblem_info emblem_info;
+	uint8 pad;
 	s_location location;
 	real_point3d center;
 	real32 radius;
@@ -181,7 +183,7 @@ struct object_datum
 	datum damage_owner_object_datum;
 	uint32 cached_object_render_state_index;
 	int16 field_D0;
-	uint8 model_variant_id;					// hlmt variant tag_block index
+	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
 	datum simulation_entity_index;
 	bool attached_to_simulation;
@@ -251,5 +253,3 @@ int object_count_from_iter();
 
 datum object_get_damage_owner(datum damaged_unit_index);
 real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
-
-void apply_biped_object_definition_patches();

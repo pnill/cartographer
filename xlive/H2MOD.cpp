@@ -17,6 +17,8 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
+#include "Blam/Engine/Simulation/game_interface/simulation_game_objects.h"
+#include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
@@ -978,7 +980,9 @@ void H2MOD::ApplyHooks() {
 	first_person_camera_apply_patches();
 	first_person_weapons_apply_patches();
 	game_statborg_apply_patches();
-	
+	simulation_game_objects_apply_patches();
+	simulation_game_units_apply_patches();
+
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
 	DETOUR_ATTACH(p_player_died, Memory::GetAddress<player_died_t>(0x5587B, 0x5DD73), OnPlayerDeath);
@@ -1089,7 +1093,6 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	apply_biped_object_definition_patches();
 	StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");

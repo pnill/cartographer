@@ -152,3 +152,8 @@ bool __cdecl players_user_is_active(int32 user_index)
 {
 	return INVOKE(0x5139B, 0x598BE, players_user_is_active, user_index);
 }
+
+uint32 player_appearance_required_bits()
+{
+	return 39;
+}

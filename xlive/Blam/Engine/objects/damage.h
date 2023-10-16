@@ -2,15 +2,15 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Math/real_math.h"
 
-#pragma pack(push, 1)
 struct s_damage_owner
 {
-	DWORD unk1;
-	DWORD unk2;
-	WORD unk3;
+	int32 unk1;
+	int32 unk2;
+	int32 unk3;
 };
-CHECK_STRUCT_SIZE(s_damage_owner, 10);
+CHECK_STRUCT_SIZE(s_damage_owner, 12);
 
+#pragma pack(push, 1)
 struct s_damage_data
 {
 	DWORD damage_tag_index;			// 0x0

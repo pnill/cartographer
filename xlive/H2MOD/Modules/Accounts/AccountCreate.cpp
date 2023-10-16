@@ -17,6 +17,8 @@
 #define ERROR_CODE_TAKEN_USERNAME -6
 #define ERROR_CODE_BANNED_EMAIL_DOMAIN -7
 
+// TODO (Carefully) Cleanup and move
+
 static int InterpretMasterCreate(char* response_content) {
 	int result = 0;//will stay as 0 when master only returns "return_code=xxx<br>"
 

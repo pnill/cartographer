@@ -1,6 +1,5 @@
 #pragma once
-#include "Blam/Engine/Networking/NetworkPrimitiveTypes.h"
-#include "H2MOD/Modules/Networking/Memory/bitstream.h"
+#include "Blam/Engine/memory/bitstream.h"
 
 enum e_simulation_event_type
 {
@@ -32,6 +31,7 @@ enum e_simulation_event_type
 	_simulation_event_type_request_boot_player_event = 0x19,
 	k_simulation_event_count = 0x1A,
 };
+
 class c_simulation_event_definition
 {
 public:

@@ -3,7 +3,6 @@
   <ItemGroup>
     <ClCompile Include="3rdparty\tinyxml\tinyxml2.cpp" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomResolutions\CustomResolutions.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -215,6 +214,12 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -324,7 +329,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\CustomResolutions\CustomResolutions.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -464,20 +468,15 @@
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
-    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEvents.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
     <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
-    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameEntities.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
-    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameObjects.h" />
-    <ClInclude Include="Blam\Engine\Simulation\GameInterface\SimulationGameUnits.h" />
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="Blam\Math\real_vector3d.h" />
@@ -612,7 +611,6 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
-    <ClInclude Include="Blam\Engine\Simulation\GameInterface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
     <ClInclude Include="Blam\Engine\ai\ai_flocks.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
@@ -659,6 +657,24 @@
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
+    <ClInclude Include="Blam\Engine\main\main.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_damage.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_device_machines.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_generics.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_items.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_projectiles.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_turrets.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_units.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_engine_player.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_vehicles.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_weapons.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_events.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_type_collection.h" />
+    <ClInclude Include="Blam\Engine\objects\emblems.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

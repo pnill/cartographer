@@ -1,13 +1,15 @@
 #pragma once
-
 #include "Blam/Math/real_math.h"
+#include "Blam/Engine/objects/emblems.h"
+#include "Blam/Engine/objects/object_placement.h"
+#include "Blam/Engine/tag_files/string_id.h"
 
 struct s_simulation_object_state_data
 {
 	real_point3d position;
 	real_vector3d forward;
 	real_vector3d up;
-	int scale;
+	real32 scale;
 	real_vector3d translational_velocity;
 	real_vector3d angular_velocity;
 	int body_vitality;
@@ -30,10 +32,27 @@ struct s_simulation_object_creation_data
 {
 	datum object_scenario_datum_index;
 	datum object_definition_index;
-	char multiplayer_spawn_monitor_index;
-	char gap_9[3];
-	char emblem_info_foreground_index;
-	char emblem_info_background_index;
-	char emblem_info_flags;
+	int8 multiplayer_spawn_monitor_index;
+	// unused padding
+	char pad[3];
+
+	s_emblem_info emblem_info;
+	
+	// Repurpose padding for variant index
+	int8 model_variant_id;
 };
-CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 0x10);
+CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
+
+bool __stdcall c_simulation_object_entity_definition__object_setup_placement_data(void* _this,
+	s_simulation_object_creation_data* object_creation_data,
+	s_simulation_object_state_data* state_data,
+	uint32* flags,
+	object_placement_data* placement_data);
+
+datum __fastcall c_simulation_object_entity_definition__object_create_object(void* _this,
+	s_simulation_object_creation_data* object_creation,
+	s_simulation_object_state_data* state_data,
+	uint32* flags,
+	object_placement_data* placement_data);
+
+void simulation_game_objects_apply_patches(void);
