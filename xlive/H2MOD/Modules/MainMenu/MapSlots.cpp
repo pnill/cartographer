@@ -23,7 +23,7 @@ namespace MapSlots
 	std::vector<s_multiplayer_ui_level_definition> MapData;
 	std::map<datum, std::string> BitmapsToLoad;
 
-	void CacheMapData()
+	void CacheMapData(void)
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
@@ -96,6 +96,8 @@ namespace MapSlots
 				LOG_TRACE_GAME("[Map Slots]: Startup - Map File Missing {}", map);
 			}
 		}
+
+		return;
 	}
 
 	void add_new_multiplayer_map_slots_game(void)
@@ -104,13 +106,13 @@ namespace MapSlots
 		
 		if (ui_levels)
 		{
-			int32 i = k_multiplayer_first_unused_slot;
+			int32 added_maps = 0;
 			for (const s_multiplayer_ui_level_definition& newSlot : MapData)
 			{
-				if (i < k_max_map_slots)
+				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
 					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.english_name.get_string());
-					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[i];
+					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
 					memcpy(slot, &newSlot, sizeof(newSlot));
@@ -119,10 +121,10 @@ namespace MapSlots
 
 					//Change the map id and sort ID so that the maps are 
 					//placed in order at the end of the list
-					int32 new_map_id = k_starting_map_index + i;
+					int32 new_map_id = k_starting_map_index + added_maps;
 					slot->map_id = new_map_id;
 					slot->sort_order = new_map_id;
-					i++;
+					added_maps++;
 				}
 				else
 				{
@@ -138,24 +140,25 @@ namespace MapSlots
 	int32 add_new_multiplayer_map_slots_server(void)
 	{
 		int32 added_map_count = 0;
+		s_multiplayer_ui_level_definition* multiplayer_levels = Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510);
 		for (const s_multiplayer_ui_level_definition& newSlot : MapData)
 		{
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
+				s_multiplayer_ui_level_definition* slot = &multiplayer_levels[k_multiplayer_first_unused_slot + added_map_count];
 				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.english_name.get_string());
-				s_multiplayer_ui_level_definition* slot = &Memory::GetAddress<s_multiplayer_ui_level_definition*>(0, 0x419510)[k_multiplayer_first_unused_slot + added_map_count];
 				DWORD dwBack[2];
-				VirtualProtect(slot, sizeof(*slot), PAGE_EXECUTE_READWRITE, &dwBack[0]);
+				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
 				//Write the data loaded from the maps into the unused slot
-				memcpy(slot, &newSlot, sizeof(newSlot));
+				memcpy(slot, &newSlot, sizeof(s_multiplayer_ui_level_definition));
 
 				//Change the map id and sort ID so that the maps are 
 				//placed in order at the end of the list
 				int32 new_map_id = k_starting_map_index + added_map_count;
 				slot->map_id = new_map_id;
 				slot->sort_order = new_map_id;
-				VirtualProtect(slot, sizeof(*slot), dwBack[0], &dwBack[1]);
+				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), dwBack[0], &dwBack[1]);
 				added_map_count++;
 			}
 			else
@@ -183,36 +186,44 @@ namespace MapSlots
 		return p_sub_map_slot(a1);
 	}
 
-	void map_slots_apply_dedi_hooks()
+	void map_slots_apply_dedi_hooks(void)
 	{
 		MapSlotCount = Memory::GetAddress<int32*>(0, 0x41950C);
 		//c_store_multiplayer_level_data = Memory::GetAddress<p_store_multiplayer_level_data*>(0, 0x6A22);
 		p_sub_map_slot = Memory::GetAddress<sub_map_slot_t*>(0, 0x3C8C3);
 		//PatchCall(Memory::GetAddress(0, 0xBBAE), store_multiplayer_level_data);
 		PatchCall(Memory::GetAddress(0, 0x6ACC), store_multiplayer_level_data);
+		return;
 	}
 
-	void OnMapLoad()
+	void OnMapLoad(void)
 	{
-		if (AddedMaps.empty()) { return; }
-
-		//Load all the added maps bitmaps
-		LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-		for (const auto& item : BitmapsToLoad)
+		if (!AddedMaps.empty())
 		{
-			tag_loader::Load_tag(item.first, false, item.second);
+			//Load all the added maps bitmaps
+			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+			for (const auto& item : BitmapsToLoad)
+			{
+				tag_loader::Load_tag(item.first, false, item.second);
+			}
+			tag_loader::Push_Back();
+			add_new_multiplayer_map_slots_game();
 		}
-		tag_loader::Push_Back();
-		add_new_multiplayer_map_slots_game();
+
+		return;
 	}
 
-	void Initialize()
+	void Initialize(void)
 	{
 		AddedMaps.emplace_back("highplains.map");
 		AddedMaps.emplace_back("derelict.map");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())
+		{
 			map_slots_apply_dedi_hooks();
+		}
+
+		return;
 	}
 }
