@@ -29,23 +29,25 @@ enum e_player_color : byte
 	player_color_tan
 };
 
-enum e_character_type : byte
+enum e_character_type : int8
 {
 	character_type_masterchief = 0,
 	character_type_dervish = 1,
 	character_type_spartan = 2,
 	character_type_elite = 3,
+
+	// cartographer added characters
 	character_type_skeleton = 4,
 	character_type_flood = 5,
 	character_type_lmao = 6
 };
 
-enum e_handicap : byte
+enum e_handicap : uint8
 {
-	handicap_none = 0,
-	handicap_minor = 1,
-	handicap_moderate = 2,
-	handicap_severe = 3
+	_handicap_none = 0,
+	_handicap_minor = 1,
+	_handicap_moderate = 2,
+	_handicap_severe = 3
 };
 
 enum e_player_flags : int
@@ -92,14 +94,14 @@ struct s_player_properties
 	wchar_t clan_name[16];
 	s_clan_identifiers clan_identifiers;
 
-	byte player_team;
+	int8 team_index;
 	e_handicap player_handicap_level;
-	byte player_displayed_skill;
-	byte player_overall_skill;
-	char player_is_griefer;
-	char bungie_user_role;
-	char achievement_flags;
-	byte unk2;
+	int8 player_displayed_skill;
+	int8 player_overall_skill;
+	int8 player_is_griefer;
+	int8 bungie_user_role;
+	int8 achievement_flags;
+	int8 unk2;
 };
 CHECK_STRUCT_SIZE(s_player_properties, 132);
 
@@ -248,3 +250,6 @@ bool __cdecl players_user_is_active(int32 user_index);
 
 // gets required bits for player_appearance
 uint32 player_appearance_required_bits(void);
+
+// Validate player configuration
+void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);

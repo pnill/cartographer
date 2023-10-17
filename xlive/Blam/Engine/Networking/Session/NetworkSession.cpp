@@ -166,7 +166,7 @@ unsigned long long NetworkSession::GetPlayerId(int playerIdx)
 
 int NetworkSession::GetPlayerTeam(int playerIdx)
 {
-	return GetPlayerInformation(playerIdx)->properties[0].player_team;
+	return GetPlayerInformation(playerIdx)->properties[0].team_index;
 }
 
 int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)

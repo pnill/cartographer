@@ -1,10 +1,19 @@
 #include "stdafx.h"
 #include "players.h"
 
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_engine.h"
+#include "Blam/Engine/game/game_engine_util.h"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/saved_games/game_variant.h"
+#include "Blam/Engine/scenario/scenario.h"
+
+#include "H2MOD/Modules/Shell/Config.h"
+
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
-	- If you need to do something in the pregame lobby, use the functions available in Network Session (H2MOD/Modules/Networking/NetworkSession)
+	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Networking/Session)
 */
 
 s_data_array* s_player::GetArray()
@@ -32,7 +41,7 @@ e_game_team s_player::GetTeam(int playerIndex)
 	{
 		return (e_game_team)NONE;
 	}
-	return (e_game_team)GetPlayer(playerIndex)->properties[0].player_team;
+	return (e_game_team)GetPlayer(playerIndex)->properties[0].team_index;
 }
 
 void s_player::SetTeam(int playerIndex, e_game_team team)
@@ -41,7 +50,7 @@ void s_player::SetTeam(int playerIndex, e_game_team team)
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].player_team = (byte)team;
+	GetPlayer(playerIndex)->properties[0].team_index = (int8)team;
 }
 
 void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)
@@ -156,4 +165,131 @@ bool __cdecl players_user_is_active(int32 user_index)
 uint32 player_appearance_required_bits()
 {
 	return 39;
+}
+
+void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+{
+    // Campaign verification
+    if (game_is_campaign())
+    {
+        scenario* scnr = get_global_scenario();
+        uint32 block_size = scnr->player_starting_locations.size;
+        if (block_size > 0)
+        {
+            uint32 i = 0;
+            while (true)
+            {
+                scenario_player* player_starting_location = scnr->player_starting_locations[i];
+                if (player_starting_location->campaign_player_type != NONE)
+                {
+                    configuration_data->team_index = 1;
+                    configuration_data->profile_traits.profile.player_character_type = (e_character_type)player_starting_location->campaign_player_type;
+                    break;
+                }
+
+                ++i;
+                if (i >= block_size)
+                {
+                    configuration_data->team_index = 1;
+                    configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
+                }
+            }
+        }
+        else
+        {
+            configuration_data->team_index = 1;
+            configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
+        }
+    }
+    // Multiplayer verification
+    else if (game_is_multiplayer())
+    {
+        // Don't allow dervish since he's not loaded properly in shared
+        if (configuration_data->profile_traits.profile.player_character_type == character_type_dervish)
+        {
+            configuration_data->profile_traits.profile.player_character_type = character_type_elite;
+        }
+
+
+        if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+        {
+            configuration_data->profile_traits.profile.player_character_type = character_type_skeleton;
+            for (uint32 i = 0; i < k_number_of_users; i++)
+            {
+                network_session_interface_set_local_user_character_type(i, character_type_skeleton);
+            }
+            *Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
+        }
+    }
+    
+    // General character verification
+    e_character_type character = configuration_data->profile_traits.profile.player_character_type;
+    if (character != NONE)
+    {
+        if (character >= character_type_masterchief)
+        {
+            s_game_globals* globals = scenario_get_game_globals();
+            if (character > (e_character_type)globals->player_representation.size - 1)
+            {
+                character = (e_character_type)(globals->player_representation.size - 1);
+            }
+        }
+        else
+        {
+            character = character_type_masterchief;
+        }
+        configuration_data->profile_traits.profile.player_character_type = character;
+    }
+
+    // Skill verification
+    int8 player_displayed_skill = configuration_data->player_displayed_skill;
+    if (player_displayed_skill != -1)
+    {
+        if (player_displayed_skill < 0)
+            player_displayed_skill = 0;
+        configuration_data->player_displayed_skill = player_displayed_skill;
+    }
+    int8 player_overall_skill = configuration_data->player_overall_skill;
+    if (player_overall_skill != NONE)
+    {
+        if (player_overall_skill < 0)
+        {
+            player_overall_skill = 0;
+        }
+        configuration_data->player_overall_skill = player_overall_skill;
+    }
+
+    // Handicap verification
+    e_handicap player_handicap_level = configuration_data->player_handicap_level;
+    if (player_handicap_level >= _handicap_none)
+    {
+        if (player_handicap_level > _handicap_severe)
+        {
+            player_handicap_level = _handicap_severe;
+        }
+    }
+    else
+    {
+        player_handicap_level = _handicap_none;
+    }
+    configuration_data->player_handicap_level = player_handicap_level;
+    
+    // User role verification
+    int8 bungie_user_role = configuration_data->bungie_user_role;
+    if (bungie_user_role < 0 || bungie_user_role > 7)
+    {
+        configuration_data->bungie_user_role = 0;
+    }
+
+    if (current_game_engine())
+    {
+        if (TEST_FLAG(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
+        {
+            if (configuration_data->team_index != NONE && (FLAG(configuration_data->team_index) & s_game_engine_globals::get()->flags_A) == 0)
+            {
+                //game_is_authoritative();
+                configuration_data->team_index = NONE;
+            }
+        }
+    }
 }

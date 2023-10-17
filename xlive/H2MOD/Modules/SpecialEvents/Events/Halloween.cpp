@@ -31,14 +31,6 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		if (H2Config_spooky_boy) 
-		{
-			for (byte user_index = 0; user_index < k_number_of_users; user_index++)
-			{
-				network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
-			}
-		}
-
 		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
 		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
 

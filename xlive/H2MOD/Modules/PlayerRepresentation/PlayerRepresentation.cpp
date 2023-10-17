@@ -97,115 +97,7 @@ namespace PlayerRepresentation
 		return DATUM_INDEX_NONE;
 	}
 
-	void __cdecl player_validate_extra_characters_type(int player_index, s_player_properties* player_properties)
-	{
-		if (player_properties->profile_traits.profile.player_character_type == character_type_masterchief)
-			player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-		if (player_properties->profile_traits.profile.player_character_type == character_type_dervish)
-			player_properties->profile_traits.profile.player_character_type = character_type_elite;
-
-		if (get_current_special_event() != e_special_event_type::_halloween)
-		{
-			if (player_properties->profile_traits.profile.player_character_type == character_type_skeleton)
-				player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-		}
-		else
-		{
-			if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
-			{
-				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
-				{
-					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
-				}
-			}
-
-			player_properties->profile_traits.profile.player_character_type = character_type_skeleton;
-		}
-
-		if ((byte)player_properties->profile_traits.profile.player_character_type > current_representation_count)
-			player_properties->profile_traits.profile.player_character_type = character_type_spartan;
-	}
-
-	typedef void(__cdecl player_properties_validate_configuration_t)(int, s_player_properties*);
-	player_properties_validate_configuration_t* p_player_properties_validate_configuration;
-
-	void __cdecl player_properties_validate_configuration_hook(int player_index, s_player_properties* player_properties)
-	{
-		LOG_INFO_GAME("{} - game engine: {}", __FUNCTION__, game_mode_get());
-
-		auto player_biped_type = player_properties->profile_traits.profile.player_character_type;
-		p_player_properties_validate_configuration(player_index, player_properties);
-		
-		if (game_is_campaign())
-		{
-			/*auto scenario = tags::get_tag_fast<s_scenario_group_definition>(tags::get_tags_header()->scenario_datum);
-			s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type player_type = s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none;
-			int v5 = 0;
-			if (scenario->player_starting_locations.size > 0)
-			{
-				for (auto i = 0; i < scenario->player_starting_locations.size; i++)
-				{
-					auto starting_location = scenario->player_starting_locations[i];
-					if (starting_location->campaign_player_type != s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none) {
-						player_type = starting_location->campaign_player_type;
-						break;
-					}
-				}
-				a2->player_team = e_object_team::player;
-				if (player_type == s_scenario_group_definition::s_player_starting_locations_block::e_campaign_player_type::none)
-					a2->profile.player_character_type = static_cast<Player::Biped>(static_cast<byte>(static_cast<short>(player_type)));
-			}*/
-			return;
-		}
-		else if (game_is_multiplayer())
-		{
-			// reset the player biped type to what was previously in the field
-			player_properties->profile_traits.profile.player_character_type = player_biped_type;
-			// then go through our multiplayer player properties filters
-			player_validate_extra_characters_type(player_index, player_properties);
-		}
-	}
-
-	// no params because actually "usercall"
-	void* p_player_representation_get;
-
-	// calls the original player representation get function
-	void player_representatio_get_orig_fn(int player_index, int* out_variant_index, int* a3)
-	{
-		__asm {
-			mov eax, a3
-			push eax
-			mov ebx, out_variant_index
-			mov eax, player_index
-			call p_player_representation_get
-			add esp, 4
-		}
-	}
-
-	void __cdecl player_representation_get(datum player_datum, int* out_variant_index, int* a3)
-	{
-		int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
-		s_player* player = s_player::GetPlayer(player_index);
-
-		if (game_is_multiplayer())
-			player_validate_extra_characters_type(player_index, &player->properties[0]);
-		player_representatio_get_orig_fn(player_datum, out_variant_index, a3);
-	}
-
-	__declspec(naked) void player_representation_get_to_cdecl()
-	{
-		__asm {
-			push eax
-			mov eax, [esp + 4h + 4h]
-			push eax // a3
-			push ebx // out_variant
-			mov eax, [esp + 8h]
-			push eax // player index
-			call player_representation_get
-			add esp, 10h // clear 16 bytes to esp == ret addr
-			retn
-		}
-	}
+	
 
 	void OnMapLoad(s_game_options* options)
 	{
@@ -213,14 +105,6 @@ namespace PlayerRepresentation
 
 		if (options->game_mode == _game_mode_multiplayer)
 		{
-			if (H2Config_spooky_boy && get_current_special_event() == e_special_event_type::_halloween && !Memory::IsDedicatedServer())
-			{
-				for (byte user_index = 0; user_index < k_number_of_users; user_index++)
-				{
-					network_session_interface_set_local_user_character_type(user_index, character_type_skeleton);
-				}
-			}
-
 			scenario* scenario_definition = get_global_scenario();
 			datum skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
 			datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
@@ -315,13 +199,7 @@ namespace PlayerRepresentation
 	}
 	void ApplyHooks()
 	{
-		p_player_properties_validate_configuration = Memory::GetAddress<player_properties_validate_configuration_t*>(0x52F23, 0x5B41B);
-		PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_properties_validate_configuration_hook);
-		
-		p_player_representation_get = Memory::GetAddress<void*>(0x53895, 0x5BD8D);
-		PatchCall(Memory::GetAddress(0x53969, 0x5BE61), player_representation_get_to_cdecl);
-		PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
-
+		PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
 		// Change the packet validation for player::properties::profile to just accept anything, we catch it later if it's outside of the acceptable range.
 		WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), 25);
 	}
