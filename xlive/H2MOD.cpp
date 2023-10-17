@@ -819,7 +819,7 @@ int get_active_count_from_bitflags(short teams_bit_flags)
 	int count = 0;
 	for (int i = 0; i < _game_team_neutral; i++)
 	{
-		if (TEST_FLAG(teams_bit_flags, i))
+		if (TEST_BIT(teams_bit_flags, i))
 			count++;
 	}
 	return count;
@@ -878,7 +878,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 				break;
 
 			// check if the team is available for play
-			if (!TEST_FLAG(activeTeamsFlags, i))
+			if (!TEST_BIT(activeTeamsFlags, i))
 				continue;
 
 			std::uniform_int_distribution<int> dist(0, activePlayersIndices.size() - 1);

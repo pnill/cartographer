@@ -47,7 +47,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	/*
 	datum result = NONE;
 
-	if (!TEST_FLAG(placement_data->object_placement_flags, 0x10))
+	if (!TEST_BIT(placement_data->object_placement_flags, 0x10))
 	{
 		if (placement_data->tag_index == NONE) 
 		{

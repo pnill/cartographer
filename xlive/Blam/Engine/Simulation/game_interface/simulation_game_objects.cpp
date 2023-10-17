@@ -68,28 +68,28 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
         object_placement_data_new(placement_data, object_creation_data->object_definition_index, NONE, 0);
         placement_data->object_placement_flags |= 0x12u;
         placement_data->emblem_info = object_creation_data->emblem_info;
-        if (TEST_FLAG(*flags, 1))
+        if (TEST_BIT(*flags, 1))
         {
             placement_data->position = state_data->position;
             *flags &= ~FLAG(1);
         }
-        if (TEST_FLAG(*flags, 2))
+        if (TEST_BIT(*flags, 2))
         {
             placement_data->forward = state_data->forward;
             placement_data->up = state_data->up;
             *flags &= ~FLAG(2);
         }
-        if (TEST_FLAG(*flags, 3))
+        if (TEST_BIT(*flags, 3))
         {
             placement_data->scale = state_data->scale;
             *flags &= ~FLAG(3);
         }
-        if (TEST_FLAG(*flags, 4))
+        if (TEST_BIT(*flags, 4))
         {
             placement_data->translational_velocity = state_data->translational_velocity;
             *flags &= ~FLAG(4);
         }
-        if (TEST_FLAG(*flags, 5))
+        if (TEST_BIT(*flags, 5))
         {
             placement_data->angular_velocity = state_data->angular_velocity;
             *flags &= ~FLAG(5);

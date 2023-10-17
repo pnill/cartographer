@@ -109,7 +109,7 @@ bool PlayerIterator::get_next_active_player()
 
 	while (m_current_player)
 	{
-		if (!TEST_FLAG(m_current_player->flags, _player_left_game_bit))
+		if (!TEST_BIT(m_current_player->flags, _player_left_game_bit))
 			break;
 
 		m_current_player = get_next_datum();
@@ -274,7 +274,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 
     if (current_game_engine())
     {
-        if (TEST_FLAG(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
+        if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
         {
             if (configuration_data->team_index != NONE && (FLAG(configuration_data->team_index) & s_game_engine_globals::get()->flags_A) == 0)
             {
@@ -283,4 +283,6 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             }
         }
     }
+
+    return;
 }

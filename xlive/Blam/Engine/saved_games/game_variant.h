@@ -292,7 +292,7 @@ struct s_game_variant
 
 	bool is_team_play()
 	{
-		return TEST_FLAG(this->game_engine_flags, _game_engine_teams_bit);
+		return TEST_BIT(this->game_engine_flags, _game_engine_teams_bit);
 	}
 
 	//the area below this seems like a big union
