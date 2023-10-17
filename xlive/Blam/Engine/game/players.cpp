@@ -62,15 +62,6 @@ void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)
 	GetPlayer(playerIndex)->properties[0].profile_traits.profile.player_character_type = bipedType;
 }
 
-void s_player::SetUnitBipedType(int playerIndex, byte representationIndex)
-{
-	if (!IndexValid(playerIndex))
-	{
-		return;
-	}
-	GetPlayer(playerIndex)->properties[0].profile_traits.profile.player_character_type = (e_character_type)representationIndex;
-}
-
 void s_player::SetBipedSpeed(int playerIndex, float speed)
 {
 	if (!IndexValid(playerIndex))
