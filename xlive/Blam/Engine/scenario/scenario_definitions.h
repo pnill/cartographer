@@ -206,6 +206,7 @@ struct scenario_object_name
 {
     static_string32 name;
     e_object_type type;
+    int8 pad;
     short placement_index;
 };
 TAG_BLOCK_SIZE_ASSERT(scenario_object_name, 36);

@@ -167,28 +167,31 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
         uint32 block_size = scnr->player_starting_locations.size;
         if (block_size > 0)
         {
-            uint32 i = 0;
-            while (true)
+            // Go through every player starting location and check if there's a campaign player type set
+            // Set the appropriate data in the player to the values of the tagblock
+            bool found = false;
+            for (uint32 i = 0; i < block_size; ++i)
             {
                 scenario_player* player_starting_location = scnr->player_starting_locations[i];
                 if (player_starting_location->campaign_player_type != NONE)
                 {
-                    configuration_data->team_index = 1;
+                    configuration_data->team_index = _game_team_player;
                     configuration_data->profile_traits.profile.player_character_type = (e_character_type)player_starting_location->campaign_player_type;
+                    found = true;
                     break;
                 }
+            }
 
-                ++i;
-                if (i >= block_size)
-                {
-                    configuration_data->team_index = 1;
-                    configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
-                }
+            // If a campaign_player_type type wasn't found in any of the starting locations set default values
+            if (!found)
+            {
+                configuration_data->team_index = _game_team_player;
+                configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
             }
         }
         else
         {
-            configuration_data->team_index = 1;
+            configuration_data->team_index = _game_team_player;
             configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
         }
     }
@@ -234,7 +237,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 
     // Skill verification
     int8 player_displayed_skill = configuration_data->player_displayed_skill;
-    if (player_displayed_skill != -1)
+    if (player_displayed_skill != NONE)
     {
         if (player_displayed_skill < 0)
             player_displayed_skill = 0;
@@ -276,9 +279,8 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     {
         if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
         {
-            if (configuration_data->team_index != NONE && (FLAG(configuration_data->team_index) & s_game_engine_globals::get()->flags_A) == 0)
+            if (configuration_data->team_index != NONE && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
             {
-                //game_is_authoritative();
                 configuration_data->team_index = NONE;
             }
         }

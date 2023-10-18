@@ -171,7 +171,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 				map_name,
 				"Multiplayer",
 				getEnglishMapName(),
-				gamemode_id_to_string(s_game_engine_globals::get()->game_engine_index),
+				gamemode_id_to_string(game_engine_globals_get()->game_engine_index),
 				getVariantName()
 			);
 			update_player_count();
