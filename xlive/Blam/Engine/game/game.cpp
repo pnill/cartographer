@@ -51,6 +51,11 @@ bool game_in_progress(void)
 	return get_main_game_globals() && get_main_game_globals()->game_in_progress;
 }
 
+bool game_is_authoritative(void)
+{
+	return game_options_get()->simulation_type != _game_simulation_distributed_client;
+}
+
 void game_options_setup_default_players(int player_count, s_game_options* game_options)
 {
 	typedef void(__cdecl* cache_file_map_clear_all_failures_t)(int, s_game_options*);

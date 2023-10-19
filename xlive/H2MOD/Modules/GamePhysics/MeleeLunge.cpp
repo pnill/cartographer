@@ -237,7 +237,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		if (m_maximum_counter + ticks_to_add <= (m_melee_tick - 1))
 			m_flags |= FLAG(_melee_flag_max_deceleration_ticks_reached);
 
-		if (!TEST_FLAG(m_flags, _melee_flag_max_deceleration_ticks_reached))
+		if (!TEST_BIT(m_flags, _melee_flag_max_deceleration_ticks_reached))
 		{
 			// compare 2 dot products
 			if (dot_product3d(aiming_vector, &direction) <= (current_velocity_per_tick * melee_max_cosine) 

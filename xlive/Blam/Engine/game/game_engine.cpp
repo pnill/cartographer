@@ -2,7 +2,7 @@
 
 #include "game_engine.h"
 
-s_game_engine_globals* s_game_engine_globals::get()
+s_game_engine_globals* game_engine_globals_get(void)
 {
 	return *Memory::GetAddress<s_game_engine_globals**>(0x4BF8F8, 0x4EA028);
 }

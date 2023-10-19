@@ -95,7 +95,8 @@ static_assert(sizeof(datum) == 4);
 
 /// Use this for setting up enum bitfields
 #define FLAG(bit)( 1<<(bit) )
-#define TEST_FLAG(flags, bit)( ((flags) & FLAG(bit)) != 0 )
+#define TEST_BIT(flags, bit)( ((flags) & FLAG(bit)) != 0 )
+#define TEST_FLAG(flags, flag)( ((flags) & (flag)) != 0 )
 #define SET_FLAG(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )

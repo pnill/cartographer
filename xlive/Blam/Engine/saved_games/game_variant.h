@@ -23,7 +23,7 @@ enum e_game_variant_description_index : char
 	_game_variant_description_territories = 6,
 	k_variant_count
 };
-enum e_game_engine_flags
+enum e_game_engine_flags : int32
 {
 	_game_engine_teams_bit = 0,
 	_game_engine_motion_sensor_bit = 1,
@@ -258,7 +258,7 @@ struct s_game_variant
 	wchar_t variant_name[16];
 	PAD(32);
 	e_game_engine_index variant_game_engine_index;
-	int game_engine_flags;
+	e_game_engine_flags game_engine_flags;
 	e_game_engine_round_setting round_setting;
 	int score_to_win_round;
 	int round_time_limit;
@@ -292,7 +292,7 @@ struct s_game_variant
 
 	bool is_team_play()
 	{
-		return TEST_FLAG(this->game_engine_flags, _game_engine_teams_bit);
+		return TEST_BIT(this->game_engine_flags, _game_engine_teams_bit);
 	}
 
 	//the area below this seems like a big union
@@ -301,5 +301,7 @@ struct s_game_variant
 };
 CHECK_STRUCT_SIZE(s_game_variant, 0x130);
 #pragma pack(pop)
+
+s_game_variant* get_game_variant(void);
 
 void game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);

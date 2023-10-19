@@ -40,6 +40,7 @@ bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);
 bool game_in_progress(void);
 bool game_is_predicted(void);
+bool game_is_authoritative(void);
 
 // Setup default player data in the game options structure
 void game_options_setup_default_players(int player_count, s_game_options* game_options);

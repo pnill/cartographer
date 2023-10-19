@@ -1,5 +1,7 @@
 #pragma once
-#include "Blam/Engine/game/game_statborg.h"
+#include "game_statborg.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+
 #define k_maximum_game_engine_event_responses_per_type 128
 
 enum e_valid_multiplayer_games : short
@@ -80,7 +82,7 @@ struct s_game_engine_globals
 	short team_flags;
 	WORD field_6;
 	WORD field_8;
-	WORD flags_A;
+	uint16 team_bitmask;
 	WORD field_C;
 	short field_E;
 	WORD field_10;
@@ -92,18 +94,16 @@ struct s_game_engine_globals
 	short field_6C;
 	DWORD field_70;
 	DWORD gap_74[28];
-	float unk_local_player_hud_field[4];
+	real32 unk_local_player_hud_field[k_number_of_users];
 	byte field_F4;
 	byte pad_F5[4];
 	byte gapF9[523];
 	c_game_statborg game_statborg;
-	s_game_engine_global_player_info player_info[16];
+	s_game_engine_global_player_info player_info[k_maximum_players];
 	DWORD ticks;
 	BYTE gap71C[1336];
 	DWORD game_engine_index;
 	BYTE gapC58[132];
-
-	static s_game_engine_globals* get();
 };
 CHECK_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
 
@@ -163,5 +163,7 @@ struct s_multiplayer_event_response_definition
     tag_block<s_multiplayer_event_sound_response_definition> sound_permutations;
 };
 TAG_BLOCK_SIZE_ASSERT(s_multiplayer_event_response_definition, 0xA8);
+
+s_game_engine_globals* game_engine_globals_get(void);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_color_rgb* change_colors);
