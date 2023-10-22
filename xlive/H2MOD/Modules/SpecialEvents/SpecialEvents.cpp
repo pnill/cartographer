@@ -73,52 +73,52 @@ bool check_special_event_date(std::wstring date)
 e_special_event_type get_current_special_event()
 {
 	if (H2Config_no_events)
-		return _no_event;
+		return _special_event_none;
 
 #ifndef NDEBUG
-	if (H2Config_forced_event != _no_event)
+	if (H2Config_forced_event != _special_event_none)
 		return (e_special_event_type)H2Config_forced_event;
 #endif
 	if (check_special_event_week(L"3-17"))
-		return _st_paddys;
+		return _special_event_st_paddys;
 
 	if (check_special_event_week(L"12-24") || check_special_event_week(L"12-30") || check_special_event_week(L"1-4"))
-		return _christmas;
+		return _special_event_christmas;
 
 	// One time event
 	/*if (CheckIfEventTime(L"4-12"))
 			return _mook_maddness;*/
 
 	if (check_special_event_week(L"10-20") || check_special_event_week(L"10-27") || check_special_event_date(L"10-31"))
-		return _halloween;
+		return _special_event_halloween;
 
 	if (check_special_event_date(L"11-08") || check_special_event_date(L"11-09") || check_special_event_date(L"11-10") || 
 	    check_special_event_date(L"5-30") || check_special_event_date(L"5-31") || check_special_event_date(L"6-01"))
-		return _birthday;
+		return _special_event_birthday;
 
-	return _no_event;
+	return _special_event_none;
 }
 
 void load_special_event()
 {
-	if (tag_loader::Map_exists("carto_shared"))
+	if (tag_loader::Map_exists("carto_shared") && get_current_special_event() != _special_event_none)
 	{
 		add_special_event_markers();
 		switch (get_current_special_event())
 		{
-		case _christmas:
+		case _special_event_christmas:
 			christmas_event_map_load();
 			break;
-		case _st_paddys:
+		case _special_event_st_paddys:
 			paddy_event_map_load();
 			break;
-		case _mook_maddness:
+		case _special_event_mook_maddness:
 			mook_event_map_load();
 			break;
-		case _halloween:
+		case _special_event_halloween:
 			halloween_event_map_load();
 			break;
-		case _birthday:
+		case _special_event_birthday:
 			birthday_event_map_load();
 			break;
 		default:

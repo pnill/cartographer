@@ -110,7 +110,7 @@ namespace PlayerRepresentation
 			datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
 			datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
 
-			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && get_current_special_event() == e_special_event_type::_halloween && !H2Config_no_events)
+			if (!DATUM_IS_NONE(skele_datum) && !DATUM_IS_NONE(skele_fp_datum) && !DATUM_IS_NONE(skele_body_datum) && get_current_special_event() == _special_event_halloween && !H2Config_no_events)
 			{
 				tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
 				tag_loader::Load_tag(skele_body_datum, true, "carto_shared");

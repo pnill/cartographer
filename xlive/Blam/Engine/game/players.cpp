@@ -9,7 +9,7 @@
 #include "Blam/Engine/scenario/scenario.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
@@ -205,7 +205,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
         }
 
 
-        if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+        if (H2Config_spooky_boy && !Memory::IsDedicatedServer() && get_current_special_event() == _special_event_halloween)
         {
             configuration_data->profile_traits.profile.player_character_type = character_type_skeleton;
             for (uint32 i = 0; i < k_number_of_users; i++)
