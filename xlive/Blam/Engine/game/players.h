@@ -39,7 +39,8 @@ enum e_character_type : int8
 	// cartographer added characters
 	character_type_skeleton = 4,
 	character_type_flood = 5,
-	character_type_lmao = 6
+	character_type_lmao = 6,
+	k_player_character_type_count
 };
 
 enum e_handicap : uint8
@@ -252,3 +253,5 @@ uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
+
+void players_apply_patches(void);

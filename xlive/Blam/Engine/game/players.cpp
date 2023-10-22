@@ -10,6 +10,9 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+
+#include "Util/Hooks/Hook.h"
+
 /*
 	- TO NOTE:
 	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
@@ -287,4 +290,13 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     }
 
     return;
+}
+
+void players_apply_patches(void)
+{
+    // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
+    WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), k_player_character_type_count);
+
+    // Replace the player profile validation function with our own
+    PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
 }
