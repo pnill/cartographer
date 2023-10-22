@@ -59,7 +59,7 @@ void christmas_event_map_load()
 			add_hat_and_beard_to_model(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 		}
 
-		if (datum flood_datum = game_globals_get_representation(character_type_flood)->third_person_unit.TagIndex;
+		if (datum flood_datum = game_globals_get_representation(_character_type_flood)->third_person_unit.TagIndex;
 			flood_datum != NONE)
 		{
 			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);

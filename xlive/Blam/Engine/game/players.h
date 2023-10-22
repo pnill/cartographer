@@ -31,15 +31,15 @@ enum e_player_color : byte
 
 enum e_character_type : int8
 {
-	character_type_masterchief = 0,
-	character_type_dervish = 1,
-	character_type_spartan = 2,
-	character_type_elite = 3,
+	_character_type_masterchief = 0,
+	_character_type_dervish = 1,
+	_character_type_spartan = 2,
+	_character_type_elite = 3,
 
 	// cartographer added characters
-	character_type_skeleton = 4,
-	character_type_flood = 5,
-	character_type_lmao = 6,
+	_character_type_skeleton = 4,
+	_character_type_flood = 5,
+	_character_type_lmao = 6,
 	k_player_character_type_count
 };
 

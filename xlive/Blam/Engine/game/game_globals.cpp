@@ -65,7 +65,7 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 	}
 	else
 	{
-		new_rep->first_person_hands = globals->player_representation[character_type_spartan]->first_person_hands;
+		new_rep->first_person_hands = globals->player_representation[_character_type_spartan]->first_person_hands;
 	}
 
 	if (fp_body != NONE)
@@ -117,17 +117,17 @@ void game_globals_fixup_representation(void)
 		s_game_globals_player_representation* representation = globals->player_representation[i];
 		if (representation->third_person_unit.TagIndex == NONE)
 		{
-			representation->third_person_unit = globals->player_representation[character_type_spartan]->third_person_unit;
+			representation->third_person_unit = globals->player_representation[_character_type_spartan]->third_person_unit;
 		}
 
 		if (representation->first_person_body.TagIndex == NONE)
 		{
-			representation->first_person_body = globals->player_representation[character_type_spartan]->first_person_body;
+			representation->first_person_body = globals->player_representation[_character_type_spartan]->first_person_body;
 		}
 
 		if (representation->first_person_hands.TagIndex == NONE)
 		{
-			representation->first_person_hands = globals->player_representation[character_type_spartan]->first_person_hands;
+			representation->first_person_hands = globals->player_representation[_character_type_spartan]->first_person_hands;
 		}
 	}
 
@@ -150,13 +150,13 @@ void game_globals_apply_tag_patches(s_game_options* options)
 			tag_loader::Load_tag(skele_datum, true, "carto_shared");
 			tag_loader::Push_Back();
 			datum skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-			add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, character_type_skeleton);
+			add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, _character_type_skeleton);
 			s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 			new_def->tag_datum = skele_new_datum;
 		}
 		else
 		{
-			clone_representation(character_type_spartan, character_type_skeleton);
+			clone_representation(_character_type_spartan, _character_type_skeleton);
 		}
 		datum flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
 		datum flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
@@ -167,13 +167,13 @@ void game_globals_apply_tag_patches(s_game_options* options)
 			tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 			tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 			tag_loader::Push_Back();
-			add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), character_type_flood);
+			add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), _character_type_flood);
 			s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 			new_def->tag_datum = tag_loader::ResolveNewDatum(flood_datum);
 		}
 		else
 		{
-			clone_representation(character_type_elite, character_type_flood);
+			clone_representation(_character_type_elite, _character_type_flood);
 		}
 
 		// Create copy of default variant for chief and add lmao object to head
@@ -226,7 +226,7 @@ void game_globals_apply_tag_patches(s_game_options* options)
 					new_object->child_object.TagIndex = lmao_datum;
 				}
 			}
-			add_representation(NONE, NONE, NONE, character_type_lmao, new_variant->name);
+			add_representation(NONE, NONE, NONE, _character_type_lmao, new_variant->name);
 		}
 	}
 

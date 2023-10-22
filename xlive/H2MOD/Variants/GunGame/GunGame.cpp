@@ -221,7 +221,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	{
 		// prespawn handler
 	case ExecTime::_preEventExec:
-		s_player::SetUnitBipedType(absPlayerIdx, character_type_spartan);
+		s_player::SetUnitBipedType(absPlayerIdx, _character_type_spartan);
 		break;
 
 		// postspawn handler
