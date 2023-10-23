@@ -215,7 +215,6 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             {
                 network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
             }
-            *Memory::GetAddress<e_character_type*>(0x51A67C) = _character_type_skeleton;
         }
     }
     
