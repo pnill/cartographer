@@ -101,7 +101,7 @@ e_special_event_type get_current_special_event()
 
 void load_special_event()
 {
-	if (tag_loader::Map_exists("carto_shared") && get_current_special_event() != _special_event_none)
+	if (tag_loader::Map_exists("carto_shared"))
 	{
 		add_special_event_markers();
 		switch (get_current_special_event())
