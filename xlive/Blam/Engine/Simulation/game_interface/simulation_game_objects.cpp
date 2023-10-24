@@ -133,15 +133,15 @@ datum __fastcall c_simulation_object_entity_definition__object_create_object(voi
 void simulation_game_objects_apply_patches(void)
 {
     DetourClassFunc(Memory::GetAddress<uint8*>(0x1F27D1, 0x1DD86A), (uint8*)c_simulation_object_entity_definition__object_creation_required_bits, 8);
-    DetourClassFunc(Memory::GetAddress<uint8*>(0x1F24ED, 0x1DD586), (uint8*)c_simulation_object_entity_definition__object_build_creation_data, 6);
-    DetourClassFunc(Memory::GetAddress<uint8*>(0x1F2704, 0x1DD79D), (uint8*)c_simulation_object_entity_definition__object_setup_placement_data, 5);
+    DetourClassFunc(Memory::GetAddress<uint8*>(0x1F24ED, 0x1DD586), (uint8*)c_simulation_object_entity_definition__object_build_creation_data, 9);
+    DetourClassFunc(Memory::GetAddress<uint8*>(0x1F2704, 0x1DD79D), (uint8*)c_simulation_object_entity_definition__object_setup_placement_data, 10);
     p_c_simulation_unit_entity_definition_encode = (c_simulation_unit_entity_definition_creation_encode_t)DetourClassFunc(
         Memory::GetAddress<uint8*>(0x1F3B11, 0x1DEBAA),
         (uint8*)c_simulation_object_entity_definition__object_creation_encode,
-        20);
+        8);
     p_c_simulation_unit_entity_definition_decode = (c_simulation_unit_entity_definition_creation_decode_t)DetourClassFunc(
         Memory::GetAddress<uint8*>(0x1F3BDD, 0x1DEC76),
         (uint8*)c_simulation_object_entity_definition__object_creation_decode,
-        16);
+        10);
     return;
 }
