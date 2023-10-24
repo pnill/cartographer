@@ -263,7 +263,7 @@ void setup_game_options_text(const wchar_t* reports_path)
         print_bool_to_file(file, game_options->scenario_custom);
 
         fwprintf(file, L"Game Tick Rate: ");
-        print_bool_to_file(file, game_options->game_tick_rate);
+        fwprintf(file, L"%d\n", game_options->game_tick_rate);
 
         fwprintf(file, L"Random Data: ");
         print_array_to_file(file, game_options->random_data, 8);
