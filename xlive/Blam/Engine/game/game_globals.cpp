@@ -19,19 +19,17 @@
 	 * \param fp_hands the datum index of the first person hands render model
 	 * \param fp_body the datum index of the first person body render model
 	 * \param tp_biped the datum index of the third person biped
-	 * \param type the type of biped being added, will override an existing biped
 	 * \param variant the string_id of the variant
 	 * \return returns a pointer to the new representation
 */
-s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant = NONE);
+s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, string_id variant = NONE);
 
 /**
  * \brief Clones an existing player_representation
- * \param index 0 based index of the representation to clone
- * \param newType the new Player::Biped type to register this as, cannot be the same as an existing one.
+ * \param original_type: index of the representation to clone
  * \return returns a pointer to the new representation
  */
-s_game_globals_player_representation* clone_representation(e_character_type original_type, e_character_type new_type);
+s_game_globals_player_representation* clone_representation(e_character_type original_type);
 
 // Loops through every representation and makes sure the base bipeds aren't null.
 // If it's the case then set it to masterchief_mp
@@ -43,7 +41,7 @@ void game_globals_add_flood_representation(scenario* scenario_definition);
 void game_globals_add_lmao_representation(void);
 
 // Adds new representations to the globals tag
-void game_globals_add_new_player_representations(s_game_options* options);
+void game_globals_add_new_player_representations(void);
 
 
 s_game_globals* scenario_get_game_globals(void)
@@ -68,7 +66,7 @@ s_game_globals_player_representation* game_globals_get_representation(e_characte
 }
 
 
-s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, e_character_type type, string_id variant)
+s_game_globals_player_representation* add_representation(datum fp_hands, datum fp_body, datum tp_biped, string_id variant)
 {
 	s_game_globals* globals = scenario_get_game_globals();
 
@@ -109,14 +107,15 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 	return new_rep;
 }
 
-s_game_globals_player_representation* clone_representation(e_character_type original_type, e_character_type new_type)
+s_game_globals_player_representation* clone_representation(e_character_type original_type)
 {
 	s_game_globals* globals = scenario_get_game_globals();
+	s_game_globals_player_representation* original_rep = globals->player_representation[original_type];
 	s_game_globals_player_representation* new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
-	new_rep->first_person_body = globals->player_representation[original_type]->first_person_body;
-	new_rep->first_person_hands = globals->player_representation[original_type]->first_person_hands;
-	new_rep->third_person_unit = globals->player_representation[original_type]->third_person_unit;
-	new_rep->third_person_variant = globals->player_representation[original_type]->third_person_variant;
+	new_rep->first_person_body = original_rep->first_person_body;
+	new_rep->first_person_hands = original_rep->first_person_hands;
+	new_rep->third_person_unit = original_rep->third_person_unit;
+	new_rep->third_person_variant = original_rep->third_person_variant;
 	return new_rep;
 }
 
@@ -165,7 +164,7 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 	}
 	else
 	{
-		clone_representation(_character_type_spartan, _character_type_skeleton);
+		clone_representation(_character_type_spartan);
 	}
 	return;
 }
@@ -187,7 +186,7 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 	}
 	else
 	{
-		clone_representation(_character_type_elite, _character_type_flood);
+		clone_representation(_character_type_masterchief);
 	}
 	return;
 }
@@ -247,28 +246,34 @@ void game_globals_add_lmao_representation(void)
 				new_object->child_object.TagIndex = lmao_datum;
 			}
 		}
-		add_representation(NONE, NONE, NONE, _character_type_lmao, new_variant->name);
+		add_representation(NONE, NONE, NONE, new_variant->name);
 	}
+	else
+	{
+		clone_representation(_character_type_masterchief);
+	}
+
 	return;
 }
 
-void game_globals_add_new_player_representations(s_game_options* options)
+void game_globals_add_new_player_representations(void)
 {
-	if (options->game_mode == _game_mode_multiplayer)
-	{
-		scenario* scenario_definition = get_global_scenario();
+	scenario* scenario_definition = get_global_scenario();
 
-		game_globals_add_skeleton_representation(scenario_definition);
-		game_globals_add_flood_representation(scenario_definition);
-		game_globals_add_lmao_representation();
-	}
+	game_globals_add_skeleton_representation(scenario_definition);
+	game_globals_add_flood_representation(scenario_definition);
+	game_globals_add_lmao_representation();
+	return;
 }
 
 void game_globals_apply_tag_patches(s_game_options* options)
 {
-	game_globals_add_new_player_representations(options);
+	if (options->game_mode == _game_mode_multiplayer)
+	{
+		game_globals_add_new_player_representations();
 
-	// Fixup representations after we add our new ones at runtime
-	game_globals_fixup_representation();
+		// Fixup representations after we add our new ones at runtime
+		game_globals_fixup_representation();
+	}
 	return;
 }

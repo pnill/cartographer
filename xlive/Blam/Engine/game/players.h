@@ -43,7 +43,7 @@ enum e_character_type : int8
 	k_player_character_type_count
 };
 
-enum e_handicap : uint8
+enum e_handicap : int8
 {
 	_handicap_none = 0,
 	_handicap_minor = 1,

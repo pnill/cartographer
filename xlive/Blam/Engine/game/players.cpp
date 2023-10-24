@@ -207,13 +207,17 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             configuration_data->profile_traits.profile.player_character_type = _character_type_elite;
         }
 
-
-        if (H2Config_spooky_boy && !Memory::IsDedicatedServer() && get_current_special_event() == _special_event_halloween)
+        // Force skeletons in mp during the halloween event
+        if (e_character_type character = configuration_data->profile_traits.profile.player_character_type;
+            character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
         {
             configuration_data->profile_traits.profile.player_character_type = _character_type_skeleton;
-            for (uint32 i = 0; i < k_number_of_users; i++)
+            if (!Memory::IsDedicatedServer())
             {
-                network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
+                for (uint32 i = 0; i < k_number_of_users; i++)
+                {
+                    network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
+                }
             }
         }
     }
