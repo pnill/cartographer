@@ -3,7 +3,6 @@
 #include "tag_loader.h"
 
 #include "Blam/Engine/game/game_options.h"
-#include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"

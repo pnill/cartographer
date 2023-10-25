@@ -4,11 +4,11 @@
 #include "../SpecialEventHelpers.h"
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
-#include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/models/models.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -98,7 +98,7 @@ void christmas_event_map_load()
 		auto sword_weapon = tags::get_tag_fast<s_weapon_group_definition>(sword_weapon_datum);
 
 		datum sword_model_datum = sword_weapon->model.TagIndex;
-		auto sword_model = tags::get_tag_fast<s_model_group_definition>(sword_model_datum);
+		auto sword_model = tags::get_tag_fast<s_model_definition>(sword_model_datum);
 
 		sword_model->render_model.TagIndex = candy_cane_datum;
 
@@ -125,7 +125,7 @@ void christmas_event_map_load()
 		ghost_vehicle->objectTag.attachments.size = 0;
 
 		datum ghost_model_datum = ghost_vehicle->objectTag.model.TagIndex;
-		auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ghost_model_datum);
+		auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ghost_model_datum);
 		ghost_model->render_model.TagIndex = deer_datum;
 	}
 	if (!DATUM_IS_NONE(ornament_datum) && !DATUM_IS_NONE(frag_model_datum) && !DATUM_IS_NONE(plasma_model_datum))
@@ -135,10 +135,10 @@ void christmas_event_map_load()
 
 		ornament_datum = tag_loader::ResolveNewDatum(ornament_datum);
 
-		auto frag_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(frag_model_datum);
+		auto frag_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(frag_model_datum);
 		frag_model->render_model.TagIndex = ornament_datum;
 
-		auto plasma_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(plasma_model_datum);
+		auto plasma_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(plasma_model_datum);
 		plasma_model->render_model.TagIndex = ornament_datum;
 	}
 	if (!DATUM_IS_NONE(present_datum) && !DATUM_IS_NONE(fp_present_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
