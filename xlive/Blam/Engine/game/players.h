@@ -31,18 +31,19 @@ enum e_player_color : byte
 
 enum e_character_type : int8
 {
-	character_type_masterchief = 0,
-	character_type_dervish = 1,
-	character_type_spartan = 2,
-	character_type_elite = 3,
+	_character_type_masterchief = 0,
+	_character_type_dervish = 1,
+	_character_type_spartan = 2,
+	_character_type_elite = 3,
 
 	// cartographer added characters
-	character_type_skeleton = 4,
-	character_type_flood = 5,
-	character_type_lmao = 6
+	_character_type_skeleton = 4,
+	_character_type_flood = 5,
+	_character_type_lmao = 6,
+	k_player_character_type_count
 };
 
-enum e_handicap : uint8
+enum e_handicap : int8
 {
 	_handicap_none = 0,
 	_handicap_minor = 1,
@@ -252,3 +253,5 @@ uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
+
+void players_apply_patches(void);

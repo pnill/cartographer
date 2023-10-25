@@ -10,7 +10,6 @@
 
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/scenario/scenario.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
@@ -60,8 +59,8 @@ void christmas_event_map_load()
 			add_hat_and_beard_to_model(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 		}
 
-		if (datum flood_datum = PlayerRepresentation::get_object_datum_from_representation(character_type_flood);
-			!DATUM_IS_NONE(flood_datum))
+		if (datum flood_datum = game_globals_get_representation(_character_type_flood)->third_person_unit.TagIndex;
+			flood_datum != NONE)
 		{
 			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
 			add_hat_and_beard_to_model(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);

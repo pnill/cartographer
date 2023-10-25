@@ -5,6 +5,7 @@
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"
@@ -41,7 +42,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -486,7 +486,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
-	PlayerRepresentation::OnMapLoad(options);
+	game_globals_apply_tag_patches(options);
 
 	tags::run_callbacks();
 	H2Tweaks::SetScreenRefreshRate();
@@ -982,6 +982,7 @@ void H2MOD::ApplyHooks() {
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();
+	players_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -1061,7 +1062,6 @@ void H2MOD::Initialize()
 	LOG_INFO_GAME("H2MOD - Initializing {}", DLL_VERSION_STR);
 	LOG_INFO_GAME("H2MOD - Image base address: 0x{:X}", Memory::baseAddress);
 
-	PlayerRepresentation::Initialize();
 	if (!Memory::IsDedicatedServer())
 	{
 		MouseInput::Initialize();

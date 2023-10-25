@@ -10,7 +10,6 @@
 #include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/units/bipeds.h"
 
-#include "H2MOD/Modules/PlayerRepresentation/PlayerRepresentation.h"
 #include "Util/Hooks/Hook.h"
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference)

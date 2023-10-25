@@ -9,6 +9,9 @@
 #include "Blam/Engine/scenario/scenario.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
+
+#include "Util/Hooks/Hook.h"
 
 /*
 	- TO NOTE:
@@ -186,33 +189,36 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             if (!found)
             {
                 configuration_data->team_index = _game_team_player;
-                configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
+                configuration_data->profile_traits.profile.player_character_type = _character_type_masterchief;
             }
         }
         else
         {
             configuration_data->team_index = _game_team_player;
-            configuration_data->profile_traits.profile.player_character_type = character_type_masterchief;
+            configuration_data->profile_traits.profile.player_character_type = _character_type_masterchief;
         }
     }
     // Multiplayer verification
     else if (game_is_multiplayer())
     {
         // Don't allow dervish since he's not loaded properly in shared
-        if (configuration_data->profile_traits.profile.player_character_type == character_type_dervish)
+        if (configuration_data->profile_traits.profile.player_character_type == _character_type_dervish)
         {
-            configuration_data->profile_traits.profile.player_character_type = character_type_elite;
+            configuration_data->profile_traits.profile.player_character_type = _character_type_elite;
         }
 
-
-        if (H2Config_spooky_boy && !Memory::IsDedicatedServer())
+        // Force skeletons in mp during the halloween event
+        if (e_character_type character = configuration_data->profile_traits.profile.player_character_type;
+            character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
         {
-            configuration_data->profile_traits.profile.player_character_type = character_type_skeleton;
-            for (uint32 i = 0; i < k_number_of_users; i++)
+            configuration_data->profile_traits.profile.player_character_type = _character_type_skeleton;
+            if (!Memory::IsDedicatedServer())
             {
-                network_session_interface_set_local_user_character_type(i, character_type_skeleton);
+                for (uint32 i = 0; i < k_number_of_users; i++)
+                {
+                    network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
+                }
             }
-            *Memory::GetAddress<e_character_type*>(0x51A67C) = character_type_skeleton;
         }
     }
     
@@ -220,7 +226,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     e_character_type character = configuration_data->profile_traits.profile.player_character_type;
     if (character != NONE)
     {
-        if (character >= character_type_masterchief)
+        if (character >= _character_type_masterchief)
         {
             s_game_globals* globals = scenario_get_game_globals();
             if (character > (e_character_type)globals->player_representation.size - 1)
@@ -230,7 +236,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
         }
         else
         {
-            character = character_type_masterchief;
+            character = _character_type_masterchief;
         }
         configuration_data->profile_traits.profile.player_character_type = character;
     }
@@ -287,4 +293,13 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     }
 
     return;
+}
+
+void players_apply_patches(void)
+{
+    // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
+    WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), k_player_character_type_count);
+
+    // Replace the player profile validation function with our own
+    PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
 }

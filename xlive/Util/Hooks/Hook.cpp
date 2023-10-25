@@ -17,13 +17,14 @@ void *DetourFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 
 	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE, // parameters
 
-	// code
+	// copy the overwritten bytes
 	memcpy(jmp, src, len);
 	jmp += len;
 
 	jmp[0] = 0xE9;
 	*(DWORD*)(jmp + 1) = (DWORD)(src + len - jmp) - 5;
 
+	// detour source function call
 	src[0] = 0xE9;
 	*(DWORD*)(src + 1) = (DWORD)(dst - src) - 5;
 
@@ -51,13 +52,15 @@ void *DetourClassFunc(BYTE *src, const BYTE *dst, const unsigned int len)
 
 	VirtualProtectAndExecutePatch(src, len, PAGE_READWRITE,
 
-	memcpy(jmp + 3, src, len);
-
 	// calculate callback function call
 	jmp[0] = 0x58;							// pop eax
 	jmp[1] = 0x59;							// pop ecx
 	jmp[2] = 0x50;							// push eax
-	jmp[len + 3] = 0xE9;						// jmp
+
+	// copy the overwritten bytes
+	memcpy(jmp + 3, src, len);
+	
+	jmp[3 + len] = 0xE9;						// jmp
 	*(DWORD*)(jmp + len + 4) = (DWORD)((src + len) - (jmp + len + 3)) - 5;
 
 	// detour source function call

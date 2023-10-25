@@ -1,5 +1,6 @@
 #pragma once
 #include "game_engine.h"
+#include "game_options.h"
 #include "game_preferences.h"
 #include "materials.h"
 
@@ -17,7 +18,6 @@
 #define NUMBER_OF_GLOBAL_SOUNDS 2
 #define k_unit_grenade_types_count 2
 #define k_global_vertex_shader_count 32
-#define k_player_character_type_count 4
 #define k_maximum_material_types 256
 #define k_game_globals_maximum_multiplayer_colors 32
 
@@ -597,3 +597,6 @@ TAG_BLOCK_SIZE_ASSERT(s_game_globals, 644);
 
 s_game_globals* scenario_get_game_globals(void);
 s_ui_levels_definition* game_globals_get_ui_levels(void);
+s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
+
+void game_globals_apply_tag_patches(s_game_options* options);
