@@ -107,7 +107,6 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
-    <ClCompile Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.cpp" />
     <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
@@ -220,6 +219,7 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -463,7 +463,6 @@
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
-    <ClInclude Include="H2MOD\Modules\PlayerRepresentation\PlayerRepresentation.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
@@ -675,6 +674,7 @@
     <ClInclude Include="Blam\Engine\objects\emblems.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

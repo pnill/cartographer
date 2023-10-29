@@ -158,7 +158,7 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 		tag_loader::Load_tag(skele_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 		datum skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-		add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum, _character_type_skeleton);
+		add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 		new_def->tag_datum = skele_new_datum;
 	}
@@ -180,13 +180,13 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 		tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 		tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 		tag_loader::Push_Back();
-		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum), _character_type_flood);
+		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum));
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 		new_def->tag_datum = tag_loader::ResolveNewDatum(flood_datum);
 	}
 	else
 	{
-		clone_representation(_character_type_masterchief);
+		clone_representation(_character_type_spartan);
 	}
 	return;
 }
@@ -250,7 +250,7 @@ void game_globals_add_lmao_representation(void)
 	}
 	else
 	{
-		clone_representation(_character_type_masterchief);
+		clone_representation(_character_type_spartan);
 	}
 
 	return;
