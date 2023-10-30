@@ -7,10 +7,11 @@
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_options.h"
+#include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
 
 // constants
 #define k_crash_message_header_break L"=============================================\n"
-const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt" };
+const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exception_info.txt", L"cpu_info.txt", L"game_options.txt", L"game_globals.txt", L"rasterizer.txt"};
 
 // globals
 
@@ -29,6 +30,9 @@ void setup_game_options_text(const wchar_t* reports_path);
 
 // Create and populate new game_globals.txt file in the report path
 void setup_game_global_text(const wchar_t* reports_path);
+
+// Create and populate new rasterizer.txt file in the report path
+void setup_rasterizer_text(const wchar_t* reports_path);
 
 // Inserts a value into a file as a string represented in hex
 void print_hex_value_to_file(FILE* file, uint32 value);
@@ -50,6 +54,7 @@ void crash_info_text_files_create(const wchar_t* reports_path, const MINIDUMP_EX
     setup_exception_text(reports_path, minidump_info);
     setup_game_options_text(reports_path);
     setup_game_global_text(reports_path);
+    setup_rasterizer_text(reports_path);
 }
 
 void setup_cpu_info_text(const wchar_t* reports_path, const MINIDUMP_EXCEPTION_INFORMATION* minidump_info)
@@ -403,6 +408,30 @@ void setup_game_global_text(const wchar_t* reports_path)
     return;
 }
 
+void setup_rasterizer_text(const wchar_t* reports_path)
+{
+    c_static_wchar_string260* report_info_path_game_globals = &g_report_text_file_paths[_report_file_type_rasterizer];
+    report_info_path_game_globals->set(reports_path);
+    report_info_path_game_globals->append(k_reports_path);
+    report_info_path_game_globals->append(k_report_text_file_names[_report_file_type_rasterizer]);
+
+    FILE* file;
+    errno_t error = _wfopen_s(&file, report_info_path_game_globals->get_string(), L"w+");
+    if (!error && file != NULL)
+    {
+        s_main_game_globals* game_globals = get_main_game_globals();
+
+        fwprintf(file, L"RASTERIZER\n");
+        fwprintf(file, L"%ls", k_crash_message_header_break);
+
+        fwprintf(file, L"Last Bitmap Tag Datum: ");
+        print_hex_value_to_file(file, (uint32)last_bitmap_tag_index_get());
+
+        fclose(file);
+    }
+
+    return;
+}
 
 // Print value parameter to file in hexadecimal format
 void print_hex_value_to_file(FILE* file, uint32 value)

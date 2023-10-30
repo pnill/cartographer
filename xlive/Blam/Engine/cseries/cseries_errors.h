@@ -6,6 +6,7 @@ enum e_report_file_type : uint8
     _report_file_type_cpu = 1,
     _report_file_type_game_options = 2,
     _report_file_type_game_globals = 3,
+    _report_file_type_rasterizer = 4,
 
     k_report_text_file_type_count
 };

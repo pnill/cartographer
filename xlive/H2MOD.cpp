@@ -18,6 +18,7 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
+#include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
 #include "Blam/Engine/Simulation/game_interface/simulation_game_objects.h"
 #include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
@@ -1046,6 +1047,7 @@ void H2MOD::ApplyHooks() {
 		screens_apply_patches();
 		aim_assist_apply_patches();
 		main_game_apply_patches();
+		rasterizer_dx9_main_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

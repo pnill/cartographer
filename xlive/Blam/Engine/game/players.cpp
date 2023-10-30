@@ -62,7 +62,10 @@ void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].profile_traits.profile.player_character_type = bipedType;
+    s_player* player = GetPlayer(playerIndex);
+    player->properties[0].profile_traits.profile.player_character_type = bipedType;
+    player->properties[1].profile_traits.profile.player_character_type = bipedType;
+    return;
 }
 
 void s_player::SetBipedSpeed(int playerIndex, float speed)
@@ -201,13 +204,21 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     // Multiplayer verification
     else if (game_is_multiplayer())
     {
+        // If the character is mastechief set him to a spartan in multiplayer
+        if (configuration_data->profile_traits.profile.player_character_type == _character_type_masterchief)
+        {
+            configuration_data->profile_traits.profile.player_character_type = _character_type_spartan;
+        }
+
         // Don't allow dervish since he's not loaded properly in shared
         if (configuration_data->profile_traits.profile.player_character_type == _character_type_dervish)
         {
             configuration_data->profile_traits.profile.player_character_type = _character_type_elite;
         }
 
+
         // Force skeletons in mp during the halloween event
+        // Carto addition
         if (e_character_type character = configuration_data->profile_traits.profile.player_character_type;
             character != _character_type_flood && H2Config_spooky_boy && get_current_special_event() == _special_event_halloween)
         {

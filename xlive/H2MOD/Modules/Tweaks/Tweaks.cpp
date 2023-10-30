@@ -326,9 +326,6 @@ void H2Tweaks::ApplyPatches() {
 
 		//TODO: turn on if you want to debug halo2.exe from start of process
 		// DETOUR_ATTACH(p_IsDebuggerPresent, IsDebuggerPresent, IsDebuggerPresent_hook);
-
-		// stop Hold to Zoom
-		NopFill(Memory::GetAddress(0x9355C), 4);
 	}
 
 	// disables profiles/game saves encryption
