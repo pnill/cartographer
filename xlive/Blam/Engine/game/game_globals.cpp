@@ -180,13 +180,14 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 		tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 		tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 		tag_loader::Push_Back();
-		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), tag_loader::ResolveNewDatum(flood_datum));
+		datum new_flood_index = tag_loader::ResolveNewDatum(flood_datum);
+		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), new_flood_index);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
-		new_def->tag_datum = tag_loader::ResolveNewDatum(flood_datum);
+		new_def->tag_datum = new_flood_index;
 	}
 	else
 	{
-		clone_representation(_character_type_spartan);
+		clone_representation(_character_type_elite);
 	}
 	return;
 }
