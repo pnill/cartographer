@@ -103,7 +103,7 @@ void load_special_event()
 {
 	if (tag_loader::Map_exists("carto_shared"))
 	{
-		add_special_event_markers();
+		bool create_new_markers = true;
 		switch (get_current_special_event())
 		{
 		case _special_event_christmas:
@@ -122,8 +122,13 @@ void load_special_event()
 			birthday_event_map_load();
 			break;
 		default:
-			// Do nothing
+			create_new_markers = false;
 			break;
+		}
+		
+		if (create_new_markers)
+		{
+			add_special_event_markers();
 		}
 	}
 	else
