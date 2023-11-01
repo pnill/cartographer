@@ -222,6 +222,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\effects\effects.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -678,6 +679,7 @@
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
+    <ClInclude Include="Blam\Engine\effects\effects.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

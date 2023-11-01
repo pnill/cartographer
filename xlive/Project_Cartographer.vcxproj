@@ -306,6 +306,7 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
+    <ClCompile Include="Blam\Engine\effects\effects.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
@@ -399,6 +400,7 @@
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
+    <ClInclude Include="Blam\Engine\effects\effects.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game.h" />
