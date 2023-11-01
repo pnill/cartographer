@@ -220,6 +220,8 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />

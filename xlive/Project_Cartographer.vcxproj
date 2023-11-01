@@ -452,6 +452,8 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
