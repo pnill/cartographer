@@ -314,7 +314,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
@@ -676,6 +675,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
+    <ClInclude Include="Blam\Engine\devices\devices.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

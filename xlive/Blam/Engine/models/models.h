@@ -525,7 +525,7 @@ struct s_model_definition
     tag_block<s_model_material> materials;
     tag_block<s_model_damage_info> new_damage_info;
     tag_block<s_model_target> targets;
-    tag_block <s_model_region> regions;
+    tag_block <s_model_region> collision_regions;
     tag_block<s_model_node> nodes;
     int32 node_list_checksum;
     tag_block<s_model_object_data> model_object_data;
