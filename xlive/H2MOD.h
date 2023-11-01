@@ -31,7 +31,6 @@ public:
 	static void Initialize();
 	static void Deinitialize();
 	static void ApplyHooks();
-	static void ApplyFirefightHooks();
 	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
