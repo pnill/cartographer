@@ -141,3 +141,8 @@ private:
 	datum m_last_datum_index;
 	int m_current_absolute_index;
 };
+
+// Get data in s_data_array from datum index
+void* datum_get(s_data_array* data, datum index);
+
+void __cdecl datum_delete(s_data_array* data_array, datum object_index);
