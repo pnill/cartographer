@@ -59,13 +59,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	return INVOKE(0x136CA7, 0x125B77, object_new, placement_data);
 }
 
-//Pass datum from new object into object to sync
-void __cdecl simulation_action_object_create(datum object_idx)
-{
-	INVOKE(0x1B8D14, 0x1B2C44, simulation_action_object_create, object_idx);
-	return;
-}
-
 void __cdecl object_delete(datum object_idx)
 {
 	INVOKE(0x136005, 0x124ED5, object_delete, object_idx);

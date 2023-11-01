@@ -245,7 +245,6 @@ void* object_header_block_get_with_count(const datum object_datum, const object_
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
 datum __cdecl object_new(object_placement_data* placement_data);
-void __cdecl simulation_action_object_create(datum object_idx);
 void __cdecl object_delete(datum object_idx);
 
 int object_get_count();

@@ -222,7 +222,9 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
   </ItemGroup>
@@ -679,9 +681,11 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\effects\effects.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
   </ItemGroup>

@@ -5,6 +5,7 @@
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Simulation/game_interface/simulation_game_action.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"

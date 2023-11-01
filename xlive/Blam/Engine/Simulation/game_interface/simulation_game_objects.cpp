@@ -66,7 +66,8 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
     if (object_creation_data->object_scenario_datum_index == NONE)
     {
         object_placement_data_new(placement_data, object_creation_data->object_definition_index, NONE, 0);
-        placement_data->object_placement_flags |= 0x12u;
+        placement_data->flags.set(_scenario_object_placement_bit_1, true);
+        placement_data->flags.set(_scenario_object_placement_bit_4, true);
         placement_data->emblem_info = object_creation_data->emblem_info;
         if (TEST_BIT(*flags, 1))
         {
