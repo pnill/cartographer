@@ -56,6 +56,8 @@ void c_animation_channel::initialize()
 
 void c_animation_channel::reset()
 {
+	this->animation_id_0.clear();
+	this->animation_id_1.clear();
 	this->authored_time = 0.0;
 	this->unk10 = 0;
 	this->animation_state_flags = animation_state_none;
