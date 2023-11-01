@@ -138,14 +138,6 @@ int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
-/* controller index aka local player index -> player index */
-datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
-{
-	typedef int(__cdecl* get_local_player_index_t)(int controller_index); 
-	auto p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
-	return p_get_local_player_index(controller_index); 
-}
-
 #pragma region PlayerFunctions
 
 float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
@@ -201,7 +193,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 
 const wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(local_player_index)));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)

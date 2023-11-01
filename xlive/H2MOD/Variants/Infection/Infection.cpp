@@ -366,7 +366,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 				LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", h2mod->get_local_player_name(0), playerIdentifier);
 
 				// check if the player being infected is local
-				if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+				if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0)))) {
 					LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
 					h2mod->set_local_team_index(0, ZOMBIE_TEAM);
 					s_player::SetUnitBipedType(absPlayerIdx, _character_type_flood);
@@ -421,7 +421,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, h2mod->get_local_player_name(0));
 			//If player being spawned is LocalUser/Player
-			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0))))
+			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0))))
 			{
 				LOG_TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = {}", h2mod->get_local_team_index());
 				//Change biped if LocalUser is in GreenTeam
@@ -445,7 +445,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		{
 			unsigned long long playerIdentifier = s_player::GetId(absPlayerIdx);
 			// if player being spawned is local
-			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))) {
+			if (playerIdentifier == s_player::GetId(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0)))) {
 				if (initialSpawn == true) {
 					//start of zombie match
 					Infection::triggerSound(e_infection_sounds::_snd_infection, 1000);

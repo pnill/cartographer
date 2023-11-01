@@ -106,7 +106,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == player_index)
+			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(i)) == player_index)
 			{
 				TriggerSound(_snd_skull_scored, 500);
 				break;
