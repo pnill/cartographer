@@ -222,6 +222,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
@@ -685,6 +686,7 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />

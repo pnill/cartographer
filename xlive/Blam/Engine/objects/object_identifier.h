@@ -22,10 +22,11 @@ public:
 	~c_object_identifier() = default;
 	void clear();
 	void clear_for_deletion();
+	void create_dynamic(e_object_type type);
 
-	short get_origin_bsp();
-	e_object_source get_source();
-	e_object_type get_type();
-	int get_unique_id();
+	int16 get_origin_bsp() const;
+	e_object_source get_source() const;
+	e_object_type get_type() const;
+	int32 get_unique_id() const;
 };
 CHECK_STRUCT_SIZE(c_object_identifier, 8);
