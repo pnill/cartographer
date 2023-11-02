@@ -31,12 +31,10 @@ public:
 	static void Initialize();
 	static void Deinitialize();
 	static void ApplyHooks();
-	static void ApplyFirefightHooks();
 	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
 	BYTE* get_player_unit_from_player_index(int playerIndex);
-	datum get_player_datum_index_from_controller_index(int controller_index);
 	const wchar_t* get_local_player_name(int local_player_index);
 	real_point3d* get_player_unit_coords(int player_index);
 	float get_distance(int, int);

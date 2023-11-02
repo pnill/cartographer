@@ -568,7 +568,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	ComVar<bool> sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
-	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
+	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0));
 	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 
 	std::string objectName = tokens[tokenArgPos++];
@@ -712,7 +712,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 		try 
 		{
 			object_placement_data nObject;
-			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0));
+			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0));
 			datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
 			real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
 			
