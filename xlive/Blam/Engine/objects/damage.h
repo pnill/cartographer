@@ -4,9 +4,10 @@
 
 struct s_damage_owner
 {
-	int32 unk1;
-	int32 unk2;
-	int32 unk3;
+	datum owner_index;
+	datum entity_index;
+	uint16 target_model_abs_index;
+	int16 pad;
 };
 CHECK_STRUCT_SIZE(s_damage_owner, 12);
 

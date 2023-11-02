@@ -5,6 +5,7 @@
 
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/memory/static_arrays.h"
 #include "Blam/Math/BlamMath.h"
 
 #define k_maximum_objects_per_map 2048
@@ -52,73 +53,73 @@ enum e_grenades : BYTE
 	Plasma
 };
 
-enum e_weapon_index : WORD
-{
-	Primary = 0xFF00,
-	Secondary = 0xFF01,
-	DualWeild = 0x0201
-};
-
 enum e_object_data_flags : int32
 {
-	object_data_flag_0x1 = FLAG(0),
-	object_data_flag_0x2 = FLAG(1),
-	object_data_flag_0x4 = FLAG(2),
-	object_data_flag_0x8 = FLAG(3),
-	_object_has_attached_lights_bit = FLAG(4),
-	_object_has_attached_looping_sounds_bit = FLAG(5),
-	_object_has_unattached_lights_bit = FLAG(6),
-	_object_in_limbo_bit = FLAG(7),
-	_object_connected_to_map_bit = FLAG(8),
-	_object_has_collision_bit = FLAG(9),
-	object_data_flag_0x400 = FLAG(10),
-	object_data_flag_0x800 = FLAG(11),
-	object_data_flag_0x1000 = FLAG(12),
-	object_data_flag_0x2000 = FLAG(13),
-	_object_garbage_bit = FLAG(14),
-	object_data_flag_0x8000 = FLAG(15),
-	_object_does_not_cast_shadow_bit = FLAG(16),
-	object_data_flag_0x20000 = FLAG(17),
-	object_data_flag_0x40000 = FLAG(18),
-	object_data_flag_0x80000 = FLAG(19),
-	object_data_flag_0x100000 = FLAG(20),
-	object_data_flag_0x200000 = FLAG(21),
-	object_data_flag_0x400000 = FLAG(22),
-	object_data_flag_0x800000 = FLAG(23),
-	object_data_flag_0x1000000 = FLAG(24),
-	_object_has_override_bit = FLAG(25),
-	_object_is_child_object = FLAG(26),
-	object_data_flag_0x8000000 = FLAG(27),
-	object_data_flag_0x10000000 = FLAG(28),
-	object_data_flag_0x20000000 = FLAG(29),
-	object_data_flag_0x40000000 = FLAG(30),
-	_object_has_prt_or_lighting_info = FLAG(31)
+	_object_data_bit_0 = 0,
+	_object_data_bit_1 = 1,
+	_object_data_bit_2 = 2,
+	_object_data_bit_3 = 3,
+	_object_has_attached_lights_bit = 4,
+	_object_has_attached_looping_sounds_bit = 5,
+	_object_has_unattached_lights_bit = 6,
+	_object_in_limbo_bit = 7,
+	_object_connected_to_map_bit = 8,
+	_object_has_collision_bit = 9,
+	_object_data_bit_10 = 10,
+	_object_data_bit_11 = 11,
+	_object_data_bit_12 = 12,
+	_object_data_bit_13 = 13,
+	_object_garbage_bit = 14,
+	_object_data_bit_15 = 15,
+	_object_does_not_cast_shadow_bit = 16,
+	_object_data_bit_17 = 17,
+	_object_data_bit_18 = 18,
+	_object_data_bit_19 = 19,
+	_object_data_bit_20 = 20,
+	_object_data_bit_21 = 21,
+	_object_data_bit_22 = 22,
+	_object_data_bit_23 = 23,
+	_object_data_bit_24 = 24,
+	_object_has_override_bit = 25,
+	_object_is_child_object_bit = 26,
+	_object_data_bit_27 = 27,
+	_object_data_bit_28 = 28,
+	_object_data_bit_29 = 29,
+	_object_data_bit_30 = 30,
+	_object_has_prt_or_lighting_info_bit = 31,
+	k_object_data_flags_count
 };
 
 enum e_object_physics_flags : uint16
 {
-	_object_allocated_havok_component_bit = FLAG(0),
-	_object_physics_flag_0x2 = FLAG(1),
-	_object_is_early_mover_bit = FLAG(3),
-	_object_is_early_mover_child_bit = FLAG(4),
-	_object_connected_to_physics_bit = FLAG(6),
-	_object_physics_flag_0x100 = FLAG(8),
+	_object_allocated_havok_component_bit = 0,
+	_object_physics_bit_1 = 1,
+	_object_physics_bit_2 = 2,
+	_object_is_early_mover_bit = 3,
+	_object_is_early_mover_child_bit = 4,
+	_object_physics_bit_5 = 5,
+	_object_connected_to_physics_bit = 6,
+	_object_physics_bit_8 = 8,
+	_object_physics_bit_9 = 9,
+	_object_physics_bit_10 = 10,
+	_object_physics_bit_11 = 11,
+	k_object_physics_flags_count
 };
 
 enum e_object_damage_flags : uint16
 {
-	_object_is_dead_bit = FLAG(2),
+	_object_is_dead_bit = 2,
 };
 
-enum e_object_header_flag : byte
+enum e_object_header_flag : uint8
 {
-	_object_header_active_bit = FLAG(0),
-	_object_header_awake_bit = FLAG(1),
-	_object_header_requires_motion_bit = FLAG(2),
-	_object_header_flags_8 = FLAG(3),
-	_object_header_being_deleted_bit = FLAG(4),
-	_object_header_connected_to_map_bit = FLAG(6),
-	_object_header_child_bit = FLAG(7)
+	_object_header_active_bit = 0,
+	_object_header_awake_bit = 1,
+	_object_header_requires_motion_bit = 2,
+	_object_header_bit_3 = 3,
+	_object_header_being_deleted_bit = 4,
+	_object_header_connected_to_map_bit = 6,
+	_object_header_child_bit = 7
 };
 
 struct object_header_block_reference
@@ -131,7 +132,7 @@ CHECK_STRUCT_SIZE(object_header_block_reference, 4);
 struct s_object_header
 {
 	int16 datum_salt;
-	e_object_header_flag flags;
+	c_flags<e_object_header_flag, uint8, 8> flags;
 	e_object_type object_type;
 	int16 cluster_index;
 	int16 object_data_size;
@@ -139,10 +140,28 @@ struct s_object_header
 };
 CHECK_STRUCT_SIZE(s_object_header, 12);
 
+struct s_object_payload
+{
+	e_object_type object_type;
+	int8 pad;
+	uint16 object_collision_cull_flags;
+	real_point3d origin_point;
+	real32 bounding_sphere_radius;
+};
+CHECK_STRUCT_SIZE(s_object_payload, 20);
+
+// Struct is used in object_attachments_block
+struct object_attachment
+{
+	int32 field_0;
+	int32 field_4;
+};
+CHECK_STRUCT_SIZE(object_attachment, 8);
+
 struct object_datum
 {
 	datum tag_definition_index;
-	e_object_data_flags object_flags;
+	c_flags<e_object_data_flags, int32, k_object_data_flags_count> object_flags;
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;
@@ -177,11 +196,11 @@ struct object_datum
 	datum havok_datum;
 	datum early_mover_index;
 	uint32 unkBC;
-	e_object_physics_flags physics_flags;
-	uint16 damage_owner_unk3;
-	uint32 damage_owner_unk1;
-	datum damage_owner_object_datum;
-	uint32 cached_object_render_state_index;
+	c_flags<e_object_physics_flags, uint16, k_object_physics_flags_count> physics_flags;
+	uint16 damage_owner_target_model_abs_index;
+	datum damage_owner_owner_index;
+	datum damage_owner_object_index;
+	datum cached_object_render_state_index;
 	int16 field_D0;
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
@@ -241,7 +260,7 @@ static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_f
 }
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
-void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, DWORD element_size, DWORD* element_count);
+void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
 datum __cdecl object_new(object_placement_data* placement_data);
@@ -251,4 +270,7 @@ int object_get_count();
 int object_count_from_iter();
 
 datum object_get_damage_owner(datum damaged_unit_index);
-real_matrix4x3* object_get_node_matrices(datum object_datum, DWORD* out_node_count);
+
+real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
+
+void objects_apply_patches(void);

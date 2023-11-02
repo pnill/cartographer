@@ -984,6 +984,7 @@ void H2MOD::ApplyHooks() {
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();
 	players_apply_patches();
+	objects_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
