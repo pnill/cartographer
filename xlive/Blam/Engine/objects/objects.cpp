@@ -43,7 +43,7 @@ void* object_header_block_get(datum object_datum, const object_header_block_refe
 	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
 }
 
-void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
+void* object_header_block_get_with_count(datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
 {
 	void* block;
 	if (reference->offset == -1)
@@ -127,7 +127,7 @@ pixel32 __cdecl object_set_initial_change_colors(datum object_index, uint32 chan
 
 // Initializes health and shields for the given object based on two floats passed to it
 // If the floats for vitality are NULL we just initialize them to the default values in the damage info block in the model tag
-void object_initialize_vitality(datum object_index, const float* new_vitality, const float* new_shield_vitality)
+void object_initialize_vitality(datum object_index, const real32* new_vitality, const real32* new_shield_vitality)
 {
 	INVOKE(0x175A62, 0x14D2C5, object_initialize_vitality, object_index, new_vitality, new_shield_vitality);
 	return;
@@ -375,7 +375,7 @@ void object_occlusion_data_initialize(datum object_index)
 	return;
 }
 
-void free_object_memory(const datum object_index)
+void free_object_memory(datum object_index)
 {
 	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 	object_header->flags = (e_object_header_flag)0;
@@ -751,6 +751,8 @@ void object_new_replace_calls()
 
 void objects_apply_patches(void)
 {
+#ifdef USE_REWRITTEN_OBJECT_NEW
 	object_new_replace_calls();
+#endif
 	return;
 }
