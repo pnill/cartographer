@@ -41,10 +41,20 @@ struct s_new_hud_engine_globals
 };
 CHECK_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
+struct s_new_hud_temporary_user_state
+{
+	int8 gap_0[0x20];
+	float primary_auto_aim_level;
+	float secondary_auto_aim_level;
+	int8 gap_28[0x260];
+};
+CHECK_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
+
 
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
+s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(const int local_user_index);
 
 void set_crosshair_scale(float scale);
 void new_hud_apply_patches();

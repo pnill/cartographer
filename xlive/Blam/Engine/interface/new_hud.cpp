@@ -35,6 +35,11 @@ s_hud_scripted_globals* get_hud_scripted_globals(void)
 	return *Memory::GetAddress<s_hud_scripted_globals**>(0x9765CC, 0x99FBB4);
 }
 
+s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(const int local_user_index)
+{
+	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
+}
+
 bool __cdecl render_ingame_chat_check() 
 {
 	if (H2Config_hide_ingame_chat)
