@@ -44,8 +44,7 @@ typedef double real64;
 static_assert(sizeof(real64) == 8);
 
 // 32-bit identifier: 16-bit index, 16-bit pseudounique "salt"
-// Imgui Console code doesn't compile if I make this a long type????
-typedef int datum;
+typedef long datum;
 static_assert(sizeof(datum) == 4);
 
 // Invokes a function
