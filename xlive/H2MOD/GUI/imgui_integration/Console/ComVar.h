@@ -103,17 +103,17 @@ protected:
 	}
 
 	template<>
-	void SetValFromStrInternal<long>(const std::string& str, int _Base)
-	{
-		baseTypeT& val = Get();
-		val = std::stol(str, nullptr, _Base);
-	}
-
-	template<>
 	void SetValFromStrInternal<unsigned int>(const std::string& str, int _Base)
 	{
 		baseTypeT& val = Get();
 		val = std::stoul(str, nullptr, _Base);
+	}
+
+	template<>
+	void SetValFromStrInternal<long>(const std::string& str, int _Base)
+	{
+		baseTypeT& val = Get();
+		val = std::stol(str, nullptr, _Base);
 	}
 
 	template<>

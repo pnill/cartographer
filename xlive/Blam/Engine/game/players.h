@@ -171,7 +171,7 @@ struct s_player
 	static void set_unit_speed(datum player_index, float speed);
 	static const wchar_t* get_name(datum player_index);
 	static datum get_unit_index(datum player_index);
-	static uint8* get_player_unit(datum player_index);
+	static uint8* get_player_unit_data(datum player_index);
 	static real_vector3d* get_unit_coords(datum player_index);
 	static uint64 get_id(datum player_index);
 };

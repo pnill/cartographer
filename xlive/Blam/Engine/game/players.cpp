@@ -97,7 +97,7 @@ datum s_player::get_unit_index(datum player_index)
 	return get(player_index)->unit_index;
 }
 
-uint8* s_player::get_player_unit(datum player_index) 
+uint8* s_player::get_player_unit_data(datum player_index)
 {
     datum unit_datum = s_player::get_unit_index(player_index);
     if (DATUM_IS_NONE(unit_datum))
@@ -108,7 +108,7 @@ uint8* s_player::get_player_unit(datum player_index)
 
 real_vector3d* s_player::get_unit_coords(datum player_index)
 {
-    uint8* player_unit = get_player_unit(player_index);
+    uint8* player_unit = get_player_unit_data(player_index);
     if (player_unit != nullptr)
         return reinterpret_cast<real_point3d*>(player_unit + 0x64);
 
