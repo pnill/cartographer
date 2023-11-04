@@ -164,7 +164,7 @@ uint32 player_appearance_required_bits()
 	return 39;
 }
 
-void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+void __cdecl player_configuration_validate_character_type(s_player_properties* configuration_data)
 {
     // Campaign verification
     if (game_is_campaign())
@@ -232,6 +232,11 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             }
         }
     }
+}
+
+void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+{
+    player_configuration_validate_character_type(configuration_data);
     
     // General character verification
     e_character_type character = configuration_data->profile_traits.profile.player_character_type;
@@ -306,6 +311,48 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     return;
 }
 
+// Basic void* type because actually "usercall"
+void* p_player_representation_get;
+
+// Calls the original player representation get function
+void player_representation_get_orig_fn(int player_index, int* out_variant_index, int* a3)
+{
+    __asm {
+        mov eax, a3
+        push eax
+        mov ebx, out_variant_index
+        mov eax, player_index
+        call p_player_representation_get
+        add esp, 4
+    }
+}
+
+void __cdecl player_representation_get(datum player_datum, int* out_variant_index, int* a3)
+{
+    s_player* player = s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
+
+    player_configuration_validate_character_type(&player->properties[0]);
+
+    // call the original function after validation
+    player_representation_get_orig_fn(player_datum, out_variant_index, a3);
+}
+
+__declspec(naked) void player_representation_get_to_cdecl()
+{
+    __asm {
+        push eax
+        mov eax, [esp + 4h + 4h]
+        push eax // a3
+        push ebx // out_variant
+        mov eax, [esp + 8h]
+        push eax // player index
+        call player_representation_get
+        add esp, 10h // clear 16 bytes to esp == ret addr
+        retn
+    }
+}
+
+
 void players_apply_patches(void)
 {
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
@@ -313,4 +360,9 @@ void players_apply_patches(void)
 
     // Replace the player profile validation function with our own
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
+
+    // Validate the player character type pre-spawn
+    p_player_representation_get = Memory::GetAddress<void*>(0x53895, 0x5BD8D);
+    PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
+    PatchCall(Memory::GetAddress(0x53969, 0x5BE61), player_representation_get_to_cdecl);
 }
