@@ -97,20 +97,20 @@ datum s_player::get_unit_index(datum player_index)
 	return get(player_index)->unit_index;
 }
 
-uint8* s_player::get_player_unit_data(datum player_index)
+unit_datum* s_player::get_player_unit_data(datum player_index)
 {
-    datum unit_datum = s_player::get_unit_index(player_index);
-    if (DATUM_IS_NONE(unit_datum))
+    datum unit_index = s_player::get_unit_index(player_index);
+    if (DATUM_IS_NONE(unit_index))
         return nullptr;
 
-    return (uint8*)object_get_fast_unsafe(unit_datum);
+    return (unit_datum*)object_get_fast_unsafe(unit_index);
 }
 
 real_vector3d* s_player::get_unit_coords(datum player_index)
 {
-    uint8* player_unit = get_player_unit_data(player_index);
+    unit_datum* player_unit = get_player_unit_data(player_index);
     if (player_unit != nullptr)
-        return reinterpret_cast<real_point3d*>(player_unit + 0x64);
+        return &player_unit->object.position;
 
     return nullptr;
 }

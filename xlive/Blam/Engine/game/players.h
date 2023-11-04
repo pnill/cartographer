@@ -1,8 +1,10 @@
 #pragma once
+
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/damage_reporting.h"
 #include "Blam/Engine/objects/emblems.h"
 #include "Blam/Engine/objects/objects.h"
+#include "Blam/Engine/units/units.h"
 #include "Blam/Engine/Simulation/MachineID.h"
 
 #define k_maximum_players 16
@@ -171,7 +173,7 @@ struct s_player
 	static void set_unit_speed(datum player_index, float speed);
 	static const wchar_t* get_name(datum player_index);
 	static datum get_unit_index(datum player_index);
-	static uint8* get_player_unit_data(datum player_index);
+	static unit_datum* get_player_unit_data(datum player_index);
 	static real_vector3d* get_unit_coords(datum player_index);
 	static uint64 get_id(datum player_index);
 };
