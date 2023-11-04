@@ -140,42 +140,11 @@ int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 
 #pragma region PlayerFunctions
 
-float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
-	real_point3d points_distance;
-	real_point3d* player1 = nullptr;
-	real_point3d* player2 = nullptr;
-
-	player1 = h2mod->get_player_unit_coords(playerIndex1);
-	player2 = h2mod->get_player_unit_coords(playerIndex2);
-	
-	points_distance.x = abs(player1->x - player2->x);
-	points_distance.y = abs(player1->y - player2->y);
-	points_distance.z = abs(player1->z - player2->z);
-
-	return sqrt(pow(points_distance.x, 2) + pow(points_distance.y, 2) + pow(points_distance.z, 2));
-}
-
-real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
-	BYTE* player_unit = get_player_unit_from_player_index(playerIndex);
-	if (player_unit != nullptr)
-		return reinterpret_cast<real_point3d*>(player_unit + 0x64);
-
-	return nullptr;
-}
-
-BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
-	if (DATUM_IS_NONE(unit_datum))
-		return nullptr;
-
-	return (BYTE*)object_get_fast_unsafe(unit_datum);
-}
-
 void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::get_unit_index(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		object_placement_data nObject;
@@ -193,12 +162,12 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 
 const wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(local_player_index)));
+	return s_player::get_name(player_index_from_user_index(local_player_index));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
-	PlayerIterator playersIt;
+	player_iterator playersIt;
 	while (playersIt.get_next_active_player())
 	{
 		datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
@@ -256,7 +225,7 @@ void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYT
 		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
 	};
 
-	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum_index = s_player::get_unit_index(playerIndex);
 	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
 
 	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));

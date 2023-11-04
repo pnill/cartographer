@@ -396,7 +396,7 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 			outStr += ", Peer index=" + std::to_string(NetworkSession::GetPeerIndex(playerIdx));
 			outStr += ", PlayerName=" + playerName;
 
-			playerNameWide = s_player::GetName(playerIdx);
+			playerNameWide = s_player::get_name(playerIdx);
 			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
 
 			outStr += ", Name from game player state=" + playerName;
@@ -451,7 +451,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 			outStr += ", Player index=" + std::to_string(playerIdx);
 			outStr += ", Player name=" + playerName;
 
-			playerNameWide = s_player::GetName(playerIdx);
+			playerNameWide = s_player::get_name(playerIdx);
 			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
 			outStr += ", Name from game player state=" + playerName;
 		}
@@ -568,8 +568,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	ComVar<bool> sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
-	int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0));
-	datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
+	datum localPlayerIdx = player_index_from_user_index(0);
 
 	std::string objectName = tokens[tokenArgPos++];
 
@@ -592,7 +591,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	if (nearPlayerSpawn.GetVal())
 	{
-		real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
+		real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 		if (localPlayerPos != nullptr)
 		{
 			varPos[0].SetVal(localPlayerPos->x + 0.5f);
@@ -658,7 +657,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		rotation = { varRotation[0].GetVal(), varRotation[1].GetVal(), varRotation[2].GetVal() };
 	}
 
-	ObjectSpawn(objectDatum, count.GetVal(), pPosition, pRotation, 1.0f, playerUnitIdx, sameTeam.GetVal());
+	ObjectSpawn(objectDatum, count.GetVal(), pPosition, pRotation, 1.0f, sameTeam.GetVal());
 
 	// output->OutputFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.GetValStr().c_str(), withRotation);
 
@@ -702,7 +701,7 @@ int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleComm
 //	commands end
 //////////////////////////////////////////////////////////////////////////
 
-void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, datum playerIdx, float randomMultiplier, bool sameTeam) 
+void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam) 
 {
 	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_point3d* orient);
 	auto p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
@@ -711,37 +710,36 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 	{
 		try 
 		{
-			object_placement_data nObject;
-			int localPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0));
-			datum playerUnitIdx = s_player::GetPlayerUnitDatumIndex(localPlayerIdx);
-			real_point3d* localPlayerPos = h2mod->get_player_unit_coords(localPlayerIdx);
+			object_placement_data new_object_placement;
+			datum localPlayerIdx = player_index_from_user_index(0);
+			real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 			
 			if (!DATUM_IS_NONE(object_idx)) 
 			{
-				object_placement_data_new(&nObject, object_idx, -1, 0);
+				object_placement_data_new(&new_object_placement, object_idx, -1, 0);
 
 				if (position)
 				{
-					nObject.position = *position;
+					new_object_placement.position = *position;
 				}
 				else if (localPlayerPos)
 				{
-					nObject.position.x = localPlayerPos->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.position.y = localPlayerPos->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
-					nObject.position.z = (localPlayerPos->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					new_object_placement.position.x = localPlayerPos->x * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					new_object_placement.position.y = localPlayerPos->y * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
+					new_object_placement.position.z = (localPlayerPos->z + 5.0f) * static_cast <float> (rand()) / static_cast<float>(RAND_MAX);
 				}
 
 				if (rotation)
 				{
-					p_vector3d_from_euler_angles3d(&nObject.forward, &nObject.up, rotation);
+					p_vector3d_from_euler_angles3d(&new_object_placement.forward, &new_object_placement.up, rotation);
 				}
 
 				if (!sameTeam)
-					nObject.team_index = NONE;
+					new_object_placement.team_index = NONE;
 
-				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, nObject.position.x, nObject.position.y, nObject.position.z);
-				datum object_gamestate_datum = object_new(&nObject);
-				simulation_action_object_create(object_gamestate_datum);
+				LOG_TRACE_GAME("object_datum = {0:#x}, x={1:f}, y={2:f}, z={3:f}", object_idx, new_object_placement.position.x, new_object_placement.position.y, new_object_placement.position.z);
+				datum new_object_index = object_new(&new_object_placement);
+				simulation_action_object_create(new_object_index);
 			}
 		}
 		catch (...) {

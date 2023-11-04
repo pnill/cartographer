@@ -111,7 +111,7 @@ struct s_player
 {
 	WORD datum_salt;
 	WORD flags;
-	unsigned long long identifier;
+	uint64 identifier;
 	DWORD player_creation_tick;
 	s_machine_identifier machine_identifier; // also known as abEnet
 	__int16 machine_index;
@@ -162,25 +162,27 @@ struct s_player
 	- These functions work only after game has started, if you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Engine/Networking/Session)
 	*/
 
-	static s_data_array* GetArray();
-	static bool IndexValid(int playerIndex);
-	static s_player* GetPlayer(int playerIndex);
-	static e_game_team GetTeam(int playerIndex);
-	static void SetTeam(int playerIndex, e_game_team team);
-	static void SetUnitBipedType(int playerIndex, e_character_type bipedType);
-	static void SetBipedSpeed(int playerIndex, float speed);
-	static const wchar_t* GetName(int playerIndex);
-	static datum GetPlayerUnitDatumIndex(int playerIndex);
-	static unsigned long long GetId(int playerIndex);
+	static s_data_array* get_data();
+	static bool is_index_valid(datum player_index);
+	static s_player* get(datum player_index);
+	static e_game_team get_team(datum player_index);
+	static void set_team(datum player_index, e_game_team team);
+	static void set_unit_character_type(datum player_index, e_character_type character_type);
+	static void set_unit_speed(datum player_index, float speed);
+	static const wchar_t* get_name(datum player_index);
+	static datum get_unit_index(datum player_index);
+	static uint8* get_player_unit(datum player_index);
+	static real_vector3d* get_unit_coords(datum player_index);
+	static uint64 get_id(datum player_index);
 };
 CHECK_STRUCT_SIZE(s_player, 516);
 #pragma pack(pop)
 
-class PlayerIterator : private s_data_iterator<s_player>
+class player_iterator : private s_data_iterator<s_player>
 {
 public:
 
-	PlayerIterator();
+	player_iterator();
 
 	bool get_next_active_player();
 
@@ -210,7 +212,7 @@ struct s_persistent_campaign_player
 	s_persistent_weapon_data weapon_0;
 	s_persistent_weapon_data weapon_1;
 	s_persistent_weapon_data weapon_2;
-	WORD grenade_counts_mask;
+	uint16 grenade_counts_mask;
 };
 CHECK_STRUCT_SIZE(s_persistent_campaign_player, 28);
 
@@ -239,7 +241,7 @@ struct s_players_globals
 	short unk_AE;
 	int player_datum_that_triggered_bsp_switch;
 	int teleported_unit_datum;
-	byte end_padding[128];
+	int8 end_padding[128];
 };
 CHECK_STRUCT_SIZE(s_players_globals, 312);
 

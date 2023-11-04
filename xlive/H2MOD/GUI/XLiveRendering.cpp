@@ -705,13 +705,13 @@ HRESULT WINAPI XLiveRender()
 
 	if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || game_is_campaign())) {
 		int text_y_coord = 60;
-		PlayerIterator playerIt;
-		while (playerIt.get_next_active_player())
+		player_iterator player_it;
+		while (player_it.get_next_active_player())
 		{
-			real_point3d* player_position = h2mod->get_player_unit_coords(playerIt.get_current_player_index());
-			object_datum* biped_unit = (object_datum*)h2mod->get_player_unit_from_player_index(playerIt.get_current_player_index());
+			real_point3d* player_position = s_player::get_unit_coords(player_it.get_current_player_index());
+			object_datum* biped_unit = (object_datum*)s_player::get_player_unit(player_it.get_current_player_index());
 			if (player_position != nullptr) {
-				std::wstring playerNameWide(playerIt.get_current_player_name());
+				std::wstring playerNameWide(player_it.get_current_player_name());
 				std::string playerName(playerNameWide.begin(), playerNameWide.end());
 				std::string xyzText =
 					"Player name: " + playerName +
