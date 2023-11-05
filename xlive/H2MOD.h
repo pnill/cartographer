@@ -34,10 +34,7 @@ public:
 	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
-	BYTE* get_player_unit_from_player_index(int playerIndex);
 	const wchar_t* get_local_player_name(int local_player_index);
-	real_point3d* get_player_unit_coords(int player_index);
-	float get_distance(int, int);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	BYTE get_unit_team_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);

@@ -69,7 +69,7 @@ namespace FirstPersonInterpolate
 			}
 
 			player_datum = player_index_from_user_index(i);
-			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
+			player_unit_datum = s_player::get_unit_index(player_datum);
 
 			if (DATUM_IS_NONE(player_unit_datum))
 			{
@@ -104,7 +104,7 @@ namespace FirstPersonInterpolate
 			if (players_user_is_active(i))
 			{
 				player_datum = player_index_from_user_index(i);
-				player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
+				player_unit_datum = s_player::get_unit_index(player_datum);
 
 				if (camera_state->unit_idx == player_unit_datum)
 				{
@@ -135,7 +135,7 @@ namespace FirstPersonInterpolate
 				continue;
 
 			player_datum = player_index_from_user_index(i);
-			player_unit_datum = s_player::GetPlayerUnitDatumIndex(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum));
+			player_unit_datum = s_player::get_unit_index(player_datum);
 
 			if (DATUM_IS_NONE(player_unit_datum))
 				continue;

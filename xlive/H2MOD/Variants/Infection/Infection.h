@@ -71,7 +71,7 @@ public:
 	static void resetWeaponInteractionAndEmblems();
 	static void sendTeamChange();
 	static void resetZombiePlayerStatus();
-	static void setZombiePlayerStatus(unsigned long long identifier);
+	static void setZombiePlayerStatus(uint64 identifier);
 	static void setPlayerAsHuman(int playerIndex);
 	static void setPlayerAsZombie(int playerIndex);
 	static void triggerSound(e_infection_sounds sound, int sleep);

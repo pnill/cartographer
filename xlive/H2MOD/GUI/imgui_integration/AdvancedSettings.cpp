@@ -964,14 +964,14 @@ namespace ImGuiHandler {
 					{
 						if(ImGui::Button("Log Player Unit Objects"))
 						{
-							PlayerIterator playerIt;
+							player_iterator player_it;
 							s_data_array* Objects = *Memory::GetAddress<s_data_array**>(0x4E461C);
 
-							while(playerIt.get_next_active_player())
+							while(player_it.get_next_active_player())
 							{
-								auto player = playerIt.get_current_player_data();
+								auto player = player_it.get_current_player_data();
 								int object = *(int*)&Objects->datum[12 * player->unit_index.Index + 8];
-								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", playerIt.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
+								LOG_INFO_GAME(L"[DevDebug]: {} {} {}", player_it.get_current_player_name(), IntToWString<int>(player->unit_index.ToInt(), std::hex), IntToWString<int>(object, std::hex));
 							}
 						}
 					}

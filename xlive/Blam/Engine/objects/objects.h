@@ -222,7 +222,7 @@ static s_data_array* get_objects_header()
 static s_object_header* get_objects_header(datum object_idx)
 {
 	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->data[objects_header->datum_element_size * DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)]);
+	return (s_object_header*)(&objects_header->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx) * objects_header->datum_element_size]);
 }
 
 // Get the object fast, with no validation from datum index

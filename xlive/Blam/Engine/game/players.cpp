@@ -14,102 +14,123 @@
 #include "Util/Hooks/Hook.h"
 
 /*
-	- TO NOTE:
-	- This functions work only after the game has started (game life cycle is in_game or after map has been loaded).
+	- NOTES:
+    - This gets the player data from the game state, thus it is available only during a match or gameplay (game life cycle is in_game or after map has been loaded)
 	- If you need to do something in the pregame lobby, use the functions available in Network Session (Blam/Networking/Session)
 */
 
-s_data_array* s_player::GetArray()
+s_data_array* s_player::get_data()
 {
 	return *Memory::GetAddress<s_data_array**>(0x4A8260, 0x4D64C4);
 }
 
-bool s_player::IndexValid(int playerIndex)
+bool s_player::is_index_valid(datum player_index)
 {
-	return playerIndex >= 0 && playerIndex < k_maximum_players;
+    int32 player_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+	return player_abs_index >= 0 && player_abs_index < k_maximum_players;
 }
 
-s_player* s_player::GetPlayer(int playerIndex)
+s_player* s_player::get(datum player_index)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return nullptr;
 	}
-	return (s_player*)&GetArray()->data[playerIndex * GetArray()->datum_element_size];
+	return (s_player*)&get_data()->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index) * get_data()->datum_element_size];
 }
 
-e_game_team s_player::GetTeam(int playerIndex)
+e_game_team s_player::get_team(datum player_index)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return (e_game_team)NONE;
 	}
-	return (e_game_team)GetPlayer(playerIndex)->properties[0].team_index;
+	return (e_game_team)get(player_index)->properties[0].team_index;
 }
 
-void s_player::SetTeam(int playerIndex, e_game_team team)
+void s_player::set_team(datum player_index, e_game_team team)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->properties[0].team_index = (int8)team;
+	get(player_index)->properties[0].team_index = (int8)team;
 }
 
-void s_player::SetUnitBipedType(int playerIndex, e_character_type bipedType)
+void s_player::set_unit_character_type(datum player_index, e_character_type character_type)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return;
 	}
-    s_player* player = GetPlayer(playerIndex);
-    player->properties[0].profile_traits.profile.player_character_type = bipedType;
-    player->properties[1].profile_traits.profile.player_character_type = bipedType;
+    s_player* player = get(player_index);
+    player->properties[0].profile_traits.profile.player_character_type = character_type;
+    player->properties[1].profile_traits.profile.player_character_type = character_type;
     return;
 }
 
-void s_player::SetBipedSpeed(int playerIndex, float speed)
+void s_player::set_unit_speed(datum player_index, float speed)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return;
 	}
-	GetPlayer(playerIndex)->unit_speed = speed;
+	get(player_index)->unit_speed = speed;
 }
 
-const wchar_t* s_player::GetName(int playerIndex)
+const wchar_t* s_player::get_name(datum player_index)
 {
-	if (!IndexValid(playerIndex))
+	if (!is_index_valid(player_index))
 	{
 		return L"";
 	}
-	return GetPlayer(playerIndex)->properties[0].player_name;
+	return get(player_index)->properties[0].player_name;
 }
 
-datum s_player::GetPlayerUnitDatumIndex(int playerIndex)
+datum s_player::get_unit_index(datum player_index)
 {
-	if (!IndexValid(playerIndex))
+    if (!is_index_valid(player_index)) 
+    {
 		return DATUM_INDEX_NONE;
+    }
 
-	return GetPlayer(playerIndex)->unit_index;
+	return get(player_index)->unit_index;
 }
 
-unsigned long long s_player::GetId(int playerIndex)
+unit_datum* s_player::get_player_unit_data(datum player_index)
 {
-	if (!IndexValid(playerIndex))
+    datum unit_index = s_player::get_unit_index(player_index);
+    if (DATUM_IS_NONE(unit_index))
+        return nullptr;
+
+    return (unit_datum*)object_get_fast_unsafe(unit_index);
+}
+
+real_vector3d* s_player::get_unit_coords(datum player_index)
+{
+    unit_datum* player_unit = get_player_unit_data(player_index);
+    if (player_unit != nullptr)
+        return &player_unit->object.position;
+
+    return nullptr;
+}
+
+uint64 s_player::get_id(datum player_index)
+{
+	if (!is_index_valid(player_index))
 	{
 		return 0ull;
 	}
 
-	return GetPlayer(playerIndex)->identifier;
+	return get(player_index)->identifier;
 }
 
-PlayerIterator::PlayerIterator() 
-	: s_data_iterator(s_player::GetArray())
+player_iterator::player_iterator() 
+	: s_data_iterator(s_player::get_data())
 {
 }
 
-bool PlayerIterator::get_next_active_player()
+bool player_iterator::get_next_active_player()
 {
 	m_current_player = get_next_datum();
 
@@ -124,24 +145,24 @@ bool PlayerIterator::get_next_active_player()
 	return m_current_player != nullptr;
 }
 
-s_player* PlayerIterator::get_current_player_data()
+s_player* player_iterator::get_current_player_data()
 {
 	return m_current_player;
 }
 
-int PlayerIterator::get_current_player_index()
+int player_iterator::get_current_player_index()
 {
 	return get_current_absolute_index();
 }
 
-wchar_t* PlayerIterator::get_current_player_name()
+wchar_t* player_iterator::get_current_player_name()
 {
 	return m_current_player->properties[0].player_name;
 }
 
-unsigned long long PlayerIterator::get_current_player_id()
+unsigned long long player_iterator::get_current_player_id()
 {
-	return s_player::GetId(this->get_current_player_index());
+	return s_player::get_id(this->get_current_player_index());
 }
 
 s_players_globals* get_players_globals()
@@ -164,7 +185,7 @@ uint32 player_appearance_required_bits()
 	return 39;
 }
 
-void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+void __cdecl player_configuration_validate_character_type(s_player_properties* configuration_data)
 {
     // Campaign verification
     if (game_is_campaign())
@@ -185,7 +206,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
                     configuration_data->profile_traits.profile.player_character_type = (e_character_type)player_starting_location->campaign_player_type;
                     found = true;
                     break;
-                }
+                 }
             }
 
             // If a campaign_player_type type wasn't found in any of the starting locations set default values
@@ -232,6 +253,11 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
             }
         }
     }
+}
+
+void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data)
+{
+    player_configuration_validate_character_type(configuration_data);
     
     // General character verification
     e_character_type character = configuration_data->profile_traits.profile.player_character_type;
@@ -306,6 +332,48 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     return;
 }
 
+// Basic void* type because actually "usercall"
+void* p_player_representation_get;
+
+// Calls the original player representation get function
+void player_representation_get_orig_fn(int player_index, int* out_variant_index, int* a3)
+{
+    __asm {
+        mov eax, a3
+        push eax
+        mov ebx, out_variant_index
+        mov eax, player_index
+        call p_player_representation_get
+        add esp, 4
+    }
+}
+
+void __cdecl player_representation_get(datum player_datum, int* out_variant_index, int* a3)
+{
+    s_player* player = s_player::get(player_datum);
+
+    player_configuration_validate_character_type(&player->properties[0]);
+
+    // call the original function after validation
+    player_representation_get_orig_fn(player_datum, out_variant_index, a3);
+}
+
+__declspec(naked) void player_representation_get_to_cdecl()
+{
+    __asm {
+        push eax
+        mov eax, [esp + 4h + 4h]
+        push eax // a3
+        push ebx // out_variant
+        mov eax, [esp + 8h]
+        push eax // player index
+        call player_representation_get
+        add esp, 10h // clear 16 bytes to esp == ret addr
+        retn
+    }
+}
+
+
 void players_apply_patches(void)
 {
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
@@ -313,4 +381,9 @@ void players_apply_patches(void)
 
     // Replace the player profile validation function with our own
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
+
+    // Validate the player character type pre-spawn
+    p_player_representation_get = Memory::GetAddress<void*>(0x53895, 0x5BD8D);
+    PatchCall(Memory::GetAddress(0x559F9, 0x5DEF1), player_representation_get_to_cdecl);
+    PatchCall(Memory::GetAddress(0x53969, 0x5BE61), player_representation_get_to_cdecl);
 }
