@@ -19,8 +19,8 @@
 
 std::vector<uint64> Infection::zombieIdentifiers;
 
-#define HUMAN_TEAM _game_team_red
-#define ZOMBIE_TEAM _game_team_green
+#define k_humans_team _game_team_red
+#define k_zombie_team _game_team_green
 
 bool initialSpawn;
 bool infectedPlayed;
@@ -70,12 +70,12 @@ void Infection::sendTeamChange()
 			if (NetworkSession::PlayerIsActive(playerIndex))
 			{
 				if (!NetworkSession::IsPeerIndexLocal(NetworkSession::GetPeerIndex(playerIndex))) {
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? ZOMBIE_TEAM : HUMAN_TEAM);
+					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? k_zombie_team : k_humans_team);
 					LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::GetPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
 				}
 				else if (!Memory::IsDedicatedServer()) {
 					bool is_player_zombie = playerIndex == zombiePlayerIndex;
-					h2mod->set_local_team_index(0, is_player_zombie ? ZOMBIE_TEAM : HUMAN_TEAM);
+					h2mod->set_local_team_index(0, is_player_zombie ? k_zombie_team : k_humans_team);
 					LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_player_zombie);
 				}
 			}
@@ -98,15 +98,15 @@ void Infection::triggerSound(e_infection_sounds sound, int sleep)
 void Infection::InitClient()
 {
 	LOG_TRACE_GAME("[h2mod-infection] Disabling slayer sounds");
-	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 
 	infectedPlayed = false;
 	initialSpawn = true;
 
 	//Change Local Player's Team to Human if Not in Green
 	//(In case player wants to start as Alpha Zombie leave him green)
-	if (h2mod->get_local_team_index() != ZOMBIE_TEAM) {
-		h2mod->set_local_team_index(0, HUMAN_TEAM);
+	if (h2mod->get_local_team_index() != k_zombie_team) {
+		h2mod->set_local_team_index(0, k_humans_team);
 	}
 }
 
@@ -169,7 +169,7 @@ void Infection::preSpawnServerSetup() {
 		uint64 playerIdentifier = player_it.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 
-		bool zombie_team_status_human = isZombie == false && s_player::get_team(currentPlayerIndex) == ZOMBIE_TEAM;
+		bool zombie_team_status_human = isZombie == false && s_player::get_team(currentPlayerIndex) == k_zombie_team;
 		if (zombie_team_status_human) {
 			// if the player just joined the and he doesn't have zombie status, and his team is green, add him in the array
 			setZombiePlayerStatus(playerIdentifier);
@@ -179,9 +179,9 @@ void Infection::preSpawnServerSetup() {
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::get_name(currentPlayerIndex));
 		if (isZombie) {
 			s_player::set_unit_character_type(currentPlayerIndex, _character_type_flood);
-			if (s_player::get_team(currentPlayerIndex) != ZOMBIE_TEAM) {
+			if (s_player::get_team(currentPlayerIndex) != k_zombie_team) {
 				if (NetworkSession::LocalPeerIsSessionHost())
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), ZOMBIE_TEAM); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), k_zombie_team); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
 			}
 		}
 		else {
@@ -359,7 +359,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 
 		if (!Memory::IsDedicatedServer())
 		{
-			if (s_player::get_team(playerIdx) != ZOMBIE_TEAM) {
+			if (s_player::get_team(playerIdx) != k_zombie_team) {
 				//if we have a valid object and the object is not on the zombie team
 				uint64 playerIdentifier = s_player::get_id(playerIdx);
 
@@ -368,7 +368,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 				// check if the player being infected is local
 				if (playerIdentifier == s_player::get_id(player_index_from_user_index(0))) {
 					LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
-					h2mod->set_local_team_index(0, ZOMBIE_TEAM);
+					h2mod->set_local_team_index(0, k_zombie_team);
 					s_player::set_unit_character_type(playerIdx, _character_type_flood);
 				}
 				else {
@@ -384,7 +384,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		{
 			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
-				if (h2mod->get_unit_team_index(playerUnitDatum) != ZOMBIE_TEAM) {
+				if (h2mod->get_unit_team_index(playerUnitDatum) != k_zombie_team) {
 					Infection::setZombiePlayerStatus(s_player::get_id(absPlayerIdx));
 				}
 				else {
@@ -418,17 +418,17 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 		if (!Memory::IsDedicatedServer())
 		{
-			uint64 playerIdentifier = s_player::get_id(absPlayerIdx);
+			uint64 playerIdentifier = s_player::get_id(playerIdx);
 			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, h2mod->get_local_player_name(0));
 			//If player being spawned is LocalUser/Player
 			if (playerIdentifier == s_player::get_id(player_index_from_user_index(0)))
 			{
 				LOG_TRACE_GAME("[h2mod-infection] Client pre spawn, found local player, current team = {}", h2mod->get_local_team_index());
 				//Change biped if LocalUser is in GreenTeam
-				if (h2mod->get_local_team_index() == ZOMBIE_TEAM)
+				if (h2mod->get_local_team_index() == k_zombie_team)
 				{
 					LOG_TRACE_GAME("[h2mod-infection] Client is infected! switching bipeds: {}", absPlayerIdx);
-					s_player::set_unit_character_type(absPlayerIdx, _character_type_flood);
+					s_player::set_unit_character_type(playerIdx, _character_type_flood);
 				}
 			}
 		}
@@ -452,18 +452,18 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 					initialSpawn = false;
 				}
 
-				if (h2mod->get_local_team_index() == ZOMBIE_TEAM && infectedPlayed == false) {
+				if (h2mod->get_local_team_index() == k_zombie_team && infectedPlayed == false) {
 					Infection::triggerSound(_snd_infected, 500);
 					infectedPlayed = true;
 				}
 
-				if (h2mod->get_local_team_index() == HUMAN_TEAM) {
+				if (h2mod->get_local_team_index() == k_humans_team) {
 					h2mod->disable_weapon_pickup(true);
 					h2mod->team_player_indicator_visibility(false);
 				}
 
-				else if (h2mod->get_local_team_index() == ZOMBIE_TEAM) {
-					s_player::set_unit_character_type(absPlayerIdx, _character_type_flood);
+				else if (h2mod->get_local_team_index() == k_zombie_team) {
+					s_player::set_unit_character_type(playerIdx, _character_type_flood);
 					h2mod->disable_weapon_pickup(false);
 					h2mod->team_player_indicator_visibility(true);
 				}
@@ -479,11 +479,11 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 
 				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, h2mod->get_unit_team_index(playerUnitDatum));
-				if (h2mod->get_unit_team_index(playerUnitDatum) == HUMAN_TEAM) {
+				if (h2mod->get_unit_team_index(playerUnitDatum) == k_humans_team) {
 					Infection::setPlayerAsHuman(absPlayerIdx);
 				}
 
-				if (h2mod->get_unit_team_index(playerUnitDatum) == ZOMBIE_TEAM) {
+				if (h2mod->get_unit_team_index(playerUnitDatum) == k_zombie_team) {
 					Infection::setPlayerAsZombie(absPlayerIdx);
 				}
 			}

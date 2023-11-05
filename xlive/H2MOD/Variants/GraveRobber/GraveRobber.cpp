@@ -117,7 +117,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 
 void GraveRobber::InitializeClient()
 {
-	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 	firstPlayerSpawn = true;
 }
 

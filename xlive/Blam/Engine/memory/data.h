@@ -61,7 +61,6 @@ template<typename T = void*>
 class s_data_iterator
 {
 public:
-
 	s_data_iterator(s_data_array* _data_array) : 
 		m_data_array(_data_array),
 		m_current_absolute_index(NONE),
@@ -136,7 +135,6 @@ public:
 	}
 
 private:
-	
 	s_data_array* m_data_array;
 	datum m_last_datum_index;
 	int m_current_absolute_index;
