@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: scenario_structure_bsp

@@ -11,7 +11,7 @@
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Engine/text/text_group.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 

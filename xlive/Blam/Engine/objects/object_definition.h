@@ -5,7 +5,7 @@
 #include "Blam/Engine/math/function_definitions.h"
 #include "Blam/Engine/objects/object_type_list.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 #define k_maximum_object_functions 256
 #define k_maximum_number_of_attachments_per_object 16

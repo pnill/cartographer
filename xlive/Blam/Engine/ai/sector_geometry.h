@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 // max count: UNSIGNED_SHORT_MAX 65535
 struct sector_vertex

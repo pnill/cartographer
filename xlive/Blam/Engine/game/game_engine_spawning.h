@@ -2,7 +2,7 @@
 
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 #define k_maximum_number_of_dynamic_spawn_zones 32
 #define MAXIMUM_STATIC_SPAWN_ZONES_PER_SCENARIO 128
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include <wtypes.h>

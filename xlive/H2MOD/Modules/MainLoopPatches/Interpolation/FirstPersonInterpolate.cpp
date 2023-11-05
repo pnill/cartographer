@@ -6,7 +6,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 #include "Util/Hooks/Hook.h"
 
 namespace FirstPersonInterpolate

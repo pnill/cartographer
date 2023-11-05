@@ -5,7 +5,7 @@
 #include "FirstPersonInterpolate.h"
 #include "ObjectInterpolate.h"
 
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
 

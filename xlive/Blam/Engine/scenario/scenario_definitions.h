@@ -30,7 +30,7 @@
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structure_audibility.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16
 #define MAXIMUM_FUNCTIONS_PER_SCENARIO 32

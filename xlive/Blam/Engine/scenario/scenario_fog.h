@@ -3,7 +3,7 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 #define MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
 #define k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry 2

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "game_time.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 
 FLOATING_POINT_ENV_ACCESS();
 

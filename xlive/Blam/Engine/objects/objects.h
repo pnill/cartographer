@@ -7,7 +7,7 @@
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/memory/static_arrays.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/BlamMath.h"
 
 #define k_maximum_objects_per_map 2048
 

@@ -4,8 +4,8 @@
 #include "object_identifier.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/math/BlamMath.h"
 #include "Blam/Engine/memory/static_arrays.h"
-#include "Blam/Math/BlamMath.h"
 
 enum e_bsp_policy : int8
 {
