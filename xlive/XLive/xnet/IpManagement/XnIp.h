@@ -3,7 +3,7 @@
 #include "../xnet.h"
 #include "../Sockets/XSocket.h"
 
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 
 #define XNIP_MAX_PCK_STR_HDR_LEN 32

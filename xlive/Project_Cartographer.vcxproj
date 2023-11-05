@@ -481,6 +481,7 @@
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
@@ -543,7 +544,7 @@
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\Shell.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
@@ -805,6 +806,7 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="Blam\Engine\shell\shell.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
@@ -900,7 +902,7 @@
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\Shell.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\H2MODShell.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Birthday.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Christmas.h" />

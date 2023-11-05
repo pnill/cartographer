@@ -3,7 +3,7 @@
 #include "Startup.h"
 #include "WinMainH2.h"
 #include "../Config.h"
-#include "../Shell.h"
+#include "../H2MODShell.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
 

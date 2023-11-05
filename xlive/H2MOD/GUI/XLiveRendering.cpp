@@ -15,7 +15,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 
 #include "Util/Hooks/Hook.h"
 

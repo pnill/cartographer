@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Shell.h"
+#include "H2MODShell.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 int instanceNumber = 0;
