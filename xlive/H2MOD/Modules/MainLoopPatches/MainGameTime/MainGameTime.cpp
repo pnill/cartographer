@@ -4,10 +4,9 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/math.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
-#include "H2MOD/Modules/Shell/Shell.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
@@ -133,7 +132,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
-		if (MainGameTime::fps_limiter_enabled || _Shell::IsGameMinimized())
+		if (MainGameTime::fps_limiter_enabled || game_is_minimized())
 		{
 			if (time_globals::available())
 			{

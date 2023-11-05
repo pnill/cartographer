@@ -30,8 +30,6 @@ NtWaitForSingleObject(
 
 namespace _Shell
 {
-	bool IsGameMinimized();
-
 	void Initialize();
 	void FileErrorDialog(int fpErrNo);
 	void OpenMessageBox(HWND hWnd, UINT uType, const char* caption, const char* format, ...);

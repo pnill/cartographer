@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -481,6 +481,7 @@
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.cpp" />
@@ -804,6 +805,7 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_damage.h" />
