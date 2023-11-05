@@ -31,7 +31,7 @@ static int weapon_sixteen = 0;
 // TODO(PermaNull): Add additional levels with dual weilding
 
 std::unordered_map<int, datum> GunGame::levelWeapon;
-std::unordered_map<unsigned long long, int> GunGame::gungamePlayers;
+std::unordered_map<uint64, int> GunGame::gungamePlayers;
 
 datum weaponDatums[36] = {
 	0xE53D2AD8, 0xE5F02B8B, 0xE6322BCD, 0xE6AF2C4A,
@@ -197,8 +197,8 @@ void GunGame::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 		// to note after the original function executes, the controlled unit by this player is set to NONE
 		if (!game_is_predicted())
 		{
-			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-			h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
+			s_player::set_player_unit_grenade_count(playerIdx, e_grenades::Fragmentation, 0, true);
+			s_player::set_player_unit_grenade_count(playerIdx, e_grenades::Plasma, 0, true);
 		}
 		break;
 
@@ -221,7 +221,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 	{
 		// prespawn handler
 	case ExecTime::_preEventExec:
-		s_player::set_unit_character_type(absPlayerIdx, _character_type_spartan);
+		s_player::set_unit_character_type(playerIdx, _character_type_spartan);
 		break;
 
 		// postspawn handler
@@ -254,11 +254,11 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 				}
 				else if (level == 15) {
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on frag grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
-					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+					s_player::set_player_unit_grenade_count(playerIdx, e_grenades::Fragmentation, 99, true);
 				}
 				else if (level == 16) {
 					LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on plasma grenade level!", __FUNCTIONW__, s_player::get_name(playerIdx));
-					h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+					s_player::set_player_unit_grenade_count(playerIdx, e_grenades::Plasma, 99, true);
 				}
 			}
 		}
@@ -306,20 +306,20 @@ bool GunGame::c_game_statborg__adjust_player_stat(ExecTime execTime, c_game_stat
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} on level {} giving them weapon...", __FUNCTIONW__, s_player::get_name(player_datum), level);
 
 				datum LevelWeapon = GunGame::levelWeapon[level];
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 0, true);
+				s_player::set_player_unit_grenade_count(player_datum, e_grenades::Fragmentation, 0, true);
+				s_player::set_player_unit_grenade_count(player_datum, e_grenades::Plasma, 0, true);
 				call_give_player_weapon(absPlayerIdx, LevelWeapon, 1);
 			}
 
 			else if (level == 15) {
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 15 - Frag Grenades!", __FUNCTIONW__, s_player::get_name(player_datum));
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 99, true);
+				s_player::set_player_unit_grenade_count(player_datum, e_grenades::Fragmentation, 99, true);
 			}
 
 			else if (level == 16) {
 				LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} - {} Level 16 - Plasma Grenades!", __FUNCTIONW__, s_player::get_name(player_datum));
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Fragmentation, 0, true);
-				h2mod->set_player_unit_grenades_count(absPlayerIdx, e_grenades::Plasma, 99, true);
+				s_player::set_player_unit_grenade_count(player_datum, e_grenades::Fragmentation, 0, true);
+				s_player::set_player_unit_grenade_count(player_datum, e_grenades::Plasma, 99, true);
 			}
 		}
 

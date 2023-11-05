@@ -211,58 +211,13 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 }
 
-void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment)
-{
-	if (type > e_grenades::Plasma)
-	{
-		LOG_TRACE_GAME("[H2MOD] set_player_unit_grenades_count() Invalid argument: type");
-		return;
-	}
-
-	static const std::string grenadeEquipamentTagName[2] =
-	{
-		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade",
-		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
-	};
-
-	datum unit_datum_index = s_player::get_unit_index(playerIndex);
-	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
-
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
-	if (unit_object != NULL)
-	{
-		// not sure what these flags are, but this is called when picking up grenades
-		typedef void(__cdecl* entity_set_unk_flags_t)(datum objectIndex, int flags);
-		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
-
-		typedef void(__cdecl* unit_add_grenade_to_inventory_send_t)(datum unitDatumIndex, datum equipamentTagIndex);
-		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
-
-		// send simulation update for grenades if we control the simulation
-		if (!game_is_predicted())
-		{
-			// delete all weapons if required
-			if (resetEquipment)
-				unit_delete_all_weapons(unit_datum_index);
-
-			// set grenade count
-			*(BYTE*)(unit_object + 0x252 + type) = count;
-
-			p_simulation_action_object_update(unit_datum_index, FLAG(22)); // flag 22 seems to be sync entity grenade count (TODO: list all of the update types)
-			//p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
-		}
-
-		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::GetPeerIndex(playerIndex));
-	}
-}
-
 BYTE H2MOD::get_local_team_index()
 {
 	return *Memory::GetAddress<BYTE*>(0x51A6B4);
 }
 #pragma endregion
 
-void H2MOD::disable_sounds(int sound_flags)
+void H2MOD::disable_score_announcer_sounds(int sound_flags)
 {
 	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)

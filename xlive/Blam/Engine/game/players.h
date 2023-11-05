@@ -170,6 +170,7 @@ struct s_player
 	static e_game_team get_team(datum player_index);
 	static void set_team(datum player_index, e_game_team team);
 	static void set_unit_character_type(datum player_index, e_character_type character_type);
+	static void set_player_unit_grenade_count(datum player_index, e_grenades type, int32 count, bool reset_equipment);
 	static void set_unit_speed(datum player_index, float speed);
 	static const wchar_t* get_name(datum player_index);
 	static datum get_unit_index(datum player_index);
@@ -180,24 +181,21 @@ struct s_player
 CHECK_STRUCT_SIZE(s_player, 516);
 #pragma pack(pop)
 
-class player_iterator : private s_data_iterator<s_player>
+class player_iterator 
 {
 public:
-
 	player_iterator();
 
 	bool get_next_active_player();
-
 	s_player* get_current_player_data();
-
 	int get_current_player_index();
-
 	wchar_t* get_current_player_name();
 
 	unsigned long long get_current_player_id();
 
 private:
 	s_player* m_current_player = nullptr;
+	s_data_iterator<s_player> m_data_iterator;
 };
 
 struct s_persistent_weapon_data

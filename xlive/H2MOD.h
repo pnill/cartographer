@@ -40,8 +40,7 @@ public:
 	void set_unit_speed_patch(bool hackit);
 	void set_local_team_index(int local_player_index, int team);
 	BYTE get_local_team_index();
-	void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
-	void disable_sounds(int sound);
+	void disable_score_announcer_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool enable);
 	void set_local_rank(BYTE rank);
