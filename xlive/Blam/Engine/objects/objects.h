@@ -46,12 +46,6 @@ enum e_game_team : short
 	_game_team_none = -1
 };
 
-enum e_grenades : BYTE
-{
-	Fragmentation,
-	Plasma
-};
-
 enum e_weapon_index : WORD
 {
 	Primary = 0xFF00,
