@@ -46,12 +46,6 @@ enum e_game_team : short
 	_game_team_none = -1
 };
 
-enum e_unit_grenade_type : int8
-{
-	_unit_grenade_type_fragmentation = 0,
-	_unit_grenade_type_plasma = 1
-};
-
 enum e_weapon_index : WORD
 {
 	Primary = 0xFF00,
