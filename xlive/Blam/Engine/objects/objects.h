@@ -46,10 +46,10 @@ enum e_game_team : short
 	_game_team_none = -1
 };
 
-enum e_grenades : BYTE
+enum e_unit_grenade_type : int8
 {
-	Fragmentation,
-	Plasma
+	_unit_grenade_type_fragmentation = 0,
+	_unit_grenade_type_plasma = 1
 };
 
 enum e_weapon_index : WORD

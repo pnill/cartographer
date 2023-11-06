@@ -43,7 +43,6 @@
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
-    <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
@@ -120,7 +119,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
-    <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
@@ -220,6 +218,7 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -376,7 +375,6 @@
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
-    <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
@@ -505,7 +503,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
-    <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\ComVar.h" />
@@ -675,6 +672,7 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

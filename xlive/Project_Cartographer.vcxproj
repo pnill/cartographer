@@ -444,6 +444,7 @@
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
@@ -762,6 +763,7 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_damage.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_device_machines.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.h" />

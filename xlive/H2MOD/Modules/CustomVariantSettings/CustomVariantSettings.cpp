@@ -91,8 +91,8 @@ namespace CustomVariantSettings
 		{
 			if (currentVariantSettings.infiniteGrenades)
 			{
-				s_player::set_player_unit_grenade_count(playerIndex, Fragmentation, 4, false);
-				s_player::set_player_unit_grenade_count(playerIndex, Plasma, 4, false);
+				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_type_fragmentation, 4, false);
+				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_type_plasma, 4, false);
 			}
 		}
 	}

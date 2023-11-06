@@ -5,6 +5,8 @@
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/Simulation/game_interface/simulation_game_action.h"
+#include "Blam/Engine/units/units.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 #include "Blam/Engine/scenario/scenario.h"
 
@@ -97,48 +99,23 @@ datum s_player::get_unit_index(datum player_index)
 	return get(player_index)->unit_index;
 }
 
-void s_player::set_player_unit_grenade_count(datum player_index, e_grenades type, int32 count, bool reset_equipment)
+void s_player::set_player_unit_grenade_count(datum player_index, e_unit_grenade_type type, int8 count, bool reset_equipment)
 {
     int32 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
-
-    if (type > e_grenades::Plasma)
-    {
-        LOG_TRACE_GAME("set_player_unit_grenades_count() invalid arg: type");
-        return;
-    }
-
-    static const std::string grenadeEquipamentTagName[2] =
-    {
-        "objects\\weapons\\grenade\\frag_grenade\\frag_grenade",
-        "objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
-    };
-
     datum unit_datum_index = s_player::get_unit_index(player_index);
-    //datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
+    unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
 
-    char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
-    if (unit_object != NULL)
+    // send simulation update for grenades if we control the simulation
+    if (unit != NULL && !game_is_predicted())
     {
-        // not sure what these flags are, but this is called when picking up grenades
-        typedef void(__cdecl* entity_set_unk_flags_t)(datum object_index, int32 flags);
-        auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
-
-        typedef void(__cdecl* unit_add_grenade_to_inventory_send_t)(datum unit_datum_index, datum equipment_tag_index);
-        auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
-
-        // send simulation update for grenades if we control the simulation
-        if (!game_is_predicted())
+        // delete all weapons if required
+        if (reset_equipment)
         {
-            // delete all weapons if required
-            if (reset_equipment)
-                unit_delete_all_weapons(unit_datum_index);
-
-            // set grenade count
-            *(int8*)(unit_object + 0x252 + type) = (int8)count;
-
-            p_simulation_action_object_update(unit_datum_index, FLAG(22)); // flag 22 seems to be sync entity grenade count (TODO: list all of the update types)
-            //p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
+            unit_delete_all_weapons(unit_datum_index);
         }
+
+        unit->grenade_counts[type] = count;
+        simulation_action_object_update(unit_datum_index, FLAG(_simulation_action_update_grenade_count_bit));
 
         LOG_TRACE_GAME("set_player_unit_grenade_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", abs_player_index, NetworkSession::GetPeerIndex(abs_player_index));
     }
