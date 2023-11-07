@@ -28,13 +28,13 @@ void observer_set_suggested_field_of_view(float fov)
 	if (fov <= 0 || fov > 110) return;
 
 	float final_fov_rad;
-	if (currentVariantSettings.forcedFOV == 0)
+	if (currentVariantSettings.forced_fov == 0)
 	{
 		final_fov_rad = fov * M_PI / 180.0f;
 	}
 	else
 	{
-		final_fov_rad = currentVariantSettings.forcedFOV * M_PI / 180.0f;
+		final_fov_rad = currentVariantSettings.forced_fov * M_PI / 180.0f;
 	}
 	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 }
@@ -58,9 +58,9 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 	{
 		float fov;
 		
-		if (currentVariantSettings.forcedFOV != 0)
+		if (currentVariantSettings.forced_fov != 0)
 		{
-			fov = currentVariantSettings.forcedFOV;
+			fov = currentVariantSettings.forced_fov * M_PI / 180.0f;
 		}
 		else if (player_control_fov_overridden)
 		{
