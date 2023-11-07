@@ -3,6 +3,7 @@
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/math/math.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 #include "H2MOD/Modules/Shell/Shell.h"
@@ -22,7 +23,7 @@ float get_ticks_leftover_time()
 {
 	time_globals* timeGlobals = time_globals::get();
 	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->game_ticks_leftover / (float)timeGlobals->ticks_per_second);
-	return blam_max(result, 0.0f);
+	return MAX(result, 0.0f);
 }
 
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
@@ -168,7 +169,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 		}
 	}
 
-	dtSec = blam_min(dtSec, 10.f);
+	dtSec = MIN(dtSec, 10.f);
 	// QueryPerformanceCounter(&currentCounter);
 	// _currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
 	_currentTimeMsec = timeGetTime();

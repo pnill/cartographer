@@ -36,7 +36,7 @@ namespace Interpolation
 
 	float GetInterpolateTime()
 	{
-		return blam_max(0.0f, blam_min(time_globals::get_ticks_fraction_leftover(), 1.0f));
+		return MAX(0.0f, MIN(time_globals::get_ticks_fraction_leftover(), 1.0f));
 	}
 
 	// TODO
