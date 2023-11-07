@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Engine/math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: user_interface_shared_globals

@@ -5,7 +5,7 @@
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam/Engine/math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 #include "Util/Hooks/Hook.h"

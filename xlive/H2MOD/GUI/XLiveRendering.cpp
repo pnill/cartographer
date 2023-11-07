@@ -5,8 +5,9 @@
 #include "backends/imgui_impl_dx9.h"
 #include "backends/imgui_impl_win32.h"
 
-#include "Blam/Engine/units/bipeds.h"
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/math/real_vector3d.h"
+#include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"

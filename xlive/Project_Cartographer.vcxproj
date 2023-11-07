@@ -920,7 +920,6 @@
     <ClInclude Include="Blam\Engine\game\player_control.h" />
     <ClInclude Include="Blam\Engine\game\players.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
-    <ClInclude Include="Blam\Engine\math\BlamMath.h" />
     <ClInclude Include="H2MOD.h" />
     <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
