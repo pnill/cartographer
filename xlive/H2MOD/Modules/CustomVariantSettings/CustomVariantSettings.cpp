@@ -29,11 +29,11 @@ namespace CustomVariantSettings
 		stream->data_encode_bool("explosion physics", data->explosionPhysics);
 		stream->data_encode_integer("hill rotation", (byte)data->hillRotation, 8);
 		stream->data_encode_bool("infinite grenades", data->infiniteGrenades);
-		stream->data_encode_bits("forced field of view", &data->forcedFOV, sizeof(data->forcedFOV) * CHAR_BIT);
+		stream->data_encode_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
 	}
 	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data)
 	{
-		double gravity, gamespeed, ForcedFOV;
+		double gravity, gamespeed;
 		stream->data_decode_bits("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
 		data->gravity = gravity;
 		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
@@ -43,8 +43,7 @@ namespace CustomVariantSettings
 		data->explosionPhysics = stream->data_decode_bool("explosion physics");
 		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("hill rotation", 8);
 		data->infiniteGrenades = stream->data_decode_bool("infinite grenades");
-		stream->data_decode_bits("forced field of view", &ForcedFOV, sizeof(ForcedFOV) * CHAR_BIT);
-		data->forcedFOV = ForcedFOV;
+		data->forced_fov = stream->data_decode_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
 		return stream->overflow() == false;
 	}
 
@@ -137,12 +136,11 @@ namespace CustomVariantSettings
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
 			else
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+		}
 
-			if (newVariantSettings->forcedFOV != 0)
-			{
-				player_control_set_field_of_view(newVariantSettings->forcedFOV);
-				observer_set_suggested_field_of_view(newVariantSettings->forcedFOV);
-			}
+		if (newVariantSettings->forced_fov != 0)
+		{
+			observer_set_suggested_field_of_view(newVariantSettings->forced_fov);
 		}
 
 		//Server Only

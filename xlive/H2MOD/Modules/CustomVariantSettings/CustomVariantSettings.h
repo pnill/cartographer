@@ -29,7 +29,7 @@ namespace CustomVariantSettings
 		bool infiniteGrenades = false;
 		bool spawnProtection = 1;
 		byte predefinedHillSet[16];
-		double forcedFOV = 0;
+		uint8 forced_fov = 0;
 
 		double ComputedGravity() const
 		{
