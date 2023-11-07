@@ -138,6 +138,11 @@ namespace CustomVariantSettings
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
 		}
 
+		if (newVariantSettings->forced_fov != 0)
+		{
+			observer_set_suggested_field_of_view(newVariantSettings->forced_fov);
+		}
+
 		//Server Only
 		if (Memory::IsDedicatedServer())
 		{
