@@ -147,7 +147,7 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	float motion_sensor_range;
 	float motion_sensor_velocity_sensitivity;		// how fast something moves to show up on the motion sensor
 	float motion_sensor_scale;						// DONTTOUCHEVER
-	rect2d default_chapter_title_bounds;
+	rectangle2d default_chapter_title_bounds;
 
 	int pad_2A4[11];
 

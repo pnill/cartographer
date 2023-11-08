@@ -411,7 +411,7 @@ struct s_button_widget_reference
 
     e_custom_font custom_font;
     real_color_argb text_color;
-    rect2d bounds;
+    rectangle2d bounds;
 
     // bitm
     tag_reference bitmap;
@@ -578,7 +578,7 @@ struct s_text_block_reference
 
     e_custom_font custom_font;
     real_color_argb text_color;
-    rect2d text_bounds;
+    rectangle2d text_bounds;
     string_id string;
     short render_depth_bias;
     short pad1;
@@ -664,7 +664,7 @@ struct s_ui_model_scene_reference
     real_vector3d animation_scale_factor;
     real_point3d camera_position;
     float fov_degress;
-    rect2d ui_viewport;
+    rectangle2d ui_viewport;
     string_id unused_intro_anim;
     string_id unused_outro_anim;
     string_id unused_ambient_anim;
@@ -701,7 +701,7 @@ struct s_hud_block_reference
     // shad
     tag_reference shader;
 
-    rect2d bounds;
+    rectangle2d bounds;
 };
 TAG_BLOCK_SIZE_ASSERT(s_hud_block_reference, 36);
 

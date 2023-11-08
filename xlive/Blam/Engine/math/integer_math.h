@@ -1,62 +1,32 @@
 #pragma once
 
-
-
-//use this for all base integer math related structs and implementations
-struct point2d
+union point2d
 {
-	short x;
-	short y;
+	int16 v[2];
+	struct { int16 x, y; };
 };
-CHECK_STRUCT_SIZE(point2d, sizeof(short) * 2);
+CHECK_STRUCT_SIZE(point2d, sizeof(int16) * 2);
 
-struct point3d
+union short_bounds
 {
-	short x;
-	short y;
-	short z;
+	int16 v[2];
+	struct { int16 lower, upper; };
 };
-CHECK_STRUCT_SIZE(point3d, sizeof(short) * 3);
+CHECK_STRUCT_SIZE(short_bounds, sizeof(int16) * 2);
 
-struct short_bounds
+union rectangle2d
 {
-	short lower;
-	short upper;
+	int16 v[4];
+	struct { int16 top, left, bottom, right; };
 };
-CHECK_STRUCT_SIZE(short_bounds, sizeof(short) * 2);
+CHECK_STRUCT_SIZE(rectangle2d, sizeof(int16) * 4);
 
-struct rect2d
+static BLAM_MATH_INL int16 rectangle2d_width(const rectangle2d* rect)
 {
-	short top;
-	short left;
-	short bottom;
-	short right;
+	return rect->right - rect->left;
+}
 
-	int width() const
-	{
-		return right - left;
-	}
-
-	int height() const
-	{
-		return bottom - top;
-	}
-
-	void add(const rect2d& other)
-	{
-		top += other.top;
-		left += other.left;
-		bottom += other.bottom;
-		right += other.right;
-	}
-
-	void subtract(const rect2d& other)
-	{
-		top -= other.top;
-		left -= other.left;
-		bottom -= other.bottom;
-		right -= other.right;
-	}
-};
-CHECK_STRUCT_SIZE(rect2d, sizeof(short) * 4);
-
+static BLAM_MATH_INL int16 rectangle2d_height(const rectangle2d* rect)
+{
+	return rect->bottom - rect->top;
+}

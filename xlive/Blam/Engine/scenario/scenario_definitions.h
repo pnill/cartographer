@@ -961,7 +961,7 @@ enum e_text_font : short
 struct s_scenario_cutscene_title
 {
     string_id name;
-    rect2d text_bounds_on_screen;
+    rectangle2d text_bounds_on_screen;
 
     e_text_justification justification;
     e_text_font font;

@@ -596,7 +596,7 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 			PAD(0xC);//0x1C
 			real_point3d camera_position;//0x28			
 			float fov_degress;//0x34
-			rect2d ui_viewport;//0x38			
+			rectangle2d ui_viewport;//0x38			
 			string_id unused_intro_anim;//0x40
 			string_id unused_outro_anim;//0x44
 			string_id unused_ambient_anim;//0x48
@@ -807,21 +807,21 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 	};
 	e_qtr_dialog_header_text_font qtr_dialog_header_text_font;//0x166
 	real_color_argb default_text_color;//0x168
-	rect2d full_screen_header_text_bounds;//0x178
+	rectangle2d full_screen_header_text_bounds;//0x178
 
-	rect2d full_screen_button_key_text_bounds;//0x180
+	rectangle2d full_screen_button_key_text_bounds;//0x180
 
-	rect2d large_dialog_header_text_bounds;//0x188
+	rectangle2d large_dialog_header_text_bounds;//0x188
 
-	rect2d large_dialog_button_key_text_bounds;//0x190
+	rectangle2d large_dialog_button_key_text_bounds;//0x190
 
-	rect2d half_dialog_header_text_bounds;//0x198
+	rectangle2d half_dialog_header_text_bounds;//0x198
 
-	rect2d half_dialog_button_key_text_bounds;//0x1A0
+	rectangle2d half_dialog_button_key_text_bounds;//0x1A0
 
-	rect2d qtr_dialog_header_text_bounds;//0x1A8
+	rectangle2d qtr_dialog_header_text_bounds;//0x1A8
 
-	rect2d qtr_dialog_button_key_text_bounds;//0x1B0
+	rectangle2d qtr_dialog_button_key_text_bounds;//0x1B0
 
 	tag_reference main_menu_music;//0x1B8
 	__int32 music_fade_time;//0x1C0

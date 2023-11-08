@@ -11,8 +11,8 @@ struct s_camera
 	__int8 pad[3];
 	float vertical_field_of_view;
 	float scale;
-	rect2d viewport_bounds;
-	rect2d window_bounds;
+	rectangle2d viewport_bounds;
+	rectangle2d window_bounds;
 	float z_near;
 	float z_far;
 	real_point3d point1;
