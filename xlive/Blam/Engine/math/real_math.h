@@ -1,5 +1,6 @@
 #pragma once
 //use this for all base real math related structs and implementations
+#include "math.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

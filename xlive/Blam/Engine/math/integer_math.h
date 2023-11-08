@@ -1,4 +1,5 @@
 #pragma once
+#include "math.h"
 
 union point2d
 {
