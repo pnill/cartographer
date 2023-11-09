@@ -3,7 +3,6 @@
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/math/math.h"
-#include "Blam/Engine/math/real_vector3d.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "Util/Memory.h"
 

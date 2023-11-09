@@ -335,9 +335,11 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -444,6 +446,7 @@
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\math\math.h" />
+    <ClInclude Include="Blam\Engine\math\matrix_math.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
@@ -475,8 +478,6 @@
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
-    <ClCompile Include="Blam\Engine\math\real_matrix4x3.cpp" />
-    <ClCompile Include="Blam\Engine\math\real_vector3d.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
@@ -828,8 +829,6 @@
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
-    <ClInclude Include="Blam\Engine\math\real_matrix4x3.h" />
-    <ClInclude Include="Blam\Engine\math\real_vector3d.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />

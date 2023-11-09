@@ -231,8 +231,8 @@
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
-    <ClCompile Include="Blam\Engine\math\real_matrix4x3.cpp" />
-    <ClCompile Include="Blam\Engine\math\real_vector3d.cpp" />
+    <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -697,8 +697,7 @@
     <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
-    <ClInclude Include="Blam\Engine\math\real_matrix4x3.h" />
-    <ClInclude Include="Blam\Engine\math\real_vector3d.h" />
+    <ClInclude Include="Blam\Engine\math\matrix_math.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

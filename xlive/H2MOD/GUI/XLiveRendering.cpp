@@ -6,7 +6,6 @@
 #include "backends/imgui_impl_win32.h"
 
 #include "Blam/Engine/game/game.h"
-#include "Blam/Engine/math/real_vector3d.h"
 #include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
