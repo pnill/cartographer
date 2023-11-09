@@ -30,11 +30,11 @@ void observer_set_suggested_field_of_view(float fov)
 	float final_fov_rad;
 	if (currentVariantSettings.forced_fov == 0)
 	{
-		final_fov_rad = fov * M_PI / 180.0f;
+		final_fov_rad = DEGREES_TO_RADIANS(fov);
 	}
 	else
 	{
-		final_fov_rad = currentVariantSettings.forced_fov * M_PI / 180.0f;
+		final_fov_rad = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
 	}
 	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 }
@@ -46,7 +46,7 @@ void player_control_set_field_of_view(float fov)
 	if (fov <= 0 || fov > 110) return;
 
 	player_control_fov_overridden = true;
-	overridden_fov_radians = fov * M_PI / 180.0f;
+	overridden_fov_radians = DEGREES_TO_RADIANS(fov);
 }
 
 float __cdecl player_control_get_field_of_view(int controller_index)
@@ -60,7 +60,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 		
 		if (currentVariantSettings.forced_fov != 0)
 		{
-			fov = currentVariantSettings.forced_fov * M_PI / 180.0f;
+			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
 		}
 		else if (player_control_fov_overridden)
 		{
