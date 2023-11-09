@@ -562,7 +562,7 @@ struct s_scenario_sound_scenery_datum
     e_sound_scenery_volume_type volume_type;
     float height;
     real_vector2d override_distance_bounds;
-    angle_bounds override_cone_angle_bounds;
+    real_bounds override_cone_real_bounds;
     float override_outer_cone_gain_db;
 };
 CHECK_STRUCT_SIZE(s_scenario_sound_scenery_datum, 28);

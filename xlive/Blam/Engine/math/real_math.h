@@ -9,91 +9,38 @@
 
 #define degreesToRadians(angleDegrees) ((float)((angleDegrees) * M_PI / 180.0))
 
-#ifndef _DEBUG
-#define BLAM_MATH_INL __forceinline
-#else
-#define BLAM_MATH_INL 
-#endif
-
-struct real_point2d
+union real_point2d
 {
-	float x, y;
+	real32 v[2];
+	struct { real32 x, y; };
 };
-CHECK_STRUCT_SIZE(real_point2d, sizeof(float) * 2);
+CHECK_STRUCT_SIZE(real_point2d, sizeof(real32) * 2);
 
 struct angle
 {
 	float rad = 0.0f;
-
-	angle() {};
-
-	angle(float _rad) :
-		rad(_rad)
-	{}
-
-	bool operator==(const angle& other) const
-	{
-		return other.rad == rad;
-	}
-
-	bool operator!=(const angle& other) const
-	{
-		return !operator==(other);
-	}
-
-
-	double as_degree() const
-	{
-		return rad * (180.0 / 3.14159265358979323846);
-	}
-
-	double as_rad() const
-	{
-		return rad;
-	}
 };
 CHECK_STRUCT_SIZE(angle, sizeof(float));
 
-struct real_euler_angles2d
+union real_euler_angles2d
 {
-	angle yaw;
-	angle pitch;
+	real32 v[2];
+	struct { real32 yaw, pitch; };
 };
 CHECK_STRUCT_SIZE(real_euler_angles2d, sizeof(angle) * 2);
 
-struct real_euler_angles3d
+union real_euler_angles3d
 {
-	angle yaw;
-	angle pitch;
-	angle roll;
+	real32 v[3];
+	struct { real32 yaw, pitch, roll; };
 };
 CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(angle) * 3);
 
 union real_vector3d
 {
-	float v[3];
-	struct { float i, j, k; };
-	struct { float x, y, z; };
-
-	BLAM_MATH_INL real_vector3d(const float _i, const float _j, const float _k) :
-		i(_i),
-		j(_j),
-		k(_k)
-	{
-	}
-
-	BLAM_MATH_INL real_vector3d() : real_vector3d(0.0f, 0.0f, 0.0f)
-	{
-	}
-
-	BLAM_MATH_INL real_euler_angles3d get_angle() const
-	{
-		real_euler_angles3d angle;
-		angle.yaw = acos(i);
-		angle.pitch = acos(j);
-		angle.roll = acos(k);
-		return angle;
-	}
+	real32 v[3];
+	struct { real32 i, j, k; };
+	struct { real32 x, y, z; };
 
 	BLAM_MATH_INL bool operator==(const real_vector3d& other) const
 	{
@@ -158,47 +105,40 @@ CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
 
 typedef real_vector3d real_point3d;
 
-struct real_vector2d
+union real_vector2d
 {
-	float i, j;
+	real32 v[2];
+	struct { real32 i, j; };
 };
-CHECK_STRUCT_SIZE(real_vector2d, sizeof(float) * 2);
+CHECK_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
 
 struct real_plane2d
 {
 	real_vector2d normal;
-	float distance;
+	real32 distance;
 };
 CHECK_STRUCT_SIZE(real_plane2d, sizeof(real_vector2d) + 4);
 
 struct real_plane3d
 {
 	real_vector3d normal;
-	float distance;
+	real32 distance;
 };
-CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(float));
+CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(real32));
 
-struct real_quaternion
+union real_quaternion
 {
-	union
-	{
-		float v[4];
-		float i, j, k, w;
-	};
-
-	inline float get_square_length() const
-	{
-		return i * i + j * j + k * k + w * w;
-	}
+	real32 v[4];
+	struct { real32 i, j, k, w; };
 };
-CHECK_STRUCT_SIZE(real_quaternion, sizeof(float) * 4);
+CHECK_STRUCT_SIZE(real_quaternion, sizeof(real32) * 4);
 
-struct real_bounds
+union real_bounds
 {
-	float lower;
-	float upper;
+	real32 v[2];
+	struct { real32 lower, upper; };
 };
-CHECK_STRUCT_SIZE(real_bounds, sizeof(float) * 2);
+CHECK_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
 
 struct angle_bounds
 {
@@ -209,132 +149,38 @@ CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
 
 struct real_matrix4x3
 {
-	float scale = 1.0f;
-	real_vector3d forward = {};
-	real_vector3d left = {};
-	real_vector3d up = {};
-	real_point3d position = {};
-
-	real_matrix4x3() = default;
-
-	real_matrix4x3(const real_quaternion& rotation)
-	{
-		set_rotation(rotation);
-	}
-
-	real_matrix4x3(const real_quaternion& _rotation, const real_point3d& _position) :
-		position(_position)
-	{
-		set_rotation(_rotation);
-	}
-
-	BLAM_MATH_INL void inverse_rotation()
-	{
-		std::swap(forward.j, left.i);
-		std::swap(forward.k, up.i);
-		std::swap(left.k, up.j);
-	}
-
-	BLAM_MATH_INL void inverse()
-	{
-		assert(scale != 0.0f);
-		scale = 1.0f / scale;
-
-		inverse_rotation();
-
-		float inverse_pos_x = -position.x * scale;
-		float inverse_pos_y = -position.y * scale;
-		float inverse_pos_z = -position.z * scale;
-
-		position.x = (inverse_pos_x * forward.i) + (inverse_pos_y * left.i) + (inverse_pos_z * up.i);
-		position.y = (inverse_pos_x * forward.j) + (inverse_pos_y * left.j) + (inverse_pos_z * up.j);
-		position.z = (inverse_pos_x * forward.k) + (inverse_pos_y * left.k) + (inverse_pos_z * up.k);
-	};
-
-	void set_rotation(const real_quaternion& rotation)
-	{
-		float square_len = rotation.get_square_length();
-		assert(square_len != 0.0f);
-		float s = 2.0f / square_len;
-
-		auto is = rotation.i * s;
-		auto js = rotation.j * s;
-		auto ks = rotation.k * s;
-
-		auto iw = rotation.w * is;
-		auto jw = rotation.w * js;
-		auto kw = rotation.w * ks;
-
-		auto ii = rotation.i * is, jj = rotation.j * js, kk = rotation.k * ks;
-		auto ij = rotation.i * js, ik = rotation.i * ks, jk = rotation.j * ks;
-
-		forward =	{ 1.0f - (jj + kk),  ij - kw,            ik + jw };
-		left =		{ ij + kw,           1.0f - (ii + kk),   jk - iw };
-		up =		{ ik - jw,           jk + iw,            1.0f - (ii + jj) };
-	}
+	real32 scale;
+	real_vector3d forward;
+	real_vector3d left;
+	real_vector3d up;
+	real_point3d position;
 };
 CHECK_STRUCT_SIZE(real_matrix4x3, 52);
 
 /* channel intensity is represented on a 0 to 1 scale */
-struct real_color_argb
+union real_color_argb
 {
-	float alpha = 1.0f;
-	float red = 1.0f;
-	float green = 1.0f;
-	float blue = 1.0f;
-
-	real_color_argb() {}
-
-	real_color_argb(float _alpha, float _red, float _green, float _blue) :
-		alpha(_alpha),
-		red(_red),
-		green(_green),
-		blue(_blue)
-	{}
+	real32 v[4];
+	struct { real32 alpha, red, green, blue; };
 };
-CHECK_STRUCT_SIZE(real_color_argb, sizeof(float) * 4);
+CHECK_STRUCT_SIZE(real_color_argb, sizeof(real32) * 4);
 
-struct real_color_rgb
+union real_color_rgb
 {
-	float red = 1.0f;
-	float green = 1.0f;
-	float blue = 1.0f;
-
-	real_color_rgb() {}
-
-	real_color_rgb(float _red, float _green, float _blue) :
-		red(_red),
-		green(_green),
-		blue(_blue)
-	{}
-
-	real_color_rgb(const real_color_argb &colour) :
-		red(colour.red),
-		green(colour.green),
-		blue(colour.blue)
-	{}
-
-	real_color_argb as_rgba(float _alpha = 1.0f)
-	{
-		real_color_argb converted;
-		converted.alpha = _alpha;
-		converted.red = red;
-		converted.green = green;
-		converted.blue = blue;
-		return converted;
-	}
+	real32 v[3];
+	struct { real32 red, green, blue; };
 };
-CHECK_STRUCT_SIZE(real_color_rgb, sizeof(float) * 3);
+CHECK_STRUCT_SIZE(real_color_rgb, sizeof(real32) * 3);
 
 class c_quantized_orientation
 {
 public:
-	short rotation_x;
-	short rotation_y;
-	short rotation_z;
-	short rotation_w;
+	int16 rotation_x;
+	int16 rotation_y;
+	int16 rotation_z;
+	int16 rotation_w;
 	real_point3d default_translation;
-	float default_scale;
+	real32 default_scale;
 };
 CHECK_STRUCT_SIZE(c_quantized_orientation, 24);
 
@@ -344,6 +190,7 @@ struct real_orientation
 	real_point3d position;
 	real32 scale;
 };
+CHECK_STRUCT_SIZE(real_orientation, 32);
 
 static void scale_interpolate(float previous_scale, float current_scale, float fractional_tick, float* out_scale)
 {

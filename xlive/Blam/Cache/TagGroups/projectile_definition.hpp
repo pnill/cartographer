@@ -132,7 +132,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 	real_bounds water_damage_range;//0x174	
 	float initial_velocity;//0x17C
 	float final_velocity;//0x180
-	angle_bounds guided_angular_velocity_lower;//0x184
+	real_bounds guided_angular_velocity_lower;//0x184
 	real_bounds acceleration_range;//0x18C
 
 	PAD(0x4);//0x194
@@ -167,7 +167,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 		};
 		e_potential_result_flags potential_result_flags;//0x16
 		float chance_fraction;//0x18
-		angle_bounds between;//0x1C		
+		real_bounds between;//0x1C		
 		real_bounds and;//0x24
 
 		tag_reference do_not_use_old_effect2;//0x2C
