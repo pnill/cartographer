@@ -1,8 +1,10 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Engine/math/real_math.h"
+
+#include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/integer_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 enum e_screen_widget_flags : int
 {

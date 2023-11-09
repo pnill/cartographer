@@ -4,6 +4,7 @@
 #include "object_identifier.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/memory/static_arrays.h"
 

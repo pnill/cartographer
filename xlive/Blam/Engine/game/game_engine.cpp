@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "game_engine.h"
 
 s_game_engine_globals* game_engine_globals_get(void)

@@ -140,26 +140,12 @@ union real_bounds
 };
 CHECK_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
 
-CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
-};
-	angle upper;
-	angle lower;
-{
 struct angle_bounds
-/* channel intensity is represented on a 0 to 1 scale */
-union real_color_argb
 {
-	real32 v[4];
-	struct { real32 alpha, red, green, blue; };
+	angle lower;
+	angle upper;
 };
-CHECK_STRUCT_SIZE(real_color_argb, sizeof(real32) * 4);
-
-union real_color_rgb
-{
-	real32 v[3];
-	struct { real32 red, green, blue; };
-};
-CHECK_STRUCT_SIZE(real_color_rgb, sizeof(real32) * 3);
+CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
 
 class c_quantized_orientation
 {
