@@ -74,10 +74,14 @@ void object_get_localized_velocity(datum object_index, real_vector3d* translatio
 	if (p_object_get_early_mover_local_space_velocity(object_index, &early_mover_velocity, false))
 	{
 		if (translational_velocity)
-			*translational_velocity = *translational_velocity - early_mover_velocity;
+		{
+			subtract_vector3d(translational_velocity, &early_mover_velocity, translational_velocity);
+		}
 
 		if (angular_velocity)
-			*angular_velocity = *angular_velocity - early_mover_velocity;
+		{
+			subtract_vector3d(angular_velocity, &early_mover_velocity, angular_velocity);
+		}
 	}
 }
 
@@ -166,7 +170,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		int added_ticks = (m_maximum_counter - 6) - (m_weapon_is_sword ? 7 : 1);
 	}*/
 
-	real_vector3d target_vector = m_target_point - *object_origin;
+	real_vector3d target_vector;
+	subtract_vector3d(&m_target_point, object_origin, &target_vector);
+
 	float remaining_distance_from_player_position = magnitude3d(&target_vector);
 	float max_speed_per_tick = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), m_distance, m_weapon_is_sword);
 
@@ -322,10 +328,11 @@ bool c_character_physics_mode_melee_datum::pin_localized_velocity(real_vector3d*
 	if (output_velocity_magnitude > localized_velocity_magnitude)
 	{
 		unk_bool = true;
-		*output = *output * (localized_velocity_magnitude / output_velocity_magnitude);
+		scale_vector3d(output, localized_velocity_magnitude / output_velocity_magnitude, output);
 	}
 
-	real_vector3d new_vec = *localized_velocity - *output;
+	real_vector3d new_vec;
+	subtract_vector3d(localized_velocity, output, &new_vec);
 
 	float magnitude = normalize3d(&new_vec);
 	if (magnitude > 1.2f)
@@ -335,7 +342,8 @@ bool c_character_physics_mode_melee_datum::pin_localized_velocity(real_vector3d*
 		if (unk2 > 0.0f)
 		{
 			unk_bool = true;
-			*output = (new_vec * unk2) + *output;
+			scale_vector3d(&new_vec, unk2, &new_vec);
+			add_vectors3d(&new_vec, output, output);
 		}
 	}
 

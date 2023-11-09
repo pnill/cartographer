@@ -41,67 +41,8 @@ union real_vector3d
 	real32 v[3];
 	struct { real32 i, j, k; };
 	struct { real32 x, y, z; };
-
-	BLAM_MATH_INL bool operator==(const real_vector3d& other) const
-	{
-		return i == other.i && j == other.j && k == other.k;
-	}
-
-	BLAM_MATH_INL bool operator!=(const real_vector3d& other) const
-	{
-		return !(*this == other);
-	}
-
-	// vector multiplication
-	BLAM_MATH_INL real_vector3d operator*(const real_vector3d& other) const
-	{
-		real_vector3d v;
-		v.i = this->i * other.i;
-		v.j = this->j * other.j;
-		v.k = this->k * other.k;
-		return v;
-	}
-
-	// scalar multiplication
-	BLAM_MATH_INL real_vector3d operator*(const float scalar) const
-	{
-		real_vector3d v;
-		v.i = this->i * scalar;
-		v.j = this->j * scalar;
-		v.k = this->k * scalar;
-		return v;
-	}
-
-	BLAM_MATH_INL real_vector3d operator/(const float scalar) const
-	{
-		real_vector3d v;
-		v.i = this->i / scalar;
-		v.j = this->j / scalar;
-		v.k = this->k / scalar;
-		return v;
-	}
-
-	// vector addition
-	BLAM_MATH_INL real_vector3d operator+(const real_vector3d& other) const
-	{
-		real_vector3d v;
-		v.i = this->i + other.i;
-		v.j = this->j + other.j;
-		v.k = this->k + other.k;
-		return v;
-	}
-
-	// vector subtraction
-	BLAM_MATH_INL real_vector3d operator-(const real_vector3d& other) const
-	{
-		real_vector3d v;
-		v.i = this->i - other.i;
-		v.j = this->j - other.j;
-		v.k = this->k - other.k;
-		return v;
-	}
 };
-CHECK_STRUCT_SIZE(real_vector3d, sizeof(float) * 3);
+CHECK_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
 
 typedef real_vector3d real_point3d;
 

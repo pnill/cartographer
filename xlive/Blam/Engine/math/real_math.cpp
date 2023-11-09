@@ -12,6 +12,11 @@ real32 square_root(real32 f)
 	return sqrt(f);
 }
 
+real32 reciprocal_square_root(real32 f)
+{
+	return 1.0 / sqrt(f);
+}
+
 real32 magnitude3d_squared(const real_vector3d* v1)
 {
 	return v1->i * v1->i + v1->j * v1->j + v1->k * v1->k;
@@ -107,8 +112,9 @@ bool limit3d(real_vector3d* v, real32 limit)
 
 	if (dot_product <= pow(limit, 2.0f))
 		return false;
-
-	*v = *v * ((1.0f / square_root(dot_product)) * limit);
+	
+	real32 scale = reciprocal_square_root(dot_product)* limit;
+	scale_vector3d(v, scale, v);
 	return true;
 }
 
