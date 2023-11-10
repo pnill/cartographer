@@ -14,6 +14,13 @@ enum e_weapon_addition_method : int16
 	_weapon_addition_method_seven = 7,
 };
 
+enum e_unit_grenade_type : int8
+{
+	_unit_grenade_type_fragmentation = 0,
+	_unit_grenade_type_plasma = 1,
+	k_unit_grenade_types_count
+};
+
 enum e_unit_weapons
 {
 	unit_weapons_primary_weapon,
@@ -94,7 +101,7 @@ struct unit_datum
 	datum item_index;
 	int8 grenade_type;
 	int8 current_grenade_index;
-	int8 grenade_counts[2];
+	int8 grenade_counts[k_unit_grenade_types_count];
 	int8 zoom_level;
 	int8 gap_255;
 	int8 field_256;

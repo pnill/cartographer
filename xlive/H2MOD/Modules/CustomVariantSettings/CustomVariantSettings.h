@@ -19,7 +19,7 @@ namespace CustomVariantSettings
 		L"reverse",
 		L"predefined"
 	};
-	struct s_variantSettings
+	struct s_variant_settings
 	{
 		double gravity = 1.0f;
 		bool infiniteAmmo = false;
@@ -29,33 +29,33 @@ namespace CustomVariantSettings
 		bool infiniteGrenades = false;
 		bool spawnProtection = 1;
 		byte predefinedHillSet[16];
-		double forcedFOV = 0;
+		uint8 forced_fov = 0;
 
 		double ComputedGravity() const
 		{
 			return gravity * s_physics_constants::get_default_gravity();
 		}
 
-		inline bool operator==(s_variantSettings& other) const
+		inline bool operator==(s_variant_settings& other) const
 		{
-			return memcmp(this, &other, sizeof(s_variantSettings)) == 0;
+			return memcmp(this, &other, sizeof(s_variant_settings)) == 0;
 		}
-		inline bool operator!=(s_variantSettings& other) const
+		inline bool operator!=(s_variant_settings& other) const
 		{
 			return !(*this == other);
 		}
 	};
-	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
-	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data);
+	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data);
+	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data);
 
-	void ApplyCustomSettings(s_variantSettings* newVariantSettings);
-	void UpdateCustomVariantSettings(s_variantSettings* data);
+	void ApplyCustomSettings(s_variant_settings* newVariantSettings);
+	void UpdateCustomVariantSettings(s_variant_settings* data);
 	void SendCustomVariantSettings(int peerIndex);
 	void ApplyHooks();
 	void Initialize();
 }
 
-extern CustomVariantSettings::s_variantSettings currentVariantSettings;
-extern std::map<std::wstring, CustomVariantSettings::s_variantSettings> customVariantSettingsMap;
+extern CustomVariantSettings::s_variant_settings currentVariantSettings;
+extern std::map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
 
-#define CustomVariantSettingsPacketSize (sizeof(CustomVariantSettings::s_variantSettings))
+#define CustomVariantSettingsPacketSize (sizeof(CustomVariantSettings::s_variant_settings))

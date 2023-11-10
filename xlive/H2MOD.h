@@ -31,22 +31,16 @@ public:
 	static void Initialize();
 	static void Deinitialize();
 	static void ApplyHooks();
-	static void ApplyFirefightHooks();
 	static void RegisterEvents();
 
 	void team_player_indicator_visibility(bool toggle);
-	BYTE* get_player_unit_from_player_index(int playerIndex);
-	datum get_player_datum_index_from_controller_index(int controller_index);
 	const wchar_t* get_local_player_name(int local_player_index);
-	real_point3d* get_player_unit_coords(int player_index);
-	float get_distance(int, int);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	BYTE get_unit_team_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);
 	void set_local_team_index(int local_player_index, int team);
 	BYTE get_local_team_index();
-	void set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment);
-	void disable_sounds(int sound);
+	void disable_score_announcer_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool enable);
 	void set_local_rank(BYTE rank);

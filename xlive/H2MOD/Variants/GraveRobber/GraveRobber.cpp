@@ -75,8 +75,8 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
 	if (DATUM_IS_NONE(skull_datum)) { return; }
 
+	s_player* player = s_player::get(player_datum);
 	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);
-	s_player* player = s_player::GetPlayer(player_index);
 
 	c_game_statborg* game_statborg = game_engine_get_statborg();
 	if (!game_is_predicted())
@@ -107,7 +107,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 	{
 		for (int i = 0; i < k_number_of_users; i++)
 		{
-			if (DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(i)) == player_index)
+			if (player_index_from_user_index(i) == player_datum)
 			{
 				TriggerSound(_snd_skull_scored, 500);
 				break;
@@ -118,7 +118,7 @@ void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 
 void GraveRobber::InitializeClient()
 {
-	h2mod->disable_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
+	h2mod->disable_score_announcer_sounds(FLAG(_sound_type_slayer) | ALL_SOUNDS_NO_SLAYER);
 	firstPlayerSpawn = true;
 }
 
@@ -187,8 +187,7 @@ void GraveRobber::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 
 void GraveRobber::OnPlayerDeath(ExecTime execTime, datum playerIdx)
 {
-	const int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(playerIdx);
-	const datum unit_datum = s_player::GetPlayerUnitDatumIndex(player_index);
+	const datum unit_datum = s_player::get_unit_index(playerIdx);
 
 	switch (execTime)
 	{

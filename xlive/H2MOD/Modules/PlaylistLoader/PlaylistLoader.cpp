@@ -143,13 +143,13 @@ namespace playlist_loader
 				playlist_entry->section_buffer[playlist_entry->reader_current_char_index + 68 * playlist_entry->section_buffer_current_index + 32] = 0;
 
 				//Grab or create the Custom Settings for the current variant.
-				CustomVariantSettings::s_variantSettings* settings;
+				CustomVariantSettings::s_variant_settings* settings;
 				const auto variant_string = std::wstring(variant);
 				if (customVariantSettingsMap.count(variant_string) > 0)
 					settings = &customVariantSettingsMap.at(variant_string);
 				else
 				{
-					customVariantSettingsMap[variant_string] = CustomVariantSettings::s_variantSettings();
+					customVariantSettingsMap[variant_string] = CustomVariantSettings::s_variant_settings();
 					settings = &customVariantSettingsMap.at(variant_string);
 				}
 				std::wstring wproperty(property_value);
@@ -179,7 +179,7 @@ namespace playlist_loader
 					settings->infiniteGrenades = custom_setting_boolean_check(playlist_entry, property_value);
 					break;
 				case forced_fov:
-					settings->forcedFOV = custom_settings_real_check(playlist_entry, property_value);
+					settings->forced_fov = custom_settings_integer_check<uint8>(playlist_entry, property_value);
 					break;
 				case hill_set:
 					pos = 0;
@@ -187,7 +187,7 @@ namespace playlist_loader
 					cIndex = 0;
 					for (auto i = 0; i < 15; i++)
 						settings->predefinedHillSet[i] = 0;
-					while ((pos = wproperty.find(L",")) != std::wstring::npos)
+					while ((pos = wproperty.find(L',')) != std::wstring::npos)
 					{
 						t = wproperty.substr(0, pos);
 						wproperty.erase(0, pos + 1);

@@ -31,10 +31,9 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
  */
 s_game_globals_player_representation* clone_representation(e_character_type original_type);
 
-// Loops through every representation and makes sure the base bipeds aren't null.
-// If it's the case then set it to masterchief_mp
-// This is an issue on maps that use custom shared and leave these representations null
-void game_globals_fixup_representation(void);
+// Set the masterchief representation to the multiplayer version only in multiplayer
+// This prevents server owners from forcing masterchief 
+void game_globals_remove_singleplayer_representation(void);
 
 void game_globals_add_skeleton_representation(scenario* scenario_definition);
 void game_globals_add_flood_representation(scenario* scenario_definition);
@@ -119,28 +118,14 @@ s_game_globals_player_representation* clone_representation(e_character_type orig
 	return new_rep;
 }
 
-void game_globals_fixup_representation(void)
+void game_globals_remove_singleplayer_representation(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();
 
-	for (uint32 i = 0; i < globals->player_representation.size; ++i)
-	{
-		s_game_globals_player_representation* representation = globals->player_representation[i];
-		if (representation->third_person_unit.TagIndex == NONE)
-		{
-			representation->third_person_unit = globals->player_representation[_character_type_spartan]->third_person_unit;
-		}
+	s_game_globals_player_representation* masterchief_rep = globals->player_representation[_character_type_masterchief];
+	s_game_globals_player_representation* spartan_rep = globals->player_representation[_character_type_spartan];
 
-		if (representation->first_person_body.TagIndex == NONE)
-		{
-			representation->first_person_body = globals->player_representation[_character_type_spartan]->first_person_body;
-		}
-
-		if (representation->first_person_hands.TagIndex == NONE)
-		{
-			representation->first_person_hands = globals->player_representation[_character_type_spartan]->first_person_hands;
-		}
-	}
+	masterchief_rep->third_person_unit = spartan_rep->third_person_unit;
 	return;
 }
 
@@ -270,9 +255,7 @@ void game_globals_apply_tag_patches(s_game_options* options)
 	if (options->game_mode == _game_mode_multiplayer)
 	{
 		game_globals_add_new_player_representations();
-
-		// Fixup representations after we add our new ones at runtime
-		game_globals_fixup_representation();
+		game_globals_remove_singleplayer_representation();
 	}
 	return;
 }

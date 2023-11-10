@@ -539,7 +539,6 @@
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
-    <ClCompile Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
@@ -584,7 +583,6 @@
     <ClCompile Include="H2MOD\Modules\Tweaks\Tweaks.cpp" />
     <ClCompile Include="H2MOD\Modules\Updater\Updater.cpp" />
     <ClCompile Include="H2MOD\Utils\Utils.cpp" />
-    <ClCompile Include="H2MOD\Variants\FireFight\FireFight.cpp" />
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
@@ -895,7 +893,6 @@
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
-    <ClInclude Include="H2MOD\Variants\FireFight\DeviceShop\DeviceShop.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
@@ -946,7 +943,6 @@
     <ClInclude Include="H2MOD\Modules\Tweaks\Tweaks.h" />
     <ClInclude Include="H2MOD\Modules\Updater\Updater.h" />
     <ClInclude Include="H2MOD\Utils\Utils.h" />
-    <ClInclude Include="H2MOD\Variants\FireFight\FireFight.h" />
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />

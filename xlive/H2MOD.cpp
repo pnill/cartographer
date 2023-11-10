@@ -138,52 +138,13 @@ int __cdecl stringDisplayHook(int a1, unsigned int a2, wchar_t* a3, int a4) {
 	return p_wcsncpy_s_hook(a1, a2, a3, a4);
 }
 
-/* controller index aka local player index -> player index */
-datum H2MOD::get_player_datum_index_from_controller_index(int controller_index) 
-{
-	typedef int(__cdecl* get_local_player_index_t)(int controller_index); 
-	auto p_get_local_player_index = Memory::GetAddress<get_local_player_index_t>(0x5141D);
-	return p_get_local_player_index(controller_index); 
-}
-
 #pragma region PlayerFunctions
-
-float H2MOD::get_distance(int playerIndex1, int playerIndex2) {
-	real_point3d points_distance;
-	real_point3d* player1 = nullptr;
-	real_point3d* player2 = nullptr;
-
-	player1 = h2mod->get_player_unit_coords(playerIndex1);
-	player2 = h2mod->get_player_unit_coords(playerIndex2);
-	
-	points_distance.x = abs(player1->x - player2->x);
-	points_distance.y = abs(player1->y - player2->y);
-	points_distance.z = abs(player1->z - player2->z);
-
-	return sqrt(pow(points_distance.x, 2) + pow(points_distance.y, 2) + pow(points_distance.z, 2));
-}
-
-real_point3d* H2MOD::get_player_unit_coords(int playerIndex) {
-	BYTE* player_unit = get_player_unit_from_player_index(playerIndex);
-	if (player_unit != nullptr)
-		return reinterpret_cast<real_point3d*>(player_unit + 0x64);
-
-	return nullptr;
-}
-
-BYTE* H2MOD::get_player_unit_from_player_index(int playerIndex) {
-	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
-	if (DATUM_IS_NONE(unit_datum))
-		return nullptr;
-
-	return (BYTE*)object_get_fast_unsafe(unit_datum);
-}
 
 void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 {
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
-	datum unit_datum = s_player::GetPlayerUnitDatumIndex(playerIndex);
+	datum unit_datum = s_player::get_unit_index(playerIndex);
 	if (!DATUM_IS_NONE(unit_datum))
 	{
 		object_placement_data nObject;
@@ -201,12 +162,12 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 
 const wchar_t* H2MOD::get_local_player_name(int local_player_index)
 {
-	return s_player::GetName(DATUM_INDEX_TO_ABSOLUTE_INDEX(this->get_player_datum_index_from_controller_index(local_player_index)));
+	return s_player::get_name(player_index_from_user_index(local_player_index));
 }
 
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
-	PlayerIterator playersIt;
+	player_iterator playersIt;
 	while (playersIt.get_next_active_player())
 	{
 		datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
@@ -250,58 +211,13 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 }
 
-void H2MOD::set_player_unit_grenades_count(int playerIndex, e_grenades type, BYTE count, bool resetEquipment)
-{
-	if (type > e_grenades::Plasma)
-	{
-		LOG_TRACE_GAME("[H2MOD] set_player_unit_grenades_count() Invalid argument: type");
-		return;
-	}
-
-	static const std::string grenadeEquipamentTagName[2] =
-	{
-		"objects\\weapons\\grenade\\frag_grenade\\frag_grenade",
-		"objects\\weapons\\grenade\\plasma_grenade\\plasma_grenade"
-	};
-
-	datum unit_datum_index = s_player::GetPlayerUnitDatumIndex(playerIndex);
-	//datum grenade_eqip_tag_datum_index = tags::find_tag(blam_tag::tag_group_type::equipment, grenadeEquipamentTagName[type]);
-
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
-	if (unit_object != NULL)
-	{
-		// not sure what these flags are, but this is called when picking up grenades
-		typedef void(__cdecl* entity_set_unk_flags_t)(datum objectIndex, int flags);
-		auto p_simulation_action_object_update = Memory::GetAddress<entity_set_unk_flags_t>(0x1B6685, 0x1B05B5);
-
-		typedef void(__cdecl* unit_add_grenade_to_inventory_send_t)(datum unitDatumIndex, datum equipamentTagIndex);
-		auto p_unit_add_grenade_to_inventory_send = Memory::GetAddress<unit_add_grenade_to_inventory_send_t>(0x1B6F12, 0x1B0E42);
-
-		// send simulation update for grenades if we control the simulation
-		if (!game_is_predicted())
-		{
-			// delete all weapons if required
-			if (resetEquipment)
-				unit_delete_all_weapons(unit_datum_index);
-
-			// set grenade count
-			*(BYTE*)(unit_object + 0x252 + type) = count;
-
-			p_simulation_action_object_update(unit_datum_index, FLAG(22)); // flag 22 seems to be sync entity grenade count (TODO: list all of the update types)
-			//p_unit_add_grenade_to_inventory_send(unit_datum_index, grenade_eqip_tag_datum_index);
-		}
-
-		LOG_TRACE_GAME("set_player_unit_grenades_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", playerIndex, NetworkSession::GetPeerIndex(playerIndex));
-	}
-}
-
 BYTE H2MOD::get_local_team_index()
 {
 	return *Memory::GetAddress<BYTE*>(0x51A6B4);
 }
 #pragma endregion
 
-void H2MOD::disable_sounds(int sound_flags)
+void H2MOD::disable_score_announcer_sounds(int sound_flags)
 {
 	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)
@@ -686,57 +602,6 @@ void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 	}
 }
 
-//This is used for maps with 'shops' where the device_acceleration_scale is an indicator that they're using the control device as a 'shop'
-float get_device_acceleration_scale(datum device_datum)
-{
-	DWORD tag_data = (DWORD)tags::get_tag_data();
-	DWORD tag_instances = (DWORD)tags::get_tag_instances();
-
-	int device_gamestate_offset = DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) + DATUM_INDEX_TO_ABSOLUTE_INDEX(device_datum) * 2;
-	DWORD device_gamestate_datum_pointer = *(DWORD*)((BYTE*)get_objects_header()->data + device_gamestate_offset * 4 + 8);
-	DWORD device_control_datum = *(DWORD*)((BYTE*)device_gamestate_datum_pointer);
-
-	__int16 device_control_index = device_control_datum & 0xFFFF;
-	device_control_index = device_control_index << 4;
-
-	DWORD device_control_tag_offset = *(DWORD*)((BYTE*)device_control_index + tag_instances + 8);
-	float acceleration_scale = *(float*)((BYTE*)device_control_tag_offset + tag_data + 0x14);
-
-	return acceleration_scale;
-}
-
-typedef int(__cdecl *device_touch_t)(datum device_datum, datum unit_datum);
-device_touch_t pdevice_touch;
-
-bool device_active = true;
-// This happens whenever a player activates a device control.
-int __cdecl device_touch(datum device_datum, datum unit_datum)
-{
-	if (game_is_multiplayer())
-	{
-		// We check this to see if the device control is a 'shopping' device, if so send a request to buy an item to the DeviceShop.
-		if (get_device_acceleration_scale(device_datum) == 999.0f)
-		{
-			if (deviceShop->BuyItem(device_datum, unit_datum)) // If the purchase was successful we won't execute the original device control action.
-			{
-				if (device_active == false)
-					return pdevice_touch(device_datum, unit_datum);
-
-				device_active = true;
-				return 0;
-			}
-			// If the purchase fails (they don't have enough points), or the device is not a shopping device return normally.
-			// In general's map returning normally will turn the point display red indicating the user has no points, we do not indicate that the purchase failed in any other way.
-			if (device_active == false)
-				return 0;
-
-			device_active = false;
-		}
-	}
-
-	return pdevice_touch(device_datum, unit_datum);
-}
-
 void H2MOD::team_player_indicator_visibility(bool toggle)
 {
 	this->drawTeamIndicators = toggle;
@@ -808,11 +673,6 @@ int __cdecl get_next_hill_index(int previousHill)
 	}
 	LOG_TRACE_GAME("[KoTH Behavior] Hill count: {} current hill: {} next hill: {}", hillCount, previousHill, previousHill + 1);
 	return previousHill + 1;
-}
-
-void H2MOD::ApplyFirefightHooks()
-{
-	pdevice_touch = (device_touch_t)DetourFunc(Memory::GetAddress<BYTE*>(0x163420, 0x158EE3), (BYTE*)device_touch, 10);
 }
 
 int get_active_count_from_bitflags(short teams_bit_flags)
@@ -966,8 +826,6 @@ void H2MOD::ApplyHooks() {
 	{
 		NopFill(Memory::GetAddress(0x1922d9), 7);
 	}
-
-	ApplyFirefightHooks();
 
 	//Guardian Patch
 	p_object_cause_damage = Memory::GetAddress<object_cause_damage_t>(0x17AD81, 0x1525E1);

@@ -35,12 +35,17 @@ s_hud_scripted_globals* get_hud_scripted_globals(void)
 	return *Memory::GetAddress<s_hud_scripted_globals**>(0x9765CC, 0x99FBB4);
 }
 
+s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(const int local_user_index)
+{
+	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
+}
+
 bool __cdecl render_ingame_chat_check() 
 {
 	if (H2Config_hide_ingame_chat)
 	{
-		datum local_player_datum_index = h2mod->get_player_datum_index_from_controller_index(0);
-		if (s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(local_player_datum_index))->is_chatting == 2) 
+		datum local_player_datum_index = player_index_from_user_index(0);
+		if (s_player::get(local_player_datum_index)->is_chatting == 2) 
 		{
 			hotkeyFuncToggleHideIngameChat();
 		}

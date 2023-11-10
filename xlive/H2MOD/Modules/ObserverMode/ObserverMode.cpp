@@ -140,7 +140,7 @@ namespace ObserverMode
 	int currentPlayerIndex = 0;
 	void NextPlayer()
 	{
-		auto pArray = s_player::GetArray();
+		auto pArray = s_player::get_data();
 		if (currentPlayerIndex + 1 > pArray->total_elements_used - 1)
 			currentPlayerIndex = 0;
 		else
@@ -189,13 +189,13 @@ namespace ObserverMode
 	void SightJackObject()
 	{
 		if (ObserverMode == observer_firstperson) {
-			PlayerIterator playerIt;
+			player_iterator player_it;
 
 			datum unitIndexSameAsObserverIndex(DATUM_INDEX_NONE);
 
-			while (playerIt.get_next_active_player())
+			while (player_it.get_next_active_player())
 			{
-				s_player* player = playerIt.get_current_player_data();
+				s_player* player = player_it.get_current_player_data();
 				if (player->unit_index == observer_current_index)
 				{
 					unitIndexSameAsObserverIndex = observer_current_index;
@@ -205,7 +205,7 @@ namespace ObserverMode
 				
 			auto control = PlayerControl::GetControls(0);
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
-			s_player::GetPlayer(DATUM_INDEX_TO_ABSOLUTE_INDEX(h2mod->get_player_datum_index_from_controller_index(0)))->unit_index = observer_current_index;
+			s_player::get(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0)))->unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;
 			//control->actions.yaw = player_actions->facing.yaw.as_rad();
 			//control->actions.pitch = player_actions->facing.pitch.as_rad();

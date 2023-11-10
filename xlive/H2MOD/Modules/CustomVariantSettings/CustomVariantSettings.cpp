@@ -3,6 +3,7 @@
 
 #include "Blam/Engine/interface/first_person_camera.h"
 #include "Blam/Engine/memory/bitstream.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/player_control.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
@@ -14,40 +15,39 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "Util/Hooks/Hook.h"
 
-CustomVariantSettings::s_variantSettings currentVariantSettings;
-CustomVariantSettings::s_variantSettings defaultCustomVariantSettings;
-std::map<std::wstring, CustomVariantSettings::s_variantSettings> customVariantSettingsMap;
+CustomVariantSettings::s_variant_settings currentVariantSettings;
+CustomVariantSettings::s_variant_settings defaultCustomVariantSettings;
+std::map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantSettingsMap;
 
 namespace CustomVariantSettings
 {
-	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
+	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data)
 	{
 		stream->data_encode_bits("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT); //16.
 		stream->data_encode_bits("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
-		stream->data_encode_bool("Infinite Ammo", data->infiniteAmmo);
-		stream->data_encode_bool("Explosion Physics", data->explosionPhysics);
-		stream->data_encode_integer("Hill Rotation", (byte)data->hillRotation, 8);
-		stream->data_encode_bool("Infinite Grenades", data->infiniteGrenades);
-		stream->data_encode_bits("Forced FOV", &data->forcedFOV, sizeof(data->forcedFOV) * CHAR_BIT);
+		stream->data_encode_bool("infinite ammo", data->infiniteAmmo);
+		stream->data_encode_bool("explosion physics", data->explosionPhysics);
+		stream->data_encode_integer("hill rotation", (byte)data->hillRotation, 8);
+		stream->data_encode_bool("infinite grenades", data->infiniteGrenades);
+		stream->data_encode_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
 	}
-	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variantSettings* data)
+	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data)
 	{
-		double gravity, gamespeed, ForcedFOV;
+		double gravity, gamespeed;
 		stream->data_decode_bits("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
 		data->gravity = gravity;
 		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
 		data->gameSpeed = gamespeed;
 		
-		data->infiniteAmmo = stream->data_decode_bool("Infinite Ammo");
-		data->explosionPhysics = stream->data_decode_bool("Explosion Physics");
-		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("Hill Rotation", 8);
-		data->infiniteGrenades = stream->data_decode_bool("Infinite Grenades");
-		stream->data_decode_bits("Forced FOV", &ForcedFOV, sizeof(ForcedFOV) * CHAR_BIT);
-		data->forcedFOV = ForcedFOV;
+		data->infiniteAmmo = stream->data_decode_bool("infinite ammo");
+		data->explosionPhysics = stream->data_decode_bool("explosion physics");
+		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("hill rotation", 8);
+		data->infiniteGrenades = stream->data_decode_bool("infinite grenades");
+		data->forced_fov = stream->data_decode_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
 		return stream->overflow() == false;
 	}
 
-	void UpdateCustomVariantSettings(s_variantSettings* data)
+	void UpdateCustomVariantSettings(s_variant_settings* data)
 	{
 		currentVariantSettings = *data;
 	}
@@ -84,18 +84,19 @@ namespace CustomVariantSettings
 		ApplyCustomSettings(&currentVariantSettings);
 	}
 
-	void OnPlayerSpawn(datum PlayerDatum)
+	void OnPlayerSpawn(datum playerIndex)
 	{
-		if (NetworkSession::LocalPeerIsSessionHost()) {
+		if (!game_is_predicted()) 
+		{
 			if (currentVariantSettings.infiniteGrenades)
 			{
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Fragmentation, 4, false);
-				h2mod->set_player_unit_grenades_count(DATUM_INDEX_TO_ABSOLUTE_INDEX(PlayerDatum), Plasma, 4, false);
+				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_type_fragmentation, 4, false);
+				s_player::set_player_unit_grenade_count(playerIndex, _unit_grenade_type_plasma, 4, false);
 			}
 		}
 	}
 
-	void ApplyCustomSettings(s_variantSettings* newVariantSettings)
+	void ApplyCustomSettings(s_variant_settings* newVariantSettings)
 	{
 		//
 		//Anything to be done on host and client goes here.
@@ -135,12 +136,11 @@ namespace CustomVariantSettings
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0x1E);
 			else
 				WriteValue(Memory::GetAddress(0x17a44b), (BYTE)0);
+		}
 
-			if (newVariantSettings->forcedFOV != 0)
-			{
-				player_control_set_field_of_view(newVariantSettings->forcedFOV);
-				observer_set_suggested_field_of_view(newVariantSettings->forcedFOV);
-			}
+		if (newVariantSettings->forced_fov != 0)
+		{
+			observer_set_suggested_field_of_view(newVariantSettings->forced_fov);
 		}
 
 		//Server Only
