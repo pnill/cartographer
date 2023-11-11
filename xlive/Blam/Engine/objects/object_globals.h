@@ -1,7 +1,6 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 struct s_object_globals
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/objects/damage.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/color_math.h"
 
 datum __cdecl effect_new_from_object(
     datum effect_tag_index,
