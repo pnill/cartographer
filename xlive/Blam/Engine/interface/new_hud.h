@@ -43,10 +43,29 @@ CHECK_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
 struct s_new_hud_temporary_user_state
 {
-	int8 gap_0[0x20];
+	datum new_hud_tag_datum;
+	int unk_4;
+	int unk_8;
+	int unk_c;
+	int unk_10;
+	int unk_14;
+	int unk_18;
+	int8 unk_1C;
+	int8 gap_1D[3];
 	float primary_auto_aim_level;
 	float secondary_auto_aim_level;
-	int8 gap_28[0x260];
+	float unit_current_vitality;
+	float unit_current_shield_vitality;
+	int8 gap_30[4];
+	int16 active_grenade_count;
+	int8 gap_36[2];
+	int16 fragmentation_grenade_count;
+	int16 plasma_grenade_count;
+	int16 current_zoom_level;
+	bool current_weapon_has_zoom;
+	int8 gap_3F[17];
+	bool dead_unit_index_exists;
+	int8 gap_51[567];
 };
 CHECK_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 
