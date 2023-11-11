@@ -258,7 +258,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 
 	if (p_location->cluster == NONE)
 	{
-		object->object_flags.set(_object_data_bit_18, true);
+		object->object_flags.set(_object_not_in_a_cluster_bit, true);
 	}
 	else
 	{
@@ -266,7 +266,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		object->location.cluster = p_location->cluster;
 		object->location.bsp_index = p_location->bsp_index;
 		object_header->cluster_index = p_location->cluster;
-		object->object_flags.set(_object_data_bit_18, false);
+		object->object_flags.set(_object_not_in_a_cluster_bit, false);
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
 	s_game_cluster_bit_vectors* p_cluster_bitvector = NULL;

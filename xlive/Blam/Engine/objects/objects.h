@@ -74,7 +74,7 @@ enum e_object_data_flags : int32
 	_object_data_bit_15 = 15,
 	_object_does_not_cast_shadow_bit = 16,
 	_object_data_bit_17 = 17,
-	_object_data_bit_18 = 18,
+	_object_not_in_a_cluster_bit = 18,
 	_object_data_bit_19 = 19,
 	_object_data_bit_20 = 20,
 	_object_data_bit_21 = 21,

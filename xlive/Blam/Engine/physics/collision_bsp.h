@@ -20,13 +20,13 @@ struct collision_bsp_test_buffer
 
 struct collision_bsp_test_sphere_result
 {
-	int count_buffer0;
+	int32 count_buffer0;
 	collision_bsp_test_buffer buffer0;
-	int count_buffer1;
+	int32 count_buffer1;
 	collision_bsp_test_buffer buffer1;
-	int count_buffer2;
+	int32 count_buffer2;
 	collision_bsp_test_buffer buffer2;
-	int stack_depth;
+	int32 stack_depth;
 	collision_bsp_test_buffer buffer3;
 };
 CHECK_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);

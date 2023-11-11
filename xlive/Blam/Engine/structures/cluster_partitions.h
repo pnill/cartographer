@@ -10,8 +10,8 @@
 // max count: MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 struct s_scenario_cluster_property
 {
-    short palette_index;
-    short pad;
+    int16 palette_index;
+	int16 pad;
 };
 TAG_BLOCK_SIZE_ASSERT(s_scenario_cluster_property, 4);
 
@@ -21,7 +21,7 @@ struct s_scenario_cluster_data
     tag_reference bsp; // sbsp
     tag_block<s_scenario_cluster_property> background_sounds;
     tag_block<s_scenario_cluster_property> sound_environments;
-    int bsp_checksum;
+	int32 bsp_checksum;
     tag_block<real_point3d> cluster_centroids;
     tag_block<s_scenario_cluster_property> weather_properties;
     tag_block<s_scenario_cluster_property> atmospheric_fog_properties;

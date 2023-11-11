@@ -37,7 +37,7 @@ enum e_active_camo_flags : int32
 
 enum e_runtime_flags : int32
 {
-    _contains_runtime_nodes = FLAG(0)
+    _runtime_flag_contains_runtime_nodes = FLAG(0)
 };
 
 enum e_sort_order : int16
