@@ -231,7 +231,7 @@ void GunGame::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		{
 			LOG_TRACE_GAME(L"[H2Mod-GunGame]: {} player index: {}, player name: {1}", __FUNCTIONW__, absPlayerIdx, s_player::get_name(playerIdx));
 
-			char* unit_object = (char*)object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
+			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
 
 				int level = 0;

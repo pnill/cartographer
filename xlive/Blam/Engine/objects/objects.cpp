@@ -14,7 +14,6 @@
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/memory/bitstream.h"
-#include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/models/models.h"
 #include "Blam/Engine/objects/widgets/widgets.h"
 #include "Blam/Engine/physics/collisions.h"
@@ -28,15 +27,20 @@
 #include "Util/Hooks/Hook.h"
 
 
-s_data_array* object_header_data_get()
+s_data_array* object_header_data_get(void)
 {
 	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
 };
 
-s_memory_pool* get_object_table()
+s_memory_pool* get_object_table(void)
 {
 	return *Memory::GetAddress<s_memory_pool**>(0x4E4610, 0x50C8E0);
 };
+
+void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags)
+{
+	return INVOKE(0x1304E3, 0x11F3A6, object_try_and_get_and_verify_type, object_index, object_type_flags);
+}
 
 void* object_header_block_get(datum object_datum, const object_header_block_reference* reference)
 {
@@ -692,26 +696,9 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_cou
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
-int object_get_count()
-{
-	s_data_iterator object_it(get_objects_header());
-	return object_it.get_data_count();
-}
-
-int object_count_from_iter()
-{
-	s_data_iterator object_it(get_objects_header());
-	int count = 0;
-	while (object_it.get_next_datum())
-	{
-		count++;
-	}
-	return count;
-}
-
 datum object_get_damage_owner(datum object_index)
 {
-	object_datum* object = object_try_and_get_and_verify_type(object_index, -1);
+	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, -1);
 	return object->damage_owner_object_index;
 }
 

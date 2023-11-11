@@ -5,6 +5,7 @@
 
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
+#include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/memory/static_arrays.h"
 #include "Blam/Math/BlamMath.h"
 
@@ -233,32 +234,20 @@ struct object_datum
 };
 CHECK_STRUCT_SIZE(object_datum, 300);
 
-static s_data_array* get_objects_header()
-{
-	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
-};
-
-// Gets the header of the object, containing some details
-static s_object_header* get_objects_header(datum object_idx)
-{
-	auto objects_header = get_objects_header();
-	return (s_object_header*)(&objects_header->data[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx) * objects_header->datum_element_size]);
-}
-
 // Get the object fast, with no validation from datum index
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	return (T*)get_objects_header(object_idx)->object;
+	s_object_header* header = (s_object_header*)datum_get(object_header_data_get(), object_idx);
+	return (T*)header->object;
 }
 
+s_data_array* object_header_data_get(void);
+
+s_memory_pool* get_object_table(void);
+
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
-template<typename T = object_datum>
-static T* object_try_and_get_and_verify_type(datum object_idx, int object_type_flags)
-{
-	auto p_object_try_and_get_and_verify_type = Memory::GetAddress<char* (__cdecl*)(datum, int)>(0x1304E3, 0x11F3A6);
-	return (T*)p_object_try_and_get_and_verify_type(object_idx, object_type_flags);
-}
+void* __cdecl object_try_and_get_and_verify_type(datum object_index, int32 object_type_flags);
 
 void* object_header_block_get(const datum object_datum, const object_header_block_reference* reference);
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
