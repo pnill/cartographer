@@ -17,11 +17,11 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 	__int16 inc_text_update_period;//0x48
 	__int16 inc_text_block_character;//0x4A
 	float callout_text_scale;//0x4C
-	real_color_argb progress_bar_color;//0x50
+	real_argb_color progress_bar_color;//0x50
 	float near_clip_plane_distance;//0x60
 	float projection_plane_distance;//0x64
 	float far_clip_plane_distance;//0x68
-	real_color_argb overlayed_interface_color;//0x6C
+	real_argb_color overlayed_interface_color;//0x6C
 	PAD(0xC);//0x7C
 	struct s_errors_block
 	{
@@ -489,7 +489,7 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 			};
 			e_animation_index animation_index;//0x4
 			__int16 intro_animation_delay_milliseconds;//0x6
-			real_color_argb color;//0x8
+			real_argb_color color;//0x8
 			struct s_points_block
 			{
 				__int16 coordinates_x;//0x0
@@ -806,7 +806,7 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		text_chat_font = 11,
 	};
 	e_qtr_dialog_header_text_font qtr_dialog_header_text_font;//0x166
-	real_color_argb default_text_color;//0x168
+	real_argb_color default_text_color;//0x168
 	rectangle2d full_screen_header_text_bounds;//0x178
 
 	rectangle2d full_screen_button_key_text_bounds;//0x180

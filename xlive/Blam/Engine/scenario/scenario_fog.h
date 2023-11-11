@@ -35,7 +35,7 @@ struct s_scenario_atmospheric_fog_palette_entry
     string_id name;
 
     // Explaination("ATMOSPHERIC FOG", "EMPTY STRING")
-    real_color_rgb color;
+    real_rgb_color color;
     float spread_distance_world_units;  // How far fog spreads into adjacent clusters: 0 defaults to 1.
     int pad;
     float maximum_density;              // Fog density clamps to this value.
@@ -43,7 +43,7 @@ struct s_scenario_atmospheric_fog_palette_entry
     float opaque_distance_world_units;  // Fog becomes opaque (maximum density) at this distance from viewer.
 
     // Explaination("SECONDARY FOG", "EMPTY STRING")
-    real_color_rgb secondary_fog_color;
+    real_rgb_color secondary_fog_color;
     int pad1;
     float secondary_fog_maximum_density;                // Fog density clamps to this value.
     float secondary_fog_start_distance_world_units;     // Before this distance, there is no fog.
@@ -51,14 +51,14 @@ struct s_scenario_atmospheric_fog_palette_entry
     int pad2;
 
     // Explaination("PLANAR FOG OVERRIDE", "Planar fog, if present, is interpolated toward these values.")
-    real_color_rgb planar_color;
+    real_rgb_color planar_color;
     float planar_max_density;
     float planar_override_amount;
     float planar_min_distance_bias_world_units;     // Don't ask.
     int pad3[11];
 
     // Explaination("PATCHY FOG", "EMPTY STRING")
-    real_color_rgb patchyColor;
+    real_rgb_color patchyColor;
     int pad4[3];
     real_vector2d patchy_density;
     real_vector2d patchy_distance_world_units;

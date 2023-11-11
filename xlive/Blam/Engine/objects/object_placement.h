@@ -58,7 +58,7 @@ struct object_placement_data
 	int team_index;
 	s_damage_owner damage_owner;
 	DWORD active_change_colors_mask;
-	real_color_rgb change_colors[4];
+	real_rgb_color change_colors[4];
 	s_emblem_info emblem_info;
 	int8 pad1;
 	int32 region_index;

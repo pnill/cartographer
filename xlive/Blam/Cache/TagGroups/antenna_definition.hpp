@@ -28,8 +28,8 @@ struct s_antenna_group_definition :TagGroup<'ant!'>
 		float length;//0x24
 		__int16 sequence_index;//0x28
 		PAD(0x2);//0x2A
-		real_color_argb color;//0x2C
-		real_color_argb lod_color;//0x3C
+		real_argb_color color;//0x2C
+		real_argb_color lod_color;//0x3C
 		PAD(0x34);//0x4C
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x80);

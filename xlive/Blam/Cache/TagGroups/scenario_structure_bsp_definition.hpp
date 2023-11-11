@@ -453,7 +453,7 @@ struct s_scenario_structure_bsp_group_definition
 				PAD(0x30);//0x4C
 				float secondary_texcoord_x;//0x7C
 				float secondary_texcoord_y;//0x80
-				real_color_rgb primary_lightmap_color;//0x84
+				real_rgb_color primary_lightmap_color;//0x84
 				float primary_lightmap_texcoord_x;//0x90
 				float primary_lightmap_texcoord_y;//0x94
 				PAD(0x2C);//0x98
@@ -1125,7 +1125,7 @@ struct s_scenario_structure_bsp_group_definition
 				float node_weight_1;//0x14
 				float node_weight_2;//0x18
 				float node_weight_3;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				float screen_size;//0x30
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x34);
@@ -1143,7 +1143,7 @@ struct s_scenario_structure_bsp_group_definition
 				float node_weight_1;//0x14
 				float node_weight_2;//0x18
 				float node_weight_3;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				PAD(0xC);//0x30
 				float screen_length;//0x3C
 			};
@@ -1289,7 +1289,7 @@ struct s_scenario_structure_bsp_group_definition
 				float node_weight_1;//0x1C
 				float node_weight_2;//0x20
 				float node_weight_3;//0x24
-				real_color_argb color;//0x28
+				real_argb_color color;//0x28
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x38);
 			tag_block<s_comments_block> comments;//0x58
@@ -1302,7 +1302,7 @@ struct s_scenario_structure_bsp_group_definition
 			float bounds_y_upper;//0x1F0
 			float bounds_z_lower;//0x1F4
 			float bounds_z_upper;//0x1F8
-			real_color_argb color;//0x1FC
+			real_argb_color color;//0x1FC
 			PAD(0x54);//0x20C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_reports_block, 0x260);
@@ -1506,7 +1506,7 @@ struct s_scenario_structure_bsp_group_definition
 				PAD(0x30);//0x4C
 				float secondary_texcoord_x;//0x7C
 				float secondary_texcoord_y;//0x80
-				real_color_rgb primary_lightmap_color;//0x84
+				real_rgb_color primary_lightmap_color;//0x84
 				float primary_lightmap_texcoord_x;//0x90
 				float primary_lightmap_texcoord_y;//0x94
 				PAD(0x2C);//0x98
@@ -2034,7 +2034,7 @@ struct s_scenario_structure_bsp_group_definition
 				PAD(0x30);//0x4C
 				float secondary_texcoord_x;//0x7C
 				float secondary_texcoord_y;//0x80
-				real_color_rgb primary_lightmap_color;//0x84
+				real_rgb_color primary_lightmap_color;//0x84
 				float primary_lightmap_texcoord_x;//0x90
 				float primary_lightmap_texcoord_y;//0x94
 				PAD(0x2C);//0x98
@@ -2088,10 +2088,10 @@ struct s_scenario_structure_bsp_group_definition
 		PAD(0x4);//0x28
 		__int16 owner_tag_section_offset;//0x2C
 		PAD(0x6);//0x2E
-		real_color_rgb sun_spot_color;//0x34
-		real_color_rgb reflection_tint;//0x40
-		real_color_rgb refraction_tint;//0x4C
-		real_color_rgb horizon_color;//0x58
+		real_rgb_color sun_spot_color;//0x34
+		real_rgb_color reflection_tint;//0x40
+		real_rgb_color refraction_tint;//0x4C
+		real_rgb_color horizon_color;//0x58
 		float sun_specular_power;//0x64
 		float reflection_bump_scale;//0x68
 		float refraction_bump_scale;//0x6C
@@ -2225,13 +2225,13 @@ struct s_scenario_structure_bsp_group_definition
 			legacy = 3,
 		};
 		e_source source;//0x7
-		real_color_rgb ambient;//0x8
+		real_rgb_color ambient;//0x8
 		PAD(0xC);//0x14
 		float lighting_accuracy;//0x20
 		float shadow_opacity;//0x24
-		real_color_rgb primary_direction_color;//0x28
+		real_rgb_color primary_direction_color;//0x28
 		PAD(0xC);//0x34
-		real_color_rgb secondary_direction_color;//0x40
+		real_rgb_color secondary_direction_color;//0x40
 		PAD(0xC);//0x4C
 		__int16 sh_index;//0x58
 		PAD(0x2);//0x5A

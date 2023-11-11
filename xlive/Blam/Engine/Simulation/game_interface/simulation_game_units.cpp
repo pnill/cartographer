@@ -17,7 +17,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
     int32 internal_state_data_size,
     s_simulation_unit_state_data* initial_state_data)
 {
-    real_color_rgb change_colors[4];
+    real_rgb_color change_colors[4];
     
     object_placement_data placement_data;
     object_placement_data_new(&placement_data, creation_data->object.object_definition_index, -1, 0);

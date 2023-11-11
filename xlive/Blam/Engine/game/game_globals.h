@@ -403,10 +403,10 @@ struct s_game_globals_rasterizer_data
     int16 pad2;
     real32 refraction_amount_pixels;
     real32 distance_falloff;
-    real_color_rgb tint_color;
+    real_rgb_color tint_color;
     real32 hyper_stealth_refraction_pixels;
     real32 hyper_stealth_distance_falloff;
-    real_color_rgb hyper_stealth_tint_color;
+    real_rgb_color hyper_stealth_tint_color;
 
     // Explaination("PC textures", "The PC can't use 3D textures, so we use this instead.")
     tag_reference pc_3d_bitmap;     // bitm
@@ -547,8 +547,8 @@ TAG_BLOCK_SIZE_ASSERT(s_game_globals_falling_damage, 104);
 struct s_game_globals_multiplayer_ui
 {
     tag_reference random_player_names;    // unic
-    tag_block<real_color_rgb> obsolete_profile_colors;  // max count: k_game_globals_maximum_multiplayer_colors
-    tag_block<real_color_rgb> team_colors;              // max count: k_game_globals_maximum_multiplayer_colors
+    tag_block<real_rgb_color> obsolete_profile_colors;  // max count: k_game_globals_maximum_multiplayer_colors
+    tag_block<real_rgb_color> team_colors;              // max count: k_game_globals_maximum_multiplayer_colors
     tag_reference team_names;           // unic
 };
 TAG_BLOCK_SIZE_ASSERT(s_game_globals_multiplayer_ui, 32);
@@ -580,7 +580,7 @@ struct s_game_globals
     tag_block<material_definition> old_materials;
     tag_block<s_global_material_definition> materials;
     tag_block<s_game_globals_multiplayer_ui> multiplayer_ui;
-    tag_block<real_color_rgb> profile_colors;               // max count: k_game_globals_maximum_multiplayer_colors
+    tag_block<real_rgb_color> profile_colors;               // max count: k_game_globals_maximum_multiplayer_colors
 
     tag_reference multiplayer_globals;      // mulg
 

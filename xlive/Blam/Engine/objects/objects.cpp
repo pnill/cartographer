@@ -124,7 +124,7 @@ void __cdecl update_object_region_information(datum object_datum, int32 region_i
 	return;
 }
 
-pixel32 __cdecl object_set_initial_change_colors(datum object_index, uint32 change_color_override_mask, real_color_rgb* colour)
+pixel32 __cdecl object_set_initial_change_colors(datum object_index, uint32 change_color_override_mask, real_rgb_color* colour)
 {
 	return INVOKE(0x1310F9, 0x11FFBD, object_set_initial_change_colors, object_index, change_color_override_mask, colour);
 }

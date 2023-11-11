@@ -160,8 +160,8 @@ TAG_BLOCK_SIZE_ASSERT(s_old_object_function_definition, 80);
 struct object_change_color_initial_permutation
 {
 	real32 weight;
-	real_color_rgb color_lower_bound;
-	real_color_rgb color_upper_bound;
+	real_rgb_color color_lower_bound;
+	real_rgb_color color_upper_bound;
 	string_id variant_name;		// if empty, may be used by any model variant
 };
 TAG_BLOCK_SIZE_ASSERT(object_change_color_initial_permutation, 32);
@@ -171,8 +171,8 @@ struct object_change_color_function
 {
 	int32 pad;
 	e_object_change_color_function_scale_flags scale_flags;
-	real_color_rgb color_lower_bound;
-	real_color_rgb color_upper_bound;
+	real_rgb_color color_lower_bound;
+	real_rgb_color color_upper_bound;
 	string_id darken_by;
 	string_id scale_by;
 };

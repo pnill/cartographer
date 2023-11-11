@@ -86,8 +86,8 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	float up_time;
 	float fade_time;
 
-	real_color_argb icon_color;
-	real_color_argb text_color;
+	real_argb_color icon_color;
+	real_argb_color text_color;
 	float text_spacing;
 
 	tag_reference item_message_text;	// unic

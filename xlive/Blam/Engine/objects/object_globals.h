@@ -14,13 +14,13 @@ struct s_object_globals
 	int32 field_10;
 	uint32 total_game_time_ticks;
 	int32 unique_id;
-	real_color_rgb cinematic_ambient_color;
+	real_rgb_color cinematic_ambient_color;
 	real_vector3d cinematic_primary_light_vector_1;
 	real32 cinematic_primary_light_unk1;
 	real32 cinematic_primary_light_unk2;
-	real_color_rgb cinematic_primary_light_color;
+	real_rgb_color cinematic_primary_light_color;
 	real_vector3d cinematic_primary_light_vector;
-	real_color_rgb cinematic_secondary_light_color;
+	real_rgb_color cinematic_secondary_light_color;
 	real_vector3d cinematic_secondary_light_vector;
 	int32 field_6C;
 	real32 global_function_values[4];

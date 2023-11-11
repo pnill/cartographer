@@ -535,7 +535,7 @@ TAG_BLOCK_SIZE_ASSERT(s_scenario_control, 68);
 
 struct s_scenario_light_fixture_datum
 {
-    real_color_rgb color;
+    real_rgb_color color;
     float intensity;
     float falloff_angle_degrees;
     float cutoff_angle_degrees;

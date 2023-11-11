@@ -646,7 +646,7 @@ struct s_physics_model_group_definition : TagGroup<'phmo'>
 				float node_weight_2;//0x14
 				float node_weight_3;//0x18
 				float node_weight_4;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				float screen_size;//0x30
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x34);
@@ -664,7 +664,7 @@ struct s_physics_model_group_definition : TagGroup<'phmo'>
 				float node_weight_2;//0x14
 				float node_weight_3;//0x18
 				float node_weight_4;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				PAD(0xC);//0x30
 				float screen_length;//0x3C
 			};
@@ -812,7 +812,7 @@ struct s_physics_model_group_definition : TagGroup<'phmo'>
 				//float node_weight[1];//0x1C
 				//float node_weight[2];//0x20
 				//float node_weight[3];//0x24
-				//real_color_argb color;//0x28
+				//real_argb_color color;//0x28
 				PAD(0x38);
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x38);
@@ -826,7 +826,7 @@ struct s_physics_model_group_definition : TagGroup<'phmo'>
 			float bounds_y_upper;//0x1F0
 			float bounds_z_lower;//0x1F4
 			float bounds_z_upper;//0x1F8
-			real_color_argb color;//0x1FC
+			real_argb_color color;//0x1FC
 			PAD(0x54);//0x20C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_reports_block, 0x260);

@@ -77,10 +77,10 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	e_interpolation_flags interpolation_flags;//0x34
 	float bloom_bounds02_lower;//0x38
 	float bloom_bound02_upper;//0x3C
-	real_color_rgb specular_lower_bound;//0x40
-	real_color_rgb specular_upper_bound;//0x4C
-	real_color_rgb diffuse_lower_bound;//0x58
-	real_color_rgb diffuse_upper_bound;//0x64
+	real_rgb_color specular_lower_bound;//0x40
+	real_rgb_color specular_upper_bound;//0x4C
+	real_rgb_color diffuse_lower_bound;//0x58
+	real_rgb_color diffuse_upper_bound;//0x64
 	float brightness_bounds02_lower;//0x70
 	float brightness_bounds_02_upper;//0x74
 	tag_reference gel_map;//0x78

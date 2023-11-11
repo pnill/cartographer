@@ -412,7 +412,7 @@ struct s_button_widget_reference
     short pad;
 
     e_custom_font custom_font;
-    real_color_argb text_color;
+    real_argb_color text_color;
     rectangle2d bounds;
 
     // bitm
@@ -564,7 +564,7 @@ struct s_table_view_list_reference_OBSOLETE
 
     e_custom_font custom_font;
     short pad;
-    real_color_argb text_color;
+    real_argb_color text_color;
     point2d topleft;
     tag_block<s_table_view_list_row_reference_OBSOLETE> table_rows;
 };
@@ -579,7 +579,7 @@ struct s_text_block_reference
     short pad0;
 
     e_custom_font custom_font;
-    real_color_argb text_color;
+    real_argb_color text_color;
     rectangle2d text_bounds;
     string_id string;
     short render_depth_bias;
@@ -785,7 +785,7 @@ struct s_user_interface_screen_widget_definition : TagGroup<'wgit'>
     e_button_key_type button_key_type;
 
     // Explaination("Default Text Color", "Any ui elements that don't explicitly set a text color will use this color")
-    real_color_argb text_color;
+    real_argb_color text_color;
     // Explaination("Screen Text", "All text specific to this screen")
     // TagReference("unic")
     tag_reference string_list_tag;

@@ -168,8 +168,8 @@ struct s_weapon_group_definition
 		struct s_initial_permutations_block
 		{
 			float weight;//0x0
-			real_color_rgb color_lower_bound;//0x4
-			real_color_rgb color_upper_bound;//0x10
+			real_rgb_color color_lower_bound;//0x4
+			real_rgb_color color_upper_bound;//0x10
 			string_id variant_name;//0x1C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_initial_permutations_block, 0x20);
@@ -183,8 +183,8 @@ struct s_weapon_group_definition
 				more_colors = FLAG(1),
 			};
 			e_scale_flags scale_flags;//0x4
-			real_color_rgb color_lower_bound;//0x8
-			real_color_rgb color_upper_bound;//0x14
+			real_rgb_color color_lower_bound;//0x8
+			real_rgb_color color_upper_bound;//0x14
 			string_id darken_by;//0x20
 			string_id scale_by;//0x24
 		};
