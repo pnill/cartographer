@@ -3,6 +3,7 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/math/function_definitions.h"
+#include "Blam/Engine/objects/object_type_list.h"
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Math/real_math.h"
 
@@ -185,7 +186,8 @@ TAG_BLOCK_SIZE_ASSERT(object_change_color_definition, 16);
 
 struct object_definition
 {
-	int16 pad;
+	e_object_type object_type;
+	int8 pad;
 	e_object_definition_flags flags;
 	real32 bounding_radius;				// World Units
 	real_point3d bounding_offset;

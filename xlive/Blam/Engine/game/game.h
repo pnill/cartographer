@@ -1,5 +1,6 @@
 #pragma once
 #include "game_options.h"
+#include "Blam/Engine/structures/cluster_partitions.h"
 
 #define k_game_maximum_ragdolls 3
 
@@ -22,7 +23,7 @@ struct s_main_game_globals
 	int unused_1;
 	byte cluster_pvs[64];
 	byte cluster_pvs_local[64];
-	DWORD cluster_activation[16];
+	s_game_cluster_bit_vectors cluster_activation[16];
 	byte enable_scripted_camera_pvs;
 	byte pad_2;
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
@@ -41,6 +42,7 @@ bool game_is_ui_shell(void);
 bool game_in_progress(void);
 bool game_is_predicted(void);
 bool game_is_authoritative(void);
+s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 
 // Setup default player data in the game options structure
 void game_options_setup_default_players(int player_count, s_game_options* game_options);

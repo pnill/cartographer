@@ -98,7 +98,7 @@
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
-    <ClCompile Include="Blam\Engine\Objects\Objects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\objects.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
@@ -218,6 +218,20 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
+    <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
+    <ClCompile Include="Blam\Engine\memory\data.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
+    <ClCompile Include="Blam\Engine\physics\havok.cpp" />
+    <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\objects\widgets\widgets.cpp" />
+    <ClCompile Include="Blam\Engine\effects\effects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
+    <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -313,7 +327,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_control_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\device_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_light_fixture_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\device_machine_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
@@ -418,7 +431,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
@@ -672,6 +684,20 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
+    <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
+    <ClInclude Include="Blam\Engine\objects\object_globals.h" />
+    <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
+    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
+    <ClInclude Include="Blam\Engine\models\models.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_models.h" />
+    <ClInclude Include="Blam\Engine\devices\devices.h" />
+    <ClInclude Include="Blam\Engine\physics\havok.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
+    <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
+    <ClInclude Include="Blam\Engine\effects\effects.h" />
+    <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
+    <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
+    <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
   </ItemGroup>
   <ItemGroup>

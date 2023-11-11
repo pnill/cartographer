@@ -32,7 +32,7 @@ namespace ObjectInterpolate
 
 		bool SameObject(datum object_idx)
 		{
-			DWORD object_node_count;
+			int32 object_node_count;
 			s_object_interpolation* object_state = &object_states[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)];
 			real_matrix4x3* object_nodes = object_get_node_matrices(object_idx, &object_node_count);
 			bool ret = object_state->valid 
@@ -53,7 +53,7 @@ namespace ObjectInterpolate
 		if (!Interpolation::ShouldInterpolate())
 			return;
 
-		s_data_iterator<s_object_header*> object_it(get_objects_header());
+		s_data_iterator<s_object_header*> object_it(object_header_data_get());
 
 		// check if we actually executed any ticks
 		if (!(time_globals::get_game_time() > 0))
@@ -65,7 +65,7 @@ namespace ObjectInterpolate
 		while (object_it.get_next_datum())
 		{
 			s_object_interpolation* object_state = &object_states[object_it.get_current_absolute_index()];
-			s_object_data_definition* object_data = object_get_fast_unsafe(object_it.get_current_datum_index());
+			object_datum* object = object_get_fast_unsafe(object_it.get_current_datum_index());
 
 			if (!SameObject(object_it.get_current_datum_index()))
 			{
@@ -78,7 +78,7 @@ namespace ObjectInterpolate
 				object_state->valid = true;
 			}
 
-			DWORD object_node_count;
+			int32 object_node_count;
 			real_matrix4x3* object_nodes = object_get_node_matrices(object_it.get_current_datum_index(), &object_node_count);
 			/*if (object_node_count > OBJECT_MAX_NODES)
 				DBGBREAK();*/
@@ -97,12 +97,12 @@ namespace ObjectInterpolate
 			return;
 		}
 
-		s_data_iterator<s_object_header*> object_it(get_objects_header());
+		s_data_iterator<s_object_header*> object_it(object_header_data_get());
 
 		while (object_it.get_next_datum())
 		{
 			s_object_interpolation* object_state = &object_states[object_it.get_current_absolute_index()];
-			s_object_data_definition* object_data = object_get_fast_unsafe(object_it.get_current_datum_index());
+			object_datum* object_data = object_get_fast_unsafe(object_it.get_current_datum_index());
 
 			// TODO FIXME add unique object ID to SameObject validation
 			if (!SameObject(object_it.get_current_datum_index()))
@@ -127,7 +127,7 @@ namespace ObjectInterpolate
 		object_count--;
 	}
 
-	const real_matrix4x3* __cdecl object_get_node_matrices_hook(datum object_idx, DWORD* out_node_count)
+	const real_matrix4x3* __cdecl object_get_node_matrices_hook(datum object_idx, int32* out_node_count)
 	{
 		s_object_interpolation* object_state = &object_states[DATUM_INDEX_TO_ABSOLUTE_INDEX(object_idx)];
 
@@ -145,7 +145,7 @@ namespace ObjectInterpolate
 			return ret;
 		}
 		
-		DWORD node_count;
+		int32 node_count;
 		real_matrix4x3* current_object_nodes = object_get_node_matrices(object_idx, &node_count);
 
 		for (int i = 0; i < object_state->node_count; i++)

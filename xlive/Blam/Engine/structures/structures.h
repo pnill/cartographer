@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 
 #include "Blam/Engine/cseries/cseries_strings.h"
 #include "Blam/Math/real_math.h"
@@ -47,3 +47,25 @@ struct structure_weather_palette_entry
     static_string32 wind_scale_function;
 };
 TAG_BLOCK_SIZE_ASSERT(structure_weather_palette_entry, 136);
+
+
+#pragma pack(push, 1)
+struct s_structure_globals
+{
+	bool cluster_marker_initialized;
+	int8 pad[2];
+	int32 cluster_index;
+	int32 cluster_instances[512];
+	bool instanced_geometry_marker_initialized;
+	int8 pad1[3];
+	int32 instanced_geometry_index;
+	int32 instanced_geometry_instances[1024];
+};
+#pragma pack(pop)
+CHECK_STRUCT_SIZE(s_structure_globals, 6159);
+
+s_structure_globals* structure_globals_get(void);
+
+int16 get_global_structure_bsp_index(void);
+
+s_scenario_structure_bsp_group_definition* get_global_structure_bsp(void);

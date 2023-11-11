@@ -11,7 +11,7 @@ typedef void (*object_dispose_from_old_map_t)();
 typedef void (*object_initialize_for_new_structure_bsp_t)(datum);
 typedef void (*object_dispose_from_old_structure_bsp_t)(datum);
 typedef void (*object_adjust_placement_t)(object_placement_data*);
-typedef bool (*object_new_t)(datum, object_placement_data*);
+typedef bool (*object_new_t)(datum, object_placement_data*, bool*);
 typedef void (*object_place_t)(datum, s_scenario_object*);
 typedef void (*object_unplace_t)(datum);
 typedef void (*object_create_children_t)(datum);
@@ -81,5 +81,18 @@ CHECK_STRUCT_SIZE(object_type_definition, 0xC8);
 
 object_type_definition** get_object_type_definitions(void);
 object_type_definition* object_type_definition_get(e_object_type object_type);
+object_type_definition* get_game_object_type_definition(datum object_datum);
 
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data);
+
+bool object_type_new(datum object_index, object_placement_data* placement_data, bool* some_bool);
+
+void object_type_create_children(datum object_index);
+
+void object_type_delete(datum object_datum);
+
+bool object_type_compute_activation(datum object_datum, s_game_cluster_bit_vectors* cluster_activation, bool* a3);
+
+void object_type_postprocess_node_matrices(datum object_datum, int32 node_count, real_matrix4x3* node_matracies);
+
+

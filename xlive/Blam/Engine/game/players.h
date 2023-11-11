@@ -201,9 +201,12 @@ private:
 struct s_persistent_weapon_data
 {
 	e_damage_reporting_type damage_reporting_type_0;
+	int8 pad0;
 	e_damage_reporting_type damage_reporting_type_1;
-	short field_4;
-	short field_6;
+	int8 pad1;
+	e_damage_reporting_type damage_reporting_type_2;
+	int8 pad2;
+	int16 field_6;
 };
 
 struct s_persistent_campaign_player

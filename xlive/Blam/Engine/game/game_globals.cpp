@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "game_globals.h"
 
-#include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/unit_definition.hpp"
 
+#include "Blam/Engine/models/models.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "Blam/Engine/cache/cache_files.h"
@@ -185,34 +185,32 @@ void game_globals_add_lmao_representation(void)
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant
-		s_model_group_definition* mode_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(mode_chief_mp_datum);
+		s_model_definition* mode_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(mode_chief_mp_datum);
 		auto base_variant = mode_chief_mp->variants[0];
-		auto new_variant = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block>((unsigned long)std::addressof(mode_chief_mp->variants));
+		auto new_variant = MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;
 		new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
 		new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
-		memcpy(new_variant->runtime_model_regions, base_variant->runtime_model_regions, sizeof(new_variant->runtime_model_regions));
+		memcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
 		for (auto i = 0; i < base_variant->regions.size; i++)
 		{
 			auto region = base_variant->regions[i];
-			auto new_region = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_regions_block>((unsigned long)std::addressof(new_variant->regions));
+			auto new_region = MetaExtender::add_tag_block2<s_model_variant_region>((unsigned long)std::addressof(new_variant->regions));
 			new_region->region_name = region->region_name;
 			new_region->runtime_model_region_index = region->runtime_model_region_index;
-			new_region->region_runtime_flags = region->region_runtime_flags;
+			new_region->runtime_flags = region->runtime_flags;
 			new_region->parent_variant = region->parent_variant;
 			new_region->sort_order = region->sort_order;
 			for (auto k = 0; k < region->permutations.size; k++)
 			{
 				auto permutation = region->permutations[k];
-				auto new_permutation = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_regions_block::s_permutations_block>((unsigned long)std::addressof(new_region->permutations));
+				auto new_permutation = MetaExtender::add_tag_block2<s_model_variant_permutation>((unsigned long)std::addressof(new_region->permutations));
 				new_permutation->permutation_name = permutation->permutation_name;
-				new_permutation->model_permutation_index = permutation->model_permutation_index;
+				new_permutation->runtime_model_permutation_index= permutation->runtime_model_permutation_index;
 				new_permutation->flags = permutation->flags;
-				new_permutation->probability_0 = permutation->probability_0;
-				memcpy(new_permutation->runtime_permutations, permutation->runtime_permutations, sizeof(new_permutation->runtime_permutations));
-				new_permutation->unk_1 = permutation->unk_1;
-				new_permutation->unk2 = permutation->unk2;
-				new_permutation->unk3 = permutation->unk3;
+				new_permutation->probability = permutation->probability;
+				memcpy(new_permutation->runtime_state_permutation_index, permutation->runtime_state_permutation_index, sizeof(new_permutation->runtime_state_permutation_index));
+				memcpy(new_permutation->pad1, permutation->pad1, sizeof(new_permutation->pad1));
 			}
 		}
 
@@ -226,7 +224,7 @@ void game_globals_add_lmao_representation(void)
 			lmao_datum = tag_loader::ResolveNewDatum(lmao_datum);
 			if (lmao_datum != NONE)
 			{
-				auto new_object = MetaExtender::add_tag_block2<s_model_group_definition::s_variants_block::s_objects_block>((unsigned long)std::addressof(new_variant->objects));
+				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));
 				new_object->parent_marker = e_global_string_id::HS_HEAD;
 				new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
 				new_object->child_object.TagIndex = lmao_datum;

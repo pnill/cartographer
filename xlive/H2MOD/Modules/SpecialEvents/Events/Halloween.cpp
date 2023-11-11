@@ -4,13 +4,13 @@
 #include "MapObjectPlacements/Halloween/Coagulation.h"
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
-#include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/models/models.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/scenario/scenario_definitions.h"
@@ -37,7 +37,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 		object_placement_data placement;
 
 		auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
-		auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(pump->objectTag.model.TagIndex, true);
+		auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(pump->objectTag.model.TagIndex, true);
 
 		const s_cache_header* cache_header = tags::get_cache_header();
 		if (!strcmp(cache_header->name, "coagulation"))

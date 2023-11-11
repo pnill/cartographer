@@ -3,11 +3,13 @@
 #include "Paddy.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/model_definition.hpp"
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
+
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/models/models.h"
+
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
@@ -29,7 +31,7 @@ void paddy_event_map_load()
 		paddy_pot_datum = tag_loader::ResolveNewDatum(paddy_pot_datum);
 
 		auto paddy_pot = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(paddy_pot_datum, true);
-		auto paddy_pot_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(paddy_pot->objectTag.model.TagIndex, true);
+		auto paddy_pot_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(paddy_pot->objectTag.model.TagIndex, true);
 
 		// Give Hat and Beard to Masterchief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
@@ -51,7 +53,7 @@ void paddy_event_map_load()
 			ball_weapon_datum != DATUM_INDEX_NONE)
 		{
 			auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_weapon_datum);
-			auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(ball_weapon->model.TagIndex);
+			auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ball_weapon->model.TagIndex);
 
 			ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
 
@@ -63,7 +65,7 @@ void paddy_event_map_load()
 			bomb_weapon_datum != DATUM_INDEX_NONE)
 		{
 			auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_weapon_datum);
-			auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_group_definition>(bomb_weapon->model.TagIndex);
+			auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(bomb_weapon->model.TagIndex);
 
 			bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
 			auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
