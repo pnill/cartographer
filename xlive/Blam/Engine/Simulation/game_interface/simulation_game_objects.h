@@ -39,7 +39,7 @@ struct s_simulation_object_creation_data
 	s_emblem_info emblem_info;
 	
 	// Repurpose padding for variant index
-	int8 model_variant_id;
+	int8 model_variant_index;
 };
 CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
 
