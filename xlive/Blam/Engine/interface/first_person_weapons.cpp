@@ -8,6 +8,11 @@ bool show_first_person = true;
 
 typedef bool(__cdecl* render_first_person_check_t)(e_skull_type skull_type);
 
+s_first_person_model_data* first_person_model_data_get(void)
+{
+	return Memory::GetAddress<s_first_person_model_data*>(0x4E8F48, 0x50EDF0);
+}
+
 bool __cdecl render_first_person_check(e_skull_type skull_type)
 {
 	return ice_cream_flavor_available(skull_type) || !show_first_person;
