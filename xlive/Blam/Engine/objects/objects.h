@@ -250,8 +250,7 @@ void __cdecl object_placement_data_new(object_placement_data* object_placement_d
 datum __cdecl object_new(object_placement_data* placement_data);
 void __cdecl object_delete(datum object_idx);
 
-int object_get_count();
-int object_count_from_iter();
+real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point);
 
 datum object_get_damage_owner(datum damaged_unit_index);
 

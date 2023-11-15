@@ -690,6 +690,11 @@ void __cdecl object_delete(datum object_index)
 	return;
 }
 
+real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
+{
+	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
+}
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
 {
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
