@@ -11,7 +11,7 @@
 
 #define k_maximum_objects_per_map 2048
 
-enum e_game_team : short
+enum e_game_team : int16
 {
 	// MP
 	_game_team_red = 0,
@@ -48,46 +48,39 @@ enum e_game_team : short
 	_game_team_none = -1
 };
 
-enum e_weapon_index : WORD
-{
-	Primary = 0xFF00,
-	Secondary = 0xFF01,
-	DualWeild = 0x0201
-};
-
 enum e_object_data_flags : int32
 {
-	_object_data_bit_0 = 0,
-	_object_data_bit_1 = 1,
-	_object_data_bit_2 = 2,
+	_object_hidden_bit = 0,
+	_object_always_active_bit = 1,
+	_object_being_created_bit = 2,
 	_object_data_bit_3 = 3,
 	_object_has_attached_lights_bit = 4,
 	_object_has_attached_looping_sounds_bit = 5,
 	_object_has_unattached_lights_bit = 6,
 	_object_in_limbo_bit = 7,
 	_object_connected_to_map_bit = 8,
-	_object_has_collision_bit = 9,
-	_object_data_bit_10 = 10,
+	_object_uses_collidable_list_bit = 9,
+	_object_mirrored_bit = 10,
 	_object_data_bit_11 = 11,
 	_object_data_bit_12 = 12,
 	_object_data_bit_13 = 13,
 	_object_garbage_bit = 14,
 	_object_data_bit_15 = 15,
-	_object_does_not_cast_shadow_bit = 16,
-	_object_data_bit_17 = 17,
-	_object_not_in_a_cluster_bit = 18,
-	_object_data_bit_19 = 19,
-	_object_data_bit_20 = 20,
-	_object_data_bit_21 = 21,
-	_object_data_bit_22 = 22,
-	_object_data_bit_23 = 23,
-	_object_data_bit_24 = 24,
+	_object_shadowless_bit = 16,
+	_object_deleted_when_deactivated_bit = 17,
+	_object_outside_of_map_bit = 18,
+	_object_cinematic_lod_bit = 19,
+	_object_cinematic_collision_bit = 20,
+	_object_cinematic_visibility_bit = 21,
+	_object_static_pathfinding_bit = 22,
+	_object_dynamic_pathfinding_disabled_bit = 23,
+	_object_uses_cinematic_lighting_bit = 24,
 	_object_has_override_bit = 25,
-	_object_is_child_object_bit = 26,
-	_object_data_bit_27 = 27,
-	_object_data_bit_28 = 28,
-	_object_data_bit_29 = 29,
-	_object_data_bit_30 = 30,
+	_object_created_with_parent_bit = 26,
+	_object_reconnect_to_map_bit = 27,
+	_object_ever_referenced_by_hs_bit = 28,
+	_object_orientations_frozen_bit = 29,
+	_object_render_only_orientations_needed_bit = 30,
 	_object_has_prt_or_lighting_info_bit = 31,
 	k_object_data_flags_count
 };
@@ -118,23 +111,24 @@ enum e_object_header_flag : uint8
 	_object_header_active_bit = 0,
 	_object_header_awake_bit = 1,
 	_object_header_requires_motion_bit = 2,
-	_object_header_bit_3 = 3,
+	_object_header_post_update_bit = 3,
 	_object_header_being_deleted_bit = 4,
 	_object_header_connected_to_map_bit = 6,
-	_object_header_child_bit = 7
+	_object_header_child_bit = 7,
+	k_object_header_flags
 };
 
 struct object_header_block_reference
 {
-	short size;
-	short offset;
+	int16 size;
+	int16 offset;
 };
 CHECK_STRUCT_SIZE(object_header_block_reference, 4);
 
 struct s_object_header
 {
 	int16 datum_salt;
-	c_flags<e_object_header_flag, uint8, 8> flags;
+	c_flags<e_object_header_flag, uint8, k_object_header_flags> flags;
 	e_object_type object_type;
 	int16 cluster_index;
 	int16 object_data_size;
