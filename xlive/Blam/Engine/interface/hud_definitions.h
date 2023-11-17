@@ -1,10 +1,10 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/BlamMath.h"
 #include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/integer_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/interface/new_hud_definitions.h"
-#include <wtypes.h>
 
 enum e_scaling_flags : short
 {
@@ -86,8 +86,8 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	float up_time;
 	float fade_time;
 
-	real_color_argb icon_color;
-	real_color_argb text_color;
+	real_argb_color icon_color;
+	real_argb_color text_color;
 	float text_spacing;
 
 	tag_reference item_message_text;	// unic
@@ -147,7 +147,7 @@ struct hud_globals_definition : TagGroup<'hudg'>
 	float motion_sensor_range;
 	float motion_sensor_velocity_sensitivity;		// how fast something moves to show up on the motion sensor
 	float motion_sensor_scale;						// DONTTOUCHEVER
-	rect2d default_chapter_title_bounds;
+	rectangle2d default_chapter_title_bounds;
 
 	int pad_2A4[11];
 

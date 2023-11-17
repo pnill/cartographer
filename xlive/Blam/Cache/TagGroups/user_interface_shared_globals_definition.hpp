@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: user_interface_shared_globals
@@ -17,11 +17,11 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 	__int16 inc_text_update_period;//0x48
 	__int16 inc_text_block_character;//0x4A
 	float callout_text_scale;//0x4C
-	real_color_argb progress_bar_color;//0x50
+	real_argb_color progress_bar_color;//0x50
 	float near_clip_plane_distance;//0x60
 	float projection_plane_distance;//0x64
 	float far_clip_plane_distance;//0x68
-	real_color_argb overlayed_interface_color;//0x6C
+	real_argb_color overlayed_interface_color;//0x6C
 	PAD(0xC);//0x7C
 	struct s_errors_block
 	{
@@ -489,7 +489,7 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 			};
 			e_animation_index animation_index;//0x4
 			__int16 intro_animation_delay_milliseconds;//0x6
-			real_color_argb color;//0x8
+			real_argb_color color;//0x8
 			struct s_points_block
 			{
 				__int16 coordinates_x;//0x0
@@ -596,7 +596,7 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 			PAD(0xC);//0x1C
 			real_point3d camera_position;//0x28			
 			float fov_degress;//0x34
-			rect2d ui_viewport;//0x38			
+			rectangle2d ui_viewport;//0x38			
 			string_id unused_intro_anim;//0x40
 			string_id unused_outro_anim;//0x44
 			string_id unused_ambient_anim;//0x48
@@ -806,22 +806,22 @@ struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
 		text_chat_font = 11,
 	};
 	e_qtr_dialog_header_text_font qtr_dialog_header_text_font;//0x166
-	real_color_argb default_text_color;//0x168
-	rect2d full_screen_header_text_bounds;//0x178
+	real_argb_color default_text_color;//0x168
+	rectangle2d full_screen_header_text_bounds;//0x178
 
-	rect2d full_screen_button_key_text_bounds;//0x180
+	rectangle2d full_screen_button_key_text_bounds;//0x180
 
-	rect2d large_dialog_header_text_bounds;//0x188
+	rectangle2d large_dialog_header_text_bounds;//0x188
 
-	rect2d large_dialog_button_key_text_bounds;//0x190
+	rectangle2d large_dialog_button_key_text_bounds;//0x190
 
-	rect2d half_dialog_header_text_bounds;//0x198
+	rectangle2d half_dialog_header_text_bounds;//0x198
 
-	rect2d half_dialog_button_key_text_bounds;//0x1A0
+	rectangle2d half_dialog_button_key_text_bounds;//0x1A0
 
-	rect2d qtr_dialog_header_text_bounds;//0x1A8
+	rectangle2d qtr_dialog_header_text_bounds;//0x1A8
 
-	rect2d qtr_dialog_button_key_text_bounds;//0x1B0
+	rectangle2d qtr_dialog_button_key_text_bounds;//0x1B0
 
 	tag_reference main_menu_music;//0x1B8
 	__int32 music_fade_time;//0x1C0

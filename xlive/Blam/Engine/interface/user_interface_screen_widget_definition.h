@@ -1,8 +1,10 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/real_math.h"
-#include "Blam/Math/integer_math.h"
+
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/integer_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 enum e_screen_widget_flags : int
 {
@@ -410,8 +412,8 @@ struct s_button_widget_reference
     short pad;
 
     e_custom_font custom_font;
-    real_color_argb text_color;
-    rect2d bounds;
+    real_argb_color text_color;
+    rectangle2d bounds;
 
     // bitm
     tag_reference bitmap;
@@ -562,7 +564,7 @@ struct s_table_view_list_reference_OBSOLETE
 
     e_custom_font custom_font;
     short pad;
-    real_color_argb text_color;
+    real_argb_color text_color;
     point2d topleft;
     tag_block<s_table_view_list_row_reference_OBSOLETE> table_rows;
 };
@@ -577,8 +579,8 @@ struct s_text_block_reference
     short pad0;
 
     e_custom_font custom_font;
-    real_color_argb text_color;
-    rect2d text_bounds;
+    real_argb_color text_color;
+    rectangle2d text_bounds;
     string_id string;
     short render_depth_bias;
     short pad1;
@@ -664,7 +666,7 @@ struct s_ui_model_scene_reference
     real_vector3d animation_scale_factor;
     real_point3d camera_position;
     float fov_degress;
-    rect2d ui_viewport;
+    rectangle2d ui_viewport;
     string_id unused_intro_anim;
     string_id unused_outro_anim;
     string_id unused_ambient_anim;
@@ -701,7 +703,7 @@ struct s_hud_block_reference
     // shad
     tag_reference shader;
 
-    rect2d bounds;
+    rectangle2d bounds;
 };
 TAG_BLOCK_SIZE_ASSERT(s_hud_block_reference, 36);
 
@@ -783,7 +785,7 @@ struct s_user_interface_screen_widget_definition : TagGroup<'wgit'>
     e_button_key_type button_key_type;
 
     // Explaination("Default Text Color", "Any ui elements that don't explicitly set a text color will use this color")
-    real_color_argb text_color;
+    real_argb_color text_color;
     // Explaination("Screen Text", "All text specific to this screen")
     // TagReference("unic")
     tag_reference string_list_tag;

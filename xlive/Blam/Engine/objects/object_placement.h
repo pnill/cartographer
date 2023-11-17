@@ -4,8 +4,9 @@
 #include "object_identifier.h"
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/memory/static_arrays.h"
-#include "Blam/Math/BlamMath.h"
 
 enum e_bsp_policy : int8
 {
@@ -57,7 +58,7 @@ struct object_placement_data
 	int team_index;
 	s_damage_owner damage_owner;
 	DWORD active_change_colors_mask;
-	real_color_rgb change_colors[4];
+	real_rgb_color change_colors[4];
 	s_emblem_info emblem_info;
 	int8 pad1;
 	int32 region_index;

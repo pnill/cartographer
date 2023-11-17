@@ -30,7 +30,7 @@
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structure_audibility.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16
 #define MAXIMUM_FUNCTIONS_PER_SCENARIO 32
@@ -535,7 +535,7 @@ TAG_BLOCK_SIZE_ASSERT(s_scenario_control, 68);
 
 struct s_scenario_light_fixture_datum
 {
-    real_color_rgb color;
+    real_rgb_color color;
     float intensity;
     float falloff_angle_degrees;
     float cutoff_angle_degrees;
@@ -562,7 +562,7 @@ struct s_scenario_sound_scenery_datum
     e_sound_scenery_volume_type volume_type;
     float height;
     real_vector2d override_distance_bounds;
-    angle_bounds override_cone_angle_bounds;
+    real_bounds override_cone_real_bounds;
     float override_outer_cone_gain_db;
 };
 CHECK_STRUCT_SIZE(s_scenario_sound_scenery_datum, 28);
@@ -961,7 +961,7 @@ enum e_text_font : short
 struct s_scenario_cutscene_title
 {
     string_id name;
-    rect2d text_bounds_on_screen;
+    rectangle2d text_bounds_on_screen;
 
     e_text_justification justification;
     e_text_font font;

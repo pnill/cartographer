@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: multiplayer_globals
@@ -18,7 +18,7 @@ struct s_multiplayer_globals_group_definition :TagGroup<'mulg'>
 		tag_reference team_names;//0x8
 		struct s_team_colors_block
 		{
-			real_color_rgb color;//0x0
+			real_rgb_color color;//0x0
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_team_colors_block, 0xC);
 		tag_block<s_team_colors_block> team_colors;//0x10

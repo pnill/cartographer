@@ -4,6 +4,8 @@
 #include "Blam/Cache/TagGroups/weapon_definition.hpp"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/math/math.h"
+
 #include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
@@ -33,7 +35,7 @@ float __cdecl game_seconds_to_ticks_real_weapon_adjust(float s)
 
 	float tick_difference = 0.0f;
 	if (trunc(s) != s)
-		tick_difference = blam_max(time_globals::get_ticks_difference_real() - 1.0f, 0.0f);
+		tick_difference = MAX(time_globals::get_ticks_difference_real() - 1.0f, 0.0f);
 	float seconds_to_ticks_adjusted = (float)time_globals::get()->ticks_per_second * s + tick_difference;
 	return seconds_to_ticks_adjusted;
 }

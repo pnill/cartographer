@@ -2,10 +2,11 @@
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/cache/predicted_resources.h"
+#include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/function_definitions.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/objects/object_type_list.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/real_math.h"
 
 #define k_maximum_object_functions 256
 #define k_maximum_number_of_attachments_per_object 16
@@ -159,8 +160,8 @@ TAG_BLOCK_SIZE_ASSERT(s_old_object_function_definition, 80);
 struct object_change_color_initial_permutation
 {
 	real32 weight;
-	real_color_rgb color_lower_bound;
-	real_color_rgb color_upper_bound;
+	real_rgb_color color_lower_bound;
+	real_rgb_color color_upper_bound;
 	string_id variant_name;		// if empty, may be used by any model variant
 };
 TAG_BLOCK_SIZE_ASSERT(object_change_color_initial_permutation, 32);
@@ -170,8 +171,8 @@ struct object_change_color_function
 {
 	int32 pad;
 	e_object_change_color_function_scale_flags scale_flags;
-	real_color_rgb color_lower_bound;
-	real_color_rgb color_upper_bound;
+	real_rgb_color color_lower_bound;
+	real_rgb_color color_upper_bound;
 	string_id darken_by;
 	string_id scale_by;
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Math/real_math.h"
-
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: weather_system
@@ -124,9 +124,9 @@ struct s_weather_system_group_definition
 			auto_scale_planesauto_update_speed = FLAG(2),
 		};
 		e_flags flags;//0x94
-		real_color_rgb tint_color0;//0x98
-		real_color_rgb tint_color1;//0xA4
-		real_color_rgb tint_color2;//0xB0
+		real_rgb_color tint_color0;//0x98
+		real_rgb_color tint_color1;//0xA4
+		real_rgb_color tint_color2;//0xB0
 		float mass_1;//0xBC
 		float mass_2;//0xC0
 		float mass_3;//0xC4

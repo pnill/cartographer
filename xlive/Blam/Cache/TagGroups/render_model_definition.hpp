@@ -1,7 +1,8 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 /*********************************************************************
 * name: render_model
@@ -251,7 +252,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 				PAD(0x30);//0x4C
 				float secondary_texcoord_x;//0x7C
 				float secondary_texcoord_y;//0x80
-				real_color_rgb primary_lightmap_color;//0x84
+				real_rgb_color primary_lightmap_color;//0x84
 				float primary_lightmap_texcoord_x;//0x90
 				float primary_lightmap_texcoord_y;//0x94
 				PAD(0x2C);//0x98
@@ -535,7 +536,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 				float node_weight_2;//0x14
 				float node_weight_3;//0x18
 				float node_weight_4;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				float screen_size;//0x30
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x34);
@@ -553,7 +554,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 				float node_weight_2;//0x14
 				float node_weight_3;//0x18
 				float node_weight_4;//0x1C
-				real_color_argb color;//0x20
+				real_argb_color color;//0x20
 				PAD(0xC);//0x30
 				float screen_length;//0x3C
 			};
@@ -699,7 +700,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 				float node_weight_2;//0x1C
 				float node_weight_3;//0x20
 				float node_weight_4;//0x24
-				real_color_argb color;//0x28
+				real_argb_color color;//0x28
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x38);
 			tag_block<s_comments_block> comments;//0x58
@@ -712,7 +713,7 @@ struct s_render_model_group_definition : TagGroup<'mode'>
 			float bounds_y_upper;//0x1F0
 			float bounds_z_lower;//0x1F4
 			float bounds_z_upper;//0x1F8
-			real_color_argb color;//0x1FC
+			real_argb_color color;//0x1FC
 			PAD(0x54);//0x20C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_reports_block, 0x260);
