@@ -75,13 +75,13 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	};
 	e_constant_sound_volume constant_sound_volume;//0xC2
 	tag_reference integrated_light_toggle;//0xC4
-	angle camera_field_of_view;//0xCC degrees
+	real_angle camera_field_of_view;//0xCC degrees
 	float camera_stiffness;//0xD0
 	string_id camera_marker_name_old_string_id;//0xD4
 	string_id camera_submerged_marker_name_old_string_id;//0xD8
-	angle pitch_autolevel;//0xDC
-	angle pitch_range_lower;//0xE0
-	angle pitch_range_upper;//0xE4
+	real_angle pitch_autolevel;//0xDC
+	real_angle pitch_range_lower;//0xE0
+	real_angle pitch_range_upper;//0xE4
 	struct s_camera_tracks_block
 	{
 		tag_reference track;//0x0
@@ -107,11 +107,11 @@ struct s_unit_group_definition :TagGroup<'unit'>
 	__int16 spawned_actor_count_lower;//0x13C
 	__int16 spawned_actor_count_upper;//0x13E
 	float spawned_velocity;//0x140
-	angle aiming_velocity_maximum;//0x144
-	angle aiming_acceleration_maximum;//0x148
+	real_angle aiming_velocity_maximum;//0x144
+	real_angle aiming_acceleration_maximum;//0x148
 	float casual_aiming_modifier;//0x14C
-	angle looking_velocity_maximum;//0x150
-	angle looking_acceleration_maximum;//0x154
+	real_angle looking_velocity_maximum;//0x150
+	real_angle looking_acceleration_maximum;//0x154
 	string_id right_hand_node;//0x158
 	string_id left_hand_node;//0x15C
 	string_id preferred_gun_noder;//0x160
@@ -230,9 +230,9 @@ struct s_unit_group_definition :TagGroup<'unit'>
 		float speed_exponent;//0x5C
 		string_id camera_marker_name_old_string_id;//0x60
 		string_id camera_submerged_marker_name_old_string_id;//0x64
-		angle pitch_autolevel;//0x68
-		angle pitch_range_lower;//0x6C
-		angle pitch_range_upper;//0x70
+		real_angle pitch_autolevel;//0x68
+		real_angle pitch_range_lower;//0x6C
+		real_angle pitch_range_upper;//0x70
 		struct s_camera_tracks_block
 		{
 			tag_reference track;//0x0
@@ -246,12 +246,12 @@ struct s_unit_group_definition :TagGroup<'unit'>
 		TAG_BLOCK_SIZE_ASSERT(s_unit_hud_interface_block, 0x8);
 		tag_block<s_unit_hud_interface_block> unit_hud_interface;//0x7C
 		string_id enter_seat_string;//0x84
-		angle yaw_minimum;//0x88
-		angle yaw_maximum;//0x8C
+		real_angle yaw_minimum;//0x88
+		real_angle yaw_maximum;//0x8C
 		tag_reference builtin_gunner;//0x90
 		float entry_radius;//0x98
-		angle entry_marker_cone_angle;//0x9C
-		angle entry_marker_facing_angle;//0xA0
+		real_angle entry_marker_cone_angle;//0x9C
+		real_angle entry_marker_facing_angle;//0xA0
 		float maximum_relative_velocity;//0xA4
 		string_id invisible_seat_region;//0xA8
 		__int32 runtime_invisible_seat_region_index;//0xAC

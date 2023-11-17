@@ -16,25 +16,21 @@ union real_point2d
 };
 CHECK_STRUCT_SIZE(real_point2d, sizeof(real32) * 2);
 
-struct angle
-{
-	float rad = 0.0f;
-};
-CHECK_STRUCT_SIZE(angle, sizeof(float));
+typedef real32 real_angle;
 
 union real_euler_angles2d
 {
 	real32 v[2];
-	struct { real32 yaw, pitch; };
+	struct { real_angle yaw, pitch; };
 };
-CHECK_STRUCT_SIZE(real_euler_angles2d, sizeof(angle) * 2);
+CHECK_STRUCT_SIZE(real_euler_angles2d, sizeof(real_angle) * 2);
 
 union real_euler_angles3d
 {
 	real32 v[3];
-	struct { real32 yaw, pitch, roll; };
+	struct { real_angle yaw, pitch, roll; };
 };
-CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(angle) * 3);
+CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 
 union real_vector3d
 {
@@ -80,13 +76,6 @@ union real_bounds
 	struct { real32 lower, upper; };
 };
 CHECK_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
-
-struct angle_bounds
-{
-	angle lower;
-	angle upper;
-};
-CHECK_STRUCT_SIZE(angle_bounds, sizeof(angle) * 2);
 
 class c_quantized_orientation
 {

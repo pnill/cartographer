@@ -68,7 +68,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 		}
 		else
 		{
-			fov = tags::get_tag_fast<s_unit_group_definition>(object_get_fast_unsafe(player_control_info->unit_datum_index)->tag_definition_index)->camera_field_of_view.as_rad();
+			fov = tags::get_tag_fast<s_unit_group_definition>(object_get_fast_unsafe(player_control_info->unit_datum_index)->tag_definition_index)->camera_field_of_view;
 		}
 
 		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.weapon_indexes);

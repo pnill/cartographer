@@ -66,7 +66,7 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	float specular_radius;//0x1C
 	float near_width;//0x20
 	float height_stretch;//0x24
-	angle field_of_view;//0x28
+	real_angle field_of_view;//0x28
 	float falloff_distance;//0x2C
 	float cutoff_distance;//0x30
 	enum class e_interpolation_flags : __int32

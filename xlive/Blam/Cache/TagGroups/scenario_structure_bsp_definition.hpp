@@ -914,8 +914,8 @@ struct s_scenario_structure_bsp_group_definition
 					__int16 reference_frame;//0x10
 					PAD(0x2);//0x12
 					__int32 sector_index;//0x14
-					angle normal_yaw;//0x18
-					angle normal_pitch;//0x1C
+					real_angle normal_yaw;//0x18
+					real_angle normal_pitch;//0x1C
 				};
 				TAG_BLOCK_SIZE_ASSERT(s_points_block, 0x20);
 				tag_block<s_points_block> points;//0x4

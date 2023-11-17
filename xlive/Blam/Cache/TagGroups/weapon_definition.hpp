@@ -309,13 +309,13 @@ struct s_weapon_group_definition
 	tag_reference detonation_damage_effect_1;//0x184
 	tag_reference player_melee_damage;//0x18C
 	tag_reference player_melee_response;//0x194
-	angle magnetism_angle;//0x19C
+	real_angle magnetism_angle;//0x19C
 	float magnetism_range;//0x1A0
 	float throttle_magnitude;//0x1A4
 	float throttle_minimum_distance;//0x1A8
-	angle throttle_maximum_adjustment_angle;//0x1AC
-	angle damage_pyramid_angles_yaw;//0x1B0
-	angle damage_pyramid_angles_pitch;//0x1B4
+	real_angle throttle_maximum_adjustment_angle;//0x1AC
+	real_angle damage_pyramid_angles_yaw;//0x1B0
+	real_angle damage_pyramid_angles_pitch;//0x1B4
 	float damage_pyramid_depth;//0x1B8
 	tag_reference NUM_1st_hit_melee_damage;//0x1BC
 	tag_reference NUM_1st_hit_melee_response;//0x1C4
@@ -375,11 +375,11 @@ struct s_weapon_group_definition
 	__int16 magnification_levels;//0x1FE
 	float magnification_range_lower;//0x200
 	float magnification_range_upper;//0x204
-	angle autoaim_angle;//0x208
+	real_angle autoaim_angle;//0x208
 	float autoaim_range;//0x20C
-	angle magnetism_angle_1;//0x210
+	real_angle magnetism_angle_1;//0x210
 	float magnetism_range_1;//0x214
-	angle deviation_angle;//0x218
+	real_angle deviation_angle;//0x218
 	PAD(0x10);//0x21C
 	enum class e_movement_penalized : __int16
 	{
@@ -623,9 +623,9 @@ struct s_weapon_group_definition
 		float acceleration_time_final_error;//0x48
 		float deceleration_time_initial_error;//0x4C
 		PAD(0x8);//0x50
-		angle minimum_error; //0x58
-		angle error_angle_lower;//0x5C
-		angle error_angle_upper;//0x60
+		real_angle minimum_error; //0x58
+		real_angle error_angle_lower;//0x5C
+		real_angle error_angle_upper;//0x60
 		float dual_wield_damage_scale;//0x64
 		enum class e_distribution_function : __int16
 		{
@@ -635,9 +635,9 @@ struct s_weapon_group_definition
 		e_distribution_function distribution_function;//0x68
 		__int16 projectiles_per_shot;//0x6A
 		float distribution_angle;//0x6C
-		angle minimum_error_1;//0x70
-		angle error_angle_lower_1;//0x74
-		angle error_angle_upper_1;//0x78
+		real_angle minimum_error_1;//0x70
+		real_angle error_angle_lower_1;//0x74
+		real_angle error_angle_upper_1;//0x78
 		float first_person_offset_i;//0x7C
 		float first_person_offset_j;//0x80
 		float first_person_offset_k;//0x84
@@ -695,8 +695,8 @@ struct s_weapon_group_definition
 		float heat_generated_per_round;//0xA4
 		float age_generated_per_round;//0xA8
 		float overload_time;//0xAC
-		angle angle_change_per_shot_lower;//0xB0
-		angle angle_change_per_shot_upper;//0xB4
+		real_angle angle_change_per_shot_lower;//0xB0
+		real_angle angle_change_per_shot_upper;//0xB4
 		float acceleration_time_2;//0xB8
 		float deceleration_time__3;//0xBC
 		enum class e_angle_change_function : __int16
