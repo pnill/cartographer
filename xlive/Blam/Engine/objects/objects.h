@@ -53,7 +53,7 @@ enum e_object_data_flags : int32
 	_object_hidden_bit = 0,
 	_object_always_active_bit = 1,
 	_object_being_created_bit = 2,
-	_object_data_bit_3 = 3,
+	_object_underwater_bit = 3,
 	_object_has_attached_lights_bit = 4,
 	_object_has_attached_looping_sounds_bit = 5,
 	_object_has_unattached_lights_bit = 6,
