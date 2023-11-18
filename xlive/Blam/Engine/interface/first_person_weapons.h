@@ -80,7 +80,7 @@ CHECK_STRUCT_SIZE(s_first_person_orientations, 4096);
 s_first_person_weapon* first_person_weapon_get_global(void);
 s_first_person_weapon* first_person_weapons_get(uint32 user_index);
 s_first_person_orientations* first_person_orientations_get_global(void);
-s_first_person_orientations* first_person_orientations_get_from_user_index(uint32 user_index);
+s_first_person_orientations* first_person_orientations_get(uint32 user_index, uint32 weapon_slot);
 s_first_person_model_data* first_person_model_data_get_global(void);
 s_first_person_model_data* first_person_model_data_get(uint32 user_index);
 
