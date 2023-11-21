@@ -82,22 +82,23 @@ protected:
 template<size_t k_maximum_count>
 class c_static_flags_no_init
 {
+public:
 	void* clear(void)
 	{
-		return csmemset(this->m_flags, 0, NUMBEROF(m_flags))
+		return csmemset(this->m_flags, 0, NUMBEROF(m_flags));
 	}
 
 	void* clear_range(int32 count)
 	{
-		return csmemset(this->m_flags, 0, BIT_VECTOR_SIZE_IN_BYTES(count))
+		return csmemset(this->m_flags, 0, BIT_VECTOR_SIZE_IN_BYTES(count));
 	}
 
 	void* fill(int32 count, uint8 value)
 	{
-		return csmemset(this->m_flags, value, BIT_VECTOR_SIZE_IN_BYTES(count))
+		return csmemset(this->m_flags, value, BIT_VECTOR_SIZE_IN_BYTES(count));
 	}
 
-	int32* get_bits_direct(void) const
+	const int32* get_bits_direct(void) const
 	{
 		return m_flags;
 	}
@@ -123,22 +124,19 @@ class c_static_flags_no_init
 		return BIT_VECTOR_TEST_FLAG(this->m_flags, index);
 	}
 
-private:
+protected:
 	int32 m_flags[k_maximum_count >> 5];
 };
 
 template<size_t k_maximum_count>
-class c_static_flags
+class c_static_flags : public c_static_flags_no_init<k_maximum_count>
 {
+public:
 	c_static_flags(void) = default;
 	c_static_flags(int32 count, uint8 value)
 	{
-		m_flags.fill(count, value);
+		fill(count, value);
 		return;
 	}
 	~c_static_flags(void) = default;
-
-private:
-	c_static_flags_no_init<k_maximum_count> m_flags;
 };
-
