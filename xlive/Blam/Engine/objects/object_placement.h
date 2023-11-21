@@ -34,7 +34,8 @@ enum e_scenario_object_placement_flags : uint32
 	_scenario_object_placement_bit_7 = 7,
 	_scenario_object_placement_bit_8 = 8,
 	_scenario_object_placement_bit_9 = 9,
-	_scenario_object_placement_bit_10 = 10
+	_scenario_object_placement_bit_10 = 10,
+	k_scenario_object_placement_flags
 };
 
 struct object_placement_data
@@ -46,7 +47,7 @@ struct object_placement_data
 	e_bsp_policy placement_policy;
 	BYTE unk_15;
 	WORD unk_16;
-	c_flags<e_scenario_object_placement_flags, uint32, 11> flags;
+	c_flags<e_scenario_object_placement_flags, uint32, k_scenario_object_placement_flags> flags;
 	real_point3d position;
 	real_vector3d forward;
 	real_vector3d up;

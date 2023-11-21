@@ -26,7 +26,6 @@
 
 #include "Util/Hooks/Hook.h"
 
-
 s_data_array* object_header_data_get(void)
 {
 	return *Memory::GetAddress<s_data_array**>(0x4E461C, 0x50C8EC);
@@ -188,7 +187,7 @@ bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vecto
 	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 	const object_datum* object = (object_datum*)object_header->object;
 
-	if (object->object_flags.test(_object_data_bit_1))
+	if (object->object_flags.test(_object_always_active_bit))
 	{
 		return true;
 	}
@@ -228,7 +227,7 @@ void get_object_payload(datum object_index, s_object_payload* payload)
 {
 	const object_datum* object = object_get_fast_unsafe(object_index);
 	uint16 object_collision_cull_flags = 0;
-	if (object->object_flags.test(_object_has_collision_bit))
+	if (object->object_flags.test(_object_uses_collidable_list_bit))
 	{
 		object_collision_cull_flags = collision_compute_object_cull_flags(object_index);
 	}
@@ -262,7 +261,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 
 	if (p_location->cluster == NONE)
 	{
-		object->object_flags.set(_object_not_in_a_cluster_bit, true);
+		object->object_flags.set(_object_outside_of_map_bit, true);
 	}
 	else
 	{
@@ -270,12 +269,12 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		object->location.cluster = p_location->cluster;
 		object->location.bsp_index = p_location->bsp_index;
 		object_header->cluster_index = p_location->cluster;
-		object->object_flags.set(_object_not_in_a_cluster_bit, false);
+		object->object_flags.set(_object_outside_of_map_bit, false);
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
 	s_game_cluster_bit_vectors* p_cluster_bitvector = NULL;
 	bool cluster_overflow = false;
-	if (object->object_flags.test(_object_data_bit_21))
+	if (object->object_flags.test(_object_cinematic_visibility_bit))
 	{
 		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
 		p_cluster_bitvector = cluster_bitvector;
@@ -285,7 +284,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	get_object_payload(object_index, &payload);
 
 	cluster_partition* partition = collideable_object_cluster_partition_get();
-	if (!object->object_flags.test(_object_has_collision_bit))
+	if (!object->object_flags.test(_object_uses_collidable_list_bit))
 	{
 		partition = noncollideable_object_cluster_partition_get();
 	}
@@ -310,7 +309,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	{
 		object_activate(object_index);
 	}
-	else if (!object->object_flags.test(_object_data_bit_17)|| simulation_query_object_is_predicted(object_index))
+	else if (!object->object_flags.test(_object_deleted_when_deactivated_bit)|| simulation_query_object_is_predicted(object_index))
 	{
 		object_deactivate(object_index);
 	}
@@ -433,7 +432,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 			object_datum* object = object_get_fast_unsafe(object_index);
 
-			object_header->flags.set(_object_header_bit_3, true);
+			object_header->flags.set(_object_header_post_update_bit, true);
 			object_header->object_type = object_def->object_type;
 			object->tag_definition_index = placement_data->tag_index;
 
@@ -458,9 +457,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object->scale = placement_data->scale;
 
 			bool enable = placement_data->flags.test(_scenario_object_placement_bit_0);
-			object->object_flags.set(_object_data_bit_10, enable);
+			object->object_flags.set(_object_mirrored_bit, enable);
 			enable = model_definition && model_definition->collision_model.TagIndex != NONE;
-			object->object_flags.set(_object_has_collision_bit, enable);
+			object->object_flags.set(_object_uses_collidable_list_bit, enable);
 
 			datum mode_index;
 			datum coll_index;
@@ -480,12 +479,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object->placement_policy = placement_data->placement_policy;
 			if (TEST_FLAG(object_def->flags, _object_definition_does_not_cast_shadow))
 			{
-				object->object_flags.set(_object_does_not_cast_shadow_bit, true);
+				object->object_flags.set(_object_shadowless_bit, true);
 			}
 
-			if (object->object_flags.test(_object_data_bit_0))
+			if (object->object_flags.test(_object_hidden_bit))
 			{
-				object->object_flags.set(_object_data_bit_0, false);
+				object->object_flags.set(_object_hidden_bit, false);
 				if (object_is_connected_to_map(object_index))
 				{
 					object_connect_lights_recursive(object_index, false, true, false, false);
@@ -597,10 +596,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				
 				if (object_type_new(object_index, placement_data, &out_of_objects))
 				{
-					bool object_flag_check = object->object_flags.test(_object_data_bit_17);
+					bool object_flag_check = object->object_flags.test(_object_deleted_when_deactivated_bit);
 					if (placement_data->flags.test(_scenario_object_placement_bit_1) || placement_data->flags.test(_scenario_object_placement_bit_2))
 					{
-						object->object_flags.set(_object_data_bit_17, false);
+						object->object_flags.set(_object_deleted_when_deactivated_bit, false);
 					}
 
 					update_object_variant_index(object_index, placement_data->variant_name);
@@ -650,10 +649,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						object_occlusion_data_initialize(object_index);
 					}
 
-					object->object_flags.set(_object_data_bit_17, object_flag_check);
+					object->object_flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
 					object_early_mover_new(object_index);
 
-					if (object->object_flags.test(_object_data_bit_17) && !object_header->flags.test(_object_header_active_bit)) 
+					if (object->object_flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
 					{ 
 						if (objects_can_connect_to_map())
 						{
@@ -689,6 +688,11 @@ void __cdecl object_delete(datum object_index)
 {
 	INVOKE(0x136005, 0x124ED5, object_delete, object_index);
 	return;
+}
+
+real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
+{
+	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
 }
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
