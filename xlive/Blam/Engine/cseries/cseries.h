@@ -105,10 +105,10 @@ static_assert(sizeof(datum) == 4);
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
 
-#define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) >> 5)
+#define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
-#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[BIT >> 5], (BIT & (LONG_BITS - 1))))
-#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[BIT >> 5], (BIT & (LONG_BITS - 1)), ENABLE))
+#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1))))
+#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1)), ENABLE))
 
 /// Creates a mask out of a count number of flags
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )

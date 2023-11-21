@@ -125,7 +125,7 @@ public:
 	}
 
 protected:
-	int32 m_flags[k_maximum_count >> 5];
+	int32 m_flags[k_maximum_count / LONG_BITS];
 };
 
 template<size_t k_maximum_count>
