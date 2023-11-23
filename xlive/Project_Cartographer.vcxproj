@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -311,6 +311,7 @@
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
@@ -437,6 +438,7 @@
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
+    <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
@@ -448,6 +450,7 @@
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
+    <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
@@ -750,7 +753,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />

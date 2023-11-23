@@ -34,6 +34,8 @@ struct _item_definition
     string_id switchto_from_ai_msg;
     tag_reference unused;           // foot
     tag_reference collision_sound;  // snd!
+
+    // max count: 8
     tag_block<tag_reference> predicted_bitmaps; // bitm
 
     tag_reference detonation_damage_effect;     // jpt!

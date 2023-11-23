@@ -5,8 +5,8 @@
 
 #include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
+#include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/models/models.h"
 #include "Blam/Engine/scenario/scenario.h"
@@ -95,21 +95,21 @@ void christmas_event_map_load()
 
 		candy_cane_datum = tag_loader::ResolveNewDatum(candy_cane_datum);
 
-		auto sword_weapon = tags::get_tag_fast<s_weapon_group_definition>(sword_weapon_datum);
+		auto sword_weapon = tags::get_tag_fast<_weapon_definition>(sword_weapon_datum);
 
-		datum sword_model_datum = sword_weapon->model.TagIndex;
+		datum sword_model_datum = sword_weapon->item.object.model.TagIndex;
 		auto sword_model = tags::get_tag_fast<s_model_definition>(sword_model_datum);
 
 		sword_model->render_model.TagIndex = candy_cane_datum;
 
-		for (auto& first_person : sword_weapon->first_person)
+		for (auto& first_person : sword_weapon->player_interface.first_person)
 			first_person.first_person_model.TagIndex = candy_cane_datum;
 
-		for (auto& attachment : sword_weapon->attachments)
+		for (auto& attachment : sword_weapon->item.object.attachments)
 		{
-			attachment.type.TagIndex = -1;
+			attachment.type.TagIndex = NONE;
 			attachment.type.TagGroup = blam_tag::tag_group_type::none;
-			attachment.marker_old_string_id = 0;
+			attachment.marker = 0;
 			attachment.primary_scale = 0;
 		}
 	}

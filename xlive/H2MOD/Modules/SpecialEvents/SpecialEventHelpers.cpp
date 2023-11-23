@@ -2,8 +2,8 @@
 #include "SpecialEventHelpers.h"
 
 #include "Blam/Cache/TagGroups/render_model_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
+#include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/models/models.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
@@ -37,12 +37,12 @@ void add_special_event_markers()
 
 void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_datum, datum _3p_model_datum)
 {
-	auto weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(weapon_datum);
-	weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
-	weapon->first_person[0]->first_person_model.TagIndex = fp_model_datum;
-	weapon->first_person[1]->first_person_model.TagIndex = fp_model_datum;
+	auto weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(weapon_datum);
+	weapon->item.object.sweetener_size = _sweetener_size_medium;
+	weapon->player_interface.first_person[0]->first_person_model.TagIndex = fp_model_datum;
+	weapon->player_interface.first_person[1]->first_person_model.TagIndex = fp_model_datum;
 
-	datum model_datum = weapon->model.TagIndex;
+	datum model_datum = weapon->item.object.model.TagIndex;
 	tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(model_datum)->render_model.TagIndex = _3p_model_datum;
 
 }
