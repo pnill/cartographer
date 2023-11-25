@@ -8,6 +8,7 @@
 #define k_real_math_epsilon 0.000099999997f
 
 #define DEGREES_TO_RADIANS(angle) ((real32)((angle) * M_PI / 180.0))
+#define RADIANS_TO_DEGREES(angle) ((real32)((angle) * 180.0 / M_PI))
 
 union real_point2d
 {
