@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
 
 #include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/models/models.h"
+#include "Blam/Engine/models/render_model_definitions.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
@@ -16,22 +16,22 @@ void add_special_event_markers()
 	auto mode_elite_datum = tags::find_tag(blam_tag::tag_group_type::rendermodel, "objects\\characters\\elite\\elite_mp");
 	if (!DATUM_IS_NONE(mode_elite_datum))
 	{
-		auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(mode_elite_datum);
-		auto new_marker_group = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block>((unsigned long)std::addressof(mode_elite->marker_groups));
-		new_marker_group->name_old_string_id = new_elite_head_marker;
-		auto new_marker = MetaExtender::add_tag_block2<s_render_model_group_definition::s_marker_groups_block::s_markers_block>((unsigned long)std::addressof(new_marker_group->markers));
+		auto mode_elite = tags::get_tag<blam_tag::tag_group_type::rendermodel, render_model_definition>(mode_elite_datum);
+		auto new_marker_group = MetaExtender::add_tag_block2<render_model_marker_group>((unsigned long)std::addressof(mode_elite->marker_groups));
+		new_marker_group->name = new_elite_head_marker;
+		render_model_marker* new_marker = MetaExtender::add_tag_block2<render_model_marker>((unsigned long)std::addressof(new_marker_group->markers));
 		LOG_INFO_GAME("[{}] {:x}", __FUNCTION__, (unsigned long)std::addressof(new_marker));
 		new_marker->node_index = 19;
-		new_marker->permutation_index = -1;
-		new_marker->region_index = -1;
-		new_marker->translation_x = 0.006f;
-		new_marker->translation_y = 0.06f;
-		new_marker->translation_z = 0.0f;
-		new_marker->rotation_i = 0.9f;
-		new_marker->rotation_j = 0.9f;
-		new_marker->roatation_k = 0.9f;
-		new_marker->rotation_w = 1;
-		new_marker->scale = 1;
+		new_marker->permutation_index = NONE;
+		new_marker->region_index = NONE;
+		new_marker->orientation.position.x = 0.006f;
+		new_marker->orientation.position.y = 0.06f;
+		new_marker->orientation.position.z = 0.0f;
+		new_marker->orientation.quaternion.i= 0.9f;
+		new_marker->orientation.quaternion.j = 0.9f;
+		new_marker->orientation.quaternion.k = 0.9f;
+		new_marker->orientation.quaternion.w = 1.0f;
+		new_marker->orientation.scale = 1.0f;
 	}
 }
 
