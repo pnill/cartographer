@@ -3,10 +3,10 @@
 
 weapon_first_person_interface_definition* first_person_interface_definition_get(_weapon_definition* definition, e_character_type character_type)
 {
-	weapon_first_person_interface_definition* result = NULL;
-	int32 index = 0;
-	switch (character_type)
-	{
+    weapon_first_person_interface_definition* result = NULL;
+    int32 index = 0;
+    switch (character_type)
+    {
     case _character_type_masterchief:
     case _character_type_spartan:
         index = 0;

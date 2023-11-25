@@ -312,6 +312,7 @@
     <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
