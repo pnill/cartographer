@@ -77,6 +77,20 @@ union real_bounds
 };
 CHECK_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
 
+union real_rectangle2d
+{
+	real32 v[4];
+	struct { real32 x0, x1, y0, y1; };
+};
+CHECK_STRUCT_SIZE(real_rectangle2d, sizeof(real32) * 4);
+
+union real_rectangle3d
+{
+	real32 v[6];
+	struct { real32 x0, x1, y0, y1, z0, z1; };
+};
+CHECK_STRUCT_SIZE(real_rectangle3d, sizeof(real32) * 6);
+
 class c_quantized_orientation
 {
 public:
