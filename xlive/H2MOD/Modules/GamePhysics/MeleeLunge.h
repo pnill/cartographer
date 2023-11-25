@@ -44,11 +44,11 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	BYTE field_F;
 	real_point3d m_melee_start_origin;
 	real_vector3d field_1C;
-	float m_field_28;
-	float m_distance;
+	real32 m_field_28;
+	real32 m_distance;
 	real_point3d m_target_point;
 	real_vector3d m_aiming_direction;
-	float m_maximum_distance;
+	real32 m_maximum_distance;
 	bool m_started_decelerating;
 	BYTE field_4D[1];
 
@@ -56,12 +56,12 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	BYTE m_flags;
 	BYTE m_deceleration_ticks;
 
-	float m_velocity_to_decelerate;
-	float m_distance_to_target_point_before_deceleration;
+	real32 m_velocity_to_decelerate;
+	real32 m_distance_to_target_point_before_deceleration;
 	real_vector3d field_58;
 	int field_64;
 	int field_68;
-	float field_6C;
+	real32 field_6C;
 	int field_70;
 	char gap_74[20];
 
@@ -71,7 +71,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	void build_initial_melee_parameters(bool valid);
 	void update_melee_parameters();
 	void update_melee_deceleration();
-	void __thiscall update_internal(s_character_physics_output* a2, bool a3, float distance_world_units, const real_vector3d* target_translational_velocity, const real_point3d* target_origin, const real_vector3d* aiming_vector, const real_vector3d* translational_velocity, const real_point3d* object_origin);
+	void __thiscall update_internal(s_character_physics_output* a2, bool a3, real32 distance_world_units, const real_vector3d* target_translational_velocity, const real_point3d* target_origin, const real_vector3d* aiming_vector, const real_vector3d* translational_velocity, const real_point3d* object_origin);
 };
 CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 
