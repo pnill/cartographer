@@ -1,8 +1,7 @@
 #pragma once
-#include "render_models.h"
-
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/game/materials.h"
+#include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/objects/damage_reporting.h"
 #include "Blam/Engine/physics/physics_models.h"
 
@@ -456,6 +455,21 @@ struct s_model_region
     tag_block<s_model_permutation> permutations;
 };
 TAG_BLOCK_SIZE_ASSERT(s_model_region, 16);
+
+// max count: MAXIMUM_NODES_PER_MODEL
+struct s_model_node
+{
+    string_id name;
+    int16 parent_node;          // Block index: model_node
+    int16 first_child_node;     // Block index: model_node
+    int16 next_sibling_node;    // Block index: model_node
+    int16 pad;
+
+    real_point3d default_translation;
+    real_quaternion default_rotation;
+    real_matrix4x3 default_inverse_matrix;
+};
+CHECK_STRUCT_SIZE(s_model_node, 92);
 
 // max count: 1
 struct s_model_object_data

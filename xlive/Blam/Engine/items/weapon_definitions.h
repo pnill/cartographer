@@ -3,6 +3,7 @@
 
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/game/aim_assist.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam/Engine/math/integer_math.h"
 #include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/objects/damage_reporting.h"
@@ -514,3 +515,5 @@ struct _weapon_definition
     real_vector2d first_person_scope_size;
 };
 TAG_GROUP_SIZE_ASSERT(_weapon_definition, 796);
+
+weapon_first_person_interface_definition* first_person_interface_definition_get(_weapon_definition* definition, e_character_type character_type);
