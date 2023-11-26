@@ -259,3 +259,14 @@ bool network_session_interface_set_local_user_character_type(int user_index, e_c
 
 	return false;
 }
+
+bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier)
+{
+	s_session_interface_user* user_properties = network_session_interface_get_local_user_properties(user_index);
+	if(user_properties->user_exists)
+	{
+		*out_identifier = user_properties->network_user_identifier;
+		return true;
+	}
+	return false;
+}

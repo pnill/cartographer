@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KantTesting.h"
 
+#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "Util/Hooks/Hook.h"
@@ -11,136 +12,105 @@ namespace KantTesting
 	{
 	}
 
-    static const std::string base64_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/";
-
-
-    static inline bool is_base64(BYTE c) {
-        return (isalnum(c) || (c == '+') || (c == '/'));
-    }
-
-    std::string base64_encode(BYTE const* buf, unsigned int bufLen) {
-        std::string ret;
-        int i = 0;
-        int j = 0;
-        BYTE char_array_3[3];
-        BYTE char_array_4[4];
-
-        while (bufLen--) {
-            char_array_3[i++] = *(buf++);
-            if (i == 3) {
-                char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-                char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-                char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-                char_array_4[3] = char_array_3[2] & 0x3f;
-
-                for (i = 0; (i < 4); i++)
-                    ret += base64_chars[char_array_4[i]];
-                i = 0;
-            }
-        }
-
-        if (i)
-        {
-            for (j = i; j < 3; j++)
-                char_array_3[j] = '\0';
-
-            char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
-            char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
-            char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
-            char_array_4[3] = char_array_3[2] & 0x3f;
-
-            for (j = 0; (j < i + 1); j++)
-                ret += base64_chars[char_array_4[j]];
-
-            while ((i++ < 3))
-                ret += '=';
-        }
-
-        return ret;
-    }
-
-    std::vector<BYTE> base64_decode(std::string const& encoded_string) {
-        int in_len = encoded_string.size();
-        int i = 0;
-        int j = 0;
-        int in_ = 0;
-        BYTE char_array_4[4], char_array_3[3];
-        std::vector<BYTE> ret;
-
-        while (in_len-- && (encoded_string[in_] != '=') && is_base64(encoded_string[in_])) {
-            char_array_4[i++] = encoded_string[in_]; in_++;
-            if (i == 4) {
-                for (i = 0; i < 4; i++)
-                    char_array_4[i] = base64_chars.find(char_array_4[i]);
-
-                char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-                char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-                char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-                for (i = 0; (i < 3); i++)
-                    ret.push_back(char_array_3[i]);
-                i = 0;
-            }
-        }
-
-        if (i) {
-            for (j = i; j < 4; j++)
-                char_array_4[j] = 0;
-
-            for (j = 0; j < 4; j++)
-                char_array_4[j] = base64_chars.find(char_array_4[j]);
-
-            char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
-            char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
-            char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
-
-            for (j = 0; (j < i - 1); j++) ret.push_back(char_array_3[j]);
-        }
-
-        return ret;
-    }
-
-	typedef void(__cdecl t_join_game)(int8* session_info);
-	t_join_game* p_join_game;
-    std::string lolz;
-	void __cdecl c_join_game(int8* session_info)
-	{
-
-        if (lolz.empty())
-        {
-            auto encoded = base64_encode(reinterpret_cast<byte const*>(session_info), 0xA1C);
-            lolz = std::string(encoded);
-            LOG_INFO_GAME(encoded);
-        }
-        p_join_game(session_info);
-        //auto decoded = base64_decode(lolz);
-		//p_join_game(reinterpret_cast<int8*>(decoded.data()));
-	}
-
-    void hot_join()
-	{
-        addDebugText("Hot Joining a lobby..");
-        auto decoded = base64_decode(lolz);
-        p_join_game(reinterpret_cast<int8*>(decoded.data()));
-	}
-
     int klk = VK_DELETE;
+
+
+
+    void __cdecl game_life_cycle_check_joining_capability()
+    {
+        INVOKE(0x1AD643, 0, game_life_cycle_check_joining_capability);
+    }
+
+    bool __cdecl get_local_user_properties(int32 user_index, int32* unk_property, s_player_properties* out_properties, int32* unk_property_2, int32* unk_property_3)
+    {
+        return INVOKE(0x1B10E0, 0, get_local_user_properties, user_index, unk_property, out_properties, unk_property_2, unk_property_3);
+    }
+
+    void __cdecl reset_global_player_counts()
+    {
+        INVOKE(0xB8B9, 0, reset_global_player_counts);
+    }
+
+    void __cdecl network_session_reset_something(int unk, char unk_2)
+    {
+        INVOKE(0x1B54CF, 0, network_session_reset_something, unk, unk_2);
+    }
+
+    void __cdecl game_shell_set_in_progress()
+    {
+        INVOKE(0x242E5B, 0, game_shell_set_in_progress);
+    }
+
+    XNKID temp_kid;
+    XNKEY temp_key;
+    XNADDR temp_addr;
+    void force_join(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version)
+    {
+        auto handler = (c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->life_cycle_handlers[e_game_life_cycle::_life_cycle_joining];
+        handler->joining_xnkid = kid;
+        handler->joining_xnkey = key;
+        handler->joining_xnaddr = addr;
+        if (exe_type != EXECUTABLE_TYPE || exe_version != EXECUTABLE_VERSION || comp_version != COMPATIBLE_VERSION)
+        {
+            handler->join_attempt_result_code = 9;
+        }
+        else
+        {
+            game_life_cycle_check_joining_capability();
+            wchar_t local_usernames[4][16];
+            s_player_identifier local_identifiers[4];
+            int valid_local_player_count = 0;
+            for (auto i = 0; i < 4; i++)
+            {
+                s_player_identifier temp_identifier;
+                s_player_properties temp_properties;
+                if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || get_local_user_properties(i, 0, &temp_properties, 0, 0))
+                {
+                    memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, 16);
+                    local_identifiers[valid_local_player_count].unk1 = temp_identifier.unk1;
+                    local_identifiers[valid_local_player_count].unk2 = temp_identifier.unk2;
+                    valid_local_player_count++;
+                }
+            }
+            reset_global_player_counts();
+            network_session_reset_something(2, 1);
+            memset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
+            memcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);
+            memcpy(&handler->player_names, local_usernames, sizeof(wchar_t) * 16 * valid_local_player_count);
+            handler->field_11 = 0; //Always 0 in the original function
+            handler->field_12 = 0; //Always 0 in the original function
+            handler->field_14 = 1;
+            handler->joining_user_count = valid_local_player_count;
+            handler->field_54 = 2; //Always 2 in original function
+            handler->field_10 = true; //Always 1 in original function
+
+            handler->join_attempt_result_code = 0; //Force valid result code, leave the denying the connection up to the host.
+        }
+        c_game_life_cycle_manager::get()->request_state_change(_life_cycle_joining, 0, 0);
+        game_shell_set_in_progress();
+    }
+
+    typedef bool(__cdecl t_set_xlive_join_game_parameters)(XNKID* kid, XNKEY* key, XNADDR* addr, void* session_info, int local_user_count, s_player_identifier* player_identifiers, wchar_t* player_names);
+    t_set_xlive_join_game_parameters* p_set_xlive_join_game_parameters;
+
+    bool __cdecl set_xlive_join_game_parameters(XNKID* kid, XNKEY* key, XNADDR* addr, void* session_info, int local_user_count, s_player_identifier* player_identifiers, wchar_t* player_names)
+    {
+        //store the current join game parameters to use in the example hotkey function
+        temp_kid = *kid;
+        temp_key = *key;
+        temp_addr = *addr;
+        return p_set_xlive_join_game_parameters(kid, key, addr, session_info, local_user_count, player_identifiers, player_names);
+    }
+
 	void Initialize()
 	{
 		if (ENABLEKANTTEST) {
-			p_join_game = Memory::GetAddress<t_join_game*>(0x2160E2);
-			PatchCall(Memory::GetAddress(0x21731C), c_join_game);
+            p_set_xlive_join_game_parameters = Memory::GetAddress<t_set_xlive_join_game_parameters*>(0x1AD5E9);
+            PatchCall(Memory::GetAddress(0x2161A5), set_xlive_join_game_parameters);
             KeyboardInput::RegisterHotkey(&klk, []()
-                {
-                    hot_join();
-                });
-		//	if (!Memory::isDedicatedServer())
-			//{
-			//tags::on_map_load(MapLoad);
-		//	}
+            {
+                force_join(temp_kid, temp_key, temp_addr, 1, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+            });
 		}
 	}
 }

@@ -925,7 +925,6 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
-		game_life_cycle::apply_patches();
 		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();

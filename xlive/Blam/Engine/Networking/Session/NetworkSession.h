@@ -377,3 +377,4 @@ CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)
 
 bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type);
+bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier);
