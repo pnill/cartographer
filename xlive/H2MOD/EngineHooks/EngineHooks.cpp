@@ -13,9 +13,6 @@ namespace EngineHooks
 	void GameLifeCycleUpdate()
 	{
 		auto gameLifeCycleData = Memory::GetAddress<BYTE*>(0x420FC4, 0x3C40AC);
-		auto a = c_game_life_cycle_manager::get();
-		if (a->life_cycle_state == 5)
-			LOG_INFO_GAME("IM BREAKPOOIINTTING");
 		p_game_life_cycle_update(gameLifeCycleData);
 
 		e_game_life_cycle currentLifeCycle = *(e_game_life_cycle*)(gameLifeCycleData);
