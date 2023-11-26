@@ -109,7 +109,7 @@ namespace KantTesting
             PatchCall(Memory::GetAddress(0x2161A5), set_xlive_join_game_parameters);
             KeyboardInput::RegisterHotkey(&klk, []()
             {
-                force_join(temp_kid, temp_key, temp_addr, 1, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+                force_join(temp_kid, temp_key, temp_addr, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
             });
 		}
 	}

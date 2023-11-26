@@ -39,6 +39,42 @@ public:
 	void initialize(void* life_cycle_manager, e_game_life_cycle life_cycle, bool unk_bool);
 };
 
+struct c_game_life_cycle_handler_none : c_game_life_cycle_handler
+{
+	int8 gap[15];
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_none, 0x20);
+
+struct c_game_life_cycle_handler_pre_game : c_game_life_cycle_handler
+{
+	int32 count_down_network_time;
+	int32 count_down_network_session;
+	int32 field_18;
+	int8 gap_1C[15];
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_pre_game, 0x2C);
+
+struct c_game_life_cycle_handler_start_game : c_game_life_cycle_handler
+{
+	int8 field_10;
+	int8 field_11;
+	int8 gap_12[25];
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_start_game, 0x2C);
+
+struct c_game_life_cycle_handler_in_game : c_game_life_cycle_handler
+{
+	int64 rand_bytes;
+	int8 gap_18[15];
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_in_game, 0x28);
+
+struct c_game_life_cycle_handler_post_game : c_game_life_cycle_handler
+{
+	int8 gap[15];
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_post_game, 0x20);
+
 struct c_game_life_cycle_handler_joining : c_game_life_cycle_handler
 {
 	bool field_10;
@@ -71,6 +107,13 @@ struct c_game_life_cycle_handler_joining : c_game_life_cycle_handler
 	int32 join_attempt_result_code;
 };
 CHECK_STRUCT_SIZE(c_game_life_cycle_handler_joining, 0x1084);
+
+struct  c_game_life_cycle_handler_match_making : c_game_life_cycle_handler
+{
+	void* some_function_pointer;
+	int32 field_14;
+};
+CHECK_STRUCT_SIZE(c_game_life_cycle_handler_match_making, 0x18);
 
 class c_game_life_cycle_manager
 {
