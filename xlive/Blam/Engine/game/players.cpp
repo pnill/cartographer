@@ -365,3 +365,9 @@ void players_apply_patches(void)
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
     return;
 }
+
+bool get_local_user_properties(int32 user_index, int32* unk_property, s_player_properties* out_properties,
+	int32* unk_property_2, int32* unk_property_3)
+{
+    return INVOKE(0x1B10E0, 0, get_local_user_properties, user_index, unk_property, out_properties, unk_property_2, unk_property_3);
+}

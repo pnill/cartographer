@@ -260,3 +260,5 @@ uint32 player_appearance_required_bits(void);
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
 
 void players_apply_patches(void);
+
+bool __cdecl get_local_user_properties(int32 user_index, int32* unk_property, s_player_properties* out_properties, int32* unk_property_2, int32* unk_property_3);

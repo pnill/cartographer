@@ -270,3 +270,8 @@ bool network_session_interface_get_local_user_identifier(int user_index, s_playe
 	}
 	return false;
 }
+
+void __cdecl network_session_reset_something(int unk, char unk_2)
+{
+	INVOKE(0x1B54CF, 0, network_session_reset_something, unk, unk_2);
+}

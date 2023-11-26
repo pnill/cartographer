@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "KantTesting.h"
 
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -13,33 +14,6 @@ namespace KantTesting
 	}
 
     int klk = VK_DELETE;
-
-
-
-    void __cdecl game_life_cycle_check_joining_capability()
-    {
-        INVOKE(0x1AD643, 0, game_life_cycle_check_joining_capability);
-    }
-
-    bool __cdecl get_local_user_properties(int32 user_index, int32* unk_property, s_player_properties* out_properties, int32* unk_property_2, int32* unk_property_3)
-    {
-        return INVOKE(0x1B10E0, 0, get_local_user_properties, user_index, unk_property, out_properties, unk_property_2, unk_property_3);
-    }
-
-    void __cdecl reset_global_player_counts()
-    {
-        INVOKE(0xB8B9, 0, reset_global_player_counts);
-    }
-
-    void __cdecl network_session_reset_something(int unk, char unk_2)
-    {
-        INVOKE(0x1B54CF, 0, network_session_reset_something, unk, unk_2);
-    }
-
-    void __cdecl game_shell_set_in_progress()
-    {
-        INVOKE(0x242E5B, 0, game_shell_set_in_progress);
-    }
 
     XNKID temp_kid;
     XNKEY temp_key;
@@ -56,7 +30,7 @@ namespace KantTesting
         }
         else
         {
-            game_life_cycle_check_joining_capability();
+            c_game_life_cycle_handler_joining::check_joining_capability();
             wchar_t local_usernames[4][16];
             s_player_identifier local_identifiers[4];
             int valid_local_player_count = 0;

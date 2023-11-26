@@ -41,6 +41,11 @@ bool game_is_ui_shell(void)
 	return game_options_get()->game_mode == _game_mode_ui_shell;
 }
 
+void __cdecl game_shell_set_in_progress()
+{
+	INVOKE(0x242E5B, 0, game_shell_set_in_progress);
+}
+
 bool game_is_predicted(void)
 {
 	return game_options_get()->simulation_type == _game_simulation_distributed_client;
@@ -67,4 +72,9 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 	auto p_game_options_setup_default_players = Memory::GetAddress<cache_file_map_clear_all_failures_t>(0x49650, 0x428ED);
 	p_game_options_setup_default_players(player_count, game_options);
 	return;
+}
+
+void __cdecl reset_global_player_counts()
+{
+	INVOKE(0xB8B9, 0, reset_global_player_counts);
 }
