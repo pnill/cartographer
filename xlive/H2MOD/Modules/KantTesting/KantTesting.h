@@ -2,18 +2,6 @@
 #define ENABLEKANTTEST 0
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
-#ifndef _BASE64_H_
-#define _BASE64_H_
-
-#include <vector>
-#include <string>
-typedef unsigned char BYTE;
-
-std::string base64_encode(BYTE const* buf, unsigned int bufLen);
-std::vector<BYTE> base64_decode(std::string const&);
-
-#endif
-
 namespace KantTesting
 {
 	struct __declspec(align(8)) s_session_informations_live

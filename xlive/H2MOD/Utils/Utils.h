@@ -148,3 +148,6 @@ static UNS_32_BITS crc_32_tab[] = { /* CRC polynomial 0xedb88320 */
 #define UPDC32(octet, crc) (crc_32_tab[((crc) ^ (octet)) & 0xff] ^ ((crc) >> 8))
 DWORD crc32buf(const char* buf, size_t len);
 bool ComputeFileCrc32Hash(wchar_t* filepath, DWORD& rtncrc32);
+
+std::vector<unsigned char> base64_decode(const std::string& encoded_string);
+std::string base64_encode(const std::vector<unsigned char>& binaryData);

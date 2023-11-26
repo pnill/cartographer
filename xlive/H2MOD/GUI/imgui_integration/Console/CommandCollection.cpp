@@ -67,7 +67,9 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players),
 	new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer),
 	new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen),
-	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode)
+	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode),
+	new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite),
+	new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -825,5 +827,60 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 	game_mode.SetValFromStr(tokens[1], 10, exception);
 
 	main_game_launch_set_game_mode(game_mode.GetVal());
+	return 0;
+}
+
+int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ConsoleLog* output = cbData.strOutput;
+	auto a = NetworkSession::GetActiveNetworkSession();
+	XNADDR host_xnaddr;
+	if (!NetworkSession::LocalPeerIsSessionHost())
+		host_xnaddr = a->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(a->session_host_peer_index)->observer_index].xnaddr;
+	else
+		host_xnaddr = a->virtual_couch->xsession_info.hostAddress;
+
+	XNKID session_id = a->session_id;
+	XNKEY session_key = a->xnkey;
+
+	std::vector<unsigned char> hostData(reinterpret_cast<const unsigned char*>(&host_xnaddr), reinterpret_cast<const unsigned char*>(&host_xnaddr) + sizeof(host_xnaddr));
+	std::vector<unsigned char> sessionIdData(session_id.ab, session_id.ab + sizeof(session_id.ab));
+	std::vector<unsigned char> sessionKeyData(session_key.ab, session_key.ab + sizeof(session_key.ab));
+
+	// Concatenate the binary data
+	hostData.insert(hostData.end(), sessionIdData.begin(), sessionIdData.end());
+	hostData.insert(hostData.end(), sessionKeyData.begin(), sessionKeyData.end());
+
+	auto encoded = base64_encode(hostData);
+
+	output->Output(StringFlag_None, "Invite code generated:");
+	output->Output(StringFlag_CopyToClipboard, encoded.c_str());
+	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
+	return 0;
+}
+
+int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	std::string encodedString = tokens[1];
+	XNADDR host_xnaddr;
+	XNKID session_id;
+	XNKEY session_key;
+
+	std::vector<unsigned char> decodedData = base64_decode(encodedString);
+
+	// Ensure the decoded data size matches the expected size of the concatenated structures
+	size_t expectedSize = sizeof(XNADDR) + sizeof(XNKID) + sizeof(XNKEY);
+	if (decodedData.size() != expectedSize) {
+		return 1;
+	}
+
+	// Extract each structure from the decoded binary data
+	std::copy(decodedData.begin(), decodedData.begin() + sizeof(XNADDR), reinterpret_cast<unsigned char*>(&host_xnaddr));
+	std::copy(decodedData.begin() + sizeof(XNADDR), decodedData.begin() + sizeof(XNADDR) + sizeof(XNKID), session_id.ab);
+	std::copy(decodedData.begin() + sizeof(XNADDR) + sizeof(XNKID), decodedData.end(), session_key.ab);
+
+
+	game_direct_connect_to_session(session_id, session_key, host_xnaddr, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+
 	return 0;
 }
