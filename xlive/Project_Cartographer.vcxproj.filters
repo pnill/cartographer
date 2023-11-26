@@ -233,6 +233,8 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
+    <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -332,7 +334,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
@@ -340,7 +341,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -430,7 +430,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
@@ -698,6 +697,17 @@
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
+    <ClInclude Include="Blam\Engine\items\item_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\interpolator.h" />
+    <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
+    <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
+    <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
+    <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
+    <ClInclude Include="Blam\Engine\render\render_prt.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="Blam\Engine\errors\error_reports.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

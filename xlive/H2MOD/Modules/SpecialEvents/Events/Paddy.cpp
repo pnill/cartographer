@@ -3,12 +3,12 @@
 #include "Paddy.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/models/models.h"
+#include "Blam/Engine/models/render_model_definitions.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -52,31 +52,31 @@ void paddy_event_map_load()
 		if (datum ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball"); 
 			ball_weapon_datum != DATUM_INDEX_NONE)
 		{
-			auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(ball_weapon_datum);
-			auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ball_weapon->model.TagIndex);
+			auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(ball_weapon_datum);
+			auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ball_weapon->item.object.model.TagIndex);
 
 			ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
 
 			//Bounding Radius and Sweetener size
-			ball_weapon->bounding_radius = 0.3f;
-			ball_weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
+			ball_weapon->item.object.bounding_radius = 0.3f;
+			ball_weapon->item.object.sweetener_size = _sweetener_size_medium;
 		}
 		if (datum bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 			bomb_weapon_datum != DATUM_INDEX_NONE)
 		{
-			auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, s_weapon_group_definition>(bomb_weapon_datum);
-			auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(bomb_weapon->model.TagIndex);
+			auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(bomb_weapon_datum);
+			auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(bomb_weapon->item.object.model.TagIndex);
 
 			bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
-			auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, s_render_model_group_definition>(paddy_pot_model->render_model.TagIndex, true);
+			auto paddy_pot_render = tags::get_tag<blam_tag::tag_group_type::rendermodel, render_model_definition>(paddy_pot_model->render_model.TagIndex, true);
 			auto pot_node = paddy_pot_render->nodes[0];
-			pot_node->default_rotation_k = -0.75f;
-			pot_node->inverse_position_y = 0.07f;
-			pot_node->inverse_position_z = -0.1f;
+			pot_node->default_rotation.k = -0.75f;
+			pot_node->default_translation.y = 0.07f;
+			pot_node->default_translation.z = -0.1f;
 
 			// Bounding Radius and Sweetener size
-			bomb_weapon->bounding_radius = 0.3f;
-			bomb_weapon->sweetener_size = s_weapon_group_definition::e_sweetener_size::medium;
+			bomb_weapon->item.object.bounding_radius = 0.3f;
+			bomb_weapon->item.object.sweetener_size = _sweetener_size_medium;
 		}
 	}
 }
