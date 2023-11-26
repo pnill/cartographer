@@ -1,16 +1,17 @@
 #include "stdafx.h"
-
 #include "Halloween.h"
+
 #include "MapObjectPlacements/Halloween/Coagulation.h"
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
-#include "Blam/Cache/TagGroups/render_model_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
+
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/models/models.h"
+#include "Blam/Engine/models/render_model_definitions.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/scenario/scenario_definitions.h"

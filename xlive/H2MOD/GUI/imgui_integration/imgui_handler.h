@@ -1,6 +1,5 @@
 #pragma once
 #include "imgui.h"
-#include "Blam/Cache/TagGroups/weapon_definition.hpp"
 
 namespace ImGuiHandler
 {

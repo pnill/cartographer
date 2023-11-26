@@ -70,8 +70,8 @@ namespace ObserverMode
 		//These are fucked and need to be fixed.... everything is offset by 4, have to go back and fix everything that uses it.
 		auto control = PlayerControl::GetControls(0);
 
-		CameraAngles->i = control->actions.facing.yaw.rad;
-		CameraAngles->j = control->actions.facing.pitch.rad;
+		CameraAngles->i = control->actions.facing.yaw;
+		CameraAngles->j = control->actions.facing.pitch;
 		//CameraAngles->k += (control->actions.trigger * 0.01f) + -(control->actions.secondary_trigger * 0.01f);
 
 		

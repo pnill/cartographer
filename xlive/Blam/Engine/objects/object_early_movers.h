@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/matrix_math.h"
 
 #define MAXIMUM_OBJECT_EARLY_MOVERS_PER_MAP 32
 
@@ -7,13 +7,13 @@ struct s_early_mover_data
 {
 	real_point3d origin;
 	real_point3d position;
-	real_vector3d vector0;
-	real_vector3d vector1;
-	real_vector3d vector2;
+	real_vector3d linear_velocity_copy;
+	real_vector3d linear_velocity;
+	real_vector3d angular_velocity_copy;
 	real_vector3d angular_velocity;
-	real_matrix4x3 matrix0;
-	real_matrix4x3 matrix1;
-	real_matrix4x3 matrix2;
+	real_matrix4x3 transform_copy;
+	real_matrix4x3 transform;
+	real_matrix4x3 inverse_transform;
 	bool some_bool;
 	bool another_bool;
 };

@@ -106,7 +106,6 @@
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
-    <ClCompile Include="Blam\Math\real_vector3d.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
@@ -127,7 +126,6 @@
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
-    <ClCompile Include="Blam\Math\real_matrix4x3.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp" />
@@ -233,6 +231,10 @@
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
+    <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
+    <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -332,7 +334,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\equipment_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\item_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
@@ -340,7 +341,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\weapon_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -430,7 +430,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\render_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
@@ -462,9 +461,6 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
-    <ClInclude Include="Blam\Math\integer_math.h" />
-    <ClInclude Include="Blam\Math\real_math.h" />
-    <ClInclude Include="Blam\Math\BlamMath.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
@@ -488,7 +484,6 @@
     <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
-    <ClInclude Include="Blam\Math\real_vector3d.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
@@ -525,7 +520,6 @@
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
-    <ClInclude Include="Blam\Math\real_matrix4x3.h" />
     <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h" />
@@ -699,6 +693,21 @@
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
+    <ClInclude Include="Blam\Engine\math\math.h" />
+    <ClInclude Include="Blam\Engine\math\integer_math.h" />
+    <ClInclude Include="Blam\Engine\math\real_math.h" />
+    <ClInclude Include="Blam\Engine\math\matrix_math.h" />
+    <ClInclude Include="Blam\Engine\items\item_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\interpolator.h" />
+    <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
+    <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
+    <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
+    <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
+    <ClInclude Include="Blam\Engine\render\render_prt.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="Blam\Engine\errors\error_reports.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

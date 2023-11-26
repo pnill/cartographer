@@ -50,8 +50,8 @@ struct s_creature_group_definition :TagGroup<'crea'>
 		large = 2,
 	};
 	e_motion_sensor_blip_size motion_sensor_blip_size;//0xC2
-	angle turning_velocity_maximum;//0xC4
-	angle turning_acceleration_maximum;//0xC8
+	real_angle turning_velocity_maximum;//0xC4
+	real_angle turning_acceleration_maximum;//0xC8
 	float casual_turning_modifier;//0xCC
 	float autoaim_width;//0xD0
 	enum class e_flags2 : __int32
@@ -154,11 +154,11 @@ struct s_creature_group_definition :TagGroup<'crea'>
 	TAG_BLOCK_SIZE_ASSERT(s_sphere_shapes_block, 0x80);
 	tag_block<s_sphere_shapes_block> sphere_shapes;//0x104
 	struct {
-		angle maximum_slope_angle;//0x10C
-		angle downhill_falloff_angle;//0x110
-		angle downhill_cutoff_angle;//0x114
-		angle uphill_falloff_angle;//0x118
-		angle uphill_cutoff_angle;//0x11C
+		real_angle maximum_slope_angle;//0x10C
+		real_angle downhill_falloff_angle;//0x110
+		real_angle downhill_cutoff_angle;//0x114
+		real_angle uphill_falloff_angle;//0x118
+		real_angle uphill_cutoff_angle;//0x11C
 		float downhill_velocity_scale;//0x120
 		float uphill_velocity_scale;//0x124
 	}ground;
@@ -167,7 +167,7 @@ struct s_creature_group_definition :TagGroup<'crea'>
 
 	struct
 	{
-		angle bank_angle;//0x13C
+		real_angle bank_angle;//0x13C
 		float bank_apply_time;//0x140
 		float bank_decay_time;//0x144
 		float pitch_ratio;//0x148
@@ -175,8 +175,8 @@ struct s_creature_group_definition :TagGroup<'crea'>
 		float max_sidestep_velocity;//0x150
 		float acceleration;//0x154
 		float deceleration;//0x158
-		angle angular_velocity_maximum;//0x15C
-		angle angular_acceleration_maximum;//0x160
+		real_angle angular_velocity_maximum;//0x15C
+		real_angle angular_acceleration_maximum;//0x160
 		float crouch_velocity_modifier;//0x164
 
 	}flying;

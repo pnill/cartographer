@@ -34,7 +34,7 @@
 //		e_flags flags;//0xE
 //		tag_reference default_bitmap;//0x10
 //		float default_const_value;//0x18
-//		real_color_rgb default_const_color;//0x1C
+//		real_rgb_color default_const_color;//0x1C
 //		enum class e_source_extern : __int16
 //		{
 //			none = 0,

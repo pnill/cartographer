@@ -5,7 +5,7 @@
 #include "FirstPersonInterpolate.h"
 #include "ObjectInterpolate.h"
 
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
 
@@ -36,7 +36,7 @@ namespace Interpolation
 
 	float GetInterpolateTime()
 	{
-		return blam_max(0.0f, blam_min(time_globals::get_ticks_fraction_leftover(), 1.0f));
+		return MAX(0.0f, MIN(time_globals::get_ticks_fraction_leftover(), 1.0f));
 	}
 
 	// TODO
