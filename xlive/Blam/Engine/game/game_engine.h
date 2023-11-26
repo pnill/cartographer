@@ -166,4 +166,4 @@ TAG_BLOCK_SIZE_ASSERT(s_multiplayer_event_response_definition, 0xA8);
 
 s_game_engine_globals* game_engine_globals_get(void);
 
-bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_color_rgb* change_colors);
+bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);

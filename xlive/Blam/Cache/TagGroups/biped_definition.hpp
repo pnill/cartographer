@@ -13,7 +13,7 @@
 struct s_biped_group_definition :TagGroup<'bipd'>
 {
 	s_unit_group_definition unitTag;
-	angle moving_turning_speed;//0x1EC
+	real_angle moving_turning_speed;//0x1EC
 	enum class e_biped_flags : __int32
 	{
 		turns_without_animating = FLAG(0),
@@ -30,7 +30,7 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 		always_ragdoll_when_dead = FLAG(11),
 	};
 	e_biped_flags biped_flags;//0x1F0
-	angle stationary_turning_threshold;//0x1F4
+	real_angle stationary_turning_threshold;//0x1F4
 	float jump_velocity;//0x1F8
 	float maximum_soft_landing_time;//0x1FC
 	float maximum_hard_landing_time;//0x200
@@ -42,8 +42,8 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	float standing_camera_height;//0x218
 	float crouching_camera_height;//0x21C
 	float crouch_transition_time;//0x220
-	angle camera_interpolation_start;//0x224
-	angle camera_interpolation_end;//0x228
+	real_angle camera_interpolation_start;//0x224
+	real_angle camera_interpolation_end;//0x228
 	float camera_forward_movement_scale;//0x22C
 	float camera_side_movement_scale;//0x230
 	float camera_vertical_movement_scale;//0x234
@@ -135,15 +135,15 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_sphere_shapes_block, 0x80);
 	tag_block<s_sphere_shapes_block> sphere_shapes;//0x294
-	angle maximum_slope_angle;//0x29C
-	angle downhill_falloff_angle;//0x2A0
-	angle downhill_cutoff_angl;//0x2A4
-	angle uphill_falloff_angle;//0x2A8
-	angle uphill_cutoff_angle;//0x2AC
+	real_angle maximum_slope_angle;//0x29C
+	real_angle downhill_falloff_angle;//0x2A0
+	real_angle downhill_cutoff_angl;//0x2A4
+	real_angle uphill_falloff_angle;//0x2A8
+	real_angle uphill_cutoff_angle;//0x2AC
 	float downhill_velocity_scale;//0x2B0
 	float uphill_velocity_scale;//0x2B4
 	PAD(0x14);//0x2B8
-	angle bank_angle;//0x2CC
+	real_angle bank_angle;//0x2CC
 	float bank_apply_time;//0x2D0
 	float bank_decay_time;//0x2D4
 	float pitch_ratio;//0x2D8
@@ -151,8 +151,8 @@ struct s_biped_group_definition :TagGroup<'bipd'>
 	float max_sidestep_velocity;//0x2E0
 	float acceleration;//0x2E4
 	float deceleration;//0x2E8
-	angle angular_velocity_maximum;//0x2EC
-	angle angular_acceleration_maximum;//0x2F0
+	real_angle angular_velocity_maximum;//0x2EC
+	real_angle angular_acceleration_maximum;//0x2F0
 	float crouch_velocity_modifier;//0x2F4
 	struct s_contact_points_block
 	{

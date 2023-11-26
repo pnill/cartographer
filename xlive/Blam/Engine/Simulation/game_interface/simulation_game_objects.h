@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/objects/emblems.h"
 #include "Blam/Engine/objects/object_placement.h"
 #include "Blam/Engine/tag_files/string_id.h"
@@ -12,10 +12,10 @@ struct s_simulation_object_state_data
 	real32 scale;
 	real_vector3d translational_velocity;
 	real_vector3d angular_velocity;
-	int body_vitality;
+	real32 body_vitality;
 	char body_stun_ticks_is_zero;
 	char gap45[3];
-	int shield_vitality;
+	real32 shield_vitality;
 	char shield_stun_ticks_is_zero;
 	char dead;
 	char gap4D[2];
@@ -39,7 +39,7 @@ struct s_simulation_object_creation_data
 	s_emblem_info emblem_info;
 	
 	// Repurpose padding for variant index
-	int8 model_variant_id;
+	int8 model_variant_index;
 };
 CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
 

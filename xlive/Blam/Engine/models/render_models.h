@@ -1,21 +1,10 @@
 #pragma once
-#include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/real_math.h"
 
 #define MAXIMUM_REGIONS_PER_MODEL 16
+#define MAXIMUM_PERMUTATIONS_PER_MODEL_REGION 32
 #define MAXIMUM_NODES_PER_MODEL 255
-
-// max count: MAXIMUM_NODES_PER_MODEL
-struct s_model_node
-{
-    string_id name;
-    int16 parent_node;          // Block index: model_node
-    int16 first_child_node;     // Block index: model_node
-    int16 next_sibling_node;    // Block index: model_node
-    int16 pad;
-
-    real_point3d default_translation;
-    real_quaternion default_rotation;
-    real_matrix4x3 default_inverse_matrix;
-};
-CHECK_STRUCT_SIZE(s_model_node, 92);
+#define MAXIMUM_SECTIONS_PER_RENDER_MODEL 255
+#define NUMBER_OF_GEOMETRY_DETAIL_LEVELS 6
+#define MAXIMUM_NODES_PER_RENDER_MODEL_SECTION 40
+#define MAXIMUM_MARKER_GROUPS_PER_RENDER_MODEL 4096
+#define MAXIMUM_MARKERS_PER_RENDER_MODEL_MARKER_GROUP 256

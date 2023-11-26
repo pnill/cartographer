@@ -2,6 +2,7 @@
 
 #include "Mouseinput.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/math/math.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
 
@@ -60,7 +61,7 @@ void MouseInput::SetSensitivity(float value)
 	if (H2Config_raw_input)
 		value = 1.0f;
 
-	value = blam_max(value - 1.0f, 0.0f);
+	value = MAX(value - 1.0f, 0.0f);
 
 	*Memory::GetAddress<float*>(0x4A89B0) = (80.0f + 20.0f * value) - 30.0f; //x-axis
 

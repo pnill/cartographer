@@ -2,7 +2,7 @@
 
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Math/real_math.h"
+#include "Blam/Engine/math/real_math.h"
 
 #define MAXIMUM_EDITOR_COMMENTS 65536
 

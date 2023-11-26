@@ -24,13 +24,14 @@
 #include "Blam/Engine/hs/hs_unit_seats.h"
 #include "Blam/Engine/main/level_definitions.h"
 #include "Blam/Engine/math/color_math.h"
+#include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/objects/light_definitions.h"
 #include "Blam/Engine/objects/object_identifier.h"
 #include "Blam/Engine/sound/sound_scenery.h"
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structure_audibility.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Math/BlamMath.h"
+#include "Blam/Engine/math/real_math.h"
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16
 #define MAXIMUM_FUNCTIONS_PER_SCENARIO 32
@@ -127,17 +128,6 @@ enum e_scenario_function_type : short
     scenario_function_type_spark = 11
 };
 
-enum e_function_map_to : short
-{
-    function_map_to_linear = 0,
-    function_map_to_early = 1,
-    function_map_to_very_early = 2,
-    function_map_to_late = 3,
-    function_map_to_very_late = 4,
-    function_map_to_cosine = 5,
-    function_map_to_one = 6,
-    function_map_to_zero = 7
-};
 
 enum e_bounds_mode : short
 {
@@ -167,9 +157,9 @@ struct scenario_function
     float square_wave_threshold;                // If non-zero, all values above square wave threshold are snapped to 1.0, and all values below it are snapped to 0.0 to create a square wave.
     short step_count;                           // Number of discrete values to snap to (e.g., step count of 5 snaps function to 0.00, 0.25, 0.50,0.75, or 1.00).
 
-    e_function_map_to map_to;
+    e_transition_function_type map_to;
     
-    short sawtoothCount;                        // Number of times this function should repeat (e.g., sawtooth count of 5 gives function value of 1.0 at each of 0.25, 0.50, and 0.75, as well as at 1.0).
+    short sawtooth_count;                       // Number of times this function should repeat (e.g., sawtooth count of 5 gives function value of 1.0 at each of 0.25, 0.50, and 0.75, as well as at 1.0).
     short pad;
 
     // Multiply this function (e.g., from a weapon, vehicle) final result of all of the above math.
@@ -535,7 +525,7 @@ TAG_BLOCK_SIZE_ASSERT(s_scenario_control, 68);
 
 struct s_scenario_light_fixture_datum
 {
-    real_color_rgb color;
+    real_rgb_color color;
     float intensity;
     float falloff_angle_degrees;
     float cutoff_angle_degrees;
@@ -562,7 +552,7 @@ struct s_scenario_sound_scenery_datum
     e_sound_scenery_volume_type volume_type;
     float height;
     real_vector2d override_distance_bounds;
-    angle_bounds override_cone_angle_bounds;
+    real_bounds override_cone_real_bounds;
     float override_outer_cone_gain_db;
 };
 CHECK_STRUCT_SIZE(s_scenario_sound_scenery_datum, 28);
@@ -961,7 +951,7 @@ enum e_text_font : short
 struct s_scenario_cutscene_title
 {
     string_id name;
-    rect2d text_bounds_on_screen;
+    rectangle2d text_bounds_on_screen;
 
     e_text_justification justification;
     e_text_font font;

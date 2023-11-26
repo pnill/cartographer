@@ -2,6 +2,7 @@
 #include "ControllerInput.h"
 
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/math/math.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Hook.h"
@@ -238,7 +239,7 @@ namespace ControllerInput
 		if (Memory::IsDedicatedServer()) return;
 		if (value == 0.0f) return;
 
-		value = blam_max(value - 1.0f, 0.0f);
+		value = MAX(value - 1.0f, 0.0f);
 
 		*Memory::GetAddress<float*>(0x4A89B8) = 80.0f + 20.0f * value; //x-axis
 		*Memory::GetAddress<float*>(0x4A89BC) = 40.0f + 10.0f * value; //y-axis

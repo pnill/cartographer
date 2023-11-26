@@ -14,6 +14,11 @@
 
 #include "Util/Hooks/Hook.h"
 
+// Ensure we aren't sending a variant index that's the same as the default variant
+// Inefficient since the variant will be set to it regardless
+// If we sync the variant index of the "default" variant this can also cause an issue where the default dialouge isn't selected but that variants specific dialouge
+bool simulation_object_variant_should_sync(s_simulation_object_creation_data* creation_data);
+
 // Builds creation data for objects
 void __stdcall c_simulation_object_entity_definition__object_build_creation_data(void* _this, datum object_index, s_simulation_object_creation_data* creation_data)
 {
@@ -21,20 +26,37 @@ void __stdcall c_simulation_object_entity_definition__object_build_creation_data
     creation_data->object_definition_index = object->tag_definition_index;
     creation_data->object_scenario_datum_index = object->placement_index;
     creation_data->multiplayer_spawn_monitor_index = object->netgame_equipment_index;
-    creation_data->model_variant_id = object->model_variant_id;
+    creation_data->model_variant_index = object->model_variant_id;
     creation_data->emblem_info = object->emblem_info;
     return;
+}
+
+bool simulation_object_variant_should_sync(s_simulation_object_creation_data* creation_data)
+{
+    bool sync_variant = creation_data->model_variant_index != NONE;
+    object_definition* object_def = (object_definition*)tag_get_fast(creation_data->object_definition_index);
+    if (datum model_tag_index = object_def->model.TagIndex;
+        model_tag_index != NONE && sync_variant)
+    {
+        s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_tag_index);
+
+        // Confirm that the "defualt" variant is not the one we are trying to sync
+        sync_variant = model_definition->variants[creation_data->model_variant_index]->name != object_def->default_model_variant;
+    }
+
+    return sync_variant;
 }
 
 typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode_t)(void* thisptr, void* creation_data, bitstream* stream);
 c_simulation_unit_entity_definition_creation_encode_t p_c_simulation_unit_entity_definition_encode;
 void __stdcall c_simulation_object_entity_definition__object_creation_encode(void* _this, s_simulation_object_creation_data* creation_data, bitstream* packet)
 {
-    bool model_variant_id_exists = creation_data->model_variant_id != NONE;
-    packet->data_encode_bool("model-variant-id-exists", model_variant_id_exists);
+    bool model_variant_id_exists = simulation_object_variant_should_sync(creation_data);
+
+    packet->data_encode_bool("model-variant-index-exists", model_variant_id_exists);
     if (model_variant_id_exists)
     {
-        packet->data_encode_integer("model-variant-id", creation_data->model_variant_id, 6);    // 6 bits since k_maximum_variants_per_model is 64
+        packet->data_encode_integer("model-variant-index", creation_data->model_variant_index, 6);    // 6 bits since k_maximum_variants_per_model is 64
     }
 
     p_c_simulation_unit_entity_definition_encode(_this, creation_data, packet);
@@ -45,13 +67,13 @@ typedef bool(__stdcall* c_simulation_unit_entity_definition_creation_decode_t)(v
 c_simulation_unit_entity_definition_creation_decode_t p_c_simulation_unit_entity_definition_decode;
 bool __stdcall c_simulation_object_entity_definition__object_creation_decode(void* _this, s_simulation_object_creation_data* creation_data, bitstream* packet)
 {
-    if (packet->data_decode_bool("model-variant-id-exists"))
+    if (packet->data_decode_bool("model-variant-index-exists"))
     {
-        creation_data->model_variant_id = packet->data_decode_integer("model-variant-id", 6);    // 6 bits since k_maximum_variants_per_model is 64
+        creation_data->model_variant_index = packet->data_decode_integer("model-variant-index", 6);    // 6 bits since k_maximum_variants_per_model is 64
     }
     else
     {
-        creation_data->model_variant_id = NONE;
+        creation_data->model_variant_index = NONE;
     }
     return p_c_simulation_unit_entity_definition_decode(_this, creation_data, packet);
 }
@@ -97,15 +119,15 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
         }
 
         // Set variant of the object
-        if (object_creation_data->model_variant_id != NONE && object_creation_data->object_definition_index != NONE)
+        if (object_creation_data->model_variant_index != NONE && object_creation_data->object_definition_index != NONE)
         {
             object_definition* object_def = (object_definition*)tag_get_fast(object_creation_data->object_definition_index);
             if (object_def->model.TagIndex != NONE)
             {
                 s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
-                if (object_creation_data->model_variant_id < model_def->variants.size)
+                if (object_creation_data->model_variant_index < model_def->variants.size)
                 {
-                    placement_data->variant_name = model_def->variants[object_creation_data->model_variant_id]->name;
+                    placement_data->variant_name = model_def->variants[object_creation_data->model_variant_index]->name;
                 }
             }
             
