@@ -72,7 +72,7 @@ struct c_game_life_cycle_handler_joining : c_game_life_cycle_handler
 };
 CHECK_STRUCT_SIZE(c_game_life_cycle_handler_joining, 0x1084);
 
-class __declspec(align(4)) c_game_life_cycle_manager
+class c_game_life_cycle_manager
 {
 public:
 	e_game_life_cycle life_cycle_state;

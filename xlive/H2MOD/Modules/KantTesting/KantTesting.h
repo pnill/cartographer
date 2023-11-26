@@ -1,5 +1,5 @@
 #pragma once
-#define ENABLEKANTTEST 1
+#define ENABLEKANTTEST 0
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 
 #ifndef _BASE64_H_
