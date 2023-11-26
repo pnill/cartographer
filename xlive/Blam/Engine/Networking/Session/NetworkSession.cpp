@@ -271,7 +271,12 @@ bool network_session_interface_get_local_user_identifier(int user_index, s_playe
 	return false;
 }
 
-void __cdecl network_session_reset_something(int unk, char unk_2)
+char __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
 {
-	INVOKE(0x1B54CF, 0, network_session_reset_something, unk, unk_2);
+	return INVOKE(0x1B10E0, 0, network_session_interface_get_local_user_properties, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
+}
+
+void __cdecl network_session_init_session(int unk, char unk_2)
+{
+	INVOKE(0x1B54CF, 0, network_session_init_session, unk, unk_2);
 }

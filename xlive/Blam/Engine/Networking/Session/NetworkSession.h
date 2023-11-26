@@ -378,4 +378,5 @@ CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 
 bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type);
 bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier);
-void __cdecl network_session_reset_something(int unk, char unk_2);
+char __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat);
+void __cdecl network_session_init_session(int unk, char unk_2);

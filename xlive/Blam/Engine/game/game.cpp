@@ -102,7 +102,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
         {
             s_player_identifier temp_identifier;
             s_player_properties temp_properties;
-            if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || get_local_user_properties(i, 0, &temp_properties, 0, 0))
+            if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
             {
                 memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, 16);
                 local_identifiers[valid_local_player_count].unk1 = temp_identifier.unk1;
@@ -111,7 +111,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
             }
         }
         reset_global_player_counts();
-        network_session_reset_something(2, 1);
+        network_session_init_session(2, 1);
         memset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
         memcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);
         memcpy(&handler->player_names, local_usernames, sizeof(wchar_t) * 16 * valid_local_player_count);
