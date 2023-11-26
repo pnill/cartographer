@@ -102,7 +102,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
         {
             s_player_identifier temp_identifier;
             s_player_properties temp_properties;
-            if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties(i, 0, &temp_properties, 0, 0))
+            if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties_out(i, 0, &temp_properties, 0, 0))
             {
                 memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, 16);
                 local_identifiers[valid_local_player_count].unk1 = temp_identifier.unk1;
