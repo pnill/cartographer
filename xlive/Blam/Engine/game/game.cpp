@@ -45,7 +45,7 @@ bool game_is_ui_shell(void)
 
 void __cdecl game_shell_set_in_progress()
 {
-	INVOKE(0x242E5B, 0, game_shell_set_in_progress);
+	INVOKE(0x242E5B, 0x22054B, game_shell_set_in_progress);
 }
 
 bool game_is_predicted(void)
@@ -78,7 +78,7 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 
 void __cdecl reset_global_player_counts()
 {
-	INVOKE(0xB8B9, 0, reset_global_player_counts);
+	INVOKE(0xB8B9, 0x219B9, reset_global_player_counts);
 }
 
 void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version,

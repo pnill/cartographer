@@ -106,7 +106,7 @@ public:
 	int32 field_1078;
 	int8 gap_107C[4];
 	int32 join_attempt_result_code;
-	static void check_joining_capability();
+	static void __cdecl check_joining_capability();
 };
 CHECK_STRUCT_SIZE(c_game_life_cycle_handler_joining, 0x1084);
 

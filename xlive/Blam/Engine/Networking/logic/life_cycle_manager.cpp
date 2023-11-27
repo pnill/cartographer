@@ -19,11 +19,9 @@ void c_game_life_cycle_handler::initialize(void* life_cycle_manager, e_game_life
 	static_cast<c_game_life_cycle_manager*>(this->life_cycle_manager)->life_cycle_handlers[this->life_cycle] = this;
 }
 
-void c_game_life_cycle_handler_joining::check_joining_capability()
+void __cdecl c_game_life_cycle_handler_joining::check_joining_capability()
 {
-	typedef void(__cdecl check_joining_capability_t)();
-	check_joining_capability_t* p_check_joining_capability = Memory::GetAddress<check_joining_capability_t*>(0x1AD643);
-	p_check_joining_capability();
+	INVOKE(0x1AD643, 0x1A65C0, c_game_life_cycle_handler_joining::check_joining_capability);
 }
 
 bool c_game_life_cycle_manager::game_life_cycle_initialized()
@@ -33,7 +31,7 @@ bool c_game_life_cycle_manager::game_life_cycle_initialized()
 
 c_game_life_cycle_manager* c_game_life_cycle_manager::get()
 {
-	return Memory::GetAddress<c_game_life_cycle_manager*>(0x420FC4);
+	return Memory::GetAddress<c_game_life_cycle_manager*>(0x420FC4, 0x3C40AC);
 }
 
 e_game_life_cycle c_game_life_cycle_manager::get_life_cycle() const

@@ -273,10 +273,10 @@ bool network_session_interface_get_local_user_identifier(int user_index, s_playe
 
 bool __cdecl network_session_interface_get_local_user_properties_out(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
 {
-	return INVOKE(0x1B10E0, 0, network_session_interface_get_local_user_properties_out, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
+	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties_out, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
 }
 
 void __cdecl network_session_init_session(int unk, char unk_2)
 {
-	INVOKE(0x1B54CF, 0, network_session_init_session, unk, unk_2);
+	INVOKE(0x1B54CF, 0x1A922D, network_session_init_session, unk, unk_2);
 }

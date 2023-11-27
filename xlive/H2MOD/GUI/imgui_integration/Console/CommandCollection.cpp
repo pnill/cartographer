@@ -16,6 +16,7 @@
 #include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
+#include "Util/Base64.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 
@@ -851,7 +852,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	hostData.insert(hostData.end(), sessionIdData.begin(), sessionIdData.end());
 	hostData.insert(hostData.end(), sessionKeyData.begin(), sessionKeyData.end());
 
-	auto encoded = base64_encode(hostData);
+	auto encoded = base64_encode_binary(hostData);
 
 	output->Output(StringFlag_None, "Invite code generated:");
 	output->Output(StringFlag_CopyToClipboard, encoded.c_str());
@@ -866,7 +867,7 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 	XNKID session_id;
 	XNKEY session_key;
 
-	std::vector<unsigned char> decodedData = base64_decode(encodedString);
+	std::vector<unsigned char> decodedData = base64_decode_binary(encodedString);
 
 	// Ensure the decoded data size matches the expected size of the concatenated structures
 	size_t expectedSize = sizeof(XNADDR) + sizeof(XNKID) + sizeof(XNKEY);
