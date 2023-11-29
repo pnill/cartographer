@@ -14,6 +14,7 @@
 #include "Blam/Engine/interface/new_hud.h"
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/interface/screens/screens_patches.h"
+#include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
@@ -843,6 +844,7 @@ void H2MOD::ApplyHooks() {
 	simulation_game_units_apply_patches();
 	players_apply_patches();
 	objects_apply_patches();
+	weapon_definitions_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

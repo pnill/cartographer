@@ -517,3 +517,5 @@ struct _weapon_definition
 TAG_GROUP_SIZE_ASSERT(_weapon_definition, 796);
 
 weapon_first_person_interface_definition* first_person_interface_definition_get(_weapon_definition* definition, e_character_type character_type);
+
+void weapon_definitions_apply_patches(void);
