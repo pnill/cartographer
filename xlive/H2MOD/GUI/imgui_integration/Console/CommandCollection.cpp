@@ -67,7 +67,9 @@ std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players),
 	new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer),
 	new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen),
-	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode)
+	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode),
+	new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite),
+	new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect)
 };
 
 void CommandCollection::InitializeCommandsMap()
@@ -825,5 +827,50 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 	game_mode.SetValFromStr(tokens[1], 10, exception);
 
 	main_game_launch_set_game_mode(game_mode.GetVal());
+	return 0;
+}
+
+int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ConsoleLog* output = cbData.strOutput;
+	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
+	bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
+
+	XSESSION_INFO session;
+	session.sessionID = network_session->session_id;
+	session.keyExchangeKey = network_session->xnkey;
+	session.hostAddress = (not_session_host ?
+		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr 
+		: network_session->virtual_couch[0].xsession_info.hostAddress);
+
+	uint8* session_bytes = (uint8*)&session;
+	char connect_string[sizeof(XSESSION_INFO) * 2 + 1];
+
+	// Encode the data into hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		sprintf(connect_string + (2 * i), "%02hhX", session_bytes[i]);
+	}
+
+	output->Output(StringFlag_None, "Invite code generated:");
+	output->Output(StringFlag_CopyToClipboard, connect_string);
+	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
+	
+	return 0;
+}
+
+int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	XSESSION_INFO session;
+	uint8* session_bytes = (uint8*)&session;
+
+	// Decode the data from hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		sscanf(tokens[1].c_str() + (2 * i), "%02hhX", &session_bytes[i]);
+	}
+
+	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+
 	return 0;
 }

@@ -365,3 +365,4 @@ void players_apply_patches(void)
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
     return;
 }
+

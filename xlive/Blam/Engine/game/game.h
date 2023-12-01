@@ -39,6 +39,7 @@ e_game_mode game_mode_get(void);
 bool game_is_campaign(void);
 bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);
+void __cdecl game_shell_set_in_progress();
 bool game_in_progress(void);
 bool game_is_predicted(void);
 bool game_is_authoritative(void);
@@ -46,3 +47,7 @@ s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 
 // Setup default player data in the game options structure
 void game_options_setup_default_players(int player_count, s_game_options* game_options);
+
+void __cdecl reset_global_player_counts();
+
+void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version);
