@@ -16,7 +16,6 @@
 #include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
-#include "Util/Base64.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 
@@ -834,54 +833,44 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = cbData.strOutput;
-	auto a = NetworkSession::GetActiveNetworkSession();
-	XNADDR host_xnaddr;
-	if (!NetworkSession::LocalPeerIsSessionHost())
-		host_xnaddr = a->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(a->session_host_peer_index)->observer_index].xnaddr;
-	else
-		host_xnaddr = a->virtual_couch->xsession_info.hostAddress;
+	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
+	bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
 
-	XNKID session_id = a->session_id;
-	XNKEY session_key = a->xnkey;
+	XSESSION_INFO session;
+	session.sessionID = network_session->session_id;
+	session.keyExchangeKey = network_session->xnkey;
+	session.hostAddress = (not_session_host ?
+		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr 
+		: network_session->virtual_couch[0].xsession_info.hostAddress);
 
-	std::vector<unsigned char> hostData(reinterpret_cast<const unsigned char*>(&host_xnaddr), reinterpret_cast<const unsigned char*>(&host_xnaddr) + sizeof(host_xnaddr));
-	std::vector<unsigned char> sessionIdData(session_id.ab, session_id.ab + sizeof(session_id.ab));
-	std::vector<unsigned char> sessionKeyData(session_key.ab, session_key.ab + sizeof(session_key.ab));
+	uint8* session_bytes = (uint8*)&session;
+	char connect_string[sizeof(XSESSION_INFO) * 2 + 1];
 
-	// Concatenate the binary data
-	hostData.insert(hostData.end(), sessionIdData.begin(), sessionIdData.end());
-	hostData.insert(hostData.end(), sessionKeyData.begin(), sessionKeyData.end());
-
-	auto encoded = base64_encode_binary(hostData);
+	// Encode the data into hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		sprintf(connect_string + (2 * i), "%02hhX", session_bytes[i]);
+	}
 
 	output->Output(StringFlag_None, "Invite code generated:");
-	output->Output(StringFlag_CopyToClipboard, encoded.c_str());
+	output->Output(StringFlag_CopyToClipboard, connect_string);
 	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
+	
 	return 0;
 }
 
 int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	std::string encodedString = tokens[1];
-	XNADDR host_xnaddr;
-	XNKID session_id;
-	XNKEY session_key;
+	XSESSION_INFO session;
+	uint8* session_bytes = (uint8*)&session;
 
-	std::vector<unsigned char> decodedData = base64_decode_binary(encodedString);
-
-	// Ensure the decoded data size matches the expected size of the concatenated structures
-	size_t expectedSize = sizeof(XNADDR) + sizeof(XNKID) + sizeof(XNKEY);
-	if (decodedData.size() != expectedSize) {
-		return 1;
+	// Decode the data from hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		sscanf(tokens[1].c_str() + (2 * i), "%02hhX", &session_bytes[i]);
 	}
 
-	// Extract each structure from the decoded binary data
-	std::copy(decodedData.begin(), decodedData.begin() + sizeof(XNADDR), reinterpret_cast<unsigned char*>(&host_xnaddr));
-	std::copy(decodedData.begin() + sizeof(XNADDR), decodedData.begin() + sizeof(XNADDR) + sizeof(XNKID), session_id.ab);
-	std::copy(decodedData.begin() + sizeof(XNADDR) + sizeof(XNKID), decodedData.end(), session_key.ab);
-
-
-	game_direct_connect_to_session(session_id, session_key, host_xnaddr, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
 
 	return 0;
 }
