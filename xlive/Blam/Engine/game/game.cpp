@@ -1,11 +1,25 @@
 #include "stdafx.h"
 #include "game.h"
 
+#include "game_engine.h"
+#include "game_time.h"
+
+#include "Blam/Engine/cseries/cseries.h"
+#include "Blam/Engine/main/interpolator.h"
+#include "Blam/Engine/main/main.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "Blam/Engine/saved_games/game_state.h"
+#include "Blam/Engine/shell/shell.h"
+#include "Util/Hooks/Hook.h"
+
+s_game_systems* get_game_systems()
+{
+	return Memory::GetAddress<s_game_systems*>(0x3A0468, 0x35D198);
+}
 
 s_main_game_globals* get_main_game_globals(void)
 {
-	return *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520);
+    return *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520);
 }
 
 bool map_initialized(void)
@@ -128,3 +142,118 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
     game_shell_set_in_progress();
 }
 
+
+void __cdecl shell_initialize(void)
+{
+    game_state_shell_initialize();
+    s_main_game_globals* p_game_globals = (s_main_game_globals*)game_state_malloc("game globals", NULL, sizeof(s_main_game_globals));
+    csmemset(p_game_globals, 0, sizeof(s_main_game_globals));
+    p_game_globals->active_structure_bsp_index = NONE;
+    *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = p_game_globals;    // Write allocated globals back to the original exe
+
+    real_math_reset_precision();
+
+    s_game_systems* g_game_systems = get_game_systems();
+    for (size_t i = 0; i < 70; ++i)
+    {
+        g_game_systems[i].initialize_proc();
+    }
+
+    // Interpolation allocation
+    if (shell_tool_type() || !Memory::IsDedicatedServer())
+    {
+        g_frame_data_storage = (s_frame_data_storage*)VirtualAlloc(0, sizeof(s_frame_data_storage), MEM_COMMIT, PAGE_READWRITE);
+        g_frame_data_intermediate = (s_interpolation_data*)VirtualAlloc(0, sizeof(s_interpolation_data), MEM_COMMIT, PAGE_READWRITE);
+        g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
+        g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
+        set_interpolation_enabled(true);
+    }
+    return;
+}
+
+bool __cdecl main_events_pending(void)
+{
+    return INVOKE(0x396B1, 0x411D0, main_events_pending);
+}
+
+void __cdecl game_tick(void)
+{
+    INVOKE(0x4A4AF, 0x4372D, game_tick);
+    return;
+}
+
+void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
+{
+    int32 actual_ticks = 0;
+    if (desired_ticks > 0)
+    {
+        while (!main_events_pending())
+        {
+            halo_interpolator_update_begin();
+            game_tick();
+            halo_interpolator_update_end();
+            if (cinematic_sound_sync_complete())
+            {
+                break;
+            }
+            if (++actual_ticks >= desired_ticks)
+            {
+                return;
+            }
+        }
+        if (actual_ticks < desired_ticks)
+        {
+            game_time_discard(desired_ticks, actual_ticks, elapsed_game_dt);
+        }
+    }
+
+    return;
+}
+
+void game_info_initialize_for_new_map(s_game_options* options)
+{
+    s_main_game_globals* game_globals = get_main_game_globals();
+
+    game_globals->options = *options;
+    game_globals->options.load_level_only = false;
+
+    if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
+    {
+        game_engine_variant_cleanup(&game_globals->options.game_variant.variant_flag);
+    }
+    random_math_set_seed(game_globals->options.random_seed);
+    game_globals->game_is_lost = false;
+    game_globals->game_is_finished = false;
+    game_globals->pvs_object_is_set = false;
+    game_globals->game_ragdoll_count = false;
+    return;
+}
+
+void __cdecl game_initialize_for_new_map(s_game_options* options)
+{
+    s_main_game_globals* game_globals = get_main_game_globals();
+
+    halo_interpolator_clear_buffers();
+    real_math_reset_precision();
+    game_globals->initializing = true;
+    game_info_initialize_for_new_map(options);
+
+    s_game_systems* g_game_systems = get_game_systems();
+    for (uint32 i = 0; i < 70; i++)
+    {
+        if (g_game_systems[i].reset_proc)
+        {
+            g_game_systems[i].reset_proc();
+        }
+    }
+    game_globals->initializing = false;
+    game_globals->map_active = true;
+}
+
+void game_apply_pre_winmain_patches()
+{
+    PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
+    PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
+    PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
+    PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), shell_initialize);
+}

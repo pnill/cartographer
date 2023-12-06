@@ -158,7 +158,7 @@ void InitRunLoop() {
 #if GAME_FRAME_INTERPOLATOR_ENABLED
 			Interpolation::ApplyPatches();
 #endif
-			MainGameTime::fps_limiter_enabled = true;
+			MainGameTime::fps_limiter_enabled = false;
 			break;
 
 		case _rendering_mode_none:

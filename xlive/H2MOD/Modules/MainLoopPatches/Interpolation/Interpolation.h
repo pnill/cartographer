@@ -1,6 +1,6 @@
 #pragma once
 
-#define GAME_FRAME_INTERPOLATOR_ENABLED false
+#define GAME_FRAME_INTERPOLATOR_ENABLED true
 
 namespace Interpolation
 {
@@ -13,4 +13,4 @@ namespace Interpolation
 	void PostGameTick();
 	float GetInterpolateTime();
 	bool ShouldInterpolate();
-}
+} 

@@ -1,5 +1,6 @@
 #pragma once
 #include "Blam/Engine/animations/animation_manager.h"
+#include "Blam/Engine/game/players.h"
 #include "Blam/Engine/math/matrix_math.h"
 
 #define MAXIMUM_NODES_PER_FIRST_PERSON_MODEL 64
@@ -13,21 +14,21 @@ enum e_first_person_weapon_data_flags : uint32
 
 struct s_first_person_model_data
 {
-	datum render_model_tag_index;
+	datum render_model_index;
 	datum object_index;
 	uint32 flags;
 	real_matrix4x3 nodes[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 };
 
-struct s_first_person_weapon_slot
+struct s_first_person_weapon_data
 {
 	e_first_person_weapon_data_flags flags;
 	datum weapon_index;
-	c_animation_manager base_animation_manager;
+	c_animation_manager animation_manager;
 	int8 gap_90[12];	// unused? maybe a real_point3d?
 	c_animation_channel move_animation_channel;
 	c_animation_channel jitter_animation_channel;
-	c_animation_id pitch_and_turn_animation_id;
+	c_animation_id pitch_turn_animation_id;
 	c_animation_id overlay_animation_id;
 	c_animation_id ammo_animation_id;
 	real32 field_E4;
@@ -43,20 +44,21 @@ struct s_first_person_weapon_slot
 	int16 child_node_index;
 	int16 alternate_parent_node_index;
 	int32 node_orientations_count;
-	int32 animation_graph_node_count;
+	int32 node_matrices_count;
 	real_matrix4x3 nodes[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 	datum sound_source_index;
 	int16 field_1004;
 	int16 pad;
 };
-CHECK_STRUCT_SIZE(s_first_person_weapon_slot, 4112);
+CHECK_STRUCT_SIZE(s_first_person_weapon_data, 4112);
 
 struct s_first_person_weapon
 {
 	uint32 flags;
 	datum unit_index;
-	int32 character_type;
-	s_first_person_weapon_slot weapons[k_first_person_max_weapons];
+	e_character_type character_type;
+	int8 pad[3];
+	s_first_person_weapon_data weapons[k_first_person_max_weapons];
 	c_interpolator_control rate_interpolator_control;
 	real_euler_angles2d pos;
 	real_euler_angles2d field_2038;
@@ -66,7 +68,7 @@ struct s_first_person_weapon
 	real_euler_angles2d field_2058;
 	real_matrix4x3 identity_matrix;
 	int32 adjustment_matrix_index;
-	real_matrix4x3 matrix_2098;
+	real_matrix4x3 adjustment_matrix;
 };
 CHECK_STRUCT_SIZE(s_first_person_weapon, 8396);
 
@@ -85,4 +87,4 @@ s_first_person_model_data* first_person_model_data_get_global(void);
 s_first_person_model_data* first_person_model_data_get(uint32 user_index);
 
 void toggle_first_person(bool state);
-void first_person_weapons_apply_patches();
+void first_person_weapons_apply_patches(void);

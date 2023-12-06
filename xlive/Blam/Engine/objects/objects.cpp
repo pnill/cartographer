@@ -432,7 +432,7 @@ void object_initialize_for_interpolation(datum object_index)
 	real_point3d center_of_mass;
 	real_matrix4x3* matrices = (real_matrix4x3*)object_header_block_get_with_count(object_index, &object->nodes_block, sizeof(real_matrix4x3), &nodes_count);
 	object_get_center_of_mass(object_index, &center_of_mass);
-	halo_frame_interpolator_object_populate_interpolation_data(object_index, matrices, nodes_count, &object->position, &object->forward, &object->up, &center_of_mass);
+	halo_interpolator_object_populate_interpolation_data(object_index, matrices, nodes_count, &object->position, &object->forward, &object->up, &center_of_mass);
 	return;
 }
 

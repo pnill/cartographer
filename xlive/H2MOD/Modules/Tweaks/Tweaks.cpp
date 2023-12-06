@@ -2,6 +2,7 @@
 #include "Tweaks.h"
 
 #include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/tag_files/files_windows.h"
@@ -272,6 +273,9 @@ void H2Tweaks::ApplyPatches() {
 
 		// Apply patches for the hud that need to be applied before WinMain is called
 		hud_apply_pre_winmain_patches();
+		
+		// Apply patches
+		game_apply_pre_winmain_patches();
 
 		// adds support for more monitor resolutions
 		rasterizer_settings_apply_hooks();
