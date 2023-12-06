@@ -3,5 +3,5 @@
 
 s_camera* get_global_camera()
 {
-	return Memory::GetAddress<s_camera*>(0x4E66C8);
+	return Memory::GetAddress<s_camera*>(0x4E66C8, 0x50E998);
 }

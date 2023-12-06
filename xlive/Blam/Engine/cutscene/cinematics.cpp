@@ -4,7 +4,7 @@
 #include "Blam/Engine/game/game.h"
 #include "Util/Hooks/Hook.h"
 
-s_cinematic_globals* get_cinematic_globals()
+s_cinematic_globals* get_cinematic_globals(void)
 {
 	return *Memory::GetAddress<s_cinematic_globals**>(0x48227C, 0x4F3DB0);
 }
@@ -26,7 +26,7 @@ bool cinematic_is_running()
 }
 
 // Same as above but hook used to disable framerate cap when playing cinematics
-bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
+bool __cdecl cinematics_in_progress_disable_framerate_cap_hook(void)
 {
 	bool result = false;
 	// don't limit the game framerate if we're single player and playing cinematics
@@ -37,6 +37,19 @@ bool __cdecl cinematics_in_progress_disable_framerate_cap_hook()
 	else
 	{
 		result = cinematic_is_running();
+	}
+
+	return result;
+}
+
+bool cinematic_in_progress(void)
+{
+	bool result = false;
+	s_cinematic_globals* cinematic_globals = get_cinematic_globals();
+
+	if (cinematic_globals)
+	{
+		result = cinematic_globals->flags.cinematic_in_progress;
 	}
 
 	return result;

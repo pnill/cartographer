@@ -3,6 +3,7 @@
 #include "WinMainH2.h"
 
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
+#include "Blam/Engine/saved_games/game_state.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h""
@@ -196,7 +197,7 @@ bool engine_basic_init()
 	if (!LOG_CHECK(tag_files_open()))
 		return false;
 
-	game_state_initialize();
+	game_state_shell_initialize();
 
 	// modifies esi need to check what the caller sets that too
 	// Update 1/13/2022:
@@ -308,13 +309,6 @@ void timing_initialize(int a1)
 	typedef void(__cdecl* init_timing_t)(int a1);
 	auto p_init_timing = Memory::GetAddress<init_timing_t>(0x37E39);
 	p_init_timing(a1);
-}
-
-void game_state_initialize()
-{
-	typedef void(__cdecl* game_state_initialize_t)();
-	auto p_game_state_initialize = Memory::GetAddress<game_state_initialize_t>(0x00030aa6);
-	p_game_state_initialize();
 }
 
 bool rasterizer_initialize()

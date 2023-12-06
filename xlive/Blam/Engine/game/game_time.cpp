@@ -69,7 +69,7 @@ bool time_globals::available()
 // We disable some broken code added by hired gun, that is also disabled while running a cinematic 
 // This should fix the built in frame limiter (while minimized)
 // As well as the game speeding up while minimized
-bool __cdecl cinematic_in_progress_hook()
+bool __cdecl cinematic_is_running_hook()
 {
 	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
 
@@ -103,9 +103,28 @@ bool __cdecl should_limit_framerate_hook()
 	return false;
 }
 
+void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)
+{
+	if (actual_ticks)
+	{
+		real32 result = *elapsed_game_dt - ((desired_ticks - actual_ticks) * time_globals::get()->seconds_per_tick);
+		if (result <= 0.0f)
+		{
+			result = 0.0f;
+		}
+		*elapsed_game_dt = result;
+	}
+	else
+	{
+		*elapsed_game_dt = 0.0;
+	}
+
+	return;
+}
+
 void game_time_apply_patches()
 {
 	// apply framerate throttle patches for when the game is minimized
-	PatchCall(Memory::GetAddress(0x39A2A), cinematic_in_progress_hook);
+	PatchCall(Memory::GetAddress(0x39A2A), cinematic_is_running_hook);
 	PatchCall(Memory::GetAddress(0x288B5), should_limit_framerate_hook);
 }

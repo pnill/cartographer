@@ -37,8 +37,10 @@ struct s_cinematic_globals
 };
 CHECK_STRUCT_SIZE(s_cinematic_globals, 36);
 
-s_cinematic_globals* get_cinematic_globals();
+s_cinematic_globals* get_cinematic_globals(void);
 
-bool cinematic_is_running();
+bool cinematic_is_running(void);
+
+bool cinematic_in_progress(void);
 
 void cinematics_apply_patches();
