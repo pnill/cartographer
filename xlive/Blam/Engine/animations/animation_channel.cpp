@@ -3,58 +3,63 @@
 
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
-c_animation_id::c_animation_id() 
-{ 
-	this->clear(); 
-};
-
-void c_animation_id::clear()
-{
-	this->graph_index = -1;
-	this->animation_index = -1;
-};
-
-short c_animation_id::index() 
-{ 
-	return this->animation_index; 
-};
-
-void c_animation_id::set_index(int16 index)
-{
-	this->animation_index = index;
-};
-
-void c_animation_id::set_subgraph(int16 subgraph)
-{
-	this->graph_index = subgraph;
-};
-
-short c_animation_id::subgraph()
-{
-	return this->graph_index;
-};
-
-bool c_animation_id::operator==(c_animation_id* animation_id)
-{
-	return this->graph_index== animation_id->graph_index && this->animation_index == animation_id->animation_index;
-}
 
 c_animation_channel::c_animation_channel()
 {
 	this->reset();
+	return;
 };
 
 c_animation_channel::~c_animation_channel()
 {
+	this->animation_string = NONE;
 	this->unk10 = 0;
+	return;
+}
+
+void c_animation_channel::apply_node_orientations(real32 a2, real32 a3, int32 orientation_count, real_orientation* orientation_list, void* func, datum object_index)
+{
+	this->apply_weighted_node_orientations(a2, 1.0f, a3, orientation_count, orientation_list, func, object_index);
+	return;
+}
+
+void c_animation_channel::apply_weighted_blend_screen_node_orientations(real32 yaw,
+	real32 pitch,
+	real32 ratio,
+	const c_static_flags<255>* flags,
+	int32 orientation_count,
+	real_orientation* orientation_list,
+	void* func,
+	datum object_index)
+{
+	typedef void(__thiscall* apply_weighted_blend_screen_node_orientations_t)(c_animation_channel*, real32, real32, real32, const c_static_flags<255>*, int32, real_orientation*, void*, datum);
+	apply_weighted_blend_screen_node_orientations_t function = Memory::GetAddress<apply_weighted_blend_screen_node_orientations_t>(0x112C8B, 0x1041AB);
+	function(this, yaw, pitch, ratio, flags, orientation_count, orientation_list, func, object_index);
+	return;
+}
+
+void c_animation_channel::apply_weighted_node_orientations(real32 a2, real32 ratio, real32 a4, int32 orientation_count, real_orientation* orientation_list, void* func, datum object_index)
+{
+	typedef void(__thiscall* apply_weighted_node_orientations_t)(c_animation_channel*, real32, real32, real32, int32, real_orientation*, void*, datum);
+	apply_weighted_node_orientations_t function = Memory::GetAddress<apply_weighted_node_orientations_t>(0x112B58, 0x104078);
+	function(this, a2, ratio, a4, orientation_count, orientation_list, func, object_index);
+	return;
+}
+
+const c_model_animation* c_animation_channel::get_state_animation(void)
+{
+	typedef c_model_animation* (__thiscall* get_state_animation_t)(c_animation_channel*);
+	get_state_animation_t get_state_animation = Memory::GetAddress<get_state_animation_t>(0x112749, 0x103C69);
+	return get_state_animation(this);
 }
 
 void c_animation_channel::initialize()
 {
 	this->reset();
+	return;
 }
 
-void c_animation_channel::reset()
+void c_animation_channel::reset(void)
 {
 	this->animation_id_0.clear();
 	this->animation_id_1.clear();
@@ -69,4 +74,18 @@ void c_animation_channel::reset()
 	this->animation_mode = -1;
 	this->unkD = -1;
 	this->unkE = -1;
+	return;
+}
+
+void c_animation_channel::set_frame_position(real32 position)
+{
+	typedef void(__thiscall* set_frame_position_t)(c_animation_channel*, real32);
+	set_frame_position_t set_frame_position = Memory::GetAddress<set_frame_position_t>(0x112F0A, 0x10442A);
+	set_frame_position(this, position);
+	return;
+}
+
+bool c_animation_channel::valid(void) const
+{
+	return this->animation_id_0.valid() && this->animation_id_1.valid();
 }
