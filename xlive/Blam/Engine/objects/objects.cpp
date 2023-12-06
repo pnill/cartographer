@@ -391,12 +391,52 @@ void free_object_memory(datum object_index)
 }
 
 
-void object_initialize_for_interpolation(datum object_datum)
+void object_initialize_for_interpolation(datum object_index)
 {
-	// TODO: finish this
+	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
+	object_datum* object = object_get_fast_unsafe(object_index);
+	object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
+
+	if (object_def->model.TagIndex == NONE)
+	{
+		if (object_def->attachments.size <= 0)
+		{
+			return;
+		}
+
+		int32 tag_block_index = 0;
+		while (1)
+		{
+			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
+			if (attachment->type.TagIndex != NONE)
+			{
+				blam_tag group = attachment->type.TagGroup;
+				if (group.as_int() == 'lens'
+					|| group.as_int() == 'ligh'
+					|| group.as_int() == 'MGS2'
+					|| group.as_int() == 'tdtl'
+					|| group.as_int() == 'cont'
+					|| group.as_int() == 'effe')
+				{
+					break;
+				}
+			}
+			if (++tag_block_index >= object_def->attachments.size)
+			{
+				return;
+			}
+		}
+	}
+
+	int32 nodes_count;
+	real_point3d center_of_mass;
+	real_matrix4x3* matrices = (real_matrix4x3*)object_header_block_get_with_count(object_index, &object->nodes_block, sizeof(real_matrix4x3), &nodes_count);
+	object_get_center_of_mass(object_index, &center_of_mass);
+	halo_frame_interpolator_object_populate_interpolation_data(object_index, matrices, nodes_count, &object->position, &object->forward, &object->up, &center_of_mass);
 	return;
 }
 
+#define USE_REWRITTEN_OBJECT_NEW
 // Creates a new object
 datum __cdecl object_new(object_placement_data* placement_data)
 {
@@ -706,6 +746,25 @@ datum object_get_damage_owner(datum object_index)
 	return object->damage_owner_object_index;
 }
 
+void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
+	render_model_definition* render_model, 
+	c_animation_manager* animation_manager, 
+	int32 a4, 
+	int32 orientation_count, 
+	real_orientation* orientations)
+{
+	INVOKE(0x134214, 0x1230E4, object_apply_function_overlay_node_orientations, object_index, render_model, animation_manager, a4, orientation_count, orientations);
+	return;
+}
+
+typedef void(__cdecl* t_object_move_t)(int);
+t_object_move_t p_object_move;
+void __cdecl object_move_hook(int a1)
+{
+	p_object_move(a1);
+	object_initialize_for_interpolation(a1);
+}
+
 // Replace calls to object_new with our own
 void object_new_replace_calls()
 {
@@ -744,6 +803,7 @@ void objects_apply_patches(void)
 {
 #ifdef USE_REWRITTEN_OBJECT_NEW
 	object_new_replace_calls();
+	DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
 #endif
 	return;
 }
