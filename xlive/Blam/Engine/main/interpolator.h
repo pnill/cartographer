@@ -63,8 +63,8 @@ void set_interpolation_enabled(bool enabled);
 
 void halo_interpolator_clear_buffers(void);
 
-void halo_frame_interpolator_update_begin(void);
-void halo_frame_interpolator_update_end(void);
+void halo_interpolator_update_begin(void);
+void halo_interpolator_update_end(void);
 
 real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
 
@@ -76,7 +76,7 @@ void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index
 
 void halo_interpolator_set_target_position_data(int32 user_index, int32 position_index, real_matrix4x3* matrix);
 
-void halo_frame_interpolator_object_populate_interpolation_data(
+void halo_interpolator_object_populate_interpolation_data(
 	datum object_index,
 	const real_matrix4x3* node_matrices,
 	int32 nodes_count,
