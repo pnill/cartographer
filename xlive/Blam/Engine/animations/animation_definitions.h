@@ -1,13 +1,14 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+#include "animation_id.h"
 
+#include "Blam/Cache/DataTypes/DataRef.h"
+#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "Blam/Cache/DataTypes/TagRef.h"
 
 #include "Blam/Engine/math/real_math.h"
-#include "Blam/Engine/animations/animation_channel.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
-#include <wtypes.h>
+#include "H2MOD/Tags/TagInterface.h"
 
 #define k_max_nodes_per_animation = 255
 
@@ -305,7 +306,7 @@ class c_model_animation
 
     byte blend_screen;
     byte node_count;
-    short frame_count;
+    int16 frame_count;
 
     e_model_animation_flags internal_flags;
     e_production_flags production_flags;
@@ -341,7 +342,7 @@ public:
     e_animation_type get_animation_type() const;
     float get_authored_duration() const;
     size_t get_effect_events_size() const;
-    short get_frame_count() const;
+    int16 get_frame_count(void) const;
     double get_frame_count_minus_epsilon() const;
     size_t get_frame_events_size() const;
     e_frame_info_type get_frame_info_type() const;
@@ -350,6 +351,7 @@ public:
     short get_loop_frame_index() const;
     byte get_node_count() const;
     int get_node_list_checksum() const;
+    e_playback_flags get_playback_flags(void) const;
     short get_primary_key_frame_index() const;
     short get_secondary_key_frame_index() const;
     short get_left_foot_frame_index() const;
@@ -385,7 +387,7 @@ public:
     size_t get_effect_reference_count() const;
     e_inheritance_flags get_inheritance_flags() const;
     const animation_graph_node* get_node(byte node_index) const;
-    size_t get_node_count() const;
+    int16 get_node_count() const;
     const animation_graph_sound_reference* get_sound_reference(byte node_index) const;
     size_t get_sound_reference_count() const;
     tag_reference get_parent_graph() const;
@@ -497,7 +499,6 @@ class c_animation_mode
     string_id label;
     tag_block<c_weapon_class> weapon_class;
     tag_block<s_animation_ik_point> mode_ik;
-
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_mode, 20);
 
@@ -518,7 +519,7 @@ struct c_vehicle_suspension
 };
 TAG_BLOCK_SIZE_ASSERT(c_vehicle_suspension, 40);
 
-enum e_function_controls : short
+enum e_function_controls : int16
 {
     function_control_frame = 0,
     function_control_scale = 1,
@@ -528,10 +529,10 @@ struct s_object_overlay
 {
     string_id label;
     c_animation_id animation;
-    PAD16;
+    int16 pad;
     e_function_controls function_controls;
     string_id function;
-    PAD32;
+    int32 pad1;
 };
 TAG_BLOCK_SIZE_ASSERT(s_object_overlay, 20);
 
@@ -554,7 +555,7 @@ TAG_BLOCK_SIZE_ASSERT(c_model_animation_graph_contents, 24);
 
 // TODO label and implement the rest of the member functions for this class
 // There's a lot of them and they're not currently needed
-class c_model_animation_graph : TagGroup<'jmad'>
+class c_model_animation_graph
 {
     c_animation_graph_resources resources;
     c_model_animation_graph_contents content;
@@ -571,12 +572,16 @@ class c_model_animation_graph : TagGroup<'jmad'>
     tag_block<s_additional_node_data> additional_node_data;
 
 public:
+    static const c_model_animation_graph* get(datum tag_datum_index)
+    {
+        return tags::get_tag_fast<const c_model_animation_graph>(tag_datum_index);
+    }
+
     byte find_node(const string_id string) const;
     byte find_node_with_flags(const e_node_model_flags flags) const;
 
-    const c_model_animation_graph* get(const datum tag_datum_index) const;
     c_model_animation_graph* get_writable(const datum tag_datum_index) const;
     const animation_graph_node* get_node(const byte node_index) const;
-    short get_node_count() const;
+    int16 get_node_count() const;
 };
 TAG_GROUP_SIZE_ASSERT(c_model_animation_graph, 172);
