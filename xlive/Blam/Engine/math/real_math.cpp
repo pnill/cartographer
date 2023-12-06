@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "real_math.h"
 
+void __cdecl real_math_reset_precision(void)
+{
+	INVOKE(0x32D88, 0x26327, real_math_reset_precision);
+	return;
+}
+
 void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion)
 {
 	INVOKE(0x34F6F, 0x285EC, fast_quaternion_interpolate_and_normalize, previous, current, fractional_ticks, out_quaternion);

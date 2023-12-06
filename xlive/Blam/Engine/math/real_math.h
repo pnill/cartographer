@@ -119,6 +119,10 @@ struct real_orientation
 };
 CHECK_STRUCT_SIZE(real_orientation, 32);
 
+const real_orientation global_identity_orientation = { {0.0f, 0.0f, 0.0f, 1.0f,}, {0.0f, 0.0f, 0.0f}, 1.0f};
+
+void __cdecl real_math_reset_precision(void);
+
 void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion);
 
 real32 square_root(real32 f);
