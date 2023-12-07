@@ -662,7 +662,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                         if (TEST_BIT(weapon_data->flags, 0) 
                             && weapon_data->weapon_index != NONE 
                             && model_data_count > 1 
-                            && TEST_FLAG(weapon_data->flags, _arm_node_table_valid_bit) 
+                            && TEST_BIT(weapon_data->flags, _arm_node_table_valid_bit)
                             && fp_hands_index != NONE)
                         {
                             weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
@@ -716,7 +716,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                             
                             real_matrix4x3* model_nodes = NULL;
                             bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
-                            if (current_model_index < model_data_count && TEST_FLAG(weapon_data->flags, _weapon_node_table_valid_bit) && weapon_model_index != NONE)
+                            if (current_model_index < model_data_count && TEST_BIT(weapon_data->flags, _weapon_node_table_valid_bit) && weapon_model_index != NONE)
                             {
                                 if (!interpolated)
                                 {
@@ -776,8 +776,8 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* m
     s_first_person_weapon* fp_data = first_person_weapons_get(user_index);
     datum unit_index = fp_data->unit_index;
     if (unit_index != NONE
-        && TEST_FLAG(fp_data->weapons[0].flags, 0)
-        && !TEST_FLAG(fp_data->weapons[1].flags, 0)
+        && TEST_BIT(fp_data->weapons[0].flags, 0)
+        && !TEST_BIT(fp_data->weapons[1].flags, 0)
         && fp_data->weapons[0].weapon_index != NONE
         && !unit_is_dual_wielding(unit_index))
     {
