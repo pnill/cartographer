@@ -183,8 +183,8 @@ namespace TagFixes
 			for (auto& biped_item : bipeds)
 			{
 				auto biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(biped_item.first);
-				biped->unitTag.objectTag.abs_acceleration.lower *= 2.0f;
-				biped->unitTag.objectTag.abs_acceleration.upper *= 2.0f;
+				biped->unitTag.object.abs_acceleration.lower *= 2.0f;
+				biped->unitTag.object.abs_acceleration.upper *= 2.0f;
 			}
 		}
 

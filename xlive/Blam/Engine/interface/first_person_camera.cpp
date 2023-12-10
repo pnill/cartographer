@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "first_person_camera.h"
 
-#include "Blam/Cache/TagGroups/unit_definition.hpp"
+#include "Blam/Engine/cache/cache_files.h"
 #include "Blam/Engine/game/player_control.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/units/units.h"
+#include "Blam/Engine/units/unit_definitions.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
 #define _USE_MATH_DEFINES
@@ -68,7 +68,8 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 		}
 		else
 		{
-			fov = tags::get_tag_fast<s_unit_group_definition>(object_get_fast_unsafe(player_control_info->unit_datum_index)->tag_definition_index)->camera_field_of_view;
+			_unit_definition* unit = (_unit_definition*)tag_get_fast(object_get_fast_unsafe(player_control_info->unit_datum_index)->tag_definition_index);
+			fov = unit->camera_field_of_view;
 		}
 
 		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.weapon_indexes);

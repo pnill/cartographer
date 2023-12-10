@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
+
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/function_definitions.h"
