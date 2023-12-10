@@ -66,6 +66,12 @@ bool time_globals::available()
 	return get() && get()->initialized;
 }
 
+bool game_time_get_paused(void)
+{
+	time_globals* game_time_globals = time_globals::get();
+	return game_time_globals->initialized && game_time_globals->paused;
+}
+
 // We disable some broken code added by hired gun, that is also disabled while running a cinematic 
 // This should fix the built in frame limiter (while minimized)
 // As well as the game speeding up while minimized

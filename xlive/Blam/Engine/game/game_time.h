@@ -28,6 +28,8 @@ struct time_globals
 };
 CHECK_STRUCT_SIZE(time_globals, 36);
 
+bool game_time_get_paused(void);
+
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt);
 
 void game_time_apply_patches();

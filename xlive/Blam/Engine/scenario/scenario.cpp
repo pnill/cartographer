@@ -19,7 +19,7 @@ uint32 scenario_netgame_equipment_size(void)
 void location_invalidate(s_location* object_location)
 {
     object_location->leaf_index = NONE;
-    object_location->cluster = NONE;
+    object_location->cluster_index = NONE;
     object_location->bsp_index = get_global_structure_bsp_index();
     return;
 }
@@ -28,6 +28,11 @@ void __cdecl scenario_location_from_point(s_location* location, real_point3d* po
 {
     INVOKE(0x281EE, 0x30CB1, scenario_location_from_point, location, point);
     return;
+}
+
+bool __cdecl scenario_location_underwater(s_location* location, real_point3d* point, int16* global_material_index)
+{
+    return INVOKE(0x27A03, 0x304C6, scenario_location_underwater, location, point, global_material_index);
 }
 
 void __cdecl scenario_location_from_leaf(s_location* location, int32 leaf_index)

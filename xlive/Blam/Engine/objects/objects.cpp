@@ -204,7 +204,7 @@ bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 	object_datum* object = object_get_fast_unsafe(object_index);
 	scenario_location_from_point(location, &object->object_origin_point);
 
-	if (location->cluster == NONE)
+	if (location->cluster_index == NONE)
 	{
 		collision_bsp_test_sphere_result test_result;
 		collision_bsp_test_sphere(global_collision_bsp_get(), 0, NULL, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
@@ -219,7 +219,7 @@ bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 		}
 	}
 
-	return location->cluster != NONE;
+	return location->cluster_index != NONE;
 }
 
 // Gets important info about the object and populates the s_object_payload argument with the appropriate data
@@ -253,22 +253,22 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		s_location scnr_location;
 		scenario_location_from_point(&scnr_location, &object->object_origin_point);
 		p_location = &scnr_location;
-		if (scnr_location.cluster == NONE)
+		if (scnr_location.cluster_index == NONE)
 		{
 			scenario_location_from_point(&scnr_location, &object->position);
 		}
 	}
 
-	if (p_location->cluster == NONE)
+	if (p_location->cluster_index == NONE)
 	{
 		object->object_flags.set(_object_outside_of_map_bit, true);
 	}
 	else
 	{
 		object->location.leaf_index = p_location->leaf_index;
-		object->location.cluster = p_location->cluster;
+		object->location.cluster_index = p_location->cluster_index;
 		object->location.bsp_index = p_location->bsp_index;
-		object_header->cluster_index = p_location->cluster;
+		object_header->cluster_index = p_location->cluster_index;
 		object->object_flags.set(_object_outside_of_map_bit, false);
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
@@ -696,7 +696,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					{ 
 						if (objects_can_connect_to_map())
 						{
-							if (!placement_data->flags.test(_scenario_object_placement_bit_1) && (!placement_data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster != NONE))
+							if (!placement_data->flags.test(_scenario_object_placement_bit_1) && (!placement_data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
 							{
 								object_delete(object_index);
 							}

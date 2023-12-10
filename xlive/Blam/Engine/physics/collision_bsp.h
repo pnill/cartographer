@@ -12,11 +12,23 @@ struct long_surface_flags
 	int32 flags;
 };
 
+struct collision_bsp_test_vector_result
+{
+	real32 field_0;
+	real_plane3d* plane;
+	int32 field_8;
+	int32 field_C;
+	int32 flags;
+	int32 field_14;
+};
+CHECK_STRUCT_SIZE(collision_bsp_test_vector_result, 24);
+
 struct collision_bsp_test_buffer
 {
 	int32 leaf_index;
 	int32 unk[255];
 };
+CHECK_STRUCT_SIZE(collision_bsp_test_buffer, 1024);
 
 struct collision_bsp_test_sphere_result
 {
@@ -56,3 +68,4 @@ bool __cdecl collision_bsp_test_sphere(
 	real_point3d* point,
 	real32 scale,
 	collision_bsp_test_sphere_result* test_result);
+
