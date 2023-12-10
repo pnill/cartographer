@@ -63,7 +63,7 @@ void christmas_event_map_load()
 			flood_datum != NONE)
 		{
 			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
-			add_hat_and_beard_to_model(flood_biped->unitTag.objectTag.model.TagIndex, santa_hat_datum, beard_datum, false);
+			add_hat_and_beard_to_model(flood_biped->unitTag.object.model.TagIndex, santa_hat_datum, beard_datum, false);
 		}
 	}
 	if (!DATUM_IS_NONE(snow_datum))
@@ -120,11 +120,11 @@ void christmas_event_map_load()
 
 		deer_datum = tag_loader::ResolveNewDatum(deer_datum);
 
-		auto ghost_vehicle = tags::get_tag<blam_tag::tag_group_type::vehicle, s_unit_group_definition>(ghost_datum);
-		ghost_vehicle->objectTag.attachments.data = 0;
-		ghost_vehicle->objectTag.attachments.size = 0;
+		auto ghost_vehicle = tags::get_tag<blam_tag::tag_group_type::vehicle, _unit_definition>(ghost_datum);
+		ghost_vehicle->object.attachments.data = 0;
+		ghost_vehicle->object.attachments.size = 0;
 
-		datum ghost_model_datum = ghost_vehicle->objectTag.model.TagIndex;
+		datum ghost_model_datum = ghost_vehicle->object.model.TagIndex;
 		auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ghost_model_datum);
 		ghost_model->render_model.TagIndex = deer_datum;
 	}

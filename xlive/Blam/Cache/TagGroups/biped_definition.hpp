@@ -1,7 +1,7 @@
 #pragma once
 
 #include "physics_model_definition.hpp"
-#include "unit_definition.hpp"
+#include "Blam/Engine/units/unit_definitions.h"
 
 /*********************************************************************
 * name: biped
@@ -12,7 +12,7 @@
 #pragma pack(push,1)
 struct s_biped_group_definition :TagGroup<'bipd'>
 {
-	s_unit_group_definition unitTag;
+	_unit_definition unitTag;
 	real_angle moving_turning_speed;//0x1EC
 	enum class e_biped_flags : __int32
 	{

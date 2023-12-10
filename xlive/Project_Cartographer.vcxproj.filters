@@ -337,7 +337,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\unit_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
@@ -707,6 +706,11 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
     <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
     <ClInclude Include="Blam\Engine\errors\error_reports.h" />
+    <ClInclude Include="Blam\Engine\ai\ai.h" />
+    <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
+    <ClInclude Include="Blam\Engine\units\dialogue_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_globals.h"
 
-#include "Blam/Cache/TagGroups/unit_definition.hpp"
+#include "Blam/Engine/units/unit_definitions.h"
 
 #include "Blam/Engine/models/models.h"
 #include "Blam/Engine/scenario/scenario.h"
@@ -180,8 +180,8 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 void game_globals_add_lmao_representation(void)
 {
 	// Create copy of default variant for chief and add lmao object to head
-	s_unit_group_definition* mp_chief_unit = (s_unit_group_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.TagIndex);
-	datum mode_chief_mp_datum =  mp_chief_unit->objectTag.model.TagIndex;
+	_unit_definition* mp_chief_unit = (_unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.TagIndex);
+	datum mode_chief_mp_datum =  mp_chief_unit->object.model.TagIndex;
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant

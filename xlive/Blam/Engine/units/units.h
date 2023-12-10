@@ -2,6 +2,12 @@
 #include "Blam/Engine/game/player_control.h"
 #include "Blam/Engine/objects/objects.h"
 
+#define MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
+#define NUMBER_OF_UNIT_HUD_TYPES 2
+#define k_powered_seats_count 2
+#define MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
+
+
 enum e_weapon_addition_method : int16
 {
 	_weapon_addition_method_zero = 0,
@@ -14,7 +20,7 @@ enum e_weapon_addition_method : int16
 	_weapon_addition_method_seven = 7,
 };
 
-enum e_unit_grenade_type : int8
+enum e_unit_grenade_type : int16
 {
 	_unit_grenade_type_fragmentation = 0,
 	_unit_grenade_type_plasma = 1,
