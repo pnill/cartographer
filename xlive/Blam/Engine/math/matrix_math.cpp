@@ -70,6 +70,44 @@ void matrix4x3_from_point_and_quaternion(real_matrix4x3* matrix, const real_poin
 	return;
 }
 
+void matrix4x3_to_point_and_vectors(real_matrix4x3* matrix, real_point3d* position, real_vector3d* forward, real_vector3d* up)
+{
+	*forward = matrix->vectors.forward;
+	*up = matrix->vectors.up;
+	*position = matrix->position;
+	return;
+}
+
+real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real_point3d* in, real_point3d* out)
+{
+	real_point3d in_copy = *in; 
+	if (matrix->scale != 1.0f)
+	{
+		in_copy.x *= matrix->scale;
+		in_copy.y *= matrix->scale;
+		in_copy.z *= matrix->scale;
+	}
+
+	out->x = (((matrix->vectors.up.i * in_copy.z) + (matrix->vectors.left.i * in_copy.y)) + (matrix->vectors.forward.i * in_copy.x)) + matrix->position.x;
+	out->y = (((matrix->vectors.up.j * in_copy.z) + (matrix->vectors.left.j * in_copy.y)) + (matrix->vectors.forward.j * in_copy.x)) + matrix->position.y;
+	out->z = (((matrix->vectors.up.k * in_copy.z) + (matrix->vectors.left.k * in_copy.y)) + (matrix->vectors.forward.k * in_copy.x)) + matrix->position.z;
+	return out;
+}
+
+real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d *in, real_vector3d* out)
+{
+	real_point3d in_copy = *in;
+	if (matrix->scale != 1.0f)
+	{
+		scale_vector3d(&in_copy, matrix->scale, &in_copy);
+	}
+
+	out->x = (((matrix->vectors.up.i * in_copy.z) + (matrix->vectors.left.i * in_copy.y)) + (matrix->vectors.forward.i * in_copy.x)) + matrix->position.x;
+	out->y = (((matrix->vectors.up.j * in_copy.z) + (matrix->vectors.left.j * in_copy.y)) + (matrix->vectors.forward.j * in_copy.x)) + matrix->position.y;
+	out->z = (((matrix->vectors.up.k * in_copy.z) + (matrix->vectors.left.k * in_copy.y)) + (matrix->vectors.forward.k * in_copy.x)) + matrix->position.z;
+	return out;
+}
+
 void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3* target, real32 fractional_ticks, real_matrix4x3* out_mat)
 {
 	real_quaternion q1_previous, q2_target, q3_interpolated;

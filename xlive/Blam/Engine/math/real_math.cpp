@@ -13,6 +13,35 @@ void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* pr
 	return;
 }
 
+real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b)
+{
+	real32 magnitude = magnitude3d(a);
+	if (fabs(magnitude) < 0.000099999997)
+	{
+		magnitude = 0.0f;
+		*a = *b;
+	}
+	else
+	{
+		scale_vector3d(a, 1.0f / magnitude, a);
+	}
+	return magnitude;
+}
+
+bool valid_real_vector3d_axes2(real_vector3d* forward, real_vector3d* up)
+{
+	bool result = false;
+	if (valid_real_normal3d(forward) && valid_real_normal3d(up))
+	{
+		real32 product = dot_product3d(forward, up);
+		if (valid_realcmp(product, 0.0f))
+		{
+			result = true;
+		}
+	}
+	return result;
+}
+
 real32 square_root(real32 f)
 {
 	return sqrt(f);
@@ -28,14 +57,9 @@ real32 absolute_value(real32 f)
 	return abs(f);
 }
 
-real32 magnitude3d_squared(const real_vector3d* v1)
-{
-	return v1->i * v1->i + v1->j * v1->j + v1->k * v1->k;
-}
-
 real32 magnitude3d(const real_vector3d* v1)
 {
-	real32 magnitude_squared = magnitude3d_squared(v1);
+	real32 magnitude_squared = magnitude_squared3d(v1);
 	return square_root(magnitude_squared);
 }
 
@@ -68,14 +92,6 @@ void subtract_vector3d(const real_vector3d* v1, const real_vector3d* v2, real_ve
 	return;
 }
 
-void scale_vector3d(const real_vector3d* v1, real32 scale, real_vector3d* out)
-{
-	out->i = v1->i * scale;
-	out->j = v1->j * scale;
-	out->k = v1->k * scale;
-	return;
-}
-
 void vector_from_points3d(const real_point3d* p1, const real_point3d* p2, real_vector3d* out)
 {
 	subtract_vector3d(p1, p2, out);
@@ -86,7 +102,7 @@ real32 distance_squared3d(const real_point3d* p1, const real_point3d* p2)
 {
 	real_vector3d t1;
 	vector_from_points3d(p1, p2, &t1);
-	return magnitude3d_squared(&t1);
+	return magnitude_squared3d(&t1);
 }
 
 real32 distance3d(const real_point3d* p1, const real_point3d* p2)
