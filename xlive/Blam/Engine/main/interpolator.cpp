@@ -200,7 +200,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
                 subtract_vector3d(target_position, previous_position, &position_difference);
 
                 // Don't interpolate if the distance interpolated is greater than k_interpolation_distance_cutoff
-                if (magnitude3d_squared(&position_difference) >= k_interpolation_distance_cutoff)
+                if (magnitude_squared3d(&position_difference) >= k_interpolation_distance_cutoff)
                 {
                     (*node_matrices)[node_index] = g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index];
                 }

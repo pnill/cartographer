@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
@@ -59,8 +60,6 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/Variants.h"
 #include "Util/Hooks/Hook.h"
-
-FLOATING_POINT_ENV_ACCESS();
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -848,6 +847,7 @@ void H2MOD::ApplyHooks() {
 	players_apply_patches();
 	objects_apply_patches();
 	weapon_definitions_apply_patches();
+	observer_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

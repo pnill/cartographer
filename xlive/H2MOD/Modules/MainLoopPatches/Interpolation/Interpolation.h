@@ -1,6 +1,6 @@
 #pragma once
 
-#define GAME_FRAME_INTERPOLATOR_ENABLED true
+#define GAME_FRAME_INTERPOLATOR_ENABLED false
 
 namespace Interpolation
 {

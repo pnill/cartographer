@@ -844,6 +844,21 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* m
     }
 }
 
+void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix)
+{
+    s_first_person_weapon* fp = first_person_weapons_get(user_index);
+    if (fp->adjustment_matrix_index != NONE && TEST_BIT(fp->flags, 2))
+    {
+        real_matrix4x3 interpolated_adjustment_matrix;
+        bool can_interpolate = halo_interpolator_get_interpolated_matrix_from_user_index(user_index, 1, &interpolated_adjustment_matrix);
+
+        real_matrix4x3* matrix_to_multiply = (can_interpolate ? &interpolated_adjustment_matrix : &fp->adjustment_matrix);
+        matrix4x3_multiply(effect_matrix, matrix_to_multiply, effect_matrix);
+    }
+
+    return;
+}
+
 void first_person_weapons_apply_patches(void)
 {
 	// Only patch if not a dedi

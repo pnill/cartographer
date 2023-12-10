@@ -87,4 +87,7 @@ s_first_person_model_data* first_person_model_data_get_global(void);
 s_first_person_model_data* first_person_model_data_get(uint32 user_index);
 
 void toggle_first_person(bool state);
+
+void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix);
+
 void first_person_weapons_apply_patches(void);

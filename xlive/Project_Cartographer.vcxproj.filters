@@ -246,6 +246,7 @@
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state_procs.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
+    <ClCompile Include="Blam\Engine\camera\director.cpp" />
     <ClCompile Include="Blam\Engine\effects\player_effects.cpp" />
     <ClCompile Include="Blam\Engine\render\render_visibility_collection.cpp" />
   </ItemGroup>
@@ -737,6 +738,7 @@
     <ClInclude Include="Blam\Engine\animations\ik_point_iterator.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state_procs.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
+    <ClInclude Include="Blam\Engine\camera\director.h" />
     <ClInclude Include="Blam\Engine\effects\player_effects.h" />
     <ClInclude Include="Blam\Engine\physics\collision_models.h" />
     <ClInclude Include="Blam\Engine\render\render_visibility_collection.h" />
