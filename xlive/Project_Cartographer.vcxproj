@@ -729,7 +729,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
@@ -766,6 +765,7 @@
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
@@ -827,6 +827,7 @@
     <ClInclude Include="Blam\Engine\text\text_group.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
+    <ClInclude Include="Blam\Engine\units\biped_definitions.h" />
     <ClInclude Include="Blam\Engine\units\dialogue_definitions.h" />
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />

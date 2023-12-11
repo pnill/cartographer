@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "TagFixes.h"
 
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/light_definition.h"
 #include "Blam/Cache/TagGroups/shader_definition.hpp"
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
+
+#include "Blam/Engine/units/biped_definitions.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -182,9 +183,9 @@ namespace TagFixes
 			auto bipeds = tags::find_tags(blam_tag::tag_group_type::biped);
 			for (auto& biped_item : bipeds)
 			{
-				auto biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(biped_item.first);
-				biped->unitTag.object.abs_acceleration.lower *= 2.0f;
-				biped->unitTag.object.abs_acceleration.upper *= 2.0f;
+				auto biped = tags::get_tag<blam_tag::tag_group_type::biped, _biped_definition>(biped_item.first);
+				biped->unit.object.abs_acceleration.lower *= 2.0f;
+				biped->unit.object.abs_acceleration.upper *= 2.0f;
 			}
 		}
 

@@ -2,6 +2,8 @@
 #include "units.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
+#define k_contact_point_count 3
+
 enum e_biped_physics_mode : uint8
 {
 	_mode_ground = 1,
