@@ -57,7 +57,7 @@ struct s_physics_model_translation
     real_quaternion rotation_k;
     real_quaternion translation;
 };
-TAG_BLOCK_SIZE_ASSERT(s_physics_model_translation, 80);
+CHECK_STRUCT_SIZE(s_physics_model_translation, 80);
 
 // max count: k_maximum_shapes_per_physics_model 1024
 struct s_physics_model_sphere

@@ -35,11 +35,12 @@ struct s_biped_lock_on_data
 };
 CHECK_STRUCT_SIZE(s_biped_lock_on_data, 8);
 
+// max count: k_contact_point_count 3
 struct biped_contact_point
 {
     string_id marker_name;
 };
-CHECK_STRUCT_SIZE(biped_contact_point, 4);
+TAG_BLOCK_SIZE_ASSERT(biped_contact_point, 4);
 
 struct _biped_definition
 {
