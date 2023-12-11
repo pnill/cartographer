@@ -324,7 +324,6 @@
     <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\biped_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
@@ -711,6 +710,8 @@
     <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
     <ClInclude Include="Blam\Engine\units\dialogue_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
+    <ClInclude Include="Blam\Engine\units\biped_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

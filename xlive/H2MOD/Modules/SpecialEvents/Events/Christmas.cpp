@@ -3,13 +3,14 @@
 #include "Christmas.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/biped_definition.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 
 #include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/models/models.h"
 #include "Blam/Engine/scenario/scenario.h"
+#include "Blam/Engine/units/biped_definitions.h"
+
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
@@ -62,8 +63,8 @@ void christmas_event_map_load()
 		if (datum flood_datum = game_globals_get_representation(_character_type_flood)->third_person_unit.TagIndex;
 			flood_datum != NONE)
 		{
-			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, s_biped_group_definition>(flood_datum, true);
-			add_hat_and_beard_to_model(flood_biped->unitTag.object.model.TagIndex, santa_hat_datum, beard_datum, false);
+			auto flood_biped = tags::get_tag<blam_tag::tag_group_type::biped, _biped_definition>(flood_datum, true);
+			add_hat_and_beard_to_model(flood_biped->unit.object.model.TagIndex, santa_hat_datum, beard_datum, false);
 		}
 	}
 	if (!DATUM_IS_NONE(snow_datum))
