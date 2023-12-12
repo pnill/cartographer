@@ -783,6 +783,7 @@
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
+    <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
