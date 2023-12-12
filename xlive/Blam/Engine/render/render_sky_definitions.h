@@ -4,6 +4,10 @@
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/real_math.h"
 
+#define MAXIMUM_ANIMATIONS_PER_SKY 8
+#define MAXIMUM_LIGHTS_PER_SKY 8
+#define MAXIMUM_SHADER_FUNCTIONS_PER_SKY 8
+
 enum e_sky_flags
 {
 	_sky_fixed_in_world_space = FLAG(0),
@@ -21,6 +25,7 @@ enum e_sky_radiosity_light_flags
 	_sky_radiosity_indirect_illumination_in_lightmaps = FLAG(3)
 };
 
+// max_count:    MAXIMUM_ANIMATIONS_PER_SKY = 8
 struct s_sky_animation
 {
 	int16 animation_index;
@@ -28,13 +33,17 @@ struct s_sky_animation
 	real32 period_sec;
 	int8 pad_2[28];
 };
+TAG_BLOCK_SIZE_ASSERT(s_sky_animation, 36);
 
+// max_count:    MAXIMUM_SHADER_FUNCTIONS_PER_SKY = 8
 struct s_sky_shader_function
 {
 	int8 pad[4];
 	char global_function_name[32];
 };
+TAG_BLOCK_SIZE_ASSERT(s_sky_shader_function, 36);
 
+// max count 1
 struct sky_radiosity_light_block
 {
 	e_sky_radiosity_light_flags flags;
@@ -46,6 +55,7 @@ struct sky_radiosity_light_block
 };
 TAG_BLOCK_SIZE_ASSERT(sky_radiosity_light_block, 0x28);
 
+// max count 1
 struct s_sky_light_fog
 {
 	real_rgb_color color;
@@ -59,6 +69,7 @@ struct s_sky_light_fog
 };
 TAG_BLOCK_SIZE_ASSERT(s_sky_light_fog, 0x2C);
 
+// max_count:    MAXIMUM_LIGHTS_PER_SKY = 8
 struct s_sky_light
 {
 	real_vector3d direction_vector;
@@ -71,6 +82,7 @@ struct s_sky_light
 };
 TAG_BLOCK_SIZE_ASSERT(s_sky_light, 0x34);
 
+// max count 1
 struct s_sky_patchy_fog
 {
 	real_rgb_color color;
@@ -82,12 +94,15 @@ struct s_sky_patchy_fog
 };
 TAG_BLOCK_SIZE_ASSERT(s_sky_patchy_fog, 0x50);
 
+// max count 1
 struct s_sky_fog
 {
 	real_rgb_color color;
 	real32 density;
 };
+TAG_BLOCK_SIZE_ASSERT(s_sky_fog, 16);
 
+// max count 1
 struct s_sky_atmospheric_fog
 {
 	real_rgb_color color;
@@ -95,12 +110,15 @@ struct s_sky_atmospheric_fog
 	real32 start_distance_world_units;
 	real32 opaque_distance_world_units;
 };
+TAG_BLOCK_SIZE_ASSERT(s_sky_atmospheric_fog, 24);
 
+// max count 1
 struct s_sky_cubemap
 {
 	tag_reference cube_map_reference;
 	real32 power_scale;
 };
+TAG_BLOCK_SIZE_ASSERT(s_sky_cubemap, 0xC);
 
 struct s_sky_definition
 {
