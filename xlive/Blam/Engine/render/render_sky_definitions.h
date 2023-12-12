@@ -8,7 +8,7 @@
 #define MAXIMUM_LIGHTS_PER_SKY 8
 #define MAXIMUM_SHADER_FUNCTIONS_PER_SKY 8
 
-enum e_sky_flags
+enum e_sky_flags : int32
 {
 	_sky_fixed_in_world_space = FLAG(0),
 	_sky_depreciated = FLAG(1),
@@ -17,7 +17,7 @@ enum e_sky_flags
 	_sky_use_clear_color = FLAG(4)
 };
 
-enum e_sky_radiosity_light_flags
+enum e_sky_radiosity_light_flags : int32
 {
 	_sky_radiosity_light_affects_exteriors = FLAG(0),
 	_sky_radiosity_light_affects_interios = FLAG(1),
