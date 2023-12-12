@@ -1,6 +1,8 @@
 #pragma once
 
+#include "effects_creation.h"
 #include "effect_location_definition.h"
+#include "particle_definition_interface.h"
 #include "particle_property.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
@@ -9,6 +11,8 @@
 
 #define k_maximum_emitters_per_definition 8
 #define k_maximum_particle_systems_per_block 32
+
+class c_particle_definition_interface;
 
 enum e_particle_billboard_style : int16
 {
@@ -62,6 +66,7 @@ enum e_particle_system_emitter_emission_shape : int32
 // max count: k_maximum_emitters_per_definition 8
 class c_particle_emitter_definition
 {
+public:
     tag_reference particle_physics; // pmov
 
     // Explaination("particle emission rate (particles/tick)", "")
@@ -98,6 +103,7 @@ CHECK_STRUCT_SIZE(c_particle_emitter_definition, 0xB8);
 // max count: k_maximum_particle_systems_per_block 32
 class c_particle_system_definition
 {
+public:
     tag_reference particle;
     //Block reference effect_locations_block
     int32 location;
@@ -119,11 +125,14 @@ class c_particle_system_definition
     real32 lod_feather_out_delta;
     int32 pad_2;
     tag_block<c_particle_emitter_definition> emitters;
+
+    c_particle_definition_interface* get_particle_system_interface() const;
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 
 class c_particle_definition
 {
+public:
     e_particle_definition_flags flags;
     e_particle_billboard_style billboard_style;
     int8 pad[2];
@@ -156,3 +165,38 @@ class c_particle_definition
     int8 pad_1[40];
 };
 TAG_GROUP_SIZE_ASSERT(c_particle_definition, 188);
+
+
+//class c_particle_interface;
+//struct c_particle_interface_vtable
+//{
+//	void* function_0;
+//	void* function_1;
+//	void* function_2;
+//	void* function_3;
+//	void* function_4;
+//	void* function_5;
+//	void* function_6;
+//	int(__thiscall* c_particle_interface__get_attached_particle_system)(c_particle_interface*, int32);
+//	int(__thiscall* get_particle_definiton_locations_size)(c_particle_interface*);
+//	effect_location_definition* (__thiscall* get_particle_definiton_locations)(c_particle_interface*);
+//	void* function_10;
+//	void* function_11;
+//	void* function_12;
+//	bool(__thiscall* system_is_debug_only_or_looping_or_cinematic)(c_particle_interface*);
+//	void* function_14;
+//	void* function_15;
+//	void* function_16;
+//	bool(__thiscall* system_is_v_mirrored_or_one_shot)(c_particle_interface*);
+//	void* function_18;
+//	void* function_19;
+//	void(__thiscall* sub_503B62)(c_particle_interface_vtable*, int);
+//};
+
+class c_particle_sprite_definition_interface : c_particle_definition_interface
+{
+public:
+    datum tag_index;
+    c_particle_definition* particle_definition;
+    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index) override;
+};
