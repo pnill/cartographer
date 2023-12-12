@@ -718,6 +718,11 @@
     <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
     <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_movement_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_property.h" />
+    <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
+    <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
