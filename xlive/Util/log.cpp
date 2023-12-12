@@ -6,12 +6,11 @@
 
 h2log* h2log::console = nullptr;
 bool h2log::failAlerted = false;
-std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> h2log::string_convert;
 
 h2log::h2log(const std::string& name)
 {
 	sname = name;
-	wname = string_convert.from_bytes(name);
+	wname = std::wstring(name.begin(), name.end());
 
 	// should be fine to do this for every logger, better here once than someplace else
 	spdlog::flush_on(spdlog::level::trace);
