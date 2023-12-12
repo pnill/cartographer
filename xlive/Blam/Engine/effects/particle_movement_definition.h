@@ -27,9 +27,11 @@ enum e_particle_controller_type : int16
 // max_count:    c_particle_movement_definition_controller_parameter_count = 9
 class c_particle_controller_parameter
 {
+public:
 	int32 parameter_id;
 	c_particle_property property;
 };
+TAG_BLOCK_SIZE_ASSERT(c_particle_controller_parameter, 0x14);
 
 // max_count:    c_particle_movement_definition_controller_max_count = 4
 class c_particle_controller
@@ -40,6 +42,7 @@ public:
 	tag_block<c_particle_controller_parameter> parameters;
 	int8 pad_2[8];
 };
+TAG_BLOCK_SIZE_ASSERT(c_particle_controller, 0x14);
 
 class c_particle_movement_definition
 {
@@ -48,3 +51,4 @@ public:
 	e_particle_movement_flags flags;
 	tag_block<c_particle_controller> movements;
 };
+TAG_GROUP_SIZE_ASSERT(c_particle_movement_definition, 0x14);
