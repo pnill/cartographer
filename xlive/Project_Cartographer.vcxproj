@@ -419,6 +419,9 @@
     <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
     <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
     <ClInclude Include="Blam\Engine\effects\effect_location_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_movement_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_property.h" />
     <ClInclude Include="Blam\Engine\effects\particle_system_definition.h" />
     <ClInclude Include="Blam\Engine\errors\error_reports.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
