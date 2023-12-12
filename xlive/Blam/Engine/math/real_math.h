@@ -33,6 +33,13 @@ union real_euler_angles3d
 };
 CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 
+union real_vector4d
+{
+	real32 v[4];
+	struct { real32 i, j, k, l; };
+};
+CHECK_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
+
 union real_vector3d
 {
 	real32 v[3];

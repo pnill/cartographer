@@ -415,6 +415,10 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\effects\effects.h" />
+    <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
+    <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\effect_location_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_system_definition.h" />
     <ClInclude Include="Blam\Engine\errors\error_reports.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
@@ -792,6 +796,8 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_damage.h" />
