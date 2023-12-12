@@ -712,6 +712,12 @@
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
     <ClInclude Include="Blam\Engine\units\biped_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\effect_location_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_system_definition.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
