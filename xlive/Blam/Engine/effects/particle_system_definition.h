@@ -1,9 +1,6 @@
 #pragma once
 
-#include "c_particle_definition_interface.h"
-#include "effects.h"
 #include "effect_location_definition.h"
-#include "test.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/shaders/shader_definitions.h"
