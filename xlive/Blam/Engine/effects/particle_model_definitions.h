@@ -4,16 +4,37 @@
 #include "particle_system_definition.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/geometry/geometry_block.h"
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"
 
 
+
+enum e_particle_model_definition_flags : int32
+{
+    _particle_model_definition_spins = FLAG(0),
+    _particle_model_definition_random_u_mirror = FLAG(1),
+    _particle_model_definition_random_v_mirror = FLAG(2),
+    _particle_model_definition_frame_animation_one_shot = FLAG(3),
+    _particle_model_definition_select_random_sequence = FLAG(4),
+    _particle_model_definition_disable_frame_blending = FLAG(5),
+    _particle_model_definition_can_animate_backwards = FLAG(6),
+    _particle_model_definition_receive_lightmap_lighting = FLAG(7),
+    _particle_model_definition_tint_from_diffuse_texture = FLAG(8),
+    _particle_model_definition_dies_at_rest = FLAG(9),
+    _particle_model_definition_dies_on_structure_collision = FLAG(10),
+    _particle_model_definition_dies_in_media = FLAG(11),
+    _particle_model_definition_dies_in_air = FLAG(12),
+    _particle_model_definition_bitmap_authored_vertically = FLAG(13),
+    _particle_model_definition_has_sweetener = FLAG(14)
+};
+
 enum e_particle_model_orientation : int32
 {
-    _particle_model_screen_facing,
-    _particle_model_parallel_to_direction,
-    _particle_model_perpendicular_to_direction,
-    _particle_model_vertical,
-    _particle_model_horizontal
+    _particle_model_orientation_screen_facing,
+    _particle_model_orientation_parallel_to_direction,
+    _particle_model_orientation_perpendicular_to_direction,
+    _particle_model_orientation_vertical,
+    _particle_model_orientation_horizontal
 };
 
 struct s_particle_model_vertex
@@ -36,7 +57,7 @@ public:
 class c_particle_model_definition
 {
 public:
-    e_particle_definition_flags flags;
+    e_particle_model_definition_flags flags;
     e_particle_model_orientation orientation;
     int8 pad[16];
     tag_reference shader; //shad
@@ -68,4 +89,13 @@ public:
     tag_block<rasterizer_vertex_buffer> cached_data;
     geometry_block_info geometry_section_info;
     int8 pad_2[28];
+};
+
+class c_particle_model_definition_interface
+{
+public:
+    int32 vtable;
+    datum tag_index;
+    c_particle_model_definition particle_model_definition;
+    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index);
 };

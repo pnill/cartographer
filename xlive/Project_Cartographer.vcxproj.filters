@@ -235,6 +235,16 @@
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_definition_interface.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_model_definition.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_system.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_system_definition.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_sky.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_emitter.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_state.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_update.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_property.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -723,6 +733,14 @@
     <ClInclude Include="Blam\Engine\effects\particle_property.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
     <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_definition_interface.h" />
+    <ClInclude Include="Blam\Engine\effects\particle.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_emitter.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_location.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_system.h" />
+    <ClInclude Include="Blam\Engine\render\render_sky.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_state.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_update.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
