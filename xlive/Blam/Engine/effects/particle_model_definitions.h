@@ -91,10 +91,11 @@ public:
     int8 pad_2[28];
 };
 
-class c_particle_model_definition_interface : c_particle_definition_interface
+class c_particle_model_definition_interface
 {
 public:
+    int32 vtable;
     datum tag_index;
     c_particle_model_definition particle_model_definition;
-    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index) override;
+    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index);
 };

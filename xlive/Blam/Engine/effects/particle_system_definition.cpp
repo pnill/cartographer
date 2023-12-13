@@ -1,5 +1,24 @@
 #include "stdafx.h"
 #include "particle_system_definition.h"
+#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "H2MOD/Tags/TagInterface.h"
+
+
+void c_particle_emitter_definition::get_emitter_particle_color(s_particle_state* particle_state,
+	real_argb_color* out_color)
+{
+	typedef void(__thiscall* get_emitter_particle_color_t)(c_particle_emitter_definition*, s_particle_state*, real_argb_color*);
+	auto function = Memory::GetAddress<get_emitter_particle_color_t>(0xFF455, 0);
+	function(this, particle_state, out_color);
+}
+
+void c_particle_emitter_definition::get_emitter_particle_inverse_color(s_particle_state* particle_state,
+	real_argb_color* out_color)
+{
+	typedef void(__thiscall* get_emitter_particle_inverse_color_t)(c_particle_emitter_definition*, s_particle_state*, real_argb_color*);
+	auto function = Memory::GetAddress<get_emitter_particle_inverse_color_t>(0xFF492, 0);
+	function(this, particle_state, out_color);
+}
 
 c_particle_definition_interface* c_particle_system_definition::get_particle_system_interface() const
 {

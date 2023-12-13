@@ -8,11 +8,11 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/shaders/shader_definitions.h"
 #include "Blam/Engine/shaders/shader_postprocess_definitions.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 #define k_maximum_emitters_per_definition 8
 #define k_maximum_particle_systems_per_block 32
 
-class c_particle_definition_interface;
 
 enum e_particle_billboard_style : int16
 {
@@ -96,7 +96,11 @@ public:
     // particle initial velocity direction relative to the location's forward
     real_euler_angles2d relative_direction;
 
-    byte pad[8];
+    int32 runtime_flags;
+    int32 runtime_flags_2;
+
+    void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
+    void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
 };
 CHECK_STRUCT_SIZE(c_particle_emitter_definition, 0xB8);
 
@@ -113,7 +117,7 @@ public:
     e_particle_system_camera_mode camera_mode;
     // use values between -10 and 10 to move closer and farther from camera (positive is closer)
     int16 sort_bias;
-    e_particle_system_flags flags;
+    e_particle_system_definition_flags flags;
     //defaults to 0.0
     real32 lod_in_distance;
     //defaults to 0.0
@@ -193,10 +197,11 @@ TAG_GROUP_SIZE_ASSERT(c_particle_definition, 188);
 //	void(__thiscall* sub_503B62)(c_particle_interface_vtable*, int);
 //};
 
-class c_particle_sprite_definition_interface : c_particle_definition_interface
+class c_particle_sprite_definition_interface
 {
 public:
+    int32 vtable;
     datum tag_index;
     c_particle_definition* particle_definition;
-    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index) override;
+    c_particle_system_definition* get_attached_particle_system(int32 particle_system_index);
 };

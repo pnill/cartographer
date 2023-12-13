@@ -1,0 +1,7 @@
+#include "stdafx.h"
+#include "render_sky.h"
+
+float __cdecl get_current_sky_render_model_scale()
+{
+	return INVOKE(0x19A139, 0, get_current_sky_render_model_scale);
+}

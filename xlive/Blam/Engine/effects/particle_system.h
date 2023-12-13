@@ -2,12 +2,20 @@
 #include "particle_system_definition.h"
 #include "Blam/Engine/objects/object_placement.h"
 
+enum e_particle_system_flags : int16
+{
+	_particle_system_scale_with_sky_render_model_bit = 10,
+};
+
+
+
 class c_particle_system
 {
+public:
 	int32 field_0;
 	int32 field_4;
 	int8 gap_8[4];
-	int16 flags;
+	e_particle_system_flags flags;
 	int16 event_particle_system_index;
 	datum tag_index;
 	int16 effect_event_index;
@@ -25,7 +33,7 @@ class c_particle_system
 	int32 field_4C;
 	pixel32 color;
 
-	c_particle_system_definition* get_particle_system_definition();
+	c_particle_system_definition* get_particle_system_definition() const;
 };
 CHECK_STRUCT_SIZE(c_particle_system, 0x54);
 
