@@ -15,18 +15,15 @@ datum __cdecl effect_new_from_object(
 
 s_data_array* get_effects_table()
 {
-    //TODO: Server offset
-    return *Memory::GetAddress<s_data_array**>(0x4CE884, 0x0);
+    return *Memory::GetAddress<s_data_array**>(0x4CE884, 0x4F5070);
 }
 
 s_data_array* get_effects_location_table()
 {
-    //TODO: Server offset
-    return *Memory::GetAddress<s_data_array**>(0x4CE880, 0);
+    return *Memory::GetAddress<s_data_array**>(0x4CE880, 0x4F506C);
 }
 
 effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int a3)
 {
-    //TODO: Server offset
-    return INVOKE(0xA68DD, 0, effect_location_get_next_valid_index, effect_datum, out_index, a3);
+    return INVOKE(0xA68DD, 0x9895D, effect_location_get_next_valid_index, effect_datum, out_index, a3);
 }

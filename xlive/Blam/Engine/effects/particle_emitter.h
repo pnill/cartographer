@@ -12,7 +12,7 @@ struct c_particle_emitter
 	real_point3d position;
 	int8 gap_40[4];
 	int8 gap_44[8];
-	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_vector) const;
+	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_point) const;
 };
 CHECK_STRUCT_SIZE(c_particle_emitter, 0x4C);
 

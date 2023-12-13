@@ -36,18 +36,15 @@ void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3*
 
 void __cdecl matrix3x3_from_forward_and_up(real_matrix3x3* out_matrix, real_vector3d* forward_vector, real_vector3d* up_vector)
 {
-	//TODO Server Offset
-	INVOKE(0x79620, 0, matrix3x3_from_forward_and_up, out_matrix, forward_vector, up_vector);
+	INVOKE(0x79620, 0x77171, matrix3x3_from_forward_and_up, out_matrix, forward_vector, up_vector);
 }
 
 void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* input_matrix_2, real_matrix3x3* out_matrix)
 {
-	//TODO Server offset
-	INVOKE(0x78645, 0, matrix3x3_multiply, input_matrix_1, input_matrix_2, out_matrix);
+	INVOKE(0x78645, 0x7623B, matrix3x3_multiply, input_matrix_1, input_matrix_2, out_matrix);
 }
 
 void matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector)
 {
-	//TODO Server offset
-	INVOKE(0x78800, 0, matrix3x3_transform_vector, input_matrix, input_vector, out_vector);
+	INVOKE(0x78800, 0x763F6, matrix3x3_transform_vector, input_matrix, input_vector, out_vector);
 }

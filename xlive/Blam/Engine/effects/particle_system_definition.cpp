@@ -8,7 +8,7 @@ void c_particle_emitter_definition::get_emitter_particle_color(s_particle_state*
 	real_argb_color* out_color)
 {
 	typedef void(__thiscall* get_emitter_particle_color_t)(c_particle_emitter_definition*, s_particle_state*, real_argb_color*);
-	auto function = Memory::GetAddress<get_emitter_particle_color_t>(0xFF455, 0);
+	auto function = Memory::GetAddress<get_emitter_particle_color_t>(0xFF455, 0xB2EB4);
 	function(this, particle_state, out_color);
 }
 
@@ -16,7 +16,7 @@ void c_particle_emitter_definition::get_emitter_particle_inverse_color(s_particl
 	real_argb_color* out_color)
 {
 	typedef void(__thiscall* get_emitter_particle_inverse_color_t)(c_particle_emitter_definition*, s_particle_state*, real_argb_color*);
-	auto function = Memory::GetAddress<get_emitter_particle_inverse_color_t>(0xFF492, 0);
+	auto function = Memory::GetAddress<get_emitter_particle_inverse_color_t>(0xFF492, 0xB2EF1);
 	function(this, particle_state, out_color);
 }
 
