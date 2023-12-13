@@ -11,30 +11,30 @@
 
 enum e_particle_model_definition_flags : int32
 {
-    _particle_model_spins = FLAG(0),
-    _particle_model_random_u_mirror = FLAG(1),
-    _particle_model_random_v_mirror = FLAG(2),
-    _particle_model_frame_animation_one_shot = FLAG(3),
-    _particle_model_select_random_sequence = FLAG(4),
-    _particle_model_disable_frame_blending = FLAG(5),
-    _particle_model_can_animate_backwards = FLAG(6),
-    _particle_model_receive_lightmap_lighting = FLAG(7),
-    _particle_model_tint_from_diffuse_texture = FLAG(8),
-    _particle_model_dies_at_rest = FLAG(9),
-    _particle_model_dies_on_structure_collision = FLAG(10),
-    _particle_model_dies_in_media = FLAG(11),
-    _particle_model_dies_in_air = FLAG(12),
-    _particle_model_bitmap_authored_vertically = FLAG(13),
-    _particle_model_has_sweetener = FLAG(14)
+    _particle_model_definition_spins = FLAG(0),
+    _particle_model_definition_random_u_mirror = FLAG(1),
+    _particle_model_definition_random_v_mirror = FLAG(2),
+    _particle_model_definition_frame_animation_one_shot = FLAG(3),
+    _particle_model_definition_select_random_sequence = FLAG(4),
+    _particle_model_definition_disable_frame_blending = FLAG(5),
+    _particle_model_definition_can_animate_backwards = FLAG(6),
+    _particle_model_definition_receive_lightmap_lighting = FLAG(7),
+    _particle_model_definition_tint_from_diffuse_texture = FLAG(8),
+    _particle_model_definition_dies_at_rest = FLAG(9),
+    _particle_model_definition_dies_on_structure_collision = FLAG(10),
+    _particle_model_definition_dies_in_media = FLAG(11),
+    _particle_model_definition_dies_in_air = FLAG(12),
+    _particle_model_definition_bitmap_authored_vertically = FLAG(13),
+    _particle_model_definition_has_sweetener = FLAG(14)
 };
 
 enum e_particle_model_orientation : int32
 {
-    _particle_model_screen_facing,
-    _particle_model_parallel_to_direction,
-    _particle_model_perpendicular_to_direction,
-    _particle_model_vertical,
-    _particle_model_horizontal
+    _particle_model_orientation_screen_facing,
+    _particle_model_orientation_parallel_to_direction,
+    _particle_model_orientation_perpendicular_to_direction,
+    _particle_model_orientation_vertical,
+    _particle_model_orientation_horizontal
 };
 
 struct s_particle_model_vertex

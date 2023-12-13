@@ -3,9 +3,9 @@
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/memory/data.h"
 
-enum e_effect_location_flags : unsigned __int16
+enum e_effect_location_flags : int16
 {
-    _effect_location_flags_bit_15 = 0x0,
+    _effect_location_flags_bit_15 = FLAG(15),
 };
 
 
@@ -53,5 +53,5 @@ s_data_array* get_effects_table();
 
 s_data_array* get_effects_location_table();
 
-effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, datum* a2, int a3);
+effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3);
 void effects_apply_patches();

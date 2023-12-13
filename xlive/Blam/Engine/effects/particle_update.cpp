@@ -28,12 +28,12 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 	c_particle_system_definition* particle_system_definition = particle_system->get_particle_system_definition();
 	if (particle_system != particle_state->particle_system)
 	{
-		particle_state->flags = (e_particle_state_flags)(particle_state->flags & ~(_particle_update_flag_bit_10 | _particle_update_flag_bit_9 | _particle_update_flag_bit_6 | _particle_update_flag_bit_5 | _particle_update_flag_bit_4));
+		particle_state->flags = (e_particle_state_flags)(particle_state->flags & ~(_particle_update_flag_10 | _particle_update_flag_9 | _particle_update_flag_6 | _particle_update_flag_5 | _particle_update_flag_4));
 		particle_state->particle_system = particle_system;
 	}
 	if (particle_location != particle_state->particle_location)
 	{
-		particle_state->flags = (e_particle_state_flags)(particle_state->flags & ~(_particle_update_flag_bit_16 | _particle_update_flag_bit_13 | _particle_update_flag_bit_12 | _particle_update_flag_bit_7));
+		particle_state->flags = (e_particle_state_flags)(particle_state->flags & ~(_particle_update_flag_16 | _particle_update_flag_13 | _particle_update_flag_12 | _particle_update_flag_7));
 		particle_state->particle_location = particle_location;
 	}
 
