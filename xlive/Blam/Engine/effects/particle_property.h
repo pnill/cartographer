@@ -1,6 +1,8 @@
 #pragma once
 #include "Blam/Engine/math/function_definitions.h"
 
+// Forward decleration of type to prevent circular reference errors
+// Used instead of void* to preserver the type information without any need to access properties
 struct s_particle_state;
 
 enum e_particle_property_output_modifier : int16
