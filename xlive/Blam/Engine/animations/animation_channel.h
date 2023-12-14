@@ -1,23 +1,9 @@
 #pragma once
+#include "animation_definitions.h"
+
+#include "Blam/Engine/math/real_math.h"
+#include "Blam/Engine/memory/static_arrays.h"
 #include "Blam/Engine/tag_files/string_id.h"
-
-class c_animation_id
-{
-	int16 graph_index;
-	int16 animation_index;
-
-public:
-	c_animation_id();
-	~c_animation_id() = default;
-	void clear();
-	int16 index();
-	void set_index(int16 index);
-	void set_subgraph(int16 subgraph);
-	int16 subgraph();
-
-	bool operator==(c_animation_id* animation_id);
-};
-CHECK_STRUCT_SIZE(c_animation_id, 4);
 
 // TODO populate flags
 enum e_animation_state_flag_bits : int8
@@ -51,9 +37,23 @@ class c_animation_channel
 	real32 authored_time;
 
 public:
-	c_animation_channel();
-	~c_animation_channel();
-	void reset();
-	void initialize();
+	c_animation_channel(void);
+	~c_animation_channel(void);
+
+	void apply_node_orientations(real32 a2, real32 a3, int32 orientation_count, real_orientation* orientation_list, void* func, datum object_index);
+	void apply_weighted_blend_screen_node_orientations(real32 yaw,
+		real32 pitch,
+		real32 ratio,
+		const c_static_flags<255>* flags,
+		int32 orientation_count,
+		real_orientation* orientation_list,
+		void* func,
+		datum object_index);
+	void apply_weighted_node_orientations(real32 a2, real32 ratio, real32 a3, int32 orientation_count, real_orientation* orientation_list, void* func, datum object_index);
+	const c_model_animation* get_state_animation(void);
+	void initialize(void);
+	void reset(void);
+	void set_frame_position(real32 position);
+	bool valid(void) const;
 };
 CHECK_STRUCT_SIZE(c_animation_channel, 0x20);

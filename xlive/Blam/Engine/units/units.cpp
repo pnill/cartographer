@@ -21,3 +21,9 @@ float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_
 {
 	return INVOKE(0x1414AC, 0x1302FB, unit_get_field_of_view, unit_datum_index, unit_camera_field_of_view, weapon_index);
 }
+
+bool unit_is_dual_wielding(datum unit_index)
+{
+	unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
+	return unit->weapon_indices[0] != NONE && unit->weapon_indices[1] != NONE;
+}

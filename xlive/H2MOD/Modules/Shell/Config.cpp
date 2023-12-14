@@ -2,7 +2,7 @@
 
 #include "Config.h"
 
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"

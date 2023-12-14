@@ -31,6 +31,29 @@ struct s_main_game_globals
 };
 CHECK_STRUCT_SIZE(s_main_game_globals, 0x1270);
 
+
+typedef void(__cdecl* initialize_proc_t)(void);
+typedef void(__cdecl* dispose_proc_t)(void);
+typedef void(__cdecl* reset_proc_t)(void);
+typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
+typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
+
+struct s_game_systems
+{
+	initialize_proc_t initialize_proc;
+	dispose_proc_t dispose_proc;
+	reset_proc_t reset_proc;
+	dispose_from_old_map_proc_t dispose_from_old_map_proc;
+	void* unk4;
+	void* unk5;
+	void* unk6;
+	void* unk7;
+	activation_proc_t activation_proc;
+};
+CHECK_STRUCT_SIZE(s_game_systems, 36);
+
+s_game_systems* get_game_systems();
+
 s_main_game_globals* get_main_game_globals(void);
 bool map_initialized(void);
 s_game_options* game_options_get(void);
@@ -51,3 +74,5 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 void __cdecl reset_global_player_counts();
 
 void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version);
+
+void game_apply_pre_winmain_patches(void);

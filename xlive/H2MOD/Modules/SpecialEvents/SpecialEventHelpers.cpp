@@ -24,14 +24,14 @@ void add_special_event_markers()
 		new_marker->node_index = 19;
 		new_marker->permutation_index = NONE;
 		new_marker->region_index = NONE;
-		new_marker->orientation.position.x = 0.006f;
-		new_marker->orientation.position.y = 0.06f;
-		new_marker->orientation.position.z = 0.0f;
-		new_marker->orientation.quaternion.i= 0.9f;
-		new_marker->orientation.quaternion.j = 0.9f;
-		new_marker->orientation.quaternion.k = 0.9f;
-		new_marker->orientation.quaternion.w = 1.0f;
-		new_marker->orientation.scale = 1.0f;
+		new_marker->position.x = 0.006f;
+		new_marker->position.y = 0.06f;
+		new_marker->position.z = 0.0f;
+		new_marker->rotation.i= 0.9f;
+		new_marker->rotation.j = 0.9f;
+		new_marker->rotation.k = 0.9f;
+		new_marker->rotation.w = 1.0f;
+		new_marker->scale = 1.0f;
 	}
 }
 
@@ -39,8 +39,8 @@ void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_dat
 {
 	auto weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(weapon_datum);
 	weapon->item.object.sweetener_size = _sweetener_size_medium;
-	weapon->player_interface.first_person[0]->first_person_model.TagIndex = fp_model_datum;
-	weapon->player_interface.first_person[1]->first_person_model.TagIndex = fp_model_datum;
+	weapon->player_interface.first_person[0]->model.TagIndex = fp_model_datum;
+	weapon->player_interface.first_person[1]->model.TagIndex = fp_model_datum;
 
 	datum model_datum = weapon->item.object.model.TagIndex;
 	tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(model_datum)->render_model.TagIndex = _3p_model_datum;

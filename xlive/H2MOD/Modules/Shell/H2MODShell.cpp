@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Shell.h"
+#include "H2MODShell.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 int instanceNumber = 0;
@@ -58,17 +58,6 @@ long long _Shell::QPCToTimeNowMsec()
 double _Shell::QPCToSecondsPrecise(LARGE_INTEGER counter, LARGE_INTEGER freq)
 {
 	return static_cast<double>((double)QPCToTime(std::micro::den, counter, freq) / (double)std::micro::den);
-}
-
-bool __cdecl _Shell::IsGameMinimized()
-{
-	typedef bool(__cdecl* is_game_is_minimized_t)();
-	auto p_game_is_minimized = Memory::GetAddress<is_game_is_minimized_t>(0x28729);
-
-	if (Memory::IsDedicatedServer())
-		return false;
-
-	return p_game_is_minimized();
 }
 
 LARGE_INTEGER _Shell::QPCGetStartupCounter()

@@ -117,7 +117,9 @@ struct render_model_marker
     uint8 permutation_index;
     uint8 node_index;
     uint8 pad;
-    real_orientation orientation;
+    real_point3d position;
+    real_quaternion rotation;
+    real32 scale;
 };
 TAG_BLOCK_SIZE_ASSERT(render_model_marker, 36);
 
@@ -164,7 +166,7 @@ struct render_model_definition
     tag_block<geometry_material> materials;
     tag_block<error_report_category> errors;
 
-    real32 dont_draw_over_camera_cosine_angle;  // dont draw fp model when camera > this angle cosine (-1,1) Sugg. -0.2. 0 disables.
+    real_angle dont_draw_over_camera_cosine_angle;  // dont draw fp model when camera > this angle cosine (-1,1) Sugg. -0.2. 0 disables.
     tag_block<prt_info> prt_info;
     tag_block<section_render_leaves> section_render_leaves;
 };

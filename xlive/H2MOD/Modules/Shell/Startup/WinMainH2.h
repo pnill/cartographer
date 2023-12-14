@@ -47,7 +47,6 @@ void game_preferences_initialize();
 void font_initialize();
 bool tag_files_open();
 void timing_initialize(int a1);
-void game_state_initialize();
 bool rasterizer_initialize();
 bool input_initialize();
 void sound_initialize();

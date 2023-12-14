@@ -695,7 +695,7 @@ namespace ImGuiHandler {
 						// TODO Remove this and replace with proper menu when selecting a map (WIP)
 						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[skull_type_anger]);
+						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[_skull_type_anger]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_anger_tooltip));
 
@@ -703,7 +703,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[skull_type_assassians]);
+						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[_skull_type_assassians]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_assassins_tooltip));
 
@@ -711,7 +711,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[skull_type_black_eye]);
+						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[_skull_type_black_eye]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_black_eye_tooltip));
 
@@ -719,7 +719,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[skull_type_blind]);
+						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[_skull_type_blind]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_blind_tooltip));
 
@@ -727,7 +727,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[skull_type_catch]);
+						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[_skull_type_catch]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_catch_tooltip));
 
@@ -735,7 +735,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[skull_type_envy]);
+						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[_skull_type_envy]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_envy_tooltip));
 
@@ -743,7 +743,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[skull_type_famine]);
+						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[_skull_type_famine]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_famine_tooltip));
 
@@ -751,7 +751,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[skull_type_ghost]);
+						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[_skull_type_ghost]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_ghost_tooltip));
 
@@ -759,7 +759,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[skull_type_grunt_birthday_party]);
+						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[_skull_type_grunt_birthday_party]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_grunt_tooltip));
 
@@ -767,7 +767,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[skull_type_iron]);
+						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[_skull_type_iron]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iron_tooltip));
 
@@ -775,7 +775,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[skull_type_IWHBYD]);
+						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[_skull_type_iwhbyd]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iwbyd_tooltip));
 
@@ -783,7 +783,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[skull_type_mythic]);
+						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[_skull_type_mythic]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_mythic_tooltip));
 
@@ -791,7 +791,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[skull_type_sputnik]);
+						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[_skull_type_sputnik]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_sputnik_tooltip));
 
@@ -799,7 +799,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[skull_type_thunderstorm]);
+						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[_skull_type_thunderstorm]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_thunderstorm_tooltip));
 
@@ -807,7 +807,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[skull_type_whuppopotamus]);
+						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[_skull_type_whuppopotamus]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_whuppopotamus_tooltip));
 

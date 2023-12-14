@@ -2,12 +2,15 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/camera/observer.h"
+#include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"
@@ -22,6 +25,7 @@
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
 #include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
+#include "Blam/Engine/saved_games/game_state_procs.h"
 #include "Blam/Engine/Simulation/game_interface/simulation_game_objects.h"
 #include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
@@ -49,7 +53,7 @@
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
@@ -58,8 +62,6 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/Variants.h"
 #include "Util/Hooks/Hook.h"
-
-FLOATING_POINT_ENV_ACCESS();
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -847,6 +849,7 @@ void H2MOD::ApplyHooks() {
 	players_apply_patches();
 	objects_apply_patches();
 	weapon_definitions_apply_patches();
+	observer_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -911,6 +914,9 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		rasterizer_dx9_main_apply_patches();
+		cinematics_apply_patches();
+		game_time_apply_patches();
+		game_state_procs_apply_patches();
 		apply_particle_update_patches();
 	}
 	else {

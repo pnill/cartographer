@@ -107,8 +107,8 @@ static_assert(sizeof(datum) == 4);
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
-#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1))))
-#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1)), ENABLE))
+#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
+#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 /// Creates a mask out of a count number of flags
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
@@ -124,3 +124,10 @@ static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagbloc
 
 #define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
 static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
+
+
+// TODO reimplement this properly
+void* csmemset(void* dst, int32 val, size_t size);
+
+// TODO reimplement this properly
+void* csmemcpy(void* dst, const void* src, size_t size);

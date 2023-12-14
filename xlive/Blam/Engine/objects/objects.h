@@ -3,9 +3,11 @@
 #include "object_placement.h"
 #include "object_type_list.h"
 
+#include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/math/matrix_math.h"
+#include "Blam/Engine/models/render_model_definitions.h"
 #include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/memory/static_arrays.h"
 
@@ -255,5 +257,12 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 datum object_get_damage_owner(datum damaged_unit_index);
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
+
+void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
+	render_model_definition* render_model, 
+	c_animation_manager* animation_manager, 
+	int32 a4, 
+	int32 orientation_count, 
+	real_orientation* orientations);
 
 void objects_apply_patches(void);

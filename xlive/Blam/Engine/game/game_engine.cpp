@@ -10,3 +10,8 @@ bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_g
 {
 	return INVOKE(0x6E5C3, 0x6D1BF, game_engine_get_change_colors, player_profile, team_index, change_colors);
 }
+
+bool __cdecl game_engine_variant_cleanup(uint16* flags)
+{
+	return INVOKE(0x5B720, 0x3D380, game_engine_variant_cleanup, flags);
+}

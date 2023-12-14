@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "animation_definitions.h"
 
-#include "H2MOD/Tags/TagInterface.h"
-
 
 const DWORD* c_model_animation_runtime_data::get_left_arm_nodes() const
 {
@@ -75,7 +73,7 @@ const animation_graph_node* c_animation_graph_resources::get_node(const byte nod
 	return this->skeleton_nodes[node_index];
 }
 
-size_t c_animation_graph_resources::get_node_count() const
+int16 c_animation_graph_resources::get_node_count() const
 { 
 	return this->skeleton_nodes.size; 
 }
@@ -151,7 +149,7 @@ size_t c_model_animation::get_effect_events_size() const
 	return this->effect_events.size;
 }
 
-short c_model_animation::get_frame_count() const
+int16 c_model_animation::get_frame_count(void) const
 {
 	return this->frame_count;
 }
@@ -211,6 +209,11 @@ int c_model_animation::get_node_list_checksum() const
 	return this->node_list_checksum;
 }
 
+e_playback_flags c_model_animation::get_playback_flags() const
+{
+	return this->playback_flags;
+}
+
 short c_model_animation::get_primary_key_frame_index() const
 {
 	return this->find_first_key_of_type(frame_event_type_primary_keyframe);
@@ -253,7 +256,6 @@ string_id c_model_animation::get_string_id() const
 	return this->name;
 }
 
-
 byte c_model_animation_graph::find_node(const string_id string) const
 {
 	const byte node_count = this->get_node_count();
@@ -282,11 +284,6 @@ byte c_model_animation_graph::find_node_with_flags(const e_node_model_flags flag
 	return -1;
 }
 
-const c_model_animation_graph* c_model_animation_graph::get(const datum tag_datum_index) const
-{
-	return tags::get_tag_fast<const c_model_animation_graph>(tag_datum_index);
-}
-
 const animation_graph_node* c_model_animation_graph::get_node(const byte node_index) const
 {
 	return this->resources.get_node(node_index);
@@ -297,7 +294,7 @@ c_model_animation_graph* c_model_animation_graph::get_writable(const datum tag_d
 	return tags::get_tag_fast<c_model_animation_graph>(tag_datum_index);
 }
 
-short c_model_animation_graph::get_node_count() const
+int16 c_model_animation_graph::get_node_count() const
 {
 	return this->resources.get_node_count();
 }

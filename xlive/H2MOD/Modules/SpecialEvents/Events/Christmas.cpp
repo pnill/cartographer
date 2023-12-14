@@ -104,7 +104,7 @@ void christmas_event_map_load()
 		sword_model->render_model.TagIndex = candy_cane_datum;
 
 		for (auto& first_person : sword_weapon->player_interface.first_person)
-			first_person.first_person_model.TagIndex = candy_cane_datum;
+			first_person.model.TagIndex = candy_cane_datum;
 
 		for (auto& attachment : sword_weapon->item.object.attachments)
 		{

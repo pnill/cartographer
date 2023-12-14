@@ -13,4 +13,4 @@ namespace Interpolation
 	void PostGameTick();
 	float GetInterpolateTime();
 	bool ShouldInterpolate();
-}
+} 

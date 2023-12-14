@@ -119,11 +119,54 @@ struct real_orientation
 };
 CHECK_STRUCT_SIZE(real_orientation, 32);
 
+const real_vector3d global_forward3d = { 1.0f, 0.0f, 0.0f };
+const real_vector3d global_left3d = { 0.0f, 1.0f, 0.0f };
+const real_vector3d global_up3d = { 0.0f, 0.0f, 1.0f };
+
+const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
+const real_orientation global_identity_orientation = { {0.0f, 0.0f, 0.0f, 1.0f,}, global_zero_vector3d, 1.0f };
+
+
+static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
+{
+	return vector->i * vector->i + vector->j * vector->j + vector->k * vector->k;
+}
+
+static BLAM_MATH_INL bool valid_real(real32 value)
+{
+	int32 value_as_int = value;
+	return (value_as_int & 0x7F800000) != 0x7F800000;
+}
+
+static BLAM_MATH_INL bool valid_realcmp(real32 a, real32 b)
+{
+	real32 result = a - b;
+	return valid_real(result) && fabs(result) < 0.01f;
+}
+
+static BLAM_MATH_INL bool valid_real_normal3d(const real_vector3d* normal)
+{
+	real32 magnitude = magnitude_squared3d(normal);
+	return valid_realcmp(magnitude, 1.0f);
+}
+
+static BLAM_MATH_INL real_vector3d* scale_vector3d(const real_vector3d* in, real32 scale, real_vector3d* out)
+{
+	out->i = in->i * scale;
+	out->j = in->j * scale;
+	out->k = in->k * scale;
+	return out;
+}
+
+void __cdecl real_math_reset_precision(void);
+
 void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion);
 
-real32 square_root(real32 f);
+real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b);
 
-real32 magnitude3d_squared(const real_vector3d* v1);
+bool valid_real_vector3d_axes2(real_vector3d* forward, real_vector3d* up);
+
+real32 square_root(real32 f);
 
 real32 magnitude3d(const real_vector3d* v1);
 
@@ -134,8 +177,6 @@ void add_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector
 void multiply_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out);
 
 void subtract_vector3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out);
-
-void scale_vector3d(const real_vector3d* v1, real32 scale, real_vector3d* out);
 
 void vector_from_points3d(const real_point3d* p1, const real_point3d* p2, real_vector3d* out);
 
@@ -152,5 +193,3 @@ bool limit3d(real_vector3d* v, real32 limit);
 void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out);
 
 void scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale);
-
-static const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };

@@ -2,7 +2,7 @@
 
 #include "Accounts.h"
 
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"

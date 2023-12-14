@@ -17,9 +17,9 @@ enum e_bsp_policy : int8
 
 struct s_location
 {
-	DWORD leaf_index;
-	short cluster;
-	WORD bsp_index;
+	int32 leaf_index;
+	int16 cluster_index;
+	int16 bsp_index;
 };
 
 enum e_scenario_object_placement_flags : uint32

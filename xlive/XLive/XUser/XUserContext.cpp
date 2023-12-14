@@ -4,7 +4,7 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "XLive/xbox/xbox.h"
