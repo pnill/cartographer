@@ -29,3 +29,6 @@ CHECK_STRUCT_SIZE(s_camera, 0x74);
 
 // Get global camera data
 s_camera* get_global_camera(void);
+
+s_camera* get_effect_camera();
+

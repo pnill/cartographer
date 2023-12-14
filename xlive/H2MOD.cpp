@@ -4,6 +4,8 @@
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
+#include "Blam/Engine/effects/particle.h"
+#include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
@@ -915,6 +917,7 @@ void H2MOD::ApplyHooks() {
 		cinematics_apply_patches();
 		game_time_apply_patches();
 		game_state_procs_apply_patches();
+		apply_particle_update_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

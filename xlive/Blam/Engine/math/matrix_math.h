@@ -39,3 +39,9 @@ real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real
 real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d* in, real_vector3d* out);
 
 void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3* target, real32 fractional_ticks, real_matrix4x3* out_mat);
+
+void __cdecl matrix3x3_from_forward_and_up(real_matrix3x3* out_matrix, real_vector3d* forward_vector, real_vector3d* up_vector);
+
+void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* input_matrix_2, real_matrix3x3* out_matrix);
+
+void __cdecl matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector);
