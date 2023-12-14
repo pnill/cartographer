@@ -2,6 +2,8 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/effects/particle.h"
+#include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
@@ -909,6 +911,7 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		rasterizer_dx9_main_apply_patches();
+		apply_particle_update_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
