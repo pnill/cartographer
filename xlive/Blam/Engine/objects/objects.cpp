@@ -509,7 +509,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_header->cluster_index = NONE;
 			location_invalidate(&object->location);
 			object->first_cluster_reference = NONE;
-			object->parent_datum = NONE;
+			object->parent_index = NONE;
 			object->next_index = NONE;
 			object->current_weapon_datum = NONE;
 			object->name_list_index = NONE;
@@ -733,6 +733,44 @@ void __cdecl object_delete(datum object_index)
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
 {
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
+}
+
+real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* point_out)
+{
+	real_point3d point;
+	real_point3d interpolated_object_position;
+	object_datum* object = object_get_fast_unsafe(object_index);
+	if (halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
+	{
+		point = interpolated_object_position;
+	}
+	else
+	{
+		point = object->position;
+		interpolated_object_position = object->position;
+	}
+
+	if (object->parent_index == NONE)
+	{
+		*point_out = point;
+	}
+	else
+	{
+		real_matrix4x3 interpolated_matrix;
+		real_matrix4x3* transform_matrix = &interpolated_matrix;
+		if (!halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
+		{
+			transform_matrix = object_get_node_matrix(object->parent_index, object->matrix_index);
+		}
+		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
+		return point_out;
+	}
+}
+
+real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
+{
+	real_matrix4x3* nodes = (real_matrix4x3*)object_header_block_get(object_index, &object_get_fast_unsafe(object_index)->nodes_block);
+	return &nodes[node_index];
 }
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)

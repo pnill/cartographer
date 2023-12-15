@@ -7,7 +7,6 @@
 #define k_powered_seats_count 2
 #define MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
 
-
 enum e_weapon_addition_method : int16
 {
 	_weapon_addition_method_zero = 0,
@@ -45,6 +44,15 @@ enum e_unit_data_flags : int32
 	_unit_suspended = FLAG(20),
 	_unit_enable_eye_tracking = FLAG(24),
 	_unit_only_takes_damage_from_players_team = FLAG(31)
+};
+
+enum e_unit_estimate_mode : int16
+{
+	_unit_estimate_none = 0,
+	_unit_estimate_1 = 1,
+	_unit_estimate_2 = 2,
+	_unit_estimate_gun_position = 3,
+	k_unit_estimate_position_modes_count
 };
 
 struct s_unit_304

@@ -88,3 +88,7 @@ void halo_interpolator_object_populate_interpolation_data(
 bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index, int32 position_index, real_matrix4x3* out);
 
 bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count);
+
+bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
+
+bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point);
