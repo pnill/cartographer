@@ -54,4 +54,5 @@ s_data_array* get_effects_table();
 s_data_array* get_effects_location_table();
 
 effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3);
+
 void effects_apply_patches();

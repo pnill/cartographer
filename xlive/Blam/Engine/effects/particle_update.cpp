@@ -24,7 +24,6 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 	c_particle_definition** particle_definition)
 {
 	//p_particle_system_update_particle_position_and_velocity(particle_system, particle_location, unk_particle_structure, callback, particle_definition);
-
 	c_particle_system_definition* particle_system_definition = particle_system->get_particle_system_definition();
 	if (particle_system != particle_state->particle_system)
 	{
@@ -90,10 +89,10 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 						particle_state->particle = particle;
 					}
 
-					// INTERPOLATION FUNCTIONS GO HERE FOR GETTING INTERPOLATED
-					// POSITION AND VELOCITY
-					real_point3d particle_position = particle->m_position;
-					real_vector3d particle_velocity = particle->m_velocity;
+					real_point3d particle_position;
+					real_vector3d particle_velocity;
+					halo_particle_interpolator_get_interpolated_position(current_particle_index, &particle_position);
+					halo_particle_interpolator_get_interpolated_velocity(current_particle_index, &particle_velocity);
 
 					particle_state_update
 					(
@@ -140,6 +139,6 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 void apply_particle_update_patches()
 {
 	//p_particle_system_update_particle_position_and_velocity = Memory::GetAddress<particle_system_update_particle_position_and_velocity_t>(0xC4125);
-	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
-	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
 }
