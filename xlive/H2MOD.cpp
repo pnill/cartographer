@@ -854,6 +854,7 @@ void H2MOD::ApplyHooks() {
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
 	bipeds_apply_patches();
+	unit_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

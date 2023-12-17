@@ -1,6 +1,7 @@
 #pragma once
 #include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/tag_files/string_id.h"
+#include "Blam/Engine/objects/objects.h"
 
 #define MAXIMUM_REGIONS_PER_MODEL 16
 #define MAXIMUM_PERMUTATIONS_PER_MODEL_REGION 32
@@ -20,3 +21,14 @@ void __cdecl render_model_apply_two_bone_ik(datum render_model_index,
 	real32 ratio,
 	int32 node_matrices_count,
 	real_matrix4x3* out);
+
+int32 __cdecl render_model_get_markers_by_name(datum render_model_index,
+    string_id marker_string,
+    void* collision_region_block,
+    int32 a4,
+    int32* node_remapping_table,
+    int32 node_count,
+    real_matrix4x3* node_matrices,
+    bool object_is_mirrored,
+    object_marker* markers,
+    int32 count);

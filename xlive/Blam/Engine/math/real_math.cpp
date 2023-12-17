@@ -82,11 +82,6 @@ real32 magnitude3d(const real_vector3d* v1)
 	return square_root(magnitude_squared);
 }
 
-real32 dot_product3d(const real_vector3d* v1, const real_vector3d* v2)
-{
-	return v1->i * v2->i + v1->j * v2->j + v1->k * v2->k;
-}
-
 void multiply_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out)
 {
 	out->i = v1->i * v2->i;

@@ -138,6 +138,11 @@ static BLAM_MATH_INL real32 dot_product2d(const real_vector2d* a, const real_vec
 	return (a->i * b->i) + (a->j * b->j);
 }
 
+static BLAM_MATH_INL real32 dot_product3d(const real_vector3d* a, const real_vector3d* b)
+{
+	return a->i * b->i + a->j * b->j + a->k * b->k;
+}
+
 static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
 {
 	return vector->i * vector->i + vector->j * vector->j + vector->k * vector->k;
@@ -198,8 +203,6 @@ real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b);
 bool valid_real_vector3d_axes2(real_vector3d* forward, real_vector3d* up);
 
 real32 magnitude3d(const real_vector3d* v1);
-
-real32 dot_product3d(const real_vector3d* v1, const real_vector3d* v2);
 
 void multiply_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out);
 
