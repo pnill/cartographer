@@ -23,6 +23,7 @@
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
+#include "Blam/Engine/units/bipeds.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
 #include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
 #include "Blam/Engine/saved_games/game_state_procs.h"
@@ -820,6 +821,8 @@ void H2MOD::ApplyHooks() {
 
 	EngineHooks::ApplyHooks();
 
+	NopFill(Memory::GetAddress(0x39BAB), 5);
+
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
@@ -850,6 +853,8 @@ void H2MOD::ApplyHooks() {
 	objects_apply_patches();
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
+	bipeds_apply_patches();
+	unit_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

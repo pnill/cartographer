@@ -30,6 +30,8 @@ void __fastcall matrix4x3_multiply(const real_matrix4x3* matrix1, const real_mat
 
 void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position);
 
+real_matrix4x3* matrix4x3_identity(real_matrix4x3* matrix);
+
 void matrix4x3_from_point_and_quaternion(real_matrix4x3* matrix, const real_point3d* point, const real_quaternion* quaternion);
 
 void matrix4x3_to_point_and_vectors(real_matrix4x3* matrix, real_point3d* position, real_vector3d* forward, real_vector3d* up);
