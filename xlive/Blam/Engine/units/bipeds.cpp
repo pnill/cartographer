@@ -170,20 +170,16 @@ void __cdecl biped_get_sight_position(datum biped_index,
         }
     }
 
-    object_origin->z = ((((1.0f - crouching) * biped_def->standing_camera_height) + (biped_def->crouching_camera_height * crouching)) * biped->unit.object.scale) + object_origin->z;
+    object_origin->z += ((((1.0f - crouching) * biped_def->standing_camera_height) + (biped_def->crouching_camera_height * crouching)) * biped->unit.object.scale);
     real_point3d origin_copy = *object_origin;
 
-    real_vector3d forward;
-    forward.i = biped->unit.aiming_vector.i;
-    forward.j = biped->unit.aiming_vector.k;
-    forward.k = biped->unit.aiming_vector.j;
-
+    real_vector3d forward = biped->unit.aiming_vector;
     real_vector3d up;
     generate_up_vector3d(&forward, &up);
     biped_offset_first_person_camera(&forward, biped_index, &origin_copy, &up);
     real_vector3d origin_vector;
     vector_from_points3d(&origin_copy, object_origin, &origin_vector);
-    if (normalize3d(&origin_vector) > 0.0)
+    if (normalize3d(&origin_vector) > 0.0f)
     {
         collision_result collision;
         collision.global_material_index = NONE;
@@ -214,7 +210,7 @@ void __cdecl biped_get_sight_position(datum biped_index,
                 vector_from_points3d(&placement, &origin_copy, &position_vector),
 
                 // Actual check here
-                dot_product3d(&origin_vector, &position_vector) + 0.05 > dot_product3d(&collision_vector, &origin_vector))
+                dot_product3d(&origin_vector, &position_vector) + 0.05f > dot_product3d(&collision_vector, &origin_vector))
             )
         {
             point_from_line3d(&collision.point, &origin_vector, -0.05f, object_origin);
@@ -284,8 +280,8 @@ __declspec(naked) void biped_offset_first_person_camera_usercall_to_rewritten(vo
 
 void bipeds_apply_patches(void)
 {
-    //PatchCall(Memory::GetAddress(0x13D35A, 0x12C1A9), biped_get_sight_position);
-    //PatchCall(Memory::GetAddress(0x1422B2, 0x131102), biped_get_sight_position);
+    PatchCall(Memory::GetAddress(0x13D35A, 0x12C1A9), biped_get_sight_position);
+    PatchCall(Memory::GetAddress(0x1422B2, 0x131102), biped_get_sight_position);
 
     PatchCall(Memory::GetAddress(0x154B88, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);
     PatchCall(Memory::GetAddress(0x15602E, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);

@@ -127,7 +127,6 @@ const real_vector3d global_up3d = { 0.0f, 0.0f, 1.0f };
 const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
 const real_orientation global_identity_orientation = { {0.0f, 0.0f, 0.0f, 1.0f,}, global_zero_vector3d, 1.0f };
 
-
 static BLAM_MATH_INL real32 square_root(real32 f)
 {
 	return sqrt(f);
@@ -146,6 +145,12 @@ static BLAM_MATH_INL real32 dot_product3d(const real_vector3d* a, const real_vec
 static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
 {
 	return vector->i * vector->i + vector->j * vector->j + vector->k * vector->k;
+}
+
+static BLAM_MATH_INL real32 magnitude3d(const real_vector3d* vector)
+{
+	real32 magnitude_squared = magnitude_squared3d(vector);
+	return square_root(magnitude_squared);
 }
 
 static BLAM_MATH_INL bool valid_real(real32 value)
@@ -190,6 +195,22 @@ static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* point, 
 	return out;
 }
 
+static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
+{
+	real32 length = magnitude3d(v1);
+
+	if (fabs(length) < k_real_math_epsilon)
+	{
+		length = 0.0f;	// vector already normalized
+	}
+	else
+	{
+		scale_vector3d(v1, 1.0f / length, v1);
+	}
+
+	return length;
+}
+
 void __cdecl real_math_reset_precision(void);
 
 real32 normalize2d(real_vector2d* vector);
@@ -213,8 +234,6 @@ void vector_from_points3d(const real_point3d* p1, const real_point3d* p2, real_v
 real32 distance_squared3d(const real_point3d* p1, const real_point3d* p2);
 
 real32 distance3d(const real_point3d* p1, const real_point3d* p2);
-
-real32 normalize3d(real_vector3d* v1);
 
 bool limit3d(real_vector3d* v, real32 limit);
 

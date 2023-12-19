@@ -71,17 +71,6 @@ real32 reciprocal_square_root(real32 f)
 	return 1.0 / sqrt(f);
 }
 
-real32 absolute_value(real32 f)
-{
-	return abs(f);
-}
-
-real32 magnitude3d(const real_vector3d* v1)
-{
-	real32 magnitude_squared = magnitude_squared3d(v1);
-	return square_root(magnitude_squared);
-}
-
 void multiply_vectors3d(const real_vector3d* v1, const real_vector3d* v2, real_vector3d* out)
 {
 	out->i = v1->i * v2->i;
@@ -115,20 +104,6 @@ real32 distance3d(const real_point3d* p1, const real_point3d* p2)
 {
 	real32 distance_squared = distance_squared3d(p1, p2);
 	return square_root(distance_squared);
-}
-
-real32 normalize3d(real_vector3d* v1)
-{
-	real32 length = magnitude3d(v1);
-
-	if (absolute_value(length) < k_real_math_epsilon)
-		return 0.0f; // vector already normal
-
-	scale_vector3d(v1, 1.0f / length, v1);
-
-	return length;
-
-	// return Memory::GetAddressRelative<real32(__cdecl*)(real_vector3d*)>(0x429359, 0x4273B0)(v1);
 }
 
 bool limit3d(real_vector3d* v, real32 limit)
