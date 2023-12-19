@@ -9,8 +9,9 @@ s_data_array* get_particle_table()
 {
 	return *Memory::GetAddress<s_data_array**>(0x4DD08C, 0x5053B4);
 }
-real32 g_accumulated_particle_delta = 0.f;
+real32 g_particle_delta_temp;
 real32 g_particle_interpolator_delta = 0.f;
+real32 g_particle_interpolator_delta_remainder = 0.f;
 bool particle_interpolator_enabled = false;
 s_particle_frame_data_storage* g_particle_frame_storage;
 s_particle_interpolation_data_storage* g_previous_particle_interpolation_frame_data;
@@ -51,7 +52,7 @@ real_point3d* halo_particle_interpolator_get_interpolated_position(datum particl
 	uint16 particle_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_index);
 	c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
 	real_point3d particle_position = particle->m_position;
-
+	//LOG_INFO_GAME("[{}] {} {:.5f}", __FUNCTION__, particle_index, particle->field_C);
 	if (g_previous_particle_interpolation_frame_data->initialized
 		&& g_previous_particle_interpolation_frame_data->particle_data[particle_abs_index].particle_index == particle_index)
 	{
@@ -61,7 +62,7 @@ real_point3d* halo_particle_interpolator_get_interpolated_position(datum particl
 			points_interpolate(
 				&g_target_particle_interpolation_frame_data->particle_data[particle_abs_index].position,
 				&g_previous_particle_interpolation_frame_data->particle_data[particle_abs_index].position,
-				g_particle_interpolator_delta,
+				g_particle_interpolator_delta_remainder,
 				&particle_position
 			);
 			*out_point = particle_position;
@@ -81,7 +82,7 @@ real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum partic
 	uint16 particle_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_index);
 	c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
 	real_vector3d particle_velocity = particle->m_velocity;
-
+	//LOG_INFO_GAME("[{}] {} {:.5f}", __FUNCTION__, particle_index, particle->field_C);
 	if (g_previous_particle_interpolation_frame_data->initialized
 		&& g_previous_particle_interpolation_frame_data->particle_data[particle_abs_index].particle_index == particle_index)
 	{
@@ -91,7 +92,7 @@ real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum partic
 			points_interpolate(
 				&g_target_particle_interpolation_frame_data->particle_data[particle_abs_index].velocity,
 				&g_previous_particle_interpolation_frame_data->particle_data[particle_abs_index].velocity,
-				g_particle_interpolator_delta,
+				g_particle_interpolator_delta_remainder,
 				&particle_velocity
 			);
 			*out_vector = particle_velocity;
@@ -109,7 +110,24 @@ real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum partic
 void particle_update(real32 delta)
 {
 
-	g_particle_interpolator_delta += delta;
+	s_data_iterator<c_particle_system> particle_system_it(get_particle_system_table());
+	g_particle_delta_temp = delta;
+	while (particle_system_it.get_next_datum())
+	{
+		c_particle_system* particle_system = particle_system_it.get_current_datum();
+		if (particle_system->first_particle_index == NONE && !c_particle_system::update(particle_system, delta))
+		{
+			if (particle_system->parent_effect_index != NONE)
+			{
+				particle_syste_remove_from_effects_cache(particle_system->parent_effect_index, particle_system_it.get_current_datum_index());
+			}
+			c_particle_system::destroy(particle_system_it.get_current_datum_index());
+		}
+	}
+	halo_particle_interpolator_update();
+
+
+	/*g_particle_interpolator_delta += delta;
 
 	real32 game_tick_length = time_globals::get()->seconds_per_tick ;
 	real32 accumulated_delta = g_particle_interpolator_delta;
@@ -131,7 +149,7 @@ void particle_update(real32 delta)
 			while (particle_system_it.get_next_datum())
 			{
 				c_particle_system* particle_system = particle_system_it.get_current_datum();
-				if (particle_system->field_4C == NONE && !particle_system->update(nearest_whole_tick_delta))
+				if (particle_system->field_4C == NONE && !c_particle_system::update(particle_system, nearest_whole_tick_delta))
 				{
 					if (particle_system->parent_effect_index != NONE)
 					{
@@ -142,7 +160,8 @@ void particle_update(real32 delta)
 			}
 			halo_particle_interpolator_update();
 		}
-	}
+		g_particle_interpolator_delta_remainder = accumulated_delta / game_tick_length;
+	}*/
 }
 
 void apply_particle_patches()

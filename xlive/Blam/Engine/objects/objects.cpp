@@ -765,6 +765,15 @@ void __cdecl object_move_hook(int a1)
 	object_initialize_for_interpolation(a1);
 }
 
+typedef void(__cdecl* t_object_update)(datum object_index);
+t_object_update p_object_update;
+
+void __cdecl object_update_hook(datum object_index)
+{
+	p_object_update(object_index);
+	object_initialize_for_interpolation(object_index);
+}
+
 // Replace calls to object_new with our own
 void object_new_replace_calls()
 {
@@ -802,8 +811,9 @@ void object_new_replace_calls()
 void objects_apply_patches(void)
 {
 #ifdef USE_REWRITTEN_OBJECT_NEW
-	object_new_replace_calls();
-	DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
+	//object_new_replace_calls();
+	//DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
+	DETOUR_ATTACH(p_object_update, Memory::GetAddress<t_object_update>(0x135219, 0), object_update_hook);
 #endif
 	return;
 }

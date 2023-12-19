@@ -123,6 +123,10 @@ const real_vector3d global_forward3d = { 1.0f, 0.0f, 0.0f };
 const real_vector3d global_left3d = { 0.0f, 1.0f, 0.0f };
 const real_vector3d global_up3d = { 0.0f, 0.0f, 1.0f };
 
+const real_vector3d global_back3d = { -1.0f, 0.0f, 0.0f };
+const real_vector3d global_right3d = { 0.0f, -1.0f, 0.0f };
+const real_vector3d global_down3d = { 0.0f, 0.0f, -1.0f };
+
 const real_vector3d global_zero_vector3d = { 0.0f, 0.0f, 0.0f };
 const real_orientation global_identity_orientation = { {0.0f, 0.0f, 0.0f, 1.0f,}, global_zero_vector3d, 1.0f };
 
@@ -193,3 +197,7 @@ bool limit3d(real_vector3d* v, real32 limit);
 void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out);
 
 void scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale);
+
+real_vector3d* perpendicular3d(real_vector3d* in, real_vector3d* out);
+
+real_vector3d* cross_product3d(real_vector3d* up, real_vector3d* forward, real_vector3d* out_left);

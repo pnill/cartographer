@@ -1,19 +1,30 @@
 #pragma once
 #include "particle_system_definition.h"
+#include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/object_placement.h"
+
+#define k_max_particle_systems 128
 
 enum e_particle_system_flags : int16
 {
 	_particle_system_scale_with_sky_render_model_bit = 10,
 };
 
+struct s_particle_system_update_timings
+{
+	real32 some_delta_calc;
+	real32 current_delta;
+	datum particle_system_location_index;
+};
+CHECK_STRUCT_SIZE(s_particle_system_update_timings, 0xC);
+
 class c_particle_system
 {
 public:
-	int32 field_0;
-	int32 field_4;
-	int8 gap_8[4];
+	int32 datum_salt;
+	real32 accumulated_time;
+	real32 duration;
 	e_particle_system_flags flags;
 	int16 event_particle_system_index;
 	datum tag_index;
@@ -21,22 +32,32 @@ public:
 	int8 gap_16[2];
 	datum parent_effect_index;
 	s_location location;
-	int8 gap_24[12];
+	datum definition_location_index;
+	int8 gap_28[8];
 	datum particle_system_location_index;
 	int8 gap_34[4];
 	int32 field_38;
 	int8 gap_3C[4];
-	int32 field_40;
-	int8 gap_44[4];
+	datum next_particle_system;
+	datum datum_44;
 	c_particle_system* parent_system;
-	int32 field_4C;
+	int32 first_particle_index;
 	pixel32 color;
-
 	c_particle_system_definition* get_particle_system_definition() const;
-	bool update(real32 delta_time);
+	void destroy_children();
+	bool update_new(real32 delta_time);
+	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
+	void adjust_particle_system_indexes(datum* datum_1, datum* datum_2);
+	int get_active_particle_locations_count();
+	bool static __stdcall update(c_particle_system* thisx, real32 delta_time);
+	static void __stdcall update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
 	static void __cdecl destroy(datum particle_system_index);
+	
+	static void __stdcall update_effect_time(c_particle_system* thisx, real32 flt);
 };
 CHECK_STRUCT_SIZE(c_particle_system, 0x54);
 
 s_data_array* get_particle_system_table();
 void __cdecl particle_syste_remove_from_effects_cache(datum effect_index, datum particle_system_index);
+
+void apply_particle_system_patches();

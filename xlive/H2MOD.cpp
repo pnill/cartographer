@@ -918,6 +918,7 @@ void H2MOD::ApplyHooks() {
 		game_time_apply_patches();
 		game_state_procs_apply_patches();
 		apply_particle_patches();
+		apply_particle_system_patches();
 		apply_particle_update_patches();
 	}
 	else {

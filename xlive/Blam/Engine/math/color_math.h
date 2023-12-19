@@ -23,3 +23,5 @@ union real_rgb_color
 	struct { real32 red, green, blue; };
 };
 CHECK_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
+
+const pixel32 global_black_pixel32 = { 255,255,255,255 };

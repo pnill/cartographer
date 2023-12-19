@@ -130,7 +130,7 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 					current_particle_index = particle->next_particle;
 				} while (current_particle_index != NONE);
 			}
-			current_particle_emitter_index = particle_emitter->parent_emitter_index;
+			current_particle_emitter_index = particle_emitter->next_emitter_index;
 			++current_emitter_index;
 		} while (current_particle_emitter_index != NONE);
 	}
@@ -139,6 +139,6 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 void apply_particle_update_patches()
 {
 	//p_particle_system_update_particle_position_and_velocity = Memory::GetAddress<particle_system_update_particle_position_and_velocity_t>(0xC4125);
-	PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
-	PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
+	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
 }

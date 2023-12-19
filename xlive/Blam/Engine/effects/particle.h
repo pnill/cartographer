@@ -29,8 +29,8 @@ struct c_particle
 	int8 gap_0[2];
 	e_particle_flags flags;
 	int32 next_particle;
-	real32 field_8;
-	real32 field_C;
+	real32 time_accumulator;
+	real32 effect_delay_time;
 	int8 gap_10[12];
 	real_point3d m_position;
 	real_vector3d m_velocity;
@@ -57,7 +57,9 @@ struct s_particle_frame_data_storage
 	s_particle_interpolation_data_storage target_data;
 };
 
+extern real32 g_particle_delta_temp;
 extern real32 g_particle_interpolator_delta;
+extern real32 g_particle_interpolator_delta_remainder;
 extern s_particle_frame_data_storage* g_particle_frame_storage;
 extern s_particle_interpolation_data_storage* g_previous_particle_interpolation_frame_data;
 extern s_particle_interpolation_data_storage* g_target_particle_interpolation_frame_data;
