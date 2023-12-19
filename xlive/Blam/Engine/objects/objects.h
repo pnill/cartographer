@@ -163,8 +163,9 @@ struct object_datum
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;
-	datum parent_datum;
-	uint16 inhibited_flags;
+	datum parent_index;
+	uint8 matrix_index;
+	uint8 inhibited_flags;
 	int16 placement_index;
 	uint8 gap_1C[8];
 	s_emblem_info emblem_info;
@@ -230,6 +231,16 @@ struct object_datum
 };
 CHECK_STRUCT_SIZE(object_datum, 300);
 
+struct object_marker
+{
+	int16 node_index;
+	int16 region_index;
+	real_matrix4x3 matrix0;
+	real_matrix4x3 matrix1;
+	int32 field_6C;
+};
+CHECK_STRUCT_SIZE(object_marker, 112);
+
 // Get the object fast, with no validation from datum index
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
@@ -256,6 +267,10 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 
 datum object_get_damage_owner(datum damaged_unit_index);
 
+real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* point_out);
+
+real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
 
 void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
@@ -264,5 +279,9 @@ void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
 	int32 a4, 
 	int32 orientation_count, 
 	real_orientation* orientations);
+
+real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
+
+datum __cdecl object_get_parent_recursive(datum parent_index);
 
 void objects_apply_patches(void);

@@ -137,7 +137,7 @@ object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint3
     }
     else
     {
-        result =(object_datum*)object_try_and_get_and_verify_type(object_index, -1);
+        result =(object_datum*)object_try_and_get_and_verify_type(object_index, NONE);
     }
     return result;
 }
@@ -153,8 +153,8 @@ bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point
         &g_previous_interpolation_frame_data->object_data[object_index].center_of_mass,
         &g_target_interpolation_frame_data->object_data[object_index].center_of_mass);
 
-    if (distance < 900.0f)
-    {
+    if (distance < k_interpolation_distance_cutoff)
+    {   
         mass_interpolated = true;
         points_interpolate(
             &g_previous_interpolation_frame_data->object_data[object_index].center_of_mass,
@@ -163,20 +163,6 @@ bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point
             center_of_mass);
     }
     return mass_interpolated;
-}
-
-real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass)
-{
-    real_point3d* result;
-    if (halo_interpolator_interpolate_center_of_mass(object_datum, center_of_mass))
-    {
-        result = center_of_mass;
-    }
-    else
-    {
-        result = object_get_center_of_mass(object_datum, center_of_mass);
-    }
-    return result;
 }
 
 bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count)
@@ -346,6 +332,97 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
                     result = true;
                 }
             }
+        }
+    }
+
+    return result;
+}
+
+bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix)
+{
+    bool result = false;
+    uint32 object_absolute_index;
+    if (halo_interpolator_object_can_interpolate(object_index, &object_absolute_index))
+    {
+        real32 distance = distance_squared3d(
+            &g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position,
+            &g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position);
+
+        if (distance >= k_interpolation_distance_cutoff)
+        {
+            *out_matrix = g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index];
+        }
+        else
+        {
+            matrix4x3_interpolate(
+                &g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
+                &g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
+                g_interpolator_delta,
+                out_matrix);
+        }
+        result = true;
+    }
+
+    return result;
+}
+
+
+bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point)
+{
+    bool interpolate_object = false;
+    
+    uint32 abs_object_index;
+    if (halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
+    {
+        real32 distance = distance_squared3d(
+            &g_previous_interpolation_frame_data->object_data[abs_object_index].position,
+            &g_target_interpolation_frame_data->object_data[abs_object_index].position);
+        
+        if (distance < k_interpolation_distance_cutoff)
+        {
+            interpolate_object = true;
+            points_interpolate(
+                &g_previous_interpolation_frame_data->object_data[abs_object_index].position,
+                &g_target_interpolation_frame_data->object_data[abs_object_index].position,
+                g_interpolator_delta,
+                point);
+        }
+    }
+    return interpolate_object;
+}
+
+void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position)
+{
+    if (g_frame_data_storage)
+    {
+        if (g_update_in_progress)
+        {
+            matrix4x3_identity(&g_target_interpolation_frame_data->position_data[user_index][position_index].node);
+            g_target_interpolation_frame_data->position_data[user_index][position_index].node.position = *position;
+            g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = 1;
+        }
+    }
+}
+
+bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position)
+{
+    bool result = false;
+
+    if (g_frame_data_storage)
+    {
+        bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized;
+        if (g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized == initialized
+            && initialized
+            && interpolation_enabled
+            && cinematic_in_progress()
+            && !g_update_in_progress)
+        {
+            points_interpolate(
+                &g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
+                &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
+                g_interpolator_delta,
+                position);
+            result = true;
         }
     }
 

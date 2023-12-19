@@ -59,6 +59,24 @@ void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position)
 	return;
 }
 
+real_matrix4x3* matrix4x3_identity(real_matrix4x3* matrix)
+{
+	matrix->scale = 1.0f;
+	matrix->vectors.forward.i = 1.0f;
+	matrix->vectors.forward.j = 0.0f;
+	matrix->vectors.forward.k = 0.0f;
+	matrix->vectors.left.i = 0.0f;
+	matrix->vectors.left.j = 1.0f;
+	matrix->vectors.left.k = 0.0f;
+	matrix->vectors.up.i = 0.0f;
+	matrix->vectors.up.j = 0.0f;
+	matrix->vectors.up.k = 1.0f;
+	matrix->position.x = 0.0f;
+	matrix->position.y = 0.0f;
+	matrix->position.z = 0.0f;
+	return matrix;
+}
+
 void matrix4x3_from_point_and_quaternion(real_matrix4x3* matrix, const real_point3d* point, const real_quaternion* quaternion)
 {
 	matrix3x3_rotation_from_quaternion(&matrix->vectors, quaternion);

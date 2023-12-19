@@ -40,3 +40,10 @@ bool __cdecl collision_test_line(e_collision_test_flags flags,
 	datum first_ignore_object_index,
 	datum second_ignore_object_index,
 	collision_result* collision);
+
+bool __cdecl collision_test_vector(e_collision_test_flags flags,
+	const real_point3d* placement,
+	const real_vector3d* direction,
+	datum first_ignore_object_index,
+	datum second_ignore_object_index,
+	collision_result* collision);

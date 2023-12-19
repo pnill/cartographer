@@ -12,3 +12,5 @@ enum e_transition_function_type : int16
     _transition_function_zero = 7,
     k_transition_functions_count
 };
+
+real32 __cdecl transition_function_evaluate(int16 function_type, real32 function_value);

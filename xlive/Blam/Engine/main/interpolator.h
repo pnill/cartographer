@@ -1,8 +1,5 @@
 #pragma once
-#include "Blam/Engine/game/players.h"
-#include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/models/render_models.h"
-#include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 
 #define k_interpolation_first_person_weapon_slot_count 4
@@ -66,7 +63,7 @@ void halo_interpolator_clear_buffers(void);
 void halo_interpolator_update_begin(void);
 void halo_interpolator_update_end(void);
 
-real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
+bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point3d* center_of_mass);
 
 bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count);
 
@@ -88,3 +85,11 @@ void halo_interpolator_object_populate_interpolation_data(
 bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index, int32 position_index, real_matrix4x3* out);
 
 bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count);
+
+bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
+
+bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point);
+
+void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
+
+bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position);

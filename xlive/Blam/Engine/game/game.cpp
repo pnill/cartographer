@@ -256,10 +256,11 @@ void __cdecl game_initialize_for_new_map(s_game_options* options)
     game_globals->map_active = true;
 }
 
-void game_apply_pre_winmain_patches()
+void game_apply_pre_winmain_patches(void)
 {
     PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
     PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), shell_initialize);
+    return;
 }

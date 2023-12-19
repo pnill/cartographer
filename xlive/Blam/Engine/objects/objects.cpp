@@ -46,7 +46,7 @@ void* object_header_block_get(datum object_datum, const object_header_block_refe
 	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
 }
 
-void* object_header_block_get_with_count(datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
+void* object_header_block_get_with_count(datum object_index, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
 {
 	void* block;
 	if (reference->offset == -1)
@@ -56,7 +56,7 @@ void* object_header_block_get_with_count(datum object_datum, const object_header
 	}
 	else
 	{
-		block = (void*)object_header_block_get(object_datum, reference);
+		block = (void*)object_header_block_get(object_index, reference);
 		*element_count = reference->size / element_size;
 	}
 
@@ -509,7 +509,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_header->cluster_index = NONE;
 			location_invalidate(&object->location);
 			object->first_cluster_reference = NONE;
-			object->parent_datum = NONE;
+			object->parent_index = NONE;
 			object->next_index = NONE;
 			object->current_weapon_datum = NONE;
 			object->name_list_index = NONE;
@@ -735,6 +735,44 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
 }
 
+real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* point_out)
+{
+	real_point3d point;
+	real_point3d interpolated_object_position;
+	object_datum* object = object_get_fast_unsafe(object_index);
+	if (halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
+	{
+		point = interpolated_object_position;
+	}
+	else
+	{
+		point = object->position;
+		interpolated_object_position = object->position;
+	}
+
+	if (object->parent_index == NONE)
+	{
+		*point_out = point;
+	}
+	else
+	{
+		real_matrix4x3 interpolated_matrix;
+		real_matrix4x3* transform_matrix = &interpolated_matrix;
+		if (!halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
+		{
+			transform_matrix = object_get_node_matrix(object->parent_index, object->matrix_index);
+		}
+		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
+	}
+	return point_out;
+}
+
+real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
+{
+	real_matrix4x3* nodes = (real_matrix4x3*)object_header_block_get(object_index, &object_get_fast_unsafe(object_index)->nodes_block);
+	return &nodes[node_index];
+}
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
 {
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
@@ -757,6 +795,25 @@ void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
 	return;
 }
 
+real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_index, real_point3d* center_of_mass)
+{
+	real_point3d* result;
+	if (halo_interpolator_interpolate_center_of_mass(object_index, center_of_mass))
+	{
+		result = center_of_mass;
+	}
+	else
+	{
+		result = object_get_center_of_mass(object_index, center_of_mass);
+	}
+	return result;
+}
+
+datum __cdecl object_get_parent_recursive(datum parent_index)
+{
+	return INVOKE(0x132574, 0x121444, object_get_parent_recursive, parent_index);
+}
+
 typedef void(__cdecl* t_object_move_t)(int);
 t_object_move_t p_object_move;
 void __cdecl object_move_hook(int a1)
@@ -774,8 +831,89 @@ void __cdecl object_update_hook(datum object_index)
 	object_initialize_for_interpolation(object_index);
 }
 
+int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit)
+{
+	int32 marker_index = 0;
+
+	datum index = object_index;
+	if (!is_unit)
+	{
+		index = object_get_parent_recursive(index);
+	}
+	if (index != NONE)
+	{
+		object_datum* object = object_get_fast_unsafe(index);
+		object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
+		if (object_def->model.TagIndex != NONE)
+		{
+			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
+
+			int32 node_count;
+			real_matrix4x3* node_matrices;
+			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
+			{
+				node_matrices = object_get_node_matrices(object_index, &node_count);
+			}
+
+			void* collision_regions = (real_matrix4x3*)object_header_block_get(object_index, &object->collision_regions_block);
+
+			int32 marker_index = render_model_get_markers_by_name(model_def->render_model.TagIndex, 
+				marker, 
+				collision_regions, 
+				NONE, 
+				NULL, 
+				node_count, 
+				node_matrices, 
+				object->object_flags.test(_object_mirrored_bit), 
+				marker_object,
+				count);
+
+			if (marker_index)
+			{
+				return marker_index;
+			}
+		}
+	}
+
+	object_datum* object = object_get_fast_unsafe(object_index);
+	marker_object->node_index = 0;
+	matrix4x3_identity(&marker_object->matrix0);
+		
+	if (halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
+	{
+		marker_object->matrix1 = marker_object->matrix1;
+	}
+	else
+	{
+		marker_object->matrix1 = *object_get_node_matrix(object_index, 0);
+	}
+		
+	marker_object->field_6C = 0;
+	if (object->object_flags.test(_object_mirrored_bit))
+	{
+		marker_object->matrix1.vectors.left.i = -marker_object->matrix1.vectors.left.i;
+		marker_object->matrix1.vectors.left.j = -marker_object->matrix1.vectors.left.j;
+		marker_object->matrix1.vectors.left.k = -marker_object->matrix1.vectors.left.k;
+	}
+
+	return (marker.get_id() ? marker_index : 1);
+}
+
+// Replace calls to internal_object_get_markers_by_string_id
+void internal_object_get_markers_by_string_id_replace_calls(void)
+{
+	PatchCall(Memory::GetAddress(0x132792, 0x121662), internal_object_get_markers_by_string_id);
+
+	PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);
+	PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);
+	PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);
+	PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);
+
+	return;
+}
+
 // Replace calls to object_new with our own
-void object_new_replace_calls()
+void object_new_replace_calls(void)
 {
 	PatchCall(Memory::GetAddress(0x3B603, 0x3F34B), object_new);
 	PatchCall(Memory::GetAddress(0x52A2E, 0x5AF3E), object_new);
@@ -811,9 +949,10 @@ void object_new_replace_calls()
 void objects_apply_patches(void)
 {
 #ifdef USE_REWRITTEN_OBJECT_NEW
-	//object_new_replace_calls();
+	object_new_replace_calls();
 	//DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
 	DETOUR_ATTACH(p_object_update, Memory::GetAddress<t_object_update>(0x135219, 0), object_update_hook);
 #endif
+	internal_object_get_markers_by_string_id_replace_calls();
 	return;
 }

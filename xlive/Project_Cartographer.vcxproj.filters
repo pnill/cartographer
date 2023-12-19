@@ -249,6 +249,8 @@
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
     <ClCompile Include="Blam\Engine\effects\player_effects.cpp" />
     <ClCompile Include="Blam\Engine\render\render_visibility_collection.cpp" />
+    <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
+    <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_definition_interface.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_model_definition.cpp" />
