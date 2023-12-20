@@ -283,9 +283,9 @@ void bipeds_apply_patches(void)
     PatchCall(Memory::GetAddress(0x13D35A, 0x12C1A9), biped_get_sight_position);
     PatchCall(Memory::GetAddress(0x1422B2, 0x131102), biped_get_sight_position);
 
-    PatchCall(Memory::GetAddress(0x154B88, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);
-    PatchCall(Memory::GetAddress(0x15602E, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);
-    PatchCall(Memory::GetAddress(0x156C03, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);
-    PatchCall(Memory::GetAddress(0x157392, 0x0), biped_offset_first_person_camera_usercall_to_rewritten);    
+    PatchCall(Memory::GetAddress(0x154B88, 0x138E44), biped_offset_first_person_camera_usercall_to_rewritten);
+    PatchCall(Memory::GetAddress(0x15602E, 0x13A2EA), biped_offset_first_person_camera_usercall_to_rewritten);
+    PatchCall(Memory::GetAddress(0x156C03, 0x13AEBF), biped_offset_first_person_camera_usercall_to_rewritten);
+    PatchCall(Memory::GetAddress(0x157392, 0x13B652), biped_offset_first_person_camera_usercall_to_rewritten);
     return;
 }
