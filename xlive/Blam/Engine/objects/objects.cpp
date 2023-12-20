@@ -815,38 +815,38 @@ datum __cdecl object_get_parent_recursive(datum parent_index)
 	return INVOKE(0x132574, 0x121444, object_get_parent_recursive, parent_index);
 }
 
-typedef void(__cdecl* t_object_move_t)(int);
+typedef void(__cdecl* t_object_move_t)(datum);
 t_object_move_t p_object_move;
 void __cdecl object_move(datum object_index)
 {
 	//p_object_move(a1);
 	//object_initialize_for_interpolation(a1);
-	INVOKE(0x137E6D, 0, object_move, object_index);
+	INVOKE(0x137E6D, 0x126D3D, object_move, object_index);
+	return;
 }
 
-typedef void(__cdecl* t_object_update)(datum object_index);
-t_object_update p_object_update;
 
-void __cdecl object_update(datum object_index)
+bool __cdecl object_update(datum object_index)
 {
-	//p_object_update(object_index);
-	INVOKE(0x1352a9, 0, object_update, object_index);
-	
+	return INVOKE(0x1352a9, 0x124179, object_update, object_index);	
 }
 
 void __cdecl object_pre_delete_recursive(datum object_index)
 {
-	INVOKE(0x1386E1, 0, object_pre_delete_recursive, object_index);
+	INVOKE(0x1386E1, 0x1275B1, object_pre_delete_recursive, object_index);
+	return;
 }
 
 void __cdecl object_delete_recursive(datum object_index, bool remove_from_map_before_deletion)
 {
-	INVOKE(0x13683D, 0, object_delete_recursive, object_index, remove_from_map_before_deletion);
+	INVOKE(0x13683D, 0x12570D, object_delete_recursive, object_index, remove_from_map_before_deletion);
+	return;
 }
 
-void __cdecl objects_garbage_collection()
+void __cdecl objects_garbage_collection(void)
 {
-	INVOKE(0x1316A4, 0, objects_garbage_collection);
+	INVOKE(0x1316A4, 0x120574, objects_garbage_collection);
+	return;
 }
 
 void objects_post_update()
@@ -964,12 +964,10 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 void internal_object_get_markers_by_string_id_replace_calls(void)
 {
 	PatchCall(Memory::GetAddress(0x132792, 0x121662), internal_object_get_markers_by_string_id);
-
 	PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);
 	PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);
 	PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);
 	PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);
-
 	return;
 }
 
