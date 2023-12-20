@@ -13,3 +13,4 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 	c_particle_definition** particle_definition);
 
 void apply_particle_update_patches();
+

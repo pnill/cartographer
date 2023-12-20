@@ -134,6 +134,11 @@ public:
 		return m_data_array->total_elements_used;
 	}
 
+	void reset()
+	{
+		m_last_datum_index = NONE;
+		m_current_absolute_index = NONE;
+	}
 private:
 	s_data_array* m_data_array;
 	datum m_last_datum_index;

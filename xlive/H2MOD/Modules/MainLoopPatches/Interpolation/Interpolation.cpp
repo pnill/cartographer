@@ -108,10 +108,10 @@ namespace Interpolation
 		ObjectInterpolate::ApplyPatches();
 
 		// fix effects at uncapped FPS
-		PatchCall(Memory::GetAddressRelative(0x439D2A), game_update_hook);
+		//PatchCall(Memory::GetAddressRelative(0x439D2A), game_update_hook);
 		// PatchCall(Memory::GetAddressRelative(0x448D5C), effects_update_hook);
-		PatchCall(Memory::GetAddressRelative(0x439D45), game_frame_hook);
-		PatchCall(Memory::GetAddressRelative(0x44A5E8), game_tick_hook);
+		//PatchCall(Memory::GetAddressRelative(0x439D45), game_frame_hook);
+		//PatchCall(Memory::GetAddressRelative(0x44A5E8), game_tick_hook);
 
 		NopFill(Memory::GetAddressRelative(0x448D68), 5);
 	}

@@ -313,6 +313,7 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_location.cpp" />
     <ClCompile Include="Blam\Engine\effects\player_effects.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_definition_interface.cpp" />
@@ -432,6 +433,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_modules.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
+    <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />

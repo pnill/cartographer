@@ -14,6 +14,12 @@ datum __cdecl unit_inventory_next_weapon(datum unit_datum_index)
 	return INVOKE(0x139E04, 0x128C53, unit_inventory_next_weapon, unit_datum_index);
 }
 
+datum __cdecl unit_inventory_get_weapon(uint16 absolute_unit_index, int16 weapon_slot)
+{
+	//todo get server offset
+	return INVOKE(0x13D9AD, 0, unit_inventory_get_weapon, absolute_unit_index, weapon_slot);
+}
+
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method)
 {
 	return INVOKE(0x1442AA, 0x1330FA, unit_add_weapon_to_inventory, unit_datum_index, weapon_datum_index, weapon_addition_method);

@@ -115,6 +115,7 @@ enum e_object_header_flag : uint8
 	_object_header_requires_motion_bit = 2,
 	_object_header_post_update_bit = 3,
 	_object_header_being_deleted_bit = 4,
+	_object_header_do_not_update_bit = 5,
 	_object_header_connected_to_map_bit = 6,
 	_object_header_child_bit = 7,
 	k_object_header_flags

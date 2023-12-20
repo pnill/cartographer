@@ -132,6 +132,19 @@ void scale_interpolate(real32 previous_scale, real32 current_scale, real32 fract
 	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);
 }
 
+real_vector3d* __cdecl perpendicular3d(real_vector3d* in, real_vector3d* out)
+{
+	return INVOKE(0x344c9, 0, perpendicular3d, in, out);
+}
+
+real_vector3d* cross_product3d(real_vector3d* up, real_vector3d* forward, real_vector3d* out_left)
+{
+	out_left->x = up->y * forward->z - forward->y * up->z;
+	out_left->y = forward->x * up->z - up->x * forward->z;
+	out_left->z = up->x * forward->y - forward->x * up->y;
+	return out_left;
+}
+
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up)
 {
 	return INVOKE(0x346E2, 0x27D5F, generate_up_vector3d, forward, up);

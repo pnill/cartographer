@@ -4,9 +4,10 @@
 
 struct c_particle_emitter
 {
-	int8 gap_0[4];
+	bool active;
+	int8 gap_1[3];
 	datum particle_index;
-	datum parent_emitter_index;
+	datum next_emitter_index;
 	int8 gap_C[4];
 	real_matrix3x3 matrix;
 	real_point3d position;
