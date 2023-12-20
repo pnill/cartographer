@@ -12,6 +12,7 @@
 #include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/models/models.h"
@@ -816,19 +817,79 @@ datum __cdecl object_get_parent_recursive(datum parent_index)
 
 typedef void(__cdecl* t_object_move_t)(int);
 t_object_move_t p_object_move;
-void __cdecl object_move_hook(int a1)
+void __cdecl object_move(datum object_index)
 {
-	p_object_move(a1);
-	object_initialize_for_interpolation(a1);
+	//p_object_move(a1);
+	//object_initialize_for_interpolation(a1);
+	INVOKE(0x137E6D, 0, object_move, object_index);
 }
 
 typedef void(__cdecl* t_object_update)(datum object_index);
 t_object_update p_object_update;
 
-void __cdecl object_update_hook(datum object_index)
+void __cdecl object_update(datum object_index)
 {
-	p_object_update(object_index);
-	object_initialize_for_interpolation(object_index);
+	//p_object_update(object_index);
+	INVOKE(0x1352a9, 0, object_update, object_index);
+	
+}
+
+void __cdecl object_pre_delete_recursive(datum object_index)
+{
+	INVOKE(0x1386E1, 0, object_pre_delete_recursive, object_index);
+}
+
+void __cdecl object_delete_recursive(datum object_index, bool remove_from_map_before_deletion)
+{
+	INVOKE(0x13683D, 0, object_delete_recursive, object_index, remove_from_map_before_deletion);
+}
+
+void __cdecl objects_garbage_collection()
+{
+	INVOKE(0x1316A4, 0, objects_garbage_collection);
+}
+
+void objects_post_update()
+{
+	object_globals_get()->objects_updating = true;
+
+	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+
+	while (object_header_it.get_next_datum())
+	{
+		s_object_header* object_header = object_header_it.get_current_datum();
+
+		object_header->flags.set(_object_header_do_not_update_bit, false);
+
+		if (object_header->flags.test((e_object_header_flag)(_object_header_post_update_bit | _object_header_active_bit | _object_header_awake_bit)) &&	!object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			object_header->flags.set(_object_header_post_update_bit, false);
+			
+			object_update(object_header_it.get_current_datum_index());
+
+			if (object_header->flags.test(_object_header_requires_motion_bit))
+				object_move(object_header_it.get_current_datum_index());
+		}
+
+		object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+	}
+
+	weapons_fire_barrels();
+	object_header_it.reset();
+
+	while (object_header_it.get_next_datum())
+	{
+		s_object_header* object_header = object_header_it.get_current_datum();
+
+		if (object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			object_pre_delete_recursive(object_header_it.get_current_datum_index());
+			object_delete_recursive(object_header_it.get_current_datum_index(), true);
+		}
+	}
+
+	object_globals_get()->objects_updating = false;
+	objects_garbage_collection();
 }
 
 int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit)
@@ -948,10 +1009,12 @@ void object_new_replace_calls(void)
 
 void objects_apply_patches(void)
 {
+	//PatchCall(Memory::GetAddress(0x1388BA), object_update_hook);
 #ifdef USE_REWRITTEN_OBJECT_NEW
 	object_new_replace_calls();
+	PatchCall(Memory::GetAddress(0x4A53C), objects_post_update);
 	//DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
-	DETOUR_ATTACH(p_object_update, Memory::GetAddress<t_object_update>(0x135219, 0), object_update_hook);
+	//DETOUR_ATTACH(p_object_update, Memory::GetAddress<t_object_update>(0x1352A9, 0), object_update_hook);
 #endif
 	internal_object_get_markers_by_string_id_replace_calls();
 	return;
