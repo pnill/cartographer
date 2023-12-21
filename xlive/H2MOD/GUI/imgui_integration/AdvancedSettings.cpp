@@ -266,12 +266,6 @@ namespace ImGuiHandler {
 					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
-					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10)
-							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 144)
-							H2Config_fps_limit = 144;
-					}
 
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))

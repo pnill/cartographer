@@ -8,9 +8,11 @@
 
 #include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/cache/cache_files.h"
+#include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/devices/devices.h"
 #include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/main/interpolator.h"
@@ -819,8 +821,6 @@ typedef void(__cdecl* t_object_move_t)(datum);
 t_object_move_t p_object_move;
 void __cdecl object_move(datum object_index)
 {
-	//p_object_move(a1);
-	//object_initialize_for_interpolation(a1);
 	INVOKE(0x137E6D, 0x126D3D, object_move, object_index);
 	return;
 }
@@ -869,9 +869,9 @@ void objects_post_update()
 
 			if (object_header->flags.test(_object_header_requires_motion_bit))
 				object_move(object_header_it.get_current_datum_index());
-		}
 
-		object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+			object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+		}
 	}
 
 	weapons_fire_barrels();
@@ -911,6 +911,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 
 			int32 node_count;
 			real_matrix4x3* node_matrices;
+
 			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
 			{
 				node_matrices = object_get_node_matrices(object_index, &node_count);
@@ -1007,13 +1008,14 @@ void object_new_replace_calls(void)
 
 void objects_apply_patches(void)
 {
-	//PatchCall(Memory::GetAddress(0x1388BA), object_update_hook);
 #ifdef USE_REWRITTEN_OBJECT_NEW
 	object_new_replace_calls();
 	PatchCall(Memory::GetAddress(0x4A53C), objects_post_update);
-	//DETOUR_ATTACH(p_object_move, Memory::GetAddress<t_object_move_t>(0x137E6D, 0), object_move_hook);
-	//DETOUR_ATTACH(p_object_update, Memory::GetAddress<t_object_update>(0x1352A9, 0), object_update_hook);
 #endif
 	internal_object_get_markers_by_string_id_replace_calls();
+
+	// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
+	// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
+	WriteValue<uint8>(Memory::GetAddress(0x135657), 0xEB);
 	return;
 }
