@@ -102,7 +102,7 @@ struct unit_datum
 	int8 gap_20D;
 	int8 tick_count_20E;
 	bool unk_bool_20F;
-	uint16 parent_seat_index;
+	int16 parent_seat_index;
 	int8 gap_212[10];
 	real32 mouth_aperture;
 	int8 gap_220[4];
@@ -170,7 +170,7 @@ datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method);
 float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, s_player_action_weapons weapon_indexes);
 bool unit_is_dual_wielding(datum unit_index);
-datum __cdecl unit_inventory_get_weapon(uint16 absolute_unit_index, int16 weapon_slot);
+datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 
 datum player_index_from_unit_index(datum unit_index);
 
