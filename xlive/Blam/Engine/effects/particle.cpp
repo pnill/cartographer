@@ -109,7 +109,6 @@ real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum partic
 
 void particle_update(real32 delta)
 {
-
 	s_data_iterator<c_particle_system> particle_system_it(get_particle_system_table());
 	g_particle_delta_temp = delta;
 	while (particle_system_it.get_next_datum())

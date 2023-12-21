@@ -164,7 +164,7 @@ static BLAM_MATH_INL real32 magnitude3d(const real_vector3d* vector)
 
 static BLAM_MATH_INL bool valid_real(real32 value)
 {
-	int32 value_as_int = value;
+	int32 value_as_int = *(int32*)&value;
 	return (value_as_int & 0x7F800000) != 0x7F800000;
 }
 

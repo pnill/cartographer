@@ -36,7 +36,7 @@ real_vector2d* biped_build_2d_camera_frame(const real_vector3d* forward, const r
     return perpendicular2d(forward_out, up_out);
 }
 
-void __stdcall biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
+void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forward, datum object_index, real_point3d* camera_position, const real_vector3d* camera_up)
 {
     biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
     _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
@@ -261,13 +261,7 @@ __declspec(naked) void biped_offset_first_person_camera_usercall_to_rewritten(vo
 
         call biped_offset_first_person_camera
 
-        // Pop values after call
-        // We don't need to do this?
-        /*
-        pop eax
-        pop edx
-        pop ecx
-        pop ebx*/
+        add esp, 4 * 4
 
         // Restore original 3 registers
         pop edx

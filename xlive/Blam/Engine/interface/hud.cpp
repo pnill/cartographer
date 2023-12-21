@@ -31,12 +31,12 @@ void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new
 
 void set_primary_hud_scale(float scale)
 {
-	*get_primary_hud_scale() = original_primary_hud_scale * scale * (1.f / k_primary_upscale_size);
+	*get_primary_hud_scale() = original_primary_hud_scale * scale * k_primary_upscale_size;
 }
 
 void set_secondary_hud_scale(float scale)
 {
-	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * (1.f / k_primary_upscale_size);
+	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * k_primary_upscale_size;
 }
 
 float* get_primary_hud_scale()
