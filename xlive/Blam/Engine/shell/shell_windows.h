@@ -9,6 +9,10 @@
 void shell_windows_initialize();
 void shell_windows_apply_patches();
 
+long long shell_time_now_sec();
+long long shell_time_now_msec();
+long long shell_time_now(long long denominator);
+
 void shell_windows_throttle_framerate(int desired_framerate);
 
 bool __cdecl game_is_minimized(void);

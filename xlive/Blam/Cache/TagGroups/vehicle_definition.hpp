@@ -10,7 +10,7 @@
 #pragma pack(push,1)
 struct s_vehicle_group_definition :TagGroup<'vehi'>
 {
-	s_unit_group_definition unitTag;
+	_unit_definition unitTag;
 	enum class e_flags : __int32
 	{
 		speed_wakes_physics = FLAG(0),
