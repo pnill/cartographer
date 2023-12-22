@@ -102,8 +102,8 @@ void XnIpManager::LogConnectionsToConsole(ConsoleLog* consoleLog) const
 					"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
 					"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
 				"Connection initiator: " + (xnIp->InitiatedConnectRequest() ? "yes" : "no") + " " +
-				"Time since last interaction: " + std::to_string((float)(_Shell::QPCToTimeNowMsec() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +
-				"Time since last packet received: " + std::to_string((float)(_Shell::QPCToTimeNowMsec() - pckStats->lastPacketReceivedTime) / 1000.f);
+				"Time since last interaction: " + std::to_string((float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +
+				"Time since last packet received: " + std::to_string((float)(timeGetTime() - pckStats->lastPacketReceivedTime) / 1000.f);
 
 			LOG_CRITICAL_NETWORK(logString);
 			if (consoleLog)
@@ -152,8 +152,8 @@ void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int err
 				const XnIpPckTransportStats* pckStats;
 				xnIp->PckGetStats(&pckStats);
 
-				float connectionLastInteractionSeconds = (float)(_Shell::QPCToTimeNowMsec() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
-				float connectionLastPacketReceivedSeconds = (float)(_Shell::QPCToTimeNowMsec() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
+				float connectionLastInteractionSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
+				float connectionLastPacketReceivedSeconds = (float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f;
 				LOG_CRITICAL_NETWORK("{} - connection index: {}, packets sent: {}, packets received: {}, time since last interaction: {:.4f} seconds, time since last packet receive: {:.4f} seconds",
 					__FUNCTION__,
 					i,

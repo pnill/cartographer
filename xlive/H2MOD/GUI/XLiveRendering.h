@@ -34,8 +34,6 @@ int getTextWidth(const char* szText, LPD3DXFONT pFont);
 int getSpaceCharacterWidth(LPD3DXFONT pFont);
 int centerTextHorizontally(const char* text, int x, int width, LPD3DXFONT pFont);
 
-void XLiveThrottleFramerate(int desiredFramerate);
-
 static CONST D3DCOLOR COLOR_RED = D3DCOLOR_ARGB(255, 255, 000, 000);
 static CONST D3DCOLOR COLOR_GREEN = D3DCOLOR_ARGB(255, 127, 255, 000);
 static CONST D3DCOLOR COLOR_ORANGE = D3DCOLOR_ARGB(255, 255, 140, 000);

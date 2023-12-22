@@ -470,119 +470,6 @@ BOOL WINAPI XLivePreTranslateMessage(const LPMSG lpMsg)
 	return false;
 }
 
-static void set_max_system_timer_resolution(bool enabled)
-{
-	ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-	_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-	_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, enabled, &ulCurrentResolution);
-}
-
-// TODO: move to _Shell or somewhere else?
-void XLiveThrottleFramerate(int desiredFramerate) 
-{
-	static LARGE_INTEGER lastCounter;
-	static int lastFrameSetting = -1;
-	static bool frameLimiterInitialized = false;
-
-	const int threadWaitTimePercentage = 90;
-	static HANDLE hFrameLimitTimer = NULL;
-
-	if (desiredFramerate <= 0)
-	{
-		lastFrameSetting = desiredFramerate;
-		frameLimiterInitialized = false;
-		return;
-	}
-
-	if (lastFrameSetting != desiredFramerate)
-	{
-		lastFrameSetting = desiredFramerate;
-		frameLimiterInitialized = false;
-	}
-
-	if (!frameLimiterInitialized)
-	{
-		QueryPerformanceCounter(&lastCounter);
-		frameLimiterInitialized = true;
-
-		if (NULL == hFrameLimitTimer)
-		{
-			hFrameLimitTimer = CreateWaitableTimer(NULL, FALSE, NULL);
-
-			atexit([]() {
-				if (NULL != hFrameLimitTimer)
-					CloseHandle(hFrameLimitTimer);
-
-				// reset timer resolution back to default on exit
-				set_max_system_timer_resolution(false);
-			});
-		}
-
-		// skip the first frame after init
-		return;
-	}
-
-	LARGE_INTEGER frequency;
-	LARGE_INTEGER deltaCounter;
-	QueryPerformanceFrequency(&frequency); 
-
-	auto minFrameTimeUs = (long long)(1000000.0 / (double)desiredFramerate);
-
-	QueryPerformanceCounter(&deltaCounter);
-	deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
-	auto deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
-
-	if (deltaTimeUs < minFrameTimeUs)
-	{
-		auto sleepTimeUs = minFrameTimeUs - deltaTimeUs;
-
-		// sleep threadWaitTimePercentage out of the target render time using thread sleep or timer wait
-		long long timeToWaitSleepUs = (threadWaitTimePercentage * sleepTimeUs) / 100;
-
-		// sleep just the milliseconds part
-		// timeToWaitSleepUs = timeToWaitSleepUs - (timeToWaitSleepUs % 1000);
-
-		// skip if time to wait is lower than 3ms
-		if (timeToWaitSleepUs > 3000)
-		{
-			if (NULL != hFrameLimitTimer)
-			{
-				// Create an unnamed waitable timer.
-				ULONG ulMinimumResolution, ulMaximumResolution, ulCurrentResolution;
-				_Shell::NtQueryTimerResolutionHelper(&ulMinimumResolution, &ulMaximumResolution, &ulCurrentResolution);
-
-				if (10ll * timeToWaitSleepUs > ulMaximumResolution)
-				{
-					LARGE_INTEGER liDueTime;
-					_Shell::NtSetTimerResolutionHelper(ulMaximumResolution, TRUE, &ulCurrentResolution);
-
-					liDueTime.QuadPart = -10ll * timeToWaitSleepUs;
-					if (SetWaitableTimer(hFrameLimitTimer, &liDueTime, 0, NULL, NULL, TRUE))
-					{
-						// Wait for the timer.
-						_Shell::NtWaitForSingleObjectHelper(hFrameLimitTimer, FALSE, &liDueTime);
-					}
-				}
-			}
-
-			/*int sleepTimeMs = timeToWaitSleepUs / 1000ll;
-			if (sleepTimeMs >= 0)
-				Sleep(sleepTimeMs);*/
-		}
-
-		while (true)
-		{
-			QueryPerformanceCounter(&deltaCounter);
-			deltaCounter.QuadPart = deltaCounter.QuadPart - lastCounter.QuadPart;
-			deltaTimeUs = _Shell::QPCToTime(std::micro::den, deltaCounter, frequency);
-			if (deltaTimeUs >= minFrameTimeUs)
-				break;
-		}
-	}
-
-	QueryPerformanceCounter(&lastCounter);
-}
-
 // #5002: XLiveRender
 HRESULT WINAPI XLiveRender()
 {
@@ -739,7 +626,7 @@ HRESULT WINAPI XLiveRender()
 
 	// limit framerate if needed
 	// UPDATE: frame limiting in XLiveRender adds input lag
-	// XLiveThrottleFramerate(H2Config_fps_limit);
+	// shell_windows_throttle_framerate(H2Config_fps_limit);
 
 	return S_OK;
 }

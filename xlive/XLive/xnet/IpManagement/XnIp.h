@@ -3,7 +3,6 @@
 #include "../xnet.h"
 #include "../Sockets/XSocket.h"
 
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 
 #define XNIP_MAX_PCK_STR_HDR_LEN 32
@@ -143,13 +142,13 @@ struct XnIpPckTransportStats
 			memset(pckSentPerSec, 0, sizeof(pckSentPerSec));
 			memset(pckRecvdPerSec, 0, sizeof(pckRecvdPerSec));
 
-			lastTimeUpdate = _Shell::QPCToTimeNowMsec();
+			lastTimeUpdate = timeGetTime();
 		}
 		else
 		{
 			const ULONGLONG sample_end_time = 1ull * 1000ull;
 
-			if (_Shell::QPCToTimeNowMsec() - lastTimeUpdate >= sample_end_time)
+			if (timeGetTime() - lastTimeUpdate >= sample_end_time)
 			{
 				pckSentPerSecIdx = (pckSentPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
 				pckRecvdPerSecIdx = (pckRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
@@ -163,7 +162,7 @@ struct XnIpPckTransportStats
 				pckCurrentSendPerSecIdx = (pckCurrentSendPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
 				pckCurrentRecvdPerSecIdx = (pckCurrentRecvdPerSecIdx + 1) % XNIP_MAX_NET_STATS_SAMPLES;
 
-				lastTimeUpdate = _Shell::QPCToTimeNowMsec();
+				lastTimeUpdate = timeGetTime();
 			}
 		}
 	}
@@ -189,7 +188,7 @@ struct XnIpPckTransportStats
 		pckRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvd;
 		pckBytesRecvdPerSec[pckRecvdPerSecIdx] += _pckRecvdBytes;
 
-		lastPacketReceivedTime = _Shell::QPCToTimeNowMsec();
+		lastPacketReceivedTime = timeGetTime();
 	}
 
 private:
@@ -329,7 +328,7 @@ public:
 
 	void UpdateInteractionTimeHappened()
 	{
-		m_lastConnectionInteractionTime = _Shell::QPCToTimeNowMsec();
+		m_lastConnectionInteractionTime = timeGetTime();
 	}
 
 	IN_ADDR GetConnectionId() const
@@ -369,7 +368,7 @@ public:
 
 	bool ConnectionTimedOut() const 
 	{
-		return _Shell::QPCToTimeNowMsec() - m_lastConnectionInteractionTime >= XnIp_ConnectionTimeOut;
+		return timeGetTime() - m_lastConnectionInteractionTime >= XnIp_ConnectionTimeOut;
 	}
 
 	static int GetConnectionIndex(IN_ADDR connectionId);

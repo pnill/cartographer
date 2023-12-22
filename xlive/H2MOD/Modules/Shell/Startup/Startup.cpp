@@ -6,6 +6,7 @@
 #include "../H2MODShell.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
@@ -285,6 +286,8 @@ void InitH2Startup() {
 	H2BaseAddr = Memory::GetAddress();
 	H2IsDediServer = Memory::IsDedicatedServer();
 
+	shell_windows_initialize();
+	// ### TODO remove entirely
 	_Shell::Initialize();
 
 	int ArgCnt;

@@ -6,6 +6,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/tag_files/files_windows.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -169,20 +170,6 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 #undef _last_param_offset
 }
 
-static DWORD (WINAPI* p_timeGetTime)() = timeGetTime;
-DWORD WINAPI timeGetTime_hook()
-{
-	LARGE_INTEGER currentCounter, frequency;
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&currentCounter);
-
-	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
-	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-	// don't start exactly from 0 (60 min)
-	return (DWORD)(PROCESS_SYSTEM_TIME_STARTUP_OFFSET + timeNow);
-}
-static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
-
 void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
 	pDataOut->cbData = pDataIn->cbData;
@@ -247,7 +234,7 @@ void H2Tweaks::ApplyPatches() {
 
 	DETOUR_BEGIN();
 
-	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
+	shell_windows_apply_patches();
 
 	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);

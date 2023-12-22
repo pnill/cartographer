@@ -3,6 +3,7 @@
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
@@ -113,7 +114,7 @@ void __cdecl rasterizer_present_hook(int a1) {
 	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
 	p_rasterizer_present(a1);
-	XLiveThrottleFramerate(H2Config_fps_limit);
+	shell_windows_throttle_framerate(H2Config_fps_limit);
 }
 
 typedef void(_cdecl* main_loop_body_t)();

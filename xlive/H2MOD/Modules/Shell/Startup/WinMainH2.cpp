@@ -40,7 +40,7 @@ LRESULT WINAPI H2WndProc_hook(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	else
 	{
 		// if we have to set the cursor, limit the frequency of the cursor being set
-		// because it's very expensive on CPU
+		// because it's very heavy on the CPU
 		bool enable_cursor = *window_in_focus && !*unk_condition1;
 		// if the cursor is about to get disabled, reset the frqLimiter
 		// and allow the cursor to be disabled

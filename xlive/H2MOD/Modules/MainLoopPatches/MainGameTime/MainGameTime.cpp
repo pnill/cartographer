@@ -79,19 +79,6 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 
 float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta)
 {
-	// original code
-	/*
-	dt = p_compute_time_delta(static_time_step, static_time_delta);
-
-	QueryPerformanceCounter(&currentCounter);
-	_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-	network_time = (_currentTimeMsec - _timeAtStartupMsec);
-	*/
-
-	//
-	// TODO cleanup
-	//
-
 	typedef float(__cdecl* compute_time_delta_t)(bool, float);
 	auto p_compute_time_delta = Memory::GetAddress<compute_time_delta_t>(0x28814);
 
@@ -99,19 +86,13 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages_t>(0x7902);
 
 	int game_time;
-	float dtSec = 0.0f;
-	LARGE_INTEGER currentCounter, counterFrq;
-	long long _currentTimeMsec, _timeAtStartupMsec;
+	float dt_sec = 0.0f;
+	long long time_now_msec;
 
 	s_main_time_globals* main_time_globals;
 
 	main_time_globals = s_main_time_globals::get();
 	game_time = game_in_progress() ? time_globals::get_game_time() : 0;
-
-	// QueryPerformanceFrequency(&counterFrq);
-	// TODO: fixme, the time offset breaks this
-	// also cleanup
-	// _timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
 
 	// TranslateMessage()
 	// TODO move to function and cleanup
@@ -119,16 +100,14 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 
 	if (fixed_time_step)
 	{
-		dtSec = fixed_time_delta;
+		dt_sec = fixed_time_delta;
 		if (time_globals::available())
 			time_globals::get()->game_ticks_leftover = 0.0f;
 	}
 	else
 	{
-		//QueryPerformanceCounter(&currentCounter);
-		//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-		_currentTimeMsec = timeGetTime();
-		dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+		time_now_msec = timeGetTime();
+		dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
@@ -138,49 +117,43 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 			{
 				// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-				while (get_ticks_leftover_time() > dtSec)
+				while (get_ticks_leftover_time() > dt_sec)
 				{
-					int iMsSleep = 0;
-					float fMsSleep = (float)(get_ticks_leftover_time() - dtSec) * 1000.f;
+					int yield_time_msec = 0;
+					float fMsSleep = (float)(get_ticks_leftover_time() - dt_sec) * 1000.f;
 
 					if ((int)fMsSleep > 0)
-						iMsSleep = (int)fMsSleep;
+						yield_time_msec = (int)fMsSleep;
 
 					// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
 					// Sleep is not precise since Windows is not a RTOS
-					Sleep(iMsSleep);
+					Sleep(yield_time_msec);
 
-					// QueryPerformanceCounter(&currentCounter);
-					//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-					_currentTimeMsec = timeGetTime();
-					dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+					time_now_msec = timeGetTime();
+					dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 				}
 			}
 			else
 			{
 				Sleep(15u);
 
-				// QueryPerformanceCounter(&currentCounter);
-				//_currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-				_currentTimeMsec = timeGetTime();
-				dtSec = (double)(_currentTimeMsec - main_time_globals->last_time_ms) / 1000.;
+				time_now_msec = timeGetTime();
+				dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 			}
 		}
 	}
 
-	dtSec = MIN(dtSec, 10.f);
-	// QueryPerformanceCounter(&currentCounter);
-	// _currentTimeMsec = _Shell::QPCToTime(std::milli::den, currentCounter, counterFrq) - _timeAtStartupMsec;
-	_currentTimeMsec = timeGetTime();
+	dt_sec = MIN(dt_sec, 10.f);
+	time_now_msec = timeGetTime();
 	if (fixed_time_step)
-		_currentTimeMsec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0f);
-	main_time_globals->last_time_ms = _currentTimeMsec;
+		time_now_msec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0f);
+	main_time_globals->last_time_ms = time_now_msec;
 	main_time_globals->game_time_passed = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
 	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
 
 	//LOG_TRACE_GAME("main_time_update() - timeDeltaSeconds: {}", timeDeltaSeconds);
-	return dtSec;
+	return dt_sec;
 }
 
 void MainGameTime::ApplyPatches()
