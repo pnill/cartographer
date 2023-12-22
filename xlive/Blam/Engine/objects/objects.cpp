@@ -603,15 +603,15 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			int16 orientation_size = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 			// Allocate object header blocks
-			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_datum::object_attachments_block), (int16)8 * object_def->attachments.size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::damage_sections_block), 8 * damage_info_damage_sections_size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::change_color_block), (int16)24 * object_def->change_colors.size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::nodes_block), 52 * nodes_count, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::collision_regions_block), 10 * collision_regions_count, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::node_orientation_block), orientation_size, 4);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::original_orientation_block), orientation_size, 4);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::animation_manager_block), (valid_animation_manager ? 144 : 0), 0);
-			can_create_object &= havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
+			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_datum::object_attachments_block), (int16)8 * object_def->attachments.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::damage_sections_block), 8 * damage_info_damage_sections_size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::change_color_block), (int16)24 * object_def->change_colors.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::nodes_block), 52 * nodes_count, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::collision_regions_block), 10 * collision_regions_count, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::node_orientation_block), orientation_size, 4)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::original_orientation_block), orientation_size, 4)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
+			&& havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
 			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 			bool out_of_objects = !can_create_object;
