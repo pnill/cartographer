@@ -33,6 +33,7 @@
 #include "Blam/Engine/render/render_cameras.h"
 #include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
+#include "Blam/Engine/widgets/cloth.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -927,6 +928,7 @@ void H2MOD::ApplyHooks() {
 		apply_particle_patches();
 		apply_particle_system_patches();
 		apply_particle_update_patches();
+		apply_cloth_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

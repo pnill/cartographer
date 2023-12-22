@@ -817,6 +817,11 @@ datum __cdecl object_get_parent_recursive(datum parent_index)
 	return INVOKE(0x132574, 0x121444, object_get_parent_recursive, parent_index);
 }
 
+int object_get_marker_by_string_id(datum object_datum, string_id marker_name, void* out_data, int16 count, bool is_unit)
+{
+	return INVOKE(0x1325FB, 0, object_get_marker_by_string_id, object_datum, marker_name, out_data, count, is_unit);
+}
+
 typedef void(__cdecl* t_object_move_t)(datum);
 t_object_move_t p_object_move;
 void __cdecl object_move(datum object_index)

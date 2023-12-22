@@ -260,6 +260,9 @@
     <ClCompile Include="Blam\Engine\effects\particle_property.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_location.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows_internals.cpp" />
+    <ClCompile Include="Blam\Engine\main\loading.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs.cpp" />
+    <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -765,6 +768,8 @@
     <ClInclude Include="Blam\Engine\effects\particle_update.h" />
     <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
+    <ClInclude Include="Blam\Engine\main\loading.h" />
+    <ClInclude Include="Blam\Engine\widgets\cloth.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
