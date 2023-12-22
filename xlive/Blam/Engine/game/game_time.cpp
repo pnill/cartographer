@@ -26,24 +26,24 @@ int time_globals::get_tickrate()
 	return get()->ticks_per_second;
 }
 
-float time_globals::get_seconds_per_tick()
+real32 time_globals::get_seconds_per_tick()
 {
 	return get()->seconds_per_tick;
 }
 
-float time_globals::seconds_to_ticks_real(float s)
+real32 time_globals::seconds_to_ticks_real(real32 s)
 {
-	return (float)get()->ticks_per_second * s;
+	return (real32)get()->ticks_per_second * s;
 }
 
-int time_globals::seconds_to_ticks_round(float s)
+int time_globals::seconds_to_ticks_round(real32 s)
 {
-	return blam_ticks_real_to_integer((float)get()->ticks_per_second * s);
+	return blam_ticks_real_to_integer((real32)get()->ticks_per_second * s);
 }
 
-float time_globals::ticks_to_seconds(int ticks)
+real32 time_globals::ticks_to_seconds(int ticks)
 {
-	return get()->seconds_per_tick * ticks;
+	return get()->seconds_per_tick * (real32)ticks;
 }
 
 int time_globals::get_ticks_difference()
@@ -51,12 +51,12 @@ int time_globals::get_ticks_difference()
 	return (get()->ticks_per_second / 30);
 }
 
-float time_globals::get_ticks_difference_real()
+real32 time_globals::get_ticks_difference_real()
 {
-	return ((float)get()->ticks_per_second / 30.0f);
+	return ((real32)get()->ticks_per_second / 30.0f);
 }
 
-float time_globals::get_ticks_fraction_leftover()
+real32 time_globals::get_ticks_fraction_leftover()
 {
 	return get()->game_ticks_leftover;
 }
