@@ -256,11 +256,26 @@ void __cdecl game_initialize_for_new_map(s_game_options* options)
     game_globals->map_active = true;
 }
 
+
+typedef void(__cdecl* game_frame_t)(real32);
+game_frame_t p_game_frame;
+void __cdecl game_frame(real32 dt)
+{
+    p_game_frame(dt);
+    halo_interpolator_update_delta();
+    return;
+}
+
 void game_apply_pre_winmain_patches(void)
 {
     PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
     PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), shell_initialize);
+    
+    // Get original game_frame function
+    p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
+
+    PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
     return;
 }

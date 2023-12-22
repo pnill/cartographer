@@ -49,7 +49,7 @@ void interpolation_clear_data_buffer(s_interpolation_data* interpolation_data)
             interpolation_data->weapon_data[i][j].node_count = 0;
         }
     }
-    memset(interpolation_data->position_data, 0, sizeof(s_position_interpolation_data));
+    memset(interpolation_data->position_data, 0, sizeof(interpolation_data->position_data));
     return;
 }
 
@@ -234,13 +234,10 @@ void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index
 
 void halo_interpolator_set_target_position_data(int32 user_index, int32 position_index, real_matrix4x3* matrix)
 {
-    if (g_frame_data_storage)
+    if (g_frame_data_storage && g_update_in_progress)
     {
-        if (g_update_in_progress)
-        {
-            g_target_interpolation_frame_data->position_data[user_index][position_index].node = *matrix;
-            g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = true;
-        }
+        g_target_interpolation_frame_data->position_data[user_index][position_index].node = *matrix;
+        g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = true;
     }
     return;
 }

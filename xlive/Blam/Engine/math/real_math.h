@@ -40,22 +40,23 @@ union real_vector4d
 };
 CHECK_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
-union real_vector3d
-{
-	real32 v[3];
-	struct { real32 i, j, k; };
-	struct { real32 x, y, z; };
-};
-CHECK_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
-
-typedef real_vector3d real_point3d;
-
 union real_vector2d
 {
 	real32 v[2];
 	struct { real32 i, j; };
 };
 CHECK_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
+
+union real_vector3d
+{
+	real32 v[3];
+	struct { real_vector2d vector2d; real32 k; };
+	struct { real32 i, j, k; };
+	struct { real32 x, y, z; };
+};
+CHECK_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
+
+typedef real_vector3d real_point3d;
 
 struct real_plane2d
 {
