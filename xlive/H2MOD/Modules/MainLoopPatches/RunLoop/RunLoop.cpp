@@ -8,7 +8,6 @@
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/MainLoopPatches/Interpolation/Interpolation.h"
 #include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -155,9 +154,6 @@ void InitRunLoop() {
 		{
 		case _rendering_mode_original_game_frame_limit:
 			MainGameTime::ApplyPatches();
-#if GAME_FRAME_INTERPOLATOR_ENABLED
-			Interpolation::ApplyPatches();
-#endif
 			MainGameTime::fps_limiter_enabled = false;
 			break;
 
