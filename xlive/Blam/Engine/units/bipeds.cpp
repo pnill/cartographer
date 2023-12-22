@@ -99,8 +99,8 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
             vector_from_points3d(camera_position, &node_matrix->position, &camera_diff);
 
 
-            real32 forward_product = dot_product2d(&forward_out, (real_vector2d*)&camera_diff);
-            real32 up_product = dot_product2d(&up_out, (real_vector2d*)&camera_diff);
+            real32 forward_product = dot_product2d(&forward_out, &camera_diff.vector2d);
+            real32 up_product = dot_product2d(&up_out, &camera_diff.vector2d);
 
             real_vector3d biped_vector = biped->vector_3E4;
 
@@ -170,9 +170,12 @@ void __cdecl biped_get_sight_position(datum biped_index,
         }
     }
 
-    object_origin->z += ((((1.0f - crouching) * biped_def->standing_camera_height) + (biped_def->crouching_camera_height * crouching)) * biped->unit.object.scale);
-    real_point3d origin_copy = *object_origin;
+    // Camera height calculations
+    real32 standing_camera_height = (1.0f - crouching) * biped_def->standing_camera_height;
+    real32 crouching_camera_height = biped_def->crouching_camera_height * crouching;
+    object_origin->z += (standing_camera_height + crouching_camera_height) * biped->unit.object.scale;
 
+    real_point3d origin_copy = *object_origin;
     real_vector3d forward = biped->unit.aiming_vector;
     real_vector3d up;
     generate_up_vector3d(&forward, &up);
