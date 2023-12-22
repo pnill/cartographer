@@ -190,7 +190,19 @@ void __cdecl biped_get_sight_position(datum biped_index,
         real_point3d placement;
         real_vector3d direction;
         scale_vector3d(&origin_vector, -0.25f, &direction);
-        if (collision_test_vector((e_collision_test_flags)0x4808C2Du, object_origin, &direction, NONE, NONE, &collision))
+
+        e_collision_test_flags flags = (e_collision_test_flags)(
+            FLAG(_collision_test_bit_26) | 
+            FLAG(_collision_test_bit_23) |
+            FLAG(_collision_test_bit_15) | 
+            FLAG(_collision_test_bit_11) | 
+            FLAG(_collision_test_bit_10) | 
+            FLAG(_collision_test_bit_5) | 
+            FLAG(_collision_test_objects_bit) | 
+            FLAG(_collision_test_instanced_geometry_bit) |
+            FLAG(_collision_test_structure_bit));
+
+        if (collision_test_vector(flags, object_origin, &direction, NONE, NONE, &collision))
         {
             real32 length = collision.t * 0.9f;
             point_from_line3d(object_origin, &direction, length, &placement);
@@ -204,17 +216,17 @@ void __cdecl biped_get_sight_position(datum biped_index,
         real_vector3d position_vector;
 
 
-        if (collision_test_vector((e_collision_test_flags)0x4808C2Du, &placement, &origin_vector, NONE, NONE, &collision)
+        if (collision_test_vector(flags, &placement, &origin_vector, NONE, NONE, &collision)
             && 
             // Secondary check that we only run if the collision_test_vector returns true
             (
                 // Populate values
-                vector_from_points3d(&placement, &collision.point, &collision_vector),
-                vector_from_points3d(&placement, &origin_copy, &position_vector),
+                vector_from_points3d(&collision.point, &placement, &collision_vector),
+                vector_from_points3d(&origin_copy, &placement, &position_vector),
 
                 // Actual check here
-                dot_product3d(&origin_vector, &position_vector) + 0.05f > dot_product3d(&collision_vector, &origin_vector))
-            )
+                dot_product3d(&origin_vector, &position_vector) + 0.05f > dot_product3d(&collision_vector, &origin_vector)
+            ))
         {
             point_from_line3d(&collision.point, &origin_vector, -0.05f, object_origin);
         }
