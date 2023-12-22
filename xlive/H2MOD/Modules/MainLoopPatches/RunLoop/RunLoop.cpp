@@ -27,6 +27,8 @@
 
 #define TIMER_RESOLUTION_MS 1
 
+H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode = _rendering_mode_original_game_frame_limit;
+
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
 	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
@@ -145,13 +147,16 @@ void InitRunLoop() {
 	else {
 		addDebugText("Hooking loop Function");
 
-		H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+		g_experimental_rendering_mode = H2Config_experimental_fps;
+
+		// override
+		g_experimental_rendering_mode = _rendering_mode_original_game_frame_limit;
 
 		// present hooks for the frame limiter
 		PatchCall(Memory::GetAddress(0x19073C), rasterizer_present_hook);
 		PatchCall(Memory::GetAddress(0x19074C), rasterizer_present_hook);
 
-		switch (experimental_rendering_mode)
+		switch (g_experimental_rendering_mode)
 		{
 		case _rendering_mode_original_game_frame_limit:
 			MainGameTime::ApplyPatches();
@@ -161,7 +166,7 @@ void InitRunLoop() {
 		case _rendering_mode_none:
 		default:
 			break;
-		} // switch (experimental_rendering_mode)
+		} // switch (g_experimental_rendering_mode)
 	}
 
 	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);

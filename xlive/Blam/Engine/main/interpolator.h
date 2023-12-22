@@ -28,7 +28,6 @@ CHECK_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
 struct s_position_interpolation_data
 {
 	bool initialized;
-	char pad[3];
 	real_matrix4x3 node;
 };
 CHECK_STRUCT_SIZE(s_position_interpolation_data, 56);
@@ -36,7 +35,6 @@ CHECK_STRUCT_SIZE(s_position_interpolation_data, 56);
 struct s_interpolation_data
 {
 	bool initialized;
-	char pad[3];
 	s_object_interpolation_data object_data[k_maximum_objects_per_map];
 	s_weapon_interpolation_data weapon_data[k_number_of_users][k_interpolation_first_person_weapon_slot_count];
 	s_position_interpolation_data position_data[k_number_of_users][k_interpolation_positions_count];

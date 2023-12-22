@@ -783,7 +783,7 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_cou
 
 datum object_get_damage_owner(datum object_index)
 {
-	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, -1);
+	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, NONE);
 	return object->damage_owner_object_index;
 }
 

@@ -38,6 +38,11 @@ void halo_interpolator_update_delta(void)
     return;
 }
 
+real32 halo_interpolator_get_update_delta(void)
+{
+    return g_interpolator_delta;
+}
+
 void interpolation_clear_data_buffer(s_interpolation_data* interpolation_data)
 {
     interpolation_data->initialized = 0;
@@ -159,7 +164,7 @@ bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point
         points_interpolate(
             &g_previous_interpolation_frame_data->object_data[object_index].center_of_mass,
             &g_target_interpolation_frame_data->object_data[object_index].center_of_mass,
-            g_interpolator_delta,
+            halo_interpolator_get_update_delta(),
             center_of_mass);
     }
     return mass_interpolated;
@@ -195,7 +200,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
                     matrix4x3_interpolate(
                         &g_previous_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index],
                         &g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index],
-                        g_interpolator_delta,
+                        halo_interpolator_get_update_delta(),
                         &(*node_matrices)[node_index]);
                 }
             }
@@ -293,7 +298,7 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index,
             && !cinematic_in_progress()
             && !g_update_in_progress)
         {
-            matrix4x3_interpolate(&previous->position_data[user_index][position_index].node, &target->position_data[user_index][position_index].node, g_interpolator_delta, out);
+            matrix4x3_interpolate(&previous->position_data[user_index][position_index].node, &target->position_data[user_index][position_index].node, halo_interpolator_get_update_delta(), out);
             result = true;
         }
     }
@@ -322,7 +327,7 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
                     {
                         matrix4x3_interpolate(&g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
                             &g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
-                            g_interpolator_delta,
+                            halo_interpolator_get_update_delta(),
                             &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index]);
                     }
                     *node_matrices_count = target_node_count;
@@ -354,7 +359,7 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
             matrix4x3_interpolate(
                 &g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
                 &g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
-                g_interpolator_delta,
+                halo_interpolator_get_update_delta(),
                 out_matrix);
         }
         result = true;
@@ -381,7 +386,7 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
             points_interpolate(
                 &g_previous_interpolation_frame_data->object_data[abs_object_index].position,
                 &g_target_interpolation_frame_data->object_data[abs_object_index].position,
-                g_interpolator_delta,
+                halo_interpolator_get_update_delta(),
                 point);
         }
     }
@@ -417,7 +422,7 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 po
             points_interpolate(
                 &g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
                 &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
-                g_interpolator_delta,
+                halo_interpolator_get_update_delta(),
                 position);
             result = true;
         }

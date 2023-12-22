@@ -9,7 +9,6 @@
 #include "particle_system_definition.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/physics/breakable_surface_definitions.h"
-#include "Blam/Engine/render/render_visibility_collection.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"

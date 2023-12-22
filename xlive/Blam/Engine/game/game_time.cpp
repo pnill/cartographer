@@ -7,9 +7,12 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
+
 #include "Util/Hooks/Hook.h"
 
 FLOATING_POINT_ENV_ACCESS();
+
+extern H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode;
 
 time_globals* time_globals::get()
 {
@@ -77,7 +80,7 @@ bool game_time_get_paused(void)
 // As well as the game speeding up while minimized
 bool __cdecl cinematic_is_running_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = g_experimental_rendering_mode;
 
 	switch (experimental_rendering_mode)
 	{
@@ -95,7 +98,7 @@ bool __cdecl cinematic_is_running_hook()
 
 bool __cdecl should_limit_framerate_hook()
 {
-	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = H2Config_experimental_fps;
+	H2Config_Experimental_Rendering_Mode experimental_rendering_mode = g_experimental_rendering_mode;
 
 	switch (experimental_rendering_mode)
 	{
