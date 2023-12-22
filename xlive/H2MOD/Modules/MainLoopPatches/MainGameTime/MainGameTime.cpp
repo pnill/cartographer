@@ -109,7 +109,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	game_time = game_in_progress() ? time_globals::get_game_time() : 0;
 
 	// QueryPerformanceFrequency(&counterFrq);
-	// TODO: fixme, time offset breaks this
+	// TODO: fixme, the time offset breaks this
 	// also cleanup
 	// _timeAtStartupMsec = _Shell::QPCToTime(std::milli::den, _Shell::QPCGetStartupCounter(), counterFrq);
 
@@ -185,7 +185,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 
 void MainGameTime::ApplyPatches()
 {
-	if (Memory::IsDedicatedServer() == false)
+	if (!Memory::IsDedicatedServer())
 	{
 		//NopFill(Memory::GetAddress(0x2728E7), 5);
 

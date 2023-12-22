@@ -695,8 +695,8 @@ bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE*
 void close_cache_header(HANDLE* map_handle)
 {
 	typedef void (__cdecl* close_cache_header_t)(HANDLE*);
-	auto close_cache_header_impl = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
-	close_cache_header_impl(map_handle);
+	auto p_close_cache_header = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
+	p_close_cache_header(map_handle);
 }
 
 static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
@@ -734,9 +734,9 @@ int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_ent
 	// without this the map is just called by it's file name
 
 	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int (__cdecl* validate_and_add_custom_map_interal_t)(s_custom_map_entry*);
-	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal_t>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
+	typedef int (__cdecl* validate_and_add_custom_map_internal_t)(s_custom_map_entry*);
+	auto validate_and_add_custom_map_internal = Memory::GetAddress<validate_and_add_custom_map_internal_t>(0x4F690, 0x56890);
+	if (!validate_and_add_custom_map_internal(custom_map_entry))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;

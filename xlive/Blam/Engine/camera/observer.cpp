@@ -19,9 +19,8 @@ s_observer* observer_user_globals_get(void);
 real32* observer_get_speed_dt(void);
 bool* observer_get_initial_update(void);
 void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
-void __stdcall observer_pass_time(void);
-void __stdcall observer_pass_time_usercall_to_stdcall(int32 user_index);
-void __stdcall observer_update_command_usercall(int32 user_index);
+void observer_pass_time_to_usercall(int32 user_index);
+void observer_update_command_to_usercall(int32 user_index);
 void __cdecl observer_postcheck(int32 user_index);
 void __cdecl observer_update(real32 dt);
 void observer_update_internal(int32 user_index);
@@ -61,29 +60,19 @@ void __cdecl observer_validate_camera_command(s_observer_command* observer_comma
 	return;
 }
 
-void __stdcall observer_pass_time(void)
-{
-	INVOKE(0x838A1, 0x47714, observer_pass_time);
-	return;
-}
-
-void __stdcall observer_pass_time_usercall_to_stdcall(int32 user_index) {
+void observer_pass_time_to_usercall(int32 user_index) {
+	void* observer_pass_time_usercall = (void*)Memory::GetAddress(0x838A1);
 	__asm {
 		mov edi, user_index
-		push edi				// user_index
-		call observer_pass_time // __stdcall
+		call observer_pass_time_usercall
 	}
 }
 
-void __stdcall observer_update_command_usercall(int32 user_index) {
-	
-	typedef void(__stdcall* func_t)(void);
-	func_t function = (func_t)Memory::GetAddress(0x82B7F, 0x0);
-	__asm
-	{
-		mov ebx, function
+void observer_update_command_to_usercall(int32 user_index) {
+	void* observer_update_command = (void*)Memory::GetAddress(0x82B7F);
+	__asm {
 		mov eax, user_index
-		call ebx
+		call observer_update_command
 	}
 }
 
@@ -106,10 +95,10 @@ void __cdecl observer_update(real32 dt)
 		{
 			s_observer* observer = observer_get_from_user(user_index);
 			observer->updated_for_frame = true;
-			observer_update_command_usercall(user_index);
+			observer_update_command_to_usercall(user_index);
 			if (*observer_speed_dt != 0.0f)
 			{
-				observer_pass_time_usercall_to_stdcall(user_index);
+				observer_pass_time_to_usercall(user_index);
 			}
 
 			s_location bsp_point;
