@@ -822,6 +822,7 @@ t_object_move_t p_object_move;
 void __cdecl object_move(datum object_index)
 {
 	INVOKE(0x137E6D, 0x126D3D, object_move, object_index);
+	object_initialize_for_interpolation(object_index);
 	return;
 }
 
@@ -874,8 +875,9 @@ void objects_post_update()
 			if (object_header->flags.test(_object_header_requires_motion_bit))
 				object_move(object_header_it.get_current_datum_index());
 
-			object_initialize_for_interpolation(object_header_it.get_current_datum_index());
 		}
+		object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+
 	}
 
 	weapons_fire_barrels();
@@ -965,6 +967,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	return (marker.get_id() ? marker_index : 1);
 }
 
+
 // Replace calls to internal_object_get_markers_by_string_id
 void internal_object_get_markers_by_string_id_replace_calls(void)
 {
@@ -1007,6 +1010,11 @@ void object_new_replace_calls(void)
 	PatchCall(Memory::GetAddress(0x3438C0, 0x2EE630), object_new);
 	PatchCall(Memory::GetAddress(0x355E03, 0x300B73), object_new);
 	PatchCall(Memory::GetAddress(0x358E31, 0x303BA1), object_new);
+
+
+	PatchCall(Memory::GetAddress(0x137f8f), object_move);
+	PatchCall(Memory::GetAddress(0x13814b), object_move);
+	PatchCall(Memory::GetAddress(0x1381b1), object_move);
 	return;
 }
 
@@ -1017,7 +1025,8 @@ void objects_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x4A53C), objects_post_update);
 #endif
 	internal_object_get_markers_by_string_id_replace_calls();
-
+	PatchCall(Memory::GetAddress(0xCD744), object_get_origin_interpolated);
+	PatchCall(Memory::GetAddress(0x13d406), object_get_center_of_mass_interpolated);
 	// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
 	// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
 	WriteValue<uint8>(Memory::GetAddress(0x135657), 0xEB);
