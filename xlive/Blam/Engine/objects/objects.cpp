@@ -862,10 +862,11 @@ void objects_post_update()
 
 		object_header->flags.set(_object_header_do_not_update_bit, false);
 
-		if (object_header->flags.test(_object_header_post_update_bit) &&
-			object_header->flags.test(_object_header_active_bit) &&
-			object_header->flags.test(_object_header_awake_bit) &&
-			!object_header->flags.test(_object_header_being_deleted_bit))
+		if (object_header->flags.test(_object_header_post_update_bit) 
+			&& object_header->flags.test(_object_header_active_bit) 
+			&& object_header->flags.test(_object_header_awake_bit) 
+			&& !object_header->flags.test(_object_header_being_deleted_bit)
+			)
 		{
 			object_header->flags.set(_object_header_post_update_bit, false);
 			
