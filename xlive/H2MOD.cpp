@@ -20,6 +20,7 @@
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/interface/screens/screens_patches.h"
 #include "Blam/Engine/items/weapon_definitions.h"
+#include "Blam/Engine/main/loading.h"
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
@@ -867,6 +868,7 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
+		loading_apply_patches();
 		lens_flare_fix();
 
 		/* These hooks are only built for the client, don't enable them on the server! */

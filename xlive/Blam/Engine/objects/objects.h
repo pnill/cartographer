@@ -108,7 +108,7 @@ enum e_object_damage_flags : uint16
 	_object_is_dead_bit = 2,
 };
 
-enum e_object_header_flag : uint8
+enum e_object_header_flags : uint8
 {
 	_object_header_active_bit = 0,
 	_object_header_awake_bit = 1,
@@ -131,7 +131,7 @@ CHECK_STRUCT_SIZE(object_header_block_reference, 4);
 struct s_object_header
 {
 	int16 datum_salt;
-	c_flags<e_object_header_flag, uint8, k_object_header_flags> flags;
+	c_flags<e_object_header_flags, uint8, k_object_header_flags> flags;
 	e_object_type object_type;
 	int16 cluster_index;
 	int16 object_data_size;

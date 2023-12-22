@@ -384,7 +384,7 @@ void object_occlusion_data_initialize(datum object_index)
 void free_object_memory(datum object_index)
 {
 	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
-	object_header->flags = (e_object_header_flag)0;
+	object_header->flags = (e_object_header_flags)0;
 	if (object_header->object != NULL)
 	{
 		memory_pool_block_free(get_object_table(), &object_header->object);
