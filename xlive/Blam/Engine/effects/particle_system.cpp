@@ -67,8 +67,6 @@ bool __stdcall c_particle_system::update(c_particle_system* thisx, real32 delta_
 	particle_system_datum_index |= (thisx->datum_salt << 16);
 	if(!result)
 	{
-		c_particle_system_definition* definition = thisx->get_particle_system_definition();
-
 		real32* accum = &particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)];
 		real32 max_accum = ((thisx->duration != 0.0f) ? 1.0f / thisx->duration : 0.0f) + time_globals::get_seconds_per_tick();
 		real32 difference = max_accum - *accum;
