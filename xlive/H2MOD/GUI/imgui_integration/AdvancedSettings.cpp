@@ -309,16 +309,7 @@ namespace ImGuiHandler {
 						H2Config_Override_Water = (e_override_texture_resolution)g_water;
 						RenderHooks::ResetDevice();
 					}
-					ImGui::NextColumn();
-					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_patch) };
-					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
-					{
-						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
-					}
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
+
 					ImGui::Columns(1);
 
 					//Force max shader LOD
