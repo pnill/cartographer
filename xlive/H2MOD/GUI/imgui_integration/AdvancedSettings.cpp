@@ -1103,9 +1103,7 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
 			string_table[0][e_advanced_string::fps_limit_tooltip] =
-				"Setting this to 0 will uncap your games frame rate."
-				"\nAnything over 60 may cause performance issues"
-				"\nUse the Experimental Rendering Changes to resolve them";
+				"Setting this to 0 will uncap your games frame rate.";
 			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Mode";
 			string_table[0][e_advanced_string::experimental_rendering_tooltip] =
 				"This will change how the game handles rendering, requires a restart to take effect."
