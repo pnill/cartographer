@@ -285,6 +285,6 @@ real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_datum,
 
 datum __cdecl object_get_parent_recursive(datum parent_index);
 
-int __cdecl object_get_marker_by_string_id(datum object_datum, string_id marker_name, void* out_data, int16 count, bool is_unit);
+int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
 
 void objects_apply_patches(void);

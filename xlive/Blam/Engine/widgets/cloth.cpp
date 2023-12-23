@@ -4,7 +4,9 @@
 #include "Blam/Engine/hs/hs.h"
 #include "Util/Hooks/Hook.h"
 
-void apply_cloth_patches()
+void apply_cloth_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x18E4DD, 0), hs_object_get_markers_by_string_id);
+	// disable cloth debugging that writes to cloth.txt
+	WriteValue<bool>(Memory::GetAddress(0x41F650), false);
+	return;
 }

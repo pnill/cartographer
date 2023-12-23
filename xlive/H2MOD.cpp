@@ -4,6 +4,7 @@
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
+#include "Blam/Engine/effects/contrails.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
@@ -31,9 +32,11 @@
 #include "Blam/Engine/Simulation/game_interface/simulation_game_objects.h"
 #include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
+#include "Blam/Engine/render/render_submit.h"
 #include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
 #include "Blam/Engine/widgets/cloth.h"
+#include "Blam/Engine/widgets/liquid.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -869,8 +872,6 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
-		loading_apply_patches();
-		lens_flare_fix();
 
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -928,7 +929,11 @@ void H2MOD::ApplyHooks() {
 		apply_particle_patches();
 		apply_particle_system_patches();
 		apply_particle_update_patches();
-		apply_cloth_patches();
+		loading_apply_patches();
+		lens_flare_fix();
+		liquid_apply_patches();
+		contrails_apply_patches();
+		render_submit_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

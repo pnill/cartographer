@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "units.h"
 
+#include "Blam/Engine/tag_files/global_string_ids.h"
 #include "Util/Hooks/Hook.h"
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index)
@@ -43,9 +44,38 @@ datum player_index_from_unit_index(datum unit_index)
 	return (unit ? unit->controlling_player_index : NONE);
 }
 
-void unit_apply_patches(void)
+void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d* position)
+{
+	object_marker marker;
+
+	object_get_markers_by_string_id(unit_index, HS_HEAD, &marker, true);
+	*position = marker.matrix1.position;
+	return;
+}
+
+void unit_get_camera_position_patch_mass_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x90C98, 0x48F98), object_get_center_of_mass_interpolated);
 	PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
+	return;
+}
+
+void unit_get_camera_position_patch_marker_functions(void)
+{
+	PatchCall(Memory::GetAddress(0x13D3CF, 0x12C21E), object_get_markers_by_string_id);
+	PatchCall(Memory::GetAddress(0x13D48D, 0x12C2DC), object_get_markers_by_string_id);
+	return;
+}
+
+
+void unit_apply_patches(void)
+{
+	if (!Memory::IsDedicatedServer())
+	{
+		unit_get_camera_position_patch_mass_functions();
+		unit_get_camera_position_patch_marker_functions();
+	
+		PatchCall(Memory::GetAddress(0x6C759), unit_get_head_position_interpolated);
+	}
 	return;
 }
