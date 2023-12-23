@@ -416,7 +416,7 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 po
         if (g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized == initialized
             && initialized
             && interpolation_enabled
-            && cinematic_in_progress()
+            && !cinematic_in_progress()
             && !g_update_in_progress)
         {
             points_interpolate(

@@ -55,6 +55,11 @@ enum e_unit_estimate_mode : int16
 	k_unit_estimate_position_modes_count
 };
 
+enum e_unit_flags : uint32
+{
+	_unit_is_crouching_bit = 23
+};
+
 struct s_unit_304
 {
 	int8 gap_0[16];
