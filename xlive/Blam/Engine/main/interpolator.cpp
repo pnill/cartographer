@@ -308,7 +308,7 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index,
 bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count)
 {
     bool result = false;
-    if (interpolation_enabled || !cinematic_in_progress())
+    if (interpolation_enabled && !cinematic_in_progress())
     {
         if (g_target_interpolation_frame_data->initialized
             && g_previous_interpolation_frame_data->initialized
