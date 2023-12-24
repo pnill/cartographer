@@ -608,8 +608,8 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::change_color_block), (int16)24 * object_def->change_colors.size, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::nodes_block), 52 * nodes_count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::collision_regions_block), 10 * collision_regions_count, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::node_orientation_block), orientation_size, 4)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::original_orientation_block), orientation_size, 4)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::node_orientation_block), orientation_size, 4)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, object_datum::animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
 			&& havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
@@ -738,12 +738,12 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
 }
 
-real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* point_out)
+void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated)
 {
 	real_point3d point;
 	real_point3d interpolated_object_position;
 	object_datum* object = object_get_fast_unsafe(object_index);
-	if (halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
+	if (interpolated && halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
 	{
 		point = interpolated_object_position;
 	}
@@ -761,13 +761,17 @@ real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* p
 	{
 		real_matrix4x3 interpolated_matrix;
 		real_matrix4x3* transform_matrix = &interpolated_matrix;
-		if (!halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
+		if (!interpolated || !halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
 		{
 			transform_matrix = object_get_node_matrix(object->parent_index, object->matrix_index);
 		}
 		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
 	}
-	return point_out;
+}
+
+void __cdecl object_get_origin_interpolated(datum object_index, real_point3d* point_out)
+{
+	object_get_origin(object_index, point_out, true);
 }
 
 real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
@@ -849,7 +853,7 @@ void __cdecl objects_garbage_collection(void)
 	return;
 }
 
-void objects_post_update()
+void __cdecl objects_post_update()
 {
 	object_globals_get()->objects_updating = true;
 
@@ -963,7 +967,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 		marker_object->matrix1.vectors.left.k = -marker_object->matrix1.vectors.left.k;
 	}
 
-	return (marker.get_id() ? marker_index : 1);
+	return (marker != 0 ? marker_index : 1);
 }
 
 int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count)
@@ -1036,6 +1040,7 @@ void objects_apply_patches(void)
 
 		PatchCall(Memory::GetAddress(0x4A53C, 0x437BA), objects_post_update);
 		PatchCall(Memory::GetAddress(0xCD744, 0xB8ABD), object_get_origin_interpolated);
+		PatchCall(Memory::GetAddress(0x1549AE, 0x0), object_get_origin_interpolated);
 		PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
 
 		// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies

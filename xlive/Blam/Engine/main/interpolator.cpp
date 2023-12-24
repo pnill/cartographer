@@ -4,6 +4,7 @@
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/real_math.h"
+#include "Blam/Engine/units/bipeds.h"
 
 s_frame_data_storage* g_frame_data_storage = NULL;
 s_interpolation_data* g_frame_data_intermediate = NULL;
@@ -81,8 +82,8 @@ void halo_interpolator_update_begin(void)
 
     if (interpolation_enabled)
     {
-        p_frame_data = g_previous_interpolation_frame_data;
         g_update_in_progress = true;
+        p_frame_data = g_previous_interpolation_frame_data;
         g_previous_interpolation_frame_data = g_target_interpolation_frame_data;
         g_target_interpolation_frame_data = p_frame_data;
         interpolation_clear_data_buffer(p_frame_data);
@@ -257,6 +258,7 @@ void halo_interpolator_object_populate_interpolation_data(
     const real_point3d* center_of_mass)
 {
     object_datum* object = object_get_fast_unsafe(object_index);
+    s_object_header* object_header = object_get_header(object_index);
     uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
     if (g_frame_data_storage && g_update_in_progress)
     {
@@ -269,11 +271,20 @@ void halo_interpolator_object_populate_interpolation_data(
             }
             else
             {
+                bool object_is_biped = TEST_FLAG(FLAG(object_header->object_type), FLAG(_object_type_biped));
+                real32 crouch = 0.0f;
+                if (object_is_biped)
+                {
+                    biped_datum* biped = (biped_datum*)object;
+                    crouch = biped->unit.crouching;
+                }
+
                 memcpy(g_target_interpolation_frame_data->object_data[abs_object_index].node_matrices, node_matrices, sizeof(real_matrix4x3) * nodes_count);
                 g_target_interpolation_frame_data->object_data[abs_object_index].object_index = object_index;
                 g_target_interpolation_frame_data->object_data[abs_object_index].position = *position;
                 g_target_interpolation_frame_data->object_data[abs_object_index].forward = *forward;
                 g_target_interpolation_frame_data->object_data[abs_object_index].up = *up;
+                g_target_interpolation_frame_data->object_data[abs_object_index].crouch = crouch;
                 g_target_interpolation_frame_data->object_data[abs_object_index].center_of_mass = *center_of_mass;
                 g_interpolator_object_updated.set(abs_object_index, true);
                 g_interpolator_object_has_updated.set(abs_object_index, false);
@@ -388,6 +399,31 @@ bool halo_interpolator_interpolate_object_position(datum object_index, real_poin
                 &g_target_interpolation_frame_data->object_data[abs_object_index].position,
                 halo_interpolator_get_update_delta(),
                 point);
+        }
+    }
+    return interpolate_object;
+}
+
+bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch)
+{
+    bool interpolate_object = false;
+
+    // ### TODO add biped check?
+    uint32 abs_object_index;
+    if (halo_interpolator_object_can_interpolate(object_index, &abs_object_index))
+    {
+        real32 distance =
+            g_previous_interpolation_frame_data->object_data[abs_object_index].crouch - g_target_interpolation_frame_data->object_data[abs_object_index].crouch;
+        distance *= distance;
+
+        if (distance < k_interpolation_distance_cutoff)
+        {
+            interpolate_object = true;
+            scale_interpolate(
+                g_previous_interpolation_frame_data->object_data[abs_object_index].crouch,
+                g_target_interpolation_frame_data->object_data[abs_object_index].crouch,
+                halo_interpolator_get_update_delta(),
+                out_crouch);
         }
     }
     return interpolate_object;

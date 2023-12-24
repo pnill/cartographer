@@ -242,15 +242,21 @@ struct object_marker
 };
 CHECK_STRUCT_SIZE(object_marker, 112);
 
+s_data_array* object_header_data_get(void);
+
+// Get the object fast, with no validation from datum index
+static s_object_header* object_get_header(datum object_idx)
+{
+	return (s_object_header*)datum_get(object_header_data_get(), object_idx);
+}
+
 // Get the object fast, with no validation from datum index
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	s_object_header* header = (s_object_header*)datum_get(object_header_data_get(), object_idx);
+	s_object_header* header = object_get_header(object_idx);
 	return (T*)header->object;
 }
-
-s_data_array* object_header_data_get(void);
 
 s_memory_pool* get_object_table(void);
 
@@ -268,7 +274,7 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 
 datum object_get_damage_owner(datum damaged_unit_index);
 
-real_point3d* object_get_origin_interpolated(datum object_index, real_point3d* point_out);
+void object_get_origin_interpolated(datum object_index, real_point3d* point_out);
 
 real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
 
@@ -281,7 +287,8 @@ void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
 	int32 orientation_count, 
 	real_orientation* orientations);
 
-real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
+void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated);
+real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
 
 datum __cdecl object_get_parent_recursive(datum parent_index);
 

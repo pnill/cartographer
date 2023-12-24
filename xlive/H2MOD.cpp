@@ -934,6 +934,8 @@ void H2MOD::ApplyHooks() {
 		liquid_apply_patches();
 		contrails_apply_patches();
 		render_submit_apply_patches();
+		cloth_apply_patches();
+		camera_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

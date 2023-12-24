@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "bipeds.h"
 
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/cache/cache_files.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/math/periodic_functions.h"
@@ -126,7 +127,8 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
     return;
 }
 
-void __cdecl biped_get_sight_position(datum biped_index,
+void __cdecl biped_get_sight_position(
+    datum biped_index,
     e_unit_estimate_mode estimate_mode,
     real_point3d* estimated_body_position,
     real_vector3d* desired_facing_vector,
@@ -166,7 +168,8 @@ void __cdecl biped_get_sight_position(datum biped_index,
         }
         if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
         {
-            crouching = biped->unit.crouching;
+            if (!halo_interpolator_interpolate_biped_crouch(biped_index, &crouching))
+                crouching = biped->unit.crouching;
         }
     }
 
