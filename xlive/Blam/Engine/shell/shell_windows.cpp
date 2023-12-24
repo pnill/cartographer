@@ -8,8 +8,6 @@
 
 static LARGE_INTEGER g_startup_counter;
 
-long long shell_time_diff(LARGE_INTEGER t2, long long denominator);
-
 bool __cdecl game_is_minimized(void)
 {
 	return INVOKE(0x28729, 0x248AB, game_is_minimized);
@@ -30,13 +28,29 @@ long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, lon
 	return _Whole + _Part;
 }
 
+LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
+{
+	LARGE_INTEGER counter;
+	if (freq) 
+	{
+		QueryPerformanceFrequency(freq);
+	}
+	QueryPerformanceCounter(&counter);
+	return counter;
+}
+
 long long shell_time_now(long long denominator)
 {
 	LARGE_INTEGER counter, freq;
-	QueryPerformanceFrequency(&freq);
-	QueryPerformanceCounter(&counter);
-	counter.QuadPart = counter.QuadPart - shell_get_startup_counter().QuadPart;
-	return shell_time_from_counter(counter, freq, denominator);
+	counter.QuadPart = shell_time_counter_now(&freq).QuadPart - shell_get_startup_counter().QuadPart;
+	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
+}
+
+long long shell_time_diff(LARGE_INTEGER t2, long long denominator)
+{
+	LARGE_INTEGER counter, freq;
+	counter.QuadPart = shell_time_counter_now(&freq).QuadPart - t2.QuadPart;
+	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
 }
 
 long long shell_time_now_sec()
@@ -49,20 +63,11 @@ long long shell_time_now_msec()
 	return shell_time_diff(shell_get_startup_counter(), k_shell_time_msec_denominator);
 }
 
-long long shell_time_diff(LARGE_INTEGER t2, long long denominator)
-{
-	LARGE_INTEGER counter, freq;
-	QueryPerformanceFrequency(&freq);
-	QueryPerformanceCounter(&counter);
-	counter.QuadPart = counter.QuadPart - t2.QuadPart;
-	return shell_time_from_counter(counter, freq, denominator);
-}
-
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {
 	long long time_now_msec = shell_time_now_msec();
-	return (DWORD)(time_now_msec + k_process_system_time_startup_offset);
+	return (DWORD)time_now_msec;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 

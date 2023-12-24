@@ -1,6 +1,7 @@
 #pragma once
 
-#define k_process_system_time_startup_offset (1000 * 60 * 60)
+// 1 hour offset
+#define k_process_system_time_startup_offset_sec (1 * 60 * 60)
 
 #define k_shell_time_sec_denominator 1
 #define k_shell_time_msec_denominator 1000
