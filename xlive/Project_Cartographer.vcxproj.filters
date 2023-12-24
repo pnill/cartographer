@@ -263,6 +263,7 @@
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
+    <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -770,6 +771,7 @@
     <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
+    <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

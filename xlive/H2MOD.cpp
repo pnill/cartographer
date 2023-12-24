@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/camera/dead_camera.h"
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/effects/particle.h"
@@ -929,6 +930,8 @@ void H2MOD::ApplyHooks() {
 		apply_particle_system_patches();
 		apply_particle_update_patches();
 		apply_cloth_patches();
+		apply_player_control_patches();
+		apply_dead_camera_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

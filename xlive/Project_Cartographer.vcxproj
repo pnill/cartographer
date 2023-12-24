@@ -303,6 +303,7 @@
     <ClCompile Include="Blam\Engine\animations\ik_point_iterator.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
@@ -428,6 +429,7 @@
     <ClInclude Include="Blam\Engine\animations\ik_point_iterator.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
+    <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />

@@ -41,7 +41,11 @@ struct s_player_control
 	player_action actions;
 	int8 gap_78[4];
 	uint32 action_context;
-	int8 gap_80[31];
+	int8 gap_80[25];
+	bool zoom_input_held;
+	int8 gap_9A[2];
+	int16 zoom_input_updates_held_count;
+	int8 gap_9E;
 	int8 field_9F;
 	int8 gap_A0[12];
 	int32 field_AC;
@@ -62,3 +66,6 @@ struct s_player_control_globals
 	static s_player_control_globals* get();
 };
 CHECK_STRUCT_SIZE(s_player_control_globals, 0x2D8);
+
+
+void apply_player_control_patches();
