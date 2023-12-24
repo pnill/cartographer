@@ -830,11 +830,6 @@ datum __cdecl object_get_parent_recursive(datum parent_index)
 	return INVOKE(0x132574, 0x121444, object_get_parent_recursive, parent_index);
 }
 
-int object_get_marker_by_string_id(datum object_datum, string_id marker_name, void* out_data, int16 count, bool is_unit)
-{
-	return INVOKE(0x1325FB, 0, object_get_marker_by_string_id, object_datum, marker_name, out_data, count, is_unit);
-}
-
 typedef void(__cdecl* t_object_move_t)(datum);
 t_object_move_t p_object_move;
 void __cdecl object_move(datum object_index)
@@ -843,7 +838,6 @@ void __cdecl object_move(datum object_index)
 	object_initialize_for_interpolation(object_index);
 	return;
 }
-
 
 bool __cdecl object_update(datum object_index)
 {
@@ -985,15 +979,19 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	return (marker.get_id() ? marker_index : 1);
 }
 
+int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count)
+{
+	return internal_object_get_markers_by_string_id(object_index, marker, marker_object, count, false);
+}
 
 // Replace calls to internal_object_get_markers_by_string_id
 void internal_object_get_markers_by_string_id_replace_calls(void)
 {
-	PatchCall(Memory::GetAddress(0x132792, 0x121662), internal_object_get_markers_by_string_id);
-	PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);
+	// PatchCall(Memory::GetAddress(0x132792, 0x121662), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
 	PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);
-	PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);
-	PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);
+	// PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
 	return;
 }
 
@@ -1028,8 +1026,11 @@ void object_new_replace_calls(void)
 	PatchCall(Memory::GetAddress(0x3438C0, 0x2EE630), object_new);
 	PatchCall(Memory::GetAddress(0x355E03, 0x300B73), object_new);
 	PatchCall(Memory::GetAddress(0x358E31, 0x303BA1), object_new);
+	return;
+}
 
-
+void object_move_replace_calls(void)
+{
 	PatchCall(Memory::GetAddress(0x137f8f), object_move);
 	PatchCall(Memory::GetAddress(0x13814b), object_move);
 	PatchCall(Memory::GetAddress(0x1381b1), object_move);
@@ -1038,15 +1039,22 @@ void object_new_replace_calls(void)
 
 void objects_apply_patches(void)
 {
+	if (!Memory::IsDedicatedServer())
+	{
 #ifdef USE_REWRITTEN_OBJECT_NEW
-	object_new_replace_calls();
-	PatchCall(Memory::GetAddress(0x4A53C), objects_post_update);
+		object_new_replace_calls();
 #endif
-	internal_object_get_markers_by_string_id_replace_calls();
-	PatchCall(Memory::GetAddress(0xCD744), object_get_origin_interpolated);
-	PatchCall(Memory::GetAddress(0x13d406), object_get_center_of_mass_interpolated);
-	// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
-	// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
-	WriteValue<uint8>(Memory::GetAddress(0x135657), 0xEB);
+		object_move_replace_calls();
+		internal_object_get_markers_by_string_id_replace_calls();
+
+		PatchCall(Memory::GetAddress(0x4A53C, 0x437BA), objects_post_update);
+		PatchCall(Memory::GetAddress(0xCD744, 0xB8ABD), object_get_origin_interpolated);
+		PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
+
+		// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
+		// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
+		WriteValue<uint8>(Memory::GetAddress(0x135657, 0x124527), JMP_OP_CODE);
+
+	}
 	return;
 }

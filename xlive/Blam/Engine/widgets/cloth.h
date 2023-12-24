@@ -1,4 +1,3 @@
 #pragma once
 
-
-void apply_cloth_patches();
+void apply_cloth_patches(void);

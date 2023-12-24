@@ -264,6 +264,10 @@
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
+    <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
+    <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -772,6 +776,10 @@
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
+    <ClInclude Include="Blam\Engine\game\player_vibration.h" />
+    <ClInclude Include="Blam\Engine\widgets\liquid.h" />
+    <ClInclude Include="Blam\Engine\effects\contrails.h" />
+    <ClInclude Include="Blam\Engine\render\render_submit.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

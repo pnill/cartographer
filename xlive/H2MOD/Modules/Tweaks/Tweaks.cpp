@@ -281,9 +281,6 @@ void H2Tweaks::ApplyPatches() {
 
 		WriteJmpTo(Memory::GetAddress(0x39EA2), is_remote_desktop);
 
-		// disable cloth debugging that writes to cloth.txt
-		WriteValue<bool>(Memory::GetAddress(0x41F650), false);
-
 		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
