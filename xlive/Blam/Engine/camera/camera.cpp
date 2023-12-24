@@ -16,6 +16,4 @@ s_camera* get_effect_camera()
 
 void camera_apply_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x13D3CF), object_get_markers_by_string_id);
-	PatchCall(Memory::GetAddress(0x13D48D), object_get_markers_by_string_id);
 }

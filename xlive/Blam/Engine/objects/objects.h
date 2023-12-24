@@ -244,7 +244,6 @@ CHECK_STRUCT_SIZE(object_marker, 112);
 
 s_data_array* object_header_data_get(void);
 
-// Get the object fast, with no validation from datum index
 static s_object_header* object_get_header(datum object_idx)
 {
 	return (s_object_header*)datum_get(object_header_data_get(), object_idx);
