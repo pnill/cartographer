@@ -2,9 +2,12 @@
 #include "bipeds.h"
 
 #include "Blam/Engine/cache/cache_files.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/physics/collisions.h"
+#include "Blam/Engine/render/render.h"
 #include "Blam/Engine/units/biped_definitions.h"
 
 #include "Util/Hooks/Hook.h"
@@ -126,6 +129,9 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
     return;
 }
 
+real32 local_user_crouch_delta_accum[4]{ 0.f, 0.f, 0.f, 0.f };
+real32 local_user_crouch_last_frame_time[4]{ 0.f, 0.f, 0.f, 0.f };
+
 void __cdecl biped_get_sight_position(datum biped_index,
     e_unit_estimate_mode estimate_mode,
     real_point3d* estimated_body_position,
@@ -158,17 +164,57 @@ void __cdecl biped_get_sight_position(datum biped_index,
     _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
     real32 crouching = 0.0f;
+
+    real32 crouch_time = biped_def->crouch_transition_time_seconds;
+
     if (estimate_mode != _unit_estimate_1)
     {
-        if (estimate_mode == _unit_estimate_2)
+        s_player* player = s_player::get_from_unit_index(biped_index);
+        if (player)
         {
-            crouching = 1.0f;
+            if (local_user_crouch_last_frame_time[player->user_index] != get_current_render_time())
+            {
+                if (!(TEST_BIT(biped->unit.unit_flags, 23)))
+                {
+                    local_user_crouch_delta_accum[player->user_index] -= g_current_game_frame_delta;
+                    if (local_user_crouch_delta_accum[player->user_index] <= 0)
+                        local_user_crouch_delta_accum[player->user_index] = 0;
+                }
+                else
+                {
+                    local_user_crouch_delta_accum[player->user_index] += g_current_game_frame_delta;
+                    if (local_user_crouch_delta_accum[player->user_index] >= crouch_time)
+                        local_user_crouch_delta_accum[player->user_index] = crouch_time;
+                }
+                local_user_crouch_last_frame_time[player->user_index] = get_current_render_time();
+            }
+            real32 t_crouch = local_user_crouch_delta_accum[player->user_index] > crouch_time ? crouch_time : local_user_crouch_delta_accum[player->user_index];
+            crouching = t_crouch / crouch_time;
         }
-        if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
+        else
         {
-            crouching = biped->unit.crouching;
+            if (estimate_mode == _unit_estimate_2)
+            {
+                crouching = 1.0f;
+            }
+            if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
+            {
+                crouching = biped->unit.crouching;
+            }
         }
     }
+
+    //if (estimate_mode != _unit_estimate_1)
+    //{
+    //    if (estimate_mode == _unit_estimate_2)
+    //    {
+    //        crouching = 1.0f;
+    //    }
+    //    if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
+    //    {
+    //        crouching = biped->unit.crouching;
+    //    }
+    //}
 
     // Camera height calculations
     real32 standing_camera_height = (1.0f - crouching) * biped_def->standing_camera_height;

@@ -256,11 +256,13 @@ void __cdecl game_initialize_for_new_map(s_game_options* options)
     game_globals->map_active = true;
 }
 
+real32 g_current_game_frame_delta;
 
 typedef void(__cdecl* game_frame_t)(real32);
 game_frame_t p_game_frame;
 void __cdecl game_frame(real32 dt)
 {
+    g_current_game_frame_delta = dt;
     p_game_frame(dt);
     halo_interpolator_update_delta();
     return;

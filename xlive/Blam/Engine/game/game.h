@@ -52,6 +52,8 @@ struct s_game_systems
 };
 CHECK_STRUCT_SIZE(s_game_systems, 36);
 
+extern real32 g_current_game_frame_delta;
+
 s_game_systems* get_game_systems();
 
 s_main_game_globals* get_main_game_globals(void);
