@@ -5,6 +5,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/math.h"
 #include "Blam/Engine/shell/shell_windows.h"
+#include "Blam/Engine/game/player_control.h"
 
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
@@ -143,6 +144,8 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	main_time_globals->game_time_passed = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
 	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
+
+	player_control_update_dt(dt_sec);
 
 	//LOG_TRACE_GAME("main_time_update() - timeDeltaSeconds: {}", timeDeltaSeconds);
 	return dt_sec;

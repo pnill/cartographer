@@ -17,9 +17,14 @@ bool interpolation_enabled = false;
 c_static_flags<k_maximum_objects_per_map> g_interpolator_object_updated;
 c_static_flags<k_maximum_objects_per_map> g_interpolator_object_has_updated;
 
-bool is_interpolation_enabled(void)
+bool halo_interpolator_is_enabled(void)
 {
     return interpolation_enabled;
+}
+
+bool halo_interpolator_update_in_progress()
+{
+    return g_update_in_progress;
 }
 
 void set_interpolation_enabled(bool enabled)

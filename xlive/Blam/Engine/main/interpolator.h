@@ -54,7 +54,8 @@ extern s_interpolation_data* g_frame_data_intermediate;
 extern s_interpolation_data* g_previous_interpolation_frame_data;
 extern s_interpolation_data* g_target_interpolation_frame_data;
 
-bool is_interpolation_enabled(void);
+bool halo_interpolator_is_enabled(void);
+bool halo_interpolator_update_in_progress(void);
 void set_interpolation_enabled(bool enabled);
 
 void halo_interpolator_update_delta(void);
