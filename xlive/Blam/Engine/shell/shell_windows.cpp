@@ -36,31 +36,33 @@ LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
 		QueryPerformanceFrequency(freq);
 	}
 	QueryPerformanceCounter(&counter);
+	counter.QuadPart -= shell_get_startup_counter().QuadPart;
 	return counter;
-}
-
-long long shell_time_now(long long denominator)
-{
-	LARGE_INTEGER counter, freq;
-	counter.QuadPart = shell_time_counter_now(&freq).QuadPart - shell_get_startup_counter().QuadPart;
-	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
 }
 
 long long shell_time_diff(LARGE_INTEGER t2, long long denominator)
 {
 	LARGE_INTEGER counter, freq;
-	counter.QuadPart = shell_time_counter_now(&freq).QuadPart - t2.QuadPart;
+	counter = shell_time_counter_now(&freq);
+	counter.QuadPart -= t2.QuadPart;
+	return shell_time_from_counter(counter, freq, denominator);
+}
+
+long long shell_time_now(long long denominator)
+{
+	LARGE_INTEGER counter, freq;
+	counter = shell_time_counter_now(&freq);
 	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
 }
 
 long long shell_time_now_sec()
 {
-	return shell_time_diff(shell_get_startup_counter(), k_shell_time_sec_denominator);
+	return shell_time_now(k_shell_time_sec_denominator);
 }
 
 long long shell_time_now_msec()
 {
-	return shell_time_diff(shell_get_startup_counter(), k_shell_time_msec_denominator);
+	return shell_time_now(k_shell_time_msec_denominator);
 }
 
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
@@ -112,7 +114,7 @@ void shell_windows_throttle_framerate(int desired_framerate)
 
 	if (!frame_limiter_initialized)
 	{
-		QueryPerformanceCounter(&last_counter);
+		last_counter = shell_time_counter_now(NULL);
 		frame_limiter_initialized = true;
 
 		if (NULL == hFrameLimitTimer)
@@ -184,5 +186,5 @@ void shell_windows_throttle_framerate(int desired_framerate)
 		}
 	}
 
-	QueryPerformanceCounter(&last_counter);
+	last_counter = shell_time_counter_now(NULL);
 }

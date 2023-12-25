@@ -96,10 +96,12 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 		dt_sec = fixed_time_delta;
 		if (time_globals::available())
 			time_globals::get()->game_ticks_leftover = 0.0f;
+
+		time_now_msec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0);
 	}
 	else
 	{
-		time_now_msec = timeGetTime();
+		time_now_msec = shell_time_now_msec();
 		dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
@@ -122,7 +124,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 					// Sleep is not precise since Windows is not a RTOS
 					Sleep(yield_time_msec);
 
-					time_now_msec = timeGetTime();
+					time_now_msec = shell_time_now_msec();
 					dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 				}
 			}
@@ -130,16 +132,13 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 			{
 				Sleep(15u);
 
-				time_now_msec = timeGetTime();
+				time_now_msec = shell_time_now_msec();
 				dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
 			}
 		}
 	}
 
 	dt_sec = MIN(dt_sec, 10.f);
-	time_now_msec = timeGetTime();
-	if (fixed_time_step)
-		time_now_msec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0f);
 	main_time_globals->last_time_ms = time_now_msec;
 	main_time_globals->game_time_passed = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
