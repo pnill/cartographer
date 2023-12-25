@@ -8,7 +8,7 @@
 
 FLOATING_POINT_ENV_ACCESS();
 
-extern bool xboxTickrateEnabled;
+extern bool g_xbox_tickrate_enabled;
 
 bool melee_lunge_hook_enabled = true;
 
@@ -647,7 +647,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		// update_melee_parameters();
 
 		m_melee_tick++;
-		if (((!game_is_campaign() && !xboxTickrateEnabled) && distance_between_havok_components > 5.0f)
+		if (((!game_is_campaign() && !g_xbox_tickrate_enabled) && distance_between_havok_components > 5.0f)
 			|| force_leave_melee_lunge_physics
 			|| m_time_to_target_in_ticks <= 0
 			|| m_melee_tick >= (m_maximum_counter + 6)

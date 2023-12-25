@@ -2,7 +2,6 @@
 #include "camera.h"
 
 #include "Blam/Engine/objects/objects.h"
-#include "Util/Hooks/Hook.h"
 
 s_camera* get_global_camera()
 {

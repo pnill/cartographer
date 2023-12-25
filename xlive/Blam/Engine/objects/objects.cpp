@@ -877,10 +877,7 @@ void __cdecl objects_post_update()
 
 			if (object_header->flags.test(_object_header_requires_motion_bit))
 				object_move(object_header_it.get_current_datum_index());
-
 		}
-		object_initialize_for_interpolation(object_header_it.get_current_datum_index());
-
 	}
 
 	weapons_fire_barrels();
@@ -1023,8 +1020,8 @@ void object_new_replace_calls(void)
 void object_move_replace_calls(void)
 {
 	PatchCall(Memory::GetAddress(0x137f8f), object_move);
-	PatchCall(Memory::GetAddress(0x13814b), object_move);
 	PatchCall(Memory::GetAddress(0x1381b1), object_move);
+	PatchCall(Memory::GetAddress(0x13814b), object_move);
 	return;
 }
 

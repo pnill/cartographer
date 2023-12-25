@@ -62,3 +62,6 @@ struct s_player_control_globals
 	static s_player_control_globals* get();
 };
 CHECK_STRUCT_SIZE(s_player_control_globals, 0x2D8);
+
+void player_control_update_dt(real32 dt);
+void player_control_apply_patches();
