@@ -72,17 +72,17 @@
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
 bool H2XFirerateEnabled = false;
-bool xboxTickrateEnabled = false;
+bool g_xbox_tickrate_enabled = false;
 
 bool xbox_tickrate_is_enabled()
 {
-	return xboxTickrateEnabled;
+	return g_xbox_tickrate_enabled;
 }
 
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", H2XFirerateEnabled },
-	{ L"ogh2", xboxTickrateEnabled },
+	{ L"ogh2", g_xbox_tickrate_enabled },
 };
 
 #pragma region engine calls
@@ -476,8 +476,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
-			toggle_xbox_tickrate(options, xboxTickrateEnabled);
-			if (!xboxTickrateEnabled)
+			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
+			if (!g_xbox_tickrate_enabled)
 			{
 				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);
 				ProjectileFix::ApplyProjectileVelocity();

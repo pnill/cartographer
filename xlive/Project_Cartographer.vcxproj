@@ -338,6 +338,7 @@
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\main\main.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_game_time.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
     <ClCompile Include="Blam\Engine\decorators\decorator_definitions.cpp" />
@@ -495,6 +496,7 @@
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
+    <ClInclude Include="Blam\Engine\main\main_game_time.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
@@ -576,7 +578,6 @@
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -936,7 +937,6 @@
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />

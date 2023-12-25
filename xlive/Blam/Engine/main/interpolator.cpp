@@ -379,7 +379,6 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
     return result;
 }
 
-
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point)
 {
     bool interpolate_object = false;

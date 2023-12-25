@@ -1,12 +1,9 @@
 #pragma once
 
-namespace MainGameTime
-{
-	void ApplyPatches();
-	extern bool fps_limiter_enabled;
-}
+extern bool g_main_game_time_frame_limiter_enabled;
 
-// TODO move this somewhere else
+void main_game_time_apply_patches();
+
 #pragma pack(push, 1)
 struct s_main_time_globals
 {

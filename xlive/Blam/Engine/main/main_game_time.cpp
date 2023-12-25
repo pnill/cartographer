@@ -1,27 +1,25 @@
 #include "stdafx.h"
-#include "MainGameTime.h"
+#include "main_game_time.h"
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/math.h"
 #include "Blam/Engine/shell/shell_windows.h"
 
-#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/Hooks/Hook.h"
 
-extern bool xboxTickrateEnabled;
+extern bool g_xbox_tickrate_enabled;
 
-bool MainGameTime::fps_limiter_enabled = false;
+bool g_main_game_time_frame_limiter_enabled = false;
 
 // if this is enabled, the tick count to be executed will be calculated the same way as in Halo 1/CE
 #define USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE 0
 
 float get_ticks_leftover_time()
 {
-	time_globals* timeGlobals = time_globals::get();
-	float result = timeGlobals->seconds_per_tick - (float)(timeGlobals->game_ticks_leftover / (float)timeGlobals->ticks_per_second);
+	time_globals* time_globals = time_globals::get();
+	float result = time_globals->seconds_per_tick - (float)(time_globals->game_ticks_leftover / (float)time_globals->ticks_per_second);
 	return MAX(result, 0.0f);
 }
 
@@ -39,16 +37,11 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 
 	p_compute_target_tick_count(dt, out_time_delta, out_target_tick_count);
 
-	/*if (*out_target_tick_count == 0)
-	{
-		LOG_TRACE_GAME("input_float: {}, dt: {}, target_tick_count: {}", dt, *a2, *out_target_tick_count);
-	}*/
-
 #if USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
-	time_globals* timeGlobals = time_globals::get();
-	if (p_game_is_not_paused() && !timeGlobals->game_is_paused && timeGlobals->game_speed > 0.f)
+	time_globals* time_globals = time_globals::get();
+	if (p_game_is_not_paused() && !time_globals->game_is_paused && time_globals->game_speed > 0.f)
 	{
-		float game_speed_in_ticks = timeGlobals->game_speed * timeGlobals->ticks_per_second;
+		float game_speed_in_ticks = time_globals->game_speed * time_globals->ticks_per_second;
 		double unk = accumulator + dt; // in seconds
 		double unk_seconds = floor(unk * game_speed_in_ticks);
 
@@ -59,7 +52,7 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 		else
 			tick_count = (float)unk_seconds;
 
-		*out_time_delta = tick_count * timeGlobals->seconds_per_tick;
+		*out_time_delta = tick_count * time_globals->seconds_per_tick;
 		*out_target_tick_count = (int)tick_count;
 
 		double unk4 = ((float)unk - (float)unk_seconds / game_speed_in_ticks);
@@ -111,7 +104,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
-		if (MainGameTime::fps_limiter_enabled || game_is_minimized())
+		if (g_main_game_time_frame_limiter_enabled || game_is_minimized())
 		{
 			if (time_globals::available())
 			{
@@ -156,7 +149,7 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 	return dt_sec;
 }
 
-void MainGameTime::ApplyPatches()
+void main_game_time_apply_patches()
 {
 	if (!Memory::IsDedicatedServer())
 	{
