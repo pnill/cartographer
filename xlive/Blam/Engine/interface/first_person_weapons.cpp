@@ -762,7 +762,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                             }
                         }
                     }
-                    first_person_weapon_apply_ik(user_index, fp_model_data, &fp_model_data[current_model_index]);
+                    first_person_weapon_apply_ik(user_index, fp_model_data, &fp_model_data[1]);
                 }
             }
         }
@@ -771,7 +771,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
     return current_model_index;
 }
 
-void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* model_data_1, s_first_person_model_data* model_data_2)
+void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* fp_hands_model_data, s_first_person_model_data* fp_weapon_model_data)
 {
     s_first_person_weapon* fp_data = first_person_weapons_get(user_index);
     datum unit_index = fp_data->unit_index;
@@ -799,40 +799,42 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* m
                             && IN_RANGE_INCLUSIVE(fp_data->character_type, _character_type_masterchief, globals->player_representation.size - 1) )
                         {
                             const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
-                            datum body_model_tag_index = player_rep->first_person_body.TagIndex;
+                            datum fp_hands_model_index = player_rep->first_person_hands.TagIndex;
                             const weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(fp_data->weapons[0].weapon_index);
                             const _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
                             weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, fp_data->character_type);
 
                             datum fp_weapon_model_index = (interface_def ? interface_def->model.TagIndex : NONE);
 
-                            if (body_model_tag_index != NONE && fp_weapon_model_index != NONE)
+                            if (fp_hands_model_index != NONE && fp_weapon_model_index != NONE)
                             {
-                                const render_model_definition* body_model = (render_model_definition*)tag_get_fast(body_model_tag_index);
-                                const render_model_definition* fp_weapon_model = (render_model_definition*)tag_get_fast(fp_weapon_model_index);
-                                int32 body_marker_group_index = render_model_find_marker_group_by_name(body_model_tag_index, iterator.marker);
+                                int32 fp_hands_marker_group_index = render_model_find_marker_group_by_name(fp_hands_model_index, iterator.marker);
                                 int32 fp_weapon_marker_group_index = render_model_find_marker_group_by_name(fp_weapon_model_index, iterator.attach_to_marker);
-                                if (body_marker_group_index != NONE && fp_weapon_marker_group_index != NONE)
+                                if (fp_hands_marker_group_index != NONE && fp_weapon_marker_group_index != NONE)
                                 {
-                                    const render_model_marker_group* body_marker_group = body_model->marker_groups[body_marker_group_index];
-                                    const render_model_marker_group* fp_weapon_marker_group = fp_weapon_model->marker_groups[fp_weapon_marker_group_index];
-                                    if (body_marker_group->markers.size > 0 && fp_weapon_marker_group->markers.size > 0)
-                                    {
-                                        render_model_marker* body_marker = body_marker_group->markers[0];
-                                        render_model_marker* fp_marker = fp_weapon_marker_group->markers[0];
+                                    const render_model_definition* fp_hands_model = (render_model_definition*)tag_get_fast(fp_hands_model_index);
+                                    const render_model_definition* fp_weapon_model = (render_model_definition*)tag_get_fast(fp_weapon_model_index);
 
-                                        real_matrix4x3 body_marker_matrix;
-                                        real_matrix4x3 fp_marker_matrix;
-                                        matrix4x3_from_point_and_quaternion(&body_marker_matrix, &body_marker->position, &body_marker->rotation);
-                                        matrix4x3_from_point_and_quaternion(&fp_marker_matrix, &fp_marker->position, &fp_marker->rotation);
-                                        matrix4x3_multiply(&model_data_2->nodes[fp_marker->node_index], &fp_marker_matrix, &fp_marker_matrix);
-                                        render_model_apply_two_bone_ik(body_model_tag_index,
-                                            body_marker->node_index,
-                                            &body_marker_matrix,
-                                            &fp_marker_matrix,
+                                    const render_model_marker_group* fp_hands_marker_group = fp_hands_model->marker_groups[fp_hands_marker_group_index];
+                                    const render_model_marker_group* fp_weapon_marker_group = fp_weapon_model->marker_groups[fp_weapon_marker_group_index];
+                                    
+                                    if (fp_hands_marker_group->markers.size > 0 && fp_weapon_marker_group->markers.size > 0)
+                                    {
+                                        const render_model_marker* fp_hands_marker = fp_hands_marker_group->markers[0];
+                                        const render_model_marker* fp_weapon_marker = fp_weapon_marker_group->markers[0];
+
+                                        real_matrix4x3 fp_hands_marker_matrix;
+                                        real_matrix4x3 fp_weapon_marker_matrix;
+                                        matrix4x3_from_point_and_quaternion(&fp_hands_marker_matrix, &fp_hands_marker->position, &fp_hands_marker->rotation);
+                                        matrix4x3_from_point_and_quaternion(&fp_weapon_marker_matrix, &fp_weapon_marker->position, &fp_weapon_marker->rotation);
+                                        matrix4x3_multiply(&fp_weapon_model_data->nodes[fp_weapon_marker->node_index], &fp_weapon_marker_matrix, &fp_weapon_marker_matrix);
+                                        render_model_apply_two_bone_ik(fp_hands_model_index,
+                                            fp_hands_marker->node_index,
+                                            &fp_hands_marker_matrix,
+                                            &fp_weapon_marker_matrix,
                                             ratio,
-                                            body_model->nodes.size,
-                                            model_data_1->nodes);
+                                            fp_hands_model->nodes.size,
+                                            fp_hands_model_data->nodes);
                                     }
                                 }
                             }
