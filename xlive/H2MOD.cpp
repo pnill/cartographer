@@ -931,8 +931,6 @@ void H2MOD::ApplyHooks() {
 		apply_particle_patches();
 		apply_particle_system_patches();
 		apply_particle_update_patches();
-		apply_cloth_patches();
-		apply_player_control_patches();
 		apply_dead_camera_patches();
 		loading_apply_patches();
 		lens_flare_fix();
