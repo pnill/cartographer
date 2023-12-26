@@ -3,9 +3,12 @@
 
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/cache/cache_files.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/physics/collisions.h"
+#include "Blam/Engine/render/render.h"
 #include "Blam/Engine/units/biped_definitions.h"
 
 #include "Util/Hooks/Hook.h"
@@ -127,6 +130,9 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
     return;
 }
 
+real32 local_user_crouch_delta_accum[4]{ 0.f, 0.f, 0.f, 0.f };
+real32 local_user_crouch_last_frame_time[4]{ 0.f, 0.f, 0.f, 0.f };
+
 void __cdecl biped_get_sight_position(
     datum biped_index,
     e_unit_estimate_mode estimate_mode,
@@ -160,6 +166,62 @@ void __cdecl biped_get_sight_position(
     _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
     real32 crouching = 0.0f;
+
+    //real32 crouch_time = biped_def->crouch_transition_time_seconds;
+
+    //if (estimate_mode != _unit_estimate_1)
+    //{
+    //    // New crouching implementation for interpolation
+    //    // Original functionality would take the biped_datum->crouching_progress float and use it to calculate the camera position->z
+    //    // Re-implemented to update on game frame if the unit is in a crouch position
+    //    // This is achieved by taking the current frame delta and accumulating it for each player and then dividing it by the biped definitions
+    //    // crouch_transition_time_in_seconds to get a progress result between 0 and 1
+
+    //	s_player* player = s_player::get_from_unit_index(biped_index);
+
+    //    // If the current biped_datum is linked to a player run the new crouching interpolation
+    //    if (player)
+    //    {
+    //        // Check if the crouching delta accumulator has already been updated in this current frame by comparing it to c_render::render_time
+    //        if (local_user_crouch_last_frame_time[player->user_index] != get_current_render_time())
+    //        {
+    //            // If the bit flag for crouching is set on the unit_datum add to the accumulator for the local_user else subtract from it
+    //            if (TEST_BIT(biped->unit.unit_flags, 23))
+    //            {
+    //                local_user_crouch_delta_accum[player->user_index] += g_current_game_frame_delta;
+    //                if (local_user_crouch_delta_accum[player->user_index] >= crouch_time)
+    //                    local_user_crouch_delta_accum[player->user_index] = crouch_time;
+    //            }
+    //            else
+    //            {
+    //                local_user_crouch_delta_accum[player->user_index] -= g_current_game_frame_delta;
+    //                if (local_user_crouch_delta_accum[player->user_index] <= 0)
+    //                    local_user_crouch_delta_accum[player->user_index] = 0;
+    //            }
+    //            // Update the last frame time for the local_user_index to prevent applying the delta more than once per frame
+    //            local_user_crouch_last_frame_time[player->user_index] = get_current_render_time();
+    //        }
+    //        // Check that the local_user_index accumulator is not greater than crouch time
+    //        real32 t_crouch = local_user_crouch_delta_accum[player->user_index] > crouch_time ? crouch_time : local_user_crouch_delta_accum[player->user_index];
+
+    //    	// calculate the final crouching progress
+    //        crouching = t_crouch / crouch_time;
+    //    }
+
+    //    // If the current biped_datum is not a player run the original crouching behavior
+    //    else
+    //    {
+    //        if (estimate_mode == _unit_estimate_2)
+    //        {
+    //            crouching = 1.0f;
+    //        }
+    //        if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
+    //        {
+    //            crouching = biped->unit.crouching;
+    //        }
+    //    }
+    //}
+
     if (estimate_mode != _unit_estimate_1)
     {
         if (estimate_mode == _unit_estimate_2)

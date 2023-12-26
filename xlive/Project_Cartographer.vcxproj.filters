@@ -261,6 +261,7 @@
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
+    <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
@@ -770,6 +771,7 @@
     <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
+    <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="Blam\Engine\effects\contrails.h" />

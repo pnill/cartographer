@@ -168,6 +168,7 @@ struct s_player
 	static bool is_index_valid(datum player_index);
 	static s_player* get(datum player_index);
 	static e_game_team get_team(datum player_index);
+	static s_player* get_from_unit_index(datum unit_index);
 	static void set_team(datum player_index, e_game_team team);
 	static void set_unit_character_type(datum player_index, e_character_type character_type);
 	static void set_player_unit_grenade_count(datum player_index, e_unit_grenade_type type, int8 count, bool reset_equipment);

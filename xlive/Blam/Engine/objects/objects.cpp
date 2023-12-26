@@ -780,6 +780,19 @@ real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
 	return &nodes[node_index];
 }
 
+real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index)
+{
+	real_matrix4x3 result;
+	if (halo_interpolator_interpolate_object_node_matrix(object_index, node_index, &result))
+	{
+		return &result;
+	}
+	else
+	{
+		return object_get_node_matrix(object_index, node_index);
+	}
+}
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
 {
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);

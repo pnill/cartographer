@@ -277,6 +277,8 @@ void object_get_origin_interpolated(datum object_index, real_point3d* point_out)
 
 real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
 
+real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index);
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
 
 void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 

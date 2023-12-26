@@ -50,6 +50,19 @@ e_game_team s_player::get_team(datum player_index)
 	return (e_game_team)get(player_index)->properties[0].team_index;
 }
 
+s_player* s_player::get_from_unit_index(datum unit_index)
+{
+    player_iterator playersIt;
+    while (playersIt.get_next_active_player())
+    {
+        datum unit_datum_index_check = playersIt.get_current_player_data()->unit_index;
+
+        if (unit_index == unit_datum_index_check)
+            return playersIt.get_current_player_data();
+    }
+    return nullptr;
+}
+
 void s_player::set_team(datum player_index, e_game_team team)
 {
 	if (!is_index_valid(player_index))

@@ -2,6 +2,7 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/camera/dead_camera.h"
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/effects/contrails.h"
@@ -930,6 +931,7 @@ void H2MOD::ApplyHooks() {
 		apply_particle_patches();
 		apply_particle_system_patches();
 		apply_particle_update_patches();
+		apply_dead_camera_patches();
 		loading_apply_patches();
 		lens_flare_fix();
 		liquid_apply_patches();
