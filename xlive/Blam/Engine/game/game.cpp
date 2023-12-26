@@ -167,7 +167,7 @@ void __cdecl shell_initialize(void)
         g_frame_data_intermediate = (s_interpolation_data*)VirtualAlloc(0, sizeof(s_interpolation_data), MEM_COMMIT, PAGE_READWRITE);
         g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
         g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
-        set_interpolation_enabled(true);
+        halo_interpolator_set_interpolation_enabled(true);
 
         g_particle_frame_storage = (s_particle_frame_data_storage*)VirtualAlloc(0, sizeof(s_particle_frame_data_storage), MEM_COMMIT, PAGE_READWRITE);
         g_previous_particle_interpolation_frame_data = &g_particle_frame_storage->previous_data;

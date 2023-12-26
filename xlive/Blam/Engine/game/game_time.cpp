@@ -44,11 +44,6 @@ int time_globals::seconds_to_ticks_round(real32 s)
 	return blam_ticks_real_to_integer((real32)get()->ticks_per_second * s);
 }
 
-real32 time_globals::ticks_to_seconds(int ticks)
-{
-	return get()->seconds_per_tick * (real32)ticks;
-}
-
 int time_globals::get_ticks_difference()
 {
 	return (get()->ticks_per_second / 30);
@@ -67,6 +62,11 @@ real32 time_globals::get_ticks_fraction_leftover()
 bool time_globals::available()
 {
 	return get() && get()->initialized;
+}
+
+real32 game_ticks_to_seconds(real32 ticks)
+{
+	return time_globals::get()->seconds_per_tick * ticks;
 }
 
 bool game_time_get_paused(void)

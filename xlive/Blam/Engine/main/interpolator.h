@@ -56,13 +56,16 @@ extern s_interpolation_data* g_target_interpolation_frame_data;
 
 bool halo_interpolator_is_enabled(void);
 bool halo_interpolator_update_in_progress(void);
-void set_interpolation_enabled(bool enabled);
+void halo_interpolator_set_interpolation_enabled(bool enabled);
 
 void halo_interpolator_update_delta(void);
+
+real32 halo_interpolator_get_interpolation_time(void);
 
 void halo_interpolator_clear_buffers(void);
 
 void halo_interpolator_update_begin(void);
+
 void halo_interpolator_update_end(void);
 
 bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point3d* center_of_mass);

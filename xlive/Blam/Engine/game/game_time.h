@@ -21,12 +21,13 @@ struct time_globals
 	static real32 get_seconds_per_tick();
 	static real32 seconds_to_ticks_real(real32 s);
 	static int seconds_to_ticks_round(real32 s);
-	static real32 ticks_to_seconds(int ticks);
 	static int get_ticks_difference();
 	static real32 get_ticks_difference_real();
 	static real32 get_ticks_fraction_leftover();
 };
 CHECK_STRUCT_SIZE(time_globals, 36);
+
+real32 game_ticks_to_seconds(real32 ticks);
 
 bool game_time_get_paused(void);
 
