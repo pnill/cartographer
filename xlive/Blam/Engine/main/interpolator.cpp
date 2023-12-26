@@ -193,7 +193,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
         (*node_matrices) = g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices;
         if (*out_node_count > 0)
         {
-            for (uint32 node_index = 0; node_index < *out_node_count; node_index++)
+            for (int32 node_index = 0; node_index < *out_node_count; node_index++)
             {
                 real_point3d* target_position = &g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
                 real_point3d* previous_position = &g_previous_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
@@ -344,7 +344,7 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
                 if (target_node_count > 0 && target_node_count == previous_node_count)
                 {
                     *nodes = g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes;
-                    for (uint32 node_index = 0; node_index < target_node_count; node_index++)
+                    for (int32 node_index = 0; node_index < target_node_count; node_index++)
                     {
                         matrix4x3_interpolate(&g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
                             &g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
