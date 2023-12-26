@@ -4,7 +4,27 @@
 #include "players.h"
 #include "Blam/Engine/units/bipeds.h"
 #include "Util/Hooks/Hook.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/main/interpolator.h"
+#include "Util/Hooks/Hook.h"
 #include <H2MOD.h>
+
+real32 g_player_control_dt = 0.0f;
+
+void player_control_update_dt(real32 dt)
+{
+	g_player_control_dt = dt;
+}
+
+real32 __cdecl player_control_get_autocenter_delta()
+{
+	if (halo_interpolator_update_in_progress())
+	{
+		return time_globals::get_seconds_per_tick();
+	}
+
+	return g_player_control_dt;
+}
 
 s_player_control_globals* s_player_control_globals::get()
 {
@@ -114,7 +134,7 @@ __declspec(naked) void update_player_control_check_held_time_jmp()
 	}
 }
 
-void apply_player_control_patches()
+void player_control_apply_patches()
 {
 	// TODO remove codecaves arnd rewrite the enitre player_control_update_player function
 
@@ -125,4 +145,6 @@ void apply_player_control_patches()
 	WriteValue<uint8>(Memory::GetAddress(0x93549), 0xEB); // Force the codecaved cmp to always jump
 
 	PatchCall(Memory::GetAddress(0x9349C), unit_rotate_zoom_level_hook);
+
+	PatchCall(Memory::GetAddress(0x91149), player_control_get_autocenter_delta);
 }

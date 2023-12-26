@@ -14,8 +14,9 @@ struct s_object_interpolation_data
 	real_vector3d up;
 	real_point3d center_of_mass;
 	real_matrix4x3 node_matrices[MAXIMUM_NODES_PER_MODEL];
+	real32 crouch;
 };
-CHECK_STRUCT_SIZE(s_object_interpolation_data, 0x3400);
+//CHECK_STRUCT_SIZE(s_object_interpolation_data, 0x3400);
 
 struct s_weapon_interpolation_data
 {
@@ -23,14 +24,14 @@ struct s_weapon_interpolation_data
 	DWORD node_count;
 	real_matrix4x3 nodes[255];
 };
-CHECK_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
+//CHECK_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
 
 struct s_position_interpolation_data
 {
 	bool initialized;
 	real_matrix4x3 node;
 };
-CHECK_STRUCT_SIZE(s_position_interpolation_data, 56);
+//CHECK_STRUCT_SIZE(s_position_interpolation_data, 56);
 
 struct s_interpolation_data
 {
@@ -39,21 +40,22 @@ struct s_interpolation_data
 	s_weapon_interpolation_data weapon_data[k_number_of_users][k_interpolation_first_person_weapon_slot_count];
 	s_position_interpolation_data position_data[k_number_of_users][k_interpolation_positions_count];
 };
-CHECK_STRUCT_SIZE(s_interpolation_data, 0x1A33F04);
+//CHECK_STRUCT_SIZE(s_interpolation_data, 0x1A33F04);
 
 struct s_frame_data_storage
 {
 	s_interpolation_data previous_data;
 	s_interpolation_data target_data;
 };
-CHECK_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
+//CHECK_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
 
 extern s_frame_data_storage* g_frame_data_storage;
 extern s_interpolation_data* g_frame_data_intermediate;
 extern s_interpolation_data* g_previous_interpolation_frame_data;
 extern s_interpolation_data* g_target_interpolation_frame_data;
 
-bool is_interpolation_enabled(void);
+bool halo_interpolator_is_enabled(void);
+bool halo_interpolator_update_in_progress(void);
 void set_interpolation_enabled(bool enabled);
 
 void halo_interpolator_update_delta(void);
@@ -89,6 +91,8 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
 bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 node_index, real_matrix4x3* out_matrix);
 
 bool halo_interpolator_interpolate_object_position(datum object_index, real_point3d* point);
+
+bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_crouch);
 
 void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
 

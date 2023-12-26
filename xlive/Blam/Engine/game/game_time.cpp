@@ -103,7 +103,7 @@ bool __cdecl should_limit_framerate_hook()
 	switch (experimental_rendering_mode)
 	{
 	case _rendering_mode_original_game_frame_limit:
-		return false; // e_render_original_game_frame_limit handles frame limit in MainGameTime.cpp
+		return false; // e_render_original_game_frame_limit handles frame limit in main_game_time.cpp
 	case _rendering_mode_none:
 	default:
 		return (game_is_minimized() || xbox_tickrate_is_enabled());

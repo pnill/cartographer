@@ -47,7 +47,7 @@ static_assert(sizeof(real64) == 8);
 typedef long datum;
 static_assert(sizeof(datum) == 4);
 
-#define SIZEOF_BITS(value) 8 * sizeof(value)
+#define SIZEOF_BITS(value) (8 * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)

@@ -4,13 +4,12 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/shell/shell_windows.h"
+#include "Blam/Engine/main/main_game_time.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
-#include "H2MOD/Modules/MainLoopPatches/UncappedFPS2/UncappedFPS2.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -159,8 +158,8 @@ void InitRunLoop() {
 		switch (g_experimental_rendering_mode)
 		{
 		case _rendering_mode_original_game_frame_limit:
-			MainGameTime::ApplyPatches();
-			MainGameTime::fps_limiter_enabled = false;
+			main_game_time_apply_patches();
+			g_main_game_time_frame_limiter_enabled = false;
 			break;
 
 		case _rendering_mode_none:

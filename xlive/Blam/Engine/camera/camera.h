@@ -32,3 +32,4 @@ s_camera* get_global_camera(void);
 
 s_camera* get_effect_camera();
 
+void camera_apply_patches(void);

@@ -68,4 +68,5 @@ struct s_player_control_globals
 CHECK_STRUCT_SIZE(s_player_control_globals, 0x2D8);
 
 
-void apply_player_control_patches();
+void player_control_update_dt(real32 dt);
+void player_control_apply_patches();
