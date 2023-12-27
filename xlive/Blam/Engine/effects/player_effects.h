@@ -22,7 +22,8 @@ enum e_player_effect_global_flags : uint32
 struct s_temporary_camera_impulse
 {
 	real32 duration;
-	e_transition_function_type fade_function;
+	int8 fade_function; // e_transition_function_type
+	int8 pad;
 	real32 rotation;
 	real32 pushback;
 	real_bounds jitter;
@@ -32,7 +33,7 @@ CHECK_STRUCT_SIZE(s_temporary_camera_impulse, 24);
 struct s_player_effect_camera_shaking
 {
 	real32 duration;
-	e_transition_function_type falloff_function;
+	int8 falloff_function;	// e_transition_function_type
 	real32 random_translation;
 	real_angle random_rotation;
 	e_periodic_function_type wobble_function;
@@ -45,7 +46,12 @@ struct s_player_effect_user_globals
 {
 	real_vector3d vector_0;
 	real_vector3d vector_C;
-	int8 field_C[16];
+	int16 field_18;
+	int16 pad_1A;
+	real32 field_1C;
+	e_transition_function_type screen_flash_function;
+	int16 pad;
+	real32 field_24;
 	real_argb_color screen_flash_color;
 	s_temporary_camera_impulse camera_impulse;
 	s_player_effect_camera_shaking camera_shaking;
@@ -60,7 +66,8 @@ struct s_player_effect_user_globals
 	int8 field_84[4];
 	c_flags<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
 	int8 field_89;
-	int8 field_8A[14];
+	int16 pad_8A;
+	real_point3d origin;
 	real32 transition_function_scale_98;
 	real32 transition_function_scale_9C;
 };

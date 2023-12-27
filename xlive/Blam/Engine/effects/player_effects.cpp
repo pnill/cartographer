@@ -11,7 +11,12 @@ real32 player_effect_transition_function_evaluate(e_transition_function_type fun
 
 s_player_effect_globals* player_effect_globals_get(void)
 {
-    return Memory::GetAddress<s_player_effect_globals*>(0x4CE860, 0x4F504C);
+    return *Memory::GetAddress<s_player_effect_globals**>(0x4CE860, 0x4F504C);
+}
+
+s_player_effect_user_globals* player_effects_get_user_globals(int32 user_index)
+{
+    return &player_effect_globals_get()->user_effects[user_index];
 }
 
 /*
@@ -88,8 +93,8 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 timing = user_effect->camera_impulse.duration - (real32)user_effect->field_80 - halo_interpolator_get_interpolation_time();
-                    function_result = player_effect_transition_function_evaluate(user_effect->camera_impulse.fade_function, user_effect->transition_function_scale_9C, timing, user_effect->camera_impulse.duration);
+                    real32 timing = user_effect->camera_impulse.duration - *(real32*)(&user_effect->field_80) - halo_interpolator_get_interpolation_time();
+                    function_result = player_effect_transition_function_evaluate((e_transition_function_type)user_effect->camera_impulse.fade_function, user_effect->transition_function_scale_9C, timing, user_effect->camera_impulse.duration);
                 }
                 
                 real_vector3d vector;
@@ -112,14 +117,15 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 calculated_matrix = global_identity4x3;
 
                 real32 transition_function_result;
-                real32 timing = user_effect->camera_shaking.duration - game_ticks_to_seconds((real32)user_effect->field_82) - halo_interpolator_get_interpolation_time();
+                real32 field_82_real = (real32)user_effect->field_82;
+                real32 timing = user_effect->camera_shaking.duration - game_ticks_to_seconds(*(real32*)(&user_effect->field_82)) - halo_interpolator_get_interpolation_time();
                 if (bit_2_result)
                 {
                     transition_function_result = 1.0f;
                 }
                 else
                 {
-                    transition_function_result = player_effect_transition_function_evaluate(user_effect->camera_shaking.falloff_function, user_effect->transition_function_scale_98, timing, user_effect->camera_shaking.duration);
+                    transition_function_result = player_effect_transition_function_evaluate((e_transition_function_type)user_effect->camera_shaking.falloff_function, user_effect->transition_function_scale_98, timing, user_effect->camera_shaking.duration);
                 }
 
                 real32 seconds_result = timing / user_effect->camera_shaking.wobble_function_period;
@@ -136,7 +142,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                 if (user_effect->field_7C > 0)
                 {
-                    real32 seconds_7C = game_ticks_to_seconds((real32)user_effect->field_7C);
+                    real32 seconds_7C = game_ticks_to_seconds(*(real32*)(&user_effect->field_7C));
                     real32 seconds_7C_x2 = seconds_7C + seconds_7C;
 
                     v1 += seconds_7C_x2 * user_effect->field_74;
