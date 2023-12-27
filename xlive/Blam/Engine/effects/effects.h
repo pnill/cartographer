@@ -37,7 +37,6 @@ struct effect_datum
     pixel32 pixel_2;
     int8 gap_10C[132];
 };
-};
 
 CHECK_STRUCT_SIZE(effect_datum, 400);
 
