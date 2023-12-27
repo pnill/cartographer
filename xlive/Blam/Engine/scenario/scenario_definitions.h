@@ -112,22 +112,6 @@ enum e_scenario_function_flags : int
     scenario_function_flag_always_active = FLAG(3)  // Function Does Not Deactivate When At Or Below Lower Bound
 };
 
-enum e_scenario_function_type : short
-{
-    scenario_function_type_one = 0,
-    scenario_function_type_zero = 1,
-    scenario_function_type_cosine = 2,
-    scenario_function_type_cosine_variable_period = 3,
-    scenario_function_type_diagonal_wave = 4,
-    scenario_function_type_diagonal_wave_variable_period = 5,
-    scenario_function_type_slide = 6,
-    scenario_function_type_slide_variable_period = 7,
-    scenario_function_type_noise = 8,
-    scenario_function_type_jitter = 9,
-    scenario_function_type_wander = 10,
-    scenario_function_type_spark = 11
-};
-
 
 enum e_bounds_mode : short
 {
@@ -146,12 +130,12 @@ struct scenario_function
     // Multiply this function by above period
     // This is the tagblock index for another scenario_function
     short scale_period_by;
-    e_scenario_function_type function;
+    e_periodic_function_type function;
 
     // Multiply this function by result of above function.
     // This is the tagblock index for another scenario_function
     short scale_function_by;
-    e_scenario_function_type wobble_function;   // Curve used for wobble.
+    e_periodic_function_type wobble_function;   // Curve used for wobble.
     float wobble_period_seconds;                // Time it takes for magnitude of this function to complete a wobble.
     float wobble_magnitude_percent;             // Amount of random wobble in the magnitude.
     float square_wave_threshold;                // If non-zero, all values above square wave threshold are snapped to 1.0, and all values below it are snapped to 0.0 to create a square wave.

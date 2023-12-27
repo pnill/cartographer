@@ -176,7 +176,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         // Clear weapon orientations
         if (node_count > 0)
         {
-            for (uint32 i = 0; i < weapon_data->node_orientations_count; i++)
+            for (int32 i = 0; i < weapon_data->node_orientations_count; i++)
             {
                 memcpy(fp_orientations->weapon_orientations, &global_identity_orientation, sizeof(real_orientation));
             }
@@ -585,7 +585,7 @@ void __cdecl first_person_weapon_build_model_nodes(int32 node_matrices_count,
         {
             if (node_matrices_count > 0)
             {
-                for (uint32 node_index = 0; node_index < node_matrices_count; node_index++)
+                for (int32 node_index = 0; node_index < node_matrices_count; node_index++)
                 {
                     matrix4x3_multiply(camera_matrix, &node_matrices[node_index], &fp_model_data->nodes[node_index]);
                 }

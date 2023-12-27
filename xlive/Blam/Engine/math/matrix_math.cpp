@@ -126,6 +126,40 @@ real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const re
 	return out;
 }
 
+real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
+{
+	matrix->scale = 1.0f;
+
+	real_vector3d cosine_vector;
+	cosine_vector.i = cos(i);
+	cosine_vector.j = cos(j);
+	cosine_vector.k = cos(k);
+
+	real_vector3d sine_vector;
+	sine_vector.i = sin(i);
+	sine_vector.j = sin(j);
+	sine_vector.k = sin(k);
+
+	matrix->vectors.forward.j = (sine_vector.i * cosine_vector.k) - ((sine_vector.j * sine_vector.k) * cosine_vector.i);
+	matrix->vectors.forward.i = cosine_vector.i * cosine_vector.j;
+	matrix->vectors.forward.k = ((sine_vector.j * cosine_vector.k) * cosine_vector.i) + (sine_vector.i * sine_vector.k);
+	matrix->vectors.left.i = -(cosine_vector.j * sine_vector.i);
+	matrix->vectors.left.j = ((sine_vector.j * sine_vector.k) * sine_vector.i) + (cosine_vector.i * cosine_vector.k);
+	matrix->vectors.up.i = -0.0f - sine_vector.j;
+	matrix->vectors.left.k = (cosine_vector.i * sine_vector.k) - ((sine_vector.j * cosine_vector.k) * sine_vector.i);
+	matrix->vectors.up.j = -0.0f - (cosine_vector.j * sine_vector.k);
+	matrix->vectors.up.k = cosine_vector.j * cosine_vector.k;
+	matrix->position.x = 0.0f;
+	matrix->position.y = 0.0f;
+	matrix->position.z = 0.0f;
+	return matrix;
+}
+
+real_matrix4x3* __cdecl matrix4x3_rotation_from_axis_and_angle(real_matrix4x3* matrix, real_vector3d* vector, real32 axis, real32 angle)
+{
+	return INVOKE(0x775C1, 0x751B7, matrix4x3_rotation_from_axis_and_angle, matrix, vector, axis, angle);
+}
+
 void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3* target, real32 fractional_ticks, real_matrix4x3* out_mat)
 {
 	real_quaternion q1_previous, q2_target, q3_interpolated;
