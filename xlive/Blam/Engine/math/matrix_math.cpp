@@ -126,7 +126,7 @@ real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const re
 	return out;
 }
 
-real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
+void matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
 {
 	matrix->scale = 1.0f;
 
@@ -152,10 +152,9 @@ real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i,
 	matrix->position.x = 0.0f;
 	matrix->position.y = 0.0f;
 	matrix->position.z = 0.0f;
-	return matrix;
 }
 
-real_matrix4x3* __cdecl matrix4x3_rotation_from_axis_and_angle(real_matrix4x3* matrix, real_vector3d* vector, real32 axis, real32 angle)
+void __cdecl matrix4x3_rotation_from_axis_and_angle(real_matrix4x3* matrix, real_vector3d* vector, real32 axis, real32 angle)
 {
 	return INVOKE(0x775C1, 0x751B7, matrix4x3_rotation_from_axis_and_angle, matrix, vector, axis, angle);
 }
