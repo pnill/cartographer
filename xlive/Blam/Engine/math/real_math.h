@@ -223,7 +223,7 @@ static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* point, 
 {
 	real_vector3d direction_scaled;
 	scale_vector3d(direction, length, &direction_scaled);
-	add_vectors3d(point, &direction_scaled, out);
+	add_vectors3d(&direction_scaled, point, out);
 	return out;
 }
 

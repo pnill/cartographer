@@ -39,6 +39,7 @@
 #include "Blam/Engine/units/units.h"
 #include "Blam/Engine/widgets/cloth.h"
 #include "Blam/Engine/widgets/liquid.h"
+#include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_fog.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -940,6 +941,7 @@ void H2MOD::ApplyHooks() {
 		cloth_apply_patches();
 		camera_apply_patches();
 		player_control_apply_patches();
+		rasterizer_fog_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

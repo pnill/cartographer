@@ -27,20 +27,20 @@ bool halo_interpolator_update_in_progress()
     return g_update_in_progress;
 }
 
-void set_interpolation_enabled(bool enabled)
+void halo_interpolator_set_interpolation_enabled(bool enabled)
 {
     interpolation_enabled = enabled;
     return;
 }
 
-float get_interpolation_time(void)
+float halo_interpolator_get_interpolation_time_internal(void)
 {
     return MAX(0.0f, MIN(time_globals::get_ticks_fraction_leftover(), 1.0f));
 }
 
 void halo_interpolator_update_delta(void)
 {
-    g_interpolator_delta = get_interpolation_time();
+    g_interpolator_delta = halo_interpolator_get_interpolation_time_internal();
     return;
 }
 
@@ -49,7 +49,12 @@ real32 halo_interpolator_get_update_delta(void)
     return g_interpolator_delta;
 }
 
-void interpolation_clear_data_buffer(s_interpolation_data* interpolation_data)
+real32 halo_interpolator_get_interpolation_time(void)
+{
+    return (g_update_in_progress ? 0.0f : halo_interpolator_get_interpolation_time_internal());
+}
+
+void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data)
 {
     interpolation_data->initialized = 0;
     for (size_t i = 0; i < k_number_of_users; i++)
@@ -72,9 +77,9 @@ void halo_interpolator_clear_buffers(void)
         memset(g_frame_data_intermediate, 0, sizeof(s_interpolation_data));
         g_interpolator_object_updated.clear();
         g_interpolator_object_has_updated.clear();
-        interpolation_clear_data_buffer(g_previous_interpolation_frame_data);
-        interpolation_clear_data_buffer(g_target_interpolation_frame_data);
-        interpolation_clear_data_buffer(g_frame_data_intermediate);
+        halo_interpolator_clear_data_buffer(g_previous_interpolation_frame_data);
+        halo_interpolator_clear_data_buffer(g_target_interpolation_frame_data);
+        halo_interpolator_clear_data_buffer(g_frame_data_intermediate);
         g_interpolator_delta = 0.0f;
         g_update_in_progress = false;
     }
@@ -91,7 +96,7 @@ void halo_interpolator_update_begin(void)
         p_frame_data = g_previous_interpolation_frame_data;
         g_previous_interpolation_frame_data = g_target_interpolation_frame_data;
         g_target_interpolation_frame_data = p_frame_data;
-        interpolation_clear_data_buffer(p_frame_data);
+        halo_interpolator_clear_data_buffer(p_frame_data);
         g_interpolator_object_updated.clear();
     }
     return;
@@ -188,7 +193,7 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
         (*node_matrices) = g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices;
         if (*out_node_count > 0)
         {
-            for (uint32 node_index = 0; node_index < *out_node_count; node_index++)
+            for (int32 node_index = 0; node_index < *out_node_count; node_index++)
             {
                 real_point3d* target_position = &g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
                 real_point3d* previous_position = &g_previous_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
@@ -339,7 +344,7 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
                 if (target_node_count > 0 && target_node_count == previous_node_count)
                 {
                     *nodes = g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes;
-                    for (uint32 node_index = 0; node_index < target_node_count; node_index++)
+                    for (int32 node_index = 0; node_index < target_node_count; node_index++)
                     {
                         matrix4x3_interpolate(&g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
                             &g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],

@@ -73,11 +73,11 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
             {
                 function_value = 1.0f;
             }
-            function_result = transition_function_evaluate(5, function_value);
+            function_result = transition_function_evaluate(_transition_function_cosine, function_value);
         }
         else
         {
-            function_result = transition_function_evaluate(5, 0.0f);
+            function_result = transition_function_evaluate(_transition_function_cosine, 0.0f);
         }
 
 

@@ -27,7 +27,7 @@ void add_special_event_markers()
 		new_marker->position.x = 0.006f;
 		new_marker->position.y = 0.06f;
 		new_marker->position.z = 0.0f;
-		new_marker->rotation.i= 0.9f;
+		new_marker->rotation.i = 0.9f;
 		new_marker->rotation.j = 0.9f;
 		new_marker->rotation.k = 0.9f;
 		new_marker->rotation.w = 1.0f;

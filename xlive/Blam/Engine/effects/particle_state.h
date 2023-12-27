@@ -4,7 +4,8 @@
 #include "particle_system.h"
 
 
-enum e_particle_state_flags : uint32 {
+enum e_particle_state_flags : uint32 
+{
 	_particle_update_flag_0 = FLAG(0),
 	_particle_update_flag_1 = FLAG(1),
 	_particle_update_flag_2 = FLAG(2),
