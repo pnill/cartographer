@@ -98,10 +98,8 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 matrix4x3_rotation_from_axis_and_angle(&calculated_matrix, &v1, sin(rotation), cos(rotation));
 
                 real32 pushback = user_effect->camera_impulse.pushback * function_result;
-                scale_vector3d(&user_effect->vector_0, pushback, &v1);
-                scale_vector3d(&user_effect->vector_C, function_result, &calculated_matrix.position);
-                add_vectors3d(&calculated_matrix.position, &v1, &calculated_matrix.position);
-
+                scale_vector3d(&user_effect->vector_0, pushback, &calculated_matrix.position);
+                point_from_line3d(&calculated_matrix.position, &user_effect->vector_C, function_result, &calculated_matrix.position);
                 matrix4x3_multiply(matrix, &calculated_matrix, matrix);
             }
 
@@ -130,10 +128,8 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                 real32 seconds_result = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_impulse_passed_time);
                 real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, seconds_result / user_effect->camera_shaking.wobble_function_period);
-                real32 periodic_function_result_scaled = 
-                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight;
-                periodic_function_result_scaled += transition_function_result * (1.0 - user_effect->camera_shaking.wobble_weight);
-
+                real32 periodic_function_result_scaled =
+                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight);
 
                 // Set v1 to 0 if v1_value is less than 0
                 real32 v1_value = user_effect->camera_shaking.random_translation * periodic_function_result_scaled;
