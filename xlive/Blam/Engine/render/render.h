@@ -1,3 +1,3 @@
 #pragma once
 
-real32 get_current_render_time();
+real64 get_current_render_time(void);
