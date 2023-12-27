@@ -10,7 +10,7 @@
 #define RANDOM_NEW_SEED(prev_seed) ((RANDOM_A * (prev_seed) + RANDOM_C))
 
 #define RANDOM_FLONE 1.0f
-#define RANDOM_MASK 65535 // 0xffff
+#define RANDOM_MASK 0xffff // 0xffff
 
 // DIV_BY_MAX_MASK Compiles to 0.000015259022
 #define DIV_BY_MAX_MASK_REAL (RANDOM_FLONE / (real32)RANDOM_MASK)
@@ -20,13 +20,13 @@
 
 // integer random
 #define INTEGER_RANDOM(seed) ((SEED_HIWORD(seed)))
-#define RANDOM_RANGE(seed, lower_bound, upper_bound) ((lower_bound) + (INTEGER_RANDOM(seed) * (int32)(upper_bound - lower_bound)) >> 16)
+#define INTEGER_RANDOM_RANGE(seed, lower_bound, delta) ((lower_bound) + (((delta) * INTEGER_RANDOM(seed)) >> 16))
 
 // floating point random
 // generates a value between 1 ... 0 <===> (65535 ... 0) / 65535 
 // [65535 = (2^16) - 1]
-#define REAL_RANDOM(seed) (SEED_HIWORD(seed) * DIV_BY_MAX_MASK_REAL)
-#define REAL_RANDOM_RANGE(seed, lower_bound, upper_bound) ((lower_bound) + ((upper_bound - lower_bound) * REAL_RANDOM(seed)))
+#define REAL_RANDOM(seed) (DIV_BY_MAX_MASK_REAL * SEED_HIWORD(seed))
+#define REAL_RANDOM_RANGE(seed, lower_bound, delta) ((lower_bound) + (delta) * REAL_RANDOM(seed))
 
 s_random_math* random_math_get_globals()
 {
@@ -61,13 +61,13 @@ void random_math_set_random_number(uint32 random_number)
 real32 _real_random_range(uint32* seed, real32 lower_bound, real32 upper_bound)
 {
 	*seed = RANDOM_NEW_SEED(*seed);
-	return REAL_RANDOM_RANGE(*seed, lower_bound, upper_bound);
+	return REAL_RANDOM_RANGE(*seed, lower_bound, upper_bound - lower_bound);
 }
 
 int32 _random_range(uint32* seed, int16 lower_bound, int16 upper_bound)
 {
 	*seed = RANDOM_NEW_SEED(*seed);
-	return RANDOM_RANGE(*seed, lower_bound, upper_bound);
+	return INTEGER_RANDOM_RANGE(*seed, lower_bound, upper_bound - lower_bound);
 }
 
 int32 _random_integer(uint32* seed)
