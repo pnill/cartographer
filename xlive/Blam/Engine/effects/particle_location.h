@@ -1,4 +1,5 @@
 #pragma once
+#include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/memory/data.h"
 
 struct c_particle_location
@@ -11,9 +12,8 @@ struct c_particle_location
 	int32 next_particle_location;
 	real32 field_10;
 	int32 field_14;
-	int32 field_18;
-	real32 field_1C;
-	int8 gap_20[20];
+	real_point3d position;
+	int8 gap_20[16];
 };
 CHECK_STRUCT_SIZE(c_particle_location, 0x34);
 

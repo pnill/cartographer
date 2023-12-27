@@ -50,8 +50,7 @@ c_particle_system_definition* c_particle_system::get_particle_system_definition(
 	if (tag_type.tag_type == blam_tag::tag_group_type::breakablesurface)
 	{
 		s_breakable_surface_definition* breakable_surface = (s_breakable_surface_definition*)tags::get_tag_fast(this->tag_index);
-		effect_definition* effect = (effect_definition*)tags::get_tag_fast(breakable_surface->effect.TagIndex);
-		return effect->events[this->effect_event_index]->particle_systems[this->event_particle_system_index];
+		return breakable_surface->particle_effects[this->event_particle_system_index];
 	}
 	return nullptr;
 }
