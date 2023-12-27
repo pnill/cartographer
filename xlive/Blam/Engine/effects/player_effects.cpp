@@ -48,17 +48,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 vibration_intensity *= attack_time;
             }
 
-            if (vibration_intensity >= 0.0f)
-            {
-                if (vibration_intensity > 1.0f)
-                {
-                    vibration_intensity = 1.0f;
-                }
-            }
-            else
-            {
-                vibration_intensity = 0.0f;
-            }
+            vibration_intensity = MIN(0.0f, MAX(vibration_intensity, 1.0f));
 
             rumble_player_set_scripted_scale(vibration_intensity);
 
@@ -82,9 +72,9 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         }
         else
         {
-            s_player_effect_user_globals* user_effect = &player_effects_globals->user_effects[user_index];
+            s_player_effect_user_globals* user_effect = player_effects_get_user_globals(user_index);
             bool bit_1_result = user_effect->flags.test(_player_effect_user_global_bit_1);
-            if (user_effect->field_80 > 0 || bit_1_result)
+            if (user_effect->camera_impulse_passed_time > 0 || bit_1_result)
             {
                 real32 function_result;
                 if (bit_1_result)
@@ -93,60 +83,69 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 timing = user_effect->camera_impulse.duration - *(real32*)(&user_effect->field_80) - halo_interpolator_get_interpolation_time();
-                    function_result = player_effect_transition_function_evaluate((e_transition_function_type)user_effect->camera_impulse.fade_function, user_effect->transition_function_scale_9C, timing, user_effect->camera_impulse.duration);
+                    real32 passed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time();
+                    function_result = player_effect_transition_function_evaluate(
+                        (e_transition_function_type)user_effect->camera_impulse.fade_function, 
+                        user_effect->transition_function_scale_9C, 
+                        passed_time,
+                        user_effect->camera_impulse.duration);
                 }
                 
-                real_vector3d vector;
-                cross_product3d(&global_up3d, &user_effect->vector_0, &vector);
+                real_vector3d v1;
+                cross_product3d(&global_up3d, &user_effect->vector_0, &v1);
 
-                real32 function_result_scaled = user_effect->camera_impulse.rotation * function_result;
-                matrix4x3_rotation_from_axis_and_angle(&calculated_matrix, &vector, sin(function_result_scaled), cos(function_result_scaled));
+                real32 rotation = user_effect->camera_impulse.rotation * function_result;
+                matrix4x3_rotation_from_axis_and_angle(&calculated_matrix, &v1, sin(rotation), cos(rotation));
 
-                real32 position_scaler = user_effect->camera_impulse.pushback * function_result;
-                calculated_matrix.position.x = user_effect->vector_0.i * position_scaler;
-                calculated_matrix.position.y = user_effect->vector_0.j * position_scaler;
-                calculated_matrix.position.z = user_effect->vector_0.k * position_scaler;
+                real32 pushback = user_effect->camera_impulse.pushback * function_result;
+                scale_vector3d(&user_effect->vector_0, pushback, &calculated_matrix.position);
                 point_from_line3d(&calculated_matrix.position, &user_effect->vector_C, function_result, &calculated_matrix.position);
                 matrix4x3_multiply(matrix, &calculated_matrix, matrix);
             }
 
             bool bit_2_result = user_effect->flags.test(_player_effect_user_global_bit_2);
-            if (user_effect->field_82 > 0 || bit_2_result)
+            if (user_effect->camera_shake_passed_time > 0 || bit_2_result)
             {
                 calculated_matrix = global_identity4x3;
 
                 real32 transition_function_result;
-                real32 field_82_real = (real32)user_effect->field_82;
-                real32 timing = user_effect->camera_shaking.duration - game_ticks_to_seconds(*(real32*)(&user_effect->field_82)) - halo_interpolator_get_interpolation_time();
                 if (bit_2_result)
                 {
                     transition_function_result = 1.0f;
                 }
                 else
                 {
-                    transition_function_result = player_effect_transition_function_evaluate((e_transition_function_type)user_effect->camera_shaking.falloff_function, user_effect->transition_function_scale_98, timing, user_effect->camera_shaking.duration);
+                    real32 passed_time = user_effect->camera_shaking.duration
+                        - game_ticks_to_seconds((real32)user_effect->camera_shake_passed_time - halo_interpolator_get_interpolation_time());
+
+                    transition_function_result = player_effect_transition_function_evaluate(
+                        (e_transition_function_type)user_effect->camera_shaking.falloff_function,
+                        user_effect->transition_function_scale_98, 
+                        passed_time,
+                        user_effect->camera_shaking.duration
+                    );
                 }
 
-                real32 seconds_result = timing / user_effect->camera_shaking.wobble_function_period;
-                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, seconds_result);
-                real32 periodic_function_result_scaled = periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0 - user_effect->camera_shaking.wobble_weight);
+                real32 seconds_result = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_impulse_passed_time);
+                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, seconds_result / user_effect->camera_shaking.wobble_function_period);
+                real32 periodic_function_result_scaled =
+                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight);
 
                 // Set v1 to 0 if v1_value is less than 0
                 real32 v1_value = user_effect->camera_shaking.random_translation * periodic_function_result_scaled;
-                real32 v1 = (v1_value <= 0.0f ? 0.0f : v1_value);
+                real32 v1 = MAX(0.0f, v1_value);
 
                 // Set v2 to 0 if v2_value is less than 0
                 real32 v2_value = user_effect->camera_shaking.random_rotation * periodic_function_result_scaled;
-                real32 v2 = (v2_value <= 0.0f ? 0.0f : v2_value);
+                real32 v2 = MAX(0.0f, v2_value);
 
                 if (user_effect->field_7C > 0)
                 {
-                    real32 seconds_7C = game_ticks_to_seconds(*(real32*)(&user_effect->field_7C));
-                    real32 seconds_7C_x2 = seconds_7C + seconds_7C;
+                    real32 seconds_7C = game_ticks_to_seconds(user_effect->field_7C);
+                    seconds_7C += seconds_7C;
 
-                    v1 += seconds_7C_x2 * user_effect->field_74;
-                    v2 += seconds_7C_x2 * user_effect->field_78;
+                    v1 += seconds_7C * user_effect->field_74;
+                    v2 += seconds_7C * user_effect->field_78;
                     
                     rumble_player_continuous(user_index, user_effect->rumble_intensity_left, user_effect->rumble_intensity_right);
                 }
@@ -179,8 +178,8 @@ void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, r
     return;
 }
 
-real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 a2, real32 a3, real32 a4)
+real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 a3, real32 a4)
 {
     real32 function_value = 1.0f - (a3 / a4);
-    return transition_function_evaluate(function_type, function_value) * a2;
+    return transition_function_evaluate(function_type, function_value) * scale;
 }
