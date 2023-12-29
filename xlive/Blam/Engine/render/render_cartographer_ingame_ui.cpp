@@ -62,6 +62,10 @@ const uint64 k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator);
 const uint32 k_cheevo_title_font = 10;
 const uint32 k_cheevo_message_font = 1;
 
+// there should be a better way of doing this. right now,
+// this works on frame-by-frame logic (text conversion, ugly STL map)
+// but you could easily hook up XAchievements to enqueue achievement
+// toast notifications.
 void render_cartographer_achievements()
 {
 	static int64 x_cheevo_timer = 0;
