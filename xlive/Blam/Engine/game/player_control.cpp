@@ -2,12 +2,9 @@
 #include "player_control.h"
 
 #include "players.h"
-#include "Blam/Engine/units/bipeds.h"
 #include "Util/Hooks/Hook.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/main/interpolator.h"
-#include "Util/Hooks/Hook.h"
-#include <H2MOD.h>
 
 real32 g_player_control_dt = 0.0f;
 
