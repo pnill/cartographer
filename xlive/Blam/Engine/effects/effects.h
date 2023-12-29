@@ -4,6 +4,26 @@
 #include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/memory/data.h"
 
+
+enum e_effect_datum_flags : int16
+{
+    _effect_datum_flags_bit_1 = 1,
+    _effect_datum_flags_bit_2 = 2,
+    _effect_datum_flags_bit_3 = 3,
+    _effect_datum_flags_bit_4 = 4,
+    _effect_datum_flags_created_in_violence_bit = 5,
+    _effect_datum_flags_bit_6 = 6,
+    _effect_datum_flags_bit_7 = 7,
+    _effect_datum_flags_bit_8 = 8,
+    _effect_datum_flags_bit_9 = 9,
+    _effect_datum_flags_bit_10 = 10,
+    _effect_datum_flags_bit_11 = 11,
+    _effect_datum_flags_bit_12 = 12,
+    _effect_datum_flags_bit_13 = 13,
+    _effect_datum_flags_bit_14 = 14,
+    _effect_datum_flags_bit_15 = 15
+};
+
 enum e_effect_location_flags : int16
 {
     _effect_location_flags_bit_15 = FLAG(15),
