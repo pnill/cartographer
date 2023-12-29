@@ -12,8 +12,12 @@
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
+// define this to enable queueing a test message in render_cartographer_achievements
+// #define ACHIVEMENT_RENDER_DEBUG_ENABLED
+
 const int32 k_status_text_font = 0;
 
+// defined in XLiveRendering.cpp
 extern char* buildText;
 
 void render_cartographer_status_text()
@@ -71,12 +75,14 @@ void render_cartographer_achievements()
 	static int64 x_cheevo_timer = 0;
 	int64 time_now = shell_time_now_msec();
 
+#ifdef ACHIVEMENT_RENDER_DEBUG_ENABLED
 	static bool x_test = false;
 	if (x_test)
 	{
 		AchievementMap.insert({ "Why are we still here? Just to suffer?|I can feel my leg, my arm... even my fingers.", false });
 		x_test = false;
 	}
+#endif
 
 	if (!AchievementMap.empty())
 	{
@@ -126,6 +132,7 @@ void render_cartographer_achievements()
 	}
 }
 
+// defined in Modules\Updater\Updater.cpp
 extern char* autoUpdateText;
 extern long long sizeOfDownload;
 extern long long sizeOfDownloaded;
