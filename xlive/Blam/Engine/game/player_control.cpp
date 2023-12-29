@@ -2,12 +2,9 @@
 #include "player_control.h"
 
 #include "players.h"
-#include "Blam/Engine/units/bipeds.h"
 #include "Util/Hooks/Hook.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/main/interpolator.h"
-#include "Util/Hooks/Hook.h"
-#include <H2MOD.h>
 
 real32 g_player_control_dt = 0.0f;
 
@@ -36,21 +33,27 @@ real32 local_player_held_zoom_delta_time[4]
 	0.f, 0.f, 0.f, 0.f
 };
 
-void __cdecl update_player_control_zoom_updates_held(int32 player_index, s_player_control* player_control, real32 delta)
+void __cdecl update_player_control_zoom_updates_held(s_player* player, s_player_control* player_control, real32 delta)
 {
-	if (local_player_held_zoom_delta_time[player_index] <= 1.0f && delta > 0.f)
+	if (player->user_index != NONE)
 	{
-		local_player_held_zoom_delta_time[player_index] += delta;
+		if (local_player_held_zoom_delta_time[player->user_index] <= 1.0f && delta > 0.f)
+		{
+			local_player_held_zoom_delta_time[player->user_index] += delta;
+		}
 	}
 }
 
 
-void __cdecl update_player_control_check_held_time(int32 player_index, s_player_control* player_control)
+void __cdecl update_player_control_check_held_time(s_player* player, s_player_control* player_control)
 {
-	if(player_control->zoom_input_held && local_player_held_zoom_delta_time[player_index] >= 1.0f)
+	if (player->user_index != NONE)
 	{
-		player_control->actions.weapon_indexes.primary_weapon_index = player_control->gap_9A[0];
-		player_control->actions.weapon_indexes.secondary_weapon_index = player_control->gap_9A[1];
+		if (player_control->zoom_input_held && local_player_held_zoom_delta_time[player->user_index] >= 1.0f)
+		{
+			player_control->actions.weapon_indexes.primary_weapon_index = player_control->gap_9A[0];
+			player_control->actions.weapon_indexes.secondary_weapon_index = player_control->gap_9A[1];
+		}
 	}
 }
 
@@ -80,11 +83,10 @@ __declspec(naked) void update_player_control_zoom_updates_held_jmp()
 		pushfd
 
 		mov ebx, [esp + pushfdoffset + pushadoffset + 78h] // move current delta onto ebx
-		mov ecx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto ecx
 
 		push ebx
 		push ebp // push pointer to s_player_control
-		push ecx
+		push esi // push pointer to s_player
 
 		call update_player_control_zoom_updates_held
 
@@ -108,10 +110,8 @@ __declspec(naked) void update_player_control_check_held_time_jmp()
 		pushad
 		pushfd
 
-		mov ebx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto eax
-
 		push ebp // push pointer to s_player_control
-		push ebx
+		push esi // push pointer to s_player
 
 		call update_player_control_check_held_time
 
