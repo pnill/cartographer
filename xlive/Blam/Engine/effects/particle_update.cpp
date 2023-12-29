@@ -136,9 +136,20 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 	}
 }
 
+real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
+{
+	// The engine would interpolate between the particle_emitters previous and current posisiton to find a rough estimate
+	// of where it should be in the world to be as close as possible to the object
+	// we can remove this and just force it to be in the previous point as that will always be
+	// the interpolated position of the attached object as we let the engine go brrrr
+	points_interpolate(previous_point, target_point, 0.0f, out);
+	return out;
+}
+
 void apply_particle_update_patches()
 {
 	//p_particle_system_update_particle_position_and_velocity = Memory::GetAddress<particle_system_update_particle_position_and_velocity_t>(0xC4125);
-	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
-	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
 }
