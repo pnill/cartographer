@@ -92,7 +92,7 @@ void __cdecl particle_system_update_particle_position_and_velocity(
 					real_point3d particle_position;
 					real_vector3d particle_velocity;
 					halo_particle_interpolator_get_interpolated_position(current_particle_index, &particle_position);
-					halo_particle_interpolator_get_interpolated_velocity(current_particle_index, &particle_velocity);
+					halo_interpolator_particle_get_interpolated_velocity(current_particle_index, &particle_velocity);
 
 					particle_state_update
 					(

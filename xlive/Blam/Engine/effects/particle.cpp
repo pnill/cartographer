@@ -77,7 +77,7 @@ real_point3d* halo_particle_interpolator_get_interpolated_position(datum particl
 	return out_point;
 }
 
-real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum particle_index, real_vector3d* out_vector)
+real_vector3d* halo_interpolator_particle_get_interpolated_velocity(datum particle_index, real_vector3d* out_vector)
 {
 	uint16 particle_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_index);
 	c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);

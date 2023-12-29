@@ -16,10 +16,10 @@
 #define DIV_BY_MAX_MASK_REAL (RANDOM_FLONE / (real32)RANDOM_MASK)
 
 // get the HIGH bits of the seed (between 65535 ... 0)
-#define SEED_HIWORD(seed) (seed >> 16)
+#define SEED_HIWORD(seed) ((seed) >> 16)
 
 // integer random
-#define INTEGER_RANDOM(seed) ((SEED_HIWORD(seed)))
+#define INTEGER_RANDOM(seed) SEED_HIWORD(seed)
 #define INTEGER_RANDOM_RANGE(seed, lower_bound, delta) ((lower_bound) + (((delta) * INTEGER_RANDOM(seed)) >> 16))
 
 // floating point random
