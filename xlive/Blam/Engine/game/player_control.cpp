@@ -79,7 +79,7 @@ __declspec(naked) void update_player_control_zoom_updates_held_jmp()
 		pushad
 		pushfd
 
-		mov eax, [esp + pushfdoffset + 8]	// move pointer to s_player_control onto eax
+		mov eax, ebp	// move pointer to s_player_control onto eax
 		mov ebx, [esp + pushfdoffset + pushadoffset + 78h] // move current delta onto ebx
 		mov ecx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto ecx
 
@@ -109,7 +109,7 @@ __declspec(naked) void update_player_control_check_held_time_jmp()
 		pushad
 		pushfd
 
-		mov eax, [esp + pushfdoffset + 8] // move pointer to s_player_control onto ebx
+		mov eax, ebp // move pointer to s_player_control onto ebx
 		mov ebx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto eax
 
 		push eax
