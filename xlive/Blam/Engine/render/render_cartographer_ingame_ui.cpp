@@ -23,18 +23,16 @@ extern char* buildText;
 void render_cartographer_status_text()
 {
 	rectangle2d bounds;
-	draw_string_reset();
-
 	rasterizer_get_frame_bounds(&bounds);
 
 	bool game_is_main_menu = game_is_ui_shell();
 	bool paused_or_in_menus = *Memory::GetAddress<bool*>(0x47A568) != 0;
 
 	wchar_t build_string_buffer[256];
-	utf8_string_to_wchar_string(buildText, build_string_buffer, 256);
+	utf8_string_to_wchar_string(buildText, build_string_buffer, NUMBEROF(build_string_buffer));
 
 	wchar_t master_state_string_buffer[256];
-	utf8_string_to_wchar_string(GetMasterStateStr(), master_state_string_buffer, 256);
+	utf8_string_to_wchar_string(GetMasterStateStr(), master_state_string_buffer, NUMBEROF(master_state_string_buffer));
 
 	real_argb_color text_color_console = **Memory::GetAddress<real_argb_color**>(0x41277C);
 	if (game_is_main_menu)
@@ -43,17 +41,15 @@ void render_cartographer_status_text()
 	}
 
 	int32 line_height = get_text_size_from_font_cache(k_status_text_font);
-
 	if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
-		draw_string_set_font(k_status_text_font);
-		draw_string_set_color(&text_color_console);
-		draw_string_set_shadow_color(*Memory::GetAddress<real_argb_color**>(0x412780));
+		draw_string_reset();
+		draw_string_set_font_and_options(k_status_text_font, 0, 0, 0, &text_color_console, *Memory::GetAddress<real_argb_color**>(0x412780), false);
 
 		if (H2Config_anti_cheat_enabled)
 		{
-			_draw_string_set_style_justification_flags_wrap_horizontally(0, 1, 0, false);
+			draw_string_set_options(0, 1, 0, false);
 			draw_string_render(&bounds, L"Anti-cheat is enabled");
-			_draw_string_set_style_justification_flags_wrap_horizontally(0, 0, 0, false);
+			draw_string_set_options(0, 0, 0, false);
 		}
 
 		draw_string_render(&bounds, build_string_buffer);
@@ -66,10 +62,6 @@ const uint64 k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator);
 const uint32 k_cheevo_title_font = 10;
 const uint32 k_cheevo_message_font = 1;
 
-// there should be a better way of doing this. right now,
-// this works on frame-by-frame logic (text conversion, ugly STL map)
-// but you could easily hook up XAchievements to enqueue achievement
-// toast notifications.
 void render_cartographer_achievements()
 {
 	static int64 x_cheevo_timer = 0;
@@ -106,7 +98,8 @@ void render_cartographer_achievements()
 			real_argb_color text_color = **Memory::GetAddress<real_argb_color**>(0x41277C);
 			text_color.alpha = (float)(x_cheevo_timer - time_now) / k_cheevo_display_lifetime;
 
-			utf8_string_to_wchar_string(it->first.c_str(), cheevo_message, 256);
+			// there should be a better way of doing this instead of every frame!
+			utf8_string_to_wchar_string(it->first.c_str(), cheevo_message, NUMBEROF(cheevo_message));
 			wchar_t* divider_position = wcschr(cheevo_message, '|');
 			if (divider_position)
 			{
@@ -114,10 +107,7 @@ void render_cartographer_achievements()
 			}
 
 			draw_string_reset();
-			draw_string_set_font(k_cheevo_title_font);
-			_draw_string_set_style_justification_flags_wrap_horizontally(0, 2, 0, false);
-			draw_string_set_color(&text_color);
-			draw_string_set_shadow_color(*Memory::GetAddress<real_argb_color**>(0x412780));
+			draw_string_set_font_and_options(k_cheevo_title_font, 0, 2, 0, &text_color, *Memory::GetAddress<real_argb_color**>(0x412780), false);
 
 			rasterizer_get_screen_bounds(&bounds);
 			bounds.top += rectangle2d_height(&bounds) / 3 - (widget_total_height / 2);
@@ -137,30 +127,51 @@ extern char* autoUpdateText;
 extern long long sizeOfDownload;
 extern long long sizeOfDownloaded;
 
+const uint32 k_update_status_font = 5;
+
 void render_cartographer_update()
 {
-	//if (autoUpdateText)
-	//{
-	//	rectangle2d bounds;
-	//	wchar_t update_message[256];
-	//
-	//	if (sizeOfDownload > 0)
-	//	{
-	//		float percent_complate = 100.f * ((float)sizeOfDownloaded / sizeOfDownload);
-	//		swprintf_s(update_message, 256, L"%S (%.1f)", autoUpdateText, percent_complate);
-	//	}
-	//	else
-	//	{
-	//		utf8_string_to_wchar_string(autoUpdateText, update_message, 256);
-	//	}
-	//
-	//	draw_string_reset();
-	//	draw_string_set_font(k_cheevo_title_font);
-	//	_draw_string_set_style_justification_flags_wrap_horizontally(0, 2, 0, false);
-	//	draw_string_set_shadow_color(*Memory::GetAddress<real_argb_color**>(0x412780));
-	//
-	//	rasterizer_get_screen_bounds(&bounds);
-	//	bounds.top += rectangle2d_height(&bounds) / 4;
-	//	draw_string_render(&bounds, update_message);
-	//}
+	if (autoUpdateText)
+	{
+		rectangle2d bounds;
+		wchar_t update_message_buffer[256];
+		wchar_t* last_line = update_message_buffer;
+		c_static_wchar_string128 lines[16];
+		int32 line_count = 0;
+		int32 update_message_length = 0;
+
+		utf8_string_to_wchar_string(autoUpdateText, update_message_buffer, NUMBEROF(update_message_buffer));
+		update_message_length = ustrnlen(update_message_buffer, NUMBEROF(update_message_buffer));
+	
+		for (int32 character_index = 0; character_index < NUMBEROF(update_message_buffer) && character_index < update_message_length && line_count < NUMBEROF(lines); character_index++)
+		{
+			wchar_t* character = &update_message_buffer[character_index];
+			if (*character == '\n')
+			{
+				*character = '\0';
+				lines[line_count++].set(last_line);
+				last_line = &update_message_buffer[character_index + 1];
+			}
+		}
+
+		draw_string_reset();
+		draw_string_set_font_and_options(k_update_status_font, 0, 0, 0, *Memory::GetAddress<real_argb_color**>(0x41277C), *Memory::GetAddress<real_argb_color**>(0x412780), false);
+	
+		rasterizer_get_frame_bounds(&bounds);
+		bounds.top += rectangle2d_height(&bounds) * .1f;
+
+		for (int32 line_index = 0; line_index < line_count; line_index++)
+		{
+			draw_string_render(&bounds, lines[line_index].get_string());
+			bounds.top += get_text_size_from_font_cache(k_update_status_font);
+		}
+
+		if (sizeOfDownload > 0)
+		{
+			wchar_t update_message_buffer[256];
+			float percent_complate = 100.f * ((float)sizeOfDownloaded / sizeOfDownload);
+			swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
+			draw_string_render(&bounds, update_message_buffer);
+		}
+	}
 }

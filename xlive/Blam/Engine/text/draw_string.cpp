@@ -21,14 +21,14 @@ void __cdecl draw_string_set_font(int32 font_index)
 	INVOKE(0x98A87, 0, draw_string_set_font, font_index);
 }
 
-void __cdecl _draw_string_set_style_justification_flags_wrap_horizontally(int32 style, int32 justification, uint32 flags, bool wrap_horizontally)
+void __cdecl draw_string_set_options(int32 style, int32 justification, uint32 flags, bool wrap_horizontally)
 {
-	INVOKE(0x98A9D, 0, _draw_string_set_style_justification_flags_wrap_horizontally, style, justification, flags, wrap_horizontally);
+	INVOKE(0x98A9D, 0, draw_string_set_options, style, justification, flags, wrap_horizontally);
 }
 
-void __cdecl _draw_string_set_font_style_justification_flags_color_shadow_color_wrap_horizontally(int32 font, int32 style, int32 justification, uint32 flags, real_argb_color const* color, real_argb_color const* shadow_color, bool wrap_horizontally)
+void __cdecl draw_string_set_font_and_options(int32 font, int32 style, int32 justification, uint32 flags, real_argb_color const* color, real_argb_color const* shadow_color, bool wrap_horizontally)
 {
-	INVOKE(0x98AC4, 0, _draw_string_set_font_style_justification_flags_color_shadow_color_wrap_horizontally, font, style, justification, flags, color, shadow_color, wrap_horizontally);
+	INVOKE(0x98AC4, 0, draw_string_set_font_and_options, font, style, justification, flags, color, shadow_color, wrap_horizontally);
 }
 
 void __cdecl draw_string_reset()
