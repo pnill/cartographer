@@ -71,7 +71,7 @@ void halo_particle_interpolator_set_state(bool state);
 void halo_particle_interpolator_clear_buffers();
 void halo_particle_interpolator_update_end();
 real_point3d* halo_particle_interpolator_get_interpolated_position(datum particle_index, real_point3d* out_point);
-real_vector3d* halo_particle_interpolator_get_interpolated_velocity(datum particle_index, real_vector3d* out_vector);
+real_vector3d* halo_interpolator_particle_get_interpolated_velocity(datum particle_index, real_vector3d* out_vector);
 
 void particle_update(real32 delta);
 
