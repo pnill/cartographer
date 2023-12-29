@@ -6,6 +6,7 @@
 #include "Blam/Engine/camera/observer.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/effects/contrails.h"
+#include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
@@ -942,6 +943,7 @@ void H2MOD::ApplyHooks() {
 		camera_apply_patches();
 		player_control_apply_patches();
 		rasterizer_fog_apply_patches();
+		effects_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
