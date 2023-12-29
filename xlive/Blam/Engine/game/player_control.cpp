@@ -72,66 +72,58 @@ int16 __cdecl unit_rotate_zoom_level_hook(datum object_index, __int16 a2)
 
 __declspec(naked) void update_player_control_zoom_updates_held_jmp()
 {
-	DWORD vebx;
+#define pushadoffset 8 * 4
+#define pushfdoffset 4
 	__asm
 	{
-		// Store original registers
-		mov vebx, ebx
-		push eax
-		push ebx
-		push ecx
+		pushad
+		pushfd
 
-		mov ebx, ebp			// move pointer to s_player_control onto ebx
-		mov eax, [esp + 84h]	// move current delta onto eax
-		mov ecx, [esp + 70h]	// move player_index onto ecx
+		mov ebx, [esp + pushfdoffset + pushadoffset + 78h] // move current delta onto ebx
+		mov ecx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto ecx
 
-		// push arguments to stack
-		push eax
 		push ebx
+		push ebp // push pointer to s_player_control
 		push ecx
 
 		call update_player_control_zoom_updates_held
 
-		// adjust stack
 		add esp, 4 * 3
 
-		// restore original registers
-		pop eax
-		pop ebx
-		pop ecx
-		mov ebx, vebx
+		popfd
+		popad
+
 		ret
 	}
+#undef pushadoffset
+#undef pushfdoffset
 }
 
 __declspec(naked) void update_player_control_check_held_time_jmp()
 {
-	DWORD vebx;
+#define pushadoffset 8 * 4
+#define pushfdoffset 4
 	__asm
 	{
-		// store original register
-		mov vebx, ebx
-		push ebx
-		push eax
+		pushad
+		pushfd
 
-		mov ebx, ebp			// move pointer to s_player_control onto ebx
-		mov eax, [esp + 70H]	// move player_index onto eax
+		mov ebx, [esp + pushfdoffset + pushadoffset + 64h] // move player_index onto eax
 
-		// push arguments to stack
+		push ebp // push pointer to s_player_control
 		push ebx
-		push eax
 
 		call update_player_control_check_held_time
 
-		// adjust stack
 		add esp, 4 * 2
 
-		// restore original register
-		pop ebx
-		pop eax
-		mov ebx, vebx
+		popfd
+		popad
+
 		ret
 	}
+#undef pushadoffset
+#undef pushfdoffset
 }
 
 void player_control_apply_patches()
