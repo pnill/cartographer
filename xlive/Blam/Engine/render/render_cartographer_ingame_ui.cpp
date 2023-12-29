@@ -58,7 +58,7 @@ void render_cartographer_status_text()
 	}
 }
 
-const uint64 k_cheevo_display_lifetime = (k_shell_time_msec_denominator * 10);
+const uint64 k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator);
 const uint32 k_cheevo_title_font = 10;
 const uint32 k_cheevo_message_font = 1;
 
