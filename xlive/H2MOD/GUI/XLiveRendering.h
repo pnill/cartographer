@@ -24,16 +24,6 @@ typedef struct XLIVE_INPUT_INFO {
 
 #define DISPLAY_DEV_TESTING_MENU 0
 
-void InitFontsIfRequired();
-void drawText(int x, int y, DWORD color, const char* text, LPD3DXFONT pFont);
-void drawRect(int x, int y, int width, int height, DWORD Color);
-void drawHorizontalLine(int x, int y, int width, D3DCOLOR Color);
-void drawVerticalLine(int x, int y, int height, D3DCOLOR Color);
-void drawBox(int x, int y, int width, int height, D3DCOLOR BorderColor, D3DCOLOR FillColor);
-int getTextWidth(const char* szText, LPD3DXFONT pFont);
-int getSpaceCharacterWidth(LPD3DXFONT pFont);
-int centerTextHorizontally(const char* text, int x, int width, LPD3DXFONT pFont);
-
 static CONST D3DCOLOR COLOR_RED = D3DCOLOR_ARGB(255, 255, 000, 000);
 static CONST D3DCOLOR COLOR_GREEN = D3DCOLOR_ARGB(255, 127, 255, 000);
 static CONST D3DCOLOR COLOR_ORANGE = D3DCOLOR_ARGB(255, 255, 140, 000);
