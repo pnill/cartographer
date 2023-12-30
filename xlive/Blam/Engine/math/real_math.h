@@ -243,21 +243,21 @@ static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
 	return length;
 }
 
-static void BLAM_MATH_INL cross_product3d(const real_vector3d* up, const real_vector3d* forward, real_vector3d* out_left)
+static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* up, const real_vector3d* forward, real_vector3d* out_left)
 {
 	out_left->i = up->j * forward->k - up->k * forward->j;
 	out_left->j = up->k * forward->i - up->i * forward->k;
 	out_left->k = up->i * forward->j - up->j * forward->i;
-	return;
+	return out_left;
 }
 
 void __cdecl real_math_reset_precision(void);
 
 real32 normalize2d(real_vector2d* vector);
 
-void perpendicular2d(const real_vector2d* in, real_vector2d* out);
+real_vector2d* perpendicular2d(const real_vector2d* in, real_vector2d* out);
 
-void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion);
+real_quaternion* __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion);
 
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b);
 
@@ -271,10 +271,10 @@ real32 distance3d(const real_point3d* p1, const real_point3d* p2);
 
 bool limit3d(real_vector3d* v, real32 limit);
 
-void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out);
+real_point3d* points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out);
 
-void scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale);
+real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale);
 
-void __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
+real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
 
-void __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);
+real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);

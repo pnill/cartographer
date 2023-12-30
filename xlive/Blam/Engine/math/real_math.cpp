@@ -7,10 +7,9 @@ void __cdecl real_math_reset_precision(void)
 	return;
 }
 
-void __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion)
+real_quaternion* __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion)
 {
-	INVOKE(0x34F6F, 0x285EC, fast_quaternion_interpolate_and_normalize, previous, current, fractional_ticks, out_quaternion);
-	return;
+	return INVOKE(0x34F6F, 0x285EC, fast_quaternion_interpolate_and_normalize, previous, current, fractional_ticks, out_quaternion);
 }
 
 real32 normalize2d(real_vector2d* vector)
@@ -29,11 +28,11 @@ real32 normalize2d(real_vector2d* vector)
 	return result;
 }
 
-void perpendicular2d(const real_vector2d* in, real_vector2d* out)
+real_vector2d* perpendicular2d(const real_vector2d* in, real_vector2d* out)
 {
 	out->i = -in->j;
 	out->j = in->i;
-	return;
+	return out;
 }
 
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b)
@@ -90,29 +89,27 @@ bool limit3d(real_vector3d* v, real32 limit)
 	return true;
 }
 
-void points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
+real_point3d* points_interpolate(const real_vector3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
 {
 	real_point3d tp1, tp2;
 	scale_vector3d(previous_point, 1.0f - fractional_tick, &tp1);
 	scale_vector3d(target_point, fractional_tick, &tp2);
 	add_vectors3d(&tp1, &tp2, out);
-	return;
+	return out;
 }
 
-void scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale)
+real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fractional_tick, real32* out_scale)
 {
 	*out_scale = previous_scale * (1.0f - fractional_tick) + (current_scale * fractional_tick);
-	return;
+	return *out_scale;
 }
 
-void __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out)
+real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out)
 {
-	INVOKE(0x344c9, 0x27B46, perpendicular3d, in, out);
-	return;
+	return (0x344c9, 0x27B46, perpendicular3d, in, out);
 }
 
-void __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up)
+real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up)
 {
-	INVOKE(0x346E2, 0x27D5F, generate_up_vector3d, forward, up);
-	return;
+	return INVOKE(0x346E2, 0x27D5F, generate_up_vector3d, forward, up);
 }
