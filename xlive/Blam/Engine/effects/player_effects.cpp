@@ -83,7 +83,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 passed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time();
+                    real32 passed_time = user_effect->camera_impulse.duration - ((real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time());
                     function_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_impulse.fade_function, 
                         user_effect->transition_function_scale_9C, 
