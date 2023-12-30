@@ -61,7 +61,7 @@ struct s_player_effect_user_globals
 	real32 field_78;
 	int16 field_7C;
 	int16 game_time;
-	int16 camera_impulse_passed_time;
+	int16 camera_impulse_countdown;
 	int16 camera_shake_passed_time;
 	int8 field_84[4];
 	c_flags<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
