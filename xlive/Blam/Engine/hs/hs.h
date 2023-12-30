@@ -127,5 +127,3 @@ struct HaloScriptCommand
 	WORD arg_count;
 	e_hs_type arg_array[1]; // array size is dynamic, but always at least one
 };
-
-int __cdecl hs_object_get_markers_by_string_id(datum object_datum, string_id marker_id, void* data, __int16 count);

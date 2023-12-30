@@ -250,10 +250,10 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
 	s_location* p_location = location;
+	s_location scnr_location;
 
 	if (!p_location)
 	{
-		s_location scnr_location;
 		scenario_location_from_point(&scnr_location, &object->object_origin_point);
 		p_location = &scnr_location;
 		if (scnr_location.cluster_index == NONE)
@@ -960,11 +960,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	marker_object->node_index = 0;
 	matrix4x3_identity(&marker_object->matrix0);
 		
-	if (halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
-	{
-		marker_object->matrix1 = marker_object->matrix1;
-	}
-	else
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
 	{
 		marker_object->matrix1 = *object_get_node_matrix(object_index, 0);
 	}

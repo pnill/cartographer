@@ -24,7 +24,7 @@ struct s_unit_control_data
 	DWORD field_50;
 	DWORD field_54;
 	DWORD field_58;
-	s_aim_assist_targetting_data target_info;
+	s_aim_assist_targeting_result target_info;
 
 };
 CHECK_STRUCT_SIZE(s_unit_control_data, 0x80);
