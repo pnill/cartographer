@@ -5,10 +5,9 @@
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 
+#include "Blam/Engine/cache/cache_files.h"
 #include "Blam/Engine/math/real_math.h"
 #include "Blam/Engine/tag_files/string_id.h"
-
-#include "H2MOD/Tags/TagInterface.h"
 
 #define k_max_nodes_per_animation = 255
 
@@ -17,7 +16,7 @@ struct s_additional_node_data
     string_id node_name;
     real_quaternion default_rotation;
     real_point3d default_translation;
-    float default_scale;
+    real32 default_scale;
     real_point3d min_bounds;
     real_point3d max_bounds;
 };
@@ -25,20 +24,20 @@ TAG_BLOCK_SIZE_ASSERT(s_additional_node_data, 60);
 
 struct inherited_animation_node_map_block
 {
-    short local_node;
+    int16 local_node;
 };
 TAG_BLOCK_SIZE_ASSERT(inherited_animation_node_map_block, 2);
 
 struct inherited_animation_node_map_flag_block
 {
-    DWORD local_node_flags;
+    uint32 local_node_flags;
 };
 TAG_BLOCK_SIZE_ASSERT(inherited_animation_node_map_flag_block, 4);
 
-enum e_inheritance_flags : byte
+enum e_inheritance_flags : uint8
 {
-    inheritance_flag_inherit_root_translation_scale_only = FLAG(0),
-    inheritance_flag_inherit_for_use_on_player = FLAG(1)
+    _inheritance_flag_inherit_root_translation_scale_only = FLAG(0),
+    _inheritance_flag_inherit_for_use_on_player = FLAG(1)
 };
 
 struct s_animation_inheritence
@@ -47,9 +46,9 @@ struct s_animation_inheritence
     tag_block<inherited_animation_node_map_block> node_map;
     tag_block<inherited_animation_node_map_flag_block> node_map_flags;
 
-    float root_z_offset;
+    real32 root_z_offset;
     e_inheritance_flags inheritance_flags;
-    PAD(3);
+    int8 pad[3];
 };
 TAG_BLOCK_SIZE_ASSERT(s_animation_inheritence, 32);
 
@@ -64,98 +63,96 @@ class c_model_animation_runtime_data
     tag_block<s_animation_inheritence> inheritence_list;
     tag_block<s_weapon_class_listing> weapon_list;
 
-    DWORD left_arm_nodes[8];
-    DWORD right_arm_nodes[8];
+    uint32 left_arm_nodes[8];
+    uint32 right_arm_nodes[8];
 
 public:
-    s_animation_inheritence* get_animation_inhertence(byte index) const;
-    s_weapon_class_listing* get_weapon_list(byte index) const;
-    const DWORD* get_left_arm_nodes() const;
-    const DWORD* get_right_arm_nodes() const;
+    s_animation_inheritence* get_animation_inhertence(uint8 index) const;
+    s_weapon_class_listing* get_weapon_list(uint8 index) const;
+    const uint32* get_left_arm_nodes(void) const;
+    const uint32* get_right_arm_nodes(void) const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_runtime_data, 80);
 
-enum e_node_model_flags : byte
+enum e_node_model_flags : uint8
 {
-    node_model_flag_primary_model = FLAG(0),
-    node_model_flag_secondary_model = FLAG(1),
-    node_model_flag_local_root = FLAG(2),
-    node_model_flag_left_hand = FLAG(3),
-    node_model_flag_right_hand = FLAG(4),
-    node_model_flag_left_arm_member = FLAG(5),
+    _node_model_flag_primary_model = FLAG(0),
+    _node_model_flag_secondary_model = FLAG(1),
+    _node_model_flag_local_root = FLAG(2),
+    _node_model_flag_left_hand = FLAG(3),
+    _node_model_flag_right_hand = FLAG(4),
+    _node_model_flag_left_arm_member = FLAG(5)
 };
 
-enum e_node_joint_flags : byte
+enum e_node_joint_flags : uint8
 {
-    node_joint_flag_ball_socket = FLAG(0),
-    node_joint_flag_hinge = FLAG(1),
-    node_joint_flag_no_movement = FLAG(2),
+    _node_joint_flag_ball_socket = FLAG(0),
+    _node_joint_flag_hinge = FLAG(1),
+    _node_joint_flag_no_movement = FLAG(2)
 };
 
 struct animation_graph_node
 {
     string_id name;
-    short next_sibling_node_index;
-    short first_child_node_index;
-    short parent_node_index;
+    int16 next_sibling_node_index;
+    int16 first_child_node_index;
+    int16 parent_node_index;
 
     e_node_model_flags model_flags;
     e_node_joint_flags node_joint_flags;
 
-    real_vector3d baseVector;
-    float vector_range;
-    float zpos;
+    real_vector3d base_vector;
+    real32 vector_range;
+    real32 zpos;
 };
 TAG_BLOCK_SIZE_ASSERT(animation_graph_node, 32);
 
-enum e_animation_graph_resources_flags : byte
+enum e_animation_graph_resources_flags : uint8
 {
-    animation_graph_resources_prepared_for_cache = FLAG(0),
-    animation_graph_resources_unused = FLAG(1),
-    animation_graph_resources_imported_with_codec_compressors = FLAG(2),
-    animation_graph_resources_unused_smelly_flag = FLAG(3),
-    animation_graph_resources_written_to_cache = FLAG(4),
-    animation_graph_resources_animation_data_reordered = FLAG(5),
+    _animation_graph_resources_prepared_for_cache = FLAG(0),
+    _animation_graph_resources_unused = FLAG(1),
+    _animation_graph_resources_imported_with_codec_compressors = FLAG(2),
+    _animation_graph_resources_unused_smelly_flag = FLAG(3),
+    _animation_graph_resources_written_to_cache = FLAG(4),
+    _animation_graph_resources_animation_data_reordered = FLAG(5)
 };
 
-enum e_animation_graph_reference_flags : short
+enum e_animation_graph_reference_flags : int16
 {
-    animation_graph_reference_flag_allow_on_player = FLAG(0),
-    animation_graph_reference_flag_left_arm_only = FLAG(1),
-    animation_graph_reference_flag_right_arm_only = FLAG(2),
-    animation_graph_reference_flag_first_person_only = FLAG(3),
-    animation_graph_reference_flag_forward_only = FLAG(4),
-    animation_graph_reference_flag_reverse_only = FLAG(5),
+    _animation_graph_reference_flag_allow_on_player = FLAG(0),
+    _animation_graph_reference_flag_left_arm_only = FLAG(1),
+    _animation_graph_reference_flag_right_arm_only = FLAG(2),
+    _animation_graph_reference_flag_first_person_only = FLAG(3),
+    _animation_graph_reference_flag_forward_only = FLAG(4),
+    _animation_graph_reference_flag_reverse_only = FLAG(5)
 };
 
 struct animation_graph_sound_reference
 {
-    // TagReference("snd!")
-    tag_reference sound;
+    tag_reference sound;    // snd!
     e_animation_graph_reference_flags flags;
-    PAD16;
+    int16 pad;
 };
 TAG_BLOCK_SIZE_ASSERT(animation_graph_sound_reference, 0xC);
 
 struct animation_graph_effect_reference
 {
-    // TagReference("snd!")
-    tag_reference effect;
+    tag_reference effect;   // effe
     e_animation_graph_reference_flags flags;
-    PAD16;
+    int16 pad;
 };
 TAG_BLOCK_SIZE_ASSERT(animation_graph_effect_reference, 12);
 
 struct animation_aiming_screen_bounds
 {
-    float right_yaw_per_frame;
-    float left_yaw_per_frame;
-    short right_frame_count;
-    short left_frame_count;
-    float down_pitch_per_frame;
-    float up_pitch_per_frame;
-    short down_pitch_frame_count;
-    short up_pitch_frame_count;
+    real32 right_yaw_per_frame;
+    real32 left_yaw_per_frame;
+    int16 right_frame_count;
+    int16 left_frame_count;
+    real32 down_pitch_per_frame;
+    real32 up_pitch_per_frame;
+    int16 down_pitch_frame_count;
+    int16 up_pitch_frame_count;
 };
 TAG_BLOCK_SIZE_ASSERT(animation_aiming_screen_bounds, 24);
 
@@ -166,41 +163,41 @@ struct s_animation_blend_screen
 };
 TAG_BLOCK_SIZE_ASSERT(s_animation_blend_screen, 28);
 
-enum e_animation_type : byte
+enum e_animation_type : uint8
 {
-    animation_type_base = 0,
-    animation_type_overlay = 1,
-    animation_type_replacement = 2,
+    _animation_type_base = 0,
+    _animation_type_overlay = 1,
+    _animation_type_replacement = 2
 };
 
-enum e_frame_info_type : byte
+enum e_frame_info_type : uint8
 {
-    frame_info_type_none = 0,
-    frame_info_type_dxdy = 1,
-    frame_info_type_dxdydyaw = 2,
-    frame_info_type_dxdydzdyaw = 3,
+    _frame_info_type_none = 0,
+    _frame_info_type_dxdy = 1,
+    _frame_info_type_dxdydyaw = 2,
+    _frame_info_type_dxdydzdyaw = 3,
 };
 
-enum e_model_animation_flags : byte
+enum e_model_animation_flags : uint8
 {
-    model_animation_flag_unused0 = FLAG(0),
-    model_animation_flag_world_relative = FLAG(1),
-    model_animation_flag_unused1 = FLAG(2),
-    model_animation_flag_unused2 = FLAG(3),
-    model_animation_flag_unused3 = FLAG(4),
-    model_animation_flag_compression_disabled = FLAG(5),
-    model_animation_flag_old_production_checksum = FLAG(6),
-    model_animation_flag_valid_production_checksum = FLAG(7),
+    _model_animation_flag_unused0 = FLAG(0),
+    _model_animation_flag_world_relative = FLAG(1),
+    _model_animation_flag_unused1 = FLAG(2),
+    _model_animation_flag_unused2 = FLAG(3),
+    _model_animation_flag_unused3 = FLAG(4),
+    _model_animation_flag_compression_disabled = FLAG(5),
+    _model_animation_flag_old_production_checksum = FLAG(6),
+    _model_animation_flag_valid_production_checksum = FLAG(7)
 };
 
-enum e_production_flags : byte
+enum e_production_flags : uint8
 {
-    production_flag_do_not_monitor_changes = FLAG(0),
-    production_flag_verify_sound_events = FLAG(1),
-    production_flag_do_not_inherit_for_player_graphs = FLAG(2),
+    _production_flag_do_not_monitor_changes = FLAG(0),
+    _production_flag_verify_sound_events = FLAG(1),
+    _production_flag_do_not_inherit_for_player_graphs = FLAG(2),
 };
 
-enum e_playback_flags : short
+enum e_playback_flags : int16
 {
     playback_flag_disable_interpolation_in = FLAG(0),
     playback_flag_disable_interpolation_out = FLAG(1),
@@ -211,84 +208,84 @@ enum e_playback_flags : short
     playback_flag_disable_transition_adjustment = FLAG(6),
 };
 
-enum e_animation_compression_type : byte
+enum e_animation_compression_type : int8
 {
-    animation_compression_type_best_score = 0,
-    animation_compression_type_best_compression = 1,
-    animation_compression_type_best_accuracy = 2,
-    animation_compression_type_best_fullframe = 3,
-    animation_compression_type_best_small_keyframe = 4,
-    animation_compression_type_best_large_keyframe = 5,
+    _animation_compression_type_best_score = 0,
+    _animation_compression_type_best_compression = 1,
+    _animation_compression_type_best_accuracy = 2,
+    _animation_compression_type_best_fullframe = 3,
+    _animation_compression_type_best_small_keyframe = 4,
+    _animation_compression_type_best_large_keyframe = 5,
 };
 
 class c_animation_data_sizes
 {
-    byte field_0;
-    byte field_1;
-    short field_2;
-    short field_4;
-    short field_6;
-    int field_8;
-    int field_12;
+    uint8 field_0;
+    uint8 field_1;
+    int16 field_2;
+    int16 field_4;
+    int16 field_6;
+    int32 field_8;
+    int32 field_12;
 
 public:
-    byte get_field0() { return field_0; }
-    byte get_field1() { return field_1; }
-    short get_field2() { return field_2; }
-    short get_field4() { return field_4; }
-    short get_field6() { return field_6; }
-    int get_field8() { return field_8; }
-    int get_field12() { return field_12; }
+    uint8 get_field0(void) const { return field_0; }
+    uint8 get_field1(void) const { return field_1; }
+    int16 get_field2(void) const { return field_2; }
+    int16 get_field4(void) const { return field_4; }
+    int16 get_field6(void) const { return field_6; }
+    int32 get_field8(void) const { return field_8; }
+    int32 get_field12(void) const { return field_12; }
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_data_sizes, 16);
 
-enum e_frame_event_type : short
+enum e_frame_event_type : int16
 {
-    frame_event_type_primary_keyframe = 0,
-    frame_event_type_secondary_keyframe = 1,
-    frame_event_type_left_foot = 2,
-    frame_event_type_right_foot = 3,
-    frame_event_type_allow_interruption = 4,
-    frame_event_type_transition_a = 5,
-    frame_event_type_transition_b = 6,
-    frame_event_type_transition_c = 7,
-    frame_event_type_transition_d = 8,
-    frame_event_type_bothfeet_shuffle = 9,
-    frame_event_type_body_impact = 10,
+    _frame_event_type_primary_keyframe = 0,
+    _frame_event_type_secondary_keyframe = 1,
+    _frame_event_type_left_foot = 2,
+    _frame_event_type_right_foot = 3,
+    _frame_event_type_allow_interruption = 4,
+    _frame_event_type_transition_a = 5,
+    _frame_event_type_transition_b = 6,
+    _frame_event_type_transition_c = 7,
+    _frame_event_type_transition_d = 8,
+    _frame_event_type_bothfeet_shuffle = 9,
+    _frame_event_type_body_impact = 10
 };
 
 struct s_frame_event
 {
     e_frame_event_type type;
-    short frame;
+    int16 frame;
 };
 TAG_BLOCK_SIZE_ASSERT(s_frame_event, 4);
 
 struct s_sound_event
 {
-    short sound;
-    short frame;
+    int16 sound;
+    int16 frame;
     string_id marker_name;
 };
 TAG_BLOCK_SIZE_ASSERT(s_sound_event, 8);
 
 struct s_effect_event
 {
-    short effect;
-    short frame;
+    int16 effect;
+    int16 frame;
 };
 TAG_BLOCK_SIZE_ASSERT(s_effect_event, 4);
 
-enum e_component_flags : short
+enum e_component_flags : int16
 {
-    component_flag_rotation = FLAG(0),
-    component_flag_translation = FLAG(1),
-    component_flag_scale = FLAG(2),
+    _component_flag_rotation = FLAG(0),
+    _component_flag_translation = FLAG(1),
+    _component_flag_scale = FLAG(2),
 };
 
 struct s_object_space_node_data
 {
-    short node_index;
+    int16 node_index;
     e_component_flags component_flags;
     c_quantized_orientation orientation;
 };
@@ -297,15 +294,15 @@ TAG_BLOCK_SIZE_ASSERT(s_object_space_node_data, 28);
 class c_model_animation
 {
     string_id name;
-    int node_list_checksum;
-    int production_checksum;
-    int import_checksum;
+    int32 node_list_checksum;
+    int32 production_checksum;
+    int32 import_checksum;
 
     e_animation_type type;
     e_frame_info_type frame_info_type;
 
-    byte blend_screen;
-    byte node_count;
+    uint8 blend_screen;
+    uint8 node_count;
     int16 frame_count;
 
     e_model_animation_flags internal_flags;
@@ -314,11 +311,11 @@ class c_model_animation
     e_animation_compression_type desired_compression;
     e_animation_compression_type current_compression;
 
-    float weight;
-    short loop_frame_index;
-    short parent_animation_index;
-    short next_animation_index;
-    short animation_size;           // This field is set to 0 upon compile
+    real32 weight;
+    int16 loop_frame_index;
+    int16 parent_animation_index;
+    int16 next_animation_index;
+    int16 animation_size;           // This field is set to 0 upon compile
 
     /****************************************
     * definition_name: aligned_animation_data_definition
@@ -335,30 +332,30 @@ class c_model_animation
     tag_block<s_object_space_node_data> objectspace_parent_nodes;
 
 public:
-    bool animation_is_world_relative() const;
-    short find_first_key_of_type(const e_frame_event_type event_type) const;
-    short find_first_sound_event(s_sound_event* sound_event) const;
-    short find_next_key_of_type(const e_frame_event_type event_type, const int frame) const;
-    e_animation_type get_animation_type() const;
-    float get_authored_duration() const;
-    size_t get_effect_events_size() const;
+    bool animation_is_world_relative(void) const;
+    int16 find_first_key_of_type(const e_frame_event_type event_type) const;
+    int16 find_first_sound_event(s_sound_event* sound_event) const;
+    int16 find_next_key_of_type(const e_frame_event_type event_type, const int32 frame) const;
+    e_animation_type get_animation_type(void) const;
+    real32 get_authored_duration(void) const;
+    size_t get_effect_events_size(void) const;
     int16 get_frame_count(void) const;
-    double get_frame_count_minus_epsilon() const;
-    size_t get_frame_events_size() const;
-    e_frame_info_type get_frame_info_type() const;
-    double get_frame_position_from_playback_ratio(float playback_ratio) const;
-    short get_last_frame_index() const;
-    short get_loop_frame_index() const;
-    byte get_node_count() const;
-    int get_node_list_checksum() const;
+    double get_frame_count_minus_epsilon(void) const;
+    size_t get_frame_events_size(void) const;
+    e_frame_info_type get_frame_info_type(void) const;
+    real64 get_frame_position_from_playback_ratio(real32 playback_ratio) const;
+    int16 get_last_frame_index(void) const;
+    int16 get_loop_frame_index(void) const;
+    uint8 get_node_count(void) const;
+    int32 get_node_list_checksum(void) const;
     e_playback_flags get_playback_flags(void) const;
-    short get_primary_key_frame_index() const;
-    short get_secondary_key_frame_index() const;
-    short get_left_foot_frame_index() const;
-    short get_right_foot_frame_index() const;
-    size_t get_sound_events_size() const;
-    short get_sound_reference_index() const;
-    string_id get_string_id() const;
+    int16 get_primary_key_frame_index(void) const;
+    int16 get_secondary_key_frame_index(void) const;
+    int16 get_left_foot_frame_index(void) const;
+    int16 get_right_foot_frame_index(void) const;
+    size_t get_sound_events_size(void) const;
+    int16 get_sound_reference_index(void) const;
+    string_id get_string_id(void) const;
 };
 
 class c_animation_graph_resources
@@ -369,7 +366,7 @@ class c_animation_graph_resources
 
     e_animation_graph_resources_flags animation_graph_resources_flags;
 
-    short animation_codec_pack;
+    int16 animation_codec_pack;
     tag_block<animation_graph_node> skeleton_nodes;
     tag_block<animation_graph_sound_reference> sound_references;
     tag_block<animation_graph_effect_reference> effect_references;
@@ -378,19 +375,19 @@ class c_animation_graph_resources
 
 public:
     const c_model_animation* get_animation(c_animation_id animation_id) const;
-    size_t get_animation_count() const;
-    e_animation_graph_resources_flags get_animation_graph_resources_flags() const;
-    const s_animation_blend_screen* get_blend_screen(DWORD index) const;
-    size_t get_blend_screen_count() const;
-    short get_codec_pack() const;
-    const animation_graph_effect_reference* get_effect_reference(byte node_index) const;
-    size_t get_effect_reference_count() const;
-    e_inheritance_flags get_inheritance_flags() const;
-    const animation_graph_node* get_node(byte node_index) const;
-    int16 get_node_count() const;
-    const animation_graph_sound_reference* get_sound_reference(byte node_index) const;
-    size_t get_sound_reference_count() const;
-    tag_reference get_parent_graph() const;
+    size_t get_animation_count(void) const;
+    e_animation_graph_resources_flags get_animation_graph_resources_flags(void) const;
+    const s_animation_blend_screen* get_blend_screen(uint32 index) const;
+    size_t get_blend_screen_count(void) const;
+    int16 get_codec_pack(void) const;
+    const animation_graph_effect_reference* get_effect_reference(uint8 node_index) const;
+    size_t get_effect_reference_count(void) const;
+    e_inheritance_flags get_inheritance_flags(void) const;
+    const animation_graph_node* get_node(uint8 node_index) const;
+    int16 get_node_count(void) const;
+    const animation_graph_sound_reference* get_sound_reference(uint8 node_index) const;
+    size_t get_sound_reference_count(void) const;
+    tag_reference get_parent_graph(void) const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_animation_graph_resources, 52);
 
@@ -423,28 +420,24 @@ struct s_animation_damage_actions
 };
 TAG_BLOCK_SIZE_ASSERT(s_animation_damage_actions, 12);
 
-enum e_frame_event_link : byte
+enum e_frame_event_link : uint8
 {
-    frame_event_link_nokeyframe = 0,
-    frame_event_link_keyframetype_a = 1,
-    frame_event_link_keyframetype_b = 2,
-    frame_event_link_keyframetype_c = 3,
-    frame_event_link_keyframetype_d = 4,
+    _frame_event_link_nokeyframe = 0,
+    _frame_event_link_keyframetype_a = 1,
+    _frame_event_link_keyframetype_b = 2,
+    _frame_event_link_keyframetype_c = 3,
+    _frame_event_link_keyframetype_d = 4
 };
 
 struct s_animation_transition_state
 {
-    /// name of the state
-    string_id state_name;
+    string_id state_name;                   // name of the state
+    e_frame_event_link frame_event_link;    // which frame event to link to
 
-    /// which frame event to link to
-    e_frame_event_link frame_event_link;
+    int8 pad;
 
-    PAD8;
-    /// first level sub-index into state
-    byte index_a;
-    /// second level sub-index into state
-    byte index_b;
+    uint8 index_a;  // first level sub-index into state
+    uint8 index_b;  // second level sub-index into state
 };
 TAG_BLOCK_SIZE_ASSERT(s_animation_transition_state, 8);
 
@@ -470,7 +463,7 @@ TAG_BLOCK_SIZE_ASSERT(s_animation_damage_actions, 12);
 
 struct precache_list_block
 {
-    int cache_block_index;
+    int32 cache_block_index;
 };
 TAG_BLOCK_SIZE_ASSERT(precache_list_block, 4);
 
@@ -508,21 +501,22 @@ struct c_vehicle_suspension
     c_animation_id animation;
 
     string_id marker_name;
-    float mass_point_offset;
-    float full_extension_grounddepth;
-    float full_compression_grounddepth;
+    real32 mass_point_offset;
+    real32 full_extension_grounddepth;
+    real32 full_compression_grounddepth;
+
     // Explaination("Destroyed Suspension", "Only Necessary for suspensions with a destroyed state")
     string_id region_name;
-    float destroyed_mass_point_offset;
-    float destroyed_full_extension_grounddepth;
-    float destroyed_full_compression_grounddepth;
+    real32 destroyed_mass_point_offset;
+    real32 destroyed_full_extension_grounddepth;
+    real32 destroyed_full_compression_grounddepth;
 };
 TAG_BLOCK_SIZE_ASSERT(c_vehicle_suspension, 40);
 
 enum e_function_controls : int16
 {
-    function_control_frame = 0,
-    function_control_scale = 1,
+    _function_control_frame = 0,
+    _function_control_scale = 1,
 };
 
 struct s_object_overlay
@@ -544,11 +538,6 @@ class c_model_animation_graph_contents
     // Explaination("SPECIAL CASE ANIMS", "")
     tag_block<c_vehicle_suspension> vehicle_suspension;
     tag_block<s_object_overlay> object_overlays;
-
-public:
-    c_animation_mode* get_mode() const;
-    c_vehicle_suspension* get_vehicle_suspension() const;
-    s_object_overlay* object_overlay() const;
 };
 TAG_BLOCK_SIZE_ASSERT(c_model_animation_graph_contents, 24);
 
@@ -572,16 +561,16 @@ class c_model_animation_graph
     tag_block<s_additional_node_data> additional_node_data;
 
 public:
-    static const c_model_animation_graph* get(datum tag_datum_index)
+    static const c_model_animation_graph* get(datum tag_index)
     {
-        return tags::get_tag_fast<const c_model_animation_graph>(tag_datum_index);
+        return (const c_model_animation_graph*)tag_get_fast(tag_index);
     }
 
-    byte find_node(const string_id string) const;
-    byte find_node_with_flags(const e_node_model_flags flags) const;
+    int32 find_node(const string_id string) const;
+    int32 find_node_with_flags(const e_node_model_flags flags) const;
 
-    c_model_animation_graph* get_writable(const datum tag_datum_index) const;
-    const animation_graph_node* get_node(const byte node_index) const;
-    int16 get_node_count() const;
+    c_model_animation_graph* get_writable(datum tag_datum_index) const;
+    const animation_graph_node* get_node(uint8 node_index) const;
+    int16 get_node_count(void) const;
 };
 TAG_GROUP_SIZE_ASSERT(c_model_animation_graph, 172);
