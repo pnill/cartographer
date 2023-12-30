@@ -73,37 +73,37 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         else
         {
             s_player_effect_user_globals* user_effect = player_effects_get_user_globals(user_index);
-            bool bit_1_result = user_effect->flags.test(_player_effect_user_global_bit_1);
+            bool bit_1_result = user_effect->flags.test(_player_effect_apply_camera_impulse);
             if (user_effect->camera_impulse_passed_time > 0 || bit_1_result)
             {
-                real32 function_result;
+                real32 transition_result;
                 if (bit_1_result)
                 {
-                    function_result = 1.0f;
+                    transition_result = 1.0f;
                 }
                 else
                 {
-                    real32 passed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time();
-                    function_result = player_effect_transition_function_evaluate(
+                    real32 camera_impulse_remaining_time = user_effect->camera_impulse.duration - ((real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time());
+                    transition_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_impulse.fade_function, 
                         user_effect->transition_function_scale_9C, 
-                        passed_time,
+                        camera_impulse_remaining_time,
                         user_effect->camera_impulse.duration);
                 }
                 
                 real_vector3d v1;
                 cross_product3d(&global_up3d, &user_effect->vector_0, &v1);
 
-                real32 rotation = user_effect->camera_impulse.rotation * function_result;
+                real32 rotation = user_effect->camera_impulse.rotation * transition_result;
                 matrix4x3_rotation_from_axis_and_angle(&calculated_matrix, &v1, sin(rotation), cos(rotation));
 
-                real32 pushback = user_effect->camera_impulse.pushback * function_result;
+                real32 pushback = user_effect->camera_impulse.pushback * transition_result;
                 scale_vector3d(&user_effect->vector_0, pushback, &calculated_matrix.position);
-                point_from_line3d(&calculated_matrix.position, &user_effect->vector_C, function_result, &calculated_matrix.position);
+                point_from_line3d(&calculated_matrix.position, &user_effect->vector_C, transition_result, &calculated_matrix.position);
                 matrix4x3_multiply(matrix, &calculated_matrix, matrix);
             }
 
-            bool bit_2_result = user_effect->flags.test(_player_effect_user_global_bit_2);
+            bool bit_2_result = user_effect->flags.test(_player_effect_apply_camera_shake);
             if (user_effect->camera_shake_passed_time > 0 || bit_2_result)
             {
                 calculated_matrix = global_identity4x3;
@@ -126,10 +126,10 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                     );
                 }
 
-                real32 seconds_result = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_impulse_passed_time);
-                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, seconds_result / user_effect->camera_shaking.wobble_function_period);
+                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_shake_passed_time);
+                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
                 real32 periodic_function_result_scaled =
-                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight);
+                    periodic_function_result * (transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight));
 
                 // Set v1 to 0 if v1_value is less than 0
                 real32 v1_value = user_effect->camera_shaking.random_translation * periodic_function_result_scaled;
