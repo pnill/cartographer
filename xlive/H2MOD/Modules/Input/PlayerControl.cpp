@@ -36,18 +36,11 @@ player_action PlayerControl::GetPlayerActions(int player_index)
 	return newActions;
 }
 
-s_player_control* PlayerControl::GetControls(int local_player_index)
-{
-	//What the hell is even this
-	//auto player_controls_globals = (s_player_control_globals*)(*(DWORD*)(0x4ca37c));
-	auto player_controls_globals = *Memory::GetAddress<s_player_control_globals**>(0x4ca37c);
-	return &player_controls_globals->local_players[local_player_index];
-}
-
 s_player_motion* PlayerControl::GetPlayerMotion(int player_index)
 {
 	return Memory::GetAddress<s_player_motion*>(0x514EE8 + player_index * sizeof(s_player_motion));
 }
+
 void PlayerControl::DisableLocalCamera(bool state)
 {
 	auto player_controls_globals = *Memory::GetAddress<s_player_control_globals**>(0x4ca37c);

@@ -23,9 +23,14 @@ real32 __cdecl player_control_get_autocenter_delta()
 	return g_player_control_dt;
 }
 
-s_player_control_globals* s_player_control_globals::get()
+s_player_control_globals* player_control_globals_get(void)
 {
 	return *Memory::GetAddress<s_player_control_globals**>(0x4CA37C, 0x4CF0E8);
+}
+
+s_player_control* player_control_get(int32 user_index)
+{
+	return &player_control_globals_get()->local_players[user_index];
 }
 
 real32 local_player_held_zoom_delta_time[4]

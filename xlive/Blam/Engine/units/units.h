@@ -95,7 +95,7 @@ struct unit_datum
 	int8 gap_1C9[3];
 	real32 trigger;
 	real32 secondary_trigger;
-	s_aim_assist_targetting_data target_info;
+	s_aim_assist_targeting_result target_info;
 	int32 field_1F8;
 	int32 field_1FC;
 	int32 flags_200;

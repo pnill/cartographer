@@ -178,7 +178,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         {
             for (int32 i = 0; i < weapon_data->node_orientations_count; i++)
             {
-                memcpy(fp_orientations->weapon_orientations, &global_identity_orientation, sizeof(real_orientation));
+                memcpy(&fp_orientations->weapon_orientations[i], &global_identity_orientation, sizeof(real_orientation));
             }
         }
 

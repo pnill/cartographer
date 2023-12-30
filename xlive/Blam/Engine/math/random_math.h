@@ -1,6 +1,5 @@
 #pragma once
 #include "real_math.h"
-#include "random_direction_table.h"
 
 struct s_random_math
 {

@@ -119,7 +119,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
             s_player_properties temp_properties;
             if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties_out(i, 0, &temp_properties, 0, 0))
             {
-                memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, 16);
+                memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, sizeof(temp_properties.player_name));
                 local_identifiers[valid_local_player_count].unk1 = temp_identifier.unk1;
                 local_identifiers[valid_local_player_count].unk2 = temp_identifier.unk2;
                 valid_local_player_count++;
@@ -230,8 +230,8 @@ void game_info_initialize_for_new_map(s_game_options* options)
     random_math_set_seed(game_globals->options.random_seed);
     game_globals->game_is_lost = false;
     game_globals->game_is_finished = false;
-    game_globals->pvs_object_is_set = false;
-    game_globals->game_ragdoll_count = false;
+    game_globals->pvs_object_is_set = 0;
+    game_globals->game_ragdoll_count = 0;
     return;
 }
 
