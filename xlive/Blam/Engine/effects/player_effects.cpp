@@ -74,7 +74,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         {
             s_player_effect_user_globals* user_effect = player_effects_get_user_globals(user_index);
             bool bit_1_result = user_effect->flags.test(_player_effect_apply_camera_impulse);
-            if (user_effect->camera_impulse_passed_time > 0 || bit_1_result)
+            if (user_effect->camera_impulse_countdown > 0 || bit_1_result)
             {
                 real32 transition_result;
                 if (bit_1_result)
@@ -83,11 +83,14 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 camera_impulse_remaining_time = user_effect->camera_impulse.duration - ((real32)user_effect->camera_impulse_passed_time - halo_interpolator_get_interpolation_time());
+                    real32 impulse_passed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown;
+                    // do not stale the transition function
+                    impulse_passed_time += halo_interpolator_get_interpolation_time();
+
                     transition_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_impulse.fade_function, 
                         user_effect->transition_function_scale_9C, 
-                        camera_impulse_remaining_time,
+                        impulse_passed_time,
                         user_effect->camera_impulse.duration);
                 }
                 
