@@ -960,7 +960,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	marker_object->node_index = 0;
 	matrix4x3_identity(&marker_object->matrix0);
 		
-	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1)
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
 	{
 		marker_object->matrix1 = *object_get_node_matrix(object_index, 0);
 	}
