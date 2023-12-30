@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "random_math.h"
 
+#include "random_direction_table.h"
+
 // More info:
+// https://en.wikipedia.org/wiki/Linear_congruential_generator
 // https://www.cec.uchile.cl/cinetica/pcordero/MC_libros/NumericalRecipesinC.pdf
 // Page 284 to 285
 
@@ -78,7 +81,7 @@ int16 _random_integer(uint32* seed)
 
 real_vector3d* _random_direction3d(uint32* seed, const char* type, char* file, int32 line, real_vector3d* direction)
 {
-	int32 index = _random_range(seed, 0, 1026);
+	int32 index = _random_range(seed, 0, k_random_direction_table_size);
 	*direction = g_random_direction_table[index];
 	return direction;
 }

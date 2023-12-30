@@ -1,7 +1,23 @@
 #pragma once
-
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/math/real_math.h"
+
+class c_player_input
+{
+public:
+	real_vector2d throttle;
+	real32 trigger;
+	real32 secondary_trigger;
+	real32 field_10;
+	real32 field_14;
+	uint32 field_18;
+	uint32 flags_1C;
+	uint32 flags_20;
+	uint32 flags_24;
+	real_euler_angles2d desired_angles;
+	s_aim_assist_targeting_result targeting;
+	int8 field_50[4];
+};
 
 struct s_player_action_weapons
 {
@@ -25,7 +41,7 @@ struct player_action
 	int32 interaction_type;
 	int32 interaction_object;
 	int32 melee_target_unit;
-	s_aim_assist_targetting_data aim_assist_data;
+	s_aim_assist_targeting_result aim_assist_data;
 	int32 unk;
 };
 CHECK_STRUCT_SIZE(player_action, 0x60);
@@ -62,11 +78,12 @@ struct s_player_control_globals
 	bool disable_camera;
 	int8 pad[7];
 	s_player_control local_players[4];
-
-	static s_player_control_globals* get();
 };
-CHECK_STRUCT_SIZE(s_player_control_globals, 0x2D8);
+CHECK_STRUCT_SIZE(s_player_control_globals, 728);
 
+
+s_player_control_globals* player_control_globals_get(void);
+s_player_control* player_control_get(int32 user_index);
 
 void player_control_update_dt(real32 dt);
 void player_control_apply_patches();

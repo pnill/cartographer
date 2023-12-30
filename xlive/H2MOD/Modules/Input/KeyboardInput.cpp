@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "KeyboardInput.h"
+
+#include "Blam/Engine/input/input_abstraction.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -25,7 +27,7 @@ unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
 	last_user_index = a1;
 	unsigned char* result = ControllerInput::get_controller_input(a1);
 	//Modifies the result for A button pressed if space is.
-	unsigned char keyboard_space_key_state = KeyboardInput::GetGameKbState(VK_SPACE);
+	unsigned char keyboard_space_key_state = input_abstraction_get_key_state(VK_SPACE);
 	if (keyboard_space_key_state > 0)
 	{
 		result[16] = keyboard_space_key_state;
@@ -37,12 +39,6 @@ void __cdecl sub_B524F7(int a1)
 {
 	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
 	result[16] = 0;
-}
-
-unsigned char KeyboardInput::GetGameKbState(__int16 keycode)
-{
-	auto input_abstraction_get_key_state_byte = Memory::GetAddress<unsigned char(__cdecl*)(__int16 key_code)>(0x2EF86);
-	return input_abstraction_get_key_state_byte(keycode);
 }
 
 void KeyboardInput::ToggleKeyboardInput()
