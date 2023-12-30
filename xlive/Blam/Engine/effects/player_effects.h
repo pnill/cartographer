@@ -7,8 +7,8 @@
 enum e_player_effect_user_global_flags : uint8
 {
 	_player_effect_user_global_bit_0 = 0,
-	_player_effect_user_global_bit_1 = 1,
-	_player_effect_user_global_bit_2 = 2,
+	_player_effect_apply_camera_impulse = 1,
+	_player_effect_apply_camera_shake = 2,
 	k_player_effect_user_global_flag_count
 };
 
