@@ -19,15 +19,11 @@ s_player_effect_user_globals* player_effects_get_user_globals(int32 user_index)
     return &player_effect_globals_get()->user_effects[user_index];
 }
 
-/*
-void __cdecl player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix)
-{
-	INVOKE(0xA432D, 0x963AA, player_effect_apply_camera_effect_matrix, user_index, matrix);
-	return;
-}*/
-
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix)
 {
+    // INVOKE(0xA432D, 0x963AA, player_effect_apply_camera_effect_matrix, user_index, matrix);
+    // return;
+	
     real_matrix4x3 calculated_matrix;
     if (user_index != NONE)
     {
@@ -83,14 +79,14 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 impulse_passed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown;
+                    real32 impulse_elapsed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown;
                     // do not stale the transition function
-                    impulse_passed_time += halo_interpolator_get_interpolation_time();
+                    impulse_elapsed_time += halo_interpolator_get_interpolation_time();
 
                     transition_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_impulse.fade_function, 
-                        user_effect->transition_function_scale_9C, 
-                        impulse_passed_time,
+                        user_effect->camera_impulse_transition_scale,
+                        impulse_elapsed_time,
                         user_effect->camera_impulse.duration);
                 }
                 
@@ -107,7 +103,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
             }
 
             bool bit_2_result = user_effect->flags.test(_player_effect_apply_camera_shake);
-            if (user_effect->camera_shake_passed_time > 0 || bit_2_result)
+            if (user_effect->camera_shake_countdown > 0 || bit_2_result)
             {
                 calculated_matrix = global_identity4x3;
 
@@ -118,18 +114,18 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 passed_time = user_effect->camera_shaking.duration
-                        - game_ticks_to_seconds((real32)user_effect->camera_shake_passed_time - halo_interpolator_get_interpolation_time());
+                    real32 shake_elapsed_time = user_effect->camera_shaking.duration
+                        - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown - halo_interpolator_get_interpolation_time());
 
                     transition_function_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_shaking.falloff_function,
-                        user_effect->transition_function_scale_98, 
-                        passed_time,
+                        user_effect->camera_shake_transition_scale,
+                        shake_elapsed_time,
                         user_effect->camera_shaking.duration
                     );
                 }
 
-                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_shake_passed_time);
+                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_shake_countdown);
                 real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
                 real32 periodic_function_result_scaled =
                     periodic_function_result * (transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight));

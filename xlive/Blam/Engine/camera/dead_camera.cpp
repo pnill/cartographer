@@ -31,7 +31,7 @@ __declspec(naked) void object_try_get_node_position_interpolated_intermediate()
 		mov esi, [esp + 4 + current_stack_offset + 0Ch]
 		retn
 	}
-#undef current_stack_offset (0Ch)
+#undef current_stack_offset
 }
 
 void apply_dead_camera_patches()

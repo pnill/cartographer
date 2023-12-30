@@ -4,7 +4,7 @@
 
 struct s_player_prediction
 {
-	DWORD predicted_entity_index;
+	int predicted_entity_index;
 	real_vector3d point_quantized;
 	real_vector3d prediction_axis;
 	real_vector3d prediction_axis2;

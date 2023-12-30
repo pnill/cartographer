@@ -149,7 +149,7 @@ real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_vector
 void apply_particle_update_patches()
 {
 	//p_particle_system_update_particle_position_and_velocity = Memory::GetAddress<particle_system_update_particle_position_and_velocity_t>(0xC4125);
-	PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
-	PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
+	//PatchCall(Memory::GetAddress(0x10459E), particle_system_update_particle_position_and_velocity);
+	//PatchCall(Memory::GetAddress(0x508AA), particle_system_update_particle_position_and_velocity);
 	PatchCall(Memory::GetAddress(0x105380), particle_update_points_interpolate_hook);
 }

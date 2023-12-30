@@ -57,7 +57,6 @@ struct s_particle_frame_data_storage
 	s_particle_interpolation_data_storage target_data;
 };
 
-extern real32 g_particle_delta_temp;
 extern real32 g_particle_interpolator_delta;
 extern real32 g_particle_interpolator_delta_remainder;
 extern s_particle_frame_data_storage* g_particle_frame_storage;
