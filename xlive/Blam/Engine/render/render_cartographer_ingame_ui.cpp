@@ -34,7 +34,7 @@ void render_cartographer_status_text()
 	wchar_t master_state_string_buffer[256];
 	utf8_string_to_wchar_string(GetMasterStateStr(), master_state_string_buffer, NUMBEROF(master_state_string_buffer));
 
-	real_argb_color text_color_console = **Memory::GetAddress<real_argb_color**>(0x41277C);
+	real_argb_color text_color_console = *global_real_argb_white;
 	if (game_is_main_menu)
 	{
 		text_color_console.alpha = .5f;
@@ -43,7 +43,7 @@ void render_cartographer_status_text()
 	int32 line_height = get_text_size_from_font_cache(k_status_text_font);
 	if (game_is_main_menu || (!game_is_main_menu && paused_or_in_menus)) {
 		draw_string_reset();
-		draw_string_set_font_and_options(k_status_text_font, 0, 0, 0, &text_color_console, *Memory::GetAddress<real_argb_color**>(0x412780), false);
+		draw_string_set_font_and_options(k_status_text_font, 0, 0, 0, &text_color_console, global_real_argb_black, false);
 
 		if (H2Config_anti_cheat_enabled)
 		{
@@ -95,7 +95,7 @@ void render_cartographer_achievements()
 			rectangle2d bounds;
 			wchar_t cheevo_message[256];
 			int32 widget_total_height = get_text_size_from_font_cache(k_cheevo_title_font) + (get_text_size_from_font_cache(k_cheevo_message_font) * 2);
-			real_argb_color text_color = **Memory::GetAddress<real_argb_color**>(0x41277C);
+			real_argb_color text_color = *global_real_argb_white;
 			text_color.alpha = (float)(x_cheevo_timer - time_now) / k_cheevo_display_lifetime;
 
 			// there should be a better way of doing this instead of every frame!
@@ -155,7 +155,7 @@ void render_cartographer_update()
 		}
 
 		draw_string_reset();
-		draw_string_set_font_and_options(k_update_status_font, 0, 0, 0, *Memory::GetAddress<real_argb_color**>(0x41277C), *Memory::GetAddress<real_argb_color**>(0x412780), false);
+		draw_string_set_font_and_options(k_update_status_font, 0, 0, 0, global_real_argb_white, global_real_argb_black, false);
 	
 		rasterizer_get_frame_bounds(&bounds);
 		bounds.top += rectangle2d_height(&bounds) * .1f;
