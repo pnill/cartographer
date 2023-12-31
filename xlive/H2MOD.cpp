@@ -26,6 +26,7 @@
 #include "Blam/Engine/items/weapon_definitions.h"
 #include "Blam/Engine/main/loading.h"
 #include "Blam/Engine/main/main_game.h"
+#include "Blam/Engine/main/main_render.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
 #include "Blam/Engine/units/bipeds.h"
@@ -943,6 +944,7 @@ void H2MOD::ApplyHooks() {
 		camera_apply_patches();
 		player_control_apply_patches();
 		rasterizer_fog_apply_patches();
+		main_render_apply_patches();
 		effects_apply_patches();
 	}
 	else {
