@@ -152,7 +152,6 @@ namespace ControllerInput
 		float LeftStickY; // xmm0_4
 		float RightStickX; // xmm0_4
 		float RightStickY; // xmm0_4
-		signed __int64 result; // rax
 
 		RightStickThrottle[0] = 0;
 		RightStickThrottle[1] = 0;

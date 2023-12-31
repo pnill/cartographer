@@ -34,6 +34,7 @@ struct s_player_effect_camera_shaking
 {
 	real32 duration;
 	int8 falloff_function;	// e_transition_function_type
+	int8 pad;
 	real32 random_translation;
 	real_angle random_rotation;
 	e_periodic_function_type wobble_function;
