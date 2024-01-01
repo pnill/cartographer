@@ -63,14 +63,14 @@ struct s_player_effect_user_globals
 	int16 field_7C;
 	int16 game_time;
 	int16 camera_impulse_countdown;
-	int16 camera_shake_passed_time;
+	int16 camera_shake_countdown;
 	int8 field_84[4];
 	c_flags<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
 	int8 field_89;
 	int16 pad_8A;
 	real_point3d origin;
-	real32 transition_function_scale_98;
-	real32 transition_function_scale_9C;
+	real32 camera_shake_transition_scale;
+	real32 camera_impulse_transition_scale;
 };
 CHECK_STRUCT_SIZE(s_player_effect_user_globals, 160);
 

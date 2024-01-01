@@ -43,10 +43,8 @@ struct collision_result
 	int32 type;
 	real32 t;
 	real_point3d point;
-	s_location location_0;
-	s_location location_1;
+	s_location locations[2];
 	int16 global_material_index;
-	int16 pad;
 	real_plane3d fog_plane;
 	int32 field_38;
 	int32 instanced_geometry_instance_index;
@@ -57,8 +55,10 @@ struct collision_result
 	int32 field_4C;
 	int32 field_50;
 	int32 flags;
-	int32 field_58;
+	int16 field_58;
+	int16 field_5A;
 };
+CHECK_STRUCT_SIZE(collision_result, 0x5C);
 
 uint16 collision_compute_object_cull_flags(datum object_index);
 

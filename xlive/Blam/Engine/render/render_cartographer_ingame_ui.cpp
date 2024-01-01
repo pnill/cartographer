@@ -107,7 +107,7 @@ void render_cartographer_achievements()
 			}
 
 			draw_string_reset();
-			draw_string_set_font_and_options(k_cheevo_title_font, 0, 2, 0, &text_color, *Memory::GetAddress<real_argb_color**>(0x412780), false);
+			draw_string_set_font_and_options(k_cheevo_title_font, 0, 2, 0, &text_color, global_real_argb_black, false);
 
 			rasterizer_get_screen_bounds(&bounds);
 			bounds.top += rectangle2d_height(&bounds) / 3 - (widget_total_height / 2);
