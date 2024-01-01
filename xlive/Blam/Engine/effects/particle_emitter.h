@@ -12,7 +12,6 @@ struct c_particle_emitter
 	real_matrix3x3 matrix;
 	real_point3d position;
 	real_point3d previous_position;
-	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_point) const;
 };
 CHECK_STRUCT_SIZE(c_particle_emitter, 0x4C);
 
