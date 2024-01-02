@@ -15,6 +15,7 @@
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/player_control.h"
+#include "Blam/Engine/input/input_xinput.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"
@@ -946,6 +947,7 @@ void H2MOD::ApplyHooks() {
 		rasterizer_fog_apply_patches();
 		main_render_apply_patches();
 		effects_apply_patches();
+		xinput_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

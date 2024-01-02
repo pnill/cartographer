@@ -53,6 +53,7 @@ void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d*
 	return;
 }
 
+// Replace calls to use interpolated functions
 void unit_get_camera_position_patch_mass_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x90C98, 0x48F98), object_get_center_of_mass_interpolated);
@@ -60,6 +61,7 @@ void unit_get_camera_position_patch_mass_functions(void)
 	return;
 }
 
+// Replace calls to use interpolated functions
 void unit_get_camera_position_patch_marker_functions(void)
 {
 	PatchCall(Memory::GetAddress(0x13D3CF, 0x12C21E), object_get_markers_by_string_id);
@@ -67,6 +69,14 @@ void unit_get_camera_position_patch_marker_functions(void)
 	return;
 }
 
+// Replace calls to use interpolated functions
+void unit_get_head_position_patch_functions(void)
+{
+	PatchCall(Memory::GetAddress(0x6C759), unit_get_head_position_interpolated);
+	PatchCall(Memory::GetAddress(0x6EAB6), unit_get_head_position_interpolated);
+	PatchCall(Memory::GetAddress(0x220E50), unit_get_head_position_interpolated);
+	return;
+}
 
 void unit_apply_patches(void)
 {
@@ -74,8 +84,7 @@ void unit_apply_patches(void)
 	{
 		unit_get_camera_position_patch_mass_functions();
 		unit_get_camera_position_patch_marker_functions();
-	
-		PatchCall(Memory::GetAddress(0x6C759), unit_get_head_position_interpolated);
+		unit_get_head_position_patch_functions();
 	}
 	return;
 }
