@@ -89,7 +89,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -161,7 +161,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -373,6 +373,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
@@ -522,6 +523,7 @@
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
+    <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
@@ -547,12 +549,16 @@
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_events.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_events_queue.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
@@ -893,15 +899,17 @@
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_engine_player.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_vehicles.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_weapons.h" />
-    <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
+    <ClInclude Include="Blam\Engine\Simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_events.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_event_handler.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_events_queue.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_type_collection.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
-    <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_view.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_world.h" />
+    <ClInclude Include="Blam\Engine\Simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Engine\structures\structures.h" />

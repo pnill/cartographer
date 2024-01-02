@@ -1,12 +1,14 @@
 #pragma once
 #include "Blam/Engine/math/real_math.h"
 
+#define k_bitstream_default_alignment 1
+
 #pragma pack(push, 1)
 struct bitstream
 {
 	//Credits : https://github.com/HaloMods/OpenSauce/blob/master/OpenSauce/Halo2/Halo2_Xbox/Networking/Networking.hpp
 
-	enum class e_bitstream_state : DWORD
+	enum class e_bitstream_state : uint32
 	{
 		bitstream_state_none,
 		bitstream_state_writing,
@@ -16,25 +18,49 @@ struct bitstream
 		bitstream_state_5,				// haven't spent time to figure this one out
 	};
 
-	void *m_data;
-	DWORD m_data_size_bytes;
-	DWORD m_data_size_alignment;
-	e_bitstream_state state;
-	int m_current_bit_position;
-	bool is_debug_stream;
+	uint8* m_data;
+	int32 m_data_size_bytes;
+	int32 m_data_size_alignment;
+	e_bitstream_state m_state;
+	int32 m_current_bit_position;
+	bool m_debug_stream;
 	BYTE gap_14[3];
 	int m_position_stack_depth;
-	DWORD stack[4];
+	int32 m_stack[4];
 	int field_2C;
 	int field_30;
 
-	void init(void* buffer, DWORD data_length);
-	void init(void* buffer, DWORD data_length, DWORD data_size_alignment);
-	void begin_writing(DWORD data_size_alignment);
-	void finish_writing(void*out_space_left_in_bits);
-	bool overflow();
-	DWORD get_space_left_in_bits();
-	DWORD get_bytes_used();
+	bitstream(uint8* data, int32 data_size)
+	{
+		initialize(data, data_size);
+	}
+
+	~bitstream()
+	{
+	}
+
+	void initialize(uint8* data, int32 data_size);
+	void reset();
+	void begin_writing(int32 data_size_alignment);
+	void finish_writing(int32* out_space_left_in_bits);
+
+	bool overflow() const
+	{
+		bool result = m_current_bit_position > m_data_size_bytes * 8;
+		if (m_debug_stream)
+			return true;
+		return result;
+	}
+
+	int32 get_space_left_in_bits() const
+	{
+		return 8 * m_data_size_bytes - m_current_bit_position;
+	}
+
+	int32 get_space_used_in_bytes() const
+	{
+		return (m_current_bit_position + 7) / 8;
+	}
 
 	void data_encode_string_wide(const char* name, void* string, int size_in_words);
 	void data_decode_string_wide(const char* name, void* string_buffer, int size_in_words);

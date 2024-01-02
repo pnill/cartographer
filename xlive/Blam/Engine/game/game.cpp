@@ -58,6 +58,17 @@ bool game_is_ui_shell(void)
 	return game_options_get()->game_mode == _game_mode_ui_shell;
 }
 
+bool game_is_distributed(void)
+{
+    return game_options_get()->simulation_type == _game_simulation_distributed_client 
+        || game_options_get()->simulation_type == _game_simulation_distributed_server;
+}
+
+bool game_is_playback(void)
+{
+    return false;
+}
+
 void __cdecl game_shell_set_in_progress()
 {
 	INVOKE(0x242E5B, 0x22054B, game_shell_set_in_progress);

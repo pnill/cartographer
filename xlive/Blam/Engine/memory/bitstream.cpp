@@ -2,35 +2,34 @@
 
 #include "bitstream.h"
 
-void bitstream::init(void* buffer, DWORD data_length)
+void bitstream::initialize(uint8* data, int32 data_size)
 {
-	this->m_data = buffer;	
-	this->m_data_size_bytes = data_length;
-	this->state = e_bitstream_state::bitstream_state_none;
+	m_data = data;
+	m_data_size_bytes = data_size;
+	m_state = e_bitstream_state::bitstream_state_none;
 
-	this->m_current_bit_position = 0;
-	this->m_position_stack_depth = 0;
-	this->is_debug_stream = 0;
+	m_current_bit_position = 0;
+	m_position_stack_depth = 0;
+	m_debug_stream = false;
 }
 
-void bitstream::init(void* buffer, DWORD data_length, DWORD data_size_alignment)
-{
-	this->m_data_size_alignment = data_size_alignment;
-	init(buffer, data_length);
-}
-
-void bitstream::begin_writing(DWORD data_size_alignment)
+void bitstream::begin_writing(int32 alignment)
 {	
-	typedef void(__thiscall* begin_writing_t)(bitstream*, DWORD, int, int);
+	typedef void(__thiscall* begin_writing_t)(bitstream*, uint32, int, int);
 	auto p_begin_writing = Memory::GetAddress<begin_writing_t>(0xD24F5, 0xCEAAF);
-	p_begin_writing(this, data_size_alignment, 0, 0);	//last 2 arguments are leftover debug stuffs
+	p_begin_writing(this, alignment, 0, 0);	// last 2 arguments are debug
 }
 
-void bitstream::finish_writing(void* out_space_left_in_bits)
+void bitstream::finish_writing(int32* out_space_left_in_bits)
 {
 	typedef void(__thiscall* finish_writing_t)(bitstream*, void*);
 	auto p_finish_writing = Memory::GetAddress<finish_writing_t>(0xD1205, 0xCD7BF);
 	p_finish_writing(this, out_space_left_in_bits);
+}
+
+void bitstream::reset()
+{
+	// ### TODO OFFSET
 }
 
 void bitstream::data_encode_string_wide(const char* name, void* string, int size_in_words)
@@ -178,21 +177,4 @@ unsigned long long bitstream::data_decode_flags(const char* name, int size_in_bi
 	typedef unsigned long long(__thiscall* data_decode_flags_t)(bitstream*, const char*, int);
 	auto p_data_decode_flags = Memory::GetAddress<data_decode_flags_t>(0xD1E9A, 0xCE454);
 	return p_data_decode_flags(this, name, size_in_bits);
-}
-
-bool bitstream::overflow()
-{
-	typedef bool(__thiscall* overflow_t)(bitstream*);
-	auto p_overflow = Memory::GetAddress<overflow_t>(0xD114C, 0xCD706);
-	return p_overflow(this);
-}
-
-DWORD bitstream::get_space_left_in_bits()
-{
-	return 8 * this->m_data_size_bytes - this->m_current_bit_position;
-}
-
-DWORD bitstream::get_bytes_used()
-{
-	return (this->m_current_bit_position + 7) / 8;
 }

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Blam/Engine/memory/bitstream.h"
 
 enum e_simulation_event_type
@@ -29,7 +30,26 @@ enum e_simulation_event_type
 	_simulation_event_type_unit_melee_damage_event = 0x17,
 	_simulation_event_type_unit_enter_vehicle_event = 0x18,
 	_simulation_event_type_request_boot_player_event = 0x19,
-	k_simulation_event_count = 0x1A,
+
+	k_simulation_event_count,
+};
+
+class c_simulation_event_definition;
+
+struct c_simulation_event_definition_vtbl
+{
+	e_simulation_event_type (__thiscall* event_type)(c_simulation_event_definition* thisx);
+	const char* (__thiscall* event_type_name)(c_simulation_event_definition* thisx);
+	int32 (__thiscall* payload_size)(c_simulation_event_definition* thisx);
+	int32(__thiscall* number_of_entity_references)(c_simulation_event_definition* thisx);
+	bool(__thiscall* reference_delays_entity_deletion)(c_simulation_event_definition* thisx);
+	bool(__thiscall* event_can_be_transmitted)(c_simulation_event_definition* thisx, int a1, int a2);
+	int32(__thiscall* minimum_required_bits)(c_simulation_event_definition* thisx, int a1, int a2, uint32* a3);
+	void(__thiscall* calculate_relevance)(c_simulation_event_definition* thisx, int a2, int a3, float a4);
+	int(__thiscall* write_description_to_string)(c_simulation_event_definition* thisx, int a2, int a3, uint32 a4, int a5, char* a6);
+	bool(__thiscall* encode)(c_simulation_event_definition* thisx, uint32 payload_size, void* payload, bitstream* packet);
+	bool(__thiscall* decode)(c_simulation_event_definition* thisx, uint32 payload_size, void* payload, bitstream* packet);
+	bool(__thiscall* perform)(c_simulation_event_definition* thisx, uint32 entity_reference_count, void* entity_refernces, uint32 payload_size, uint8* data);
 };
 
 class c_simulation_event_definition
@@ -40,11 +60,16 @@ public:
 	virtual signed int payload_size();
 	virtual signed int number_of_entity_references();
 	virtual bool reference_delays_entity_deletion();
-	virtual char sub_A894C7(int a1, int a2);
-	virtual DWORD minimum_required_bits(int a1, int a2, DWORD* a3);
-	virtual void get_relevance(int a2, int a3, float a4);
-	virtual int get_relevance_string(int a2, int a3, DWORD a4, int a5, char* a6);
-	virtual bool encode(DWORD payload_size, void* data, bitstream* packet);
-	virtual bool decode(DWORD payload_size, void* data, bitstream* packet);
-	virtual bool perform(DWORD entity_reference_count, void* entity_refernces, DWORD payload_size, void* data);
+	virtual bool event_can_be_transmitted(int a1, int a2);
+	virtual int32 minimum_required_bits(int a1, int a2, uint32* a3);
+	virtual void calculate_relevance(int a2, int a3, float a4);
+	virtual int write_description_to_string(int a2, int a3, uint32 a4, int a5, char* a6);
+	virtual bool encode(uint32 payload_size, void* data, bitstream* packet);
+	virtual bool decode(uint32 payload_size, void* data, bitstream* packet);
+	virtual bool perform(uint32 entity_reference_count, void* entity_refernces, uint32 payload_size, uint8* data);
+
+	static c_simulation_event_definition_vtbl* get_vtbl()
+	{
+		return Memory::GetAddress<c_simulation_event_definition_vtbl*>(0x0, 0x0);
+	}
 };

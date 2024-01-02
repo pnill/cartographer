@@ -1,6 +1,6 @@
 #pragma once
-#include "MachineID.h"
-#include "Blam/Engine/Players/PlayerActions.h"
+#include "machine_id.h"
+#include "Blam/Engine/game/player_control.h"
 
 enum e_simulation_player_type   //TODO: determine actual names for this enum field
 {
@@ -18,7 +18,7 @@ struct s_simulation_player
 	int player_index;
 	datum player_datum_index;
 	e_simulation_player_type m_player_type;
-	XNKID player_identifier;
+	uint64 player_identifier;
 	s_machine_identifier player_machine_identifier;
 	PAD(2);
 	void* simulation_world_ptr;

@@ -1,16 +1,17 @@
 #pragma once
-#include "Blam/Cache/DataTypes/StringID.h"
+
+#include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/math/real_math.h"
 
 struct s_unit_control_data
 {
 	string_id animation_state;
-	unsigned __int16 aiming_speed;
-	unsigned __int16 weapon_set_identifier;
-	unsigned __int8 field_8;
-	unsigned __int8 field_9;
-	WORD grenade_index;
+	uint16 aiming_speed;
+	uint16 weapon_set_identifier;
+	uint8 field_8;
+	uint8 field_9;
+	uint16 grenade_index;
 	unsigned __int16 zoom_level;
 	char gap_E[2];
 	DWORD control_flag0;
