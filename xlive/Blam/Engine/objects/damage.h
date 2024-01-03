@@ -11,7 +11,6 @@ struct s_damage_owner
 };
 CHECK_STRUCT_SIZE(s_damage_owner, 12);
 
-#pragma pack(push, 1)
 struct s_damage_data
 {
 	DWORD damage_tag_index;			// 0x0
@@ -40,8 +39,7 @@ struct s_damage_data
 	BYTE gap_80[4];					// 0x80
 	char field_84;					// 0x84
 };
-#pragma pack(pop)
-CHECK_STRUCT_SIZE(s_damage_data, 0x85);
+CHECK_STRUCT_SIZE(s_damage_data, 0x88);
 
 // max_count: LONG_MAX
 struct s_armor_modifier_definition
