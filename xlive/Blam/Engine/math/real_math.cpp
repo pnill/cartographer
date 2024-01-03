@@ -106,7 +106,7 @@ real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fra
 
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out)
 {
-	return (0x344c9, 0x27B46, perpendicular3d, in, out);
+	return INVOKE(0x344c9, 0x27B46, perpendicular3d, in, out);
 }
 
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up)
