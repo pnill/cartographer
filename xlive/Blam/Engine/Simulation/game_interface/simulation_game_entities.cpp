@@ -17,7 +17,8 @@ bool simulation_object_index_valid(datum object_index)
 
 void simulation_entity_indices_to_object_index(int32* entity_references, int32 entity_reference_count, datum* out_object_index, int32 out_object_index_count)
 {
-	for (int32 i = 0; i < entity_reference_count && i < out_object_index_count; i++)
+	int32 i;
+	for (i = 0; i < entity_reference_count && i < out_object_index_count; i++)
 	{
 		out_object_index[i] = simulation_entity_index_to_object_index(entity_references[i]);
 
@@ -25,5 +26,11 @@ void simulation_entity_indices_to_object_index(int32* entity_references, int32 e
 		{
 			// DEBUG
 		}
+	}
+
+	// set the rest to none, in case we have less entity references
+	for (; i < out_object_index_count; i++)
+	{
+		out_object_index[i] = DATUM_INDEX_NONE;
 	}
 }

@@ -32,7 +32,7 @@ struct c_simulation_event_handler_vtbl
     static c_simulation_event_handler_vtbl* get()
     {
         // ### OFFSET
-        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x0);
+        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268);
     }
 };
 CHECK_STRUCT_SIZE(c_simulation_event_handler_vtbl, 6 * sizeof(void*));
@@ -42,12 +42,14 @@ class c_simulation_event_handler
     c_simulation_event_handler_vtbl* get_vtbl()
     {
         // ### TODO OFFSET
-        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x0);
+        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268);
     };
 
     c_simulation_event_handler_vtbl* vtbl;
-    uint8 gap_4[4];
+    uint8 gap_4[12];
     c_simulation_type_collection* m_event_type_collection;
 
     void process_incoming_event(e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, s_payload_block* block);
 };
+
+void simulation_event_handler_apply_patches();

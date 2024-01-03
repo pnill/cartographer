@@ -67,9 +67,4 @@ public:
 	virtual bool encode(int32 payload_size, void* data, bitstream* packet);
 	virtual bool decode(int32 payload_size, void* data, bitstream* packet);
 	virtual bool perform(int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);
-
-	static c_simulation_event_definition_vtbl* get_vtbl()
-	{
-		return Memory::GetAddress<c_simulation_event_definition_vtbl*>(0x0, 0x0);
-	}
 };

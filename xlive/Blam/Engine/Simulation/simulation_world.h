@@ -28,10 +28,18 @@ enum e_simulation_world_state
 class c_simulation_world
 {
 public:
+	uint8 gap_0[8];
+	// ### TODO validate
+	e_simulation_world_type m_simulation_world_mode;
+
 	static void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	static void simulation_queue_enqueue(s_simulation_queue_element* element);
 
+	static void queues_initialize();
+
 	void apply_simulation_queue(c_simulation_queue* queue);
+	void apply_event_update_queue();
+	void apply_entity_update_queue();
 
 	void destroy_update();
 
@@ -45,9 +53,6 @@ public:
 		return false;
 	}
 
-	uint8 gap_0[8];
-	// ### TODO validate
-	e_simulation_world_type m_simulation_world_mode;
 
 	bool exists()
 	{

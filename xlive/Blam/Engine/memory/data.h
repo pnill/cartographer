@@ -98,7 +98,7 @@ public:
 		{
 			result = reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * index]);
 			m_current_absolute_index = index;
-			m_last_datum_index = DATUM_INDEX_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
+			m_last_datum_index = DATUM_INDEX_NEW(index, *(int16*)(result)); // absolute index w/ salt
 		}
 		return result;
 	}

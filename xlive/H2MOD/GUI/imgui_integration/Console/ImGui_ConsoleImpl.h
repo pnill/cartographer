@@ -14,7 +14,8 @@ Console* GetMainConsoleInstance();
 
 #define CONSOLE_TABS 2
 
-static const char* console_tab_name[CONSOLE_TABS] = {
+static const char* console_tab_name[CONSOLE_TABS] = 
+{
     "Console commands",
     "Logs"
 };
@@ -118,3 +119,8 @@ public:
 	static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 };
 
+#define QUICK_DBG(fmt, ...) \
+do { \
+Console::LogToTab(_console_tab_logs, \
+	"       %s " fmt, __FUNCTION__, __VA_ARGS__); \
+} while (0)

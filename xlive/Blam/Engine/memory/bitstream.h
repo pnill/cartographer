@@ -66,14 +66,14 @@ struct bitstream
 		return bit_count + m_current_bit_position > 8 * m_stream_buf_size_bytes;
 	}
 
-	bool overflow() const
+	bool overflowed() const
 	{
 		return m_current_bit_position > m_stream_buf_size_bytes * 8;
 	}
 
 	bool error_occured() const
 	{
-		bool result = overflow();
+		bool result = overflowed();
 		// debug mode in release mode should be disabled !!!
 		if (m_error_stream_debug_mode_is_enabled)
 			result = true;

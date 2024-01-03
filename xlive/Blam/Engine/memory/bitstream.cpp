@@ -19,6 +19,8 @@ void bitstream::begin_reading()
 	int32 header = data_decode_integer("bitstream-header", 32);
 	if (header == 'debg')
 	{
+		// comment this line if you want to read debug streams
+		// but probably isn't recommended
 		m_error_stream_debug_mode_is_enabled = true;
 	}
 	else

@@ -72,7 +72,7 @@ namespace OverridePackets
 		*(DWORD *)(a3 + 4) = stream->data_decode_integer("identifier", 32);
 		*(DWORD *)(a3 + 8) = stream->data_decode_integer("closure-reason", 5);
 
-		if (stream->overflow())
+		if (stream->error_occured())
 			return result;
 
 		closure_reason = *(DWORD *)(a3 + 8);

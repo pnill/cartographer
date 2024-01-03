@@ -2,6 +2,8 @@
 
 #include "Networking/memory/networking_memory.h"
 
+#include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
+
 #define k_simulation_queue_count_max 4096
 #define k_simulation_payload_size_max 1024
 #define k_simulation_queue_avg_payload_size 32
@@ -151,7 +153,22 @@ public:
 
 	int32 queued_count() const
 	{
-		return m_queued_count;
+		if (initialized())
+		{
+			return m_queued_count;
+		}
+
+		return 0;
+	}
+	
+	int32 queued_size() const
+	{
+		if (initialized())
+		{
+			return m_queued_size;
+		}
+
+		return 0;
 	}
 
 	void allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem);
@@ -171,27 +188,27 @@ inline void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_ele
 	{
 		uint32 required_data_size = sizeof(s_simulation_queue_element) + data_size;
 
-		if (allocated_count() + 1 > k_simulation_queue_count_max)
+		if (allocated_count() + 1 < k_simulation_queue_count_max)
 		{
-			if (allocated_size_in_bytes() + required_data_size > k_simulation_queue_size_max)
+			if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
 			{
 				if (data_size < k_simulation_payload_size_max)
 				{
-					if (allocated_new_encoded_size_bytes(data_size) > k_simulation_queue_max_encoded_size)
+					if (allocated_new_encoded_size_bytes(data_size) < k_simulation_queue_max_encoded_size)
 					{
 						uint8* net_heap_block = network_heap_allocate_block(required_data_size);
 						if (net_heap_block)
 						{
 							csmemset(net_heap_block, 0, required_data_size);
-							s_simulation_queue_element* queue_elem = (s_simulation_queue_element*)net_heap_block;
-							queue_elem->type = _simulation_queue_element_type_none;
-							queue_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
-							queue_elem->data_size = data_size;
-							queue_elem->next = NULL;
+							s_simulation_queue_element* allocated_elem = (s_simulation_queue_element*)net_heap_block;
+							allocated_elem->type = _simulation_queue_element_type_none;
+							allocated_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
+							allocated_elem->data_size = data_size;
+							allocated_elem->next = NULL;
 
 							m_allocated_count++;
 							m_allocated_size_in_bytes += required_data_size;
-							*out_allocated_elem = queue_elem;
+							*out_allocated_elem = allocated_elem;
 						}
 						else
 						{
@@ -208,9 +225,7 @@ inline void c_simulation_queue::deallocate(s_simulation_queue_element* element)
 {
 	if (initialized())
 	{
-		int32 actual_data_size = element->data_size + sizeof(s_simulation_queue_element);
-
-		m_allocated_size_in_bytes -= actual_data_size;
+		m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
 		m_allocated_count--;
 		network_heap_free_block((uint8*)element);
 	}
@@ -231,7 +246,7 @@ inline void c_simulation_queue::enqueue(s_simulation_queue_element* element)
 
 		m_tail = element;
 		m_queued_count++;
-		m_queued_size += element->data_size;
+		m_queued_size += get_element_size_in_bytes(element);
 	}
 }
 
@@ -240,11 +255,18 @@ inline void c_simulation_queue::dequeue(s_simulation_queue_element** out_deq_ele
 	*out_deq_elem = NULL;
 	if (initialized())
 	{
-		m_queued_count--;
-		m_queued_size -= m_head->data_size + sizeof(s_simulation_queue_element);
-		*out_deq_elem = m_head;
-		m_head = m_head->next;
-		(*out_deq_elem)->next = NULL;
+		if (m_head)
+		{
+			m_queued_count--;
+			m_queued_size -= get_element_size_in_bytes(m_head);
+			*out_deq_elem = m_head;
+			m_head = m_head->next;
+			(*out_deq_elem)->next = NULL;
+		}
+		if (m_head == NULL)
+		{
+			m_tail = NULL;
+		}
 	}
 }
 
@@ -252,7 +274,7 @@ inline void c_simulation_queue::clear()
 {
 	if (initialized())
 	{
-		while (m_head)
+		while (get_head() != NULL)
 		{
 			s_simulation_queue_element* element_to_deque = NULL;
 			dequeue(&element_to_deque);

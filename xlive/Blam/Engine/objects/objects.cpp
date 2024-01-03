@@ -733,6 +733,11 @@ void __cdecl object_delete(datum object_index)
 	return;
 }
 
+void __cdecl objects_purge_deleted_objects()
+{
+
+}
+
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
 {
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
