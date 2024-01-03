@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Simulation/simulation_events_queue.h"
+#include "Simulation/simulation_queue_events.h"
 
 enum e_simulation_world_type
 {
@@ -31,7 +31,9 @@ public:
 	static void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	static void simulation_queue_enqueue(s_simulation_queue_element* element);
 
-	void c_simulation_world::apply_simulation_queue(c_simulation_queue* queue);
+	void apply_simulation_queue(c_simulation_queue* queue);
+
+	void destroy_update();
 
 	bool is_playback()
 	{
@@ -54,5 +56,3 @@ public:
 
 private:
 };
-
-void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* references, int32 block_size, uint8* block);

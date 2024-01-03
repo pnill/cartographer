@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Simulation/simulation.h"
 #include "Networking/memory/networking_memory.h"
 
 #define k_simulation_queue_count_max 4096
@@ -13,8 +12,6 @@
 #define k_simulation_queue_header_encoded_size_in_bits (k_simulation_queue_type_encoded_size_in_bits + k_simulation_queue_payload_encoded_size_in_bits)
 
 #define k_simulation_queue_max_encoded_size 59392
-
-#define k_entity_reference_indices_count_max 2
 
 enum e_event_queue_type : int16
 {
@@ -58,6 +55,8 @@ class c_simulation_queue
 
 	s_simulation_queue_element* m_head;
 	s_simulation_queue_element* m_tail;
+
+	void dequeue(s_simulation_queue_element** out_deq_elem);
 
 public:
 	c_simulation_queue()
@@ -133,7 +132,7 @@ public:
 		return 0;
 	}
 
-	int32 get_element_size_in_bytes(s_simulation_queue_element* element) const
+	int32 get_element_size_in_bytes(const s_simulation_queue_element* element) const
 	{
 		return element->data_size + sizeof(s_simulation_queue_element);
 	}
@@ -157,13 +156,11 @@ public:
 
 	void allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem);
 	void deallocate(s_simulation_queue_element* element);
-
 	void enqueue(s_simulation_queue_element* element);
-	void dequeue(s_simulation_queue_element** out_deq_elem);
 
 	void clear();
 
-	void dispose(c_simulation_queue* to_dispose);
+	static void dispose(c_simulation_queue* to_dispose);
 };
 
 inline void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem)
@@ -188,7 +185,7 @@ inline void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_ele
 							csmemset(net_heap_block, 0, required_data_size);
 							s_simulation_queue_element* queue_elem = (s_simulation_queue_element*)net_heap_block;
 							queue_elem->type = _simulation_queue_element_type_none;
-							queue_elem->data = net_heap_block;
+							queue_elem->data = net_heap_block + sizeof(s_simulation_queue_element);
 							queue_elem->data_size = data_size;
 							queue_elem->next = NULL;
 
@@ -260,6 +257,7 @@ inline void c_simulation_queue::clear()
 			s_simulation_queue_element* element_to_deque = NULL;
 			dequeue(&element_to_deque);
 			deallocate(element_to_deque);
+			// ### TODO clear allocated but not queued too??
 		}
 	}
 }

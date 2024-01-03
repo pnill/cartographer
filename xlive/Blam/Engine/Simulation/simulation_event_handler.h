@@ -4,6 +4,8 @@
 #include "Simulation/simulation_type_collection.h"
 #include "Simulation/game_interface/simulation_game_entities.h"
 
+#define k_entity_reference_indices_count_max 2
+
 class c_simulation_event_handler;
 
 enum e_payload_block_type
