@@ -119,8 +119,11 @@ public:
 	static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 };
 
-#define QUICK_DBG(fmt, ...) \
-do { \
-Console::LogToTab(_console_tab_logs, \
-	"       %s " fmt, __FUNCTION__, __VA_ARGS__); \
-} while (0)
+
+// #define SIM_QUEUE_DBG(fmt, ...) \
+// do { \
+// Console::LogToTab(_console_tab_logs, \
+// 	"       %s " fmt, __FUNCTION__, __VA_ARGS__); \
+// } while (0)
+
+#define SIM_QUEUE_DBG()

@@ -49,12 +49,12 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		// player event, player update, gamestate clear
 		g_event_update_queue.enqueue(element);
 
-		QUICK_DBG("queue 0x%08X allocated count: %d, size: %d",
+		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_event_update_queue, 
 			g_event_update_queue.allocated_count(), 
 			g_event_update_queue.allocated_size_in_bytes());
 
-		QUICK_DBG("queue 0x%08X queued count: %d, size: %d", 
+		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
 			&g_event_update_queue, 
 			g_event_update_queue.queued_count(), 
 			g_event_update_queue.queued_size());
@@ -64,12 +64,12 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 		g_entity_update_queue.enqueue(element);
 
-		QUICK_DBG("queue 0x%08X allocated count: %d, size: %d",
+		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_entity_update_queue,
 			g_entity_update_queue.allocated_count(),
 			g_entity_update_queue.allocated_size_in_bytes());
 
-		QUICK_DBG("queue 0x%08X queued count: %d, size: %d", &g_entity_update_queue, g_entity_update_queue.queued_count(), g_entity_update_queue.queued_size());
+		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", &g_entity_update_queue, g_entity_update_queue.queued_count(), g_entity_update_queue.queued_size());
 	}
 }
 
@@ -90,7 +90,7 @@ void c_simulation_world::apply_simulation_queue(c_simulation_queue* queue)
 
 	if (shell_time_now_msec() - last_time_msec > 1000)
 	{
-		/*<QUICK_DBG(
+		/*<SIM_QUEUE_DBG(
 			"queue 0x%08X, initialized: %d queued count: %d, size: %d",
 			queue,
 			queue->initialized(),
@@ -104,7 +104,7 @@ void c_simulation_world::apply_simulation_queue(c_simulation_queue* queue)
 
 		while (element != NULL)
 		{
-			QUICK_DBG("appying element: %08X, type: %d to gamestate",
+			SIM_QUEUE_DBG("appying element: %08X, type: %d to gamestate",
 				element,
 				element->type);
 

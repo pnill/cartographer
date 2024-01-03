@@ -20,7 +20,7 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 		c_simulation_event_definition* sim_event_def = m_event_type_collection->get_event_definition(simulation_event_type);
 		int32 entity_reference_indices_count = sim_event_def->number_of_entity_references();
 
-		QUICK_DBG(
+		SIM_QUEUE_DBG(
 			"received simulation event type: %d, entity reference count: %d, block count: %d, payload size: %d", 
 			simulation_event_type,  
 			entity_reference_indices_count,
@@ -33,7 +33,7 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 			uint8* block = payload_blocks->block_data;
 			int32 block_size = payload_blocks->block_size;
 
-			QUICK_DBG(
+			SIM_QUEUE_DBG(
 				"event block: 0x%08X payload size from block: %d",
 				block,
 				block_size
@@ -41,18 +41,18 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 
 			for (int32 i = 0; i < entity_reference_indices_count; i++)
 			{
-				QUICK_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
+				SIM_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
 			}
 
 			simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, block_size, block);
 		}
 		else
 		{
-			QUICK_DBG("payload size : 0");
+			SIM_QUEUE_DBG("payload size : 0");
 
 			for (int32 i = 0; i < entity_reference_indices_count; i++)
 			{
-				QUICK_DBG("event entity reference indices: %d", entity_reference_indices[i]);
+				SIM_QUEUE_DBG("event entity reference indices: %d", entity_reference_indices[i]);
 			}
 
 			simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, 0, NULL);
