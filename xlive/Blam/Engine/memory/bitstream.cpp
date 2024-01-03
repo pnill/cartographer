@@ -2,15 +2,35 @@
 
 #include "bitstream.h"
 
-void bitstream::initialize(uint8* data, int32 data_size)
+void bitstream::set_data(uint8* stream_buf, int32 stream_buf_size)
 {
-	m_data = data;
-	m_data_size_bytes = data_size;
-	m_state = e_bitstream_state::bitstream_state_none;
+	m_stream_buf = stream_buf;
+	m_stream_buf_size_bytes = stream_buf_size;
+	reset(_bitstream_state_none);
+}
 
-	m_current_bit_position = 0;
-	m_position_stack_depth = 0;
-	m_debug_stream = false;
+void bitstream::begin_reading()
+{
+	if (!writing())
+	{
+		bitstream::reset(_bitstream_state_reading);
+	}
+
+	int32 header = data_decode_integer("bitstream-header", 32);
+	if (header == 'debg')
+	{
+		m_error_stream_debug_mode_is_enabled = true;
+	}
+	else
+	{
+		m_current_bit_position = 0;
+		m_error_stream_debug_mode_is_enabled = false;
+	}
+}
+
+void bitstream::finish_reading()
+{
+	m_state = _bitstream_state_reading_finished;
 }
 
 void bitstream::begin_writing(int32 alignment)
@@ -27,9 +47,20 @@ void bitstream::finish_writing(int32* out_space_left_in_bits)
 	p_finish_writing(this, out_space_left_in_bits);
 }
 
-void bitstream::reset()
+void bitstream::reset(e_bitstream_state state)
 {
-	// ### TODO OFFSET
+	m_state = state;
+	m_current_bit_position = 0;
+	m_position_stack_depth = 0;
+	m_error_stream_debug_mode_is_enabled = false;
+	if (writing())
+	{
+		// enable some debugging, not really required in release?
+	}
+	else if (reading())
+	{
+		// enable some debugging, not really required in release?
+	}
 }
 
 void bitstream::data_encode_string_wide(const char* name, void* string, int size_in_words)

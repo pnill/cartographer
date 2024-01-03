@@ -103,11 +103,6 @@ void c_simulation_world::destroy_update()
 	c_simulation_queue::dispose(&g_entity_update_queue);
 }
 
-void simulation_queue_event_apply_to_gamestate()
-{
-
-}
-
 void simulation_world_queue_apply_hooks()
 {
 
