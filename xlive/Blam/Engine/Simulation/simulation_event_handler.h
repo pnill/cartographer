@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Simulation/simulation_world.h"
 #include "Simulation/simulation_type_collection.h"
 #include "Simulation/game_interface/simulation_game_entities.h"
 

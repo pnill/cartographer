@@ -3,7 +3,7 @@
 
 #include "game/game.h"
 #include "simulation.h"
-#include "Simulation/simulation_event_handler.h"
+#include "Simulation/simulation_world.h"
 #include "Simulation/game_interface/simulation_game_entities.h"
 
 #include "memory/bitstream.h"
@@ -12,6 +12,12 @@ static void encode_object_index_reference(bitstream* stream, datum object_index_
 {
 	stream->data_encode_integer("gamestate-index-id", DATUM_INDEX_TO_IDENTIFIER(object_index_references), 16);
 	stream->data_encode_integer("gamestate-index-absolute", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index_references), 11);
+}
+
+static void decode_object_index_reference(bitstream* stream, datum* object_index_reference_out)
+{
+	*object_index_reference_out 
+		= DATUM_INDEX_NEW(stream->data_decode_integer("gamestate-index-id", 16), stream->data_decode_integer("gamestate-index-absolute", 11));
 }
 
 static bool encode_event_to_buffer(
@@ -47,7 +53,50 @@ static bool encode_event_to_buffer(
 	stream.finish_writing(NULL);
 	*out_written_size = stream.get_space_used_in_bytes();
 
-	return !stream.overflow();
+	return !stream.error_occured();
+}
+
+static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_events_apply* decode_out)
+{
+	bitstream stream(encoded_data, encoded_size);
+	stream.begin_reading();
+	decode_out->event_type = (e_simulation_event_type)stream.data_decode_integer("event-type", 5);
+	decode_out->reference_count = stream.data_decode_integer("reference-count", 2);
+
+	for (int32 i = 0; i < decode_out->reference_count; i++)
+	{
+		if (stream.data_decode_bool("object-index-exists"))
+		{
+			decode_object_index_reference(&stream, &decode_out->object_refereces[i]);
+		}
+		else
+		{
+			decode_out->object_refereces[i] = DATUM_INDEX_NONE;
+		}
+	}
+
+	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
+	c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(decode_out->event_type);
+
+	decode_out->data_size = sim_entity_def->get_vtbl()->payload_size(sim_entity_def);
+	if (decode_out->data_size < k_simulation_payload_size_max)
+	{
+		if (decode_out->data_size > 0)
+		{
+			if (sim_entity_def->get_vtbl()->decode(sim_entity_def, decode_out->data_size, decode_out->data, &stream))
+			{
+				// everything is fine
+			}
+			else
+			{
+				// TODO debugging macros for statements, asserts, etc
+				// debug
+			}
+		}
+	}
+
+	stream.finish_reading();
+	return !stream.error_occured();
 }
 
 void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* references, int32 block_size, uint8* block)
@@ -91,6 +140,19 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 	}
 }
 
-void simulation_event_queue_apply(const s_simulation_queue_element* update)
+bool simulation_event_queue_apply(const s_simulation_queue_element* update)
 {
+	s_simulation_queue_events_apply sim_apply_data;
+	decode_event_to_buffer(update->data_size, update->data, &sim_apply_data);
+
+	bool apply_event_result = false;
+
+	// apply the decoded event to sim
+
+	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
+	c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
+
+	// ### FIXME !!! this actually requires entity references, instead of object references
+	apply_event_result = sim_entity_def->get_vtbl()->perform(sim_entity_def, sim_apply_data.reference_count, sim_apply_data.object_refereces, sim_apply_data.data_size, sim_apply_data.data);
+	return apply_event_result;
 }
