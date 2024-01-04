@@ -274,6 +274,8 @@
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
+    <ClCompile Include="Blam\Engine\input\controllers.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_events.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_events_queue.cpp" />
@@ -791,6 +793,7 @@
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
+    <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
     <ClInclude Include="Blam\Engine\Simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_actors.h" />

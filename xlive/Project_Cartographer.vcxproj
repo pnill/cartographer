@@ -332,8 +332,10 @@
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
+    <ClCompile Include="Blam\Engine\input\controllers.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
@@ -485,6 +487,7 @@
     <ClInclude Include="Blam\Engine\input\controllers.h" />
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
+    <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
