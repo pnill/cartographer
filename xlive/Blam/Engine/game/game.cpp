@@ -168,11 +168,6 @@ void __cdecl shell_initialize(void)
         g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
         g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
         halo_interpolator_set_interpolation_enabled(true);
-
-        //g_particle_frame_storage = (s_particle_frame_data_storage*)VirtualAlloc(0, sizeof(s_particle_frame_data_storage), MEM_COMMIT, PAGE_READWRITE);
-        //g_previous_particle_interpolation_frame_data = &g_particle_frame_storage->previous_data;
-        //g_target_particle_interpolation_frame_data = &g_particle_frame_storage->target_data;
-        halo_particle_interpolator_set_state(false);
     }
     return;
 }
