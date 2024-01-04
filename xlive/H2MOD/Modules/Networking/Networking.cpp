@@ -2,7 +2,6 @@
 
 #include "Networking.h"
 #include "Blam/Engine/memory/bitstream.h"
-#include "OverridePackets/OverridePackets.h"
 
 #include "Util/Hooks/Hook.h"
 
@@ -57,7 +56,6 @@ void MachineIDUpdatePatch()
 void CustomNetwork::ApplyPatches() 
 {
 	MachineIDUpdatePatch();
-	OverridePackets::ApplyGamePatches();
 	NetworkMessage::ApplyGamePatches();
 
 	// LIVE network protocol research
