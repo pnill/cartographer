@@ -59,8 +59,19 @@ static bool encode_event_to_buffer(
 
 	bool result = !stream.error_occured();
 
-	SIM_QUEUE_DBG("#####");
-	SIM_QUEUE_DBG("event decoding, stream is fine? %d, encoded size: %d", !stream.error_occured(), stream.get_space_used_in_bytes());
+	if (result)
+	{
+		SIM_QUEUE_DBG("#####");
+		SIM_QUEUE_DBG("event encoding, stream is fine? %d, encoded size: %d", 
+			!stream.error_occured(), 
+			stream.get_space_used_in_bytes());
+		SIM_QUEUE_DBG("event type: %d, reference count: %d", event_type, reference_count);
+	}
+	else
+	{
+		SIM_QUEUE_DBG("event encoding failed!!!! --------");
+	}
+
 
 	return result;
 }
@@ -110,8 +121,10 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 	if (result)
 	{
 		// everything is fine
-		SIM_QUEUE_DBG("event decoding successful");
-		SIM_QUEUE_DBG("size of the decode: %d, size of the payload: %d", stream.get_space_used_in_bytes(), decode_out->data_size);
+		SIM_QUEUE_DBG("event decoding, stream is fine? %d, decoded size: %d, size of the payload: %d", 
+			!stream.error_occured(),
+			stream.get_space_used_in_bytes(), 
+			decode_out->data_size);
 		SIM_QUEUE_DBG("event type: %d, reference count: %d", decode_out->event_type, decode_out->reference_count);
 
 		for (int32 i = 0; i < decode_out->reference_count; i++)
@@ -129,9 +142,9 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 
 void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* entity_references, int32 block_size, uint8* block)
 {
-	datum object_indexes_from_entity_references[k_entity_reference_indices_count_max];
-	uint8 write_buffer[k_simulation_payload_size_max];
 	int32 write_buffer_space_used;
+	uint8 write_buffer[k_simulation_payload_size_max];
+	datum object_indexes_from_entity_references[k_entity_reference_indices_count_max];
 	s_simulation_queue_element* allocated_element = NULL;
 
 	if (game_is_distributed() && !game_is_playback())
@@ -146,18 +159,16 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 		SIM_QUEUE_DBG("#####");
 		for (int32 i = 0; i < reference_count; i++)
 		{
-			SIM_QUEUE_DBG("entity reference indice				 %d -> %08X",
-				i,
+			SIM_QUEUE_DBG("entity reference indice				 -> %08X",
 				entity_references[i]
 			);
 		}
 
 		simulation_entity_indices_to_object_index(entity_references, reference_count, object_indexes_from_entity_references, k_entity_reference_indices_count_max);
 
-		for (int32 i = 0; i < reference_count; i++)
+		for (int32 i = 0; i < k_entity_reference_indices_count_max; i++)
 		{
-			SIM_QUEUE_DBG("object reference indice (datum index) %d -> %08X",
-				i,
+			SIM_QUEUE_DBG("object reference indice (datum index) -> %08X",
 				object_indexes_from_entity_references[i]
 			);
 		}
