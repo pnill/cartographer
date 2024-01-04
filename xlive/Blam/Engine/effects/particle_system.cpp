@@ -10,6 +10,8 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/physics/breakable_surface_definitions.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
+#include "Blam/Engine/main/interpolator.h"
+
 #include "H2MOD/Tags/TagInterface.h"
 #include "Util/Hooks/Hook.h"
 
@@ -21,63 +23,84 @@ s_data_array* get_particle_system_table()
 	return *Memory::GetAddress<s_data_array**>(0x4D83D4, 0x4FFEA8);
 }
 
-void particle_system_update_update_game_time(datum datum_index)
+void particle_system_update_game_time(datum datum_index)
 {
 	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = time_globals::get_game_time();
+}
+
+void particle_system_reset_game_time(datum datum_index)
+{
+	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = 0;
+}
+
+void particle_system_update_dt(datum datum_index, real32 dt)
+{
+	particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] += dt;
+}
+
+void particle_system_reset_dt(datum datum_index)
+{
+	particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = 0.0f;
+}
+
+datum particle_system_get_by_ptr(c_particle_system* particle_system)
+{
+	return (datum)((((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system)) | (particle_system->datum_salt << 16));
 }
 
 typedef bool(__stdcall* c_particle_system_update_t)(c_particle_system* thisx, real32 dt);
 c_particle_system_update_t p_c_particle_system_update;
 
-const real32 tolerance = 1e-5f;
-bool __stdcall c_particle_system::update(c_particle_system* thisx, real32 delta_time)
+bool __stdcall c_particle_system::update(c_particle_system* particle_system, real32 dt)
 {
-	bool result = p_c_particle_system_update(thisx, delta_time);
+	bool result = p_c_particle_system_update(particle_system, dt);
 
-	datum particle_system_datum_index = ((char*)thisx - get_particle_system_table()->data) / sizeof(c_particle_system);
-	particle_system_datum_index |= (thisx->datum_salt << 16);
-	if(!result)
+	datum particle_system_datum_index = particle_system_get_by_ptr(particle_system);
+	int32 particle_system_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index);
+
+	particle_system_update_dt(particle_system_datum_index, dt);
+
+	if (!result)
 	{
-		real32* accum = &particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)];
-		real32 max_accum = ((thisx->duration != 0.0f) ? 1.0f / thisx->duration : 0.0f) + time_globals::get_seconds_per_tick();
-		real32 difference = max_accum - *accum;
-		int32 ticks = time_globals::get_game_time() - particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)];
-		
-		if (difference <= tolerance && ticks >= 1)
+		// real32 accum = particle_system_accumulated_time[particle_system_abs_index];
+		//real32 update_dt = 1.0f / 30.f;
+		//if (particle_system->duration_in_ticks > 0.0f)
+			//update_dt = 1.0f / particle_system->duration_in_ticks;
+
+		//int32 duration_in_ticks = (int32)(update_dt / time_globals::get_seconds_per_tick());
+		int32 ticks = time_globals::get_game_time() - particle_system_game_time[particle_system_abs_index];
+		if (ticks > 1)
 		{
-			particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)] = 0;
-			*accum = 0.f;
+			particle_system_reset_game_time(particle_system_datum_index);
+			particle_system_reset_dt(particle_system_datum_index);
 			return false;
 		}
 		else
 		{
-			particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)] += delta_time;
 			return true;
 		}
 	}
-	particle_system_accumulated_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index)] += delta_time;
-	return  result;
+	return result;
 }
 
-typedef void(__stdcall* t_c_particle_system__update_location_time)(c_particle_system*, s_particle_system_update_timings*, real_matrix4x3*, int );
+typedef void(__stdcall* t_c_particle_system__update_location_time)(c_particle_system*, s_particle_system_update_timings*, real_matrix4x3*, int);
 t_c_particle_system__update_location_time p_c_particle_system__update_location_time;
 
 void c_particle_system::update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused)
 {
-	datum particle_system_datum_index = ((char*)thisx - get_particle_system_table()->data) / sizeof(c_particle_system);
-	particle_system_datum_index |= (thisx->datum_salt << 16);
-	particle_system_update_update_game_time(particle_system_datum_index);
+	datum particle_system_datum_index = particle_system_get_by_ptr(thisx);
+	particle_system_update_game_time(particle_system_datum_index);
 	p_c_particle_system__update_location_time(thisx, timings, matrix, unused);
-}
-
-void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum particle_system_index)
-{
-	INVOKE(0xA69EB, 0x98A6B, particle_system_remove_from_effects_cache, effect_index, particle_system_index);
 }
 
 void __cdecl c_particle_system::destroy(datum particle_system_index)
 {
 	INVOKE(0xC3C49, 0xB0B34, c_particle_system::destroy, particle_system_index);
+}
+
+void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum particle_system_index)
+{
+	INVOKE(0xA69EB, 0x98A6B, particle_system_remove_from_effects_cache, effect_index, particle_system_index);
 }
 
 void apply_particle_system_patches()

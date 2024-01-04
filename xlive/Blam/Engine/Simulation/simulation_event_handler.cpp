@@ -52,7 +52,7 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 
 			for (int32 i = 0; i < entity_reference_indices_count; i++)
 			{
-				SIM_QUEUE_DBG("event entity reference indices: %d", entity_reference_indices[i]);
+				SIM_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
 			}
 
 			simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, 0, NULL);

@@ -23,8 +23,8 @@ class c_particle_system
 {
 public:
 	int32 datum_salt;
-	real32 accumulated_time;
-	real32 duration;
+	real32 update_dt;
+	real32 duration_in_ticks;
 	e_particle_system_flags flags;
 	int16 event_particle_system_index;
 	datum tag_index;
