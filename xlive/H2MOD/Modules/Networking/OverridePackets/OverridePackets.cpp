@@ -27,7 +27,7 @@ namespace OverridePackets
 	bool __cdecl request_read(bitstream* stream, int a2, int a3) {
 		*(DWORD *)a3 = stream->data_decode_integer("identifier", 32);
 		*(DWORD *)(a3 + 4) = stream->data_decode_integer("flags", 8);
-		return stream->overflow() == false;
+		return stream->error_occured() == false;
 	}
 
 	void __cdecl refuse_write(bitstream* stream, int a2, int a3) {
@@ -38,7 +38,7 @@ namespace OverridePackets
 	bool __cdecl refuse_read(bitstream* stream, int a2, int a3) {
 		*(DWORD *)a3 = stream->data_decode_integer("remote-identifier", 32);
 		*(DWORD *)(a3 + 4) = stream->data_decode_integer("reason", 3);
-		bool isValid = stream->overflow() == false;
+		bool isValid = stream->error_occured() == false;
 		//LOG_TRACE_NETWORK_N("[H2MOD-network] connection refuse read, remote-identifier={}, reason=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 		return isValid;
 	}
@@ -52,7 +52,7 @@ namespace OverridePackets
 	bool __cdecl establish_read(bitstream* stream, int a2, int a3) {
 		*(DWORD *)a3 = stream->data_decode_integer("remote-identifier", 32);
 		*(DWORD *)(a3 + 4) = stream->data_decode_integer("identifier", 32);
-		bool isValid = stream->overflow() == false;
+		bool isValid = stream->error_occured() == false;
 		//LOG_TRACE_NETWORK_N("[H2MOD-network] connection establish read, remote-identifier=%d, identifier=%d, isValid=%d", *(DWORD *)a3, *(DWORD *)(a3 + 4), isValid);
 		return isValid;
 	}
@@ -72,7 +72,7 @@ namespace OverridePackets
 		*(DWORD *)(a3 + 4) = stream->data_decode_integer("identifier", 32);
 		*(DWORD *)(a3 + 8) = stream->data_decode_integer("closure-reason", 5);
 
-		if (stream->overflow())
+		if (stream->error_occured())
 			return result;
 
 		closure_reason = *(DWORD *)(a3 + 8);

@@ -11,6 +11,7 @@
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam/Engine/saved_games/game_state.h"
 #include "Blam/Engine/shell/shell.h"
+#include "Blam/Engine/Simulation/simulation.h"
 #include "Util/Hooks/Hook.h"
 
 s_game_systems* get_game_systems()
@@ -56,6 +57,17 @@ bool game_is_multiplayer(void)
 bool game_is_ui_shell(void)
 {
 	return game_options_get()->game_mode == _game_mode_ui_shell;
+}
+
+bool game_is_distributed(void)
+{
+    return game_options_get()->simulation_type == _game_simulation_distributed_client 
+        || game_options_get()->simulation_type == _game_simulation_distributed_server;
+}
+
+bool game_is_playback(void)
+{
+    return false;
 }
 
 void __cdecl game_shell_set_in_progress()
@@ -192,6 +204,8 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
         {
             halo_interpolator_update_begin();
             game_tick();
+            // discard simulation update
+            simulation_update_discard();
             halo_interpolator_update_end();
             if (cinematic_sound_sync_complete())
             {

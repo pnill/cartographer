@@ -440,6 +440,10 @@ void object_initialize_for_interpolation(datum object_index)
 }
 
 #define USE_REWRITTEN_OBJECT_NEW
+
+typedef datum (__cdecl* t_object_new)(object_placement_data* placement_data);
+t_object_new p_object_new;
+
 // Creates a new object
 datum __cdecl object_new(object_placement_data* placement_data)
 {
@@ -723,7 +727,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	
 	return object_index;
 #else
-	return INVOKE(0x136CA7, 0x125B77, object_new, placement_data);
+	return p_object_new(placement_data);
 #endif
 }
 
@@ -731,6 +735,11 @@ void __cdecl object_delete(datum object_index)
 {
 	INVOKE(0x136005, 0x124ED5, object_delete, object_index);
 	return;
+}
+
+void __cdecl objects_purge_deleted_objects()
+{
+
 }
 
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
@@ -994,34 +1003,7 @@ void internal_object_get_markers_by_string_id_replace_calls(void)
 // Replace calls to object_new with our own
 void object_new_replace_calls(void)
 {
-	PatchCall(Memory::GetAddress(0x3B603, 0x3F34B), object_new);
-	PatchCall(Memory::GetAddress(0x52A2E, 0x5AF3E), object_new);
-	PatchCall(Memory::GetAddress(0x55C06, 0x5E0FE), object_new);
-	PatchCall(Memory::GetAddress(0x5D6EB, 0x6F074), object_new);
-	PatchCall(Memory::GetAddress(0x70573, 0x8E454), object_new);
-	PatchCall(Memory::GetAddress(0xA8C90, 0x9AD10), object_new);
-	PatchCall(Memory::GetAddress(0xD4B8C, 0xD28A1), object_new);
-	PatchCall(Memory::GetAddress(0x10D6AF, 0xD9C5F), object_new);
-	PatchCall(Memory::GetAddress(0x1102AF, 0xDC85F), object_new);
-	PatchCall(Memory::GetAddress(0x138057, 0x126F27), object_new);
-	PatchCall(Memory::GetAddress(0x1385AD, 0x12747D), object_new);
-	PatchCall(Memory::GetAddress(0x13E3A8, 0x12D1F7), object_new);
-	PatchCall(Memory::GetAddress(0x142B85, 0x1319D5), object_new);
-	PatchCall(Memory::GetAddress(0x144B89, 0x1339D9), object_new);
-	PatchCall(Memory::GetAddress(0x144F2E, 0x133D7E), object_new);
-	PatchCall(Memory::GetAddress(0x15D4D1, 0x141791), object_new);
-	PatchCall(Memory::GetAddress(0x166787, 0x15151C), object_new);
-	PatchCall(Memory::GetAddress(0x16B931, 0x15C247), object_new);
-	PatchCall(Memory::GetAddress(0x16BD2C, 0x1613F1), object_new);
-	PatchCall(Memory::GetAddress(0x179CBC, 0x1617EC), object_new);
-	PatchCall(Memory::GetAddress(0x1F32F2, 0x1DE38B), object_new);
-	PatchCall(Memory::GetAddress(0x317863, 0x2C25CD), object_new);
-	PatchCall(Memory::GetAddress(0x3178A3, 0x2C260D), object_new);
-	PatchCall(Memory::GetAddress(0x318DEC, 0x2C3B56), object_new);
-	PatchCall(Memory::GetAddress(0x33992A, 0x2E469A), object_new);
-	PatchCall(Memory::GetAddress(0x3438C0, 0x2EE630), object_new);
-	PatchCall(Memory::GetAddress(0x355E03, 0x300B73), object_new);
-	PatchCall(Memory::GetAddress(0x358E31, 0x303BA1), object_new);
+	DETOUR_ATTACH(p_object_new, Memory::GetAddress<t_object_new>(0x136CA7, 0x125B77), object_new);
 	return;
 }
 

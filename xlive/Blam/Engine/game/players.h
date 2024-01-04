@@ -5,7 +5,7 @@
 #include "Blam/Engine/objects/emblems.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/units/units.h"
-#include "Blam/Engine/Simulation/MachineID.h"
+#include "Blam/Engine/Simulation/machine_id.h"
 
 #define k_maximum_players 16
 

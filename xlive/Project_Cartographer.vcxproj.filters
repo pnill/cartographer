@@ -274,6 +274,10 @@
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_events.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_event_handler.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_events_queue.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -504,17 +508,11 @@
     <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
-    <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
     <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
-    <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
@@ -794,6 +792,15 @@
     <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
     <ClInclude Include="Blam\Engine\input\input_windows.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
+    <ClInclude Include="Blam\Engine\Simulation\machine_id.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_actors.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_event_handler.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_players.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_view.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_world.h" />
+    <ClInclude Include="Blam\Engine\Simulation\unit_control.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_events_queue.h" />
+    <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -61,12 +61,12 @@ static_assert(sizeof(datum) == 4);
 
 #define NONE -1
 #define DATUM_INDEX_NONE ((datum)(NONE))
-#define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)((_absolute_index) | ((_salt) << 16))
+#define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
 #define DATUM_IS_NONE(_datum_index) ((_datum_index) == DATUM_INDEX_NONE)
 #define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & 0xFFFF))
 #define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & 0xFFFF))
 
-#define NUMBEROF(_array) (sizeof(_array) / sizeof(_array[0]))
+#define NUMBEROF(_array) (sizeof(_array) / sizeof(*_array))
 #define IN_RANGE_INCLUSIVE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))
 #define VALID_COUNT(index, count) ((index) >= 0 && (index) <= (count))
@@ -100,7 +100,7 @@ static_assert(sizeof(datum) == 4);
 /// Use this for setting up enum bitfields
 #define FLAG(bit)( 1<<(bit) )
 #define TEST_BIT(flags, bit)( ((flags) & FLAG(bit)) != 0 )
-#define TEST_FLAG(flags, flag)( ((flags) & (flag)) != 0 )
+#define TEST_FLAG(flag, flags)( ((flag) & (flags)) != 0 )
 #define SET_FLAG(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )

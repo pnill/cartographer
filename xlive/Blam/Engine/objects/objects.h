@@ -204,7 +204,7 @@ struct object_datum
 	int16 field_D0;
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
-	datum simulation_entity_index;
+	int32 simulation_entity_index;
 	bool attached_to_simulation;
 	int8 gap_D9[3];
 	datum object_projectile_datum;
@@ -255,6 +255,11 @@ static T* object_get_fast_unsafe(datum object_idx)
 {
 	s_object_header* header = object_get_header(object_idx);
 	return (T*)header->object;
+}
+
+static int32 object_get_entity_index(datum object_idx)
+{
+	return object_get_fast_unsafe(object_idx)->simulation_entity_index;
 }
 
 s_memory_pool* get_object_table(void);
