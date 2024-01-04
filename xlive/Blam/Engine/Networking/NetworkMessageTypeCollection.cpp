@@ -38,7 +38,7 @@ bool __cdecl decode_map_file_name_message(bitstream* stream, int a2, s_custom_ma
 {
 	stream->data_decode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
-	return stream->overflow() == false;
+	return stream->error_occured() == false;
 }
 
 void __cdecl encode_request_map_filename_message(bitstream* stream, int a2, s_request_map_filename* data)
@@ -50,7 +50,7 @@ bool __cdecl decode_request_map_filename_message(bitstream* stream, int a2, s_re
 {
 	stream->data_decode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
 	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
-	return stream->overflow() == false;
+	return stream->error_occured() == false;
 }
 
 void __cdecl encode_team_change_message(bitstream* stream, int a2, s_team_change* data)
@@ -60,7 +60,7 @@ void __cdecl encode_team_change_message(bitstream* stream, int a2, s_team_change
 bool __cdecl decode_team_change_message(bitstream* stream, int a2, s_team_change* data)
 {
 	data->team_index = stream->data_decode_integer("team-index", 32);
-	return stream->overflow() == false;
+	return stream->error_occured() == false;
 }
 
 void __cdecl encode_rank_change_message(bitstream* stream, int a2, s_rank_change* data)
@@ -70,7 +70,7 @@ void __cdecl encode_rank_change_message(bitstream* stream, int a2, s_rank_change
 bool __cdecl decode_rank_change_message(bitstream* stream, int a2, s_rank_change* data)
 {
 	data->rank = stream->data_decode_integer("rank", 8);
-	return stream->overflow() == false;
+	return stream->error_occured() == false;
 }
 
 void __cdecl encode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* data)
@@ -80,7 +80,7 @@ void __cdecl encode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* 
 bool __cdecl decode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* data)
 {
 	data->enabled = stream->data_decode_bool("anti-cheat-enabled");
-	return stream->overflow() == false;
+	return stream->error_occured() == false;
 }
 
 void register_custom_network_message(void* network_messages)

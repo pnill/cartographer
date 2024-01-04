@@ -44,7 +44,7 @@ namespace CustomVariantSettings
 		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("hill rotation", 8);
 		data->infiniteGrenades = stream->data_decode_bool("infinite grenades");
 		data->forced_fov = stream->data_decode_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
-		return stream->overflow() == false;
+		return stream->error_occured() == false;
 	}
 
 	void UpdateCustomVariantSettings(s_variant_settings* data)

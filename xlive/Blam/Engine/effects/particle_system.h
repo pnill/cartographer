@@ -23,8 +23,8 @@ class c_particle_system
 {
 public:
 	int32 datum_salt;
-	real32 accumulated_time;
-	real32 duration;
+	real32 update_dt;
+	real32 duration_in_ticks;
 	e_particle_system_flags flags;
 	int16 event_particle_system_index;
 	datum tag_index;
@@ -43,21 +43,15 @@ public:
 	c_particle_system* parent_system;
 	int32 first_particle_index;
 	pixel32 color;
-	c_particle_system_definition* get_particle_system_definition() const;
-	void destroy_children();
-	bool update_new(real32 delta_time);
-	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
-	void adjust_particle_system_indexes(datum* datum_1, datum* datum_2);
-	int get_active_particle_locations_count();
+
 	bool static __stdcall update(c_particle_system* thisx, real32 delta_time);
 	static void __stdcall update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
 	static void __cdecl destroy(datum particle_system_index);
-	
-	static void __stdcall update_effect_time(c_particle_system* thisx, real32 flt);
 };
 CHECK_STRUCT_SIZE(c_particle_system, 0x54);
 
 s_data_array* get_particle_system_table();
-void __cdecl particle_syste_remove_from_effects_cache(datum effect_index, datum particle_system_index);
+
+void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum particle_system_index);
 
 void apply_particle_system_patches();

@@ -1,5 +1,6 @@
 #pragma once
-#include "MachineID.h"
+
+#include "machine_id.h"
 
 enum e_simulation_view_type : __int16
 {
