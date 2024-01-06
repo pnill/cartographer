@@ -173,13 +173,14 @@ void __cdecl shell_initialize(void)
     }
 
     // Interpolation allocation
-    if (shell_tool_type() || !Memory::IsDedicatedServer())
+    if (shell_tool_type() && !Memory::IsDedicatedServer())
     {
-        g_frame_data_storage = (s_frame_data_storage*)VirtualAlloc(0, sizeof(s_frame_data_storage), MEM_COMMIT, PAGE_READWRITE);
-        g_frame_data_intermediate = (s_interpolation_data*)VirtualAlloc(0, sizeof(s_interpolation_data), MEM_COMMIT, PAGE_READWRITE);
-        g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
-        g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
+        halo_interpolator_initialize();
         halo_interpolator_set_interpolation_enabled(true);
+    }
+    else
+    {
+        halo_interpolator_set_interpolation_enabled(false);
     }
     return;
 }

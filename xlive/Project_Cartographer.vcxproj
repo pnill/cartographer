@@ -558,6 +558,7 @@
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_queue_entities.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_queue_events.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_queue.cpp" />
@@ -907,6 +908,7 @@
     <ClInclude Include="Blam\Engine\Simulation\simulation_actors.h" />
     <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_events.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_event_handler.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_queue_entities.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_queue_events.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_players.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_queue.h" />

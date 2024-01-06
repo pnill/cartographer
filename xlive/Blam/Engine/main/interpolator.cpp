@@ -17,6 +17,14 @@ bool interpolation_enabled = false;
 c_static_flags<k_maximum_objects_per_map> g_interpolator_object_updated;
 c_static_flags<k_maximum_objects_per_map> g_interpolator_object_has_updated;
 
+void halo_interpolator_initialize()
+{
+    g_frame_data_storage = (s_frame_data_storage*)VirtualAlloc(0, sizeof(s_frame_data_storage), MEM_COMMIT, PAGE_READWRITE);
+    g_frame_data_intermediate = (s_interpolation_data*)VirtualAlloc(0, sizeof(s_interpolation_data), MEM_COMMIT, PAGE_READWRITE);
+    g_previous_interpolation_frame_data = &g_frame_data_storage->previous_data;
+    g_target_interpolation_frame_data = &g_frame_data_storage->target_data;
+}
+
 bool halo_interpolator_is_enabled(void)
 {
     return interpolation_enabled;
@@ -30,10 +38,11 @@ bool halo_interpolator_update_in_progress()
 void halo_interpolator_set_interpolation_enabled(bool enabled)
 {
     interpolation_enabled = enabled;
+    halo_interpolator_clear_buffers();
     return;
 }
 
-float halo_interpolator_get_interpolation_time_internal(void)
+real32 halo_interpolator_get_interpolation_time_internal(void)
 {
     return MAX(0.0f, MIN(time_globals::get_ticks_fraction_leftover(), 1.0f));
 }
@@ -73,15 +82,15 @@ void halo_interpolator_clear_buffers(void)
 {
     if (interpolation_enabled)
     {
-        memset(g_frame_data_storage, 0, sizeof(s_frame_data_storage));
-        memset(g_frame_data_intermediate, 0, sizeof(s_interpolation_data));
+        g_update_in_progress = false;
+        g_interpolator_delta = 0.0f;
         g_interpolator_object_updated.clear();
         g_interpolator_object_has_updated.clear();
         halo_interpolator_clear_data_buffer(g_previous_interpolation_frame_data);
         halo_interpolator_clear_data_buffer(g_target_interpolation_frame_data);
         halo_interpolator_clear_data_buffer(g_frame_data_intermediate);
-        g_interpolator_delta = 0.0f;
-        g_update_in_progress = false;
+        memset(g_frame_data_storage, 0, sizeof(s_frame_data_storage));
+        memset(g_frame_data_intermediate, 0, sizeof(s_interpolation_data));
     }
     return;
 }

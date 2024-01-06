@@ -48,7 +48,7 @@ void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d*
 {
 	object_marker marker;
 
-	object_get_markers_by_string_id(unit_index, HS_HEAD, &marker, true);
+	object_get_markers_by_string_id(unit_index, HS_HEAD, &marker, 1);
 	*position = marker.matrix1.position;
 	return;
 }

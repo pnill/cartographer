@@ -37,7 +37,7 @@ public:
 
 	static void queues_initialize();
 
-	void apply_simulation_queue(c_simulation_queue* queue);
+	void apply_simulation_queue(const c_simulation_queue* queue);
 	void apply_event_update_queue();
 	void apply_entity_update_queue();
 

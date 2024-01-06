@@ -130,16 +130,15 @@ void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* a4,
 	int a5)
 {
-	// value converted from h2x tickrate
-	static float edgeDropFactorConverted = 0.117f * 30.f;
+	const float edge_drop_value = 0.117f;
 
 	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, float);
 	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
-	float edgeDropFactorPerTick = edgeDropFactorConverted * time_globals::get_seconds_per_tick();
+	float edge_drop_per_tick = 30.f * edge_drop_value * time_globals::get_seconds_per_tick();
 
 	// push last parameter despite the function taking just 5 parameters
-	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edgeDropFactorPerTick);
+	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
 
 	// account for the last parameter that doesn't get handled by the actual function
 	__asm add esp, 4;
@@ -159,8 +158,8 @@ __declspec(naked) void biped_ground_mode_update_to_stdcall()
 // fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
 __declspec(naked) void update_biped_ground_mode_physics_constant()
 {
-#define _stack_pointer_offset 4Ch + 4h
-#define _last_param_offset 14h
+#define _stack_pointer_offset 4h + 4Ch
+#define _last_param_offset 4h + 10h
 	__asm
 	{
 		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
@@ -323,7 +322,7 @@ void H2Tweaks::ApplyPatches() {
 
 	// fixes edge drop fast fall when using higher tickrates than 30
 	PatchCall(Memory::GetAddressRelative(0x5082B4, 0x4FA5D4), biped_ground_mode_update_to_stdcall);
-	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
+	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
 
 	// custom map hooks
 	MapManager::ApplyPatches();

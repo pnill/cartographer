@@ -49,10 +49,7 @@ struct s_frame_data_storage
 };
 //CHECK_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
 
-extern s_frame_data_storage* g_frame_data_storage;
-extern s_interpolation_data* g_frame_data_intermediate;
-extern s_interpolation_data* g_previous_interpolation_frame_data;
-extern s_interpolation_data* g_target_interpolation_frame_data;
+void halo_interpolator_initialize();
 
 bool halo_interpolator_is_enabled(void);
 bool halo_interpolator_update_in_progress(void);
@@ -60,6 +57,7 @@ void halo_interpolator_set_interpolation_enabled(bool enabled);
 
 void halo_interpolator_update_delta(void);
 
+real32 halo_interpolator_get_update_delta(void);
 real32 halo_interpolator_get_interpolation_time(void);
 
 void halo_interpolator_clear_buffers(void);

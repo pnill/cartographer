@@ -6,15 +6,15 @@
 
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size
-c_simulation_queue g_entity_update_queue;
-c_simulation_queue g_event_update_queue;
+c_simulation_queue g_high_priority_queue;
+c_simulation_queue g_basic_event_queue;
 
 void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int32 size, s_simulation_queue_element** out_allocated_elem)
 {
 	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		g_event_update_queue.allocate(size, out_allocated_elem);
+		g_basic_event_queue.allocate(size, out_allocated_elem);
 	}
 	else
 	{
@@ -33,7 +33,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 		if (!sim_entity_queue_full)
-			g_entity_update_queue.allocate(size, out_allocated_elem);
+			g_high_priority_queue.allocate(size, out_allocated_elem);
 	}
 
 	if (*out_allocated_elem)
@@ -47,43 +47,43 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		g_event_update_queue.enqueue(element);
+		g_basic_event_queue.enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_event_update_queue, 
-			g_event_update_queue.allocated_count(), 
-			g_event_update_queue.allocated_size_in_bytes());
+			&g_basic_event_queue, 
+			g_basic_event_queue.allocated_count(), 
+			g_basic_event_queue.allocated_size_in_bytes());
 
 		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
-			&g_event_update_queue, 
-			g_event_update_queue.queued_count(), 
-			g_event_update_queue.queued_size());
+			&g_basic_event_queue, 
+			g_basic_event_queue.queued_count(), 
+			g_basic_event_queue.queued_size());
 	}
 	else
 	{
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
-		g_entity_update_queue.enqueue(element);
+		g_high_priority_queue.enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_entity_update_queue,
-			g_entity_update_queue.allocated_count(),
-			g_entity_update_queue.allocated_size_in_bytes());
+			&g_high_priority_queue,
+			g_high_priority_queue.allocated_count(),
+			g_high_priority_queue.allocated_size_in_bytes());
 
-		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", &g_entity_update_queue, g_entity_update_queue.queued_count(), g_entity_update_queue.queued_size());
+		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", &g_high_priority_queue, g_high_priority_queue.queued_count(), g_high_priority_queue.queued_size());
 	}
 }
 
 void c_simulation_world::apply_entity_update_queue()
 {
-	apply_simulation_queue(&g_entity_update_queue);
+	apply_simulation_queue(&g_high_priority_queue);
 }
 
 void c_simulation_world::apply_event_update_queue()
 {
-	apply_simulation_queue(&g_event_update_queue);
+	apply_simulation_queue(&g_basic_event_queue);
 }
 
-void c_simulation_world::apply_simulation_queue(c_simulation_queue* queue)
+void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 {
 	static long long last_time_msec;
 	static void* last_queue;
@@ -148,12 +148,12 @@ void c_simulation_world::apply_simulation_queue(c_simulation_queue* queue)
 
 void c_simulation_world::destroy_update()
 {
-	c_simulation_queue::dispose(&g_event_update_queue);
-	c_simulation_queue::dispose(&g_entity_update_queue);
+	c_simulation_queue::dispose(&g_basic_event_queue);
+	c_simulation_queue::dispose(&g_high_priority_queue);
 }
 
 void c_simulation_world::queues_initialize()
 {
-	g_event_update_queue.initialize();
-	g_entity_update_queue.initialize();
+	g_basic_event_queue.initialize();
+	g_high_priority_queue.initialize();
 }
