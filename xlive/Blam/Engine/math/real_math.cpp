@@ -7,9 +7,38 @@ void __cdecl real_math_reset_precision(void)
 	return;
 }
 
-real_quaternion* __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion)
+real_quaternion* quaternion_normalize(real_quaternion* quaternion)
 {
-	return INVOKE(0x34F6F, 0x285EC, fast_quaternion_interpolate_and_normalize, previous, current, fractional_ticks, out_quaternion);
+	real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
+	if (dot_product <= 0.0f)
+	{
+		quaternion->i = 0.0f;
+		quaternion->j = 0.0f;
+		quaternion->k = 0.0f;
+		quaternion->w = 1.0f;
+	}
+	else
+	{
+		real32 rsqrt = reciprocal_square_root(dot_product);
+		quaternion->i *= rsqrt;
+		quaternion->j *= rsqrt;
+		quaternion->k *= rsqrt;
+		quaternion->w *= rsqrt;
+	}
+	return quaternion;
+}
+
+real_quaternion* fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* quaternion)
+{	
+	real32 dot_product = dot_product4d_quaternion(current, previous);
+	real32 v1 = (dot_product >= 0.0f ? fractional_ticks : -fractional_ticks);
+	real32 v2 = 1.0f - fractional_ticks;
+
+	quaternion->i = (previous->i * v2) + (v1 * current->i);
+	quaternion->j = (current->j * v1) + (v2 * previous->j);
+	quaternion->k = (current->k * v1) + (v2 * previous->k);
+	quaternion->w = (previous->w * v2) + (v1 * current->w);
+	return quaternion_normalize(quaternion);
 }
 
 real32 normalize2d(real_vector2d* vector)

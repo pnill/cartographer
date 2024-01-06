@@ -44,7 +44,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 vibration_intensity *= attack_time;
             }
 
-            vibration_intensity = MIN(0.0f, MAX(vibration_intensity, 1.0f));
+            vibration_intensity = MAX(0.0f, MIN(vibration_intensity, 1.0f));
 
             rumble_player_set_scripted_scale(vibration_intensity);
 

@@ -74,8 +74,9 @@ CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(real32));
 
 union real_quaternion
 {
-	real32 v[4];
 	struct { real32 i, j, k, w; };
+	struct { real_vector3d vector; real32 w; };
+	struct { real32 n[4]; } v;
 };
 CHECK_STRUCT_SIZE(real_quaternion, sizeof(real32) * 4);
 
@@ -152,6 +153,11 @@ static BLAM_MATH_INL real32 dot_product3d(const real_vector3d* a, const real_vec
 	return a->i * b->i + a->j * b->j + a->k * b->k;
 }
 
+static BLAM_MATH_INL real32 dot_product4d_quaternion(const real_quaternion* a, const real_quaternion* b)
+{
+	return a->i * b->i + a->j * b->j + a->k * b->k + a->w * b->w;
+}
+
 static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
 {
 	return vector->i * vector->i + vector->j * vector->j + vector->k * vector->k;
@@ -179,6 +185,13 @@ static BLAM_MATH_INL bool valid_real_normal3d(const real_vector3d* normal)
 {
 	real32 magnitude = magnitude_squared3d(normal);
 	return valid_realcmp(magnitude, 1.0f);
+}
+
+static BLAM_MATH_INL real_vector2d* scale_vector2d(const real_vector2d* in, real32 scale, real_vector2d* out)
+{
+	out->i = in->i * scale;
+	out->j = in->j * scale;
+	return out;
 }
 
 static BLAM_MATH_INL real_vector3d* scale_vector3d(const real_vector3d* in, real32 scale, real_vector3d* out)
@@ -251,13 +264,23 @@ static BLAM_MATH_INL real_vector3d* cross_product3d(const real_vector3d* up, con
 	return out_left;
 }
 
+static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
+{
+	point->x = x;
+	point->y = y;
+	point->z = z;
+	return;
+}
+
 void __cdecl real_math_reset_precision(void);
 
 real32 normalize2d(real_vector2d* vector);
 
 real_vector2d* perpendicular2d(const real_vector2d* in, real_vector2d* out);
 
-real_quaternion* __cdecl fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* out_quaternion);
+real_quaternion* quaternion_normalize(real_quaternion* quaternion);
+
+real_quaternion* fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* quaternion);
 
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b);
 

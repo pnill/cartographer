@@ -112,7 +112,7 @@ namespace RenderHooks
 			switch (H2Config_Override_Shadows)
 			{
 				case tex_low:
-					return 512;
+					return 32;
 				case tex_high:
 					return 2048;
 				case tex_ultra:
@@ -122,7 +122,7 @@ namespace RenderHooks
 			switch (H2Config_Override_Shadows)
 			{
 				case tex_low:
-					return 512;
+					return 32;
 				case tex_high:
 					return 2048;
 				case tex_ultra:
@@ -153,7 +153,7 @@ namespace RenderHooks
 			texture_width = 128;
 			texture_height = 128;
 		}
-		LIMITED_LOG(15, LOG_TRACE_GAME, L"{} - : {} {} {} {} {}", __FUNCTIONW__, type, texture_width, texture_height, fmt, a5);
+		//LIMITED_LOG(15, LOG_TRACE_GAME, L"{} - : {} {} {} {} {}", __FUNCTIONW__, type, texture_width, texture_height, fmt, a5);
 		return p_initialize_rasterizer_layer(type, texture_width, texture_height, fmt, a5);
 	}
 
