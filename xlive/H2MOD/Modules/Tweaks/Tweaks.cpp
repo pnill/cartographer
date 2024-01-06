@@ -336,20 +336,6 @@ void H2Tweaks::DisposePatches() {
 
 }
 
-void H2Tweaks::SetScreenRefreshRate() {
-
-	if (Memory::IsDedicatedServer())
-		return;
-
-	{
-		static bool refresh_redirected = false;
-		if (!refresh_redirected) {
-			WritePointer(Memory::GetAddress(0x25E869) + 3, &H2Config_refresh_rate);
-			refresh_redirected = true;
-		}
-	}
-}
-
 void H2Tweaks::WarpFix(bool enable)
 {
 	if (Memory::IsDedicatedServer())
