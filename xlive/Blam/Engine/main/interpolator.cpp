@@ -15,7 +15,7 @@ real32 g_interpolator_delta = 0.0f;
 bool g_update_in_progress = false;
 bool interpolation_enabled = false;
 c_static_flags<k_maximum_objects_per_map> g_interpolator_object_updated;
-c_static_flags<k_maximum_objects_per_map> g_interpolator_object_has_updated;
+c_static_flags<k_maximum_objects_per_map> g_interpolator_object_interpolation_updated;
 
 void halo_interpolator_initialize()
 {
@@ -74,7 +74,8 @@ void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_dat
             interpolation_data->weapon_data[i][j].node_count = 0;
         }
     }
-    memset(interpolation_data->position_data, 0, sizeof(interpolation_data->position_data));
+
+    csmemset(interpolation_data->position_data, 0, sizeof(interpolation_data->position_data));
     return;
 }
 
@@ -84,13 +85,13 @@ void halo_interpolator_clear_buffers(void)
     {
         g_update_in_progress = false;
         g_interpolator_delta = 0.0f;
-        g_interpolator_object_updated.clear();
-        g_interpolator_object_has_updated.clear();
+        csmemset(g_frame_data_storage, 0, sizeof(s_frame_data_storage));
+        csmemset(g_frame_data_intermediate, 0, sizeof(s_interpolation_data));
         halo_interpolator_clear_data_buffer(g_previous_interpolation_frame_data);
         halo_interpolator_clear_data_buffer(g_target_interpolation_frame_data);
         halo_interpolator_clear_data_buffer(g_frame_data_intermediate);
-        memset(g_frame_data_storage, 0, sizeof(s_frame_data_storage));
-        memset(g_frame_data_intermediate, 0, sizeof(s_interpolation_data));
+        g_interpolator_object_updated.clear();
+        g_interpolator_object_interpolation_updated.clear();
     }
     return;
 }
@@ -113,20 +114,23 @@ void halo_interpolator_update_begin(void)
 
 void halo_interpolator_update_end(void)
 {
-    if (g_frame_data_storage)
-    {
-        for (uint32 abs_object_index = 0; abs_object_index < k_maximum_objects_per_map; abs_object_index++)
-        {
-            if (!g_interpolator_object_updated.test(abs_object_index))
-            {
-                if (!g_interpolator_object_has_updated.test(abs_object_index))
-                {
-                    memcpy(&g_target_interpolation_frame_data->object_data[abs_object_index], 
-                        &g_previous_interpolation_frame_data->object_data[abs_object_index], 
-                        sizeof(s_object_interpolation_data));
-                    g_interpolator_object_has_updated.set(abs_object_index, true);
-                }
-            }
+	if (g_frame_data_storage)
+	{
+		for (int32 abs_object_index = 0; abs_object_index < k_maximum_objects_per_map; abs_object_index++)
+		{
+			if (g_target_interpolation_frame_data->object_data[abs_object_index].object_index != DATUM_INDEX_NONE)
+			{
+				if (!g_interpolator_object_updated.test(abs_object_index))
+				{
+					if (!g_interpolator_object_interpolation_updated.test(abs_object_index))
+					{
+						csmemcpy(&g_target_interpolation_frame_data->object_data[abs_object_index],
+							&g_previous_interpolation_frame_data->object_data[abs_object_index],
+							sizeof(s_object_interpolation_data));
+						g_interpolator_object_interpolation_updated.set(abs_object_index, true);
+					}
+				}
+			}
         }
 
         g_update_in_progress = false;
@@ -149,7 +153,7 @@ object_datum* halo_interpolator_object_can_interpolate(datum object_index, uint3
         return NULL;
     if (abs_object_index >= k_maximum_objects_per_map)
         return NULL;
-    if (g_interpolator_object_has_updated.test(abs_object_index))
+    if (g_interpolator_object_interpolation_updated.test(abs_object_index))
         return NULL;
 
     *out_abs_object_index = abs_object_index;
@@ -241,7 +245,7 @@ void halo_interpolator_setup_new_object(datum object_index)
         }
 
         g_interpolator_object_updated.set(abs_object_index, false);
-        g_interpolator_object_has_updated.set(abs_object_index, false);
+        g_interpolator_object_interpolation_updated.set(abs_object_index, false);
     }
     return;
 }
@@ -250,7 +254,7 @@ void halo_interpolator_setup_weapon_data(int32 user_index, datum animation_index
 {
     if (g_frame_data_storage && g_update_in_progress)
     {
-        memcpy(g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes, node_matrices, sizeof(real_matrix4x3) * nodes_count);
+        csmemcpy(g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes, node_matrices, sizeof(real_matrix4x3) * nodes_count);
         g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index = animation_index;
         g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].node_count = nodes_count;
     }
@@ -287,6 +291,9 @@ void halo_interpolator_object_populate_interpolation_data(
             if (object->object_flags.test(_object_hidden_bit))
             {
                 g_target_interpolation_frame_data->object_data[abs_object_index].object_index = NONE;
+                // discard previous as well
+                // because next time this is executed it won't include this object, until it is unhidden again
+                g_previous_interpolation_frame_data->object_data[abs_object_index].object_index = NONE;
             }
             else
             {
@@ -298,15 +305,15 @@ void halo_interpolator_object_populate_interpolation_data(
                     crouch = biped->unit.crouching;
                 }
 
-                memcpy(g_target_interpolation_frame_data->object_data[abs_object_index].node_matrices, node_matrices, sizeof(real_matrix4x3) * nodes_count);
                 g_target_interpolation_frame_data->object_data[abs_object_index].object_index = object_index;
+                csmemcpy(g_target_interpolation_frame_data->object_data[abs_object_index].node_matrices, node_matrices, sizeof(real_matrix4x3) * nodes_count);
                 g_target_interpolation_frame_data->object_data[abs_object_index].position = *position;
                 g_target_interpolation_frame_data->object_data[abs_object_index].forward = *forward;
                 g_target_interpolation_frame_data->object_data[abs_object_index].up = *up;
-                g_target_interpolation_frame_data->object_data[abs_object_index].crouch = crouch;
                 g_target_interpolation_frame_data->object_data[abs_object_index].center_of_mass = *center_of_mass;
+                g_target_interpolation_frame_data->object_data[abs_object_index].crouch = crouch;
                 g_interpolator_object_updated.set(abs_object_index, true);
-                g_interpolator_object_has_updated.set(abs_object_index, false);
+                g_interpolator_object_interpolation_updated.set(abs_object_index, false);
             }
         }
     }

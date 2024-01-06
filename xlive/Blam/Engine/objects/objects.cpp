@@ -883,6 +883,7 @@ void __cdecl objects_post_update()
 	while (object_header_it.get_next_datum())
 	{
 		s_object_header* object_header = object_header_it.get_current_datum();
+		object_datum* object = object_get_fast_unsafe(object_header_it.get_current_datum_index());
 
 		object_header->flags.set(_object_header_do_not_update_bit, false);
 
@@ -898,6 +899,18 @@ void __cdecl objects_post_update()
 
 			if (object_header->flags.test(_object_header_requires_motion_bit))
 				object_move(object_header_it.get_current_datum_index());
+		}
+
+		if (object_header->flags.test(_object_header_active_bit)
+			&& object_header->flags.test(_object_header_awake_bit)
+			&& !object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			if (object->object_flags.test(_object_hidden_bit))
+			{
+				// reset the interpolator for this object, if hidden
+				// ### FIXME maybe hook object_hide and reset it there?
+				object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+			}
 		}
 	}
 
