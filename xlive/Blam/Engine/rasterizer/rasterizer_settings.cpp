@@ -167,4 +167,8 @@ void rasterizer_settings_apply_hooks()
 {
 	DETOUR_ATTACH(p_update_screen_settings, Memory::GetAddress<update_screen_settings_t>(0x264979), update_screen_settings);
 	create_new_display_setting_array();
+
+	// fix (or workaround) the refresh rate being unset
+	// by some hacky looking code in the game
+	NopFill(Memory::GetAddress(0x26475D), 26);
 }

@@ -56,7 +56,7 @@ struct bitstream
 		return m_state == _bitstream_state_reading || m_state == _bitstream_state_read_only_for_consistency;
 	}
 
-	bool read_only_for_consistency()
+	bool read_only_for_consistency() const
 	{
 		return m_state == _bitstream_state_read_only_for_consistency;
 	}
