@@ -1,39 +1,175 @@
 #include "stdafx.h"
 #include "matrix_math.h"
 
-void __cdecl matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const real_quaternion* quaternion)
+real_matrix3x3* matrix3x3_from_forward_and_up(real_matrix3x3* matrix, const real_vector3d* forward, const real_vector3d* up)
 {
-	INVOKE(0x776F3, 0x752E9, matrix3x3_rotation_from_quaternion, matrix, quaternion);
+	matrix->forward = *forward;
+	cross_product3d(up, forward, &matrix->left);
+	matrix->up = *up;
+	return matrix;
+}
+
+real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const real_quaternion* quaternion)
+{
+	real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
+
+	real32 scalar = (dot_product > k_real_math_epsilon ? 2.0f / dot_product : 0.0f);
+
+	real_vector3d scaled_vector;
+	scale_vector3d(&quaternion->vector, scalar, &scaled_vector);
+
+	real_vector3d w_scaled_vector;
+	scale_vector3d(&scaled_vector, quaternion->w, &w_scaled_vector);
+
+	real_vector3d i_scaled_vector;
+	scale_vector3d(&scaled_vector, quaternion->i, &i_scaled_vector);
+
+	real32 j_scaled_vector_j = quaternion->j * scaled_vector.j;
+	real32 j_scaled_vector_k = quaternion->j * scaled_vector.k;
+	real32 k_scaled_vector_k = quaternion->k * scaled_vector.k;
+
+	matrix->forward.i = 1.0f - (k_scaled_vector_k + j_scaled_vector_j);
+	matrix->left.i = i_scaled_vector.j - w_scaled_vector.k;
+	matrix->up.i = i_scaled_vector.k + w_scaled_vector.j;
+	matrix->forward.j = i_scaled_vector.j + w_scaled_vector.k;
+	matrix->left.j = 1.0f - (k_scaled_vector_k + i_scaled_vector.i);
+	matrix->up.j = j_scaled_vector_k - w_scaled_vector.i;
+	matrix->forward.k = i_scaled_vector.k - w_scaled_vector.j;
+	matrix->left.k = j_scaled_vector_k + w_scaled_vector.i;
+	matrix->up.k = 1.0f - (j_scaled_vector_j + i_scaled_vector.i);
+	return matrix;
+}
+
+real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, real_quaternion* quaternion)
+{
+	real32 v1 = matrix->forward.i + matrix->left.j + matrix->up.k;
+	if (v1 <= 0.0f)
+	{
+		uint32 i = matrix->forward.i < matrix->left.j;
+		if (matrix->forward.v[i] < matrix->up.k)
+		{
+			i = 2;
+		}
+
+		int32 i_1 = (i + 1) % 3;
+		int32 i_2 = (i + 2) % 3;
+		real32 forward_result = matrix->v.n[4 * i] - matrix->v.n[4 * i_1] - matrix->v.n[4 * i_2] + 1.0f;
+		real32 forward_result_sqroot = square_root(forward_result);
+
+		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
+		real32 scalar = 0.25f / quaternion->v.n[i];
+
+		quaternion->w = (matrix->matrix[i_1][i_2] - matrix->matrix[i_2][i_1]) * scalar;
+		quaternion->v.n[i_1] = (matrix->matrix[i][i_1] + matrix->matrix[i_1][i]) * scalar;
+		quaternion->v.n[i_2] = scalar * (matrix->matrix[i][i_2] + matrix->matrix[i_2][i]);
+	}
+	else
+	{
+		real32 v1_root = square_root(v1 + 1.0f);
+		quaternion->w = v1_root * 0.5f;
+
+		real32 scalar = 0.25f / quaternion->w;
+		quaternion->i = (matrix->left.k - matrix->up.j) * scalar;
+		quaternion->j = (matrix->up.i - matrix->forward.k) * scalar;
+		quaternion->k = (matrix->forward.j - matrix->left.i) * scalar;
+	}
+
+	if (quaternion->w < 0.0f)
+	{
+		quaternion->i = -quaternion->i;
+		quaternion->j = -quaternion->j;
+		quaternion->k = -quaternion->k;
+		quaternion->w = -quaternion->w;
+	}
+	return quaternion;
+}
+
+
+void matrix4x3_from_orientation(real_matrix4x3* matrix, const real_orientation* orientation)
+{
+	matrix4x3_rotation_from_quaternion(matrix, &orientation->quaternion);
+	matrix->position = orientation->position;
+	matrix->scale = orientation->scale;
 	return;
 }
 
-void __cdecl matrix4x3_from_orientation(real_matrix4x3* matrix, const real_orientation* orientation)
+void matrix4x3_rotation_from_quaternion(real_matrix4x3* matrix, const real_quaternion* quaternion)
 {
-	INVOKE(0x778CB, 0x754C1, matrix4x3_from_orientation, matrix, orientation);
+	matrix3x3_rotation_from_quaternion(&matrix->vectors, quaternion);
+	matrix->position.x = 0.0f;
+	matrix->position.y = 0.0f;
+	matrix->position.z = 0.0f;
+	matrix->scale = 1.0f;
 	return;
 }
 
-void __cdecl matrix4x3_rotation_from_quaternion(real_matrix4x3* matrix, const real_quaternion* quaternion)
+real_quaternion* matrix4x3_rotation_to_quaternion(const real_matrix4x3* matrix, real_quaternion* out)
 {
-	INVOKE(0x7784E, 0x75444, matrix4x3_rotation_from_quaternion, matrix, quaternion);
+	return matrix3x3_rotation_to_quaternion(&matrix->vectors, out);
+	
+}
+
+void matrix4x3_rotation_from_vectors(real_matrix4x3* matrix, const real_vector3d* forward, const real_vector3d* up)
+{
+	matrix->scale = 1.0f;
+	matrix->vectors.forward = *forward;
+	cross_product3d(up, forward, &matrix->vectors.left);
+	matrix->vectors.up = *up;
+	set_real_point3d(&matrix->position, 0.0f, 0.0f, 0.0f);
 	return;
 }
 
-void __cdecl matrix4x3_rotation_to_quaternion(const real_matrix4x3* matrix, real_quaternion* out)
+void matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d* position, const real_vector3d* forward, const real_vector3d* up)
 {
-	INVOKE(0x791A2, 0x76CF3, matrix4x3_rotation_to_quaternion, matrix, out);
+	matrix4x3_rotation_from_vectors(matrix, forward, up);
+	matrix->position = *position;
 	return;
 }
 
-void __cdecl matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d* position, const real_vector3d* forward, const real_vector3d* up)
+void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 {
-	INVOKE(0x791B2, 0x76D03, matrix4x3_from_point_and_vectors, matrix, position, forward, up);
-	return;
-}
+	if (input->scale == 0.0f)
+	{
+		csmemset(output, 0, sizeof(real_matrix4x3));
+	}
+	else
+	{
+		real_point3d inverse_pos;
+		inverse_pos.x = -input->position.x;
+		inverse_pos.y = -input->position.y;
+		inverse_pos.z = -input->position.z;
+		if (input->scale == 1.0f)
+		{
+			output->scale = 1.0f;
+		}
+		else
+		{
+			output->scale = 1.0 / input->scale;
+			inverse_pos.x *= output->scale;
+			inverse_pos.y *= output->scale;
+			inverse_pos.z *= output->scale;
+		}
+		output->vectors.forward.i = input->vectors.forward.i;
+		output->vectors.left.j = input->vectors.left.j;
+		output->vectors.up.k = input->vectors.up.k;
 
-void __cdecl matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
-{
-	INVOKE(0x773DA, 0x74FD0, matrix4x3_inverse, input, output);
+		real32 temp_value = input->vectors.left.i;
+		output->vectors.left.i = input->vectors.forward.j;
+		output->vectors.forward.j = temp_value;
+		
+		temp_value = input->vectors.up.i;
+		output->vectors.up.i = input->vectors.forward.k;
+		output->vectors.forward.k = temp_value;
+
+		temp_value = input->vectors.up.j;
+		output->vectors.up.j = input->vectors.left.k;
+		output->vectors.left.k = temp_value;
+
+		output->position.x = output->vectors.left.i * inverse_pos.y		+ output->vectors.forward.i * inverse_pos.x + output->vectors.up.i * inverse_pos.z;
+		output->position.y = output->vectors.forward.j * inverse_pos.x	+ output->vectors.left.j * inverse_pos.x	+ output->vectors.up.j * inverse_pos.z;
+		output->position.z = output->vectors.forward.k * inverse_pos.x	+ output->vectors.left.k * inverse_pos.y	+ output->vectors.up.k * inverse_pos.z;
+	}
+
 	return;
 }
 
@@ -173,11 +309,6 @@ void matrix4x3_interpolate(const real_matrix4x3* previous, const real_matrix4x3*
 	scale_interpolate(previous->scale, target->scale, fractional_ticks, &out_mat->scale);
 	points_interpolate(&previous->position, &target->position, fractional_ticks, &out_mat->position);
 	return;
-}
-
-void __cdecl matrix3x3_from_forward_and_up(real_matrix3x3* out_matrix, real_vector3d* forward_vector, real_vector3d* up_vector)
-{
-	INVOKE(0x79620, 0x77171, matrix3x3_from_forward_and_up, out_matrix, forward_vector, up_vector);
 }
 
 void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* input_matrix_2, real_matrix3x3* out_matrix)

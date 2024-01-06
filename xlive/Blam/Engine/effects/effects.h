@@ -24,7 +24,7 @@ enum e_effect_datum_flags : int16
     _effect_datum_flags_bit_15 = 15
 };
 
-enum e_effect_location_flags : int16
+enum e_effect_location_flags : uint16
 {
     _effect_location_flags_bit_15 = FLAG(15),
 };
