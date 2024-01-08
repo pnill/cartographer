@@ -123,7 +123,7 @@ public:
 #define QUICK_DBG(header, fmt, ...) \
 do { \
 Console::LogToTab(_console_tab_logs, \
-	header ": " "%s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
+	header ": " "   %s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
 } while (0)
 
 #define SIM_QUEUE_DBG(fmt, ...)
