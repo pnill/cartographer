@@ -31,8 +31,7 @@ struct c_simulation_event_handler_vtbl
 
     static c_simulation_event_handler_vtbl* get()
     {
-        // ### OFFSET
-        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268);
+        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268, 0x381D50);
     }
 };
 CHECK_STRUCT_SIZE(c_simulation_event_handler_vtbl, 6 * sizeof(void*));
@@ -41,8 +40,7 @@ class c_simulation_event_handler
 {
     c_simulation_event_handler_vtbl* get_vtbl()
     {
-        // ### TODO OFFSET
-        return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268);
+        return c_simulation_event_handler_vtbl::get();
     };
 
     c_simulation_event_handler_vtbl* vtbl;

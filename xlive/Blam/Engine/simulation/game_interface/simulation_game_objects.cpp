@@ -78,6 +78,11 @@ bool __stdcall c_simulation_object_entity_definition__object_creation_decode(voi
     return p_c_simulation_unit_entity_definition_decode(_this, creation_data, packet);
 }
 
+datum simulation_object_get_replicated_object_from_entity(int32 entity_index)
+{
+    return INVOKE(0x1F2211, 0x1DD2AA, simulation_object_get_replicated_object_from_entity, entity_index);
+}
+
 bool __stdcall c_simulation_object_entity_definition__object_setup_placement_data(void* _this,
     s_simulation_object_creation_data* object_creation_data,
     s_simulation_object_state_data* state_data,

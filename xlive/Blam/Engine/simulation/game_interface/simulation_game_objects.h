@@ -43,6 +43,8 @@ struct s_simulation_object_creation_data
 };
 CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
 
+datum simulation_object_get_replicated_object_from_entity(int32 entity_index);
+
 bool __stdcall c_simulation_object_entity_definition__object_setup_placement_data(void* _this,
 	s_simulation_object_creation_data* object_creation_data,
 	s_simulation_object_state_data* state_data,

@@ -40,7 +40,7 @@ struct s_simulation_game_entity
 };
 CHECK_STRUCT_SIZE(s_simulation_game_entity, 0x24);
 
-datum simulation_entity_index_to_object_index(int32 entity_index);
+datum simulation_gamestate_entity_get_object_index(int32 entity_index);
 void simulation_entity_indices_to_object_index(int32* entity_references, int32 entity_reference_count, datum* out_object_index, int32 out_object_index_count);
 bool simulation_object_index_valid(datum object_index);
 
