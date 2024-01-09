@@ -4,7 +4,7 @@
 #include "simulation_type_collection.h"
 #include "game/player_control.h"
 
-void __cdecl simulation_update_discard();
+void simulation_update_discard();
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
 
