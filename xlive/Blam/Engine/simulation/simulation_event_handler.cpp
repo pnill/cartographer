@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "simulation_event_handler.h"
 
-#include "Simulation/simulation.h"
-#include "Simulation/simulation_world.h"
+#include "simulation/simulation_world.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
 #include "Networking/memory/networking_memory.h"
