@@ -3,8 +3,8 @@
 
 #include "game/game.h"
 #include "simulation.h"
-#include "Simulation/simulation_world.h"
-#include "Simulation/game_interface/simulation_game_entities.h"
+#include "simulation/simulation_world.h"
+#include "simulation/game_interface/simulation_game_entities.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
@@ -202,7 +202,7 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 	}
 }
 
-bool simulation_event_queue_apply(const s_simulation_queue_element* update)
+bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 {
 	s_simulation_queue_events_apply sim_apply_data;
 	bool decode_success = decode_event_to_buffer(update->data_size, update->data, &sim_apply_data);

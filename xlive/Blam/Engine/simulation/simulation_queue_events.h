@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Simulation/simulation_queue.h"
-#include "Simulation/simulation_event_handler.h"
-#include "Simulation/simulation_type_collection.h"
+#include "simulation/simulation_queue.h"
+#include "simulation/simulation_event_handler.h"
+#include "simulation/simulation_type_collection.h"
 
 struct s_simulation_queue_events_apply
 {
@@ -13,5 +13,6 @@ struct s_simulation_queue_events_apply
 	int32 data_size;
 };
 
-bool simulation_event_queue_apply(const s_simulation_queue_element* update);
+
+bool simulation_queue_event_apply(const s_simulation_queue_element* update);
 void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* references, int32 block_size, uint8* block);

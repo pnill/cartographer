@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Simulation/simulation_type_collection.h"
-#include "Simulation/game_interface/simulation_game_entities.h"
+#include "simulation/simulation_type_collection.h"
+#include "simulation/game_interface/simulation_game_entities.h"
 
 #define k_entity_reference_indices_count_max 2
 

@@ -111,7 +111,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 			switch (element->type)
 			{
 			case _simulation_queue_element_type_event:
-				simulation_event_queue_apply(element);
+				simulation_queue_event_apply(element);
 				break;
 			case _simulation_queue_element_type_entity_creation:
 				break;

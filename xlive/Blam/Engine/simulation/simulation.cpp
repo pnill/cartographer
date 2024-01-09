@@ -8,8 +8,7 @@
 
 c_simulation_world* simulation_get_world()
 {
-	// ### TODO offset
-	return *Memory::GetAddress<c_simulation_world**>(0x5178DC, 0x0);
+	return *Memory::GetAddress<c_simulation_world**>(0x5178DC, 0x520B6C);
 }
 
 bool simulation_query_object_is_predicted(datum object_datum)
@@ -19,7 +18,7 @@ bool simulation_query_object_is_predicted(datum object_datum)
 
 void __cdecl simulation_process_input(uint32 player_action_mask, const player_action* player_actions)
 {
-    INVOKE(0x1ADDA9, 0x0, simulation_process_input, player_action_mask, player_actions);
+    INVOKE(0x1ADDA9, 0x1A8160, simulation_process_input, player_action_mask, player_actions);
     return;
 }
 
@@ -38,9 +37,8 @@ void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
     simulation_get_world()->apply_event_update_queue();
 }
 
-// ### TODO server offsets
 
-void __cdecl simulation_update_discard()
+void simulation_update_discard()
 {
     // remove everything from the queue
     simulation_get_world()->destroy_update();
@@ -50,5 +48,5 @@ void simulation_apply_patches()
 {
     c_simulation_world::queues_initialize();
     simulation_event_handler_apply_patches();
-    DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902), simulation_update_before_game_hook);
+    DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
 }

@@ -1,27 +1,27 @@
 #pragma once
 #include "Blam/Engine/memory/bitstream.h"
 
-enum e_simulation_entity_type : __int16
+enum e_simulation_entity_type : int16
 {
-	_simulation_entity_type_none = -1,
-	_simulation_entity_type_slayer_engine_globals = 0x0,
-	_simulation_entity_type_ctf_engine_globals = 0x1,
-	_simulation_entity_type_oddball_engine_globals = 0x2,
-	_simulation_entity_type_king_engine_globals = 0x3,
-	_simulation_entity_type_territories_engine_globals = 0x4,
-	_simulation_entity_type_juggernaut_engine_globals = 0x5,
-	_simulation_entity_type_game_engine_player = 0x6,
-	_simulation_entity_type_game_engine_statborg = 0x7,
-	_simulation_entity_type_breakable_surface_group = 0x8,
-	_simulation_entity_type_unit = 0x9,
-	_simulation_entity_type_item = 0xA,
-	_simulation_entity_type_generic = 0xB,
-	_simulation_entity_type_vehicle = 0xC,
-	_simulation_entity_type_projectile = 0xD,
-	_simulation_entity_type_weapon = 0xE,
-	_simulation_entity_type_turret = 0xF,
-	_simulation_entity_type_device = 0x10,
-	k_simulation_entity_count = 0x11,
+	_simulation_entity_type_none = NONE,
+	_simulation_entity_type_slayer_engine_globals = 0,
+	_simulation_entity_type_ctf_engine_globals = 1,
+	_simulation_entity_type_oddball_engine_globals = 2,
+	_simulation_entity_type_king_engine_globals = 3,
+	_simulation_entity_type_territories_engine_globals = 4,
+	_simulation_entity_type_juggernaut_engine_globals = 5,
+	_simulation_entity_type_game_engine_player = 6,
+	_simulation_entity_type_game_engine_statborg = 7,
+	_simulation_entity_type_breakable_surface_group = 8,
+	_simulation_entity_type_unit = 9,
+	_simulation_entity_type_item = 10,
+	_simulation_entity_type_generic = 11,
+	_simulation_entity_type_vehicle = 12,
+	_simulation_entity_type_projectile = 13,
+	_simulation_entity_type_weapon = 14,
+	_simulation_entity_type_turret = 15,
+	_simulation_entity_type_device = 16,
+	k_simulation_entity_count,
 };
 
 struct s_simulation_game_entity
@@ -63,8 +63,8 @@ public:
 	virtual bool object_creation_decode(uint32 creation_data_size, void* creation_data, bitstream* packet) = 0;;
 	virtual bool write_update_to_packet(bool unk, DWORD update_mask, DWORD* update_mask_written, DWORD state_data_size, void* state_data, void* telemetry_data, bitstream* packet, int required_leave_space_bits) = 0;;
 	virtual bool read_update_from_packet(bool a1, DWORD* out_update_mask, DWORD state_data_size, void* state_data, bitstream* packet) = 0;;
-	virtual bool sub_A90891(int a1, int a2, int a3) = 0;
-	virtual int8 sub_A908DB(int a1, int a2, int a3) = 0;
+	virtual bool entity_state_lossy_compare(void* a1, void* a2, int32 a3) = 0;
+	virtual bool entity_creation_lossy_compare(void* a1, void* a2, int32 a3) = 0;
 	virtual uint32 build_creation_data(s_simulation_game_entity* entity, int32 creation_data_size, void* out_creation_data) = 0;
 	virtual bool build_baseline_state_data(int32 creation_data_size, void* creation_data, int32 state_data_size, void* baseline_state_data) = 0;
 	virtual bool build_updated_state_data(s_simulation_game_entity* entity, uint32* update_mask, int32 state_data_size, void* state_data) = 0;
