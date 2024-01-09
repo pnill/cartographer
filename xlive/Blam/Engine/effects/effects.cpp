@@ -33,29 +33,28 @@ effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum
     return INVOKE(0xA68DD, 0x9895D, effect_location_get_next_valid_index, effect_datum, out_index, a3);
 }
 
-
-
-
-void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 a1, effect_datum* effect, real_matrix4x3* out_mat, bool a4)
+void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_datum* effect, real_matrix4x3* out_mat, bool a4)
 {
     int32 origin_user = effect->origin_local_user_index;
     datum origin_object_index = effect->multi_purpose_origin_index;
 
-    if (!a4 || a1 == -1 || (a1 & 0x8000) == 0 || origin_user == -1)
+    bool special_node = (node & 0x8000) != 0;
+    int16 node_index = node & ~0x8000;
+
+    if (!a4 || node == -1 || !special_node || origin_user == -1)
     {
-        if (a1 != -1)
+        if (node != -1)
         {
-            if ((a1 & 0x8000) != 0)
+            if (special_node)
             {
-                if (origin_user != -1)
+                if (origin_user != NONE)
                 {
-                    first_person_weapon_get_worldspace_node_matrix(origin_user, origin_object_index, a1 & ~0x8000, out_mat);
+                    first_person_weapon_get_worldspace_node_matrix(origin_user, origin_object_index, node_index, out_mat);
                     return;
                 }
             }
             else
             {
-                int16 node_index = a1 & ~0x8000;
                 if (!halo_interpolator_interpolate_object_node_matrix(origin_object_index, node_index, out_mat))
                 {
                     csmemcpy(out_mat, object_get_node_matrix(origin_object_index, node_index), sizeof(real_matrix4x3));
@@ -65,7 +64,7 @@ void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 a1, effect_da
     }
     else
     {
-        real_matrix4x3* mat = first_person_weapon_get_relative_node_matrix(origin_user, origin_object_index, a1 & ~0x8000);
+        real_matrix4x3* mat = first_person_weapon_get_relative_node_matrix(origin_user, origin_object_index, node_index);
         csmemcpy(out_mat, mat, sizeof(real_matrix4x3));
     }
 }

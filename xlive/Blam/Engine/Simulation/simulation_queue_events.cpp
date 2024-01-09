@@ -223,6 +223,8 @@ bool simulation_event_queue_apply(const s_simulation_queue_element* update)
 		if (!DATUM_IS_NONE(sim_apply_data.object_refereces[i]))
 		{
 			// hopefully this does the job
+			// TODO FIXME this crashed the game once
+			// the events need to be discarded whenever simulation layer initializes
 			entity_references[i] = object_get_entity_index(sim_apply_data.object_refereces[i]);
 		}
 		else

@@ -3,7 +3,6 @@
 
 #include "game/game.h"
 #include "objects/objects.h"
-#include "simulation_world.h"
 
 #include "Util/Hooks/Hook.h"
 

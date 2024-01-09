@@ -458,7 +458,7 @@ void Console::Draw(const char* title, bool* p_open)
 		ImGui::EndPopup();
 	}
 
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 2));
 	for (size_t i = 0; i < GetMainOutput()->GetHeaderCount(); i++)
 	{
 		// TODO add color support

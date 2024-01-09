@@ -1,13 +1,20 @@
 #include "stdafx.h"
 #include "rasterizer_settings.h"
 
+#include "Blam/Engine/math/math.h"
+#include "Blam/Engine/shell/shell.h"
+#include "dx9/rasterizer_dx9_main.h"
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Util/Hooks/Hook.h"
 
-s_display_option g_display_options[k_max_display_option_count] = { 0 };
+void __cdecl rasterizer_discard_refresh_rate();
+
+s_display_option g_display_options[k_max_display_option_count] = {};
 
 typedef void(__cdecl* update_screen_settings_t)(int, int, short, short, short, short, float, float);
 update_screen_settings_t p_update_screen_settings;
+
+int32** g_refresh_rate = NULL;
 
 void __cdecl update_screen_settings(
 	int width, 
@@ -84,10 +91,21 @@ void create_new_display_setting_array()
 	{
 		// See if we already have a duplicate setting
 		// Don't populate it if we do
+
 		bool populate_setting = true;
+
+		// discard anything bellow 640x480 (which is already very low res)
+		if (screen.dmPelsWidth < 640
+			|| screen.dmPelsHeight < 480)
+		{
+			populate_setting = false;
+			continue;
+		}
+
 		for (size_t j = 0; j < count; j++)
 		{
-			if (screen.dmPelsWidth == g_display_options[j].width && screen.dmPelsHeight == g_display_options[j].height)
+			if (screen.dmPelsWidth == g_display_options[j].width 
+				&& screen.dmPelsHeight == g_display_options[j].height)
 			{
 				populate_setting = false;
 				break;
@@ -117,7 +135,7 @@ void create_new_display_setting_array()
 			{
 				g_display_options[count].aspect_ratio = _aspect_ratio_4x3;
 			}
-			++count;
+			count++;
 		}
 	}
 
@@ -163,8 +181,270 @@ void create_new_display_setting_array()
 	}
 }
 
+s_video_mode* rasterizer_get_video_modes()
+{
+	return *Memory::GetAddress<s_video_mode**>(0xA3D9F0);
+}
+
+s_video_mode* rasterizer_get_video_mode(int32 video_mode)
+{
+	return &rasterizer_get_video_modes()[video_mode];
+}
+
+uint32 rasterizer_get_video_mode_count()
+{
+	return *Memory::GetAddress<uint32*>(0xA3D9F4);
+}
+
+int32 rasterizer_get_default_display_monitor()
+{
+	int32 monitor_index = 0;
+
+	if (shell_startup_flag_is_set(_startup_flag_monitor_count))
+	{
+		if (shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_get_interface()->GetAdapterCount())
+		{
+			monitor_index = shell_startup_flag_get(_startup_flag_monitor_count);
+		}
+	}
+
+	return monitor_index;
+}
+
+int __cdecl d3d_display_mode_compare(void* context, void const* a, void const* b)
+{
+	D3DDISPLAYMODE* mode_a = (D3DDISPLAYMODE*)a;
+	D3DDISPLAYMODE* mode_b = (D3DDISPLAYMODE*)b;
+
+	if (mode_a->Width != mode_b->Width)
+	{
+		return mode_a->Width - mode_b->Width;
+	}
+	else if (mode_a->Height != mode_b->Height)
+	{
+		return mode_a->Height - mode_b->Height;
+	}
+
+	return mode_a->RefreshRate - mode_b->RefreshRate;
+}
+
+bool rasterizer_display_refresh_rate_exists(D3DDISPLAYMODE* d3d_display_modes, int32 display_mode_count, UINT width, UINT height, UINT refresh_rate)
+{
+	for (int32 i = 0; i < display_mode_count; i++)
+	{
+		if (d3d_display_modes[i].Width == width && d3d_display_modes[i].Height == height)
+		{
+			if (d3d_display_modes[i].RefreshRate == refresh_rate)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+typedef void(__cdecl* t_video_settings_get_available_monitor_display_modes)();
+t_video_settings_get_available_monitor_display_modes p_video_settings_get_available_monitor_display_modes;
+
+void __cdecl video_settings_get_available_monitor_display_modes_hook()
+{
+	p_video_settings_get_available_monitor_display_modes();
+
+	static bool initialized = false;
+	if (!initialized)
+	{
+		IDirect3D9* d3d9 = rasterizer_dx9_get_interface();
+
+		int32 adapter_index = rasterizer_get_default_display_monitor();
+
+		D3DDISPLAYMODE d3d_display_mode;
+		d3d9->GetAdapterDisplayMode(adapter_index, &d3d_display_mode);
+
+		int32 d3d_adapter_mode_count = d3d9->GetAdapterModeCount(adapter_index, d3d_display_mode.Format);
+
+		if (d3d_adapter_mode_count > 0)
+		{
+			D3DDISPLAYMODE* d3d_display_modes = new D3DDISPLAYMODE[d3d_adapter_mode_count];
+
+			int32 d3d_mode_index = 0;
+
+			for (UINT i = 0; i < d3d_adapter_mode_count; i++)
+			{
+				if (SUCCEEDED(d3d9->EnumAdapterModes(adapter_index, d3d_display_mode.Format, i, &d3d_display_modes[d3d_mode_index])))
+				{
+					d3d_mode_index++;
+				}
+			}
+
+			int32 d3d_mode_count = d3d_mode_index;
+			qsort_s(d3d_display_modes, d3d_mode_count, sizeof(D3DDISPLAYMODE), d3d_display_mode_compare, NULL);
+
+			s_video_mode* video_modes = rasterizer_get_video_modes();
+			int32 video_mode_count = rasterizer_get_video_mode_count();
+
+			// allocate the new refresh rate buffers
+			g_refresh_rate = new int32*[video_mode_count];
+
+			// reset the refresh rate data
+			for (int32 i = 0; i < video_mode_count; i++)
+			{
+				for (int32 j = 0; j < video_modes[i].refresh_rate_count; j++)
+				{
+					video_modes[i].refresh_rate[j] = 0;
+				}
+				video_modes[i].refresh_rate_count = 0;
+			}
+
+			// a tad too complex, might need some cleanup
+			// move to function that's using callbacks for each stage
+			bool compute_refresh_rate_count = true;
+			for (int32 i = 0; i < video_mode_count; )
+			{
+				int32 refresh_rate_index = 0;
+				for (int32 j = 0; j < d3d_mode_count; j++)
+				{
+					if (d3d_display_modes[j].Width == video_modes[i].width
+						&& d3d_display_modes[j].Height == video_modes[i].height)
+					{
+						bool refresh_rate_valid = true;
+
+						if (d3d_mode_count > 2)
+						{
+							if ((d3d_display_modes[j].RefreshRate > 30 && d3d_display_modes[j].RefreshRate < 60)
+								&& rasterizer_display_refresh_rate_exists(d3d_display_modes, d3d_mode_count, d3d_display_modes[j].Width, d3d_display_modes[j].Height, 60))
+							{
+								refresh_rate_valid = false;
+							}
+
+							if (d3d_display_modes[j].RefreshRate < 30
+								&& rasterizer_display_refresh_rate_exists(d3d_display_modes, d3d_mode_count, d3d_display_modes[j].Width, d3d_display_modes[j].Height, 30))
+							{
+								refresh_rate_valid = false;
+							}
+						}
+
+						// stage 1
+						// check if we're computing the refresh rate count
+						if (compute_refresh_rate_count)
+						{
+							if (refresh_rate_valid)
+							{
+								video_modes[i].refresh_rate_count++;
+							}
+						}
+						else
+						{
+							// stage 2
+							// copy, then move to next
+							if (refresh_rate_valid)
+							{
+								// ### FIXME needs some more code re-written
+								g_refresh_rate[i][refresh_rate_index++] = d3d_display_modes[j].RefreshRate;
+							}
+						}
+					}
+				}
+
+				// if we computed the valid refresh rate count, add them to the list
+				if (compute_refresh_rate_count && video_modes[i].refresh_rate_count > 0)
+				{
+					g_refresh_rate[i] = new int32[video_modes[i].refresh_rate_count];
+					compute_refresh_rate_count = false;
+				}
+				else
+				{
+					// skip entirely if no refresh rates are available
+					// and calculate the refresh rate count again
+					i++;
+					compute_refresh_rate_count = true;
+				}
+			}
+
+			// ### FIXME replace
+			// copy the refresh rates 
+			for (int32 i = 0; i < video_mode_count; i++)
+			{
+				int32 refresh_rate_start_index = MIN(video_modes[i].refresh_rate_count, k_max_default_display_refresh_rate_count) - 1;
+				for (int32 j = video_modes[i].refresh_rate_count - 1; j >= 0; j--)
+				{
+					if (refresh_rate_start_index >= 0)
+					{
+						video_modes[i].refresh_rate[refresh_rate_start_index--] = g_refresh_rate[i][j];
+					}
+					else
+					{
+						break;
+					}
+				}
+
+				video_modes[i].refresh_rate_count = MIN(video_modes[i].refresh_rate_count, k_max_default_display_refresh_rate_count);
+			}
+
+			// ### FIXME remove once extended refresh list is ready
+			rasterizer_discard_refresh_rate();
+
+			delete[] d3d_display_modes;
+		}
+
+		initialized = true;
+	}
+
+	return;
+}
+
+uint32 rasterizer_get_video_mode_refresh_rate_count(int32 video_mode_index)
+{
+	if (video_mode_index < rasterizer_get_video_mode_count())
+	{
+		return rasterizer_get_video_mode(video_mode_index)->refresh_rate_count;
+	}
+
+	return 0;
+}
+
+void __cdecl rasterizer_discard_refresh_rate()
+{
+	// atexit
+
+	if (g_refresh_rate != NULL)
+	{
+		for (int32 i = 0; i < rasterizer_get_video_mode_refresh_rate_count(i); i++)
+		{
+			if (g_refresh_rate[i])
+				delete[] g_refresh_rate[i];
+		}
+		
+		delete[] g_refresh_rate;
+	}
+
+	return;
+}
+
+typedef int32(__cdecl* t_rasterizer_get_video_mode_refresh_rate)(int32, int32);
+t_rasterizer_get_video_mode_refresh_rate p_rasterizer_get_video_mode_refresh_rate;
+
+int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(int32 video_mode_index, int32 refresh_rate_index)
+{
+	if (video_mode_index < rasterizer_get_video_mode_count())
+	{
+		if (refresh_rate_index < rasterizer_get_video_mode_refresh_rate_count(video_mode_index))
+			return g_refresh_rate[video_mode_index][refresh_rate_index];
+	}
+
+	return g_refresh_rate[0][0];
+}
+
 void rasterizer_settings_apply_hooks()
 {
 	DETOUR_ATTACH(p_update_screen_settings, Memory::GetAddress<update_screen_settings_t>(0x264979), update_screen_settings);
 	create_new_display_setting_array();
+
+	DETOUR_ATTACH(p_video_settings_get_available_monitor_display_modes, Memory::GetAddress<t_video_settings_get_available_monitor_display_modes>(0x2638BB), video_settings_get_available_monitor_display_modes_hook);
+
+	//DETOUR_ATTACH(p_rasterizer_get_video_mode_refresh_rate, Memory::GetAddress<t_rasterizer_get_video_mode_refresh_rate>(0x263CA8), rasterizer_get_video_mode_refresh_rate_hook);
+
+	atexit(rasterizer_discard_refresh_rate);
+
+	// fix (or workaround) the refresh rate being unset
+	// by some hacky looking code in the game
+	NopFill(Memory::GetAddress(0x26475D), 26);
 }

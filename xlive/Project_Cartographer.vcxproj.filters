@@ -87,7 +87,6 @@
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
     <ClCompile Include="XLive\xnet\NIC.cpp" />
     <ClCompile Include="XLive\xnet\net_utils.cpp" />
     <ClCompile Include="Util\curl-interface.cpp" />
@@ -278,8 +277,11 @@
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_events.cpp" />
     <ClCompile Include="Blam\Engine\Simulation\simulation_event_handler.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\simulation_events_queue.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_queue_events.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_queue.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_world.cpp" />
+    <ClCompile Include="Blam\Engine\Simulation\simulation_queue_entities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -480,7 +482,6 @@
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Cache\TagGroups\physics_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
     <ClInclude Include="XLive\xnet\NIC.h" />
     <ClInclude Include="XLive\xnet\net_utils.h" />
     <ClInclude Include="Util\curl-interface.h" />
@@ -802,8 +803,10 @@
     <ClInclude Include="Blam\Engine\Simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\Simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\Simulation\unit_control.h" />
-    <ClInclude Include="Blam\Engine\Simulation\simulation_events_queue.h" />
     <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_queue_events.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_queue.h" />
+    <ClInclude Include="Blam\Engine\Simulation\simulation_queue_entities.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

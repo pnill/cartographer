@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
+#include "Blam/Engine/shell/shell.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/tag_files/files_windows.h"
@@ -531,9 +532,8 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_map_name(con
 
 bool __thiscall s_custom_map_data::get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry)
 {
-	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 	// custom_scenario_test_map_name_instead_of_hash
-	if (flags_array[15])
+	if (shell_startup_flag_is_set(_startup_flag_custom_map_entry_test_map_name_instead_of_hash))
 		return find_matching_entries_by_map_name(custom_map_id->map_name, out_entry, 1) != 0;
 	else
 		return find_matching_entries_by_sha256_hash(custom_map_id->map_sha256_hash, out_entry, 1) != 0;

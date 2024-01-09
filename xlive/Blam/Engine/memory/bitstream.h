@@ -9,7 +9,7 @@ enum e_bitstream_state : uint32
 	_bitstream_state_writing,
 	_bitstream_state_write_finished,
 	_bitstream_state_reading,
-	_bitstream_state_reading_2,// read after write maybe???
+	_bitstream_state_read_only_for_consistency,// read after write maybe???
 	_bitstream_state_reading_finished,
 
 	k_bitstream_state_count
@@ -53,7 +53,12 @@ struct bitstream
 
 	bool reading() const
 	{
-		return m_state == _bitstream_state_reading || m_state == _bitstream_state_reading_2;
+		return m_state == _bitstream_state_reading || m_state == _bitstream_state_read_only_for_consistency;
+	}
+
+	bool read_only_for_consistency() const
+	{
+		return m_state == _bitstream_state_read_only_for_consistency;
 	}
 
 	void begin_reading();

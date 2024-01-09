@@ -424,7 +424,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	game_globals_apply_tag_patches(options);
 
 	tags::run_callbacks();
-	H2Tweaks::SetScreenRefreshRate();
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading the main menu

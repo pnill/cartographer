@@ -2,6 +2,7 @@
 
 #include "WinMainH2.h"
 
+#include "Blam/Engine/shell/shell.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 #include "Blam/Engine/saved_games/game_state.h"
 
@@ -13,7 +14,6 @@
 
 const static int max_monitor_count = 9;
 
-BOOL __cdecl is_init_flag_set(e_startup_flags id);
 int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
 
 void InitH2WinMainPatches()
@@ -21,7 +21,7 @@ void InitH2WinMainPatches()
 	if (Memory::IsDedicatedServer())
 		return;
 
-	WriteJmpTo(Memory::GetAddress(0x4544), is_init_flag_set);
+	WriteJmpTo(Memory::GetAddress(0x4544), shell_startup_flag_get);
 	WriteJmpTo(Memory::GetAddress(0x7E43), WinMain_Halo2);
 }
 
@@ -119,20 +119,22 @@ int WINAPI WinMain_Halo2(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpC
 
 bool engine_basic_init()
 {
-	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-	ZeroMemory(flags_array, e_startup_flags::count * sizeof(DWORD)); // should be zero initalized anyways but the game does it
+	void(__cdecl * fn_c000285fd)() = Memory::GetAddress<void(__cdecl*)()>(0x285fd);
+
+	for (int32 i = 0; i < k_startup_flags_count; i++)
+	{
+		shell_startup_flag_set((e_startup_flags)i, 0);
+	}
 
 	H2Config_voice_chat = false;
-	flags_array[e_startup_flags::nointro] = H2Config_skip_intro;
-
-	void(__cdecl * fn_c000285fd)() = (void(__cdecl*)())Memory::GetAddress<void*>(0x000285fd);
+	shell_startup_flag_set(_startup_flag_nointro, H2Config_skip_intro);
 
 	gfwl_gamestore_initialize();
 	init_data_checksum_info();
 	runtime_state_initialize();
 
-	flags_array[e_startup_flags::d3d9ex_enabled] = H2Config_d3d9ex;
-	flags_array[e_startup_flags::disable_voice_chat] = 1;
+	shell_startup_flag_set(_startup_flag_d3d9ex_enabled, H2Config_d3d9ex);
+	shell_startup_flag_set(_startup_flag_disable_voice_chat, 1);
 
 	int arg_count;
 	wchar_t** cmd_line_args = LOG_CHECK(CommandLineToArgvW(GetCommandLineW(), &arg_count));
@@ -141,24 +143,24 @@ bool engine_basic_init()
 			wchar_t* cmd_line_arg = cmd_line_args[i];
 
 			if (_wcsicmp(cmd_line_arg, L"-windowed") == 0) {
-				flags_array[e_startup_flags::windowed] = 1;
+				shell_startup_flag_set(_startup_flag_windowed, 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-nosound") == 0) {
-				flags_array[e_startup_flags::nosound] = 1;
+				shell_startup_flag_set(_startup_flag_nosound, 1);
 				WriteValue(Memory::GetAddress(0x479EDC), 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-novsync") == 0) {
-				flags_array[e_startup_flags::novsync] = 1;
+				shell_startup_flag_set(_startup_flag_novsync, 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-nointro") == 0) {
-				flags_array[e_startup_flags::nointro] = 1;
+				shell_startup_flag_set(_startup_flag_nointro, 1);
 			}
 			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
-				flags_array[e_startup_flags::monitor_count] = min(max(0, monitor_id), max_monitor_count);
+				shell_startup_flag_set(_startup_flag_monitor_count, MIN(MAX(0, monitor_id), max_monitor_count));
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
-				flags_array[e_startup_flags::high_quality] = 1;
+				shell_startup_flag_set(_startup_flag_high_quality, 1);
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-disabledepthbias") == 0)
 			{
@@ -170,22 +172,22 @@ bool engine_basic_init()
 #if COMPILE_WITH_VOICE
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
-				flags_array[e_startup_flags::disable_voice_chat] = 0;
+				shell_startup_flag_set(_startup_flag_disable_voice_chat, 0);
 				H2Config_voice_chat = true;
 			}
 #endif
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
-				flags_array[min(max(0, flag_id), e_startup_flags::count - 1)] = 1;
+				shell_startup_flag_set((e_startup_flags)MIN(MAX(0, flag_id), e_startup_flags::k_startup_flags_count - 1), 1);
 			}
 #endif
 		}
 	}
 	LocalFree(cmd_line_args);
 
-	if (flags_array[e_startup_flags::unk26])
-		timing_initialize(1000 * flags_array[e_startup_flags::unk26]);
+	if (shell_startup_flag_is_set(_startup_flag_unk26))
+		timing_initialize(1000 * shell_startup_flag_get(_startup_flag_unk26));
 	real_math_initialize();
 	async_initialize();
 	game_preferences_initialize();
@@ -228,20 +230,6 @@ bool engine_basic_init()
 	//XLivePBufferSetByte((FakePBuffer*)var_c00479e78, 0, 1);
 
 	return true;
-}
-
-BOOL __cdecl is_init_flag_set(e_startup_flags id)
-{
-	static int flag_log_count[e_startup_flags::count];
-	if (flag_log_count[id] < 10)
-	{
-		LOG_TRACE_GAME("is_init_flag_set() : flag {}", id);
-		flag_log_count[id]++;
-		if (flag_log_count[id] == 10)
-			LOG_TRACE_GAME("is_init_flag_set() : flag {} logged to many times ignoring", id);
-	}
-	DWORD* init_flags_array = Memory::GetAddress<DWORD*>(0x46d820);
-	return init_flags_array[id] != 0;
 }
 
 #pragma region Game Init functions

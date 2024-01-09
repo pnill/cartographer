@@ -255,8 +255,6 @@ namespace ImGuiHandler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
-					CHRONO_DEFINE_TIME_AND_CLOCK();
-
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
@@ -272,17 +270,9 @@ namespace ImGuiHandler {
 					{
 						H2Config_fps_limit = 60;
 					}
-					ImGui::NextColumn();
-					ImGui::PopItemWidth();
-					ImGui::Text(GetString(refresh_rate));
-					ImGui::PushItemWidth(WidthPercentage(100));
-					int gRefresh = H2Config_refresh_rate;
-					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysOverwrite);
-					if (ImGui::IsItemEdited())
-						H2Config_refresh_rate = gRefresh;
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
+					// from the old refresh button
+					ImGui::NextColumn();
 					ImGui::NextColumn();
 					//LOD
 					ImGui::Text(GetString(lod));
@@ -1112,8 +1102,6 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::render_none] = "None";
 			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
 			string_table[0][e_advanced_string::render_engine] = "Engine Force";
-			string_table[0][e_advanced_string::refresh_rate] = "Refresh Rate";
-			string_table[0][e_advanced_string::refresh_rate_tooltip] = "This settings requires a restart to take effect";
 			string_table[0][e_advanced_string::lod] = "Level of Detail";
 			string_table[0][e_advanced_string::e_default] = "Default";
 			string_table[0][e_advanced_string::lod_1] = "L1 - Very Low";
@@ -1274,8 +1262,6 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::render_none] = "Ninguno";
 			string_table[4][e_advanced_string::render_cinematic] = "Fuerza Cinematográfica";
 			string_table[4][e_advanced_string::render_engine] = "Fuerza del motor";
-			string_table[4][e_advanced_string::refresh_rate] = "Taza de refresco";
-			string_table[4][e_advanced_string::refresh_rate_tooltip] = "Este ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::lod] = "Nivel de detalle";
 			string_table[4][e_advanced_string::e_default] = "Inicial";
 			string_table[4][e_advanced_string::lod_1] = "N1 - Muy bajo";
