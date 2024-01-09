@@ -8,7 +8,7 @@
 #include "Blam/Engine/game/game_statborg.h"
 #include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_action.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "Blam/Engine/units/bipeds.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"

@@ -22,8 +22,8 @@
 #include "Blam/Engine/physics/collisions.h"
 #include "Blam/Engine/physics/havok.h"
 #include "Blam/Engine/physics/havok_memory.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
-#include "Blam/Engine/Simulation/simulation.h"
+#include "simulation/game_interface/simulation_game_units.h"
+#include "simulation/simulation.h"
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/units/bipeds.h"
 

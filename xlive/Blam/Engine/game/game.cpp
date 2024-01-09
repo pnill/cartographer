@@ -11,7 +11,7 @@
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam/Engine/saved_games/game_state.h"
 #include "Blam/Engine/shell/shell.h"
-#include "Blam/Engine/Simulation/simulation.h"
+#include "simulation/simulation.h"
 #include "Util/Hooks/Hook.h"
 
 s_game_systems* get_game_systems()

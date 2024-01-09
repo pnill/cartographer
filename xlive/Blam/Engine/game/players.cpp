@@ -5,7 +5,7 @@
 #include "Blam/Engine/game/game_engine.h"
 #include "Blam/Engine/game/game_engine_util.h"
 #include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_action.h"
+#include "simulation/game_interface/simulation_game_action.h"
 #include "Blam/Engine/units/units.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 #include "Blam/Engine/scenario/scenario.h"
