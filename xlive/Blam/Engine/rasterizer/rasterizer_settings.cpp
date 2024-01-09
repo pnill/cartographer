@@ -314,7 +314,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 							{
 								refresh_rate_valid = false;
 							}
-							
+
 							if (d3d_display_modes[j].RefreshRate < 30
 								&& rasterizer_display_refresh_rate_exists(d3d_display_modes, d3d_mode_count, d3d_display_modes[j].Width, d3d_display_modes[j].Height, 30))
 							{
@@ -340,27 +340,22 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 								// ### FIXME needs some more code re-written
 								g_refresh_rate[i][refresh_rate_index++] = d3d_display_modes[j].RefreshRate;
 							}
-
-							// reset the loop if last iteration
-							if (j + 1 == d3d_mode_count)
-							{
-								compute_refresh_rate_count = true;
-								i++;
-							}
 						}
 					}
 				}
 
+				// if we computed the valid refresh rate count, add them to the list
 				if (compute_refresh_rate_count && video_modes[i].refresh_rate_count > 0)
 				{
-					// ### FIXME
 					g_refresh_rate[i] = new int32[video_modes[i].refresh_rate_count];
 					compute_refresh_rate_count = false;
 				}
 				else
 				{
-					compute_refresh_rate_count = true;
+					// skip entirely if no refresh rates are available
+					// and calculate the refresh rate count again
 					i++;
+					compute_refresh_rate_count = true;
 				}
 			}
 
