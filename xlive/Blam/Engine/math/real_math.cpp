@@ -67,7 +67,7 @@ real_vector2d* perpendicular2d(const real_vector2d* in, real_vector2d* out)
 real32 normalize3d_with_default(real_vector3d* a, const real_vector3d* b)
 {
 	real32 magnitude = magnitude3d(a);
-	if (fabs(magnitude) < 0.000099999997)
+	if (fabs(magnitude) < k_real_math_epsilon)
 	{
 		magnitude = 0.0f;
 		*a = *b;

@@ -127,8 +127,9 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                 real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_shake_countdown);
                 real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
-                real32 periodic_function_result_scaled =
-                    periodic_function_result * (transition_function_result * user_effect->camera_shaking.wobble_weight + transition_function_result * (1.0f - user_effect->camera_shaking.wobble_weight));
+                
+                real32 periodic_function_result_scaled = ((1.0f - user_effect->camera_shaking.wobble_weight) * transition_function_result) +
+                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight;
 
                 // Set v1 to 0 if v1_value is less than 0
                 real32 v1_value = user_effect->camera_shaking.random_translation * periodic_function_result_scaled;
