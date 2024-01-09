@@ -14,7 +14,7 @@ s_display_option g_display_options[k_max_display_option_count] = {};
 typedef void(__cdecl* update_screen_settings_t)(int, int, short, short, short, short, float, float);
 update_screen_settings_t p_update_screen_settings;
 
-int32** g_refresh_rate = NULL;
+int32** g_video_mode_refresh_rates = NULL;
 
 void __cdecl update_screen_settings(
 	int width, 
@@ -282,7 +282,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 			int32 video_mode_count = rasterizer_get_video_mode_count();
 
 			// allocate the new refresh rate buffers
-			g_refresh_rate = new int32*[video_mode_count];
+			g_video_mode_refresh_rates = new int32*[video_mode_count];
 
 			// reset the refresh rate data
 			for (int32 i = 0; i < video_mode_count; i++)
@@ -338,7 +338,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 							if (refresh_rate_valid)
 							{
 								// ### FIXME needs some more code re-written
-								g_refresh_rate[i][refresh_rate_index++] = d3d_display_modes[j].RefreshRate;
+								g_video_mode_refresh_rates[i][refresh_rate_index++] = d3d_display_modes[j].RefreshRate;
 							}
 						}
 					}
@@ -347,7 +347,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 				// if we computed the valid refresh rate count, add them to the list
 				if (compute_refresh_rate_count && video_modes[i].refresh_rate_count > 0)
 				{
-					g_refresh_rate[i] = new int32[video_modes[i].refresh_rate_count];
+					g_video_mode_refresh_rates[i] = new int32[video_modes[i].refresh_rate_count];
 					compute_refresh_rate_count = false;
 				}
 				else
@@ -368,7 +368,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 				{
 					if (refresh_rate_start_index >= 0)
 					{
-						video_modes[i].refresh_rate[refresh_rate_start_index--] = g_refresh_rate[i][j];
+						video_modes[i].refresh_rate[refresh_rate_start_index--] = g_video_mode_refresh_rates[i][j];
 					}
 					else
 					{
@@ -405,15 +405,15 @@ void __cdecl rasterizer_discard_refresh_rate()
 {
 	// atexit
 
-	if (g_refresh_rate != NULL)
+	if (g_video_mode_refresh_rates != NULL)
 	{
-		for (int32 i = 0; i < rasterizer_get_video_mode_refresh_rate_count(i); i++)
+		for (int32 i = 0; i < rasterizer_get_video_mode_count(); i++)
 		{
-			if (g_refresh_rate[i])
-				delete[] g_refresh_rate[i];
+			if (g_video_mode_refresh_rates[i])
+				delete[] g_video_mode_refresh_rates[i];
 		}
 		
-		delete[] g_refresh_rate;
+		delete[] g_video_mode_refresh_rates;
 	}
 
 	return;
@@ -427,10 +427,10 @@ int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(int32 video_mode_index
 	if (video_mode_index < rasterizer_get_video_mode_count())
 	{
 		if (refresh_rate_index < rasterizer_get_video_mode_refresh_rate_count(video_mode_index))
-			return g_refresh_rate[video_mode_index][refresh_rate_index];
+			return g_video_mode_refresh_rates[video_mode_index][refresh_rate_index];
 	}
 
-	return g_refresh_rate[0][0];
+	return g_video_mode_refresh_rates[0][0];
 }
 
 void rasterizer_settings_apply_hooks()
