@@ -394,10 +394,8 @@ public:
 		memset(&m_startupParams, 0, sizeof(m_startupParams));
 	}
 
-	~XnIpManager()
-	{
-		// TODO maybe terminate all connections
-	}
+	// TODO maybe terminate all connections
+	~XnIpManager() = default;
 
 	// disable copy/move
 	XnIpManager(const XnIpManager& other) = delete;

@@ -16,7 +16,7 @@ namespace TagFixes
 {
 	namespace
 	{
-		void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, size_t bitmap_idx)
+		void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, int32 bitmap_idx)
 		{
 			datum bitmap_to_fix = tags::find_tag(blam_tag::tag_group_type::bitmap, bitmap_name);
 			datum borked_template = tags::find_tag(blam_tag::tag_group_type::shadertemplate, template_name);

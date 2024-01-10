@@ -31,9 +31,7 @@ public:
 		*(void**)this = old_vtbl;
 	}
 
-	~c_virtual_keyboard_menu()
-	{
-	}
+	~c_virtual_keyboard_menu() = default;
 
 	virtual int custom_deconstructor(BYTE flags) override
 	{

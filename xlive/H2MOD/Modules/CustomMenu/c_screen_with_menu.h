@@ -22,9 +22,7 @@ public:
 		*(void**)this = old_vtbl;
 	};
 
-	~c_screen_with_menu()
-	{
-	}
+	~c_screen_with_menu() = default;
 
 	// base interface overrides
 	virtual int custom_deconstructor(BYTE flags) override

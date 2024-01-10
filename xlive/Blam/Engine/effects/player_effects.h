@@ -64,7 +64,10 @@ struct s_player_effect_user_globals
 	int16 game_time;
 	int16 camera_impulse_countdown;
 	int16 camera_shake_countdown;
-	int8 field_84[4];
+	int8 field_84;
+	int8 field_85;
+	int8 damage_indicator;
+	int8 field_87;
 	c_flags<e_player_effect_user_global_flags, uint8, k_player_effect_user_global_flag_count> flags;
 	int8 field_89;
 	int16 pad_8A;
