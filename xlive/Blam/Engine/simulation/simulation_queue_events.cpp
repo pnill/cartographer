@@ -10,16 +10,16 @@
 
 #include "memory/bitstream.h"
 
-static void encode_object_index_reference(bitstream* stream, datum object_index_references)
+static void encode_object_index_reference(c_bitstream* stream, datum object_index_references)
 {
-	stream->data_encode_integer("gamestate-index-id", DATUM_INDEX_TO_IDENTIFIER(object_index_references), 16);
-	stream->data_encode_integer("gamestate-index-absolute", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index_references), 11);
+	stream->write_integer("gamestate-index-id", DATUM_INDEX_TO_IDENTIFIER(object_index_references), 16);
+	stream->write_integer("gamestate-index-absolute", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index_references), 11);
 }
 
-static void decode_object_index_reference(bitstream* stream, datum* object_index_reference_out)
+static void decode_object_index_reference(c_bitstream* stream, datum* object_index_reference_out)
 {
-	int32 object_index_id = stream->data_decode_integer("gamestate-index-id", 16);
-	int32 object_absolute_index = stream->data_decode_integer("gamestate-index-absolute", 11);
+	int32 object_index_id = stream->read_integer("gamestate-index-id", 16);
+	int32 object_absolute_index = stream->read_integer("gamestate-index-absolute", 11);
 
 	*object_index_reference_out = DATUM_INDEX_NEW(object_absolute_index, object_index_id);
 }
@@ -35,10 +35,10 @@ static bool encode_event_to_buffer(
 	uint8* block
 )
 {
-	bitstream stream(out_buffer, out_buffer_size);
+	c_bitstream stream(out_buffer, out_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
-	stream.data_encode_integer("event-type", event_type, 5);
-	stream.data_encode_integer("reference-count", reference_count, 2);
+	stream.write_integer("event-type", event_type, 5);
+	stream.write_integer("reference-count", reference_count, 2);
 
 	for (int32 i = 0; i < reference_count; i++)
 	{
@@ -78,10 +78,10 @@ static bool encode_event_to_buffer(
 
 static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_events_apply* decode_out)
 {
-	bitstream stream(encoded_data, encoded_size);
+	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
-	decode_out->event_type = (e_simulation_event_type)stream.data_decode_integer("event-type", 5);
-	decode_out->reference_count = stream.data_decode_integer("reference-count", 2);
+	decode_out->event_type = (e_simulation_event_type)stream.read_integer("event-type", 5);
+	decode_out->reference_count = stream.read_integer("reference-count", 2);
 
 	for (int32 i = 0; i < decode_out->reference_count; i++)
 	{

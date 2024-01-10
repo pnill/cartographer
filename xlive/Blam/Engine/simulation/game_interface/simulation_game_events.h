@@ -47,8 +47,8 @@ struct c_simulation_event_definition_vtbl
 	int32(__thiscall* minimum_required_bits)(c_simulation_event_definition* thisx, int a1, int a2, uint8* a3);
 	void(__thiscall* calculate_relevance)(c_simulation_event_definition* thisx, int a2, int a3, float a4);
 	int(__thiscall* write_description_to_string)(c_simulation_event_definition* thisx, int a2, int a3, uint32 a4, int a5, char* a6);
-	bool(__thiscall* encode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, bitstream* packet);
-	bool(__thiscall* decode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, bitstream* packet);
+	bool(__thiscall* encode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, c_bitstream* packet);
+	bool(__thiscall* decode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, c_bitstream* packet);
 	bool(__thiscall* perform)(c_simulation_event_definition* thisx, int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);
 };
 
@@ -64,7 +64,7 @@ public:
 	virtual int32 minimum_required_bits(int a1, int a2, uint32* a3);
 	virtual void calculate_relevance(int a2, int a3, float a4);
 	virtual int write_description_to_string(int a2, int a3, uint32 a4, int a5, char* a6);
-	virtual bool encode(int32 payload_size, void* data, bitstream* packet);
-	virtual bool decode(int32 payload_size, void* data, bitstream* packet);
+	virtual bool encode(int32 payload_size, void* data, c_bitstream* packet);
+	virtual bool decode(int32 payload_size, void* data, c_bitstream* packet);
 	virtual bool perform(int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);
 };

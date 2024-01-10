@@ -15,11 +15,8 @@ enum e_bitstream_state : uint32
 	k_bitstream_state_count
 };
 
-#pragma pack(push, 1)
-struct bitstream
+struct c_bitstream
 {
-	//Credits : https://github.com/HaloMods/OpenSauce/blob/master/OpenSauce/Halo2/Halo2_Xbox/Networking/Networking.hpp
-
 	uint8* m_stream_buf;
 	int32 m_stream_buf_size_bytes;
 	int32 m_data_size_alignment;
@@ -32,16 +29,14 @@ struct bitstream
 	int field_2C;
 	int field_30;
 
-	bitstream(uint8* stream, int32 stream_size_bytes)
+	c_bitstream(uint8* stream, int32 stream_size_bytes)
 	{
 		// field_15 = false;
 		m_data_size_alignment = k_bitstream_default_alignment;
 		set_data(stream, stream_size_bytes);
 	}
 
-	~bitstream()
-	{
-	}
+	~c_bitstream() = default;
 
 	void set_data(uint8* data, int32 data_size);
 	void reset(e_bitstream_state state);
@@ -96,10 +91,10 @@ struct bitstream
 		return (m_current_bit_position + 7) / 8;
 	}
 
-	void data_encode_string_wide(const char* name, void* string, int size_in_words);
-	void data_decode_string_wide(const char* name, void* string_buffer, int size_in_words);
-	void data_encode_integer(const char* name, unsigned int value, unsigned int size_in_bits);
-	int data_decode_integer(const char* name, unsigned int size_in_bits);
+	void read_string_wchar(const char* name, void* string, int size_in_words);
+	void write_string_wchar(const char* name, void* string_buffer, int size_in_words);
+	void write_integer(const char* name, unsigned int value, unsigned int size_in_bits);
+	int32 read_integer(const char* name, uint32 size_in_bits);
 	void data_encode_bits(const char* name, void* data, unsigned int size_in_bits);
 	void data_decode_bits(const char* name, void* data, int size_in_bits);
 	void data_encode_bool(const char* name, bool value);
@@ -118,5 +113,4 @@ struct bitstream
 	void data_encode_flags(const char *name, unsigned long long value, int size_in_bits);
 	unsigned long long data_decode_flags(const char *name, int size_in_bits);
 };
-#pragma pack(pop)
-CHECK_STRUCT_SIZE(bitstream, 0x34);
+CHECK_STRUCT_SIZE(c_bitstream, 52);
