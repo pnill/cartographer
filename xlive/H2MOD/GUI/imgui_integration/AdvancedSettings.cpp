@@ -145,7 +145,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
-						H2Config_field_of_view = 78.0f;
+						H2Config_field_of_view = 78;
 						player_control_set_field_of_view(H2Config_field_of_view);
 					}
 					ImGui::PopItemWidth();
@@ -171,7 +171,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
-						H2Config_vehicle_field_of_view = 78.0f;
+						H2Config_vehicle_field_of_view = 78;
 						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 					}
 					ImGui::PopItemWidth();

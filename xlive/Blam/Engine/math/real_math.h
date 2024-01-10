@@ -140,7 +140,7 @@ static BLAM_MATH_INL real32 square_root(real32 f)
 
 static BLAM_MATH_INL real32 reciprocal_square_root(real32 f)
 {
-	return 1.0 / square_root(f);
+	return 1.0f / square_root(f);
 }
 
 static BLAM_MATH_INL real32 dot_product2d(const real_vector2d* a, const real_vector2d* b)

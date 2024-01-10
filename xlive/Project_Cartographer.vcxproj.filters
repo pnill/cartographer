@@ -281,6 +281,8 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -805,6 +807,9 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_entities.h" />
+    <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

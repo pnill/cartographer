@@ -185,7 +185,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         // Set weapon orientations from render model
         if (fp_weapon_model->nodes.size > 0)
         {
-            for (uint32 node_index = 0; node_index < fp_weapon_model->nodes.size; node_index++)
+            for (int32 node_index = 0; node_index < fp_weapon_model->nodes.size; node_index++)
             {
                 int32 orientation_index = weapon_data->weapon_node_remapping_table[node_index];
                 render_model_node* node = fp_weapon_model->nodes[node_index];
@@ -202,7 +202,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         // Set hand orientations from render model
         if (fp_hands_model->nodes.size > 0)
         {
-            for (uint32 node_index = 0; node_index < fp_hands_model->nodes.size; node_index++)
+            for (int32 node_index = 0; node_index < fp_hands_model->nodes.size; node_index++)
             {
                 int32 orientation_index = weapon_data->hands_node_remapping_table[node_index];
                 render_model_node* node = fp_hands_model->nodes[node_index];

@@ -29,55 +29,55 @@ bool MessageIsCustom(e_network_message_type_collection enumVal)
 	return enumVal > e_network_message_type_collection::_test;
 }
 
-void __cdecl encode_map_file_name_message(bitstream* stream, int a2, s_custom_map_filename* data)
+void __cdecl encode_map_file_name_message(c_bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_encode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
-	stream->data_encode_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
+	stream->read_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
-bool __cdecl decode_map_file_name_message(bitstream* stream, int a2, s_custom_map_filename* data)
+bool __cdecl decode_map_file_name_message(c_bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->data_decode_string_wide("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
-	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
+	stream->write_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_request_map_filename_message(bitstream* stream, int a2, s_request_map_filename* data)
+void __cdecl encode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
 	stream->data_encode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
-	stream->data_encode_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
+	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
-bool __cdecl decode_request_map_filename_message(bitstream* stream, int a2, s_request_map_filename* data)
+bool __cdecl decode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
 	stream->data_decode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
-	data->map_download_id = stream->data_decode_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
+	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_team_change_message(bitstream* stream, int a2, s_team_change* data)
+void __cdecl encode_team_change_message(c_bitstream* stream, int a2, s_team_change* data)
 {
-	stream->data_encode_integer("team-index", data->team_index, 32);
+	stream->write_integer("team-index", data->team_index, 32);
 }
-bool __cdecl decode_team_change_message(bitstream* stream, int a2, s_team_change* data)
+bool __cdecl decode_team_change_message(c_bitstream* stream, int a2, s_team_change* data)
 {
-	data->team_index = stream->data_decode_integer("team-index", 32);
+	data->team_index = stream->read_integer("team-index", 32);
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_rank_change_message(bitstream* stream, int a2, s_rank_change* data)
+void __cdecl encode_rank_change_message(c_bitstream* stream, int a2, s_rank_change* data)
 {
-	stream->data_encode_integer("rank", data->rank, 8);
+	stream->write_integer("rank", data->rank, 8);
 }
-bool __cdecl decode_rank_change_message(bitstream* stream, int a2, s_rank_change* data)
+bool __cdecl decode_rank_change_message(c_bitstream* stream, int a2, s_rank_change* data)
 {
-	data->rank = stream->data_decode_integer("rank", 8);
+	data->rank = stream->read_integer("rank", 8);
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* data)
+void __cdecl encode_anti_cheat_message(c_bitstream* stream, int a2, s_anti_cheat* data)
 {
 	stream->data_encode_bool("anti-cheat-enabled", data->enabled);
 }
-bool __cdecl decode_anti_cheat_message(bitstream* stream, int a2, s_anti_cheat* data)
+bool __cdecl decode_anti_cheat_message(c_bitstream* stream, int a2, s_anti_cheat* data)
 {
 	data->enabled = stream->data_decode_bool("anti-cheat-enabled");
 	return stream->error_occured() == false;
