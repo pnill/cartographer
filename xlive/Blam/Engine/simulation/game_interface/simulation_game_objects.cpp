@@ -47,29 +47,29 @@ bool simulation_object_variant_should_sync(s_simulation_object_creation_data* cr
     return sync_variant;
 }
 
-typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode_t)(void* thisptr, void* creation_data, bitstream* stream);
+typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode_t)(void* thisptr, void* creation_data, c_bitstream* stream);
 c_simulation_unit_entity_definition_creation_encode_t p_c_simulation_unit_entity_definition_encode;
-void __stdcall c_simulation_object_entity_definition__object_creation_encode(void* _this, s_simulation_object_creation_data* creation_data, bitstream* packet)
+void __stdcall c_simulation_object_entity_definition__object_creation_encode(void* _this, s_simulation_object_creation_data* creation_data, c_bitstream* packet)
 {
     bool model_variant_id_exists = simulation_object_variant_should_sync(creation_data);
 
     packet->data_encode_bool("model-variant-index-exists", model_variant_id_exists);
     if (model_variant_id_exists)
     {
-        packet->data_encode_integer("model-variant-index", creation_data->model_variant_index, 6);    // 6 bits since k_maximum_variants_per_model is 64
+        packet->write_integer("model-variant-index", creation_data->model_variant_index, 6);    // 6 bits since k_maximum_variants_per_model is 64
     }
 
     p_c_simulation_unit_entity_definition_encode(_this, creation_data, packet);
     return;
 }
 
-typedef bool(__stdcall* c_simulation_unit_entity_definition_creation_decode_t)(void* thisptr, void* creation_data, bitstream* stream);
+typedef bool(__stdcall* c_simulation_unit_entity_definition_creation_decode_t)(void* thisptr, void* creation_data, c_bitstream* stream);
 c_simulation_unit_entity_definition_creation_decode_t p_c_simulation_unit_entity_definition_decode;
-bool __stdcall c_simulation_object_entity_definition__object_creation_decode(void* _this, s_simulation_object_creation_data* creation_data, bitstream* packet)
+bool __stdcall c_simulation_object_entity_definition__object_creation_decode(void* _this, s_simulation_object_creation_data* creation_data, c_bitstream* packet)
 {
     if (packet->data_decode_bool("model-variant-index-exists"))
     {
-        creation_data->model_variant_index = packet->data_decode_integer("model-variant-index", 6);    // 6 bits since k_maximum_variants_per_model is 64
+        creation_data->model_variant_index = packet->read_integer("model-variant-index", 6);    // 6 bits since k_maximum_variants_per_model is 64
     }
     else
     {

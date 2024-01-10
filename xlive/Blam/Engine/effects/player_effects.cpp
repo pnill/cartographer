@@ -32,7 +32,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         {
             real32 vibration_intensity = player_effects_globals->max_intensity;
             calculated_matrix = global_identity4x3;
-            
+
             if (player_effects_globals->attack_time_ticks > 0)
             {
                 real32 attack_time = player_effects_globals->attack_time_ticks / player_effects_globals->attack_time_ticks_1;
@@ -56,7 +56,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
             scale_vector3d(&random_angles, vibration_intensity, &random_angles);
 
             matrix4x3_rotation_from_angles(&calculated_matrix, random_angles.i, random_angles.j, random_angles.k);
-            
+
             random_angles.i = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
             random_angles.j = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
             random_angles.k = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
@@ -69,27 +69,25 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
         else
         {
             s_player_effect_user_globals* user_effect = player_effects_get_user_globals(user_index);
-            bool bit_1_result = user_effect->flags.test(_player_effect_apply_camera_impulse);
-            if (user_effect->camera_impulse_countdown > 0 || bit_1_result)
+            bool apply_camera_impulse = user_effect->flags.test(_player_effect_apply_camera_impulse);
+            if (user_effect->camera_impulse_countdown > 0 || apply_camera_impulse)
             {
                 real32 transition_result;
-                if (bit_1_result)
+                if (apply_camera_impulse)
                 {
                     transition_result = 1.0f;
                 }
                 else
                 {
-                    real32 impulse_elapsed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown;
-                    // do not stale the transition function
-                    impulse_elapsed_time += halo_interpolator_get_interpolation_time();
+                    real32 impulse_elapsed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown - halo_interpolator_get_interpolation_time();
 
                     transition_result = player_effect_transition_function_evaluate(
-                        (e_transition_function_type)user_effect->camera_impulse.fade_function, 
+                        (e_transition_function_type)user_effect->camera_impulse.fade_function,
                         user_effect->camera_impulse_transition_scale,
                         impulse_elapsed_time,
                         user_effect->camera_impulse.duration);
                 }
-                
+
                 real_vector3d v1;
                 cross_product3d(&global_up3d, &user_effect->vector_0, &v1);
 
@@ -102,13 +100,13 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 matrix4x3_multiply(matrix, &calculated_matrix, matrix);
             }
 
-            bool bit_2_result = user_effect->flags.test(_player_effect_apply_camera_shake);
-            if (user_effect->camera_shake_countdown > 0 || bit_2_result)
+            bool apply_camera_shake = user_effect->flags.test(_player_effect_apply_camera_shake);
+            if (user_effect->camera_shake_countdown > 0 || apply_camera_shake)
             {
                 calculated_matrix = global_identity4x3;
 
                 real32 transition_function_result;
-                if (bit_2_result)
+                if (apply_camera_shake)
                 {
                     transition_function_result = 1.0f;
                 }
@@ -116,7 +114,6 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 {
                     real32 shake_elapsed_time = user_effect->camera_shaking.duration
                         - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown - halo_interpolator_get_interpolation_time());
-
                     transition_function_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_shaking.falloff_function,
                         user_effect->camera_shake_transition_scale,
@@ -125,7 +122,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                     );
                 }
 
-                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds(user_effect->camera_shake_countdown);
+                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown);
                 real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
                 
                 real32 periodic_function_result_scaled = ((1.0f - user_effect->camera_shaking.wobble_weight) * transition_function_result) +
@@ -146,7 +143,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                     v1 += seconds_7C * user_effect->field_74;
                     v2 += seconds_7C * user_effect->field_78;
-                    
+
                     rumble_player_continuous(user_index, user_effect->rumble_intensity_left, user_effect->rumble_intensity_right);
                 }
                 player_effect_apply_camera_effect_matrix_internal(&calculated_matrix, v1, v2);

@@ -262,32 +262,31 @@ real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const re
 	return out;
 }
 
-void matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
+real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)
 {
+	const real_vector3d cosine_vector { cos(i), cos(j), cos(k) };
+	const real_vector3d sine_vector{ sin(i), sin(j), sin(k) };
+
+	const real32 j_cos_k = sine_vector.j * cosine_vector.k;
+	const real32 sin_jk = sine_vector.j * sine_vector.k;
+
 	matrix->scale = 1.0f;
-
-	real_vector3d cosine_vector;
-	cosine_vector.i = cos(i);
-	cosine_vector.j = cos(j);
-	cosine_vector.k = cos(k);
-
-	real_vector3d sine_vector;
-	sine_vector.i = sin(i);
-	sine_vector.j = sin(j);
-	sine_vector.k = sin(k);
-
-	matrix->vectors.forward.j = (sine_vector.i * cosine_vector.k) - ((sine_vector.j * sine_vector.k) * cosine_vector.i);
 	matrix->vectors.forward.i = cosine_vector.i * cosine_vector.j;
-	matrix->vectors.forward.k = ((sine_vector.j * cosine_vector.k) * cosine_vector.i) + (sine_vector.i * sine_vector.k);
-	matrix->vectors.left.i = -(cosine_vector.j * sine_vector.i);
-	matrix->vectors.left.j = ((sine_vector.j * sine_vector.k) * sine_vector.i) + (cosine_vector.i * cosine_vector.k);
-	matrix->vectors.up.i = -0.0f - sine_vector.j;
-	matrix->vectors.left.k = (cosine_vector.i * sine_vector.k) - ((sine_vector.j * cosine_vector.k) * sine_vector.i);
-	matrix->vectors.up.j = -0.0f - (cosine_vector.j * sine_vector.k);
+	matrix->vectors.forward.j = sine_vector.i * cosine_vector.k - sin_jk * cosine_vector.i;
+	matrix->vectors.forward.k = j_cos_k * cosine_vector.i + sine_vector.i * sine_vector.k;
+	
+	matrix->vectors.left.i = -cosine_vector.j * sine_vector.i;
+	matrix->vectors.left.j = sin_jk * sine_vector.i + cosine_vector.i * cosine_vector.k;
+	matrix->vectors.left.k = cosine_vector.i * sine_vector.k - sine_vector.i * j_cos_k;
+	
+	matrix->vectors.up.i = -sine_vector.j;
+	matrix->vectors.up.j = -sine_vector.k * cosine_vector.j;
 	matrix->vectors.up.k = cosine_vector.j * cosine_vector.k;
+	
 	matrix->position.x = 0.0f;
 	matrix->position.y = 0.0f;
 	matrix->position.z = 0.0f;
+	return matrix;
 }
 
 void __cdecl matrix4x3_rotation_from_axis_and_angle(real_matrix4x3* matrix, real_vector3d* vector, real32 axis, real32 angle)

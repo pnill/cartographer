@@ -10,6 +10,7 @@
 #include "Blam/Engine/main/main.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam/Engine/saved_games/game_state.h"
+#include "Blam/Engine/saved_games/saved_film.h"
 #include "Blam/Engine/shell/shell.h"
 #include "simulation/simulation.h"
 #include "Util/Hooks/Hook.h"
@@ -26,7 +27,7 @@ s_main_game_globals* get_main_game_globals(void)
 
 bool map_initialized(void)
 {
-	return get_main_game_globals() && get_main_game_globals()->map_active && get_main_game_globals()->active_structure_bsp_index != -1;
+	return get_main_game_globals() && get_main_game_globals()->map_active && get_main_game_globals()->active_structure_bsp_index != NONE;
 }
 
 s_game_options* game_options_get(void)
@@ -65,9 +66,10 @@ bool game_is_distributed(void)
         || game_options_get()->simulation_type == _game_simulation_distributed_server;
 }
 
+// TODO: saved films
 bool game_is_playback(void)
 {
-    return false;
+    return _game_playback_none;
 }
 
 void __cdecl game_shell_set_in_progress()
@@ -103,13 +105,13 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 	return;
 }
 
-void __cdecl reset_global_player_counts()
+void __cdecl reset_global_player_counts(void)
 {
 	INVOKE(0xB8B9, 0x219B9, reset_global_player_counts);
+    return;
 }
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version,
-	int32 comp_version)
+void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version)
 {
     auto handler = (c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->life_cycle_handlers[e_game_life_cycle::_life_cycle_joining];
     handler->joining_xnkid = kid;
@@ -122,8 +124,8 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
     else
     {
         c_game_life_cycle_handler_joining::check_joining_capability();
-        wchar_t local_usernames[4][16];
-        s_player_identifier local_identifiers[4];
+        wchar_t local_usernames[k_number_of_users][k_maximum_players];
+        s_player_identifier local_identifiers[k_number_of_users];
         int valid_local_player_count = 0;
         for (auto i = 0; i < 4; i++)
         {
@@ -131,7 +133,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
             s_player_properties temp_properties;
             if (network_session_interface_get_local_user_identifier(i, &temp_identifier) || network_session_interface_get_local_user_properties_out(i, 0, &temp_properties, 0, 0))
             {
-                memcpy(local_usernames[valid_local_player_count], temp_properties.player_name, sizeof(temp_properties.player_name));
+                csmemcpy(local_usernames[valid_local_player_count], temp_properties.player_name, sizeof(temp_properties.player_name));
                 local_identifiers[valid_local_player_count].unk1 = temp_identifier.unk1;
                 local_identifiers[valid_local_player_count].unk2 = temp_identifier.unk2;
                 valid_local_player_count++;
@@ -139,9 +141,9 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
         }
         reset_global_player_counts();
         network_session_init_session(2, 1);
-        memset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
-        memcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);
-        memcpy(&handler->player_names, local_usernames, sizeof(wchar_t) * 16 * valid_local_player_count);
+        csmemset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
+        csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);
+        csmemcpy(&handler->player_names, local_usernames, sizeof(wchar_t) * 16 * valid_local_player_count);
         handler->field_11 = 0; //Always 0 in the original function
         handler->field_12 = 0; //Always 0 in the original function
         handler->field_14 = 1;
@@ -173,7 +175,7 @@ void __cdecl shell_initialize(void)
     }
 
     // Interpolation allocation
-    if (shell_tool_type() && !Memory::IsDedicatedServer())
+    if (shell_tool_type() != _shell_tool_type_editing_tools && !Memory::IsDedicatedServer())
     {
         halo_interpolator_initialize();
         halo_interpolator_set_interpolation_enabled(true);
@@ -204,9 +206,10 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
         while (!main_events_pending())
         {
             halo_interpolator_update_begin();
+            
             game_tick();
-            // discard simulation update
-            simulation_update_discard();
+            simulation_update_discard();        // Discard simulation update
+            
             halo_interpolator_update_end();
             if (cinematic_sound_sync_complete())
             {

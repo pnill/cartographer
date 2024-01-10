@@ -135,7 +135,7 @@ int16 c_model_animation::find_first_sound_event(s_sound_event* sound_event) cons
 
 int16 c_model_animation::find_next_key_of_type(e_frame_event_type event_type, int32 frame) const
 {
-	for (uint32 i = 0; i < this->frame_events.size; ++i)
+	for (int32 i = 0; i < this->frame_events.size; ++i)
 	{
 		s_frame_event* frame_event = this->frame_events[i];
 		if (frame_event->type == event_type && frame_event->frame > frame)

@@ -146,11 +146,7 @@ void __cdecl biped_get_sight_position(
         *object_origin = *estimated_body_position;
         if (estimate_mode == _unit_estimate_gun_position)
         {
-            real_vector3d direction;
-            direction.i = -desired_facing_vector->j;
-            direction.j = desired_facing_vector->i;
-            direction.k = 0.0f;
-
+            const real_vector3d direction = { -desired_facing_vector->j, desired_facing_vector->i, 0.0f };
             point_from_line3d(object_origin, desired_facing_vector, desired_gun_offset->i, object_origin);
             point_from_line3d(object_origin, &direction, desired_gun_offset->j, object_origin);
             object_origin->z += desired_gun_offset->k;
