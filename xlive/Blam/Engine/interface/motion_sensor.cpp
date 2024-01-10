@@ -100,6 +100,42 @@ void motion_sensor_update_with_delta(real32 delta)
 	//			motion_sensor_update_move_examined_objects_onto_sample_array(i);
 	//	}
 	//}
+
+	s_motion_sensor_globals* motion_sensor_globals = get_motion_sensor_globals();
+
+	real32 passed_tick_time = fmodf(game_ticks_to_seconds(time_globals::get_game_time()), 2.099999904632568f);
+	if (passed_tick_time >= 2.0374999f)
+	{
+		set_motion_sensor_doppler_scale(passed_tick_time);
+	}
+	else
+	{
+		real32 scaled_tick_time = 1.0f / (passed_tick_time + 0.0625f) * 1.1f;
+		set_motion_sensor_doppler_scale(scaled_tick_time);
+	}
+
+	if(motion_sensor_globals->field_BC4)
+	{
+		motion_sensor_update_examine_nearby_players();
+		--motion_sensor_globals->field_BC4;
+	}
+	else
+	{
+		motion_sensor_update_sort_examined_objects();
+		motion_sensor_update_examine_nearby_players();
+		motion_sensor_update_examine_near_by_units();
+		motion_sensor_globals->field_BC4 = time_globals::seconds_to_ticks_round(0.5f);
+	}
+
+	if (motion_sensor_globals->current_sample_index)
+		--motion_sensor_globals->current_sample_index;
+	else
+		motion_sensor_globals->current_sample_index = 9;
+
+	for (int i = 0; i < 4; ++i)
+		if(players_user_is_active(i))
+			motion_sensor_update_move_examined_objects_onto_sample_array(i);
+
 }
 
 void radar_patch()
