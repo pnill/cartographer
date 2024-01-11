@@ -96,8 +96,8 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 real32 rotation = user_effect->camera_impulse.rotation * transition_result;
                 matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sin(rotation), cos(rotation));
 
-                real32 pushback = user_effect->camera_impulse.pushback * transition_result;
-                scale_vector3d(&user_effect->vector_0, pushback, &effect_matrix.position);
+                real32 pushback_transition = user_effect->camera_impulse.pushback * transition_result;
+                scale_vector3d(&user_effect->vector_0, pushback_transition, &effect_matrix.position);
                 point_from_line3d(&effect_matrix.position, &user_effect->vector_C, transition_result, &effect_matrix.position);
                 matrix4x3_multiply(matrix, &effect_matrix, matrix);
             }
@@ -127,24 +127,19 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown);
                 real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
                 
-                real32 periodic_function_result_scaled = ((1.0f - user_effect->camera_shaking.wobble_weight) * transition_function_result) +
-                    periodic_function_result * transition_function_result * user_effect->camera_shaking.wobble_weight;
+                real32 periodic_function_result_scaled = 
+                    transition_function_result * ((1.0f - user_effect->camera_shaking.wobble_weight) + (user_effect->camera_shaking.wobble_weight * periodic_function_result));
 
-                // Set v1 to 0 if v1_value is less than 0
-                real32 v1_value = user_effect->camera_shaking.random_translation * periodic_function_result_scaled;
-                real32 v1 = MAX(0.0f, v1_value);
-
-                // Set v2 to 0 if v2_value is less than 0
-                real32 v2_value = user_effect->camera_shaking.random_rotation * periodic_function_result_scaled;
-                real32 v2 = MAX(0.0f, v2_value);
+                real32 v1 = MAX(0.0f, user_effect->camera_shaking.random_translation * periodic_function_result_scaled);
+                real32 v2 = MAX(0.0f, user_effect->camera_shaking.random_rotation * periodic_function_result_scaled);
 
                 if (user_effect->field_7C > 0)
                 {
                     real32 seconds_7C = game_ticks_to_seconds(user_effect->field_7C);
                     seconds_7C += seconds_7C;
 
-                    v1 += seconds_7C * user_effect->field_74;
-                    v2 += seconds_7C * user_effect->field_78;
+                    v1 += user_effect->field_74 * seconds_7C;
+                    v2 += user_effect->field_78 * seconds_7C;
 
                     rumble_player_continuous(user_index, user_effect->rumble_intensity_left, user_effect->rumble_intensity_right);
                 }
@@ -170,9 +165,7 @@ void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, r
     if (a2 != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        matrix->position.x = vector.i * a2;
-        matrix->position.y = vector.j * a2;
-        matrix->position.z = vector.k * a2;
+        scale_vector3d(&vector, a2, &matrix->position);
     }
     return;
 }
