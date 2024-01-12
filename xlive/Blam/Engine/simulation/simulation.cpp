@@ -32,9 +32,9 @@ t_simulation_update_before_game p_simulation_update_before_game;
 
 void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
 {
-    p_simulation_update_before_game(sim_data_out);
     simulation_get_world()->apply_entity_update_queue();
     simulation_get_world()->apply_event_update_queue();
+    p_simulation_update_before_game(sim_data_out);
 }
 
 
