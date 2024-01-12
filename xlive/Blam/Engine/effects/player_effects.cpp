@@ -6,7 +6,7 @@
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/math/random_math.h"
 
-void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 a2, real32 a3);
+void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 translation, real32 rotation);
 real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);
 
 s_player_effect_globals* player_effect_globals_get(void)
@@ -114,24 +114,26 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 shake_elapsed_time = user_effect->camera_shaking.duration
+                    real32 shake_elapsed_time = user_effect->camera_shake.duration
                         - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown - halo_interpolator_get_interpolation_time());
                     transition_function_result = player_effect_transition_function_evaluate(
-                        (e_transition_function_type)user_effect->camera_shaking.falloff_function,
+                        (e_transition_function_type)user_effect->camera_shake.falloff_function,
                         user_effect->camera_shake_transition_scale,
                         shake_elapsed_time,
-                        user_effect->camera_shaking.duration
+                        user_effect->camera_shake.duration
                     );
                 }
 
-                real32 camera_shake_remaining_time = user_effect->camera_shaking.duration - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown);
-                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shaking.wobble_function, camera_shake_remaining_time / user_effect->camera_shaking.wobble_function_period);
-                
-                real32 periodic_function_result_scaled = 
-                    transition_function_result * ((1.0f - user_effect->camera_shaking.wobble_weight) + (user_effect->camera_shaking.wobble_weight * periodic_function_result));
+                real32 camera_shake_periodic_value = user_effect->camera_shake.duration - game_ticks_to_seconds((real32)user_effect->camera_shake_countdown);
+                camera_shake_periodic_value /= user_effect->camera_shake.wobble_function_period;
 
-                real32 v1 = MAX(0.0f, user_effect->camera_shaking.random_translation * periodic_function_result_scaled);
-                real32 v2 = MAX(0.0f, user_effect->camera_shaking.random_rotation * periodic_function_result_scaled);
+                real32 periodic_function_result = periodic_function_evaluate(user_effect->camera_shake.wobble_function, camera_shake_periodic_value);
+
+                real32 periodic_function_result_scaled = 
+                    transition_function_result * ((1.0f - user_effect->camera_shake.wobble_weight) + (user_effect->camera_shake.wobble_weight * periodic_function_result));
+
+                real32 v1 = MAX(0.0f, user_effect->camera_shake.random_translation * periodic_function_result_scaled);
+                real32 v2 = MAX(0.0f, user_effect->camera_shake.random_rotation * periodic_function_result_scaled);
 
                 if (user_effect->field_7C > 0)
                 {
@@ -153,19 +155,19 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 }
 
 
-void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 a2, real32 a3)
+void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 translation, real32 rotation)
 {
     real_vector3d vector;
 
-    if (a3 != 0.0f)
+    if (rotation != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        matrix4x3_rotation_from_axis_and_angle(matrix, &vector, sin(a3), cos(a3));
+        matrix4x3_rotation_from_axis_and_angle(matrix, &vector, sin(rotation), cos(rotation));
     }
-    if (a2 != 0.0f)
+    if (translation != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        scale_vector3d(&vector, a2, &matrix->position);
+        scale_vector3d(&vector, translation, &matrix->position);
     }
     return;
 }
