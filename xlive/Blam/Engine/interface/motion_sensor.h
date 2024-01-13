@@ -11,21 +11,27 @@ struct s_local_player_motion_sensor_sample
 {
     byte gap[68];
 };
+CHECK_STRUCT_SIZE(s_local_player_motion_sensor_sample, 0x44);
 
-struct s_local_player_motion_sensor_data
+class c_local_player_motion_sensor_data
 {
+public:
     s_local_player_motion_sensor_sample samples[9];
     byte gap_264[130];
     int32 field_2E8;
     int32 field_2EC;
+
+    void sort();
 };
+CHECK_STRUCT_SIZE(c_local_player_motion_sensor_data, 0x2F0);
 
 struct s_motion_sensor_globals
 {
-    s_local_player_motion_sensor_data local_players[4];
+    c_local_player_motion_sensor_data local_players[4];
     int32 current_sample_index;
     int32 field_BC4;
 };
+CHECK_STRUCT_SIZE(s_motion_sensor_globals, 0xBC8);
 
 s_motion_sensor_globals* get_motion_sensor_globals();
 

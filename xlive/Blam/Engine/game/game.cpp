@@ -12,6 +12,7 @@
 #include "Blam/Engine/saved_games/game_state.h"
 #include "Blam/Engine/saved_games/saved_film.h"
 #include "Blam/Engine/shell/shell.h"
+#include "interface/motion_sensor.h"
 #include "simulation/simulation.h"
 #include "Util/Hooks/Hook.h"
 
@@ -276,6 +277,8 @@ game_frame_t p_game_frame;
 void __cdecl game_frame(real32 dt)
 {
     g_current_game_frame_delta = dt;
+
+    motion_sensor_update_with_delta(dt);
     halo_interpolator_update_delta();
     p_game_frame(dt);
     return;

@@ -53,6 +53,11 @@ void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d*
 	return;
 }
 
+void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point)
+{
+	INVOKE(0x13D2EC, 0, unit_get_camera_position, unit_index, out_point);
+}
+
 // Replace calls to use interpolated functions
 void unit_get_camera_position_patch_mass_functions(void)
 {
