@@ -32,8 +32,8 @@ t_simulation_update_before_game p_simulation_update_before_game;
 
 void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
 {
-    simulation_get_world()->apply_entity_update_queue();
-    simulation_get_world()->apply_event_update_queue();
+    simulation_get_world()->apply_high_priority_queue();
+    simulation_get_world()->apply_basic_queue();
     p_simulation_update_before_game(sim_data_out);
 }
 
@@ -46,7 +46,7 @@ void simulation_update_discard()
 
 void simulation_apply_patches()
 {
-    c_simulation_world::queues_initialize();
+    simulation_get_world()->queues_initialize();
     simulation_event_handler_apply_patches();
     DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
 }

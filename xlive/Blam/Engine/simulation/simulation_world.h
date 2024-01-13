@@ -1,6 +1,14 @@
 #pragma once
 #include "simulation_queue_events.h"
 
+enum e_simulation_queue_type
+{
+	_simulation_queue_high_priority,
+	_simulation_queue_basic,
+
+	k_simulation_queue_count
+};
+
 enum e_simulation_world_type
 {
 	_simulation_world_type_none = 0x0,
@@ -24,6 +32,12 @@ enum e_simulation_world_state
 	k_simulation_world_state_count = 0x7,
 };
 
+struct s_simulation_queue_stats
+{
+	int32 allocated;
+	int32 queued;
+};
+
 class c_simulation_world
 {
 public:
@@ -31,14 +45,24 @@ public:
 	// ### TODO validate
 	e_simulation_world_type m_simulation_world_mode;
 
-	static void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
-	static void simulation_queue_enqueue(s_simulation_queue_element* element);
+	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
+	void simulation_queue_enqueue(s_simulation_queue_element* element);
 
-	static void queues_initialize();
+	void queues_initialize();
 
 	void apply_simulation_queue(const c_simulation_queue* queue);
-	void apply_event_update_queue();
-	void apply_entity_update_queue();
+	void apply_basic_queue();
+	void apply_high_priority_queue();
+
+	c_simulation_queue* queue_get(e_simulation_queue_type type);
+
+
+	s_simulation_queue_stats queue_describe(const c_simulation_queue* queue)
+	{
+		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count() };
+	}
+
+
 
 	void destroy_update();
 
