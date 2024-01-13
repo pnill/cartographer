@@ -175,7 +175,7 @@ void observer_update_internal(int32 user_index)
 
 		if (collision_test_line((e_collision_test_flags)flags, &observer->result.position, &point, NONE, NONE, &collision))
 		{
-			points_interpolate(&observer->result.position, &point, collision.t * 0.89999998, &point);
+			points_interpolate(&observer->result.position, &point, collision.t * 0.89999998f, &point);
 		}
 	}
 

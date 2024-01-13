@@ -7,6 +7,7 @@ union real_matrix3x3
 	struct { real32 n[9]; } v;						// Array of values
 	real32 matrix[3][3];							// Matrix of values
 };
+CHECK_STRUCT_SIZE(real_matrix3x3, 36);
 
 struct real_matrix4x3
 {

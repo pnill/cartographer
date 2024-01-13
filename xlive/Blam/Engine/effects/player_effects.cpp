@@ -7,7 +7,7 @@
 #include "Blam/Engine/math/random_math.h"
 
 void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 a2, real32 a3);
-real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 a2, real32 a3, real32 a4);
+real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);
 
 s_player_effect_globals* player_effect_globals_get(void)
 {
@@ -24,14 +24,14 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
     // INVOKE(0xA432D, 0x963AA, player_effect_apply_camera_effect_matrix, user_index, matrix);
     // return;
 	
-    real_matrix4x3 calculated_matrix;
+    real_matrix4x3 effect_matrix;
     if (user_index != NONE)
     {
         s_player_effect_globals* player_effects_globals = player_effect_globals_get();
         if (player_effects_globals->flags.test(_player_effect_global_bit_0))
         {
             real32 vibration_intensity = player_effects_globals->max_intensity;
-            calculated_matrix = global_identity4x3;
+            effect_matrix = global_identity4x3;
 
             if (player_effects_globals->attack_time_ticks > 0)
             {
@@ -55,16 +55,16 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
             multiply_vectors3d(&random_angles, &player_effects_globals->position.orientation, &random_angles);
             scale_vector3d(&random_angles, vibration_intensity, &random_angles);
 
-            matrix4x3_rotation_from_angles(&calculated_matrix, random_angles.i, random_angles.j, random_angles.k);
+            matrix4x3_rotation_from_angles(&effect_matrix, random_angles.i, random_angles.j, random_angles.k);
 
             random_angles.i = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
             random_angles.j = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
             random_angles.k = _real_random_range(get_local_random_seed_address(), -1.0f, 1.0f);
 
-            calculated_matrix.position.x = random_angles.i * player_effects_globals->position.position.y * vibration_intensity;
-            calculated_matrix.position.y = random_angles.j * player_effects_globals->position.position.x * vibration_intensity;
-            calculated_matrix.position.z = random_angles.k * player_effects_globals->position.position.z * vibration_intensity;
-            matrix4x3_multiply(matrix, &calculated_matrix, matrix);
+            effect_matrix.position.x = random_angles.i * player_effects_globals->position.position.y * vibration_intensity;
+            effect_matrix.position.y = random_angles.j * player_effects_globals->position.position.x * vibration_intensity;
+            effect_matrix.position.z = random_angles.k * player_effects_globals->position.position.z * vibration_intensity;
+            matrix4x3_multiply(matrix, &effect_matrix, matrix);
         }
         else
         {
@@ -79,7 +79,9 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
                 else
                 {
-                    real32 impulse_elapsed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown - halo_interpolator_get_interpolation_time();
+                    real32 impulse_elapsed_time = user_effect->camera_impulse.duration - (real32)user_effect->camera_impulse_countdown;
+                    // do not stale the transition function
+                    impulse_elapsed_time += halo_interpolator_get_interpolation_time();
 
                     transition_result = player_effect_transition_function_evaluate(
                         (e_transition_function_type)user_effect->camera_impulse.fade_function,
@@ -92,18 +94,18 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 cross_product3d(&global_up3d, &user_effect->vector_0, &v1);
 
                 real32 rotation = user_effect->camera_impulse.rotation * transition_result;
-                matrix4x3_rotation_from_axis_and_angle(&calculated_matrix, &v1, sin(rotation), cos(rotation));
+                matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sin(rotation), cos(rotation));
 
                 real32 pushback = user_effect->camera_impulse.pushback * transition_result;
-                scale_vector3d(&user_effect->vector_0, pushback, &calculated_matrix.position);
-                point_from_line3d(&calculated_matrix.position, &user_effect->vector_C, transition_result, &calculated_matrix.position);
-                matrix4x3_multiply(matrix, &calculated_matrix, matrix);
+                scale_vector3d(&user_effect->vector_0, pushback, &effect_matrix.position);
+                point_from_line3d(&effect_matrix.position, &user_effect->vector_C, transition_result, &effect_matrix.position);
+                matrix4x3_multiply(matrix, &effect_matrix, matrix);
             }
 
             bool apply_camera_shake = user_effect->flags.test(_player_effect_apply_camera_shake);
             if (user_effect->camera_shake_countdown > 0 || apply_camera_shake)
             {
-                calculated_matrix = global_identity4x3;
+                effect_matrix = global_identity4x3;
 
                 real32 transition_function_result;
                 if (apply_camera_shake)
@@ -146,8 +148,8 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                     rumble_player_continuous(user_index, user_effect->rumble_intensity_left, user_effect->rumble_intensity_right);
                 }
-                player_effect_apply_camera_effect_matrix_internal(&calculated_matrix, v1, v2);
-                matrix4x3_multiply(matrix, &calculated_matrix, matrix);
+                player_effect_apply_camera_effect_matrix_internal(&effect_matrix, v1, v2);
+                matrix4x3_multiply(matrix, &effect_matrix, matrix);
             }
         }
     }
@@ -175,8 +177,8 @@ void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, r
     return;
 }
 
-real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 a3, real32 a4)
+real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration)
 {
-    real32 function_value = 1.0f - (a3 / a4);
+    real32 function_value = 1.0f - (elapsed_time / duration);
     return transition_function_evaluate(function_type, function_value) * scale;
 }
