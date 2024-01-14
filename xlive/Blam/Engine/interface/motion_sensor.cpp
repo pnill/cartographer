@@ -89,8 +89,8 @@ void motion_sensor_update_with_delta(real32 delta)
 		motion_sensor_update_examine_nearby_players();
 		motion_sensor_update_examine_near_by_units();
 
-		static constexpr float tick_seconds = 1.f / 60.f;
-		if (g_motion_sensor_sample_accumulator >= tick_seconds)
+		// Added accumulation to meet the length of a game tick to preserve the trailing effect of fast moving objects on the radar
+		if (g_motion_sensor_sample_accumulator >= time_globals::get_seconds_per_tick())
 		{
 			if (motion_sensor_globals->current_sample_index)
 			{
@@ -105,7 +105,7 @@ void motion_sensor_update_with_delta(real32 delta)
 		else
 			g_motion_sensor_sample_accumulator += delta;
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < k_number_of_users; i++)
 		{
 			if (players_user_is_active(i))
 				motion_sensor_update_move_examined_objects_onto_sample_array(i);
