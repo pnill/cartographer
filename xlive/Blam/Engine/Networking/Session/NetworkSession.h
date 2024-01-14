@@ -277,7 +277,7 @@ struct s_network_session
 {
 	void* vtbl;
 	void* p_network_message_gateway;
-	s_network_observer* p_network_observer;
+	c_network_observer* p_network_observer;
 	void* session_manager_ptr;
 	DWORD text_chat;
 	int session_index;

@@ -81,6 +81,7 @@ struct s_player_control_globals
 };
 CHECK_STRUCT_SIZE(s_player_control_globals, 728);
 
+void player_control_disable_local_camera(bool state);
 
 s_player_control_globals* player_control_globals_get(void);
 s_player_control* player_control_get(int32 user_index);

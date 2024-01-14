@@ -59,7 +59,7 @@ void CustomNetwork::ApplyPatches()
 	NetworkMessage::ApplyGamePatches();
 
 	// LIVE network protocol research
-	s_network_observer::ApplyGamePatches();
+	c_network_observer::apply_patches();
 
 	// stub QoS lookup function for mid-game data, our XNet QoS implementation is trash
 	// we spawn one thread for each QoS lookup, for the serverlist it doesn't matter that much

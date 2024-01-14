@@ -64,7 +64,7 @@ enum e_network_message_type_collection : unsigned int
 	_anti_cheat,
 	_custom_variant_settings,
 
-	_network_message_type_collection_end
+	k_network_message_type_collection_count
 };
 
 static const char* network_message_type_collection_name[] = {
@@ -143,12 +143,12 @@ struct s_request_map_filename
 
 struct s_team_change
 {
-	DWORD team_index;
+	int32 team_index;
 };
 
 struct s_rank_change
 {
-	BYTE rank;
+	int8 rank;
 };
 
 struct s_anti_cheat

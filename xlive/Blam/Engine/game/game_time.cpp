@@ -5,7 +5,6 @@
 #include "Blam/Engine/math/math.h"
 #include "Blam/Engine/shell/shell_windows.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
 #include "Util/Hooks/Hook.h"

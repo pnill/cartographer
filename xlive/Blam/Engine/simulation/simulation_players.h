@@ -1,4 +1,5 @@
 #pragma once
+
 #include "machine_id.h"
 #include "Blam/Engine/game/player_control.h"
 

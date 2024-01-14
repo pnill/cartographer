@@ -42,7 +42,7 @@ static bool encode_event_to_buffer(
 
 	for (int32 i = 0; i < reference_count; i++)
 	{
-		stream.data_encode_bool("object-index-exists", !DATUM_IS_NONE(object_index_references[i]));
+		stream.write_bool("object-index-exists", !DATUM_IS_NONE(object_index_references[i]));
 		if (!DATUM_IS_NONE(object_index_references[i]))
 		{
 			encode_object_index_reference(&stream, object_index_references[i]);
@@ -85,7 +85,7 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 
 	for (int32 i = 0; i < decode_out->reference_count; i++)
 	{
-		if (stream.data_decode_bool("object-index-exists"))
+		if (stream.read_bool("object-index-exists"))
 		{
 			decode_object_index_reference(&stream, &decode_out->object_refereces[i]);
 		}

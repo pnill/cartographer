@@ -920,7 +920,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
 		// Initialise_tag_loader();
-		PlayerControl::ApplyHooks();
 		
 		PatchCall(Memory::GetAddress(0x2422C8), get_last_single_player_level_id_unlocked_from_profile);
 
