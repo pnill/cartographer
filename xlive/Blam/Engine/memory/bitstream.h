@@ -91,17 +91,17 @@ struct c_bitstream
 		return (m_current_bit_position + 7) / 8;
 	}
 
+	void write_string_wchar(const char* name, const void* string, int size_in_words);
 	void read_string_wchar(const char* name, void* string, int size_in_words);
-	void write_string_wchar(const char* name, void* string_buffer, int size_in_words);
 	void write_integer(const char* name, unsigned int value, unsigned int size_in_bits);
 	int32 read_integer(const char* name, uint32 size_in_bits);
-	void data_encode_bits(const char* name, void* data, unsigned int size_in_bits);
-	void data_decode_bits(const char* name, void* data, int size_in_bits);
-	void data_encode_bool(const char* name, bool value);
-	bool data_decode_bool(const char* name);
+	void write_raw_data(const char* name, void* data, unsigned int size_in_bits);
+	void read_raw_data(const char* name, void* data, int size_in_bits);
+	void write_bool(const char* name, bool value);
+	bool read_bool(const char* name);
 	void data_decode_address(const char* name, void* address);
-	void data_encode_quantized_real(const char* name, float value, float min_value, float max_value, int size_in_bits, char exact_midpoint);
-	float data_decode_quantized_real(const char* name, float min_value, float max_value, int size_in_bits, char exact_midpoint);
+	void data_encode_quantized_real(const char* name, float value, float min_value, float max_value, int size_in_bits, bool exact_midpoint);
+	float data_decode_quantized_real(const char* name, float min_value, float max_value, int size_in_bits, bool exact_midpoint);
 	void data_encode_unit_vector(const char* name, real_vector3d* vector);
 	void data_decode_unit_vector(const char* name, real_vector3d* out_vector);
 	void data_encode_signed_integer(const char* name, int value, unsigned int size_in_bits);
@@ -110,7 +110,7 @@ struct c_bitstream
 	void data_decode_axes(const char* name, real_vector3d* out_forward, real_vector3d* out_up);
 	void data_encode_vector(const char* name, real_vector3d* vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
 	void data_decode_vector(const char* name, real_vector3d* out_vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
-	void data_encode_flags(const char *name, unsigned long long value, int size_in_bits);
-	unsigned long long data_decode_flags(const char *name, int size_in_bits);
+	void write_long_integer(const char *name, uint64 value, int size_in_bits);
+	uint64 read_long_integer(const char *name, int size_in_bits);
 };
 CHECK_STRUCT_SIZE(c_bitstream, 52);

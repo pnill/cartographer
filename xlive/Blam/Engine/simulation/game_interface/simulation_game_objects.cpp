@@ -53,7 +53,7 @@ void __stdcall c_simulation_object_entity_definition__object_creation_encode(voi
 {
     bool model_variant_id_exists = simulation_object_variant_should_sync(creation_data);
 
-    packet->data_encode_bool("model-variant-index-exists", model_variant_id_exists);
+    packet->write_bool("model-variant-index-exists", model_variant_id_exists);
     if (model_variant_id_exists)
     {
         packet->write_integer("model-variant-index", creation_data->model_variant_index, 6);    // 6 bits since k_maximum_variants_per_model is 64
@@ -67,7 +67,7 @@ typedef bool(__stdcall* c_simulation_unit_entity_definition_creation_decode_t)(v
 c_simulation_unit_entity_definition_creation_decode_t p_c_simulation_unit_entity_definition_decode;
 bool __stdcall c_simulation_object_entity_definition__object_creation_decode(void* _this, s_simulation_object_creation_data* creation_data, c_bitstream* packet)
 {
-    if (packet->data_decode_bool("model-variant-index-exists"))
+    if (packet->read_bool("model-variant-index-exists"))
     {
         creation_data->model_variant_index = packet->read_integer("model-variant-index", 6);    // 6 bits since k_maximum_variants_per_model is 64
     }

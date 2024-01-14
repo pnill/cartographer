@@ -57,7 +57,10 @@ static_assert(sizeof(datum) == 4);
 // ADDR_SERVER: file offset in h2server.exe
 // TYPE: function
 // __VA_ARGS__: arguments for the function we want to invoke
-#define INVOKE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<decltype(TYPE)*>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
+#define INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<TYPE>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
+#define INVOKE(ADDR_CLIENT, ADDR_SERVER, FN_DECL, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, decltype(FN_DECL)*, __VA_ARGS__)
+// ### TODO find better name
+#define INVOKE_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, __VA_ARGS__)
 
 #define NONE -1
 #define DATUM_INDEX_NONE ((datum)(NONE))

@@ -10,7 +10,7 @@
 
 #include "Util/Hooks/Hook.h"
 
-BYTE g_network_message_type_collection[e_network_message_type_collection::_network_message_type_collection_end * 32];
+uint8 g_network_message_type_collection[e_network_message_type_collection::k_network_message_type_collection_count * 32];
 
 void register_network_message(void* network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
 {
@@ -19,41 +19,41 @@ void register_network_message(void* network_message_collection, int type, const 
 	return register_packet(network_message_collection, type, name, a4, size1, size2, write_packet_method, read_packet_method, unk_callback);
 }
 
-const char* GetNetworkMessageName(int enumVal)
+const char* GetNetworkMessageName(int type)
 {
-	return network_message_type_collection_name[enumVal];
+	return network_message_type_collection_name[type];
 }
 
-bool MessageIsCustom(e_network_message_type_collection enumVal)
+bool MessageIsCustom(e_network_message_type_collection type)
 {
-	return enumVal > e_network_message_type_collection::_test;
+	return type > e_network_message_type_collection::_test;
 }
 
-void __cdecl encode_map_file_name_message(c_bitstream* stream, int a2, s_custom_map_filename* data)
+void __cdecl encode_map_file_name_message(c_bitstream* stream, int a2, const s_custom_map_filename* data)
 {
-	stream->read_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->write_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
 bool __cdecl decode_map_file_name_message(c_bitstream* stream, int a2, s_custom_map_filename* data)
 {
-	stream->write_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
+	stream->read_string_wchar("map-file-name", &data->file_name, ARRAYSIZE(data->file_name));
 	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
 void __cdecl encode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_encode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
+	stream->write_raw_data("user-identifier", &data->player_id, player_identifier_size_bits);
 	stream->write_integer("map-download-id", data->map_download_id, CHAR_BIT * sizeof(data->map_download_id));
 }
 bool __cdecl decode_request_map_filename_message(c_bitstream* stream, int a2, s_request_map_filename* data)
 {
-	stream->data_decode_bits("user-identifier", &data->player_id, player_identifier_size_bits);
+	stream->read_raw_data("user-identifier", &data->player_id, player_identifier_size_bits);
 	data->map_download_id = stream->read_integer("map-download-id", CHAR_BIT * sizeof(data->map_download_id));
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_team_change_message(c_bitstream* stream, int a2, s_team_change* data)
+void __cdecl encode_team_change_message(c_bitstream* stream, int a2, const s_team_change* data)
 {
 	stream->write_integer("team-index", data->team_index, 32);
 }
@@ -63,7 +63,7 @@ bool __cdecl decode_team_change_message(c_bitstream* stream, int a2, s_team_chan
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_rank_change_message(c_bitstream* stream, int a2, s_rank_change* data)
+void __cdecl encode_rank_change_message(c_bitstream* stream, int a2, const s_rank_change* data)
 {
 	stream->write_integer("rank", data->rank, 8);
 }
@@ -73,13 +73,13 @@ bool __cdecl decode_rank_change_message(c_bitstream* stream, int a2, s_rank_chan
 	return stream->error_occured() == false;
 }
 
-void __cdecl encode_anti_cheat_message(c_bitstream* stream, int a2, s_anti_cheat* data)
+void __cdecl encode_anti_cheat_message(c_bitstream* stream, int a2, const s_anti_cheat* data)
 {
-	stream->data_encode_bool("anti-cheat-enabled", data->enabled);
+	stream->write_bool("anti-cheat-enabled", data->enabled);
 }
 bool __cdecl decode_anti_cheat_message(c_bitstream* stream, int a2, s_anti_cheat* data)
 {
-	data->enabled = stream->data_decode_bool("anti-cheat-enabled");
+	data->enabled = stream->read_bool("anti-cheat-enabled");
 	return stream->error_occured() == false;
 }
 
@@ -382,8 +382,8 @@ void NetworkMessage::ApplyGamePatches()
 {
 	WritePointer(Memory::GetAddress(0x1AC733, 0x1AC901), g_network_message_type_collection);
 	WritePointer(Memory::GetAddress(0x1AC8F8, 0x1ACAC6), g_network_message_type_collection);
-	WriteValue<BYTE>(Memory::GetAddress(0x1E825E, 0x1CA221), e_network_message_type_collection::_network_message_type_collection_end);
-	WriteValue<int>(Memory::GetAddress(0x1E81C6, 0x1CA189), e_network_message_type_collection::_network_message_type_collection_end * 32);
+	WriteValue<BYTE>(Memory::GetAddress(0x1E825E, 0x1CA221), e_network_message_type_collection::k_network_message_type_collection_count);
+	WriteValue<int>(Memory::GetAddress(0x1E81C6, 0x1CA189), e_network_message_type_collection::k_network_message_type_collection_count * 32);
 
 	PatchCall(Memory::GetAddress(0x1B5196, 0x1A8EF4), register_custom_network_message);
 
