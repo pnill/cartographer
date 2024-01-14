@@ -55,7 +55,7 @@ struct s_player_effect_user_globals
 	real32 field_24;
 	real_argb_color screen_flash_color;
 	s_temporary_camera_impulse camera_impulse;
-	s_player_effect_camera_shaking camera_shaking;
+	s_player_effect_camera_shaking camera_shake;
 	real32 rumble_intensity_left;
 	real32 rumble_intensity_right;
 	real32 field_74;

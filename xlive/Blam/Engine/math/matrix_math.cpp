@@ -96,9 +96,7 @@ void matrix4x3_from_orientation(real_matrix4x3* matrix, const real_orientation* 
 void matrix4x3_rotation_from_quaternion(real_matrix4x3* matrix, const real_quaternion* quaternion)
 {
 	matrix3x3_rotation_from_quaternion(&matrix->vectors, quaternion);
-	matrix->position.x = 0.0f;
-	matrix->position.y = 0.0f;
-	matrix->position.z = 0.0f;
+	set_real_point3d(&matrix->position, 0.0f, 0.0f, 0.0f);
 	matrix->scale = 1.0f;
 	return;
 }
@@ -135,19 +133,15 @@ void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 	else
 	{
 		real_point3d inverse_pos;
-		inverse_pos.x = -input->position.x;
-		inverse_pos.y = -input->position.y;
-		inverse_pos.z = -input->position.z;
+		scale_vector3d(&input->position, -1.0f, &inverse_pos);
 		if (input->scale == 1.0f)
 		{
 			output->scale = 1.0f;
 		}
 		else
 		{
-			output->scale = 1.0 / input->scale;
-			inverse_pos.x *= output->scale;
-			inverse_pos.y *= output->scale;
-			inverse_pos.z *= output->scale;
+			output->scale = 1.0f / input->scale;
+			scale_vector3d(&inverse_pos, output->scale, &inverse_pos);
 		}
 		output->vectors.forward.i = input->vectors.forward.i;
 		output->vectors.left.j = input->vectors.left.j;
@@ -182,15 +176,9 @@ void __fastcall matrix4x3_multiply(const real_matrix4x3* matrix1, const real_mat
 void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position)
 {
 	matrix->scale = 1.0f;
-	matrix->vectors.forward.i = 1.0f;
-	matrix->vectors.forward.j = 0.0f;
-	matrix->vectors.forward.k = 0.0f;
-	matrix->vectors.left.i = 0.0f;
-	matrix->vectors.left.j = 1.0f;
-	matrix->vectors.left.k = 0.0f;
-	matrix->vectors.up.i = 0.0f;
-	matrix->vectors.up.j = 0.0f;
-	matrix->vectors.up.k = 1.0f;
+	matrix->vectors.forward = global_forward3d;
+	matrix->vectors.left = global_left3d;
+	matrix->vectors.up = global_up3d;
 	matrix->position = *position;
 	return;
 }
@@ -198,27 +186,16 @@ void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position)
 real_matrix4x3* matrix4x3_identity(real_matrix4x3* matrix)
 {
 	matrix->scale = 1.0f;
-	matrix->vectors.forward.i = 1.0f;
-	matrix->vectors.forward.j = 0.0f;
-	matrix->vectors.forward.k = 0.0f;
-	matrix->vectors.left.i = 0.0f;
-	matrix->vectors.left.j = 1.0f;
-	matrix->vectors.left.k = 0.0f;
-	matrix->vectors.up.i = 0.0f;
-	matrix->vectors.up.j = 0.0f;
-	matrix->vectors.up.k = 1.0f;
-	matrix->position.x = 0.0f;
-	matrix->position.y = 0.0f;
-	matrix->position.z = 0.0f;
+	matrix->vectors.forward = global_forward3d;
+	matrix->vectors.left = global_left3d;
+	matrix->vectors.up = global_up3d;
+	set_real_point3d(&matrix->position, 0.0f, 0.0f, 0.0f);
 	return matrix;
 }
 
 void matrix4x3_from_point_and_quaternion(real_matrix4x3* matrix, const real_point3d* point, const real_quaternion* quaternion)
 {
 	matrix3x3_rotation_from_quaternion(&matrix->vectors, quaternion);
-	matrix->position.x = 0.0f;
-	matrix->position.y = 0.0f;
-	matrix->position.z = 0.0f;
 	matrix->scale = 1.0f;
 	matrix->position = *point;
 	return;
@@ -237,9 +214,7 @@ real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real
 	real_point3d in_copy = *in; 
 	if (matrix->scale != 1.0f)
 	{
-		in_copy.x *= matrix->scale;
-		in_copy.y *= matrix->scale;
-		in_copy.z *= matrix->scale;
+		scale_vector3d(&in_copy, matrix->scale, &in_copy);
 	}
 
 	out->x = (((matrix->vectors.up.i * in_copy.z) + (matrix->vectors.left.i * in_copy.y)) + (matrix->vectors.forward.i * in_copy.x)) + matrix->position.x;
@@ -282,10 +257,8 @@ real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i,
 	matrix->vectors.up.i = -sine_vector.j;
 	matrix->vectors.up.j = -sine_vector.k * cosine_vector.j;
 	matrix->vectors.up.k = cosine_vector.j * cosine_vector.k;
-	
-	matrix->position.x = 0.0f;
-	matrix->position.y = 0.0f;
-	matrix->position.z = 0.0f;
+
+	set_real_point3d(&matrix->position, 0.0f, 0.0f, 0.0f);
 	return matrix;
 }
 

@@ -183,14 +183,14 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 			block_size,
 			block))
 		{
-			c_simulation_world::simulation_queue_allocate(_simulation_queue_element_type_event, write_buffer_space_used, &allocated_element);
+			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_event, write_buffer_space_used, &allocated_element);
 			if (allocated_element)
 			{
 				// copy the data to the buffer
 				csmemcpy(allocated_element->data, write_buffer, write_buffer_space_used);
 
 				// copy it to the queue
-				c_simulation_world::simulation_queue_enqueue(allocated_element);
+				simulation_get_world()->simulation_queue_enqueue(allocated_element);
 
 				SIM_QUEUE_DBG("added element 0x%08X, type: %d, size: %d to simulation queue", 
 					allocated_element, 

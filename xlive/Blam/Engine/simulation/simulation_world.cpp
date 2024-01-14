@@ -6,15 +6,19 @@
 
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size
-c_simulation_queue g_high_priority_queue;
-c_simulation_queue g_basic_event_queue;
+c_simulation_queue g_simulation_queues[k_simulation_queue_count];
+
+c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type)
+{
+	return &g_simulation_queues[type];
+}
 
 void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int32 size, s_simulation_queue_element** out_allocated_elem)
 {
 	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		g_basic_event_queue.allocate(size, out_allocated_elem);
+		queue_get(_simulation_queue_basic)->allocate(size, out_allocated_elem);
 	}
 	else
 	{
@@ -33,7 +37,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 		if (!sim_entity_queue_full)
-			g_high_priority_queue.allocate(size, out_allocated_elem);
+			queue_get(_simulation_queue_high_priority)->allocate(size, out_allocated_elem);
 	}
 
 	if (*out_allocated_elem)
@@ -47,7 +51,7 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		g_basic_event_queue.enqueue(element);
+		queue_get(_simulation_queue_basic)->enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_basic_event_queue, 
@@ -62,7 +66,8 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	else
 	{
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
-		g_high_priority_queue.enqueue(element);
+
+		queue_get(_simulation_queue_high_priority)->enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_high_priority_queue,
@@ -73,14 +78,14 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	}
 }
 
-void c_simulation_world::apply_entity_update_queue()
+void c_simulation_world::apply_high_priority_queue()
 {
-	apply_simulation_queue(&g_high_priority_queue);
+	apply_simulation_queue(queue_get(_simulation_queue_high_priority));
 }
 
-void c_simulation_world::apply_event_update_queue()
+void c_simulation_world::apply_basic_queue()
 {
-	apply_simulation_queue(&g_basic_event_queue);
+	apply_simulation_queue(queue_get(_simulation_queue_basic));
 }
 
 void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
@@ -148,12 +153,16 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 
 void c_simulation_world::destroy_update()
 {
-	c_simulation_queue::dispose(&g_basic_event_queue);
-	c_simulation_queue::dispose(&g_high_priority_queue);
+	for (int32 i = 0; i < k_simulation_queue_count; i++)
+	{
+		c_simulation_queue::dispose(queue_get((e_simulation_queue_type)i));
+	}
 }
 
 void c_simulation_world::queues_initialize()
 {
-	g_basic_event_queue.initialize();
-	g_high_priority_queue.initialize();
+	for (int32 i = 0; i < k_simulation_queue_count; i++)
+	{
+		queue_get((e_simulation_queue_type)i)->initialize();
+	}
 }
