@@ -2,8 +2,8 @@
 
 #include "imgui_handler.h"
 #include "H2MOD.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
-#include "Util/Hooks/Hook.h"
+
+#include "Blam/Engine/game/player_control.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"
@@ -123,7 +123,7 @@ namespace ImGuiHandler
 		last_frame_update = !keep_game_input_blocked;
 		SetGameInputState(!keep_game_input_blocked);
 		ImGuiToggleInput(keep_game_input_blocked);
-		PlayerControl::DisableLocalCamera(keep_game_input_blocked);
+		player_control_disable_local_camera(keep_game_input_blocked);
 	}
 
 	bool IsWindowActive(const std::string& name)

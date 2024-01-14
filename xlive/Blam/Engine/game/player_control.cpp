@@ -33,6 +33,11 @@ s_player_control* player_control_get(int32 user_index)
 	return &player_control_globals_get()->local_players[user_index];
 }
 
+void player_control_disable_local_camera(bool state)
+{
+	player_control_globals_get()->disable_camera = state;
+}
+
 real32 local_player_held_zoom_delta_time[4]
 {
 	0.f, 0.f, 0.f, 0.f

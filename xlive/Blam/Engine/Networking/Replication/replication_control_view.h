@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Blam/Engine/Networking/PlayerPrediction.h"
+#include "simulation/game_interface/simulation_game_engine_player.h"
+#include "Blam/Engine/Networking/player_prediction.h"
 
-enum e_network_memory_block : __int16
+enum e_network_memory_block : int16
 {
 	_network_memory_block_message_outgoing = 0x0,
 	_network_memory_block_message_incoming = 0x1,
@@ -22,14 +23,15 @@ enum e_network_memory_block : __int16
 	_network_memory_block_logic_session_array = 0xF,
 	_network_memory_block_logic_unsuitable_session_array = 0x10,
 	_network_memory_block_join_request = 0x11,
-	k_network_memory_block_count = 0x12,
+
+	k_network_memory_block_count,
 };
 
 struct s_replication_allocation_block
 {
-	unsigned __int16 block_size;
+	int16 block_size;
 	e_network_memory_block block_type;
-	void* block_data;
+	uint8* block_data;
 };
 CHECK_STRUCT_SIZE(s_replication_allocation_block, 0x8);
 
@@ -54,6 +56,6 @@ struct c_replication_control_view
 	char gap_18[1792];
 	DWORD player_prediction_flags;
 	DWORD field_71C;
-	s_player_prediction player_prediction[16];
+	s_player_prediction player_prediction[k_maximum_multiplayer_players];
 };
 CHECK_STRUCT_SIZE(c_replication_control_view, 0xB20);
