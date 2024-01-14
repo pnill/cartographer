@@ -432,7 +432,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 		return 0;
 	}
 
-	s_network_observer* observer = NetworkSession::GetActiveNetworkSession()->p_network_observer;
+	c_network_observer* observer = NetworkSession::GetActiveNetworkSession()->p_network_observer;
 
 	output->Output(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
 

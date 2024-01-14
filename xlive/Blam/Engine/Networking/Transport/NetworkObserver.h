@@ -167,8 +167,9 @@ struct alignas(8) s_observer_channel
 };
 CHECK_STRUCT_SIZE(s_observer_channel, 0x740);
 
-struct alignas(8) s_network_observer
+struct alignas(8) c_network_observer
 {
+public:
 	void* network_observer_vtbl; // vtable at the start
 	void* network_link;
 	void* network_message_gateway;
@@ -228,9 +229,8 @@ struct alignas(8) s_network_observer
 		out_of_band
 	};
 
-	static void ApplyGamePatches();
-	static void ResetNetworkPreferences();
-	static void ForceConstantNetworkRate();
+	static void apply_patches();
+	static void reset_network_observer_bandwidth_preferences();
 
 	bool __thiscall channel_should_send_packet_hook(int network_channel_index,
 		bool a4,
@@ -243,11 +243,14 @@ struct alignas(8) s_network_observer
 		int out_voice_chat_data_buffer_size,
 		BYTE* out_voice_chat_data_buffer);
 
-	bool __thiscall GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4);
-	int getObserverState(int observerIndex) { return observer_channels[observerIndex].state; };
-	void sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
+	bool __thiscall get_bandwidth_results(int32 *out_throughput, float *out_satiation, int32 *a4);
+	int get_observer_channel_state(int observer_index) { return observer_channels[observer_index].state; };
+	void send_message(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
+
+private:
+	static void force_constant_network_rate();
 };
-CHECK_STRUCT_SIZE(s_network_observer, 0x75C8);
+CHECK_STRUCT_SIZE(c_network_observer, 0x75C8);
 
 struct s_network_observer_configuration
 {

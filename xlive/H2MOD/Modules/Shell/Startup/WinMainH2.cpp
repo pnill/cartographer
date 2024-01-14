@@ -192,7 +192,7 @@ bool engine_basic_init()
 	async_initialize();
 	game_preferences_initialize();
 
-	s_network_observer::ResetNetworkPreferences();
+	c_network_observer::reset_network_observer_bandwidth_preferences();
 
 	font_initialize();
 

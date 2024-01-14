@@ -50,7 +50,7 @@ struct alignas(8) s_network_channel
 	DWORD field_34;
 	DWORD field_38;
 	void* simulation_interface;
-	s_network_observer* network_observer;
+	c_network_observer* network_observer;
 	int channel_index;
 	DWORD channel_flags;
 	DWORD remote_identifier;
