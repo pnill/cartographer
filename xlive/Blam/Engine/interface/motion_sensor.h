@@ -1,4 +1,5 @@
 #pragma once
+#include "Networking/Session/NetworkSession.h"
 
 enum e_motion_sensor_blip_size : int16
 {
@@ -27,7 +28,7 @@ CHECK_STRUCT_SIZE(c_local_player_motion_sensor_data, 0x2F0);
 
 struct s_motion_sensor_globals
 {
-    c_local_player_motion_sensor_data local_players[4];
+    c_local_player_motion_sensor_data local_players[k_number_of_users];
     int32 current_sample_index;
     int32 field_BC4;
 };
