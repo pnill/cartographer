@@ -7,6 +7,16 @@ void __cdecl real_math_reset_precision(void)
 	return;
 }
 
+real32 distance_squared2d(const real_point2d* a, const real_point2d* b)
+{
+	return (a->x - b->x) * (a->x - b->x) + (a->y - b->y) * (a->y - b->y);
+}
+
+real32 distance2d(const real_point2d* a, const real_point2d* b)
+{
+	return square_root(distance_squared2d(a, b));
+}
+
 real_quaternion* quaternion_normalize(real_quaternion* quaternion)
 {
 	real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);

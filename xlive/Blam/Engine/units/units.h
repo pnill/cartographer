@@ -179,4 +179,6 @@ datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 
 datum player_index_from_unit_index(datum unit_index);
 
+void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point);
+
 void unit_apply_patches(void);

@@ -274,6 +274,10 @@ static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32
 
 void __cdecl real_math_reset_precision(void);
 
+real32 distance_squared2d(const real_point2d* a, const real_point2d* b);
+
+real32 distance2d(const real_point2d* a, const real_point2d* b);
+
 real32 normalize2d(real_vector2d* vector);
 
 real_vector2d* perpendicular2d(const real_vector2d* in, real_vector2d* out);
