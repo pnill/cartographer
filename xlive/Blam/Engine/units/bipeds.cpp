@@ -303,7 +303,6 @@ void __cdecl biped_get_sight_position(
             if (player->user_index != NONE)
             {
                 real_point3d point;
-                halo_interpolator_interpolate_position_data(player->user_index, 0, object_origin);
                 if (halo_interpolator_interpolate_position_backwards(player->user_index, 0, &point))
                 {
                     *object_origin = point;
