@@ -303,6 +303,21 @@ void halo_interpolator_object_populate_interpolation_data(
                 {
                     biped_datum* biped = (biped_datum*)object;
                     crouch = biped->unit.crouching;
+
+                    datum player_index = player_index_from_unit_index(object_index);
+                    if (player_index != NONE)
+                    {
+                        s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+                        if (player->user_index != NONE)
+                        {
+                            real_point3d point;
+                            // during game update/tick, this will return the current sight position of the biped
+                            // ### TODO a proper fix, remove all this backwards camera nonsense
+                            // because all nodes/positions are calculated using interpolated values
+                            biped_get_sight_position(object_index, _unit_estimate_none, NULL, NULL, NULL, &point);
+                            halo_interpolator_interpolate_position_data(player->user_index, 0, &point);
+                        }
+                    }
                 }
 
                 g_target_interpolation_frame_data->object_data[abs_object_index].object_index = object_index;
@@ -462,7 +477,7 @@ void halo_interpolator_interpolate_position_data(int32 user_index, int32 positio
         {
             matrix4x3_identity(&g_target_interpolation_frame_data->position_data[user_index][position_index].node);
             g_target_interpolation_frame_data->position_data[user_index][position_index].node.position = *position;
-            g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = 1;
+            g_target_interpolation_frame_data->position_data[user_index][position_index].initialized = true;
         }
     }
 }
