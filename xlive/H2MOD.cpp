@@ -822,6 +822,37 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
+__declspec(naked) void object_function_value_adjust_primary_firing()
+{
+	static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
+
+	__asm
+	{
+		// eax holds game_time_get()
+		sub     eax, [ebx + 248h]
+
+		push esi
+		push eax
+		// adjust the value first
+		fld seconds_trigger_hold
+		push eax
+		fstp [esp]
+		call time_globals::seconds_to_ticks_real
+		fstp [esp]
+		cvttss2si esi, [esp]
+		add esp, 4
+		pop eax
+
+		// WRONG
+		// cmp eax, 1
+		// RIGHT, compare with adjusted to tickrate
+		cmp eax, esi
+
+		pop esi
+
+		retn
+	}
+}
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -832,6 +863,8 @@ void H2MOD::ApplyHooks() {
 	EngineHooks::ApplyHooks();
 
 	NopFill(Memory::GetAddress(0x39BAB), 5);
+	// ### TODO dedi offset
+	Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
