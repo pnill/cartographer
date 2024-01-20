@@ -488,19 +488,26 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 po
 
     if (g_frame_data_storage)
     {
-        bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized;
-        if (g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized == initialized
-            && initialized
+        bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized
+            && g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized;
+        if (initialized
             && interpolation_enabled
             && !cinematic_in_progress()
             && !g_update_in_progress)
         {
-            points_interpolate(
+            real32 distance = distance_squared3d(
                 &g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
-                &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
-                halo_interpolator_get_update_delta(),
-                position);
-            result = true;
+                &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position);
+
+            if (distance < k_interpolation_distance_cutoff)
+            {
+				points_interpolate(
+					&g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
+					&g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
+					halo_interpolator_get_update_delta(),
+					position);
+				result = true;
+            }
         }
     }
 
