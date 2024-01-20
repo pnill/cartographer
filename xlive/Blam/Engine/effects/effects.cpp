@@ -49,7 +49,8 @@ void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_
             {
                 if (origin_user != NONE)
                 {
-                    first_person_weapon_get_worldspace_node_matrix(origin_user, origin_object_index, node_index, out_mat);
+                    //first_person_weapon_get_worldspace_node_matrix(origin_user, origin_object_index, node_index, out_mat);
+                    first_person_weapon_get_worldspace_node_matrix_interpolated(origin_user, origin_object_index, node_index, out_mat);
                     return;
                 }
             }
@@ -64,7 +65,8 @@ void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_
     }
     else
     {
-        real_matrix4x3* mat = first_person_weapon_get_relative_node_matrix(origin_user, origin_object_index, node_index);
+        // real_matrix4x3* mat = first_person_weapon_get_relative_node_matrix(origin_user, origin_object_index, node_index);
+        real_matrix4x3* mat = first_person_weapon_get_relative_node_matrix_interpolated(origin_user, origin_object_index, node_index);
         csmemcpy(out_mat, mat, sizeof(real_matrix4x3));
     }
 }

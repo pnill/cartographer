@@ -66,11 +66,12 @@ struct s_first_person_weapon
 	real_euler_angles2d field_2048;
 	real_euler_angles2d player_facing;
 	real_euler_angles2d field_2058;
-	real_matrix4x3 identity_matrix;
+	real_matrix4x3 identity_matrix; // probably not identity matrix
 	int32 adjustment_matrix_index;
 	real_matrix4x3 adjustment_matrix;
 };
 CHECK_STRUCT_SIZE(s_first_person_weapon, 8396);
+CHECK_STRUCT_OFFSET(s_first_person_weapon, identity_matrix, 8288);
 
 struct s_first_person_orientations
 {
@@ -91,7 +92,9 @@ void toggle_first_person(bool state);
 void first_person_weapon_apply_camera_effect(int32 user_index, real_matrix4x3* effect_matrix);
 
 real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index);
+real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index);
 
 void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);
+void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix);
 
 void first_person_weapons_apply_patches(void);
