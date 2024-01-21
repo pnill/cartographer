@@ -788,7 +788,7 @@ real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int1
 {
 	if (!halo_interpolator_interpolate_object_node_matrix(object_index, node_index, out_mat))
 	{
-		out_mat = object_get_node_matrix(object_index, node_index);
+		*out_mat = *object_get_node_matrix(object_index, node_index);
 	}
 	return out_mat;
 }
