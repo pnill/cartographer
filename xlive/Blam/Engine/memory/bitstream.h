@@ -61,9 +61,9 @@ struct c_bitstream
 	void begin_writing(int32 data_size_alignment);
 	void finish_writing(int32* out_space_left_in_bits);
 
-	bool would_overflow(int32 bit_count)
+	bool would_overflow(int32 bit_count) const
 	{
-		return bit_count + m_current_bit_position > 8 * m_stream_buf_size_bytes;
+		return bit_count + m_current_bit_position > m_stream_buf_size_bytes * 8;
 	}
 
 	bool overflowed() const

@@ -58,6 +58,20 @@ s_first_person_weapon_data* first_person_weapon_data_get(uint32 weapon_slot, s_f
     return &first_person_data->weapons[weapon_slot];
 }
 
+int32 first_person_weapon_slot_by_weapon_datum_index(int32 user_index, datum weapon_index)
+{
+    for (int32 i = 0; i < k_first_person_max_weapons; i++)
+    {
+        s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(i, first_person_weapons_get(user_index));
+        if (weapon_data->weapon_index == weapon_index)
+        {
+            return i;
+        }
+    }
+
+    return NONE;
+}
+
 s_first_person_orientations* first_person_orientations_get_global(void)
 {
 	return *Memory::GetAddress<s_first_person_orientations**>(0x977100, 0x99FBC0);
@@ -106,11 +120,7 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
         render_model_definition* render_model = (render_model_definition*)tag_get_fast(model_data->render_model_index);
         *render_model_index = model_data->render_model_index;
         *object_node_matrices = model_data->nodes;
-        size = render_model->nodes.size;
-        if (size > MAXIMUM_NODES_PER_FIRST_PERSON_MODEL)
-        {
-            size = MAXIMUM_NODES_PER_FIRST_PERSON_MODEL;
-        }
+        size = MIN(render_model->nodes.size, MAXIMUM_NODES_PER_FIRST_PERSON_MODEL);
         *object_node_matrix_count = size;
         *flags = model_data->flags;
         *out_object_index = model_data->object_index;
@@ -123,12 +133,7 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
         render_model_definition* render_model = (render_model_definition*)tag_get_fast(model->render_model.TagIndex);
         *render_model_index = model->render_model.TagIndex;
         
-        real_matrix4x3* interpolated_matrices = NULL;
-        if (halo_interpolator_interpolate_object_node_matrices(object_index, &interpolated_matrices, object_node_matrix_count))
-        {
-            *object_node_matrices = interpolated_matrices;
-        }
-        else
+        if (!halo_interpolator_interpolate_object_node_matrices(object_index, object_node_matrices, object_node_matrix_count))
         {
             *object_node_matrices = object_get_node_matrices(object_index, object_node_matrix_count);
             *object_node_matrix_count = render_model->nodes.size;
@@ -866,9 +871,50 @@ void __cdecl first_person_weapon_get_worldspace_node_matrix(int32 user_index, da
     INVOKE(0x228CC6, 0, first_person_weapon_get_worldspace_node_matrix, user_index, weapon_index, node_index, out_matrix);
 }
 
+void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index, real_matrix4x3* out_matrix)
+{
+	real_matrix4x3 result = *first_person_weapon_get_relative_node_matrix_interpolated(user_index, weapon_index, node_index);
+
+	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
+    int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+	s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
+	if (TEST_BIT(weapon_data->flags, 0)
+		&& weapon_data->weapon_index != DATUM_INDEX_NONE)
+	{
+		matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
+	}
+}
+
 real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
 {
     return INVOKE(0x228C6F, 0, first_person_weapon_get_relative_node_matrix, user_index, weapon_index, node_index);
+}
+
+real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 user_index, datum weapon_index, int16 node_index)
+{
+    real_matrix4x3* result = NULL;
+    s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
+    int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
+    s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
+    if (TEST_BIT(weapon_data->flags, 0)
+        && weapon_data->weapon_index != DATUM_INDEX_NONE)
+    {
+        weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
+        _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
+        weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+        datum weapon_animations_index = (interface_def ? interface_def->animations.TagIndex : NONE);
+
+        // ### FIXME either make use across the entire code of the intermediate buffer
+        // or remove it entirely
+
+        result = &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index];
+        if (!halo_interpolator_interpolate_weapon_node(user_index, weapon_animations_index, node_index, weapon_slot, result))
+        {
+            result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
+        }
+    }
+
+    return result;
 }
 
 void first_person_weapons_apply_patches(void)

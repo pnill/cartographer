@@ -65,13 +65,13 @@ real32 halo_interpolator_get_interpolation_time(void)
 
 void halo_interpolator_clear_data_buffer(s_interpolation_data* interpolation_data)
 {
-    interpolation_data->initialized = 0;
+    interpolation_data->initialized = false;
     for (size_t i = 0; i < k_number_of_users; i++)
     {
         for (size_t j = 0; j < k_interpolation_first_person_weapon_slot_count; j++)
         {
-            interpolation_data->weapon_data[i][j].animation_index = NONE;
             interpolation_data->weapon_data[i][j].node_count = 0;
+            interpolation_data->weapon_data[i][j].animation_index = NONE;
         }
     }
 
@@ -203,7 +203,6 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
         result = true;
 
         object_get_node_matrices(object_index, out_node_count);
-        (*node_matrices) = g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices;
         if (*out_node_count > 0)
         {
             for (int32 node_index = 0; node_index < *out_node_count; node_index++)
@@ -211,13 +210,11 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
                 real_point3d* target_position = &g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
                 real_point3d* previous_position = &g_previous_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index].position;
                 
-                real_point3d position_difference;
-                subtract_vector3d(target_position, previous_position, &position_difference);
-
                 // Don't interpolate if the distance interpolated is greater than k_interpolation_distance_cutoff
-                if (magnitude_squared3d(&position_difference) >= k_interpolation_distance_cutoff)
+                if (distance_squared3d(previous_position, target_position) >= k_interpolation_distance_cutoff)
                 {
-                    (*node_matrices)[node_index] = g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index];
+                    g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices[node_index] 
+                        = g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index];
                 }
                 else
                 {
@@ -225,9 +222,15 @@ bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real
                         &g_previous_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index],
                         &g_target_interpolation_frame_data->object_data[out_abs_object_index].node_matrices[node_index],
                         halo_interpolator_get_update_delta(),
-                        &(*node_matrices)[node_index]);
+                        &g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices[node_index]);
                 }
             }
+
+            *node_matrices = g_frame_data_intermediate->object_data[out_abs_object_index].node_matrices;
+        }
+        else
+        {
+            *node_matrices = NULL;
         }
     }
     return result;
@@ -350,11 +353,45 @@ bool halo_interpolator_get_interpolated_matrix_from_user_index(int32 user_index,
             && !cinematic_in_progress()
             && !g_update_in_progress)
         {
-            matrix4x3_interpolate(&previous->position_data[user_index][position_index].node, &target->position_data[user_index][position_index].node, halo_interpolator_get_update_delta(), out);
+            matrix4x3_interpolate(
+                &previous->position_data[user_index][position_index].node, 
+                &target->position_data[user_index][position_index].node, 
+                halo_interpolator_get_update_delta(), 
+                out);
             result = true;
         }
     }
     return result;
+}
+
+bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node)
+{
+	bool result = false;
+	if (interpolation_enabled && !cinematic_in_progress())
+	{
+		if (g_target_interpolation_frame_data->initialized
+			&& g_previous_interpolation_frame_data->initialized
+			&& user_index != NONE)
+		{
+			datum target_animation_index = g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
+			datum previous_animation_index = g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].animation_index;
+			int32 target_node_count = g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].node_count;
+			int32 previous_node_count = g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].node_count;
+			if (target_animation_index == animation_index && previous_animation_index == target_animation_index)
+			{
+				if (target_node_count > 0 && target_node_count == previous_node_count)
+				{
+					matrix4x3_interpolate(
+                        &g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
+						&g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
+						halo_interpolator_get_update_delta(),
+						out_node);
+					result = true;
+				}
+			}
+		}
+	}
+	return result;
 }
 
 bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_index, int32 weapon_slot, real_matrix4x3** nodes, int32* node_matrices_count)
@@ -377,7 +414,8 @@ bool halo_interpolator_interpolate_weapon(datum user_index, datum animation_inde
                     *nodes = g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes;
                     for (int32 node_index = 0; node_index < target_node_count; node_index++)
                     {
-                        matrix4x3_interpolate(&g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
+                        matrix4x3_interpolate(
+                            &g_previous_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
                             &g_target_interpolation_frame_data->weapon_data[user_index][weapon_slot].nodes[node_index],
                             halo_interpolator_get_update_delta(),
                             &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index]);
@@ -402,11 +440,7 @@ bool halo_interpolator_interpolate_object_node_matrix(datum object_index, int16 
             &g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position,
             &g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index].position);
 
-        if (distance >= k_interpolation_distance_cutoff)
-        {
-            *out_matrix = g_target_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index];
-        }
-        else
+        if (distance < k_interpolation_distance_cutoff)
         {
             matrix4x3_interpolate(
                 &g_previous_interpolation_frame_data->object_data[object_absolute_index].node_matrices[node_index],
@@ -488,19 +522,26 @@ bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 po
 
     if (g_frame_data_storage)
     {
-        bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized;
-        if (g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized == initialized
-            && initialized
+        bool initialized = g_target_interpolation_frame_data->position_data[user_index][position_index].initialized
+            && g_previous_interpolation_frame_data->position_data[user_index][position_index].initialized;
+        if (initialized
             && interpolation_enabled
             && !cinematic_in_progress()
             && !g_update_in_progress)
         {
-            points_interpolate(
+            real32 distance = distance_squared3d(
                 &g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
-                &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
-                halo_interpolator_get_update_delta(),
-                position);
-            result = true;
+                &g_target_interpolation_frame_data->position_data[user_index][position_index].node.position);
+
+            if (distance < k_interpolation_distance_cutoff)
+            {
+				points_interpolate(
+					&g_previous_interpolation_frame_data->position_data[user_index][position_index].node.position,
+					&g_target_interpolation_frame_data->position_data[user_index][position_index].node.position,
+					halo_interpolator_get_update_delta(),
+					position);
+				result = true;
+            }
         }
     }
 

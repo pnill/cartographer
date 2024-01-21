@@ -27,13 +27,13 @@ struct s_bitflags
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array
 {
-	char name[0x20];				// 0x0
-	int datum_max_elements;			// 0x20
-	int datum_element_size;			// 0x24
-	BYTE alignment_bit;				// 0x28
+	char name[32];				// 0x0
+	int32 datum_max_elements;			// 0x20
+	int32 datum_element_size;			// 0x24
+	int8 alignment_bits;				// 0x28
 	bool is_valid;					// 0x29
-	WORD flags;						// 0x2A
-	char data_signature[4];			// 0x2C
+	int16 flags;						// 0x2A
+	int32 data_signature;			// 0x2C
 	void **allocator;				// 0x30
 	int bit_index_size;				// 0x34
 	int next_unused_index;					// 0x38

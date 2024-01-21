@@ -737,11 +737,6 @@ void __cdecl object_delete(datum object_index)
 	return;
 }
 
-void __cdecl objects_purge_deleted_objects()
-{
-
-}
-
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point)
 {
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
@@ -791,14 +786,11 @@ real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
 
 real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index, real_matrix4x3* out_mat)
 {
-	if (halo_interpolator_interpolate_object_node_matrix(object_index, node_index, out_mat))
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, node_index, out_mat))
 	{
-		return out_mat;
+		*out_mat = *object_get_node_matrix(object_index, node_index);
 	}
-	else
-	{
-		return object_get_node_matrix(object_index, node_index);
-	}
+	return out_mat;
 }
 
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
@@ -825,16 +817,11 @@ void __cdecl object_apply_function_overlay_node_orientations(datum object_index,
 
 real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_index, real_point3d* center_of_mass)
 {
-	real_point3d* result;
-	if (halo_interpolator_interpolate_center_of_mass(object_index, center_of_mass))
+	if (!halo_interpolator_interpolate_center_of_mass(object_index, center_of_mass))
 	{
-		result = center_of_mass;
+		center_of_mass = object_get_center_of_mass(object_index, center_of_mass);
 	}
-	else
-	{
-		result = object_get_center_of_mass(object_index, center_of_mass);
-	}
-	return result;
+	return center_of_mass;
 }
 
 datum __cdecl object_get_parent_recursive(datum parent_index)
@@ -874,12 +861,25 @@ void __cdecl objects_garbage_collection(void)
 	return;
 }
 
+void __cdecl objects_purge_deleted_objects(void)
+{
+	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+	while (object_header_it.get_next_datum())
+	{
+		s_object_header* object_header = object_header_it.get_current_datum();
+		if (object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			object_pre_delete_recursive(object_header_it.get_current_datum_index());
+			object_delete_recursive(object_header_it.get_current_datum_index(), true);
+		}
+	}
+}
+
 void __cdecl objects_post_update()
 {
 	object_globals_get()->objects_updating = true;
 
 	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
-
 	while (object_header_it.get_next_datum())
 	{
 		s_object_header* object_header = object_header_it.get_current_datum();
@@ -915,19 +915,7 @@ void __cdecl objects_post_update()
 	}
 
 	weapons_fire_barrels();
-	object_header_it.reset();
-
-	while (object_header_it.get_next_datum())
-	{
-		s_object_header* object_header = object_header_it.get_current_datum();
-
-		if (object_header->flags.test(_object_header_being_deleted_bit))
-		{
-			object_pre_delete_recursive(object_header_it.get_current_datum_index());
-			object_delete_recursive(object_header_it.get_current_datum_index(), true);
-		}
-	}
-
+	objects_purge_deleted_objects();
 	object_globals_get()->objects_updating = false;
 	objects_garbage_collection();
 }
@@ -989,9 +977,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	marker_object->field_6C = 0;
 	if (object->object_flags.test(_object_mirrored_bit))
 	{
-		marker_object->matrix1.vectors.left.i = -marker_object->matrix1.vectors.left.i;
-		marker_object->matrix1.vectors.left.j = -marker_object->matrix1.vectors.left.j;
-		marker_object->matrix1.vectors.left.k = -marker_object->matrix1.vectors.left.k;
+		scale_vector3d(&marker_object->matrix1.vectors.left, -1.0f, &marker_object->matrix1.vectors.left);
 	}
 
 	return (marker != 0 ? marker_index : 1);

@@ -23,16 +23,16 @@ void biped_build_2d_camera_frame(const real_vector3d* forward, const real_vector
 {
     forward_out->i = forward->i;
     forward_out->j = forward->j;
-    if (normalize2d(forward_out) == 0.0)
+    if (normalize2d(forward_out) == 0.0f)
     {
         forward_out->i = up->i;
         forward_out->j = up->j;
-        if (forward->k > 0.0)
+        if (forward->k > 0.0f)
         {
             forward_out->i = -forward_out->i;
             forward_out->j = -forward_out->j;
         }
-        if (normalize2d(forward_out) == 0.0)
+        if (normalize2d(forward_out) == 0.0f)
         {
             *forward_out = global_forward2d;
         }
@@ -275,7 +275,6 @@ void __cdecl biped_get_sight_position(
 
         real_vector3d collision_vector;
         real_vector3d position_vector;
-
 
         if (collision_test_vector(flags, &placement, &origin_vector, NONE, NONE, &collision)
             && 

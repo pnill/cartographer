@@ -21,8 +21,8 @@ struct s_object_interpolation_data
 struct s_weapon_interpolation_data
 {
 	datum animation_index;
-	DWORD node_count;
-	real_matrix4x3 nodes[255];
+	int32 node_count;
+	real_matrix4x3 nodes[MAXIMUM_NODES_PER_MODEL];
 };
 //CHECK_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
 
@@ -69,6 +69,7 @@ void halo_interpolator_update_end(void);
 bool halo_interpolator_interpolate_center_of_mass(datum object_datum, real_point3d* center_of_mass);
 
 bool halo_interpolator_interpolate_object_node_matrices(datum object_index, real_matrix4x3** node_matrices, int32* out_node_count);
+bool halo_interpolator_interpolate_weapon_node(datum user_index, datum animation_index, int32 node_index, int32 weapon_slot, real_matrix4x3* out_node);
 
 void halo_interpolator_setup_new_object(datum object_datum);
 
@@ -98,3 +99,5 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
 
 bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position);
+
+extern s_interpolation_data* g_frame_data_intermediate;
