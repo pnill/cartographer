@@ -1,4 +1,5 @@
 #pragma once
+#include "memory/bitstream.h"
 
 enum e_replication_entity_flags
 {
@@ -27,3 +28,10 @@ enum e_replication_entity_view_state
 	_replication_entity_view_state_deleting = 0x4,
 	k_replication_entity_view_state_count = 0x5,
 };
+
+// Get the replication entity index
+void replication_entity_index_decode(c_bitstream* bitstream, int32* replication_entity_index);
+
+// Get the replication entity index as well as the entity abs index
+void replication_entity_index_decode_get_abs_entity_index(c_bitstream* bitstream, int32* replication_entity_index, uint32* entity_abs_index);
+
