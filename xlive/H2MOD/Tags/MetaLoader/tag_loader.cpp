@@ -940,14 +940,14 @@ namespace tag_loader
 	{
 		typedef bool(__cdecl t_init_shader_template)(int a1);
 		auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
-		s_tag_data_iterator* stem_iterator = Memory::GetAddress<s_tag_data_iterator*>(0xA4AF10);
+		tag_iterator* stem_iterator = Memory::GetAddress<tag_iterator*>(0xA4AF10);
 		for (auto ref : injected_tag_refs)
 		{
 			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.new_datum)];
 			if (inst.type.tag_type == blam_tag::tag_group_type::shadertemplate)
 			{
 				//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
-				stem_iterator->next_tag_datum = inst.datum_index;
+				stem_iterator->next_tag_index = inst.datum_index;
 				p_init_shader_template(1);
 			}
 		}
