@@ -1,6 +1,8 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamTag.h"
 
+#define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
+
 struct tag_iterator
 {
 	int32 field_0;
