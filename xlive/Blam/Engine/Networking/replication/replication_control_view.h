@@ -1,7 +1,6 @@
 #pragma once
-
-#include "simulation/game_interface/simulation_game_engine_player.h"
-#include "Blam/Engine/Networking/player_prediction.h"
+#include "game/players.h"
+#include "Networking/player_prediction.h"
 
 enum e_network_memory_block : int16
 {
@@ -23,39 +22,38 @@ enum e_network_memory_block : int16
 	_network_memory_block_logic_session_array = 0xF,
 	_network_memory_block_logic_unsuitable_session_array = 0x10,
 	_network_memory_block_join_request = 0x11,
-
-	k_network_memory_block_count,
+	k_network_memory_block_count = 0x12,
 };
 
 struct s_replication_allocation_block
 {
 	int16 block_size;
 	e_network_memory_block block_type;
-	uint8* block_data;
+	void* block_data;
 };
-CHECK_STRUCT_SIZE(s_replication_allocation_block, 0x8);
+CHECK_STRUCT_SIZE(s_replication_allocation_block, 8);
 
 struct s_replication_control_request
 {
-	DWORD unknown_count;
-	unsigned int control_index;
-	char gap_8[52];
-	signed int block_count;
+	int32 unknown_count;
+	int32 control_index;
+	int8 gap_8[52];
+	int32 block_count;
 	s_replication_allocation_block blocks[2];
-	char gap_50[48];
+	int8 gap_50[48];
 };
 
-struct c_replication_control_view
+class c_replication_control_view
 {
-	char gap_0[4];
-	DWORD field_4;
-	char gap_8[4];
-	DWORD unk_vtable;
-	DWORD motion_flags;
-	DWORD field_14;
-	char gap_18[1792];
-	DWORD player_prediction_flags;
-	DWORD field_71C;
-	s_player_prediction player_prediction[k_maximum_multiplayer_players];
+	int8 gap_0[4];
+	int32 field_4;
+	int8 gap_8[4];
+	int32 unk_vtable;
+	int32 motion_flags;
+	int32 field_14;
+	int8 gap_18[1792];
+	int32 player_prediction_flags;
+	int32 field_71C;
+	s_player_prediction player_prediction[k_maximum_players];
 };
 CHECK_STRUCT_SIZE(c_replication_control_view, 0xB20);
