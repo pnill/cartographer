@@ -19,7 +19,9 @@ struct tag_block
 		if (this->data != NONE)
 		{
 			char *tag_data_table = tags::get_tag_data();
+#ifdef DEBUG
 			if (LOG_CHECK(tag_data_table))
+#endif
 				return reinterpret_cast<T*>(&tag_data_table[this->data]);
 		}
 		return nullptr;
@@ -27,7 +29,9 @@ struct tag_block
 
 	T* end() const
 	{
+#ifdef DEBUG
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
+#endif
 		if (this->begin())
 			return &this->begin()[this->size];
 		else
@@ -36,7 +40,9 @@ struct tag_block
 
 	T* operator[](int32 index) const
 	{
+#ifdef DEBUG
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
+#endif
 		if (index == NONE)
 			return nullptr;
 		if (index >= this->size)
