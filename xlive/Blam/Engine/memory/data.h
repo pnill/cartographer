@@ -40,7 +40,7 @@ struct s_data_array
 	int total_elements_used;		// 0x3C 
 	int field_40;					// 0x40
 	char* data;						// 0x44
-	s_bitflags<> active_bit_mask;		// 0x48
+	s_bitflags<> in_use_bit_flags;		// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -51,7 +51,7 @@ struct s_data_array
 	static void data_make_valid(s_data_array* data_array)
 	{
 		// not entirely sure what this actually does
-		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x0); // TODO DEDI OFFSET
+		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x0); // ### TODO DEDI OFFSET
 		return p_data_make_valid(data_array);
 	}
 };
@@ -111,7 +111,7 @@ public:
 		if (index >= m_data_array->next_unused_index)
 			return -1;
 
-		while (!m_data_array->active_bit_mask.test_bit(index))
+		while (!m_data_array->in_use_bit_flags.test_bit(index))
 		{
 			if (++index >= m_data_array->next_unused_index)
 				return -1;

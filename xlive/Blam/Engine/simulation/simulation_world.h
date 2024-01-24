@@ -56,13 +56,16 @@ public:
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 
+	void initialize_world(int32 a2, int32 a3, int32 a4);
+	// discard resources
+	void destroy_world();
+
+	void queues_dispose();
 
 	s_simulation_queue_stats queue_describe(const c_simulation_queue* queue)
 	{
 		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count() };
 	}
-
-
 
 	void destroy_update();
 
@@ -76,7 +79,6 @@ public:
 		return false;
 	}
 
-
 	bool exists()
 	{
 		return m_simulation_world_mode != _simulation_world_type_none;
@@ -84,3 +86,5 @@ public:
 
 private:
 };
+
+void simulation_world_apply_patches();

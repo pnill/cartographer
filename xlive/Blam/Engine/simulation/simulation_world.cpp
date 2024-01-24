@@ -4,6 +4,8 @@
 #include "game/game.h"
 #include "shell/shell_windows.h"
 
+#include "Util/Hooks/Hook.h"
+
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size
 c_simulation_queue g_simulation_queues[k_simulation_queue_count];
@@ -90,19 +92,6 @@ void c_simulation_world::apply_basic_queue()
 
 void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 {
-	static long long last_time_msec;
-	static void* last_queue;
-
-	if (shell_time_now_msec() - last_time_msec > 1000)
-	{
-		/*<SIM_QUEUE_DBG(
-			"queue 0x%08X, initialized: %d queued count: %d, size: %d",
-			queue,
-			queue->initialized(),
-			queue->queued_count(),
-			queue->queued_size());*/
-	}
-
 	if (queue->queued_count() > 0)
 	{
 		const s_simulation_queue_element* element = queue->get_first_element();
@@ -144,20 +133,46 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 			element = queue->get_next_element(element);
 		}
 	}
-
-	if (shell_time_now_msec() - last_time_msec > 1000)
-	{
-		last_time_msec = shell_time_now_msec();
-	}
 }
 
 void c_simulation_world::destroy_update()
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
 	{
-		c_simulation_queue::dispose(queue_get((e_simulation_queue_type)i));
+		queue_get((e_simulation_queue_type)i)->clear();
 	}
 }
+
+typedef void(__thiscall* t_c_simulation_world__initialize_world)(c_simulation_world*, int32, int32, int32);
+t_c_simulation_world__initialize_world p_c_simulation_world__initialize_world;
+
+void c_simulation_world::initialize_world(int32 a2, int32 a3, int32 a4)
+{
+	p_c_simulation_world__initialize_world(this, a2, a3, a4);
+	if (!is_playback())
+	{
+		queues_initialize();
+	}
+}
+
+void __declspec(naked) jmp_initialize_world() { __asm { jmp c_simulation_world::initialize_world } }
+
+typedef void(__thiscall* t_c_simulation_world__destroy_world)(c_simulation_world*);
+t_c_simulation_world__destroy_world p_c_simulation_world__destroy_world;
+
+void c_simulation_world::destroy_world()
+{
+	// call orig
+	p_c_simulation_world__destroy_world(this);
+
+	// clear the queues
+	if (!is_playback())
+	{
+		queues_dispose();
+	}
+}
+
+void __declspec(naked) jmp_destroy_world() { __asm{ jmp c_simulation_world::destroy_world } }
 
 void c_simulation_world::queues_initialize()
 {
@@ -165,4 +180,20 @@ void c_simulation_world::queues_initialize()
 	{
 		queue_get((e_simulation_queue_type)i)->initialize();
 	}
+}
+
+void c_simulation_world::queues_dispose()
+{
+	for (int32 i = 0; i < k_simulation_queue_count; i++)
+	{
+		queue_get((e_simulation_queue_type)i)->dispose();
+	}
+}
+
+void simulation_world_apply_patches()
+{
+	// ### TODO dedi offset
+	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x0), jmp_initialize_world);
+	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x0), jmp_destroy_world);
+	return;
 }
