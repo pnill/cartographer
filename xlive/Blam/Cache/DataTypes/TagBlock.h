@@ -19,7 +19,9 @@ struct tag_block
 		if (this->data != NONE)
 		{
 			char *tag_data_table = tags::get_tag_data();
+#ifdef DEBUG
 			if (LOG_CHECK(tag_data_table))
+#endif
 				return reinterpret_cast<T*>(&tag_data_table[this->data]);
 		}
 		return nullptr;

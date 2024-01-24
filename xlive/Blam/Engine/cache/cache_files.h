@@ -1,16 +1,17 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamTag.h"
 
-struct alignas(4) s_tag_data_iterator
+#define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
+
+struct tag_iterator
 {
-	DWORD dword0;
-	DWORD dword4;
-	datum current_tag_datum;
-	datum next_tag_datum;
+	int32 field_0;
+	int32 field_4;
+	datum current_tag_index;
+	datum next_tag_index;
 	blam_tag tag_type;
-	datum get_next_datum();
 };
-CHECK_STRUCT_SIZE(s_tag_data_iterator, 20);
+CHECK_STRUCT_SIZE(tag_iterator, 20);
 
 struct cache_file_tag_instance
 {
@@ -22,6 +23,11 @@ struct cache_file_tag_instance
 CHECK_STRUCT_SIZE(cache_file_tag_instance, 16);
 
 cache_file_tag_instance* global_tag_instances_get(void);
+
+tag_iterator* tag_iterator_new(tag_iterator* itr, blam_tag::tag_group_type type);
+
+datum __cdecl tag_iterator_next(tag_iterator* itr);
+
 void cache_file_map_clear_all_failures(void);
 
 // Get tag data from tag index

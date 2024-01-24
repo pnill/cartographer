@@ -30,7 +30,7 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 
 		if (sim_event_def->payload_size() > 0)
 		{
-			uint8* block = payload_blocks->block_data;
+			uint8* block = (uint8*)payload_blocks->block_data;
 			int32 block_size = payload_blocks->block_size;
 
 			SIM_QUEUE_DBG(

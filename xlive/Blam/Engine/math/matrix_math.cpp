@@ -104,7 +104,6 @@ void matrix4x3_rotation_from_quaternion(real_matrix4x3* matrix, const real_quate
 real_quaternion* matrix4x3_rotation_to_quaternion(const real_matrix4x3* matrix, real_quaternion* out)
 {
 	return matrix3x3_rotation_to_quaternion(&matrix->vectors, out);
-	
 }
 
 void matrix4x3_rotation_from_vectors(real_matrix4x3* matrix, const real_vector3d* forward, const real_vector3d* up)

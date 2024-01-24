@@ -88,19 +88,19 @@ void XnIpManager::LogConnectionsToConsole(ConsoleLog* consoleLog) const
 		consoleLog->Output(StringFlag_None, "# %s", xnet_connections_str);
 
 	for (int i = 0; i < GetMaxXnConnections(); i++)
+	{
+		std::string logString;
+		XnIp* xnIp = &m_XnIPs[i];
+		if (xnIp->m_valid)
 		{
-			std::string logString;
-			XnIp* xnIp = &m_XnIPs[i];
-			if (xnIp->m_valid)
-			{
-				const XnIpPckTransportStats* pckStats;
-				xnIp->PckGetStats(&pckStats);
+			const XnIpPckTransportStats* pckStats;
+			xnIp->PckGetStats(&pckStats);
 
-				logString +=
-					"		Index: " + std::to_string(i) + " " +
-					"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
-					"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
-					"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
+			logString +=
+				"		Index: " + std::to_string(i) + " " +
+				"Packets sent: " + std::to_string(pckStats->pckBytesSent) + " " +
+				"Packets received: " + std::to_string(pckStats->pckBytesRecvd) + " " +
+				"Connect status: " + std::to_string(xnIp->GetConnectStatus()) + " " +
 				"Connection initiator: " + (xnIp->InitiatedConnectRequest() ? "yes" : "no") + " " +
 				"Time since last interaction: " + std::to_string((float)(timeGetTime() - xnIp->m_lastConnectionInteractionTime) / 1000.f) + " " +
 				"Time since last packet received: " + std::to_string((float)(timeGetTime() - pckStats->lastPacketReceivedTime) / 1000.f);
@@ -972,13 +972,13 @@ INT WINAPI XNetXnAddrToInAddr(const XNADDR* pxna, const XNKID* pxnkid, IN_ADDR* 
 		return WSAEINVAL;
 
 	int ret = gXnIpMgr.CreateOrGetXnIpIdentifierFromPacket(pxna, pxnkid, nullptr, pina);
+
 	if (ret != 0)
 	{
 		gXnIpMgr.LogConnectionsErrorDetails(nullptr, ret, pxnkid);
 		return ret;
 	}
 
-	XnIp* xnIp = gXnIpMgr.GetConnection(*pina);
 	LOG_TRACE_NETWORK("{} - XNADDR local-address: {:X}, online-address: {:X}", __FUNCTION__, ntohl(pxna->ina.s_addr), ntohl(pxna->inaOnline.s_addr));
 	return ret;
 }
