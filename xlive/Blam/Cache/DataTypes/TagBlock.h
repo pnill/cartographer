@@ -29,9 +29,7 @@ struct tag_block
 
 	T* end() const
 	{
-#ifdef DEBUG
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
-#endif
 		if (this->begin())
 			return &this->begin()[this->size];
 		else
@@ -40,9 +38,7 @@ struct tag_block
 
 	T* operator[](int32 index) const
 	{
-#ifdef DEBUG
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
-#endif
 		if (index == NONE)
 			return nullptr;
 		if (index >= this->size)
