@@ -51,7 +51,7 @@ struct s_data_array
 	static void data_make_valid(s_data_array* data_array)
 	{
 		// not entirely sure what this actually does
-		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x3281F); // ### TODO DEDI OFFSET
+		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x3281F);
 		return p_data_make_valid(data_array);
 	}
 };

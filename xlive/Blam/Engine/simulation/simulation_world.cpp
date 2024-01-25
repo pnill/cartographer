@@ -192,7 +192,6 @@ void c_simulation_world::queues_dispose()
 
 void simulation_world_apply_patches()
 {
-	// ### TODO dedi offset
 	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x1C500E), jmp_initialize_world);
 	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x1C5569), jmp_destroy_world);
 	return;
