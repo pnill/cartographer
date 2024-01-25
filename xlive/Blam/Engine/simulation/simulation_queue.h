@@ -68,7 +68,7 @@ public:
 
 	~c_simulation_queue()
 	{
-		dispose(this);
+		dispose();
 	}
 
 	void initialize()
@@ -177,7 +177,7 @@ public:
 
 	void clear();
 
-	static void dispose(c_simulation_queue* to_dispose);
+	void dispose();
 };
 
 inline void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem)
@@ -284,11 +284,11 @@ inline void c_simulation_queue::clear()
 	}
 }
 
-inline void c_simulation_queue::dispose(c_simulation_queue* to_dispose)
+inline void c_simulation_queue::dispose()
 {
-	if (to_dispose->initialized())
+	if (initialized())
 	{
-		to_dispose->clear();
-		to_dispose = NULL;
+		clear();
+		m_initialized = false;
 	}
 }
