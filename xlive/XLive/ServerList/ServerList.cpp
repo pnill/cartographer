@@ -1024,8 +1024,8 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 
-	XCloseHandle(xlocatorhandle);
 	ServerListQueryCancelAll();
+	XCloseHandle(xlocatorhandle);
 
 	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 
