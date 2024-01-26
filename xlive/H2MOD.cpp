@@ -35,6 +35,7 @@
 #include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
 #include "Blam/Engine/saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
+#include "simulation/simulation_entity_database.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
@@ -899,8 +900,8 @@ void H2MOD::ApplyHooks() {
 	bipeds_apply_patches();
 	unit_apply_patches();
 
-	// ### TODO server offsets
 	simulation_apply_patches();
+	simulation_entity_database_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

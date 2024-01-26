@@ -1,17 +1,41 @@
 #pragma once
+#include "simulation.h"
+#include "simulation_queue.h"
 
-#include "simulation/simulation_queue.h"
-#include "simulation/simulation_event_handler.h"
-#include "simulation/simulation_type_collection.h"
+struct s_simulation_queue_entity_data
+{
+	int32 entity_index;
+	e_simulation_entity_type entity_type;
+	int16 pad;
+	int32 creation_data_size;
+	uint8* creation_data;
+	int32 state_data_size;
+	uint8* state_data;
+};
+
+struct s_simulation_queue_decoded_creation_data
+{
+	e_simulation_entity_type entity_type;
+	int16 pad;
+	int32 gamestate_index;
+	uint32 initial_update_mask;
+	uint8 creation_data[k_simulation_payload_size_max];
+	int32 creation_data_size;
+	uint8 state_data[k_simulation_payload_size_max];
+	int32 state_data_size;
+};
 
 struct s_simulation_queue_entity_update_apply
 {
 	e_simulation_entity_type entity_type;
+	int16 pad;
 	int32 reference_count;
 	datum object_refereces[k_entity_reference_indices_count_max];
 	uint8 data[k_simulation_payload_size_max];
 	int32 data_size;
 };
 
-bool simulation_event_queue_apply(const s_simulation_queue_element* update);
-void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* references, int32 block_size, uint8* block);
+void simulation_queue_entity_creation_insert(s_simulation_queue_element* element);
+bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* simulation_queue_entity_data, uint32 update_mask, s_simulation_queue_element** element, int32* gamestate_index);
+void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element);
+
