@@ -24,8 +24,8 @@ enum e_network_memory_block : int16
 	_network_memory_block_join_request = 0x11,
 
 	// these are new
-	_network_memory_block_simulation_entity_creation_gamestate_index,
-	_network_memory_block_simulation_entity_creation_queued_element,
+	_network_memory_block_forward_gamestate_element,
+	_network_memory_block_forward_simulation_queue_element,
 
 	k_network_memory_block_count //= 0x12,
 };
