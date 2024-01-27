@@ -28,5 +28,5 @@ void simulation_entity_index_decode(c_bitstream* stream, int32* entity_index)
 	int32 entity_abs_index = stream->read_integer("entity-absolute-index", 10);
 	int32 entity_seed = stream->read_integer("entity-seed", 4);
 
-	*entity_index = (entity_abs_index << 28) | (entity_abs_index & (k_simulation_entity_database_maximum_entities - 1));
+	*entity_index = (entity_seed << 28) | (entity_abs_index & (k_simulation_entity_database_maximum_entities - 1));
 }
