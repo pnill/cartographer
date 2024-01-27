@@ -223,7 +223,7 @@ __declspec(naked) void jmp_c_simulation_entity_database__read_creation_from_pack
 
 void simulation_entity_database_apply_patches(void)
 {
-    //WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
-    //WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
-    return;
+	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
+	WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
+	return;
 }
