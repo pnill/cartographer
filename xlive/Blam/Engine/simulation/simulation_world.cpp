@@ -169,7 +169,6 @@ void c_simulation_world::destroy_world()
 	// call orig
 	p_c_simulation_world__destroy_world(this);
 
-	// clear the queues
 	if (!is_playback())
 	{
 		queues_dispose();

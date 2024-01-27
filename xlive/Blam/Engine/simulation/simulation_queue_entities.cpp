@@ -11,6 +11,12 @@
 bool simulation_queue_entity_decode_header(c_bitstream* bitstream, e_simulation_entity_type* entity_type, int32* gamestate_index, uint32* entity_abs_index);
 bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_decoded_creation_data* creation_data, uint32* entity_abs_index);
 
+c_simulation_entity_definition* simulation_queue_entities_get_definition(e_simulation_entity_type type)
+{
+	c_simulation_type_collection* sim_collection = simulation_get_type_collection();
+	return sim_collection->get_entity_definition(type);
+}
+
 
 void simulation_queue_entity_creation_insert(s_simulation_queue_element* simulation_queue_element)
 {
@@ -21,6 +27,15 @@ void simulation_queue_entity_creation_insert(s_simulation_queue_element* simulat
 bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* simulation_queue_entity_data, uint32 update_mask, s_simulation_queue_element** element, int32* gamestate_index)
 {
 	//int32 entity_index = simulation_gamestate_entity_create();
+
+	c_simulation_entity_definition* entity_definition = simulation_queue_entities_get_definition(simulation_queue_entity_data->entity_type);
+
+	// ### TODO STUB for now
+	if (gamestate_index)
+	{
+		*gamestate_index = NONE;
+	}
+
 	return false;
 }
 
@@ -35,8 +50,8 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 		uint32 entity_abs_index;
 		if (decode_simulation_queue_creation_from_buffer(element->data_size, element->data, &creation_data, &entity_abs_index))
 		{
-			c_simulation_type_collection* type = simulation_get_type_collection();
-			c_simulation_entity_definition* entity = type->get_entity_definition(creation_data.entity_type);
+			c_simulation_entity_definition* entity = simulation_queue_entities_get_definition(creation_data.entity_type);
+			
 			bool valid_gamestate_index = true;
 			if (game_is_playback())
 			{
@@ -48,7 +63,8 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 			{
 				s_simulation_game_entity game_entity; 
 				game_entity.entity_index = entity_abs_index;
-				valid_gamestate_index = entity->create_game_entity(&game_entity, 
+				valid_gamestate_index = entity->create_game_entity(
+					&game_entity, 
 					creation_data.creation_data_size,
 					creation_data.creation_data, 
 					entity->initial_update_mask(),
