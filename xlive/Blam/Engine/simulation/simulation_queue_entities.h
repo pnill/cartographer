@@ -6,7 +6,6 @@ struct s_simulation_queue_entity_data
 {
 	int32 entity_index;
 	e_simulation_entity_type entity_type;
-	int16 pad;
 	int32 creation_data_size;
 	uint8* creation_data;
 	int32 state_data_size;
@@ -16,8 +15,7 @@ struct s_simulation_queue_entity_data
 struct s_simulation_queue_decoded_creation_data
 {
 	e_simulation_entity_type entity_type;
-	int16 pad;
-	int32 gamestate_index;
+	datum gamestate_index;
 	uint32 initial_update_mask;
 	uint8 creation_data[k_simulation_payload_size_max];
 	int32 creation_data_size;
@@ -28,7 +26,6 @@ struct s_simulation_queue_decoded_creation_data
 struct s_simulation_queue_entity_update_apply
 {
 	e_simulation_entity_type entity_type;
-	int16 pad;
 	int32 reference_count;
 	datum object_refereces[k_entity_reference_indices_count_max];
 	uint8 data[k_simulation_payload_size_max];

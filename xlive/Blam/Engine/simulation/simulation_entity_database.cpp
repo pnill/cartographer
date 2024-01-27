@@ -16,7 +16,7 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     game_entity->field_10 = 0;
     game_entity->event_reference_count = 0;
     game_entity->exists_in_gameworld = 0;
-    game_entity->object_index = NONE;
+    game_entity->object_index = DATUM_INDEX_NONE;
 
     // we could also validate here the type of the blocks
     game_entity->creation_data_size = blocks[_entity_creation_block_order_simulation_entity_creation].block_size;
