@@ -22,7 +22,12 @@ enum e_network_memory_block : int16
 	_network_memory_block_logic_session_array = 0xF,
 	_network_memory_block_logic_unsuitable_session_array = 0x10,
 	_network_memory_block_join_request = 0x11,
-	k_network_memory_block_count = 0x12,
+
+	// these are new
+	_network_memory_block_forward_gamestate_element,
+	_network_memory_block_forward_simulation_queue_element,
+
+	k_network_memory_block_count //= 0x12,
 };
 
 struct s_replication_allocation_block
