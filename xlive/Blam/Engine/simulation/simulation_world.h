@@ -41,11 +41,13 @@ struct s_simulation_queue_stats
 class c_simulation_world
 {
 public:
-	uint8 gap_0[8];
+	uint8 gap_0[4];
+	void* m_distributed_world;
 	// ### TODO validate
 	e_simulation_world_type m_simulation_world_mode;
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
+	void simulation_queue_free(s_simulation_queue_element* element);
 	void simulation_queue_enqueue(s_simulation_queue_element* element);
 
 	void queues_initialize();

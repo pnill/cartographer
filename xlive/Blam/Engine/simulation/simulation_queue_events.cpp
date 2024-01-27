@@ -5,24 +5,11 @@
 #include "simulation.h"
 #include "simulation/simulation_world.h"
 #include "simulation/game_interface/simulation_game_entities.h"
+#include "simulation/simulation_gamestate_entities.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"
 
 #include "memory/bitstream.h"
-
-static void encode_object_index_reference(c_bitstream* stream, datum object_index_references)
-{
-	stream->write_integer("gamestate-index-id", DATUM_INDEX_TO_IDENTIFIER(object_index_references), 16);
-	stream->write_integer("gamestate-index-absolute", DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index_references), 11);
-}
-
-static void decode_object_index_reference(c_bitstream* stream, datum* object_index_reference_out)
-{
-	int32 object_index_id = stream->read_integer("gamestate-index-id", 16);
-	int32 object_absolute_index = stream->read_integer("gamestate-index-absolute", 11);
-
-	*object_index_reference_out = DATUM_INDEX_NEW(object_absolute_index, object_index_id);
-}
 
 static bool encode_event_to_buffer(
 	uint8* out_buffer,
@@ -45,7 +32,7 @@ static bool encode_event_to_buffer(
 		stream.write_bool("object-index-exists", !DATUM_IS_NONE(object_index_references[i]));
 		if (!DATUM_IS_NONE(object_index_references[i]))
 		{
-			encode_object_index_reference(&stream, object_index_references[i]);
+			simulation_gamestate_index_encode(&stream, object_index_references[i]);
 		}
 	}
 
@@ -87,7 +74,7 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 	{
 		if (stream.read_bool("object-index-exists"))
 		{
-			decode_object_index_reference(&stream, &decode_out->object_refereces[i]);
+			simulation_gamestate_index_decode(&stream, &decode_out->object_refereces[i]);
 		}
 		else
 		{
