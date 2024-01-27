@@ -66,7 +66,7 @@ bool encode_simulation_queue_creation_to_buffer(uint8* out_buffer, int32 out_buf
 		SIM_QUEUE_DBG("entity encoding, stream is fine? %d, encoded size: %d",
 			!stream.error_occured(),
 			stream.get_space_used_in_bytes());
-		SIM_QUEUE_DBG("entity type: %d, reference count: %d", event_type, reference_count);
+		SIM_QUEUE_DBG("entity type: %d", data->entity_type);
 	}
 	else
 	{
@@ -84,7 +84,6 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 	bool result = false;
 	int32 write_buffer_space_used;
 	uint8 write_buffer[k_simulation_payload_size_max];
-	s_simulation_queue_element* allocated_element = NULL;
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
 
 	if (game_is_distributed() && !game_is_playback())
@@ -108,15 +107,14 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 			&write_buffer_space_used
 		))
 		{
-			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_creation, write_buffer_space_used, &allocated_element);
-			if (allocated_element)
+			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_creation, write_buffer_space_used, element);
+			if (*element)
 			{
 				// copy the data to the buffer, enqueuing done later for entities
-				csmemcpy(allocated_element->data, write_buffer, write_buffer_space_used);
+				csmemcpy((*element)->data, write_buffer, write_buffer_space_used);
+				result = true;
 			}
 		}
-
-		return result;
 	}
 
 	return result;

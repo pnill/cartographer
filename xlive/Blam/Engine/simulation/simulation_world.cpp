@@ -20,6 +20,8 @@ c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type)
 
 void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int32 size, s_simulation_queue_element** out_allocated_elem)
 {
+	*out_allocated_elem = NULL;
+
 	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
@@ -51,6 +53,19 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 	}
 }
 
+void c_simulation_world::simulation_queue_free(s_simulation_queue_element* element)
+{
+	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
+	{
+		// player event, player update, gamestate clear
+		queue_get(_simulation_queue_basic)->deallocate(element);
+	}
+	else
+	{
+		queue_get(_simulation_queue_high_priority)->deallocate(element);
+	}
+}
+
 void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* element)
 {
 	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
@@ -59,14 +74,14 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		queue_get(_simulation_queue_basic)->enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_basic_event_queue, 
-			g_basic_event_queue.allocated_count(), 
-			g_basic_event_queue.allocated_size_in_bytes());
+			&g_simulation_queues[_simulation_queue_basic],
+			g_simulation_queues[_simulation_queue_basic].allocated_count(),
+			g_simulation_queues[_simulation_queue_basic].allocated_size_in_bytes());
 
 		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
-			&g_basic_event_queue, 
-			g_basic_event_queue.queued_count(), 
-			g_basic_event_queue.queued_size());
+			&g_simulation_queues[_simulation_queue_basic],
+			g_simulation_queues[_simulation_queue_basic].queued_count(),
+			g_simulation_queues[_simulation_queue_basic].queued_size());
 	}
 	else
 	{
@@ -75,11 +90,14 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		queue_get(_simulation_queue_high_priority)->enqueue(element);
 
 		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_high_priority_queue,
-			g_high_priority_queue.allocated_count(),
-			g_high_priority_queue.allocated_size_in_bytes());
+			&g_simulation_queues[_simulation_queue_high_priority],
+			g_simulation_queues[_simulation_queue_high_priority].allocated_count(),
+			g_simulation_queues[_simulation_queue_high_priority].allocated_size_in_bytes());
 
-		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", &g_high_priority_queue, g_high_priority_queue.queued_count(), g_high_priority_queue.queued_size());
+		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
+			&g_simulation_queues[_simulation_queue_high_priority], 
+			g_simulation_queues[_simulation_queue_high_priority].queued_count(), 
+			g_simulation_queues[_simulation_queue_high_priority].queued_size());
 	}
 }
 

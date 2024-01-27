@@ -7,10 +7,10 @@
 
 enum e_entity_creation_block_order
 {
-	_entity_creation_block_order_forward_memory_queue_element,
-	// _entity_creation_block_order_gamestate_index,
 	_entity_creation_block_order_simulation_entity_creation,
 	_entity_creation_block_order_simulation_entity_state,
+	_entity_creation_block_order_forward_memory_queue_element,
+	// _entity_creation_block_order_gamestate_index,
 	k_entity_creation_block_order_count
 };
 
