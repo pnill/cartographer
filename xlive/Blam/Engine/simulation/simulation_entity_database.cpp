@@ -88,12 +88,10 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
         s_simulation_queue_element** queue_element = (s_simulation_queue_element**)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
         result = (!creation_data || !queue_element || !state_data /*|| !gamestate_index*/ ? 2 : result);
 
-        if (!creation_data_size || (creation_data && state_data && queue_element /* && gamestate_index*/))
+        // check if creation size is > 0 and if network heap block have been successfully allocated
+        if (creation_data_size > 0 && (creation_data && state_data && queue_element /* && gamestate_index*/))
         {
-            if (creation_data_size > 0)
-            {
-                csmemset(creation_data, 0, creation_data_size);
-            }
+            csmemset(creation_data, 0, creation_data_size);
 
             if (entity_definition->object_creation_decode(creation_data_size, creation_data, packet) 
                 && entity_definition->build_baseline_state_data(
