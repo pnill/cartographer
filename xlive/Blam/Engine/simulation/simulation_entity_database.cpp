@@ -5,17 +5,22 @@
 
 #include "Util/Hooks/Hook.h"
 
+c_simulation_entity_database* simulation_get_entity_database()
+{
+    return (c_simulation_entity_database*)((uint8*)simulation_get_world()->m_distributed_world + 8352);
+}
+
 bool c_simulation_entity_database::process_creation(int32 entity_index, e_simulation_entity_type type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
 {
     bool result = false;
     c_simulation_entity_definition*  entity_definition = m_type_collection->get_entity_definition(type);
-    s_simulation_game_entity* game_entity = &m_game_entities[entity_index & (k_simulation_entity_database_maximum_entities - 1)];
+    s_simulation_game_entity* game_entity = get_entity(entity_index);
     game_entity->entity_index = entity_index;
     game_entity->entity_type = type;
     game_entity->entity_update_flag = 0;
     game_entity->field_10 = 0;
     game_entity->event_reference_count = 0;
-    game_entity->exists_in_gameworld = 0;
+    game_entity->exists_in_gameworld = false;
     game_entity->object_index = DATUM_INDEX_NONE;
 
     // we could also validate here the type of the blocks
@@ -89,16 +94,17 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
         result = (!creation_data || !queue_element || !state_data /*|| !gamestate_index*/ ? 2 : result);
 
         // check if creation size is > 0 and if network heap block have been successfully allocated
-        if (creation_data_size > 0 && (creation_data && state_data && queue_element /* && gamestate_index*/))
+        if ((!creation_data_size || creation_data != NULL) && (state_data && queue_element /* && gamestate_index*/))
         {
-            csmemset(creation_data, 0, creation_data_size);
+            if (creation_data > 0)
+                csmemset(creation_data, 0, creation_data_size);
 
             if (entity_definition->object_creation_decode(creation_data_size, creation_data, packet) 
                 && entity_definition->build_baseline_state_data(
                     creation_data_size,
                     creation_data,
                     state_data_size,
-                    state_data))
+                    (s_simulation_baseline_state_data*)state_data))
             {
                 uint32 update_mask = entity_definition->initial_update_mask();
                 uint32 entity_out_update_mask = 0;

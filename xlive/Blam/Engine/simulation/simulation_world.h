@@ -41,7 +41,8 @@ struct s_simulation_queue_stats
 class c_simulation_world
 {
 public:
-	uint8 gap_0[8];
+	uint8 gap_0[4];
+	void* m_distributed_world;
 	// ### TODO validate
 	e_simulation_world_type m_simulation_world_mode;
 
