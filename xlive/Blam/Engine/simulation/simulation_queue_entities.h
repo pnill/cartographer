@@ -28,6 +28,8 @@ struct s_simulation_queue_entity_update_apply
 {
 };
 
+c_simulation_entity_definition* simulation_queue_entities_get_definition(e_simulation_entity_type type);
+
 void simulation_queue_entity_creation_insert(s_simulation_queue_element* element);
 bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* simulation_queue_entity_data, uint32 update_mask, s_simulation_queue_element** element, int32* gamestate_index);
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element);

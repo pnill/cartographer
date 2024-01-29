@@ -49,31 +49,36 @@ bool encode_simulation_queue_creation_to_buffer(uint8* out_buffer, int32 out_buf
 
 	// write the actual data
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(data->entity_type);
-	entity_def->object_creation_encode(data->creation_data_size, data->creation_data, NULL, &stream);
+	entity_def->entity_creation_encode(data->creation_data_size, data->creation_data, NULL, &stream);
 
 	if (initial_update_mask != 0)
 	{
 		uint32 update_mask_written = 0;
-		entity_def->entity_update_encode(true, initial_update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0);
+		if (entity_def->entity_update_encode(true, initial_update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0))
+		{
+			SIM_ENT_QUEUE_DBG("enity update encode success!");
+		}
 	}
 
+	bool result = !stream.error_occured();
 	stream.finish_writing(NULL);
 
-	bool result = !stream.error_occured();
 	if (result)
 	{
-		SIM_QUEUE_DBG("#####");
-		SIM_QUEUE_DBG("entity encoding, stream is fine? %d, encoded size: %d",
+		SIM_ENT_QUEUE_DBG("#####");
+		SIM_ENT_QUEUE_DBG("entity encoding, stream is fine? %d, encoded size: %d",
 			!stream.error_occured(),
 			stream.get_space_used_in_bytes());
-		SIM_QUEUE_DBG("entity type: %d", data->entity_type);
+		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", data->entity_type, data->entity_index, initial_update_mask);
 	}
 	else
 	{
-		SIM_QUEUE_DBG("entity encoding failed!!!! --------");
+		SIM_ENT_QUEUE_DBG("entity encoding failed!!!! --------");
+		
 	}
 
 	*out_written_size = stream.get_space_used_in_bytes();
+
 	return result;
 }
 
@@ -120,6 +125,58 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 	return result;
 }
 
+void dump_entity_unit_creation_to_file(
+	e_simulation_entity_type type, 
+	uint32 initial_update_mask, 
+	uint8* encoded_creation, 
+	uint8* decoded_creation, 
+	int32 creation_size,
+	uint8* encoded_state,
+	uint8* decoded_state, 
+	int32 state_size
+)
+{
+	if (type == _simulation_entity_type_unit)
+	{
+		FILE* fp;
+		c_static_wchar_string256 path;
+
+		extern wchar_t* H2AppDataLocal;
+		path.set(H2AppDataLocal);
+		path.append(L"entity_update_unit_creation_state.bin");
+
+		if (!_wfopen_s(&fp, path.get_string(), L"wb"))
+		{
+			fwrite(&type, sizeof(type), 1, fp);
+			fwrite("creation data here:", sizeof("creation data here:"), 1, fp);
+			fwrite(&creation_size, sizeof(creation_size), 1, fp);
+			fwrite(encoded_creation, creation_size, 1, fp);
+			fwrite("state data here:", sizeof("state data here:"), 1, fp);
+			fwrite(&state_size, sizeof(state_size), 1, fp);
+			fwrite(encoded_state, state_size, 1, fp);
+			fwrite(&initial_update_mask, sizeof(initial_update_mask), 1, fp);
+
+			while (ftell(fp) % 16 > 0)
+				putc(0, fp);
+
+			fwrite(&type, sizeof(type), 1, fp);
+			fwrite("decoded creation data here:", sizeof("decoded creation data here:"), 1, fp);
+			fwrite(&creation_size, sizeof(creation_size), 1, fp);
+			fwrite(decoded_creation, creation_size, 1, fp);
+			fwrite("decoded borked state data here:", sizeof("decoded borked state data here:"), 1, fp);
+			fwrite(&state_size, sizeof(state_size), 1, fp);
+			fwrite(decoded_state, state_size, 1, fp);
+			fwrite(&initial_update_mask, sizeof(initial_update_mask), 1, fp);
+
+			while (ftell(fp) % 16 > 0)
+				putc(0, fp);
+
+			fclose(fp);
+		}
+
+	}
+}
+
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element)
 {
 	s_simulation_queue_decoded_creation_data decoded_creation_data;
@@ -131,44 +188,28 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 		if (decode_simulation_queue_creation_from_buffer(element->data_size, element->data, &decoded_creation_data))
 		{
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_creation_data.entity_type);
-			
-			bool valid_gamestate_index = true;
-			 
-			if (valid_gamestate_index)
-			{
-				s_simulation_game_entity* game_entity = simulation_get_entity_database()->get_entity(decoded_creation_data.entity_index);
+			s_simulation_game_entity* game_entity = simulation_get_entity_database()->get_entity(decoded_creation_data.entity_index);
 
-				game_entity->entity_index = decoded_creation_data.entity_index;
-				game_entity->creation_data = decoded_creation_data.creation_data;
-				game_entity->creation_data_size = decoded_creation_data.creation_data_size;
-				game_entity->state_data = decoded_creation_data.state_data;
-				game_entity->state_data_size = decoded_creation_data.state_data_size;
-
-				valid_gamestate_index = entity_def->create_game_entity(
-					game_entity, 
-					decoded_creation_data.creation_data_size,
-					decoded_creation_data.creation_data, 
-					decoded_creation_data.initial_update_mask,
-					decoded_creation_data.state_data_size,
-					decoded_creation_data.state_data
-				);
-
-			}
-			else
-			{
-				// TODO: asserts here
-			}
+			game_entity->entity_index = decoded_creation_data.entity_index;
+			game_entity->exists_in_gameworld = entity_def->create_game_entity(
+				game_entity,
+				decoded_creation_data.creation_data_size,
+				decoded_creation_data.creation_data,
+				decoded_creation_data.initial_update_mask,
+				decoded_creation_data.state_data_size,
+				decoded_creation_data.state_data
+			);
 		}
-		else
-		{
-			// TODO: asserts here
-		}
+	}
+	else
+	{
+		// TODO: asserts here
 	}
 }
 
 bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_decoded_creation_data* decoded_creation_data)
 {
-	bool successfully_decoded = false;
+	bool decode_success = false;
 
 	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
@@ -179,52 +220,70 @@ bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* enc
 		decoded_creation_data->initial_update_mask = stream.read_integer("initial-update-mask", 32);
 
 		const c_simulation_type_collection* type = simulation_get_type_collection();
-		c_simulation_entity_definition* entity = type->get_entity_definition(decoded_creation_data->entity_type);
-		decoded_creation_data->creation_data_size = entity->creation_data_size();
-		decoded_creation_data->state_data_size = entity->state_data_size();
+		c_simulation_entity_definition* entity_def = type->get_entity_definition(decoded_creation_data->entity_type);
+		decoded_creation_data->creation_data_size = entity_def->creation_data_size();
+		decoded_creation_data->state_data_size = entity_def->state_data_size();
 
 		if (decoded_creation_data->creation_data_size <= k_simulation_payload_size_max)
 		{
 			if (decoded_creation_data->state_data_size <= k_simulation_payload_size_max)
 			{
-				successfully_decoded = entity->object_creation_decode(
+				decode_success = entity_def->entity_creation_decode(
 					decoded_creation_data->creation_data_size,
 					decoded_creation_data->creation_data,
 					&stream);
-				if (successfully_decoded)
+				
+				if (decode_success)
 				{
 					if (decoded_creation_data->initial_update_mask)
 					{
 						uint32 update_mask = 0;
-						// this might not be needed in h2v
-						// because h2v doesn't have this extra parameter where you pass the state baseline data
-						// when decoding updates
-						entity->build_baseline_state_data(
+						if (entity_def->build_baseline_state_data(
 							decoded_creation_data->creation_data_size,
 							decoded_creation_data->creation_data,
 							decoded_creation_data->state_data_size,
 							(s_simulation_baseline_state_data*)decoded_creation_data->state_data
-						);
+						))
+						{
+							SIM_ENT_QUEUE_DBG("entity baseline state data success when decoding!");
+						}
 						// in H3 this has some extra param which signals whether to decode
 						// gamestate index or entity index
-						entity->entity_update_decode(
+						if (entity_def->entity_update_decode(
 							true,
 							&update_mask,
 							decoded_creation_data->state_data_size,
 							decoded_creation_data->state_data,
-							&stream);
+							&stream))
+						{
+							SIM_ENT_QUEUE_DBG("entity update decode success!");
+						}
 					}
-					successfully_decoded = !stream.error_occured();
-					stream.finish_reading();
 				}
+				
+				decode_success = !stream.error_occured();
+				stream.finish_reading();
 			}
 		}
 
-		/*if (successfully_decoded && decoded_creation_data->gamestate_index == NONE)
+		/*if (decode_success && decoded_creation_data->gamestate_index == NONE)
 		{
-			successfully_decoded = false;
+			decode_success = false;
 		}*/
 	}
 
-	return successfully_decoded;
+	if (decode_success)
+	{
+		SIM_ENT_QUEUE_DBG("#####");
+		SIM_ENT_QUEUE_DBG("entity decoding, stream is fine? %d, decoded size: %d",
+			!stream.error_occured(),
+			stream.get_space_used_in_bytes());
+		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", decoded_creation_data->entity_type, decoded_creation_data->entity_index, decoded_creation_data->initial_update_mask);
+	}
+	else
+	{
+		SIM_ENT_QUEUE_DBG("entity decoding failed!!!! --------");
+	}
+
+	return decode_success;
 }

@@ -126,5 +126,8 @@ Console::LogToTab(_console_tab_logs, \
 	header ": " "   %s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
 } while (0)
 
-#define SIM_QUEUE_DBG(fmt, ...)
-//#define SIM_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-queue", fmt, __VA_ARGS__)
+#define SIM_EVENT_QUEUE_DBG(fmt, ...)
+//#define SIM_EVENT_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-event-queue", fmt, __VA_ARGS__)
+
+#define SIM_ENT_QUEUE_DBG(fmt, ...)
+//#define SIM_ENT_QUEUE_DBG(fmt, ...) QUICK_DBG("sim-ent-queue", fmt, __VA_ARGS__)

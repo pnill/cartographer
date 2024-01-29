@@ -590,15 +590,18 @@ void CServerList::EnumerateFromHttp()
 			// vector should be XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN in size
 			for (auto& itemQuery : itemsToDownloadQuery)
 			{
-				if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+				if (!itemQuery.second.empty())
 				{
-					m_pageItemsFoundCount++;
+					if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+					{
+						m_pageItemsFoundCount++;
 
 					// this holds all servers found count
 					// not just per page
-					validItemsFound++;
+						validItemsFound++;
 
-					searchResultIdx++;
+						searchResultIdx++;
+					}
 				}
 
 				// this counts even bad servers

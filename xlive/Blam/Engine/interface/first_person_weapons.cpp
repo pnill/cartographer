@@ -913,6 +913,10 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
             result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
         }
     }
+    else
+    {
+        result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
+    }
 
     return result;
 }

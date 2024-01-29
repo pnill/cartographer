@@ -41,25 +41,23 @@ static bool encode_event_to_buffer(
 	// write the event data to the stream
 	sim_event_definition->encode(block_size, block, &stream);
 
-	stream.finish_writing(NULL);
-	*out_written_size = stream.get_space_used_in_bytes();
-
 	bool result = !stream.error_occured();
+	stream.finish_writing(NULL);
 
 	if (result)
 	{
-		SIM_QUEUE_DBG("#####");
-		SIM_QUEUE_DBG("event encoding, stream is fine? %d, encoded size: %d", 
+		SIM_EVENT_QUEUE_DBG("#####");
+		SIM_EVENT_QUEUE_DBG("event encoding, stream is fine? %d, encoded size: %d", 
 			!stream.error_occured(), 
 			stream.get_space_used_in_bytes());
-		SIM_QUEUE_DBG("event type: %d, reference count: %d", event_type, reference_count);
+		SIM_EVENT_QUEUE_DBG("event type: %d, reference count: %d", event_type, reference_count);
 	}
 	else
 	{
-		SIM_QUEUE_DBG("event encoding failed!!!! --------");
+		SIM_EVENT_QUEUE_DBG("event encoding failed!!!! --------");
 	}
 
-
+	*out_written_size = stream.get_space_used_in_bytes();
 	return result;
 }
 
@@ -101,27 +99,27 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 		}
 	}
 
-	stream.finish_reading();
 	bool result = !stream.error_occured();
+	stream.finish_reading();
 
-	SIM_QUEUE_DBG("#####");
+	SIM_EVENT_QUEUE_DBG("#####");
 	if (result)
 	{
 		// everything is fine
-		SIM_QUEUE_DBG("event decoding, stream is fine? %d, decoded size: %d, size of the payload: %d", 
+		SIM_EVENT_QUEUE_DBG("event decoding, stream is fine? %d, decoded size: %d, size of the payload: %d", 
 			!stream.error_occured(),
 			stream.get_space_used_in_bytes(), 
 			decode_out->data_size);
-		SIM_QUEUE_DBG("event type: %d, reference count: %d", decode_out->event_type, decode_out->reference_count);
+		SIM_EVENT_QUEUE_DBG("event type: %d, reference count: %d", decode_out->event_type, decode_out->reference_count);
 
 		for (int32 i = 0; i < decode_out->reference_count; i++)
 		{
-			SIM_QUEUE_DBG("reference: %08X", decode_out->object_refereces[i]);
+			SIM_EVENT_QUEUE_DBG("reference: %08X", decode_out->object_refereces[i]);
 		}
 	}
 	else
 	{
-		SIM_QUEUE_DBG("event decoding failed!!!! --------");
+		SIM_EVENT_QUEUE_DBG("event decoding failed!!!! --------");
 	}
 
 	return result;
@@ -143,10 +141,10 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 		// call postprocess from event def
 		// end
 
-		SIM_QUEUE_DBG("#####");
+		SIM_EVENT_QUEUE_DBG("#####");
 		for (int32 i = 0; i < reference_count; i++)
 		{
-			SIM_QUEUE_DBG("entity reference indice				 -> %08X",
+			SIM_EVENT_QUEUE_DBG("entity reference indice				 -> %08X",
 				entity_references[i]
 			);
 		}
@@ -155,7 +153,7 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 
 		for (int32 i = 0; i < k_entity_reference_indices_count_max; i++)
 		{
-			SIM_QUEUE_DBG("object reference indice (datum index) -> %08X",
+			SIM_EVENT_QUEUE_DBG("object reference indice (datum index) -> %08X",
 				object_indexes_from_entity_references[i]
 			);
 		}
@@ -179,7 +177,7 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 				// copy it to the queue
 				simulation_get_world()->simulation_queue_enqueue(allocated_element);
 
-				SIM_QUEUE_DBG("added element 0x%08X, type: %d, size: %d to simulation queue", 
+				SIM_EVENT_QUEUE_DBG("added element 0x%08X, type: %d, size: %d to simulation queue", 
 					allocated_element, 
 					allocated_element->type, 
 					allocated_element->data_size
@@ -219,13 +217,13 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 			entity_references[i] = NONE;
 		}
 
-		SIM_QUEUE_DBG("object reference (datum index): %08X converted -> entity reference: %08X: ", sim_apply_data.object_refereces[i], entity_references[i]);
+		SIM_EVENT_QUEUE_DBG("object reference (datum index): %08X converted -> entity reference: %08X: ", sim_apply_data.object_refereces[i], entity_references[i]);
 	}
 
 	// ### FIXME !!! this actually requires entity references, instead of object references
 	apply_event_result = sim_entity_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
 
-	SIM_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d", 
+	SIM_EVENT_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d", 
 		sim_apply_data.event_type, 
 		decode_success, 
 		apply_event_result, 

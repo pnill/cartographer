@@ -45,7 +45,7 @@ void particle_system_reset_dt(datum datum_index)
 
 datum particle_system_get_by_ptr(c_particle_system* particle_system)
 {
-	return (datum)((((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system)) | (particle_system->datum_salt << 16));
+	return DATUM_INDEX_NEW(((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system), particle_system->datum_salt);
 }
 
 typedef bool(__stdcall* c_particle_system_update_t)(c_particle_system* thisx, real32 dt);
