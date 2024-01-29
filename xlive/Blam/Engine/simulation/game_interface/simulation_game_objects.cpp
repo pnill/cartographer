@@ -144,7 +144,7 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
 
 int32 __stdcall c_simulation_object_entity_definition__object_creation_required_bits(void* _this)
 {
-    return simulation_definition_table_index_bits() + 92 + 6;
+    return simulation_definition_table_index_bits() + 92 + (6 + 1);
 }
 
 datum __fastcall c_simulation_object_entity_definition__object_create_object(void* _this,

@@ -31,14 +31,14 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 
 	s_simulation_queue_element* queue_element = *(s_simulation_queue_element**)blocks[_entity_creation_block_order_forward_memory_queue_element].block_data;
 
-    csmemset(blocks, 0, sizeof(s_replication_allocation_block) * block_count);
-
 	// TODO when we implement this
 	// datum gamestate_index = *(datum*)blocks[_entity_creation_block_order_gamestate_index].block_data;
 
     // free these blocks
 	network_heap_free_block((uint8*)blocks[_entity_creation_block_order_forward_memory_queue_element].block_data);
 	// network_heap_free_block((uint8*)blocks[_entity_creation_block_order_gamestate_index].block_data);
+
+    csmemset(blocks, 0, sizeof(s_replication_allocation_block) * block_count);
 
 	if (queue_element)
 	{
@@ -50,31 +50,31 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     else
     {
         result = entity_definition->create_game_entity(
-            game_entity, 
-            game_entity->creation_data_size, 
-            game_entity->creation_data, 
-            update_mask, 
-            game_entity->state_data_size, 
+            game_entity,
+            game_entity->creation_data_size,
+            game_entity->creation_data,
+            update_mask,
+            game_entity->state_data_size,
             game_entity->state_data);
+        game_entity->exists_in_gameworld = result;
     }
 
-    game_entity->exists_in_gameworld = result;
     return result;
 }
 
 __declspec(naked) void jmp_c_simulation_entity_database__process_creation() { __asm { jmp c_simulation_entity_database::process_creation } }
 
 
-uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, e_simulation_entity_type* simulation_entity_type, uint32* out_update_mask, int32 block_max_count, int32* block_count, s_replication_allocation_block* blocks, c_bitstream* packet)
+uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, e_simulation_entity_type* simulation_entity_type, uint32* out_entity_initial_update_mask, int32 block_max_count, int32* block_count, s_replication_allocation_block* blocks, c_bitstream* packet)
 {
     uint32 result = 3;
     e_simulation_entity_type entity_type = (e_simulation_entity_type)packet->read_integer("entity-type", 5);
-    c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(entity_type);
+    c_simulation_entity_definition* entity_def = m_type_collection->get_entity_definition(entity_type);
     
-    if (entity_definition)
+    if (entity_def)
     {
-        uint32 creation_data_size = entity_definition->creation_data_size();
-        uint32 state_data_size = entity_definition->state_data_size();
+        uint32 creation_data_size = entity_def->creation_data_size();
+        uint32 state_data_size = entity_def->state_data_size();
 
         // Allocate creation data
         uint8* creation_data = NULL;
@@ -99,28 +99,30 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
             if (creation_data_size > 0)
                 csmemset(creation_data, 0, creation_data_size);
 
-            if (entity_definition->object_creation_decode(creation_data_size, creation_data, packet))
+            memset(state_data, 0, state_data_size);
+            *queue_element = NULL;
+
+            if (entity_def->entity_creation_decode(creation_data_size, creation_data, packet))
             {
-                if (entity_definition->build_baseline_state_data(
+                if (entity_def->build_baseline_state_data(
                     creation_data_size,
                     creation_data,
                     state_data_size,
                     (s_simulation_baseline_state_data*)state_data))
                 {
-                    uint32 update_mask = entity_definition->initial_update_mask();
-                    uint32 entity_out_update_mask = 0;
+                    uint32 entity_initial_update_mask = 0;
+                    uint32 entity_allowed_initial_update_mask = entity_def->initial_update_mask();
 
                     bool decode_success = true;
-                    if (update_mask
+                    if (entity_allowed_initial_update_mask != 0
                         && packet->read_bool("initial-update-exists")
                         )
                     {
-                        if (entity_definition->entity_update_decode(true, &entity_out_update_mask, state_data_size, state_data, packet))
+                        if (entity_def->entity_update_decode(true, &entity_initial_update_mask, state_data_size, state_data, packet))
                         {
-                            // check if all updates have been decoded?
-                            if (TEST_FLAG(~update_mask, entity_out_update_mask))
+                            // check if the state contains updates allowed only on creation
+                            if (TEST_FLAG(~entity_allowed_initial_update_mask, entity_initial_update_mask))
                             {
-                                // if not, the block is invalid?
                                 decode_success = false;
                             }
                         }
@@ -134,7 +136,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                     {
                         /* Original code
                         *simulation_entity_type = entity_type;
-                        *out_update_mask = entity_out_update_mask;
+                        *out_entity_initial_update_mask = entity_initial_update_mask;
                         blocks[*block_count].block_type = _network_memory_block_simulation_entity_creation;
                         blocks[*block_count].block_size = creation_data_size;
                         blocks[*block_count].block_data = creation_data;
@@ -144,16 +146,16 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                         *block_count += 2;
                         */
 
-                        s_simulation_queue_entity_data simulation_queue_entity_type;
-                        simulation_queue_entity_type.entity_index = entity_index;
-                        simulation_queue_entity_type.entity_type = entity_type;
-                        simulation_queue_entity_type.creation_data_size = creation_data_size;
-                        simulation_queue_entity_type.creation_data = creation_data;
-                        simulation_queue_entity_type.state_data_size = state_data_size;
-                        simulation_queue_entity_type.state_data = state_data;
+                        s_simulation_queue_entity_data sim_queue_entity_data;
+                        sim_queue_entity_data.entity_index = entity_index;
+                        sim_queue_entity_data.entity_type = entity_type;
+                        sim_queue_entity_data.creation_data_size = creation_data_size;
+                        sim_queue_entity_data.creation_data = creation_data;
+                        sim_queue_entity_data.state_data_size = state_data_size;
+                        sim_queue_entity_data.state_data = state_data;
 
                         if (!packet->read_only_for_consistency()
-                            && !simulation_queue_entity_creation_allocate(&simulation_queue_entity_type, entity_out_update_mask, queue_element, NULL))
+                            && !simulation_queue_entity_creation_allocate(&sim_queue_entity_data, entity_initial_update_mask, queue_element, NULL))
                         {
                             decode_success = false;
                         }
@@ -162,7 +164,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                     if (decode_success)
                     {
                         *simulation_entity_type = entity_type;
-                        *out_update_mask = entity_out_update_mask;
+                        *out_entity_initial_update_mask = entity_initial_update_mask;
 
                         //blocks[_entity_creation_block_order_gamestate_index].block_type = _network_memory_block_forward_gamestate_element;
                         //blocks[_entity_creation_block_order_gamestate_index].block_size = sizeof(gamestate_index);
@@ -205,6 +207,11 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 
             if (queue_element != NULL)
             {
+                if (*queue_element != NULL)
+                {
+                    simulation_get_world()->simulation_queue_free(*queue_element);
+                }
+
                 network_heap_free_block((uint8*)queue_element);
             }
 

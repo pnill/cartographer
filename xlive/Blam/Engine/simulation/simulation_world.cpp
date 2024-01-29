@@ -73,12 +73,12 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 		// player event, player update, gamestate clear
 		queue_get(_simulation_queue_basic)->enqueue(element);
 
-		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
+		SIM_EVENT_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_simulation_queues[_simulation_queue_basic],
 			g_simulation_queues[_simulation_queue_basic].allocated_count(),
 			g_simulation_queues[_simulation_queue_basic].allocated_size_in_bytes());
 
-		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
+		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
 			&g_simulation_queues[_simulation_queue_basic],
 			g_simulation_queues[_simulation_queue_basic].queued_count(),
 			g_simulation_queues[_simulation_queue_basic].queued_size());
@@ -89,12 +89,12 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 
 		queue_get(_simulation_queue_high_priority)->enqueue(element);
 
-		SIM_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
+		SIM_EVENT_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
 			&g_simulation_queues[_simulation_queue_high_priority],
 			g_simulation_queues[_simulation_queue_high_priority].allocated_count(),
 			g_simulation_queues[_simulation_queue_high_priority].allocated_size_in_bytes());
 
-		SIM_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
+		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
 			&g_simulation_queues[_simulation_queue_high_priority], 
 			g_simulation_queues[_simulation_queue_high_priority].queued_count(), 
 			g_simulation_queues[_simulation_queue_high_priority].queued_size());
@@ -119,7 +119,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 
 		while (element != NULL)
 		{
-			SIM_QUEUE_DBG("appying element: %08X, type: %d to gamestate",
+			SIM_EVENT_QUEUE_DBG("appying element: %08X, type: %d to gamestate",
 				element,
 				element->type);
 
