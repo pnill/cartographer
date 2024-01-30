@@ -923,6 +923,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_events.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_type_collection.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
