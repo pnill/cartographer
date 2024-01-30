@@ -1,28 +1,5 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-template<typename T = int>
-struct s_bitflags
-{
-	T* m_flags;
-
-	// only power of 2 sized types
-	static_assert(sizeof(T) > 0 && (sizeof(T) & (sizeof(T) - 1)) == 0);
-
-	bool test_bit(int index) const
-	{
-		return (m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1))) != 0;
-	}
-
-	void set_bit(int index, bool state)
-	{
-		if (state)
-			m_flags[index / (CHAR_BIT * sizeof(T))] |= m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1));
-		else
-			m_flags[index / (CHAR_BIT * sizeof(T))] = m_flags[index / (CHAR_BIT * sizeof(T))] & ~(FLAG(index & (CHAR_BIT * sizeof(T) - 1)));
-	}
-};
+#include "memory/static_arrays.h"
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array
@@ -40,7 +17,7 @@ struct s_data_array
 	int total_elements_used;		// 0x3C 
 	int field_40;					// 0x40
 	char* data;						// 0x44
-	s_bitflags<> in_use_bit_vector;		// 0x48
+	c_flags<uint32, uint32, 32> in_use_bit_vector;		// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -111,7 +88,7 @@ public:
 		if (index >= m_data_array->next_unused_index)
 			return -1;
 
-		while (!m_data_array->in_use_bit_vector.test_bit(index))
+		while (!m_data_array->in_use_bit_vector.test(index))
 		{
 			if (++index >= m_data_array->next_unused_index)
 				return -1;
