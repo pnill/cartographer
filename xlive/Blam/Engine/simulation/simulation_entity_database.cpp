@@ -14,7 +14,7 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 {
     bool result = false;
     c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(type);
-    s_simulation_game_entity* game_entity = get_entity(entity_index);
+    s_simulation_game_entity* game_entity = entity_get(entity_index);
     game_entity->entity_index = entity_index;
     game_entity->entity_type = type;
     game_entity->entity_update_flag = 0;
@@ -90,7 +90,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
         //int32* gamestate_index = (int32*)network_heap_allocate_block(sizeof(int32));
 
         // Allocate queue data
-        s_simulation_queue_element** queue_element = (s_simulation_queue_element**)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
+        uint8* queue_element = (uint8*)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
         result = (!creation_data || !queue_element || !state_data /*|| !gamestate_index*/ ? 2 : result);
 
         // check if creation size is > 0 and if network heap block have been successfully allocated
@@ -154,7 +154,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                         sim_queue_entity_data.state_data = state_data;
 
                         if (!packet->read_only_for_consistency()
-                            && !simulation_queue_entity_creation_allocate(&sim_queue_entity_data, entity_initial_update_mask, queue_element, NULL))
+                            && !simulation_queue_entity_creation_allocate(&sim_queue_entity_data, entity_initial_update_mask, (s_simulation_queue_element**)queue_element, NULL))
                         {
                             decode_success = false;
                         }
@@ -179,7 +179,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                         blocks[*block_count + _entity_creation_block_order_simulation_entity_state].block_data = state_data;
 
                         blocks[*block_count + _entity_creation_block_order_forward_memory_queue_element].block_type = _network_memory_block_forward_simulation_queue_element;
-                        blocks[*block_count + _entity_creation_block_order_forward_memory_queue_element].block_size = sizeof(queue_element);
+                        blocks[*block_count + _entity_creation_block_order_forward_memory_queue_element].block_size = sizeof(s_simulation_queue_element*);
                         blocks[*block_count + _entity_creation_block_order_forward_memory_queue_element].block_data = queue_element;
 
                         *block_count += k_entity_creation_block_order_count;
@@ -187,31 +187,29 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
                         result = 0;
                     }
                 }
-                else
-                {
-                    result = 3;
-                }
             }
         }
-        else
+
+        if (result == 3
+            || result == 2)
         {
             if (creation_data != NULL)
             {
-                network_heap_free_block((uint8*)creation_data);
+                network_heap_free_block(creation_data);
             }
             if (state_data != NULL)
             {
-                network_heap_free_block((uint8*)state_data);
+                network_heap_free_block(state_data);
             }
 
             if (queue_element != NULL)
             {
                 if (*queue_element != NULL)
                 {
-                    simulation_get_world()->simulation_queue_free(*queue_element);
+                    simulation_get_world()->simulation_queue_free(*(s_simulation_queue_element**)queue_element);
                 }
 
-                network_heap_free_block((uint8*)queue_element);
+                network_heap_free_block(queue_element);
             }
 
             /*if (gamestate_index != NULL)
@@ -226,10 +224,144 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 
 __declspec(naked) void jmp_c_simulation_entity_database__read_creation_from_packet() { __asm { jmp c_simulation_entity_database::read_creation_from_packet } }
 
+bool c_simulation_entity_database::process_update(int32 entity_index, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
+{
+    bool result = false;
+    s_simulation_game_entity* game_entity = entity_try_and_get(entity_index);
+    s_simulation_queue_element* queue_element = *(s_simulation_queue_element**)blocks[_entity_update_block_order_forward_memory_queue_element].block_data;
+    uint8* state_data = (uint8*)blocks[_entity_update_block_order_simulation_entity_state].block_data;
+
+    if (game_entity)
+    {
+        c_simulation_entity_definition* entity_def = m_type_collection->get_entity_definition(game_entity->entity_type);
+        csmemcpy(game_entity->state_data, state_data, game_entity->state_data_size);
+        simulation_queue_entity_update_insert(queue_element);
+    }
+    network_heap_free_block((uint8*)blocks[_entity_update_block_order_forward_memory_queue_element].block_data);
+    csmemset(&blocks[_entity_update_block_order_forward_memory_queue_element], 0, sizeof(blocks[_entity_update_block_order_forward_memory_queue_element]));
+    return true;
+}
+
+__declspec(naked) void jmp_c_simulation_entity_database__process_update() { __asm { jmp c_simulation_entity_database::process_update } }
+
+int32 c_simulation_entity_database::read_update_from_packet(
+    int32 entity_index, 
+    uint32* out_update_mask, 
+    int32 maximum_block_count, 
+    int32* block_count, 
+    s_replication_allocation_block* blocks,
+    c_bitstream* packet
+)
+{
+	uint32 result = 3;
+	s_simulation_game_entity* game_entity = entity_try_and_get(entity_index);
+	if (game_entity && game_entity != (void*)-20)
+	{
+		c_simulation_entity_definition* entity_def = m_type_collection->get_entity_definition(game_entity->entity_type);
+
+		// Allocate state data
+		uint8* state_data = network_heap_allocate_block(game_entity->state_data_size);
+        uint8* queue_element = (uint8*)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
+
+        result = (!state_data || !queue_element ? 2 : result);
+
+        if (state_data && queue_element)
+        {
+            uint32 update_mask = 0;
+            bool decode_success = false;
+
+			if (packet->read_only_for_consistency())
+			{
+				decode_success =
+					entity_def->build_baseline_state_data(
+                        game_entity->creation_data_size, 
+                        game_entity->creation_data, 
+                        game_entity->state_data_size, 
+                        (s_simulation_baseline_state_data*)state_data
+                    );
+			}
+			else
+			{
+				csmemcpy(state_data, game_entity->state_data, game_entity->state_data_size);
+				decode_success = true;
+			}
+
+			if (decode_success)
+			{
+                decode_success = entity_def->entity_update_decode(
+                    false,
+                    &update_mask,
+                    game_entity->state_data_size,
+                    state_data,
+                    packet
+                );
+			}
+
+            if (decode_success)
+            {
+                s_simulation_queue_entity_data sim_queue_entity_data;
+                sim_queue_entity_data.entity_index = entity_index;
+                sim_queue_entity_data.entity_type = game_entity->entity_type;
+                sim_queue_entity_data.creation_data_size = game_entity->creation_data_size;
+                sim_queue_entity_data.creation_data = (uint8*)game_entity->creation_data;
+                sim_queue_entity_data.state_data_size = game_entity->state_data_size;
+                sim_queue_entity_data.state_data = state_data;
+
+                if (!packet->read_only_for_consistency()
+                    && !simulation_queue_entity_update_allocate(&sim_queue_entity_data, DATUM_INDEX_NONE, update_mask, (s_simulation_queue_element**)queue_element))
+                {
+                    decode_success = false;
+                }
+            }
+
+            if (decode_success)
+            {
+                *out_update_mask = update_mask;
+
+                blocks[*block_count + _entity_update_block_order_simulation_entity_state].block_type = _network_memory_block_simulation_entity_state;
+                blocks[*block_count + _entity_update_block_order_simulation_entity_state].block_size = game_entity->state_data_size;
+                blocks[*block_count + _entity_update_block_order_simulation_entity_state].block_data = state_data;
+
+                blocks[*block_count + _entity_update_block_order_forward_memory_queue_element].block_type = _network_memory_block_forward_simulation_queue_element;
+                blocks[*block_count + _entity_update_block_order_forward_memory_queue_element].block_size = sizeof(s_simulation_queue_element*);
+                blocks[*block_count + _entity_update_block_order_forward_memory_queue_element].block_data = queue_element;
+
+                *block_count += k_entity_update_block_order_count;
+
+                result = 0;
+            }
+        }
+
+		if (result == 3
+			|| result == 2)
+		{
+            if (state_data)
+			    network_heap_free_block(state_data);
+
+            if (queue_element)
+            {
+                if (*queue_element != NULL)
+                {
+                    simulation_get_world()->simulation_queue_free(*(s_simulation_queue_element**)queue_element);
+                }
+
+                network_heap_free_block(queue_element);
+            }
+		}
+	}
+
+	return result;
+}
+
+__declspec(naked) void jmp_c_simulation_entity_database__read_update_from_packet() { __asm { jmp c_simulation_entity_database::read_update_from_packet } }
 
 void simulation_entity_database_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
 	WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
+
+    WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
+    WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
+
 	return;
 }

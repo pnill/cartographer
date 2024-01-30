@@ -35,7 +35,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 		{
 			// entity_deletion, entity_promotion, game_global_event
 
-			// TODO
+			// ### TODO FIXME implement this
 			// c_simulation_queue::get_allocation_status()
 			// check the allocation status
 			// this type of elements can be skupped from being queued, in case of overflow??
@@ -132,6 +132,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_entity_creation_apply(element);
 				break;
 			case _simulation_queue_element_type_entity_update:
+				simulation_queue_entity_update_apply(element);
 				break;
 			case _simulation_queue_element_type_entity_deletion:
 				break;
