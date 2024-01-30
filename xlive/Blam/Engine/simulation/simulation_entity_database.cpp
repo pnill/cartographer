@@ -99,7 +99,6 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
             if (creation_data_size > 0)
                 csmemset(creation_data, 0, creation_data_size);
 
-            memset(state_data, 0, state_data_size);
             *queue_element = NULL;
 
             if (entity_def->entity_creation_decode(creation_data_size, creation_data, packet))
