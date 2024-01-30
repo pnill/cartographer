@@ -17,7 +17,7 @@ struct s_data_array
 	int total_elements_used;		// 0x3C 
 	int field_40;					// 0x40
 	char* data;						// 0x44
-	c_flags<uint32, uint32, 32> in_use_bit_vector;		// 0x48
+	int32 *in_use_bit_vector;		// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -88,7 +88,7 @@ public:
 		if (index >= m_data_array->next_unused_index)
 			return -1;
 
-		while (!m_data_array->in_use_bit_vector.test(index))
+		while (!BIT_VECTOR_TEST_FLAG(m_data_array->in_use_bit_vector, index))
 		{
 			if (++index >= m_data_array->next_unused_index)
 				return -1;
