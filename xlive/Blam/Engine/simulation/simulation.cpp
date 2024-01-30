@@ -14,7 +14,12 @@ c_simulation_world* simulation_get_world()
 
 bool simulation_engine_initialized()
 {
-    return *Memory::GetAddress<bool*>(0x5178D0, 0x0);
+    return *Memory::GetAddress<bool*>(0x5178D0, 0x520B60);
+}
+
+bool simulation_is_paused()
+{
+    return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
 }
 
 bool simulation_query_object_is_predicted(datum object_datum)
@@ -48,11 +53,8 @@ t_simulation_update_pregame p_simulation_update_pregame;
 
 void __cdecl simulation_update_pregame()
 {
-    // ### TODO dedi offset
-    bool unk_9178D2 = *Memory::GetAddress<bool*>(0x5178D2, 0x0);
-
     p_simulation_update_pregame();
-    if (simulation_engine_initialized() && game_in_progress() && !unk_9178D2)
+    if (simulation_engine_initialized() && game_in_progress() && !simulation_is_paused())
     {
         if (c_simulation_watcher::get()->need_to_generate_updates())
         {
@@ -75,6 +77,5 @@ void simulation_apply_patches()
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
-    // ### TODO dedi offset
-    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x0), simulation_update_pregame);
+    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
 }
