@@ -15,10 +15,12 @@ public:
 	int32 get_block_size(const uint8* block);
 };
 
-uint8* network_heap_allocate_block(uint32 size);
+uint8* __cdecl network_heap_allocate_block(uint32 size);
 
-void network_heap_free_block(uint8* block);
+void __cdecl network_heap_free_block(uint8* block);
 
 void network_heap_verify_block(uint8* block);
 
 s_network_heap_stats* network_heap_get_description();
+
+void network_memory_apply_patches();

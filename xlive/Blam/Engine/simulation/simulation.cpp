@@ -3,12 +3,23 @@
 
 #include "game/game.h"
 #include "objects/objects.h"
+#include "simulation_watcher.h"
 
 #include "Util/Hooks/Hook.h"
 
 c_simulation_world* simulation_get_world()
 {
 	return *Memory::GetAddress<c_simulation_world**>(0x5178DC, 0x520B6C);
+}
+
+bool simulation_engine_initialized()
+{
+    return *Memory::GetAddress<bool*>(0x5178D0, 0x520B60);
+}
+
+bool simulation_is_paused()
+{
+    return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
 }
 
 bool simulation_query_object_is_predicted(datum object_datum)
@@ -37,8 +48,22 @@ void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
     p_simulation_update_before_game(sim_data_out);
 }
 
+typedef void (__cdecl* t_simulation_update_pregame)();
+t_simulation_update_pregame p_simulation_update_pregame;
 
-void simulation_update_discard()
+void __cdecl simulation_update_pregame()
+{
+    p_simulation_update_pregame();
+    if (simulation_engine_initialized() && game_in_progress() && !simulation_is_paused())
+    {
+        if (c_simulation_watcher::get()->need_to_generate_updates())
+        {
+            simulation_destroy_update();
+        }
+    }
+}
+
+void simulation_destroy_update()
 {
     // remove everything from the queue
     simulation_get_world()->destroy_update();
@@ -46,7 +71,11 @@ void simulation_update_discard()
 
 void simulation_apply_patches()
 {
+    // ### TODO move somewhere else, network related
+    network_memory_apply_patches();
+
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
+    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
 }
