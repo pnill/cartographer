@@ -46,6 +46,8 @@ void simulation_update_discard()
 
 void simulation_apply_patches()
 {
+    // ### TODO move somewhere else, network related
+    network_memory_apply_patches();
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
