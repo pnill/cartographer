@@ -378,18 +378,29 @@ void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
     return;
 }
 
+bool c_simulation_entity_database::notify_promote_to_authority(int32 entity_index)
+{
+    s_simulation_game_entity* game_entity = this->entity_get(entity_index);
+    simulation_queue_entity_promotion_insert(game_entity);
+    return true;
+}
+
+__declspec(naked) void jmp_c_simulation_entity_database__notify_promote_to_authority() { __asm { jmp c_simulation_entity_database::notify_promote_to_authority } }
+
+
 void simulation_entity_database_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
 	WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
-    // ### TODO dedicated server offsets
     // allow the creation of turrets by increasing the block count, block count was hardcoded
-    WriteValue<int8>(Memory::GetAddress(0x1D7081, 0x0) + 1, (int8)k_entity_creation_block_order_count);
-    WriteValue<int8>(Memory::GetAddress(0x1D7091, 0x0) + 2, (int8)sizeof(s_replication_allocation_block) * k_entity_creation_block_order_count);
+    WriteValue<int8>(Memory::GetAddress(0x1D7081, 0x1DA3A2) + 1, (int8)k_entity_creation_block_order_count);
+    WriteValue<int8>(Memory::GetAddress(0x1D7091, 0x1DA3B2) + 2, (int8)sizeof(s_replication_allocation_block) * k_entity_creation_block_order_count);
 
     WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
     WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
 
     WritePointer(Memory::GetAddress(0x3C624C, 0x381D34), jmp_c_simulation_entity_database__notify_mark_entity_for_deletion);
+
+    WritePointer(Memory::GetAddress(0x3C6258, 0x381D40), jmp_c_simulation_entity_database__notify_promote_to_authority);
 	return;
 }
