@@ -5,6 +5,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/shell/shell_windows.h"
 #include "Blam/Engine/main/main_game_time.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
@@ -110,11 +111,11 @@ void __cdecl game_modules_dispose_hook() {
 
 // rasterizer_present hook
 // used to limit framerate using our implementation
-void __cdecl rasterizer_present_hook(int a1) {
-	typedef void(__cdecl* rasterizer_present_t)(int);
-	auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
+void __cdecl rasterizer_present_hook(bitmap_data* bitmap) {
+	//typedef void(__cdecl* rasterizer_present_t)(int);
+	//auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
-	p_rasterizer_present(a1);
+	rasterizer_present(bitmap);
 	shell_windows_throttle_framerate(H2Config_fps_limit);
 }
 

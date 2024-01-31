@@ -125,12 +125,12 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			} while (probes > 0);
 
 			/*int WSAError = WSAGetLastError();
-			if (RecvLen == SOCKET_ERROR 
-				|| WSAError == WSAETIMEDOUT 
-				|| WSAError == WSAECONNRESET 
-				|| WSAError == WSAESHUTDOWN 
-				|| WSAError == WSAEINVAL 
-				|| connectSocket == INVALID_SOCKET 
+			if (RecvLen == SOCKET_ERROR
+				|| WSAError == WSAETIMEDOUT
+				|| WSAError == WSAECONNRESET
+				|| WSAError == WSAESHUTDOWN
+				|| WSAError == WSAEINVAL
+				|| connectSocket == INVALID_SOCKET
 				|| connectSocket == SOCKET_ERROR)
 			{
 				closesocket(connectSocket);
