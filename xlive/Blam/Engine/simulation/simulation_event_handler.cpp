@@ -60,7 +60,7 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 
 		if (payload_blocks->block_data != NULL)
 		{
-			network_heap_free_block((uint8*)payload_blocks);
+			network_heap_free_block((uint8*)payload_blocks->block_data);
 			payload_blocks->block_data = NULL;
 		}
 	}
