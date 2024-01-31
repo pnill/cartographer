@@ -34,3 +34,5 @@ void simulation_queue_entity_creation_insert(s_simulation_queue_element* element
 bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* simulation_queue_entity_data, uint32 update_mask, s_simulation_queue_element** element, int32* gamestate_index);
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element);
 
+void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity);
+void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* element);

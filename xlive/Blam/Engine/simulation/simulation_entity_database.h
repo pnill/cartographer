@@ -35,7 +35,7 @@ public:
 	virtual void rotate_entity_seed(void) = 0;
 	virtual uint32 generate_current_entity_update_mask(int32 entity_index) = 0;
 
-	s_simulation_game_entity* get_entity(int32 entity_index)
+	s_simulation_game_entity* entity_get(int32 entity_index)
 	{
 		return &m_game_entities[entity_index & (k_simulation_entity_database_maximum_entities - 1)];
 	}
@@ -43,6 +43,8 @@ public:
 private:
 	c_simulation_type_collection* m_type_collection;
 	s_simulation_game_entity m_game_entities[k_simulation_entity_database_maximum_entities];
+
+	void entity_delete_gameworld(int32 entity_index);
 };
 CHECK_STRUCT_SIZE(c_simulation_entity_database, 36884);
 
