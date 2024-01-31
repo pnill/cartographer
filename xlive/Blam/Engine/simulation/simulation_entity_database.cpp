@@ -21,7 +21,7 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     game_entity->field_10 = 0;
     game_entity->event_reference_count = 0;
     game_entity->exists_in_gameworld = false;
-    game_entity->object_index = DATUM_INDEX_NONE;
+    game_entity->object_index = NONE;
 
     // we could also validate here the type of the blocks
     game_entity->creation_data = blocks[_entity_creation_block_order_simulation_entity_creation].block_data;
@@ -308,7 +308,7 @@ int32 c_simulation_entity_database::read_update_from_packet(
                 sim_queue_entity_data.state_data = state_data;
 
                 if (!packet->read_only_for_consistency()
-                    && !simulation_queue_entity_update_allocate(&sim_queue_entity_data, DATUM_INDEX_NONE, update_mask, (s_simulation_queue_element**)queue_element))
+                    && !simulation_queue_entity_update_allocate(&sim_queue_entity_data, NONE, update_mask, (s_simulation_queue_element**)queue_element))
                 {
                     decode_success = false;
                 }
@@ -364,11 +364,13 @@ __declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_
 
 void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 {
-    s_simulation_game_entity* game_entity = entity_get(entity_index);
-    if (game_entity->exists_in_gameworld)
+    s_simulation_game_entity* game_entity = entity_try_and_get(entity_index);
+    if (game_entity->exists_in_gameworld
+        && game_entity->object_index != NONE)
     {
         c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
         simulation_queue_entity_deletion_insert(game_entity);
+        game_entity->object_index = NONE;
         game_entity->exists_in_gameworld = false;
         game_entity->entity_update_flag = 0;
         game_entity->field_10 = 0;
@@ -380,13 +382,13 @@ void simulation_entity_database_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
 	WritePointer(Memory::GetAddress(0x3C622C, 0x381D14), jmp_c_simulation_entity_database__process_creation);
-
-    WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
-    WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
-
+    // ### TODO dedicated server offsets
     // allow the creation of turrets by increasing the block count, block count was hardcoded
     WriteValue<int8>(Memory::GetAddress(0x1D7081, 0x0) + 1, (int8)k_entity_creation_block_order_count);
     WriteValue<int8>(Memory::GetAddress(0x1D7091, 0x0) + 2, (int8)sizeof(s_replication_allocation_block) * k_entity_creation_block_order_count);
+
+    WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
+    WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
 
     WritePointer(Memory::GetAddress(0x3C624C, 0x381D34), jmp_c_simulation_entity_database__notify_mark_entity_for_deletion);
 	return;
