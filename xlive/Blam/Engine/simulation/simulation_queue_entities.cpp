@@ -265,10 +265,9 @@ void dump_entity_unit_creation_to_file(
 
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element)
 {
-	s_simulation_queue_decoded_creation_data decoded_creation_data;
-
 	if (game_is_distributed() && !game_is_playback())
 	{
+		s_simulation_queue_decoded_creation_data decoded_creation_data;
 		csmemset(&decoded_creation_data, 0, sizeof(decoded_creation_data));
 		
 		if (decode_simulation_queue_creation_from_buffer(element->data_size, element->data, &decoded_creation_data))
@@ -476,4 +475,61 @@ void simulation_queue_entity_update_apply(const s_simulation_queue_element* elem
 	{
 		// TODO: asserts here
 	}
+}
+
+void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
+{
+	uint8 data[512];
+	c_bitstream stream(data, sizeof(data));
+	stream.begin_writing(1);
+	simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
+	simulation_entity_index_encode(&stream, entity->entity_index);		// Encode this as gamestate index isn't encoded
+	int32 space_used = stream.get_space_used_in_bytes();
+
+	if (stream.error_occured())
+	{
+		
+	}
+	else
+	{
+		c_simulation_world* world= simulation_get_world();
+		s_simulation_queue_element* element = NULL;
+		world->simulation_queue_allocate(_simulation_queue_element_type_entity_deletion, space_used, &element);
+		if (element)
+		{
+			csmemcpy(element->data, data, space_used);
+			world->simulation_queue_enqueue(element);
+		}
+	}
+	stream.finish_writing(NULL);
+	return;
+}
+
+void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* element)
+{
+	c_bitstream stream(element->data, element->data_size);
+	stream.begin_reading();
+
+	e_simulation_entity_type entity_type;
+	datum gamestate_index;
+	if (simulation_queue_entity_decode_header(&stream, &entity_type, &gamestate_index))
+	{
+		int32 entity_index;
+		simulation_entity_index_decode(&stream, &entity_index);		// Encode this as gamestate index isn't encoded
+		c_simulation_type_collection* type_collection = simulation_get_type_collection();
+		c_simulation_entity_definition* entity_definition = type_collection->get_entity_definition(entity_type);
+
+		s_simulation_game_entity* entity = simulation_get_entity_database()->entity_get(entity_index);
+
+		if (entity_definition->delete_game_entity(entity))
+		{
+			// SUCCESS
+		}
+		else
+		{
+			// FAILURE
+		}
+	}
+	stream.finish_reading();
+	return;
 }

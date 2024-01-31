@@ -9,6 +9,8 @@
 
 #include "Util/Hooks/Hook.h"
 
+// ### TODO remove this code off the face of the earth
+
 #pragma region Custom Language
 
 std::vector<custom_language*> custom_languages;

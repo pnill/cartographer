@@ -286,6 +286,9 @@
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
+    <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -817,6 +820,9 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
+    <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -355,6 +355,27 @@ int32 c_simulation_entity_database::read_update_from_packet(
 
 __declspec(naked) void jmp_c_simulation_entity_database__read_update_from_packet() { __asm { jmp c_simulation_entity_database::read_update_from_packet } }
 
+void c_simulation_entity_database::notify_mark_entity_for_deletion(int32 entity_index)
+{
+    this->entity_delete_gameworld(entity_index);
+}
+
+__declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_deletion() { __asm { jmp c_simulation_entity_database::notify_mark_entity_for_deletion } }
+
+void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
+{
+    s_simulation_game_entity* game_entity = entity_get(entity_index);
+    if (game_entity->exists_in_gameworld)
+    {
+        c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
+        simulation_queue_entity_deletion_insert(game_entity);
+        game_entity->exists_in_gameworld = false;
+        game_entity->entity_update_flag = 0;
+        game_entity->field_10 = 0;
+    }
+    return;
+}
+
 void simulation_entity_database_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);
@@ -363,5 +384,6 @@ void simulation_entity_database_apply_patches(void)
     WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
     WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
 
+    WritePointer(Memory::GetAddress(0x3C624C, 0x381D34), jmp_c_simulation_entity_database__notify_mark_entity_for_deletion);
 	return;
 }

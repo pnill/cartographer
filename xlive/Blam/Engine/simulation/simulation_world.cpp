@@ -135,6 +135,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_entity_update_apply(element);
 				break;
 			case _simulation_queue_element_type_entity_deletion:
+				simulation_queue_entity_deletion_apply(element);
 				break;
 			case _simulation_queue_element_type_entity_promotion:
 				break;
