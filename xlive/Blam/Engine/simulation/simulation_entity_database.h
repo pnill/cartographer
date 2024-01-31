@@ -14,6 +14,13 @@ enum e_entity_creation_block_order
 	k_entity_creation_block_order_count
 };
 
+enum e_entity_update_block_order
+{
+	_entity_update_block_order_simulation_entity_state,
+	_entity_update_block_order_forward_memory_queue_element,
+	k_entity_update_block_order_count
+};
+
 // TODO reverse parent class: c_replication_entity_manager
 class c_simulation_entity_database : c_replication_entity_manager_client
 {
@@ -38,6 +45,19 @@ public:
 	s_simulation_game_entity* entity_get(int32 entity_index)
 	{
 		return &m_game_entities[entity_index & (k_simulation_entity_database_maximum_entities - 1)];
+	}
+
+	s_simulation_game_entity* entity_try_and_get(int32 entity_index)
+	{
+		if (entity_index != NONE)
+		{
+			if (entity_get(entity_index)->entity_index == entity_index)
+			{
+				return entity_get(entity_index);
+			}
+		}
+
+		return NULL;
 	}
 
 private:
