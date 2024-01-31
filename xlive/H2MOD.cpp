@@ -505,6 +505,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
+			toggle_xbox_tickrate(options, true);
 		}
 
 		resetAfterMatch = true;
