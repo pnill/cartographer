@@ -275,7 +275,6 @@ typedef void(__cdecl* game_frame_t)(real32);
 game_frame_t p_game_frame;
 void __cdecl game_frame(real32 dt)
 {
-    motion_sensor_update_with_delta(dt);
     halo_interpolator_update_delta();
     motion_sensor_update_with_delta(dt);
     p_game_frame(dt);
