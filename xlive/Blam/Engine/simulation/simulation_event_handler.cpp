@@ -28,40 +28,35 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 			sim_event_def->payload_size()
 		);
 
+		uint8* block;
+		int32 block_size;
+
 		if (sim_event_def->payload_size() > 0)
 		{
-			uint8* block = (uint8*)payload_blocks->block_data;
-			int32 block_size = payload_blocks->block_size;
-
-			SIM_EVENT_QUEUE_DBG(
-				"event block: 0x%08X payload size from block: %d",
-				block,
-				block_size
-			);
+			block = (uint8*)payload_blocks->block_data;
+			block_size = payload_blocks->block_size;
+			payload_blocks->block_data = NULL;
 
 			for (int32 i = 0; i < entity_reference_indices_count; i++)
 			{
 				SIM_EVENT_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
 			}
-
-			simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, block_size, block);
 		}
 		else
 		{
-			SIM_EVENT_QUEUE_DBG("payload size : 0");
+			block = NULL;
+			block_size = 0;
 
 			for (int32 i = 0; i < entity_reference_indices_count; i++)
 			{
 				SIM_EVENT_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
 			}
-
-			simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, 0, NULL);
 		}
 
-		if (payload_blocks->block_data != NULL)
+		simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, block_size, block);
+		if (block)
 		{
-			network_heap_free_block((uint8*)payload_blocks->block_data);
-			payload_blocks->block_data = NULL;
+			network_heap_free_block(block);
 		}
 	}
 	else
