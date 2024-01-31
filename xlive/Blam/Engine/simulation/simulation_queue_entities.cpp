@@ -291,7 +291,7 @@ void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
 {
 	uint8 data[512];
 	c_bitstream stream(data, sizeof(data));
-
+	stream.begin_writing(1);
 	simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
 	simulation_entity_index_encode(&stream, entity->entity_index);		// Encode this as gamestate index isn't encoded
 	int32 space_used = stream.get_space_used_in_bytes();
