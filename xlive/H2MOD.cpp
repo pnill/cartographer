@@ -274,7 +274,7 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = DATUM_INDEX_NONE;
+								(&general_event->sound)[j].TagIndex = NONE;
 							}
 						}
 					}

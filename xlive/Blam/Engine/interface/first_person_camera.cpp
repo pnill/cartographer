@@ -54,7 +54,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 	const s_player_control* player_control_info = player_control_get(controller_index);
 
 	float result = observer_suggested_field_of_view();
-	if (player_control_info->unit_datum_index != DATUM_INDEX_NONE)
+	if (player_control_info->unit_datum_index != NONE)
 	{
 		float fov;
 		

@@ -879,7 +879,7 @@ void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 u
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
 	s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
 	if (TEST_BIT(weapon_data->flags, 0)
-		&& weapon_data->weapon_index != DATUM_INDEX_NONE)
+		&& weapon_data->weapon_index != NONE)
 	{
 		matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
 	}
@@ -897,7 +897,7 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
     s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
     if (TEST_BIT(weapon_data->flags, 0)
-        && weapon_data->weapon_index != DATUM_INDEX_NONE)
+        && weapon_data->weapon_index != NONE)
     {
         weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
         _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);

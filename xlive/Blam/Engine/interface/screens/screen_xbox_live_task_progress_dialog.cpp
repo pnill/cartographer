@@ -16,7 +16,7 @@ void c_xbox_live_task_progress_menu::apply_patches()
 {
 	// Get tag definition
 	datum task_progress_dialog_datum_index = tags::find_tag(blam_tag::tag_group_type::userinterfacescreenwidgetdefinition, "ui\\screens\\game_shell\\xbox_live\\task_progress_dialog\\task_progress_dialog");
-	if (task_progress_dialog_datum_index == DATUM_INDEX_NONE) { return;	}
+	if (task_progress_dialog_datum_index == NONE) { return;	}
 	s_user_interface_screen_widget_definition* task_progress_dialog_definition = tags::get_tag_fast<s_user_interface_screen_widget_definition>(task_progress_dialog_datum_index);
 	
 	// Sanity checks

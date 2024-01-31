@@ -43,7 +43,7 @@ namespace TagFixes
 								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
 								datum* bitmap = reinterpret_cast<datum*>(bitmap_data);
 								if(*bitmap == bitmap_to_fix)
-									*bitmap = DATUM_INDEX_NONE;
+									*bitmap = NONE;
 							}
 						}
 					}
@@ -98,7 +98,7 @@ namespace TagFixes
 		{
 			//Fix the Master Chief FP Arms Shader
 			auto fp_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
-			if (fp_shader_datum != DATUM_INDEX_NONE)
+			if (fp_shader_datum != NONE)
 			{
 				auto fp_shader = tags::get_tag<blam_tag::tag_group_type::shader, shader_definition>(fp_shader_datum);
 				fp_shader->lightmapSpecularBrightness = 1.0f;
@@ -107,7 +107,7 @@ namespace TagFixes
 			//Fix the Visor
 			auto tex_bump_env_datum = tags::find_tag(blam_tag::tag_group_type::shadertemplate, "shaders\\shader_templates\\opaque\\tex_bump_env");
 			auto visor_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
-			if (visor_shader_datum != DATUM_INDEX_NONE)
+			if (visor_shader_datum != NONE)
 			{
 				auto visor_shader = tags::get_tag_fast<shader_definition>(visor_shader_datum);
 				visor_shader->postprocessDefinition[0]->shaderTemplateIndex = tex_bump_env_datum;
@@ -115,21 +115,21 @@ namespace TagFixes
 
 			//Fix the Grunt Shaders
 			auto grunt_arm_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
-			if (grunt_arm_shader_datum != DATUM_INDEX_NONE)
+			if (grunt_arm_shader_datum != NONE)
 			{
 				auto grunt_arm_shader = tags::get_tag_fast<shader_definition>(grunt_arm_shader_datum);
 				grunt_arm_shader->lightmapSpecularBrightness = 1.0f;
 			}
 
 			auto grunt_backpack_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
-			if (grunt_backpack_shader_datum != DATUM_INDEX_NONE)
+			if (grunt_backpack_shader_datum != NONE)
 			{
 				auto grunt_backpack_shader = tags::get_tag_fast<shader_definition>(grunt_backpack_shader_datum);
 				grunt_backpack_shader->lightmapSpecularBrightness = 1.0f;
 			}
 
 			auto grunt_torso_shader_datum = tags::find_tag(blam_tag::tag_group_type::shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
-			if (grunt_torso_shader_datum != DATUM_INDEX_NONE)
+			if (grunt_torso_shader_datum != NONE)
 			{
 				auto grunt_torso_shader = tags::get_tag_fast<shader_definition>(grunt_torso_shader_datum);
 				grunt_torso_shader->lightmapSpecularBrightness = 1.0f;
@@ -193,7 +193,7 @@ namespace TagFixes
 		{
 			// Change sound_classes data to equivalents in original halo 2
 			datum sound_classes_datum = tags::find_tag(blam_tag::tag_group_type::soundclasses, "sound\\sound_classes");
-			if (sound_classes_datum != DATUM_INDEX_NONE)
+			if (sound_classes_datum != NONE)
 			{
 				s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
 				if (sound_classes->soundClasses.size < 35) { return; }

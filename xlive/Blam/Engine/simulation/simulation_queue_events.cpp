@@ -76,7 +76,7 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 		}
 		else
 		{
-			decode_out->object_refereces[i] = DATUM_INDEX_NONE;
+			decode_out->object_refereces[i] = NONE;
 		}
 	}
 

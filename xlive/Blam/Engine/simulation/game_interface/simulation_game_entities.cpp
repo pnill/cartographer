@@ -27,6 +27,6 @@ void simulation_entity_indices_to_object_index(int32* entity_references, int32 e
 	// set the rest to none, in case we have less entity references
 	for (; i < out_object_index_count; i++)
 	{
-		out_object_index[i] = DATUM_INDEX_NONE;
+		out_object_index[i] = NONE;
 	}
 }

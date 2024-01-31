@@ -122,7 +122,7 @@ datum tags::find_tag(blam_tag type, const std::string& name)
 				return index_to_datum(it->first);
 		}
 	}
-	return DATUM_INDEX_NONE;
+	return NONE;
 }
 
 std::map<datum, std::string> tags::find_tags(blam_tag type)

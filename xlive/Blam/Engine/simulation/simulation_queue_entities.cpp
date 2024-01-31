@@ -33,7 +33,7 @@ void simulation_queue_entity_encode_header(c_bitstream* stream, e_simulation_ent
 bool simulation_queue_entity_decode_header(c_bitstream* stream, e_simulation_entity_type* type, datum* gamestate_index)
 {
 	*type = (e_simulation_entity_type)stream->read_integer("entity-type", 5);
-	*gamestate_index = DATUM_INDEX_NONE;
+	*gamestate_index = NONE;
 	//simulation_gamestate_index_decode(stream, gamestate_index);
 	bool successfully_decoded = IN_RANGE_INCLUSIVE(*type, _simulation_entity_type_slayer_engine_globals, k_simulation_entity_count - 1);
 	return successfully_decoded;
@@ -192,7 +192,7 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 		if (encode_simulation_queue_creation_to_buffer(
 			write_buffer,
 			sizeof(write_buffer),
-			DATUM_INDEX_NONE,
+			NONE,
 			sim_queue_entity_data,
 			initial_update_mask,
 			&write_buffer_space_used

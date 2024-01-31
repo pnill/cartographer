@@ -191,7 +191,7 @@ namespace ObserverMode
 		if (ObserverMode == observer_firstperson) {
 			player_iterator player_it;
 
-			datum unitIndexSameAsObserverIndex(DATUM_INDEX_NONE);
+			datum unitIndexSameAsObserverIndex(NONE);
 
 			while (player_it.get_next_active_player())
 			{
