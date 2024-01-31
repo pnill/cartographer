@@ -13,6 +13,8 @@ class c_network_heap
 public:
 	c_fixed_memory_rockall_frontend* rockall_frontend;
 	int32 get_block_size(const uint8* block);
+
+	void dispose();
 };
 
 uint8* __cdecl network_heap_allocate_block(uint32 size);
