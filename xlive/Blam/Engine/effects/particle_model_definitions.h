@@ -4,7 +4,7 @@
 #include "particle_system_definition.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/geometry/geometry_block.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"
 
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/memory/data.h"
 
 struct c_particle_location

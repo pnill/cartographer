@@ -4,7 +4,7 @@
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam/Engine/math/integer_math.h"
+
 #include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/objects/damage_reporting.h"
 

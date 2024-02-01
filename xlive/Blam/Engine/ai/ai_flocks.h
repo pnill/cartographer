@@ -3,8 +3,8 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Engine/math/integer_math.h"
-#include "Blam/Engine/math/real_math.h"
+
+
 #define k_max_flock_definitions_per_map 20
 #define k_max_sinks_per_flock 10
 #define k_max_sources_per_flock 10

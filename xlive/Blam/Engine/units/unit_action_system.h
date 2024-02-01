@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/tag_files/string_id.h"
 
 #define MAXIMUM_POSTURES_PER_UNIT 20

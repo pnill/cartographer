@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/function_definitions.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/tag_files/string_id.h"
 
 struct s_shader_postprocess_value_property

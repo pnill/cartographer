@@ -3,7 +3,7 @@
 
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
-#include "math/integer_math.h"
+
 #include "rasterizer/rasterizer_loading.h"
 
 #include "Util/Hooks/Hook.h"

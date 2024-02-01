@@ -4,7 +4,7 @@
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/math/function_definitions.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "particle_system_definition.h"
 
 #define k_maximum_effect_parts_per_event_count 32

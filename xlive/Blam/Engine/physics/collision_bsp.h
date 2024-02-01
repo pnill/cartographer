@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Engine/math/real_math.h"
+
 #include "H2MOD/Tags/TagInterface.h"
 
 #define MAXIMUM_EDGES_PER_COLLISION_BSP 262144

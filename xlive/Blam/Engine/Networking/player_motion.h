@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/math/real_math.h"
+
 #include "NetworkPrimitiveTypes.h"
 
 #pragma pack(push, 1)

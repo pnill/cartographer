@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/game/aim_assist.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 class c_player_input
 {

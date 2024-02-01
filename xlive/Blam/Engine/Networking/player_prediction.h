@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/math/real_math.h"
+
 
 struct s_player_prediction
 {

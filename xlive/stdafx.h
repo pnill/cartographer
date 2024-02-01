@@ -17,6 +17,9 @@
 
 #define TEST_N_DEF(TEST)
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
@@ -63,6 +66,10 @@
 
 // Cartographer includes
 #include "cseries/cseries.h"
+#include "math/math.h"
+#include "math/integer_math.h"
+#include "math/real_math.h"
+
 #include "Util/curl-interface.h"
 #include "Util/log.h"
 #include "Util/Memory.h"
