@@ -127,7 +127,7 @@ bool configureXinput() {
 				static const long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
 				static const bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
 				std::string available_xinput_md5;
-				if (!hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5))
+				if (!hashes::calc_file_md5(L"xinput9_1_0.dll", available_xinput_md5))
 				{
 					report_error("Failed to hash original xinput9_1_0.dll, file might be missing?");
 					return false;
