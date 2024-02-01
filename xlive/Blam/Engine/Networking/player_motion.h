@@ -1,14 +1,11 @@
 #pragma once
 
-
-#include "NetworkPrimitiveTypes.h"
-
 #pragma pack(push, 1)
 struct s_player_predicted_aim_assist
 {
 	float primary_auto_aim_level;
 	float secondary_auto_aim_level;
-	network_entity_index entity;
+	int32 entity_index;
 	unsigned int model_target;
 };
 CHECK_STRUCT_SIZE(s_player_predicted_aim_assist, 0x10);
