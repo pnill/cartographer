@@ -14,7 +14,7 @@ s_display_option g_display_options[k_max_display_option_count] = {};
 typedef void(__cdecl* update_screen_settings_t)(int, int, short, short, short, short, float, float);
 update_screen_settings_t p_update_screen_settings;
 
-int32** g_video_mode_refresh_rates = NULL;
+uint32** g_video_mode_refresh_rates = NULL;
 
 void __cdecl update_screen_settings(
 	int width, 
@@ -56,9 +56,9 @@ int compare_display_options(void* context, const void* a1, const void* a2)
 }
 
 // Calculates the greatest common denominator of the 2 numbers
-size_t calculate_gcd(size_t n, size_t m)
+uint32 calculate_gcd(uint32 n, uint32 m)
 {
-	size_t r;
+	uint32 r;
 	while (n != 0)
 	{
 		r = m % n;
@@ -68,13 +68,10 @@ size_t calculate_gcd(size_t n, size_t m)
 	return m;
 }
 
-s_aspect_ratio calculate_aspect_ratio(size_t width, size_t height)
+s_aspect_ratio calculate_aspect_ratio(uint32 width, uint32 height)
 {
-	size_t gcd = calculate_gcd(width, height);
-
-	s_aspect_ratio aspect_ratio;
-	aspect_ratio.x = byte(width / gcd);
-	aspect_ratio.y = byte(height / gcd);
+	uint32 gcd = calculate_gcd(width, height);
+	s_aspect_ratio aspect_ratio { uint8(width / gcd), uint8(height / gcd) };
 	return aspect_ratio;
 }
 
@@ -202,7 +199,7 @@ int32 rasterizer_get_default_display_monitor()
 
 	if (shell_startup_flag_is_set(_startup_flag_monitor_count))
 	{
-		if (shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_get_interface()->GetAdapterCount())
+		if ((uint32)shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_get_interface()->GetAdapterCount())
 		{
 			monitor_index = shell_startup_flag_get(_startup_flag_monitor_count);
 		}
@@ -279,15 +276,15 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 			qsort_s(d3d_display_modes, d3d_mode_count, sizeof(D3DDISPLAYMODE), d3d_display_mode_compare, NULL);
 
 			s_video_mode* video_modes = rasterizer_get_video_modes();
-			int32 video_mode_count = rasterizer_get_video_mode_count();
+			uint32 video_mode_count = rasterizer_get_video_mode_count();
 
 			// allocate the new refresh rate buffers
-			g_video_mode_refresh_rates = new int32*[video_mode_count];
+			g_video_mode_refresh_rates = new uint32*[video_mode_count];
 
 			// reset the refresh rate data
-			for (int32 i = 0; i < video_mode_count; i++)
+			for (uint32 i = 0; i < video_mode_count; i++)
 			{
-				for (int32 j = 0; j < video_modes[i].refresh_rate_count; j++)
+				for (uint32 j = 0; j < video_modes[i].refresh_rate_count; j++)
 				{
 					video_modes[i].refresh_rate[j] = 0;
 				}
@@ -297,7 +294,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 			// a tad too complex, might need some cleanup
 			// move to function that's using callbacks for each stage
 			bool compute_refresh_rate_count = true;
-			for (int32 i = 0; i < video_mode_count; )
+			for (uint32 i = 0; i < video_mode_count; )
 			{
 				int32 refresh_rate_index = 0;
 				for (int32 j = 0; j < d3d_mode_count; j++)
@@ -347,7 +344,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 				// if we computed the valid refresh rate count, add them to the list
 				if (compute_refresh_rate_count && video_modes[i].refresh_rate_count > 0)
 				{
-					g_video_mode_refresh_rates[i] = new int32[video_modes[i].refresh_rate_count];
+					g_video_mode_refresh_rates[i] = new uint32[video_modes[i].refresh_rate_count];
 					compute_refresh_rate_count = false;
 				}
 				else
@@ -361,10 +358,10 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 
 			// ### FIXME replace
 			// copy the refresh rates 
-			for (int32 i = 0; i < video_mode_count; i++)
+			for (uint32 i = 0; i < video_mode_count; i++)
 			{
 				int32 refresh_rate_start_index = MIN(video_modes[i].refresh_rate_count, k_max_default_display_refresh_rate_count) - 1;
-				for (int32 j = video_modes[i].refresh_rate_count - 1; j >= 0; j--)
+				for (int32 j = (int32)(video_modes[i].refresh_rate_count - 1); j >= 0; j--)
 				{
 					if (refresh_rate_start_index >= 0)
 					{
@@ -391,7 +388,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 	return;
 }
 
-uint32 rasterizer_get_video_mode_refresh_rate_count(int32 video_mode_index)
+uint32 rasterizer_get_video_mode_refresh_rate_count(uint32 video_mode_index)
 {
 	if (video_mode_index < rasterizer_get_video_mode_count())
 	{
@@ -407,7 +404,7 @@ void __cdecl rasterizer_discard_refresh_rate()
 
 	if (g_video_mode_refresh_rates != NULL)
 	{
-		for (int32 i = 0; i < rasterizer_get_video_mode_count(); i++)
+		for (uint32 i = 0; i < rasterizer_get_video_mode_count(); i++)
 		{
 			if (g_video_mode_refresh_rates[i])
 				delete[] g_video_mode_refresh_rates[i];
@@ -419,10 +416,10 @@ void __cdecl rasterizer_discard_refresh_rate()
 	return;
 }
 
-typedef int32(__cdecl* t_rasterizer_get_video_mode_refresh_rate)(int32, int32);
+typedef int32(__cdecl* t_rasterizer_get_video_mode_refresh_rate)(uint32, uint32);
 t_rasterizer_get_video_mode_refresh_rate p_rasterizer_get_video_mode_refresh_rate;
 
-int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(int32 video_mode_index, int32 refresh_rate_index)
+int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_index, uint32 refresh_rate_index)
 {
 	if (video_mode_index < rasterizer_get_video_mode_count())
 	{

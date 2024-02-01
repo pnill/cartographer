@@ -20,6 +20,7 @@
 
 const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
 
+// TODO: determine whether or not the pre-release version of vista's map files are supported (11028.07.03.23.1927.main)
 const static char* offically_supported_builds[32] =
 {
 	"11081.07.04.30.0934.main",
@@ -50,9 +51,9 @@ const wchar_t* getCustomMapFolderPath()
 	return getCustomMapData()->custom_maps_folder_path;
 }
 
-int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder)
+int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
 {
-	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
+	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
 	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x474A15);
 	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
@@ -701,7 +702,7 @@ void close_cache_header(HANDLE* map_handle)
 	p_close_cache_header(map_handle);
 }
 
-int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
+bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
 {
 	s_cache_header header;
 	HANDLE map_cache_handle;

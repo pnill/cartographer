@@ -11,11 +11,11 @@ DWORD WINAPI XStorageBuildServerPath(DWORD dwUserIndex, XSTORAGE_FACILITY Storag
 	const void *pvStorageFacilityInfo, DWORD dwStorageFacilityInfoSize,
 	WCHAR* pwszItemName, WCHAR *pwszServerPath, DWORD *pdwServerPathLength)
 {
-	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
-		(int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength);
-
 	if (!pdwServerPathLength)
 		return ERROR_INVALID_PARAMETER;
+
+	LOG_TRACE_XLIVE(L"XStorageBuildServerPath  ( StorageFacility = {},  dwStorageFacilityInfoSize = {}, pwszItemName = {}, pwszServerPath = {}, pdwServerPathLength = {} )",
+		(int)StorageFacility, dwStorageFacilityInfoSize, (wchar_t*)pwszItemName, (wchar_t*)pwszServerPath, *pdwServerPathLength);
 
 	if (pwszServerPath)
 	{

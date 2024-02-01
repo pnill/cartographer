@@ -92,9 +92,7 @@ class c_brightness_menu : protected c_screen_with_menu
 public:
 	c_brightness_menu(int _ui_channel, int a4, __int16 _flags);
 
-	~c_brightness_menu()
-	{
-	}
+	~c_brightness_menu() = default;
 
 	typedef c_brightness_menu class_type;
 

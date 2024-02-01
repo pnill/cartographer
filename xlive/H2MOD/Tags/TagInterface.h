@@ -203,7 +203,7 @@ namespace tags
 
 	struct ilterator
 	{
-		ilterator() {};
+		ilterator() = default;
 		ilterator(blam_tag _type) : type(_type) {};
 
 		blam_tag type = blam_tag::none(); // type we are searching for

@@ -29,7 +29,6 @@
 #include <codecvt>
 #include <DbgHelp.h>
 #include <ShlObj.h>
-#include <time.h>
 #include <psapi.h>
 #include <TlHelp32.h>
 
