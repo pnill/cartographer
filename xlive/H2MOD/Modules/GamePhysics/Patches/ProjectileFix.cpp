@@ -4,7 +4,7 @@
 
 
 #include "game/game_time.h"
-#include "math/real_math.h"
+
 #include "objects/objects.h"
 
 #include "Blam/Cache/TagGroups/projectile_definition.hpp"
@@ -154,7 +154,7 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 
 void ProjectileFix::ApplyProjectileVelocity()
 {
-	for (uint32 i = 0; i < 3; i++)
+	for (uint32 i = 0; i < ARRAYSIZE(tag_names); i++)
 	{
 		datum proj_index = tags::find_tag(blam_tag::tag_group_type::projectile, tag_names[i]);
 		if (proj_index != NONE)

@@ -52,7 +52,7 @@ e_special_event_type get_current_special_event()
 		break;
 	// October
 	case 10:
-		event = (IN_RANGE_INCLUSIVE(date.day, 17, 24) ? _special_event_halloween : event);
+		event = (IN_RANGE_INCLUSIVE(date.day, 17, 31) ? _special_event_halloween : event);
 		break;
 	// November
 	case 11:
