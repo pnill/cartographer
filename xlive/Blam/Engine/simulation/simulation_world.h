@@ -64,8 +64,9 @@ public:
 
 	void queues_dispose();
 
-	s_simulation_queue_stats queue_describe(const c_simulation_queue* queue)
+	s_simulation_queue_stats queue_describe(e_simulation_queue_type type)
 	{
+		c_simulation_queue* queue = queue_get(type);
 		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count() };
 	}
 
