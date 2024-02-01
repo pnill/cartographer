@@ -48,7 +48,6 @@
 #include <map>
 #include <mutex>
 #include <queue>
-#include <tuple>
 #include <string>
 #include <vector>
 #include <random>
@@ -64,7 +63,7 @@
 #include <d3dx9.h>
 
 // Cartographer includes
-#include "Blam/Engine/cseries/cseries.h"
+#include "cseries/cseries.h"
 #include "Util/curl-interface.h"
 #include "Util/log.h"
 #include "Util/Memory.h"

@@ -119,10 +119,10 @@ void set_crosshair_scale(float scale)
 // Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
 void initialize_crosshair_bitmap_data()
 {
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
-		for (size_t j = 0; j < bitm_definition->bitmaps.size; ++j)
+		for (int32 j = 0; j < bitm_definition->bitmaps.size; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
 			point2d bitmap_size = { bitmap_data_block->width_pixels, bitmap_data_block->height_pixels };

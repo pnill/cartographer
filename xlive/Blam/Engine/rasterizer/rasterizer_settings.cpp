@@ -259,7 +259,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 		D3DDISPLAYMODE d3d_display_mode;
 		d3d9->GetAdapterDisplayMode(adapter_index, &d3d_display_mode);
 
-		int32 d3d_adapter_mode_count = d3d9->GetAdapterModeCount(adapter_index, d3d_display_mode.Format);
+		uint32 d3d_adapter_mode_count = d3d9->GetAdapterModeCount(adapter_index, d3d_display_mode.Format);
 
 		if (d3d_adapter_mode_count > 0)
 		{
