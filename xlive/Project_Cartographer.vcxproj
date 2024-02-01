@@ -885,7 +885,6 @@
     <ClInclude Include="Blam\Engine\saved_games\game_state_procs.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_control_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity.h" />
     <ClInclude Include="Blam\Engine\Networking\player_motion.h" />

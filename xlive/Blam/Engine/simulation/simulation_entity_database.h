@@ -5,6 +5,9 @@
 
 #define k_simulation_entity_database_maximum_entities 1024
 
+#define ENTITY_INDEX_TO_ABSOLUTE_INDEX(_entity_index)  ((_entity_index) & (k_simulation_entity_database_maximum_entities - 1))
+#define ENTITY_INDEX_TO_SEED(_entity_index) ((_entity_index) >> 28)
+
 enum e_entity_creation_block_order
 {
 	_entity_creation_block_order_simulation_entity_creation,
@@ -44,7 +47,7 @@ public:
 
 	s_simulation_game_entity* entity_get(int32 entity_index)
 	{
-		return &m_game_entities[entity_index & (k_simulation_entity_database_maximum_entities - 1)];
+		return &m_game_entities[ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index)];
 	}
 
 	s_simulation_game_entity* entity_try_and_get(int32 entity_index)
