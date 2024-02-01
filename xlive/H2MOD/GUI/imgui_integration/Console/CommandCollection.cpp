@@ -565,7 +565,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	// spawn object_name count same_team near_player x y z i j k
 
-	datum objectDatum = DATUM_INDEX_NONE;
+	datum objectDatum = NONE;
 	ComVar<int> count;
 	ComVar<float> varPos[3];
 	ComVar<float> varRotation[3];

@@ -208,7 +208,7 @@ namespace tags
 
 		blam_tag type = blam_tag::none(); // type we are searching for
 		long current_index = 0; // current tag idx
-		datum m_datum = DATUM_INDEX_NONE; // last tag datum we returned
+		datum m_datum = NONE; // last tag datum we returned
 
 		datum next()
 		{
@@ -225,7 +225,7 @@ namespace tags
 				}
 			}
 
-			return DATUM_INDEX_NONE;
+			return NONE;
 		}
 
 	};

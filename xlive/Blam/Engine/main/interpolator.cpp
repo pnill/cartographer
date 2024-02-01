@@ -118,7 +118,7 @@ void halo_interpolator_update_end(void)
 	{
 		for (int32 abs_object_index = 0; abs_object_index < k_maximum_objects_per_map; abs_object_index++)
 		{
-			if (g_target_interpolation_frame_data->object_data[abs_object_index].object_index != DATUM_INDEX_NONE)
+			if (g_target_interpolation_frame_data->object_data[abs_object_index].object_index != NONE)
 			{
 				if (!g_interpolator_object_updated.test(abs_object_index))
 				{

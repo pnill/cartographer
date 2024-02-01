@@ -106,7 +106,7 @@ datum s_player::get_unit_index(datum player_index)
 {
     if (!is_index_valid(player_index)) 
     {
-		return DATUM_INDEX_NONE;
+		return NONE;
     }
 
 	return get(player_index)->unit_index;

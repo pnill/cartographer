@@ -78,7 +78,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 		}
 
 		datum sound_datum = player_information->ice_cream.TagIndex;
-		if (sound_datum != DATUM_INDEX_NONE)
+		if (sound_datum != NONE)
 		{
 			p_unspatialized_impulse_sound_new(sound_datum, 1.0);
 		}

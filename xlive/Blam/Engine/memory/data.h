@@ -41,7 +41,7 @@ public:
 	s_data_iterator(s_data_array* _data_array) : 
 		m_data_array(_data_array),
 		m_current_absolute_index(NONE),
-		m_last_datum_index(DATUM_INDEX_NONE)
+		m_last_datum_index(NONE)
 	{
 	}
 
@@ -68,7 +68,7 @@ public:
 		if (index == -1)
 		{
 			result = nullptr;
-			m_last_datum_index = DATUM_INDEX_NONE;
+			m_last_datum_index = NONE;
 			m_current_absolute_index = m_data_array->datum_max_elements;
 		}
 		else

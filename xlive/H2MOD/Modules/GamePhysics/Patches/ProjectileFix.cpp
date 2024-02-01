@@ -99,7 +99,7 @@ std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
 	//std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 2000.0f, 2000.0f)
 };
 
-datum trigger_projectile_datum_index = DATUM_INDEX_NONE;
+datum trigger_projectile_datum_index = NONE;
 
 #pragma region H3 collision data research
 __declspec(naked) void update_projectile_collision_data()

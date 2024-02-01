@@ -264,7 +264,7 @@ namespace tag_loader
 		}*/
 		fin->close();
 		delete fin;
-		return DATUM_INDEX_NONE;
+		return NONE;
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
@@ -1106,7 +1106,7 @@ namespace tag_loader
 			if (ref.old_datum == oldDatum)
 				return datum(ref.new_datum);
 		}
-		return DATUM_INDEX_NONE;
+		return NONE;
 	}
 
 	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size)
@@ -1383,7 +1383,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Clear the table
 	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
-		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), DATUM_INDEX_NONE, 0, 0 };
+		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
 	tag_loader::injected_tag_refs.clear();

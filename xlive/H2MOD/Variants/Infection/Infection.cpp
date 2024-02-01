@@ -264,7 +264,7 @@ void Infection::removeUnwantedItems()
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
 			netgame_equipment->item_vehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-			netgame_equipment->item_vehicle_collection.TagIndex = DATUM_INDEX_NONE;
+			netgame_equipment->item_vehicle_collection.TagIndex = NONE;
 		}
 	}
 }

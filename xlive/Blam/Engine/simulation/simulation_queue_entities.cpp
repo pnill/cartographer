@@ -33,7 +33,7 @@ void simulation_queue_entity_encode_header(c_bitstream* stream, e_simulation_ent
 bool simulation_queue_entity_decode_header(c_bitstream* stream, e_simulation_entity_type* type, datum* gamestate_index)
 {
 	*type = (e_simulation_entity_type)stream->read_integer("entity-type", 5);
-	*gamestate_index = DATUM_INDEX_NONE;
+	*gamestate_index = NONE;
 	//simulation_gamestate_index_decode(stream, gamestate_index);
 	bool successfully_decoded = IN_RANGE_INCLUSIVE(*type, _simulation_entity_type_slayer_engine_globals, k_simulation_entity_count - 1);
 	return successfully_decoded;
@@ -192,7 +192,7 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 		if (encode_simulation_queue_creation_to_buffer(
 			write_buffer,
 			sizeof(write_buffer),
-			DATUM_INDEX_NONE,
+			NONE,
 			sim_queue_entity_data,
 			initial_update_mask,
 			&write_buffer_space_used
@@ -499,7 +499,6 @@ void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
 			csmemcpy(element->data, write_buffer, space_used);
 			sim_world->simulation_queue_enqueue(element);
 		}
-		
 	}
 	stream.finish_writing(NULL);
 	return;
@@ -539,5 +538,67 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		}
 	}
 	stream.finish_reading();
+	return;
+}
+
+void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity)
+{
+	if (game_is_distributed() && !game_is_playback())
+	{
+		uint8 data[512];
+		c_bitstream stream(data, sizeof(data));
+		stream.begin_writing(k_bitstream_default_alignment);
+		simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
+		//simulation_entity_index_encode(&stream, entity->entity_index);
+		simulation_gamestate_index_encode(&stream, entity->object_index);		// Encode this as gamestate index isn't encoded
+		int32 space_used = stream.get_space_used_in_bytes();
+		if (!stream.error_occured())
+		{
+			c_simulation_world* sim_world = simulation_get_world();
+			s_simulation_queue_element* element = NULL;
+			sim_world->simulation_queue_allocate(_simulation_queue_element_type_entity_promotion, space_used, &element);
+			if (element)
+			{
+				csmemcpy(element->data, data, space_used);
+				sim_world->simulation_queue_enqueue(element);
+			}
+		}
+		stream.finish_writing(NULL);
+	}
+	return;
+}
+
+void simulation_queue_entity_promotion_apply(const s_simulation_queue_element* element)
+{
+	if (game_is_distributed())
+	{
+		c_bitstream stream(element->data, element->data_size);
+		stream.begin_reading();
+
+		int32 entity_index;
+		datum gamestate_index;
+		e_simulation_entity_type entity_type;
+		if (simulation_queue_entity_decode_header(&stream, &entity_type, &gamestate_index))
+		{
+			simulation_gamestate_index_decode(&stream, &gamestate_index);
+			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(entity_type);
+
+			// quite hacky, but should do the job
+			s_simulation_game_entity game_entity;
+			game_entity.entity_index = NONE;
+			game_entity.entity_type = entity_type;
+			game_entity.entity_update_flag = 0;
+			game_entity.field_10 = 0;
+			game_entity.event_reference_count = 0;
+			game_entity.exists_in_gameworld = false;
+			game_entity.object_index = gamestate_index;
+
+			if (entity_def->promote_game_entity_to_authority(&game_entity))
+			{
+				// SUCCESS
+			}
+		}
+		stream.finish_reading();
+	}
 	return;
 }

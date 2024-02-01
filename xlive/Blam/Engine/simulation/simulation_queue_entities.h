@@ -54,3 +54,6 @@ void simulation_queue_entity_update_apply(const s_simulation_queue_element* elem
 void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity);
 void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* element);
 
+// promotion
+void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity);
+void simulation_queue_entity_promotion_apply(const s_simulation_queue_element* element);

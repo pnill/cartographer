@@ -28,17 +28,17 @@ void birthday_event_map_load()
 
 		// Give Birthday Hat and Beard to Chief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-			hlmt_chief_datum != DATUM_INDEX_NONE) 
+			hlmt_chief_datum != NONE) 
 		{
 			add_hat_to_model(hlmt_chief_datum, bday_hat_datum);
 		}
 		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-			hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
+			hlmt_chief_mp_datum != NONE) 
 		{
 			add_hat_to_model(hlmt_chief_mp_datum, bday_hat_datum);
 		}
 		datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-		if (hlmt_elite_datum != DATUM_INDEX_NONE)
+		if (hlmt_elite_datum != NONE)
 		{
 			add_hat_to_model(hlmt_elite_datum, bday_hat_datum, true);
 		}
