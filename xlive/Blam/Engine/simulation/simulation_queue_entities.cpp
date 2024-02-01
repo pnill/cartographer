@@ -549,8 +549,7 @@ void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity)
 		c_bitstream stream(data, sizeof(data));
 		stream.begin_writing(k_bitstream_default_alignment);
 		simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
-		//simulation_entity_index_encode(&stream, entity->entity_index);
-		simulation_gamestate_index_encode(&stream, entity->object_index);		// Encode this as gamestate index isn't encoded
+		simulation_entity_index_encode(&stream, entity->entity_index);
 		int32 space_used = stream.get_space_used_in_bytes();
 		if (!stream.error_occured())
 		{
@@ -570,30 +569,21 @@ void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity)
 
 void simulation_queue_entity_promotion_apply(const s_simulation_queue_element* element)
 {
-	if (game_is_distributed())
+	if (game_is_distributed() && !game_is_playback())
 	{
-		c_bitstream stream(element->data, element->data_size);
-		stream.begin_reading();
-
 		int32 entity_index;
 		datum gamestate_index;
 		e_simulation_entity_type entity_type;
+		c_bitstream stream(element->data, element->data_size);
+		stream.begin_reading();
+
 		if (simulation_queue_entity_decode_header(&stream, &entity_type, &gamestate_index))
 		{
-			simulation_gamestate_index_decode(&stream, &gamestate_index);
+			simulation_entity_index_decode(&stream, &entity_index);
+
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(entity_type);
-
-			// quite hacky, but should do the job
-			s_simulation_game_entity game_entity;
-			game_entity.entity_index = NONE;
-			game_entity.entity_type = entity_type;
-			game_entity.entity_update_flag = 0;
-			game_entity.field_10 = 0;
-			game_entity.event_reference_count = 0;
-			game_entity.exists_in_gameworld = false;
-			game_entity.object_index = gamestate_index;
-
-			if (entity_def->promote_game_entity_to_authority(&game_entity))
+			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_get(entity_index);
+			if (entity_def->promote_game_entity_to_authority(game_entity))
 			{
 				// SUCCESS
 			}
