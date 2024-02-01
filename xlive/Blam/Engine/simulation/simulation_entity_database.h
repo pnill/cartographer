@@ -5,9 +5,6 @@
 
 #define k_simulation_entity_database_maximum_entities 1024
 
-#define ENTITY_INDEX_NONE (NONE)
-
-#define ENTITY_IS_NONE(_entity_index) ((_entity_index) == NONE)
 #define ENTITY_INDEX_TO_ABSOLUTE_INDEX(_entity_index)  ((_entity_index) & (k_simulation_entity_database_maximum_entities - 1))
 #define ENTITY_INDEX_TO_SEED(_entity_index) ((_entity_index) >> 28)
 
