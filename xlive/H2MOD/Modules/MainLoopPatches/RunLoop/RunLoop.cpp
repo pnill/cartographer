@@ -53,7 +53,7 @@ void CartographerMainLoop() {
 	}
 	if(H2IsDediServer)
 	{
-		StatsHandler::playerRanksUpdateTick();
+		//StatsHandler::playerRanksUpdateTick();
 	}
 	//EventHandler::executeGameLoopCallbacks();
 	/*
