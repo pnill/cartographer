@@ -16,7 +16,7 @@ s_network_heap_stats* network_heap_get_description()
 	return &g_network_heap_allocations;
 }
 
-int32 c_network_heap::get_block_size(const uint8* block)
+int32 c_network_heap::get_block_size(const uint8* block) const
 {
 	int32 size;
 	if (!rockall_frontend->Details(block, &size))

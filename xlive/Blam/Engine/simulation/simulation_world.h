@@ -60,6 +60,7 @@ public:
 
 	void initialize_world(int32 a2, int32 a3, int32 a4);
 	// discard resources
+	void reset();
 	void destroy_world();
 
 	void queues_dispose();
@@ -72,7 +73,7 @@ public:
 
 	void destroy_update();
 
-	bool is_playback()
+	bool is_playback() const
 	{
 		if (exists())
 		{
@@ -82,9 +83,21 @@ public:
 		return false;
 	}
 
-	bool exists()
+	bool exists() const
 	{
 		return m_simulation_world_mode != _simulation_world_type_none;
+	}
+
+	bool runs_simulation() const
+	{
+		bool result = false;
+
+		if (exists())
+		{
+			result = m_simulation_world_mode != _simulation_world_type_distributed_authority;
+		}
+
+		return result;
 	}
 
 private:
