@@ -45,7 +45,7 @@ public:
 	void* m_distributed_world;
 	// ### TODO validate
 	e_simulation_world_type m_simulation_world_mode;
-	uint8 gap_C[0xC];
+	uint8 gap_C[12];
 	e_simulation_world_state m_world_state;
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
