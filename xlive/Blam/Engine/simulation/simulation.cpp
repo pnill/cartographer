@@ -17,6 +17,23 @@ bool simulation_engine_initialized()
     return *Memory::GetAddress<bool*>(0x5178D0, 0x520B60);
 }
 
+bool simulation_in_progress()
+{
+    bool result = false;
+    bool simulation_unk1 = *Memory::GetAddress<bool*>(0x5178D2, 0x0);
+
+    if (simulation_engine_initialized()
+        && game_in_progress()
+        && game_get_active_structure_bsp_index() != NONE
+        && !simulation_unk1
+        && simulation_get_world()->is_active())
+    {
+        result = true;
+    }
+
+    return result;
+}
+
 bool simulation_is_paused()
 {
     return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
@@ -38,14 +55,17 @@ c_simulation_type_collection* simulation_get_type_collection()
     return c_simulation_type_collection::get();
 }
 
-typedef void(__cdecl* t_simulation_update_before_game)(int8* sim_data_out);
+typedef void(__cdecl* t_simulation_update_before_game)(s_simulation_update* sim_data);
 t_simulation_update_before_game p_simulation_update_before_game;
 
-void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
+void __cdecl simulation_update_before_game_hook(s_simulation_update* sim_data)
 {
-    simulation_get_world()->apply_high_priority_queue();
-    simulation_get_world()->apply_basic_queue();
-    p_simulation_update_before_game(sim_data_out);
+    if (sim_data->simulation_in_progress)
+    {
+        simulation_get_world()->apply_high_priority_queue();
+        simulation_get_world()->apply_basic_queue();
+    }
+    p_simulation_update_before_game(sim_data);
 }
 
 typedef void (__cdecl* t_simulation_update_pregame)();

@@ -45,6 +45,8 @@ public:
 	void* m_distributed_world;
 	// ### TODO validate
 	e_simulation_world_type m_simulation_world_mode;
+	uint8 gap_C[0xC];
+	e_simulation_world_state m_world_state;
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	void simulation_queue_free(s_simulation_queue_element* element);
@@ -100,7 +102,18 @@ public:
 		return result;
 	}
 
+	bool is_active() const
+	{
+		bool result = false;
+
+		if (exists())
+		{
+			result = m_world_state == _simulation_world_state_active;
+		}
+
+		return result;
+	}
+
 private:
 };
-
 void simulation_world_apply_patches();
