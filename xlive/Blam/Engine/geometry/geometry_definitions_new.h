@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"
 
 #define MAXIMUM_PARTS_PER_GEOMETRY_SECTION 255

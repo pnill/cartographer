@@ -1,9 +1,4 @@
 #pragma once
-//use this for all base real math related structs and implementations
-#include "math.h"
-
-#define _USE_MATH_DEFINES
-#include <math.h>
 
 #define k_real_math_epsilon 0.000099999997f
 

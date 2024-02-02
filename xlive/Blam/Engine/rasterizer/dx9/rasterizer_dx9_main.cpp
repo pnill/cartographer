@@ -3,7 +3,7 @@
 
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
-#include "math/integer_math.h"
+
 #include "rasterizer/rasterizer_loading.h"
 
 #include "Util/Hooks/Hook.h"
@@ -133,7 +133,6 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
                 && !screenshot_bitmap->mipmap_count
                 && global_d3d_surface_screenshot->LockRect(&locked_rect, NULL, D3DLOCK_READONLY) >= 0)
             {
-                result = true;
                 if (locked_rect.pBits)
                 {
                     int32 screenshot_pitch = width * (bitmap_format_get_bits_per_pixel(screenshot_bitmap->format) / 8);

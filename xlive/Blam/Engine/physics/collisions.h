@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/objects/objects.h"
 
 enum e_collision_test_flags : uint32

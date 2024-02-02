@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/integer_math.h"
+
 
 void __cdecl draw_string_get_color(real_argb_color* color);
 void __cdecl draw_string_set_color(real_argb_color const* color);

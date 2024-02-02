@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 
 struct alignas(4) s_physics_constants
 {

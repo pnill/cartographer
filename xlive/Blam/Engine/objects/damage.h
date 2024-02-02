@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 struct s_damage_owner
 {

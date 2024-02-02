@@ -1,7 +1,7 @@
 #pragma once
 
 #define k_max_particles 1024
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/memory/data.h"
 
 enum e_particle_flags : int16

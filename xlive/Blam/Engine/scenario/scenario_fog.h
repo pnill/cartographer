@@ -3,7 +3,7 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/tag_files/string_id.h"
 
 #define MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127

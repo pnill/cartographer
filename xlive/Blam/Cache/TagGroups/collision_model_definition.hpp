@@ -4,7 +4,7 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-#include "Blam/Engine/math/real_math.h"
+
 
 #pragma pack(push,1)
 struct s_collision_model_block

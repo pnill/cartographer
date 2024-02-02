@@ -1,16 +1,18 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
-#include "Blam/Engine/shell/shell.h"
-#include "H2MOD/Tags/TagInterface.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/tag_files/files_windows.h"
 
-#include "Util/Hooks/Hook.h"
+#include "memory/data.h"
+#include "shell/shell.h"
+#include "tag_files/files_windows.h"
+#include "text/unicode.h"
 
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Blam/Cache/CacheHeader.h"
 
 #include "H2MOD/Modules/CustomMenu/c_list_widget.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Util/Hooks/Hook.h"
+
 
 #pragma region 50 map limit removal
 
@@ -18,6 +20,7 @@
 
 const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
 
+// TODO: determine whether or not the pre-release version of vista's map files are supported (11028.07.03.23.1927.main)
 const static char* offically_supported_builds[32] =
 {
 	"11081.07.04.30.0934.main",
@@ -48,9 +51,9 @@ const wchar_t* getCustomMapFolderPath()
 	return getCustomMapData()->custom_maps_folder_path;
 }
 
-int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder)
+int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
 {
-	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
+	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
 	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x474A15);
 	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
@@ -699,9 +702,7 @@ void close_cache_header(HANDLE* map_handle)
 	p_close_cache_header(map_handle);
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-
-int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
+bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
 {
 	s_cache_header header;
 	HANDLE map_cache_handle;
@@ -741,7 +742,9 @@ int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_ent
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
 		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+			wchar_t fallback_name_c[32];
+			utf8_string_to_wchar_string(header.name, fallback_name_c, NUMBEROF(fallback_name_c));
+			fallback_name.append(fallback_name_c);
 		}
 		else {
 			std::wstring full_file_name = file_name;

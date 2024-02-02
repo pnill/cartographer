@@ -112,6 +112,19 @@ void __cdecl reset_global_player_counts(void)
     return;
 }
 
+void game_time_get_date_and_time(s_date_and_time* date_and_time)
+{
+    _SYSTEMTIME SystemTime;
+    GetLocalTime(&SystemTime);
+    date_and_time->year = SystemTime.wYear;
+    date_and_time->month = SystemTime.wMonth;
+    date_and_time->day = SystemTime.wDay;
+    date_and_time->hour = SystemTime.wHour;
+    date_and_time->minute = SystemTime.wMinute;
+    date_and_time->second = SystemTime.wSecond;
+    return;
+}
+
 void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version)
 {
     auto handler = (c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->life_cycle_handlers[e_game_life_cycle::_life_cycle_joining];

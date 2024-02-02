@@ -4,7 +4,7 @@
 #include "units.h"
 
 #include "Blam/Engine/ai/ai.h"
-#include "Blam/Engine/math/integer_math.h"
+
 #include "Blam/Engine/interface/motion_sensor.h"
 #include "Blam/Engine/objects/object_definition.h"
 #include "Blam/Engine/objects/objects.h"

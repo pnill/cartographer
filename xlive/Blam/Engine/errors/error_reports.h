@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/DataRef.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 #define MAXIMUM_ERROR_REPORT_CATEGORIES 64
 #define MAXIMUM_REPORTS_PER_ERROR_REPORT_CATEGORY 1024

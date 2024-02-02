@@ -3,7 +3,7 @@
 #include "ComVar.h"
 #include "CommandHandler.h"
 
-#include "Blam/Engine/math/real_math.h"
+
 
 namespace CommandCollection
 {

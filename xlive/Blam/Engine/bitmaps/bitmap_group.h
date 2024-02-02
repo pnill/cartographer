@@ -2,8 +2,8 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 
-#include "math/integer_math.h"
-#include "math/real_math.h"
+
+
 
 enum e_bitmap_tag_type : int16
 {

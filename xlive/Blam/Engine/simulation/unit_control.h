@@ -2,7 +2,7 @@
 
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Engine/game/aim_assist.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 struct s_unit_control_data
 {

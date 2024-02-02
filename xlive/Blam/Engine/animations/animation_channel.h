@@ -1,7 +1,7 @@
 #pragma once
 #include "animation_definitions.h"
 
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/memory/static_arrays.h"
 #include "Blam/Engine/tag_files/string_id.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 
 struct c_ai_point3d
 {

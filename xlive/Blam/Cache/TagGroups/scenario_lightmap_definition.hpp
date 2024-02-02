@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 /*********************************************************************
 * name: scenario_structure_lightmap

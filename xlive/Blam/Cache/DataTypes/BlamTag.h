@@ -1,5 +1,7 @@
 #pragma once
 
+// ### TODO MOVE AND REFACTOR
+
 struct blam_tag
 {
 	enum class tag_group_type : __int32

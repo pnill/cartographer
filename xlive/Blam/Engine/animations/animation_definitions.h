@@ -6,7 +6,7 @@
 #include "Blam/Cache/DataTypes/TagRef.h"
 
 #include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/tag_files/string_id.h"
 
 #define k_max_nodes_per_animation = 255

@@ -7,7 +7,7 @@
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/objects/object_placement.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 /*
    TODO: Reverse engineer more of the actor struct and fill this data in appropriately.

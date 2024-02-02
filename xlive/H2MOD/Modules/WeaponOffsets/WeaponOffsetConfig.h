@@ -1,6 +1,6 @@
 
 #include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 struct s_weapon_custom_offset {
 	const real_vector3d defaultOffset;

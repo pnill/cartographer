@@ -3,7 +3,7 @@
 #include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Cache/DataTypes/TagBlock.h"
 
-#include "Blam/Engine/math/real_math.h"
+
 
 /*********************************************************************
 * name: camera_track

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/physics/physics_models.h"
 
 #define k_character_physics_dead_size 0
