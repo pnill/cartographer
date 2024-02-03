@@ -149,10 +149,11 @@ struct s_object_payload
 };
 CHECK_STRUCT_SIZE(s_object_payload, 20);
 
-// Struct is used in object_attachments_block
+// Used in object_attachments_block
 struct object_attachment
 {
-	int32 field_0;
+	int8 field_0;
+	int8 pad[3];
 	int32 field_4;
 };
 CHECK_STRUCT_SIZE(object_attachment, 8);
@@ -271,6 +272,9 @@ void* object_header_block_get(const datum object_datum, const object_header_bloc
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
+
+void object_initialize_for_interpolation(datum object_index);
+
 datum __cdecl object_new(object_placement_data* placement_data);
 void __cdecl object_delete(datum object_idx);
 

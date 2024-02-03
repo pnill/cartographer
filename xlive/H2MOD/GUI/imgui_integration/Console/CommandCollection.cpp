@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/main/main_game.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "main/main_game.h"
+#include "Networking/NetworkMessageTypeCollection.h"
+#include "Networking/Session/NetworkSession.h"
 #include "simulation/game_interface/simulation_game_action.h"
-#include "Blam/Engine/main/main_game_time.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -841,7 +841,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	session.sessionID = network_session->session_id;
 	session.keyExchangeKey = network_session->xnkey;
 	session.hostAddress = (not_session_host ?
-		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr 
+		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr
 		: network_session->virtual_couch[0].xsession_info.hostAddress);
 
 	uint8* session_bytes = (uint8*)&session;
@@ -856,7 +856,6 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	output->Output(StringFlag_None, "Invite code generated:");
 	output->Output(StringFlag_CopyToClipboard, connect_string);
 	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
-	
 	return 0;
 }
 

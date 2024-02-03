@@ -58,6 +58,8 @@ bool cinematic_in_progress(void)
 void cinematics_apply_patches()
 {
 	// allow cinematics to run at 60 fps
-	PatchCall(Memory::GetAddress(0x97774), cinematics_in_progress_disable_framerate_cap_hook);
-	PatchCall(Memory::GetAddress(0x7C378), cinematics_in_progress_disable_framerate_cap_hook);
+	// Don't run these since interpolation does not currently work in cutscenes
+	// PatchCall(Memory::GetAddress(0x97774), cinematics_in_progress_disable_framerate_cap_hook);
+	// PatchCall(Memory::GetAddress(0x7C378), cinematics_in_progress_disable_framerate_cap_hook);
+	return;
 }
