@@ -261,9 +261,14 @@ namespace ImGuiHandler {
 					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
-					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
+					int fps_limit = H2Config_fps_limit;
+					ImGui::InputInt("##FPS1", &fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
+					if (ImGui::IsItemDeactivatedAfterEdit())
+					{
+						H2Config_fps_limit = (std::max)(fps_limit, 25);
+					}
 
 					ImGui::SameLine();
 					if (ImGui::Button(GetString(reset, "FPS2"), ImVec2(WidthPercentage(50), item_size.y)))
