@@ -1,4 +1,6 @@
 #pragma once
+
+#include "simulation/simulation_view.h"
 #include "simulation_queue_events.h"
 
 enum e_simulation_queue_type
@@ -40,13 +42,46 @@ struct s_simulation_queue_stats
 
 class c_simulation_world
 {
-public:
-	uint8 gap_0[4];
+	void* m_watcher;
 	void* m_distributed_world;
-	// ### TODO validate
-	e_simulation_world_type m_simulation_world_mode;
-	uint8 gap_C[12];
+	e_simulation_world_type m_world_type;
+	bool m_local_machine_identifier_valid;
+	s_machine_identifier m_local_machine_identifier;
+	uint8 gap_13;
+	int32 m_local_machine_index;
 	e_simulation_world_state m_world_state;
+	int32 m_join_time_start;
+	int32 m_valid_machines_mask;
+	char m_time_running;
+	bool m_time_immediate_update;
+	uint8 gap_26[2];
+	uint32 m_next_update_number;
+	bool m_out_of_sync;
+	uint8 gap_2D;
+	char field_2E;
+	bool m_attached_to_map;
+	int32 m_join_attempt_count;
+	int32 m_join_failure_start;
+	int field_38;
+	int32 m_join_timeout;
+	int32 m_view_count;
+	c_simulation_view* m_views[16];
+	uint8 gap_84[4];
+	//c_simulation_player m_players[16];
+	//c_simulation_actor m_actors[16];
+	//char field_1288;
+	//uint8 gap_1289[3];
+	//int32 m_synchronous_gamestate_write_progress;
+	//void* m_synchronous_gamestate_write_buffer;
+	//unsigned int field_1294;
+	//int32 m_synchronous_client_next_update_number_to_dequeue;
+	//int32 m_synchronous_client_latest_update_number_received;
+	//int32 m_synchronous_client_queue_length;
+	//void* m_synchronous_client_queue_head;
+	//void* m_synchronous_client_queue_tail;
+	//char gap_12A8[4];
+
+public:
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	void simulation_queue_free(s_simulation_queue_element* element);
@@ -59,6 +94,11 @@ public:
 	void apply_high_priority_queue();
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
+
+	void* get_distributed_world()
+	{
+		return m_distributed_world;
+	}
 
 	void initialize_world(int32 a2, int32 a3, int32 a4);
 	// discard resources
@@ -87,7 +127,7 @@ public:
 
 	bool exists() const
 	{
-		return m_simulation_world_mode != _simulation_world_type_none;
+		return m_world_type != _simulation_world_type_none;
 	}
 
 	bool runs_simulation() const
@@ -96,7 +136,7 @@ public:
 
 		if (exists())
 		{
-			result = m_simulation_world_mode != _simulation_world_type_distributed_authority;
+			result = m_world_type != _simulation_world_type_distributed_authority;
 		}
 
 		return result;
@@ -113,7 +153,7 @@ public:
 
 		return result;
 	}
-
-private:
 };
+//CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
+
 void simulation_world_apply_patches();

@@ -7,7 +7,7 @@
 
 c_simulation_entity_database* simulation_get_entity_database()
 {
-    return (c_simulation_entity_database*)((uint8*)simulation_get_world()->m_distributed_world + 8352);
+    return (c_simulation_entity_database*)((uint8*)simulation_get_world()->get_distributed_world() + 8352);
 }
 
 bool c_simulation_entity_database::process_creation(int32 entity_index, e_simulation_entity_type type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks)
