@@ -1,6 +1,8 @@
 #pragma once
 
 #include "simulation/simulation_view.h"
+#include "simulation/simulation_actors.h"
+#include "simulation/simulation_players.h"
 #include "simulation_queue_events.h"
 
 enum e_simulation_queue_type
@@ -67,19 +69,19 @@ class c_simulation_world
 	int32 m_view_count;
 	c_simulation_view* m_views[16];
 	uint8 gap_84[4];
-	//c_simulation_player m_players[16];
-	//c_simulation_actor m_actors[16];
-	//char field_1288;
-	//uint8 gap_1289[3];
-	//int32 m_synchronous_gamestate_write_progress;
-	//void* m_synchronous_gamestate_write_buffer;
-	//unsigned int field_1294;
-	//int32 m_synchronous_client_next_update_number_to_dequeue;
-	//int32 m_synchronous_client_latest_update_number_received;
-	//int32 m_synchronous_client_queue_length;
-	//void* m_synchronous_client_queue_head;
-	//void* m_synchronous_client_queue_tail;
-	//char gap_12A8[4];
+	c_simulation_player m_players[16];
+	c_simulation_actor m_actors[16];
+	char field_1288;
+	uint8 gap_1289[3];
+	int32 m_synchronous_gamestate_write_progress;
+	void* m_synchronous_gamestate_write_buffer;
+	unsigned int field_1294;
+	int32 m_synchronous_client_next_update_number_to_dequeue;
+	int32 m_synchronous_client_latest_update_number_received;
+	int32 m_synchronous_client_queue_length;
+	void* m_synchronous_client_queue_head;
+	void* m_synchronous_client_queue_tail;
+	char gap_12A8[4];
 
 public:
 
@@ -154,6 +156,6 @@ public:
 		return result;
 	}
 };
-//CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
+CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
 
 void simulation_world_apply_patches();

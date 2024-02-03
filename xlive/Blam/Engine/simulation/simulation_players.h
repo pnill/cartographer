@@ -14,19 +14,21 @@ enum e_simulation_player_type   //TODO: determine actual names for this enum fie
 	k_simulation_player_type_count = 0x6,
 };
 
-struct s_simulation_player
+#pragma pack(push, 1)
+struct c_simulation_player
 {
-	int player_index;
-	datum player_datum_index;
+	int32 m_player_index;
+	datum m_player_datum_index;
 	e_simulation_player_type m_player_type;
-	uint64 player_identifier;
-	s_machine_identifier player_machine_identifier;
+	uint64 m_player_identifier;
+	s_machine_identifier m_player_machine_identifier;
 	PAD(2);
-	void* simulation_world_ptr;
-	char field_20[1];
+	void* m_simulation_world;
+	char m_field_20;
 	bool m_active;
 	PAD(2);
-	unsigned int start_commit_ticks;
-	player_action actions;
+	uint32 m_start_commit_ticks;
+	player_action m_actions;
 };
-CHECK_STRUCT_SIZE(s_simulation_player, 0x88);
+#pragma pack(pop)
+CHECK_STRUCT_SIZE(c_simulation_player, 0x88);
