@@ -22,6 +22,22 @@ bool simulation_is_paused()
     return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
 }
 
+bool simulation_in_progress()
+{
+    bool result = false;
+
+    if (simulation_engine_initialized()
+        && game_in_progress()
+        && game_get_active_structure_bsp_index() != NONE
+        && !simulation_is_paused()
+        && simulation_get_world()->is_active())
+    {
+        result = true;
+    }
+
+    return result;
+}
+
 bool simulation_query_object_is_predicted(datum object_datum)
 {
     return game_is_predicted() && object_get_fast_unsafe(object_datum)->simulation_entity_index != NONE;
@@ -38,14 +54,17 @@ c_simulation_type_collection* simulation_get_type_collection()
     return c_simulation_type_collection::get();
 }
 
-typedef void(__cdecl* t_simulation_update_before_game)(int8* sim_data_out);
+typedef void(__cdecl* t_simulation_update_before_game)(s_simulation_update* sim_data);
 t_simulation_update_before_game p_simulation_update_before_game;
 
-void __cdecl simulation_update_before_game_hook(int8* sim_data_out)
+void __cdecl simulation_update_before_game_hook(s_simulation_update* sim_data)
 {
-    simulation_get_world()->apply_high_priority_queue();
-    simulation_get_world()->apply_basic_queue();
-    p_simulation_update_before_game(sim_data_out);
+    if (sim_data->simulation_in_progress)
+    {
+        simulation_get_world()->apply_high_priority_queue();
+        simulation_get_world()->apply_basic_queue();
+    }
+    p_simulation_update_before_game(sim_data);
 }
 
 typedef void (__cdecl* t_simulation_update_pregame)();
@@ -65,8 +84,13 @@ void __cdecl simulation_update_pregame()
 
 void simulation_destroy_update()
 {
-    // remove everything from the queue
-    simulation_get_world()->destroy_update();
+    // only discard these updates if they were actually
+    // during simulation
+    if (simulation_in_progress())
+    {
+        // remove everything from the queue
+		simulation_get_world()->destroy_update();
+    }
 }
 
 void simulation_apply_patches()

@@ -47,7 +47,7 @@ public:
 
 	s_simulation_game_entity* entity_get(int32 entity_index)
 	{
-		return &m_game_entities[ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index)];
+		return &m_entity_data[ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index)];
 	}
 
 	s_simulation_game_entity* entity_try_and_get(int32 entity_index)
@@ -65,7 +65,7 @@ public:
 
 private:
 	c_simulation_type_collection* m_type_collection;
-	s_simulation_game_entity m_game_entities[k_simulation_entity_database_maximum_entities];
+	s_simulation_game_entity m_entity_data[k_simulation_entity_database_maximum_entities];
 
 	void entity_delete_gameworld(int32 entity_index);
 };

@@ -9,7 +9,7 @@ struct s_main_game_globals
 {
 	bool initializing;
 	bool map_active;
-	short active_structure_bsp_index;
+	int16 active_structure_bsp_index;
 	int unused_0;
 	s_game_options options;
 	bool game_in_progress;
@@ -70,6 +70,7 @@ bool map_initialized(void);
 s_game_options* game_options_get(void);
 s_game_variant* current_game_variant(void);
 e_game_mode game_mode_get(void);
+int16 game_get_active_structure_bsp_index();
 bool game_is_campaign(void);
 bool game_is_multiplayer(void);
 bool game_is_ui_shell(void);

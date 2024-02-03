@@ -12,19 +12,18 @@ struct s_unit_control_data
 	uint8 field_8;
 	uint8 field_9;
 	uint16 grenade_index;
-	unsigned __int16 zoom_level;
+	uint16 zoom_level;
 	char gap_E[2];
-	DWORD control_flag0;
-	DWORD control_flag1;
+	int64 control_flags;
 	real_vector3d throttle;
 	float trigger;
 	float secondary_trigger;
 	real_vector3d desired_facing;
 	real_vector3d desired_aiming;
 	real_vector3d desired_looking;
-	DWORD field_50;
-	DWORD field_54;
-	DWORD field_58;
+	int32 field_50;
+	int32 field_54;
+	int32 field_58;
 	s_aim_assist_targeting_result target_info;
 
 };

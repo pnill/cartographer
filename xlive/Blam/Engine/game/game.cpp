@@ -67,10 +67,16 @@ bool game_is_distributed(void)
         || game_options_get()->simulation_type == _game_simulation_distributed_server;
 }
 
+int16 game_get_active_structure_bsp_index()
+{
+    return get_main_game_globals()->active_structure_bsp_index;
+}
+
 // TODO: saved films
 bool game_is_playback(void)
 {
-    return _game_playback_none;
+    return false;
+    //return _game_playback_none;
 }
 
 void __cdecl game_shell_set_in_progress()

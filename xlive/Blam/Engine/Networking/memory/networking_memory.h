@@ -12,7 +12,7 @@ class c_network_heap
 {
 public:
 	c_fixed_memory_rockall_frontend* rockall_frontend;
-	int32 get_block_size(const uint8* block);
+	int32 get_block_size(const uint8* block) const;
 
 	void dispose();
 };
