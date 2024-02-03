@@ -17,26 +17,25 @@ bool simulation_engine_initialized()
     return *Memory::GetAddress<bool*>(0x5178D0, 0x520B60);
 }
 
+bool simulation_is_paused()
+{
+    return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
+}
+
 bool simulation_in_progress()
 {
     bool result = false;
-    bool simulation_unk1 = *Memory::GetAddress<bool*>(0x5178D2, 0x0);
 
     if (simulation_engine_initialized()
         && game_in_progress()
         && game_get_active_structure_bsp_index() != NONE
-        && !simulation_unk1
+        && !simulation_is_paused()
         && simulation_get_world()->is_active())
     {
         result = true;
     }
 
     return result;
-}
-
-bool simulation_is_paused()
-{
-    return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
 }
 
 bool simulation_query_object_is_predicted(datum object_datum)

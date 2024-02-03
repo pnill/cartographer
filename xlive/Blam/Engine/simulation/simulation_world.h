@@ -75,7 +75,7 @@ class c_simulation_world
 	uint8 gap_1289[3];
 	int32 m_synchronous_gamestate_write_progress;
 	void* m_synchronous_gamestate_write_buffer;
-	unsigned int field_1294;
+	uint32 field_1294;
 	int32 m_synchronous_client_next_update_number_to_dequeue;
 	int32 m_synchronous_client_latest_update_number_received;
 	int32 m_synchronous_client_queue_length;
