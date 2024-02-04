@@ -70,7 +70,7 @@ void render_cartographer_status_text()
 	if (cartographer_test_build_draw_text)
 	{
 		rasterizer_get_frame_bounds(&bounds);
-		int32 test_build_font = 0;
+		int32 test_build_font = k_status_text_font;
 		line_height = get_text_size_from_font_cache(test_build_font);
 
 		text_color_console.alpha = .55f;
