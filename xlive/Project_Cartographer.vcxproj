@@ -137,6 +137,9 @@
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -196,6 +199,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug/xliveless.bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">

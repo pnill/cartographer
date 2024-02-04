@@ -8,6 +8,7 @@
 
 void set_primary_hud_scale(float scale);
 void set_secondary_hud_scale(float scale);
+float* get_ui_scale();
 float* get_primary_hud_scale();
 float* get_secondary_hud_scale();
 void set_crosshair_offset(float offset);
