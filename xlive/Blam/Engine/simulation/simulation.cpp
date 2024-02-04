@@ -84,7 +84,7 @@ void __cdecl simulation_update_pregame()
 
 void simulation_destroy_update()
 {
-    // only discard these updates if they were actually
+    // only discard these updates if they were actually applied
     // during simulation
     if (simulation_in_progress())
     {
