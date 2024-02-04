@@ -79,27 +79,15 @@ void render_cartographer_status_text()
 		bounds.bottom = bounds.top + line_height;
 		
 		draw_string_reset();
-		draw_string_set_font_and_options(test_build_font, 1, 0, 0, &text_color_console, global_real_argb_black, false);
-
-		wchar_t build_git_version_string[256];
-		wchar_t build_date[256];
-		wchar_t build_time[256];
-		wchar_t git_username[256];
-		wchar_t git_branch_name[256];
+		draw_string_set_font_and_options(test_build_font, 0, 0, 0, &text_color_console, global_real_argb_black, false);
 
 		wchar_t result_text_buffer[1024];
 
-		utf8_string_to_wchar_string(GEN_GIT_VER_VERSION_STRING, build_git_version_string, NUMBEROF(build_git_version_string));
-		utf8_string_to_wchar_string(__DATE__, build_date, NUMBEROF(build_date));
-		utf8_string_to_wchar_string(__TIME__, build_time, NUMBEROF(build_time));
-		utf8_string_to_wchar_string(GET_GIT_VER_USERNAME, git_username, NUMBEROF(git_username));
-		utf8_string_to_wchar_string(GET_GIT_VER_BRANCH, git_branch_name, NUMBEROF(git_branch_name));
-
-		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%s %s", build_date, build_time);
+		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S", __DATE__, __TIME__);
 		draw_string_render(&bounds, result_text_buffer);
 		bounds.top += line_height;
 		bounds.bottom = bounds.top + line_height;
-		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%s %s branch: %s", build_git_version_string, git_username, git_branch_name);
+		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
 		draw_string_render(&bounds, result_text_buffer);
 	}
 #endif
