@@ -87,7 +87,7 @@ void render_cartographer_status_text()
 		draw_string_render(&bounds, result_text_buffer);
 		bounds.top += line_height;
 		bounds.bottom = bounds.top + line_height;
-		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
+		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GEN_GIT_VER_USERNAME, GEN_GIT_VER_BRANCH);
 		draw_string_render(&bounds, result_text_buffer);
 	}
 #endif
