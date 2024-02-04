@@ -74,7 +74,7 @@ void render_cartographer_status_text()
 		line_height = get_text_size_from_font_cache(test_build_font);
 
 		text_color_console.alpha = .55f;
-		bounds.top += (line_height * 58);
+		bounds.top += (1050 * *get_ui_scale());
 		bounds.left = bounds.right - (765 * *get_ui_scale());
 		bounds.bottom = bounds.top + line_height;
 		
