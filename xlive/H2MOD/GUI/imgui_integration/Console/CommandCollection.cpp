@@ -4,6 +4,7 @@
 #include "game/game.h"
 #include "game/game_time.h"
 #include "main/main_game.h"
+#include "main/main_game_time.h"
 #include "Networking/NetworkMessageTypeCollection.h"
 #include "Networking/Session/NetworkSession.h"
 #include "simulation/game_interface/simulation_game_action.h"
@@ -17,7 +18,6 @@
 
 // for XNet connection logging
 #include "XLive/xnet/IpManagement/XnIp.h"
-
 
 std::mutex commandInsertMtx;
 
