@@ -995,7 +995,7 @@ void object_get_markers_by_string_id_replace_calls(void)
 	// PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
 	// PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
 	// PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
-	PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);	// object_animation_callback
+	// PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);	// object_animation_callback
 
 	PatchCall(Memory::GetAddress(0xAAFA4, 0x0), object_get_markers_by_string_id);			// Function for creating effects at markers
 	PatchCall(Memory::GetAddress(0xFDF7D, 0x0), object_get_markers_by_string_id);			// effect_on_new_object_marker	
