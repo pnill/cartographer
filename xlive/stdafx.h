@@ -71,6 +71,7 @@
 #include "math/real_math.h"
 
 #include "Util/curl-interface.h"
+#include "Util/Hooks/Hook.h"
 #include "Util/log.h"
 #include "Util/Memory.h"
 #include "Util/remove_all_ptr.h"

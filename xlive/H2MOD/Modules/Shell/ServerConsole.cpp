@@ -4,7 +4,7 @@
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 typedef void* (__cdecl* dedi_command_t)(wchar_t** a1, int a2, char a3);
 dedi_command_t p_dedi_command;

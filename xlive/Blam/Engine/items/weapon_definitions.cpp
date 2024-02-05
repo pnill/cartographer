@@ -2,7 +2,7 @@
 #include "weapon_definitions.h"
 
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 weapon_first_person_interface_definition* first_person_interface_definition_get(const _weapon_definition* definition, e_character_type character_type)
 {

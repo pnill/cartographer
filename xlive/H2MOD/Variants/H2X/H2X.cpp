@@ -8,7 +8,7 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 const H2X::h2x_mod_info weapons[] =
 {

@@ -2,7 +2,7 @@
 #include "game_state_procs.h"
 
 #include "Blam/Engine/main/interpolator.h"
-#include "Util/Hooks/Hook.h"
+
 
 
 typedef void(__cdecl* game_state_call_after_load_procs_t)(int32);

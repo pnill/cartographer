@@ -3,7 +3,7 @@
 
 #include "simulation_queue_entities.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 c_simulation_entity_database* simulation_get_entity_database()
 {

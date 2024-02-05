@@ -49,6 +49,8 @@ struct s_frame_data_storage
 };
 //CHECK_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
 
+extern s_interpolation_data* g_frame_data_intermediate;
+
 void halo_interpolator_initialize();
 
 bool halo_interpolator_is_enabled(void);
@@ -99,5 +101,3 @@ bool halo_interpolator_interpolate_biped_crouch(datum object_index, real32* out_
 void halo_interpolator_interpolate_position_data(int32 user_index, int32 position_index, real_point3d* position);
 
 bool halo_interpolator_interpolate_position_backwards(int32 user_index, int32 position_index, real_point3d* position);
-
-extern s_interpolation_data* g_frame_data_intermediate;

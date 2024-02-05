@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "cloth.h"
 
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/hs/hs.h"
-#include "Util/Hooks/Hook.h"
+#include "game/game_time.h"
+#include "memory/data.h"
+#include "objects/objects.h"
+
+
 
 void __cdecl sub_58F279(datum cloth_index)
 {
@@ -69,6 +70,10 @@ void cloth_apply_patches(void)
 	WriteValue<bool>(Memory::GetAddress(0x41F650), false);
 
 	DETOUR_ATTACH(p_cloth_frame_advance, Memory::GetAddress<t_cloth_frame_advance>(0x18F6D0), cloth_frame_advance);
+
+	// replace functions with interpolated equivalents
+	PatchCall(Memory::GetAddress(0x18E19C, 0x0), object_get_markers_by_string_id);
+	PatchCall(Memory::GetAddress(0x18E4DD, 0x0), object_get_markers_by_string_id);
 
 	return;
 }

@@ -3,7 +3,7 @@
 
 #include "particle_system.h"
 #include "Blam/Engine/game/game_time.h"
-#include "Util/Hooks/Hook.h"
+
 
 s_data_array* get_particle_table()
 {

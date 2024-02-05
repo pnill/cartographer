@@ -15,7 +15,7 @@
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 #pragma region Done_Tweaks

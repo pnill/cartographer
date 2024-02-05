@@ -2,7 +2,7 @@
 #include "units.h"
 
 #include "Blam/Engine/tag_files/global_string_ids.h"
-#include "Util/Hooks/Hook.h"
+
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index)
 {

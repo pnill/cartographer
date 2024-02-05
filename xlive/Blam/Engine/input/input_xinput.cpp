@@ -4,7 +4,7 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};

@@ -11,7 +11,7 @@
 #include "Blam/Engine/render/render.h"
 #include "Blam/Engine/units/biped_definitions.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 bool __cdecl biped_is_running_invisible_crouched_uber_melee(datum object_index)
 {

@@ -4,7 +4,7 @@
 
 #include "Blam/Engine/math/math.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 static LARGE_INTEGER g_startup_counter;
 

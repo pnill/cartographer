@@ -2,7 +2,7 @@
 #include "game_statborg.h"
 
 #include "H2MOD/Variants/Variants.h"
-#include "Util/Hooks/Hook.h"
+
 
 c_game_statborg* __cdecl game_engine_get_statborg(void)
 {

@@ -2,7 +2,7 @@
 #include "contrails.h"
 
 #include "Blam/Engine/objects/objects.h"
-#include "Util/Hooks/Hook.h"
+
 
 void contrails_apply_patches(void)
 {

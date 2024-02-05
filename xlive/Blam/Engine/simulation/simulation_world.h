@@ -67,10 +67,10 @@ class c_simulation_world
 	int field_38;
 	int32 m_join_timeout;
 	int32 m_view_count;
-	c_simulation_view* m_views[16];
+	c_simulation_view* m_views[k_maximum_players];
 	uint8 gap_84[4];
-	c_simulation_player m_players[16];
-	c_simulation_actor m_actors[16];
+	c_simulation_player m_players[k_maximum_players];
+	c_simulation_actor m_actors[k_maximum_players];
 	char field_1288;
 	uint8 gap_1289[3];
 	int32 m_synchronous_gamestate_write_progress;

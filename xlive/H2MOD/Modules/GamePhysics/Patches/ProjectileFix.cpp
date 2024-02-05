@@ -9,7 +9,7 @@
 
 #include "Blam/Cache/TagGroups/projectile_definition.hpp"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 FLOATING_POINT_ENV_ACCESS();
 

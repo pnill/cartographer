@@ -2,7 +2,7 @@
 #include "dead_camera.h"
 
 #include "Blam/Engine/objects/objects.h"
-#include "Util/Hooks/Hook.h"
+
 
 real_point3d* __cdecl object_try_and_get_interpolated_position(datum object_index, int16 node_index, real_point3d* out_pos)
 {

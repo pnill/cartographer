@@ -2,7 +2,7 @@
 #include "screen_esrb_warning.h"
 
 
-#include "Util/Hooks/Hook.h"
+
 
 void c_screen_esrb_warning::apply_patches()
 {		
