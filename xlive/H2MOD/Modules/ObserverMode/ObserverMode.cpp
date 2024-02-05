@@ -7,7 +7,7 @@
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 namespace ObserverMode
 {

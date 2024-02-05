@@ -12,7 +12,7 @@
 
 #include "H2MOD/Tags/TagInterface.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 // Ensure we aren't sending a variant index that's the same as the default variant
 // Inefficient since the variant will be set to it regardless

@@ -11,7 +11,7 @@
 #include "Blam/Engine/physics/collisions.h"
 #include "Blam/Engine/render/render_visibility_collection.h"
 #include "Blam/Engine/scenario/scenario.h"
-#include "Util/Hooks/Hook.h"
+
 
 real32 g_camera_speed = 1.0f;
 

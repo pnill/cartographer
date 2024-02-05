@@ -8,7 +8,7 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());

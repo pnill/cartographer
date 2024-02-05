@@ -5,7 +5,7 @@
 #include "memory/data.h"
 #include "objects/objects.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 void __cdecl sub_58F279(datum cloth_index)
 {

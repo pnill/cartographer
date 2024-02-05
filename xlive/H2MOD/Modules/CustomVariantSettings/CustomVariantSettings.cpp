@@ -13,7 +13,7 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Util/Hooks/Hook.h"
+
 
 CustomVariantSettings::s_variant_settings currentVariantSettings;
 CustomVariantSettings::s_variant_settings defaultCustomVariantSettings;

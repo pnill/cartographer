@@ -75,7 +75,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/Variants.h"
-#include "Util/Hooks/Hook.h"
+
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 

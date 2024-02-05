@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 #define k_redraw_map_name "ui_redraw"
 

@@ -2,7 +2,7 @@
 
 #include "rasterizer_dx9_fog.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 real32 g_rasterizer_fog_dt = 0.0f;
 

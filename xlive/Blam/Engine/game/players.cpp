@@ -13,7 +13,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 /*
 	- NOTES:

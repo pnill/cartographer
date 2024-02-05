@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 uint8 g_network_message_type_collection[e_network_message_type_collection::k_network_message_type_collection_count * 32];
 

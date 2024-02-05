@@ -5,7 +5,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
 #include "Networking/Session/NetworkSession.h"
-#include "Util/Hooks/Hook.h"
+
 
 #define k_radar_size_multiplier 1.f
 #define k_radar_distance_multiplier 1.5f

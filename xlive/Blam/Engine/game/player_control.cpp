@@ -2,7 +2,7 @@
 #include "player_control.h"
 
 #include "players.h"
-#include "Util/Hooks/Hook.h"
+
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/main/interpolator.h"
 

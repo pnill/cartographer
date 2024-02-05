@@ -5,7 +5,7 @@
 #include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "Util/Hooks/Hook.h"
+
 
 FLOATING_POINT_ENV_ACCESS();
 

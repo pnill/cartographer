@@ -2,7 +2,7 @@
 #include "font_cache.h"
 
 #include "Blam/Engine/interface/hud.h"
-#include "Util/Hooks/Hook.h"
+
 
 // Multiply font size by the global text scale to fix scaling issues on resolutions higher than 1080 pixels vertically
 int __cdecl get_text_size_from_font_cache(int font_cache_index)

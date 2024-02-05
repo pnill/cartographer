@@ -8,7 +8,7 @@
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/units/units.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
     int32 creation_data_size,

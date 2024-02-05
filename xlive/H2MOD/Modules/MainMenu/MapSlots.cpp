@@ -6,7 +6,7 @@
 
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/filesys.h"
-#include "Util/Hooks/Hook.h"
+
 
 // TODO Move to Blam/Engine/main/levels once the below are complete
 // TODO remove std:: references used in here

@@ -4,7 +4,7 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/math.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 bool rawInputInit = false;
 DWORD base;

@@ -6,7 +6,7 @@
 
 #include "rasterizer/rasterizer_loading.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 datum last_bitmap_tag_index = 0;
 

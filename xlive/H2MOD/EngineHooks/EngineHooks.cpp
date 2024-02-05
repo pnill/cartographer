@@ -3,7 +3,7 @@
 #include "EngineHooks.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Util/Hooks/Hook.h"
+
 
 namespace EngineHooks
 {

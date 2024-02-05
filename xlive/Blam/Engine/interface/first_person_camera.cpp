@@ -9,7 +9,7 @@
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 #define _USE_MATH_DEFINES
 #include <math.h>

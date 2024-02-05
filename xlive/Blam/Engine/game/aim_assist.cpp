@@ -3,7 +3,7 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/game/game.h"
-#include "Util/Hooks/Hook.h"
+
 
 // sword-flying target clear patch
 void __cdecl aim_assist_targeting_clear_hook(s_aim_assist_targeting_result* target_data)

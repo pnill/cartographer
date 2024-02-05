@@ -7,7 +7,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "Util/filesys.h"
-#include "Util/Hooks/Hook.h"
+
 
 #include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 #include "Blam/Engine/cache/cache_files.h"

@@ -8,7 +8,7 @@
 #include "Blam/Engine/game/player_control.h"
 
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 extern bool g_xbox_tickrate_enabled;
 

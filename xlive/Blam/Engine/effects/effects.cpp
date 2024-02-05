@@ -4,7 +4,7 @@
 #include "Blam/Engine/interface/first_person_weapons.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/objects/objects.h"
-#include "Util/Hooks/Hook.h"
+
 
 datum __cdecl effect_new_from_object(
     datum effect_tag_index,

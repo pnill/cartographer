@@ -19,7 +19,7 @@
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Utils/Utils.h"
 
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 

@@ -13,7 +13,7 @@
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 bool g_should_draw_hud_override = true;
 std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums

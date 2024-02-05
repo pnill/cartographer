@@ -4,7 +4,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
 #include "H2MOD/Tags/TagInterface.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 void UIRankPatch() 
 {

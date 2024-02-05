@@ -27,7 +27,7 @@
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/units/bipeds.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 s_data_array* object_header_data_get(void)
 {

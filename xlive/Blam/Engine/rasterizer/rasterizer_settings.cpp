@@ -5,7 +5,7 @@
 #include "Blam/Engine/shell/shell.h"
 #include "dx9/rasterizer_dx9_main.h"
 #include "Blam/Engine/interface/user_interface_text.h"
-#include "Util/Hooks/Hook.h"
+
 
 void __cdecl rasterizer_discard_refresh_rate();
 

@@ -2,7 +2,7 @@
 #include "render_submit.h"
 
 #include "Blam/Engine/objects/objects.h"
-#include "Util/Hooks/Hook.h"
+
 
 void render_submit_apply_patches(void)
 {

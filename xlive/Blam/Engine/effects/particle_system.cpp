@@ -13,7 +13,7 @@
 #include "Blam/Engine/main/interpolator.h"
 
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 int particle_system_game_time[k_max_particle_systems];
 real32 particle_system_accumulated_time[k_max_particle_systems];

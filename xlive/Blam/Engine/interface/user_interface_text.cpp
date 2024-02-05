@@ -2,7 +2,7 @@
 #include "user_interface_text.h"
 
 #include "Blam/Engine/interface/hud.h"
-#include "Util/Hooks/Hook.h"
+
 
 // Seperated scale for the text labels (carto addition)
 float ui_text_label_scaling = 0.0f;

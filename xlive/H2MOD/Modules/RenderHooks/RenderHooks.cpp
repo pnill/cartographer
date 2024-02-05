@@ -2,7 +2,7 @@
 
 #include "RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 bool ras_layer_overrides[RenderHooks::end];
 bool geo_render_overrides[24];

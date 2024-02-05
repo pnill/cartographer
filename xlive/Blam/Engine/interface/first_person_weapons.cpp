@@ -13,7 +13,7 @@
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 bool show_first_person = true;
 
