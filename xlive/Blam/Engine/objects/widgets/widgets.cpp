@@ -1,15 +1,9 @@
 #include "stdafx.h"
 #include "widgets.h"
 
-#include "main/interpolator.h"
-#include "objects/objects.h"
-
-
-
 void __cdecl widgets_new(datum object_index)
 {
 	INVOKE(0x14FFE2, 0x14CD7A, widgets_new, object_index);
-	object_initialize_for_interpolation(object_index);
 	return;
 }
 
