@@ -19,8 +19,8 @@ void simulation_gamestate_index_decode(c_bitstream* stream, datum* object_index)
 
 void simulation_entity_index_encode(c_bitstream* stream, int32 entity_index)
 {
-	stream->write_integer("entity-absolute-index", entity_index & (k_simulation_entity_database_maximum_entities - 1), 10);
-	stream->write_integer("entity-seed", entity_index >> 28, 4);
+	stream->write_integer("entity-absolute-index", ENTITY_INDEX_TO_ABSOLUTE_INDEX(entity_index), 10);
+	stream->write_integer("entity-seed", ENTITY_INDEX_TO_SEED(entity_index), 4);
 }
 
 void simulation_entity_index_decode(c_bitstream* stream, int32* entity_index)

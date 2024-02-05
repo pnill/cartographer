@@ -188,13 +188,13 @@ inline void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_ele
 	{
 		uint32 required_data_size = sizeof(s_simulation_queue_element) + data_size;
 
-		if (allocated_count() + 1 < k_simulation_queue_count_max)
+		//if (allocated_count() + 1 < k_simulation_queue_count_max)
 		{
-			if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
+			//if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
 			{
 				if (data_size < k_simulation_payload_size_max)
 				{
-					if (allocated_new_encoded_size_bytes(data_size) < k_simulation_queue_max_encoded_size)
+					//if (allocated_new_encoded_size_bytes(data_size) < k_simulation_queue_max_encoded_size)
 					{
 						uint8* net_heap_block = network_heap_allocate_block(required_data_size);
 						if (net_heap_block)

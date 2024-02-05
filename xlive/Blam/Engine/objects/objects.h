@@ -257,11 +257,6 @@ static T* object_get_fast_unsafe(datum object_idx)
 	return (T*)header->object;
 }
 
-static int32 object_get_entity_index(datum object_idx)
-{
-	return object_get_fast_unsafe(object_idx)->simulation_entity_index;
-}
-
 s_memory_pool* get_object_table(void);
 
 // Gets the object and verifies the type, returns NULL if object doesn't match object type flags
@@ -277,6 +272,8 @@ void __cdecl object_delete(datum object_idx);
 real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d* point);
 
 datum object_get_damage_owner(datum damaged_unit_index);
+
+int32 object_get_entity_index(datum object_idx);
 
 void object_get_origin_interpolated(datum object_index, real_point3d* point_out);
 
@@ -301,3 +298,5 @@ datum __cdecl object_get_parent_recursive(datum parent_index);
 int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
 
 void objects_apply_patches(void);
+
+void __cdecl objects_purge_deleted_objects(void);

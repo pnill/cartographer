@@ -66,6 +66,11 @@ void* object_header_block_get_with_count(datum object_index, const object_header
 	return block;
 }
 
+int32 object_get_entity_index(datum object_idx)
+{
+	return object_get_fast_unsafe(object_idx)->simulation_entity_index;
+}
+
 datum __cdecl object_header_new(int16 object_data_size)
 {
 	return INVOKE(0x130AF6, 0x11F9B9, object_header_new, object_data_size);
@@ -638,7 +643,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						sizeof(object_attachment_definition),
 						&attachments_count);
 
-					memset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
+					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
 				}
 				
 				if (object_type_new(object_index, placement_data, &out_of_objects))

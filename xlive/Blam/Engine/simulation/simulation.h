@@ -11,6 +11,7 @@ struct s_simulation_update
 	bool simulation_in_progress;
 };
 
+bool simulation_in_progress();
 void simulation_destroy_update();
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
