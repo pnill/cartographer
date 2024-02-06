@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "HaloScript.h"
 
 namespace HaloScript
@@ -46,13 +45,6 @@ namespace HaloScript
 		p_physics_set_velocity_frame(unk1, unk2, unk3);
 	}
 
-	typedef void(__cdecl render_lights_enable_cinematic_shadow_t)(bool unk1, datum objectDatum, string_id StringId, float unk2);
-	render_lights_enable_cinematic_shadow_t* p_render_lights_enable_cinematic_shadow;
-	void RenderLightsEnableCinenaticShadow(bool unk1, datum objectDatum, string_id StringId, float unk2)
-	{
-		p_render_lights_enable_cinematic_shadow(unk1, objectDatum, StringId, unk2);
-	}
-
 	typedef void(__cdecl object_destroy_t)(datum object_datum_index);
 	object_destroy_t* p_object_destroy;
 	void ObjectDestroy(datum object_datum_index)
@@ -68,7 +60,6 @@ namespace HaloScript
 		p_unit_get_shield = Memory::GetAddress<unit_get_shield_t*>(0x18447C, 0x16E518);
 		p_physics_set_gravity	= Memory::GetAddress<physics_set_gravity_t*>(0xB3C00, 0xA3E13);
 		p_physics_set_velocity_frame = Memory::GetAddress<physics_set_velocity_frame_t*>(0xB3D5B, 0xA3F6E);
-		p_render_lights_enable_cinematic_shadow = Memory::GetAddress<render_lights_enable_cinematic_shadow_t*>(0x19245A);
 		p_object_destroy = Memory::GetAddress<object_destroy_t*>(0xFDCFD, 0x124ED5);
 	}
 }

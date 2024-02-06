@@ -439,15 +439,12 @@ void object_initialize_for_interpolation(datum object_index)
 	return;
 }
 
-#define USE_REWRITTEN_OBJECT_NEW
-
 typedef datum (__cdecl* t_object_new)(object_placement_data* placement_data);
 t_object_new p_object_new;
 
 // Creates a new object
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-#ifdef USE_REWRITTEN_OBJECT_NEW
 	datum object_index = NONE;
 
 	if (!placement_data->flags.test(_scenario_object_placement_bit_4) && placement_data->tag_index != NONE)
@@ -726,9 +723,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	}
 	
 	return object_index;
-#else
-	return p_object_new(placement_data);
-#endif
 }
 
 void __cdecl object_delete(datum object_index)
@@ -905,7 +899,7 @@ void __cdecl objects_post_update()
 			&& object_header->flags.test(_object_header_awake_bit)
 			&& !object_header->flags.test(_object_header_being_deleted_bit))
 		{
-			if (object->object_flags.test(_object_hidden_bit))
+			if (object->object_flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
 			{
 				// reset the interpolator for this object, if hidden
 				// ### FIXME maybe hook object_hide and reset it there?
@@ -1021,9 +1015,7 @@ void objects_apply_patches(void)
 {
 	if (!Memory::IsDedicatedServer())
 	{
-#ifdef USE_REWRITTEN_OBJECT_NEW
 		object_new_replace_calls();
-#endif
 		object_move_replace_calls();
 		object_get_markers_by_string_id_replace_calls();
 

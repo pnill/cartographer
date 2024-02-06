@@ -360,6 +360,6 @@ void c_network_observer::apply_patches()
 	// which is not really available anymore with cartographer, since the QoS probes are not that accurate anymore
 	if (!Memory::IsDedicatedServer())
 	{
-		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);
+		PatchCall(Memory::GetAddress(0x1D97DD, 0x1BEE59), is_network_observer_mode_managed);
 	}
 }
