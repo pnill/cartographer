@@ -396,8 +396,8 @@ void simulation_entity_database_apply_patches(void)
     WriteValue<int8>(Memory::GetAddress(0x1D7081, 0x1DA3A2) + 1, (int8)k_entity_creation_block_order_count);
     WriteValue<int8>(Memory::GetAddress(0x1D7091, 0x1DA3B2) + 2, (int8)sizeof(s_replication_allocation_block) * k_entity_creation_block_order_count);
 
-    WritePointer(Memory::GetAddress(0x3C623C, 0x0), jmp_c_simulation_entity_database__read_update_from_packet);
-    WritePointer(Memory::GetAddress(0x3C6240, 0x0), jmp_c_simulation_entity_database__process_update);
+    WritePointer(Memory::GetAddress(0x3C623C, 0x381D24), jmp_c_simulation_entity_database__read_update_from_packet);
+    WritePointer(Memory::GetAddress(0x3C6240, 0x381D28), jmp_c_simulation_entity_database__process_update);
 
     WritePointer(Memory::GetAddress(0x3C624C, 0x381D34), jmp_c_simulation_entity_database__notify_mark_entity_for_deletion);
 

@@ -864,10 +864,6 @@ void H2MOD::ApplyHooks() {
 
 	EngineHooks::ApplyHooks();
 
-	NopFill(Memory::GetAddress(0x39BAB), 5);
-	// ### TODO dedi offset
-	Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
-
 	/* Labeled "AutoPickup" handler may be proximity to vehicles and such as well */
 	PatchCall(Memory::GetAddress(0x58789, 0x60C81), OnAutoPickUpHandler);
 
@@ -915,6 +911,9 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
+
+		// ### TODO dedi offset
+		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -982,6 +981,10 @@ void H2MOD::ApplyHooks() {
 		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
+
+		// Map loading patch (saves framerate)
+		// TODO move
+		NopFill(Memory::GetAddress(0x39BAB), 5);
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

@@ -68,7 +68,8 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 
 __declspec(naked) void jmp_c_simulation_event_handler_process_incoming_event() { __asm { jmp c_simulation_event_handler::process_incoming_event } }
 
-void simulation_event_handler_apply_patches()
+void simulation_event_handler_apply_patches(void)
 {
-	DETOUR_ATTACH(p_process_incoming_event, Memory::GetAddress<t_process_incoming_event>(0x1D3E02), jmp_c_simulation_event_handler_process_incoming_event);
+	DETOUR_ATTACH(p_process_incoming_event, Memory::GetAddress<t_process_incoming_event>(0x1D3E02, 0x1D9092), jmp_c_simulation_event_handler_process_incoming_event);
+	return;
 }
