@@ -8,7 +8,7 @@ e_shell_tool_type shell_tool_type(void)
 
 static int32* shell_startup_flags_get()
 {
-	return Memory::GetAddress<int32*>(0x46D820);
+	return Memory::GetAddress<int32*>(0x46D820, 0x40E708);
 }
 
 bool shell_startup_flag_is_set(e_startup_flags flag)
