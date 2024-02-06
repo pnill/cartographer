@@ -30,6 +30,7 @@ xliveless.v12.suo
 *.opensdf
 *.user
 *.ipch
+version_git.h
 
 JSON/
 

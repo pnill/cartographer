@@ -11,6 +11,49 @@
 
 #include "memory/bitstream.h"
 
+void simulation_event_encode_header(
+	c_bitstream* stream,
+	e_simulation_event_type event_type,
+	int32 reference_count,
+	datum* object_references
+)
+{
+	stream->write_integer("event-type", event_type, 5);
+	stream->write_integer("reference-count", reference_count, 2);
+
+	for (int32 i = 0; i < reference_count; i++)
+	{
+		stream->write_bool("object-reference-exists", object_references[i] != NONE);
+		if (object_references[i] != NONE)
+		{
+			simulation_gamestate_index_encode(stream, object_references[i]);
+		}
+	}
+}
+
+void simulation_event_decode_header(
+	c_bitstream* stream,
+	e_simulation_event_type* event_type,
+	int32* reference_count,
+	datum* object_references
+)
+{
+	*event_type = (e_simulation_event_type)stream->read_integer("event-type", 5);
+	*reference_count = stream->read_integer("reference-count", 2);
+
+	for (int32 i = 0; i < *reference_count; i++)
+	{
+		if (stream->read_bool("object-reference-exists"))
+		{
+			simulation_gamestate_index_decode(stream, &object_references[i]);
+		}
+		else
+		{
+			object_references[i] = NONE;
+		}
+	}
+}
+
 static bool encode_event_to_buffer(
 	uint8* out_buffer,
 	int32 out_buffer_size,
@@ -24,17 +67,7 @@ static bool encode_event_to_buffer(
 {
 	c_bitstream stream(out_buffer, out_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
-	stream.write_integer("event-type", event_type, 5);
-	stream.write_integer("reference-count", reference_count, 2);
-
-	for (int32 i = 0; i < reference_count; i++)
-	{
-		stream.write_bool("object-index-exists", !DATUM_IS_NONE(object_index_references[i]));
-		if (!DATUM_IS_NONE(object_index_references[i]))
-		{
-			simulation_gamestate_index_encode(&stream, object_index_references[i]);
-		}
-	}
+	simulation_event_encode_header(&stream, event_type, reference_count, object_index_references);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 	c_simulation_event_definition* sim_event_definition = sim_type_collection->get_event_definition(event_type);
@@ -65,20 +98,7 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 {
 	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
-	decode_out->event_type = (e_simulation_event_type)stream.read_integer("event-type", 5);
-	decode_out->reference_count = stream.read_integer("reference-count", 2);
-
-	for (int32 i = 0; i < decode_out->reference_count; i++)
-	{
-		if (stream.read_bool("object-index-exists"))
-		{
-			simulation_gamestate_index_decode(&stream, &decode_out->object_refereces[i]);
-		}
-		else
-		{
-			decode_out->object_refereces[i] = NONE;
-		}
-	}
+	simulation_event_decode_header(&stream, &decode_out->event_type, &decode_out->reference_count, decode_out->object_refereces);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 	c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(decode_out->event_type);
@@ -195,40 +215,42 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 	bool apply_event_result = false;
 
 	// apply the decoded event to sim
-
-	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
-	c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
-
-	// convert object indexes back to entity references, lol
-	// ### FIXME !!! at some point, add the gamestate to entity database
-	int32 entity_references[k_entity_reference_indices_count_max];
-
-	for (int32 i = 0; i < sim_apply_data.reference_count; i++)
+	if (decode_success)
 	{
-		if (!DATUM_IS_NONE(sim_apply_data.object_refereces[i]))
+		c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
+		c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
+
+		// convert object indexes back to entity references, lol
+		// ### FIXME !!! at some point, add the gamestate to entity database
+		int32 entity_references[k_entity_reference_indices_count_max];
+
+		for (int32 i = 0; i < sim_apply_data.reference_count; i++)
 		{
-			// hopefully this does the job
-			// TODO FIXME this crashed the game once
-			// the events need to be discarded whenever simulation layer initializes
-			entity_references[i] = object_get_entity_index(sim_apply_data.object_refereces[i]);
-		}
-		else
-		{
-			entity_references[i] = NONE;
+			if (!DATUM_IS_NONE(sim_apply_data.object_refereces[i]))
+			{
+				// hopefully this does the job
+				// TODO FIXME this crashed the game once
+				// the events need to be discarded whenever simulation layer initializes
+				entity_references[i] = object_get_entity_index(sim_apply_data.object_refereces[i]);
+			}
+			else
+			{
+				entity_references[i] = NONE;
+			}
+
+			SIM_EVENT_QUEUE_DBG("object reference (datum index): %08X converted -> entity reference: %08X: ", sim_apply_data.object_refereces[i], entity_references[i]);
 		}
 
-		SIM_EVENT_QUEUE_DBG("object reference (datum index): %08X converted -> entity reference: %08X: ", sim_apply_data.object_refereces[i], entity_references[i]);
+		// ### FIXME !!! this actually requires entity references, instead of object references
+		apply_event_result = sim_entity_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
+
+		SIM_EVENT_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d",
+			sim_apply_data.event_type,
+			decode_success,
+			apply_event_result,
+			update,
+			sim_apply_data.data_size);
 	}
-
-	// ### FIXME !!! this actually requires entity references, instead of object references
-	apply_event_result = sim_entity_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
-
-	SIM_EVENT_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d", 
-		sim_apply_data.event_type, 
-		decode_success, 
-		apply_event_result, 
-		update, 
-		sim_apply_data.data_size);
 	
 	return apply_event_result;
 }

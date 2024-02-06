@@ -63,7 +63,17 @@ void __cdecl simulation_update_before_game_hook(s_simulation_update* sim_data)
     {
         simulation_get_world()->apply_high_priority_queue();
         simulation_get_world()->apply_basic_queue();
+
+        // destroy the update exactly after we applied the queues to the gamestate
+        simulation_get_world()->destroy_update();
     }
+    else
+    {
+        // purge any deletion pending object during this update
+        // if simulation is not in progress
+        objects_purge_deleted_objects();
+    }
+
     p_simulation_update_before_game(sim_data);
 }
 
@@ -89,7 +99,7 @@ void simulation_destroy_update()
     if (simulation_in_progress())
     {
         // remove everything from the queue
-		simulation_get_world()->destroy_update();
+		// simulation_get_world()->destroy_update();
     }
 }
 
