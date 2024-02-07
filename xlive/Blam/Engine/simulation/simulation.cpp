@@ -5,21 +5,37 @@
 #include "objects/objects.h"
 #include "simulation_watcher.h"
 
-
+s_simulation_globals* simulation_get_globals()
+{
+    return Memory::GetAddress<s_simulation_globals*>(0x5178D0, 0x520B60);
+}
 
 c_simulation_world* simulation_get_world()
 {
-	return *Memory::GetAddress<c_simulation_world**>(0x5178DC, 0x520B6C);
+    return simulation_get_globals()->simulation_world;
 }
 
 bool simulation_engine_initialized()
 {
-    return *Memory::GetAddress<bool*>(0x5178D0, 0x520B60);
+    return simulation_get_globals()->engine_initialized;
 }
 
 bool simulation_is_paused()
 {
-    return *Memory::GetAddress<bool*>(0x5178D2, 0x520B62);
+    return simulation_get_globals()->engine_paused;
+}
+
+void simulation_reset()
+{
+    s_simulation_globals* sim_globals = simulation_get_globals();
+    if (sim_globals->simulation_invalidate)
+    {
+        sim_globals->simulation_invalidate = false;
+    }
+    else
+    {
+        sim_globals->simulation_reset = true;
+    }
 }
 
 bool simulation_in_progress()
