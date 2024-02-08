@@ -291,6 +291,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
     <ClCompile Include="Blam\Engine\memory\lruv_cache.cpp" />
     <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -825,6 +826,8 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
     <ClInclude Include="Blam\Engine\memory\lruv_cache.h" />
     <ClInclude Include="Blam\Engine\math\real_quantization.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -582,6 +582,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
@@ -926,6 +927,7 @@
     <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_event_handler.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
@@ -933,6 +935,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_queue.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_entities.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_type_collection.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />

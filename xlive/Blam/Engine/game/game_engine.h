@@ -169,3 +169,5 @@ s_game_engine_globals* game_engine_globals_get(void);
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
 
 bool __cdecl game_engine_variant_cleanup(uint16* flags);
+
+void __cdecl game_engine_player_activated(datum player_index);

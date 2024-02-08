@@ -8,6 +8,7 @@
 #include "simulation/machine_id.h"
 
 #define k_maximum_players 16
+#define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
 
 enum e_player_color : byte
 {
@@ -253,6 +254,8 @@ s_players_globals* get_players_globals();
 
 datum __cdecl player_index_from_user_index(int32 user_index);
 bool __cdecl players_user_is_active(int32 user_index);
+
+datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index);
 
 // gets required bits for player_appearance
 uint32 player_appearance_required_bits(void);

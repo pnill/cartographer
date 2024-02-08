@@ -71,10 +71,10 @@ c_simulation_type_collection* simulation_get_type_collection()
     return c_simulation_type_collection::get();
 }
 
-typedef void(__cdecl* t_simulation_update_before_game)(s_simulation_update* sim_data);
+typedef void(__cdecl* t_simulation_update_before_game)(simulation_update* sim_data);
 t_simulation_update_before_game p_simulation_update_before_game;
 
-void __cdecl simulation_update_before_game_hook(s_simulation_update* sim_data)
+void __cdecl simulation_update_before_game_hook(simulation_update* sim_data)
 {
     if (sim_data->simulation_in_progress)
     {
@@ -118,6 +118,11 @@ void simulation_destroy_update()
         // remove everything from the queue
 		// simulation_get_world()->destroy_update();
     }
+}
+
+bool __cdecl simulation_get_machine_active_in_game(s_machine_identifier* machine_identifier)
+{
+    return INVOKE(0x1AE0CB, 0x1A8482, simulation_get_machine_active_in_game, machine_identifier);
 }
 
 void simulation_apply_patches()

@@ -15,3 +15,9 @@ bool __cdecl game_engine_variant_cleanup(uint16* flags)
 {
 	return INVOKE(0x5B720, 0x3D380, game_engine_variant_cleanup, flags);
 }
+
+void __cdecl game_engine_player_activated(datum player_index)
+{
+	INVOKE(0x6A29E, 0x69CB6, game_engine_player_activated, player_index);
+	return;
+}

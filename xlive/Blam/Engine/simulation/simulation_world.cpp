@@ -3,6 +3,7 @@
 
 #include "simulation_queue_entities.h"
 #include "simulation_queue_events.h"
+#include "simulation_queue_global_events.h"
 
 #include "game/game.h"
 #include "shell/shell_windows.h"
@@ -143,6 +144,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 			case _simulation_queue_element_type_game_global_event:
 				break;
 			case _simulation_queue_element_type_player_event:
+				simulation_queue_player_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_update_event:
 				break;

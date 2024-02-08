@@ -4,7 +4,7 @@
 #include "Blam/Engine/game/aim_assist.h"
 
 
-struct s_unit_control_data
+struct unit_control_data
 {
 	string_id animation_state;
 	uint16 aiming_speed;
@@ -27,4 +27,4 @@ struct s_unit_control_data
 	s_aim_assist_targeting_result target_info;
 
 };
-CHECK_STRUCT_SIZE(s_unit_control_data, 0x80);
+CHECK_STRUCT_SIZE(unit_control_data, 0x80);
