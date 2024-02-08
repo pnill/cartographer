@@ -226,7 +226,7 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 
 		for (int32 i = 0; i < sim_apply_data.reference_count; i++)
 		{
-			if (!DATUM_IS_NONE(sim_apply_data.object_refereces[i]))
+			if (simulation_object_index_valid(sim_apply_data.object_refereces[i]))
 			{
 				// hopefully this does the job
 				// TODO FIXME this crashed the game once

@@ -72,8 +72,8 @@ void cloth_apply_patches(void)
 	DETOUR_ATTACH(p_cloth_frame_advance, Memory::GetAddress<t_cloth_frame_advance>(0x18F6D0), cloth_frame_advance);
 
 	// replace functions with interpolated equivalents
-	PatchCall(Memory::GetAddress(0x18E19C, 0x0), object_get_markers_by_string_id);
-	PatchCall(Memory::GetAddress(0x18E4DD, 0x0), object_get_markers_by_string_id);
+	//PatchCall(Memory::GetAddress(0x18E19C, 0x0), object_get_markers_by_string_id);
+	//PatchCall(Memory::GetAddress(0x18E4DD, 0x0), object_get_markers_by_string_id);
 
 	return;
 }

@@ -81,6 +81,10 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
         if (creation_data_size > 0)
         {
             creation_data = network_heap_allocate_block(creation_data_size);
+            if (!creation_data)
+            {
+                result = 2;
+            }
         }
 
         // Allocate state data
@@ -91,7 +95,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 
         // Allocate queue data
         uint8* queue_element = (uint8*)network_heap_allocate_block(sizeof(s_simulation_queue_element*));
-        result = (!creation_data || !queue_element || !state_data /*|| !gamestate_index*/ ? 2 : result);
+        result = (!queue_element || !state_data /*|| !gamestate_index*/ ? 2 : result);
 
         // check if creation size is > 0 and if network heap block have been successfully allocated
         if ((!creation_data_size || creation_data != NULL) && (state_data && queue_element /* && gamestate_index*/))
