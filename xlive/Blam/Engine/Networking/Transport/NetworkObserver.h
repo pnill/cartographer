@@ -3,7 +3,7 @@
 // Network Observer
 //	- manages network bandwidth based on network conditions
 
-#include "../NetworkCommon.h"
+#include "transport.h"
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled
@@ -24,7 +24,7 @@
 #define k_network_preferences_size 108
 
 // default: 1048576
-#define k_network_heap_size 10485760 
+#define k_network_heap_size 10485760
 
 // defaults
 #define k_online_netcode_client_rate_real 60.0f

@@ -282,6 +282,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
@@ -541,7 +542,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
@@ -813,6 +813,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_entities.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />

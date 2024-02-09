@@ -2,7 +2,7 @@
 
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/input/controllers.h"
-#include "Blam/Engine/Networking/NetworkCommon.h"
+#include "Blam/Engine/Networking/Transport/transport.h"
 #include "Blam/Engine/Networking/Transport/NetworkChannel.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 #include "Blam/Engine/saved_games/game_variant.h"
@@ -80,7 +80,9 @@ enum e_network_session_state : int
 	_network_session_state_host_handoff,
 	_network_session_state_host_reestablish,
 	_network_session_state_election,
-	_network_session_state_dead
+	_network_session_state_dead,
+
+	k_network_session_state_count
 };
 
 enum e_map_status : int
@@ -90,7 +92,9 @@ enum e_map_status : int
 	_network_session_map_status_precaching,
 	_network_session_map_status_precached,
 	_network_session_map_status_loaded,
-	_network_session_map_status_downloading
+	_network_session_map_status_downloading,
+
+	k_network_session_map_status_count
 };
 
 #pragma pack(push, 1)
