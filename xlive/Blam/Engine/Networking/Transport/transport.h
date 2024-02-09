@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 struct network_address
 {
 	union
@@ -13,3 +11,5 @@ struct network_address
 	short address_type;
 };
 CHECK_STRUCT_SIZE(network_address, 20);
+
+void network_transport_apply_patches();

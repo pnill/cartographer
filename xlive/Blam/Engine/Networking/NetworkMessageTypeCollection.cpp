@@ -142,8 +142,8 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
 		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on handle_channel_message_hook request-map-filename from XUID: {}",
 			received_data->player_id);
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
-			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+			&& peer_network_channel->get_network_address(&addr))
 		{
 			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
 
@@ -182,7 +182,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _custom_map_filename:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			if (received_data->map_download_id != NONE)
@@ -211,7 +211,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _team_change:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}",
@@ -223,7 +223,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _rank_change:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			s_rank_change* recieved_data = (s_rank_change*)packet;
 			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}",
@@ -235,7 +235,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _anti_cheat:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
 			H2Config_anti_cheat_enabled = recieved_data->enabled;
@@ -245,7 +245,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _custom_variant_settings:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5)
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			auto recieved_data = (CustomVariantSettings::s_variant_settings*)packet;
 			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
@@ -256,8 +256,8 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 	// default packet
 	case _leave_session:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
-			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+			&& peer_network_channel->get_network_address(&addr))
 		{
 			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_before, peer_index, EventHandler::NetworkPlayerEventType::remove);
@@ -269,7 +269,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		break;
 	} // switch (message_type)
 
-	if (peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
+	if (peer_network_channel->get_network_address(&addr))
 	{
 		LOG_TRACE_NETWORK("{} - Received message: {} from peer index: {}, address: {:x}",
 			__FUNCTION__, GetNetworkMessageName(message_type), NetworkSession::GetPeerIndexFromNetworkAddress(&addr), ntohl(addr.address.ipv4));
@@ -284,8 +284,8 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 
 	if (message_type == _player_add) {
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::unk_state_5
-			&& peer_network_channel->GetNetworkAddressFromNetworkChannel(&addr))
+		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+			&& peer_network_channel->get_network_address(&addr))
 		{
 			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);

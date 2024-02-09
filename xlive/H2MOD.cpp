@@ -45,6 +45,7 @@
 #include "Blam/Engine/widgets/cloth.h"
 #include "Blam/Engine/widgets/liquid.h"
 #include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_fog.h"
+#include "Blam/Engine/Networking/Transport/transport.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -896,6 +897,7 @@ void H2MOD::ApplyHooks() {
 	observer_apply_patches();
 	bipeds_apply_patches();
 	unit_apply_patches();
+	network_transport_apply_patches();
 
 	simulation_apply_patches();
 	simulation_entity_database_apply_patches();
