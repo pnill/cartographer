@@ -30,10 +30,18 @@ s_observer* observer_get_from_user(int32 user_index)
 	return &observer_user_globals_get()[user_index];
 }
 
+void observer_apply_interpolation_patches()
+{
+	if (!Memory::IsDedicatedServer())
+	{
+		PatchCall(Memory::GetAddress(0x39D5D, 0xC0EC), observer_update);
+		PatchCall(Memory::GetAddress(0x97C93, 0xB6D47), observer_update);
+	}
+}
+
 void observer_apply_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x39D5D, 0xC0EC), observer_update);
-	PatchCall(Memory::GetAddress(0x97C93, 0xB6D47), observer_update);
+	observer_apply_interpolation_patches();
 	return;
 }
 

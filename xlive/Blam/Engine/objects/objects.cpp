@@ -1016,7 +1016,7 @@ void object_move_replace_calls(void)
 	return;
 }
 
-void objects_apply_patches(void)
+void objects_apply_interpolation_patches()
 {
 	if (!Memory::IsDedicatedServer())
 	{
@@ -1032,7 +1032,11 @@ void objects_apply_patches(void)
 		// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
 		// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
 		WriteValue<uint8>(Memory::GetAddress(0x135657, 0x124527), JMP_OP_CODE);
-
 	}
+}
+
+void objects_apply_patches(void)
+{
+	objects_apply_interpolation_patches();
 	return;
 }
