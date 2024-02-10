@@ -164,9 +164,8 @@ void simulation_apply_patches(void)
     simulation_entity_database_apply_patches();
     PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
     PatchCall(Memory::GetAddress(0x1AEA23, 0x1A8C7D), simulation_apply_before_game);
-    
-    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
-
     PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
+
+    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
     return;
 }
