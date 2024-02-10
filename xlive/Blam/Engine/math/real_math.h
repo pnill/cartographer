@@ -238,16 +238,14 @@ static BLAM_MATH_INL real_point3d* point_from_line3d(const real_point3d* point, 
 static BLAM_MATH_INL real32 normalize3d(real_vector3d* v1)
 {
 	real32 length = magnitude3d(v1);
-
-	if (fabs(length) < k_real_math_epsilon)
-	{
-		length = 0.0f;	// vector already normalized
-	}
-	else
+	if (abs(length) >= k_real_math_epsilon)
 	{
 		scale_vector3d(v1, 1.0f / length, v1);
 	}
-
+	else
+	{
+		length = 0.0f;	// vector already normalized
+	}
 	return length;
 }
 
