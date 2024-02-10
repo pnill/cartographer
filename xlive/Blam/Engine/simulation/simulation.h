@@ -3,7 +3,6 @@
 #include "simulation_type_collection.h"
 #include "simulation_watcher.h"
 #include "simulation_world.h"
-#include "unit_control.h"
 
 #include "game/player_control.h"
 
@@ -59,4 +58,4 @@ void __cdecl simulation_process_input(uint32 player_action_mask, const player_ac
 
 bool __cdecl simulation_get_machine_active_in_game(s_machine_identifier* machine_identifier);
 
-void simulation_apply_patches();
+void simulation_apply_patches(void);

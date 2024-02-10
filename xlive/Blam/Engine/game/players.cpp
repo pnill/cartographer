@@ -224,6 +224,12 @@ datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index)
     return INVOKE(0x513F3, 0x59916, player_index_from_absolute_player_index, abs_player_index);
 }
 
+void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers)
+{
+    INVOKE(0x56549, 0x5EA41, players_set_machines, new_machine_valid_mask, new_machine_identifiers);
+    return;
+}
+
 uint32 player_appearance_required_bits()
 {
 	return 39;

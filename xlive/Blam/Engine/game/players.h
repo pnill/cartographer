@@ -257,6 +257,8 @@ bool __cdecl players_user_is_active(int32 user_index);
 
 datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index);
 
+void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers);
+
 // gets required bits for player_appearance
 uint32 player_appearance_required_bits(void);
 

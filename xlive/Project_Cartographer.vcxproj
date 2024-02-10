@@ -576,9 +576,11 @@
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_events.cpp" />
@@ -940,7 +942,6 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
-    <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Engine\structures\structures.h" />

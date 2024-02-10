@@ -292,6 +292,8 @@
     <ClCompile Include="Blam\Engine\memory\lruv_cache.cpp" />
     <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -819,7 +821,6 @@
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
-    <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />

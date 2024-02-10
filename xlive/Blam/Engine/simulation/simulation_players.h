@@ -50,3 +50,5 @@ struct simulation_player_update
 	s_player_identifier swap_player_identifier;
 };
 CHECK_STRUCT_SIZE(simulation_player_update, 0xB4);
+
+bool __cdecl simulation_players_apply_update(simulation_player_update* player_update);

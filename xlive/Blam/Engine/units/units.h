@@ -65,6 +65,31 @@ struct s_unit_304
 	int8 gap_0[16];
 };
 
+struct unit_control_data
+{
+	string_id animation_state;
+	uint16 aiming_speed;
+	uint16 weapon_set_identifier;
+	uint8 field_8;
+	uint8 field_9;
+	uint16 grenade_index;
+	uint16 zoom_level;
+	char gap_E[2];
+	int64 control_flags;
+	real_vector3d throttle;
+	float trigger;
+	float secondary_trigger;
+	real_vector3d desired_facing;
+	real_vector3d desired_aiming;
+	real_vector3d desired_looking;
+	int32 field_50;
+	int32 field_54;
+	int32 field_58;
+	s_aim_assist_targeting_result target_info;
+
+};
+CHECK_STRUCT_SIZE(unit_control_data, 0x80);
+
 struct unit_datum
 {
 	object_datum object;
@@ -180,5 +205,7 @@ datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 datum player_index_from_unit_index(datum unit_index);
 
 void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point);
+
+void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 
 void unit_apply_patches(void);
