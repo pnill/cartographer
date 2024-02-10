@@ -290,6 +290,7 @@
     <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
     <ClCompile Include="Blam\Engine\memory\lruv_cache.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -823,6 +824,7 @@
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
     <ClInclude Include="Blam\Engine\memory\lruv_cache.h" />
+    <ClInclude Include="Blam\Engine\math\real_quantization.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

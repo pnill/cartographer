@@ -112,5 +112,10 @@ struct c_bitstream
 	void data_decode_vector(const char* name, real_vector3d* out_vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
 	void write_long_integer(const char *name, uint64 value, int size_in_bits);
 	uint64 read_long_integer(const char *name, int size_in_bits);
+
+	void write_unit_vector(const char* name, const real_vector3d* unit_vector);
+	void read_unit_vector(const char* name, real_vector3d* out_unit_vector);
 };
 CHECK_STRUCT_SIZE(c_bitstream, 52);
+
+void bitstream_serialization_apply_patches();

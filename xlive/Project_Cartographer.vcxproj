@@ -378,6 +378,7 @@
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
     <ClCompile Include="Blam\Engine\memory\lruv_cache.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
@@ -533,6 +534,7 @@
     <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\math\real_quantization.h" />
     <ClInclude Include="Blam\Engine\memory\lruv_cache.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />

@@ -982,6 +982,8 @@ void H2MOD::ApplyHooks() {
 		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
+		bitstream_serialization_apply_patches();
+
 
 		// Map loading patch (saves framerate)
 		// TODO move
