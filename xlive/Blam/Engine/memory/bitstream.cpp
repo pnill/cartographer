@@ -210,8 +210,8 @@ __declspec(naked) void jmp_read_unit_vector() { __asm jmp c_bitstream::read_unit
 
 void bitstream_serialization_apply_patches()
 {
-	// ### TODO needs size adjustments for each entity/event update, 
-	// 2 more bits (17 + 2) required for each unit vector
-	//WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
-	//WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
+	WriteValue(Memory::GetAddress(0xD215C, 0xCE716) + 1, (int8)19);
+	PatchCall(Memory::GetAddress(0xD216B, 0xCE725), (void*)dequantize_unit_vector);
+	WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
+	WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
 }
