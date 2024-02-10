@@ -75,8 +75,8 @@ struct alignas(8) s_network_channel
 	LARGE_INTEGER field_E0;
 	char gap[10];
 
-	static s_network_channel* get(int channelIndex);
-	bool get_network_address(network_address* out_addr);
+	static s_network_channel* get(int32 channel_index);
+	bool get_network_address(network_address* address_out);
 
 	bool has_simulation_interface() { return simulation_interface != NULL; }
 	bool is_simulation_authority() { return has_simulation_interface() && *(bool*)((uint8*)simulation_interface + 48); }

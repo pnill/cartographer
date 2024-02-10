@@ -181,10 +181,10 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
 void __cdecl shell_initialize(void)
 {
     game_state_shell_initialize();
-    s_main_game_globals* p_game_globals = (s_main_game_globals*)game_state_malloc("game globals", NULL, sizeof(s_main_game_globals));
-    csmemset(p_game_globals, 0, sizeof(s_main_game_globals));
-    p_game_globals->active_structure_bsp_index = NONE;
-    *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = p_game_globals;    // Write allocated globals back to the original exe
+    s_main_game_globals* main_game_globals = (s_main_game_globals*)game_state_malloc("game globals", NULL, sizeof(s_main_game_globals));
+    csmemset(main_game_globals, 0, sizeof(s_main_game_globals));
+    main_game_globals->active_structure_bsp_index = NONE;
+    *Memory::GetAddress<s_main_game_globals**>(0x482D3C, 0x4CB520) = main_game_globals;    // Write allocated globals back to the original exe
 
     real_math_reset_precision();
 
@@ -308,8 +308,11 @@ void game_apply_pre_winmain_patches(void)
     PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), shell_initialize);
     
     // Get original game_frame function
-    p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
+    if (!Memory::IsDedicatedServer())
+    {
+        p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
 
-    PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
+        PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
+    }
     return;
 }
