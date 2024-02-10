@@ -58,7 +58,7 @@ void __cdecl network_heap_free_block(uint8* block)
 	}
 
 	return p_network_heap_free_block(block);
-	// return INVOKE(0x1AC94A, 0x1D9B6E, network_heap_free_block, block);
+	// return INVOKE(0x1AC94A, 0x1ACB18, network_heap_free_block, block);
 }
 
 void c_network_heap::dispose()
@@ -74,7 +74,7 @@ void network_memory_apply_patches(void)
 {
 	// hook the heap allocator globally, to get a picture of the network heap usage
 	DETOUR_ATTACH(p_network_heap_allocate_block, Memory::GetAddress<t_network_heap_allocate_block>(0x1AC939, 0x1ACB07), network_heap_allocate_block);
-	DETOUR_ATTACH(p_network_heap_free_block, Memory::GetAddress<t_network_heap_free_block>(0x1AC94A, 0x1D9B6E), network_heap_free_block);
+	DETOUR_ATTACH(p_network_heap_free_block, Memory::GetAddress<t_network_heap_free_block>(0x1AC94A, 0x1ACB18), network_heap_free_block);
 	PatchCall(Memory::GetAddress(0x1AD292, 0x1AD460), jmp_c_network_heap__discard);
 	return;
 }

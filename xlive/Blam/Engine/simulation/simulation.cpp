@@ -4,6 +4,7 @@
 #include "game/game.h"
 #include "objects/objects.h"
 #include "simulation_watcher.h"
+#include "simulation_entity_database.h"
 
 s_simulation_globals* simulation_get_globals()
 {
@@ -126,6 +127,8 @@ void simulation_apply_patches()
 
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
+    simulation_entity_database_apply_patches();
+
     DETOUR_ATTACH(p_simulation_update_before_game, Memory::GetAddress<t_simulation_update_before_game>(0x1AE902, 0x1A8B5C), simulation_update_before_game_hook);
     DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
 }
