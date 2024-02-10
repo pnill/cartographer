@@ -85,12 +85,6 @@ void c_bitstream::write_integer(const char* name, unsigned int value, unsigned i
 	INVOKE_TYPE(0xD17C6, 0xCDD80, write_integer_t, this, name, value, size_in_bits);
 }
 
-void c_bitstream::write_value_internal(int32 value, int32 size_in_bits)
-{
-	typedef void(__thiscall* write_value_internal_t)(c_bitstream*, unsigned int, int);
-	INVOKE_TYPE(0xD17C6, 0xCDD80, write_value_internal_t, this, value, size_in_bits);
-}
-
 int32 c_bitstream::read_integer(const char* name, uint32 size_in_bits)
 {
 	typedef int32(__thiscall* read_integer_t)(c_bitstream*, const char*, uint32);
@@ -217,7 +211,7 @@ __declspec(naked) void jmp_read_unit_vector() { __asm jmp c_bitstream::read_unit
 void bitstream_serialization_apply_patches()
 {
 	// ### TODO needs size adjustments for each entity/event update, 
-	// 2 more bits (17 + 2) required for each vector update
+	// 2 more bits (17 + 2) required for each unit vector
 	//WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
 	//WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
 }
