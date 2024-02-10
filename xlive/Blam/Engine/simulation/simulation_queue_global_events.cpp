@@ -51,7 +51,7 @@ void simulation_queue_player_event_apply(const s_simulation_queue_element* eleme
 
         datum player_index = player_index_from_absolute_player_index(abs_player_index);
         s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
-        if (TEST_BIT(player->flags, 0))
+        if (TEST_BIT(player->flags, 0) != active)
         {
             if (active)
             {

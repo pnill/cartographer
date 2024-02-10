@@ -401,7 +401,7 @@ void __cdecl players_update_activation(void)
                     machine_active_in_game = true;
                 }
 
-                if (!TEST_BIT(player->flags, 0) != machine_active_in_game)
+                if (TEST_BIT(player->flags, 0) != machine_active_in_game)
                 {
                     datum player_index = player_it.get_current_datum_index();
                     if (insert_event)
