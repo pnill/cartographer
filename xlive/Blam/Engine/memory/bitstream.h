@@ -94,6 +94,7 @@ struct c_bitstream
 	void write_string_wchar(const char* name, const void* string, int size_in_words);
 	void read_string_wchar(const char* name, void* string, int size_in_words);
 	void write_integer(const char* name, unsigned int value, unsigned int size_in_bits);
+	void write_value_internal(int32 value, int32 size_in_bits);
 	int32 read_integer(const char* name, uint32 size_in_bits);
 	void write_raw_data(const char* name, void* data, unsigned int size_in_bits);
 	void read_raw_data(const char* name, void* data, int size_in_bits);
@@ -112,5 +113,10 @@ struct c_bitstream
 	void data_decode_vector(const char* name, real_vector3d* out_vector, float min_magnitude_value, float max_magnitude_value, int magnitude_size_in_bits);
 	void write_long_integer(const char *name, uint64 value, int size_in_bits);
 	uint64 read_long_integer(const char *name, int size_in_bits);
+
+	void write_unit_vector(const char* name, const real_vector3d* unit_vector);
+	void read_unit_vector(const char* name, real_vector3d* out_unit_vector);
 };
 CHECK_STRUCT_SIZE(c_bitstream, 52);
+
+void bitstream_serialization_apply_patches();

@@ -2,6 +2,8 @@
 
 #include "bitstream.h"
 
+#include "Blam/Engine/math/real_quantization.h"
+
 void c_bitstream::set_data(uint8* stream_buf, int32 stream_buf_size)
 {
 	m_stream_buf = stream_buf;
@@ -81,6 +83,12 @@ void c_bitstream::write_integer(const char* name, unsigned int value, unsigned i
 {
 	typedef void(__thiscall* write_integer_t)(c_bitstream*, const char*, unsigned int, int);
 	INVOKE_TYPE(0xD17C6, 0xCDD80, write_integer_t, this, name, value, size_in_bits);
+}
+
+void c_bitstream::write_value_internal(int32 value, int32 size_in_bits)
+{
+	typedef void(__thiscall* write_value_internal_t)(c_bitstream*, unsigned int, int);
+	INVOKE_TYPE(0xD17C6, 0xCDD80, write_value_internal_t, this, value, size_in_bits);
 }
 
 int32 c_bitstream::read_integer(const char* name, uint32 size_in_bits)
@@ -189,4 +197,27 @@ uint64 c_bitstream::read_long_integer(const char* name, int size_in_bits)
 {
 	typedef uint64(__thiscall* read_long_integer_t)(c_bitstream*, const char*, int);
 	return INVOKE_TYPE(0xD1E9A, 0xCE454, read_long_integer_t, this, name, size_in_bits);
+}
+
+void c_bitstream::write_unit_vector(const char* name, const real_vector3d* unit_vector)
+{
+	int32 quantized_vector = quantize_unit_vector(unit_vector);
+	write_integer("unit-vector", quantized_vector, 19);
+}
+
+void c_bitstream::read_unit_vector(const char* name, real_vector3d* out_unit_vector)
+{
+	int32 quantized_vector = read_integer("unit-vector", 19);
+	dequantize_unit_vector(quantized_vector, out_unit_vector);
+}
+
+__declspec(naked) void jmp_write_unit_vector() { __asm jmp c_bitstream::write_unit_vector }
+__declspec(naked) void jmp_read_unit_vector() { __asm jmp c_bitstream::read_unit_vector }
+
+void bitstream_serialization_apply_patches()
+{
+	// ### TODO needs size adjustments for each entity/event update, 
+	// 2 more bits (17 + 2) required for each vector update
+	//WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
+	//WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
 }
