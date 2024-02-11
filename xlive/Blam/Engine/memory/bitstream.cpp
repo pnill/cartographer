@@ -214,4 +214,15 @@ void bitstream_serialization_apply_patches()
 	PatchCall(Memory::GetAddress(0xD216B, 0xCE725), (void*)dequantize_unit_vector);
 	WriteJmpTo(Memory::GetAddress(0xD1BD9, 0xCE193), jmp_write_unit_vector);
 	WriteJmpTo(Memory::GetAddress(0xD20F4, 0xCE6AE), jmp_read_unit_vector);
+
+	// write_axes
+	PatchCall(Memory::GetAddress(0xD1DF7, 0xCE3B1), (void*)quantize_unit_vector);
+	WriteValue(Memory::GetAddress(0xD1E05, 0xCE3BF) + 2, (int32)(1 << 19));
+	WriteValue(Memory::GetAddress(0xD1E0D, 0xCE3C7) + 1, (int32)(1 << 19));
+	WriteValue(Memory::GetAddress(0xD1E2A, 0xCE3E4) + 1, (int8)19);
+	PatchCall(Memory::GetAddress(0xD1E3A, 0xCE3F4), (void*)dequantize_unit_vector);
+
+	// read_axes
+	WriteValue(Memory::GetAddress(0xD2243, 0xCE7FD) + 1, (int8)19);
+	PatchCall(Memory::GetAddress(0xD2252, 0xCE80C), (void*)dequantize_unit_vector);
 }
