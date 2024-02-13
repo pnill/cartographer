@@ -417,14 +417,11 @@ void __cdecl players_update_activation(void)
                     }
                     else
                     {
+                        SET_FLAG(player->flags, 0, machine_active_in_game);
+
                         if (machine_active_in_game)
                         {
-                            SET_FLAG(player->flags, 0, true);
                             game_engine_player_activated(player_index);
-                        }
-                        else
-                        {
-                            SET_FLAG(player->flags, 0, false);
                         }
                     }
                 }

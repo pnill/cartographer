@@ -84,7 +84,7 @@ class c_simulation_world
 	char gap_12A8[4];
 
 public:
-	void gamestate_flush(void);
+	void gamestate_flush(void) const;
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	void simulation_queue_free(s_simulation_queue_element* element);

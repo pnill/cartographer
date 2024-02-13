@@ -94,8 +94,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     for (int32 i = 0; i < k_maximum_players; i++)
     {
         datum control_unit_index = update->control_unit_index[i];
-        if (TEST_BIT(update->unit_control_mask, i) && 
-            object_try_and_get_and_verify_type(control_unit_index, FLAG(_object_type_biped) | FLAG(_object_type_vehicle)))
+        if (TEST_BIT(update->unit_control_mask, i) && object_try_and_get_and_verify_type(control_unit_index, FLAG(_object_type_vehicle) | FLAG(_object_type_biped)))
         {
             unit_control(control_unit_index, &update->unit_control[i]);
         }
@@ -106,6 +105,29 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
         players_set_machines(update->machine_update.machine_valid_mask, update->machine_update.identifiers);
     }
 
+    // Player activation code
+    /* Moved so we can activate in the queue
+    s_simulation_globals* globals = simulation_get_globals();
+    if (update->player_update_count > 0)
+    {
+        bool fatal_error = false;
+        for (int32 player_update_index = 0; simulation_players_apply_update(&update->player_updates[player_update_index]); player_update_index++)
+        {
+            // Get out of here if we've overflown
+            if (player_update_index >= update->player_update_count) 
+            {
+                fatal_error = true;
+                break;
+            }
+        }
+        
+        //  Set bool to true ONLY if overflown is false, don't change otherwise
+        if (!fatal_error)
+        {
+            globals->fatal_error = true;
+        }
+    }*/
+
     if (update->flush_gamestate)
     {
         simulation_get_globals()->simulation_world->gamestate_flush();
@@ -113,16 +135,30 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     return;
 }
 
-typedef void (__cdecl* t_simulation_update_pregame)();
-t_simulation_update_pregame p_simulation_update_pregame;
-
-void __cdecl simulation_update_pregame()
+void __cdecl simulation_build_update(simulation_update* update)
 {
-    p_simulation_update_pregame();
-    if (simulation_engine_initialized() && game_in_progress() && !simulation_is_paused())
+    INVOKE(0x1ADDF3, 0x1A81AA, simulation_build_update, update);
+    return;
+}
+
+void __cdecl simulation_update_aftermath(simulation_update* update)
+{
+    INVOKE(0x1ADEA9, 0x1A8260, simulation_update_aftermath, update);
+    return;
+}
+
+void __cdecl simulation_update_pregame(void)
+{
+    simulation_update update;
+    s_simulation_globals* globals = simulation_get_globals();
+
+    if (globals->engine_initialized && game_in_progress() && !simulation_is_paused())
     {
-        if (simulation_get_globals()->simulation_watcher->need_to_generate_updates())
+        if (globals->simulation_watcher->need_to_generate_updates())
         {
+            simulation_build_update(&update);
+            simulation_apply_before_game(&update);
+            simulation_update_aftermath(&update);
             simulation_destroy_update();
         }
     }
@@ -135,8 +171,9 @@ void simulation_destroy_update()
     if (simulation_in_progress())
     {
         // remove everything from the queue
-		// simulation_get_world()->destroy_update();
+        // simulation_get_world()->destroy_update();
     }
+    return;
 }
 
 bool __cdecl simulation_get_machine_active_in_game(s_machine_identifier* machine_identifier)
@@ -162,10 +199,9 @@ void simulation_apply_patches(void)
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     simulation_entity_database_apply_patches();
-    PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
-    PatchCall(Memory::GetAddress(0x1AEA23, 0x1A8C7D), simulation_apply_before_game);
-    PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
 
-    DETOUR_ATTACH(p_simulation_update_pregame, Memory::GetAddress<t_simulation_update_pregame>(0x1AE9D3, 0x1A8C2D), simulation_update_pregame);
+    PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);
+    PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
+    PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
     return;
 }

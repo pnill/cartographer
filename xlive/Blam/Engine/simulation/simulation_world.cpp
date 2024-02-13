@@ -15,7 +15,7 @@
 c_simulation_queue g_simulation_queues[k_simulation_queue_count];
 
 
-void c_simulation_world::gamestate_flush(void)
+void c_simulation_world::gamestate_flush(void) const
 {
 	if (m_world_type == _simulation_world_type_synchronous_client
 		|| m_world_type == _simulation_world_type_distributed_client)

@@ -33,7 +33,7 @@ CHECK_STRUCT_SIZE(simulation_update, 0x3BD8);
 struct s_simulation_globals
 {
 	bool engine_initialized;
-	bool field_1;
+	bool fatal_error;
 	bool engine_paused;
 	int32 field_4;
 	bool simulation_invalidate;
@@ -50,7 +50,7 @@ c_simulation_world* simulation_get_world();
 
 void simulation_reset();
 bool simulation_in_progress();
-void simulation_destroy_update();
+void simulation_destroy_update(void);
 bool simulation_query_object_is_predicted(datum object_datum);
 c_simulation_type_collection* simulation_get_type_collection();
 
