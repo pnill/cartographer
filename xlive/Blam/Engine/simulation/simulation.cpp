@@ -29,6 +29,14 @@ bool simulation_is_paused()
     return simulation_get_globals()->engine_paused;
 }
 
+void simulation_reset_immediate()
+{
+    s_simulation_globals* sim_globals = simulation_get_globals();
+    sim_globals->simulation_reset = true;
+
+
+}
+
 void simulation_reset()
 {
     s_simulation_globals* sim_globals = simulation_get_globals();
@@ -38,7 +46,7 @@ void simulation_reset()
     }
     else
     {
-        sim_globals->simulation_reset = true;
+        simulation_reset_immediate();
     }
 }
 
