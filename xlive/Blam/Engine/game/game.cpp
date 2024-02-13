@@ -226,10 +226,7 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
         while (!main_events_pending())
         {
             halo_interpolator_update_begin();
-            
             game_tick();
-            simulation_destroy_update();        // Discard simulation update
-            
             halo_interpolator_update_end();
             if (cinematic_sound_sync_complete())
             {

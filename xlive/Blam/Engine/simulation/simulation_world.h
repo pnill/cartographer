@@ -7,8 +7,8 @@
 
 enum e_simulation_queue_type
 {
-	_simulation_queue_high_priority,
-	_simulation_queue_basic,
+	_simulation_queue_bookkeeping,
+	_simulation_queue,
 
 	k_simulation_queue_count
 };
@@ -93,8 +93,8 @@ public:
 	void queues_initialize();
 
 	void apply_simulation_queue(const c_simulation_queue* queue);
-	void apply_basic_queue();
-	void apply_high_priority_queue();
+	void simulation_apply_bookkeeping_queue();
+	void simulation_apply_queued_elements();
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 
@@ -139,7 +139,7 @@ public:
 
 		if (exists())
 		{
-			result = m_world_type != _simulation_world_type_distributed_authority;
+			result = m_world_type != _simulation_world_type_synchronous_client;
 		}
 
 		return result;
@@ -155,6 +155,11 @@ public:
 		}
 
 		return result;
+	}
+
+	bool simulation_queues_empty()
+	{
+		return queue_get(_simulation_queue_bookkeeping)->queued_count() == 0 && queue_get(_simulation_queue)->queued_count() == 0;
 	}
 };
 CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);

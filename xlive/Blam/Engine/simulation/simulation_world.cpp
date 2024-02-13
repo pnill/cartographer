@@ -38,7 +38,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		queue_get(_simulation_queue_basic)->allocate(size, out_allocated_elem);
+		queue_get(_simulation_queue_bookkeeping)->allocate(size, out_allocated_elem);
 	}
 	else
 	{
@@ -57,7 +57,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 		if (!sim_entity_queue_full)
-			queue_get(_simulation_queue_high_priority)->allocate(size, out_allocated_elem);
+			queue_get(_simulation_queue)->allocate(size, out_allocated_elem);
 	}
 
 	if (*out_allocated_elem)
@@ -71,11 +71,11 @@ void c_simulation_world::simulation_queue_free(s_simulation_queue_element* eleme
 	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		queue_get(_simulation_queue_basic)->deallocate(element);
+		queue_get(_simulation_queue_bookkeeping)->deallocate(element);
 	}
 	else
 	{
-		queue_get(_simulation_queue_high_priority)->deallocate(element);
+		queue_get(_simulation_queue)->deallocate(element);
 	}
 }
 
@@ -84,44 +84,44 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
 	{
 		// player event, player update, gamestate clear
-		queue_get(_simulation_queue_basic)->enqueue(element);
+		queue_get(_simulation_queue_bookkeeping)->enqueue(element);
 
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_simulation_queues[_simulation_queue_basic],
-			g_simulation_queues[_simulation_queue_basic].allocated_count(),
-			g_simulation_queues[_simulation_queue_basic].allocated_size_in_bytes());
+			&g_simulation_queues[_simulation_queue_bookkeeping],
+			g_simulation_queues[_simulation_queue_bookkeeping].allocated_count(),
+			g_simulation_queues[_simulation_queue_bookkeeping].allocated_size_in_bytes());
 
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
-			&g_simulation_queues[_simulation_queue_basic],
-			g_simulation_queues[_simulation_queue_basic].queued_count(),
-			g_simulation_queues[_simulation_queue_basic].queued_size());
+			&g_simulation_queues[_simulation_queue_bookkeeping],
+			g_simulation_queues[_simulation_queue_bookkeeping].queued_count(),
+			g_simulation_queues[_simulation_queue_bookkeeping].queued_size());
 	}
 	else
 	{
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
 
-		queue_get(_simulation_queue_high_priority)->enqueue(element);
+		queue_get(_simulation_queue)->enqueue(element);
 
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X allocated count: %d, size: %d",
-			&g_simulation_queues[_simulation_queue_high_priority],
-			g_simulation_queues[_simulation_queue_high_priority].allocated_count(),
-			g_simulation_queues[_simulation_queue_high_priority].allocated_size_in_bytes());
+			&g_simulation_queues[_simulation_queue],
+			g_simulation_queues[_simulation_queue].allocated_count(),
+			g_simulation_queues[_simulation_queue].allocated_size_in_bytes());
 
 		SIM_EVENT_QUEUE_DBG("queue 0x%08X queued count: %d, size: %d", 
-			&g_simulation_queues[_simulation_queue_high_priority], 
-			g_simulation_queues[_simulation_queue_high_priority].queued_count(), 
-			g_simulation_queues[_simulation_queue_high_priority].queued_size());
+			&g_simulation_queues[_simulation_queue], 
+			g_simulation_queues[_simulation_queue].queued_count(), 
+			g_simulation_queues[_simulation_queue].queued_size());
 	}
 }
 
-void c_simulation_world::apply_high_priority_queue()
+void c_simulation_world::simulation_apply_queued_elements()
 {
-	apply_simulation_queue(queue_get(_simulation_queue_high_priority));
+	apply_simulation_queue(queue_get(_simulation_queue));
 }
 
-void c_simulation_world::apply_basic_queue()
+void c_simulation_world::simulation_apply_bookkeeping_queue()
 {
-	apply_simulation_queue(queue_get(_simulation_queue_basic));
+	apply_simulation_queue(queue_get(_simulation_queue_bookkeeping));
 }
 
 void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
@@ -159,7 +159,8 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_player_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_update_event:
-				simulation_queue_player_update_apply(element);
+				if (!simulation_get_globals()->fatal_error)
+					simulation_queue_player_update_apply(element);
 				break;
 			case _simulation_queue_element_type_gamestates_clear:
 				break;
@@ -206,10 +207,7 @@ void c_simulation_world::reset()
 
 	if (!is_playback())
 	{
-		// ### FIXME apparently H2v doesn't like discarding updates from the received buffer
-		// because it doesn't currently have a solid or a reliable system to determine if we're out of sync or not
-		// to let the host know we missed some updates
-		//destroy_update();
+		destroy_update();
 	}
 }
 
