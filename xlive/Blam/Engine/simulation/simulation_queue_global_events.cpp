@@ -42,7 +42,7 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 
 void simulation_queue_player_event_apply(const s_simulation_queue_element* element)
 {
-    c_bitstream stream(element->data, element->data_size);
+	c_bitstream stream(element->data, element->data_size);
 	stream.begin_reading();
 
 	uint16 abs_player_index = stream.read_integer("player-index", k_player_index_bit_count);
@@ -96,7 +96,7 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
 void simulation_queue_player_update_apply(const s_simulation_queue_element* element)
 {
     simulation_player_update update;
-    memset(&update, 0, sizeof(simulation_player_update));
+    csmemset(&update, 0, sizeof(simulation_player_update));
 
     c_bitstream stream(element->data, element->data_size);
     stream.begin_reading();
@@ -108,7 +108,7 @@ void simulation_queue_player_update_apply(const s_simulation_queue_element* elem
     }
     else if (!simulation_players_apply_update(&update))
     {
-       // ASSERT HERE
+        simulation_get_globals()->fatal_error = true;
     }
 
     stream.finish_reading();

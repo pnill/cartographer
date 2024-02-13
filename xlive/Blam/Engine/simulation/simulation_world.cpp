@@ -159,7 +159,8 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_player_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_update_event:
-				simulation_queue_player_update_apply(element);
+				if (!simulation_get_globals()->fatal_error)
+					simulation_queue_player_update_apply(element);
 				break;
 			case _simulation_queue_element_type_gamestates_clear:
 				break;
