@@ -89,7 +89,11 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     {
         players_set_machines(update->machine_update.machine_valid_mask, update->machine_update.identifiers);
     }
-    simulation_get_world()->apply_basic_queue();
+
+    if (simulation_get_world()->runs_simulation())
+    {
+		simulation_get_world()->apply_basic_queue();
+    }
 
     // Player activation code
     /* Moved so we can activate in the queue
@@ -118,16 +122,19 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     // ### FIXME 
     // IMPLEMENT simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application();
 
-    if (update->simulation_in_progress
-        /*|| simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application()*/
-        || simulation_get_world()->queue_get(_simulation_queue_high_priority)->queued_count() > 0)
+    if (simulation_get_world()->runs_simulation())
     {
-        simulation_get_world()->apply_high_priority_queue();
+        if (update->simulation_in_progress
+            /*|| simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application()*/
+            || simulation_get_world()->queue_get(_simulation_queue_high_priority)->queued_count() > 0)
+        {
+            simulation_get_world()->apply_high_priority_queue();
 
-        // purge any deletion pending object during this update
-        // if simulation is not in progress
-        if (!update->simulation_in_progress)
-            objects_purge_deleted_objects();
+            // purge any deletion pending object during this update
+            // if simulation is not in progress
+            if (!update->simulation_in_progress)
+                objects_purge_deleted_objects();
+        }
     }
 
     if (update->flush_gamestate)
@@ -136,7 +143,10 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     }
 
 	// destroy the update exactly after we applied the queues to the gamestate
-    simulation_destroy_update();
+    if (simulation_get_world()->runs_simulation())
+    {
+		simulation_destroy_update();
+    }
 
     return;
 }

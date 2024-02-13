@@ -139,7 +139,7 @@ public:
 
 		if (exists())
 		{
-			result = m_world_type != _simulation_world_type_distributed_authority;
+			result = m_world_type != _simulation_world_type_synchronous_client;
 		}
 
 		return result;
