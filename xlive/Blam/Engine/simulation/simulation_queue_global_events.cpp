@@ -5,6 +5,7 @@
 #include "simulation_encoding.h"
 #include "game_interface/simulation_game_action.h"
 
+#include "main/main.h"
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "memory/bitstream.h"
@@ -38,7 +39,7 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
     return;
 }
 
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element)
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, simulation_update* update)
 {
     c_bitstream stream(element->data, element->data_size);
     stream.begin_reading();
@@ -58,10 +59,13 @@ void simulation_queue_game_global_event_apply(const s_simulation_queue_element* 
         case _simulation_queue_game_global_event_main_revert_map:
             break;
         case _simulation_queue_game_global_event_main_reset_map:
+            main_game_reset_map();
+            update->flush_gamestate = true;
             break;
         case _simulation_queue_game_global_event_main_save_and_exit_campaign:
             break;
         case _simulation_queue_game_global_event_notify_reset_complete:
+            simulation_notify_reset_complete();
             break;
         default:
             break;

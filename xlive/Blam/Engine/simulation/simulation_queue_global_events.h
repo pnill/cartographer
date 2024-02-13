@@ -35,4 +35,4 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
 void simulation_queue_player_update_apply(const s_simulation_queue_element* element);
 
 void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_type global_event_type);
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element);
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, struct simulation_update* update);

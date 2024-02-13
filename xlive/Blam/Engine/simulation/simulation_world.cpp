@@ -114,17 +114,17 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	}
 }
 
-void c_simulation_world::simulation_apply_queued_elements()
+void c_simulation_world::simulation_apply_queued_elements(simulation_update* update)
 {
-	apply_simulation_queue(queue_get(_simulation_queue));
+	apply_simulation_queue(queue_get(_simulation_queue), update);
 }
 
-void c_simulation_world::simulation_apply_bookkeeping_queue()
+void c_simulation_world::simulation_apply_bookkeeping_queue(simulation_update* update)
 {
-	apply_simulation_queue(queue_get(_simulation_queue_bookkeeping));
+	apply_simulation_queue(queue_get(_simulation_queue_bookkeeping), update);
 }
 
-void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
+void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue, simulation_update* update)
 {
 	if (queue->queued_count() > 0)
 	{
@@ -154,7 +154,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_entity_promotion_apply(element);
 				break;
 			case _simulation_queue_element_type_game_global_event:
-				simulation_queue_game_global_event_apply(element);
+				simulation_queue_game_global_event_apply(element, update);
 				break;
 			case _simulation_queue_element_type_player_event:
 				simulation_queue_player_event_apply(element);
@@ -230,6 +230,18 @@ void c_simulation_world::destroy_world()
 
 void __declspec(naked) jmp_destroy_world() { __asm{ jmp c_simulation_world::destroy_world } }
 
+void c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress(bool a1)
+{
+	if (!simulation_reset_in_progress())
+	{
+		send_player_acknowledgments(a1);
+	}
+}
+
+void __declspec(naked) jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress() { 
+	__asm { jmp c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress } 
+}
+
 void c_simulation_world::queues_initialize()
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
@@ -251,5 +263,7 @@ void simulation_world_apply_patches()
 	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x1C500E), jmp_initialize_world);
 	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x1C5569), jmp_destroy_world);
 	DETOUR_ATTACH(p_c_simulation_world__reset, Memory::GetAddress<t_c_simulation_world__reset>(0x1DD0EA, 0x1C459E), jmp_reset_world);
+	// ### TODO server offset
+	PatchCall(Memory::GetAddress(0x1DD9FB, 0x0), jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress);
 	return;
 }

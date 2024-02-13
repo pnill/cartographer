@@ -92,9 +92,9 @@ public:
 
 	void queues_initialize();
 
-	void apply_simulation_queue(const c_simulation_queue* queue);
-	void simulation_apply_bookkeeping_queue();
-	void simulation_apply_queued_elements();
+	void apply_simulation_queue(const c_simulation_queue* queue, struct simulation_update* update);
+	void simulation_apply_bookkeeping_queue(struct simulation_update* update);
+	void simulation_apply_queued_elements(struct simulation_update* update);
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 
@@ -145,6 +145,18 @@ public:
 		return result;
 	}
 
+	bool is_authority() const
+	{
+		bool result = false;
+		if (exists())
+		{
+			result = m_world_type == _simulation_world_type_distributed_authority
+				|| m_world_type == _simulation_world_type_synchronous_authority;
+		}
+
+		return result;
+	}
+
 	bool is_active() const
 	{
 		bool result = false;
@@ -160,6 +172,14 @@ public:
 	bool simulation_queues_empty()
 	{
 		return queue_get(_simulation_queue_bookkeeping)->queued_count() == 0 && queue_get(_simulation_queue)->queued_count() == 0;
+	}
+
+	void send_player_acknowledgements_not_during_simulation_reset_in_progress(bool a1);
+
+	void send_player_acknowledgments(bool a1)
+	{
+		// ### TODO server offset
+		INVOKE_TYPE(0x1DD777, 0x0, void(__thiscall*)(c_simulation_world*, bool), this, a1);
 	}
 };
 CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
