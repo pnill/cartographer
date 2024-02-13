@@ -211,8 +211,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const utf8* path, s_
 	{
 		if (!file_open(&cache_file, _permission_write_bit, &open_file_error_code))
 		{
-			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}",
-				__FUNCTION__, open_file_error_code);
+			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}", __FUNCTION__, (uint32)open_file_error_code);
 
 			break;
 		}
@@ -249,8 +248,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const utf8* path, s_
 	}
 	else if (!create_file_success && open_file_error_code == _file_open_error_not_found)
 	{
-		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!"
-			__FUNCTION__);
+		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!", __FUNCTION__);
 	}
 
 	return success;

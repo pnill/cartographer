@@ -25,7 +25,7 @@ struct s_creature_group_definition :TagGroup<'crea'>
 	e_flags flags;//0xBC
 	enum class e_default_team : __int16
 	{
-		default = 0,
+		_default = 0,
 		player = 1,
 		human = 2,
 		covenant = 3,

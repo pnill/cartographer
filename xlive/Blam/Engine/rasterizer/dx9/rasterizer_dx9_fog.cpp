@@ -1,14 +1,11 @@
 #include "stdafx.h"
-
 #include "rasterizer_dx9_fog.h"
 
-
-
 real32 g_rasterizer_fog_dt = 0.0f;
+static real32 fog_wind_x_axis_velocity_factor1 = 30.0f;
 
 void __declspec(naked) rasterizer_fog_constant_velocity_update()
 {
-	static real32 fog_wind_x_axis_velocity_factor1 = 30.0f;
 #define k_delta_time_stack_location (-10h)
 	__asm
 	{
