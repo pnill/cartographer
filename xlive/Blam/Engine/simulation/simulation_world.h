@@ -1,9 +1,9 @@
 #pragma once
 
-#include "simulation/simulation_view.h"
-#include "simulation/simulation_actors.h"
-#include "simulation/simulation_players.h"
-#include "simulation_queue_events.h"
+#include "simulation_view.h"
+#include "simulation_actors.h"
+#include "simulation_players.h"
+#include "simulation_queue.h"
 
 enum e_simulation_queue_type
 {

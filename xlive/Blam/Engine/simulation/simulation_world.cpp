@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "simulation_world.h"
 
-#include "simulation_queue_entities.h"
 #include "simulation_queue_events.h"
+#include "simulation_queue_entities.h"
 #include "simulation_queue_global_events.h"
 
 #include "game/game.h"

@@ -28,7 +28,7 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
         uint8 data[128];
         c_bitstream stream(data, sizeof(data));
         stream.begin_writing(1);
-        stream.write_integer("glboal-event-type", global_event_type, 3);
+        stream.write_integer("global-event-type", global_event_type, 3);
         if (!stream.error_occured())
         {
             simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, data, stream.get_space_used_in_bytes());

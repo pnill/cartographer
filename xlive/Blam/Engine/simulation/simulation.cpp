@@ -2,6 +2,7 @@
 #include "simulation.h"
 
 #include "simulation_queue_global_events.h"
+#include "simulation_event_handler.h"
 #include "simulation_watcher.h"
 
 #include "game/game.h"
@@ -27,6 +28,11 @@ bool simulation_engine_initialized()
 bool simulation_is_paused()
 {
     return simulation_get_globals()->engine_paused;
+}
+
+bool simulation_reset_in_progress()
+{
+    return simulation_get_globals()->simulation_reset_in_progress;
 }
 
 void simulation_reset_immediate()
