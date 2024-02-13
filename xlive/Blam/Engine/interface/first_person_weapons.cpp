@@ -513,7 +513,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                 }
                 else
                 {
-                    memcpy(&fp_data->adjustment_matrix, &weapon_data->nodes[adjustment_matrix_index], sizeof(fp_data->adjustment_matrix));
+                    csmemcpy(&fp_data->adjustment_matrix, &weapon_data->nodes[adjustment_matrix_index], sizeof(fp_data->adjustment_matrix));
                     fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_definition->first_person_weapon_offset.i;
                     fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_definition->first_person_weapon_offset.j;
                     fp_data->adjustment_matrix.position.z = fp_data->adjustment_matrix.position.z - weapon_definition->first_person_weapon_offset.k;

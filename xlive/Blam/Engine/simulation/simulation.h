@@ -6,20 +6,17 @@
 
 #include "game/player_control.h"
 
-struct simulation_update
+struct alignas(8) simulation_update
 {
 	int32 simulation_time;
 	bool simulation_in_progress;
-	int8 pad[3];
 	uint32 player_action_mask;
 	int32 field_C;
 	player_action player_actions[k_maximum_players];
 	uint32 unit_control_mask;
 	datum control_unit_index[k_maximum_players];
-	int32 field_654;
 	unit_control_data unit_control[k_maximum_players];
 	bool machine_update_valid;
-	int8 pad1[3];
 	simulation_machine_update machine_update;
 	int32 player_update_count;
 	simulation_player_update player_updates[k_maximum_players];
@@ -47,6 +44,7 @@ struct s_simulation_globals
 CHECK_STRUCT_SIZE(s_simulation_globals, 24);
 
 c_simulation_world* simulation_get_world();
+s_simulation_globals* simulation_globals_get();
 
 void simulation_reset();
 bool simulation_in_progress();

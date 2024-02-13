@@ -43,30 +43,28 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 void simulation_queue_player_event_apply(const s_simulation_queue_element* element)
 {
     c_bitstream stream(element->data, element->data_size);
-    stream.begin_reading();
+	stream.begin_reading();
 
-    uint16 abs_player_index = stream.read_integer("player-index", k_player_index_bit_count);
-    if (!stream.error_occured())
-    {
-        bool active = stream.read_bool("active");
+	uint16 abs_player_index = stream.read_integer("player-index", k_player_index_bit_count);
+	bool active = stream.read_bool("active");
 
-        datum player_index = player_index_from_absolute_player_index(abs_player_index);
-        s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
-        if (TEST_BIT(player->flags, 0) != active)
-        {
-            if (active)
-            {
-                SET_FLAG(player->flags, 0, true);
-                game_engine_player_activated(player_index);
-            }
-            else
-            {
-                SET_FLAG(player->flags, 0, false);
-            }
-        }
-        simulation_action_game_engine_player_update(player_index, 0x200);
-    }
-    return;
+	if (!stream.error_occured())
+	{
+		datum player_index = player_index_from_absolute_player_index(abs_player_index);
+		s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
+		if (TEST_BIT(player->flags, 0) != active)
+		{
+			SET_FLAG(player->flags, 0, active);
+			if (active)
+			{
+				game_engine_player_activated(player_index);
+			}
+		}
+		simulation_action_game_engine_player_update(player_index, 0x200);
+	}
+
+    stream.finish_reading();
+	return;
 }
 
 void simulation_queue_player_update_insert(const simulation_player_update* player_update)

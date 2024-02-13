@@ -206,10 +206,7 @@ void c_simulation_world::reset()
 
 	if (!is_playback())
 	{
-		// ### FIXME apparently H2v doesn't like discarding updates from the received buffer
-		// because it doesn't currently have a solid or a reliable system to determine if we're out of sync or not
-		// to let the host know we missed some updates
-		//destroy_update();
+		destroy_update();
 	}
 }
 
