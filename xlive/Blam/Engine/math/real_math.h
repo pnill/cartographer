@@ -45,7 +45,7 @@ CHECK_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
 union real_vector3d
 {
 	real32 v[3];
-	struct { real_vector2d vector2d; real32 k; };
+	struct { real_vector2d vector2d; };
 	struct { real32 i, j, k; };
 	struct { real32 x, y, z; };
 };
@@ -70,7 +70,7 @@ CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(real32));
 union real_quaternion
 {
 	struct { real32 i, j, k, w; };
-	struct { real_vector3d vector; real32 w; };
+	struct { real_vector3d vector; };
 	struct { real32 n[4]; } v;
 };
 CHECK_STRUCT_SIZE(real_quaternion, sizeof(real32) * 4);

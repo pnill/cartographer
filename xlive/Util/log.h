@@ -40,40 +40,40 @@ public:
 
 #define log_a(level) \
 	if (output != nullptr)                      \
-		output->##level(fmt.data(), args...);   \
+		output->level(fmt.data(), args...);		\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			("[" + sname + "] " + fmt).data()   \
 			, args...)
 
 #define log_b(level) \
 	if (output != nullptr)                      \
-		output->##level(fmt.data(), args...);   \
+		output->level(fmt.data(), args...);		\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(               \
 			(L"[" + wname + L"] " + fmt).data() \
 			, args...)
 
 #define log_c(level) \
 	if (output != nullptr)                      \
-		output->##level(msg.data());            \
+		output->level(msg.data());				\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			("[" + sname + "] " + msg).data())
 
 #define log_d(level) \
 	if (output != nullptr)                      \
-		output->##level(msg.data());            \
+		output->level(msg.data());				\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			(L"[" + wname + L"] " + msg).data())
 
 	// For the most unimportant stuff

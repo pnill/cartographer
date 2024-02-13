@@ -151,9 +151,9 @@ void get_crosshair_bitmap_datums()
 {
 	// Get all nhdt tags
 	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(blam_tag::tag_group_type::newhuddefinition);
-	for each (auto nhdt_tag in new_hud_definition_tags)
+	for (auto it = new_hud_definition_tags.begin(); it != new_hud_definition_tags.end(); it++)
 	{
-		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(nhdt_tag.first);
+		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(it->first);
 
 		// Loop through every bitmap widget in the nhdt definition
 		for (byte i = 0; i < nhdt_definition->bitmap_widgets.size; ++i)
