@@ -154,6 +154,7 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 				simulation_queue_entity_promotion_apply(element);
 				break;
 			case _simulation_queue_element_type_game_global_event:
+				simulation_queue_game_global_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_event:
 				simulation_queue_player_event_apply(element);

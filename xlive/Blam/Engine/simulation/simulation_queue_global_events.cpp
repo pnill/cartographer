@@ -9,6 +9,66 @@
 #include "game/game_engine.h"
 #include "memory/bitstream.h"
 
+static void simulation_queue_global_event_allocate_and_insert(e_event_queue_type type, void* data, int32 data_size)
+{
+    s_simulation_queue_element* element = NULL;
+    c_simulation_world* world = simulation_get_world();
+    world->simulation_queue_allocate(type, data_size, &element);
+    if (element)
+    {
+        csmemcpy((void*)element->data, data, data_size);
+        world->simulation_queue_enqueue(element);
+    }
+}
+
+void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_type global_event_type)
+{
+    if (!game_is_playback())
+    {
+        uint8 data[128];
+        c_bitstream stream(data, sizeof(data));
+        stream.begin_writing(1);
+        stream.write_integer("glboal-event-type", global_event_type, 3);
+        if (!stream.error_occured())
+        {
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, data, stream.get_space_used_in_bytes());
+        }
+        stream.finish_writing(NULL);
+    }
+    return;
+}
+
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element)
+{
+    c_bitstream stream(element->data, element->data_size);
+    stream.begin_reading();
+    e_simulation_queue_global_event_type type = (e_simulation_queue_global_event_type)stream.read_integer("global-event-type", 3);
+    if (!stream.error_occured())
+    {
+        switch (type)
+        {
+        case _simulation_queue_game_global_event_type_claim_authority:
+            break;
+        case _simulation_queue_game_global_event_type_set_simulation_to_distributed_server:
+            break;
+        case _simulation_queue_game_global_event_type_set_simulation_to_distributed_client:
+            break;
+        case _simulation_queue_game_global_event_type_game_won:
+            break;
+        case _simulation_queue_game_global_event_main_revert_map:
+            break;
+        case _simulation_queue_game_global_event_main_reset_map:
+            break;
+        case _simulation_queue_game_global_event_main_save_and_exit_campaign:
+            break;
+        case _simulation_queue_game_global_event_notify_reset_complete:
+            break;
+        default:
+            break;
+        }
+    }
+    stream.finish_reading();
+}
 
 void simulation_queue_player_event_insert(e_simulation_queue_player_event_type event_type, datum player_index, const s_simulation_queue_player_event_data* event_data)
 {
@@ -22,18 +82,9 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
         stream.begin_writing(1);
         stream.write_integer("player-index", abs_player_index, k_player_index_bit_count);
         stream.write_bool("active", event_data->active);
-
-        int32 space_used = stream.get_space_used_in_bytes();
         if (!stream.error_occured())
         {
-            s_simulation_queue_element* element = NULL;
-            c_simulation_world* world = simulation_get_world();
-            world->simulation_queue_allocate(_simulation_queue_element_type_player_event, space_used, &element);
-            if (element)
-            {
-                csmemcpy((void*)element->data, data, space_used);
-                world->simulation_queue_enqueue(element);
-            }
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_event, data, stream.get_space_used_in_bytes());
         }
         stream.finish_writing(NULL);
     }
@@ -75,18 +126,9 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
         c_bitstream stream(data, sizeof(data));
         stream.begin_writing(1);
         simulation_player_update_encode(&stream, player_update);
-        
-        int32 space_used = stream.get_space_used_in_bytes();
         if (!stream.error_occured())
         {
-            s_simulation_queue_element* element = NULL;
-            c_simulation_world* world = simulation_get_world();
-            world->simulation_queue_allocate(_simulation_queue_element_type_player_update_event, space_used, &element);
-            if (element)
-            {
-                csmemcpy(element->data, data, space_used);
-                world->simulation_queue_enqueue(element);
-            }
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_update_event, data, stream.get_space_used_in_bytes());
         }
         stream.finish_writing(NULL);
     }
