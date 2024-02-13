@@ -182,13 +182,8 @@ void __cdecl simulation_update_pregame(void)
 
 void simulation_destroy_update()
 {
-    // only discard these updates if they were actually applied
-    // during simulation
-    if (simulation_in_progress())
-    {
-        // remove everything from the queue
-        simulation_get_world()->destroy_update();
-    }
+	// remove everything from the queue
+	simulation_get_world()->destroy_update();
     return;
 }
 
