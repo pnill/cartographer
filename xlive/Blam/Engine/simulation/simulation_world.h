@@ -156,6 +156,11 @@ public:
 
 		return result;
 	}
+
+	bool simulation_queues_empty()
+	{
+		return queue_get(_simulation_queue_bookkeeping)->queued_count() == 0 && queue_get(_simulation_queue)->queued_count() == 0;
+	}
 };
 CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
 
