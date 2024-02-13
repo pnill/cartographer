@@ -5,6 +5,7 @@
 #include "simulation_encoding.h"
 #include "game_interface/simulation_game_action.h"
 
+#include "main/main.h"
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "memory/bitstream.h"
@@ -28,7 +29,7 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
         uint8 data[128];
         c_bitstream stream(data, sizeof(data));
         stream.begin_writing(1);
-        stream.write_integer("glboal-event-type", global_event_type, 3);
+        stream.write_integer("global-event-type", global_event_type, 3);
         if (!stream.error_occured())
         {
             simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, data, stream.get_space_used_in_bytes());
@@ -38,7 +39,7 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
     return;
 }
 
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element)
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, simulation_update* update)
 {
     c_bitstream stream(element->data, element->data_size);
     stream.begin_reading();
@@ -58,10 +59,13 @@ void simulation_queue_game_global_event_apply(const s_simulation_queue_element* 
         case _simulation_queue_game_global_event_main_revert_map:
             break;
         case _simulation_queue_game_global_event_main_reset_map:
+            main_game_reset_map();
+            update->flush_gamestate = true;
             break;
         case _simulation_queue_game_global_event_main_save_and_exit_campaign:
             break;
         case _simulation_queue_game_global_event_notify_reset_complete:
+            simulation_notify_reset_complete();
             break;
         default:
             break;

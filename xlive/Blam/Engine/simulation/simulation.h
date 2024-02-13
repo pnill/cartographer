@@ -34,7 +34,7 @@ struct s_simulation_globals
 	bool engine_paused;
 	int32 field_4;
 	bool simulation_invalidate;
-	bool simulation_reset;
+	bool main_simulation_reset;
 	bool simulation_reset_in_progress;
 	bool field_B;
 	c_simulation_world* simulation_world;
@@ -47,6 +47,9 @@ c_simulation_world* simulation_get_world();
 s_simulation_globals* simulation_get_globals();
 
 void simulation_reset();
+bool simulation_reset_in_progress();
+void simulation_notify_reset_complete();
+
 bool simulation_in_progress();
 void simulation_destroy_update(void);
 bool simulation_query_object_is_predicted(datum object_datum);

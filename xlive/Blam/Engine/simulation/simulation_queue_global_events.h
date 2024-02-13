@@ -9,7 +9,7 @@ enum e_simulation_queue_player_event_type : uint32
 	k_simulation_queue_player_event_size_bits = 2
 };
 
-enum e_simulation_queue_global_event_type
+enum e_simulation_queue_global_event_type : int8
 {
 	_simulation_queue_game_global_event_type_claim_authority,
 	_simulation_queue_game_global_event_type_set_simulation_to_distributed_server,
@@ -19,6 +19,8 @@ enum e_simulation_queue_global_event_type
 	_simulation_queue_game_global_event_main_reset_map,
 	_simulation_queue_game_global_event_main_save_and_exit_campaign,
 	_simulation_queue_game_global_event_notify_reset_complete,
+
+	k_simulation_queue_game_global_event_count
 };
 
 struct s_simulation_queue_player_event_data
@@ -33,4 +35,4 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
 void simulation_queue_player_update_apply(const s_simulation_queue_element* element);
 
 void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_type global_event_type);
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element);
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, struct simulation_update* update);

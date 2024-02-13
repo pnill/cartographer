@@ -2,6 +2,7 @@
 #include "simulation.h"
 
 #include "simulation_queue_global_events.h"
+#include "simulation_event_handler.h"
 #include "simulation_watcher.h"
 
 #include "game/game.h"
@@ -29,15 +30,35 @@ bool simulation_is_paused()
     return simulation_get_globals()->engine_paused;
 }
 
+bool simulation_reset_in_progress()
+{
+    return simulation_get_globals()->simulation_reset_in_progress;
+}
+
+void simulation_notify_reset_complete()
+{
+    s_simulation_globals* sim_globals = simulation_get_globals();
+    if (!game_is_playback())
+    {
+        sim_globals->simulation_world->send_player_acknowledgements(true);
+    }
+    sim_globals->simulation_reset_in_progress = false;
+}
+
 void simulation_reset_immediate()
 {
     s_simulation_globals* sim_globals = simulation_get_globals();
-    sim_globals->simulation_reset = true;
 
-
+    sim_globals->simulation_reset_in_progress = true;
+    sim_globals->simulation_world->reset();
+    simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_main_reset_map);
+    // ### TODO figure out these
+    // simulation_gamestate_entities_build_clear_flags();
+    // simulation_queue_gamestates_delete_insert();
+    simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_notify_reset_complete);
 }
 
-void simulation_reset()
+void __cdecl simulation_reset()
 {
     s_simulation_globals* sim_globals = simulation_get_globals();
     if (sim_globals->simulation_invalidate)
@@ -46,6 +67,11 @@ void simulation_reset()
     }
     else
     {
+        // this will use the main game simulation reset code
+        // but we don't need it
+        //sim_globals->main_simulation_reset = true;
+
+        // instead, call reset directly
         simulation_reset_immediate();
     }
 }
@@ -100,7 +126,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 
     if (simulation_get_world()->runs_simulation())
     {
-		simulation_get_world()->simulation_apply_bookkeeping_queue();
+		simulation_get_world()->simulation_apply_bookkeeping_queue(update);
     }
 
     // Player activation code
@@ -136,7 +162,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
             /*|| simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application()*/
             || simulation_get_world()->queue_get(_simulation_queue)->queued_count() > 0)
         {
-            simulation_get_world()->simulation_apply_queued_elements();
+            simulation_get_world()->simulation_apply_queued_elements(update);
 
             // purge any deletion pending object during this update
             // if simulation is not in progress
@@ -183,7 +209,6 @@ void __cdecl simulation_update_pregame(void)
             simulation_build_update(&update);
             simulation_apply_before_game(&update);
             simulation_update_aftermath(&update);
-            simulation_destroy_update();
         }
     }
 }
@@ -222,5 +247,7 @@ void simulation_apply_patches(void)
     PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);
     PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
     PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
+
+    WriteJmpTo(Memory::GetAddress(0x1AE6D8, 0x0), simulation_reset);
     return;
 }
