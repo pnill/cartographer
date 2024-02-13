@@ -576,12 +576,15 @@
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_event_handler.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
@@ -926,6 +929,7 @@
     <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_event_handler.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
@@ -933,11 +937,11 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_queue.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_entities.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_type_collection.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
-    <ClInclude Include="Blam\Engine\simulation\unit_control.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Engine\structures\structures.h" />

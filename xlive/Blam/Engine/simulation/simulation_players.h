@@ -1,7 +1,9 @@
 #pragma once
-
 #include "machine_id.h"
-#include "Blam/Engine/game/player_control.h"
+
+#include "game/player_control.h"
+#include "game/players.h"
+#include "Networking/Session/NetworkSession.h"
 
 enum e_simulation_player_type   //TODO: determine actual names for this enum field
 {
@@ -32,3 +34,21 @@ struct c_simulation_player
 };
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(c_simulation_player, 0x88);
+
+struct simulation_player_update
+{
+	int32 player_index;
+	s_player_identifier player_identifier;
+	int32 update_type;
+	s_machine_identifier machine_identifier;
+	int32 user_index;
+	int32 controller_index;
+	bool player_left_game;
+	int8 pad[3];
+	s_player_properties properties;
+	int32 swap_player_index;
+	s_player_identifier swap_player_identifier;
+};
+CHECK_STRUCT_SIZE(simulation_player_update, 0xB4);
+
+bool __cdecl simulation_players_apply_update(simulation_player_update* player_update);

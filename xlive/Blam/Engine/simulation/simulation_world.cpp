@@ -3,15 +3,28 @@
 
 #include "simulation_queue_entities.h"
 #include "simulation_queue_events.h"
+#include "simulation_queue_global_events.h"
 
 #include "game/game.h"
+#include "saved_games/game_state_procs.h"
 #include "shell/shell_windows.h"
-
 
 
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size
 c_simulation_queue g_simulation_queues[k_simulation_queue_count];
+
+
+void c_simulation_world::gamestate_flush(void) const
+{
+	if (m_world_type == _simulation_world_type_synchronous_client
+		|| m_world_type == _simulation_world_type_distributed_client)
+	{
+		game_state_call_before_save_procs(0);
+		game_state_call_after_save_procs();
+	}
+	return;
+}
 
 c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type)
 {
@@ -143,8 +156,10 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue)
 			case _simulation_queue_element_type_game_global_event:
 				break;
 			case _simulation_queue_element_type_player_event:
+				simulation_queue_player_event_apply(element);
 				break;
 			case _simulation_queue_element_type_player_update_event:
+				simulation_queue_player_update_apply(element);
 				break;
 			case _simulation_queue_element_type_gamestates_clear:
 				break;

@@ -9,6 +9,8 @@
 #include "Blam/Engine/units/units.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 #include "Blam/Engine/scenario/scenario.h"
+#include "simulation/simulation.h"
+#include "simulation/simulation_queue_global_events.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -217,6 +219,17 @@ bool __cdecl players_user_is_active(int32 user_index)
 	return INVOKE(0x5139B, 0x598BE, players_user_is_active, user_index);
 }
 
+datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index)
+{
+    return INVOKE(0x513F3, 0x59916, player_index_from_absolute_player_index, abs_player_index);
+}
+
+void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers)
+{
+    INVOKE(0x56549, 0x5EA41, players_set_machines, new_machine_valid_mask, new_machine_identifiers);
+    return;
+}
+
 uint32 player_appearance_required_bits()
 {
 	return 39;
@@ -369,6 +382,55 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     return;
 }
 
+void __cdecl players_update_activation(void)
+{
+    if (!game_is_predicted())
+    {
+        s_data_iterator<s_player> player_it(s_player::get_data());
+        while (player_it.get_next_datum())
+        {
+            s_player* player = player_it.get_current_datum();
+            if (!TEST_BIT(player->flags, 1))
+            {
+                bool machine_active_in_game = TEST_BIT(player->flags, 0);
+                bool insert_event = false;
+                if (game_is_distributed())
+                {
+                    if (!game_is_playback())
+                    {
+                        machine_active_in_game = simulation_get_machine_active_in_game(&player->machine_identifier);
+                        insert_event = true;
+                    }
+                }
+                else
+                {
+                    machine_active_in_game = true;
+                }
+
+                if (TEST_BIT(player->flags, 0) != machine_active_in_game)
+                {
+                    datum player_index = player_it.get_current_datum_index();
+                    if (insert_event)
+                    {
+                        s_simulation_queue_player_event_data event_data{ machine_active_in_game };
+                        simulation_queue_player_event_insert(_simulation_queue_player_event_update, player_index, &event_data);
+                    }
+                    else
+                    {
+                        SET_FLAG(player->flags, 0, machine_active_in_game);
+
+                        if (machine_active_in_game)
+                        {
+                            game_engine_player_activated(player_index);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return;
+}
+
 void players_apply_patches(void)
 {
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
@@ -376,6 +438,9 @@ void players_apply_patches(void)
 
     // Replace the player profile validation function with our own
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);
+
+    // Replace update activation to insert events into the simulation queue
+    PatchCall(Memory::GetAddress(0x58182, 0x6067A), players_update_activation);
     return;
 }
 

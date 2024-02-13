@@ -19,3 +19,11 @@ void __cdecl simulation_action_pickup_equipment(datum unit_datum_index, datum gr
 	INVOKE(0x1B6F12, 0x1B0E42, simulation_action_pickup_equipment, unit_datum_index, grenade_tag_index);
 	return;
 }
+
+void __cdecl simulation_action_game_engine_player_update(datum player_index, uint32 update_mask)
+{
+	INVOKE(0x1B6662, 0x1B0592, simulation_action_game_engine_player_update, player_index, update_mask);
+	return;
+}
+
+
