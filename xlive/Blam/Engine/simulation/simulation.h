@@ -44,7 +44,7 @@ struct s_simulation_globals
 CHECK_STRUCT_SIZE(s_simulation_globals, 24);
 
 c_simulation_world* simulation_get_world();
-s_simulation_globals* simulation_globals_get();
+s_simulation_globals* simulation_get_globals();
 
 void simulation_reset();
 bool simulation_in_progress();

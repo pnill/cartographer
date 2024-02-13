@@ -7,8 +7,8 @@
 
 enum e_simulation_queue_type
 {
-	_simulation_queue_high_priority,
-	_simulation_queue_basic,
+	_simulation_queue_bookkeeping,
+	_simulation_queue,
 
 	k_simulation_queue_count
 };
@@ -93,8 +93,8 @@ public:
 	void queues_initialize();
 
 	void apply_simulation_queue(const c_simulation_queue* queue);
-	void apply_basic_queue();
-	void apply_high_priority_queue();
+	void simulation_apply_bookkeeping_queue();
+	void simulation_apply_queued_elements();
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 

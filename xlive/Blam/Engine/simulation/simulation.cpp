@@ -92,7 +92,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 
     if (simulation_get_world()->runs_simulation())
     {
-		simulation_get_world()->apply_basic_queue();
+		simulation_get_world()->simulation_apply_bookkeeping_queue();
     }
 
     // Player activation code
@@ -126,9 +126,9 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     {
         if (update->simulation_in_progress
             /*|| simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application()*/
-            || simulation_get_world()->queue_get(_simulation_queue_high_priority)->queued_count() > 0)
+            || simulation_get_world()->queue_get(_simulation_queue)->queued_count() > 0)
         {
-            simulation_get_world()->apply_high_priority_queue();
+            simulation_get_world()->simulation_apply_queued_elements();
 
             // purge any deletion pending object during this update
             // if simulation is not in progress
