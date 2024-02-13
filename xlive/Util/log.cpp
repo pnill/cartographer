@@ -27,7 +27,7 @@ bool h2log::is_valid()
 	return output != nullptr;
 }
 
-h2log* h2log::create(const std::string &name, std::wstring &filename, bool shouldCreateLog, int debugLogLevel)
+h2log* h2log::create(const std::string &name, const std::wstring &filename, bool shouldCreateLog, int debugLogLevel)
 {
 	if (shouldCreateLog)
 	{

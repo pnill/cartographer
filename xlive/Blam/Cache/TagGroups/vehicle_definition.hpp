@@ -236,7 +236,7 @@ struct s_vehicle_group_definition :TagGroup<'vehi'>
 		PAD(0x2);//0x40
 		enum class e_model_state_destroyed : __int16
 		{
-			default = 0,
+			_default = 0,
 			minor_damage = 1,
 			medium_damage = 2,
 			major_damage = 3,

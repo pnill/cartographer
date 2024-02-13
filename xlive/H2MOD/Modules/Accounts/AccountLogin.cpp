@@ -407,7 +407,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_password);
 
 #if !defined(LC2)
-	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, &rtn_result);
+	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2").c_str(), http_request_body_build, &rtn_result);
 #else
 	TEST_N_DEF(LC2);
 #endif

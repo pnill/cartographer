@@ -32,12 +32,9 @@ namespace ImGuiHandler {
 		std::string windowName = "advanced_settings";
 		namespace
 		{
-			float crosshairSize = 1.0f;
 			bool should_show_hud = true;
 			bool g_showFP = true;
-			bool g_UncappedFPS = false;
 			int g_fpsLimit = 60;
-			bool g_hitfix = true;
 			int g_deadzone = 0;
 			int g_aiming = 0;
 			int g_shadows = 0;

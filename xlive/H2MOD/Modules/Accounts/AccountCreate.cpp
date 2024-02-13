@@ -90,7 +90,7 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 	free(escaped_user_password);
 
 #ifndef LC4
-	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/create1"), http_request_body_build, &rtn_result);
+	int rtn_code = MasterHttpResponse(std::string(cartographerURL + "/create1").c_str(), http_request_body_build, &rtn_result);
 #else
 	TEST_N_DEF(LC4);
 #endif

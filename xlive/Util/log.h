@@ -30,7 +30,7 @@ public:
 	///   <para>Creates a logger which outputs to a file.</para>
 	///   <para>Use logger.is_valid() to check if logging is working.</para>
 	/// </summary>
-	static h2log* create(const std::string &name, std::wstring &filename, bool shouldCreateLog, int debugLogLevel);
+	static h2log* create(const std::string &name, const std::wstring &filename, bool shouldCreateLog, int debugLogLevel);
 
 	/// <summary>
 	///   <para>Creates a logger which outputs to a console window.</para>
@@ -54,7 +54,7 @@ public:
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->level(               \
+		console->output->level(					\
 			(L"[" + wname + L"] " + fmt).data() \
 			, args...)
 
@@ -70,7 +70,7 @@ public:
 #define log_d(level) \
 	if (output != nullptr)                      \
 		output->level(msg.data());				\
-	if (!isConsole                              \
+	if (!isConsole								\
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
 		console->output->level(					\

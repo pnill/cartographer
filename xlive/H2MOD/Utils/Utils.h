@@ -31,7 +31,7 @@ char* wcstombs2r(wchar_t* text);
 std::string ToNarrow(const wchar_t *s, char dfault = '?', const std::locale& loc = std::locale());
 
 ///FREE MEMOERY in rtn_response if returned 0 (success).
-int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_response);
+int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response);
 
 void CreateDirTree(const wchar_t* path);
 

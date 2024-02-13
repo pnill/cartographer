@@ -1,6 +1,6 @@
 #include "stdafx.h"
-
 #include "Startup.h"
+
 #include "WinMainH2.h"
 #include "../Config.h"
 #include "../H2MODShell.h"
@@ -252,7 +252,7 @@ CRITICAL_SECTION log_section;
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath) {
+std::wstring prepareLogFileName(const std::wstring &logFileName, bool useAppDataLocalPath) {
 	std::wstring filename = (useAppDataLocalPath ? H2AppDataLocal : L"");
 	std::wstring processName(Memory::IsDedicatedServer() ? L"H2Server" : L"Halo2Client");
 	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(_Shell::GetInstanceId()));

@@ -87,7 +87,7 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	tag_reference gel_map;//0x78
 	enum class e_specular_mask : __int16
 	{
-		default = 0,
+		_default = 0,
 		none_no_mask = 1,
 		gel_alpha = 2,
 		gel_color = 3,
@@ -96,7 +96,7 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	PAD(0x6);//0x82
 	enum class e_falloff_function : __int16
 	{
-		default = 0,
+		_default = 0,
 		narrow = 1,
 		broad = 2,
 		very_broad = 3,
@@ -120,7 +120,7 @@ struct s_light_group_definition :TagGroup<'ligh'>
 	e_specular_contrast specular_contrast;//0x8C
 	enum class e_falloff_geometry : __int16
 	{
-		default = 0,
+		_default = 0,
 		directional = 1,
 		spherical = 2,
 	};
