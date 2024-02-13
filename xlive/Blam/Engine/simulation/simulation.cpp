@@ -40,7 +40,7 @@ void simulation_notify_reset_complete()
     s_simulation_globals* sim_globals = simulation_get_globals();
     if (!game_is_playback())
     {
-        sim_globals->simulation_world->send_player_acknowledgments(true);
+        sim_globals->simulation_world->send_player_acknowledgements(true);
     }
     sim_globals->simulation_reset_in_progress = false;
 }

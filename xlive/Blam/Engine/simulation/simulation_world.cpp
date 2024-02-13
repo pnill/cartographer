@@ -234,7 +234,7 @@ void c_simulation_world::send_player_acknowledgements_not_during_simulation_rese
 {
 	if (!simulation_reset_in_progress())
 	{
-		send_player_acknowledgments(a1);
+		send_player_acknowledgements(a1);
 	}
 }
 
