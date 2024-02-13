@@ -9,5 +9,5 @@ bool __cdecl cinematic_sound_sync_complete(void)
 void main_game_reset_map()
 {
 	// ### TODO server offset
-	*Memory::GetAddress<bool*>(0x48224E, 0x0) = true;
+	*Memory::GetAddress<bool*>(0x48224E, 0x1FA4E) = true;
 }
