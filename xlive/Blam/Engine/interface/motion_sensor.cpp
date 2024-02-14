@@ -90,6 +90,7 @@ void motion_sensor_update_with_delta(real32 delta)
 		motion_sensor_update_examine_near_by_units();
 
 		// Added accumulation to meet the length of a game tick to preserve the trailing effect of fast moving objects on the radar
+		g_motion_sensor_sample_accumulator += delta;
 		if (g_motion_sensor_sample_accumulator >= time_globals::get_seconds_per_tick())
 		{
 			if (motion_sensor_globals->current_sample_index)
@@ -102,8 +103,6 @@ void motion_sensor_update_with_delta(real32 delta)
 			}
 			g_motion_sensor_sample_accumulator = 0.f;
 		}
-		else
-			g_motion_sensor_sample_accumulator += delta;
 
 		for (int i = 0; i < k_number_of_users; i++)
 		{
