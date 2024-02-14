@@ -59,7 +59,7 @@ void simulation_queue_game_global_event_apply(const s_simulation_queue_element* 
         case _simulation_queue_game_global_event_main_revert_map:
             break;
         case _simulation_queue_game_global_event_main_reset_map:
-            main_game_reset_map();
+            main_reset_map();
             update->flush_gamestate = true;
             break;
         case _simulation_queue_game_global_event_main_save_and_exit_campaign:

@@ -263,7 +263,7 @@ void simulation_world_apply_patches()
 	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x1C500E), jmp_initialize_world);
 	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x1C5569), jmp_destroy_world);
 	DETOUR_ATTACH(p_c_simulation_world__reset, Memory::GetAddress<t_c_simulation_world__reset>(0x1DD0EA, 0x1C459E), jmp_reset_world);
-	// ### TODO server offset
-	PatchCall(Memory::GetAddress(0x1DD9FB, 0x0), jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress);
+
+	PatchCall(Memory::GetAddress(0x1DD9FB, 0x1C4EBB), jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress);
 	return;
 }
