@@ -178,7 +178,6 @@ public:
 
 	void send_player_acknowledgements(bool a1)
 	{
-		// ### TODO server offset
 		INVOKE_TYPE(0x1DD777, 0x1C4C37, void(__thiscall*)(c_simulation_world*, bool), this, a1);
 	}
 };
