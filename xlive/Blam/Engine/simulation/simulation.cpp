@@ -248,6 +248,6 @@ void simulation_apply_patches(void)
     PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);
     PatchCall(Memory::GetAddress(0x1DD22F, 0x1C46E3), simulation_build_player_updates);
 
-    WriteJmpTo(Memory::GetAddress(0x1AE6D8, 0x0), simulation_reset);
+    WriteJmpTo(Memory::GetAddress(0x1AE6D8, 0x1A8932), simulation_reset);
     return;
 }
