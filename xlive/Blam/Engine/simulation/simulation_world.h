@@ -40,6 +40,7 @@ struct s_simulation_queue_stats
 {
 	int32 allocated;
 	int32 queued;
+	int32 allocated_in_bytes;
 };
 
 class c_simulation_world
@@ -60,7 +61,7 @@ class c_simulation_world
 	uint32 m_next_update_number;
 	bool m_out_of_sync;
 	uint8 gap_2D;
-	char field_2E;
+	bool m_flush_gamestate;
 	bool m_attached_to_map;
 	int32 m_join_attempt_count;
 	int32 m_join_failure_start;
@@ -84,17 +85,16 @@ class c_simulation_world
 	char gap_12A8[4];
 
 public:
-	void gamestate_flush(void) const;
+	void gamestate_flush_immediate(void);
 
 	void simulation_queue_allocate(e_event_queue_type type, int32 encoded_size, s_simulation_queue_element** out_allocated_elem);
 	void simulation_queue_free(s_simulation_queue_element* element);
 	void simulation_queue_enqueue(s_simulation_queue_element* element);
 
 	void queues_initialize();
-
 	void apply_simulation_queue(const c_simulation_queue* queue, struct simulation_update* update);
-	void simulation_apply_bookkeeping_queue(struct simulation_update* update);
-	void simulation_apply_queued_elements(struct simulation_update* update);
+
+	void attach_simulation_queues_to_update(bool simulation_in_progress, c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 
@@ -113,10 +113,10 @@ public:
 	s_simulation_queue_stats queue_describe(e_simulation_queue_type type)
 	{
 		c_simulation_queue* queue = queue_get(type);
-		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count() };
+		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count(), queue->allocated_size_in_bytes() };
 	}
 
-	void destroy_update();
+	void queues_clear();
 
 	bool is_playback() const
 	{

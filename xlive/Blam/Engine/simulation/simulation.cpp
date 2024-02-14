@@ -69,7 +69,7 @@ void __cdecl simulation_reset()
     {
         // this will use the main game simulation reset code
         // but we don't need it
-        //sim_globals->main_simulation_reset = true;
+        //sim_globals->simulation_reset_pending = true;
 
         // instead, call reset directly
         simulation_reset_immediate();
@@ -110,6 +110,21 @@ c_simulation_type_collection* simulation_get_type_collection()
 
 void __cdecl simulation_apply_before_game(simulation_update* update)
 {
+    c_simulation_queue simulation_bookkeeping_queue, game_simulation_queue;
+    c_simulation_world* sim_world = simulation_get_world();
+
+    // only during distributed system or server synchronous
+    // but not client synchronous
+    if (sim_world->runs_simulation())
+    {
+		// transfer the elements to the 
+        sim_world->attach_simulation_queues_to_update(
+				update->simulation_in_progress,
+				&simulation_bookkeeping_queue,
+				&game_simulation_queue
+			);
+    }
+
     for (int32 i = 0; i < k_maximum_players; i++)
     {
         datum control_unit_index = update->control_unit_index[i];
@@ -124,9 +139,9 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
         players_set_machines(update->machine_update.machine_valid_mask, update->machine_update.identifiers);
     }
 
-    if (simulation_get_world()->runs_simulation())
+    if (sim_world->runs_simulation())
     {
-		simulation_get_world()->simulation_apply_bookkeeping_queue(update);
+        sim_world->apply_simulation_queue(&simulation_bookkeeping_queue, update);
     }
 
     // Player activation code
@@ -156,31 +171,25 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     // ### FIXME 
     // IMPLEMENT simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application();
 
-    if (simulation_get_world()->runs_simulation())
+    if (sim_world->runs_simulation())
     {
-        if (update->simulation_in_progress
-            /*|| simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application()*/
-            || simulation_get_world()->queue_get(_simulation_queue)->queued_count() > 0)
-        {
-            simulation_get_world()->simulation_apply_queued_elements(update);
+		sim_world->apply_simulation_queue(&game_simulation_queue, update);
 
-            // purge any deletion pending object during this update
-            // if simulation is not in progress
-            if (!update->simulation_in_progress)
-                objects_purge_deleted_objects();
-        }
+		// purge any deletion pending object during this update
+		// if simulation is not in progress
+		if (!update->simulation_in_progress)
+			objects_purge_deleted_objects();
     }
 
     if (update->flush_gamestate)
     {
-        simulation_get_globals()->simulation_world->gamestate_flush();
+        simulation_get_globals()->simulation_world->gamestate_flush_immediate();
     }
 
 	// destroy the update exactly after we applied the queues to the gamestate
-    if (simulation_get_world()->runs_simulation())
-    {
-		simulation_destroy_update();
-    }
+	simulation_bookkeeping_queue.dispose();
+	game_simulation_queue.dispose();
+	//simulation_destroy_update();
 
     return;
 }
@@ -215,8 +224,6 @@ void __cdecl simulation_update_pregame(void)
 
 void simulation_destroy_update()
 {
-	// remove everything from the queue
-	simulation_get_world()->destroy_update();
     return;
 }
 

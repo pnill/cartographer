@@ -34,7 +34,7 @@ struct s_simulation_globals
 	bool engine_paused;
 	int32 field_4;
 	bool simulation_invalidate;
-	bool main_simulation_reset;
+	bool simulation_reset_pending;
 	bool simulation_reset_in_progress;
 	bool field_B;
 	c_simulation_world* simulation_world;
