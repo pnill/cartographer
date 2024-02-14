@@ -17,8 +17,7 @@ c_simulation_queue g_simulation_queues[k_simulation_queue_count];
 
 void c_simulation_world::gamestate_flush(void) const
 {
-	if (m_world_type == _simulation_world_type_synchronous_client
-		|| m_world_type == _simulation_world_type_distributed_client)
+	if (!is_authority())
 	{
 		game_state_call_before_save_procs(0);
 		game_state_call_after_save_procs(0);

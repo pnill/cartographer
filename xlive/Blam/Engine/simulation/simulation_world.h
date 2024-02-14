@@ -150,8 +150,8 @@ public:
 		bool result = false;
 		if (exists())
 		{
-			result = m_world_type == _simulation_world_type_distributed_authority
-				|| m_world_type == _simulation_world_type_synchronous_authority;
+			result = m_world_type != _simulation_world_type_distributed_client
+				&& m_world_type != _simulation_world_type_synchronous_client;
 		}
 
 		return result;
