@@ -21,7 +21,7 @@ void c_simulation_world::gamestate_flush(void) const
 		|| m_world_type == _simulation_world_type_distributed_client)
 	{
 		game_state_call_before_save_procs(0);
-		game_state_call_after_save_procs();
+		game_state_call_after_save_procs(0);
 	}
 	return;
 }
