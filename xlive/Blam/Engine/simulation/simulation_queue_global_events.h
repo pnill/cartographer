@@ -28,6 +28,8 @@ struct s_simulation_queue_player_event_data
 	bool active;
 };
 
+bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue_element* element);
+
 void simulation_queue_player_event_insert(e_simulation_queue_player_event_type event_type, datum player_index, const s_simulation_queue_player_event_data* event_data);
 void simulation_queue_player_event_apply(const s_simulation_queue_element* element);
 

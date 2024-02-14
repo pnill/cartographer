@@ -39,12 +39,36 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
     return;
 }
 
-void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, simulation_update* update)
+bool simulation_queue_game_global_event_decode(const s_simulation_queue_element* element, e_simulation_queue_global_event_type* out_global_event_type)
 {
     c_bitstream stream(element->data, element->data_size);
     stream.begin_reading();
-    e_simulation_queue_global_event_type type = (e_simulation_queue_global_event_type)stream.read_integer("global-event-type", 3);
-    if (!stream.error_occured())
+    *out_global_event_type = (e_simulation_queue_global_event_type)stream.read_integer("global-event-type", 3);
+    bool result = !stream.error_occured();
+    stream.finish_reading();
+    return result;
+}
+
+bool simulation_queue_game_global_event_requires_cutoff(const s_simulation_queue_element* element)
+{
+    bool result = false;
+    e_simulation_queue_global_event_type type;
+    if (simulation_queue_game_global_event_decode(element, &type))
+    {
+        if (type >= _simulation_queue_game_global_event_main_reset_map
+            && type <= _simulation_queue_game_global_event_main_save_and_exit_campaign)
+        {
+            result = true;
+        }
+    }
+
+    return result;
+ }
+
+void simulation_queue_game_global_event_apply(const s_simulation_queue_element* element, simulation_update* update)
+{
+    e_simulation_queue_global_event_type type;
+    if (simulation_queue_game_global_event_decode(element, &type))
     {
         switch (type)
         {
@@ -60,7 +84,7 @@ void simulation_queue_game_global_event_apply(const s_simulation_queue_element* 
             break;
         case _simulation_queue_game_global_event_main_reset_map:
             main_reset_map();
-            update->flush_gamestate = true;
+            //update->flush_gamestate = true;
             break;
         case _simulation_queue_game_global_event_main_save_and_exit_campaign:
             break;
@@ -68,10 +92,10 @@ void simulation_queue_game_global_event_apply(const s_simulation_queue_element* 
             simulation_notify_reset_complete();
             break;
         default:
+            // DEBUG
             break;
         }
     }
-    stream.finish_reading();
 }
 
 void simulation_queue_player_event_insert(e_simulation_queue_player_event_type event_type, datum player_index, const s_simulation_queue_player_event_data* event_data)

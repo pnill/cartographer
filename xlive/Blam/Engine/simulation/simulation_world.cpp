@@ -9,13 +9,11 @@
 #include "saved_games/game_state_procs.h"
 #include "shell/shell_windows.h"
 
-
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size
 c_simulation_queue g_simulation_queues[k_simulation_queue_count];
 
-
-void c_simulation_world::gamestate_flush(void) const
+void c_simulation_world::gamestate_flush_immediate(void)
 {
 	if (!is_authority())
 	{
@@ -113,16 +111,6 @@ void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* el
 	}
 }
 
-void c_simulation_world::simulation_apply_queued_elements(simulation_update* update)
-{
-	apply_simulation_queue(queue_get(_simulation_queue), update);
-}
-
-void c_simulation_world::simulation_apply_bookkeeping_queue(simulation_update* update)
-{
-	apply_simulation_queue(queue_get(_simulation_queue_bookkeeping), update);
-}
-
 void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue, simulation_update* update)
 {
 	if (queue->queued_count() > 0)
@@ -176,7 +164,21 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue,
 	}
 }
 
-void c_simulation_world::destroy_update()
+void c_simulation_world::attach_simulation_queues_to_update(
+	bool simulation_in_progress,
+	c_simulation_queue* out_bookkeepin_queue,
+	c_simulation_queue* out_game_simulation_queue)
+{
+	out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
+
+	if (simulation_in_progress
+		|| queue_get(_simulation_queue)->queued_count() > 0)
+	{
+		out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
+	}
+}
+
+void c_simulation_world::queues_clear()
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
 	{
@@ -207,7 +209,9 @@ void c_simulation_world::reset()
 
 	if (!is_playback())
 	{
-		destroy_update();
+		//queues_clear();
+		// during reset, discard just simulation updates
+		queue_get(_simulation_queue)->clear();
 	}
 }
 
