@@ -7,6 +7,8 @@
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 
+// ### TODO Cleanup
+
 enum e_map_status : int
 {
 	_network_session_map_status_none,
@@ -93,6 +95,8 @@ namespace NetworkSession
 	bool IsVariantTeamPlay();
 	void LeaveSession();
 }
+
+s_membership_peer* network_session_get_peer(int32 peer_index);
 
 #pragma pack(push, 1)
 struct s_session_observer_channel
