@@ -65,7 +65,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	int field_70;
 	char gap_74[20];
 
-	void melee_set_time_to_target_time(real32 ticks)
+	void set_time_to_target(real32 ticks)
 	{
 		m_time_to_target_in_ticks = (int32)ticks;
 	}
