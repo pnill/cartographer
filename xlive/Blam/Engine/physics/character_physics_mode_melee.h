@@ -65,6 +65,11 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	int field_70;
 	char gap_74[20];
 
+	void set_time_to_target(real32 ticks)
+	{
+		m_time_to_target_in_ticks = (int32)ticks;
+	}
+
 	bool pin_localized_velocity(real_vector3d* output, real_vector3d* localized_velocity);
 	void melee_deceleration_fixup(s_character_physics_output* output, real_point3d* object_origin, real_vector3d* current_velocity, real_vector3d* aiming_vector);
 

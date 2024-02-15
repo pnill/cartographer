@@ -55,9 +55,9 @@ void c_simulation_queue::transfer_elements(c_simulation_queue* source_queue)
 		source_queue->dequeue(&element);
 		source_queue->m_allocated_count--;
 		source_queue->m_allocated_size_in_bytes -= get_element_size_in_bytes(element);
-		this->enqueue(element);
 		this->m_allocated_count++;
 		this->m_allocated_size_in_bytes += get_element_size_in_bytes(element);
+		this->enqueue(element);
 		// if the element type is a global event
 		// check if we need to cut the update here
 		if (element->type == _simulation_queue_element_type_game_global_event
