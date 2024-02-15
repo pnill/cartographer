@@ -95,7 +95,7 @@
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="Blam\Engine\game\game_globals.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine.cpp" />
@@ -509,7 +509,7 @@
     <ClInclude Include="Blam\Cache\CacheHeader.h" />
     <ClInclude Include="Blam\Cache\TagGroups\light_definition.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
-    <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />

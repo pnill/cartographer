@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "MeleeLunge.h"
+#include "character_physics_mode_melee.h"
 
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/math/math.h"
