@@ -91,7 +91,7 @@ void CommandCollection::InitializeCommandsMap()
 
 void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 {
-	std::scoped_lock(commandInsertMtx);
+	std::scoped_lock lock(commandInsertMtx);
 
 	for (auto command : commandTable)
 	{
@@ -107,7 +107,7 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 
 ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& name)
 {
-	std::scoped_lock(commandInsertMtx);
+	std::scoped_lock lock(commandInsertMtx);
 
 	for (auto command : commandTable)
 	{

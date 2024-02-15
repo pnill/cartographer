@@ -476,7 +476,7 @@ void CServerList::EnumerateFromHttp()
 	bool itemQueryError = false;
 
 	// build the list to download
-	auto& serverXuidArray = document["servers"].GetArray();
+	const auto& serverXuidArray = document["servers"].GetArray();
 	auto xuidStrItr = serverXuidArray.Begin();
 	auto xuidStrWriteItemItr = serverXuidArray.Begin();
 

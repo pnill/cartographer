@@ -86,6 +86,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	int result = strlen(login_token) == 32 ? 1 : 2;
 
 	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {
