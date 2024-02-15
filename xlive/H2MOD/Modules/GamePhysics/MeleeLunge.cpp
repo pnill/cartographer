@@ -442,7 +442,6 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 				m_melee_start_origin = *player_origin;
 				m_has_target = true;
-				m_deceleration_ticks = 0;
 				m_flags = 0;
 				m_maximum_counter = blam_ticks_real_to_integer((real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2);
 				// m_maximum_counter = (real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2;
@@ -521,32 +520,48 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 					real32 min_velocity_after_deceleration_per_tick = time_globals::get_seconds_per_tick() * temp;
 
-					// magnitude3d might change the real32ing point unit settings
+					// magnitude3d might change the floating point unit settings
 					// apparently the issue is present in default code as well
 					real32 temp_current_velocity_per_tick = magnitude3d(&current_translational_velocity_per_tick);
 					
 					real_vector3d direction_of_current_translational_velocity = current_translational_velocity_per_tick;
 					real32 direction_magnitude_from_normalization = normalize3d(&direction_of_current_translational_velocity);
 
-					bool melee_allow_deceleration = (real32)m_deceleration_ticks < k_deceleration_ticks_real
-						|| (real32)(m_maximum_counter - m_melee_tick) > k_deceleration_ticks_real
-						;
-
 					if (!m_started_decelerating)
 					{
 						// if we weren't previously decelerating
 						// build the deceleration parameters
 						m_started_decelerating = true;
+						m_deceleration_ticks = 0;
 						m_velocity_to_decelerate = MAX(min_velocity_after_deceleration_per_tick, temp_current_velocity_per_tick - min_velocity_after_deceleration_per_tick);
 						m_distance_to_target_point_before_deceleration = MAX(distance_to_target_point, k_valid_real_epsilon);
 					}
 
-					if (dot_product3d(aiming_vector, &direction_of_current_translational_velocity) <= (temp_current_velocity_per_tick * 0.087155744f)
+					bool melee_allow_deceleration = false;
+					real32 deceleration_ticks = k_deceleration_ticks_real;
+
+					if (m_weapon_is_sword)
+					{
+						// when lunging with the sword, allow it to fully decelerate,
+						// hence "k_deceleration_ticks_real + 1.0f"
+						deceleration_ticks += 1.0f;
+					}
+
+					melee_allow_deceleration = ((real32)m_deceleration_ticks < deceleration_ticks
+						|| (real32)(m_maximum_counter - m_melee_tick) > k_deceleration_ticks_real);
+
+					if (dot_product3d(aiming_vector, &direction_of_current_translational_velocity) <= temp_current_velocity_per_tick * 0.087155744f
 						|| direction_magnitude_from_normalization == 0.0f)
 					{
 						real32 deceleration = MIN((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f, temp_current_velocity_per_tick);
 
-						point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, -deceleration, &physics_output->translational_velocity);
+						// the best we can do is to reproduce the 30 tick behaviour
+						// on the physics velocity vector
+						point_from_line3d(&current_translational_velocity_per_tick, 
+							&direction_of_current_translational_velocity, 
+							-deceleration * time_globals::get_ticks_difference_real(),
+							//-deceleration,
+							&physics_output->translational_velocity);
 
 						// for some reason in the actual game the following line of code is missing from the actual game
 						// no idea why
@@ -558,7 +573,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						if (min_velocity_after_deceleration_per_tick > ((temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f)) + k_valid_real_epsilon))
 						{
 							force_leave_melee_lunge_physics = true;
-							m_time_to_target_in_ticks = 0;
+							melee_set_time_to_target_time(0.0f);
 						}
 					}
 					else if (melee_allow_deceleration)
@@ -568,7 +583,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 							real32 deceleration = MIN(m_velocity_to_decelerate / k_deceleration_ticks_real, temp_current_velocity_per_tick);
 							point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, -deceleration, &physics_output->translational_velocity);
 							scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
-							m_time_to_target_in_ticks = (int)((distance_to_target_point / unk1) - 0.5f);
+							melee_set_time_to_target_time((distance_to_target_point / unk1) - 0.5f);
 
 							// increase the counter only if we're not pre-decelerating
 							if ((real32)(m_maximum_counter - m_melee_tick) <= k_deceleration_ticks_real)
@@ -578,29 +593,31 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 							// but breaks the sword glitches like butterflying and sword flying
 							// real32 remaining_time_to_target_real = floor(((current_velocity_per_tick_from_normalization / deceleration) - 0.5f));
 							// remaining_time_to_target_real += (remaining_time_to_target_real > 0.0f ? 0.5f : -0.5f);
-							// m_time_to_target_in_ticks = (int)remaining_time_to_target_real;
+							// melee_set_time_to_target_time(remaining_time_to_target_real);
 						}
 						else
 						{
 							force_leave_melee_lunge_physics = true;
-							m_time_to_target_in_ticks = 0;
+							melee_set_time_to_target_time(0.0f);
 						}
 					}
 					else
 					{
 						// maintain velocity
-						physics_output->translational_velocity = current_translational_velocity_per_tick;
+						point_from_line3d(&current_translational_velocity_per_tick, &direction_of_current_translational_velocity, 0.0f, &physics_output->translational_velocity);
 						scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
-						m_time_to_target_in_ticks = 0;
+						melee_set_time_to_target_time(0.0f);
 					}
 
 				}
 				else if ((real32)m_melee_tick >= 5.0f)
 				{
 					// maintain current velocity
-					physics_output->translational_velocity = current_translational_velocity_per_tick;
+					point_from_line3d(&current_translational_velocity_per_tick, &m_aiming_direction, 0.0f, &physics_output->translational_velocity);
 					scale_vector3d(&physics_output->translational_velocity, time_globals::seconds_to_ticks_real(1.0f), &physics_output->translational_velocity);
-					m_time_to_target_in_ticks = (int)((((distance_to_target_point - unk1) / max_speed_per_tick) + 3.0f) - 0.5f);
+					// add missing 4 ticks from the time to target in case the tickrate is higher than 30
+					// TODO figure out a better patch
+					melee_set_time_to_target_time((((distance_to_target_point - unk1) / max_speed_per_tick) + 3.0f) - 0.5f);
 				}
 				else
 				{
@@ -629,7 +646,10 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						+ 3.0f)
 						+ 0.5f);
 
-					m_time_to_target_in_ticks = (int)time_to_target;
+					// add missing 4 ticks from the time to target in case the tickrate is higher than 30
+					// TODO figure out a better patch
+
+					melee_set_time_to_target_time(time_to_target);
 
 					LOG_TRACE_MELEE("{} - max_speed_per_tick: {}, acceleration: {}, output magnitude: {}",
 						__FUNCTION__, max_speed_per_tick, final_acceleration, magnitude3d(&physics_output->translational_velocity));
@@ -639,7 +659,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 			{
 				m_started_decelerating = true;
 				force_leave_melee_lunge_physics = true;
-				m_time_to_target_in_ticks = 0;
+				melee_set_time_to_target_time(0.0f);
 			}
 		}
 
