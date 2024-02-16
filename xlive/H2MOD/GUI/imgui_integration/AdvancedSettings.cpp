@@ -266,12 +266,14 @@ namespace ImGuiHandler {
 					{
 						if (fps_limit > 0)
 						{
-							H2Config_fps_limit = (std::max)(fps_limit, 25);
+							fps_limit = (std::max)(fps_limit, 25);
 						}
 						else
 						{
 							fps_limit = 0;
 						}
+
+						H2Config_fps_limit = fps_limit;
 					}
 
 					ImGui::SameLine();
