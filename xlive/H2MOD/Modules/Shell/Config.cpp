@@ -465,9 +465,6 @@ void SaveH2Config() {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
-			
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
-			ini.SetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", std::to_string(H2Config_experimental_fps).c_str());
 
 			if (FloatIsNaN(H2Config_crosshair_offset)) {
 				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
@@ -706,17 +703,18 @@ void ReadH2Config() {
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
 				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
-				//H2Config_experimental_fps = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "experimental_fpx_fix", H2Config_experimental_fps);
-				switch(std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "experimental_rendering", "0")))
+
+				switch(1)
 				{
-					default:
-						//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
-						H2Config_fps_limit = 60;
 					case 0:
 						H2Config_experimental_fps = _rendering_mode_none;
 						break;
 					case 1:
 						H2Config_experimental_fps = _rendering_mode_original_game_frame_limit;
+						break;
+					default:
+						//Incase any of the old rendering modes were used for a higher fps, set it back to 60.
+						H2Config_fps_limit = 60;
 						break;
 				}
 				
