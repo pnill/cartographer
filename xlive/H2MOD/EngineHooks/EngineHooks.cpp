@@ -31,20 +31,16 @@ namespace EngineHooks
 	}
 
 #pragma region Game Version hooks
-	verify_game_version_on_join p_verify_game_version_on_join;
 	bool __cdecl verify_game_version_on_join_hook(uint8 executable_type, uint16 executable_version, uint16 compatible_version)
 	{
 		return executable_type == EXECUTABLE_TYPE && executable_version >= EXECUTABLE_VERSION && compatible_version <= COMPATIBLE_VERSION;
 	}
 
-	verify_executable_type p_verify_executable_version;
 	bool __cdecl verify_executable_type_hook(BYTE executable_type)
 	{
 		// will not display servers that don't match this in server list
 		return executable_type == EXECUTABLE_TYPE;
 	}
-
-	get_game_version p_get_game_version;
 
 	void __cdecl get_game_version_hook(BYTE* executable_type, uint16* executable_version, uint16* compatible_version)
 	{
@@ -83,11 +79,11 @@ namespace EngineHooks
 		PatchCall(Memory::GetAddress(0x1AE82F, 0x1A8A89), main_game_reset_map_blue_screen_detection);
 
 		/*Game Version Hooks*/
-		p_get_game_version = (get_game_version)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)get_game_version_hook, 8);
+		DetourFunc(Memory::GetAddress<BYTE*>(0x1B4BF5, 0x1B0043), (BYTE*)get_game_version_hook, 8);
 		if (!Memory::IsDedicatedServer()) {
+			DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
+			DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 			p_xlocator_parse_search_result = (t_xlocator_parse_search_result)DetourClassFunc(Memory::GetAddress<BYTE*>(0x1DA8ED), (BYTE*)xlocator_parse_search_result, 8);
-			p_verify_game_version_on_join = (verify_game_version_on_join)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C14), (BYTE*)verify_game_version_on_join_hook, 5);
-			p_verify_executable_version = (verify_executable_type)DetourFunc(Memory::GetAddress<BYTE*>(0x1B4C32), (BYTE*)verify_executable_type_hook, 8);
 		}
 	}
 }

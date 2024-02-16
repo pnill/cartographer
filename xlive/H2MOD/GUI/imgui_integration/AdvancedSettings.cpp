@@ -264,7 +264,14 @@ namespace ImGuiHandler {
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
 					if (ImGui::IsItemDeactivatedAfterEdit())
 					{
-						H2Config_fps_limit = (std::max)(fps_limit, 25);
+						if (fps_limit > 0)
+						{
+							H2Config_fps_limit = (std::max)(fps_limit, 25);
+						}
+						else
+						{
+							fps_limit = 0;
+						}
 					}
 
 					ImGui::SameLine();
