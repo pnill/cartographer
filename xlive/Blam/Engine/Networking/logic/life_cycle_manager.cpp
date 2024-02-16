@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "life_cycle_manager.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 e_game_life_cycle __cdecl get_game_life_cycle()
 {

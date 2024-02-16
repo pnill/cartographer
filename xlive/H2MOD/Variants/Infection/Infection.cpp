@@ -225,7 +225,7 @@ void Infection::onGameTick()
 
 			// check the difference between game time now
 			// if the time wasn't updated for more than 5 seconds, end the game
-			if (time_globals::ticks_to_seconds(time_globals::get_game_time() - last_time_at_game_should_not_end) > 5.0f)
+			if (game_ticks_to_seconds(time_globals::get_game_time() - last_time_at_game_should_not_end) > 5.0f)
 			{
 				NetworkSession::EndGame();
 			}
@@ -238,14 +238,14 @@ void Infection::removeUnwantedItems()
 	const datum shotgun_ammo_equip_datum = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
 
 	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
-	for each (auto itemcollection in itemcollections)
+	for (auto it = itemcollections.begin(); it != itemcollections.end(); it++)
 	{
-		std::string item_name = tags::get_tag_name(itemcollection.first);
+		std::string item_name = tags::get_tag_name(it->first);
 		if (item_name.find("multiplayer\\powerups") != std::string::npos ||
 			item_name == "multiplayer\\single_weapons\\frag_grenades" ||
 			item_name == "multiplayer\\single_weapons\\plasma_grenades")
 		{
-			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(itemcollection.first);
+			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(it->first);
 
 			for (int i = 0; i < itmc->item_permutations.size; i++)
 			{
@@ -264,7 +264,7 @@ void Infection::removeUnwantedItems()
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
 			netgame_equipment->item_vehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
-			netgame_equipment->item_vehicle_collection.TagIndex = DATUM_INDEX_NONE;
+			netgame_equipment->item_vehicle_collection.TagIndex = NONE;
 		}
 	}
 }

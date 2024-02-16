@@ -1,11 +1,12 @@
 #include "stdafx.h"
-
 #include "Startup.h"
+
 #include "WinMainH2.h"
 #include "../Config.h"
-#include "../Shell.h"
+#include "../H2MODShell.h"
 
 #include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
@@ -17,7 +18,7 @@
 
 #include "Util/filesys.h"
 #include "Util/hash.h"
-#include "Util/Hooks/Hook.h"
+
 
 namespace filesystem = std::filesystem;
 
@@ -126,7 +127,7 @@ bool configureXinput() {
 				static const long xinput_offset[xinput_array_length] = { xinput_offset_durazno_0_6_0_0, xinput_offset_x360ce_3_3_1_444, xinput_offset_x360ce_3_4_1_1357 };
 				static const bool xinput_unicode[xinput_array_length] = { xinput_unicode_durazno_0_6_0_0, xinput_unicode_x360ce_3_3_1_444, xinput_unicode_x360ce_3_4_1_1357 };
 				std::string available_xinput_md5;
-				if (!hashes::calc_file_md5("xinput9_1_0.dll", available_xinput_md5))
+				if (!hashes::calc_file_md5(L"xinput9_1_0.dll", available_xinput_md5))
 				{
 					report_error("Failed to hash original xinput9_1_0.dll, file might be missing?");
 					return false;
@@ -251,7 +252,7 @@ CRITICAL_SECTION log_section;
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath) {
+std::wstring prepareLogFileName(const std::wstring &logFileName, bool useAppDataLocalPath) {
 	std::wstring filename = (useAppDataLocalPath ? H2AppDataLocal : L"");
 	std::wstring processName(Memory::IsDedicatedServer() ? L"H2Server" : L"Halo2Client");
 	std::wstring folders(L"logs\\" + processName + L"\\instance" + std::to_wstring(_Shell::GetInstanceId()));
@@ -285,6 +286,8 @@ void InitH2Startup() {
 	H2BaseAddr = Memory::GetAddress();
 	H2IsDediServer = Memory::IsDedicatedServer();
 
+	shell_windows_initialize();
+	// ### TODO remove entirely
 	_Shell::Initialize();
 
 	int ArgCnt;

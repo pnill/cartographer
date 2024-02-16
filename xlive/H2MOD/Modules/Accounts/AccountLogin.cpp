@@ -86,6 +86,7 @@ int ConfigureUserDetails(const char* username, const char* login_token, unsigned
 	int result = strlen(login_token) == 32 ? 1 : 2;
 
 	XUserSetup(0, xuid, username, xnaddr, lanaddr, H2Config_base_port, machineUID, abOnline, online_signin);
+	TEST_N_DEF(PC4);
 	UpdateMasterLoginStatus(developer);
 
 	if (online_signin) {
@@ -407,7 +408,7 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 	free(escaped_user_password);
 
 #if !defined(LC2)
-	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2"), http_request_body_build, &rtn_result);
+	int error_code = MasterHttpResponse(std::string(cartographerURL + "/login2").c_str(), http_request_body_build, &rtn_result);
 #else
 	TEST_N_DEF(LC2);
 #endif

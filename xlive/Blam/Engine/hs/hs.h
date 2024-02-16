@@ -3,6 +3,10 @@
 #define k_maximum_hs_globals_per_scenario 256
 #define k_maximum_hs_references_per_scenario 512
 #define k_maximum_hs_source_files_per_scenario 8
+#include "Blam/Cache/DataTypes/DataRef.h"
+#include "Blam/Cache/DataTypes/TagRef.h"
+#include "Blam/Engine/cseries/cseries_strings.h"
+#include "Blam/Engine/tag_files/string_id.h"
 
 enum e_hs_script_type : short
 {

@@ -476,7 +476,7 @@ void CServerList::EnumerateFromHttp()
 	bool itemQueryError = false;
 
 	// build the list to download
-	auto& serverXuidArray = document["servers"].GetArray();
+	const auto& serverXuidArray = document["servers"].GetArray();
 	auto xuidStrItr = serverXuidArray.Begin();
 	auto xuidStrWriteItemItr = serverXuidArray.Begin();
 
@@ -590,15 +590,18 @@ void CServerList::EnumerateFromHttp()
 			// vector should be XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN in size
 			for (auto& itemQuery : itemsToDownloadQuery)
 			{
-				if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+				if (!itemQuery.second.empty())
 				{
-					m_pageItemsFoundCount++;
+					if (SearchResultParseAndWrite(itemQuery.second, std::stoll(xuidStrWriteItemItr->GetString()), &searchResults[searchResultIdx], &propertiesBuffer, &stringBuffer))
+					{
+						m_pageItemsFoundCount++;
 
 					// this holds all servers found count
 					// not just per page
-					validItemsFound++;
+						validItemsFound++;
 
-					searchResultIdx++;
+						searchResultIdx++;
+					}
 				}
 
 				// this counts even bad servers
@@ -1024,8 +1027,8 @@ DWORD WINAPI XLocatorServiceUnInitialize(HANDLE xlocatorhandle)
 {
 	LOG_TRACE_XLIVE("XLocatorServiceUnInitialize(a1 = {})", xlocatorhandle);
 
-	XCloseHandle(xlocatorhandle);
 	ServerListQueryCancelAll();
+	XCloseHandle(xlocatorhandle);
 
 	g_hXLocatorHandle = INVALID_HANDLE_VALUE;
 

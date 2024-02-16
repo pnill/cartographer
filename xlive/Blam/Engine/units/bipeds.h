@@ -24,8 +24,22 @@ struct biped_datum
 {
 	unit_datum unit;
 	e_biped_flags biped_flags;
-	byte gap0[144];
+	int8 gap364[124];
+	bool field_3E0;
+	int8 pad[3];
+	real_vector3d vector_3E4;
+	int8 gap3F0[4];
 	e_biped_physics_mode biped_movement_type;
-	byte gap1[139];
+	int8 gap1[139];
 };
 CHECK_STRUCT_SIZE(biped_datum, 0x480);
+
+void bipeds_apply_patches(void);
+
+void __cdecl biped_get_sight_position(
+	datum biped_index,
+	e_unit_estimate_mode estimate_mode,
+	real_point3d* estimated_body_position,
+	real_vector3d* desired_facing_vector,
+	real_vector3d* desired_gun_offset,
+	real_point3d* object_origin);

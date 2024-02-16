@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "SpecialEvents.h"
 #include "SpecialEventHelpers.h"
 #include "Events/Birthday.h"
@@ -8,95 +7,64 @@
 #include "Events/Mook.h"
 #include "Events/Paddy.h"
 
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "game/game.h"
+#include "Networking/NetworkMessageTypeCollection.h"
+
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
-// This function gets the current date and time
-std::time_t get_epoch_time(int year, const std::wstring& dateTime)
-{
-	// Let's consider we are getting all the input in
-	// this format: '2014-07-25T20:17:22Z' (T denotes
-	// start of Time part, Z denotes UTC zone).
-	// A better approach would be to pass in the format as well.
-	static const std::wstring dateTimeFormat{ L"%Y-%m-%dT%H:%M:%SZ" };
-
-	// Create a stream which we will use to parse the string,
-	// which we provide to constructor of stream to fill the buffer.
-	std::wstring tmp = std::to_wstring(year + 1900);
-	tmp.append(L"-");
-	tmp.append(dateTime);
-	std::wistringstream ss{ tmp };
-
-	// Create a tm object to store the parsed date and time.
-	std::tm dt;
-
-	// Now we read from buffer using get_time manipulator
-	// and formatting the input appropriately.
-	ss >> std::get_time(&dt, dateTimeFormat.c_str());
-
-	// Convert the tm structure to time_t value and return.
-	return std::mktime(&dt);
-}
-
-// This function checks if the current date passed is in the current week.
-bool check_special_event_week(std::wstring date)
-{
-	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-	time_t tt = std::chrono::system_clock::to_time_t(now);
-	tm utc_tm = *gmtime(&tt);
-
-	time_t pat = get_epoch_time(utc_tm.tm_year, date.append(L"T00:00:00Z"));
-	tm utc_pat = *gmtime(&pat);
-
-	int a, b = 0;
-	a = utc_tm.tm_yday - utc_tm.tm_wday;
-	b = utc_pat.tm_yday - utc_pat.tm_wday;
-	return a == b;
-}
-
-// This function checks if the current date matches the one passed.
-bool check_special_event_date(std::wstring date)
-{
-	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-	time_t tt = std::chrono::system_clock::to_time_t(now);
-	tm utc_tm = *gmtime(&tt);
-
-	time_t pat = get_epoch_time(utc_tm.tm_year, date.append(L"T00:00:00Z"));
-	tm utc_pat = *gmtime(&pat);
-
-	return utc_tm.tm_yday == utc_pat.tm_yday;
-}
-
 // Enables event if the current date and time line up with an event time
 e_special_event_type get_current_special_event()
 {
+	e_special_event_type event = _special_event_none;
+
 	if (H2Config_no_events)
-		return _special_event_none;
+		return event;
+
+	s_date_and_time date;
+	game_time_get_date_and_time(&date);
 
 #ifndef NDEBUG
 	if (H2Config_forced_event != _special_event_none)
 		return (e_special_event_type)H2Config_forced_event;
 #endif
-	if (check_special_event_week(L"3-17"))
-		return _special_event_st_paddys;
 
-	if (check_special_event_week(L"12-24") || check_special_event_week(L"12-30") || check_special_event_week(L"1-4"))
-		return _special_event_christmas;
+	switch (date.month)
+	{
+	// January
+	case 1:
+		event = (IN_RANGE_INCLUSIVE(date.day, 1, 7) ? _special_event_christmas : event);
+		break;
+	// March
+	case 3:
+		event = (IN_RANGE_INCLUSIVE(date.day, 17, 24) ? _special_event_st_paddys : event);
+		break;
+	// April
+	/* One time event
+	case 4:
+		event = (date.day == 12 ? _special_event_mook_maddness : event);
+		break;
+	*/
+	// May
+	case 5:
+		event = (IN_RANGE_INCLUSIVE(date.day, 30, 31) ? _special_event_birthday : event);
+		break;
+	// October
+	case 10:
+		event = (IN_RANGE_INCLUSIVE(date.day, 17, 31) ? _special_event_halloween : event);
+		break;
+	// November
+	case 11:
+		event = (IN_RANGE_INCLUSIVE(date.day, 8, 10) ? _special_event_birthday : event);
+		break;
+	// December
+	case 12:
+		event = (IN_RANGE_INCLUSIVE(date.day, 20, 31) ? _special_event_christmas : event);
+		break;
+	}
 
-	// One time event
-	/*if (CheckIfEventTime(L"4-12"))
-			return _mook_maddness;*/
-
-	if (check_special_event_week(L"10-20") || check_special_event_week(L"10-27") || check_special_event_date(L"10-31"))
-		return _special_event_halloween;
-
-	if (check_special_event_date(L"11-08") || check_special_event_date(L"11-09") || check_special_event_date(L"11-10") || 
-	    check_special_event_date(L"5-30") || check_special_event_date(L"5-31") || check_special_event_date(L"6-01"))
-		return _special_event_birthday;
-
-	return _special_event_none;
+	return event;
 }
 
 void load_special_event()

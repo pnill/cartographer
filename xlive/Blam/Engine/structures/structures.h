@@ -2,7 +2,7 @@
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 
 #include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 #define MAXIMUM_NODES_PER_BSP2D 131072
 #define MAXIMUM_BSPS_PER_COLLISION_REGION 64

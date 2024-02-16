@@ -3,8 +3,8 @@
 template<typename T = void>
 struct tag_block
 {
-	size_t size;
-	size_t data;
+	int32 size;
+	int32 data;
 
 	int data_size() const
 	{
@@ -19,7 +19,9 @@ struct tag_block
 		if (this->data != NONE)
 		{
 			char *tag_data_table = tags::get_tag_data();
+#ifdef DEBUG
 			if (LOG_CHECK(tag_data_table))
+#endif
 				return reinterpret_cast<T*>(&tag_data_table[this->data]);
 		}
 		return nullptr;
@@ -34,7 +36,7 @@ struct tag_block
 			return nullptr;
 	}
 
-	T* operator[](size_t index) const
+	T* operator[](int32 index) const
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)

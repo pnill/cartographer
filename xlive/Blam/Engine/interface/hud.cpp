@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 #define k_redraw_map_name "ui_redraw"
 
@@ -31,12 +31,17 @@ void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new
 
 void set_primary_hud_scale(float scale)
 {
-	*get_primary_hud_scale() = original_primary_hud_scale * scale * (1.f / k_primary_upscale_size);
+	*get_primary_hud_scale() = original_primary_hud_scale * scale * k_primary_upscale_size;
 }
 
 void set_secondary_hud_scale(float scale)
 {
-	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * (1.f / k_primary_upscale_size);
+	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * k_primary_upscale_size;
+}
+
+float* get_ui_scale()
+{
+	return Memory::GetAddress<float*>(0xA3E424);
 }
 
 float* get_primary_hud_scale()

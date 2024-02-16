@@ -9,7 +9,7 @@
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -51,10 +51,10 @@ void player_control_set_field_of_view(float fov)
 
 float __cdecl player_control_get_field_of_view(int controller_index)
 {
-	const s_player_control* player_control_info = &s_player_control_globals::get()->local_players[controller_index];
+	const s_player_control* player_control_info = player_control_get(controller_index);
 
 	float result = observer_suggested_field_of_view();
-	if (player_control_info->unit_datum_index != DATUM_INDEX_NONE)
+	if (player_control_info->unit_datum_index != NONE)
 	{
 		float fov;
 		
@@ -79,10 +79,13 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 
 void first_person_camera_apply_patches()
 {
-	// Set the custom FOV's from our config beforehand
-	player_control_set_field_of_view(H2Config_field_of_view);
-	observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+	if (!Memory::IsDedicatedServer())
+	{
+		// Set the custom FOV's from our config beforehand
+		player_control_set_field_of_view(H2Config_field_of_view);
+		observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 
-	// Patch this call for our custom fov implementation
-	PatchCall(Memory::GetAddress(0xCD880, 0xB8BF9), player_control_get_field_of_view);
+		// Patch this call for our custom fov implementation
+		PatchCall(Memory::GetAddress(0xCD880, 0xB8BF9), player_control_get_field_of_view);
+	}
 }

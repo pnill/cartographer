@@ -4,7 +4,7 @@
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/players.h"
-#include "Blam/Engine/math/integer_math.h"
+
 #include "Blam/Engine/math/periodic_functions.h"
 #include "Blam/Engine/objects/damage_reporting.h"
 
@@ -181,7 +181,7 @@ CHECK_STRUCT_SIZE(s_melee_damage_parameters, 76);
 
 struct weapon_tracking_struct_block
 {
-    e_tracking_type trackingType;
+    e_tracking_type tracking_type;
     int16 pad;
 };
 CHECK_STRUCT_SIZE(weapon_tracking_struct_block, 4);
@@ -189,8 +189,8 @@ CHECK_STRUCT_SIZE(weapon_tracking_struct_block, 4);
 // max count: k_player_character_type_count
 struct weapon_first_person_interface_definition
 {
-    tag_reference first_person_model;       // mode
-    tag_reference first_person_animations;  // jmad
+    tag_reference model;        // mode
+    tag_reference animations;   // jmad
 };
 TAG_BLOCK_SIZE_ASSERT(weapon_first_person_interface_definition, 16);
 
@@ -516,6 +516,6 @@ struct _weapon_definition
 };
 TAG_GROUP_SIZE_ASSERT(_weapon_definition, 796);
 
-weapon_first_person_interface_definition* first_person_interface_definition_get(_weapon_definition* definition, e_character_type character_type);
+weapon_first_person_interface_definition* first_person_interface_definition_get(const _weapon_definition* definition, e_character_type character_type);
 
 void weapon_definitions_apply_patches(void);

@@ -6,7 +6,7 @@
 #include "Blam/Engine/tag_files/global_string_ids.h"
 #include "H2MOD/Tags/TagInterface.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 
 typedef bool(__cdecl* ice_cream_flavor_available_t)(unsigned int skull);
@@ -78,7 +78,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 		}
 
 		datum sound_datum = player_information->ice_cream.TagIndex;
-		if (sound_datum != DATUM_INDEX_NONE)
+		if (sound_datum != NONE)
 		{
 			p_unspatialized_impulse_sound_new(sound_datum, 1.0);
 		}

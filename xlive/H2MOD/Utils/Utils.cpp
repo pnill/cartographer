@@ -489,7 +489,7 @@ static size_t writefunc(void *ptr, size_t size, size_t nmemb, struct stringMe *s
 	return size*nmemb;
 }
 
-int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_response) {
+int MasterHttpResponse(const char* url, const char* http_request, char** rtn_response) {
 	TEST_N_DEF(LC1);
 	int result = ERROR_CODE_CURL_SOCKET_FAILED;//Socket failed to connect to server
 
@@ -502,7 +502,7 @@ int MasterHttpResponse(std::string& url, const char* http_request, char** rtn_re
 		/* First set the URL that is about to receive our POST. This URL can
 		just as well be a https:// URL if that is what should receive the
 		data. */
-		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, url);
 
 		struct stringMe s;
 		init_string(&s);

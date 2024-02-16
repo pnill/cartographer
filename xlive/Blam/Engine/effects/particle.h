@@ -1,7 +1,7 @@
 #pragma once
 
 #define k_max_particles 1024
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/memory/data.h"
 
 enum e_particle_flags : int16
@@ -29,8 +29,8 @@ struct c_particle
 	int8 gap_0[2];
 	e_particle_flags flags;
 	int32 next_particle;
-	real32 field_8;
-	real32 field_C;
+	real32 time_accumulator;
+	real32 effect_delay_time;
 	int8 gap_10[12];
 	real_point3d m_position;
 	real_vector3d m_velocity;

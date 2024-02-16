@@ -2,7 +2,7 @@
 #include "Blam/Cache/DataTypes/TagBlock.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/real_math.h"
+
 
 #define MAXIMUM_ANIMATIONS_PER_SKY 8
 #define MAXIMUM_LIGHTS_PER_SKY 8

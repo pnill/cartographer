@@ -106,13 +106,3 @@ bool hashes::calc_file_md5(const std::wstring &filename, std::string &checksum_o
 	}
 	return false;
 }
-
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-bool hashes::calc_file_md5(const std::string &filename, BYTE *checksum, size_t &checksum_len, long long len_read)
-{
-	return hashes::calc_file_md5(wstring_to_string.from_bytes(filename), checksum, checksum_len, len_read);
-}
-bool hashes::calc_file_md5(const std::string &filename, std::string &checksum_out, long long len_read)
-{
-	return hashes::calc_file_md5(wstring_to_string.from_bytes(filename), checksum_out, len_read);
-}

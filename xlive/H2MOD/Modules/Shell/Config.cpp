@@ -2,7 +2,7 @@
 
 #include "Config.h"
 
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -41,7 +41,6 @@ int H2Config_fps_limit = 60;
 int H2Config_static_lod_state = e_static_lod::disable;
 int H2Config_field_of_view = 78;
 int H2Config_vehicle_field_of_view = 78;
-__int16 H2Config_refresh_rate = 60;
 bool H2Config_static_first_person = false;
 float H2Config_mouse_sens = 0;
 bool H2Config_mouse_uniform = false;
@@ -445,8 +444,6 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
 
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
-
 			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
@@ -737,7 +734,6 @@ void ReadH2Config() {
 				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
 				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
 
-				H2Config_refresh_rate = ini.GetLongValue(H2ConfigVersionSection.c_str(), "refresh_rate", H2Config_refresh_rate);
 				H2Config_mouse_uniform = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
 				std::string mouse_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_sens", "0"));
 				H2Config_mouse_sens = std::stof(mouse_sens_str);

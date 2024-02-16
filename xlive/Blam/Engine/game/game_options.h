@@ -1,10 +1,9 @@
 #pragma once
 
-
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/math/random_math.h"
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Simulation/MachineID.h"
+#include "simulation/machine_id.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 
 enum e_game_simulation : __int8

@@ -47,7 +47,7 @@ static_assert(sizeof(real64) == 8);
 typedef long datum;
 static_assert(sizeof(datum) == 4);
 
-#define SIZEOF_BITS(value) 8 * sizeof(value)
+#define SIZEOF_BITS(value) (8 * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)
@@ -57,16 +57,18 @@ static_assert(sizeof(datum) == 4);
 // ADDR_SERVER: file offset in h2server.exe
 // TYPE: function
 // __VA_ARGS__: arguments for the function we want to invoke
-#define INVOKE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<decltype(TYPE)*>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
+#define INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<TYPE>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
+#define INVOKE(ADDR_CLIENT, ADDR_SERVER, FN_DECL, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, decltype(FN_DECL)*, __VA_ARGS__)
+// ### TODO find better name
+#define INVOKE_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, __VA_ARGS__)
 
 #define NONE -1
-#define DATUM_INDEX_NONE ((datum)(NONE))
-#define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)((_absolute_index) | ((_salt) << 16))
-#define DATUM_IS_NONE(_datum_index) ((_datum_index) == DATUM_INDEX_NONE)
+#define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
+#define DATUM_IS_NONE(_datum_index) ((_datum_index) == NONE)
 #define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & 0xFFFF))
 #define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & 0xFFFF))
 
-#define NUMBEROF(_array) (sizeof(_array) / sizeof(_array[0]))
+#define NUMBEROF(_array) (sizeof(_array) / sizeof(*_array))
 #define IN_RANGE_INCLUSIVE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))
 #define VALID_COUNT(index, count) ((index) >= 0 && (index) <= (count))
@@ -100,15 +102,15 @@ static_assert(sizeof(datum) == 4);
 /// Use this for setting up enum bitfields
 #define FLAG(bit)( 1<<(bit) )
 #define TEST_BIT(flags, bit)( ((flags) & FLAG(bit)) != 0 )
-#define TEST_FLAG(flags, flag)( ((flags) & (flag)) != 0 )
+#define TEST_FLAG(flag, flags)( ((flag) & (flags)) != 0 )
 #define SET_FLAG(flags, bit, value)( (value) ? ((flags) |= FLAG(bit)) : ((flags) &= ~FLAG(bit)) )
 #define SWAP_FLAG(flags, bit)			( (flags) ^=FLAG(bit) )
 #define FLAG_RANGE(first_bit, last_bit)	( (FLAG( (last_bit)+1 - (first_bit) )-1) << (first_bit) )
 
 #define BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT) (((BIT_COUNT) + (LONG_BITS - 1)) / LONG_BITS)
 #define BIT_VECTOR_SIZE_IN_BYTES(BIT_COUNT) (4 * BIT_VECTOR_SIZE_IN_LONGS(BIT_COUNT))
-#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1))))
-#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[BIT / LONG_BITS], (BIT & (LONG_BITS - 1)), ENABLE))
+#define BIT_VECTOR_TEST_FLAG(BIT_VECTOR, BIT) (TEST_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1))))
+#define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 /// Creates a mask out of a count number of flags
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
@@ -124,3 +126,10 @@ static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagbloc
 
 #define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
 static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
+
+
+// TODO reimplement this properly
+void* csmemset(void* dst, int32 val, size_t size);
+
+// TODO reimplement this properly
+void* csmemcpy(void* dst, const void* src, size_t size);

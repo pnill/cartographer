@@ -45,17 +45,17 @@ void christmas_event_map_load()
 
 		// Give Santa Hat and Beard to Chief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-			hlmt_chief_datum != DATUM_INDEX_NONE) 
+			hlmt_chief_datum != NONE) 
 		{
 			add_hat_and_beard_to_model(hlmt_chief_datum, santa_hat_datum, beard_datum);
 		}
 		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
-			hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
+			hlmt_chief_mp_datum != NONE) 
 		{
 			add_hat_and_beard_to_model(hlmt_chief_mp_datum, santa_hat_datum, beard_datum);
 		}
 		if (datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
-			hlmt_elite_datum != DATUM_INDEX_NONE)
+			hlmt_elite_datum != NONE)
 		{
 			add_hat_and_beard_to_model(hlmt_elite_datum, santa_hat_datum, beard_datum, true);
 		}
@@ -104,7 +104,7 @@ void christmas_event_map_load()
 		sword_model->render_model.TagIndex = candy_cane_datum;
 
 		for (auto& first_person : sword_weapon->player_interface.first_person)
-			first_person.first_person_model.TagIndex = candy_cane_datum;
+			first_person.model.TagIndex = candy_cane_datum;
 
 		for (auto& attachment : sword_weapon->item.object.attachments)
 		{

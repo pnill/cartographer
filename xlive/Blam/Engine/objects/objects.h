@@ -3,9 +3,11 @@
 #include "object_placement.h"
 #include "object_type_list.h"
 
+#include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/memory/data.h"
 #include "Blam/Engine/math/matrix_math.h"
+#include "Blam/Engine/models/render_model_definitions.h"
 #include "Blam/Engine/memory/memory_pool.h"
 #include "Blam/Engine/memory/static_arrays.h"
 
@@ -106,13 +108,14 @@ enum e_object_damage_flags : uint16
 	_object_is_dead_bit = 2,
 };
 
-enum e_object_header_flag : uint8
+enum e_object_header_flags : uint8
 {
 	_object_header_active_bit = 0,
 	_object_header_awake_bit = 1,
 	_object_header_requires_motion_bit = 2,
 	_object_header_post_update_bit = 3,
 	_object_header_being_deleted_bit = 4,
+	_object_header_do_not_update_bit = 5,
 	_object_header_connected_to_map_bit = 6,
 	_object_header_child_bit = 7,
 	k_object_header_flags
@@ -128,7 +131,7 @@ CHECK_STRUCT_SIZE(object_header_block_reference, 4);
 struct s_object_header
 {
 	int16 datum_salt;
-	c_flags<e_object_header_flag, uint8, k_object_header_flags> flags;
+	c_flags<e_object_header_flags, uint8, k_object_header_flags> flags;
 	e_object_type object_type;
 	int16 cluster_index;
 	int16 object_data_size;
@@ -146,10 +149,11 @@ struct s_object_payload
 };
 CHECK_STRUCT_SIZE(s_object_payload, 20);
 
-// Struct is used in object_attachments_block
+// Used in object_attachments_block
 struct object_attachment
 {
-	int32 field_0;
+	int8 field_0;
+	int8 pad[3];
 	int32 field_4;
 };
 CHECK_STRUCT_SIZE(object_attachment, 8);
@@ -161,8 +165,9 @@ struct object_datum
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;
-	datum parent_datum;
-	uint16 inhibited_flags;
+	datum parent_index;
+	uint8 matrix_index;
+	uint8 inhibited_flags;
 	int16 placement_index;
 	uint8 gap_1C[8];
 	s_emblem_info emblem_info;
@@ -200,7 +205,7 @@ struct object_datum
 	int16 field_D0;
 	int8 model_variant_id;					// hlmt variant tag_block index
 	int8 gap_D3;
-	datum simulation_entity_index;
+	int32 simulation_entity_index;
 	bool attached_to_simulation;
 	int8 gap_D9[3];
 	datum object_projectile_datum;
@@ -228,15 +233,30 @@ struct object_datum
 };
 CHECK_STRUCT_SIZE(object_datum, 300);
 
+struct object_marker
+{
+	int16 node_index;
+	int16 region_index;
+	real_matrix4x3 matrix0;
+	real_matrix4x3 matrix1;
+	int32 field_6C;
+};
+CHECK_STRUCT_SIZE(object_marker, 112);
+
+s_data_array* object_header_data_get(void);
+
+static s_object_header* object_get_header(datum object_idx)
+{
+	return (s_object_header*)datum_get(object_header_data_get(), object_idx);
+}
+
 // Get the object fast, with no validation from datum index
 template<typename T = object_datum>
 static T* object_get_fast_unsafe(datum object_idx)
 {
-	s_object_header* header = (s_object_header*)datum_get(object_header_data_get(), object_idx);
+	s_object_header* header = object_get_header(object_idx);
 	return (T*)header->object;
 }
-
-s_data_array* object_header_data_get(void);
 
 s_memory_pool* get_object_table(void);
 
@@ -247,6 +267,9 @@ void* object_header_block_get(const datum object_datum, const object_header_bloc
 void* object_header_block_get_with_count(const datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count);
 
 void __cdecl object_placement_data_new(object_placement_data* object_placement_data, datum object_definition_idx, datum object_owner_idx, s_damage_owner* damage_owner);
+
+void object_initialize_for_interpolation(datum object_index);
+
 datum __cdecl object_new(object_placement_data* placement_data);
 void __cdecl object_delete(datum object_idx);
 
@@ -254,6 +277,30 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 
 datum object_get_damage_owner(datum damaged_unit_index);
 
+int32 object_get_entity_index(datum object_idx);
+
+void object_get_origin_interpolated(datum object_index, real_point3d* point_out);
+
+real_matrix4x3* object_get_node_matrix(datum object_datum, int16 node_index);
+
+real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index, real_matrix4x3* out_mat);
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count);
 
+void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
+	render_model_definition* render_model, 
+	c_animation_manager* animation_manager, 
+	int32 a4, 
+	int32 orientation_count, 
+	real_orientation* orientations);
+
+void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated);
+real_point3d* object_get_center_of_mass_interpolated(datum object_datum, real_point3d* center_of_mass);
+
+datum __cdecl object_get_parent_recursive(datum parent_index);
+
+int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
+
 void objects_apply_patches(void);
+
+void __cdecl objects_purge_deleted_objects(void);

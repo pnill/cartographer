@@ -89,6 +89,8 @@ void addDebugText(const char* format, ...)
 
 void InitOnScreenDebugText() {
 	initialisedDebugText = true;
-	onscreendebug_log = h2log::create("OnScreenDebug", prepareLogFileName(L"h2onscreendebug"), true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
+	const std::wstring string(L"h2onscreendebug");
+	const std::wstring processed = prepareLogFileName(string);
+	onscreendebug_log = h2log::create("OnScreenDebug", processed, true, 0); // we always create onscreendebuglog, which logs everything (log level 0)
 	addDebugText("Initialized onscreendebug log");
 }

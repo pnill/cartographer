@@ -9,7 +9,7 @@
 #include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 extern int notify_xlive_ui;

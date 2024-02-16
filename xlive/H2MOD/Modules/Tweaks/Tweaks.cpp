@@ -2,9 +2,11 @@
 #include "Tweaks.h"
 
 #include "Blam/Engine/interface/hud.h"
+#include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/rasterizer/rasterizer_settings.h"
 #include "Blam/Engine/tag_files/files_windows.h"
+#include "Blam/Engine/shell/shell_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
@@ -13,7 +15,7 @@
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 #pragma region Done_Tweaks
@@ -128,16 +130,15 @@ void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* a4,
 	int a5)
 {
-	// value converted from h2x tickrate
-	static float edgeDropFactorConverted = 0.117f * 30.f;
+	const float edge_drop_value = 0.117f;
 
 	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, float);
 	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
-	float edgeDropFactorPerTick = edgeDropFactorConverted * time_globals::get_seconds_per_tick();
+	float edge_drop_per_tick = 30.f * edge_drop_value * time_globals::get_seconds_per_tick();
 
 	// push last parameter despite the function taking just 5 parameters
-	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edgeDropFactorPerTick);
+	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
 
 	// account for the last parameter that doesn't get handled by the actual function
 	__asm add esp, 4;
@@ -157,8 +158,8 @@ __declspec(naked) void biped_ground_mode_update_to_stdcall()
 // fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
 __declspec(naked) void update_biped_ground_mode_physics_constant()
 {
-#define _stack_pointer_offset 4Ch + 4h
-#define _last_param_offset 14h
+#define _stack_pointer_offset 4h + 4Ch
+#define _last_param_offset 4h + 10h
 	__asm
 	{
 		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
@@ -167,20 +168,6 @@ __declspec(naked) void update_biped_ground_mode_physics_constant()
 #undef _stack_pointer_offset
 #undef _last_param_offset
 }
-
-static DWORD (WINAPI* p_timeGetTime)() = timeGetTime;
-DWORD WINAPI timeGetTime_hook()
-{
-	LARGE_INTEGER currentCounter, frequency;
-	QueryPerformanceFrequency(&frequency);
-	QueryPerformanceCounter(&currentCounter);
-
-	currentCounter.QuadPart = currentCounter.QuadPart - _Shell::QPCGetStartupCounter().QuadPart;
-	const long long timeNow = _Shell::QPCToTime(std::milli::den, currentCounter, frequency);
-	// don't start exactly from 0 (60 min)
-	return (DWORD)(PROCESS_SYSTEM_TIME_STARTUP_OFFSET + timeNow);
-}
-static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");
 
 void DuplicateDataBlob(DATA_BLOB* pDataIn, DATA_BLOB* pDataOut)
 {
@@ -246,7 +233,7 @@ void H2Tweaks::ApplyPatches() {
 
 	DETOUR_BEGIN();
 
-	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
+	shell_windows_apply_patches();
 
 	if (Memory::IsDedicatedServer()) {
 		p_hookServ1 = (hookServ1_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x8EFA), (BYTE*)LoadRegistrySettings, 11);
@@ -272,6 +259,9 @@ void H2Tweaks::ApplyPatches() {
 
 		// Apply patches for the hud that need to be applied before WinMain is called
 		hud_apply_pre_winmain_patches();
+		
+		// Apply patches
+		game_apply_pre_winmain_patches();
 
 		// adds support for more monitor resolutions
 		rasterizer_settings_apply_hooks();
@@ -289,9 +279,6 @@ void H2Tweaks::ApplyPatches() {
 		//NopFill(Memory::GetAddress(0x219D6D), 2);
 
 		WriteJmpTo(Memory::GetAddress(0x39EA2), is_remote_desktop);
-
-		// disable cloth debugging that writes to cloth.txt
-		WriteValue<bool>(Memory::GetAddress(0x41F650), false);
 
 		// prevent game from setting timeBeginPeriod/timeEndPeriod, when rendering loading screen
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
@@ -335,7 +322,7 @@ void H2Tweaks::ApplyPatches() {
 
 	// fixes edge drop fast fall when using higher tickrates than 30
 	PatchCall(Memory::GetAddressRelative(0x5082B4, 0x4FA5D4), biped_ground_mode_update_to_stdcall);
-	Codecave(Memory::GetAddressRelative(0x506E23, 0x4F9143), update_biped_ground_mode_physics_constant, 3);
+	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
 
 	// custom map hooks
 	MapManager::ApplyPatches();
@@ -347,20 +334,6 @@ void H2Tweaks::ApplyPatches() {
 
 void H2Tweaks::DisposePatches() {
 
-}
-
-void H2Tweaks::SetScreenRefreshRate() {
-
-	if (Memory::IsDedicatedServer())
-		return;
-
-	{
-		static bool refresh_redirected = false;
-		if (!refresh_redirected) {
-			WritePointer(Memory::GetAddress(0x25E869) + 3, &H2Config_refresh_rate);
-			refresh_redirected = true;
-		}
-	}
 }
 
 void H2Tweaks::WarpFix(bool enable)

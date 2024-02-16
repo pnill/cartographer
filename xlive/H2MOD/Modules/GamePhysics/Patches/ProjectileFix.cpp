@@ -1,12 +1,15 @@
 #include "stdafx.h"
 #include "ProjectileFix.h"
 
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/objects/objects.h"
 
-#include "Blam/Engine/math/real_math.h"
+
+#include "game/game_time.h"
+
+#include "objects/objects.h"
+
+#include "Blam/Cache/TagGroups/projectile_definition.hpp"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 FLOATING_POINT_ENV_ACCESS();
 
@@ -62,14 +65,14 @@ bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)
 void __cdecl projectile_update_instantaneous(datum projectile_object_index, real_point3d *a2)
 {
 	float tick_length = projectile_get_update_tick_length(projectile_object_index, true);
-	LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	// LOG_TRACE_GAME("projectile_update_instantaneous() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
 void __cdecl projectile_update_regular(datum projectile_object_index, real_point3d *a2)
 {
 	float tick_length = projectile_get_update_tick_length(projectile_object_index, false);
-	LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
+	// LOG_TRACE_GAME("projectile_update_regular() - projectile obj index: {:X}, tick length: {}", projectile_object_index, tick_length);
 	p_projectile_update(projectile_object_index, a2, tick_length);
 }
 
@@ -87,19 +90,15 @@ static float __declspec(naked) get_tick_length_hook()
 }
 
 // we still keep this because the fix above doen't fully fix it
-// object string, initial bullet speed, final bullet speed
-std::vector<std::tuple<std::string, float, float>> weapon_projectiles =
+
+const char* tag_names[]
 {
-	//std::make_tuple("objects\\weapons\\rifle\\battle_rifle\\projectiles\\battle_rifle_bullet", 400.f * 2, 400.f * 2),
-	//std::make_tuple("objects\\weapons\\rifle\\covenant_carbine\\projectiles\\carbine_slug\\carbine_slug", 400.f * 2, 400.f * 2),
-	std::make_tuple("objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet", 1200.0f * 2.f, 1200.0f * 2.f),
-	std::make_tuple("objects\\weapons\\rifle\\beam_rifle\\projectiles\\beam_rifle_beam", 1200.0f * 2.f, 1200.0f * 2.f),
-	std::make_tuple("objects\\vehicles\\warthog\\turrets\\gauss\\weapon\\gauss_bullet", 90.f * 2.f, 90.f * 2.f),
-	//std::make_tuple("objects\\weapons\\pistol\\magnum\\projectiles\\magnum_bullet", 400.f * 2, 400.f * 2),
-	//std::make_tuple("objects\\vehicles\\warthog\\turrets\\chaingun\\weapon\\bullet", 2000.0f, 2000.0f)
+	"objects\\weapons\\rifle\\sniper_rifle\\projectiles\\sniper_bullet",
+	"objects\\weapons\\rifle\\beam_rifle\\projectiles\\beam_rifle_beam",
+	"objects\\vehicles\\warthog\\turrets\\gauss\\weapon\\gauss_bullet"
 };
 
-datum trigger_projectile_datum_index = DATUM_INDEX_NONE;
+datum trigger_projectile_datum_index = NONE;
 
 #pragma region H3 collision data research
 __declspec(naked) void update_projectile_collision_data()
@@ -155,16 +154,17 @@ void __cdecl matrix4x3_transform_point(void* matrix, real_vector3d* v1, real_vec
 
 void ProjectileFix::ApplyProjectileVelocity()
 {
-	for (auto& proj_tuple : weapon_projectiles)
+	for (uint32 i = 0; i < ARRAYSIZE(tag_names); i++)
 	{
-		auto proj_datum = tags::find_tag(blam_tag::tag_group_type::projectile, std::get<0>(proj_tuple));
-		BYTE* projectile_tag_data = tags::get_tag<blam_tag::tag_group_type::projectile, BYTE>(proj_datum);
-		if (projectile_tag_data != nullptr)
+		datum proj_index = tags::find_tag(blam_tag::tag_group_type::projectile, tag_names[i]);
+		if (proj_index != NONE)
 		{
-			*(float*)(projectile_tag_data + 380) = std::get<1>(proj_tuple);
-			*(float*)(projectile_tag_data + 384) = std::get<2>(proj_tuple);
+			s_projectile_group_definition* projectile = (s_projectile_group_definition*)tag_get_fast(proj_index);
+			projectile->initial_velocity *= 2;
+			projectile->final_velocity *= 2;
 		}
 	}
+	return;
 }
 
 void ProjectileFix::ApplyPatches()

@@ -10,7 +10,7 @@
 
 struct s_weapon_magazine
 {
-	e_weapon_type weapon_type;
+	int16 weapon_state;
 	int16 field_2;
 	int16 field_4;
 	int16 rounds_inventory_maximum;
@@ -30,7 +30,8 @@ struct weapon_datum
 	int16 first_person_animation_duration_ticks;
 	int8 field_17E[6];
 	real32 field_184;
-	int8 field_188[22];
+	real32 field_188;
+	int8 field_18C[18];
 	int16 turn_on_time_ticks;
 	int8 field_202[130];
 	int16 field_222;
@@ -38,3 +39,6 @@ struct weapon_datum
 	int8 field_22E[24];
 };
 CHECK_STRUCT_SIZE(weapon_datum, 604);
+
+int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3);
+void __cdecl weapons_fire_barrels(void);

@@ -168,7 +168,7 @@ struct s_projectile_group_definition :TagGroup<'proj'>
 		e_potential_result_flags potential_result_flags;//0x16
 		float chance_fraction;//0x18
 		real_bounds between;//0x1C		
-		real_bounds and;//0x24
+		real_bounds _and;//0x24
 
 		tag_reference do_not_use_old_effect2;//0x2C
 		enum class e_scale_effects_by : __int16

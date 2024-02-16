@@ -1,6 +1,7 @@
 #pragma once
-
 #include "stdafx.h"
+
+static std::string empty = std::string();
 
 // remove pointer
 
@@ -65,7 +66,7 @@ public:
 	}
 
 	template<typename Type = baseTypeT>
-	bool SetValFromStr(const std::string& str, int _Base = 10, std::string& potentialException = std::string())
+	bool SetValFromStr(const std::string& str, int _Base = 10, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try

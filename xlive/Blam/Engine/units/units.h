@@ -7,7 +7,6 @@
 #define k_powered_seats_count 2
 #define MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
 
-
 enum e_weapon_addition_method : int16
 {
 	_weapon_addition_method_zero = 0,
@@ -47,10 +46,49 @@ enum e_unit_data_flags : int32
 	_unit_only_takes_damage_from_players_team = FLAG(31)
 };
 
+enum e_unit_estimate_mode : int16
+{
+	_unit_estimate_none = 0,
+	_unit_estimate_1 = 1,
+	_unit_estimate_2 = 2,
+	_unit_estimate_gun_position = 3,
+	k_unit_estimate_position_modes_count
+};
+
+enum e_unit_flags : uint32
+{
+	_unit_is_crouching_bit = 23
+};
+
 struct s_unit_304
 {
 	int8 gap_0[16];
 };
+
+struct unit_control_data
+{
+	string_id animation_state;
+	uint16 aiming_speed;
+	uint16 weapon_set_identifier;
+	uint8 field_8;
+	uint8 field_9;
+	uint16 grenade_index;
+	uint16 zoom_level;
+	char gap_E[2];
+	int64 control_flags;
+	real_vector3d throttle;
+	float trigger;
+	float secondary_trigger;
+	real_vector3d desired_facing;
+	real_vector3d desired_aiming;
+	real_vector3d desired_looking;
+	int32 field_50;
+	int32 field_54;
+	int32 field_58;
+	s_aim_assist_targeting_result target_info;
+
+};
+CHECK_STRUCT_SIZE(unit_control_data, 0x80);
 
 struct unit_datum
 {
@@ -82,7 +120,7 @@ struct unit_datum
 	int8 gap_1C9[3];
 	real32 trigger;
 	real32 secondary_trigger;
-	s_aim_assist_targetting_data target_info;
+	s_aim_assist_targeting_result target_info;
 	int32 field_1F8;
 	int32 field_1FC;
 	int32 flags_200;
@@ -94,7 +132,7 @@ struct unit_datum
 	int8 gap_20D;
 	int8 tick_count_20E;
 	bool unk_bool_20F;
-	uint16 parent_seat_index;
+	int16 parent_seat_index;
 	int8 gap_212[10];
 	real32 mouth_aperture;
 	int8 gap_220[4];
@@ -161,3 +199,13 @@ void __cdecl unit_delete_all_weapons(datum unit_datum_index);
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method);
 float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, s_player_action_weapons weapon_indexes);
+bool unit_is_dual_wielding(datum unit_index);
+datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
+
+datum player_index_from_unit_index(datum unit_index);
+
+void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point);
+
+void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
+
+void unit_apply_patches(void);

@@ -5,7 +5,7 @@
 #include "Blam/Engine/math/math.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 namespace ControllerInput
 {
@@ -152,7 +152,6 @@ namespace ControllerInput
 		float LeftStickY; // xmm0_4
 		float RightStickX; // xmm0_4
 		float RightStickY; // xmm0_4
-		signed __int64 result; // rax
 
 		RightStickThrottle[0] = 0;
 		RightStickThrottle[1] = 0;

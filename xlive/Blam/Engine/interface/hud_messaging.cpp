@@ -2,7 +2,7 @@
 #include "hud_messaging.h"
 
 #include "Blam/Engine/interface/hud.h"
-#include "Util/Hooks/Hook.h"
+
 
 // Pointer to the crosshair and text scale for the below hook
 float* p_text_scale_factor;

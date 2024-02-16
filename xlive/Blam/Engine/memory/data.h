@@ -1,46 +1,23 @@
 #pragma once
-
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-template<typename T = int>
-struct s_bitflags
-{
-	T* m_flags;
-
-	// only power of 2 sized types
-	static_assert(sizeof(T) > 0 && (sizeof(T) & (sizeof(T) - 1)) == 0);
-
-	bool test_bit(int index) const
-	{
-		return (m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1))) != 0;
-	}
-
-	void set_bit(int index, bool state)
-	{
-		if (state)
-			m_flags[index / (CHAR_BIT * sizeof(T))] |= m_flags[index / (CHAR_BIT * sizeof(T))] & FLAG(index & (CHAR_BIT * sizeof(T) - 1));
-		else
-			m_flags[index / (CHAR_BIT * sizeof(T))] = m_flags[index / (CHAR_BIT * sizeof(T))] & ~(FLAG(index & (CHAR_BIT * sizeof(T) - 1)));
-	}
-};
+#include "memory/static_arrays.h"
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array
 {
-	char name[0x20];				// 0x0
-	int datum_max_elements;			// 0x20
-	int datum_element_size;			// 0x24
-	BYTE alignment_bit;				// 0x28
+	char name[32];				// 0x0
+	int32 datum_max_elements;			// 0x20
+	int32 datum_element_size;			// 0x24
+	int8 alignment_bits;				// 0x28
 	bool is_valid;					// 0x29
-	WORD flags;						// 0x2A
-	char data_signature[4];			// 0x2C
+	int16 flags;						// 0x2A
+	int32 data_signature;			// 0x2C
 	void **allocator;				// 0x30
 	int bit_index_size;				// 0x34
 	int next_unused_index;					// 0x38
 	int total_elements_used;		// 0x3C 
 	int field_40;					// 0x40
 	char* data;						// 0x44
-	s_bitflags<> active_bit_mask;		// 0x48
+	int32 *in_use_bit_vector;		// 0x48
 
 	static datum datum_new_in_range(s_data_array* data_array)
 	{
@@ -51,7 +28,7 @@ struct s_data_array
 	static void data_make_valid(s_data_array* data_array)
 	{
 		// not entirely sure what this actually does
-		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x0); // TODO DEDI OFFSET
+		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x3281F);
 		return p_data_make_valid(data_array);
 	}
 };
@@ -64,7 +41,7 @@ public:
 	s_data_iterator(s_data_array* _data_array) : 
 		m_data_array(_data_array),
 		m_current_absolute_index(NONE),
-		m_last_datum_index(DATUM_INDEX_NONE)
+		m_last_datum_index(NONE)
 	{
 	}
 
@@ -91,14 +68,14 @@ public:
 		if (index == -1)
 		{
 			result = nullptr;
-			m_last_datum_index = DATUM_INDEX_NONE;
+			m_last_datum_index = NONE;
 			m_current_absolute_index = m_data_array->datum_max_elements;
 		}
 		else
 		{
 			result = reinterpret_cast<T*>(&m_data_array->data[m_data_array->datum_element_size * index]);
 			m_current_absolute_index = index;
-			m_last_datum_index = DATUM_INDEX_NEW(index, *(unsigned short*)(result)); // absolute index w/ salt
+			m_last_datum_index = DATUM_INDEX_NEW(index, *(int16*)(result)); // absolute index w/ salt
 		}
 		return result;
 	}
@@ -111,7 +88,7 @@ public:
 		if (index >= m_data_array->next_unused_index)
 			return -1;
 
-		while (!m_data_array->active_bit_mask.test_bit(index))
+		while (!BIT_VECTOR_TEST_FLAG(m_data_array->in_use_bit_vector, index))
 		{
 			if (++index >= m_data_array->next_unused_index)
 				return -1;
@@ -134,6 +111,11 @@ public:
 		return m_data_array->total_elements_used;
 	}
 
+	void reset()
+	{
+		m_last_datum_index = NONE;
+		m_current_absolute_index = NONE;
+	}
 private:
 	s_data_array* m_data_array;
 	datum m_last_datum_index;

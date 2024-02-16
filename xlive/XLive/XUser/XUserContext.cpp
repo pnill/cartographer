@@ -4,7 +4,7 @@
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/game/game_engine.h"
 #include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "XLive/xbox/xbox.h"
@@ -72,18 +72,18 @@ void update_player_count()
 	}
 }
 
-std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string getEnglishMapName()
 {
-	wchar_t* englishMapName = Memory::GetAddress<wchar_t*>(0x97737C);
-	return  wstring_to_string.to_bytes(englishMapName);
+	wchar_t* p_englishMapName = Memory::GetAddress<wchar_t*>(0x97737C);
+	std::wstring englishMapName(p_englishMapName);
+	return  std::string(englishMapName.begin(), englishMapName.end());
 }
 
 std::string getVariantName()
 {
 	std::wstring variant = NetworkSession::GetGameVariantName();
 	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
-	return wstring_to_string.to_bytes(variant);
+	return std::string(variant.begin(), variant.end());
 }
 
 std::string gamemode_id_to_string(int id)
@@ -136,7 +136,8 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L'\\') + 1);
 		}
 
-		std::string map_name = wstring_to_string.to_bytes(map_name_wide);
+		std::string map_name(map_name_wide.begin(), map_name_wide.end());
+
 		LOG_TRACE_GAME(L"[Discord] map_name: {}", map_name_wide.c_str());
 
 		switch (static_cast<ContextPresence>(dwContextValue)) {
@@ -145,7 +146,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 			std::wstring map_name_wide = Memory::GetAddress<wchar_t*>(0x46DD88);
 			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L'\\') + 1);
 
-			std::string map_name = wstring_to_string.to_bytes(map_name_wide);
+			std::string map_name(map_name_wide.begin(), map_name_wide.end());
 
 			std::string level_name = map_name;
 			auto it = singleplayer_maps.find(map_name);

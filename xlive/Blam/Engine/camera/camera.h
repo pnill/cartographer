@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
-#include "Blam/Engine/math/integer_math.h"
+
+
 
 struct s_camera
 {
@@ -28,6 +28,8 @@ struct s_camera
 CHECK_STRUCT_SIZE(s_camera, 0x74);
 
 // Get global camera data
-s_camera* get_global_camera();
+s_camera* get_global_camera(void);
 
 s_camera* get_effect_camera();
+
+void camera_apply_patches(void);

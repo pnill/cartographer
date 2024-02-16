@@ -16,7 +16,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "Util/Hooks/Hook.h"
+
 
 #ifndef NDEBUG
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -32,12 +32,9 @@ namespace ImGuiHandler {
 		std::string windowName = "advanced_settings";
 		namespace
 		{
-			float crosshairSize = 1.0f;
 			bool should_show_hud = true;
 			bool g_showFP = true;
-			bool g_UncappedFPS = false;
 			int g_fpsLimit = 60;
-			bool g_hitfix = true;
 			int g_deadzone = 0;
 			int g_aiming = 0;
 			int g_shadows = 0;
@@ -145,7 +142,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "PlayerFov3"), b2_size))
 					{
-						H2Config_field_of_view = 78.0f;
+						H2Config_field_of_view = 78;
 						player_control_set_field_of_view(H2Config_field_of_view);
 					}
 					ImGui::PopItemWidth();
@@ -171,7 +168,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(GetString(reset, "VehicleFOV3"), b2_size))
 					{
-						H2Config_vehicle_field_of_view = 78.0f;
+						H2Config_vehicle_field_of_view = 78;
 						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 					}
 					ImGui::PopItemWidth();
@@ -255,22 +252,19 @@ namespace ImGuiHandler {
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
-					CHRONO_DEFINE_TIME_AND_CLOCK();
-
 					ImVec2 LargestText = ImGui::CalcTextSize(GetString(hires_fix), NULL, true);
 					float float_offset = ImGui::GetCursorPosX() + LargestText.x + (LargestText.x * 0.075);
 					//FPS Limit
 					ImGui::Columns(2, NULL, false);
 					ImGui::Text(GetString(fps_limit));
 					ImGui::PushItemWidth(WidthPercentage(50));
-					ImGui::InputInt("##FPS1", &H2Config_fps_limit, 0, 110);
+					int fps_limit = H2Config_fps_limit;
+					ImGui::InputInt("##FPS1", &fps_limit, 0, 110);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(fps_limit_tooltip));
-					if (ImGui::IsItemEdited()) {
-						if (H2Config_fps_limit < 10)
-							H2Config_fps_limit = 10;
-						if (H2Config_fps_limit > 144)
-							H2Config_fps_limit = 144;
+					if (ImGui::IsItemDeactivatedAfterEdit())
+					{
+						H2Config_fps_limit = (std::max)(fps_limit, 25);
 					}
 
 					ImGui::SameLine();
@@ -278,17 +272,9 @@ namespace ImGuiHandler {
 					{
 						H2Config_fps_limit = 60;
 					}
-					ImGui::NextColumn();
-					ImGui::PopItemWidth();
-					ImGui::Text(GetString(refresh_rate));
-					ImGui::PushItemWidth(WidthPercentage(100));
-					int gRefresh = H2Config_refresh_rate;
-					ImGui::InputInt("##Refresh1", &gRefresh, 0, 110, ImGuiInputTextFlags_AlwaysOverwrite);
-					if (ImGui::IsItemEdited())
-						H2Config_refresh_rate = gRefresh;
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(refresh_rate_tooltip));
 
+					// from the old refresh button
+					ImGui::NextColumn();
 					ImGui::NextColumn();
 					//LOD
 					ImGui::Text(GetString(lod));
@@ -315,16 +301,7 @@ namespace ImGuiHandler {
 						H2Config_Override_Water = (e_override_texture_resolution)g_water;
 						RenderHooks::ResetDevice();
 					}
-					ImGui::NextColumn();
-					ImGui::Text(GetString(experimental_rendering_changes));
-					const char* r_items[] = { GetString(render_none), GetString(render_patch) };
-					ImGui::PushItemWidth(WidthPercentage(100));
-					if (ImGui::Combo("##ExpRend", &g_experimental, r_items, 2))
-					{
-						H2Config_experimental_fps = (H2Config_Experimental_Rendering_Mode)g_experimental;
-					}
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
+
 					ImGui::Columns(1);
 
 					//Force max shader LOD
@@ -695,7 +672,7 @@ namespace ImGuiHandler {
 						// TODO Remove this and replace with proper menu when selecting a map (WIP)
 						TextVerticalPad(GetString(skull_anger));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[skull_type_anger]);
+						ImGui::Checkbox("##SkullAnger", &get_ice_cream_activation()[_skull_type_anger]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_anger_tooltip));
 
@@ -703,7 +680,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_assassins));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[skull_type_assassians]);
+						ImGui::Checkbox("##SkullAssassins", &get_ice_cream_activation()[_skull_type_assassians]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_assassins_tooltip));
 
@@ -711,7 +688,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_black_eye));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[skull_type_black_eye]);
+						ImGui::Checkbox("##SkullBlackEye", &get_ice_cream_activation()[_skull_type_black_eye]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_black_eye_tooltip));
 
@@ -719,7 +696,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_blind));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[skull_type_blind]);
+						ImGui::Checkbox("##SkullBlind", &get_ice_cream_activation()[_skull_type_blind]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_blind_tooltip));
 
@@ -727,7 +704,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_catch));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[skull_type_catch]);
+						ImGui::Checkbox("##SkullCatch", &get_ice_cream_activation()[_skull_type_catch]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_catch_tooltip));
 
@@ -735,7 +712,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_envy));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[skull_type_envy]);
+						ImGui::Checkbox("##SkullEnvy", &get_ice_cream_activation()[_skull_type_envy]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_envy_tooltip));
 
@@ -743,7 +720,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_famine));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[skull_type_famine]);
+						ImGui::Checkbox("##SkullFamine", &get_ice_cream_activation()[_skull_type_famine]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_famine_tooltip));
 
@@ -751,7 +728,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_ghost));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[skull_type_ghost]);
+						ImGui::Checkbox("##SkullGhost", &get_ice_cream_activation()[_skull_type_ghost]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_ghost_tooltip));
 
@@ -759,7 +736,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_grunt));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[skull_type_grunt_birthday_party]);
+						ImGui::Checkbox("##SkullGBP", &get_ice_cream_activation()[_skull_type_grunt_birthday_party]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_grunt_tooltip));
 
@@ -767,7 +744,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iron));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[skull_type_iron]);
+						ImGui::Checkbox("##SkullIron", &get_ice_cream_activation()[_skull_type_iron]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iron_tooltip));
 
@@ -775,7 +752,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_iwbyd));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[skull_type_IWHBYD]);
+						ImGui::Checkbox("##SkullIWHBYD", &get_ice_cream_activation()[_skull_type_iwhbyd]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_iwbyd_tooltip));
 
@@ -783,7 +760,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_mythic));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[skull_type_mythic]);
+						ImGui::Checkbox("##SkullMythic", &get_ice_cream_activation()[_skull_type_mythic]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_mythic_tooltip));
 
@@ -791,7 +768,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_sputnik));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[skull_type_sputnik]);
+						ImGui::Checkbox("##SkullSputnik", &get_ice_cream_activation()[_skull_type_sputnik]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_sputnik_tooltip));
 
@@ -799,7 +776,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_thunderstorm));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[skull_type_thunderstorm]);
+						ImGui::Checkbox("##SkullThunderstorm", &get_ice_cream_activation()[_skull_type_thunderstorm]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_thunderstorm_tooltip));
 
@@ -807,7 +784,7 @@ namespace ImGuiHandler {
 
 						TextVerticalPad(GetString(skull_whuppopotamus));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[skull_type_whuppopotamus]);
+						ImGui::Checkbox("##SkullWhuppopatamus", &get_ice_cream_activation()[_skull_type_whuppopotamus]);
 						if (ImGui::IsItemHovered())
 							ImGui::SetTooltip(GetString(skull_whuppopotamus_tooltip));
 
@@ -1118,9 +1095,7 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
 			string_table[0][e_advanced_string::fps_limit_tooltip] =
-				"Setting this to 0 will uncap your games frame rate."
-				"\nAnything over 60 may cause performance issues"
-				"\nUse the Experimental Rendering Changes to resolve them";
+				"Setting this to 0 will uncap your games frame rate.";
 			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Mode";
 			string_table[0][e_advanced_string::experimental_rendering_tooltip] =
 				"This will change how the game handles rendering, requires a restart to take effect."
@@ -1129,8 +1104,6 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::render_none] = "None";
 			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
 			string_table[0][e_advanced_string::render_engine] = "Engine Force";
-			string_table[0][e_advanced_string::refresh_rate] = "Refresh Rate";
-			string_table[0][e_advanced_string::refresh_rate_tooltip] = "This settings requires a restart to take effect";
 			string_table[0][e_advanced_string::lod] = "Level of Detail";
 			string_table[0][e_advanced_string::e_default] = "Default";
 			string_table[0][e_advanced_string::lod_1] = "L1 - Very Low";
@@ -1291,8 +1264,6 @@ namespace ImGuiHandler {
 			string_table[4][e_advanced_string::render_none] = "Ninguno";
 			string_table[4][e_advanced_string::render_cinematic] = "Fuerza Cinematográfica";
 			string_table[4][e_advanced_string::render_engine] = "Fuerza del motor";
-			string_table[4][e_advanced_string::refresh_rate] = "Taza de refresco";
-			string_table[4][e_advanced_string::refresh_rate_tooltip] = "Este ajuste requiere reiniciar el juego para que tenga efecto.";
 			string_table[4][e_advanced_string::lod] = "Nivel de detalle";
 			string_table[4][e_advanced_string::e_default] = "Inicial";
 			string_table[4][e_advanced_string::lod_1] = "N1 - Muy bajo";

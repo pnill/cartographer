@@ -112,12 +112,13 @@ bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const
 			uint32 file_size;
 			if (file_get_size(file_to_add, &file_size))
 			{
-				// Add minidump to zip file
+				// Add the file to the zip
 				if (zipOpenNewFileInZip(zip_file, path_in_zip, NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_BEST_COMPRESSION) == Z_OK)
 				{
 					void* file_data = malloc(file_size);
 					if (file_read(file_to_add, file_size, false, file_data))
 					{
+						// Write the data to the file in the zip
 						if(zipWriteInFileInZip(zip_file, file_data, file_size) != Z_OK)
 						{
 							result = false;
@@ -129,6 +130,7 @@ bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const
 					}
 
 					free(file_data);
+					// Close the zip
 					if (zipCloseFileInZip(zip_file) != Z_OK)
 					{
 						result = false;
@@ -144,6 +146,7 @@ bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const
 				result = false;
 			}
 
+			// Close the file reference to the zip
 			if (!file_close(file_to_add))
 			{
 				result = false;

@@ -5,9 +5,10 @@
 #include "Blam/Engine/objects/emblems.h"
 #include "Blam/Engine/objects/objects.h"
 #include "Blam/Engine/units/units.h"
-#include "Blam/Engine/Simulation/MachineID.h"
+#include "simulation/machine_id.h"
 
 #define k_maximum_players 16
+#define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
 
 enum e_player_color : byte
 {
@@ -168,6 +169,7 @@ struct s_player
 	static bool is_index_valid(datum player_index);
 	static s_player* get(datum player_index);
 	static e_game_team get_team(datum player_index);
+	static s_player* get_from_unit_index(datum unit_index);
 	static void set_team(datum player_index, e_game_team team);
 	static void set_unit_character_type(datum player_index, e_character_type character_type);
 	static void set_player_unit_grenade_count(datum player_index, e_unit_grenade_type type, int8 count, bool reset_equipment);
@@ -252,6 +254,10 @@ s_players_globals* get_players_globals();
 
 datum __cdecl player_index_from_user_index(int32 user_index);
 bool __cdecl players_user_is_active(int32 user_index);
+
+datum __cdecl player_index_from_absolute_player_index(uint16 abs_player_index);
+
+void __cdecl players_set_machines(uint32 new_machine_valid_mask, const s_machine_identifier* new_machine_identifiers);
 
 // gets required bits for player_appearance
 uint32 player_appearance_required_bits(void);

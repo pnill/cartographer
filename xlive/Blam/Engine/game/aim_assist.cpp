@@ -3,10 +3,10 @@
 
 #include "H2MOD.h"
 #include "Blam/Engine/game/game.h"
-#include "Util/Hooks/Hook.h"
+
 
 // sword-flying target clear patch
-void __cdecl aim_assist_targeting_clear_hook(s_aim_assist_targetting_data* target_data)
+void __cdecl aim_assist_targeting_clear_hook(s_aim_assist_targeting_result* target_data)
 {
 	if (!game_is_campaign() && !xbox_tickrate_is_enabled())
 	{

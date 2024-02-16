@@ -13,7 +13,7 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "Util/Hooks/Hook.h"
+
 
 CustomVariantSettings::s_variant_settings currentVariantSettings;
 CustomVariantSettings::s_variant_settings defaultCustomVariantSettings;
@@ -21,30 +21,30 @@ std::map<std::wstring, CustomVariantSettings::s_variant_settings> customVariantS
 
 namespace CustomVariantSettings
 {
-	void __cdecl EncodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data)
+	void __cdecl EncodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
-		stream->data_encode_bits("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT); //16.
-		stream->data_encode_bits("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
-		stream->data_encode_bool("infinite ammo", data->infiniteAmmo);
-		stream->data_encode_bool("explosion physics", data->explosionPhysics);
-		stream->data_encode_integer("hill rotation", (byte)data->hillRotation, 8);
-		stream->data_encode_bool("infinite grenades", data->infiniteGrenades);
-		stream->data_encode_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
+		stream->write_raw_data("gravity", &data->gravity, sizeof(data->gravity) * CHAR_BIT); //16.
+		stream->write_raw_data("game speed", &data->gameSpeed, sizeof(data->gameSpeed) * CHAR_BIT);
+		stream->write_bool("infinite ammo", data->infiniteAmmo);
+		stream->write_bool("explosion physics", data->explosionPhysics);
+		stream->write_integer("hill rotation", (byte)data->hillRotation, 8);
+		stream->write_bool("infinite grenades", data->infiniteGrenades);
+		stream->write_integer("forced field of view", data->forced_fov, sizeof(data->forced_fov) * CHAR_BIT);
 	}
-	bool __cdecl DecodeVariantSettings(bitstream* stream, int a2, s_variant_settings* data)
+	bool __cdecl DecodeVariantSettings(c_bitstream* stream, int a2, s_variant_settings* data)
 	{
 		double gravity, gamespeed;
-		stream->data_decode_bits("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
+		stream->read_raw_data("gravity", &gravity, sizeof(gravity) * CHAR_BIT);
 		data->gravity = gravity;
-		stream->data_decode_bits("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
+		stream->read_raw_data("game speed", &gamespeed, sizeof(gamespeed) * CHAR_BIT);
 		data->gameSpeed = gamespeed;
 		
-		data->infiniteAmmo = stream->data_decode_bool("infinite ammo");
-		data->explosionPhysics = stream->data_decode_bool("explosion physics");
-		data->hillRotation = (e_hill_rotation)stream->data_decode_integer("hill rotation", 8);
-		data->infiniteGrenades = stream->data_decode_bool("infinite grenades");
-		data->forced_fov = stream->data_decode_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
-		return stream->overflow() == false;
+		data->infiniteAmmo = stream->read_bool("infinite ammo");
+		data->explosionPhysics = stream->read_bool("explosion physics");
+		data->hillRotation = (e_hill_rotation)stream->read_integer("hill rotation", 8);
+		data->infiniteGrenades = stream->read_bool("infinite grenades");
+		data->forced_fov = stream->read_integer("forced field of view", sizeof(data->forced_fov) * CHAR_BIT);
+		return stream->error_occured() == false;
 	}
 
 	void UpdateCustomVariantSettings(s_variant_settings* data)
@@ -65,13 +65,13 @@ namespace CustomVariantSettings
 			{
 				currentVariantSettings = customVariantSetting->second;
 				if (currentVariantSettings != defaultCustomVariantSettings) {
-					s_network_observer* observer = session->p_network_observer;
+					c_network_observer* observer = session->p_network_observer;
 					s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIndex);
 					if (peerIndex != -1 && !NetworkSession::IsPeerIndexLocal(peerIndex))
 					{
 						if (observer_channel->field_1)
-							observer->sendNetworkMessage(session->session_index, observer_channel->observer_index,
-								s_network_observer::e_network_message_send_protocol::in_band, _custom_variant_settings,
+							observer->send_message(session->session_index, observer_channel->observer_index,
+								c_network_observer::e_network_message_send_protocol::in_band, _custom_variant_settings,
 								CustomVariantSettingsPacketSize, &currentVariantSettings);
 					}
 				}

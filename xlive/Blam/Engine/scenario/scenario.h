@@ -12,4 +12,6 @@ void location_invalidate(s_location* object_location);
 
 void __cdecl scenario_location_from_point(s_location* location, real_point3d* point);
 
+bool __cdecl scenario_location_underwater(s_location* location, real_point3d* point, int16* global_material_index);
+
 void __cdecl scenario_location_from_leaf(s_location* location, int32 leaf_index);

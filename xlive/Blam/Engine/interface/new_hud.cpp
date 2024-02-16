@@ -8,12 +8,12 @@
 #include "Blam/Engine/interface/new_hud_definitions.h"
 #include "Blam/Engine/main/main_screenshot.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
-#include "Blam/Engine/math/integer_math.h"
+
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
-#include "Util/Hooks/Hook.h"
+
 
 bool g_should_draw_hud_override = true;
 std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums
@@ -119,10 +119,10 @@ void set_crosshair_scale(float scale)
 // Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
 void initialize_crosshair_bitmap_data()
 {
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
-		for (size_t j = 0; j < bitm_definition->bitmaps.size; ++j)
+		for (int32 j = 0; j < bitm_definition->bitmaps.size; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
 			point2d bitmap_size = { bitmap_data_block->width_pixels, bitmap_data_block->height_pixels };
@@ -151,9 +151,9 @@ void get_crosshair_bitmap_datums()
 {
 	// Get all nhdt tags
 	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(blam_tag::tag_group_type::newhuddefinition);
-	for each (auto nhdt_tag in new_hud_definition_tags)
+	for (auto it = new_hud_definition_tags.begin(); it != new_hud_definition_tags.end(); it++)
 	{
-		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(nhdt_tag.first);
+		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(it->first);
 
 		// Loop through every bitmap widget in the nhdt definition
 		for (byte i = 0; i < nhdt_definition->bitmap_widgets.size; ++i)

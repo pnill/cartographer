@@ -7,9 +7,7 @@
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
-#include <math.h>
-#define _USE_MATH_DEFINES
+
 
 namespace ObserverMode
 {
@@ -68,7 +66,7 @@ namespace ObserverMode
 		float* result = p_editor_camera_update(a1, a2, a3);
 		real_vector3d* CameraPosition = *Memory::GetAddress<real_vector3d**>(0x4d84ec);
 		//These are fucked and need to be fixed.... everything is offset by 4, have to go back and fix everything that uses it.
-		auto control = PlayerControl::GetControls(0);
+		auto control = player_control_get(0);
 
 		CameraAngles->i = control->actions.facing.yaw;
 		CameraAngles->j = control->actions.facing.pitch;
@@ -191,7 +189,7 @@ namespace ObserverMode
 		if (ObserverMode == observer_firstperson) {
 			player_iterator player_it;
 
-			datum unitIndexSameAsObserverIndex(DATUM_INDEX_NONE);
+			datum unitIndexSameAsObserverIndex(NONE);
 
 			while (player_it.get_next_active_player())
 			{
@@ -203,7 +201,7 @@ namespace ObserverMode
 				}
 			}
 				
-			auto control = PlayerControl::GetControls(0);
+			auto control = player_control_get(0);
 			auto player_actions = PlayerControl::GetPlayerActions(currentPlayerIndex);
 			s_player::get(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index_from_user_index(0)))->unit_index = observer_current_index;
 			//control->ControllingDatum = observer_current_index;

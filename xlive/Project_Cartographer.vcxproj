@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -89,7 +89,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -137,6 +137,9 @@
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -161,7 +164,7 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -196,6 +199,9 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug/xliveless.bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>CALL $(SolutionDir)GIT-VS-VERSION-GEN.bat "$(IntDir)" "$(SolutionDir)xlive\version_git.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdparty\imgui\backends\imgui_impl_dx9.cpp">
@@ -297,17 +303,28 @@
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_channel.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\animations\animation_id.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_manager.cpp" />
     <ClCompile Include="Blam\Engine\animations\animation_interpolation.cpp" />
+    <ClCompile Include="Blam\Engine\animations\ik_point_iterator.cpp" />
+    <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\director.cpp" />
+    <ClCompile Include="Blam\Engine\camera\observer.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
+    <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_location.cpp" />
+    <ClCompile Include="Blam\Engine\effects\player_effects.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_definition_interface.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_emitter.cpp" />
@@ -321,10 +338,21 @@
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
+    <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
+    <ClCompile Include="Blam\Engine\hs\hs.cpp" />
+    <ClCompile Include="Blam\Engine\input\controllers.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
+    <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
+    <ClCompile Include="Blam\Engine\main\loading.cpp" />
+    <ClCompile Include="Blam\Engine\main\main.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_game_time.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_render.cpp" />
     <ClCompile Include="Blam\Engine\main\main_screenshot.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_debug_pc.cpp" />
     <ClCompile Include="Blam\Engine\decorators\decorator_definitions.cpp" />
@@ -348,11 +376,19 @@
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
     <ClCompile Include="Blam\Engine\math\random_math.cpp" />
+    <ClCompile Include="Blam\Engine\math\real_quantization.cpp" />
     <ClCompile Include="Blam\Engine\memory\data.cpp" />
+    <ClCompile Include="Blam\Engine\memory\lruv_cache.cpp" />
     <ClCompile Include="Blam\Engine\memory\memory_pool.cpp" />
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
+    <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
+    <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
@@ -409,21 +445,30 @@
     <ClInclude Include="Blam\Engine\ai\zone.h" />
     <ClInclude Include="Blam\Engine\animations\animation_channel.h" />
     <ClInclude Include="Blam\Engine\animations\animation_definitions.h" />
+    <ClInclude Include="Blam\Engine\animations\animation_id.h" />
     <ClInclude Include="Blam\Engine\animations\animation_manager.h" />
     <ClInclude Include="Blam\Engine\animations\animation_interpolation.h" />
+    <ClInclude Include="Blam\Engine\animations\ik_point_iterator.h" />
+    <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
+    <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
+    <ClInclude Include="Blam\Engine\camera\director.h" />
+    <ClInclude Include="Blam\Engine\camera\observer.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_modules.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
+    <ClInclude Include="Blam\Engine\cseries\runtime_state.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
+    <ClInclude Include="Blam\Engine\effects\contrails.h" />
     <ClInclude Include="Blam\Engine\effects\effects.h" />
     <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
     <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
@@ -438,6 +483,7 @@
     <ClInclude Include="Blam\Engine\effects\particle_state.h" />
     <ClInclude Include="Blam\Engine\effects\particle_system.h" />
     <ClInclude Include="Blam\Engine\effects\particle_system_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\player_effects.h" />
     <ClInclude Include="Blam\Engine\effects\particle_update.h" />
     <ClInclude Include="Blam\Engine\errors\error_reports.h" />
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
@@ -448,11 +494,15 @@
     <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
+    <ClInclude Include="Blam\Engine\game\player_vibration.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_block.h" />
     <ClInclude Include="Blam\Engine\geometry\geometry_definitions_new.h" />
     <ClInclude Include="Blam\Engine\hs\hs_library_internal_runtime.h" />
     <ClInclude Include="Blam\Engine\hs\hs_unit_seats.h" />
     <ClInclude Include="Blam\Engine\input\controllers.h" />
+    <ClInclude Include="Blam\Engine\input\input_abstraction.h" />
+    <ClInclude Include="Blam\Engine\input\input_windows.h" />
+    <ClInclude Include="Blam\Engine\input\input_xinput.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
@@ -469,8 +519,11 @@
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
+    <ClInclude Include="Blam\Engine\main\main_game_time.h" />
+    <ClInclude Include="Blam\Engine\main\main_render.h" />
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
@@ -479,40 +532,72 @@
     <ClInclude Include="Blam\Engine\math\math.h" />
     <ClInclude Include="Blam\Engine\math\matrix_math.h" />
     <ClInclude Include="Blam\Engine\math\periodic_functions.h" />
+    <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
+    <ClInclude Include="Blam\Engine\math\real_quantization.h" />
+    <ClInclude Include="Blam\Engine\memory\lruv_cache.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
+    <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
     <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkCommon.h" />
+    <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_globals.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_settings.cpp" />
+    <ClCompile Include="Blam\Engine\render\render.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_visibility_collection.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\game_state.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\game_state_procs.cpp" />
     <ClCompile Include="Blam\Engine\render\render_sky.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />
+    <ClCompile Include="Blam\Engine\shell\shell_windows_internals.cpp" />
     <ClCompile Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_action.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\game_interface\simulation_game_units.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\simulation.cpp" />
-    <ClCompile Include="Blam\Engine\Simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_action.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_interface.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_internal.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_objects.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_units.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_event_handler.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_gamestate_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_entities.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
+    <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
+    <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
+    <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
@@ -531,23 +616,18 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.cpp" />
+    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\EventHandler\EventHandler.cpp" />
-    <ClCompile Include="H2MOD\Modules\GamePhysics\MeleeLunge.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.cpp" />
-    <ClCompile Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
@@ -555,11 +635,10 @@
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\Shell.cpp" />
+    <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
@@ -568,7 +647,6 @@
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Paddy.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\SpecialEvents.cpp" />
-    <ClCompile Include="H2MOD\Modules\Stats\StatsHandler.cpp" />
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
@@ -588,10 +666,6 @@
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
-    <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
     <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
@@ -606,10 +680,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp">
-      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotSet</EnableEnhancedInstructionSet>
-      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NoExtensions</EnableEnhancedInstructionSet>
-    </ClCompile>
     <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
@@ -779,6 +849,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
@@ -796,25 +868,34 @@
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_models.h" />
     <ClInclude Include="Blam\Engine\physics\havok.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_globals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
+    <ClInclude Include="Blam\Engine\render\render.h" />
+    <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
     <ClInclude Include="Blam\Engine\render\render_prt.h" />
     <ClInclude Include="Blam\Engine\render\render_sky.h" />
     <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />
+    <ClInclude Include="Blam\Engine\render\render_submit.h" />
+    <ClInclude Include="Blam\Engine\render\render_visibility_collection.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
+    <ClInclude Include="Blam\Engine\saved_games\game_state_procs.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\physics\physics_constants.h" />
-    <ClInclude Include="Blam\Engine\Networking\NetworkPrimitiveTypes.h" />
-    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationControlView.h" />
-    <ClInclude Include="Blam\Engine\Networking\Replication\ReplicationEntity.h" />
-    <ClInclude Include="Blam\Engine\Networking\PlayerMotion.h" />
-    <ClInclude Include="Blam\Engine\Networking\PlayerPrediction.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_control_view.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_entity.h" />
+    <ClInclude Include="Blam\Engine\Networking\player_motion.h" />
+    <ClInclude Include="Blam\Engine\Networking\player_prediction.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />
@@ -822,37 +903,49 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="Blam\Engine\shell\shell.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows.h" />
+    <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
     <ClInclude Include="Blam\Engine\shell\windows\crash_report_window\crash_report_window.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_action.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_damage.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_device_machines.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_entities.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_generics.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_interface.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_internal.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_items.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_objects.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_projectiles.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_turrets.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_units.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_engine_player.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_vehicles.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_weapons.h" />
-    <ClInclude Include="Blam\Engine\Simulation\MachineID.h" />
-    <ClInclude Include="Blam\Engine\Simulation\simulation.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationActors.h" />
-    <ClInclude Include="Blam\Engine\Simulation\game_interface\simulation_game_events.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationPlayers.h" />
-    <ClInclude Include="Blam\Engine\Simulation\simulation_type_collection.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationView.h" />
-    <ClInclude Include="Blam\Engine\Simulation\SimulationWorld.h" />
-    <ClInclude Include="Blam\Engine\Simulation\UnitControl.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_action.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_damage.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_device_machines.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_engine_player.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_entities.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_generics.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_interface.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_internal.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_items.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_objects.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_projectiles.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_turrets.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_units.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_vehicles.h" />
+    <ClInclude Include="Blam\Engine\simulation\game_interface\simulation_game_weapons.h" />
+    <ClInclude Include="Blam\Engine\simulation\machine_id.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_actors.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_entity_database.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_event_handler.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_gamestate_entities.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_players.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_entities.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_type_collection.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
+    <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
@@ -869,6 +962,8 @@
     <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
+    <ClInclude Include="Blam\Engine\widgets\cloth.h" />
+    <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
@@ -887,23 +982,18 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\FirstPersonInterpolate.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\Interpolation.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\Interpolation\ObjectInterpolate.h" />
+    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\Modules\CustomVariantSettings\CustomVariantSettings.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="H2MOD\Modules\EventHandler\EventHandler.hpp" />
-    <ClInclude Include="H2MOD\Modules\GamePhysics\MeleeLunge.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_melee.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.h" />
     <ClInclude Include="H2MOD\Modules\Input\ControllerInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\KeyboardInput.h" />
     <ClInclude Include="H2MOD\Modules\Input\PlayerControl.h" />
     <ClInclude Include="H2MOD\Modules\KantTesting\KantTesting.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\TestGameTimePrep.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\UncappedFPS2\UncappedFPS2.h" />
-    <ClInclude Include="H2MOD\Modules\MainLoopPatches\MainGameTime\MainGameTime.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
@@ -911,12 +1001,11 @@
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\OverridePackets\OverridePackets.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\Shell.h" />
+    <ClInclude Include="H2MOD\Modules\Shell\H2MODShell.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Birthday.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Christmas.h" />
@@ -927,7 +1016,6 @@
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Paddy.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEventHelpers.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\SpecialEvents.h" />
-    <ClInclude Include="H2MOD\Modules\Stats\StatsHandler.h" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
@@ -972,7 +1060,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
-    <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />

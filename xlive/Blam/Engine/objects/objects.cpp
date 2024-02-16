@@ -8,10 +8,13 @@
 
 #include "Blam/Engine/animations/animation_manager.h"
 #include "Blam/Engine/cache/cache_files.h"
+#include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/devices/devices.h"
 #include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
+#include "Blam/Engine/items/weapons.h"
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/memory/bitstream.h"
 #include "Blam/Engine/models/models.h"
@@ -19,12 +22,12 @@
 #include "Blam/Engine/physics/collisions.h"
 #include "Blam/Engine/physics/havok.h"
 #include "Blam/Engine/physics/havok_memory.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
-#include "Blam/Engine/Simulation/simulation.h"
+#include "simulation/game_interface/simulation_game_units.h"
+#include "simulation/simulation.h"
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/units/bipeds.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 s_data_array* object_header_data_get(void)
 {
@@ -46,7 +49,7 @@ void* object_header_block_get(datum object_datum, const object_header_block_refe
 	return (void*)((char*)object_get_fast_unsafe(object_datum) + reference->offset);
 }
 
-void* object_header_block_get_with_count(datum object_datum, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
+void* object_header_block_get_with_count(datum object_index, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
 {
 	void* block;
 	if (reference->offset == -1)
@@ -56,11 +59,16 @@ void* object_header_block_get_with_count(datum object_datum, const object_header
 	}
 	else
 	{
-		block = (void*)object_header_block_get(object_datum, reference);
+		block = (void*)object_header_block_get(object_index, reference);
 		*element_count = reference->size / element_size;
 	}
 
 	return block;
+}
+
+int32 object_get_entity_index(datum object_idx)
+{
+	return object_get_fast_unsafe(object_idx)->simulation_entity_index;
 }
 
 datum __cdecl object_header_new(int16 object_data_size)
@@ -204,7 +212,7 @@ bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 	object_datum* object = object_get_fast_unsafe(object_index);
 	scenario_location_from_point(location, &object->object_origin_point);
 
-	if (location->cluster == NONE)
+	if (location->cluster_index == NONE)
 	{
 		collision_bsp_test_sphere_result test_result;
 		collision_bsp_test_sphere(global_collision_bsp_get(), 0, NULL, &object->object_origin_point, object->shadow_sphere_radius, &test_result);
@@ -219,7 +227,7 @@ bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 		}
 	}
 
-	return location->cluster != NONE;
+	return location->cluster_index != NONE;
 }
 
 // Gets important info about the object and populates the s_object_payload argument with the appropriate data
@@ -247,28 +255,28 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
 	s_location* p_location = location;
+	s_location scnr_location;
 
 	if (!p_location)
 	{
-		s_location scnr_location;
 		scenario_location_from_point(&scnr_location, &object->object_origin_point);
 		p_location = &scnr_location;
-		if (scnr_location.cluster == NONE)
+		if (scnr_location.cluster_index == NONE)
 		{
 			scenario_location_from_point(&scnr_location, &object->position);
 		}
 	}
 
-	if (p_location->cluster == NONE)
+	if (p_location->cluster_index == NONE)
 	{
 		object->object_flags.set(_object_outside_of_map_bit, true);
 	}
 	else
 	{
 		object->location.leaf_index = p_location->leaf_index;
-		object->location.cluster = p_location->cluster;
+		object->location.cluster_index = p_location->cluster_index;
 		object->location.bsp_index = p_location->bsp_index;
-		object_header->cluster_index = p_location->cluster;
+		object_header->cluster_index = p_location->cluster_index;
 		object->object_flags.set(_object_outside_of_map_bit, false);
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
@@ -381,7 +389,7 @@ void object_occlusion_data_initialize(datum object_index)
 void free_object_memory(datum object_index)
 {
 	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
-	object_header->flags = (e_object_header_flag)0;
+	object_header->flags = (e_object_header_flags)0;
 	if (object_header->object != NULL)
 	{
 		memory_pool_block_free(get_object_table(), &object_header->object);
@@ -391,16 +399,57 @@ void free_object_memory(datum object_index)
 }
 
 
-void object_initialize_for_interpolation(datum object_datum)
+void object_initialize_for_interpolation(datum object_index)
 {
-	// TODO: finish this
+	uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
+	object_datum* object = object_get_fast_unsafe(object_index);
+	object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
+
+	if (object_def->model.TagIndex == NONE)
+	{
+		if (object_def->attachments.size <= 0)
+		{
+			return;
+		}
+
+		int32 tag_block_index = 0;
+		while (1)
+		{
+			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
+			if (attachment->type.TagIndex != NONE)
+			{
+				blam_tag group = attachment->type.TagGroup;
+				if (group.as_int() == 'lens'
+					|| group.as_int() == 'ligh'
+					|| group.as_int() == 'MGS2'
+					|| group.as_int() == 'tdtl'
+					|| group.as_int() == 'cont'
+					|| group.as_int() == 'effe')
+				{
+					break;
+				}
+			}
+			if (++tag_block_index >= object_def->attachments.size)
+			{
+				return;
+			}
+		}
+	}
+
+	int32 nodes_count;
+	real_point3d center_of_mass;
+	real_matrix4x3* matrices = (real_matrix4x3*)object_header_block_get_with_count(object_index, &object->nodes_block, sizeof(real_matrix4x3), &nodes_count);
+	object_get_center_of_mass(object_index, &center_of_mass);
+	halo_interpolator_object_populate_interpolation_data(object_index, matrices, nodes_count, &object->position, &object->forward, &object->up, &center_of_mass);
 	return;
 }
+
+typedef datum (__cdecl* t_object_new)(object_placement_data* placement_data);
+t_object_new p_object_new;
 
 // Creates a new object
 datum __cdecl object_new(object_placement_data* placement_data)
 {
-#ifdef USE_REWRITTEN_OBJECT_NEW
 	datum object_index = NONE;
 
 	if (!placement_data->flags.test(_scenario_object_placement_bit_4) && placement_data->tag_index != NONE)
@@ -469,7 +518,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object_header->cluster_index = NONE;
 			location_invalidate(&object->location);
 			object->first_cluster_reference = NONE;
-			object->parent_datum = NONE;
+			object->parent_index = NONE;
 			object->next_index = NONE;
 			object->current_weapon_datum = NONE;
 			object->name_list_index = NONE;
@@ -560,15 +609,15 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			int16 orientation_size = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 			// Allocate object header blocks
-			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_datum::object_attachments_block), (int16)8 * object_def->attachments.size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::damage_sections_block), 8 * damage_info_damage_sections_size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::change_color_block), (int16)24 * object_def->change_colors.size, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::nodes_block), 52 * nodes_count, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::collision_regions_block), 10 * collision_regions_count, 0);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::node_orientation_block), orientation_size, 4);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::original_orientation_block), orientation_size, 4);
-			can_create_object &= object_header_block_allocate(object_index, offsetof(object_datum, object_datum::animation_manager_block), (valid_animation_manager ? 144 : 0), 0);
-			can_create_object &= havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
+			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * object_def->attachments.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * object_def->change_colors.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), 52 * nodes_count, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
+			&& havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
 			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 			bool out_of_objects = !can_create_object;
@@ -591,7 +640,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						sizeof(object_attachment_definition),
 						&attachments_count);
 
-					memset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
+					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
 				}
 				
 				if (object_type_new(object_index, placement_data, &out_of_objects))
@@ -656,7 +705,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					{ 
 						if (objects_can_connect_to_map())
 						{
-							if (!placement_data->flags.test(_scenario_object_placement_bit_1) && (!placement_data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster != NONE))
+							if (!placement_data->flags.test(_scenario_object_placement_bit_1) && (!placement_data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
 							{
 								object_delete(object_index);
 							}
@@ -679,9 +728,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 	}
 	
 	return object_index;
-#else
-	return INVOKE(0x136CA7, 0x125B77, object_new, placement_data);
-#endif
 }
 
 void __cdecl object_delete(datum object_index)
@@ -695,6 +741,57 @@ real_point3d* __cdecl object_get_center_of_mass(datum object_index, real_point3d
 	return INVOKE(0x132A23, 0x1218F3, object_get_center_of_mass, object_index, point);
 }
 
+void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool interpolated)
+{
+	real_point3d point;
+	real_point3d interpolated_object_position;
+	object_datum* object = object_get_fast_unsafe(object_index);
+	if (interpolated && halo_interpolator_interpolate_object_position(object_index, &interpolated_object_position))
+	{
+		point = interpolated_object_position;
+	}
+	else
+	{
+		point = object->position;
+		interpolated_object_position = object->position;
+	}
+
+	if (object->parent_index == NONE)
+	{
+		*point_out = point;
+	}
+	else
+	{
+		real_matrix4x3 interpolated_matrix;
+		real_matrix4x3* transform_matrix = &interpolated_matrix;
+		if (!interpolated || !halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
+		{
+			transform_matrix = object_get_node_matrix(object->parent_index, object->matrix_index);
+		}
+		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
+	}
+}
+
+void __cdecl object_get_origin_interpolated(datum object_index, real_point3d* point_out)
+{
+	object_get_origin(object_index, point_out, true);
+}
+
+real_matrix4x3* object_get_node_matrix(datum object_index, int16 node_index)
+{
+	real_matrix4x3* nodes = (real_matrix4x3*)object_header_block_get(object_index, &object_get_fast_unsafe(object_index)->nodes_block);
+	return &nodes[node_index];
+}
+
+real_matrix4x3* object_try_get_node_matrix_interpolated(datum object_index, int16 node_index, real_matrix4x3* out_mat)
+{
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, node_index, out_mat))
+	{
+		*out_mat = *object_get_node_matrix(object_index, node_index);
+	}
+	return out_mat;
+}
+
 real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_count)
 {
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
@@ -702,48 +799,244 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_cou
 
 datum object_get_damage_owner(datum object_index)
 {
-	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, -1);
+	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, NONE);
 	return object->damage_owner_object_index;
 }
 
-// Replace calls to object_new with our own
-void object_new_replace_calls()
+void __cdecl object_apply_function_overlay_node_orientations(datum object_index, 
+	render_model_definition* render_model, 
+	c_animation_manager* animation_manager, 
+	int32 a4, 
+	int32 orientation_count, 
+	real_orientation* orientations)
 {
-	PatchCall(Memory::GetAddress(0x3B603, 0x3F34B), object_new);
-	PatchCall(Memory::GetAddress(0x52A2E, 0x5AF3E), object_new);
-	PatchCall(Memory::GetAddress(0x55C06, 0x5E0FE), object_new);
-	PatchCall(Memory::GetAddress(0x5D6EB, 0x6F074), object_new);
-	PatchCall(Memory::GetAddress(0x70573, 0x8E454), object_new);
-	PatchCall(Memory::GetAddress(0xA8C90, 0x9AD10), object_new);
-	PatchCall(Memory::GetAddress(0xD4B8C, 0xD28A1), object_new);
-	PatchCall(Memory::GetAddress(0x10D6AF, 0xD9C5F), object_new);
-	PatchCall(Memory::GetAddress(0x1102AF, 0xDC85F), object_new);
-	PatchCall(Memory::GetAddress(0x138057, 0x126F27), object_new);
-	PatchCall(Memory::GetAddress(0x1385AD, 0x12747D), object_new);
-	PatchCall(Memory::GetAddress(0x13E3A8, 0x12D1F7), object_new);
-	PatchCall(Memory::GetAddress(0x142B85, 0x1319D5), object_new);
-	PatchCall(Memory::GetAddress(0x144B89, 0x1339D9), object_new);
-	PatchCall(Memory::GetAddress(0x144F2E, 0x133D7E), object_new);
-	PatchCall(Memory::GetAddress(0x15D4D1, 0x141791), object_new);
-	PatchCall(Memory::GetAddress(0x166787, 0x15151C), object_new);
-	PatchCall(Memory::GetAddress(0x16B931, 0x15C247), object_new);
-	PatchCall(Memory::GetAddress(0x16BD2C, 0x1613F1), object_new);
-	PatchCall(Memory::GetAddress(0x179CBC, 0x1617EC), object_new);
-	PatchCall(Memory::GetAddress(0x1F32F2, 0x1DE38B), object_new);
-	PatchCall(Memory::GetAddress(0x317863, 0x2C25CD), object_new);
-	PatchCall(Memory::GetAddress(0x3178A3, 0x2C260D), object_new);
-	PatchCall(Memory::GetAddress(0x318DEC, 0x2C3B56), object_new);
-	PatchCall(Memory::GetAddress(0x33992A, 0x2E469A), object_new);
-	PatchCall(Memory::GetAddress(0x3438C0, 0x2EE630), object_new);
-	PatchCall(Memory::GetAddress(0x355E03, 0x300B73), object_new);
-	PatchCall(Memory::GetAddress(0x358E31, 0x303BA1), object_new);
+	INVOKE(0x134214, 0x1230E4, object_apply_function_overlay_node_orientations, object_index, render_model, animation_manager, a4, orientation_count, orientations);
 	return;
+}
+
+real_point3d* __cdecl object_get_center_of_mass_interpolated(datum object_index, real_point3d* center_of_mass)
+{
+	if (!halo_interpolator_interpolate_center_of_mass(object_index, center_of_mass))
+	{
+		center_of_mass = object_get_center_of_mass(object_index, center_of_mass);
+	}
+	return center_of_mass;
+}
+
+datum __cdecl object_get_parent_recursive(datum parent_index)
+{
+	return INVOKE(0x132574, 0x121444, object_get_parent_recursive, parent_index);
+}
+
+typedef void(__cdecl* t_object_move_t)(datum);
+t_object_move_t p_object_move;
+void __cdecl object_move(datum object_index)
+{
+	INVOKE(0x137E6D, 0x126D3D, object_move, object_index);
+	object_initialize_for_interpolation(object_index);
+	return;
+}
+
+bool __cdecl object_update(datum object_index)
+{
+	return INVOKE(0x1352a9, 0x124179, object_update, object_index);	
+}
+
+void __cdecl object_pre_delete_recursive(datum object_index)
+{
+	INVOKE(0x1386E1, 0x1275B1, object_pre_delete_recursive, object_index);
+	return;
+}
+
+void __cdecl object_delete_recursive(datum object_index, bool remove_from_map_before_deletion)
+{
+	INVOKE(0x13683D, 0x12570D, object_delete_recursive, object_index, remove_from_map_before_deletion);
+	return;
+}
+
+void __cdecl objects_garbage_collection(void)
+{
+	INVOKE(0x1316A4, 0x120574, objects_garbage_collection);
+	return;
+}
+
+void __cdecl objects_purge_deleted_objects(void)
+{
+	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+	while (object_header_it.get_next_datum())
+	{
+		s_object_header* object_header = object_header_it.get_current_datum();
+		if (object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			object_pre_delete_recursive(object_header_it.get_current_datum_index());
+			object_delete_recursive(object_header_it.get_current_datum_index(), true);
+		}
+	}
+}
+
+void __cdecl objects_post_update()
+{
+	object_globals_get()->objects_updating = true;
+
+	s_data_iterator<s_object_header> object_header_it(object_header_data_get());
+	while (object_header_it.get_next_datum())
+	{
+		s_object_header* object_header = object_header_it.get_current_datum();
+		object_datum* object = object_get_fast_unsafe(object_header_it.get_current_datum_index());
+
+		object_header->flags.set(_object_header_do_not_update_bit, false);
+
+		if (object_header->flags.test(_object_header_post_update_bit) 
+			&& object_header->flags.test(_object_header_active_bit) 
+			&& object_header->flags.test(_object_header_awake_bit) 
+			&& !object_header->flags.test(_object_header_being_deleted_bit)
+			)
+		{
+			object_header->flags.set(_object_header_post_update_bit, false);
+			
+			object_update(object_header_it.get_current_datum_index());
+
+			if (object_header->flags.test(_object_header_requires_motion_bit))
+				object_move(object_header_it.get_current_datum_index());
+		}
+
+		if (object_header->flags.test(_object_header_active_bit)
+			&& object_header->flags.test(_object_header_awake_bit)
+			&& !object_header->flags.test(_object_header_being_deleted_bit))
+		{
+			if (object->object_flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
+			{
+				// reset the interpolator for this object, if hidden
+				// ### FIXME maybe hook object_hide and reset it there?
+				object_initialize_for_interpolation(object_header_it.get_current_datum_index());
+			}
+		}
+	}
+
+	weapons_fire_barrels();
+	objects_purge_deleted_objects();
+	object_globals_get()->objects_updating = false;
+	objects_garbage_collection();
+}
+
+int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count, bool is_unit)
+{
+	int32 marker_index = 0;
+
+	datum index = object_index;
+	if (!is_unit)
+	{
+		index = object_get_parent_recursive(index);
+	}
+	if (index != NONE)
+	{
+		object_datum* object = object_get_fast_unsafe(index);
+		object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
+		if (object_def->model.TagIndex != NONE)
+		{
+			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
+
+			int32 node_count;
+			real_matrix4x3* node_matrices;
+
+			if (!halo_interpolator_interpolate_object_node_matrices(object_index, &node_matrices, &node_count))
+			{
+				node_matrices = object_get_node_matrices(object_index, &node_count);
+			}
+
+			void* collision_regions = (real_matrix4x3*)object_header_block_get(object_index, &object->collision_regions_block);
+
+			int32 marker_index = render_model_get_markers_by_name(model_def->render_model.TagIndex, 
+				marker, 
+				collision_regions, 
+				NONE, 
+				NULL, 
+				node_count, 
+				node_matrices, 
+				object->object_flags.test(_object_mirrored_bit), 
+				marker_object,
+				count);
+
+			if (marker_index)
+			{
+				return marker_index;
+			}
+		}
+	}
+
+	object_datum* object = object_get_fast_unsafe(object_index);
+	marker_object->node_index = 0;
+	matrix4x3_identity(&marker_object->matrix0);
+		
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
+	{
+		marker_object->matrix1 = *object_get_node_matrix(object_index, 0);
+	}
+		
+	marker_object->field_6C = 0;
+	if (object->object_flags.test(_object_mirrored_bit))
+	{
+		scale_vector3d(&marker_object->matrix1.vectors.left, -1.0f, &marker_object->matrix1.vectors.left);
+	}
+
+	return (marker != 0 ? marker_index : 1);
+}
+
+int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count)
+{
+	return internal_object_get_markers_by_string_id(object_index, marker, marker_object, count, false);
+}
+
+// Replace calls to functions getting the marker by string id
+void object_get_markers_by_string_id_replace_calls(void)
+{
+	// PatchCall(Memory::GetAddress(0x132792, 0x121662), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x1327B1, 0x121681), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x13823D, 0x12710D), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x138257, 0x1214CB), internal_object_get_markers_by_string_id);	(Disabled as this is not interpolated)	TODO: Add parameter to internal_object_get_markers_by_string_id instead of not patchcalling
+	// PatchCall(Memory::GetAddress(0x134C26, 0x123AF6), internal_object_get_markers_by_string_id);	// object_animation_callback
+
+	PatchCall(Memory::GetAddress(0xAAFA4, 0x0), object_get_markers_by_string_id);			// Function for creating effects at markers
+	PatchCall(Memory::GetAddress(0xFDF7D, 0x0), object_get_markers_by_string_id);			// effect_on_new_object_marker	
+	return;
+}
+
+// Replace calls to object_new with our own
+void object_new_replace_calls(void)
+{
+	DETOUR_ATTACH(p_object_new, Memory::GetAddress<t_object_new>(0x136CA7, 0x125B77), object_new);
+	return;
+}
+
+void object_move_replace_calls(void)
+{
+	PatchCall(Memory::GetAddress(0x137f8f), object_move);
+	PatchCall(Memory::GetAddress(0x1381b1), object_move);
+	PatchCall(Memory::GetAddress(0x13814b), object_move);
+	return;
+}
+
+void objects_apply_interpolation_patches()
+{
+	if (!Memory::IsDedicatedServer())
+	{
+		object_new_replace_calls();
+		object_move_replace_calls();
+		object_get_markers_by_string_id_replace_calls();
+
+		PatchCall(Memory::GetAddress(0x4A53C, 0x437BA), objects_post_update);
+		PatchCall(Memory::GetAddress(0xCD744, 0xB8ABD), object_get_origin_interpolated);
+		PatchCall(Memory::GetAddress(0x1549AE, 0x0), object_get_origin_interpolated);
+		PatchCall(Memory::GetAddress(0x13D406, 0x12C255), object_get_center_of_mass_interpolated);
+
+		// Prevents the game from passing the runtime_node_flags to the animation manager when updating object_node_matricies
+		// When they are passed to the animation manager it causes the game to reset? node positions causing a flipping state between frames.
+		WriteValue<uint8>(Memory::GetAddress(0x135657, 0x124527), JMP_OP_CODE);
+	}
 }
 
 void objects_apply_patches(void)
 {
-#ifdef USE_REWRITTEN_OBJECT_NEW
-	object_new_replace_calls();
-#endif
+	objects_apply_interpolation_patches();
 	return;
 }

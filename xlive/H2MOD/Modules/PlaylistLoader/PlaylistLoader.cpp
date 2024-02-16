@@ -6,7 +6,7 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Util/Hooks/Hook.h"
+
 
 namespace playlist_loader
 {

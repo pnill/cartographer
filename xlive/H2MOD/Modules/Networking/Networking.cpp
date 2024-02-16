@@ -2,9 +2,8 @@
 
 #include "Networking.h"
 #include "Blam/Engine/memory/bitstream.h"
-#include "OverridePackets/OverridePackets.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 // stub qos lookup function in-game between peers in a network session
 int __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
@@ -57,11 +56,10 @@ void MachineIDUpdatePatch()
 void CustomNetwork::ApplyPatches() 
 {
 	MachineIDUpdatePatch();
-	OverridePackets::ApplyGamePatches();
 	NetworkMessage::ApplyGamePatches();
 
 	// LIVE network protocol research
-	s_network_observer::ApplyGamePatches();
+	c_network_observer::apply_patches();
 
 	// stub QoS lookup function for mid-game data, our XNet QoS implementation is trash
 	// we spawn one thread for each QoS lookup, for the serverlist it doesn't matter that much

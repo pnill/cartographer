@@ -8,7 +8,7 @@
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
-#include "Util/Hooks/Hook.h"
+
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
@@ -477,7 +477,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		}
 		else
 		{
-			LOG_ERROR_GAME("{} - {} failed with error: {}", __FUNCTION__, STRINGIFY(curl_easy_perform()), res);
+			LOG_ERROR_GAME("{} - {} failed with error: {}", __FUNCTION__, STRINGIFY(curl_easy_perform()), (uint32)res);
 			if (res == CURLE_ABORTED_BY_CALLBACK)
 				addDebugText("Map downloading aborted because of user input!");
 			

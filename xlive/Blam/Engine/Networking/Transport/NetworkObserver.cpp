@@ -3,7 +3,7 @@
 #include "NetworkObserver.h"
 #include "NetworkChannel.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 s_network_observer_configuration* g_network_configuration;
 
@@ -137,12 +137,10 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_configuration->field_200 = 4096 * 4; // H2v - 4096, 60 tick  = H2v * 4 = 16384
 }
 
-void s_network_observer::sendNetworkMessage(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
+void c_network_observer::send_message(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message_t)(s_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
-	auto p_observer_channel_send_message = Memory::GetAddress<observer_channel_send_message_t>(0x1BED40, 0x1B8C1A);
-
-	p_observer_channel_send_message(this, session_index, observer_index, send_out_of_band, type, size, data);
+	typedef void(__thiscall* observer_channel_send_message_t)(c_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
+	INVOKE_TYPE(0x1BED40, 0x1B8C1A, observer_channel_send_message_t, this, session_index, observer_index, send_out_of_band, type, size, data);
 }
 
 bool __cdecl is_network_observer_mode_managed()
@@ -153,55 +151,44 @@ bool __cdecl is_network_observer_mode_managed()
 	return false;
 }
 
-void s_network_observer::ResetNetworkPreferences()
+void c_network_observer::reset_network_observer_bandwidth_preferences()
 {
 	// reset the network bandwidth preferences
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preferences_size);
 }
 
-bool __thiscall s_network_observer::GetNetworkMeasurements(DWORD *out_throughput, float *out_satiation, DWORD *a4)
+bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput, float *out_satiation, int32 *a4)
 {
 	// let the game know we don't have any bandwidth measurements available to save
 	return false;
 }
 
-void __declspec(naked) call_GetNetworkMeasurements() { __asm jmp s_network_observer::GetNetworkMeasurements }
-
-DWORD* dataToOverwrite1 = nullptr;
-__declspec (naked) void overwrite1()
-{
-	__asm 
-	{
-		mov eax, dataToOverwrite1
-		mov dword ptr[eax], 131072
-		mov dword ptr[eax + 4], 131072
-		ret
-	}
-}
+void __declspec(naked) call_get_bandwidth_results() { __asm jmp c_network_observer::get_bandwidth_results }
 
 // raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
 int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 {
 	enum e_protocol_type : int
 	{
-		e_protocol_udp_loopback = 2,
-		e_protocol_udp,
-		e_protocol_tcp // not entirely sure if this is TCP
+		_protocol_udp_loopback = 2,
+		_protocol_udp,
+		_protocol_tcp, // not entirely sure if this is TCP
+		k_protocol_count
 	};
 
 	switch ((e_protocol_type)protocol_type)
 	{
 
 	// replace XNet UDP header overhead with WinSock overhead
-	case e_protocol_udp_loopback:
+	case _protocol_udp_loopback:
 		// return 44;
 		return 28;
 
-	case e_protocol_udp:
+	case _protocol_udp:
 		//return 48;
 		return 28 + 4;
 		
-	case e_protocol_tcp:
+	case _protocol_tcp:
 		return 56;
 	
 	default:
@@ -211,7 +198,7 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 	return 0;
 }
 
-bool __thiscall s_network_observer::channel_should_send_packet_hook(
+bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	int network_channel_index,
 	bool a3,
 	bool a4,
@@ -223,7 +210,7 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	int out_voice_chat_data_buffer_size,
 	BYTE* out_voice_chat_data_buffer)
 {
-	typedef bool(__thiscall* channel_should_send_packet_t)(s_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
+	typedef bool(__thiscall* channel_should_send_packet_t)(c_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
 	auto p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
 
 	int observer_index = -1;
@@ -282,9 +269,9 @@ bool __thiscall s_network_observer::channel_should_send_packet_hook(
 	return ret;
 }
 
-static void __declspec(naked) jmp_network_observer_channel_should_send_packet_hook() { __asm jmp s_network_observer::channel_should_send_packet_hook }
+static void __declspec(naked) jmp_network_observer_channel_should_send_packet_hook() { __asm jmp c_network_observer::channel_should_send_packet_hook }
 
-void s_network_observer::ForceConstantNetworkRate()
+void c_network_observer::force_constant_network_rate()
 {
 	// patches to force static network rate and bandwidth
 	// because the bandwidth management is totaly fucked/busted in Halo 2 Vista
@@ -304,7 +291,7 @@ void s_network_observer::ForceConstantNetworkRate()
 	NopFill(Memory::GetAddressRelative(0x5BF000, 0x5B8EDA), 14);
 }
 
-void s_network_observer::ApplyGamePatches()
+void c_network_observer::apply_patches()
 {
 #if USE_LIVE_NETWORK_PROTOCOL
 #	if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
@@ -342,9 +329,6 @@ void s_network_observer::ApplyGamePatches()
 
 	WriteValue<DWORD>(Memory::GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 60 tick - 40960
 
-	dataToOverwrite1 = Memory::GetAddress<DWORD*>(0x4F8200, 0x522750);
-	Codecave(Memory::GetAddress(0x1AB5A2, 0x1ABAA7), overwrite1, 5);
-
 	// prevent the game from setting the client's tickrate to half of host network tickrate
 	NopFill(Memory::GetAddress(0x1BFBE7, 0x1B9AC7), 19);
 	NopFill(Memory::GetAddress(0x1BE33A, 0x1B8214), 15);
@@ -361,13 +345,13 @@ void s_network_observer::ApplyGamePatches()
 	// increase the network heap size
 	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
 
-	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_GetNetworkMeasurements);
+	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_get_bandwidth_results);
 
 	WriteJmpTo(Memory::GetAddressRelative(0x5AC1BD, 0x5A6B76), transport_get_packet_overhead_hook);
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 #if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
-	ForceConstantNetworkRate();
+	force_constant_network_rate();
 #endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 
@@ -376,6 +360,6 @@ void s_network_observer::ApplyGamePatches()
 	// which is not really available anymore with cartographer, since the QoS probes are not that accurate anymore
 	if (!Memory::IsDedicatedServer())
 	{
-		PatchCall(Memory::GetAddress(0x1D97DD), is_network_observer_mode_managed);
+		PatchCall(Memory::GetAddress(0x1D97DD, 0x1BEE59), is_network_observer_mode_managed);
 	}
 }

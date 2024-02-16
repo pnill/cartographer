@@ -5,28 +5,28 @@
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
-#include "Util/Hooks/Hook.h"
+
 
 namespace ImGuiHandler {
 	namespace WeaponOffsets {
 		s_weapon_custom_offset weapOffsets[16]
 		{
-			{{0.02f, 0.f, -0.004f},		"objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {0,0,0}, NULL},
-			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {0,0,0}, NULL},
-			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", {0,0,0}, NULL},
-			{{0.02f, -0.01f, 0.001f},	"objects\\weapons\\support_low\\brute_shot\\brute_shot", {0,0,0}, NULL},
-			{{0.02f, 0.f, -0.004f},		"objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", {0,0,0}, NULL},
-			{{0.05f, 0.f, 0.f},			"objects\\weapons\\melee\\energy_blade\\energy_blade", {0,0,0}, NULL},
-			{{0.02f, 0.f, -0.005f},		"objects\\weapons\\support_high\\flak_cannon\\flak_cannon", {0,0,0}, NULL},
-			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\magnum\\magnum", {0,0,0}, NULL},
-			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\needler\\needler", {0,0,0}, NULL},
-			{{0.03f, 0.f, -0.005f},		"objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", {0,0,0}, NULL},
-			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", {0,0,0}, NULL},
-			{{0.02f, 0.f, -0.005f},		"objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", {0,0,0}, NULL},
-			{{0.02f, 0.03f, 0.f},		"objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam", {0,0,0}, NULL},
-			{{0.02f, -0.001f, -0.015f}, "objects\\weapons\\rifle\\shotgun\\shotgun", {0,0,0}, NULL},
-			{{0.02f, 0.f, 0.f},			"objects\\weapons\\rifle\\smg\\smg", {0,0,0}, NULL},
-			{{0.01f, 0.f, 0.f},			"objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {0,0,0}, NULL}
+			{{{0.02f, 0.f, -0.004f}},		"objects\\weapons\\rifle\\battle_rifle\\battle_rifle", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, 0.f}},			"objects\\weapons\\rifle\\beam_rifle\\beam_rifle", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, 0.f}},			"objects\\weapons\\rifle\\brute_plasma_rifle\\brute_plasma_rifle", {{0,0,0}}, NULL},
+			{{{0.02f, -0.01f, 0.001f}},		"objects\\weapons\\support_low\\brute_shot\\brute_shot", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, -0.004f}},		"objects\\weapons\\rifle\\covenant_carbine\\covenant_carbine", {{0,0,0}}, NULL},
+			{{{0.05f, 0.f, 0.f}},			"objects\\weapons\\melee\\energy_blade\\energy_blade", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, -0.005f}},		"objects\\weapons\\support_high\\flak_cannon\\flak_cannon", {{0,0,0}}, NULL},
+			{{{0.03f, 0.f, -0.005f}},		"objects\\weapons\\pistol\\magnum\\magnum", {{0,0,0}}, NULL},
+			{{{0.03f, 0.f, -0.005f}},		"objects\\weapons\\pistol\\needler\\needler", {{0,0,0}}, NULL},
+			{{{0.03f, 0.f, -0.005f}},		"objects\\weapons\\pistol\\plasma_pistol\\plasma_pistol", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, 0.f}},			"objects\\weapons\\rifle\\plasma_rifle\\plasma_rifle", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, -0.005f}},		"objects\\weapons\\support_high\\rocket_launcher\\rocket_launcher", {{0,0,0}}, NULL},
+			{{{0.02f, 0.03f, 0.f}},			"objects\\characters\\sentinel_aggressor\\weapons\\beam\\sentinel_aggressor_beam", {{0,0,0}}, NULL},
+			{{{0.02f, -0.001f, -0.015f}},	"objects\\weapons\\rifle\\shotgun\\shotgun", {{0,0,0}}, NULL},
+			{{{0.02f, 0.f, 0.f}},			"objects\\weapons\\rifle\\smg\\smg", {{0,0,0}}, NULL},
+			{{{0.01f, 0.f, 0.f}},			"objects\\weapons\\rifle\\sniper_rifle\\sniper_rifle", {{0,0,0}}, NULL}
 		};
 
 		void ApplyOffset(int weapon)

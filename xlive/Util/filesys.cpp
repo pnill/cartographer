@@ -1,7 +1,9 @@
 #include "stdafx.h"
-
 #include "filesys.h"
-#include <codecvt>
+
+#include "text/unicode.h"
+
+// ### TODO Remove
 
 std::wstring GetExeDirectoryWide()
 {
@@ -23,8 +25,9 @@ std::wstring GetExeDirectoryWide()
 	}
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
 std::string GetExeDirectoryNarrow()
 {
-	return wstring_to_string.to_bytes(GetExeDirectoryWide());
+	utf8 string[MAX_PATH * 2];
+	wchar_string_to_utf8_string(GetExeDirectoryWide().c_str(), string, MAX_PATH * 2);
+	return std::string(string);
 }

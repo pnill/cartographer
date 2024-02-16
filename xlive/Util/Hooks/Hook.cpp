@@ -1,9 +1,6 @@
 #include "stdafx.h"
+#include "Hook.h"
 
-#include <malloc.h>
-
-#include "hook.h"
-#pragma warning( disable :4996)
 
 #define VirtualProtectAndExecutePatch(_address, _length, _protection, _code) \
 	DWORD dwBack[2]; \

@@ -2,7 +2,7 @@
 #include "render_cameras.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Hook.h"
+
 
 typedef void(__cdecl render_camera_build_projection_t)(s_camera*, float*, real_matrix4x3*);
 render_camera_build_projection_t* p_render_camera_build_projection;
@@ -15,7 +15,7 @@ void __cdecl render_camera_build_projection_hook(s_camera* camera, float* frustu
 	
 	if (H2Config_static_first_person) 
 	{
-		camera->vertical_field_of_view = ((64.f * M_PI) / 180.0f) * 0.78500003f;
+		camera->vertical_field_of_view = DEGREES_TO_RADIANS(64.f) * 0.78500003f;
 	}
 	
 	p_render_camera_build_projection(camera, frustum_bounds, out_projection);

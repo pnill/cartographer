@@ -75,22 +75,22 @@ do \
 
 // Generic logging
 // For the most unimportant stuff
-#define LOG_TRACE(logger, msg, ...)      CHECK_PTR((logger), (logger)->trace    (  ## msg, __VA_ARGS__))
+#define LOG_TRACE(logger, msg, ...)      CHECK_PTR((logger), (logger)->trace    (msg, __VA_ARGS__))
 
 // Somewhat more useful information
-#define LOG_DEBUG(logger, msg, ...)      CHECK_PTR((logger), (logger)->debug    (  ## msg, __VA_ARGS__))
+#define LOG_DEBUG(logger, msg, ...)      CHECK_PTR((logger), (logger)->debug    (msg, __VA_ARGS__))
 
 // Things that even users may want to see
-#define LOG_INFO(logger, msg, ...)       CHECK_PTR((logger), (logger)->info     (  ## msg, __VA_ARGS__))
+#define LOG_INFO(logger, msg, ...)       CHECK_PTR((logger), (logger)->info     (msg, __VA_ARGS__))
 
 // A surprise to be sure, but not a serious one
-#define LOG_WARNING(logger, msg, ...)    CHECK_PTR((logger), (logger)->warning  (  ## msg, __VA_ARGS__))
+#define LOG_WARNING(logger, msg, ...)    CHECK_PTR((logger), (logger)->warning  (msg, __VA_ARGS__))
 
 // Absolutely not good, probably game breaking events
-#define LOG_ERROR(logger, msg, ...)      CHECK_PTR((logger), (logger)->error    (  ## msg, __VA_ARGS__))
+#define LOG_ERROR(logger, msg, ...)      CHECK_PTR((logger), (logger)->error    (msg, __VA_ARGS__))
 
 // "Wait, that's illegal" except it is definitely not a joke
-#define LOG_CRITICAL(logger, msg, ...)   CHECK_PTR((logger), (logger)->critical (  ## msg, __VA_ARGS__))
+#define LOG_CRITICAL(logger, msg, ...)   CHECK_PTR((logger), (logger)->critical (msg, __VA_ARGS__))
 
 // Mod-specific logging
 // For the most unimportant stuff related to H2mod specifically
@@ -113,34 +113,34 @@ do \
 
 // Function calls
 // For the most unimportant stuff, prepends the current function name
-#define LOG_TRACE_FUNC(msg, ...)         LOG_TRACE     (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_TRACE_FUNC(msg, ...)         LOG_TRACE     (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // For the most unimportant stuff, prepends the current function name
-#define LOG_TRACE_FUNCW(msg, ...)        LOG_TRACE     (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_TRACE_FUNCW(msg, ...)        LOG_TRACE     (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // Somewhat more useful information, prepends the current function name
-#define LOG_DEBUG_FUNC(msg, ...)         LOG_DEBUG     (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_DEBUG_FUNC(msg, ...)         LOG_DEBUG     (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // Somewhat more useful information, prepends the current function name
-#define LOG_DEBUG_FUNCW(msg, ...)        LOG_DEBUG     (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_DEBUG_FUNCW(msg, ...)        LOG_DEBUG     (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // Things that even users may want to see, prepends the current function name
-#define LOG_INFO_FUNC(msg, ...)          LOG_INFO      (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_INFO_FUNC(msg, ...)          LOG_INFO      (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // Things that even users may want to see, prepends the current function name
-#define LOG_INFO_FUNCW(msg, ...)         LOG_INFO      (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_INFO_FUNCW(msg, ...)         LOG_INFO      (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // A surprise to be sure, but not a serious one, prepends the current function name
-#define LOG_WARNING_FUNC(msg, ...)       LOG_WARNING   (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_WARNING_FUNC(msg, ...)       LOG_WARNING   (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // A surprise to be sure, but not a serious one, prepends the current function name
-#define LOG_WARNING_FUNCW(msg, ...)      LOG_WARNING   (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_WARNING_FUNCW(msg, ...)      LOG_WARNING   (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // Absolutely not good, probably game breaking events, prepends the current function name
-#define LOG_ERROR_FUNC(msg, ...)         LOG_ERROR     (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_ERROR_FUNC(msg, ...)         LOG_ERROR     (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // Absolutely not good, probably game breaking events, prepends the current function name
-#define LOG_ERROR_FUNCW(msg, ...)        LOG_ERROR     (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_ERROR_FUNCW(msg, ...)        LOG_ERROR     (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // "Wait, that's illegal" except it is definitely not a joke, prepends the current function name
-#define LOG_CRITICAL_FUNC(msg, ...)      LOG_CRITICAL  (h2mod_log, __FUNCTION__   "(): " msg, __VA_ARGS__)
+#define LOG_CRITICAL_FUNC(msg, ...)      LOG_CRITICAL  (h2mod_log, "{}(): " msg, __func__, __VA_ARGS__)
 // "Wait, that's illegal" except it is definitely not a joke, prepends the current function name
-#define LOG_CRITICAL_FUNCW(msg, ...)     LOG_CRITICAL  (h2mod_log, __FUNCTIONW__ L"(): " msg, __VA_ARGS__)
+#define LOG_CRITICAL_FUNCW(msg, ...)     LOG_CRITICAL  (h2mod_log, L"{}(): " msg, __FUNCTIONW__, __VA_ARGS__)
 
 // Networking
 // For the most unimportant stuff related to networking

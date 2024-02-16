@@ -1,9 +1,9 @@
 #pragma once
-#include "stdafx.h"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Cache/TagGroups.hpp"
-#include "Blam/Engine/math/integer_math.h"
-#include "Blam/Engine/math/real_math.h"
+
+
+
 
 enum e_bitmap_tag_type : int16
 {
@@ -123,7 +123,19 @@ enum e_more_bitmap_data_flags : byte
     more_bitmap_data_flag_bitmap_create_attempted = FLAG(1)
 };
 
-enum e_bitmap_data_format : short
+enum e_bitmap_data_flags : short
+{
+    bitmap_data_flag_power_of_two_dimensions = FLAG(0),
+    bitmap_data_flag_compressed = FLAG(1),
+    bitmap_data_flag_palettized = FLAG(2),
+    bitmap_data_flag_swizzled = FLAG(3),
+    bitmap_data_flag_linear = FLAG(4),
+    bitmap_data_flag_v16u16 = FLAG(5),
+    bitmap_data_flag_mip_map_debug_level = FLAG(6),
+    bitmap_data_flag_prefer_stutter_prefer_low_detail = FLAG(7)
+};
+
+enum e_bitmap_data_format : int16
 {
     bitmap_data_format_a8 = 0,
     bitmap_data_format_y8 = 1,
@@ -148,19 +160,8 @@ enum e_bitmap_data_format : short
     bitmap_data_format_rgbfp32 = 20,
     bitmap_data_format_rgbfp16 = 21,
     bitmap_data_format_v8u8 = 22,
-    bitmap_data_format_g8b8 = 23
-};
-
-enum e_bitmap_data_flags : short
-{
-    bitmap_data_flag_power_of_two_dimensions = FLAG(0),
-    bitmap_data_flag_compressed = FLAG(1),
-    bitmap_data_flag_palettized = FLAG(2),
-    bitmap_data_flag_swizzled = FLAG(3),
-    bitmap_data_flag_linear = FLAG(4),
-    bitmap_data_flag_v16u16 = FLAG(5),
-    bitmap_data_flag_mip_map_debug_level = FLAG(6),
-    bitmap_data_flag_prefer_stutter_prefer_low_detail = FLAG(7)
+    bitmap_data_format_g8b8 = 23,
+    k_bitmap_format_count
 };
 
 enum e_bitmap_cache_usage : byte
@@ -191,45 +192,46 @@ enum e_bitmap_cache_usage : byte
 struct bitmap_data
 {
     char signature[4];
-    short width_pixels;
-    short height_pixels;
-    byte depthPixels;                       // Depth is 1 for 2D textures and cube maps.
+    int16 width_pixels;
+    int16 height_pixels;
+    uint8 depth_pixels;                       // Depth is 1 for 2D textures and cube maps.
 
     e_more_bitmap_data_flags more_flags;
     e_bitmap_type type;                     // Determines bitmap "geometry."
     e_bitmap_data_format format;            // Determines how pixels are represented internally.
     e_bitmap_data_flags flags;
     point2d registration_point;
-    short mipmap_count;
+    int16 mipmap_count;
 #ifdef TAGS_BUILD
-    short low_detail_mipmap_count;
+    int16 low_detail_mipmap_count;
 #else
-    byte lod_adjust;
+    uint8 lod_adjust;
     e_bitmap_cache_usage cache_usage;
 #endif
-    int pixels_offset;
+    int32 pixels_offset;
 
     // The below fields are not referenced or used in a "TAG" build of the game
     // However they're just replaced with padding of the same size
-    int lod1_offset;
-    int lod2_offset;
-    int lod3_offset;
-    DWORD unk0[3];
-    int lod1_size;
-    int lod2_size;
-    int lod3_size;
-    DWORD unk1[3];
-    tag_reference parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
-    void* pixel_data_pointer;
-    int unk3;
-    int unk4;
-    int low_detail_offset;
-    int low_detail_size;
+    int32 lod1_offset;
+    int32 lod2_offset;
+    int32 lod3_offset;
+    uint32 unk0[3];
+    int32 lod1_size;
+    int32 lod2_size;
+    int32 lod3_size;
+    uint32 unk1[3];
+    datum parent_bitmap_tag;        // References the parent bitmap tag this bitmap data is located in
+    IDirect3DTexture9* d3dtexture;
+    uint8* base_address;
+    int32 field_58;
+    int32 field_5C;
+    int32 low_detail_offset;
+    int32 low_detail_size;
     e_bitmap_data_format low_detail_format;
-    short low_detail_width;
-    short low_detail_height;
-    short low_detail_depth;
-    int* unk5;
+    int16 low_detail_width;
+    int16 low_detail_height;
+    int16 low_detail_depth;
+    int32* field_70;
 };
 TAG_BLOCK_SIZE_ASSERT(bitmap_data, 116);
 

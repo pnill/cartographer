@@ -7,7 +7,7 @@ void DeinitH2Startup();
 
 // use only after initLocalAppData has been called
 // by default useAppDataLocalPath is set to true, if not specified
-inline std::wstring prepareLogFileName(std::wstring logFileName, bool useAppDataLocalPath = true);
+inline std::wstring prepareLogFileName(const std::wstring& logFileName, bool useAppDataLocalPath = true);
 
 extern bool H2IsDediServer;
 extern DWORD H2BaseAddr;

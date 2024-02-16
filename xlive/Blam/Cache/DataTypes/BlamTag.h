@@ -1,5 +1,7 @@
 #pragma once
 
+// ### TODO MOVE AND REFACTOR
+
 struct blam_tag
 {
 	enum class tag_group_type : __int32
@@ -128,9 +130,7 @@ struct blam_tag
 		udlg = 'udlg'
 	};
 
-	blam_tag()
-	{
-	}
+	blam_tag() = default;
 
 	constexpr blam_tag(tag_group_type data) :
 		tag_type(data)
@@ -151,7 +151,7 @@ struct blam_tag
 		return out;
 	}
 
-	static blam_tag from_string(std::string string)
+	static blam_tag from_string(const std::string string)
 	{
 		if (string.length() != 4)
 			return tag_group_type::none;

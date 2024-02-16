@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Blam/Engine/Networking/logic/network_session_interface.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_engine_player.h"
+#include "simulation/game_interface/simulation_game_engine_player.h"
 #define k_statborg_entry_total_stat_count 9
 
 // TODO Confirm these are correct

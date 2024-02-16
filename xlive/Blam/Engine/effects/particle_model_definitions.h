@@ -4,7 +4,7 @@
 #include "particle_system_definition.h"
 #include "Blam/Cache/DataTypes/TagRef.h"
 #include "Blam/Engine/geometry/geometry_block.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"
 
 
@@ -96,6 +96,10 @@ class c_particle_model_definition_interface
 public:
     int32 vtable;
     datum tag_index;
-    c_particle_model_definition particle_model_definition;
+    c_particle_model_definition* particle_model_definition;
     c_particle_system_definition* get_attached_particle_system(int32 particle_system_index);
+    effect_location_definition* get_particle_definition_locations();
+    size_t get_particle_definition_locations_size();
+    bool particle_is_v_mirrored_or_one_shot();
+    bool particle_is_one_shot();
 };

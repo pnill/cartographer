@@ -35,22 +35,22 @@ void paddy_event_map_load()
 
 		// Give Hat and Beard to Masterchief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
-			hlmt_chief_datum != DATUM_INDEX_NONE) 
+			hlmt_chief_datum != NONE) 
 		{
 			add_hat_and_beard_to_model(hlmt_chief_datum, paddy_hat_datum, paddy_beard_datum);
 		}
-		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp"); hlmt_chief_mp_datum != DATUM_INDEX_NONE) 
+		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp"); hlmt_chief_mp_datum != NONE) 
 		{
 			add_hat_and_beard_to_model(hlmt_chief_mp_datum, paddy_hat_datum, paddy_beard_datum);
 		}
-		if (datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp"); hlmt_elite_datum != DATUM_INDEX_NONE)
+		if (datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp"); hlmt_elite_datum != NONE)
 		{
 			add_hat_and_beard_to_model(hlmt_elite_datum, paddy_hat_datum, paddy_beard_datum, true);
 		}
 
 		// Replace ball and bomb with the pot of gold
 		if (datum ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball"); 
-			ball_weapon_datum != DATUM_INDEX_NONE)
+			ball_weapon_datum != NONE)
 		{
 			auto ball_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(ball_weapon_datum);
 			auto ball_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ball_weapon->item.object.model.TagIndex);
@@ -62,7 +62,7 @@ void paddy_event_map_load()
 			ball_weapon->item.object.sweetener_size = _sweetener_size_medium;
 		}
 		if (datum bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-			bomb_weapon_datum != DATUM_INDEX_NONE)
+			bomb_weapon_datum != NONE)
 		{
 			auto bomb_weapon = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(bomb_weapon_datum);
 			auto bomb_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(bomb_weapon->item.object.model.TagIndex);

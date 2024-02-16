@@ -209,12 +209,12 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 	}
 	
 
-	MINIDUMP_EXCEPTION_INFORMATION minidump_info;
+	MINIDUMP_EXCEPTION_INFORMATION minidump_info{};
 	minidump_info.ThreadId = GetCurrentThreadId();
 	minidump_info.ExceptionPointers = ExceptionInfo;
 	minidump_info.ClientPointers = TRUE;
 
-	MINIDUMP_CALLBACK_INFORMATION minidump_callback_info;
+	MINIDUMP_CALLBACK_INFORMATION minidump_callback_info{};
 	minidump_callback_info.CallbackParam = NULL;
 	minidump_callback_info.CallbackRoutine = &minidump_info_cb;
 

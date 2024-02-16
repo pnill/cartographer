@@ -17,11 +17,6 @@ Project_Cartographer.vcxproj.user
 *.suo
 *.opendb
 *.db
-/GSSecurity.cpp
-/Directx SDK/include
-/Directx SDK/lib/
-UpgradeLog.htm
-version.txt
 xlive.ilk
 xliveless.aps
 xliveless.opensdf
@@ -35,5 +30,8 @@ xliveless.v12.suo
 *.opensdf
 *.user
 *.ipch
+version_git.h
 
 JSON/
+
+xlive/version_git.h

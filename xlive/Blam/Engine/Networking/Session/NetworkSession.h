@@ -2,15 +2,43 @@
 
 #include "Blam/Engine/game/players.h"
 #include "Blam/Engine/input/controllers.h"
-#include "Blam/Engine/Networking/NetworkCommon.h"
+#include "Blam/Engine/Networking/Transport/transport.h"
 #include "Blam/Engine/Networking/Transport/NetworkChannel.h"
 #include "Blam/Engine/Networking/Transport/NetworkObserver.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 
-// forward declarations
-enum e_map_status;
-enum e_network_session_state;
+// ### TODO Cleanup
 
+enum e_map_status : int
+{
+	_network_session_map_status_none,
+	_network_session_map_status_unable_to_precache,
+	_network_session_map_status_precaching,
+	_network_session_map_status_precached,
+	_network_session_map_status_loaded,
+	_network_session_map_status_downloading,
+
+	k_network_session_map_status_count
+}; 
+
+enum e_network_session_state : int
+{
+	_network_session_state_none,
+	_network_session_state_peer_joining,
+	_network_session_state_peer_join_abort,
+	_network_session_state_peer_established,
+	_network_session_state_peer_leaving,
+	_network_session_state_host_established,
+	_network_session_state_host_disband,
+	_network_session_state_host_handoff,
+	_network_session_state_host_reestablish,
+	_network_session_state_election,
+	_network_session_state_dead,
+
+	k_network_session_state_count
+};
+
+// forward declarations
 struct s_network_session;
 struct s_session_membership;
 struct s_membership_player;
@@ -68,30 +96,7 @@ namespace NetworkSession
 	void LeaveSession();
 }
 
-enum e_network_session_state : int
-{
-	_network_session_state_none,
-	_network_session_state_peer_joining,
-	_network_session_state_peer_join_abort,
-	_network_session_state_peer_established,
-	_network_session_state_peer_leaving,
-	_network_session_state_host_established,
-	_network_session_state_host_disband,
-	_network_session_state_host_handoff,
-	_network_session_state_host_reestablish,
-	_network_session_state_election,
-	_network_session_state_dead
-};
-
-enum e_map_status : int
-{
-	_network_session_map_status_none,
-	_network_session_map_status_unable_to_precache,
-	_network_session_map_status_precaching,
-	_network_session_map_status_precached,
-	_network_session_map_status_loaded,
-	_network_session_map_status_downloading
-};
+s_membership_peer* network_session_get_peer(int32 peer_index);
 
 #pragma pack(push, 1)
 struct s_session_observer_channel
@@ -277,7 +282,7 @@ struct s_network_session
 {
 	void* vtbl;
 	void* p_network_message_gateway;
-	s_network_observer* p_network_observer;
+	c_network_observer* p_network_observer;
 	void* session_manager_ptr;
 	DWORD text_chat;
 	int session_index;

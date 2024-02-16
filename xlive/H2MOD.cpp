@@ -2,12 +2,20 @@
 #include "H2MOD.h"
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
+#include "Blam/Engine/camera/dead_camera.h"
+#include "Blam/Engine/camera/observer.h"
+#include "Blam/Engine/cutscene/cinematics.h"
+#include "Blam/Engine/effects/contrails.h"
+#include "Blam/Engine/effects/effects.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/effects/particle_update.h"
 #include "Blam/Engine/game/aim_assist.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/game/game_time.h"
+#include "Blam/Engine/game/player_control.h"
+#include "Blam/Engine/input/input_xinput.h"
 #include "Blam/Engine/interface/hud.h"
 #include "Blam/Engine/interface/hud_messaging.h"
 #include "Blam/Engine/interface/motion_sensor.h"
@@ -17,16 +25,27 @@
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/interface/screens/screens_patches.h"
 #include "Blam/Engine/items/weapon_definitions.h"
+#include "Blam/Engine/main/loading.h"
 #include "Blam/Engine/main/main_game.h"
+#include "Blam/Engine/main/main_render.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/objects/damage.h"
+#include "Blam/Engine/units/bipeds.h"
 #include "Blam/Engine/rasterizer/rasterizer_lens_flares.h"
 #include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_objects.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_units.h"
+#include "Blam/Engine/saved_games/game_state_procs.h"
+#include "simulation/simulation.h"
+#include "simulation/simulation_entity_database.h"
+#include "simulation/game_interface/simulation_game_objects.h"
+#include "simulation/game_interface/simulation_game_units.h"
 #include "Blam/Engine/render/render_cameras.h"
+#include "Blam/Engine/render/render_submit.h"
 #include "Blam/Engine/text/font_cache.h"
 #include "Blam/Engine/units/units.h"
+#include "Blam/Engine/widgets/cloth.h"
+#include "Blam/Engine/widgets/liquid.h"
+#include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_fog.h"
+#include "Blam/Engine/Networking/Transport/transport.h"
 
 #include "H2MOD/EngineHooks/EngineHooks.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
@@ -49,7 +68,7 @@
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Shell.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
@@ -57,24 +76,22 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/Variants.h"
-#include "Util/Hooks/Hook.h"
 
-FLOATING_POINT_ENV_ACCESS();
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
 bool H2XFirerateEnabled = false;
-bool xboxTickrateEnabled = false;
+bool g_xbox_tickrate_enabled = false;
 
 bool xbox_tickrate_is_enabled()
 {
-	return xboxTickrateEnabled;
+	return g_xbox_tickrate_enabled;
 }
 
 std::unordered_map<const wchar_t*, bool&> GametypesMap
 {
 	{ L"h2x", H2XFirerateEnabled },
-	{ L"ogh2", xboxTickrateEnabled },
+	{ L"ogh2", g_xbox_tickrate_enabled },
 };
 
 #pragma region engine calls
@@ -258,7 +275,7 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = DATUM_INDEX_NONE;
+								(&general_event->sound)[j].TagIndex = NONE;
 							}
 						}
 					}
@@ -409,7 +426,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	game_globals_apply_tag_patches(options);
 
 	tags::run_callbacks();
-	H2Tweaks::SetScreenRefreshRate();
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading the main menu
@@ -468,8 +484,8 @@ bool __cdecl OnMapLoad(s_game_options* options)
 				}
 			}
 
-			toggle_xbox_tickrate(options, xboxTickrateEnabled);
-			if (!xboxTickrateEnabled)
+			toggle_xbox_tickrate(options, g_xbox_tickrate_enabled);
+			if (!g_xbox_tickrate_enabled)
 			{
 				H2X::ApplyMapLoadPatches(H2XFirerateEnabled);
 				ProjectileFix::ApplyProjectileVelocity();
@@ -490,7 +506,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		{
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
-			//H2X::Initialize(true);
+			toggle_xbox_tickrate(options, true);
 		}
 
 		resetAfterMatch = true;
@@ -809,6 +825,37 @@ int __cdecl get_last_single_player_level_id_unlocked_from_profile()
 	return 805; // return the id of the last level
 }
 
+__declspec(naked) void object_function_value_adjust_primary_firing()
+{
+	static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
+
+	__asm
+	{
+		// eax holds game_time_get()
+		sub     eax, [ebx + 248h]
+
+		push esi
+		push eax
+		// adjust the value first
+		fld seconds_trigger_hold
+		push eax
+		fstp [esp]
+		call time_globals::seconds_to_ticks_real
+		fstp [esp]
+		cvttss2si esi, [esp]
+		add esp, 4
+		pop eax
+
+		// WRONG
+		// cmp eax, 1
+		// RIGHT, compare with adjusted to tickrate
+		cmp eax, esi
+
+		pop esi
+
+		retn
+	}
+}
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */
@@ -847,6 +894,13 @@ void H2MOD::ApplyHooks() {
 	players_apply_patches();
 	objects_apply_patches();
 	weapon_definitions_apply_patches();
+	observer_apply_patches();
+	bipeds_apply_patches();
+	unit_apply_patches();
+	network_transport_apply_patches();
+	bitstream_serialization_apply_patches();
+
+	simulation_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -859,7 +913,9 @@ void H2MOD::ApplyHooks() {
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
-		lens_flare_fix();
+
+		// ### TODO dedi offset
+		Codecave(Memory::GetAddress(0x15E8DC, 0x0), object_function_value_adjust_primary_firing, 4);
 
 		/* These hooks are only built for the client, don't enable them on the server! */
 
@@ -900,7 +956,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
 		// Initialise_tag_loader();
-		PlayerControl::ApplyHooks();
 		
 		PatchCall(Memory::GetAddress(0x2422C8), get_last_single_player_level_id_unlocked_from_profile);
 
@@ -911,7 +966,27 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		rasterizer_dx9_main_apply_patches();
+		cinematics_apply_patches();
+		game_time_apply_patches();
+		game_state_procs_apply_patches();
 		apply_particle_update_patches();
+		apply_dead_camera_patches();
+		loading_apply_patches();
+		lens_flare_fix();
+		liquid_apply_patches();
+		contrails_apply_patches();
+		render_submit_apply_patches();
+		cloth_apply_patches();
+		camera_apply_patches();
+		player_control_apply_patches();
+		rasterizer_fog_apply_patches();
+		main_render_apply_patches();
+		effects_apply_patches();
+		xinput_apply_patches();
+
+		// Map loading patch (saves framerate)
+		// TODO move
+		NopFill(Memory::GetAddress(0x39BAB), 5);
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
@@ -959,7 +1034,7 @@ void H2MOD::Initialize()
 	H2MOD::ApplyHooks();
 	H2MOD::RegisterEvents();
 
-	StatsHandler::Initialize();
+	//StatsHandler::Initialize();
 
 	LOG_INFO_GAME("H2MOD - Initialized");
 }

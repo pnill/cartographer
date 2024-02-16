@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 #include "c_brightness_menu.h"
 

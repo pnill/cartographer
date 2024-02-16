@@ -393,7 +393,7 @@ void setup_game_global_text(const wchar_t* reports_path)
         print_array_to_file(file, game_globals->cluster_pvs_local, sizeof(game_globals->cluster_pvs_local));
 
         fwprintf(file, L"Cluster Activation: ");
-        print_array_to_file(file, game_globals->cluster_activation, sizeof(game_globals->cluster_activation) / sizeof(DWORD));
+        print_array_to_file(file, game_globals->cluster_activation, NUMBEROF(game_globals->cluster_activation));
 
         fwprintf(file, L"Enable Scripted Camera PVS: ");
         print_bool_to_file(file, game_globals->enable_scripted_camera_pvs);

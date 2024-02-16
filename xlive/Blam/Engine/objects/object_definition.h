@@ -5,7 +5,7 @@
 #include "Blam/Engine/cache/predicted_resources.h"
 #include "Blam/Engine/math/color_math.h"
 #include "Blam/Engine/math/function_definitions.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/objects/object_type_list.h"
 #include "Blam/Engine/tag_files/string_id.h"
 

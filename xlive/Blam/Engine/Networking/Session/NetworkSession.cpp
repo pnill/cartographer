@@ -3,6 +3,8 @@
 
 #include "Blam/Engine/game/game.h"
 
+// ### TODO Cleanup
+
 bool NetworkSession::PlayerIsActive(int playerIdx)
 {
 	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
@@ -234,6 +236,11 @@ void NetworkSession::LeaveSession()
 	typedef int(__cdecl* leave_game_type_t)(int a1);
 	auto p_leave_session = Memory::GetAddress<leave_game_type_t>(0x216388);
 	p_leave_session(0);
+}
+
+s_membership_peer* network_session_get_peer(int32 peer_index)
+{
+	return &NetworkSession::GetActiveNetworkSession()->membership[0].peers[peer_index];
 }
 
 s_session_interface_globals* s_session_interface_globals::get()

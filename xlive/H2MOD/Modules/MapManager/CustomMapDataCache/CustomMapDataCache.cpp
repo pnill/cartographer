@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "CustomMapDataCache.h"
 
-#include "H2MOD/Tags/TagInterface.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/tag_files/files_windows.h"
 
-#include "Util/Hooks/Hook.h"
+#include "memory/data.h"
+#include "shell/shell.h"
+#include "tag_files/files_windows.h"
+#include "text/unicode.h"
 
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "Blam/Cache/CacheHeader.h"
 
 #include "H2MOD/Modules/CustomMenu/c_list_widget.h"
+#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+
+
 
 #pragma region 50 map limit removal
 
@@ -17,6 +20,7 @@
 
 const wchar_t* custom_map_cache_filename_client = L"mapset.h2mdat";
 
+// TODO: determine whether or not the pre-release version of vista's map files are supported (11028.07.03.23.1927.main)
 const static char* offically_supported_builds[32] =
 {
 	"11081.07.04.30.0934.main",
@@ -47,9 +51,9 @@ const wchar_t* getCustomMapFolderPath()
 	return getCustomMapData()->custom_maps_folder_path;
 }
 
-int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder)
+int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder)
 {
-	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, char is_folder);
+	typedef int(__cdecl* get_path_from_id)(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_folder);
 	auto p_get_directory_path_by_id = Memory::GetAddressRelative<get_path_from_id>(0x48EF9E, 0x474A15);
 	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
@@ -207,8 +211,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const utf8* path, s_
 	{
 		if (!file_open(&cache_file, _permission_write_bit, &open_file_error_code))
 		{
-			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}",
-				__FUNCTION__, open_file_error_code);
+			LOG_ERROR_GAME("{} - failed to open custom map cache file, error code: {}", __FUNCTION__, (uint32)open_file_error_code);
 
 			break;
 		}
@@ -245,8 +248,7 @@ bool s_custom_map_data::write_custom_map_data_cache_to_file(const utf8* path, s_
 	}
 	else if (!create_file_success && open_file_error_code == _file_open_error_not_found)
 	{
-		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!"
-			__FUNCTION__);
+		LOG_ERROR_GAME("{} - failed to create custom map data cache while file not present!", __FUNCTION__);
 	}
 
 	return success;
@@ -531,9 +533,8 @@ unsigned int __thiscall s_custom_map_data::find_matching_entries_by_map_name(con
 
 bool __thiscall s_custom_map_data::get_entry_by_id(const s_custom_map_id* custom_map_id, s_custom_map_entry** out_entry)
 {
-	DWORD* flags_array = Memory::GetAddress<DWORD*>(0x46d820);
 	// custom_scenario_test_map_name_instead_of_hash
-	if (flags_array[15])
+	if (shell_startup_flag_is_set(_startup_flag_custom_map_entry_test_map_name_instead_of_hash))
 		return find_matching_entries_by_map_name(custom_map_id->map_name, out_entry, 1) != 0;
 	else
 		return find_matching_entries_by_sha256_hash(custom_map_id->map_sha256_hash, out_entry, 1) != 0;
@@ -695,13 +696,11 @@ bool open_cache_header(const wchar_t* file_path, void* cache_header_ptr, HANDLE*
 void close_cache_header(HANDLE* map_handle)
 {
 	typedef void (__cdecl* close_cache_header_t)(HANDLE*);
-	auto close_cache_header_impl = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
-	close_cache_header_impl(map_handle);
+	auto p_close_cache_header = Memory::GetAddress<close_cache_header_t>(0x64C03, 0x4CC5A);
+	p_close_cache_header(map_handle);
 }
 
-static std::wstring_convert<std::codecvt_utf8<wchar_t>> wstring_to_string;
-
-int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
+bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_entry)
 {
 	s_cache_header header;
 	HANDLE map_cache_handle;
@@ -734,14 +733,16 @@ int __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_ent
 	// without this the map is just called by it's file name
 
 	// todo move the code for loading the descriptions to our code and get rid of this
-	typedef int (__cdecl* validate_and_add_custom_map_interal_t)(s_custom_map_entry*);
-	auto validate_and_add_custom_map_interal_impl = Memory::GetAddress<validate_and_add_custom_map_interal_t>(0x4F690, 0x56890);
-	if (!validate_and_add_custom_map_interal_impl(custom_map_entry))
+	typedef int (__cdecl* validate_and_add_custom_map_internal_t)(s_custom_map_entry*);
+	auto validate_and_add_custom_map_internal = Memory::GetAddress<validate_and_add_custom_map_internal_t>(0x4F690, 0x56890);
+	if (!validate_and_add_custom_map_internal(custom_map_entry))
 	{
 		LOG_TRACE_FUNCW(L"warning \"{}\" has bad checksums or is blacklisted, map may not work correctly", file_name);
 		std::wstring fallback_name;
 		if (strnlen_s(header.name, sizeof(header.name)) > 0) {
-			fallback_name = wstring_to_string.from_bytes(header.name, &header.name[sizeof(header.name) - 1]);
+			wchar_t fallback_name_c[32];
+			utf8_string_to_wchar_string(header.name, fallback_name_c, NUMBEROF(fallback_name_c));
+			fallback_name.append(fallback_name_c);
 		}
 		else {
 			std::wstring full_file_name = file_name;

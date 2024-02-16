@@ -8,11 +8,16 @@ cache_file_tag_instance* global_tag_instances_get(void)
 	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);
 }
 
-datum s_tag_data_iterator::get_next_datum()
+tag_iterator* tag_iterator_new(tag_iterator* itr, blam_tag::tag_group_type type)
 {
-	typedef datum(__cdecl t_get_next_datum)(s_tag_data_iterator* it);
-	auto p_get_next_datum = Memory::GetAddress<t_get_next_datum*>(0x3172C);
-	return  p_get_next_datum(this);
+	itr->next_tag_index = 0;
+	itr->tag_type.tag_type = type;
+	return itr;
+}
+
+datum __cdecl tag_iterator_next(tag_iterator* itr)
+{
+	return INVOKE(0x3172C, 0x255DC, tag_iterator_next, itr);
 }
 
 void cache_file_map_clear_all_failures(void)

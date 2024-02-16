@@ -17,6 +17,9 @@
 
 #define TEST_N_DEF(TEST)
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
@@ -29,7 +32,6 @@
 #include <codecvt>
 #include <DbgHelp.h>
 #include <ShlObj.h>
-#include <time.h>
 #include <psapi.h>
 #include <TlHelp32.h>
 
@@ -48,7 +50,6 @@
 #include <map>
 #include <mutex>
 #include <queue>
-#include <tuple>
 #include <string>
 #include <vector>
 #include <random>
@@ -64,8 +65,13 @@
 #include <d3dx9.h>
 
 // Cartographer includes
-#include "Blam/Engine/cseries/cseries.h"
+#include "cseries/cseries.h"
+#include "math/math.h"
+#include "math/integer_math.h"
+#include "math/real_math.h"
+
 #include "Util/curl-interface.h"
+#include "Util/Hooks/Hook.h"
 #include "Util/log.h"
 #include "Util/Memory.h"
 #include "Util/remove_all_ptr.h"

@@ -5,7 +5,7 @@
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/real_math.h"
+
 #include "Blam/Engine/memory/static_arrays.h"
 
 enum e_bsp_policy : int8
@@ -17,9 +17,9 @@ enum e_bsp_policy : int8
 
 struct s_location
 {
-	DWORD leaf_index;
-	short cluster;
-	WORD bsp_index;
+	int32 leaf_index;
+	int16 cluster_index;
+	int16 bsp_index;
 };
 
 enum e_scenario_object_placement_flags : uint32

@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/TagBlock.h"
 
-#include "Blam/Engine/math/real_math.h"
+
 
 #define k_max_flight_hints_per_bsp 50
 #define k_max_points_per_flight_hint 10

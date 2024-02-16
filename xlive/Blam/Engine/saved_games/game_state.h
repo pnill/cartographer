@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/game/GameOptions.h"
+#include "Blam/Engine/game/game_options.h"
 
 #pragma pack(push,1)
 struct s_game_state_header
@@ -31,3 +31,7 @@ struct s_game_state_header
 };
 CHECK_STRUCT_SIZE(s_game_state_header, 0x12F8);
 #pragma pack(pop)
+
+void __cdecl game_state_shell_initialize(void);
+
+void* __cdecl game_state_malloc(const char* name, const char* description, uint32 size);

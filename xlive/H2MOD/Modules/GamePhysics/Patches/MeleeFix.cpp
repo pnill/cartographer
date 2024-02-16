@@ -2,10 +2,11 @@
 #include "MeleeFix.h"
 
 #include "Blam/Engine/tag_files/global_string_ids.h"
-#include "H2MOD/Modules/GamePhysics/MeleeLunge.h"
+#include "Blam/Engine/physics/character_physics_mode_melee.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "Util/Hooks/Hook.h"
+
 
 FLOATING_POINT_ENV_ACCESS();
 

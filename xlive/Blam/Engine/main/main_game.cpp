@@ -7,7 +7,7 @@
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/saved_games/game_variant.h"
 
-#include "Util/Hooks/Hook.h"
+
 
 s_game_options g_main_game_launch_options = {};
 int g_main_game_launch_user_count = 1;

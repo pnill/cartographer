@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/real_math.h"
+
 
 struct melee_aim_assist_parameters
 {
@@ -24,17 +24,17 @@ struct aim_assist_parameters
 };
 CHECK_STRUCT_SIZE(aim_assist_parameters, 36);
 
-struct s_aim_assist_targetting_data
+struct s_aim_assist_targeting_result
 {
 	datum target_object;
 	datum model_target;
 	datum target_player;
-	char gap_C[12];
-	signed __int16 auto_aim_flags;
-	char gap_1A[2];
+	int8 gap_C[12];
+	int16 auto_aim_flags;
+	int8 gap_1A[2];
 	real32 primary_auto_aim_level;
 	real32 secondary_auto_aim_level;
 };
-CHECK_STRUCT_SIZE(s_aim_assist_targetting_data, 0x24);
+CHECK_STRUCT_SIZE(s_aim_assist_targeting_result, 36);
 
 void aim_assist_apply_patches();

@@ -30,7 +30,7 @@ public:
 	///   <para>Creates a logger which outputs to a file.</para>
 	///   <para>Use logger.is_valid() to check if logging is working.</para>
 	/// </summary>
-	static h2log* create(const std::string &name, std::wstring &filename, bool shouldCreateLog, int debugLogLevel);
+	static h2log* create(const std::string &name, const std::wstring &filename, bool shouldCreateLog, int debugLogLevel);
 
 	/// <summary>
 	///   <para>Creates a logger which outputs to a console window.</para>
@@ -40,40 +40,40 @@ public:
 
 #define log_a(level) \
 	if (output != nullptr)                      \
-		output->##level(fmt.data(), args...);   \
+		output->level(fmt.data(), args...);		\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			("[" + sname + "] " + fmt).data()   \
 			, args...)
 
 #define log_b(level) \
 	if (output != nullptr)                      \
-		output->##level(fmt.data(), args...);   \
+		output->level(fmt.data(), args...);		\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			(L"[" + wname + L"] " + fmt).data() \
 			, args...)
 
 #define log_c(level) \
 	if (output != nullptr)                      \
-		output->##level(msg.data());            \
+		output->level(msg.data());				\
 	if (!isConsole                              \
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			("[" + sname + "] " + msg).data())
 
 #define log_d(level) \
 	if (output != nullptr)                      \
-		output->##level(msg.data());            \
-	if (!isConsole                              \
+		output->level(msg.data());				\
+	if (!isConsole								\
 		&& console != nullptr                   \
 		&& console->output != nullptr)          \
-		console->output->##level(               \
+		console->output->level(					\
 			(L"[" + wname + L"] " + msg).data())
 
 	// For the most unimportant stuff

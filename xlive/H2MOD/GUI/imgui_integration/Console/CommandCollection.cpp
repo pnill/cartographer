@@ -1,15 +1,16 @@
 #include "stdafx.h"
 #include "ImGui_ConsoleImpl.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/main/main_game.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Simulation/game_interface/simulation_game_action.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "main/main_game.h"
+#include "main/main_game_time.h"
+#include "Networking/NetworkMessageTypeCollection.h"
+#include "Networking/Session/NetworkSession.h"
+#include "simulation/game_interface/simulation_game_action.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/MainLoopPatches/MainGameTime/MainGameTime.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
@@ -17,7 +18,6 @@
 
 // for XNet connection logging
 #include "XLive/xnet/IpManagement/XnIp.h"
-
 
 std::mutex commandInsertMtx;
 
@@ -29,8 +29,9 @@ const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 ComVarFromPtr(d3d9ex_var, bool*, &H2Config_d3d9ex, 
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 ComVarFromPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
-	"var_net_metrics", "enable/disable useful net metrics, 0 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
-ComVarFromPtr(og_frame_limiter_var, bool*, &MainGameTime::fps_limiter_enabled,
+	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
+
+ComVarFromPtr(og_frame_limiter_var, bool*, &g_main_game_time_frame_limiter_enabled,
 	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
@@ -90,7 +91,7 @@ void CommandCollection::InitializeCommandsMap()
 
 void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 {
-	std::scoped_lock(commandInsertMtx);
+	std::scoped_lock lock(commandInsertMtx);
 
 	for (auto command : commandTable)
 	{
@@ -106,7 +107,7 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 
 ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& name)
 {
-	std::scoped_lock(commandInsertMtx);
+	std::scoped_lock lock(commandInsertMtx);
 
 	for (auto command : commandTable)
 	{
@@ -431,7 +432,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 		return 0;
 	}
 
-	s_network_observer* observer = NetworkSession::GetActiveNetworkSession()->p_network_observer;
+	c_network_observer* observer = NetworkSession::GetActiveNetworkSession()->p_network_observer;
 
 	output->Output(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
 
@@ -564,7 +565,7 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	// spawn object_name count same_team near_player x y z i j k
 
-	datum objectDatum = DATUM_INDEX_NONE;
+	datum objectDatum = NONE;
 	ComVar<int> count;
 	ComVar<float> varPos[3];
 	ComVar<float> varRotation[3];
@@ -840,7 +841,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	session.sessionID = network_session->session_id;
 	session.keyExchangeKey = network_session->xnkey;
 	session.hostAddress = (not_session_host ?
-		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr 
+		network_session->p_network_observer->observer_channels[NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index].xnaddr
 		: network_session->virtual_couch[0].xsession_info.hostAddress);
 
 	uint8* session_bytes = (uint8*)&session;
@@ -855,7 +856,6 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	output->Output(StringFlag_None, "Invite code generated:");
 	output->Output(StringFlag_CopyToClipboard, connect_string);
 	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
-	
 	return 0;
 }
 
