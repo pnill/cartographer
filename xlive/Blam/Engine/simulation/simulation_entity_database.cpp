@@ -406,5 +406,11 @@ void simulation_entity_database_apply_patches(void)
     WritePointer(Memory::GetAddress(0x3C624C, 0x381D34), jmp_c_simulation_entity_database__notify_mark_entity_for_deletion);
 
     WritePointer(Memory::GetAddress(0x3C6258, 0x381D40), jmp_c_simulation_entity_database__notify_promote_to_authority);
+
+    // don't update the weapon state if we didn't actually received an update
+    // for some reason someone at bungie thought it was a good idea to apply an weapon ammo update
+    // even if we received just the weapon definition
+    NopFill(Memory::GetAddress(0x1F836A, 0x1E20D0), 4);
+
 	return;
 }
