@@ -25,17 +25,17 @@ void __cdecl object_type_adjust_placement(object_placement_data* placement_data)
 	return;
 }
 
-bool object_type_new(datum object_index, object_placement_data* placement_data, bool* some_bool)
+bool object_type_new(datum object_index, object_placement_data* placement_data, bool* a3)
 {
 	const object_type_definition* object_type = get_game_object_type_definition(object_index);
 	bool object_created = true;
 
 	for (uint8 i = 0; object_type->base_object_types[i]; i++)
 	{
-		object_new_t object_new = object_type->base_object_types[i]->object_new;
-		if (object_new)
+		object_new_t p_object_new = object_type->base_object_types[i]->object_new;
+		if (p_object_new)
 		{
-			object_created &= object_new(object_index, placement_data, some_bool);
+			object_created = object_created && p_object_new(object_index, placement_data, a3);
 		}
 	}
 	return object_created;
