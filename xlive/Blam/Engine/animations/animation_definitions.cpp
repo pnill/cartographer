@@ -30,7 +30,7 @@ const c_model_animation* c_animation_graph_resources::get_animation(c_animation_
 
 size_t c_animation_graph_resources::get_animation_count(void) const
 {
-	return this->animations.size;
+	return this->animations.count;
 }
 
 e_animation_graph_resources_flags c_animation_graph_resources::get_animation_graph_resources_flags(void) const
@@ -45,7 +45,7 @@ const s_animation_blend_screen* c_animation_graph_resources::get_blend_screen(ui
 
 size_t c_animation_graph_resources::get_blend_screen_count(void) const
 {
-	return this->blend_screens.size;
+	return this->blend_screens.count;
 }
 
 int16 c_animation_graph_resources::get_codec_pack(void) const
@@ -60,7 +60,7 @@ const animation_graph_effect_reference* c_animation_graph_resources::get_effect_
 
 size_t c_animation_graph_resources::get_effect_reference_count(void) const
 {
-	return this->effect_references.size;
+	return this->effect_references.count;
 }
 
 
@@ -76,7 +76,7 @@ const animation_graph_node* c_animation_graph_resources::get_node(uint8 node_ind
 
 int16 c_animation_graph_resources::get_node_count(void) const
 { 
-	return (int16)this->skeleton_nodes.size; 
+	return (int16)this->skeleton_nodes.count;
 }
 
 const animation_graph_sound_reference* c_animation_graph_resources::get_sound_reference(uint8 node_index) const
@@ -86,7 +86,7 @@ const animation_graph_sound_reference* c_animation_graph_resources::get_sound_re
 
 size_t c_animation_graph_resources::get_sound_reference_count(void) const
 {
-	return this->sound_references.size;
+	return this->sound_references.count;
 }
 
 tag_reference c_animation_graph_resources::get_parent_graph(void) const
@@ -102,7 +102,7 @@ bool c_model_animation::animation_is_world_relative(void) const
 int16 c_model_animation::find_first_key_of_type(const e_frame_event_type event_type) const
 {
 	int16 result = NONE;
-	for (int32 i = 0; i < this->frame_events.size; ++i)
+	for (int32 i = 0; i < this->frame_events.count; ++i)
 	{
 		s_frame_event* frame_event = this->frame_events[i];
 		if (frame_event->type == event_type)
@@ -118,7 +118,7 @@ int16 c_model_animation::find_first_key_of_type(const e_frame_event_type event_t
 int16 c_model_animation::find_first_sound_event(s_sound_event* sound_event) const
 {
 	int16 frame = 0;
-	if (this->sound_events.size > 0) 
+	if (this->sound_events.count > 0)
 	{
 		s_sound_event* event = this->sound_events[0];
 		frame = event->frame;
@@ -135,7 +135,7 @@ int16 c_model_animation::find_first_sound_event(s_sound_event* sound_event) cons
 
 int16 c_model_animation::find_next_key_of_type(e_frame_event_type event_type, int32 frame) const
 {
-	for (int32 i = 0; i < this->frame_events.size; ++i)
+	for (int32 i = 0; i < this->frame_events.count; ++i)
 	{
 		s_frame_event* frame_event = this->frame_events[i];
 		if (frame_event->type == event_type && frame_event->frame > frame)
@@ -159,7 +159,7 @@ real32 c_model_animation::get_authored_duration(void) const
 
 size_t c_model_animation::get_effect_events_size(void) const
 {
-	return this->effect_events.size;
+	return this->effect_events.count;
 }
 
 int16 c_model_animation::get_frame_count(void) const
@@ -175,7 +175,7 @@ double c_model_animation::get_frame_count_minus_epsilon(void) const
 
 size_t c_model_animation::get_frame_events_size(void) const
 {
-	return this->frame_events.size;
+	return this->frame_events.count;
 }
 
 e_frame_info_type c_model_animation::get_frame_info_type(void) const
@@ -249,7 +249,7 @@ int16 c_model_animation::get_right_foot_frame_index(void) const
 
 size_t c_model_animation::get_sound_events_size(void) const
 {
-	return this->sound_events.size;
+	return this->sound_events.count;
 }
 
 int16 c_model_animation::get_sound_reference_index(void) const

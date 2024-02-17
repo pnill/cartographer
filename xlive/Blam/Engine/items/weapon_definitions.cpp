@@ -22,8 +22,8 @@ weapon_first_person_interface_definition* first_person_interface_definition_get(
     default:
         break;
 	}
-    int32 size = definition->player_interface.first_person.size;
-    if (index >= size && size > 0)
+    int32 block_count = definition->player_interface.first_person.count;
+    if (index >= block_count && block_count > 0)
     {
         if (definition->player_interface.first_person.data != NONE)
         {
@@ -42,6 +42,6 @@ weapon_first_person_interface_definition* first_person_interface_definition_get(
 
 void weapon_definitions_apply_patches(void)
 {
-    DetourFunc(Memory::GetAddress<uint8*>(0x190164, 0x17CE56), (uint8*)first_person_interface_definition_get, 11);
+	DetourFunc(Memory::GetAddress<uint8*>(0x190164, 0x17CE56), (uint8*)first_person_interface_definition_get, 11);
     return;
 }

@@ -100,7 +100,7 @@ void set_crosshair_scale(float scale)
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
 
 		// Loop through every bitmap inside the bitmap tag
-		for (size_t j = 0; j < bitm_definition->bitmaps.size; ++j)
+		for (size_t j = 0; j < bitm_definition->bitmaps.count; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
 			point2d original_bitmap_size = crosshair_original_bitmap_sizes[bitmap_size_vector_index];
@@ -122,7 +122,7 @@ void initialize_crosshair_bitmap_data()
 	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
-		for (int32 j = 0; j < bitm_definition->bitmaps.size; ++j)
+		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
 			point2d bitmap_size = { bitmap_data_block->width_pixels, bitmap_data_block->height_pixels };
@@ -156,7 +156,7 @@ void get_crosshair_bitmap_datums()
 		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(it->first);
 
 		// Loop through every bitmap widget in the nhdt definition
-		for (byte i = 0; i < nhdt_definition->bitmap_widgets.size; ++i)
+		for (byte i = 0; i < nhdt_definition->bitmap_widgets.count; ++i)
 		{
 			s_hud_bitmap_widget_definition* bitmap_widget_definition = nhdt_definition->bitmap_widgets[i];
 

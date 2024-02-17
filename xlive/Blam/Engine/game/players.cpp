@@ -241,7 +241,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
     if (game_is_campaign())
     {
         scenario* scnr = get_global_scenario();
-        uint32 block_size = scnr->player_starting_locations.size;
+        uint32 block_size = scnr->player_starting_locations.count;
         if (block_size > 0)
         {
             // Go through every player starting location and check if there's a campaign player type set
@@ -316,9 +316,9 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
         if (character >= _character_type_masterchief)
         {
             s_game_globals* globals = scenario_get_game_globals();
-            if (character > (e_character_type)globals->player_representation.size - 1)
+            if (character > (e_character_type)globals->player_representation.count - 1)
             {
-                character = (e_character_type)(globals->player_representation.size - 1);
+                character = (e_character_type)(globals->player_representation.count - 1);
             }
         }
         else

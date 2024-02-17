@@ -247,7 +247,7 @@ void Infection::removeUnwantedItems()
 		{
 			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(it->first);
 
-			for (int i = 0; i < itmc->item_permutations.size; i++)
+			for (int i = 0; i < itmc->item_permutations.count; i++)
 			{
 				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
 				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
@@ -257,7 +257,7 @@ void Infection::removeUnwantedItems()
 
 	//Replace vehicles with shotgun ammo
 	scenario* scenario_definition = get_global_scenario();
-	for (DWORD i = 0; i < scenario_definition->netgame_equipment.size; i++)
+	for (DWORD i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
 		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
 		if (netgame_equipment->item_vehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)

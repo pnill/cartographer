@@ -13,7 +13,7 @@ s_scenario_structure_bsp_group_definition::s_collision_bsp_block* global_collisi
 
 uint32 scenario_netgame_equipment_size(void)
 {
-	return get_global_scenario()->netgame_equipment.size;
+	return get_global_scenario()->netgame_equipment.count;
 }
 
 void location_invalidate(s_location* object_location)

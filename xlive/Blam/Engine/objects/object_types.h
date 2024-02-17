@@ -35,7 +35,7 @@ typedef void (*object_notify_impulse_sound_t)(datum, int32, int32);
 typedef void (*object_render_debug)(datum);
 
 
-#define k_max_object_type_inheritence 3
+#define k_max_object_type_inheritence 16
 struct object_type_definition
 {
 	const char* name;
@@ -74,7 +74,6 @@ struct object_type_definition
 	object_notify_impulse_sound_t object_notify_impulse_sound;
 	object_render_debug object_render_debug;
 	object_type_definition* base_object_types[k_max_object_type_inheritence];
-	int32 unused[13];
 	void* next;
 };
 CHECK_STRUCT_SIZE(object_type_definition, 0xC8);
@@ -85,7 +84,7 @@ object_type_definition* get_game_object_type_definition(datum object_datum);
 
 void __cdecl object_type_adjust_placement(object_placement_data* placement_data);
 
-bool object_type_new(datum object_index, object_placement_data* placement_data, bool* some_bool);
+bool object_type_new(datum object_index, object_placement_data* placement_data, bool* a3);
 
 void object_type_create_children(datum object_index);
 

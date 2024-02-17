@@ -21,18 +21,18 @@ void c_xbox_live_task_progress_menu::apply_patches()
 	
 	// Sanity checks
 	if (task_progress_dialog_definition == nullptr) { return; }
-	if (task_progress_dialog_definition->panes.size == 0) { return; }
+	if (task_progress_dialog_definition->panes.count == 0) { return; }
 
 	s_window_pane_reference* pane_definition = task_progress_dialog_definition->panes[0];
 	
 	// Fix the text placement
-	if (pane_definition->text_blocks.size > 0)
+	if (pane_definition->text_blocks.count > 0)
 	{
 		pane_definition->text_blocks[0]->text_bounds = { 144, -244, -38, 244 };
 	}
 
 	// Fix the placement of the 4 UI bitmaps
-	if (pane_definition->bitmap_blocks.size == 4)
+	if (pane_definition->bitmap_blocks.count == 4)
 	{
 		point2d fixed_bitmaps_placemets[4] = { {-288, 218}, {148, -66}, {-278, 208}, {-234, 306} };
 
@@ -44,7 +44,7 @@ void c_xbox_live_task_progress_menu::apply_patches()
 	}
 
 	// Fix the model viewport bounds
-	if (pane_definition->model_scene_blocks.size > 0)
+	if (pane_definition->model_scene_blocks.count > 0)
 	{
 		pane_definition->model_scene_blocks[0]->ui_viewport = { 78, -110, -174, 110 };
 	}

@@ -101,7 +101,7 @@ void __cdecl object_update_collision_culling(datum object_datum)
 
 bool __cdecl object_header_block_allocate(datum object_datum, int16 offset, int16 padded_size, int16 alignment_bits)
 {
-	return INVOKE(0x130BC6, 0x1213B9, object_header_block_allocate, object_datum, offset, padded_size, alignment_bits);
+	return INVOKE(0x130BC6, 0x11FA89, object_header_block_allocate, object_datum, offset, padded_size, alignment_bits);
 }
 
 // Sets the mode_tag_index and coll_tag_index parameters (if they exist)
@@ -284,7 +284,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	bool cluster_overflow = false;
 	if (object->object_flags.test(_object_cinematic_visibility_bit))
 	{
-		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
+		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 0x1F) >> 5));
 		p_cluster_bitvector = cluster_bitvector;
 	}
 
@@ -407,7 +407,7 @@ void object_initialize_for_interpolation(datum object_index)
 
 	if (object_def->model.TagIndex == NONE)
 	{
-		if (object_def->attachments.size <= 0)
+		if (object_def->attachments.count <= 0)
 		{
 			return;
 		}
@@ -429,7 +429,7 @@ void object_initialize_for_interpolation(datum object_index)
 					break;
 				}
 			}
-			if (++tag_block_index >= object_def->attachments.size)
+			if (++tag_block_index >= object_def->attachments.count)
 			{
 				return;
 			}
@@ -468,7 +468,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			model_definition = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
 		}
 
-		if (TEST_FLAG(FLAG(object_def->object_type), (FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped))))
+		if (
+			TEST_FLAG(FLAG(object_def->object_type), 
+				(FLAG(_object_type_creature) | FLAG(_object_type_crate) | FLAG(_object_type_machine) | FLAG(_object_type_vehicle) | FLAG(_object_type_biped)))
+			)
 		{
 			havok_memory_garbage_collect();
 		}
@@ -550,7 +553,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object->physics_flags.set_raw_bits(0);
 			object->physics_flags.set(_object_physics_bit_8, placement_data->flags.test(_scenario_object_placement_bit_3));
 			object->havok_datum = NONE;
-			object->simulation_entity_index = -1;
+			object->simulation_entity_index = NONE;
 			object->attached_to_simulation = 0;
 			object->destroyed_constraints_flag = placement_data->destroyed_constraints_flag;
 			object->loosened_constraints_flag = placement_data->loosened_constraints_flag;
@@ -564,18 +567,18 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if (model_definition)
 			{
-				if (model_definition->nodes.size >= 1) 
+				if (model_definition->nodes.count >= 1)
 				{ 
-					nodes_count = model_definition->nodes.size; 
+					nodes_count = model_definition->nodes.count;
 				}
-				if (model_definition->collision_regions.size >= 1) 
+				if (model_definition->collision_regions.count >= 1)
 				{ 
-					collision_regions_count = model_definition->collision_regions.size; 
+					collision_regions_count = model_definition->collision_regions.count;
 				}
 
-				if (model_definition->new_damage_info.size > 0 && model_definition->new_damage_info.data != NONE)
+				if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
 				{
-					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.size;
+					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
 				}
 
 				if (model_definition->animation.TagIndex != NONE)
@@ -609,9 +612,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			int16 orientation_size = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 			// Allocate object header blocks
-			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * object_def->attachments.size, 0)
+			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * (int16)object_def->attachments.count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * object_def->change_colors.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * (int16)object_def->change_colors.count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), 52 * nodes_count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
@@ -632,12 +635,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				}
 
 				// Null attachment block
-				if (object_def->attachments.size > 0)
+				if (object_def->attachments.count > 0)
 				{
 					int32 attachments_count;
 					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
 						&object->object_attachments_block,
-						sizeof(object_attachment_definition),
+						sizeof(object_attachment),
 						&attachments_count);
 
 					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
@@ -1018,9 +1021,10 @@ void object_move_replace_calls(void)
 
 void objects_apply_interpolation_patches()
 {
+	object_new_replace_calls();
+
 	if (!Memory::IsDedicatedServer())
 	{
-		object_new_replace_calls();
 		object_move_replace_calls();
 		object_get_markers_by_string_id_replace_calls();
 
