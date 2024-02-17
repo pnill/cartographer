@@ -51,7 +51,7 @@ s_game_globals* scenario_get_game_globals(void)
 s_ui_levels_definition* game_globals_get_ui_levels(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();
-	if (globals->ui_level_data.size > 0 && globals->ui_level_data.data != NONE)
+	if (globals->ui_level_data.count > 0 && globals->ui_level_data.data != NONE)
 	{
 		return globals->ui_level_data[0];
 	}
@@ -192,7 +192,7 @@ void game_globals_add_lmao_representation(void)
 		new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
 		new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
 		memcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
-		for (auto i = 0; i < base_variant->regions.size; i++)
+		for (auto i = 0; i < base_variant->regions.count; i++)
 		{
 			auto region = base_variant->regions[i];
 			auto new_region = MetaExtender::add_tag_block2<s_model_variant_region>((unsigned long)std::addressof(new_variant->regions));
@@ -201,7 +201,7 @@ void game_globals_add_lmao_representation(void)
 			new_region->runtime_flags = region->runtime_flags;
 			new_region->parent_variant = region->parent_variant;
 			new_region->sort_order = region->sort_order;
-			for (auto k = 0; k < region->permutations.size; k++)
+			for (auto k = 0; k < region->permutations.count; k++)
 			{
 				auto permutation = region->permutations[k];
 				auto new_permutation = MetaExtender::add_tag_block2<s_model_variant_permutation>((unsigned long)std::addressof(new_region->permutations));

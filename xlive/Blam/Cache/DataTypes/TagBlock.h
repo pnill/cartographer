@@ -3,7 +3,7 @@
 template<typename T = void>
 struct tag_block
 {
-	int32 size;
+	int32 count;
 	int32 data;
 
 	int data_size() const
@@ -31,7 +31,7 @@ struct tag_block
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (this->begin())
-			return &this->begin()[this->size];
+			return &this->begin()[this->count];
 		else
 			return nullptr;
 	}
@@ -41,7 +41,7 @@ struct tag_block
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)
 			return nullptr;
-		if (index >= this->size)
+		if (index >= this->count)
 			return nullptr;
 		if (this->begin()) {
 			T *data_array = this->begin();
@@ -50,3 +50,4 @@ struct tag_block
 		return nullptr;
 	}
 };
+CHECK_STRUCT_SIZE(tag_block<>, 8);

@@ -148,7 +148,7 @@ void halloween_event_map_load()
 			ltmp->lightmap_groups[0]->bitmap_group.TagIndex = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour
-			bsp_definition->decorators_block.size= 0;
+			bsp_definition->decorators_block.count = 0;
 			bsp_definition->decorators_block.data = 0;
 		}
 

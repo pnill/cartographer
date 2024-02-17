@@ -284,7 +284,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	bool cluster_overflow = false;
 	if (object->object_flags.test(_object_cinematic_visibility_bit))
 	{
-		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.size + 0x1F) >> 5));
+		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 0x1F) >> 5));
 		p_cluster_bitvector = cluster_bitvector;
 	}
 
@@ -407,7 +407,7 @@ void object_initialize_for_interpolation(datum object_index)
 
 	if (object_def->model.TagIndex == NONE)
 	{
-		if (object_def->attachments.size <= 0)
+		if (object_def->attachments.count <= 0)
 		{
 			return;
 		}
@@ -429,7 +429,7 @@ void object_initialize_for_interpolation(datum object_index)
 					break;
 				}
 			}
-			if (++tag_block_index >= object_def->attachments.size)
+			if (++tag_block_index >= object_def->attachments.count)
 			{
 				return;
 			}
@@ -567,18 +567,18 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			if (model_definition)
 			{
-				if (model_definition->nodes.size >= 1) 
+				if (model_definition->nodes.count >= 1)
 				{ 
-					nodes_count = model_definition->nodes.size; 
+					nodes_count = model_definition->nodes.count;
 				}
-				if (model_definition->collision_regions.size >= 1) 
+				if (model_definition->collision_regions.count >= 1)
 				{ 
-					collision_regions_count = model_definition->collision_regions.size; 
+					collision_regions_count = model_definition->collision_regions.count;
 				}
 
-				if (model_definition->new_damage_info.size > 0 && model_definition->new_damage_info.data != NONE)
+				if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
 				{
-					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.size;
+					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
 				}
 
 				if (model_definition->animation.TagIndex != NONE)
@@ -612,9 +612,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			int16 orientation_size = (!allow_interpolation ? 0 : 32 * nodes_count);
 
 			// Allocate object header blocks
-			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * (int16)object_def->attachments.size, 0)
+			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * (int16)object_def->attachments.count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * (int16)object_def->change_colors.size, 0)
+			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * (int16)object_def->change_colors.count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), 52 * nodes_count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
 			&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
@@ -635,7 +635,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				}
 
 				// Null attachment block
-				if (object_def->attachments.size > 0)
+				if (object_def->attachments.count > 0)
 				{
 					int32 attachments_count;
 					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,

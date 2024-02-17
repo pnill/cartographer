@@ -196,7 +196,7 @@ namespace TagFixes
 			if (sound_classes_datum != NONE)
 			{
 				s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
-				if (sound_classes->soundClasses.size < 35) { return; }
+				if (sound_classes->soundClasses.count < 35) { return; }
 
 				sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
 				sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };

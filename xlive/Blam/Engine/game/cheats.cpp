@@ -71,7 +71,7 @@ void __cdecl ice_cream_flavor_stock(const e_skull_type skull)
 		p_scripted_player_effect_screen_fade_in(1.0, 1.0, 1.0, 20);
 
 		// The below should never return true, if that's the case we've got bigger issues
-		if (g_globals_tag->player_information.size == 0) 
+		if (g_globals_tag->player_information.count == 0)
 		{
 			LOG_CRITICAL_GAME("g_globals_tag->player_information.size == 0, something is wrong with the globals tag on this map");
 			return; 

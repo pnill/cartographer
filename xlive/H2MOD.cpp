@@ -248,19 +248,19 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 		{
 			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<blam_tag::tag_group_type::multiplayerglobals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
-			if (multiplayerGlobalsTag->runtime.size)
+			if (multiplayerGlobalsTag->runtime.count)
 			{
 				auto* runtime_tag_block_data = multiplayerGlobalsTag->runtime[0];
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
-					runtime_tag_block_data->slayer_events.size = 0;
+					runtime_tag_block_data->slayer_events.count = 0;
 					runtime_tag_block_data->slayer_events.data = 0;
 				}
 
 				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code bellow
 				{
-					for (int i = 0; i < runtime_tag_block_data->general_events.size; i++)
+					for (int i = 0; i < runtime_tag_block_data->general_events.count; i++)
 					{
 						using sound_events = s_multiplayer_globals_group_definition::s_runtime_block::s_general_events_block::e_event;
 						auto* general_event = runtime_tag_block_data->general_events[i];

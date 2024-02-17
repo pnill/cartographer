@@ -112,7 +112,7 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
     real_matrix4x3** object_node_matrices,
     int32* object_node_matrix_count)
 {
-    int32 size;
+    int32 block_count;
 
     if (first_person)
     {
@@ -120,8 +120,8 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
         render_model_definition* render_model = (render_model_definition*)tag_get_fast(model_data->render_model_index);
         *render_model_index = model_data->render_model_index;
         *object_node_matrices = model_data->nodes;
-        size = MIN(render_model->nodes.size, MAXIMUM_NODES_PER_FIRST_PERSON_MODEL);
-        *object_node_matrix_count = size;
+        block_count = MIN(render_model->nodes.count, MAXIMUM_NODES_PER_FIRST_PERSON_MODEL);
+        *object_node_matrix_count = block_count;
         *flags = model_data->flags;
         *out_object_index = model_data->object_index;
     }
@@ -136,7 +136,7 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
         if (!halo_interpolator_interpolate_object_node_matrices(object_index, object_node_matrices, object_node_matrix_count))
         {
             *object_node_matrices = object_get_node_matrices(object_index, object_node_matrix_count);
-            *object_node_matrix_count = render_model->nodes.size;
+            *object_node_matrix_count = render_model->nodes.count;
         }
         *flags = 0;
         *out_object_index = object_index;
@@ -167,8 +167,8 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         render_model_definition* fp_hands_model = (render_model_definition*)tag_get_fast(player_representation->first_person_hands.TagIndex);
         c_animation_channel weapon_channel;
 
-        bool fp_weapon_nodes_match = weapon_data->weapon_node_remapping_table_count == fp_weapon_model->nodes.size;
-        bool fp_hand_nodes_match = weapon_data->hands_node_remapping_table_count == fp_hands_model->nodes.size;
+        bool fp_weapon_nodes_match = weapon_data->weapon_node_remapping_table_count == fp_weapon_model->nodes.count;
+        bool fp_hand_nodes_match = weapon_data->hands_node_remapping_table_count == fp_hands_model->nodes.count;
         if (!fp_weapon_nodes_match || !fp_hand_nodes_match)
         {
             first_person_weapon_update(user_index, weapon_slot);
@@ -188,9 +188,9 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         }
 
         // Set weapon orientations from render model
-        if (fp_weapon_model->nodes.size > 0)
+        if (fp_weapon_model->nodes.count > 0)
         {
-            for (int32 node_index = 0; node_index < fp_weapon_model->nodes.size; node_index++)
+            for (int32 node_index = 0; node_index < fp_weapon_model->nodes.count; node_index++)
             {
                 int32 orientation_index = weapon_data->weapon_node_remapping_table[node_index];
                 render_model_node* node = fp_weapon_model->nodes[node_index];
@@ -205,9 +205,9 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         }
 
         // Set hand orientations from render model
-        if (fp_hands_model->nodes.size > 0)
+        if (fp_hands_model->nodes.count > 0)
         {
-            for (int32 node_index = 0; node_index < fp_hands_model->nodes.size; node_index++)
+            for (int32 node_index = 0; node_index < fp_hands_model->nodes.count; node_index++)
             {
                 int32 orientation_index = weapon_data->hands_node_remapping_table[node_index];
                 render_model_node* node = fp_hands_model->nodes[node_index];
@@ -536,7 +536,7 @@ void first_person_weapon_build_model_nodes_from_remapping_table(datum render_mod
     int32* node_remapping_table)
 {
     render_model_definition* model = (render_model_definition*)tag_get_fast(render_model_tag_index);
-    int32 model_node_count = model->nodes.size;
+    int32 model_node_count = model->nodes.count;
     int32 node_count = model_node_count;
     if (model_node_count > max_node_count)
     {
@@ -623,7 +623,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
             if (first_person_data->unit_index == unit_index && first_person_data->unit_index != NONE)
             {
                 s_game_globals* globals = scenario_get_game_globals();
-                if (IN_RANGE_INCLUSIVE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.size - 1))
+                if (IN_RANGE_INCLUSIVE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
                 {
                     s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
                     datum fp_hands_index = player_rep->first_person_hands.TagIndex;
@@ -747,7 +747,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                     {
                         render_model_definition* body_render_model = (render_model_definition*)tag_get_fast(fp_body_index);
                         render_model_definition* unit_render_model = (render_model_definition*)tag_get_fast(unit_model_index);
-                        if (body_render_model->nodes.size == unit_render_model->nodes.size
+                        if (body_render_model->nodes.count == unit_render_model->nodes.count
                             && body_render_model->node_list_checksum == unit_render_model->node_list_checksum)
                         {
                             real_angle angle = body_render_model->dont_draw_over_camera_cosine_angle;
@@ -801,7 +801,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                     {
                         if (iterator.attach_to_marker != NONE 
                             && iterator.attach_to_marker.get_packed() 
-                            && IN_RANGE_INCLUSIVE(fp_data->character_type, _character_type_masterchief, globals->player_representation.size - 1) )
+                            && IN_RANGE_INCLUSIVE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
                         {
                             const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
                             datum fp_hands_model_index = player_rep->first_person_hands.TagIndex;
@@ -823,7 +823,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                                     const render_model_marker_group* fp_hands_marker_group = fp_hands_model->marker_groups[fp_hands_marker_group_index];
                                     const render_model_marker_group* fp_weapon_marker_group = fp_weapon_model->marker_groups[fp_weapon_marker_group_index];
                                     
-                                    if (fp_hands_marker_group->markers.size > 0 && fp_weapon_marker_group->markers.size > 0)
+                                    if (fp_hands_marker_group->markers.count > 0 && fp_weapon_marker_group->markers.count > 0)
                                     {
                                         const render_model_marker* fp_hands_marker = fp_hands_marker_group->markers[0];
                                         const render_model_marker* fp_weapon_marker = fp_weapon_marker_group->markers[0];
@@ -838,7 +838,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                                             &fp_hands_marker_matrix,
                                             &fp_weapon_marker_matrix,
                                             ratio,
-                                            fp_hands_model->nodes.size,
+                                            fp_hands_model->nodes.count,
                                             fp_hands_model_data->nodes);
                                     }
                                 }

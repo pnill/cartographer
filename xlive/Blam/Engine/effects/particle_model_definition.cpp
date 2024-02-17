@@ -15,7 +15,7 @@ effect_location_definition* c_particle_model_definition_interface::get_particle_
 
 size_t c_particle_model_definition_interface::get_particle_definition_locations_size()
 {
-	return this->particle_model_definition->locations.size;
+	return this->particle_model_definition->locations.count;
 }
 
 bool c_particle_model_definition_interface::particle_is_v_mirrored_or_one_shot()

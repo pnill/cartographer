@@ -85,7 +85,7 @@ void christmas_event_map_load()
 
 			for (auto& cluster : bsp_definition->clusters)
 			{
-				cluster.weather = (short)bsp_definition->weather_palette.size - 1;
+				cluster.weather = (short)bsp_definition->weather_palette.count - 1;
 			}
 		}
 	}
@@ -123,7 +123,7 @@ void christmas_event_map_load()
 
 		auto ghost_vehicle = tags::get_tag<blam_tag::tag_group_type::vehicle, _unit_definition>(ghost_datum);
 		ghost_vehicle->object.attachments.data = 0;
-		ghost_vehicle->object.attachments.size = 0;
+		ghost_vehicle->object.attachments.count = 0;
 
 		datum ghost_model_datum = ghost_vehicle->object.model.TagIndex;
 		auto ghost_model = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(ghost_model_datum);

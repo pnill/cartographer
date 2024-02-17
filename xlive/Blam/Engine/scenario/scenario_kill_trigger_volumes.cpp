@@ -6,7 +6,7 @@
 
 DWORD get_scenario_volume_count() 
 {
-	return get_global_scenario()->scenario_kill_triggers.size;
+	return get_global_scenario()->scenario_kill_triggers.count;
 }
 
 typedef void(__cdecl* kill_volume_enable_or_disable_t)(int volume_id);

@@ -130,7 +130,7 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
             if (object_def->model.TagIndex != NONE)
             {
                 s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
-                if (object_creation_data->model_variant_index < model_def->variants.size)
+                if (object_creation_data->model_variant_index < model_def->variants.count)
                 {
                     placement_data->variant_name = model_def->variants[object_creation_data->model_variant_index]->name;
                 }
