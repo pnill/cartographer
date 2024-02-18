@@ -65,7 +65,7 @@ void c_animation_channel::reset(void)
 	this->animation_ids[0].clear();
 	this->animation_ids[1].clear();
 	this->authored_time = 0.0f;
-	this->field_10 - 0;
+	this->field_10 = 0;
 	this->animation_state_flags = animation_state_none;
 	this->frame_event_types[0] = animation_frame_event_type_none;
 	this->field_18 = 1.0f;
