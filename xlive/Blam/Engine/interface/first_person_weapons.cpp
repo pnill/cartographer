@@ -787,12 +787,12 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
         && !unit_is_dual_wielding(unit_index))
     {
         const unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
-        c_animation_manager* weapon_raised_manager = (c_animation_manager*)object_header_block_get(unit_index, &unit->weapon_raised_block);
+        c_interpolator_control* interpolator_controls = (c_interpolator_control*)((uint8*)object_header_block_get(unit_index, &unit->weapon_raised_block) + 128);
         if (fp_data->weapons[0].animation_manager.valid())
         {
-            if (weapon_raised_manager->interpolator_controls[1].enabled())
+            if (interpolator_controls[0].enabled())
             {
-                real32 ratio = weapon_raised_manager->interpolator_controls[1].get_ratio();
+                real32 ratio = interpolator_controls[0].get_ratio();
                 if (fabs(ratio) >= k_real_math_epsilon)
                 {
                     s_game_globals* globals = scenario_get_game_globals();
