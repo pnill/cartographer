@@ -232,7 +232,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                 weapon_data->node_orientations_count,
                 fp_orientations->weapon_orientations);
 
-            const c_model_animation* state_animation = weapon_data->animation_manager.channel1.get_state_animation();
+            const c_model_animation* state_animation = weapon_data->animation_manager.channels[0].get_state_animation();
             real32 duration = 0.4f;
             if (state_animation && TEST_FLAG(state_animation->get_playback_flags(), playback_flag_disable_weapon_aim_1st_person))
             {
@@ -480,7 +480,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                     weapon_channel.apply_node_orientations(0.0f, 0.0f, weapon_data->node_orientations_count, fp_orientations->weapon_orientations, 0, 0);
                 }
             }
-            if (TEST_BIT(fp_data->flags, 1) && weapon_data->animation_manager.interpolator_control_1.enabled())
+            if (TEST_BIT(fp_data->flags, 1) && weapon_data->animation_manager.interpolator_controls[1].enabled())
             {
                 weapon_data->animation_manager.interpolate_node_orientations(weapon_data->node_orientations_count, NULL, fp_orientations->hand_orientations, fp_orientations->weapon_orientations);
             }
@@ -787,12 +787,12 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
         && !unit_is_dual_wielding(unit_index))
     {
         const unit_datum* unit = (unit_datum*)object_get_fast_unsafe(unit_index);
-        c_animation_manager* weapon_raised_manager = (c_animation_manager*)object_header_block_get(unit_index, &unit->weapon_raised_block);
+        c_interpolator_control* interpolator_controls = (c_interpolator_control*)((uint8*)object_header_block_get(unit_index, &unit->weapon_raised_block) + 128);
         if (fp_data->weapons[0].animation_manager.valid())
         {
-            if (weapon_raised_manager->interpolator_control_2.enabled())
+            if (interpolator_controls[0].enabled())
             {
-                real32 ratio = weapon_raised_manager->interpolator_control_2.get_ratio();
+                real32 ratio = interpolator_controls[0].get_ratio();
                 if (fabs(ratio) >= k_real_math_epsilon)
                 {
                     s_game_globals* globals = scenario_get_game_globals();

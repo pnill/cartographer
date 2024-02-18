@@ -52,7 +52,7 @@ void* object_header_block_get(datum object_datum, const object_header_block_refe
 void* object_header_block_get_with_count(datum object_index, const object_header_block_reference* reference, uint32 element_size, int32* element_count)
 {
 	void* block;
-	if (reference->offset == -1)
+	if (reference->offset == NONE)
 	{
 		block = 0;
 		*element_count = 0;
@@ -178,7 +178,7 @@ void object_reset_interpolation(datum object_index)
 	const object_datum* object = object_get_fast_unsafe(object_index);
 	c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 
-	animation_manager->interpolator_control_1.disable();
+	animation_manager->interpolator_controls[1].disable();
 	object_wake(object_index);
 	return;
 }
@@ -304,7 +304,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		object->shadow_sphere_radius,
 		&object->location,
 		p_cluster_bitvector,
-		20,
+		sizeof(payload),
 		&payload,
 		&cluster_overflow);
 

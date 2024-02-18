@@ -3,10 +3,8 @@
 
 c_interpolator_control::c_interpolator_control()
 {
-	this->ticks_remaining = 0;
-	this->duration_ticks = 0;
+	this->disable();
 	this->interpolation_type = _interpolation_type_none;
-	this->flags = _interpolator_control_flag_none;
 }
 
 real32 c_interpolator_control::get_ratio(void)

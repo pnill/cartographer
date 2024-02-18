@@ -8,16 +8,13 @@
 class c_animation_manager
 {
 public:
-	c_animation_channel channel1;
-	c_animation_channel channel2;
-	c_animation_channel channel3;
-	c_interpolator_control interpolator_control_0;
-	c_interpolator_control interpolator_control_1;
+	c_animation_channel channels[3];
+	c_interpolator_control interpolator_controls[2];
 	datum jmad_tag_datum;
 	uint16 animation_manager_flags;
 	int16 unk6E;
 	string_id animation_string_ids[4];
-	c_interpolator_control interpolator_control_2;
+	int32 field_80;
 
 	c_animation_manager(void);
 	~c_animation_manager(void) = default;

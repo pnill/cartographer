@@ -3,17 +3,24 @@
 
 #include "Blam/Engine/tag_files/global_string_ids.h"
 
+void c_animation_channel::initialize()
+{
+	this->reset();
+	return;
+}
 
 c_animation_channel::c_animation_channel()
 {
-	this->reset();
+	this->initialize();
 	return;
 };
 
 c_animation_channel::~c_animation_channel()
 {
+	this->animation_ids[0].clear();
+	this->animation_ids[1].clear();
 	this->animation_string = NONE;
-	this->unk10 = 0;
+	this->field_10 = 0;
 	return;
 }
 
@@ -53,27 +60,21 @@ const c_model_animation* c_animation_channel::get_state_animation(void)
 	return get_state_animation(this);
 }
 
-void c_animation_channel::initialize()
-{
-	this->reset();
-	return;
-}
-
 void c_animation_channel::reset(void)
 {
-	this->animation_id_0.clear();
-	this->animation_id_1.clear();
-	this->authored_time = 0.0;
-	this->unk10 = 0;
+	this->animation_ids[0].clear();
+	this->animation_ids[1].clear();
+	this->authored_time = 0.0f;
+	this->field_10 = 0;
 	this->animation_state_flags = animation_state_none;
-	this->frame_event_types_1 = animation_frame_event_type_none;
-	this->unk18 = 1.0f;
-	this->frame_event_types_2 = animation_frame_event_type_none;
-	this->frame_event_types_3 = animation_frame_event_type_none;
+	this->frame_event_types[0] = animation_frame_event_type_none;
+	this->field_18 = 1.0f;
+	this->frame_event_types[1] = animation_frame_event_type_none;
+	this->frame_event_types[2] = animation_frame_event_type_none;
 	this->animation_string = HS_ID_NONE;
+	this->field_E = -1;
 	this->animation_mode = -1;
-	this->unkD = -1;
-	this->unkE = -1;
+	this->field_D = -1;
 	return;
 }
 
@@ -87,5 +88,5 @@ void c_animation_channel::set_frame_position(real32 position)
 
 bool c_animation_channel::valid(void) const
 {
-	return this->animation_id_0.valid() && this->animation_id_1.valid();
+	return this->animation_ids[0].valid() && this->animation_ids[1].valid();
 }
