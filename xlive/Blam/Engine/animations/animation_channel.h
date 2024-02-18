@@ -22,18 +22,15 @@ enum e_animation_frame_event_types : int16
 
 class c_animation_channel
 {
-	c_animation_id animation_id_0;
-	c_animation_id animation_id_1;
+	c_animation_id animation_ids[2];
 	string_id animation_string;
 	int8 animation_mode;
-	int8 unkD;
-	int16 unkE;
-	int8 unk10;
+	int8 field_D;
+	int16 field_E;
+	int8 field_10;
 	e_animation_state_flag_bits animation_state_flags;
-	e_animation_frame_event_types frame_event_types_1;
-	e_animation_frame_event_types frame_event_types_2;
-	e_animation_frame_event_types frame_event_types_3;
-	real32 unk18;
+	e_animation_frame_event_types frame_event_types[3];
+	real32 field_18;
 	real32 authored_time;
 
 public:

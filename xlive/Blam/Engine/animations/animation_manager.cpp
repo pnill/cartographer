@@ -10,19 +10,21 @@ c_animation_manager::c_animation_manager()
 
 void c_animation_manager::initialize()
 {
-    this->channel1.initialize();
-    this->channel2.initialize();
-    this->channel3.initialize();
+    for (int32 i = 0; i < NUMBEROF(channels); i++)
+    {
+        channels[i].reset();
+    }
+
     this->animation_manager_flags = 0;
     this->unk6E = 0;
     this->jmad_tag_datum = NONE;
-    this->interpolator_control_0.disable();
-    this->interpolator_control_1.disable();
+    this->interpolator_controls[0].disable();
+    this->interpolator_controls[1].disable();
     this->animation_string_ids[0] = HS_ID_NONE;
     this->animation_string_ids[1] = HS_ID_NONE;
     this->animation_string_ids[2] = HS_ID_NONE;
     this->animation_string_ids[3] = HS_ID_NONE;
-    this->interpolator_control_2.disable();
+    this->field_80 = 0;
 }
 
 bool c_animation_manager::find_next_weapon_ik_point(ik_point_iterator* iterator)
@@ -107,7 +109,7 @@ bool c_animation_manager::setup_animation_channel_by_index(c_animation_channel* 
 
 bool c_animation_manager::valid(void) const
 {
-    return this->animation_string_ids[1] != NONE && this->channel1.valid();
+    return this->animation_string_ids[1] != NONE && this->channels[0].valid();
 }
 
 bool c_animation_manager::validate_graph(datum jmad_tag_index, datum hlmt_tag_index)
