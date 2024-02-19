@@ -203,7 +203,7 @@ bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vecto
 	{
 		return result;
 	}
-	return (TEST_FLAG(FLAG(object_header->cluster_index & 0x1F), cluster_activation[object_header->cluster_index >> 5].cluster_bitvector));
+	return TEST_FLAG(FLAG(object_header->cluster_index & 31), cluster_activation[object_header->cluster_index / 32].cluster_bitvector);
 }
 
 
@@ -284,7 +284,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	bool cluster_overflow = false;
 	if (object->object_flags.test(_object_cinematic_visibility_bit))
 	{
-		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 0x1F) >> 5));
+		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 31) / 32));
 		p_cluster_bitvector = cluster_bitvector;
 	}
 
@@ -312,12 +312,11 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	object_header->flags.set(_object_header_connected_to_map_bit, true);
 	object_connect_lights_recursive(object_index, false, true, false, false);
 
-	if (s_game_cluster_bit_vectors* cluster_activation = game_get_cluster_activation();
-		object_can_activate_in_cluster(object_index, cluster_activation))
+	if (object_can_activate_in_cluster(object_index, game_get_cluster_activation()))
 	{
 		object_activate(object_index);
 	}
-	else if (!object->object_flags.test(_object_deleted_when_deactivated_bit)|| simulation_query_object_is_predicted(object_index))
+	else if (!object->object_flags.test(_object_deleted_when_deactivated_bit) || simulation_query_object_is_predicted(object_index))
 	{
 		object_deactivate(object_index);
 	}
@@ -325,6 +324,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	{
 		object_delete(object_index);
 	}
+
 	if (cluster_index_is_null && object_header->cluster_index != NONE)
 	{
 		object_cleanup_havok(object_index);
@@ -352,7 +352,7 @@ void object_postprocess_node_matrices(datum object_index)
 
 void __cdecl object_reconnect_to_physics(datum object_index)
 {
-	INVOKE(0x1323B3, 0x121282, object_reconnect_to_physics, object_index);
+	INVOKE(0x1323B3, 0x121283, object_reconnect_to_physics, object_index);
 	return;
 }
 
@@ -407,12 +407,12 @@ void object_initialize_for_interpolation(datum object_index)
 
 	if (object_def->model.TagIndex == NONE)
 	{
-		if (object_def->attachments.count <= 0)
+		if ((int16)object_def->attachments.count <= 0)
 		{
 			return;
 		}
 
-		int32 tag_block_index = 0;
+		int16 tag_block_index = 0;
 		while (1)
 		{
 			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
@@ -429,7 +429,7 @@ void object_initialize_for_interpolation(datum object_index)
 					break;
 				}
 			}
-			if (++tag_block_index >= object_def->attachments.count)
+			if (++tag_block_index >= (int16)object_def->attachments.count)
 			{
 				return;
 			}
@@ -451,6 +451,7 @@ t_object_new p_object_new;
 datum __cdecl object_new(object_placement_data* placement_data)
 {
 	datum object_index = NONE;
+	bool process_is_game_client = !Memory::IsDedicatedServer();
 
 	if (!placement_data->flags.test(_scenario_object_placement_bit_4) && placement_data->tag_index != NONE)
 	{
@@ -480,12 +481,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 		if (object_index != NONE)
 		{
-			bool not_a_dedicated_server = !Memory::IsDedicatedServer();
-			// Don't run interpolation on dedis
-			if (not_a_dedicated_server)
-			{
-				halo_interpolator_setup_new_object(object_index);
-			}
+			halo_interpolator_setup_new_object(object_index);
 			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 			object_datum* object = object_get_fast_unsafe(object_index);
 
@@ -640,7 +636,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				}
 
 				// Null attachment block
-				if (object_def->attachments.count > 0)
+				if ((int16)object_def->attachments.count > 0)
 				{
 					int32 attachments_count;
 					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
@@ -648,7 +644,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						sizeof(object_attachment),
 						&attachments_count);
 
-					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
+					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * (int16)attachments_count);
 				}
 				
 				if (object_type_new(object_index, placement_data, &out_of_objects))
@@ -685,12 +681,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					}
 
 					object_postprocess_node_matrices(object_index);
-
-					// Don't run interpolation on dedis
-					if (not_a_dedicated_server)
-					{
-						object_initialize_for_interpolation(object_index);
-					}
+					object_initialize_for_interpolation(object_index);
 
 					object_wake(object_index);
 
@@ -707,7 +698,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 					// Not 100% sure what this function does but it has to do with occlusion
 					// This function is nulled out on the dedi
-					if (not_a_dedicated_server)
+					if (process_is_game_client)
 					{ 
 						object_occlusion_data_initialize(object_index);
 					}
