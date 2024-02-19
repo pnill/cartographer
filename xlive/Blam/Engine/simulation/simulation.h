@@ -6,6 +6,8 @@
 
 #include "game/player_control.h"
 
+#define k_maximum_simulation_player_updates 64
+
 struct alignas(8) simulation_update
 {
 	int32 simulation_time;
@@ -19,8 +21,7 @@ struct alignas(8) simulation_update
 	bool machine_update_valid;
 	simulation_machine_update machine_update;
 	int32 player_update_count;
-	simulation_player_update player_updates[k_maximum_players];
-	int8 field_1A0C[8640];	// unused?
+	simulation_player_update player_updates[k_maximum_simulation_player_updates];
 	bool flush_gamestate;
 	int32 game_time_ticks;
 	uint32 random_seed;
