@@ -480,7 +480,12 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 		if (object_index != NONE)
 		{
-			halo_interpolator_setup_new_object(object_index);
+			bool not_a_dedicated_server = !Memory::IsDedicatedServer();
+			// Don't run interpolation on dedis
+			if (not_a_dedicated_server)
+			{
+				halo_interpolator_setup_new_object(object_index);
+			}
 			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 			object_datum* object = object_get_fast_unsafe(object_index);
 
@@ -680,7 +685,13 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					}
 
 					object_postprocess_node_matrices(object_index);
-					object_initialize_for_interpolation(object_index);
+
+					// Don't run interpolation on dedis
+					if (not_a_dedicated_server)
+					{
+						object_initialize_for_interpolation(object_index);
+					}
+
 					object_wake(object_index);
 
 					object->physics_flags.set(_object_physics_bit_2, placement_data->flags.test(_scenario_object_placement_bit_5));
@@ -696,7 +707,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 					// Not 100% sure what this function does but it has to do with occlusion
 					// This function is nulled out on the dedi
-					if (!Memory::IsDedicatedServer()) 
+					if (not_a_dedicated_server)
 					{ 
 						object_occlusion_data_initialize(object_index);
 					}

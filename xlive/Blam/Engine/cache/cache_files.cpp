@@ -3,6 +3,16 @@
 
 #include "Blam/Engine/game/game_globals.h"
 
+s_cache_header* cache_files_get_header(void)
+{
+	return Memory::GetAddress<s_cache_header*>(0x47CD68, 0x4A29D0);
+}
+
+s_tags_header* cache_files_get_tags_header(void)
+{
+	return tags::get_at_tag_data_offset<s_tags_header>(cache_files_get_header()->tag_offset_mask);
+}
+
 cache_file_tag_instance* global_tag_instances_get(void)
 {
 	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);

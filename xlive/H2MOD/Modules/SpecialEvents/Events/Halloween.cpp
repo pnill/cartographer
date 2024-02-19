@@ -40,7 +40,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 		auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
 		auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(pump->objectTag.model.TagIndex, true);
 
-		const s_cache_header* cache_header = tags::get_cache_header();
+		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
 		{
 			for (auto& scen_place : coag_scen_places)
@@ -101,8 +101,8 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 void halloween_event_map_load()
 {
 	// Load specific tags from shared and modify placements depending on the map being played
-	const s_cache_header* cache_header = tags::get_cache_header();
-	scenario* scenario_definition = tags::get_tag_fast<scenario>(tags::get_tags_header()->scenario_datum);
+	const s_cache_header* cache_header = cache_files_get_header();
+	scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
 	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.TagIndex);
 	if (!strcmp(cache_header->name, "coagulation"))
 	{

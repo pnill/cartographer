@@ -11,6 +11,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
 
+// ### TODO Cleanup
 
 namespace TagFixes
 {
@@ -33,14 +34,14 @@ namespace TagFixes
 					tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
 					if(shader_template->TagIndex == borked_template)
 					{
-						auto *shader_post = reinterpret_cast<tags::tag_data_block*>(shader + 0x20);
-						if(shader_post->block_count > 0)
+						tag_block<int> *shader_post = reinterpret_cast<tag_block<int>*>(shader + 0x20);
+						if(shader_post->count > 0)
 						{
-							auto shader_post_data = tags::get_tag_data() + shader_post->block_data_offset;
-							auto shader_post_bitmap = reinterpret_cast<tags::tag_data_block*>(shader_post_data + 0x4);
-							if(shader_post_bitmap->block_count >= bitmap_idx + 1)
+							auto shader_post_data = tags::get_tag_data() + shader_post->data;
+							auto shader_post_bitmap = reinterpret_cast<tag_block<int>*>(shader_post_data + 0x4);
+							if(shader_post_bitmap->count >= bitmap_idx + 1)
 							{
-								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->block_data_offset + (bitmap_idx * 0xC));
+								auto bitmap_data = tags::get_tag_data() + (shader_post_bitmap->data + (bitmap_idx * 0xC));
 								datum* bitmap = reinterpret_cast<datum*>(bitmap_data);
 								if(*bitmap == bitmap_to_fix)
 									*bitmap = NONE;
@@ -76,14 +77,14 @@ namespace TagFixes
 			byte* shadow_tag = tags::get_tag<blam_tag::tag_group_type::shaderpass, BYTE>(shadow_datum);
 			if(shadow_tag != nullptr)
 			{
-				auto *shadow_pp = reinterpret_cast<tags::tag_data_block*>(shadow_tag + 0x1C);
-				if(shadow_pp->block_count > 0 && shadow_pp->block_data_offset != -1)
+				tag_block<int> *shadow_pp = reinterpret_cast<tag_block<int>*>(shadow_tag + 0x1C);
+				if(shadow_pp->count > 0 && shadow_pp->data != NONE)
 				{
-					auto shadow_pp_data = tags::get_tag_data() + shadow_pp->block_data_offset;
-					auto *shadow_impl_block = reinterpret_cast<tags::tag_data_block*>(shadow_pp_data);
-					if(shadow_impl_block->block_count > 0 && shadow_impl_block->block_data_offset != -1)
+					auto shadow_pp_data = tags::get_tag_data() + shadow_pp->data;
+					tag_block<int>*shadow_impl_block = reinterpret_cast<tag_block<int>*>(shadow_pp_data);
+					if(shadow_pp->count > 0 && shadow_impl_block->data != NONE)
 					{
-						auto *shadow_impl = tags::get_tag_data() + shadow_impl_block->block_data_offset;
+						auto shadow_impl = tags::get_tag_data() + shadow_impl_block->data;
 						tag_reference* impl_1 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A) + 0xFC);
 						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 

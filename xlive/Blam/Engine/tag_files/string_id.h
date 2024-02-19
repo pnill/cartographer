@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#define k_maximum_string_id_count 393216
 
 /*********************************************************************
 * string_id

@@ -11,11 +11,6 @@ char* tags::get_tag_data()
 	return *Memory::GetAddress<char**>(0x47CD54, 0x4A29BC);
 }
 
-s_cache_header* tags::get_cache_header()
-{
-	return Memory::GetAddress<s_cache_header*>(0x47CD68, 0x4A29D0);
-}
-
 HANDLE tags::get_cache_handle()
 {
 	return *Memory::GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
@@ -55,12 +50,12 @@ bool tags::load_tag_debug_name()
 	if (!LOG_CHECK(cache_handle != INVALID_HANDLE_VALUE))
 		return false;
 
-	s_cache_header* header = get_cache_header();
+	s_cache_header* header = cache_files_get_header();
 
-	size_t name_buffer_offset = header->TagNamesBufferOffset;
-	size_t name_buffer_size = header->TagNamesBufferSize;
-	size_t tag_indices_offset = header->TagIndicesToName;
-	size_t tag_count = header->TagNamesCount;
+	size_t name_buffer_offset = header->tag_name_buffer_offset;
+	size_t name_buffer_size = header->tag_name_buffer_size;
+	size_t tag_indices_offset = header->tag_name_offsets_offset;
+	size_t tag_count = header->tag_name_count;
 
 	if (name_buffer_offset == 0 || name_buffer_size == 0 || tag_indices_offset == 0 || tag_count == 0
 		|| (name_buffer_offset + name_buffer_size) > header->file_size || (tag_indices_offset + (tag_count * 4)) > header->file_size)

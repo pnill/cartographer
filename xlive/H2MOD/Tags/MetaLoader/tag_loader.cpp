@@ -1,16 +1,16 @@
 #include "stdafx.h"
-
 #include "tag_loader.h"
 
-#include "Blam/Engine/game/game_options.h"
+#include "cache/cache_files.h"
+#include "game/game_options.h"
+#include "scenario/scenario.h"
+
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
+#include "Blam/Cache/TagGroups/weather_system_definition.hpp"
+
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "Util/filesys.h"
-
-
-#include "Blam/Cache/TagGroups/weather_system_definition.hpp"
-#include "Blam/Engine/cache/cache_files.h"
 
 // TODO Cleanup
 
@@ -122,7 +122,7 @@ namespace tag_loader
 		fin->seekg(0x0);
 		fin->read(map_header, 0x800);
 
-		if (tags::get_cache_header()->type == _game_mode_mutiplayer_shared || tags::get_cache_header()->type == _game_mode_single_player_shared)
+		if (cache_files_get_header()->type == _game_mode_mutiplayer_shared || cache_files_get_header()->type == _game_mode_single_player_shared)
 		{
 			delete[] map_header;
 			return true;
@@ -1067,7 +1067,7 @@ namespace tag_loader
 	{
 		tags::tag_instance* SharedTables = reinterpret_cast<tags::tag_instance*>(tags::get_tag_data() + 0x20 + 0xC * *(DWORD*)(tags::get_tag_data() + 4));
 
-		for (int i = 10000; i < tags::get_tag_count(); i++)
+		for (int i = FIRST_SHARED_TAG_INSTANCE_INDEX; i < tags::get_tag_count(); i++)
 			memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
 	}
 	void Generate_sync_list(int type, DWORD index)
@@ -1396,7 +1396,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//tag_loader::Add_all_shared_refs();
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (!tags::get_cache_header()->is_single_player_shared())
+	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
 	{
 		DWORD* TagTableStart = Memory::GetAddress<DWORD*>(0x47CD50);
 		memset((BYTE*)tag_loader::new_Tables, 0, 0x3BA40);
@@ -1417,7 +1417,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	///tag_injector testing
 	//Just for testing purpose,dont cluter here	
 	///Actual injection process after map load
-	if (!tags::get_cache_header()->is_single_player_shared())
+	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
 	{
 		//actual tag_loading
 		///parse query file

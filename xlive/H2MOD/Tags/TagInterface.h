@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/CacheHeader.h"
+#include "cache/cache_files.h"
 #include "Blam/Cache/DataTypes/BlamTag.h"
 
 namespace tags
@@ -11,30 +11,12 @@ namespace tags
 		size_t data_offset;
 		size_t size;
 	};
-
+	
 	struct tag_parent_info
 	{
 		blam_tag tag;
 		blam_tag parent;
 		blam_tag grandparent;
-	};
-
-	struct tag_offset_header
-	{
-		void* parent_info;
-		int tag_parent_info_count;
-		tag_instance* tag_instances;
-		datum scenario_datum;
-		datum globals_datum;
-		int field_14;
-		int tag_count;
-		int type;
-	};
-
-	struct tag_data_block
-	{
-		int block_count;
-		DWORD block_data_offset;
 	};
 
 	/*
@@ -52,9 +34,6 @@ namespace tags
 
 	/* tag data in currently loaded map (merged cache and shared cache data afaik) */
 	char* get_tag_data();
-
-	/* header for the current .map/cache file */
-	s_cache_header* get_cache_header();
 
 	/* Returns a handle to the map file currently loaded */
 	HANDLE get_cache_handle();
@@ -75,19 +54,13 @@ namespace tags
 		return reinterpret_cast<T*>(&get_tag_data()[offset]);
 	}
 
-	/* header containing information about currently loaded tags */
-	inline tag_offset_header* get_tags_header()
-	{
-		return get_at_tag_data_offset<tag_offset_header>(get_cache_header()->tag_offset_mask);
-	}
-
 	/* Returns a pointer to the tag instance array */
 	tag_instance* get_tag_instances();
 
 	/* Returns the number of tags, pretty self explanatory */
 	inline long get_tag_count()
 	{
-		return get_tags_header()->tag_count;
+		return cache_files_get_tags_header()->tag_count;
 	}
 
 	/* Convert a tag index to a tag datum */
@@ -112,7 +85,7 @@ namespace tags
 	/* Get parent tag groups for a tag group */
 	inline const tag_parent_info* get_tag_parent_info(const blam_tag& tag_type)
 	{
-		auto* header = get_tags_header();
+		s_tags_header* header = cache_files_get_tags_header();
 		if (!header)
 		{
 			LOG_ERROR_FUNC("Tags header not loaded");
@@ -163,7 +136,7 @@ namespace tags
 	template <blam_tag::tag_group_type request_type = blam_tag::tag_group_type::none, typename T = void>
 	inline T* get_tag(datum tag, bool injectedTag = false)
 	{
-		tag_offset_header* header = get_tags_header();
+		s_tags_header* header = cache_files_get_tags_header();
 
 		if (DATUM_IS_NONE(tag))
 		{

@@ -4,10 +4,9 @@
 
 #include "memory/data.h"
 #include "shell/shell.h"
+#include "scenario/scenario.h"
 #include "tag_files/files_windows.h"
 #include "text/unicode.h"
-
-#include "Blam/Cache/CacheHeader.h"
 
 #include "H2MOD/Modules/CustomMenu/c_list_widget.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -707,7 +706,7 @@ bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_en
 	wchar_t* file_name = custom_map_entry->file_path;
 	if (!open_cache_header(file_name, &header, &map_cache_handle))
 		return false;
-	if (header.magic != 'head' || header.foot != 'foot' || header.file_size <= 0 || header.engine_gen != 8)
+	if (header.header_signature != 'head' || header.footer_signature != 'foot' || header.file_size <= 0 || header.version != 8)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid header", file_name);
 		return false;
@@ -717,12 +716,12 @@ bool __cdecl validate_and_read_custom_map_data(s_custom_map_entry* custom_map_en
 		LOG_TRACE_FUNCW(L"\"{}\" has bad scenario type", file_name);
 		return false;
 	}
-	if (strnlen_s(header.name, MAX_MAP_NAME_SIZE) >= 32 || strnlen_s(header.version, 32) >= 32)
+	if (strnlen_s(header.name, MAX_MAP_NAME_SIZE) >= 32 || strnlen_s(header.version_string, 32) >= 32)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" has invalid version or name string", file_name);
 		return false;
 	}
-	if (!header.is_multiplayer() && !header.is_single_player())
+	if (header.type != scenario_type_multiplayer && header.type != scenario_type_singleplayer)
 	{
 		LOG_TRACE_FUNCW(L"\"{}\" is not playable", file_name);
 		return false;

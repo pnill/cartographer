@@ -180,11 +180,6 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 	}
 }
 
-const wchar_t* H2MOD::get_local_player_name(int local_player_index)
-{
-	return s_player::get_name(player_index_from_user_index(local_player_index));
-}
-
 int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 {
 	player_iterator playersIt;
@@ -231,10 +226,6 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 	}
 }
 
-BYTE H2MOD::get_local_team_index()
-{
-	return *Memory::GetAddress<BYTE*>(0x51A6B4);
-}
 #pragma endregion
 
 void H2MOD::disable_score_announcer_sounds(int sound_flags)
