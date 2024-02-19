@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 #include "Blam/Engine/math/color_math.h"
 
@@ -761,7 +761,8 @@ struct s_window_pane_reference
 };
 TAG_BLOCK_SIZE_ASSERT(s_window_pane_reference, 0x4C);
 
-struct s_user_interface_screen_widget_definition : TagGroup<'wgit'>
+// ### TODO Finish this
+struct s_user_interface_screen_widget_definition
 {
     /* Explaination("Notes on screen widgets:", 
     "- the widget coordinate system is a left-handed system (+x to the right, +y up, +z into the screen)

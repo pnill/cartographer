@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 
 /*********************************************************************
@@ -10,7 +10,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_user_interface_shared_globals_group_definition :TagGroup<'wigl'>
+struct s_user_interface_shared_globals_group_definition
 {
 	PAD(0x44);//0x0
 	float overlayed_screen_alpha_mod;//0x44

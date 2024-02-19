@@ -8,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_vehicle_group_definition :TagGroup<'vehi'>
+struct s_vehicle_group_definition
 {
 	_unit_definition unitTag;
 	enum class e_flags : __int32

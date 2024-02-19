@@ -8,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_device_machine_group_definition :TagGroup<'mach'>
+struct s_device_machine_group_definition
 {
 	s_device_group_definition deviceTag;
 	enum class e_type : __int16

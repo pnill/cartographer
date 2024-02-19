@@ -9,7 +9,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_user_interface_globals_group_definition :TagGroup<'wgtz'>
+struct s_user_interface_globals_group_definition
 {
 	tag_reference shared_globals;//0x0
 	struct s_screen_widgets_block

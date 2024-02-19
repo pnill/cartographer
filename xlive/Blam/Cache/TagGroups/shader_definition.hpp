@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 #pragma pack(push,1)
 
@@ -51,7 +51,7 @@ struct shader_postprocess_definition_new_block
 * group_tag: shad
 **********************************************************************/
 
-struct shader_definition : TagGroup<'shad'>
+struct shader_definition
 {
 	// TagReference("stem")
 	tag_reference shader_template;

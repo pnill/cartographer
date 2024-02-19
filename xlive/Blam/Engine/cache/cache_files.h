@@ -23,9 +23,9 @@ struct s_tags_header
 	cache_file_tag_instance* tag_instances;
 	datum scenario_index;
 	datum globals_index;
-	int field_14;
-	int tag_count;
-	int type;
+	int32 field_14;
+	int32 tag_count;
+	int32 type;
 };
 CHECK_STRUCT_SIZE(s_tags_header, 32);
 

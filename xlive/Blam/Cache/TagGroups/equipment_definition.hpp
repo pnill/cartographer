@@ -8,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_equipment_group_definition :TagGroup<'eqip'>
+struct s_equipment_group_definition
 {
 	s_item_group_definition itemTag;
 	enum class e_powerup_type : __int16
