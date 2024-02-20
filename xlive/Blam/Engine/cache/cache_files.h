@@ -1,14 +1,13 @@
 #pragma once
 #include "game/game_preferences.h"
-
-#include "Blam/Cache/DataTypes/BlamTag.h"
+#include "tag_files/tag_groups.h"
 
 #define FIRST_SHARED_TAG_INSTANCE_INDEX 10000
 #define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
 
 struct cache_file_tag_instance
 {
-	blam_tag tag_group;
+	tag_group tag_group;
 	int32 tag_index;
 	uint32 data_offset;
 	uint32 size;
@@ -94,7 +93,7 @@ struct tag_iterator
 	int32 field_4;
 	datum current_tag_index;
 	datum next_tag_index;
-	blam_tag tag_type;
+	tag_group tag_type;
 };
 CHECK_STRUCT_SIZE(tag_iterator, 20);
 
@@ -104,7 +103,7 @@ s_tags_header* cache_files_get_tags_header(void);
 
 cache_file_tag_instance* global_tag_instances_get(void);
 
-tag_iterator* tag_iterator_new(tag_iterator* itr, blam_tag::tag_group_type type);
+tag_iterator* tag_iterator_new(tag_iterator* itr, tag_group type);
 
 datum __cdecl tag_iterator_next(tag_iterator* itr);
 

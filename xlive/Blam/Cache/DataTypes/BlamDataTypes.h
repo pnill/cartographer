@@ -8,6 +8,5 @@
 #include "Blam/Engine/tag_files/string_id.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
 #include "TagRef.h"
-#include "BlamTag.h"
 #include "TagBlock.h"
 #include "DataRef.h"

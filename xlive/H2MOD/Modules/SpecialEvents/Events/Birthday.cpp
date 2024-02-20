@@ -11,13 +11,13 @@
 void birthday_event_map_load()
 {
 	// Carto Shared Tags
-	datum bday_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", blam_tag::tag_group_type::scenery, "carto_shared");
-	datum bday_cake_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\birthday_cake", blam_tag::tag_group_type::rendermodel, "carto_shared");
-	datum fp_bday_cake_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
+	datum bday_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", _tag_group_scenery, "carto_shared");
+	datum bday_cake_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\birthday_cake", _tag_group_render_model, "carto_shared");
+	datum fp_bday_cake_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\birthday_cake\\fp\\fp", _tag_group_render_model, "carto_shared");
 
 	// Halo 2 Tags
-	datum ball_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\ball\\ball");
-	datum bomb_weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+	datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 
 	if (!DATUM_IS_NONE(bday_hat_datum))
 	{
@@ -27,17 +27,17 @@ void birthday_event_map_load()
 		bday_hat_datum = tag_loader::ResolveNewDatum(bday_hat_datum);
 
 		// Give Birthday Hat and Beard to Chief & Friends
-		if (datum hlmt_chief_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief");
+		if (datum hlmt_chief_datum = tags::find_tag(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
 			hlmt_chief_datum != NONE) 
 		{
 			add_hat_to_model(hlmt_chief_datum, bday_hat_datum);
 		}
-		if (datum hlmt_chief_mp_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\masterchief\\masterchief_mp");
+		if (datum hlmt_chief_mp_datum = tags::find_tag(_tag_group_model, "objects\\characters\\masterchief\\masterchief_mp");
 			hlmt_chief_mp_datum != NONE) 
 		{
 			add_hat_to_model(hlmt_chief_mp_datum, bday_hat_datum);
 		}
-		datum hlmt_elite_datum = tags::find_tag(blam_tag::tag_group_type::model, "objects\\characters\\elite\\elite_mp");
+		datum hlmt_elite_datum = tags::find_tag(_tag_group_model, "objects\\characters\\elite\\elite_mp");
 		if (hlmt_elite_datum != NONE)
 		{
 			add_hat_to_model(hlmt_elite_datum, bday_hat_datum, true);

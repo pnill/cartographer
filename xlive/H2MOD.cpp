@@ -233,11 +233,11 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)
 	{
-		datum multiplayerGlobalsTagIndex = tags::find_tag(blam_tag::tag_group_type::multiplayerglobals, multiplayerGlobalsTag);
+		datum multiplayerGlobalsTagIndex = tags::find_tag(_tag_group_multiplayer_globals, multiplayerGlobalsTag);
 
 		if (!DATUM_IS_NONE(multiplayerGlobalsTagIndex))
 		{
-			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<blam_tag::tag_group_type::multiplayerglobals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<_tag_group_multiplayer_globals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
 			if (multiplayerGlobalsTag->runtime.count)
 			{

@@ -90,7 +90,7 @@ struct effect_part_definition
     // effect.locations index
     int16 location;
     e_effect_part_flags flags;
-    blam_tag runtime_base_tag_group;
+    tag_group runtime_base_tag_group;
     tag_reference base_type;
     // initial velocity along the location's forward, for decals the distance at which decal is created (defaults to 0.5)
     real_bounds velocity_bounds;

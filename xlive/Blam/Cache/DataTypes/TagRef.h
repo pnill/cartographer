@@ -1,6 +1,5 @@
 #pragma once
-
-#include "BlamTag.h"
+#include "tag_files/tag_groups.h"
 
 /*********************************************************************
 * Blam::Cache::DataTypes::tag_reference
@@ -9,7 +8,7 @@
 
 struct tag_reference
 {
-	blam_tag TagGroup;
+	tag_group TagGroup;
 	datum TagIndex;
 	inline void operator=(const tag_reference &other)
 	{

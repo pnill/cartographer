@@ -150,7 +150,7 @@ bool crosshair_bitmap_vector_contains_datum(datum tag_datum)
 void get_crosshair_bitmap_datums()
 {
 	// Get all nhdt tags
-	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(blam_tag::tag_group_type::newhuddefinition);
+	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(_tag_group_new_hud_definition);
 	for (auto it = new_hud_definition_tags.begin(); it != new_hud_definition_tags.end(); it++)
 	{
 		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(it->first);

@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamTag.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
 

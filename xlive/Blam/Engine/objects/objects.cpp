@@ -418,13 +418,13 @@ void object_initialize_for_interpolation(datum object_index)
 			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
 			if (attachment->type.TagIndex != NONE)
 			{
-				blam_tag group = attachment->type.TagGroup;
-				if (group.as_int() == 'lens'
-					|| group.as_int() == 'ligh'
-					|| group.as_int() == 'MGS2'
-					|| group.as_int() == 'tdtl'
-					|| group.as_int() == 'cont'
-					|| group.as_int() == 'effe')
+				tag_group type = attachment->type.TagGroup;
+				if (type.group == 'lens'
+					|| type.group == 'ligh'
+					|| type.group == 'MGS2'
+					|| type.group == 'tdtl'
+					|| type.group == 'cont'
+					|| type.group == 'effe')
 				{
 					break;
 				}

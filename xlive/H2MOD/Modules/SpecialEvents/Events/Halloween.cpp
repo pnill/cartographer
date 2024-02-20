@@ -37,8 +37,8 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 
 		object_placement_data placement;
 
-		auto pump = tags::get_tag<blam_tag::tag_group_type::scenery, s_scenery_group_definition>(pump_datum, true);
-		auto pump_hmlt = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(pump->objectTag.model.TagIndex, true);
+		auto pump = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(pump_datum, true);
+		auto pump_hmlt = tags::get_tag<_tag_group_model, s_model_definition>(pump->objectTag.model.TagIndex, true);
 
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
@@ -106,12 +106,12 @@ void halloween_event_map_load()
 	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.TagIndex);
 	if (!strcmp(cache_header->name, "coagulation"))
 	{
-		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", blam_tag::tag_group_type::bitmap, "carto_shared");
-		sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", blam_tag::tag_group_type::sky, "carto_shared");
-		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
-		large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", blam_tag::tag_group_type::scenery, "carto_shared");
+		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", _tag_group_bitmap, "carto_shared");
+		sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", _tag_group_sky, "carto_shared");
+		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", _tag_group_scenery, "carto_shared");
+		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", _tag_group_scenery, "carto_shared");
+		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
+		large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", _tag_group_scenery, "carto_shared");
 
 		tag_loader::Load_tag(pump_datum, true, "carto_shared");
 		tag_loader::Load_tag(candle_datum, true, "carto_shared");
@@ -121,7 +121,7 @@ void halloween_event_map_load()
 		tag_loader::Push_Back();
 
 		// OG Halo 2 Coag lightmap
-		datum ltmp_datum = tags::find_tag(blam_tag::tag_group_type::scenariostructurelightmap,
+		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
 		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
@@ -162,9 +162,9 @@ void halloween_event_map_load()
 	}
 	else if (!strcmp(cache_header->name, "lockout"))
 	{
-		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", blam_tag::tag_group_type::scenery, "carto_shared");
-		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", blam_tag::tag_group_type::scenery, "carto_shared");
-		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", blam_tag::tag_group_type::scenery, "carto_shared");
+		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", _tag_group_scenery, "carto_shared");
+		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", _tag_group_scenery, "carto_shared");
+		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
 
 		tag_loader::Load_tag(pump_datum, true, "carto_shared");
 		tag_loader::Load_tag(candle_datum, true, "carto_shared");
