@@ -495,7 +495,7 @@ struct s_scenario_load_parameters
     * flags: 6
     * alignment_bit: 0
     ****************************************/
-    data_block paramaters;
+    data_reference paramaters;
     int8 pad[32];
 };
 

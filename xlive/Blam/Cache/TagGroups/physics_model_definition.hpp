@@ -485,7 +485,7 @@ struct s_physics_model_group_definition
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_mopps_block, 0x14);
 	tag_block<s_mopps_block> mopps;//0xA0
-	data_block mopp_codes;//0xA8
+	data_reference mopp_codes;//0xA8
 	struct s_hinge_constraints_block
 	{
 		string_id name;//0x0
@@ -581,7 +581,7 @@ struct s_physics_model_group_definition
 			PAD(0x60);//0x120
 			__int32 checksum;//0x180
 			__int32 size;//0x184
-			data_block zipped_data;//0x188
+			data_reference zipped_data;//0x188
 			PAD(0x80);//0x190
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_files_block, 0x210);
@@ -630,7 +630,7 @@ struct s_physics_model_group_definition
 				report_key_is_valid = FLAG(4),
 			};
 			e_flags flags;//0x2
-			data_block text;//0x4
+			data_reference text;//0x4
 			static_string32 source_filename;//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block

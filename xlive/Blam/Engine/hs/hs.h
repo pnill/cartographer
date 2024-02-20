@@ -1,12 +1,14 @@
 #pragma once
+#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "Blam/Cache/DataTypes/TagRef.h"
+
+#include "cseries/cseries_strings.h"
+#include "tag_files/data_reference.h"
+#include "tag_files/string_id.h"
 
 #define k_maximum_hs_globals_per_scenario 256
 #define k_maximum_hs_references_per_scenario 512
 #define k_maximum_hs_source_files_per_scenario 8
-#include "Blam/Cache/DataTypes/DataRef.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
-#include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Engine/tag_files/string_id.h"
 
 enum e_hs_script_type : short
 {
@@ -105,7 +107,7 @@ TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
 struct hs_source_file
 {
 	 static_string32 name;
-	 data_block source;		// DataSize: 262144
+	 data_reference source;		// DataSize: 262144
 };
 TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
 

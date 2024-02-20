@@ -9,4 +9,3 @@
 #include "Blam/Engine/cseries/cseries_strings.h"
 #include "TagRef.h"
 #include "TagBlock.h"
-#include "DataRef.h"
