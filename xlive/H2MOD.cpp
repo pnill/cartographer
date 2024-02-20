@@ -731,13 +731,13 @@ bool __cdecl should_start_pregame_countdown_hook()
 		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_game_team_neutral);
+		int maxTeams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, _game_team_neutral);
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		
-		int maxPlayersPerTeam = (std::max)(1, NetworkSession::GetPlayerCount() / maxTeams);
+		int maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / maxTeams);
 
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 

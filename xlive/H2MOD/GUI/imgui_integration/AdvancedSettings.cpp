@@ -266,7 +266,7 @@ namespace ImGuiHandler {
 					{
 						if (fps_limit > 0)
 						{
-							fps_limit = (std::max)(fps_limit, 25);
+							fps_limit = MAX(fps_limit, 25);
 						}
 						else
 						{

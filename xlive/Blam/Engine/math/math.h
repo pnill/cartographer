@@ -11,6 +11,9 @@
 // Returns the minimum of the two values
 #define MIN(a, b) ((a) > (b) ? (b) : (a))
 
+// Ensure a value stays within a certain range
+#define PIN(v, v_min, v_max) MIN(v_min, MAX(v, v_max))
+
 // decimal part <0.5, floor
 // decimal part >0.5, ceil
 // TODO rework
