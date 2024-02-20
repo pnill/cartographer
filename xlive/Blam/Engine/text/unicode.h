@@ -1,6 +1,9 @@
 #pragma once
 
 // TODO add asserts in the future
+int32 ustrncmp(const wchar_t* string1, const wchar_t* string2, size_t max_count);
+
+// TODO add asserts in the future
 size_t ustrnlen(const wchar_t* string, size_t max_count);
 
 // TODO add asserts in the future

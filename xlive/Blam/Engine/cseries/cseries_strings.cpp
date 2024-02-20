@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cseries_strings.h"
 
-size_t csstrnlen(char* string, size_t size)
+size_t csstrnlen(const char* string, size_t size)
 {
 	return strnlen(string, size);
 }

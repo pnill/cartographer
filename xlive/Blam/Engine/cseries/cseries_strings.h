@@ -25,6 +25,7 @@ public:
 	int index_of(const char* src) const;
 	int next_index_of(const char* src, size_t starting_index) const;
 	int last_index_of(const char* src) const;
+	bool is_equal(const char* string) const;
 
 private:
 	char text[string_length];
@@ -50,6 +51,7 @@ public:
 	int index_of(const wchar_t* src) const;
 	int next_index_of(const wchar_t* src, size_t starting_index) const;
 	int last_index_of(const wchar_t* src) const;
+	bool is_equal(const wchar_t* string) const;
 
 private:
 	wchar_t text[string_length];
@@ -161,6 +163,12 @@ int c_static_string<T>::last_index_of(const char* src) const
 }
 
 template<size_t T>
+bool c_static_string<T>::is_equal(const char* string) const
+{
+	return !strncmp(text, string, T);
+}
+
+template<size_t T>
 inline const wchar_t* c_static_wchar_string<T>::get_string(void) const
 {
 	return this->text;
@@ -253,8 +261,14 @@ int c_static_wchar_string<T>::last_index_of(const wchar_t* src) const
 	return index;
 }
 
+template<size_t T>
+bool c_static_wchar_string<T>::is_equal(const wchar_t* string) const
+{
+	return !ustrncmp(text, string, T);
+}
+
 // TODO add asserts in the future
-size_t csstrnlen(char* s, size_t size);
+size_t csstrnlen(const char* s, size_t size);
 
 // TODO add asserts in the future
 char* csstrnzcpy(char* dst, const char* src, size_t size);

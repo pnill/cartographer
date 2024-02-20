@@ -1,10 +1,5 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-
-
-
-
 #include "Blam/Engine/math/function_definitions.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
