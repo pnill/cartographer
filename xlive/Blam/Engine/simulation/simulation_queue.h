@@ -35,7 +35,6 @@ enum e_event_queue_type : int16
 
 	_simulation_queue_element_type_1 = FLAG(_simulation_queue_element_type_player_event) | FLAG(_simulation_queue_element_type_player_update_event) | FLAG(_simulation_queue_element_type_gamestates_clear),
 	_simulation_queue_element_type_2 = FLAG(_simulation_queue_element_type_entity_deletion) | FLAG(_simulation_queue_element_type_entity_promotion) | FLAG(_simulation_queue_element_type_game_global_event),
-	_simulation_queue_element_type_3 = (int16)0xffff & (int16)~(_simulation_queue_element_type_1 | _simulation_queue_element_type_2),
 };
 
 struct s_simulation_queue_element
