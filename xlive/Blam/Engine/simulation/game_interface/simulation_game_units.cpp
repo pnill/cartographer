@@ -26,7 +26,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
     // TODO Remove this once we get tag injection working on servers
     if (initial_state_data->controlling_player_index != NONE)
     {
-        if (datum unit_rep_tag_index = game_globals_get_representation(creation_data->profile_traits.profile.player_character_type)->third_person_unit.TagIndex;
+        if (datum unit_rep_tag_index = game_globals_get_representation(creation_data->profile_traits.profile.player_character_type)->third_person_unit.index;
             unit_rep_tag_index != NONE)
         {
             placement_data.tag_index = unit_rep_tag_index;

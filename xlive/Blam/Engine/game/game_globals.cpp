@@ -72,8 +72,8 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 	auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 	if (fp_hands != NONE)
 	{
-		new_rep->first_person_hands.TagGroup.group = _tag_group_render_model;
-		new_rep->first_person_hands.TagIndex = fp_hands;
+		new_rep->first_person_hands.group.group = _tag_group_render_model;
+		new_rep->first_person_hands.index = fp_hands;
 	}
 	else
 	{
@@ -82,16 +82,16 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 
 	if (fp_body != NONE)
 	{
-		new_rep->first_person_body.TagGroup.group = _tag_group_render_model;
-		new_rep->first_person_body.TagIndex = fp_body;
+		new_rep->first_person_body.group.group = _tag_group_render_model;
+		new_rep->first_person_body.index = fp_body;
 	}
 	else
 		new_rep->first_person_body = globals->player_representation[_character_type_spartan]->first_person_body;
 
 	if (tp_biped != NONE)
 	{
-		new_rep->third_person_unit.TagGroup.group = _tag_group_biped;
-		new_rep->third_person_unit.TagIndex = tp_biped;
+		new_rep->third_person_unit.group.group = _tag_group_biped;
+		new_rep->third_person_unit.index = tp_biped;
 	}
 	else
 	{
@@ -180,8 +180,8 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 void game_globals_add_lmao_representation(void)
 {
 	// Create copy of default variant for chief and add lmao object to head
-	_unit_definition* mp_chief_unit = (_unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.TagIndex);
-	datum mode_chief_mp_datum =  mp_chief_unit->object.model.TagIndex;
+	_unit_definition* mp_chief_unit = (_unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.index);
+	datum mode_chief_mp_datum =  mp_chief_unit->object.model.index;
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant
@@ -189,8 +189,8 @@ void game_globals_add_lmao_representation(void)
 		auto base_variant = mode_chief_mp->variants[0];
 		auto new_variant = MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;
-		new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
-		new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
+		new_variant->dialogue.group = base_variant->dialogue.group;
+		new_variant->dialogue.index = base_variant->dialogue.index;
 		memcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
 		for (auto i = 0; i < base_variant->regions.count; i++)
 		{
@@ -226,8 +226,8 @@ void game_globals_add_lmao_representation(void)
 			{
 				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));
 				new_object->parent_marker = e_global_string_id::HS_HEAD;
-				new_object->child_object.TagGroup.group = _tag_group_scenery;
-				new_object->child_object.TagIndex = lmao_datum;
+				new_object->child_object.group.group = _tag_group_scenery;
+				new_object->child_object.index = lmao_datum;
 			}
 		}
 		add_representation(NONE, NONE, NONE, new_variant->name);

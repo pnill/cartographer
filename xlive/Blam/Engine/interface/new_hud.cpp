@@ -162,9 +162,9 @@ void get_crosshair_bitmap_datums()
 
 			if (bitmap_widget_definition->widget_inputs.input_1 == hud_input_type_unit_autoaimed && 
 				bitmap_widget_definition->anchor == hud_anchor_crosshair && 
-				!crosshair_bitmap_vector_contains_datum(bitmap_widget_definition->bitmap.TagIndex))
+				!crosshair_bitmap_vector_contains_datum(bitmap_widget_definition->bitmap.index))
 			{
-				crosshair_bitmap_datums.push_back(bitmap_widget_definition->bitmap.TagIndex);
+				crosshair_bitmap_datums.push_back(bitmap_widget_definition->bitmap.index);
 			}
 		}
 	}

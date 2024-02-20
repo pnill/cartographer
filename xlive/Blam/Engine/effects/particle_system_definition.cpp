@@ -22,7 +22,7 @@ void c_particle_emitter_definition::get_emitter_particle_inverse_color(s_particl
 
 c_particle_definition_interface* c_particle_system_definition::get_particle_system_interface() const
 {
-	return get_particle_system_interface_from_tag_index(this->particle.TagIndex);
+	return get_particle_system_interface_from_tag_index(this->particle.index);
 }
 
 c_particle_system_definition* c_particle_sprite_definition_interface::get_attached_particle_system(int32 particle_system_index)

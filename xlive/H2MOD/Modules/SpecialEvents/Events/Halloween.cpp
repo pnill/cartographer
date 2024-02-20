@@ -38,7 +38,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 		object_placement_data placement;
 
 		auto pump = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(pump_datum, true);
-		auto pump_hmlt = tags::get_tag<_tag_group_model, s_model_definition>(pump->objectTag.model.TagIndex, true);
+		auto pump_hmlt = tags::get_tag<_tag_group_model, s_model_definition>(pump->objectTag.model.index, true);
 
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
@@ -103,7 +103,7 @@ void halloween_event_map_load()
 	// Load specific tags from shared and modify placements depending on the map being played
 	const s_cache_header* cache_header = cache_files_get_header();
 	scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
-	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.TagIndex);
+	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.index);
 	if (!strcmp(cache_header->name, "coagulation"))
 	{
 		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", _tag_group_bitmap, "carto_shared");
@@ -139,13 +139,13 @@ void halloween_event_map_load()
 
 		if (!DATUM_IS_NONE(sky_datum))
 		{
-			scenario_definition->skies[0]->TagIndex = sky_datum;
+			scenario_definition->skies[0]->index = sky_datum;
 		}
 
 		if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
 		{
 			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
-			ltmp->lightmap_groups[0]->bitmap_group.TagIndex = lbitm_datum;
+			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour
 			bsp_definition->decorators_block.count = 0;

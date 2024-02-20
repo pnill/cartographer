@@ -3,7 +3,7 @@
 
 struct tag_reference
 {
-	tag_group TagGroup;
-	datum TagIndex;
+	tag_group group;
+	datum index;
 };
 CHECK_STRUCT_SIZE(tag_reference, 8);
