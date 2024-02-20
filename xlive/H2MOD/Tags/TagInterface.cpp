@@ -106,7 +106,7 @@ std::string tags::get_tag_name(datum tag_index)
 	return "tag name lost"; // tool does something similar if it can't find the name of a tag from the shared cache
 }
 
-datum tags::find_tag(blam_tag type, const std::string& name)
+datum tags::find_tag(e_tag_group type, const std::string& name)
 {
 	for (auto it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)
 	{
@@ -120,7 +120,7 @@ datum tags::find_tag(blam_tag type, const std::string& name)
 	return NONE;
 }
 
-std::map<datum, std::string> tags::find_tags(blam_tag type)
+std::map<datum, std::string> tags::find_tags(e_tag_group type)
 {
 	std::map<datum, std::string> result;
 	for (auto it = tag_datum_name_map.begin(); it != tag_datum_name_map.end(); it++)

@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Blam/Cache/TagGroups.hpp"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 /*********************************************************************
@@ -10,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_ai_mission_dialogue_group_definition :TagGroup<'mdlg'>
+struct s_ai_mission_dialogue_group_definition
 {
 	struct s_lines_block
 	{

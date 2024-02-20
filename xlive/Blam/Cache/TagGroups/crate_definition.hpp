@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 /*********************************************************************
 * name: crate
@@ -9,7 +9,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_crate_group_definition :TagGroup<'bloc'>
+struct s_crate_group_definition
 {
 	object_definition objectTag;
 	enum class e_flags : __int16

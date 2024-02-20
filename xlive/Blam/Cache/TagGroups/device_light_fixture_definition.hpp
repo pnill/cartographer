@@ -8,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_device_light_fixture_group_definition :TagGroup<'lifi'>
+struct s_device_light_fixture_group_definition
 {
 	s_device_group_definition deviceTag;
 };

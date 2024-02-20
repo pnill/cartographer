@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 #include "Blam/Engine/math/color_math.h"
 
 
@@ -9,7 +9,7 @@
 * group_tag : ltmp
 * header size : 260
 * *********************************************************************/
-struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
+struct s_scenario_structure_lightmap_group_definition
 {
 	float search_distance_lower_bound;//0x0
 	float search_distance_upper_bound;//0x4

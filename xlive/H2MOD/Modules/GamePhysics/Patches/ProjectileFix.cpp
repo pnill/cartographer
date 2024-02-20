@@ -156,7 +156,7 @@ void ProjectileFix::ApplyProjectileVelocity()
 {
 	for (uint32 i = 0; i < ARRAYSIZE(tag_names); i++)
 	{
-		datum proj_index = tags::find_tag(blam_tag::tag_group_type::projectile, tag_names[i]);
+		datum proj_index = tags::find_tag(_tag_group_projectile, tag_names[i]);
 		if (proj_index != NONE)
 		{
 			s_projectile_group_definition* projectile = (s_projectile_group_definition*)tag_get_fast(proj_index);

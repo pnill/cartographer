@@ -680,15 +680,21 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	}
 
 	std::string tagName = tokens[1];
-	blam_tag tagType = blam_tag::from_string(tokens[2]);
 	std::string mapName = tokens[3];
 
-	auto tagDatum = tag_loader::Get_tag_datum(tagName, tagType, mapName);
+	const char* p_string = tokens[2].c_str();
+	tag_group tag_type;
+	tag_type.string[3] = p_string[0];
+	tag_type.string[2] = p_string[1];
+	tag_type.string[1] = p_string[2];
+	tag_type.string[0] = p_string[3];
+
+	auto tagDatum = tag_loader::Get_tag_datum(tagName, tag_type.group, mapName);
 	tag_loader::Load_tag(tagDatum, true, mapName);
 	tag_loader::Push_Back();
 	output->Output(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
 
-	LOG_INFO_GAME("{} - {} {} {}", tagName, tagType.as_string(), mapName);
+	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
 	return 0;
 }
 

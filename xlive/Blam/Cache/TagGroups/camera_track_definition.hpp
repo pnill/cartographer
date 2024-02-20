@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 #include "Blam/Cache/DataTypes/TagBlock.h"
 
 
@@ -12,7 +12,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_camera_track_group_definition :TagGroup<'trak'>
+struct s_camera_track_group_definition
 {
 	enum class e_flags : __int32
 	{

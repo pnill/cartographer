@@ -23,7 +23,7 @@ namespace tag_loader
 	//Checks if the map file exists
 	bool Map_exists(std::string map);
 	//Find tag datum based off of tag name
-	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map);
+	datum Get_tag_datum(std::string tag_name, e_tag_group type, std::string map);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
@@ -64,13 +64,13 @@ namespace tag_loader
 	//Adds reference of all the tags present in shared map into the tag_table
 	void Add_all_shared_refs();
 	//verifies and adds the Datum to  sync_tags list for the module loading
-	void Generate_sync_list(int type, DWORD index);
+	void Generate_sync_list(tag_group type, DWORD index);
 	//Adds the valid tags to GlobalScenario->SimulationDefinitionTable Block and clears the sync list
 	void Add_tags_to_simulation_table();
 	//Get new datum from old datum
 	datum ResolveNewDatum(int oldDatum);
 	//Temporary call
-	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size);
+	tags::tag_instance AddNewtagInstance(tag_group type, int data, size_t size);
 	///
 	//<-----------------The query parser or more of a script parser------------------------------->
 	///

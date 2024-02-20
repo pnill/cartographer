@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 /*********************************************************************
 * name: scenery
@@ -9,7 +9,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_scenery_group_definition :TagGroup<'scen'>
+struct s_scenery_group_definition
 {
 	object_definition objectTag;
 	enum class e_pathfinding_policy : __int16

@@ -236,9 +236,9 @@ void Infection::onGameTick()
 
 void Infection::removeUnwantedItems()
 {
-	const datum shotgun_ammo_equip_datum = tags::find_tag(blam_tag::tag_group_type::equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+	const datum shotgun_ammo_equip_datum = tags::find_tag(_tag_group_equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
 
-	auto itemcollections = tags::find_tags(blam_tag::tag_group_type::itemcollection);
+	auto itemcollections = tags::find_tags(_tag_group_item_collection);
 	for (auto it = itemcollections.begin(); it != itemcollections.end(); it++)
 	{
 		std::string item_name = tags::get_tag_name(it->first);
@@ -250,7 +250,7 @@ void Infection::removeUnwantedItems()
 
 			for (int i = 0; i < itmc->item_permutations.count; i++)
 			{
-				itmc->item_permutations[i]->item.TagGroup = blam_tag::tag_group_type::equipment;
+				itmc->item_permutations[i]->item.TagGroup.group = _tag_group_equipment;
 				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
 			}
 		}
@@ -261,10 +261,10 @@ void Infection::removeUnwantedItems()
 	for (DWORD i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
 		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
-		if (netgame_equipment->item_vehicle_collection.TagGroup.tag_type == blam_tag::tag_group_type::vehiclecollection)
+		if (netgame_equipment->item_vehicle_collection.TagGroup.group == _tag_group_vehicle_collection)
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
-			netgame_equipment->item_vehicle_collection.TagGroup = blam_tag::tag_group_type::itemcollection;
+			netgame_equipment->item_vehicle_collection.TagGroup.group = _tag_group_item_collection;
 			netgame_equipment->item_vehicle_collection.TagIndex = NONE;
 		}
 	}

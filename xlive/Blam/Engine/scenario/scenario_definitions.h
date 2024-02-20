@@ -5,7 +5,7 @@
 
 
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 #include "Blam/Engine/ai/ai_flocks.h"
 #include "Blam/Engine/ai/ai_mission_dialogue.h"
 #include "Blam/Engine/ai/ai_orders.h"
@@ -1132,7 +1132,7 @@ struct s_scenario_simulation_definition_table_element
 };
 TAG_BLOCK_SIZE_ASSERT(s_scenario_simulation_definition_table_element, 4);
 
-struct scenario : TagGroup<'scnr'>
+struct scenario
 {
 	tag_reference do_not_use;	                    // sbsp
 	tag_block<tag_reference> skies;

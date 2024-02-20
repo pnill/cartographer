@@ -1,11 +1,11 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 #include <wtypes.h>
 
 #pragma pack(push,1)
-struct s_sound_classes_block : TagGroup<'sncl'>
+struct s_sound_classes_block
 {
     struct sound_class_block
     {

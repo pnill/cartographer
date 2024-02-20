@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 
 /*********************************************************************
@@ -10,7 +10,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_multiplayer_globals_group_definition :TagGroup<'mulg'>
+struct s_multiplayer_globals_group_definition
 {
 	struct s_universal_block
 	{

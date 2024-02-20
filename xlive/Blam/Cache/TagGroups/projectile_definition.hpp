@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 /*********************************************************************
 * name: projectile
@@ -9,7 +9,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_projectile_group_definition :TagGroup<'proj'>
+struct s_projectile_group_definition
 {
 	object_definition objectTag;
 	enum class e_projectile_flags : __int32

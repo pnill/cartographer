@@ -8,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_garbage_group_definition :TagGroup<'garb'>
+struct s_garbage_group_definition
 {
 	s_item_group_definition itemTag;
 	PAD(0xA8);//0x12C

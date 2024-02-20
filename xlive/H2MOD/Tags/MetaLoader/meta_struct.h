@@ -4,9 +4,9 @@
 //version -1.1:improvement in extended meta loading logic
 ///
 #pragma once
-#include "Blam/Cache/DataTypes/BlamTag.h"
-#include"stdafx.h"
-#include"tinyxml/tinyxml2.h"
+#include "stdafx.h"
+#include "tag_files/tag_groups.h"
+#include "tinyxml/tinyxml2.h"
 
 namespace meta_struct
 {
@@ -75,7 +75,7 @@ namespace meta_struct
 	/// </summary>
 	class meta
 	{
-		blam_tag type;//the type of the meta
+		tag_group type;//the type of the meta
 		int datum_index;//datum index of the meta data
 
 		int mem_off;// the memory address to which the tag is designed to be loaded at
@@ -111,7 +111,7 @@ namespace meta_struct
 	public:
 		/// used to read meta data from a meta file along with ability to modify mem_off
 		///i kept file_loc,datum_index,type for debugging purposes
-		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream = nullptr, int map_off = -1, __int8 count = 1, int datum_index = -1, std::string loc = "", blam_tag type = blam_tag::none());
+		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream = nullptr, int map_off = -1, __int8 count = 1, int datum_index = -1, std::string loc = "", tag_group type = { (e_tag_group)NONE});
 		//constructor supporting in Game modification of meta loaded into memory
 		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, int count, int datum_index = -1);
 		~meta();
@@ -123,7 +123,7 @@ namespace meta_struct
 
 		int Get_Total_size();
 		int Get_mem_addr();
-		blam_tag Get_type();
+		tag_group Get_type();
 		std::string Get_map_loc();
 		std::list<int> Get_all_tag_refs();
 		char* Generate_meta_file();

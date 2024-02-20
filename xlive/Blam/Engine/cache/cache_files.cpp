@@ -18,10 +18,10 @@ cache_file_tag_instance* global_tag_instances_get(void)
 	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);
 }
 
-tag_iterator* tag_iterator_new(tag_iterator* itr, blam_tag::tag_group_type type)
+tag_iterator* tag_iterator_new(tag_iterator* itr, tag_group type)
 {
 	itr->next_tag_index = 0;
-	itr->tag_type.tag_type = type;
+	itr->tag_type.group = type.group;
 	return itr;
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 #include "Blam/Engine/math/color_math.h"
 
@@ -11,7 +11,7 @@
 * header size : 272
 * *********************************************************************/
 #pragma pack(push,1)
-struct s_physics_model_group_definition : TagGroup<'phmo'>
+struct s_physics_model_group_definition
 {
 	enum class e_flags : __int32
 	{

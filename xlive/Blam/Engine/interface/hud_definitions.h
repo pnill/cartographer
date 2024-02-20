@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 #include "Blam/Engine/math/color_math.h"
 
 
@@ -64,7 +64,7 @@ struct s_waypoint_arrows_block
 };
 TAG_BLOCK_SIZE_ASSERT(s_waypoint_arrows_block, 104);
 
-struct hud_globals_definition : TagGroup<'hudg'>
+struct hud_globals_definition
 {
 	// Explaination("Messaging parameters", "")
 	e_hud_anchor anchor;

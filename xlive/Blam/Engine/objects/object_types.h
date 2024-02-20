@@ -39,7 +39,7 @@ typedef void (*object_render_debug)(datum);
 struct object_type_definition
 {
 	const char* name;
-	blam_tag tag_group;
+	tag_group group;
 	int16 datum_size;
 	int16 placement_tag_block_offset;
 	int16 palette_tag_block_offset;
