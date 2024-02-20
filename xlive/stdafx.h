@@ -57,7 +57,6 @@
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
-#include <unordered_set>
 #include <filesystem>
 
 #include <d3d9.h>

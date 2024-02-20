@@ -18,7 +18,7 @@ int max_player_count = 0;
 bool hide_players = false;
 
 // AFAIK there is no easy way to get the list of uploaded assets using the API
-const static std::unordered_set<std::string> maps_with_images = {
+const std::string g_maps_with_images[] = {
 	// logo
 	"default",
 	// singleplayer maps
@@ -167,8 +167,21 @@ void DiscordInterface::SetGameState(std::string map_id,
 	std::string details = ((map_name.empty() && gamemode_name.empty()) ? "" :
 		gamemode_name + " on " + map_name);
 
-	if (!maps_with_images.count(map_id))
+	bool map_found = false;
+	for (uint32 i = 0; i < NUMBEROF(g_maps_with_images); i++)
+	{
+		if (g_maps_with_images[i] == map_id) 
+		{
+			map_found = true;
+			break;
+		}
+	}
+
+	if (!map_found)
+	{
 		map_id = "unknown_map";
+	}
+
 	strncpy_s(map_mouse_over, sizeof(map_mouse_over), map_name.c_str(), map_name.size());
 	strncpy_s(map_key, sizeof(map_key), map_id.c_str(), map_id.size());
 	strncpy_s(state, sizeof(state), game_state.c_str(), game_state.size());
