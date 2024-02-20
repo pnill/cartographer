@@ -2,7 +2,7 @@
 #include "effect_location_definition.h"
 #include "particle_property.h"
 #include "particle_system_definition.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/geometry/geometry_block.h"
 
 #include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"

@@ -2,7 +2,7 @@
 #include "effects_creation.h"
 #include "effect_location_definition.h"
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/math/function_definitions.h"
 
 #include "particle_system_definition.h"

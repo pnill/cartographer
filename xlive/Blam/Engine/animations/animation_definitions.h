@@ -6,7 +6,7 @@
 #include "tag_files/string_id.h"
 
 #include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 
 
 

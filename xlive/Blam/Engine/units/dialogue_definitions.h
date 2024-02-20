@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 
 // max count: MAXIMUM_DIALOGUE_VARIANTS_PER_UNIT 16
 struct dialogue_variant_definition
