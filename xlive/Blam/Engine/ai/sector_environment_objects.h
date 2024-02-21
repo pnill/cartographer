@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 
 
 #define k_maximum_environment_objects_per_scenario 2000		// This is different from the MAXIMUM_ENVIRONMENT_OBJECTS_PER_SCENARIO define

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 
 #define MAXIMUM_LEAVES_PER_BSP3D 65536
 #define MAXIMUM_SURFACE_REFERENCES_PER_STRUCTURE 262144

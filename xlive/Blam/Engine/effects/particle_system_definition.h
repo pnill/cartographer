@@ -4,7 +4,7 @@
 #include "effect_location_definition.h"
 #include "particle_definition_interface.h"
 #include "particle_property.h"
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "Blam/Engine/shaders/shader_definitions.h"
 #include "Blam/Engine/shaders/shader_postprocess_definitions.h"

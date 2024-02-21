@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
 #include "Blam/Engine/cache/predicted_resources.h"

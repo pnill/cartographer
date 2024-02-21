@@ -4,7 +4,7 @@
 #include "game_preferences.h"
 #include "materials.h"
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "Blam/Engine/bitmaps/bitmap_group.h"
 #include "Blam/Engine/main/level_definitions.h"

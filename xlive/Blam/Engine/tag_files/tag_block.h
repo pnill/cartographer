@@ -14,11 +14,11 @@ struct tag_block
 	{
 		return sizeof(T);
 	}
-	T *begin() const
+	T* begin() const
 	{
 		if (this->data != NONE)
 		{
-			char *tag_data_table = tags::get_tag_data();
+			char* tag_data_table = tags::get_tag_data();
 #ifdef DEBUG
 			if (LOG_CHECK(tag_data_table))
 #endif
@@ -44,7 +44,7 @@ struct tag_block
 		if (index >= this->count)
 			return nullptr;
 		if (this->begin()) {
-			T *data_array = this->begin();
+			T* data_array = this->begin();
 			return &data_array[index];
 		}
 		return nullptr;

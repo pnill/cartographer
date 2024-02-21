@@ -2,7 +2,7 @@
 #include "math/color_math.h"
 #include "tag_files/data_reference.h"
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 
 
 #define MAXIMUM_ERROR_REPORT_CATEGORIES 64
