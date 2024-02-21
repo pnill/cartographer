@@ -1,5 +1,7 @@
 #pragma once
 
+// ### TODO Rename to c_tag_block and refactor
+
 template<typename T = void>
 struct tag_block
 {

@@ -130,4 +130,12 @@ union tag_group
 	char string[4];
 };
 
+struct s_tag_block
+{
+	int32 count;
+	int32 data;
+};
+
 tag_group tag_group_get_name(tag_group group);
+
+void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 index, int32 block_size);
