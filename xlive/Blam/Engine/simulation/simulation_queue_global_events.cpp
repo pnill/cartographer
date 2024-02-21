@@ -26,13 +26,13 @@ void simulation_queue_game_global_event_insert(e_simulation_queue_global_event_t
 {
     if (!game_is_playback())
     {
-        uint8 data[128];
-        c_bitstream stream(data, sizeof(data));
+        uint8 encoded_data[128];
+        c_bitstream stream(encoded_data, sizeof(encoded_data));
         stream.begin_writing(1);
         stream.write_integer("global-event-type", global_event_type, 3);
         if (!stream.error_occured())
         {
-            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, data, stream.get_space_used_in_bytes());
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_game_global_event, encoded_data, stream.get_space_used_in_bytes());
         }
         stream.finish_writing(NULL);
     }
@@ -102,8 +102,8 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
 {
     if (!game_is_playback())
     {
-        uint8 data[128];
-        c_bitstream stream(data, sizeof(data));
+        uint8 encoded_data[128];
+        c_bitstream stream(encoded_data, sizeof(encoded_data));
 
         uint16 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 
@@ -112,7 +112,7 @@ void simulation_queue_player_event_insert(e_simulation_queue_player_event_type e
         stream.write_bool("active", event_data->active);
         if (!stream.error_occured())
         {
-            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_event, data, stream.get_space_used_in_bytes());
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_event, encoded_data, stream.get_space_used_in_bytes());
         }
         stream.finish_writing(NULL);
     }
@@ -150,13 +150,13 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
 {
     if (!game_is_playback())
     {
-        uint8 data[k_simulation_queue_element_data_size_max];
-        c_bitstream stream(data, sizeof(data));
+        uint8 encoded_data[k_simulation_queue_element_data_size_max];
+        c_bitstream stream(encoded_data, sizeof(encoded_data));
         stream.begin_writing(1);
         simulation_player_update_encode(&stream, player_update);
         if (!stream.error_occured())
         {
-            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_update_event, data, stream.get_space_used_in_bytes());
+            simulation_queue_global_event_allocate_and_insert(_simulation_queue_element_type_player_update_event, encoded_data, stream.get_space_used_in_bytes());
         }
         stream.finish_writing(NULL);
     }
