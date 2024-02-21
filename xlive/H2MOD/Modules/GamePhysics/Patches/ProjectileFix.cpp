@@ -1,10 +1,7 @@
 #include "stdafx.h"
 #include "ProjectileFix.h"
 
-
-
 #include "game/game_time.h"
-
 #include "objects/objects.h"
 
 #include "Blam/Cache/TagGroups/projectile_definition.hpp"
