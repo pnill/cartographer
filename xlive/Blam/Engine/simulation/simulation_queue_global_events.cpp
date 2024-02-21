@@ -150,7 +150,7 @@ void simulation_queue_player_update_insert(const simulation_player_update* playe
 {
     if (!game_is_playback())
     {
-        uint8 data[k_simulation_payload_size_max];
+        uint8 data[k_simulation_queue_element_data_size_max];
         c_bitstream stream(data, sizeof(data));
         stream.begin_writing(1);
         simulation_player_update_encode(&stream, player_update);

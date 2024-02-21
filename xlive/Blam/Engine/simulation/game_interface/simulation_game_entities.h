@@ -33,9 +33,9 @@ struct s_simulation_game_entity
 	datum object_index;
 	int32 entity_update_flag;
 	int32 field_10;
-	int32 creation_data_size;
+	uint32 creation_data_size;
 	void* creation_data;
-	int32 state_data_size;
+	uint32 state_data_size;
 	void* state_data;
 };
 CHECK_STRUCT_SIZE(s_simulation_game_entity, 0x24);

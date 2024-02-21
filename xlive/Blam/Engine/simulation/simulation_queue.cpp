@@ -15,7 +15,7 @@ void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** 
 		{
 			if (allocated_size_in_bytes() + required_data_size < k_simulation_queue_size_max)
 			{
-				if (data_size < k_simulation_payload_size_max)
+				if (data_size < k_simulation_queue_element_data_size_max)
 				{
 					if (allocated_new_encoded_size_bytes(data_size) < k_simulation_queue_max_encoded_size)
 					{
