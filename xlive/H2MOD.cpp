@@ -233,11 +233,11 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)
 	{
-		datum multiplayerGlobalsTagIndex = tags::find_tag(blam_tag::tag_group_type::multiplayerglobals, multiplayerGlobalsTag);
+		datum multiplayerGlobalsTagIndex = tags::find_tag(_tag_group_multiplayer_globals, multiplayerGlobalsTag);
 
 		if (!DATUM_IS_NONE(multiplayerGlobalsTagIndex))
 		{
-			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<blam_tag::tag_group_type::multiplayerglobals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<_tag_group_multiplayer_globals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
 			if (multiplayerGlobalsTag->runtime.count)
 			{
@@ -266,7 +266,7 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 							// disable all sounds from english to chinese
 							for (int j = 0; j < 8; j++)
 							{
-								(&general_event->sound)[j].TagIndex = NONE;
+								(&general_event->sound)[j].index = NONE;
 							}
 						}
 					}
@@ -731,14 +731,12 @@ bool __cdecl should_start_pregame_countdown_hook()
 		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		int16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int32 max_teams = MIN(MAX(get_active_count_from_bitflags(activeTeamsFlags), 2), (int32)_game_team_neutral);
-
+		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)_game_team_neutral);
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		
 		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
-
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
 		for (int32 i = 0; i < _game_team_neutral; i++)

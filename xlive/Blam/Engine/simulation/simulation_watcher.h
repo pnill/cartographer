@@ -1,6 +1,5 @@
 #pragma once
 #include "simulation_players.h"
-
 #include "simulation_world.h"
 
 class c_simulation_watcher

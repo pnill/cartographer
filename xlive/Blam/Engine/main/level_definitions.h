@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
 
 #define k_maximum_number_of_campaigns 4

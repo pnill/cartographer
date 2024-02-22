@@ -723,9 +723,7 @@ u_short WINAPI XSocketHTONS(u_short hostshort)
 
 int XSocket::SetBufferSize(int optname, INT bufSize)
 {
-	static const std::unordered_set<int> sockOpts = { SO_SNDBUF, SO_RCVBUF };
-
-	if (sockOpts.count(optname) == 0)
+	if (optname != SO_SNDBUF && optname != SO_RCVBUF)
 	{
 		WSASetLastError(WSAEINVAL);
 		return SOCKET_ERROR;

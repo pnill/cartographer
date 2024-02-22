@@ -129,9 +129,9 @@ void __cdecl first_person_weapon_get_node_data(datum object_index,
     {
         datum tag_index = object_get_fast_unsafe(object_index)->tag_definition_index;
         object_definition* object_def = (object_definition*)tag_get_fast(tag_index);
-        s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
-        render_model_definition* render_model = (render_model_definition*)tag_get_fast(model->render_model.TagIndex);
-        *render_model_index = model->render_model.TagIndex;
+        s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->model.index);
+        render_model_definition* render_model = (render_model_definition*)tag_get_fast(model->render_model.index);
+        *render_model_index = model->render_model.index;
         
         if (!halo_interpolator_interpolate_object_node_matrices(object_index, object_node_matrices, object_node_matrix_count))
         {
@@ -163,8 +163,8 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
         _weapon_definition* weapon_definition = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
 
         weapon_first_person_interface_definition* first_person_weapon_interface = first_person_interface_definition_get(weapon_definition, (e_character_type)fp_data->character_type);
-        render_model_definition* fp_weapon_model = (render_model_definition*)tag_get_fast(first_person_weapon_interface->model.TagIndex);
-        render_model_definition* fp_hands_model = (render_model_definition*)tag_get_fast(player_representation->first_person_hands.TagIndex);
+        render_model_definition* fp_weapon_model = (render_model_definition*)tag_get_fast(first_person_weapon_interface->model.index);
+        render_model_definition* fp_hands_model = (render_model_definition*)tag_get_fast(player_representation->first_person_hands.index);
         c_animation_channel weapon_channel;
 
         bool fp_weapon_nodes_match = weapon_data->weapon_node_remapping_table_count == fp_weapon_model->nodes.count;
@@ -503,7 +503,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                     weapon_data->alternate_parent_node_index);
             }
 
-            halo_interpolator_setup_weapon_data(user_index, first_person_weapon_interface->animations.TagIndex, weapon_slot, weapon_data->nodes, weapon_data->node_matrices_count);
+            halo_interpolator_setup_weapon_data(user_index, first_person_weapon_interface->animations.index, weapon_slot, weapon_data->nodes, weapon_data->node_matrices_count);
             if (!weapon_slot)
             {
                 int32 adjustment_matrix_index = fp_data->adjustment_matrix_index;
@@ -626,19 +626,19 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                 if (IN_RANGE_INCLUSIVE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
                 {
                     s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
-                    datum fp_hands_index = player_rep->first_person_hands.TagIndex;
-                    datum fp_body_index = player_rep->first_person_body.TagIndex;
+                    datum fp_hands_index = player_rep->first_person_hands.index;
+                    datum fp_body_index = player_rep->first_person_body.index;
                     datum unit_model_index = NONE;
                     int32 node_count = 0;
                     real_matrix4x3* node_matrices = NULL;
                     object_datum* object = object_get_fast_unsafe(unit_index);
                     object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
-                    if (object_def->model.TagIndex != NONE)
+                    if (object_def->model.index != NONE)
                     {
-                        s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
-                        if (model->animation.TagIndex != NONE)
+                        s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->model.index);
+                        if (model->animation.index != NONE)
                         {
-                            unit_model_index = model->render_model.TagIndex;
+                            unit_model_index = model->render_model.index;
                             if (!halo_interpolator_interpolate_object_node_matrices(unit_index, &node_matrices, &node_count))
                             {
                                 node_matrices = object_get_node_matrices(unit_index, &node_count);
@@ -673,7 +673,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                             weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
                             _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
                             weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-                            datum weapon_animations_index = (interface_def ? interface_def->animations.TagIndex : NONE);
+                            datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
 
                             real_matrix4x3* model_nodes;
                             bool interpolated = halo_interpolator_interpolate_weapon(user_index, weapon_animations_index, weapon_slot, &model_nodes, &weapon_data->node_matrices_count);
@@ -710,8 +710,8 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                             datum weapon_animations_index;
                             if (interface_def)
                             {
-                                weapon_model_index = interface_def->model.TagIndex;
-                                weapon_animations_index = interface_def->animations.TagIndex;
+                                weapon_model_index = interface_def->model.index;
+                                weapon_animations_index = interface_def->animations.index;
                             }
                             else
                             {
@@ -804,12 +804,12 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                             && IN_RANGE_INCLUSIVE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
                         {
                             const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
-                            datum fp_hands_model_index = player_rep->first_person_hands.TagIndex;
+                            datum fp_hands_model_index = player_rep->first_person_hands.index;
                             const weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(fp_data->weapons[0].weapon_index);
                             const _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
                             weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, fp_data->character_type);
 
-                            datum fp_weapon_model_index = (interface_def ? interface_def->model.TagIndex : NONE);
+                            datum fp_weapon_model_index = (interface_def ? interface_def->model.index : NONE);
 
                             if (fp_hands_model_index != NONE && fp_weapon_model_index != NONE)
                             {
@@ -902,7 +902,7 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
         weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
         _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
         weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-        datum weapon_animations_index = (interface_def ? interface_def->animations.TagIndex : NONE);
+        datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
 
         // ### FIXME either make use across the entire code of the intermediate buffer
         // or remove it entirely

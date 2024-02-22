@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 #include "Blam/Engine/math/color_math.h"
 
 
@@ -9,7 +9,7 @@
 * group_tag : ltmp
 * header size : 260
 * *********************************************************************/
-struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
+struct s_scenario_structure_lightmap_group_definition
 {
 	float search_distance_lower_bound;//0x0
 	float search_distance_upper_bound;//0x4
@@ -240,7 +240,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				};
 				TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
 				tag_block<s_strip_indices_block> strip_indices;//0x20
-				data_block visibility_mopp_code;//0x28
+				data_reference visibility_mopp_code;//0x28
 				struct s_mopp_reorder_table_block
 				{
 					__int16 index;//0x0
@@ -454,7 +454,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				};
 				TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
 				tag_block<s_strip_indices_block> strip_indices;//0x20
-				data_block visibility_mopp_code;//0x28
+				data_reference visibility_mopp_code;//0x28
 				struct s_mopp_reorder_table_block
 				{
 					__int16 index;//0x0
@@ -679,7 +679,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 				report_key_is_valid = FLAG(4),
 			};
 			e_flags flags;//0x2
-			data_block text;//0x4
+			data_reference text;//0x4
 			static_string32 source_filename;//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block
@@ -793,7 +793,7 @@ struct s_scenario_structure_lightmap_group_definition :TagGroup<'ltmp'>
 			tag_block<s_quads_block> quads;//0x50
 			struct s_comments_block
 			{
-				data_block text;//0x0
+				data_reference text;//0x0
 				float position_x;//0x8
 				float position_y;//0xC
 				float position_z;//0x10

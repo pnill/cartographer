@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/effects/particle_system_definition.h"
 
 struct s_breakable_surface_definition

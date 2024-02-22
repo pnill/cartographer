@@ -1,10 +1,5 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
-
-
-
-
 #include "Blam/Engine/math/function_definitions.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
@@ -509,7 +504,7 @@ struct s_hud_screen_effect_widget_definition
 };
 TAG_BLOCK_SIZE_ASSERT(s_hud_screen_effect_widget_definition, 80);
 
-struct s_new_hud_definition : TagGroup<'nhdt'>
+struct s_new_hud_definition
 {
     tag_reference donotuse;         // this isnt used anymore
     tag_block<s_hud_bitmap_widget_definition> bitmap_widgets;

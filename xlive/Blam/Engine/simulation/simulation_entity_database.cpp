@@ -65,7 +65,13 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 __declspec(naked) void jmp_c_simulation_entity_database__process_creation() { __asm { jmp c_simulation_entity_database::process_creation } }
 
 
-uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, e_simulation_entity_type* simulation_entity_type, uint32* out_entity_initial_update_mask, int32 block_max_count, int32* block_count, s_replication_allocation_block* blocks, c_bitstream* packet)
+uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_index, 
+    e_simulation_entity_type* simulation_entity_type, 
+    uint32* out_entity_initial_update_mask, 
+    int32 block_max_count,
+    int32* block_count, 
+    s_replication_allocation_block* blocks,
+    c_bitstream* packet)
 {
     uint32 result = 3;
     e_simulation_entity_type entity_type = (e_simulation_entity_type)packet->read_integer("entity-type", 5);
@@ -391,6 +397,58 @@ bool c_simulation_entity_database::notify_promote_to_authority(int32 entity_inde
 
 __declspec(naked) void jmp_c_simulation_entity_database__notify_promote_to_authority() { __asm { jmp c_simulation_entity_database::notify_promote_to_authority } }
 
+void c_simulation_entity_database::entity_delete_internal(int32 entity_index)
+{
+    s_simulation_game_entity* entity = this->entity_get(entity_index);
+    // Discard creation data
+    if (entity->creation_data)
+    {
+        network_heap_free_block((uint8*)entity->creation_data);
+        entity->creation_data = 0;
+        entity->creation_data_size = 0;
+    }
+
+    // Discard state data
+    if (entity->state_data)
+    {
+        network_heap_free_block((uint8*)entity->state_data);
+        entity->state_data = 0;
+        entity->state_data_size = 0;
+    }
+
+    // Clear entity data
+    entity->entity_type = _simulation_entity_type_none;
+    entity->entity_index = NONE;
+    return;
+}
+
+void c_simulation_entity_database::reset(void)
+{
+    m_field_5 = true;
+    if (m_initialized)
+    {
+        csmemset(m_entity_data, 0, sizeof(m_entity_data));
+    }
+
+    for (uint32 i = 0; i < k_simulation_entity_database_maximum_entities; i++)
+    {
+        s_simulation_game_entity* entity = &m_entity_data[i];
+        if (m_initialized)
+        {
+            if (entity->entity_index != NONE)
+            {
+                this->entity_delete_internal(entity->entity_index);
+            }
+        }
+        else
+        {
+            entity->entity_index = NONE;
+            entity->entity_type = _simulation_entity_type_none;
+        }
+    }
+    m_field_5 = 0;
+    return;
+}
 
 void simulation_entity_database_apply_patches(void)
 {

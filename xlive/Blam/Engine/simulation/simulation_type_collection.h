@@ -18,8 +18,8 @@ public:
 	c_simulation_entity_definition* get_entity_definition(e_simulation_entity_type type) const;
 	c_simulation_event_definition* get_event_definition(e_simulation_event_type type) const;
 
-	void register_entity_definition(e_simulation_entity_type type, void** event_definition);
-	void register_event_definition(e_simulation_event_type type, void** event_definition);
+	void register_entity_definition(e_simulation_entity_type type, c_simulation_entity_definition* definition);
+	void register_event_definition(e_simulation_event_type type, c_simulation_event_definition* definition);
 
 	static c_simulation_type_collection* get()
 	{

@@ -2,7 +2,7 @@
 #include "MetaExtender.h"
 #include "TagInterface.h"
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 
 std::vector<void*> ToFree;
 

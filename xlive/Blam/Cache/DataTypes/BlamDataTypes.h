@@ -5,9 +5,8 @@
 // simply just include the headers you need in the blam data type header
 // and use this header for external usage
 
-#include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Engine/cseries/cseries_strings.h"
-#include "TagRef.h"
-#include "BlamTag.h"
-#include "TagBlock.h"
-#include "DataRef.h"
+#include "cseries/cseries_strings.h"
+#include "tag_files/data_reference.h"
+#include "tag_files/string_id.h"
+#include "tag_files/tag_reference.h"
+#include "tag_files/tag_block.h"

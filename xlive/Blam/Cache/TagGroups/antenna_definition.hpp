@@ -1,5 +1,4 @@
 #pragma once
-#include "../Blam/Cache/TagGroups.hpp"
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 /*********************************************************************
@@ -9,7 +8,7 @@
 * *********************************************************************/
 
 #pragma pack(push,1)
-struct s_antenna_group_definition :TagGroup<'ant!'>
+struct s_antenna_group_definition
 {
 	string_id attachment_marker_name;//0x0
 	tag_reference bitmaps;//0x4

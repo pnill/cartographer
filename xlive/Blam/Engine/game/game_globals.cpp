@@ -72,8 +72,8 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 	auto new_rep = MetaExtender::add_tag_block2<s_game_globals_player_representation>((unsigned long)std::addressof(globals->player_representation));
 	if (fp_hands != NONE)
 	{
-		new_rep->first_person_hands.TagGroup = blam_tag::tag_group_type::rendermodel;
-		new_rep->first_person_hands.TagIndex = fp_hands;
+		new_rep->first_person_hands.group.group = _tag_group_render_model;
+		new_rep->first_person_hands.index = fp_hands;
 	}
 	else
 	{
@@ -82,16 +82,16 @@ s_game_globals_player_representation* add_representation(datum fp_hands, datum f
 
 	if (fp_body != NONE)
 	{
-		new_rep->first_person_body.TagGroup = blam_tag::tag_group_type::rendermodel;
-		new_rep->first_person_body.TagIndex = fp_body;
+		new_rep->first_person_body.group.group = _tag_group_render_model;
+		new_rep->first_person_body.index = fp_body;
 	}
 	else
 		new_rep->first_person_body = globals->player_representation[_character_type_spartan]->first_person_body;
 
 	if (tp_biped != NONE)
 	{
-		new_rep->third_person_unit.TagGroup = blam_tag::tag_group_type::biped;
-		new_rep->third_person_unit.TagIndex = tp_biped;
+		new_rep->third_person_unit.group.group = _tag_group_biped;
+		new_rep->third_person_unit.index = tp_biped;
 	}
 	else
 	{
@@ -132,9 +132,9 @@ void game_globals_remove_singleplayer_representation(void)
 void game_globals_add_skeleton_representation(scenario* scenario_definition)
 {
 	// Add skeleton
-	datum skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", blam_tag::tag_group_type::biped, "carto_shared");
-	datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", blam_tag::tag_group_type::rendermodel, "carto_shared");
-	datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
+	datum skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", _tag_group_biped, "carto_shared");
+	datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", _tag_group_render_model, "carto_shared");
+	datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
 
 	if (skele_datum != NONE && skele_fp_datum != NONE && skele_body_datum != NONE && get_current_special_event() == _special_event_halloween && !H2Config_no_events)
 	{
@@ -156,9 +156,9 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 
 void game_globals_add_flood_representation(scenario* scenario_definition)
 {
-	datum flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", blam_tag::tag_group_type::biped, "carto_shared");
-	datum flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", blam_tag::tag_group_type::rendermodel, "carto_shared");
-	datum flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", blam_tag::tag_group_type::rendermodel, "carto_shared");
+	datum flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", _tag_group_biped, "carto_shared");
+	datum flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", _tag_group_render_model, "carto_shared");
+	datum flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
 	if (flood_datum != NONE && flood_arms_datum != NONE && flood_body_datum != NONE)
 	{
 		tag_loader::Load_tag(flood_datum, true, "carto_shared");
@@ -180,17 +180,17 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 void game_globals_add_lmao_representation(void)
 {
 	// Create copy of default variant for chief and add lmao object to head
-	_unit_definition* mp_chief_unit = (_unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.TagIndex);
-	datum mode_chief_mp_datum =  mp_chief_unit->object.model.TagIndex;
+	_unit_definition* mp_chief_unit = (_unit_definition*)tag_get_fast(game_globals_get_representation(_character_type_spartan)->third_person_unit.index);
+	datum mode_chief_mp_datum =  mp_chief_unit->object.model.index;
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant
-		s_model_definition* mode_chief_mp = tags::get_tag<blam_tag::tag_group_type::model, s_model_definition>(mode_chief_mp_datum);
+		s_model_definition* mode_chief_mp = tags::get_tag<_tag_group_model, s_model_definition>(mode_chief_mp_datum);
 		auto base_variant = mode_chief_mp->variants[0];
 		auto new_variant = MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;
-		new_variant->dialogue.TagGroup = base_variant->dialogue.TagGroup;
-		new_variant->dialogue.TagIndex = base_variant->dialogue.TagIndex;
+		new_variant->dialogue.group = base_variant->dialogue.group;
+		new_variant->dialogue.index = base_variant->dialogue.index;
 		memcpy(new_variant->runtime_model_region_index, base_variant->runtime_model_region_index, sizeof(new_variant->runtime_model_region_index));
 		for (auto i = 0; i < base_variant->regions.count; i++)
 		{
@@ -215,7 +215,7 @@ void game_globals_add_lmao_representation(void)
 		}
 
 		// Add lmao head as an attachment on the new variant
-		datum lmao_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", blam_tag::tag_group_type::scenery, "carto_shared");
+		datum lmao_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", _tag_group_scenery, "carto_shared");
 		if (lmao_datum != NONE)
 		{
 			tag_loader::Load_tag(lmao_datum, true, "carto_shared");
@@ -226,8 +226,8 @@ void game_globals_add_lmao_representation(void)
 			{
 				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));
 				new_object->parent_marker = e_global_string_id::HS_HEAD;
-				new_object->child_object.TagGroup = blam_tag::tag_group_type::scenery;
-				new_object->child_object.TagIndex = lmao_datum;
+				new_object->child_object.group.group = _tag_group_scenery;
+				new_object->child_object.index = lmao_datum;
 			}
 		}
 		add_representation(NONE, NONE, NONE, new_variant->name);

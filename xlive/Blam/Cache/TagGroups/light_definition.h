@@ -1,8 +1,8 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
-#include "Blam/Cache/TagGroups.hpp"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
+
 
 #include "Blam/Engine/math/color_math.h"
 
@@ -12,7 +12,7 @@
 * group_tag : ligh
 * header size : 228
 * *********************************************************************/
-struct s_light_group_definition :TagGroup<'ligh'>
+struct s_light_group_definition
 {
 	enum class e_flags : __int32
 	{

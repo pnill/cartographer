@@ -1,13 +1,31 @@
 #pragma once
 #include "replication_control_view.h"
+#include "replication_entity_manager_view.h"
 
 #include "simulation/game_interface/simulation_game_entities.h"
+
+
+class c_replication_entity_manager
+{
+public:
+	void initialize(void);
+
+private: 
+	void reset(void);
+
+	int32 m_field_0;
+	c_replication_entity_manager_view* m_views[16];
+	int32 m_field_44;
+	int32 m_entity_data[2048];
+	int32 m_field_2048;
+};
+
 
 class c_replication_entity_manager_client
 {
 public:
 	virtual bool write_creation_to_packet(int32 entity_index, uint32 update_mask, const void* telemetry_data, c_bitstream* packet, int32 required_leave_space_bits, uint32* out_update_mask) = 0;
-	virtual uint32 read_creation_from_packet(int32 entity_index, e_simulation_entity_type* simulation_entity_type, uint32* out_update_mask, int32 a5, uint32* a6, s_replication_allocation_block* a7, c_bitstream* packet) = 0;
+	virtual uint32 read_creation_from_packet(int32 entity_index, e_simulation_entity_type* simulation_entity_type, uint32* out_update_mask, int32 a5, int32* block_count, s_replication_allocation_block* a7, c_bitstream* packet) = 0;
 	virtual bool process_creation(int32 entity_index, e_simulation_entity_type type, uint32 update_mask, int32 block_count, s_replication_allocation_block* blocks) = 0;
 	virtual void calculate_creation_requirements(int32 entity_index, uint32 update_mask, const void* a4, real32* a5, int32* a6) = 0;
 	virtual void write_creation_description_to_string(int32 entity_index, void* telemetry_data, int32 buffer_size, char* buffer) = 0;

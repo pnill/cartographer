@@ -1,12 +1,12 @@
 #pragma once
 #include "cache/cache_files.h"
-#include "Blam/Cache/DataTypes/BlamTag.h"
+#include "tag_files/tag_groups.h"
 
 namespace tags
 {
 	struct tag_instance
 	{
-		blam_tag type;
+		tag_group type;
 		datum datum_index;
 		size_t data_offset;
 		size_t size;
@@ -14,9 +14,9 @@ namespace tags
 	
 	struct tag_parent_info
 	{
-		blam_tag tag;
-		blam_tag parent;
-		blam_tag grandparent;
+		tag_group tag;
+		tag_group parent;
+		tag_group grandparent;
 	};
 
 	/*
@@ -83,7 +83,7 @@ namespace tags
 	}
 
 	/* Get parent tag groups for a tag group */
-	inline const tag_parent_info* get_tag_parent_info(const blam_tag& tag_type)
+	inline const tag_parent_info* get_tag_parent_info(const tag_group& tag_type)
 	{
 		s_tags_header* header = cache_files_get_tags_header();
 		if (!header)
@@ -95,9 +95,9 @@ namespace tags
 		{
 			auto* info_a = static_cast<const tag_parent_info*>(a);
 			auto* info_b = static_cast<const tag_parent_info*>(b);
-			return info_a->tag.as_int() - info_b->tag.as_int();
+			return info_a->tag.group - info_b->tag.group;
 		};
-		const tag_parent_info search_for{ tag_type, blam_tag::none(), blam_tag::none() };
+		const tag_parent_info search_for{ tag_type, (e_tag_group)NONE, (e_tag_group)NONE };
 		return static_cast<tag_parent_info*>(
 			bsearch(
 				&search_for,
@@ -109,14 +109,14 @@ namespace tags
 	}
 
 	/* Returns true if check is the same tag as main or a parent tag */
-	inline bool is_tag_or_parent_tag(const blam_tag& main, const blam_tag& check)
+	inline bool is_tag_or_parent_tag(const tag_group& main, const e_tag_group& check)
 	{
-		if (main == check)
+		if (main.group == check)
 			return true;
 		auto* parent_info = get_tag_parent_info(main);
 		if (LOG_CHECK(parent_info))
 		{
-			if (check == parent_info->tag || check == parent_info->parent || check == parent_info->grandparent)
+			if (check == parent_info->tag.group || check == parent_info->parent.group || check == parent_info->grandparent.group)
 				return true;
 		}
 		return false;
@@ -133,7 +133,7 @@ namespace tags
 		Using the injectedTag flag will skil the max tag count check as injected tags are placed after the limit.
 		Returns null on error
 	*/
-	template <blam_tag::tag_group_type request_type = blam_tag::tag_group_type::none, typename T = void>
+	template <uint32 request_type = NONE, typename T = void>
 	inline T* get_tag(datum tag, bool injectedTag = false)
 	{
 		s_tags_header* header = cache_files_get_tags_header();
@@ -153,7 +153,7 @@ namespace tags
 
 		//tag_instance instance = header->tag_instances[tag.Index];
 		tag_instance instance = get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag)];
-		if (request_type != blam_tag::tag_group_type::none && !is_tag_or_parent_tag(instance.type, request_type))
+		if (request_type != NONE && !is_tag_or_parent_tag(instance.type, (e_tag_group)request_type))
 		{
 			LOG_ERROR_FUNC("tag type doesn't match requested type - to disable check set requested type to 'none' in template");
 			return nullptr;
@@ -171,15 +171,15 @@ namespace tags
 	/*
 		Returns the tag datum or a null datum
 	*/
-	datum find_tag(blam_tag type, const std::string& name);
-	std::map<datum, std::string> find_tags(blam_tag type);
+	datum find_tag(e_tag_group type, const std::string& name);
+	std::map<datum, std::string> find_tags(e_tag_group type);
 
 	struct ilterator
 	{
 		ilterator() = default;
-		ilterator(blam_tag _type) : type(_type) {};
+		ilterator(tag_group _type) : type(_type) {};
 
-		blam_tag type = blam_tag::none(); // type we are searching for
+		tag_group type = { (e_tag_group)NONE }; // type we are searching for
 		long current_index = 0; // current tag idx
 		datum m_datum = NONE; // last tag datum we returned
 
@@ -188,9 +188,9 @@ namespace tags
 			while (current_index < get_tag_count())
 			{
 				auto tag_instance = &get_tag_instances()[current_index++];
-				if (tag_instance && !tag_instance->type.is_none() && !DATUM_IS_NONE(tag_instance->datum_index))
+				if (tag_instance && tag_instance->type.group != NONE && !DATUM_IS_NONE(tag_instance->datum_index))
 				{
-					if (type.is_none() || is_tag_or_parent_tag(tag_instance->type, type))
+					if (type.group == NONE|| is_tag_or_parent_tag(tag_instance->type, type.group))
 					{
 						m_datum = tag_instance->datum_index;
 						return m_datum;

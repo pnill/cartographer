@@ -45,7 +45,7 @@ void H2X::ApplyMapLoadPatches(bool enable)
 	for (auto& weapon : weapons)
 	{
 		float rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
-		datum weapon_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapon.tag_string);
+		datum weapon_datum = tags::find_tag(_tag_group_weapon, weapon.tag_string);
 		if (weapon_datum != NONE)
 		{
 			_weapon_definition* weapon_tag = tags::get_tag_fast<_weapon_definition>(weapon_datum);

@@ -294,6 +294,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -380,7 +381,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
@@ -412,9 +412,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
-    <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
@@ -513,7 +510,6 @@
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_definition.hpp" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
@@ -828,6 +824,10 @@
     <ClInclude Include="Blam\Engine\math\real_quantization.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_queue_global_events.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_encoding.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
+    <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

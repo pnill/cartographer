@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "AccountCreate.h"
 
 #include "H2MOD/Modules/Shell/Config.h"

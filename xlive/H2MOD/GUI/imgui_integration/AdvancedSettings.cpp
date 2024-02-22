@@ -27,6 +27,7 @@
 #include "imgui.h"
 #include "imgui_handler.h"
 
+
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {
 		std::string windowName = "advanced_settings";
@@ -39,7 +40,6 @@ namespace ImGuiHandler {
 			int g_aiming = 0;
 			int g_shadows = 0;
 			int g_water = 0;
-			int g_experimental = 0;
 			bool g_init = false;
 			int g_language_code = -1;
 
@@ -266,7 +266,7 @@ namespace ImGuiHandler {
 					{
 						if (fps_limit > 0)
 						{
-							fps_limit = (std::max)(fps_limit, 25);
+							fps_limit = MAX(fps_limit, 25);
 						}
 						else
 						{
@@ -324,11 +324,6 @@ namespace ImGuiHandler {
 					ImGui::Checkbox(GetString(light_suppressor), &H2Config_light_suppressor);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(GetString(light_suppressor_tooltip));
-
-					//ImGui::Checkbox(GetString(experimental_rendering_changes), &H2Config_experimental_fps);
-					//if (ImGui::IsItemHovered())
-					//	ImGui::SetTooltip(GetString(experimental_rendering_tooltip));
-
 				}
 			}
 			void MouseKeyboardSettings()
@@ -912,7 +907,6 @@ namespace ImGuiHandler {
 				g_language_code = H2Config_language.code_main;
 				g_shadows = (int)H2Config_Override_Shadows;
 				g_water = (int)H2Config_Override_Water;
-				g_experimental = (int)H2Config_experimental_fps;
 				if (g_language_code == -1)
 					g_language_code = 8;
 				g_init = true;
@@ -1103,16 +1097,7 @@ namespace ImGuiHandler {
 			string_table[0][e_advanced_string::weaponoffsets] = "Adjust Weapon Offsets";
 			string_table[0][e_advanced_string::video_title] = "Video Settings";
 			string_table[0][e_advanced_string::fps_limit] = "FPS Limit";
-			string_table[0][e_advanced_string::fps_limit_tooltip] =
-				"Setting this to 0 will uncap your games frame rate.";
-			string_table[0][e_advanced_string::experimental_rendering_changes] = "Experimental Rendering Mode";
-			string_table[0][e_advanced_string::experimental_rendering_tooltip] =
-				"This will change how the game handles rendering, requires a restart to take effect."
-				"\n\nNone: Default behavior of the game, will not work past 60FPS"
-				"\n\nOriginal: Forces the original framerate limiter used in the original game, tied to tickrate";
-			string_table[0][e_advanced_string::render_none] = "None";
-			string_table[0][e_advanced_string::render_cinematic] = "Cinematic Force";
-			string_table[0][e_advanced_string::render_engine] = "Engine Force";
+			string_table[0][e_advanced_string::fps_limit_tooltip] = "Setting this to 0 will uncap your games frame rate.";
 			string_table[0][e_advanced_string::lod] = "Level of Detail";
 			string_table[0][e_advanced_string::e_default] = "Default";
 			string_table[0][e_advanced_string::lod_1] = "L1 - Very Low";
@@ -1265,14 +1250,6 @@ namespace ImGuiHandler {
 				"Dejar este ajuste en 0 quitará el límite de fotogramas por segundo."
 				"\nCualquier valor mayor a 60 puede causar problemas de rendimiento."
 				"\nUsa el Cambio de Renderizado Experimental para solucionarlo.";
-			string_table[4][e_advanced_string::experimental_rendering_changes] = "Cambio de Renderizado Experimental";
-			string_table[4][e_advanced_string::experimental_rendering_tooltip] =
-				"Esto cambiará la forma en que el juego maneja el renderizado, requiere un reinicio para que surta efecto."
-				"\n\nNinguno: el comportamiento predeterminado del juego, no funcionará más allá de los 60FPS "
-				"\n\nOriginal: fuerza el limitador de FPS original utilizado en el juego original, vinculado a la velocidad de tick ";
-			string_table[4][e_advanced_string::render_none] = "Ninguno";
-			string_table[4][e_advanced_string::render_cinematic] = "Fuerza Cinematográfica";
-			string_table[4][e_advanced_string::render_engine] = "Fuerza del motor";
 			string_table[4][e_advanced_string::lod] = "Nivel de detalle";
 			string_table[4][e_advanced_string::e_default] = "Inicial";
 			string_table[4][e_advanced_string::lod_1] = "N1 - Muy bajo";

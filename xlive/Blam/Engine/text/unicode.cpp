@@ -1,6 +1,10 @@
 #include "stdafx.h"
 #include "unicode.h"
 
+int32 ustrncmp(const wchar_t* string1, const wchar_t* string2, size_t max_count)
+{
+	return wcsncmp(string1, string2, max_count);
+}
 
 size_t ustrnlen(const wchar_t* string, size_t max_count)
 {

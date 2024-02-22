@@ -388,6 +388,8 @@
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -590,6 +592,7 @@
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
@@ -820,7 +823,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamTag.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
@@ -849,6 +851,8 @@
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
@@ -943,7 +947,11 @@
     <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
@@ -954,7 +962,6 @@
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
@@ -1034,9 +1041,6 @@
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
-    <ClInclude Include="Blam\Cache\TagGroups.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />

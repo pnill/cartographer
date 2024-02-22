@@ -1,8 +1,8 @@
 #pragma once
 #include "effects_creation.h"
 #include "effect_location_definition.h"
-#include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/math/function_definitions.h"
 
 #include "particle_system_definition.h"
@@ -90,7 +90,7 @@ struct effect_part_definition
     // effect.locations index
     int16 location;
     e_effect_part_flags flags;
-    blam_tag runtime_base_tag_group;
+    tag_group runtime_base_tag_group;
     tag_reference base_type;
     // initial velocity along the location's forward, for decals the distance at which decal is created (defaults to 0.5)
     real_bounds velocity_bounds;

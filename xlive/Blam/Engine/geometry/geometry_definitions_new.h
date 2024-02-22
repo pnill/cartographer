@@ -182,7 +182,7 @@ struct geometry_section
     tag_block<geometry_vertex> raw_vertices;
     tag_block<uint16> strip_indices;    // max count: MAXIMUM_STRIP_INDICES_PER_GEOMETRY_SECTION
 
-    data_block visibility_mopp_code;  // Data Size: 393216
+    data_reference visibility_mopp_code;  // Data Size: 393216
     tag_block<uint16> mopp_reorder_table;
     tag_block<rasterizer_vertex_buffer> vertex_buffers;
     int32 pad;
@@ -201,7 +201,7 @@ TAG_BLOCK_SIZE_ASSERT(geometry_rigid_point_group, 4);
 struct geometry_point_data
 {
     tag_block<geometry_point> raw_points;
-    data_block runtime_point_data;    // Data size: 1048544
+    data_reference runtime_point_data;    // Data size: 1048544
     tag_block<geometry_rigid_point_group> rigidPointGroups;
     tag_block<uint16> vertex_point_indices;
 };

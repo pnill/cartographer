@@ -87,7 +87,7 @@ namespace MapSlots
 					MapData.emplace_back(newBlock);
 
 					//Store the bitmap datum for loading it into the main menu
-					BitmapsToLoad.emplace(newBlock.bitmap.TagIndex, map);
+					BitmapsToLoad.emplace(newBlock.bitmap.index, map);
 					fin.close();
 				}
 			}
@@ -117,7 +117,7 @@ namespace MapSlots
 					//Write the data loaded from the maps into the unused slot
 					memcpy(slot, &newSlot, sizeof(newSlot));
 					//Resolve the loaded bitmap datum
-					slot->bitmap.TagIndex = tag_loader::ResolveNewDatum(newSlot.bitmap.TagIndex);
+					slot->bitmap.index = tag_loader::ResolveNewDatum(newSlot.bitmap.index);
 
 					//Change the map id and sort ID so that the maps are 
 					//placed in order at the end of the list

@@ -193,10 +193,10 @@ namespace ImGuiHandler {
 		{
 			for (int i = 0; i < ARRAYSIZE(weapOffsets); i++)
 			{
-				datum weap_datum = tags::find_tag(blam_tag::tag_group_type::weapon, weapOffsets[i].weaponPath);
+				datum weap_datum = tags::find_tag(_tag_group_weapon, weapOffsets[i].weaponPath);
 				if (!DATUM_IS_NONE(weap_datum))
 				{
-					weapOffsets[i].tag = tags::get_tag<blam_tag::tag_group_type::weapon, _weapon_definition>(weap_datum);
+					weapOffsets[i].tag = tags::get_tag<_tag_group_weapon, _weapon_definition>(weap_datum);
 
 					ApplyOffset(i);
 				}

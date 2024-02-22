@@ -1,13 +1,13 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Cache/TagGroups.hpp"
+
 
 /*********************************************************************
 * name: item_collection
 * group_tag : itmc
 * header size : 12
 * *********************************************************************/
-struct s_item_collection_group_definition :TagGroup<'itmc'>
+struct s_item_collection_group_definition
 {
 	struct s_item_permutations_block
 	{

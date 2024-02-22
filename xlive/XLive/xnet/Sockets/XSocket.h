@@ -14,13 +14,6 @@
 
 #define MAX_PACKETS_TO_READ_PER_RECV_CALL 20
 
-// the only needed sockets to be connected
-const static std::unordered_set<int> H2v_socketsToConnect =
-{
-	1000,
-	1001
-};
-
 struct XSocket
 {
 	int identifier;

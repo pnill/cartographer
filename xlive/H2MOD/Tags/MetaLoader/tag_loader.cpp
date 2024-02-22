@@ -162,7 +162,7 @@ namespace tag_loader
 
 	}
 
-	datum Get_tag_datum(std::string tag_name, blam_tag type, std::string map)
+	datum Get_tag_datum(std::string tag_name, e_tag_group type, std::string map)
 	{
 		std::ifstream* fin;
 		std::string map_loc;
@@ -230,7 +230,7 @@ namespace tag_loader
 					cpos = fin->tellg();
 					fin->seekg(table_start + i * sizeof(tags::tag_instance));
 					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
-					if (tag_info.type == type)
+					if (tag_info.type.group == type)
 					{
 						delete fin;
 						return tag_info.datum_index;
@@ -342,9 +342,11 @@ namespace tag_loader
 
 					fin->read((char*)&tag_info, sizeof(tags::tag_instance));
 
-					if (*(load_tag_list.cbegin()) == tag_info.datum_index && tag_info.type != blam_tag::tag_group_type::sound)
+					if (*(load_tag_list.cbegin()) == tag_info.datum_index && tag_info.type.group != _tag_group_sound)
 					{
-						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(tag_info.type.as_string());
+						tag_group group_name = tag_group_get_name(tag_info.type);
+						char null_terminated_string[5] = { group_name.string[0], group_name.string[1], group_name.string[2], group_name.string[3], '\0' };
+						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(null_terminated_string);
 
 						//precaution for plugin load errors
 						if (!temp_plugin)
@@ -617,7 +619,7 @@ namespace tag_loader
 			i.second->Rebase_meta(0x0);
 			int size = i.second->Get_Total_size();
 			char* data = i.second->Generate_meta_file();
-			std::string type = i.second->Get_type().as_string();
+			std::string type = i.second->Get_type().string;
 
 			file_loc += '.' + type;
 			fout.open(file_loc, std::ios::out | std::ios::binary);
@@ -742,7 +744,7 @@ namespace tag_loader
 		}
 		*Memory::GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
 
-		switch (tag_info->type.as_int())
+		switch (tag_info->type.group)
 		{
 		case 'mode':
 
@@ -837,7 +839,7 @@ namespace tag_loader
 
 		*(HANDLE*)(Memory::baseAddress + 0x4AE8A8) = file;
 
-		switch (tag_info->type.as_int())
+		switch (tag_info->type.group)
 		{
 		case 'mode':
 
@@ -904,7 +906,7 @@ namespace tag_loader
 	//Fixes the reference of the tags to their global objects(vftables)
 	void Fix_global_objects_ref(datum datum_index)
 	{
-		blam_tag type = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].type;
+		tag_group type = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].type;
 		datum Tdatum_index = new_Tables[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].datum_index;
 
 		if (Tdatum_index != datum_index)
@@ -914,7 +916,7 @@ namespace tag_loader
 			throw new std::exception(error.c_str());
 		}
 
-		switch (type.as_int())
+		switch (type.group)
 		{
 		case 'crea':
 			global_objects_fix::crea_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
@@ -944,7 +946,7 @@ namespace tag_loader
 		for (auto ref : injected_tag_refs)
 		{
 			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.new_datum)];
-			if (inst.type.tag_type == blam_tag::tag_group_type::shadertemplate)
+			if (inst.type.group == _tag_group_shader_template)
 			{
 				//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
 				stem_iterator->next_tag_index = inst.datum_index;
@@ -1014,7 +1016,10 @@ namespace tag_loader
 				t_ref.old_datum = tags_first_d_index++;
 				t_ref.new_datum = new_datum_index++;//assign and increment it for next tag
 
-				std::shared_ptr<plugins_field> t_plugin = Get_plugin((&t_ptr[i])->type.as_string());
+				tag_group group_name = tag_group_get_name((&t_ptr[i])->type);
+				char null_terminated_string[5] = { group_name.string[0], group_name.string[1], group_name.string[2], group_name.string[3], '\0' };
+
+				std::shared_ptr<plugins_field> t_plugin = Get_plugin(null_terminated_string);
 				std::shared_ptr<meta> t_meta = std::make_shared<meta>(d_ptr, size, mem_off, t_plugin, 1, t_ref.old_datum);
 
 				my_inject_refs.push_back(t_ref);
@@ -1022,7 +1027,7 @@ namespace tag_loader
 
 				std::string t_name = n_ptr;
 				tag_list.push_back(t_name.substr(t_name.rfind('\\') + 1) + ",0x" + meta_struct::to_hex_string(t_ref.new_datum));
-				tag_loader::Generate_sync_list((&t_ptr[i])->type.as_int(), t_ref.new_datum);
+				tag_loader::Generate_sync_list((&t_ptr[i])->type, t_ref.new_datum);
 
 				n_ptr += t_name.size() + 1;
 				d_ptr += size;
@@ -1070,24 +1075,24 @@ namespace tag_loader
 		for (int i = FIRST_SHARED_TAG_INSTANCE_INDEX; i < tags::get_tag_count(); i++)
 			memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
 	}
-	void Generate_sync_list(int type, DWORD index)
+	void Generate_sync_list(tag_group type, DWORD index)
 	{
-		switch ((blam_tag::tag_group_type)type)
+		switch (type.group)
 		{
-		case blam_tag::tag_group_type::biped:
-		case blam_tag::tag_group_type::vehicle:
-		case blam_tag::tag_group_type::weapon:
-		case blam_tag::tag_group_type::garbage:
-		case blam_tag::tag_group_type::projectile:
-		case blam_tag::tag_group_type::crate:
-		case blam_tag::tag_group_type::damageeffect:
-		case blam_tag::tag_group_type::device:
-		case blam_tag::tag_group_type::scenery:
-		case blam_tag::tag_group_type::devicelightfixture:
-		case blam_tag::tag_group_type::soundscenery:
-		case blam_tag::tag_group_type::creature:
-		case blam_tag::tag_group_type::devicemachine:
-		case blam_tag::tag_group_type::equipment:
+		case _tag_group_biped:
+		case _tag_group_vehicle:
+		case _tag_group_weapon:
+		case _tag_group_garbage:
+		case _tag_group_projectile:
+		case _tag_group_crate:
+		case _tag_group_damage_effect:
+		case _tag_group_device:
+		case _tag_group_scenery:
+		case _tag_group_device_light_fixture:
+		case _tag_group_sound_scenery:
+		case _tag_group_creature:
+		case _tag_group_device_machine:
+		case _tag_group_equipment:
 			sync_list.push_back(index);
 			break;
 
@@ -1109,7 +1114,7 @@ namespace tag_loader
 		return NONE;
 	}
 
-	tags::tag_instance AddNewtagInstance(blam_tag type, int data, size_t size)
+	tags::tag_instance AddNewtagInstance(tag_group type, int data, size_t size)
 	{
 		tags::tag_instance tables_data;
 		tables_data.type = type;
@@ -1383,7 +1388,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	//Clear the table
 	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
-		tag_loader::new_Tables[i] = tags::tag_instance{ blam_tag::none(), NONE, 0, 0 };
+		tag_loader::new_Tables[i] = tags::tag_instance{ (e_tag_group)NONE, NONE, 0, 0 };
 	}
 	tag_loader::que_meta_list.clear();
 	tag_loader::injected_tag_refs.clear();
