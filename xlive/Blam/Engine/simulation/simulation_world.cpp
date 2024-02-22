@@ -201,12 +201,41 @@ void c_simulation_world::initialize_world(int32 a2, int32 a3, int32 a4)
 
 void __declspec(naked) jmp_initialize_world() { __asm { jmp c_simulation_world::initialize_world } }
 
-typedef void(__thiscall* t_c_simulation_world__reset)(c_simulation_world*);
-t_c_simulation_world__reset p_c_simulation_world__reset;
 
-void c_simulation_world::reset()
+void c_simulation_world::delete_all_actors(void)
 {
-	p_c_simulation_world__reset(this);
+	for (uint32 i = 0; i < NUMBEROF(m_actors); i++)
+	{
+		c_simulation_actor* actor = &m_actors[i];
+		if (actor->m_actor_index != NONE)
+		{
+			actor->destroy();
+		}
+	}
+	return;
+}
+
+void c_simulation_world::update_queue_reset(void)
+{
+	typedef void(__thiscall* update_queue_reset_t)(c_simulation_world*);
+	INVOKE_BY_TYPE(0x1DCDC3, 0x1C4277, update_queue_reset_t, this);
+	return;
+}
+
+void c_simulation_world::reset_world(void)
+{
+	m_time_immediate_update = 0;
+	m_out_of_sync = 0;
+	m_flush_gamestate = 0;
+	if (this->is_distributed())
+	{
+		m_distributed_world->m_entity_manager.reset();
+		m_distributed_world->m_event_manager.reset();
+		m_distributed_world->m_entity_database.reset();
+		// m_distributed_world->m_event_handler.reset();	// Function definition doesn't exist
+		
+		this->delete_all_actors();
+	}
 
 	if (!is_playback())
 	{
@@ -214,9 +243,16 @@ void c_simulation_world::reset()
 		// not bookkeeping updates
 		queue_get(_simulation_queue)->clear();
 	}
+
+	if (this->m_world_type == _simulation_world_type_synchronous_client)
+	{
+		this->update_queue_reset();
+	}
+
+	return;
 }
 
-__declspec(naked) void jmp_reset_world() { __asm { jmp c_simulation_world::reset } }
+__declspec(naked) void jmp_reset_world() { __asm { jmp c_simulation_world::reset_world } }
 
 typedef void(__thiscall* t_c_simulation_world__destroy_world)(c_simulation_world*);
 t_c_simulation_world__destroy_world p_c_simulation_world__destroy_world;
@@ -271,8 +307,8 @@ void simulation_world_apply_patches()
 {
 	DETOUR_ATTACH(p_c_simulation_world__initialize_world, Memory::GetAddress<t_c_simulation_world__initialize_world>(0x1DDB4E, 0x1C500E), jmp_initialize_world);
 	DETOUR_ATTACH(p_c_simulation_world__destroy_world, Memory::GetAddress<t_c_simulation_world__destroy_world>(0x1DE0A9, 0x1C5569), jmp_destroy_world);
-	DETOUR_ATTACH(p_c_simulation_world__reset, Memory::GetAddress<t_c_simulation_world__reset>(0x1DD0EA, 0x1C459E), jmp_reset_world);
 
+	PatchCall(Memory::GetAddress(0x1AE82A, 0x1A8A84), jmp_reset_world);
 	PatchCall(Memory::GetAddress(0x1DD9FB, 0x1C4EBB), jmp_send_player_acknowledgements_not_during_simulation_reset_in_progress);
 	return;
 }

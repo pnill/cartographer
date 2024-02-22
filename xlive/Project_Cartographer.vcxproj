@@ -390,6 +390,7 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -578,6 +579,7 @@
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_objects.cpp" />
     <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_units.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_actors.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_entity_database.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_event_handler.cpp" />

@@ -295,6 +295,10 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_encoding.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_players.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\simulation_actors.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -828,6 +832,8 @@
     <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
