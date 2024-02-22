@@ -15,8 +15,8 @@ void c_replication_entity_manager::reset(void)
 
 void c_replication_entity_manager::initialize(void)
 {
-	this->m_field_0 = 0;
-	this->m_field_44 = 0;
+	this->m_client = NULL;
+	this->m_view_mask = 0;
 
 	for (uint32 i = 0; i < 16; i++)
 	{

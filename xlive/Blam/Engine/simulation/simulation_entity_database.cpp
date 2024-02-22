@@ -450,6 +450,21 @@ void c_simulation_entity_database::reset(void)
     return;
 }
 
+void c_simulation_entity_database::entity_capture_creation_data(int32 entity_index)
+{
+    s_simulation_game_entity* entity = this->entity_get(entity_index);
+    c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(entity->entity_type);
+
+    entity_definition->build_creation_data(entity, entity->creation_data_size, entity->creation_data);
+    entity_definition->build_baseline_state_data(entity->creation_data_size, entity->creation_data, entity->state_data_size, entity->state_data);
+    entity->exists_in_gameworld = true;
+    
+    int32 count = entity_definition->update_flag_count();
+    entity->field_10 = 0;
+    entity->entity_update_flag = FLAG(count) - 1;
+    return;
+}
+
 void simulation_entity_database_apply_patches(void)
 {
 	WritePointer(Memory::GetAddress(0x3C6228, 0x381D10), jmp_c_simulation_entity_database__read_creation_from_packet);

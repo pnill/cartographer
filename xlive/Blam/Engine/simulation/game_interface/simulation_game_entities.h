@@ -46,9 +46,6 @@ struct s_simulation_baseline_state_data
 };
 CHECK_STRUCT_SIZE(s_simulation_baseline_state_data, 248);
 
-void simulation_entity_indices_to_object_index(int32* entity_references, int32 entity_reference_count, datum* out_object_index, int32 out_object_index_count);
-bool simulation_object_index_valid(datum object_index);
-
 class c_simulation_entity_definition
 {
 public:
@@ -71,7 +68,7 @@ public:
 	virtual bool entity_state_lossy_compare(void* a1, void* a2, int32 a3) = 0;
 	virtual bool entity_creation_lossy_compare(void* a1, void* a2, int32 a3) = 0;
 	virtual uint32 build_creation_data(s_simulation_game_entity* entity, int32 creation_data_size, void* out_creation_data) = 0;
-	virtual bool build_baseline_state_data(int32 creation_data_size, void* creation_data, int32 state_data_size, s_simulation_baseline_state_data* out_state_baseline_data) = 0;
+	virtual bool build_baseline_state_data(int32 creation_data_size, void* creation_data, int32 state_data_size, void* out_state_baseline_data) = 0;
 	virtual bool build_updated_state_data(s_simulation_game_entity* entity, uint32* update_mask, int32 state_data_size, void* state_data) = 0;
 	virtual uint32 rotate_entity_indices(s_simulation_game_entity* entity) = 0;
 	virtual bool create_game_entity(s_simulation_game_entity* entity, int32 creation_data_size, void* creation_data, uint32 mask, int32 state_data_size, void* state_data) = 0;
@@ -89,3 +86,9 @@ public:
 	virtual void* object_interpolation_data_out(int32 a1, void* a2, void* a3) = 0;
 	virtual void* object_interpolation_data(int32 a1, void* a2, void* a3) = 0;
 };
+
+
+void simulation_entity_indices_to_object_index(int32* entity_references, int32 entity_reference_count, datum* out_object_index, int32 out_object_index_count);
+bool simulation_object_index_valid(datum object_index);
+
+int32 __cdecl simulation_entity_create(int32 entity_type, datum object_index);

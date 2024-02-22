@@ -2,8 +2,6 @@
 #include "simulation_type_collection.h"
 #include "Networking/replication/replication_entity_manager.h"
 
-#define k_simulation_entity_database_maximum_entities 1024
-
 #define ENTITY_INDEX_TO_ABSOLUTE_INDEX(_entity_index)  ((_entity_index) & (k_simulation_entity_database_maximum_entities - 1))
 #define ENTITY_INDEX_TO_SEED(_entity_index) ((_entity_index) >> 28)
 
@@ -44,6 +42,8 @@ public:
 	virtual void rotate_entity_seed(void);
 	virtual uint32 generate_current_entity_update_mask(int32 entity_index);
 
+
+	void entity_capture_creation_data(int32 entity_index);
 
 	void entity_delete_internal(int32 entity_index);
 	void reset(void);

@@ -335,6 +335,7 @@
     <ClCompile Include="Blam\Engine\effects\particle_system_definition.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_update.cpp" />
     <ClCompile Include="Blam\Engine\game\game.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
     <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
@@ -492,6 +493,7 @@
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\game_preferences.h" />

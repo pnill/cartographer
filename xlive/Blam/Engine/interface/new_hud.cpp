@@ -94,13 +94,13 @@ void set_crosshair_scale(float scale)
 	size_t bitmap_size_vector_index = 0;
 
 	// Loops through every bitmap datum in the vector that's considered a crosshair
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		// Grab the bitmap definition
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
 
 		// Loop through every bitmap inside the bitmap tag
-		for (size_t j = 0; j < bitm_definition->bitmaps.count; ++j)
+		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
 			point2d original_bitmap_size = crosshair_original_bitmap_sizes[bitmap_size_vector_index];
