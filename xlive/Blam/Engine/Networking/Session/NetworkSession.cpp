@@ -5,21 +5,21 @@
 
 // ### TODO Cleanup
 
-bool NetworkSession::PlayerIsActive(int playerIdx)
+bool NetworkSession::PlayerIsActive(datum player_index)
 {
-	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(playerIdx)) != 0;
+	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))) != 0;
 }
 
-std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
+std::vector<uint64> NetworkSession::GetActivePlayerIdList()
 {
-	std::vector<unsigned long long> activePlayerIdList;
+	std::vector<uint64> activePlayerIdList;
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIdx))
 			{
-				unsigned long long playerId = NetworkSession::GetPlayerId(playerIdx);
+				uint64 playerId = NetworkSession::GetPlayerId(playerIdx);
 				activePlayerIdList.emplace_back(playerId);
 			}
 		}
@@ -28,12 +28,12 @@ std::vector<unsigned long long> NetworkSession::GetActivePlayerIdList()
 	return activePlayerIdList;
 }
 
-std::vector<int> NetworkSession::GetActivePlayerIndicesList()
+std::vector<int32> NetworkSession::GetActivePlayerIndicesList()
 {
-	std::vector<int> activePlayersIndices;
+	std::vector<int32> activePlayersIndices;
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
-		for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
+		for (int32 playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 		{
 			if (NetworkSession::PlayerIsActive(playerIndex))
 				activePlayersIndices.emplace_back(playerIndex);
@@ -106,7 +106,7 @@ bool NetworkSession::LocalPeerIsEstablished()
 }
 
 // returns NONE (-1) if fails
-int NetworkSession::GetPeerIndexFromNetworkAddress(network_address* address)
+int32 NetworkSession::GetPeerIndexFromNetworkAddress(network_address* address)
 {
 	typedef int(__thiscall* get_peer_index_from_network_address_t)(s_network_session* session, network_address* address);
 	auto p_get_peer_index_from_network_address = Memory::GetAddress<get_peer_index_from_network_address_t>(0x1C71DF, 0x19E9CF);
@@ -121,19 +121,19 @@ bool NetworkSession::GetMapFileLocation(wchar_t* buffer, size_t size)
 	return p_get_map_file_location(GetActiveNetworkSession(), buffer, size);
 }
 
-int NetworkSession::GetPeerCount()
+int32 NetworkSession::GetPeerCount()
 {
 	return GetActiveNetworkSession()->membership[0].peer_count;
 }
 
-int NetworkSession::GetLocalPeerIndex()
+int32 NetworkSession::GetLocalPeerIndex()
 {
 	return GetActiveNetworkSession()->local_peer_index;
 }
 
-bool NetworkSession::IsPeerIndexLocal(int peerIdx)
+bool NetworkSession::IsPeerIndexLocal(int32 peer_index)
 {
-	return GetLocalPeerIndex() == peerIdx;
+	return GetLocalPeerIndex() == peer_index;
 }
 
 IN_ADDR NetworkSession::GetLocalNetworkAddress()
@@ -141,58 +141,58 @@ IN_ADDR NetworkSession::GetLocalNetworkAddress()
 	return GetActiveNetworkSession()->membership[0].peers[GetLocalPeerIndex()].secure_address.inaOnline;
 }
 
-int NetworkSession::GetPeerIndex(int playerIdx)
+int32 NetworkSession::GetPeerIndex(datum player_index)
 {
-	return GetPlayerInformation(playerIdx)->peer_index;
+	return GetPlayerInformation(player_index)->peer_index;
 }
 
-int NetworkSession::GetPlayerCount()
+int32 NetworkSession::GetPlayerCount()
 {
 	return GetActiveNetworkSession()->membership[0].player_count;
 }
 
-s_membership_player* NetworkSession::GetPlayerInformation(int playerIdx)
+s_membership_player* NetworkSession::GetPlayerInformation(datum player_index)
 {
-	return &GetActiveNetworkSession()->membership[0].players[playerIdx];
+	return &GetActiveNetworkSession()->membership[0].players[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
 }
 
-const wchar_t* NetworkSession::GetPlayerName(int playerIdx)
+const wchar_t* NetworkSession::GetPlayerName(datum player_index)
 {
-	return GetPlayerInformation(playerIdx)->properties[0].player_name;
+	return GetPlayerInformation(player_index)->properties[0].player_name;
 }
 
-unsigned long long NetworkSession::GetPlayerId(int playerIdx)
+uint64 NetworkSession::GetPlayerId(datum player_index)
 {
-	return GetPlayerInformation(playerIdx)->identifier;
+	return GetPlayerInformation(player_index)->identifier;
 }
 
-int NetworkSession::GetPlayerTeam(int playerIdx)
+int NetworkSession::GetPlayerTeam(datum player_index)
 {
-	return GetPlayerInformation(playerIdx)->properties[0].team_index;
+	return GetPlayerInformation(player_index)->properties[0].team_index;
 }
 
-int NetworkSession::GetPeerIndexFromId(unsigned long long xuid)
+int32 NetworkSession::GetPeerIndexFromId(uint64 xuid)
 {
 	if (GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
+		for (int32 player_index = 0; player_index < k_maximum_players; player_index++)
 		{
-			if (PlayerIsActive(playerIdx) && GetPlayerId(playerIdx) == xuid)
-				return GetPeerIndex(playerIdx);
+			if (PlayerIsActive(player_index) && GetPlayerId(player_index) == xuid)
+				return GetPeerIndex(player_index);
 		}
 	}
 	return NONE;
 }
 
-void NetworkSession::KickPeer(int peerIdx)
+void NetworkSession::KickPeer(int32 peer_index)
 {
 	typedef void(__thiscall* game_session_boot_t)(s_network_session*, int, bool);
 	auto p_game_session_boot = Memory::GetAddress<game_session_boot_t>(0x1CCE9B);
 
-	if (peerIdx < GetPeerCount())
+	if (peer_index < GetPeerCount())
 	{
-		LOG_TRACE_GAME("{} - about to kick peer index = {}", __FUNCTION__, peerIdx);
-		p_game_session_boot(NetworkSession::GetActiveNetworkSession(), peerIdx, true);
+		LOG_TRACE_GAME("{} - about to kick peer index = {}", __FUNCTION__, peer_index);
+		p_game_session_boot(NetworkSession::GetActiveNetworkSession(), peer_index, true);
 	}
 }
 
@@ -203,9 +203,9 @@ void NetworkSession::EndGame()
 	p_end_game();
 }
 
-s_session_observer_channel* NetworkSession::GetPeerObserverChannel(int peerIdx)
+s_session_observer_channel* NetworkSession::GetPeerObserverChannel(int32 peer_index)
 {
-	return &GetActiveNetworkSession()->observer_channels[peerIdx];
+	return &GetActiveNetworkSession()->observer_channels[peer_index];
 }
 
 wchar_t* NetworkSession::GetGameVariantName()

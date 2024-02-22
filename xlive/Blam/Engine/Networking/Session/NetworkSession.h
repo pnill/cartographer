@@ -55,7 +55,7 @@ namespace NetworkSession
 	s_network_session* GetActiveNetworkSession();
 	bool GetActiveNetworkSession(s_network_session** outSession);
 	e_network_session_state GetLocalSessionState();
-	int GetPeerIndexFromNetworkAddress(network_address* address);
+	int32 GetPeerIndexFromNetworkAddress(network_address* address);
 	bool GetMapFileLocation(wchar_t* buffer, size_t size);
 
 	bool LocalPeerIsSessionHost();
@@ -63,32 +63,32 @@ namespace NetworkSession
 	bool LocalPeerIsEstablished();
 
 	// peer functions
-	int GetPeerCount();
-	int GetLocalPeerIndex();
-	bool IsPeerIndexLocal(int peerIdx);
+	int32 GetPeerCount();
+	int32 GetLocalPeerIndex();
+	bool IsPeerIndexLocal(int32 peer_index);
 	IN_ADDR GetLocalNetworkAddress();
-	void KickPeer(int peerIdx);
+	void KickPeer(int32 peer_index);
 	void EndGame();
-	s_session_observer_channel* GetPeerObserverChannel(int peerIdx);
+	s_session_observer_channel* GetPeerObserverChannel(int32 peer_index);
 
 	// peer-player functions
-	int GetPeerIndex(int playerIdx);
+	int32 GetPeerIndex(datum player_index);
 
 	// player functions
 	
 	/* Use this to verify if a player is currently active in the network session */
 	/* Otherwise you will wonder why you don't get the right data/player index etc. */
-	bool PlayerIsActive(int playerIdx);
-	std::vector<unsigned long long> GetActivePlayerIdList();
-	std::vector<int> GetActivePlayerIndicesList();
+	bool PlayerIsActive(datum player_index);
+	std::vector<uint64> GetActivePlayerIdList();
+	std::vector<int32> GetActivePlayerIndicesList();
 
-	int GetPlayerCount();
-	const wchar_t* GetPlayerName(int playerIdx);
-	unsigned long long GetPlayerId(int playerIdx);
+	int32 GetPlayerCount();
+	const wchar_t* GetPlayerName(datum player_index);
+	unsigned long long GetPlayerId(datum player_index);
 
-	int GetPlayerTeam(int playerIdx);
-	int GetPeerIndexFromId(unsigned long long xuid);
-	s_membership_player* GetPlayerInformation(int playerIdx);
+	int GetPlayerTeam(datum player_index);
+	int32 GetPeerIndexFromId(uint64 xuid);
+	s_membership_player* GetPlayerInformation(datum player_index);
 
 	wchar_t* GetGameVariantName();
 
