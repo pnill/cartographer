@@ -337,10 +337,10 @@ void object_postprocess_node_matrices(datum object_index)
 {
 	const object_datum* object = object_get_fast_unsafe(object_index);
 	const object_definition* object_tag = (object_definition*)tag_get_fast(object->tag_definition_index);
-	if (object_tag->model.TagIndex != NONE)
+	if (object_tag->model.index != NONE)
 	{
-		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(object_tag->model.TagIndex);
-		if (model_tag->render_model.TagIndex != NONE && model_tag->animation.TagIndex != NONE)
+		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(object_tag->model.index);
+		if (model_tag->render_model.index != NONE && model_tag->animation.index != NONE)
 		{
 			int32 node_count;
 			real_matrix4x3* node_matricies = object_get_node_matrices(object_index, &node_count);
@@ -405,7 +405,7 @@ void object_initialize_for_interpolation(datum object_index)
 	object_datum* object = object_get_fast_unsafe(object_index);
 	object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
 
-	if (object_def->model.TagIndex == NONE)
+	if (object_def->model.index == NONE)
 	{
 		if ((int16)object_def->attachments.count <= 0)
 		{
@@ -416,9 +416,9 @@ void object_initialize_for_interpolation(datum object_index)
 		while (1)
 		{
 			object_attachment_definition* attachment = object_def->attachments[tag_block_index];
-			if (attachment->type.TagIndex != NONE)
+			if (attachment->type.index != NONE)
 			{
-				tag_group type = attachment->type.TagGroup;
+				tag_group type = attachment->type.group;
 				if (type.group == 'lens'
 					|| type.group == 'ligh'
 					|| type.group == 'MGS2'
@@ -464,9 +464,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
 		const s_model_definition* model_definition = NULL;
 
-		if (object_def->model.TagIndex != NONE)
+		if (object_def->model.index != NONE)
 		{
-			model_definition = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
+			model_definition = (s_model_definition*)tag_get_fast(object_def->model.index);
 		}
 
 		if (
@@ -511,7 +511,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 
 			bool enable = placement_data->flags.test(_scenario_object_placement_bit_0);
 			object->object_flags.set(_object_mirrored_bit, enable);
-			enable = model_definition && model_definition->collision_model.TagIndex != NONE;
+			enable = model_definition && model_definition->collision_model.index != NONE;
 			object->object_flags.set(_object_uses_collidable_list_bit, enable);
 
 			datum mode_index;
@@ -582,10 +582,10 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
 				}
 
-				if (model_definition->animation.TagIndex != NONE)
+				if (model_definition->animation.index != NONE)
 				{
 					c_animation_manager animation_manager;
-					if (animation_manager.reset_graph(model_definition->animation.TagIndex, object_def->model.TagIndex, true))
+					if (animation_manager.reset_graph(model_definition->animation.index, object_def->model.index, true))
 					{
 						valid_animation_manager = true;
 						allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), (
@@ -631,7 +631,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				{
 					c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 					animation_manager->initialize();
-					bool graph_reset = animation_manager->reset_graph(model_definition->animation.TagIndex, object_def->model.TagIndex, true);
+					bool graph_reset = animation_manager->reset_graph(model_definition->animation.index, object_def->model.index, true);
 					object->object_flags.set(_object_data_bit_11, graph_reset);
 				}
 
@@ -691,9 +691,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					object_initialize_effects(object_index);
 					object_type_create_children(object_index);
 
-					if (object_def->creation_effect.TagIndex != NONE)
+					if (object_def->creation_effect.index != NONE)
 					{
-						effect_new_from_object(object_def->creation_effect.TagIndex, &placement_data->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
+						effect_new_from_object(object_def->creation_effect.index, &placement_data->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
 					}
 
 					// Not 100% sure what this function does but it has to do with occlusion
@@ -937,9 +937,9 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	{
 		object_datum* object = object_get_fast_unsafe(index);
 		object_definition* object_def = (object_definition*)tag_get_fast(object->tag_definition_index);
-		if (object_def->model.TagIndex != NONE)
+		if (object_def->model.index != NONE)
 		{
-			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
+			s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.index);
 
 			int32 node_count;
 			real_matrix4x3* node_matrices;
@@ -951,7 +951,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 
 			void* collision_regions = (real_matrix4x3*)object_header_block_get(object_index, &object->collision_regions_block);
 
-			int32 marker_index = render_model_get_markers_by_name(model_def->render_model.TagIndex, 
+			int32 marker_index = render_model_get_markers_by_name(model_def->render_model.index, 
 				marker, 
 				collision_regions, 
 				NONE, 

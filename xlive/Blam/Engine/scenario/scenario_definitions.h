@@ -695,7 +695,7 @@ struct recorded_animation_definition
     byte pad;
     short length_of_animation_ticks;
     short pad1[3];
-    data_block recorded_animation_event_stream; // DataSize: 2097152
+    data_reference recorded_animation_event_stream; // DataSize: 2097152
 };
 TAG_BLOCK_SIZE_ASSERT(recorded_animation_definition, 52);
 
@@ -1015,7 +1015,7 @@ struct s_here_but_for_the_grace_of_god_go_this_poor_soul
     * byteswap_proc: 0x00531b20
     ****************************************/
     // DataSize: 1048576
-    data_block mopp_code;
+    data_reference mopp_code;
     tag_block<c_object_identifier> environment_object_identifiers;
 
     int pad;
@@ -1149,7 +1149,7 @@ struct scenario
     * flags: 4
     * alignment_bit: 0
     ****************************************/    
-    data_block editor_scenario_data;                // DataSize: 65536
+    data_reference editor_scenario_data;                // DataSize: 65536
     tag_block<editor_comment_definition> comments;
     tag_block<scenario_environment_object> dont_use_me_scenario_environment_object_block;   
     tag_block<scenario_object_name> object_names;
@@ -1198,8 +1198,8 @@ struct scenario
     tag_block<ai_recording_reference_definition> ai_recording_references;
     tag_block<ai_conversation> ai_conversations;
 
-    data_block script_syntax_data;  // DataSize: 737356
-    data_block script_string_data;  // DataSize: 614400
+    data_reference script_syntax_data;  // DataSize: 737356
+    data_reference script_string_data;  // DataSize: 614400
     tag_block<hs_script> scripts;
     tag_block<hs_global_internal> globals;
     tag_block<hs_tag_reference> references;

@@ -1,7 +1,7 @@
 #pragma once
 #include "decorator_projected_decals.h"
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 
 #include "Blam/Engine/geometry/geometry_block.h"
 #include "Blam/Engine/math/color_math.h"

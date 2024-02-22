@@ -3,7 +3,7 @@
 #include "ai_orders.h"
 
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "Blam/Engine/tag_files/string_id.h"
 
 #define k_max_roles_per_scene 10

@@ -1,7 +1,8 @@
 #pragma once
-#include "Blam/Cache/DataTypes/DataRef.h"
-#include "Blam/Cache/DataTypes/TagBlock.h"
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
+#include "tag_files/data_reference.h"
+
+#include "tag_files/tag_block.h"
 
 
 #define MAXIMUM_ERROR_REPORT_CATEGORIES 64
@@ -84,7 +85,7 @@ TAG_BLOCK_SIZE_ASSERT(error_report_quad, 144);
 // max count: MAXIMUM_COMMENTS_PER_ERROR_REPORT
 struct error_report_comment
 {
-    data_block text;    // Data size: 8192
+    data_reference text;    // Data size: 8192
     s_error_report_point point;
     real_argb_color color;
 };
@@ -96,7 +97,7 @@ struct error_reports_block
     e_error_report_type type;
     e_error_report_flags flags;
 
-    data_block text;    // Data size: 8192
+    data_reference text;    // Data size: 8192
     char source_filename[32];
     int32 source_line_number;
     tag_block<error_report_vertex> vertices;

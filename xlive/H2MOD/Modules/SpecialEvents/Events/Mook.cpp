@@ -24,7 +24,7 @@ void mook_event_map_load()
 
 		auto mook_ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(mook_ball_weapon_datum, true);
 
-		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->item.object.model.TagIndex, mook_ball_weapon->item.object.model.TagIndex);
-		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->item.object.model.TagIndex, mook_ball_weapon->item.object.model.TagIndex);
+		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);
+		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);
 	}
 }

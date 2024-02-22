@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/cseries/cseries_strings.h"
 
 #define k_maximum_cluster_sound_palette_entries_per_structure 64

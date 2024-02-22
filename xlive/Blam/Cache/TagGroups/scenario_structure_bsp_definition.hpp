@@ -26,7 +26,7 @@ struct s_scenario_structure_bsp_group_definition
 			PAD(0x60);//0x120
 			__int32 checksum;//0x180
 			__int32 size;//0x184
-			data_block zipped_data;//0x188
+			data_reference zipped_data;//0x188
 			PAD(0x80);//0x190
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_files_block, 0x210);
@@ -159,7 +159,7 @@ struct s_scenario_structure_bsp_group_definition
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_surface_references_block, 0x8);
 	tag_block<s_surface_references_block> surface_references;//0x4C
-	data_block cluster_data;//0x54
+	data_reference cluster_data;//0x54
 	struct s_cluster_portals_block
 	{
 		__int16 back_cluster;//0x0
@@ -466,7 +466,7 @@ struct s_scenario_structure_bsp_group_definition
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
 			tag_block<s_strip_indices_block> strip_indices;//0x20
-			data_block visibility_mopp_code;//0x28
+			data_reference visibility_mopp_code;//0x28
 			struct s_mopp_reorder_table_block
 			{
 				__int16 index;//0x0
@@ -548,7 +548,7 @@ struct s_scenario_structure_bsp_group_definition
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_index_reorder_table_block, 0x2);
 		tag_block<s_index_reorder_table_block> index_reorder_table;//0xA0
-		data_block collision_mopp_code;//0xA8
+		data_reference collision_mopp_code;//0xA8
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_clusters_block, 0xB0);
 	tag_block<s_clusters_block> clusters;//0x9C
@@ -978,7 +978,7 @@ struct s_scenario_structure_bsp_group_definition
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_sound_environment_palette_block, 0x48);
 	tag_block<s_sound_environment_palette_block> sound_environment_palette;//0xDC
-	data_block sound_pas_data;//0xE4
+	data_reference sound_pas_data;//0xE4
 	struct s_markers_block
 	{
 		static_string32 name;//0x0
@@ -1109,7 +1109,7 @@ struct s_scenario_structure_bsp_group_definition
 				report_key_is_valid = FLAG(4),
 			};
 			e_flags flags;//0x2
-			data_block text;//0x4
+			data_reference text;//0x4
 			static_string32 source_filename;//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block
@@ -1277,7 +1277,7 @@ struct s_scenario_structure_bsp_group_definition
 			tag_block<s_quads_block> quads;//0x50
 			struct s_comments_block
 			{
-				data_block text;//0x0
+				data_reference text;//0x0
 				float position_x;//0x8
 				float position_y;//0xC
 				float position_z;//0x10
@@ -1326,10 +1326,10 @@ struct s_scenario_structure_bsp_group_definition
 		__int16 cluster_count;//0xA
 		__int16 volume_count;//0xC
 		PAD(0x2);//0xE
-		data_block projections;//0x10
-		data_block visibility_clusters;//0x18
-		data_block cluster_remap_table;//0x20
-		data_block visibility_volumes;//0x28
+		data_reference projections;//0x10
+		data_reference visibility_clusters;//0x18
+		data_reference cluster_remap_table;//0x20
+		data_reference visibility_volumes;//0x28
 	};
 	TAG_BLOCK_SIZE_ASSERT(s_precomputed_lighting_block, 0x30);
 	tag_block<s_precomputed_lighting_block> precomputed_lighting;//0x130
@@ -1519,7 +1519,7 @@ struct s_scenario_structure_bsp_group_definition
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
 			tag_block<s_strip_indices_block> strip_indices;//0x20
-			data_block visibility_mopp_code;//0x28
+			data_reference visibility_mopp_code;//0x28
 			struct s_mopp_reorder_table_block
 			{
 				__int16 index;//0x0
@@ -1641,7 +1641,7 @@ struct s_scenario_structure_bsp_group_definition
 			__int16 sizeb;//0x54
 			__int16 countb;//0x56
 			PAD(0xC);//0x58
-			data_block mopp_code_data;//0x64
+			data_reference mopp_code_data;//0x64
 			PAD(0x8);//0x6C
 		};
 		TAG_BLOCK_SIZE_ASSERT(s_bsp_physics_block, 0x74);
@@ -1919,7 +1919,7 @@ struct s_scenario_structure_bsp_group_definition
 	TAG_BLOCK_SIZE_ASSERT(s_debug_info_block, 0x58);
 	tag_block<s_debug_info_block> debug_info;//0x1D0
 	tag_reference decorators;//0x1D8
-	data_block mopp_code;//0x1E0
+	data_reference mopp_code;//0x1E0
 	PAD(0x4);//0x1E8
 	float mopp_bounds_min_x;//0x1EC
 	float mopp_bounds_min_y;//0x1F0
@@ -1927,7 +1927,7 @@ struct s_scenario_structure_bsp_group_definition
 	float mopp_bounds_max_x;//0x1F8
 	float mopp_bounds_max_y;//0x1FC
 	float mopp_bounds_max_z;//0x200
-	data_block breakable_surfaces_mopp_code;//0x204
+	data_reference breakable_surfaces_mopp_code;//0x204
 	struct s_breakable_surface_key_table_block
 	{
 		__int16 instanced_geometry_index;//0x0
@@ -2047,7 +2047,7 @@ struct s_scenario_structure_bsp_group_definition
 			};
 			TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
 			tag_block<s_strip_indices_block> strip_indices;//0x20
-			data_block visibility_mopp_code;//0x28
+			data_reference visibility_mopp_code;//0x28
 			struct s_mopp_reorder_table_block
 			{
 				__int16 index;//0x0

@@ -290,9 +290,9 @@ struct bitmap_group
     short color_plate_height_pixels;
 
     // DataSize(1073741824)
-    data_block color_plate_data;        // compressed_color_plate_data
+    data_reference color_plate_data;        // compressed_color_plate_data
     // DataSize(1073741824)
-    data_block bitmap_pixel_data;       // processed_pixel_data
+    data_reference bitmap_pixel_data;       // processed_pixel_data
 
     // Explaination("Miscellaneous", "")
     float blur_filter_size;             // Blurs the bitmap before generating mipmaps.

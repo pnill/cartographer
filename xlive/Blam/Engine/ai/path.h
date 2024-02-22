@@ -5,7 +5,7 @@
 #include "sector_environment_objects.h"
 
 
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "Blam/Engine/physics/collision_bsp.h"
 #include "Blam/Engine/structures/structures.h"
 

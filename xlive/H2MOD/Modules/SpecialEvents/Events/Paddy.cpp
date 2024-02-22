@@ -31,7 +31,7 @@ void paddy_event_map_load()
 		paddy_pot_datum = tag_loader::ResolveNewDatum(paddy_pot_datum);
 
 		auto paddy_pot = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(paddy_pot_datum, true);
-		auto paddy_pot_model = tags::get_tag<_tag_group_model, s_model_definition>(paddy_pot->objectTag.model.TagIndex, true);
+		auto paddy_pot_model = tags::get_tag<_tag_group_model, s_model_definition>(paddy_pot->objectTag.model.index, true);
 
 		// Give Hat and Beard to Masterchief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
@@ -53,9 +53,9 @@ void paddy_event_map_load()
 			ball_weapon_datum != NONE)
 		{
 			auto ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(ball_weapon_datum);
-			auto ball_model = tags::get_tag<_tag_group_model, s_model_definition>(ball_weapon->item.object.model.TagIndex);
+			auto ball_model = tags::get_tag<_tag_group_model, s_model_definition>(ball_weapon->item.object.model.index);
 
-			ball_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
+			ball_model->render_model.index = paddy_pot_model->render_model.index;
 
 			//Bounding Radius and Sweetener size
 			ball_weapon->item.object.bounding_radius = 0.3f;
@@ -65,10 +65,10 @@ void paddy_event_map_load()
 			bomb_weapon_datum != NONE)
 		{
 			auto bomb_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(bomb_weapon_datum);
-			auto bomb_model = tags::get_tag<_tag_group_model, s_model_definition>(bomb_weapon->item.object.model.TagIndex);
+			auto bomb_model = tags::get_tag<_tag_group_model, s_model_definition>(bomb_weapon->item.object.model.index);
 
-			bomb_model->render_model.TagIndex = paddy_pot_model->render_model.TagIndex;
-			auto paddy_pot_render = tags::get_tag<_tag_group_render_model, render_model_definition>(paddy_pot_model->render_model.TagIndex, true);
+			bomb_model->render_model.index = paddy_pot_model->render_model.index;
+			auto paddy_pot_render = tags::get_tag<_tag_group_render_model, render_model_definition>(paddy_pot_model->render_model.index, true);
 			auto pot_node = paddy_pot_render->nodes[0];
 			pot_node->default_rotation.k = -0.75f;
 			pot_node->default_translation.y = 0.07f;

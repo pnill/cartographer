@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagBlock.h"
+#include "tag_files/tag_block.h"
 #include "Blam/Engine/game/materials.h"
 #include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/objects/damage_reporting.h"
@@ -495,7 +495,7 @@ struct s_scenario_load_parameters
     * flags: 6
     * alignment_bit: 0
     ****************************************/
-    data_block paramaters;
+    data_reference paramaters;
     int8 pad[32];
 };
 

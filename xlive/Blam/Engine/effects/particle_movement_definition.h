@@ -1,6 +1,6 @@
 #pragma once
 #include "particle_property.h"
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 
 #define k_particle_movement_definition_controller_max_count 4
 #define k_particle_movement_definition_controller_parameter_count 9

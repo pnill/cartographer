@@ -39,11 +39,11 @@ void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_dat
 {
 	auto weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(weapon_datum);
 	weapon->item.object.sweetener_size = _sweetener_size_medium;
-	weapon->player_interface.first_person[0]->model.TagIndex = fp_model_datum;
-	weapon->player_interface.first_person[1]->model.TagIndex = fp_model_datum;
+	weapon->player_interface.first_person[0]->model.index = fp_model_datum;
+	weapon->player_interface.first_person[1]->model.index = fp_model_datum;
 
-	datum model_datum = weapon->item.object.model.TagIndex;
-	tags::get_tag<_tag_group_model, s_model_definition>(model_datum)->render_model.TagIndex = _3p_model_datum;
+	datum model_datum = weapon->item.object.model.index;
+	tags::get_tag<_tag_group_model, s_model_definition>(model_datum)->render_model.index = _3p_model_datum;
 
 }
 
@@ -53,8 +53,8 @@ void add_hat_to_model(datum player_hlmt_datum, datum hat_scenery_datum, bool is_
 	auto variant = hlmt->variants[0];
 	auto hat = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
 	hat->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
-	hat->child_object.TagGroup.group = _tag_group_scenery;
-	hat->child_object.TagIndex = hat_scenery_datum;
+	hat->child_object.group.group = _tag_group_scenery;
+	hat->child_object.index = hat_scenery_datum;
 }
 
 void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum, datum beard_scenery_datum, bool is_elite)
@@ -65,6 +65,6 @@ void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum
 	auto variant = hlmt->variants[0];
 	auto beard = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
 	beard->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
-	beard->child_object.TagGroup.group = _tag_group_scenery;
-	beard->child_object.TagIndex = beard_scenery_datum;
+	beard->child_object.group.group = _tag_group_scenery;
+	beard->child_object.index = beard_scenery_datum;
 }

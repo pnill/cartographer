@@ -943,8 +943,11 @@
     <ClInclude Include="Blam\Engine\structures\structures.h" />
     <ClInclude Include="Blam\Engine\structures\structure_audibility.h" />
     <ClInclude Include="Blam\Engine\structures\structure_bsp_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
@@ -955,7 +958,6 @@
     <ClInclude Include="Blam\Engine\units\units.h" />
     <ClInclude Include="Blam\Engine\tag_files\global_string_ids.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\DataRef.h" />
     <ClInclude Include="Blam\Engine\math\integer_math.h" />
     <ClInclude Include="Blam\Engine\math\real_math.h" />
     <ClInclude Include="Blam\Engine\memory\data.h" />
@@ -1035,8 +1037,6 @@
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagRef.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\TagBlock.h" />
     <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />

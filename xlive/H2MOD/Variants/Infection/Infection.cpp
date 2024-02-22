@@ -250,8 +250,8 @@ void Infection::removeUnwantedItems()
 
 			for (int i = 0; i < itmc->item_permutations.count; i++)
 			{
-				itmc->item_permutations[i]->item.TagGroup.group = _tag_group_equipment;
-				itmc->item_permutations[i]->item.TagIndex = shotgun_ammo_equip_datum;
+				itmc->item_permutations[i]->item.group.group = _tag_group_equipment;
+				itmc->item_permutations[i]->item.index = shotgun_ammo_equip_datum;
 			}
 		}
 	}
@@ -261,11 +261,11 @@ void Infection::removeUnwantedItems()
 	for (DWORD i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
 		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
-		if (netgame_equipment->item_vehicle_collection.TagGroup.group == _tag_group_vehicle_collection)
+		if (netgame_equipment->item_vehicle_collection.group.group == _tag_group_vehicle_collection)
 		{
 			netgame_equipment->classification = netgame_item_classification_powerup;
-			netgame_equipment->item_vehicle_collection.TagGroup.group = _tag_group_item_collection;
-			netgame_equipment->item_vehicle_collection.TagIndex = NONE;
+			netgame_equipment->item_vehicle_collection.group.group = _tag_group_item_collection;
+			netgame_equipment->item_vehicle_collection.index = NONE;
 		}
 	}
 }

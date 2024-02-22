@@ -32,7 +32,7 @@ namespace TagFixes
 				if(shader != nullptr)
 				{
 					tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
-					if(shader_template->TagIndex == borked_template)
+					if(shader_template->index == borked_template)
 					{
 						tag_block<int> *shader_post = reinterpret_cast<tag_block<int>*>(shader + 0x20);
 						if(shader_post->count > 0)
@@ -88,7 +88,7 @@ namespace TagFixes
 						tag_reference* impl_1 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A) + 0xFC);
 						tag_reference* impl_2 = reinterpret_cast<tag_reference*>(shadow_impl + (0x14A*2) + 0xFC);
 
-						impl_1->TagIndex = cinematic_shadow_datum;
+						impl_1->index = cinematic_shadow_datum;
 						//TODO: Re-enable this once the vertex shaders for shadows are fixed.
 						//impl_2->TagIndex = cinematic_shadow_datum.data;
 					}

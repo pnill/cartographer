@@ -10,12 +10,16 @@
 #include "../NIC.h"
 #include "../net_utils.h"
 
+// The only needed sockets
+const uint16 g_needed_sockets[2] = { 1000, 1001 };
+
 XnIpManager gXnIpMgr;
 
 // local user xbox network address
 XnIp XnIpManager::m_ipLocal;
 
 XECRYPT_RC4_STATE gRc4StateRand;
+
 
 const char requestStrHdr[XNIP_MAX_PCK_STR_HDR_LEN] = "XNetBrOadPack";
 const char broadcastStrHdr[XNIP_MAX_PCK_STR_HDR_LEN] = "XNetReqPack";
@@ -759,13 +763,20 @@ void XnIp::SendXNetRequestAllSockets(eXnip_ConnectRequestType reqType)
 	// send for each UDP socket, the other side may not have the NAT data
 	for (auto sockIt : XSocket::Sockets)
 	{
-		// TODO: handle dinamically, so it can be used by other games too
-		if (sockIt->IsUDP() // connect only UDP sockets
-			&& H2v_socketsToConnect.find(sockIt->GetHostOrderSocketVirtualPort()) != H2v_socketsToConnect.end())
+		// connect only UDP sockets
+		if (sockIt->IsUDP())
 		{
-			SendXNetRequest(sockIt, reqType);
+			for (uint32 i = 0; i < NUMBEROF(g_needed_sockets); i++)
+			{
+				if (sockIt->GetHostOrderSocketVirtualPort() == g_needed_sockets[i])
+				{
+					SendXNetRequest(sockIt, reqType);
+					break;
+				}
+			}
 		}
 	}
+	return;
 }
 
 void XnIp::SendXNetRequest(XSocket* xsocket, eXnip_ConnectRequestType reqType)

@@ -35,7 +35,7 @@ bool simulation_object_variant_should_sync(s_simulation_object_creation_data* cr
 {
     bool sync_variant = creation_data->model_variant_index != NONE;
     object_definition* object_def = (object_definition*)tag_get_fast(creation_data->object_definition_index);
-    if (datum model_tag_index = object_def->model.TagIndex;
+    if (datum model_tag_index = object_def->model.index;
         model_tag_index != NONE && sync_variant)
     {
         s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_tag_index);
@@ -127,9 +127,9 @@ bool __stdcall c_simulation_object_entity_definition__object_setup_placement_dat
         if (object_creation_data->model_variant_index != NONE && object_creation_data->object_definition_index != NONE)
         {
             object_definition* object_def = (object_definition*)tag_get_fast(object_creation_data->object_definition_index);
-            if (object_def->model.TagIndex != NONE)
+            if (object_def->model.index != NONE)
             {
-                s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.TagIndex);
+                s_model_definition* model_def = (s_model_definition*)tag_get_fast(object_def->model.index);
                 if (object_creation_data->model_variant_index < model_def->variants.count)
                 {
                     placement_data->variant_name = model_def->variants[object_creation_data->model_variant_index]->name;

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/TagRef.h"
+#include "tag_files/tag_reference.h"
 #include "Blam/Engine/objects/object_definition.h"
 
 enum e_device_definition_flags : int32
