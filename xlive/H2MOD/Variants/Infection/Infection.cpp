@@ -362,13 +362,11 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 		{
 			if (s_player::get_team(player_index) != k_zombie_team) {
 				//if we have a valid object and the object is not on the zombie team
-				uint64 player_id = s_player::get_id(player_index_from_user_index(0));
-
-				LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(0)), player_id);
+				uint64 player_id = s_player::get_id(player_index);
 
 				// check if the player being infected is local
 				if (player_id == s_player::get_id(player_index_from_user_index(0))) {
-					LOG_TRACE_GAME("[h2mod-infection] Setting player as zombie");
+					LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(0)), player_id);
 					h2mod->set_local_team_index(0, k_zombie_team);
 					s_player::set_unit_character_type(player_index, _character_type_flood);
 				}
