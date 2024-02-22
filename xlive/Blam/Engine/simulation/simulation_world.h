@@ -111,10 +111,7 @@ public:
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type);
 
-	void* get_distributed_world()
-	{
-		return m_distributed_world;
-	}
+	c_simulation_distributed_world* get_distributed_world(void) { return m_distributed_world; }
 
 	void initialize_world(int32 a2, int32 a3, int32 a4);
 	

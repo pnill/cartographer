@@ -4,6 +4,19 @@
 
 #include "simulation/game_interface/simulation_game_entities.h"
 
+#define k_simulation_entity_database_maximum_entities 1024
+
+// Forward declaration
+typedef class c_replication_entity_manager_client;
+
+struct s_replication_entity_manager_data
+{
+	uint8 mask;
+	uint8 mask_1;
+	int16 pad;
+	int32 field_4;
+};
+
 
 class c_replication_entity_manager
 {
@@ -12,10 +25,10 @@ public:
 	void reset(void);
 
 private: 
-	int32 m_field_0;
+	c_replication_entity_manager_client* m_client;
 	c_replication_entity_manager_view* m_views[16];
-	int32 m_field_44;
-	int32 m_entity_data[2048];
+	uint32 m_view_mask;
+	s_replication_entity_manager_data m_entity_data[k_simulation_entity_database_maximum_entities];
 	int32 m_field_2048;
 };
 
@@ -45,5 +58,5 @@ protected:
 	bool m_field_5;
 	int8 pad[2];
 	void* m_world;
-	void* m_entity_manager;
+	c_replication_entity_manager* m_entity_manager;
 };

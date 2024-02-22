@@ -28,3 +28,8 @@ void simulation_entity_indices_to_object_index(int32* entity_references, int32 e
 		out_object_index[i] = NONE;
 	}
 }
+
+int32 __cdecl simulation_entity_create(int32 entity_type, datum object_index)
+{
+	return INVOKE(0x1B99C0, 0x1B2E95, simulation_entity_create, entity_type, object_index);
+}

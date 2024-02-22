@@ -2,13 +2,13 @@
 #include "simulation.h"
 
 #include "simulation_queue_global_events.h"
+#include "simulation_entity_database.h"
 #include "simulation_event_handler.h"
 #include "simulation_watcher.h"
 
 #include "game/game.h"
 #include "objects/objects.h"
-#include "simulation_watcher.h"
-#include "simulation_entity_database.h"
+#include "simulation/game_interface/simulation_game_action.h"
 
 s_simulation_globals* simulation_get_globals()
 {
@@ -250,6 +250,7 @@ void simulation_apply_patches(void)
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     simulation_entity_database_apply_patches();
+    simulation_game_action_apply_patches();
 
     PatchCall(Memory::GetAddress(0x39D73, 0xC0F8), simulation_update_pregame);
     PatchCall(Memory::GetAddress(0x4A4DF, 0x4375D), simulation_apply_before_game);

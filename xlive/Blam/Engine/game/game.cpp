@@ -67,6 +67,13 @@ bool game_is_distributed(void)
         || game_options_get()->simulation_type == _game_simulation_distributed_server;
 }
 
+bool game_is_server(void)
+{
+    const s_game_options* options = game_options_get();
+
+    return !(options->simulation_type == _game_simulation_synchronous_client || options->simulation_type == _game_simulation_distributed_client);
+}
+
 int16 game_get_active_structure_bsp_index()
 {
     return get_main_game_globals()->active_structure_bsp_index;

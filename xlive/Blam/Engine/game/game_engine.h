@@ -89,7 +89,7 @@ struct s_game_engine_globals
 	WORD field_12[8];
 	DWORD field_24;
 	DWORD field_28;
-	DWORD gap_3A[16];
+	int32 player_entity_index[k_maximum_players];
 	short field_6A;
 	short field_6C;
 	DWORD field_70;
