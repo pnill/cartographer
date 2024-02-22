@@ -32,8 +32,12 @@ class c_simulation_event_handler
     };
 
     c_simulation_event_handler_vtbl* vtbl;
-    uint8 gap_4[12];
+    bool field_4;
+    int8 pad[3];
+    int32 field_8;
+    int32 field_C;
     c_simulation_type_collection* m_event_type_collection;
+    c_simulation_entity_database* m_entity_database;
 
     void process_incoming_event(e_simulation_event_type simulation_event_type, int32* entity_reference_indices, int32 block_count, s_replication_allocation_block* block);
 };

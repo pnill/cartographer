@@ -220,7 +220,7 @@ __declspec(naked) void jmp_reset_world() { __asm { jmp c_simulation_world::reset
 typedef void(__thiscall* t_c_simulation_world__destroy_world)(c_simulation_world*);
 t_c_simulation_world__destroy_world p_c_simulation_world__destroy_world;
 
-void c_simulation_world::destroy_world()
+void c_simulation_world::destroy_world(void)
 {
 	// call orig
 	p_c_simulation_world__destroy_world(this);
@@ -232,6 +232,11 @@ void c_simulation_world::destroy_world()
 }
 
 void __declspec(naked) jmp_destroy_world() { __asm{ jmp c_simulation_world::destroy_world } }
+
+void c_simulation_world::disconnect(void)
+{
+	return;
+}
 
 void c_simulation_world::send_player_acknowledgements_not_during_simulation_reset_in_progress(bool a1)
 {

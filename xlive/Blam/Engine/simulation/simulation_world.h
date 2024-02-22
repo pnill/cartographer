@@ -1,9 +1,11 @@
 #pragma once
-
-#include "simulation_view.h"
 #include "simulation_actors.h"
+#include "simulation_entity_database.h"
 #include "simulation_players.h"
 #include "simulation_queue.h"
+#include "simulation_view.h"
+
+#include "Networking/replication/replication_event_manager.h"
 
 enum e_simulation_queue_type
 {
@@ -43,10 +45,19 @@ struct s_simulation_queue_stats
 	int32 allocated_in_bytes;
 };
 
+class c_simulation_distributed_world
+{
+	c_replication_entity_manager m_entity_manager;
+	c_replication_event_manager m_event_manager;
+	c_simulation_entity_database m_entity_database;
+	c_simulation_event_handler m_event_handler;
+};
+CHECK_STRUCT_SIZE(c_simulation_distributed_world, 45260);
+
 class c_simulation_world
 {
 	void* m_watcher;
-	void* m_distributed_world;
+	c_simulation_distributed_view* m_distributed_world;
 	e_simulation_world_type m_world_type;
 	bool m_local_machine_identifier_valid;
 	s_machine_identifier m_local_machine_identifier;
@@ -107,6 +118,7 @@ public:
 	// discard resources
 	void reset();
 	void destroy_world();
+	void disconnect(void);
 
 	void queues_dispose();
 
@@ -126,6 +138,12 @@ public:
 		}
 
 		return false;
+	}
+
+	bool is_distributed(void)
+	{
+		return m_world_type == _simulation_world_type_distributed_authority
+			|| m_world_type == _simulation_world_type_distributed_client;
 	}
 
 	bool exists() const
