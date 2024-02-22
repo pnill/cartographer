@@ -81,3 +81,19 @@ struct c_simulation_view
 };
 #pragma pack(pop)
 CHECK_STRUCT_SIZE(c_simulation_view, 0xB4);
+
+class c_simulation_distributed_view
+{
+	int32 m_field_0;
+	void* m_replication_scheduler_vftable;
+	int8 m_replication_scheduler[40];
+	void* m_replication_entity_manager_view_vftable;
+	int8 m_replication_entity_manager_view[20540];
+	void* m_replication_event_manager_view_vftable;
+	int8 m_replication_event_manager_view[36];
+	void* m_replication_control_view_vftable;
+	int8 m_replication_control_view[3868];
+	void* m_simulation_view_telemetry_provider_vftable;
+	int8 m_simulation_view_telemetry_provider[19616];
+};
+CHECK_STRUCT_SIZE(c_simulation_distributed_view, 44124);
