@@ -626,15 +626,15 @@ void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
 		p_game_mode_engine_draw_team_indicators(local_user_render_idx);
 }
 
-typedef short(__cdecl* get_enabled_teams_flags_t)(s_network_session*);
+typedef int16(__cdecl* get_enabled_teams_flags_t)(s_network_session*);
 get_enabled_teams_flags_t p_get_enabled_teams_flags;
 
-short __cdecl get_enabled_team_flags(s_network_session* session)
+int16 __cdecl get_enabled_team_flags(s_network_session* session)
 {
-	short default_teams_enabled_flags = p_get_enabled_teams_flags(session);
-	short new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	const short red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
-	const short infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
+	int16 default_teams_enabled_flags = p_get_enabled_teams_flags(session);
+	int16 new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	const int16 red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
+	const int16 infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
 
 	std::wstring selected_map_file_name;
 
@@ -685,10 +685,10 @@ int __cdecl get_next_hill_index(int previousHill)
 	return previousHill + 1;
 }
 
-int get_active_count_from_bitflags(short teams_bit_flags)
+int32 get_active_count_from_bitflags(int16 teams_bit_flags)
 {
-	int count = 0;
-	for (int i = 0; i < _game_team_neutral; i++)
+	int32 count = 0;
+	for (int32 i = 0; i < _game_team_neutral; i++)
 	{
 		if (TEST_BIT(teams_bit_flags, i))
 			count++;
@@ -728,22 +728,22 @@ bool __cdecl should_start_pregame_countdown_hook()
 		&& NetworkSession::IsVariantTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
-		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		short activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
+		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
+		int16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int maxTeams = (std::min)((std::max)(get_active_count_from_bitflags(activeTeamsFlags), 2), (int)_game_team_neutral);
+		int32 max_teams = MIN(MAX(get_active_count_from_bitflags(activeTeamsFlags), 2), (int32)_game_team_neutral);
 
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
 		
-		int maxPlayersPerTeam = (std::max)(1, NetworkSession::GetPlayerCount() / maxTeams);
+		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
 
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
-		for (int i = 0; i < _game_team_neutral; i++)
+		for (int32 i = 0; i < _game_team_neutral; i++)
 		{
-			int currentTeamPlayers = 0;
+			int32 currentTeamPlayers = 0;
 
 			if (activePlayersIndices.empty())
 				break;
@@ -752,12 +752,12 @@ bool __cdecl should_start_pregame_countdown_hook()
 			if (!TEST_BIT(activeTeamsFlags, i))
 				continue;
 
-			std::uniform_int_distribution<int> dist(0, activePlayersIndices.size() - 1);
+			std::uniform_int_distribution<int32> dist(0, activePlayersIndices.size() - 1);
 
 			for (; currentTeamPlayers < maxPlayersPerTeam; currentTeamPlayers++)
 			{
-				int vecPlayerIdx = dist(mt_rand);
-				int playerIndexSelected = activePlayersIndices[vecPlayerIdx];
+				int32 vecPlayerIdx = dist(mt_rand);
+				int32 playerIndexSelected = activePlayersIndices[vecPlayerIdx];
 				// swap the player index with the last one, then just pop the last element
 				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
 				activePlayersIndices.pop_back();
@@ -847,6 +847,7 @@ __declspec(naked) void object_function_value_adjust_primary_firing()
 		retn
 	}
 }
+
 void H2MOD::ApplyHooks() {
 	/* Should store all offsets in a central location and swap the variables based on h2server/halo2.exe*/
 	/* We also need added checks to see if someone is the host or not, if they're not they don't need any of this handling. */

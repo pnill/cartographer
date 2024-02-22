@@ -44,7 +44,7 @@ int Infection::calculateZombiePlayerIndex()
 	if (NetworkSession::GetPlayerCount() > 0)
 	{
 		std::mt19937 mt_rand(rd());
-		std::vector<int> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
+		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		std::uniform_int_distribution<int> dist(0, NetworkSession::GetPlayerCount() - 1);
 	
 		if (activePlayersIndices.empty())

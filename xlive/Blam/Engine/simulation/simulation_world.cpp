@@ -210,8 +210,8 @@ void c_simulation_world::reset()
 
 	if (!is_playback())
 	{
-		//queues_clear();
 		// during reset, discard just simulation updates
+		// not bookkeeping updates
 		queue_get(_simulation_queue)->clear();
 	}
 }
