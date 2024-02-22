@@ -1,6 +1,6 @@
 #pragma once
+#include "simulation_entity_database.h"
 
-#include "simulation/simulation_type_collection.h"
 #include "simulation/game_interface/simulation_game_entities.h"
 #include "Networking/replication/replication_control_view.h"
 

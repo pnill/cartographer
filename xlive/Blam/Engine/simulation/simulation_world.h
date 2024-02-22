@@ -1,6 +1,7 @@
 #pragma once
 #include "simulation_actors.h"
 #include "simulation_entity_database.h"
+#include "simulation_event_handler.h"
 #include "simulation_players.h"
 #include "simulation_queue.h"
 #include "simulation_view.h"
@@ -57,7 +58,7 @@ CHECK_STRUCT_SIZE(c_simulation_distributed_world, 45260);
 class c_simulation_world
 {
 	void* m_watcher;
-	c_simulation_distributed_view* m_distributed_world;
+	c_simulation_distributed_world* m_distributed_world;
 	e_simulation_world_type m_world_type;
 	bool m_local_machine_identifier_valid;
 	s_machine_identifier m_local_machine_identifier;
