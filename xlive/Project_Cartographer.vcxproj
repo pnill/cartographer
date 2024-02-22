@@ -388,6 +388,7 @@
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -849,6 +850,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
