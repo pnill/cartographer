@@ -50,7 +50,7 @@ void simulation_reset_immediate()
     s_simulation_globals* sim_globals = simulation_get_globals();
 
     sim_globals->simulation_reset_in_progress = true;
-    sim_globals->simulation_world->reset();
+    sim_globals->simulation_world->reset_world();
     simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_main_reset_map);
     // ### TODO figure out these
     // simulation_gamestate_entities_build_clear_flags();

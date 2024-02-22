@@ -48,6 +48,7 @@ struct s_simulation_queue_stats
 
 class c_simulation_distributed_world
 {
+public:
 	c_replication_entity_manager m_entity_manager;
 	c_replication_event_manager m_event_manager;
 	c_simulation_entity_database m_entity_database;
@@ -116,8 +117,14 @@ public:
 	}
 
 	void initialize_world(int32 a2, int32 a3, int32 a4);
+	
+	void delete_all_actors(void);
+
+	void update_queue_reset(void);
+
 	// discard resources
-	void reset();
+	void reset_world(void);
+
 	void destroy_world();
 	void disconnect(void);
 

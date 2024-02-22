@@ -3,6 +3,9 @@
 
 struct c_simulation_actor
 {
+public:
+	void destroy(void);
+
 	int32 m_actor_index;	//index in actor data array
 	datum m_unit_index;		//index in object data array
 	void* m_simulation_world;

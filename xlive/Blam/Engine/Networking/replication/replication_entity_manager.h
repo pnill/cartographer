@@ -9,10 +9,9 @@ class c_replication_entity_manager
 {
 public:
 	void initialize(void);
-
-private: 
 	void reset(void);
 
+private: 
 	int32 m_field_0;
 	c_replication_entity_manager_view* m_views[16];
 	int32 m_field_44;
