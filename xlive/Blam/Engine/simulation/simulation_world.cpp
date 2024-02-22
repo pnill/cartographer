@@ -224,9 +224,9 @@ void c_simulation_world::update_queue_reset(void)
 
 void c_simulation_world::reset_world(void)
 {
-	m_time_immediate_update = 0;
-	m_out_of_sync = 0;
-	m_flush_gamestate = 0;
+	m_time_immediate_update = false;
+	m_out_of_sync = false;
+	m_flush_gamestate = false;
 	if (this->is_distributed())
 	{
 		m_distributed_world->m_entity_manager.reset();
