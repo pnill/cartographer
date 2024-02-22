@@ -6,7 +6,8 @@ void c_replication_entity_manager::reset(void)
 {
 	for (uint32 i = 0; i < 16; i++)
 	{
-		this->m_views[i]->reset();
+		if (this->m_views[i])
+			this->m_views[i]->reset();
 	}
 	csmemset(this->m_entity_data, 0, sizeof(m_entity_data));
 	m_field_2048 = 0;
