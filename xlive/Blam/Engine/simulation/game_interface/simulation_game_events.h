@@ -40,13 +40,13 @@ struct c_simulation_event_definition_vtbl
 {
 	e_simulation_event_type (__thiscall* event_type)(c_simulation_event_definition* thisx);
 	const char* (__thiscall* event_type_name)(c_simulation_event_definition* thisx);
-	int32 (__thiscall* payload_size)(c_simulation_event_definition* thisx);
+	uint32 (__thiscall* payload_size)(c_simulation_event_definition* thisx);
 	int32(__thiscall* number_of_entity_references)(c_simulation_event_definition* thisx);
 	bool(__thiscall* reference_delays_entity_deletion)(c_simulation_event_definition* thisx);
 	bool(__thiscall* event_can_be_transmitted)(c_simulation_event_definition* thisx, int a1, int a2);
 	int32(__thiscall* minimum_required_bits)(c_simulation_event_definition* thisx, int a1, int a2, uint8* a3);
 	void(__thiscall* calculate_relevance)(c_simulation_event_definition* thisx, int a2, int a3, float a4);
-	int(__thiscall* write_description_to_string)(c_simulation_event_definition* thisx, int a2, int a3, uint32 a4, int a5, char* a6);
+	int32(__thiscall* write_description_to_string)(c_simulation_event_definition* thisx, int a2, int a3, uint32 a4, int a5, char* a6);
 	bool(__thiscall* encode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, c_bitstream* packet);
 	bool(__thiscall* decode)(c_simulation_event_definition* thisx, int32 payload_size, void* payload, c_bitstream* packet);
 	bool(__thiscall* perform)(c_simulation_event_definition* thisx, int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);
@@ -57,13 +57,13 @@ class c_simulation_event_definition
 public:
 	virtual e_simulation_event_type event_type();
 	virtual const char* event_type_name();
-	virtual signed int payload_size();
-	virtual signed int number_of_entity_references();
+	virtual uint32 payload_size();
+	virtual int32 number_of_entity_references();
 	virtual bool reference_delays_entity_deletion();
 	virtual bool event_can_be_transmitted(int a1, int a2);
 	virtual int32 minimum_required_bits(int a1, int a2, uint32* a3);
 	virtual void calculate_relevance(int a2, int a3, float a4);
-	virtual int write_description_to_string(int a2, int a3, uint32 a4, int a5, char* a6);
+	virtual int32 write_description_to_string(int a2, int a3, uint32 a4, int a5, char* a6);
 	virtual bool encode(int32 payload_size, void* data, c_bitstream* packet);
 	virtual bool decode(int32 payload_size, void* data, c_bitstream* packet);
 	virtual bool perform(int32 entity_reference_count, int32* entity_references, uint32 payload_size, uint8* data);

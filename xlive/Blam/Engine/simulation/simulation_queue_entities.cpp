@@ -38,16 +38,23 @@ bool simulation_queue_entity_decode_header(c_bitstream* stream, e_simulation_ent
 	return successfully_decoded;
 }
 
-bool encode_simulation_queue_creation_to_buffer(uint8* out_buffer, int32 out_buffer_size, datum gamestate_index, s_simulation_queue_entity_data* data, uint32 initial_update_mask, int32* out_written_size)
+bool encode_simulation_queue_creation_to_buffer(
+	uint8* encode_buffer, 
+	int32 encode_buffer_size, 
+	datum gamestate_index, 
+	s_simulation_queue_entity_data* data, 
+	uint32 initial_update_mask, 
+	int32* out_encoded_size
+)
 {
-	c_bitstream stream(out_buffer, out_buffer_size);
+	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 	
 	simulation_queue_entity_encode_header(&stream, data->entity_type, gamestate_index);
 	simulation_entity_index_encode(&stream, data->entity_index);
 	stream.write_integer("initial-update-mask", initial_update_mask, 32);
 
-	// write the actual data
+	// write the actual encode_buffer
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(data->entity_type);
 	entity_def->entity_creation_encode(data->creation_data_size, data->creation_data, NULL, &stream);
 
@@ -77,7 +84,7 @@ bool encode_simulation_queue_creation_to_buffer(uint8* out_buffer, int32 out_buf
 		
 	}
 
-	*out_written_size = stream.get_space_used_in_bytes();
+	*out_encoded_size = stream.get_space_used_in_bytes();
 
 	return result;
 }
@@ -98,9 +105,9 @@ bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* enc
 		decoded_creation_data->creation_data_size = entity_def->creation_data_size();
 		decoded_creation_data->state_data_size = entity_def->state_data_size();
 
-		if (decoded_creation_data->creation_data_size <= k_simulation_payload_size_max)
+		if (decoded_creation_data->creation_data_size <= k_simulation_entity_maximum_creation_data_size)
 		{
-			if (decoded_creation_data->state_data_size <= k_simulation_payload_size_max)
+			if (decoded_creation_data->state_data_size <= k_simulation_entity_maximum_state_data_size)
 			{
 				decode_success = entity_def->entity_creation_decode(
 					decoded_creation_data->creation_data_size,
@@ -167,8 +174,8 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 	//int32 entity_index = simulation_gamestate_entity_create();
 
 	bool result = false;
-	int32 write_buffer_space_used;
-	uint8 write_buffer[k_simulation_payload_size_max];
+	int32 encoded_size;
+	uint8 encode_buffer[k_simulation_queue_element_data_size_max];
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
 
 	// simulation_queue_allocate does set this to NULL
@@ -189,19 +196,19 @@ bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* s
 		// entity_def->prepare_state_data_for_gameworld()
 
 		if (encode_simulation_queue_creation_to_buffer(
-			write_buffer,
-			sizeof(write_buffer),
+			encode_buffer,
+			sizeof(encode_buffer),
 			NONE,
 			sim_queue_entity_data,
 			initial_update_mask,
-			&write_buffer_space_used
+			&encoded_size
 		))
 		{
-			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_creation, write_buffer_space_used, element);
+			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_creation, encoded_size, element);
 			if (*element)
 			{
-				// copy the data to the buffer, enqueuing done later for entities
-				csmemcpy((*element)->data, write_buffer, write_buffer_space_used);
+				// copy the encode_buffer to the buffer, enqueuing done later for entities
+				csmemcpy((*element)->data, encode_buffer, encoded_size);
 				result = true;
 			}
 		}
@@ -299,16 +306,22 @@ void simulation_queue_entity_update_insert(s_simulation_queue_element* simulatio
 	return;
 }
 
-bool encode_simulation_queue_update_to_buffer(uint8* out_buffer, int32 out_buffer_size, datum gamestate_index, s_simulation_queue_entity_data* data, uint32 update_mask, int32* out_written_size)
+bool encode_simulation_queue_update_to_buffer(
+	uint8* encode_buffer, 
+	int32 encode_buffer_size, 
+	datum gamestate_index, 
+	s_simulation_queue_entity_data* data, 
+	uint32 update_mask, 
+	int32* out_encoded_size)
 {
-	c_bitstream stream(out_buffer, out_buffer_size);
+	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 
 	simulation_queue_entity_encode_header(&stream, data->entity_type, gamestate_index);
 	simulation_entity_index_encode(&stream, data->entity_index);
 	stream.write_integer("update-mask", update_mask, 32);
 
-	// write the actual data
+	// write the actual encode_buffer
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(data->entity_type);
 	uint32 update_mask_written = 0;
 	if (entity_def->entity_update_encode(false, update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0))
@@ -333,39 +346,39 @@ bool encode_simulation_queue_update_to_buffer(uint8* out_buffer, int32 out_buffe
 
 	}
 
-	*out_written_size = stream.get_space_used_in_bytes();
+	*out_encoded_size = stream.get_space_used_in_bytes();
 
 	return result;
 }
 
-bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_decoded_update_data* decoded_update_data)
+bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_decoded_update_data* out_decoded_data)
 {
 	bool decode_success = false;
 
 	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
 
-	if (simulation_queue_entity_decode_header(&stream, &decoded_update_data->entity_type, &decoded_update_data->gamestate_index))
+	if (simulation_queue_entity_decode_header(&stream, &out_decoded_data->entity_type, &out_decoded_data->gamestate_index))
 	{
-		simulation_entity_index_decode(&stream, &decoded_update_data->entity_index);
-		decoded_update_data->update_mask = stream.read_integer("update-mask", 32);
+		simulation_entity_index_decode(&stream, &out_decoded_data->entity_index);
+		out_decoded_data->update_mask = stream.read_integer("update-mask", 32);
 
 		c_simulation_entity_database* entity_database = simulation_get_entity_database();
-		s_simulation_game_entity* entity = entity_database->entity_try_and_get(decoded_update_data->entity_index);
+		s_simulation_game_entity* entity = entity_database->entity_try_and_get(out_decoded_data->entity_index);
 
 		if (entity)
 		{
-			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_update_data->entity_type);
-			decoded_update_data->state_data_size = entity->state_data_size;
+			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(out_decoded_data->entity_type);
+			out_decoded_data->state_data_size = entity->state_data_size;
 
-			if (decoded_update_data->state_data_size <= k_simulation_payload_size_max)
+			if (out_decoded_data->state_data_size <= k_simulation_entity_maximum_state_data_size)
 			{
 				uint32 update_mask = 0;
 				if (entity_def->build_baseline_state_data(
 					entity->creation_data_size,
 					entity->creation_data,
-					decoded_update_data->state_data_size,
-					(s_simulation_baseline_state_data*)decoded_update_data->state_data
+					out_decoded_data->state_data_size,
+					(s_simulation_baseline_state_data*)out_decoded_data->state_data
 				))
 				{
 					SIM_ENT_QUEUE_DBG("entity baseline state data success when decoding!");
@@ -376,8 +389,8 @@ bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encod
 				if (entity_def->entity_update_decode(
 					false,
 					&update_mask,
-					decoded_update_data->state_data_size,
-					decoded_update_data->state_data,
+					out_decoded_data->state_data_size,
+					out_decoded_data->state_data,
 					&stream))
 				{
 					SIM_ENT_QUEUE_DBG("entity update decode success!");
@@ -395,7 +408,7 @@ bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encod
 		SIM_ENT_QUEUE_DBG("entity decoding, stream is fine? %d, decoded size: %d",
 			!stream.error_occured(),
 			stream.get_space_used_in_bytes());
-		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", decoded_update_data->entity_type, decoded_update_data->entity_index, decoded_update_data->initial_update_mask);
+		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", out_decoded_data->entity_type, out_decoded_data->entity_index, out_decoded_data->initial_update_mask);
 	}
 	else
 	{
@@ -410,8 +423,8 @@ bool simulation_queue_entity_update_allocate(s_simulation_queue_entity_data* sim
 	//int32 entity_index = simulation_gamestate_entity_create();
 
 	bool result = false;
-	int32 write_buffer_space_used;
-	uint8 write_buffer[k_simulation_payload_size_max];
+	int32 encoded_size;
+	uint8 encode_buffer[k_simulation_queue_element_data_size_max];
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(sim_queue_entity_data->entity_type);
 
 	// simulation_queue_allocate does set this to NULL
@@ -425,19 +438,19 @@ bool simulation_queue_entity_update_allocate(s_simulation_queue_entity_data* sim
 		// entity_def->prepare_state_data_for_gameworld()
 
 		if (encode_simulation_queue_update_to_buffer(
-			write_buffer,
-			sizeof(write_buffer),
+			encode_buffer,
+			sizeof(encode_buffer),
 			gamestate_index,
 			sim_queue_entity_data,
 			update_mask,
-			&write_buffer_space_used
+			&encoded_size
 		))
 		{
-			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_update, write_buffer_space_used, element);
+			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_entity_update, encoded_size, element);
 			if (*element)
 			{
-				// copy the data to the buffer, enqueuing done later for entities
-				csmemcpy((*element)->data, write_buffer, write_buffer_space_used);
+				// copy the encode_buffer to the buffer, enqueuing done later for entities
+				csmemcpy((*element)->data, encode_buffer, encoded_size);
 				result = true;
 			}
 		}
@@ -478,24 +491,24 @@ void simulation_queue_entity_update_apply(const s_simulation_queue_element* elem
 
 void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
 {
-	uint8 write_buffer[512];
+	uint8 encode_buffer[512];
 	
-	c_bitstream stream(write_buffer, sizeof(write_buffer));
+	c_bitstream stream(encode_buffer, sizeof(encode_buffer));
 	stream.begin_writing(k_bitstream_default_alignment);
 	simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
 	//simulation_entity_index_encode(&stream, entity->entity_index);
 	simulation_gamestate_index_encode(&stream, entity->object_index);		// Encode this as gamestate index isn't encoded
-	int32 space_used = stream.get_space_used_in_bytes();
+	int32 encoded_size = stream.get_space_used_in_bytes();
 
 	s_simulation_queue_element* element = NULL;
 	c_simulation_world* sim_world = simulation_get_world();
 
 	if (!stream.error_occured())
 	{
-		sim_world->simulation_queue_allocate(_simulation_queue_element_type_entity_deletion, space_used, &element);
+		sim_world->simulation_queue_allocate(_simulation_queue_element_type_entity_deletion, encoded_size, &element);
 		if (element)
 		{
-			csmemcpy(element->data, write_buffer, space_used);
+			csmemcpy(element->data, encode_buffer, encoded_size);
 			sim_world->simulation_queue_enqueue(element);
 		}
 	}
@@ -508,8 +521,8 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 	c_bitstream stream(element->data, element->data_size);
 	stream.begin_reading();
 
-	int32 entity_index;
-	datum gamestate_index;
+	int32 entity_index = NONE;
+	datum gamestate_index = NONE;
 	e_simulation_entity_type entity_type;
 	if (simulation_queue_entity_decode_header(&stream, &entity_type, &gamestate_index))
 	{
@@ -544,20 +557,20 @@ void simulation_queue_entity_promotion_insert(s_simulation_game_entity* entity)
 {
 	if (game_is_distributed() && !game_is_playback())
 	{
-		uint8 data[512];
-		c_bitstream stream(data, sizeof(data));
+		uint8 encode_buffer[512];
+		c_bitstream stream(encode_buffer, sizeof(encode_buffer));
 		stream.begin_writing(k_bitstream_default_alignment);
 		simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
 		simulation_entity_index_encode(&stream, entity->entity_index);
-		int32 space_used = stream.get_space_used_in_bytes();
+		int32 encoded_size = stream.get_space_used_in_bytes();
 		if (!stream.error_occured())
 		{
 			c_simulation_world* sim_world = simulation_get_world();
 			s_simulation_queue_element* element = NULL;
-			sim_world->simulation_queue_allocate(_simulation_queue_element_type_entity_promotion, space_used, &element);
+			sim_world->simulation_queue_allocate(_simulation_queue_element_type_entity_promotion, encoded_size, &element);
 			if (element)
 			{
-				csmemcpy(element->data, data, space_used);
+				csmemcpy(element->data, encode_buffer, encoded_size);
 				sim_world->simulation_queue_enqueue(element);
 			}
 		}

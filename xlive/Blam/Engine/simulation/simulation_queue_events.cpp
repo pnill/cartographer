@@ -55,24 +55,24 @@ void simulation_event_decode_header(
 }
 
 static bool encode_event_to_buffer(
-	uint8* out_buffer,
-	int32 out_buffer_size,
-	int32* out_written_size,
+	uint8* encode_buffer,
+	int32 encode_buffer_size,
+	int32* out_encoded_size,
 	e_simulation_event_type event_type,
 	int32 reference_count,
 	datum* object_index_references,
-	int32 block_size,
-	uint8* block
+	int32 payload_size,
+	uint8* payload
 )
 {
-	c_bitstream stream(out_buffer, out_buffer_size);
+	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 	simulation_event_encode_header(&stream, event_type, reference_count, object_index_references);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 	c_simulation_event_definition* sim_event_definition = sim_type_collection->get_event_definition(event_type);
 	// write the event data to the stream
-	sim_event_definition->encode(block_size, block, &stream);
+	sim_event_definition->encode(payload_size, payload, &stream);
 
 	bool result = !stream.error_occured();
 	stream.finish_writing(NULL);
@@ -90,25 +90,25 @@ static bool encode_event_to_buffer(
 		SIM_EVENT_QUEUE_DBG("event encoding failed!!!! --------");
 	}
 
-	*out_written_size = stream.get_space_used_in_bytes();
+	*out_encoded_size = stream.get_space_used_in_bytes();
 	return result;
 }
 
-static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_events_apply* decode_out)
+static bool decode_event_from_buffer(int32 encoded_size, uint8* encoded_data, s_simulation_queue_events_apply* decode_out)
 {
 	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
 	simulation_event_decode_header(&stream, &decode_out->event_type, &decode_out->reference_count, decode_out->object_refereces);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
-	c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(decode_out->event_type);
+	c_simulation_event_definition* sim_event_def = sim_type_collection->get_event_definition(decode_out->event_type);
 
-	decode_out->data_size = sim_entity_def->payload_size();
-	if (decode_out->data_size < k_simulation_payload_size_max)
+	decode_out->data_size = sim_event_def->payload_size();
+	if (decode_out->data_size <= k_simulation_event_maximum_payload_size)
 	{
 		if (decode_out->data_size > 0)
 		{
-			if (sim_entity_def->decode(decode_out->data_size, decode_out->data, &stream))
+			if (sim_event_def->decode(decode_out->data_size, decode_out->data, &stream))
 			{
 			}
 			else
@@ -147,15 +147,15 @@ static bool decode_event_to_buffer(int32 encoded_size, uint8* encoded_data, s_si
 
 void simulation_queue_event_insert(e_simulation_event_type type, int32 reference_count, int32* entity_references, int32 block_size, uint8* block)
 {
-	int32 write_buffer_space_used;
-	uint8 write_buffer[k_simulation_payload_size_max];
+	int32 encoded_size;
+	uint8 encode_buffer[k_simulation_event_maximum_payload_size];
 	datum object_indexes_from_entity_references[k_entity_reference_indices_count_max];
 	s_simulation_queue_element* allocated_element = NULL;
 
 	if (game_is_distributed() && !game_is_playback())
 	{
 		c_simulation_type_collection* simulation_type_collection = simulation_get_type_collection();
-		c_simulation_event_definition* event_definition = simulation_type_collection->get_event_definition(type);
+		c_simulation_event_definition* sim_event_def = simulation_type_collection->get_event_definition(type);
 
 		// skip postprocess, not available in h2
 		// call postprocess from event def
@@ -179,20 +179,20 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 		}
 
 		if (encode_event_to_buffer(
-			write_buffer,
-			sizeof(write_buffer),
-			&write_buffer_space_used,
+			encode_buffer,
+			sizeof(encode_buffer),
+			&encoded_size,
 			type,
 			k_entity_reference_indices_count_max,
 			object_indexes_from_entity_references,
 			block_size,
 			block))
 		{
-			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_event, write_buffer_space_used, &allocated_element);
+			simulation_get_world()->simulation_queue_allocate(_simulation_queue_element_type_event, encoded_size, &allocated_element);
 			if (allocated_element)
 			{
 				// copy the data to the buffer
-				csmemcpy(allocated_element->data, write_buffer, write_buffer_space_used);
+				csmemcpy(allocated_element->data, encode_buffer, encoded_size);
 
 				// copy it to the queue
 				simulation_get_world()->simulation_queue_enqueue(allocated_element);
@@ -210,7 +210,7 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 {
 	s_simulation_queue_events_apply sim_apply_data;
-	bool decode_success = decode_event_to_buffer(update->data_size, update->data, &sim_apply_data);
+	bool decode_success = decode_event_from_buffer(update->data_size, update->data, &sim_apply_data);
 
 	bool apply_event_result = false;
 
@@ -218,7 +218,7 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 	if (decode_success)
 	{
 		c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
-		c_simulation_event_definition* sim_entity_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
+		c_simulation_event_definition* sim_event_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
 
 		// convert object indexes back to entity references, lol
 		// ### FIXME !!! at some point, add the gamestate to entity database
@@ -242,7 +242,7 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 		}
 
 		// ### FIXME !!! this actually requires entity references, instead of object references
-		apply_event_result = sim_entity_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
+		apply_event_result = sim_event_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
 
 		SIM_EVENT_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d",
 			sim_apply_data.event_type,

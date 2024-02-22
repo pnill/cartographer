@@ -6,6 +6,12 @@
 #define k_simulation_entity_type_maximum_count 32
 #define k_simulation_event_type_maximum_count 32
 
+#define k_simulation_entity_maximum_update_flag_count 32
+#define k_simulation_entity_maximum_creation_data_size 128
+#define k_simulation_entity_maximum_state_data_size 1024
+
+#define k_simulation_event_maximum_payload_size 512
+
 class c_simulation_type_collection
 {
 public:

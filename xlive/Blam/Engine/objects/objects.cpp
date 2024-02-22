@@ -478,7 +478,6 @@ datum __cdecl object_new(object_placement_data* placement_data)
 		}
 
 		object_index = object_header_new(object_type_definition->datum_size);
-
 		if (object_index != NONE)
 		{
 			halo_interpolator_setup_new_object(object_index);
@@ -518,7 +517,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			datum coll_index;
 			enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
 			object->object_flags.set(_object_has_prt_or_lighting_info_bit, enable);
-			
+
 			object_header->cluster_index = NONE;
 			location_invalidate(&object->location);
 			object->first_cluster_reference = NONE;
@@ -559,7 +558,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			object->destroyed_constraints_flag = placement_data->destroyed_constraints_flag;
 			object->loosened_constraints_flag = placement_data->loosened_constraints_flag;
 
-			uint32 nodes_count = 1;
+			uint32 node_count = 1;
 			uint32 collision_regions_count = 1;
 			uint32 damage_info_damage_sections_size = 0;
 
@@ -569,11 +568,11 @@ datum __cdecl object_new(object_placement_data* placement_data)
 			if (model_definition)
 			{
 				if (model_definition->nodes.count >= 1)
-				{ 
-					nodes_count = model_definition->nodes.count;
+				{
+					node_count = model_definition->nodes.count;
 				}
 				if (model_definition->collision_regions.count >= 1)
-				{ 
+				{
 					collision_regions_count = model_definition->collision_regions.count;
 				}
 
@@ -609,19 +608,20 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					}
 				}
 			}
-			
-			int16 orientation_size = (!allow_interpolation ? 0 : 32 * nodes_count);
+
+			int16 orientation_size = (!allow_interpolation ? 0 : 32 * node_count);
 
 			// Allocate object header blocks
-			bool can_create_object = object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (int16)8 * (int16)object_def->attachments.count, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (int16)24 * (int16)object_def->change_colors.count, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), 52 * nodes_count, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
-			&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
-			&& havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
+			bool can_create_object =
+				object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (uint16)8 * (uint16)object_def->attachments.count, 0)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (uint16)24 * (uint16)object_def->change_colors.count, 0)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), sizeof(real_matrix4x3) * node_count, 0)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
+				&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
+				&& havok_can_allocate_space_for_instance_of_object_definition(placement_data->tag_index);
 
 			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 			bool out_of_objects = !can_create_object;
@@ -636,7 +636,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 				}
 
 				// Null attachment block
-				if ((int16)object_def->attachments.count > 0)
+				if (object_def->attachments.count > 0)
 				{
 					int32 attachments_count;
 					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
@@ -644,9 +644,9 @@ datum __cdecl object_new(object_placement_data* placement_data)
 						sizeof(object_attachment),
 						&attachments_count);
 
-					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * (int16)attachments_count);
+					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
 				}
-				
+
 				if (object_type_new(object_index, placement_data, &out_of_objects))
 				{
 					bool object_flag_check = object->object_flags.test(_object_deleted_when_deactivated_bit);
@@ -673,7 +673,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					if (objects_can_connect_to_map())
 					{
 						placement_data->object_is_inside_cluster = set_object_position_if_in_cluster(&placement_data->location, object_index);
-						
+
 						// If the object is inside a cluster set the location to the one passed in the placement data
 						// If not then pass null
 						s_location* p_location = (placement_data->object_is_inside_cluster ? &placement_data->location : NULL);
@@ -699,7 +699,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					// Not 100% sure what this function does but it has to do with occlusion
 					// This function is nulled out on the dedi
 					if (process_is_game_client)
-					{ 
+					{
 						object_occlusion_data_initialize(object_index);
 					}
 
@@ -707,7 +707,7 @@ datum __cdecl object_new(object_placement_data* placement_data)
 					object_early_mover_new(object_index);
 
 					if (object->object_flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
-					{ 
+					{
 						if (objects_can_connect_to_map())
 						{
 							if (!placement_data->flags.test(_scenario_object_placement_bit_1) && (!placement_data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))

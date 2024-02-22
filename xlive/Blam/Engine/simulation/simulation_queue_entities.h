@@ -18,10 +18,10 @@ struct s_simulation_queue_decoded_creation_data
 	e_simulation_entity_type entity_type;
 	datum gamestate_index;
 	uint32 initial_update_mask;
-	uint8 creation_data[k_simulation_payload_size_max];
-	int32 creation_data_size;
-	uint8 state_data[k_simulation_payload_size_max];
-	int32 state_data_size;
+	uint32 creation_data_size;
+	uint8 creation_data[k_simulation_entity_maximum_creation_data_size];
+	uint32 state_data_size;
+	uint8 state_data[k_simulation_entity_maximum_state_data_size];
 };
 
 struct s_simulation_queue_decoded_update_data
@@ -30,12 +30,8 @@ struct s_simulation_queue_decoded_update_data
 	e_simulation_entity_type entity_type;
 	datum gamestate_index;
 	uint32 update_mask;
-	uint8 state_data[k_simulation_payload_size_max];
-	int32 state_data_size;
-};
-
-struct s_simulation_queue_entity_update_apply
-{
+	uint32 state_data_size;
+	uint8 state_data[k_simulation_entity_maximum_state_data_size];
 };
 
 c_simulation_entity_definition* simulation_queue_entities_get_definition(e_simulation_entity_type type);
