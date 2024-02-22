@@ -852,6 +852,7 @@
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
+    <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
