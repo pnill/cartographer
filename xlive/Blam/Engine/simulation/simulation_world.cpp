@@ -218,7 +218,7 @@ void c_simulation_world::delete_all_actors(void)
 void c_simulation_world::update_queue_reset(void)
 {
 	typedef void(__thiscall* update_queue_reset_t)(c_simulation_world*);
-	INVOKE_BY_TYPE(0x1DCDC3, 0x1C4277, update_queue_reset_t, this);
+	INVOKE_TYPE(0x1DCDC3, 0x1C4277, update_queue_reset_t, this);
 	return;
 }
 
@@ -244,7 +244,7 @@ void c_simulation_world::reset_world(void)
 		queue_get(_simulation_queue)->clear();
 	}
 
-	if (this->m_world_type == _simulation_world_type_synchronous_client)
+	if (m_world_type == _simulation_world_type_synchronous_client)
 	{
 		this->update_queue_reset();
 	}
