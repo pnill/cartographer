@@ -4,6 +4,6 @@
 void c_replication_event_manager::reset(void)
 {
 	typedef void(__thiscall* reset_t)(c_replication_event_manager*);
-	INVOKE_BY_TYPE(0x1D676D, 0x1D9A8E, reset_t, this);
+	INVOKE_TYPE(0x1D676D, 0x1D9A8E, reset_t, this);
 	return;
 }
