@@ -50,8 +50,8 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     //        update_mask,
     //        game_entity->state_data_size,
     //        game_entity->state_data);
+    //    game_entity->exists_in_gameworld = result;
 
-    game_entity->exists_in_gameworld = result;
     return result;
 }
 
@@ -368,16 +368,20 @@ __declspec(naked) void jmp_c_simulation_entity_database__notify_mark_entity_for_
 void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 {
     s_simulation_game_entity* game_entity = entity_try_and_get(entity_index);
-    if (game_entity->object_index != NONE)
+    if (game_entity->exists_in_gameworld)
     {
-        c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
+        if (game_entity->object_index != NONE)
+        {
+			c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
         simulation_queue_entity_deletion_insert(game_entity);
     }
 
     game_entity->object_index = NONE;
-    game_entity->exists_in_gameworld = false;
-    game_entity->entity_update_flag = 0;
-    game_entity->field_10 = 0;
+        game_entity->exists_in_gameworld = false;
+        game_entity->entity_update_flag = 0;
+        game_entity->field_10 = 0;
+    }
+    
     return;
 }
 

@@ -33,8 +33,8 @@ enum e_event_queue_type : int16
 
 	k_simulation_queue_element_type_count,
 
-	_simulation_queue_element_type_1 = FLAG(_simulation_queue_element_type_player_event) | FLAG(_simulation_queue_element_type_player_update_event) | FLAG(_simulation_queue_element_type_gamestates_clear),
-	_simulation_queue_element_type_2 = FLAG(_simulation_queue_element_type_entity_deletion) | FLAG(_simulation_queue_element_type_entity_promotion) | FLAG(_simulation_queue_element_type_game_global_event),
+	_simulation_queue_element_type_bookkeeping = FLAG(_simulation_queue_element_type_player_event) | FLAG(_simulation_queue_element_type_player_update_event) | FLAG(_simulation_queue_element_type_gamestates_clear),
+	_simulation_queue_element_important_update = FLAG(_simulation_queue_element_type_entity_deletion) | FLAG(_simulation_queue_element_type_entity_promotion) | FLAG(_simulation_queue_element_type_game_global_event),
 };
 
 struct s_simulation_queue_element
@@ -168,6 +168,12 @@ public:
 		}
 
 		return 0;
+	}
+
+	void get_allocation_status(real32* allocation_percentage, real32* allocated_count_percentage) const
+	{
+		*allocation_percentage = (real32)allocated_size_in_bytes() / (real32)k_simulation_queue_size_max;
+		*allocated_count_percentage = (real32)allocated_count() / (real32)k_simulation_queue_count_max;
 	}
 
 	void allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem);
