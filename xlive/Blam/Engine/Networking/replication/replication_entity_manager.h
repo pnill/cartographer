@@ -32,7 +32,6 @@ private:
 	int32 m_field_2048;
 };
 
-
 class c_replication_entity_manager_client
 {
 public:

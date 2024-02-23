@@ -283,7 +283,7 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 
 			if (game_entity)
 			{
-				game_entity->exists_in_gameworld = entity_def->create_game_entity(
+				entity_def->create_game_entity(
 					game_entity,
 					decoded_creation_data.creation_data_size,
 					decoded_creation_data.creation_data,

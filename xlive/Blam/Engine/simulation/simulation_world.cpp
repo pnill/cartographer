@@ -232,8 +232,7 @@ void c_simulation_world::reset_world(void)
 		m_distributed_world->m_entity_manager.reset();
 		m_distributed_world->m_event_manager.reset();
 		m_distributed_world->m_entity_database.reset();
-		// m_distributed_world->m_event_handler.reset();	// Function definition doesn't exist
-		
+		m_distributed_world->m_event_handler.reset();
 		this->delete_all_actors();
 	}
 
@@ -244,7 +243,7 @@ void c_simulation_world::reset_world(void)
 		queue_get(_simulation_queue)->clear();
 	}
 
-	if (m_world_type == _simulation_world_type_synchronous_client)
+	if (!runs_simulation())
 	{
 		this->update_queue_reset();
 	}

@@ -26,11 +26,17 @@ CHECK_STRUCT_SIZE(c_simulation_event_handler_vtbl, 6 * sizeof(void*));
 
 class c_simulation_event_handler
 {
+public:
     c_simulation_event_handler_vtbl* get_vtbl()
     {
         return c_simulation_event_handler_vtbl::get();
     };
 
+    void reset()
+    {
+    }
+
+private:
     c_simulation_event_handler_vtbl* vtbl;
     bool field_4;
     int8 pad[3];
