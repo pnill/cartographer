@@ -115,12 +115,12 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 
     // only during distributed system or server synchronous
     // but not client synchronous
+		// transfer the elements to the
     if (sim_world->runs_simulation())
     {
-		// transfer the elements to the 
-        sim_world->attach_simulation_queues_to_update(
-				update->simulation_in_progress,
-				&simulation_bookkeeping_queue,
+		sim_world->attach_simulation_queues_to_update(
+			update->simulation_in_progress,
+			&simulation_bookkeeping_queue,
 				&game_simulation_queue
 			);
     }
@@ -139,10 +139,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
         players_set_machines(update->machine_update.machine_valid_mask, update->machine_update.identifiers);
     }
 
-    if (sim_world->runs_simulation())
-    {
-        sim_world->apply_simulation_queue(&simulation_bookkeeping_queue, update);
-    }
+	sim_world->apply_simulation_queue(&simulation_bookkeeping_queue, update);
 
     // Player activation code
     /* Moved so we can activate in the queue
@@ -171,8 +168,8 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     // ### FIXME 
     // IMPLEMENT simulation_get_world()->queue_get(_simulation_queue_basic)->requires_application();
 
-    if (sim_world->runs_simulation())
-    {
+	if (game_simulation_queue.queued_count() > 0)
+	{
 		sim_world->apply_simulation_queue(&game_simulation_queue, update);
 
 		// purge any deletion pending object during this update

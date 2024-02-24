@@ -541,12 +541,9 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		game_entity.exists_in_gameworld = false;
 		game_entity.object_index = gamestate_index;
 
-		if (simulation_object_index_valid(game_entity.object_index))
+		if (entity_def->delete_game_entity(&game_entity))
 		{
-			if (entity_def->delete_game_entity(&game_entity))
-			{
-				// SUCCESS
-			}
+			// SUCCESS
 		}
 	}
 	stream.finish_reading();

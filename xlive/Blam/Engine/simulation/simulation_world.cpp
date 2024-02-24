@@ -177,14 +177,8 @@ void c_simulation_world::attach_simulation_queues_to_update(
 	c_simulation_queue* out_bookkeepin_queue,
 	c_simulation_queue* out_game_simulation_queue)
 {
-	if (queue_get(_simulation_queue_bookkeeping)->queued_count() > 0)
-	{
-		out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
-	}
-	if (queue_get(_simulation_queue)->queued_count() > 0)
-	{
-		out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
-	}
+	out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
+	out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
 }
 
 void c_simulation_world::queues_clear()

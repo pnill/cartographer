@@ -54,7 +54,7 @@ void* object_header_block_get_with_count(datum object_index, const object_header
 	void* block;
 	if (reference->offset == NONE)
 	{
-		block = 0;
+		block = NULL;
 		*element_count = 0;
 	}
 	else

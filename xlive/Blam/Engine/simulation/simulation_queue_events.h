@@ -8,7 +8,7 @@ struct s_simulation_queue_events_apply
 {
 	e_simulation_event_type event_type;
 	int32 reference_count;
-	datum object_refereces[k_entity_reference_indices_count_max];
+	int32 entity_references[k_entity_reference_indices_count_max];
 	uint8 data[k_simulation_event_maximum_payload_size];
 	int32 data_size;
 };
