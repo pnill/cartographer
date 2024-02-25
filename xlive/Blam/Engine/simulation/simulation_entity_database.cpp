@@ -52,6 +52,8 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     //        game_entity->state_data);
     //    game_entity->exists_in_gameworld = result;
 
+    game_entity->exists_in_gameworld = result;
+
     return result;
 }
 
@@ -200,6 +202,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
             {
                 network_heap_free_block(creation_data);
             }
+
             if (state_data != NULL)
             {
                 network_heap_free_block(state_data);
@@ -373,11 +376,11 @@ void c_simulation_entity_database::entity_delete_gameworld(int32 entity_index)
 		c_simulation_entity_definition* entity_definition = m_type_collection->get_entity_definition(game_entity->entity_type);
 		simulation_queue_entity_deletion_insert(game_entity);
 	}
+
 	game_entity->object_index = NONE;
 	game_entity->exists_in_gameworld = false;
 	game_entity->entity_update_flag = 0;
 	game_entity->field_10 = 0;
-    
     return;
 }
 

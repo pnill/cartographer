@@ -249,6 +249,10 @@ void __cdecl game_update(int32 desired_ticks, real32* elapsed_game_dt)
             game_time_discard(desired_ticks, actual_ticks, elapsed_game_dt);
         }
     }
+    else
+    {
+        simulation_get_globals()->simulation_world->queues_update_statistsics();
+    }
 
     return;
 }

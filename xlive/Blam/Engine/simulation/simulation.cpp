@@ -113,6 +113,8 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     c_simulation_queue simulation_bookkeeping_queue, game_simulation_queue;
     c_simulation_world* sim_world = simulation_get_world();
 
+    simulation_get_globals()->simulation_world->queues_update_statistsics();
+
     // only during distributed system or server synchronous
     // but not client synchronous
 		// transfer the elements to the
@@ -121,8 +123,8 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 		sim_world->attach_simulation_queues_to_update(
 			update->simulation_in_progress,
 			&simulation_bookkeeping_queue,
-				&game_simulation_queue
-			);
+			&game_simulation_queue
+		);
     }
 
     for (int32 i = 0; i < k_maximum_players; i++)
@@ -176,7 +178,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 		// if simulation is not in progress
 		if (!update->simulation_in_progress)
 			objects_purge_deleted_objects();
-    }
+	}
 
     if (update->flush_gamestate)
     {
@@ -215,6 +217,10 @@ void __cdecl simulation_update_pregame(void)
             simulation_build_update(&update);
             simulation_apply_before_game(&update);
             simulation_update_aftermath(&update);
+        }
+        else
+        {
+            globals->simulation_world->queues_update_statistsics();
         }
     }
 }

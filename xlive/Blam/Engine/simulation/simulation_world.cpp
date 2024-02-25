@@ -23,7 +23,7 @@ void c_simulation_world::gamestate_flush_immediate(void)
 	return;
 }
 
-c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type)
+c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type) const
 {
 	return &g_simulation_queues[type];
 }

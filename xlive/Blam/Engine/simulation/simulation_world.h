@@ -39,13 +39,6 @@ enum e_simulation_world_state
 	k_simulation_world_state_count = 0x7,
 };
 
-struct s_simulation_queue_stats
-{
-	int32 allocated;
-	int32 queued;
-	int32 allocated_in_bytes;
-};
-
 class c_simulation_distributed_world
 {
 public:
@@ -109,9 +102,9 @@ public:
 
 	void attach_simulation_queues_to_update(bool simulation_in_progress, c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
 
-	c_simulation_queue* queue_get(e_simulation_queue_type type);
+	c_simulation_queue* queue_get(e_simulation_queue_type type) const;
 
-	c_simulation_distributed_world* get_distributed_world(void) { return m_distributed_world; }
+	c_simulation_distributed_world* get_distributed_world(void) const { return m_distributed_world; }
 
 	void initialize_world(int32 a2, int32 a3, int32 a4);
 	
@@ -127,10 +120,17 @@ public:
 
 	void queues_dispose();
 
-	s_simulation_queue_stats queue_describe(e_simulation_queue_type type)
+	void queues_update_statistsics()
 	{
-		c_simulation_queue* queue = queue_get(type);
-		return s_simulation_queue_stats{ queue->allocated_count(), queue->queued_count(), queue->allocated_size_in_bytes() };
+		for (int32 i = 0; i < k_simulation_queue_count; i++)
+		{
+			queue_get((e_simulation_queue_type)i)->build_statistics();
+		}
+	}
+
+	bool queue_describe(e_simulation_queue_type type, const s_simulation_queue_stats** out_stats) const
+	{
+		return queue_get(type)->get_statistics(out_stats);
 	}
 
 	void queues_clear();
