@@ -279,11 +279,11 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 		if (decode_simulation_queue_creation_from_buffer(element->data_size, element->data, &decoded_creation_data))
 		{
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_creation_data.entity_type);
-			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_try_and_get(decoded_creation_data.entity_index);
+			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_get(decoded_creation_data.entity_index);
 
 			if (game_entity)
 			{
-				 entity_def->create_game_entity(
+				 game_entity->exists_in_gameworld = entity_def->create_game_entity(
 					game_entity,
 					decoded_creation_data.creation_data_size,
 					decoded_creation_data.creation_data,
@@ -497,7 +497,8 @@ void simulation_queue_entity_deletion_insert(s_simulation_game_entity* entity)
 	stream.begin_writing(k_bitstream_default_alignment);
 	simulation_queue_entity_encode_header(&stream, entity->entity_type, NONE);
 	//simulation_entity_index_encode(&stream, entity->entity_index);
-	simulation_gamestate_index_encode(&stream, entity->object_index);		// Encode this as gamestate index isn't encoded
+	// encode the object index because the entity is currently pending deletion
+	simulation_gamestate_index_encode(&stream, entity->object_index);
 	int32 encoded_size = stream.get_space_used_in_bytes();
 
 	s_simulation_queue_element* element = NULL;
@@ -540,6 +541,10 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		game_entity.event_reference_count = 0;
 		game_entity.exists_in_gameworld = false;
 		game_entity.object_index = gamestate_index;
+		game_entity.creation_data = NULL;
+		game_entity.creation_data_size = 0;
+		game_entity.state_data = NULL;
+		game_entity.state_data_size = 0;
 
 		if (entity_def->delete_game_entity(&game_entity))
 		{

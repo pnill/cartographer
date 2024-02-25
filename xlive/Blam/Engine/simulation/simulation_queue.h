@@ -53,7 +53,7 @@ struct s_simulation_queue_stats
 	int32 queued;
 	int32 queued_in_bytes;
 	real32 allocated_percentage;
-	real32 allocated_bytes_perccentage;
+	real32 allocated_bytes_percentage;
 };
 
 class c_simulation_queue
@@ -197,7 +197,7 @@ public:
 		m_stats.allocated_in_bytes = allocated_size_in_bytes();
 		m_stats.queued = queued_count();
 		m_stats.queued_in_bytes = queued_size();
-		get_allocation_status(&m_stats.allocated_percentage, &m_stats.allocated_bytes_perccentage);
+		get_allocation_status(&m_stats.allocated_percentage, &m_stats.allocated_bytes_percentage);
 	}
 
 	bool get_statistics(const s_simulation_queue_stats** out_stats) const
