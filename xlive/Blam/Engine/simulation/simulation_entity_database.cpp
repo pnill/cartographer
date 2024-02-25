@@ -43,7 +43,7 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
     simulation_queue_entity_creation_apply(queue_element);
     simulation_get_world()->simulation_queue_free(queue_element);
     //simulation_queue_entity_creation_insert(queue_element);
-    //result = true;
+    result = true;
     
 	/*result = entity_definition->create_game_entity(
 		game_entity,
