@@ -418,7 +418,7 @@ void c_simulation_entity_database::entity_delete_internal(int32 entity_index)
 void c_simulation_entity_database::reset(void)
 {
     m_field_5 = true;
-    if (m_initialized)
+    if (!m_initialized)
     {
         csmemset(m_entity_data, 0, sizeof(m_entity_data));
     }
