@@ -271,9 +271,9 @@ void dump_entity_unit_creation_to_file(
 
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element)
 {
+	s_simulation_queue_decoded_creation_data decoded_creation_data;
 	if (game_is_distributed() && !game_is_playback())
 	{
-		s_simulation_queue_decoded_creation_data decoded_creation_data;
 		csmemset(&decoded_creation_data, 0, sizeof(decoded_creation_data));
 		
 		if (decode_simulation_queue_creation_from_buffer(element->data_size, element->data, &decoded_creation_data))
@@ -283,7 +283,7 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 
 			if (game_entity)
 			{
-				game_entity->exists_in_gameworld = entity_def->create_game_entity(
+				 entity_def->create_game_entity(
 					game_entity,
 					decoded_creation_data.creation_data_size,
 					decoded_creation_data.creation_data,
@@ -541,12 +541,9 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		game_entity.exists_in_gameworld = false;
 		game_entity.object_index = gamestate_index;
 
-		if (simulation_object_index_valid(game_entity.object_index))
+		if (entity_def->delete_game_entity(&game_entity))
 		{
-			if (entity_def->delete_game_entity(&game_entity))
-			{
-				// SUCCESS
-			}
+			// SUCCESS
 		}
 	}
 	stream.finish_reading();

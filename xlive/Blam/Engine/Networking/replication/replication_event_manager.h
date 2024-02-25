@@ -9,3 +9,4 @@ public:
 private:
 	int8 m_field_0[84];
 };
+CHECK_STRUCT_SIZE(c_replication_event_manager, 84);

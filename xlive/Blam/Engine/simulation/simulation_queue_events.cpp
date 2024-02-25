@@ -15,7 +15,7 @@ void simulation_event_encode_header(
 	c_bitstream* stream,
 	e_simulation_event_type event_type,
 	int32 reference_count,
-	datum* object_references
+	int32* entity_references
 )
 {
 	stream->write_integer("event-type", event_type, 5);
@@ -23,10 +23,10 @@ void simulation_event_encode_header(
 
 	for (int32 i = 0; i < reference_count; i++)
 	{
-		stream->write_bool("object-reference-exists", object_references[i] != NONE);
-		if (object_references[i] != NONE)
+		stream->write_bool("entity-index-exists", entity_references[i] != NONE);
+		if (entity_references[i] != NONE)
 		{
-			simulation_gamestate_index_encode(stream, object_references[i]);
+			simulation_entity_index_encode(stream, entity_references[i]);
 		}
 	}
 }
@@ -35,7 +35,7 @@ void simulation_event_decode_header(
 	c_bitstream* stream,
 	e_simulation_event_type* event_type,
 	int32* reference_count,
-	datum* object_references
+	int32* entity_references
 )
 {
 	*event_type = (e_simulation_event_type)stream->read_integer("event-type", 5);
@@ -43,13 +43,13 @@ void simulation_event_decode_header(
 
 	for (int32 i = 0; i < *reference_count; i++)
 	{
-		if (stream->read_bool("object-reference-exists"))
+		if (stream->read_bool("entity-index-exists"))
 		{
-			simulation_gamestate_index_decode(stream, &object_references[i]);
+			simulation_entity_index_decode(stream, &entity_references[i]);
 		}
 		else
 		{
-			object_references[i] = NONE;
+			entity_references[i] = NONE;
 		}
 	}
 }
@@ -60,14 +60,14 @@ static bool encode_event_to_buffer(
 	int32* out_encoded_size,
 	e_simulation_event_type event_type,
 	int32 reference_count,
-	datum* object_index_references,
+	int32* entity_references,
 	int32 payload_size,
 	uint8* payload
 )
 {
 	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
-	simulation_event_encode_header(&stream, event_type, reference_count, object_index_references);
+	simulation_event_encode_header(&stream, event_type, reference_count, entity_references);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 	c_simulation_event_definition* sim_event_definition = sim_type_collection->get_event_definition(event_type);
@@ -98,7 +98,7 @@ static bool decode_event_from_buffer(int32 encoded_size, uint8* encoded_data, s_
 {
 	c_bitstream stream(encoded_data, encoded_size);
 	stream.begin_reading();
-	simulation_event_decode_header(&stream, &decode_out->event_type, &decode_out->reference_count, decode_out->object_refereces);
+	simulation_event_decode_header(&stream, &decode_out->event_type, &decode_out->reference_count, decode_out->entity_references);
 
 	c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 	c_simulation_event_definition* sim_event_def = sim_type_collection->get_event_definition(decode_out->event_type);
@@ -149,7 +149,6 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 {
 	int32 encoded_size;
 	uint8 encode_buffer[k_simulation_event_maximum_payload_size];
-	datum object_indexes_from_entity_references[k_entity_reference_indices_count_max];
 	s_simulation_queue_element* allocated_element = NULL;
 
 	if (game_is_distributed() && !game_is_playback())
@@ -161,30 +160,13 @@ void simulation_queue_event_insert(e_simulation_event_type type, int32 reference
 		// call postprocess from event def
 		// end
 
-		SIM_EVENT_QUEUE_DBG("#####");
-		for (int32 i = 0; i < reference_count; i++)
-		{
-			SIM_EVENT_QUEUE_DBG("entity reference indice				 -> %08X",
-				entity_references[i]
-			);
-		}
-
-		simulation_entity_indices_to_object_index(entity_references, reference_count, object_indexes_from_entity_references, k_entity_reference_indices_count_max);
-
-		for (int32 i = 0; i < k_entity_reference_indices_count_max; i++)
-		{
-			SIM_EVENT_QUEUE_DBG("object reference indice (datum index) -> %08X",
-				object_indexes_from_entity_references[i]
-			);
-		}
-
 		if (encode_event_to_buffer(
 			encode_buffer,
 			sizeof(encode_buffer),
 			&encoded_size,
 			type,
 			k_entity_reference_indices_count_max,
-			object_indexes_from_entity_references,
+			entity_references,
 			block_size,
 			block))
 		{
@@ -220,29 +202,8 @@ bool simulation_queue_event_apply(const s_simulation_queue_element* update)
 		c_simulation_type_collection* sim_type_collection = simulation_get_type_collection();
 		c_simulation_event_definition* sim_event_def = sim_type_collection->get_event_definition(sim_apply_data.event_type);
 
-		// convert object indexes back to entity references, lol
-		// ### FIXME !!! at some point, add the gamestate to entity database
-		int32 entity_references[k_entity_reference_indices_count_max];
-
-		for (int32 i = 0; i < sim_apply_data.reference_count; i++)
-		{
-			if (simulation_object_index_valid(sim_apply_data.object_refereces[i]))
-			{
-				// hopefully this does the job
-				// TODO FIXME this crashed the game once
-				// the events need to be discarded whenever simulation layer initializes
-				entity_references[i] = object_get_entity_index(sim_apply_data.object_refereces[i]);
-			}
-			else
-			{
-				entity_references[i] = NONE;
-			}
-
-			SIM_EVENT_QUEUE_DBG("object reference (datum index): %08X converted -> entity reference: %08X: ", sim_apply_data.object_refereces[i], entity_references[i]);
-		}
-
 		// ### FIXME !!! this actually requires entity references, instead of object references
-		apply_event_result = sim_event_def->perform(sim_apply_data.reference_count, entity_references, sim_apply_data.data_size, sim_apply_data.data);
+		apply_event_result = sim_event_def->perform(sim_apply_data.reference_count, sim_apply_data.entity_references, sim_apply_data.data_size, sim_apply_data.data);
 
 		SIM_EVENT_QUEUE_DBG("type %d decoded: %d, perform result: %d, element: 0x%08X, perform data size: %d",
 			sim_apply_data.event_type,

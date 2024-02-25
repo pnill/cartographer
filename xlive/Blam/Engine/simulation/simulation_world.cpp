@@ -23,7 +23,7 @@ void c_simulation_world::gamestate_flush_immediate(void)
 	return;
 }
 
-c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type)
+c_simulation_queue* c_simulation_world::queue_get(e_simulation_queue_type type) const
 {
 	return &g_simulation_queues[type];
 }
@@ -32,29 +32,37 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 {
 	*out_allocated_elem = NULL;
 
-	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_1))
+	if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_bookkeeping))
 	{
 		// player event, player update, gamestate clear
 		queue_get(_simulation_queue_bookkeeping)->allocate(size, out_allocated_elem);
 	}
 	else
 	{
-		bool sim_entity_queue_full = false;
+		bool sim_queue_restrict_allocations = false;
+		c_simulation_queue* simulation_queue = queue_get(_simulation_queue);
 
-		if (TEST_FLAG(FLAG(type), _simulation_queue_element_type_2))
+		if (!TEST_FLAG(FLAG(type), _simulation_queue_element_important_update))
 		{
-			// entity_deletion, entity_promotion, game_global_event
+			real32 allocated_percentage;
+			real32 allocated_in_bytes_percentage;
+			simulation_queue->get_allocation_status(&allocated_percentage, &allocated_in_bytes_percentage);
 
-			// ### TODO FIXME implement this
-			// c_simulation_queue::get_allocation_status()
-			// check the allocation status
-			// this type of elements can be skupped from being queued, in case of overflow??
-			// sim_entity_queue_full = true;
+			// if we allocated more than 90% of the buffer
+			// skip some updates to aleviate some of the stress on the queue
+			// especially if the game froze for multiple seconds
+			// and allow the allocation for important updates only
+			// entity deletion, entity promotion, and global game events
+			if (allocated_percentage > 90.f / 100.f
+				|| allocated_in_bytes_percentage > 90.f / 100.f)
+			{
+				sim_queue_restrict_allocations = true;
+			}
 		}
 
 		// event, creation, update, entity_deletion, entity_promotion, game_global_event
-		if (!sim_entity_queue_full)
-			queue_get(_simulation_queue)->allocate(size, out_allocated_elem);
+		if (!sim_queue_restrict_allocations)
+			simulation_queue->allocate(size, out_allocated_elem);
 	}
 
 	if (*out_allocated_elem)
@@ -65,7 +73,7 @@ void c_simulation_world::simulation_queue_allocate(e_event_queue_type type, int3
 
 void c_simulation_world::simulation_queue_free(s_simulation_queue_element* element)
 {
-	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
+	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_bookkeeping))
 	{
 		// player event, player update, gamestate clear
 		queue_get(_simulation_queue_bookkeeping)->deallocate(element);
@@ -78,7 +86,7 @@ void c_simulation_world::simulation_queue_free(s_simulation_queue_element* eleme
 
 void c_simulation_world::simulation_queue_enqueue(s_simulation_queue_element* element)
 {
-	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_1))
+	if (TEST_FLAG(FLAG(element->type), _simulation_queue_element_type_bookkeeping))
 	{
 		// player event, player update, gamestate clear
 		queue_get(_simulation_queue_bookkeeping)->enqueue(element);
@@ -169,14 +177,8 @@ void c_simulation_world::attach_simulation_queues_to_update(
 	c_simulation_queue* out_bookkeepin_queue,
 	c_simulation_queue* out_game_simulation_queue)
 {
-	if (queue_get(_simulation_queue_bookkeeping)->queued_count() > 0)
-	{
-		out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
-	}
-	if (queue_get(_simulation_queue)->queued_count() > 0)
-	{
-		out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
-	}
+	out_bookkeepin_queue->transfer_elements(queue_get(_simulation_queue_bookkeeping));
+	out_game_simulation_queue->transfer_elements(queue_get(_simulation_queue));
 }
 
 void c_simulation_world::queues_clear()
@@ -232,8 +234,7 @@ void c_simulation_world::reset_world(void)
 		m_distributed_world->m_entity_manager.reset();
 		m_distributed_world->m_event_manager.reset();
 		m_distributed_world->m_entity_database.reset();
-		// m_distributed_world->m_event_handler.reset();	// Function definition doesn't exist
-		
+		m_distributed_world->m_event_handler.reset();
 		this->delete_all_actors();
 	}
 
@@ -244,7 +245,7 @@ void c_simulation_world::reset_world(void)
 		queue_get(_simulation_queue)->clear();
 	}
 
-	if (m_world_type == _simulation_world_type_synchronous_client)
+	if (!runs_simulation())
 	{
 		this->update_queue_reset();
 	}

@@ -32,26 +32,21 @@ void c_simulation_event_handler::process_incoming_event(e_simulation_event_type 
 		uint8* block;
 		int32 block_size;
 
+		for (int32 i = 0; i < entity_reference_indices_count; i++)
+		{
+			SIM_EVENT_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
+		}
+
 		if (sim_event_def->payload_size() > 0)
 		{
 			block = (uint8*)payload_blocks->block_data;
 			block_size = payload_blocks->block_size;
 			payload_blocks->block_data = NULL;
-
-			for (int32 i = 0; i < entity_reference_indices_count; i++)
-			{
-				SIM_EVENT_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
-			}
 		}
 		else
 		{
 			block = NULL;
 			block_size = 0;
-
-			for (int32 i = 0; i < entity_reference_indices_count; i++)
-			{
-				SIM_EVENT_QUEUE_DBG("event entity reference indices: %08X", entity_reference_indices[i]);
-			}
 		}
 
 		simulation_queue_event_insert(simulation_event_type, entity_reference_indices_count, entity_reference_indices, block_size, block);

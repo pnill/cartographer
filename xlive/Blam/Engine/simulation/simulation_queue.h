@@ -33,8 +33,8 @@ enum e_event_queue_type : int16
 
 	k_simulation_queue_element_type_count,
 
-	_simulation_queue_element_type_1 = FLAG(_simulation_queue_element_type_player_event) | FLAG(_simulation_queue_element_type_player_update_event) | FLAG(_simulation_queue_element_type_gamestates_clear),
-	_simulation_queue_element_type_2 = FLAG(_simulation_queue_element_type_entity_deletion) | FLAG(_simulation_queue_element_type_entity_promotion) | FLAG(_simulation_queue_element_type_game_global_event),
+	_simulation_queue_element_type_bookkeeping = FLAG(_simulation_queue_element_type_player_event) | FLAG(_simulation_queue_element_type_player_update_event) | FLAG(_simulation_queue_element_type_gamestates_clear),
+	_simulation_queue_element_important_update = FLAG(_simulation_queue_element_type_entity_deletion) | FLAG(_simulation_queue_element_type_entity_promotion) | FLAG(_simulation_queue_element_type_game_global_event),
 };
 
 struct s_simulation_queue_element
@@ -43,6 +43,17 @@ struct s_simulation_queue_element
 	s_simulation_queue_element* next;
 	uint8* data;
 	uint32 data_size;
+};
+
+struct s_simulation_queue_stats
+{
+	bool valid;
+	int32 allocated;
+	int32 allocated_in_bytes;
+	int32 queued;
+	int32 queued_in_bytes;
+	real32 allocated_percentage;
+	real32 allocated_bytes_perccentage;
 };
 
 class c_simulation_queue
@@ -56,6 +67,8 @@ class c_simulation_queue
 
 	s_simulation_queue_element* m_head;
 	s_simulation_queue_element* m_tail;
+
+	s_simulation_queue_stats m_stats;
 
 	void dequeue(s_simulation_queue_element** out_deq_elem);
 
@@ -79,6 +92,7 @@ public:
 		m_head = NULL;
 		m_tail = NULL;
 		m_initialized = true;
+		memset(&m_stats, 0, sizeof(m_stats));
 	}
 
 	bool initialized() const
@@ -168,6 +182,31 @@ public:
 		}
 
 		return 0;
+	}
+
+	void get_allocation_status(real32* allocation_percentage, real32* allocated_count_percentage) const
+	{
+		*allocation_percentage = (real32)allocated_size_in_bytes() / (real32)k_simulation_queue_size_max;
+		*allocated_count_percentage = (real32)allocated_count() / (real32)k_simulation_queue_count_max;
+	}
+
+	void build_statistics()
+	{
+		m_stats.valid = true;
+		m_stats.allocated = allocated_count();
+		m_stats.allocated_in_bytes = allocated_size_in_bytes();
+		m_stats.queued = queued_count();
+		m_stats.queued_in_bytes = queued_size();
+		get_allocation_status(&m_stats.allocated_percentage, &m_stats.allocated_bytes_perccentage);
+	}
+
+	bool get_statistics(const s_simulation_queue_stats** out_stats) const
+	{
+		if (m_stats.valid)
+		{
+			*out_stats = &m_stats;
+		}
+		return m_stats.valid;
 	}
 
 	void allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem);
