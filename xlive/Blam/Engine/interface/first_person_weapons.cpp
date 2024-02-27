@@ -92,11 +92,6 @@ s_first_person_model_data* first_person_model_data_get(uint32 user_index)
 	return &first_person_model_data_get_global()[user_index];
 }
 
-bool __cdecl render_first_person_check(e_skull_type skull_type)
-{
-	return ice_cream_flavor_available(skull_type) || !show_first_person;
-}
-
 void toggle_first_person(bool state)
 {
 	show_first_person = state;
@@ -606,7 +601,14 @@ void __cdecl first_person_weapon_build_model_nodes(int32 node_matrices_count,
 int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_index, int32 model_data_count, s_first_person_model_data* fp_model_data)
 {
     int32 current_model_index = 0;
-    if (!ice_cream_flavor_available(_skull_type_blind) && user_index != NONE)
+    
+    // Only show the first person model if the following are true:
+    // 1. global bool to show first person is enabled
+    // 2. Blind skull isn't enabled
+    // 3. User index is not NONE
+    if (show_first_person
+        && !ice_cream_flavor_available(_skull_type_blind) 
+        && user_index != NONE)
     {
         bool weapon_flag_0 = false;
         bool weapon_flag_1 = false;
@@ -923,7 +925,6 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 
 void first_persoon_apply_interpolation_patches()
 {
-    PatchCall(Memory::GetAddress(0x228579), render_first_person_check);
     PatchCall(Memory::GetAddress(0x19D281), first_person_weapon_get_node_data);
     PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
     PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
