@@ -203,8 +203,6 @@ bool new_hud_dont_draw(void)
 
 void new_hud_apply_patches()
 {
-	if (Memory::IsDedicatedServer()) { return; }
-
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdToggleHideIngameChat,
 		[]() {
 			H2Config_hide_ingame_chat = !H2Config_hide_ingame_chat;

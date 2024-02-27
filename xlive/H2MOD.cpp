@@ -25,6 +25,7 @@
 #include "Blam/Engine/interface/user_interface_text.h"
 #include "Blam/Engine/interface/screens/screens_patches.h"
 #include "Blam/Engine/items/weapon_definitions.h"
+#include "Blam/Engine/main/levels.h"
 #include "Blam/Engine/main/loading.h"
 #include "Blam/Engine/main/main_game.h"
 #include "Blam/Engine/main/main_render.h"
@@ -808,12 +809,6 @@ void H2MOD::RegisterEvents()
 	}
 }
 
-// unlocks all single player maps
-int __cdecl get_last_single_player_level_id_unlocked_from_profile()
-{
-	return 805; // return the id of the last level
-}
-
 __declspec(naked) void object_function_value_adjust_primary_firing()
 {
 	static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
@@ -872,12 +867,6 @@ void H2MOD::ApplyHooks() {
 	PatchCall(Memory::GetAddress(0x147DB8, 0x172D55), projectile_collision_object_cause_damage);
 
 	apply_cheat_hooks();
-
-	new_hud_apply_patches();
-	motion_sensor_apply_patches();
-	render_cameras_apply_patches();
-	first_person_camera_apply_patches();
-	first_person_weapons_apply_patches();
 	game_statborg_apply_patches();
 	simulation_game_objects_apply_patches();
 	simulation_game_units_apply_patches();
@@ -885,10 +874,8 @@ void H2MOD::ApplyHooks() {
 	objects_apply_patches();
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
-	bipeds_apply_patches();
-	unit_apply_patches();
 	network_transport_apply_patches();
-	bitstream_serialization_apply_patches();
+	//bitstream_serialization_apply_patches();
 
 	simulation_apply_patches();
 
@@ -945,9 +932,14 @@ void H2MOD::ApplyHooks() {
 
 		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
 
-		// Initialise_tag_loader();
-		
-		PatchCall(Memory::GetAddress(0x2422C8), get_last_single_player_level_id_unlocked_from_profile);
+		levels_apply_patches();
+		new_hud_apply_patches();
+		motion_sensor_apply_patches();
+		render_cameras_apply_patches();
+		first_person_camera_apply_patches();
+		first_person_weapons_apply_patches();
+		bipeds_apply_patches();
+		unit_apply_patches();
 
 		user_interface_text_apply_hooks();
 		hud_messaging_apply_hooks();
@@ -973,10 +965,6 @@ void H2MOD::ApplyHooks() {
 		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
-
-		// Map loading patch (saves framerate)
-		// TODO move
-		NopFill(Memory::GetAddress(0x39BAB), 5);
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

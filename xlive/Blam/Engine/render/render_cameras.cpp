@@ -26,7 +26,5 @@ void __cdecl render_camera_build_projection_hook(s_camera* camera, float* frustu
 
 void render_cameras_apply_patches()
 {
-	if (Memory::IsDedicatedServer()) { return; }
-
 	PatchCall(Memory::GetAddress(0x191440), render_camera_build_projection_hook);
 }

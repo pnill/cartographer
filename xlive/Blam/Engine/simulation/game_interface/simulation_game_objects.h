@@ -21,7 +21,7 @@ struct s_simulation_object_state_data
 	char gap4D[2];
 	char region_count;
 	char region_states[16];
-	char constraint_count;
+	uint8 constraint_count;
 	__int16 destroyed_constraints;
 	__int16 loosened_constraints;
 	char pad[42];

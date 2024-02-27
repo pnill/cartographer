@@ -119,8 +119,6 @@ void radar_patch()
 
 void motion_sensor_apply_patches()
 {
-	if (Memory::IsDedicatedServer()) { return; }
-
 	radar_patch();
 	motion_sensor_fix_size();
 
