@@ -349,6 +349,7 @@
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
+    <ClCompile Include="Blam\Engine\main\levels.cpp" />
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\main\main.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
@@ -523,6 +524,7 @@
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
+    <ClInclude Include="Blam\Engine\main\levels.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />

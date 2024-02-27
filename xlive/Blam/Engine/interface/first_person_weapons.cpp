@@ -923,13 +923,10 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 
 void first_persoon_apply_interpolation_patches()
 {
-    if (!Memory::IsDedicatedServer())
-    {
-        PatchCall(Memory::GetAddress(0x228579), render_first_person_check);
-        PatchCall(Memory::GetAddress(0x19D281), first_person_weapon_get_node_data);
-        PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
-        PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
-    }
+    PatchCall(Memory::GetAddress(0x228579), render_first_person_check);
+    PatchCall(Memory::GetAddress(0x19D281), first_person_weapon_get_node_data);
+    PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
+    PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
 }
 
 void first_person_weapons_apply_patches(void)
