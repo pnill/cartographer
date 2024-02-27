@@ -875,7 +875,7 @@ void H2MOD::ApplyHooks() {
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
 	network_transport_apply_patches();
-	//bitstream_serialization_apply_patches();
+	bitstream_serialization_apply_patches();
 
 	simulation_apply_patches();
 
