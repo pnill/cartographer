@@ -1089,7 +1089,6 @@
     <ClInclude Include="Util\Hooks\Detour.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
-    <ClInclude Include="Util\ReadIniArguments.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
