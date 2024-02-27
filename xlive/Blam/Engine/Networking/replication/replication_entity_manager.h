@@ -7,7 +7,7 @@
 #define k_simulation_entity_database_maximum_entities 1024
 
 // Forward declaration
-typedef class c_replication_entity_manager_client;
+class c_replication_entity_manager_client;
 
 struct s_replication_entity_manager_data
 {
