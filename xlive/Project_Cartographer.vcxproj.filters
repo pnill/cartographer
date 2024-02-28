@@ -456,7 +456,6 @@
     <ClInclude Include="Util\Hooks\Detour.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
-    <ClInclude Include="Util\ReadIniArguments.h" />
     <ClInclude Include="xlivedefs.h" />
     <ClInclude Include="xliveless.h" />
     <ClInclude Include="XLive\achievements\XAchievements.h" />
@@ -834,6 +833,8 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
+    <ClInclude Include="Blam\Engine\main\levels.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
