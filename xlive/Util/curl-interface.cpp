@@ -1,12 +1,6 @@
 #include "stdafx.h"
-
 #include "curl-interface.h"
 
-#ifdef _DEBUG
-#pragma comment(lib, "libcurl_a_debug.lib")
-#else
-#pragma comment(lib, "libcurl_a.lib")
-#endif
 
 CURL* curl_interface_init()
 {
