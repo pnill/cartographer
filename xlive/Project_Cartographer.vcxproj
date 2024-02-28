@@ -109,7 +109,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc.lib;libssl.lib;libcrypto.lib;nghttp2.lib;detours.lib;libminiupnpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc.lib;detours.lib;libminiupnpc.lib;libcurl.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -181,7 +181,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc-debug.lib;libssl.lib;libcrypto.lib;nghttp2.lib;detours.lib;libminiupnpc.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc-debug.lib;detours.lib;libminiupnpc.lib;libcurl-d.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
