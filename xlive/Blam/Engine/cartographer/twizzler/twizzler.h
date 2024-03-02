@@ -6,7 +6,7 @@ PC5_EX
 extern bool g_twizzler_status;
 #endif
 
-void BLAM_MATH_INL twizzler_set_status(bool status)
+static BLAM_MATH_INL void twizzler_set_status(bool status)
 {
 	g_twizzler_status = status;
 	TEST_N_DEF(PC5);
