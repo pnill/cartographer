@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+#include "cartographer/twizzler/twizzler.h"
 #include "Blam/Engine/game/cheats.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/interface/hud.h"
@@ -648,8 +649,9 @@ namespace ImGuiHandler {
 						ImGui::Columns(2, NULL, false);
 						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##Anti-Cheat", &H2Config_anti_cheat_enabled))
+						if (ImGui::Checkbox("##Anti-Cheat", &g_twizzler_status))
 						{
+							twizzler_set_status(g_twizzler_status);
 							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
 								NetworkMessage::SendAntiCheat(i);
