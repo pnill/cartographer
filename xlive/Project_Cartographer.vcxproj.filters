@@ -299,6 +299,9 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_actors.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
+    <ClCompile Include="Blam\Engine\main\levels.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -835,6 +838,7 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
+    <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

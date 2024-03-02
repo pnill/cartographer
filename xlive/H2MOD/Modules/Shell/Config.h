@@ -96,7 +96,6 @@ extern bool H2Config_vip_lock;
 extern bool H2Config_even_shuffle_teams;
 extern bool H2Config_koth_random;
 extern H2Config_Experimental_Rendering_Mode H2Config_experimental_fps;
-extern bool H2Config_anti_cheat_enabled;
 
 extern int H2Config_hotkeyIdHelp;
 extern int H2Config_hotkeyIdAlignWindow;
