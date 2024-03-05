@@ -48,6 +48,42 @@ datum particle_system_get_by_ptr(c_particle_system* particle_system)
 	return DATUM_INDEX_NEW(((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system), particle_system->datum_salt);
 }
 
+bool c_particle_system::get_in_sky(void) const
+{
+	return TEST_BIT(this->flags, _particle_system_scale_with_sky_render_model_bit);
+}
+
+c_particle_system_definition* c_particle_system::get_particle_system_definition(void) const
+{
+	c_particle_system_definition* definition = nullptr;
+	tag_group tag_type = tags::datum_to_instance(this->tag_index)->type;
+
+	if (tag_type.group == _tag_group_effect)
+	{
+		effect_definition* effect = (effect_definition*)tag_get_fast(this->tag_index);
+		definition = effect->events[this->effect_event_index]->particle_systems[this->event_particle_system_index];
+	}
+	if (tag_type.group == _tag_group_particle_model)
+	{
+		c_particle_system_definition* parent_system_definition = this->parent_system->get_particle_system_definition();
+		c_particle_model_definition_interface* system_interface = dynamic_cast<c_particle_model_definition_interface*>(parent_system_definition->get_particle_system_interface());
+		definition = system_interface->get_attached_particle_system(this->event_particle_system_index);
+	}
+	if (tag_type.group == _tag_group_particle)
+	{
+		c_particle_system_definition* parent_system_definition = this->parent_system->get_particle_system_definition();
+		c_particle_sprite_definition_interface* system_interface = dynamic_cast<c_particle_sprite_definition_interface*>(parent_system_definition->get_particle_system_interface());
+		definition = system_interface->get_attached_particle_system(this->event_particle_system_index);
+	}
+	if (tag_type.group == _tag_group_breakable_surface)
+	{
+		s_breakable_surface_definition* breakable_surface = (s_breakable_surface_definition*)tag_get_fast(this->tag_index);
+		definition = breakable_surface->particle_effects[this->event_particle_system_index];
+	}
+
+	return definition;
+}
+
 typedef bool(__stdcall* c_particle_system_update_t)(c_particle_system* thisx, real32 dt);
 c_particle_system_update_t p_c_particle_system_update;
 

@@ -99,6 +99,7 @@ public:
     int32 runtime_flags;
     int32 runtime_flags_2;
 
+    real32 get_particle_emissions_per_tick(s_particle_state* particle_state);
     void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
     void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
 };
@@ -131,6 +132,8 @@ public:
     tag_block<c_particle_emitter_definition> emitters;
 
     c_particle_definition_interface* get_particle_system_interface() const;
+    bool system_is_cinematic(void) const;
+
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 

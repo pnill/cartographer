@@ -8,7 +8,9 @@
 
 enum e_particle_system_flags : int16
 {
+	_particle_system_bit_9 = 9,
 	_particle_system_scale_with_sky_render_model_bit = 10,
+	_particle_system_bit_11 = 11
 };
 
 struct s_particle_system_update_timings
@@ -43,6 +45,9 @@ public:
 	c_particle_system* parent_system;
 	int32 first_particle_index;
 	pixel32 color;
+
+	bool get_in_sky(void) const;
+	c_particle_system_definition* get_particle_system_definition(void) const;
 
 	bool static __stdcall update(c_particle_system* thisx, real32 delta_time);
 	static void __stdcall update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused);
