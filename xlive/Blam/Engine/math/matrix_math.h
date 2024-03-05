@@ -19,6 +19,8 @@ CHECK_STRUCT_SIZE(real_matrix4x3, 52);
 
 const real_matrix4x3 global_identity4x3 = { 1.0f, { global_forward3d, global_left3d, global_up3d }, global_zero_vector3d };
 
+real_matrix3x3* matrix3x3_from_angles(real_matrix3x3* matrix, real32 i, real32 j, real32 k);
+
 real_matrix3x3* matrix3x3_from_forward_and_up(real_matrix3x3* matrix, const real_vector3d* forward, const real_vector3d* up);
 
 real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const real_quaternion* quaternion);
