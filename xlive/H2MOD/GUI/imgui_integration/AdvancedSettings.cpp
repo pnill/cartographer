@@ -34,6 +34,7 @@ namespace ImGuiHandler {
 		std::string windowName = "advanced_settings";
 		namespace
 		{
+			bool g_twizzler_checkbox = g_twizzler_status;
 			bool should_show_hud = true;
 			bool g_showFP = true;
 			int g_fpsLimit = 60;
@@ -649,9 +650,9 @@ namespace ImGuiHandler {
 						ImGui::Columns(2, NULL, false);
 						TextVerticalPad(GetString(anti_cheat));
 						ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-						if (ImGui::Checkbox("##Anti-Cheat", &g_twizzler_status))
+						if (ImGui::Checkbox("##Anti-Cheat", &g_twizzler_checkbox))
 						{
-							twizzler_set_status(g_twizzler_status);
+							twizzler_set_status(g_twizzler_checkbox);
 							for (int i = 0; i < NetworkSession::GetPeerCount(); i++)
 							{
 								NetworkMessage::SendAntiCheat(i);
