@@ -39,25 +39,19 @@ bool __cdecl main_game_change(const s_game_options* options)
     return INVOKE(0x89BA, 0x1E4EC, main_game_change, options);
 }
 
-void main_game_launch_set_difficulty(short difficulty)
+void main_game_launch_set_difficulty(int16 difficulty)
 {
-    if (!VALID_INDEX(difficulty, k_campaign_difficulty_levels_count))
-    {
-        LOG_ERROR_GAME("main_game_launch_set_difficulty: invalid difficulty {} (must be from 0-{})", difficulty, k_campaign_difficulty_levels_count - 1);
-    }
-    else
-    {
-        g_main_game_launch_options.difficulty = difficulty;
-        g_main_game_launch_options.game_mode = _game_mode_campaign;
-    }
+    ASSERT(VALID_INDEX(difficulty, k_campaign_difficulty_levels_count));
+    g_main_game_launch_options.difficulty = difficulty;
+    g_main_game_launch_options.game_mode = _game_mode_campaign;
     return;
 }
 
-void main_game_launch_set_coop_player_count(int player_count)
+void main_game_launch_set_coop_player_count(int32 player_count)
 {
-    if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
+    if (!IN_RANGE_INCLUSIVE(player_count, 1, 2))
     {
-        LOG_ERROR_GAME("main_game_launch_set_coop_player_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
+        error(2, __FUNCTION__": invalid player count %d (must be from 1-%d)", player_count, 2);
     }
     else
     {
@@ -68,11 +62,11 @@ void main_game_launch_set_coop_player_count(int player_count)
     return;
 }
 
-void main_game_launch_set_multiplayer_splitscreen_count(int player_count)
+void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 {
     if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
     {
-        LOG_ERROR_GAME("main_game_launch_set_multiplayer_splitscreen_count: invalid player count {} (must be from 1-{})", player_count, k_number_of_users);
+        error(2, __FUNCTION__": invalid player count %d (must be from 1-%d)", player_count, k_number_of_users);
     }
     else
     {
@@ -109,7 +103,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
     if (i == k_variant_count)
     {
-        LOG_ERROR_GAME("invalid variant name [{}] provided, defaulting to slayer", variant_name);
+        error(2, __FUNCTION__": invalid variant name [%s] provided, defaulting to slayer", variant_name);
         game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
     }
     else
@@ -122,11 +116,11 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
     return;
 }
 
-void main_game_launch_set_game_mode(int game_mode)
+void main_game_launch_set_game_mode(int32 game_mode)
 {
     if (!IN_RANGE_INCLUSIVE(game_mode, 1, (int)k_game_mode_count - 1))
     {
-        LOG_ERROR_GAME("invalid game mode [{}] provided", game_mode);
+        error(2, __FUNCTION__": invalid game mode [%d] provided", game_mode);
     }
     else
     {

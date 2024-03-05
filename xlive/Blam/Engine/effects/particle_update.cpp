@@ -12,7 +12,14 @@ real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_vector
 	// of where it should be in the world to be as close as possible to the object
 	// we can remove this and just force it to be in the previous point as that will always be
 	// the interpolated position of the attached object as we let the engine go brrrr
-	points_interpolate(previous_point, target_point, 0.0f, out);
+	// this can be fired before the initial position of the emitter is set in some situations
+	// there for instead of rendering the particle at the root origin do it at the target (initial) position instead
+	// this is only really noticeable on 30 tick gameplay
+
+	if (memcmp(previous_point, &global_zero_vector3d, sizeof(real_point3d)) == 0)
+		memcpy(out, target_point, sizeof(real_point3d));
+	else
+		memcpy(out, previous_point, sizeof(real_point3d));	
 	return out;
 }
 
