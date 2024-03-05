@@ -1705,7 +1705,7 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02E, "Logging in...");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF02F, "Please wait while you are being logged in.");
 	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF030, "Connection Failed!");
-	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF031, "Please visit:\r\nhttps://h2pc.org/connection\r\nfor help with troubleshooting potential issues.");
+	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFF031, "Please visit:\r\nhttps://halo2pc.com/connection\r\nfor help with troubleshooting potential issues.");
 
 
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF0, "Select Language");
