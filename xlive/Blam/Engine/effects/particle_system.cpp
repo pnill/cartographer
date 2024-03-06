@@ -7,16 +7,22 @@
 #include "particle_location.h"
 #include "particle_model_definitions.h"
 #include "particle_system_definition.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/physics/breakable_surface_definitions.h"
-#include "Blam/Engine/tag_files/global_string_ids.h"
-#include "Blam/Engine/main/interpolator.h"
+#include "game/game_time.h"
+#include "physics/breakable_surface_definitions.h"
+#include "tag_files/global_string_ids.h"
+#include "main/interpolator.h"
+#include "render/render_visibility_collection.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 
 
 int particle_system_game_time[k_max_particle_systems];
 real32 particle_system_accumulated_time[k_max_particle_systems];
+
+c_particle_system_definition* c_particle_system::get_definition() const
+{
+	return INVOKE_TYPE(0xC3CE9, 0x0, c_particle_system_definition*(__thiscall*)(const c_particle_system*), this);
+}
 
 s_data_array* get_particle_system_table()
 {
@@ -48,49 +54,202 @@ datum particle_system_get_by_ptr(c_particle_system* particle_system)
 	return DATUM_INDEX_NEW(((char*)particle_system - get_particle_system_table()->data) / sizeof(c_particle_system), particle_system->datum_salt);
 }
 
-typedef bool(__stdcall* c_particle_system_update_t)(c_particle_system* thisx, real32 dt);
-c_particle_system_update_t p_c_particle_system_update;
-
-bool __stdcall c_particle_system::update(c_particle_system* particle_system, real32 dt)
+void c_particle_system::destroy_children()
 {
-	bool result = p_c_particle_system_update(particle_system, dt);
+	return INVOKE_TYPE(0xC37DE, 0x0, void(__thiscall*)(c_particle_system*), this);
+}
 
-	datum particle_system_datum_index = particle_system_get_by_ptr(particle_system);
+void c_particle_system::update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2)
+{
+	return INVOKE_TYPE(0xC381F, 0, void(__thiscall *)(c_particle_system*, bool, bool, pixel32, pixel32), this, v_mirrored_or_one_shot, one_shot, color, color_2);
+}
+
+int32 c_particle_system::get_particle_count()
+{
+	int32 particle_count = 0;
+	datum current_location_index = this->particle_system_location_index;
+	while (current_location_index != NONE)
+	{
+		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), current_location_index);
+		datum current_emitter_index = particle_location->particle_emitter_index;
+		while (current_emitter_index != NONE)
+		{
+			c_particle_emitter* particle_emitter = (c_particle_emitter*)datum_get(get_particle_emitter_table(), current_emitter_index);
+			particle_count += particle_emitter->m_particle_count;
+			current_emitter_index = particle_emitter->m_next_emitter_index;
+		}
+		current_location_index = particle_location->next_particle_location;
+	}
+	return particle_count;
+}
+
+void c_particle_system::change_parent_effect(datum* datum_1, datum* datum_2)
+{
+	return INVOKE_TYPE(0xC35F7, 0, void(__thiscall*)(c_particle_system*, datum*, datum*), this, datum_1, datum_2);
+}
+
+void c_particle_system::pulse()
+{
+
+}
+
+typedef bool(__stdcall* c_particle_system_frame_advance_t)(c_particle_system* thisx, real32 dt);
+c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
+
+bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
+{
+	if (thisx->flags.test(_particle_system_flags_bit_9) && thisx->flags.test(_particle_system_flags_bit_5))
+		thisx->flags.set(_particle_system_flags_bit_11, true);
+	else
+		thisx->flags.set(_particle_system_flags_bit_11, false);
+
+	if (thisx->flags.test(_particle_system_flags_bit_8))
+		thisx->flags.set(_particle_system_flags_bit_9, true);
+	else
+		thisx->flags.set(_particle_system_flags_bit_9, false);
+
+	thisx->flags.set(_particle_system_flags_bit_8, false);
+
+	if (!thisx->flags.test(_particle_system_flags_bit_5)
+		&& !render_visibility_check_location_cluster_active(&thisx->location))
+	{
+		thisx->destroy_children();
+	}
+
+	c_particle_system_definition* particle_system_definition = thisx->get_definition();
+
+	datum current_particle_location_index = thisx->particle_system_location_index;
+	while (current_particle_location_index != NONE)
+	{
+		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), current_particle_location_index);
+
+		particle_location->frame_advance(thisx, particle_system_definition, dt);
+		//particle_location->update_rewritten(this, particle_system_definition, dt);
+		current_particle_location_index = particle_location->next_particle_location;
+	}
+
+	c_particle_definition_interface* particle_def_interface = particle_system_definition->get_particle_system_interface();
+
+	effect_location_definition* location_definitions = particle_def_interface->vtbl->get_particle_definiton_locations(particle_def_interface);
+
+	datum current_particle_system_index = thisx->next_particle_system;
+	while (current_particle_system_index != NONE)
+	{
+		c_particle_system* current_particle_system = (c_particle_system*)datum_get(get_particle_system_table(), current_particle_system_index);
+		c_particle* particle = (c_particle*)datum_try_and_get(get_particle_table(), current_particle_system->first_particle_index);
+
+		real_matrix4x3 marker_matrix;
+		s_particle_system_update particle_system_update;
+		if (particle)
+		{
+			if (current_particle_system->definition_location_index == NONE 
+				|| current_particle_system->definition_location_index >= particle_def_interface->vtbl->get_particle_definiton_locations_size(particle_def_interface))
+			{
+				scale_vector3d(&particle->m_velocity, -1.0f, &marker_matrix.vectors.forward);
+				normalize3d(&marker_matrix.vectors.forward);
+				perpendicular3d(&marker_matrix.vectors.forward, &marker_matrix.vectors.up);
+				cross_product3d(&marker_matrix.vectors.up, &marker_matrix.vectors.forward, &marker_matrix.vectors.left);
+			}
+			else
+			{
+				string_id marker_name = location_definitions[current_particle_system->definition_location_index].marker_name;
+				switch (marker_name.get_id())
+				{
+				case HS_UP:
+					marker_matrix.vectors.forward = global_up3d;
+					marker_matrix.vectors.up = global_forward3d;
+					marker_matrix.vectors.left = global_left3d;
+					break;
+				case HS_GRAVITY:
+					marker_matrix.vectors.forward = global_down3d;
+					marker_matrix.vectors.up = global_back3d;
+					marker_matrix.vectors.left = global_left3d;
+					break;
+				default:
+					scale_vector3d(&particle->m_velocity, -1.0f, &marker_matrix.vectors.forward);
+					normalize3d(&marker_matrix.vectors.forward);
+					perpendicular3d(&marker_matrix.vectors.forward, &marker_matrix.vectors.up);
+					cross_product3d(&marker_matrix.vectors.up, &marker_matrix.vectors.forward, &marker_matrix.vectors.left);
+					break;
+				}
+			}
+
+			marker_matrix.position = particle->m_position;
+			marker_matrix.scale = 1.0f;
+
+			particle_system_update.some_delta_calc = (particle->time_accumulator / particle->effect_delay_time) - dt;
+			particle_system_update.delta_time = dt;
+			particle_system_update.particle_system_location_index = current_particle_system->particle_system_location_index;
+
+			c_particle_definition_interface* particle_def_interface = current_particle_system->get_definition()->get_particle_system_interface();
+
+			current_particle_system->update_colors(
+				particle_def_interface->vtbl->system_is_v_mirrored_or_one_shot(particle_def_interface),
+				particle_def_interface->vtbl->system_is_one_shot(particle_def_interface),
+				thisx->color,
+				global_black_pixel32
+			);
+
+			c_particle_system::restart(current_particle_system, &particle_system_update, &marker_matrix, 0);
+			//current_particle_system->restart(&particle_system_update, &marker_matrix, 0);
+		}
+		
+		if (!current_particle_system->frame_advance(current_particle_system, dt))
+		{
+			current_particle_system->change_parent_effect(&thisx->next_particle_system, &thisx->datum_44);
+			c_particle_system::destroy(current_particle_system_index);
+		}
+
+		current_particle_system_index = current_particle_system->field_38;
+	}
+
+	thisx->flags.set(_particle_system_flags_updating_bit, false);
+
+	bool result =
+		thisx->get_particle_count() > 0 && thisx->flags.test(_particle_system_flags_bit_3)
+		|| thisx->flags.test(_particle_system_flags_updating_bit)
+		|| thisx->next_particle_system != NONE
+		|| (thisx->flags.test(_particle_system_flags_bit_9) || thisx->flags.test(_particle_system_flags_bit_11));
+	
+	if (thisx->keep_system_alive(dt))
+	{
+		result = true;
+	}
+
+	return result;
+}
+
+bool c_particle_system::keep_system_alive(real32 dt)
+{
+	bool result = false;
+	datum particle_system_datum_index = particle_system_get_by_ptr(this);
 	int32 particle_system_abs_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(particle_system_datum_index);
 
 	particle_system_update_dt(particle_system_datum_index, dt);
 
-	if (!result)
+	int32 ticks = time_globals::get_game_time() - particle_system_game_time[particle_system_abs_index];
+	if (ticks > 1)
 	{
-		// real32 accum = particle_system_accumulated_time[particle_system_abs_index];
-		//real32 update_dt = 1.0f / 30.f;
-		//if (particle_system->duration_in_ticks > 0.0f)
-			//update_dt = 1.0f / particle_system->duration_in_ticks;
-
-		//int32 duration_in_ticks = (int32)(update_dt / time_globals::get_seconds_per_tick());
-		int32 ticks = time_globals::get_game_time() - particle_system_game_time[particle_system_abs_index];
-		if (ticks > 1)
-		{
-			particle_system_reset_game_time(particle_system_datum_index);
-			particle_system_reset_dt(particle_system_datum_index);
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		particle_system_reset_game_time(particle_system_datum_index);
+		particle_system_reset_dt(particle_system_datum_index);
+		result = false;
 	}
+	else
+	{
+		result = true;
+	}
+
 	return result;
 }
 
-typedef void(__stdcall* t_c_particle_system__update_location_time)(c_particle_system*, s_particle_system_update_timings*, real_matrix4x3*, int);
-t_c_particle_system__update_location_time p_c_particle_system__update_location_time;
+typedef void(__stdcall* t_c_particle_system__update_location_time)(c_particle_system*, s_particle_system_update*, real_matrix4x3*, int);
+t_c_particle_system__update_location_time p_c_particle_system__restart;
 
-void c_particle_system::update_location_time(c_particle_system* thisx, s_particle_system_update_timings* timings, real_matrix4x3* matrix, int unused)
+void c_particle_system::restart(c_particle_system* thisx, s_particle_system_update* timings, real_matrix4x3* matrix, int unused)
 {
 	datum particle_system_datum_index = particle_system_get_by_ptr(thisx);
 	particle_system_update_game_time(particle_system_datum_index);
-	p_c_particle_system__update_location_time(thisx, timings, matrix, unused);
+	p_c_particle_system__restart(thisx, timings, matrix, unused);
 }
 
 void __cdecl c_particle_system::destroy(datum particle_system_index)
@@ -105,6 +264,6 @@ void __cdecl particle_system_remove_from_effects_cache(datum effect_index, datum
 
 void apply_particle_system_patches()
 {
-	p_c_particle_system_update = (c_particle_system_update_t)DetourClassFunc((uint8*)Memory::GetAddressRelative(0x4C43F9), (uint8*)c_particle_system::update, 10);
-	p_c_particle_system__update_location_time = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::update_location_time, 11);
+	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc((uint8*)Memory::GetAddress(0xC43F9), (uint8*)c_particle_system::frame_advance, 10);
+	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::restart, 11);
 }

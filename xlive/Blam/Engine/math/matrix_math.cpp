@@ -287,7 +287,7 @@ void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* 
 	INVOKE(0x78645, 0x7623B, matrix3x3_multiply, input_matrix_1, input_matrix_2, out_matrix);
 }
 
-void matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector)
+void matrix3x3_transform_vector(const real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector)
 {
 	INVOKE(0x78800, 0x763F6, matrix3x3_transform_vector, input_matrix, input_vector, out_vector);
 }

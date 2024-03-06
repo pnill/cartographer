@@ -43,11 +43,46 @@ enum e_particle_state_flags : uint32
 
 struct s_particle_state
 {
-	int8 data[68];
-	c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags;
-	c_particle_system* particle_system;
-	c_particle_location* particle_location;
-	c_particle* particle;
+	int8 m_data[68];
+	struct
+	{
+		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags;
+		c_particle_system* particle_system;
+		c_particle_location* particle_location;
+		c_particle* particle;
+	} m_system;
+
+	s_particle_state()
+	{
+		csmemset(&m_system, 0, sizeof(m_system));
+	}
+
+	~s_particle_state() = default;
+
+	void set_particle_system(c_particle_system* particle_system)
+	{
+		if (m_system.particle_system != particle_system)
+		{
+			m_system.particle_system = particle_system;
+			m_system.flags.set(_particle_update_bit_4, false);
+			m_system.flags.set(_particle_update_bit_5, false);
+			m_system.flags.set(_particle_update_bit_6, false);
+			m_system.flags.set(_particle_update_bit_9, false);
+			m_system.flags.set(_particle_update_bit_10, false);
+		}
+	}
+
+	void set_particle_location(c_particle_location* particle_location)
+	{
+		if (m_system.particle_location != particle_location)
+		{
+			m_system.particle_location = particle_location;
+			m_system.flags.set(_particle_update_bit_7, false);
+			m_system.flags.set(_particle_update_bit_12, false);
+			m_system.flags.set(_particle_update_bit_13, false);
+			m_system.flags.set(_particle_update_bit_16, false);
+		}
+	}
 };
 
-void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* a4, s_particle_state* particle_state);
+void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state);

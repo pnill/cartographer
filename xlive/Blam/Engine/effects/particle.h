@@ -27,8 +27,8 @@ enum e_particle_flags : int16
 struct c_particle
 {
 	int8 gap_0[2];
-	e_particle_flags flags;
-	int32 next_particle;
+	int16 flags;
+	datum next_particle;
 	real32 time_accumulator;
 	real32 effect_delay_time;
 	int8 gap_10[12];
