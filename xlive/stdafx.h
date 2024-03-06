@@ -64,6 +64,8 @@
 
 // Cartographer includes
 #include "cseries/cseries.h"
+#include "cseries/cseries_errors.h"
+#include "cseries/cseries_windows.h"
 #include "math/math.h"
 #include "math/integer_math.h"
 #include "math/real_math.h"

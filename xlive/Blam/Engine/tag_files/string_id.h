@@ -1,6 +1,6 @@
 #pragma once
 
-#define k_maximum_string_id_count 393216
+#define k_maximum_string_id_storage 393216
 
 /*********************************************************************
 * string_id

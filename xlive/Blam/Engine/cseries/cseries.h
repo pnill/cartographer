@@ -127,6 +127,27 @@ static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagbloc
 #define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
 static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
 
+#if defined(_DEBUG)
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION) \
+if (!(STATEMENT)) \
+{                                                                   \
+    display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
+    if (!is_debugger_present() && g_catch_exceptions)               \
+        exit(-1);                                                   \
+    else                                                            \
+        __debugbreak();                                             \
+}
+#define ASSERT(STATEMENT)   ASSERT_EXCEPTION(STATEMENT, true)
+#else
+#define ASSERT_EXCEPTION(STATEMENT, ...) (void)(#STATEMENT)
+#define ASSERT(STATEMENT, ...) (void)(#STATEMENT)
+#endif // _DEBUG
+
+
+extern bool g_catch_exceptions;
+
+// TODO implement
+void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
 
 // TODO reimplement this properly
 void* csmemset(void* dst, int32 val, size_t size);
