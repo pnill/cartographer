@@ -3,6 +3,7 @@
 #include "particle_location.h"
 #include "particle_system.h"
 
+#define k_particle_state_values_count 17
 
 enum e_particle_state_flags : uint32 
 {
@@ -43,7 +44,7 @@ enum e_particle_state_flags : uint32
 
 struct s_particle_state
 {
-	int8 m_data[68];
+	real32 m_states[k_particle_state_values_count];
 	struct
 	{
 		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags;
@@ -84,5 +85,6 @@ struct s_particle_state
 		}
 	}
 };
+CHECK_STRUCT_SIZE(s_particle_state, 84);
 
-void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state);
+void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state, int32 state_values_count);
