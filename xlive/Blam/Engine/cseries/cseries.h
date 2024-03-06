@@ -137,7 +137,7 @@ if (!(STATEMENT)) \
     else                                                            \
         __debugbreak();                                             \
 }
-#define ASSERT(STATEMENT)  if (!(STATEMENT)) ASSERT_EXCEPTION(STATEMENT, true)
+#define ASSERT(STATEMENT)   ASSERT_EXCEPTION(STATEMENT, true)
 #else
 #define ASSERT_EXCEPTION(STATEMENT, ...) (void)(#STATEMENT)
 #define ASSERT(STATEMENT, ...) (void)(#STATEMENT)
