@@ -167,7 +167,7 @@ void main_game_launch_setup_game_mode_details(void)
     }
     default:
     {
-        LOG_ERROR_GAME("main_game_launch: unknown game mode {}!", g_main_game_launch_options.game_mode);
+        error(2, __FUNCTION__": unknown game mode %d!", g_main_game_launch_options.game_mode);
     }
     }
 
