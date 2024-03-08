@@ -123,7 +123,7 @@ public:
     e_particle_system_camera_mode camera_mode;
     // use values between -10 and 10 to move closer and farther from camera (positive is closer)
     int16 sort_bias;
-    e_particle_system_definition_flags flags;
+    uint16 flags;
     //defaults to 0.0
     real32 lod_in_distance;
     //defaults to 0.0
@@ -138,7 +138,7 @@ public:
 
     c_particle_definition_interface* get_particle_system_interface() const;
 
-    bool c_particle_system_definition::system_is_cinematic(void) const;
+    bool c_particle_system_definition::system_is_looping_particle(void) const;
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 

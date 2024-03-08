@@ -58,9 +58,9 @@ bool c_particle_sprite_definition_interface::particle_is_one_shot()
 	return (this->particle_definition->flags >> 8) & 1;
 }
 
-bool c_particle_system_definition::system_is_cinematic(void) const
+bool c_particle_system_definition::system_is_looping_particle(void) const
 {
-	return TEST_FLAG(this->flags, _particle_system_definition_flags_cinematics);
+	return TEST_FLAG(this->flags, _particle_system_definition_flags_looping_particle);
 }
 
 real32 c_particle_emitter_definition::get_particle_emissions_per_tick(s_particle_state* particle_state)

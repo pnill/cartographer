@@ -116,7 +116,7 @@ void c_particle_system::adjust_initial_position(datum particle_location_index, c
 
 		if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
 		{
-			if (flags.test(_particle_system_bit_8))
+			if (this->flags.test(_particle_system_bit_8))
 				particle_location->adjust_emitter_particle_intial_position(this, time_globals::get_seconds_per_tick(), matrix);
 		}
 	}
@@ -127,18 +127,13 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
-	bool initial_update = false;
-
 	if (thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5))
 		thisx->flags.set(_particle_system_bit_11, true);
 	else
 		thisx->flags.set(_particle_system_bit_11, false);
 
 	if (thisx->flags.test(_particle_system_bit_8))
-	{
 		thisx->flags.set(_particle_system_bit_9, true);
-		initial_update = true;
-	}
 	else
 		thisx->flags.set(_particle_system_bit_9, false);
 
@@ -155,12 +150,6 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 	datum current_particle_location_index = thisx->particle_system_location_index;
 	while (current_particle_location_index != NONE)
 	{
-		if (initial_update)
-		{
-			// TODO: pass the updated position matrix here
-			//thisx->adjust_initial_position(current_particle_location_index, matrix);
-		}
-
 		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), current_particle_location_index);
 
 		particle_location->frame_advance(thisx, particle_system_definition, dt);

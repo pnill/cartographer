@@ -38,7 +38,7 @@ struct c_particle
 	real_vector3d m_velocity;
 	int8 gap_34[12];
 
-	void c_particle::adjust_initial_position(
+	void adjust_initial_position(
 		c_particle_emitter_definition* emitter_definition,
 		c_particle_emitter* particle_emitter,
 		s_particle_state* state,

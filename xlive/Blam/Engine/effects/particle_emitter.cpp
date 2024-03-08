@@ -96,19 +96,18 @@ void c_particle_emitter::pulse(
 		add_vectors3d(&_this->position, &translated_vector, &_this->position);
 	}
 
-	if (!particle_system_definition->system_is_cinematic() || _this->particle_index == NONE)
+	if (!particle_system_definition->system_is_looping_particle() || _this->particle_index == NONE)
 	{
 		_this->emission_time = emitter_definition->get_particle_emissions_per_tick(particle_state) * delta + _this->emission_time;
 	}
 	if (_this->emission_time + k_real_math_epsilon >= 1.0f)
 	{
-		bool particle_system_flag_check = particle_system->flags.test(_particle_system_bit_11) && particle_system->flags.test(_particle_system_bit_9);
 		bool particle_system_definition_flag_check = TEST_BIT(particle_system_definition->flags, 7);
 
 		real32 time_slice = 0.f;
 		real32 accumulator = 0.f;
 
-		if (particle_system_flag_check && particle_system_definition_flag_check)
+		if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition_flag_check)
 		{
 			time_slice = 1.f / _this->emission_time;
 		}
@@ -172,23 +171,23 @@ void c_particle_emitter::adjust_initial_particle_position(
 	datum particle_index = this->particle_index;
 	while (particle_index != NONE)
 	{
+		this->emission_time = 0.0f;
 		c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 		c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
 
-		if (!particle_system_definition->system_is_cinematic() || particle->next_particle == NONE)
+		if (!particle_system_definition->system_is_looping_particle() || particle->next_particle == NONE)
 		{
 			this->emission_time = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt + this->emission_time;
 		}
 
 		if (this->emission_time + k_real_math_epsilon >= 1.0f)
 		{
-			bool particle_system_flag_check = particle_system->flags.test(_particle_system_bit_11) && particle_system->flags.test(_particle_system_bit_9);
 			bool particle_system_definition_flag_check = TEST_BIT(particle_system_definition->flags, 7);
 
 			real32 time_slice = 0.f;
 			real32 accumulator = 0.f;
 
-			if (particle_system_flag_check && particle_system_definition_flag_check)
+			if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition_flag_check)
 			{
 				time_slice = 1.f / this->emission_time;
 			}
