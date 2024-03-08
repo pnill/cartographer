@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "particle_system.h"
 
+#include "effects.h"
 #include "effects_definitions.h"
 #include "particle.h"
 #include "particle_emitter.h"
 #include "particle_location.h"
+#include "particle_state.h"
 #include "particle_model_definitions.h"
 #include "particle_system_definition.h"
 #include "game/game_time.h"
@@ -88,9 +90,36 @@ void c_particle_system::change_parent_effect(datum* datum_1, datum* datum_2)
 	return INVOKE_TYPE(0xC35F7, 0, void(__thiscall*)(c_particle_system*, datum*, datum*), this, datum_1, datum_2);
 }
 
-void c_particle_system::pulse()
-{
+typedef void(__thiscall* t_c_particle_system__update_position)(c_particle_system* particle_system, s_particle_system_update* particle_system_update, const real_matrix4x3* matrix, bool a4);
+t_c_particle_system__update_position p_update_position;
 
+void __thiscall c_particle_system::update_position(
+	s_particle_system_update* particle_system_update,
+	const real_matrix4x3* matrix,
+	bool a4)
+{
+	// the index is updated in the original code, so get it early
+	c_particle_system_definition* particle_system_def = this->get_definition();
+	datum location_index = particle_system_update->particle_system_location_index;
+	p_update_position(this, particle_system_update, matrix, a4);
+	adjust_initial_position(location_index, matrix);
+}
+
+__declspec(naked) void jmp_c_particle_system_update_position() {__asm jmp c_particle_system::update_position}
+
+void c_particle_system::adjust_initial_position(datum particle_location_index, const real_matrix4x3* matrix)
+{
+	if (particle_location_index != NONE)
+	{
+		c_particle_system_definition* particle_system_def = this->get_definition();
+		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), particle_location_index);
+
+		if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
+		{
+			if (flags.test(_particle_system_bit_8))
+				particle_location->adjust_emitter_particle_intial_position(this, time_globals::get_seconds_per_tick(), matrix);
+		}
+	}
 }
 
 typedef bool(__stdcall* c_particle_system_frame_advance_t)(c_particle_system* thisx, real32 dt);
@@ -98,19 +127,24 @@ c_particle_system_frame_advance_t p_c_particle_system_frame_advance;
 
 bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32 dt)
 {
-	if (thisx->flags.test(_particle_system_flags_bit_9) && thisx->flags.test(_particle_system_flags_bit_5))
-		thisx->flags.set(_particle_system_flags_bit_11, true);
+	bool initial_update = false;
+
+	if (thisx->flags.test(_particle_system_bit_9) && thisx->flags.test(_particle_system_bit_5))
+		thisx->flags.set(_particle_system_bit_11, true);
 	else
-		thisx->flags.set(_particle_system_flags_bit_11, false);
+		thisx->flags.set(_particle_system_bit_11, false);
 
-	if (thisx->flags.test(_particle_system_flags_bit_8))
-		thisx->flags.set(_particle_system_flags_bit_9, true);
+	if (thisx->flags.test(_particle_system_bit_8))
+	{
+		thisx->flags.set(_particle_system_bit_9, true);
+		initial_update = true;
+	}
 	else
-		thisx->flags.set(_particle_system_flags_bit_9, false);
+		thisx->flags.set(_particle_system_bit_9, false);
 
-	thisx->flags.set(_particle_system_flags_bit_8, false);
+	thisx->flags.set(_particle_system_bit_8, false);
 
-	if (!thisx->flags.test(_particle_system_flags_bit_5)
+	if (!thisx->flags.test(_particle_system_bit_5)
 		&& !render_visibility_check_location_cluster_active(&thisx->location))
 	{
 		thisx->destroy_children();
@@ -121,10 +155,15 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 	datum current_particle_location_index = thisx->particle_system_location_index;
 	while (current_particle_location_index != NONE)
 	{
+		if (initial_update)
+		{
+			// TODO: pass the updated position matrix here
+			//thisx->adjust_initial_position(current_particle_location_index, matrix);
+		}
+
 		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), current_particle_location_index);
 
 		particle_location->frame_advance(thisx, particle_system_definition, dt);
-		//particle_location->update_rewritten(this, particle_system_definition, dt);
 		current_particle_location_index = particle_location->next_particle_location;
 	}
 
@@ -190,8 +229,9 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 				global_black_pixel32
 			);
 
+			// this in h2 might not be restart, could be update or something
+			// need more research on this
 			c_particle_system::restart(current_particle_system, &particle_system_update, &marker_matrix, 0);
-			//current_particle_system->restart(&particle_system_update, &marker_matrix, 0);
 		}
 		
 		if (!current_particle_system->frame_advance(current_particle_system, dt))
@@ -203,13 +243,13 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 		current_particle_system_index = current_particle_system->field_38;
 	}
 
-	thisx->flags.set(_particle_system_flags_updating_bit, false);
+	thisx->flags.set(_particle_system_updating_bit, false);
 
 	bool result =
-		thisx->get_particle_count() > 0 && thisx->flags.test(_particle_system_flags_bit_3)
-		|| thisx->flags.test(_particle_system_flags_updating_bit)
+		thisx->get_particle_count() > 0 && thisx->flags.test(_particle_system_bit_3)
+		|| thisx->flags.test(_particle_system_updating_bit)
 		|| thisx->next_particle_system != NONE
-		|| (thisx->flags.test(_particle_system_flags_bit_9) || thisx->flags.test(_particle_system_flags_bit_11));
+		|| (thisx->flags.test(_particle_system_bit_9) || thisx->flags.test(_particle_system_bit_11));
 	
 	if (thisx->keep_system_alive(dt))
 	{
@@ -266,4 +306,9 @@ void apply_particle_system_patches()
 {
 	p_c_particle_system_frame_advance = (c_particle_system_frame_advance_t)DetourClassFunc((uint8*)Memory::GetAddress(0xC43F9), (uint8*)c_particle_system::frame_advance, 10);
 	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::restart, 11);
+
+	DETOUR_ATTACH(p_update_position, Memory::GetAddress<t_c_particle_system__update_position>(0xC376A), jmp_c_particle_system_update_position);
+	// allow world coordinate system particles to be updated
+	NopFill(Memory::GetAddress(0xA9563), 5);
+	NopFill(Memory::GetAddress(0xA9563) + 5 + 4, 6);
 }

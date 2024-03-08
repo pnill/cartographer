@@ -2,7 +2,6 @@
 
 #include "effects_creation.h"
 #include "effect_location_definition.h"
-#include "particle_definition_interface.h"
 
 class c_particle_definition_interface;
 struct c_particle_definition_interface_vtable

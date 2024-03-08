@@ -6,13 +6,15 @@
 #include "particle_property.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/shaders/shader_definitions.h"
-#include "Blam/Engine/shaders/shader_postprocess_definitions.h"
+#include "shaders/shader_definitions.h"
+#include "shaders/shader_postprocess_definitions.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #define k_maximum_emitters_per_definition 8
 #define k_maximum_particle_systems_per_block 32
 
+class c_particle;
+class c_particle_system;
 
 enum e_particle_billboard_style : int16
 {
@@ -99,6 +101,10 @@ public:
     int32 runtime_flags;
     int32 runtime_flags_2;
 
+    real32 get_particle_emissions_per_tick(s_particle_state* particle_state);
+
+    void initialize_particle(s_particle_state* particle_state, c_particle* particle, c_particle_system* particle_system);
+
     void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
     void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
 };
@@ -131,6 +137,8 @@ public:
     tag_block<c_particle_emitter_definition> emitters;
 
     c_particle_definition_interface* get_particle_system_interface() const;
+
+    bool c_particle_system_definition::system_is_cinematic(void) const;
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 

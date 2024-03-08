@@ -42,6 +42,8 @@ enum e_particle_state_flags : uint32
 	k_particle_state_flags
 };
 
+void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state, int32 state_values_count);
+
 struct s_particle_state
 {
 	real32 m_states[k_particle_state_values_count];
@@ -64,12 +66,12 @@ struct s_particle_state
 	{
 		if (m_system.particle_system != particle_system)
 		{
-			m_system.particle_system = particle_system;
 			m_system.flags.set(_particle_update_bit_4, false);
 			m_system.flags.set(_particle_update_bit_5, false);
 			m_system.flags.set(_particle_update_bit_6, false);
 			m_system.flags.set(_particle_update_bit_9, false);
 			m_system.flags.set(_particle_update_bit_10, false);
+			m_system.particle_system = particle_system;
 		}
 	}
 
@@ -77,14 +79,42 @@ struct s_particle_state
 	{
 		if (m_system.particle_location != particle_location)
 		{
-			m_system.particle_location = particle_location;
 			m_system.flags.set(_particle_update_bit_7, false);
 			m_system.flags.set(_particle_update_bit_12, false);
 			m_system.flags.set(_particle_update_bit_13, false);
 			m_system.flags.set(_particle_update_bit_16, false);
+			m_system.particle_location = particle_location;
 		}
+	}
+
+	void set_particle(c_particle* particle)
+	{
+		if (m_system.particle != particle)
+		{
+			m_system.flags.set(_particle_update_bit_0, false);
+			m_system.flags.set(_particle_update_bit_1, false);
+			m_system.flags.set(_particle_update_bit_2, false);
+			m_system.flags.set(_particle_update_bit_3, false);
+			m_system.flags.set(_particle_update_bit_11, false);
+			m_system.flags.set(_particle_update_bit_12, false);
+			m_system.flags.set(_particle_update_bit_13, false);
+			m_system.flags.set(_particle_update_bit_14, false);
+			m_system.flags.set(_particle_update_bit_15, false);
+			m_system.particle = particle;
+		}
+	}
+
+	void state_update(uint32 flags)
+	{
+		particle_state_update(
+			m_system.flags.not() & flags,
+			m_system.particle_system,
+			m_system.particle_location,
+			m_system.particle,
+			this,
+			k_particle_state_values_count
+		);
+		m_system.flags.or(flags);
 	}
 };
 CHECK_STRUCT_SIZE(s_particle_state, 84);
-
-void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state, int32 state_values_count);

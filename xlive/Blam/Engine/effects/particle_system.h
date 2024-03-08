@@ -1,4 +1,5 @@
 #pragma once
+
 #include "particle_system_definition.h"
 #include "Blam/Engine/math/matrix_math.h"
 #include "Blam/Engine/memory/data.h"
@@ -8,21 +9,21 @@
 
 enum e_particle_system_flags : int16
 {
-	_particle_system_flags_updating_bit,
-	_particle_system_flags_bit_1,
-	_particle_system_flags_bit_2,
-	_particle_system_flags_bit_3,
-	_particle_system_flags_bit_4,
-	_particle_system_flags_bit_5,
-	_particle_system_flags_bit_6,
-	_particle_system_flags_bit_7,
-	_particle_system_flags_bit_8,
-	_particle_system_flags_bit_9,
+	_particle_system_updating_bit,
+	_particle_system_bit_1,
+	_particle_system_bit_2,
+	_particle_system_bit_3,
+	_particle_system_bit_4,
+	_particle_system_bit_5,
+	_particle_system_bit_6,
+	_particle_system_bit_7,
+	_particle_system_bit_8,
+	_particle_system_bit_9,
 	_particle_system_scale_with_sky_render_model_bit,
-	_particle_system_flags_bit_11,
-	_particle_system_flags_bit_12,
-	_particle_system_flags_bit_13,
-	_particle_system_flags_bit_14,
+	_particle_system_bit_11,
+	_particle_system_bit_12,
+	_particle_system_bit_13,
+	_particle_system_bit_14,
 	k_particle_system_flags_count
 };
 
@@ -62,6 +63,18 @@ public:
 	c_particle_system_definition* get_definition() const;
 
 	void pulse();
+
+	bool c_particle_system::get_in_sky(void) const
+	{
+		return this->flags.test(_particle_system_scale_with_sky_render_model_bit);
+	}
+
+	void __thiscall update_position(
+		s_particle_system_update* particle_system_update,
+		const real_matrix4x3* matrix,
+		bool a4);
+
+	void adjust_initial_position(datum particle_location_index, const real_matrix4x3* matrix);
 
 	void change_parent_effect(datum* datum_1, datum* datum_2);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "effects_creation.h"
 #include "effect_location_definition.h"
 #include "tag_files/tag_block.h"

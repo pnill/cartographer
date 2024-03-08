@@ -20,8 +20,8 @@ typedef void(__cdecl* particle_system_draw_t)(
 	s_particle_state* particle_state,
 	particle_draw_callback_t callback,
 	c_particle_definition** particle_definition);
-
 particle_system_draw_t p_particle_system_draw;
+
 void __cdecl particle_system_draw(
 	c_particle_system* particle_system,
 	c_particle_location* particle_location,
@@ -30,25 +30,9 @@ void __cdecl particle_system_draw(
 	c_particle_definition** particle_definition)
 {
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
-	if (particle_system != particle_state->m_system.particle_system)
-	{
-		particle_state->m_system.flags.set(_particle_update_bit_10, false);
-		particle_state->m_system.flags.set(_particle_update_bit_9, false);
-		particle_state->m_system.flags.set(_particle_update_bit_6, false);
-		particle_state->m_system.flags.set(_particle_update_bit_5, false);
-		particle_state->m_system.flags.set(_particle_update_bit_4, false);
-		particle_state->m_system.particle_system = particle_system;
-	}
 
-	if (particle_location != particle_state->m_system.particle_location)
-	{
-		particle_state->m_system.flags.set(_particle_update_bit_16, false);
-		particle_state->m_system.flags.set(_particle_update_bit_13, false);
-		particle_state->m_system.flags.set(_particle_update_bit_12, false);
-		particle_state->m_system.flags.set(_particle_update_bit_17, false);
-
-		particle_state->m_system.particle_location = particle_location;
-	}
+	particle_state->set_particle_system(particle_system);
+	particle_state->set_particle_location(particle_location);
 
 	int32 emitter_index = 0;
 	datum current_particle_emitter_index = particle_location->particle_emitter_index;
@@ -66,7 +50,7 @@ void __cdecl particle_system_draw(
 			real_point3d relative_position;
 			real_argb_color particle_color;
 
-			if (particle_system->flags.test(_particle_system_scale_with_sky_render_model_bit)) 
+			if (particle_system->flags.test(_particle_system_scale_with_sky_render_model_bit))
 			{
 				sky_render_model_scale = get_current_sky_render_model_scale();
 			}
@@ -80,14 +64,7 @@ void __cdecl particle_system_draw(
 				);
 			}
 
-			particle_state_update(
-				emitter_definition->runtime_flags_2 & 0x107F0 & particle_state->m_system.flags.not(),
-				particle_state->m_system.particle_system,
-				particle_state->m_system.particle_location,
-				particle_state->m_system.particle,
-				particle_state,
-				k_particle_state_values_count
-			);
+			particle_state->state_update(emitter_definition->runtime_flags_2 & 0x107F0u);
 
 			emitter_definition->get_emitter_particle_color(particle_state, &particle_color);
 
@@ -99,33 +76,14 @@ void __cdecl particle_system_draw(
 			while (current_particle_index != NONE)
 			{
 				c_particle* particle = (c_particle*)datum_get(get_particle_table(), DATUM_INDEX_TO_ABSOLUTE_INDEX(current_particle_index));
-				if (particle != particle_state->m_system.particle)
-				{
-					particle_state->m_system.flags.set(_particle_update_bit_0, false);
-					particle_state->m_system.flags.set(_particle_update_bit_1, false);
-					particle_state->m_system.flags.set(_particle_update_bit_2, false);
-					particle_state->m_system.flags.set(_particle_update_bit_3, false);
-					particle_state->m_system.flags.set(_particle_update_bit_11, false);
-					particle_state->m_system.flags.set(_particle_update_bit_12, false);
-					particle_state->m_system.flags.set(_particle_update_bit_13, false);
-					particle_state->m_system.flags.set(_particle_update_bit_14, false);
-					particle_state->m_system.flags.set(_particle_update_bit_15, false);
-					particle_state->m_system.particle = particle;
-				}
+				particle_state->set_particle(particle);
 
 				real_point3d particle_position;
 				real_vector3d particle_velocity;
 				particle_position = particle->m_position;
 				particle_velocity = particle->m_velocity;
 
-				particle_state_update(
-					emitter_definition->runtime_flags_2 & 0xF80F & particle_state->m_system.flags.not(),
-					particle_state->m_system.particle_system,
-					particle_state->m_system.particle_location,
-					particle_state->m_system.particle,
-					particle_state,
-					k_particle_state_values_count
-				);
+				particle_state->state_update(emitter_definition->runtime_flags_2 & 0xF80Fu);
 
 				emitter_definition->get_emitter_particle_inverse_color(particle_state, &particle_color);
 

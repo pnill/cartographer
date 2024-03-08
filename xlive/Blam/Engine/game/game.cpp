@@ -4,6 +4,7 @@
 #include "game_engine.h"
 #include "game_time.h"
 
+#include "blam/Engine/effects/particle_emitter.h"
 #include "Blam/Engine/cseries/cseries.h"
 #include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/main/interpolator.h"

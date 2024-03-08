@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "interpolator.h"
 
+#include "Blam/Engine/effects/particle.h"
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/game/game_time.h"
 
