@@ -1,19 +1,21 @@
 #pragma once
-#include "Blam/Engine/objects/damage.h"
-#include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/memory/data.h"
+#include "objects/damage.h"
+#include "objects/object_placement.h"
+#include "math/color_math.h"
+#include "math/matrix_math.h"
+#include "memory/data.h"
 
 
-enum e_effect_datum_flags : int16
+enum e_effect_flags : int16
 {
+    _effect_datum_flags_bit_0 = 0,
     _effect_datum_flags_bit_1 = 1,
     _effect_datum_flags_bit_2 = 2,
     _effect_datum_flags_bit_3 = 3,
     _effect_datum_flags_bit_4 = 4,
     _effect_datum_flags_created_in_violence_bit = 5,
     _effect_datum_flags_bit_6 = 6,
-    _effect_datum_flags_bit_7 = 7,
+    _effect_potentially_first_person_bit = 7,
     _effect_datum_flags_bit_8 = 8,
     _effect_datum_flags_bit_9 = 9,
     _effect_datum_flags_bit_10 = 10,
@@ -21,7 +23,8 @@ enum e_effect_datum_flags : int16
     _effect_datum_flags_bit_12 = 12,
     _effect_datum_flags_bit_13 = 13,
     _effect_datum_flags_bit_14 = 14,
-    _effect_datum_flags_bit_15 = 15
+    _effect_datum_flags_bit_15 = 15,
+    k_effect_flag_count
 };
 
 enum e_effect_location_flags : uint16
@@ -29,35 +32,46 @@ enum e_effect_location_flags : uint16
     _effect_location_flags_bit_15 = FLAG(15),
 };
 
+struct s_effect_struct
+{
+    int32 field_0;
+    datum particle_system;
+};
 
 struct effect_datum
 {
     int8 gap_0[2];
-    int16 flags;
-    int32 tag_datum;
-    int8 gap_8[24];
-    int16 sky_owner_cluster;
-    int8 gap_22[14];
+    c_flags<e_effect_flags, int16, k_effect_flag_count> flags;
+    datum tag_index;
+    datum object_looping_sound_index;
+    string_id input_marker_name;
+    string_id field_10;
+    string_id field_14;
+    int16 field_18;
+    int8 field_1A[2];
+    s_location location;
+    real_rgb_color color;
     real_vector3d vector;
     int8 gap_3C[12];
-    datum multi_purpose_origin_index;
+    datum object_index;
     s_damage_owner damage_owner;
-    int32 origin_local_user_index;
+    int32 first_person_user_index;
     int16 event_index;
-    int8 gap_5E[6];
-    float delay;
-    int8 gap_68[4];
-    float type_specific_scale;
-    float scale;
-    int8 gap_74[6];
+    int16 field_5E;
+    real32 field_60;
+    real32 delay;
+    real32 gap_68;
+    real32 type_specific_scale;
+    real32 scale;
+    real_vector2d field_74;
     datum effect_locations[32];
     datum particle_system;
     void* particle_system_ptr;
     pixel32 pixel_1;
     pixel32 pixel_2;
-    int8 gap_10C[132];
+    int32 field_10C;
+    s_effect_struct field_110[16];
 };
-
 CHECK_STRUCT_SIZE(effect_datum, 400);
 
 struct effect_location_datum
