@@ -306,10 +306,9 @@ real_matrix3x3* matrix3x3_from_angles(real_matrix3x3* matrix, real32 i, real32 j
 
 	matrix->forward.i = cosine_vector.i * cosine_vector.j;
 	matrix->forward.j = cosine_vector.j * sine_vector.i;
-
+	matrix->forward.k = sine_vector.j;
 	matrix->left.i = -(ci_sk * cosine_vector.j) - si_ck;
 	matrix->left.j = ci_ck - (si_sk * cosine_vector.j);
-	matrix->forward.k = cosine_vector.j;
 	matrix->left.k = cosine_vector.j * sine_vector.k;
 	matrix->up.i = si_sk - (ci_ck * cosine_vector.j);
 	matrix->up.j = -(si_ck * cosine_vector.j) - ci_sk;

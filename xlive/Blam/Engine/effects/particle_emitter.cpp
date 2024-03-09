@@ -102,12 +102,12 @@ void c_particle_emitter::pulse(
 	}
 	if (_this->particles_to_emit + k_real_math_epsilon >= 1.0f)
 	{
-		real32 time_slice = 0.f;
+		real32 spread = 0.f;
 		real32 accumulator = 0.f;
 
 		if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition->spread_between_ticks())
 		{
-			time_slice = 1.f / _this->particles_to_emit;
+			spread = 1.f / _this->particles_to_emit;
 		}
 		else
 		{
@@ -121,7 +121,7 @@ void c_particle_emitter::pulse(
 			// subtract 1 particle
 			_this->particles_to_emit -= 1.0f;
 			_this->spawn_particle(particle_state, particle_system, emitter_definition, alpha, accumulator, delta, scale);
-			accumulator += time_slice;
+			accumulator += spread;
 		}
 	}
 	return;
