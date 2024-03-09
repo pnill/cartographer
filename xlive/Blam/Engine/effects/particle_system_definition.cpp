@@ -63,6 +63,11 @@ bool c_particle_system_definition::system_is_looping_particle(void) const
 	return TEST_FLAG(this->flags, _particle_system_definition_flags_looping_particle);
 }
 
+bool c_particle_system_definition::spread_between_ticks(void) const
+{
+	return TEST_FLAG(this->flags, _particle_system_definition_flags_spread_between_ticks);
+}
+
 real32 c_particle_emitter_definition::get_particle_emissions_per_tick(s_particle_state* particle_state)
 {
 	typedef real32(__thiscall* get_particle_emissions_per_tick_t)(c_particle_emitter_definition*, s_particle_state*);

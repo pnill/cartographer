@@ -98,18 +98,16 @@ void c_particle_emitter::pulse(
 
 	if (!particle_system_definition->system_is_looping_particle() || _this->particle_index == NONE)
 	{
-		_this->emission_time = emitter_definition->get_particle_emissions_per_tick(particle_state) * delta + _this->emission_time;
+		_this->particles_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * delta + _this->particles_to_emit;
 	}
-	if (_this->emission_time + k_real_math_epsilon >= 1.0f)
+	if (_this->particles_to_emit + k_real_math_epsilon >= 1.0f)
 	{
-		bool particle_system_definition_flag_check = TEST_BIT(particle_system_definition->flags, 7);
-
 		real32 time_slice = 0.f;
 		real32 accumulator = 0.f;
 
-		if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition_flag_check)
+		if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition->spread_between_ticks())
 		{
-			time_slice = 1.f / _this->emission_time;
+			time_slice = 1.f / _this->particles_to_emit;
 		}
 		else
 		{
@@ -117,9 +115,11 @@ void c_particle_emitter::pulse(
 			delta = 0.f;
 		}
 
-		while (_this->emission_time + k_real_math_epsilon >= 1.0f)
+		// while there are multiple particles to emit, spawn them
+		while (_this->particles_to_emit + k_real_math_epsilon >= 1.0f)
 		{
-			_this->emission_time -= 1.0f;
+			// subtract 1 particle
+			_this->particles_to_emit -= 1.0f;
 			_this->spawn_particle(particle_state, particle_system, emitter_definition, alpha, accumulator, delta, scale);
 			accumulator += time_slice;
 		}
@@ -169,45 +169,59 @@ void c_particle_emitter::adjust_initial_particle_position(
 	}
 
 	datum particle_index = this->particle_index;
+	real32 particle_count_to_emit = 0.0f;
+
+	// if particle is not none, the particle count got to emit got updated at least once
+	if (particle_index != NONE)
+	{
+		particle_count_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt;
+	}
+
 	while (particle_index != NONE)
 	{
-		this->emission_time = 0.0f;
 		c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 		c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
 
-		if (!particle_system_definition->system_is_looping_particle() || particle->next_particle == NONE)
+		if (!particle_system_definition->system_is_looping_particle())
 		{
-			this->emission_time = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt + this->emission_time;
+			particle_count_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt + particle_count_to_emit;
 		}
 
-		if (this->emission_time + k_real_math_epsilon >= 1.0f)
+		if (particle_count_to_emit + k_real_math_epsilon >= 1.0f)
 		{
-			bool particle_system_definition_flag_check = TEST_BIT(particle_system_definition->flags, 7);
-
-			real32 time_slice = 0.f;
+			real32 spread = 0.f;
 			real32 accumulator = 0.f;
 
-			if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition_flag_check)
+			if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition->spread_between_ticks())
 			{
-				time_slice = 1.f / this->emission_time;
+				spread = 1.f / particle_count_to_emit;
 			}
 			else
 			{
+				spread = 0.0f;
 				accumulator = 1.f;
 				dt = 0.f;
 			}
 
-			while (this->emission_time + k_real_math_epsilon >= 1.0f)
+			while (particle_count_to_emit + k_real_math_epsilon >= 1.0f)
 			{
-				this->emission_time -= 1.0f;
+				particle_count_to_emit -= 1.0f;
 				particle->adjust_initial_position(emitter_definition, this, particle_state, particle_system, accumulator, dt, scale);
-				accumulator += time_slice;
+				accumulator += spread;
+
+				if (particle_count_to_emit + k_real_math_epsilon >= 1.0f && particle->next_particle != NONE)
+				{
+					particle = (c_particle*)datum_get(get_particle_table(), particle->next_particle);
+				}
+				else
+				{
+					break;
+				}
 			}
 		}
-
 		particle_index = particle->next_particle;
 	}
-	
+
 	return;
 }
 

@@ -25,7 +25,7 @@ enum e_particle_billboard_style : int16
     _particle_billboard_horizontal
 };
 
-enum e_particle_definition_flags : int32
+enum e_particle_definition_flags : uint32
 {
     _particle_spins = FLAG(0),
     _particle_random_u_mirror = FLAG(1),
@@ -98,8 +98,8 @@ public:
     // particle initial velocity direction relative to the location's forward
     real_euler_angles2d relative_direction;
 
-    int32 runtime_flags;
-    int32 runtime_flags_2;
+    uint32 runtime_flags;
+    uint32 runtime_flags_2;
 
     real32 get_particle_emissions_per_tick(s_particle_state* particle_state);
 
@@ -138,14 +138,15 @@ public:
 
     c_particle_definition_interface* get_particle_system_interface() const;
 
-    bool c_particle_system_definition::system_is_looping_particle(void) const;
+    bool spread_between_ticks(void) const;
+    bool system_is_looping_particle(void) const;
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 
 class c_particle_definition
 {
 public:
-    e_particle_definition_flags flags;
+    uint32 flags;
     e_particle_billboard_style billboard_style;
     int8 pad[2];
     int16 first_sequence_index;

@@ -12,7 +12,7 @@ struct c_particle_emitter
 	int16 m_particle_count;
 	datum particle_index;
 	datum m_next_emitter_index;
-	real32 emission_time;
+	real32 particles_to_emit;
 	real_matrix3x3 matrix;
 	real_point3d position;
 	real_point3d previous_position;

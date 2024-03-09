@@ -66,7 +66,7 @@ void c_particle_system::update_colors(bool v_mirrored_or_one_shot, bool one_shot
 	return INVOKE_TYPE(0xC381F, 0, void(__thiscall *)(c_particle_system*, bool, bool, pixel32, pixel32), this, v_mirrored_or_one_shot, one_shot, color, color_2);
 }
 
-int32 c_particle_system::get_particle_count()
+int32 c_particle_system::get_particle_count() const
 {
 	int32 particle_count = 0;
 	datum current_location_index = this->particle_system_location_index;

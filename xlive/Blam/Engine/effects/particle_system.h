@@ -62,9 +62,7 @@ public:
 
 	c_particle_system_definition* get_definition() const;
 
-	void pulse();
-
-	bool get_ever_pulsed_or_frame_updated()
+	bool get_ever_pulsed_or_frame_updated() const
 	{
 		return flags.test(_particle_system_bit_11) || flags.test(_particle_system_bit_9);
 	}
@@ -83,7 +81,7 @@ public:
 
 	void change_parent_effect(datum* datum_1, datum* datum_2);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
-	int32 get_particle_count();
+	int32 get_particle_count() const;
 
 	static bool __stdcall frame_advance(c_particle_system* thsix, real32 delta_time);
 
