@@ -47,9 +47,11 @@ struct c_particle_emitter
 		real32 dt
 	);
 
-	void update_positions(
+	void calc_matrix(
+		c_particle_emitter_definition* definition,
 		c_particle_system* particle_system,
-		c_particle_location* particle_location
+		real32 scale,
+		const real_matrix4x3* matrix
 	);
 };
 CHECK_STRUCT_SIZE(c_particle_emitter, 0x4C);

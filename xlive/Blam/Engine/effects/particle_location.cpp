@@ -27,7 +27,7 @@ void c_particle_location::adjust_emitter_particle_intial_position(
 	s_particle_state particle_state;
 	particle_state.set_particle_system(particle_system);
 	particle_state.set_particle_location(this);
-	particle_state.state_update(0x1FFFF);
+	particle_state.state_update(0x1FFFFu);
 	particle_state.m_states[7] = this->field_1C;
 
 	for (datum particle_emitter_index = this->particle_emitter_index; particle_emitter_index != NONE; )

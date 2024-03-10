@@ -64,7 +64,6 @@ void c_particle_emitter::pulse(
 	real32 alpha)
 {
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
-	c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 	real32 scale = 1.0f;
 	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
 	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->multi_purpose_origin_index);
@@ -78,22 +77,7 @@ void c_particle_emitter::pulse(
 			scale = matrix->scale;
 		}
 
-		_this->matrix = matrix->vectors;
-		_this->position = matrix->position;
-		scale_vector3d(&_this->position, scale, &_this->position);
-
-		real_vector3d translated_vector;
-		matrix3x3_transform_vector(&_this->matrix, &emitter_definition->translational_offset, &translated_vector);
-
-		if (abs(emitter_definition->relative_direction.yaw) >= k_real_math_epsilon ||
-			abs(emitter_definition->relative_direction.pitch) >= k_real_math_epsilon)
-		{
-			real_matrix3x3 rotations_matrix;
-			matrix3x3_from_angles(&rotations_matrix, emitter_definition->relative_direction.yaw, emitter_definition->relative_direction.pitch, 0.0f);
-			matrix3x3_multiply(&_this->matrix, &rotations_matrix, &_this->matrix);
-		}
-
-		add_vectors3d(&_this->position, &translated_vector, &_this->position);
+		calc_matrix(emitter_definition, particle_system, scale, matrix);
 	}
 
 	if (!particle_system_definition->system_is_looping_particle() || _this->particle_index == NONE)
@@ -127,7 +111,36 @@ void c_particle_emitter::pulse(
 	return;
 }
 
-// ### TODO de-duplication with c_particle_emitter::pulse
+void c_particle_emitter::calc_matrix(
+	c_particle_emitter_definition* definition, 
+	c_particle_system* particle_system, 
+	real32 scale, 
+	const real_matrix4x3* matrix
+)
+{
+	this->matrix = matrix->vectors;
+	this->position = matrix->position;
+	scale_vector3d(&this->position, scale, &this->position);
+
+	real_vector3d translated_vector;
+	matrix3x3_transform_vector(&this->matrix, &definition->translational_offset, &translated_vector);
+
+	if (abs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
+		abs(definition->relative_direction.pitch) >= k_real_math_epsilon)
+	{
+		real_matrix3x3 rotations_matrix;
+		matrix3x3_from_angles(&rotations_matrix, definition->relative_direction.yaw, definition->relative_direction.pitch, 0.0f);
+		matrix3x3_multiply(&this->matrix, &rotations_matrix, &this->matrix);
+	}
+
+	add_vectors3d(&this->position, &translated_vector, &this->position);
+}
+
+// ### FIXME this approach will probably not work
+// because when the particle is spawned, it'll use the position of the emitter at that time
+// that can change in time
+// that or we need to figure out a way to update the effect just once
+// thus update only the spawn position
 void c_particle_emitter::adjust_initial_particle_position(
 	c_particle_system* particle_system,
 	c_particle_emitter_definition* emitter_definition,
@@ -150,22 +163,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 			scale = matrix->scale;
 		}
 
-		this->matrix = matrix->vectors;
-		this->position = matrix->position;
-		scale_vector3d(&this->position, scale, &this->position);
-
-		real_vector3d translated_vector;
-		matrix3x3_transform_vector(&this->matrix, &emitter_definition->translational_offset, &translated_vector);
-
-		if (abs(emitter_definition->relative_direction.yaw) >= k_real_math_epsilon ||
-			abs(emitter_definition->relative_direction.pitch) >= k_real_math_epsilon)
-		{
-			real_matrix3x3 rotations_matrix;
-			matrix3x3_from_angles(&rotations_matrix, emitter_definition->relative_direction.yaw, emitter_definition->relative_direction.pitch, 0.0f);
-			matrix3x3_multiply(&this->matrix, &rotations_matrix, &this->matrix);
-		}
-
-		add_vectors3d(&this->position, &translated_vector, &this->position);
+		calc_matrix(emitter_definition, particle_system, scale, matrix);
 	}
 
 	datum particle_index = this->particle_index;
@@ -179,8 +177,8 @@ void c_particle_emitter::adjust_initial_particle_position(
 
 	while (particle_index != NONE)
 	{
-		c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 		c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
+		c_particle_definition_interface* particle_system_interface = particle_system_definition->get_particle_system_interface();
 
 		if (!particle_system_definition->system_is_looping_particle())
 		{
@@ -198,7 +196,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 			}
 			else
 			{
-				spread = 0.0f;
+				spread = 0.f;
 				accumulator = 1.f;
 				dt = 0.f;
 			}
@@ -208,7 +206,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 				particle_count_to_emit -= 1.0f;
 				particle->adjust_initial_position(emitter_definition, this, particle_state, particle_system, accumulator, dt, scale);
 				accumulator += spread;
-
+				
 				if (particle_count_to_emit + k_real_math_epsilon >= 1.0f && particle->next_particle != NONE)
 				{
 					particle = (c_particle*)datum_get(get_particle_table(), particle->next_particle);
@@ -219,6 +217,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 				}
 			}
 		}
+
 		particle_index = particle->next_particle;
 	}
 

@@ -114,11 +114,12 @@ void c_particle_system::adjust_initial_position(datum particle_location_index, c
 		c_particle_system_definition* particle_system_def = this->get_definition();
 		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), particle_location_index);
 
-		if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
+		// ### TODO FIXME info in particle emitter
+		/*if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
 		{
 			if (this->flags.test(_particle_system_bit_8))
 				particle_location->adjust_emitter_particle_intial_position(this, time_globals::get_seconds_per_tick(), matrix);
-		}
+		}*/
 	}
 }
 
@@ -297,6 +298,8 @@ void apply_particle_system_patches()
 	p_c_particle_system__restart = (t_c_particle_system__update_location_time)DetourClassFunc((uint8*)Memory::GetAddress(0xC3E32), (uint8*)c_particle_system::restart, 11);
 
 	DETOUR_ATTACH(p_update_position, Memory::GetAddress<t_c_particle_system__update_position>(0xC376A), jmp_c_particle_system_update_position);
+
+	// TODO fixme info in particle emitter
 	// allow world coordinate system particles to be updated
 	NopFill(Memory::GetAddress(0xA9563), 5);
 	NopFill(Memory::GetAddress(0xA9563) + 5 + 4, 6);
