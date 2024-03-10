@@ -5,6 +5,21 @@
 #include "Blam/Engine/main/interpolator.h"
 #include "Blam/Engine/objects/objects.h"
 
+s_data_array* get_effects_table()
+{
+    return *Memory::GetAddress<s_data_array**>(0x4CE884, 0x4F5070);
+}
+
+s_data_array* get_effects_location_table()
+{
+    return *Memory::GetAddress<s_data_array**>(0x4CE880, 0x4F506C);
+}
+
+real_point3d* effect_get_velocity(datum effect_index)
+{
+    effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), effect_index);
+    return &effect->velocity;
+}
 
 datum __cdecl effect_new_from_object(
     datum effect_tag_index,
@@ -18,19 +33,32 @@ datum __cdecl effect_new_from_object(
     return INVOKE(0xAADCE, 0x9CE4E, effect_new_from_object, effect_tag_index, damage_owner, object_index, a4, a5, color, effect_vector_field);
 }
 
-s_data_array* get_effects_table()
+effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_index, int32* out_index, int16 a3)
 {
-    return *Memory::GetAddress<s_data_array**>(0x4CE884, 0x4F5070);
+    return INVOKE(0xA68DD, 0x9895D, effect_location_get_next_valid_index, effect_index, out_index, a3);
 }
 
-s_data_array* get_effects_location_table()
+void __cdecl effects_frame_advance(real32 dt)
 {
-    return *Memory::GetAddress<s_data_array**>(0x4CE880, 0x4F506C);
+
 }
 
-effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3)
+void __cdecl effect_update(datum effect_index, real32 dt)
 {
-    return INVOKE(0xA68DD, 0x9895D, effect_location_get_next_valid_index, effect_datum, out_index, a3);
+    void* fn = Memory::GetAddress<void*>(0xAA9FF, 0x0);
+
+    __asm
+    {
+        mov eax, dt
+        push eax
+        mov eax, effect_index
+        call fn
+    }
+}
+
+void __cdecl effect_update_time(datum effect_datum, real32 dt)
+{
+    return INVOKE(0xAA7B4, 0x0, effect_update_time, effect_datum, dt);
 }
 
 void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_datum* effect, real_matrix4x3* out_mat, bool a4)

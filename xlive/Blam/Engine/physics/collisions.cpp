@@ -6,7 +6,7 @@ uint16 collision_compute_object_cull_flags(datum object_index)
 	return INVOKE(0xCBE87, 0x8C1A7, collision_compute_object_cull_flags, object_index);
 }
 
-bool __cdecl collision_test_line(e_collision_test_flags flags,
+bool __cdecl collision_test_line(uint32 flags,
     const real_point3d* placement,
     const real_point3d* position,
     datum first_ignore_object_index,
@@ -16,7 +16,7 @@ bool __cdecl collision_test_line(e_collision_test_flags flags,
     return INVOKE(0xCAC08, 0x8AF26, collision_test_line, flags, placement, position, first_ignore_object_index, second_ignore_object_index, collision);
 }
 
-bool __cdecl collision_test_vector(e_collision_test_flags flags,
+bool __cdecl collision_test_vector(uint32 flags,
     const real_point3d* placement,
     const real_vector3d* direction,
     datum first_ignore_object_index,

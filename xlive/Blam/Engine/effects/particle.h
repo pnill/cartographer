@@ -2,9 +2,11 @@
 
 #define k_max_particles 1024
 
+#include "particle_system.h"
+#include "particle_emitter.h"
 #include "Blam/Engine/memory/data.h"
 
-enum e_particle_flags : int16
+enum e_particle_flags : uint16
 {
 	_particle_flag_bit_0 = 0x0,
 	_particle_flag_bit_1 = 0x1,
@@ -27,14 +29,23 @@ enum e_particle_flags : int16
 struct c_particle
 {
 	int8 gap_0[2];
-	e_particle_flags flags;
-	int32 next_particle;
+	uint16 flags;
+	datum next_particle;
 	real32 time_accumulator;
 	real32 effect_delay_time;
 	int8 gap_10[12];
 	real_point3d m_position;
 	real_vector3d m_velocity;
 	int8 gap_34[12];
+
+	void adjust_initial_position(
+		c_particle_emitter_definition* emitter_definition,
+		c_particle_emitter* particle_emitter,
+		s_particle_state* state,
+		c_particle_system* particle_system,
+		real32 fraction,
+		real32 dt,
+		real32 scale);
 };
 
 s_data_array* get_particle_table();

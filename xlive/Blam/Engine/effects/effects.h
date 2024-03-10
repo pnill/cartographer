@@ -6,7 +6,7 @@
 #include "memory/data.h"
 
 
-enum e_effect_flags : int16
+enum e_effect_datum_flags : int16
 {
     _effect_datum_flags_bit_0 = 0,
     _effect_datum_flags_bit_1 = 1,
@@ -24,7 +24,7 @@ enum e_effect_flags : int16
     _effect_datum_flags_bit_13 = 13,
     _effect_datum_flags_bit_14 = 14,
     _effect_datum_flags_bit_15 = 15,
-    k_effect_flag_count
+    k_effect_datum_flag_count,
 };
 
 enum e_effect_location_flags : uint16
@@ -41,7 +41,7 @@ struct s_effect_struct
 struct effect_datum
 {
     int8 gap_0[2];
-    c_flags<e_effect_flags, int16, k_effect_flag_count> flags;
+    c_flags<e_effect_datum_flags, uint16, k_effect_datum_flag_count> flags;
     datum tag_index;
     datum object_looping_sound_index;
     string_id input_marker_name;
@@ -51,7 +51,7 @@ struct effect_datum
     int8 field_1A[2];
     s_location location;
     real_rgb_color color;
-    real_vector3d vector;
+    real_vector3d velocity;
     int8 gap_3C[12];
     datum object_index;
     s_damage_owner damage_owner;
@@ -97,6 +97,9 @@ s_data_array* get_effects_table();
 
 s_data_array* get_effects_location_table();
 
+real_point3d* effect_get_velocity(datum effect_index);
+void __cdecl effect_update(datum effect_index, real32 dt);
+void __cdecl effect_update_time(datum effect_index, real32 dt);
 effect_location_datum* __cdecl effect_location_get_next_valid_index(effect_datum* effect_datum, int32* out_index, int16 a3);
 
 void effects_apply_patches();

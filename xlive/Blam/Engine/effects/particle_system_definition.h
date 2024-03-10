@@ -6,13 +6,15 @@
 #include "particle_property.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/shaders/shader_definitions.h"
-#include "Blam/Engine/shaders/shader_postprocess_definitions.h"
+#include "shaders/shader_definitions.h"
+#include "shaders/shader_postprocess_definitions.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 #define k_maximum_emitters_per_definition 8
 #define k_maximum_particle_systems_per_block 32
 
+class c_particle;
+class c_particle_system;
 
 enum e_particle_billboard_style : int16
 {
@@ -23,7 +25,7 @@ enum e_particle_billboard_style : int16
     _particle_billboard_horizontal
 };
 
-enum e_particle_definition_flags : int32
+enum e_particle_definition_flags : uint32
 {
     _particle_spins = FLAG(0),
     _particle_random_u_mirror = FLAG(1),
@@ -96,8 +98,12 @@ public:
     // particle initial velocity direction relative to the location's forward
     real_euler_angles2d relative_direction;
 
-    int32 runtime_flags;
-    int32 runtime_flags_2;
+    uint32 runtime_flags;
+    uint32 runtime_flags_2;
+
+    real32 get_particle_emissions_per_tick(s_particle_state* particle_state);
+
+    void initialize_particle(s_particle_state* particle_state, c_particle* particle, c_particle_system* particle_system);
 
     void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
     void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
@@ -117,7 +123,7 @@ public:
     e_particle_system_camera_mode camera_mode;
     // use values between -10 and 10 to move closer and farther from camera (positive is closer)
     int16 sort_bias;
-    e_particle_system_definition_flags flags;
+    uint16 flags;
     //defaults to 0.0
     real32 lod_in_distance;
     //defaults to 0.0
@@ -131,13 +137,16 @@ public:
     tag_block<c_particle_emitter_definition> emitters;
 
     c_particle_definition_interface* get_particle_system_interface() const;
+
+    bool spread_between_ticks(void) const;
+    bool system_is_looping_particle(void) const;
 };
 CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
 
 class c_particle_definition
 {
 public:
-    e_particle_definition_flags flags;
+    uint32 flags;
     e_particle_billboard_style billboard_style;
     int8 pad[2];
     int16 first_sequence_index;

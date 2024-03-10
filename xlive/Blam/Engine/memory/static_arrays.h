@@ -44,6 +44,16 @@ public:
 		return;
 	}
 
+	t_storage_type not()
+	{
+		return ~m_storage;
+	}
+
+	void or(t_storage_type flags)
+	{
+		m_storage |= flags;
+	}
+
 	bool valid_bit(t_type bit) const
 	{
 		return VALID_INDEX(0, k_count);
