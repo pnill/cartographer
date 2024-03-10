@@ -55,22 +55,29 @@ struct s_shader_postprocess_implementation_new
 	int16 vertex_constants;
 };
 
+// max count: k_kilo
+#pragma pack(push,1)
 struct s_shader_postprocess_level_of_detail_new
 {
 	int32 available_layer_flags;
 	int16 layers;
 };
+TAG_BLOCK_SIZE_ASSERT(s_shader_postprocess_level_of_detail_new, 6);
+#pragma pack(pop)
 
+// max count: k_kilo
 struct s_shader_postprocess_bitmap_new
 {
-	int32 bitmap_group;
-	int32 bitmap_index;
+	datum bitmap_group;		// This is the actual index in cache builds?
+	datum bitmap_index;
 	real32 log_bitmap_dimension;
 };
+TAG_BLOCK_SIZE_ASSERT(s_shader_postprocess_bitmap_new, 12);
+
 
 struct s_shader_postprocess_definition_new
 {
-	int32 shader_template_index;
+	datum shader_template_index;
 	tag_block<s_shader_postprocess_bitmap_new> bitmaps;
 	tag_block<pixel32> pixel_constants;
 	tag_block<real_vector4d> vertex_constants;
