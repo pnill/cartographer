@@ -2,22 +2,22 @@
 #include "TagFixes.h"
 
 #include "Blam/Cache/TagGroups/light_definition.h"
-#include "Blam/Cache/TagGroups/shader_definition.hpp"
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 
-#include "Blam/Engine/units/biped_definitions.h"
+#include "shaders/shader_definitions.h"
+#include "units/biped_definitions.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 // ### TODO Cleanup
+extern bool g_xbox_tickrate_enabled;
 
 namespace TagFixes
 {
 	namespace
 	{
-		void fix_shader_template_nvidia(const std::string &template_name, const std::string &bitmap_name, int32 bitmap_idx)
+		void fix_shader_template_nvidia(const char *template_name, const char* bitmap_name, int32 bitmap_idx)
 		{
 			datum bitmap_to_fix = tags::find_tag(_tag_group_bitmap, bitmap_name);
 			datum borked_template = tags::find_tag(_tag_group_shader_template, template_name);
@@ -53,8 +53,6 @@ namespace TagFixes
 		}
 		void fix_shaders_nvidia()
 		{
-			if (Memory::IsDedicatedServer()) return;
-
 			fix_shader_template_nvidia(
 				"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
 				"shaders\\default_bitmaps\\bitmaps\\alpha_white",
@@ -98,42 +96,42 @@ namespace TagFixes
 		void ShaderSpecularFix()
 		{
 			//Fix the Master Chief FP Arms Shader
-			auto fp_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
+			datum fp_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\masterchief\\fp\\shaders\\fp_arms");
 			if (fp_shader_datum != NONE)
 			{
-				auto fp_shader = tags::get_tag<_tag_group_shader, shader_definition>(fp_shader_datum);
-				fp_shader->lightmapSpecularBrightness = 1.0f;
+				s_shader_definition* fp_shader = (s_shader_definition*)tag_get_fast(fp_shader_datum);
+				fp_shader->lightmap_specular_brightness = 1.0f;
 			}
 
 			//Fix the Visor
-			auto tex_bump_env_datum = tags::find_tag(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump_env");
-			auto visor_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
+			datum tex_bump_env_datum = tags::find_tag(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump_env");
+			datum visor_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\masterchief\\shaders\\masterchief_visor");
 			if (visor_shader_datum != NONE)
 			{
-				auto visor_shader = tags::get_tag_fast<shader_definition>(visor_shader_datum);
-				visor_shader->postprocessDefinition[0]->shaderTemplateIndex = tex_bump_env_datum;
+				s_shader_definition* visor_shader = (s_shader_definition*)tag_get_fast(visor_shader_datum);
+				visor_shader->postprocess_definition[0]->shader_template_index = tex_bump_env_datum;
 			}
 
 			//Fix the Grunt Shaders
-			auto grunt_arm_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
+			datum grunt_arm_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_arms");
 			if (grunt_arm_shader_datum != NONE)
 			{
-				auto grunt_arm_shader = tags::get_tag_fast<shader_definition>(grunt_arm_shader_datum);
-				grunt_arm_shader->lightmapSpecularBrightness = 1.0f;
+				s_shader_definition* grunt_arm_shader = (s_shader_definition*)tag_get_fast(grunt_arm_shader_datum);
+				grunt_arm_shader->lightmap_specular_brightness = 1.0f;
 			}
 
-			auto grunt_backpack_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
+			datum grunt_backpack_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_backpack");
 			if (grunt_backpack_shader_datum != NONE)
 			{
-				auto grunt_backpack_shader = tags::get_tag_fast<shader_definition>(grunt_backpack_shader_datum);
-				grunt_backpack_shader->lightmapSpecularBrightness = 1.0f;
+				s_shader_definition* grunt_backpack_shader = (s_shader_definition*)tag_get_fast(grunt_backpack_shader_datum);
+				grunt_backpack_shader->lightmap_specular_brightness = 1.0f;
 			}
 
-			auto grunt_torso_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
+			datum grunt_torso_shader_datum = tags::find_tag(_tag_group_shader, "objects\\characters\\grunt\\shaders\\grunt_torso");
 			if (grunt_torso_shader_datum != NONE)
 			{
-				auto grunt_torso_shader = tags::get_tag_fast<shader_definition>(grunt_torso_shader_datum);
-				grunt_torso_shader->lightmapSpecularBrightness = 1.0f;
+				s_shader_definition* grunt_torso_shader = (s_shader_definition*)tag_get_fast(grunt_torso_shader_datum);
+				grunt_torso_shader->lightmap_specular_brightness = 1.0f;
 			}
 		}
 
@@ -144,13 +142,14 @@ namespace TagFixes
 			WriteValue<int>(Memory::GetAddress(0x464958), 0);
 			WriteValue<int>(Memory::GetAddress(0x464964), 0);
 		}
+
 		void shader_lod_max()
 		{
 			auto shaders = tags::find_tags(_tag_group_shader);
 			for (auto& shader_item : shaders)
 			{
-				auto shader = tags::get_tag<_tag_group_shader, shader_definition>(shader_item.first);
-				shader->shaderLODBias = shader_definition::_Never;
+				auto shader = tags::get_tag<_tag_group_shader, s_shader_definition>(shader_item.first);
+				shader->shader_lod_bias = _shader_lod_bias_never;
 			}
 		}
 
@@ -228,7 +227,8 @@ namespace TagFixes
 
 	void OnMapLoad()
 	{
-		if (!Memory::IsDedicatedServer()) {
+		if (!Memory::IsDedicatedServer()) 
+		{
 			fix_shaders_nvidia();
 			ShaderSpecularFix();
 			fix_dynamic_lights();
@@ -243,8 +243,11 @@ namespace TagFixes
 				light_framerate_killer();
 			}
 		}
-		// both client/server
-		fall_damage_fix();
+		if (!g_xbox_tickrate_enabled)
+		{
+			// both client/server
+			fall_damage_fix();
+		}
 	}
 
 	void Initalize()

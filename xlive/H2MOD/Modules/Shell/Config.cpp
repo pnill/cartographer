@@ -1,7 +1,7 @@
 #include "stdafx.h"
-
 #include "Config.h"
 
+#include "cartographer/twizzler/twizzler.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"
@@ -75,7 +75,8 @@ bool H2Config_vip_lock = false;
 bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
-bool H2Config_anti_cheat_enabled = true;
+
+
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
@@ -545,7 +546,7 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
+			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", g_twizzler_status);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 
@@ -844,7 +845,7 @@ void ReadH2Config() {
 				H2Config_vip_lock = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "vip_lock", H2Config_vip_lock);
 				H2Config_even_shuffle_teams = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shuffle_even_teams", H2Config_even_shuffle_teams);
 				H2Config_koth_random = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "koth_random", H2Config_koth_random);
-				H2Config_anti_cheat_enabled = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", H2Config_anti_cheat_enabled);
+				twizzler_set_status(ini.GetBoolValue(H2ConfigVersionSection.c_str(), "enable_anti_cheat", g_twizzler_status));
 
 				const char* login_identifier = ini.GetValue(H2ConfigVersionSection.c_str(), "login_identifier", H2Config_login_identifier);
 				if (login_identifier) {

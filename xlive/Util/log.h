@@ -8,7 +8,7 @@ enum log_level : unsigned int {
 	debug,    //          Give me the dirty details
 	info,     // Default. Occasionally helpful information
 	warning,  //          What probably shouldn't be happening
-	error,    //          Bad news only, please
+	_log_level_error,    //          Bad news only, please
 	critical  //          I only want to see death and destruction
 };
 

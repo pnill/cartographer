@@ -522,8 +522,8 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 	c_bitstream stream(element->data, element->data_size);
 	stream.begin_reading();
 
-	int32 entity_index = NONE;
-	datum gamestate_index = NONE;
+	int32 entity_index;
+	datum gamestate_index;
 	e_simulation_entity_type entity_type;
 	if (simulation_queue_entity_decode_header(&stream, &entity_type, &gamestate_index))
 	{
@@ -545,6 +545,13 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		game_entity.creation_data_size = 0;
 		game_entity.state_data = NULL;
 		game_entity.state_data_size = 0;
+
+		// validate the object index, mainly for attached objects
+		// cause they might have been deleted already with the parent
+		if (!simulation_object_index_valid(game_entity.object_index))
+		{
+			game_entity.object_index = NONE;
+		}
 
 		if (entity_def->delete_game_entity(&game_entity))
 		{

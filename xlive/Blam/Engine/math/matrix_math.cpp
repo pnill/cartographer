@@ -287,7 +287,31 @@ void __cdecl matrix3x3_multiply(real_matrix3x3* input_matrix_1, real_matrix3x3* 
 	INVOKE(0x78645, 0x7623B, matrix3x3_multiply, input_matrix_1, input_matrix_2, out_matrix);
 }
 
-void matrix3x3_transform_vector(real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector)
+void matrix3x3_transform_vector(const real_matrix3x3* input_matrix, real_vector3d* input_vector, real_vector3d* out_vector)
 {
 	INVOKE(0x78800, 0x763F6, matrix3x3_transform_vector, input_matrix, input_vector, out_vector);
+}
+
+real_matrix3x3* matrix3x3_from_angles(real_matrix3x3* matrix, real32 i, real32 j, real32 k)
+{
+	const real_vector3d cosine_vector{ cos(i), cos(j), cos(k) };
+	const real_vector3d sine_vector{ sin(i), sin(j), sin(k) };
+
+
+	real32 ci_ck = cosine_vector.i * cosine_vector.k;
+	real32 ci_sk = cosine_vector.i * sine_vector.k;
+
+	real32 si_ck = sine_vector.i * cosine_vector.k;
+	real32 si_sk = sine_vector.i * sine_vector.k;
+
+	matrix->forward.i = cosine_vector.i * cosine_vector.j;
+	matrix->forward.j = cosine_vector.j * sine_vector.i;
+	matrix->forward.k = sine_vector.j;
+	matrix->left.i = -(ci_sk * cosine_vector.j) - si_ck;
+	matrix->left.j = ci_ck - (si_sk * cosine_vector.j);
+	matrix->left.k = cosine_vector.j * sine_vector.k;
+	matrix->up.i = si_sk - (ci_ck * cosine_vector.j);
+	matrix->up.j = -(si_ck * cosine_vector.j) - ci_sk;
+	matrix->up.k = cosine_vector.j * cosine_vector.k;
+	return matrix;
 }

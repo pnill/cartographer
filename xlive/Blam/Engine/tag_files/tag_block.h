@@ -8,11 +8,11 @@ struct tag_block
 	int32 count;
 	int32 data;
 
-	int data_size() const
+	int32 data_size() const
 	{
-		return size * sizeof(T);
+		return count * type_size();
 	}
-	int type_size() const
+	int32 type_size() const
 	{
 		return sizeof(T);
 	}
@@ -42,14 +42,14 @@ struct tag_block
 	{
 		static_assert(std::is_void<T>::value == false, "You need to set the tag block type to use this function");
 		if (index == NONE)
-			return nullptr;
+			return NULL;
 		if (index >= this->count)
-			return nullptr;
+			return NULL;
 		if (this->begin()) {
 			T* data_array = this->begin();
 			return &data_array[index];
 		}
-		return nullptr;
+		return NULL;
 	}
 };
 CHECK_STRUCT_SIZE(tag_block<>, 8);
