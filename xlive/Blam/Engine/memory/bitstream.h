@@ -93,7 +93,7 @@ struct c_bitstream
 
 	void write_string_wchar(const char* name, const void* string, int size_in_words);
 	void read_string_wchar(const char* name, void* string, int size_in_words);
-	void write_integer(const char* name, unsigned int value, unsigned int size_in_bits);
+	void write_integer(const char* name, int32 value, uint32 size_in_bits);
 	int32 read_integer(const char* name, uint32 size_in_bits);
 	void write_raw_data(const char* name, void* data, unsigned int size_in_bits);
 	void read_raw_data(const char* name, void* data, int size_in_bits);
