@@ -301,6 +301,6 @@ void apply_particle_system_patches()
 
 	// TODO fixme info in particle emitter
 	// allow world coordinate system particles to be updated
-	NopFill(Memory::GetAddress(0xA9563), 5);
-	NopFill(Memory::GetAddress(0xA9563) + 5 + 4, 6);
+	//NopFill(Memory::GetAddress(0xA9563), 5);
+	//NopFill(Memory::GetAddress(0xA9563) + 5 + 4, 6);
 }
