@@ -16,10 +16,6 @@
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 RECT rectScreenOriginal;
 
-//Leveraging this call to unset the controller state
-typedef void(__cdecl sub_B524F7_t)(int a1);
-sub_B524F7_t* p_sub_B524F7;
-
 __int16 last_user_index;
 //Patching this call to enable keyboards to switch death targets
 unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
@@ -229,7 +225,6 @@ void hotkeyFuncConsole() {
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	p_sub_B524F7 = Memory::GetAddress<sub_B524F7_t*>(0x824F7);
 	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
 	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {

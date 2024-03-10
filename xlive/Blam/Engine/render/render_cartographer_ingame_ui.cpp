@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "render_cartographer_ingame_ui.h"
 
+#include "cartographer/twizzler/twizzler.h"
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/rasterizer/rasterizer_globals.h"
 #include "Blam/Engine/interface/hud.h"
@@ -53,7 +54,7 @@ void render_cartographer_status_text()
 
 		bounds.bottom = bounds.top + line_height;
 
-		if (H2Config_anti_cheat_enabled)
+		if (g_twizzler_status)
 		{
 			draw_string_set_options(0, 1, 0, false);
 			draw_string_render(&bounds, L"Anti-cheat is enabled");

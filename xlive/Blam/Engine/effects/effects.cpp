@@ -63,8 +63,8 @@ void __cdecl effect_update_time(datum effect_datum, real32 dt)
 
 void __cdecl effect_datum_get_node_matrix_relative_or_origin(int16 node, effect_datum* effect, real_matrix4x3* out_mat, bool a4)
 {
-    int32 origin_user = effect->origin_local_user_index;
-    datum origin_object_index = effect->multi_purpose_origin_index;
+    int32 origin_user = effect->first_person_user_index;
+    datum origin_object_index = effect->object_index;
 
     bool special_node = (node & 0x8000) != 0;
     int16 node_index = node & ~0x8000;

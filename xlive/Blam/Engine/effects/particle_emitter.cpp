@@ -66,7 +66,7 @@ void c_particle_emitter::pulse(
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
 	real32 scale = 1.0f;
 	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
-	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->multi_purpose_origin_index);
+	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
 	_this->previous_position = _this->position;
 	if (matrix)
@@ -152,7 +152,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
 	real32 scale = 1.0f;
 	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
-	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->multi_purpose_origin_index);
+	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
 	this->previous_position = this->position;
 	if (matrix)

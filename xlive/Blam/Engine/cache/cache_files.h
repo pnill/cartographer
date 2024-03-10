@@ -87,6 +87,18 @@ struct s_cache_header
 };
 CHECK_STRUCT_SIZE(s_cache_header, 0x800);
 
+struct s_cache_file_globals
+{
+	bool tags_loaded;
+	bool custom_map;
+	int8 pad[2];
+	int32 tag_cache_base_address;
+	s_cache_header cache_header;
+	s_tags_header* tags_header;
+	void* field_80C;
+};
+CHECK_STRUCT_SIZE(s_cache_file_globals, 0x810);
+
 struct tag_iterator
 {
 	int32 field_0;
