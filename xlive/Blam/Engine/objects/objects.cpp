@@ -444,30 +444,309 @@ void object_initialize_for_interpolation(datum object_index)
 	return;
 }
 
+datum object_allocate_header(datum tag_definition_index)
+{
+	datum object_index = NONE;
+	if (tag_definition_index != NONE)
+	{
+		const object_definition* object_def = (object_definition*)tag_get_fast(tag_definition_index);
+		const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
+		const s_model_definition* model_definition = NULL;
+		object_index = object_header_new(object_type_definition->datum_size);
+
+		if (object_index != NONE)
+		{
+			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
+			object_datum* object = object_get_fast_unsafe(object_index);
+		}
+	}
+
+	return object_index;
+}
+
+datum object_new_internal(datum object_index, object_placement_data* placement)
+{
+	bool process_is_game_client = !Memory::IsDedicatedServer();
+
+	const object_definition* object_def = (object_definition*)tag_get_fast(placement->tag_index);
+	const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
+	const s_model_definition* model_definition = NULL;
+
+	if (object_def->model.index != NONE)
+	{
+		model_definition = (s_model_definition*)tag_get_fast(object_def->model.index);
+	}
+
+	halo_interpolator_setup_new_object(object_index);
+	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
+	object_datum* object = object_get_fast_unsafe(object_index);
+
+	object_header->flags.set(_object_header_post_update_bit, true);
+	object_header->object_type = object_def->object_type;
+	object->tag_definition_index = placement->tag_index;
+
+	if (placement->object_identifier.get_source() == NONE)
+	{
+		object->object_identifier.create_dynamic(object_def->object_type);
+		object->placement_index = NONE;
+		object->structure_bsp_index = get_global_structure_bsp_index();
+	}
+	else
+	{
+		object->object_identifier = placement->object_identifier;
+		object->placement_index = placement->placement_index;
+		object->structure_bsp_index = placement->object_identifier.get_origin_bsp();
+	}
+
+	object->position = placement->position;
+	object->forward = placement->forward;
+	object->up = placement->up;
+	object->translational_velocity = placement->translational_velocity;
+	object->angular_velocity = placement->angular_velocity;
+	object->scale = placement->scale;
+
+	bool enable = placement->flags.test(_scenario_object_placement_bit_0);
+	object->object_flags.set(_object_mirrored_bit, enable);
+	enable = model_definition && model_definition->collision_model.index != NONE;
+	object->object_flags.set(_object_uses_collidable_list_bit, enable);
+
+	datum mode_index;
+	datum coll_index;
+	enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
+	object->object_flags.set(_object_has_prt_or_lighting_info_bit, enable);
+
+	object_header->cluster_index = NONE;
+	location_invalidate(&object->location);
+	object->first_cluster_reference = NONE;
+	object->parent_index = NONE;
+	object->next_index = NONE;
+	object->current_weapon_datum = NONE;
+	object->name_list_index = NONE;
+	object->netgame_equipment_index = NONE;
+	object->byte_108 = NONE;
+	object->byte_109 = NONE;
+	object->placement_policy = placement->placement_policy;
+	if (TEST_FLAG(object_def->flags, _object_definition_does_not_cast_shadow))
+	{
+		object->object_flags.set(_object_shadowless_bit, true);
+	}
+
+	if (object->object_flags.test(_object_hidden_bit))
+	{
+		object->object_flags.set(_object_hidden_bit, false);
+		if (object_is_connected_to_map(object_index))
+		{
+			object_connect_lights_recursive(object_index, false, true, false, false);
+		}
+		object_update_collision_culling(object_index);
+	}
+
+	object->damage_owner_target_model_abs_index = placement->damage_owner.target_model_abs_index;
+	object->damage_owner_owner_index = placement->damage_owner.owner_index;
+	object->damage_owner_object_index = placement->damage_owner.entity_index;
+	object->model_variant_id = NONE;
+	object->cached_object_render_state_index = NONE;
+	object->field_D0 = NONE;
+	object->physics_flags.set_raw_bits(0);
+	object->physics_flags.set(_object_physics_bit_8, placement->flags.test(_scenario_object_placement_bit_3));
+	object->havok_datum = NONE;
+	object->simulation_entity_index = NONE;
+	object->attached_to_simulation = 0;
+	object->destroyed_constraints_flag = placement->destroyed_constraints_flag;
+	object->loosened_constraints_flag = placement->loosened_constraints_flag;
+
+	uint32 node_count = 1;
+	uint32 collision_regions_count = 1;
+	uint32 damage_info_damage_sections_size = 0;
+
+	bool allow_interpolation = false;
+	bool valid_animation_manager = false;
+
+	if (model_definition)
+	{
+		if (model_definition->nodes.count >= 1)
+		{
+			node_count = model_definition->nodes.count;
+		}
+		if (model_definition->collision_regions.count >= 1)
+		{
+			collision_regions_count = model_definition->collision_regions.count;
+		}
+
+		if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
+		{
+			damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
+		}
+
+		if (model_definition->animation.index != NONE)
+		{
+			c_animation_manager animation_manager;
+			if (animation_manager.reset_graph(model_definition->animation.index, object_def->model.index, true))
+			{
+				valid_animation_manager = true;
+				allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), (
+					FLAG(_object_type_sound_scenery) |
+					FLAG(_object_type_light_fixture) |
+					FLAG(_object_type_control) |
+					FLAG(_object_type_machine) |
+					FLAG(_object_type_scenery) |
+					FLAG(_object_type_projectile))
+				);
+
+				// allow interpolation if object is device and device flags include interpolation
+				if (TEST_FLAG(FLAG(object_def->object_type), (FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine))))
+				{
+					_device_definition* device_def = (_device_definition*)tag_get_fast(placement->tag_index);
+					if (TEST_FLAG(device_def->flags, _device_definition_allow_interpolation))
+					{
+						allow_interpolation = true;
+					}
+				}
+			}
+		}
+	}
+
+	int16 orientation_size = (!allow_interpolation ? 0 : 32 * node_count);
+
+	// Allocate object header blocks
+	bool can_create_object =
+		object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (uint16)8 * (uint16)object_def->attachments.count, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (uint16)24 * (uint16)object_def->change_colors.count, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), sizeof(real_matrix4x3) * node_count, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
+		&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
+		&& havok_can_allocate_space_for_instance_of_object_definition(placement->tag_index);
+
+	// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
+	bool out_of_objects = !can_create_object;
+	if (can_create_object)
+	{
+		if (valid_animation_manager)
+		{
+			c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
+			animation_manager->initialize();
+			bool graph_reset = animation_manager->reset_graph(model_definition->animation.index, object_def->model.index, true);
+			object->object_flags.set(_object_data_bit_11, graph_reset);
+		}
+
+		// Null attachment block
+		if (object_def->attachments.count > 0)
+		{
+			int32 attachments_count;
+			object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
+				&object->object_attachments_block,
+				sizeof(object_attachment),
+				&attachments_count);
+
+			csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
+		}
+
+		if (object_type_new(object_index, placement, &out_of_objects))
+		{
+			bool object_flag_check = object->object_flags.test(_object_deleted_when_deactivated_bit);
+			if (placement->flags.test(_scenario_object_placement_bit_1) || placement->flags.test(_scenario_object_placement_bit_2))
+			{
+				object->object_flags.set(_object_deleted_when_deactivated_bit, false);
+			}
+
+			update_object_variant_index(object_index, placement->variant_name);
+			update_object_region_information(object_index, placement->region_index);
+			object_set_initial_change_colors(object_index, placement->active_change_colors_mask, placement->change_colors);
+			object_initialize_vitality(object_index, NULL, NULL);
+			object_compute_change_colors(object_index);
+			object->emblem_info = placement->emblem_info;
+
+			if (object->animation_manager_block.offset != NONE)
+			{
+				object_reset_interpolation(object_index);
+			}
+
+			object_compute_node_matrices_with_children(object_index);
+
+			// If the object (can) connect to the map we make sure it gets connected
+			if (objects_can_connect_to_map())
+			{
+				placement->object_is_inside_cluster = set_object_position_if_in_cluster(&placement->location, object_index);
+
+				// If the object is inside a cluster set the location to the one passed in the placement data
+				// If not then pass null
+				s_location* p_location = (placement->object_is_inside_cluster ? &placement->location : NULL);
+				object_reconnect_to_map(p_location, object_index);
+			}
+
+			object_postprocess_node_matrices(object_index);
+			object_initialize_for_interpolation(object_index);
+
+			object_wake(object_index);
+
+			object->physics_flags.set(_object_physics_bit_2, placement->flags.test(_scenario_object_placement_bit_5));
+
+			object_reconnect_to_physics(object_index);
+			object_initialize_effects(object_index);
+			object_type_create_children(object_index);
+
+			if (object_def->creation_effect.index != NONE)
+			{
+				effect_new_from_object(object_def->creation_effect.index, &placement->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
+			}
+
+			// Not 100% sure what this function does but it has to do with occlusion
+			// This function is nulled out on the dedi
+			if (process_is_game_client)
+			{
+				object_occlusion_data_initialize(object_index);
+			}
+
+			object->object_flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
+			object_early_mover_new(object_index);
+
+			if (object->object_flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
+			{
+				if (objects_can_connect_to_map())
+				{
+					if (!placement->flags.test(_scenario_object_placement_bit_1) && (!placement->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
+					{
+						object_delete(object_index);
+					}
+				}
+			}
+		}
+		else
+		{
+			object_type_delete(object_index);
+			free_object_memory(object_index);
+			object_index = NONE;
+		}
+	}
+	else
+	{
+		free_object_memory(object_index);
+		object_index = NONE;
+	}
+
+	return object_index;
+}
+
 typedef datum (__cdecl* t_object_new)(object_placement_data* placement_data);
 t_object_new p_object_new;
 
 // Creates a new object
-datum __cdecl object_new(object_placement_data* data)
+datum __cdecl object_new(object_placement_data* placement_data)
 {
 	datum object_index = NONE;
-	bool process_is_game_client = !Memory::IsDedicatedServer();
 
-	if (!data->flags.test(_scenario_object_placement_bit_4) && data->tag_index != NONE)
+	if (!placement_data->flags.test(_scenario_object_placement_bit_4) 
+		&& placement_data->tag_index != NONE)
 	{
-		object_type_adjust_placement(data);
+		object_type_adjust_placement(placement_data);
 	}
 
-	if (data->tag_index != NONE)
+	if (placement_data->tag_index != NONE)
 	{
-	 	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
-		const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
-		const s_model_definition* model_definition = NULL;
-
-		if (object_def->model.index != NONE)
-		{
-			model_definition = (s_model_definition*)tag_get_fast(object_def->model.index);
-		}
+	 	const object_definition* object_def = (object_definition*)tag_get_fast(placement_data->tag_index);
 
 		if (
 			TEST_FLAG(FLAG(object_def->object_type), 
@@ -477,258 +756,10 @@ datum __cdecl object_new(object_placement_data* data)
 			havok_memory_garbage_collect();
 		}
 
-		object_index = object_header_new(object_type_definition->datum_size);
+		object_index = object_allocate_header(placement_data->tag_index);
 		if (object_index != NONE)
 		{
-			halo_interpolator_setup_new_object(object_index);
-			s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
-			object_datum* object = object_get_fast_unsafe(object_index);
-
-			object_header->flags.set(_object_header_post_update_bit, true);
-			object_header->object_type = object_def->object_type;
-			object->tag_definition_index = data->tag_index;
-
-			if (data->object_identifier.get_source() == NONE)
-			{
-				object->object_identifier.create_dynamic(object_def->object_type);
-				object->placement_index = NONE;
-				object->structure_bsp_index = get_global_structure_bsp_index();
-			}
-			else
-			{
-				object->object_identifier = data->object_identifier;
-				object->placement_index = data->placement_index;
-				object->structure_bsp_index = data->object_identifier.get_origin_bsp();
-			}
-
-			object->position = data->position;
-			object->forward = data->forward;
-			object->up = data->up;
-			object->translational_velocity = data->translational_velocity;
-			object->angular_velocity = data->angular_velocity;
-			object->scale = data->scale;
-
-			bool enable = data->flags.test(_scenario_object_placement_bit_0);
-			object->object_flags.set(_object_mirrored_bit, enable);
-			enable = model_definition && model_definition->collision_model.index != NONE;
-			object->object_flags.set(_object_uses_collidable_list_bit, enable);
-
-			datum mode_index;
-			datum coll_index;
-			enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
-			object->object_flags.set(_object_has_prt_or_lighting_info_bit, enable);
-
-			object_header->cluster_index = NONE;
-			location_invalidate(&object->location);
-			object->first_cluster_reference = NONE;
-			object->parent_index = NONE;
-			object->next_index = NONE;
-			object->current_weapon_datum = NONE;
-			object->name_list_index = NONE;
-			object->netgame_equipment_index = NONE;
-			object->byte_108 = NONE;
-			object->byte_109 = NONE;
-			object->placement_policy = data->placement_policy;
-			if (TEST_FLAG(object_def->flags, _object_definition_does_not_cast_shadow))
-			{
-				object->object_flags.set(_object_shadowless_bit, true);
-			}
-
-			if (object->object_flags.test(_object_hidden_bit))
-			{
-				object->object_flags.set(_object_hidden_bit, false);
-				if (object_is_connected_to_map(object_index))
-				{
-					object_connect_lights_recursive(object_index, false, true, false, false);
-				}
-				object_update_collision_culling(object_index);
-			}
-
-			object->damage_owner_target_model_abs_index = data->damage_owner.target_model_abs_index;
-			object->damage_owner_owner_index = data->damage_owner.owner_index;
-			object->damage_owner_object_index = data->damage_owner.entity_index;
-			object->model_variant_id = NONE;
-			object->cached_object_render_state_index = NONE;
-			object->field_D0 = NONE;
-			object->physics_flags.set_raw_bits(0);
-			object->physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
-			object->havok_datum = NONE;
-			object->simulation_entity_index = NONE;
-			object->attached_to_simulation = 0;
-			object->destroyed_constraints_flag = data->destroyed_constraints_flag;
-			object->loosened_constraints_flag = data->loosened_constraints_flag;
-
-			uint32 node_count = 1;
-			uint32 collision_regions_count = 1;
-			uint32 damage_info_damage_sections_size = 0;
-
-			bool allow_interpolation = false;
-			bool valid_animation_manager = false;
-
-			if (model_definition)
-			{
-				if (model_definition->nodes.count >= 1)
-				{
-					node_count = model_definition->nodes.count;
-				}
-				if (model_definition->collision_regions.count >= 1)
-				{
-					collision_regions_count = model_definition->collision_regions.count;
-				}
-
-				if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
-				{
-					damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
-				}
-
-				if (model_definition->animation.index != NONE)
-				{
-					c_animation_manager animation_manager;
-					if (animation_manager.reset_graph(model_definition->animation.index, object_def->model.index, true))
-					{
-						valid_animation_manager = true;
-						allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), (
-							FLAG(_object_type_sound_scenery) |
-							FLAG(_object_type_light_fixture) |
-							FLAG(_object_type_control) |
-							FLAG(_object_type_machine) |
-							FLAG(_object_type_scenery) |
-							FLAG(_object_type_projectile))
-						);
-
-						// allow interpolation if object is device and device flags include interpolation
-						if (TEST_FLAG(FLAG(object_def->object_type), (FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine))))
-						{
-							_device_definition* device_def = (_device_definition*)tag_get_fast(data->tag_index);
-							if (TEST_FLAG(device_def->flags, _device_definition_allow_interpolation))
-							{
-								allow_interpolation = true;
-							}
-						}
-					}
-				}
-			}
-
-			int16 orientation_size = (!allow_interpolation ? 0 : 32 * node_count);
-
-			// Allocate object header blocks
-			bool can_create_object =
-				object_header_block_allocate(object_index, offsetof(object_datum, object_attachments_block), (uint16)8 * (uint16)object_def->attachments.count, 0)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, damage_sections_block), 8 * damage_info_damage_sections_size, 0)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, change_color_block), (uint16)24 * (uint16)object_def->change_colors.count, 0)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, nodes_block), sizeof(real_matrix4x3) * node_count, 0)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, collision_regions_block), 10 * collision_regions_count, 0)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
-				&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
-				&& havok_can_allocate_space_for_instance_of_object_definition(data->tag_index);
-
-			// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
-			bool out_of_objects = !can_create_object;
-			if (can_create_object)
-			{
-				if (valid_animation_manager)
-				{
-					c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
-					animation_manager->initialize();
-					bool graph_reset = animation_manager->reset_graph(model_definition->animation.index, object_def->model.index, true);
-					object->object_flags.set(_object_data_bit_11, graph_reset);
-				}
-
-				// Null attachment block
-				if (object_def->attachments.count > 0)
-				{
-					int32 attachments_count;
-					object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
-						&object->object_attachments_block,
-						sizeof(object_attachment),
-						&attachments_count);
-
-					csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
-				}
-
-				if (object_type_new(object_index, data, &out_of_objects))
-				{
-					bool object_flag_check = object->object_flags.test(_object_deleted_when_deactivated_bit);
-					if (data->flags.test(_scenario_object_placement_bit_1) || data->flags.test(_scenario_object_placement_bit_2))
-					{
-						object->object_flags.set(_object_deleted_when_deactivated_bit, false);
-					}
-
-					update_object_variant_index(object_index, data->variant_name);
-					update_object_region_information(object_index, data->region_index);
-					object_set_initial_change_colors(object_index, data->active_change_colors_mask, data->change_colors);
-					object_initialize_vitality(object_index, NULL, NULL);
-					object_compute_change_colors(object_index);
-					object->emblem_info = data->emblem_info;
-
-					if (object->animation_manager_block.offset != NONE)
-					{
-						object_reset_interpolation(object_index);
-					}
-
-					object_compute_node_matrices_with_children(object_index);
-
-					// If the object (can) connect to the map we make sure it gets connected
-					if (objects_can_connect_to_map())
-					{
-						data->object_is_inside_cluster = set_object_position_if_in_cluster(&data->location, object_index);
-
-						// If the object is inside a cluster set the location to the one passed in the placement data
-						// If not then pass null
-						s_location* p_location = (data->object_is_inside_cluster ? &data->location : NULL);
-						object_reconnect_to_map(p_location, object_index);
-					}
-
-					object_postprocess_node_matrices(object_index);
-					object_initialize_for_interpolation(object_index);
-
-					object_wake(object_index);
-
-					object->physics_flags.set(_object_physics_bit_2, data->flags.test(_scenario_object_placement_bit_5));
-
-					object_reconnect_to_physics(object_index);
-					object_initialize_effects(object_index);
-					object_type_create_children(object_index);
-
-					if (object_def->creation_effect.index != NONE)
-					{
-						effect_new_from_object(object_def->creation_effect.index, &data->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
-					}
-
-					// Not 100% sure what this function does but it has to do with occlusion
-					// This function is nulled out on the dedi
-					if (process_is_game_client)
-					{
-						object_occlusion_data_initialize(object_index);
-					}
-
-					object->object_flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
-					object_early_mover_new(object_index);
-
-					if (object->object_flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
-					{
-						if (objects_can_connect_to_map())
-						{
-							if (!data->flags.test(_scenario_object_placement_bit_1) && (!data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
-							{
-								object_delete(object_index);
-							}
-						}
-					}
-				}
-				else
-				{
-					object_type_delete(object_index);
-					free_object_memory(object_index);
-					object_index = NONE;
-				}
-			}
-			else
-			{
-				free_object_memory(object_index);
-				object_index = NONE;
-			}
+			object_index = object_new_internal(object_index, placement_data);
 		}
 	}
 	
