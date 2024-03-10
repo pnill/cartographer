@@ -15,6 +15,10 @@
 
 #include "version.h"
 
+static_assert(EXECUTABLE_VERSION < 65535 && EXECUTABLE_VERSION > 0, "EXECUTABLE_VERSION VALUE EXCEEDS 65534");
+static_assert(COMPATIBLE_VERSION < 65535 && COMPATIBLE_VERSION > 0, "COMPATIBLE_VERSION VALUE EXCEEDS 65534");
+static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VALUE EXCEEDS 7 OR BELLOW 0");
+
 #define TEST_N_DEF(TEST)
 
 #define _USE_MATH_DEFINES
@@ -82,11 +86,7 @@
 
 #include <contrib/minizip/zip.h>
 
-#if defined __has_include
-#  if __has_include ("CartographerDllConf.h")
-#    include "CartographerDllConf.h"
-#  endif
-#endif
+#include "CartographerDllConf.h"
 
 extern std::random_device rd;
 
