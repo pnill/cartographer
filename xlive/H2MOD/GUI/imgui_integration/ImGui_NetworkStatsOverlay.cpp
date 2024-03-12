@@ -3,7 +3,11 @@
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "effects/player_effects.h"
+#include "game/game_time.h"
+#include "Networking/memory/networking_memory.h"
+#include "Networking/Session/NetworkSession.h"
+#include "simulation/simulation.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 
@@ -36,7 +40,7 @@ net_bandwidth_display_data get_net_bandwidth_display_data(unsigned int bytes_cou
 
 void ShowNetworkStatsOverlay(bool* p_open)
 {
-	if (p_open == nullptr 
+	if (p_open == nullptr
 		|| !*p_open)
 		return;
 
@@ -94,7 +98,7 @@ void ShowNetworkStatsOverlay(bool* p_open)
 		{
 			const XnIpPckTransportStats* local_user_net_metrics;
 			localIp->PckGetStats(&local_user_net_metrics);
-			
+
 			localIp->m_pckStats.PckDataSampleUpdate();
 
 			int currentSentPerSecIdx = local_user_net_metrics->pckCurrentSendPerSecIdx;
@@ -104,24 +108,83 @@ void ShowNetworkStatsOverlay(bool* p_open)
 			{
 				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesSentPerSec[currentSentPerSecIdx]);
 
-				ImGui::Text("Network pck xmit:  %d pck/s", 
-					local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx]);
-				ImGui::Text("Network pck bandwidth xmit:  %.3g %s/s", 
-					bandwidth_usage.val, bandwidth_usage.unit_str);
+				ImGui::Text("Network pck xmit:  %d pck/s bandwidth:  %.3g %s/s",
+					local_user_net_metrics->pckSentPerSec[currentSentPerSecIdx],
+					bandwidth_usage.val,
+					bandwidth_usage.unit_str);
 			}
 
 			if (currentRecvdPerSecIdx != -1)
 			{
 				net_bandwidth_display_data bandwidth_usage = get_net_bandwidth_display_data(local_user_net_metrics->pckBytesRecvdPerSec[currentRecvdPerSecIdx]);
 
-				ImGui::Text("Network pck recvd: %d pck/s", 
-					local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx]);
-				ImGui::Text("Network pck bandwidth recvd: %.3g %s/s", 
-					bandwidth_usage.val, bandwidth_usage.unit_str);
+				ImGui::Text("Network pck recvd: %d pck/s bandwidth: %.3g %s/s",
+					local_user_net_metrics->pckRecvdPerSec[currentRecvdPerSecIdx],
+					bandwidth_usage.val,
+					bandwidth_usage.unit_str);
 			}
 		}
 
-		if (window_flags & ImGuiWindowFlags_NoMouseInputs)
+		// ImGui::Text("Object count: %d", object_get_count());
+		// ImGui::Text("Object count from iter: %d", object_count_from_iter());
+		// ImGui::Text("Object to interpolate count: %d", ObjectInterpolate::GetObjectInterpolateCount());
+
+		ImGui::Text("Game tick fraction leftover: %.5f", time_globals::get_ticks_fraction_leftover());
+
+		// s_player_effect_user_globals* user_effect = player_effects_get_user_globals(0);
+
+		// ImGui::Text("Game impulse transition scale: %.5f, camera shake transition scale: %.5f", 
+		// 	user_effect->camera_impulse_transition_scale,
+		// 	user_effect->camera_shake_transition_scale
+		// );
+
+		s_network_heap_stats* net_heap_stats = network_heap_get_description();
+		ImGui::Text("Network heap allocated count: [%d], size in bytes: [%d]", net_heap_stats->allocations, net_heap_stats->allocations_in_bytes);
+
+		c_simulation_world* sim_world = simulation_get_world();
+		const s_simulation_queue_stats* sim_queue_stats;
+		bool sim_queue_stats_available = sim_world->queue_describe(_simulation_queue, &sim_queue_stats);
+
+		if (sim_queue_stats_available)
+		{
+			ImGui::Text("Simulation queue statistics:");
+			ImGui::Text("allocated: [%d], queued: [%d], in bytes: [%d]",
+				sim_queue_stats->allocated,
+				sim_queue_stats->queued,
+				sim_queue_stats->allocated_in_bytes);
+
+			static bool restricted_allocations_once = false;
+			static real32 allocated_percentage_max;
+			static real32 allocated_in_bytes_percentage_max;
+			bool restricting_allocations = false;
+
+			allocated_percentage_max = MAX(allocated_percentage_max, sim_queue_stats->allocated_percentage);
+			allocated_in_bytes_percentage_max = MAX(allocated_in_bytes_percentage_max, sim_queue_stats->allocated_bytes_percentage);
+
+			// if we allocated more than 90% of the buffer
+			// skip some updates to aleviate some of the stress on the queue
+			// especially if the game froze for multiple seconds
+			// and allow the allocation for important updates only
+			// entity deletion, entity promotion, and global game events
+			if (sim_queue_stats->allocated_percentage > 90.f / 100.f
+				|| sim_queue_stats->allocated_bytes_percentage > 90.f / 100.f)
+			{
+				restricting_allocations = true;
+				restricted_allocations_once = true;
+			}
+
+			ImGui::Text("allocated %%: [%.3f] [%.3f], restricting?: %s",
+				sim_queue_stats->allocated_percentage * 100.f,
+				sim_queue_stats->allocated_bytes_percentage * 100.f,
+				restricting_allocations ? "YES!" : "no");
+
+			ImGui::Text("max allocated %%: [%.3f] [%.3f], restricted alloc: %s",
+				allocated_percentage_max * 100.f,
+				allocated_in_bytes_percentage_max * 100.f,
+				restricted_allocations_once ? "YES!" : "no");
+		}
+
+		if (!(window_flags & ImGuiWindowFlags_NoMouseInputs))
 		{
 			if (ImGui::BeginPopupContextWindow())
 			{
