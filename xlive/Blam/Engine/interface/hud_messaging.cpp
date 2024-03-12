@@ -20,7 +20,7 @@ __declspec(naked) void ui_hud_left_messaging_top_scale()
 		mov eax, [p_text_scale_factor]
 		fmul[eax]
 		pop eax
-		fisttp[esp + 18h]
+		fistp[esp + 18h]
 
 		// original code
 		mov     ecx, ebx
