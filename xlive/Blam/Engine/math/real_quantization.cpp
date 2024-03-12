@@ -2,7 +2,7 @@
 
 #include "real_quantization.h"
 
-int32 quantize_real(real32 value, real32 min_value, real32 max_value, int8 size_in_bits, bool exact_midpoint)
+int32 quantize_real(real32 value, real32 min_value, real32 max_value, int32 size_in_bits, bool exact_midpoint)
 {
 	int32 step_count = (1 << size_in_bits) - 1;
 	if (exact_midpoint)
@@ -13,7 +13,7 @@ int32 quantize_real(real32 value, real32 min_value, real32 max_value, int8 size_
 	return (int32)((value - min_value) / ((max_value - min_value) / (real32)step_count));
 }
 
-real32 dequantize_real(int32 quantized_value, real32 min_value, real32 max_value, int8 size_in_bits, bool exact_midpoint)
+real32 dequantize_real(int32 quantized_value, real32 min_value, real32 max_value, int32 size_in_bits, bool exact_midpoint)
 {
 	int32 step_count = (1 << size_in_bits) - 1;
 	real32 result;
