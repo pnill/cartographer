@@ -17,7 +17,7 @@ s_simulation_globals* simulation_get_globals()
 
 c_simulation_world* simulation_get_world()
 {
-    return simulation_get_globals()->simulation_world;
+    return simulation_get_globals()->world;
 }
 
 bool simulation_engine_initialized()
@@ -35,12 +35,28 @@ bool simulation_reset_in_progress()
     return simulation_get_globals()->simulation_reset_in_progress;
 }
 
+bool simulation_starting_up(void)
+{
+    bool result = false;
+    s_simulation_globals* simulation_globals = simulation_get_globals();
+    if (simulation_globals->engine_initialized)
+    {
+        ASSERT(simulation_globals->world);
+        if (!simulation_globals->engine_paused && simulation_globals->world->exists())
+        {
+            result = !simulation_globals->world->is_active();
+        }
+    }
+
+    return result;
+}
+
 void simulation_notify_reset_complete()
 {
     s_simulation_globals* sim_globals = simulation_get_globals();
     if (!game_is_playback())
     {
-        sim_globals->simulation_world->send_player_acknowledgements(true);
+        sim_globals->world->send_player_acknowledgements(true);
     }
     sim_globals->simulation_reset_in_progress = false;
 }
@@ -50,7 +66,7 @@ void simulation_reset_immediate()
     s_simulation_globals* sim_globals = simulation_get_globals();
 
     sim_globals->simulation_reset_in_progress = true;
-    sim_globals->simulation_world->reset_world();
+    sim_globals->world->reset_world();
     simulation_queue_game_global_event_insert(_simulation_queue_game_global_event_main_reset_map);
     // ### TODO figure out these
     // simulation_gamestate_entities_build_clear_flags();
@@ -113,7 +129,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     c_simulation_queue simulation_bookkeeping_queue, game_simulation_queue;
     c_simulation_world* sim_world = simulation_get_world();
 
-    simulation_get_globals()->simulation_world->queues_update_statistsics();
+    simulation_get_globals()->world->queues_update_statistsics();
 
     // only during distributed system or server synchronous
     // but not client synchronous
@@ -182,7 +198,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
 
     if (update->flush_gamestate)
     {
-        simulation_get_globals()->simulation_world->gamestate_flush_immediate();
+        simulation_get_globals()->world->gamestate_flush_immediate();
     }
 
 	// destroy the update exactly after we applied the queues to the gamestate
@@ -220,7 +236,7 @@ void __cdecl simulation_update_pregame(void)
         }
         else
         {
-            globals->simulation_world->queues_update_statistsics();
+            globals->world->queues_update_statistsics();
         }
     }
 }

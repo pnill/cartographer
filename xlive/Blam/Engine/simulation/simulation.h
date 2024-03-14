@@ -38,7 +38,7 @@ struct s_simulation_globals
 	bool simulation_reset_pending;
 	bool simulation_reset_in_progress;
 	bool field_B;
-	c_simulation_world* simulation_world;
+	c_simulation_world* world;
 	c_simulation_watcher* simulation_watcher;
 	c_simulation_type_collection* simulation_type_collection;
 };
@@ -49,6 +49,7 @@ s_simulation_globals* simulation_get_globals();
 
 void simulation_reset();
 bool simulation_reset_in_progress();
+bool simulation_starting_up(void);
 void simulation_notify_reset_complete();
 
 bool simulation_in_progress();
