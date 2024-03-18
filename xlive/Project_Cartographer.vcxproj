@@ -396,6 +396,7 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
+    <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
@@ -866,6 +867,7 @@
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
+    <ClInclude Include="Blam\Engine\objects\damage_effects.h" />
     <ClInclude Include="Blam\Engine\objects\emblems.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\object_definition.h" />
