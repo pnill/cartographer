@@ -19,6 +19,50 @@ enum e_player_effect_global_flags : uint32
 	k_player_effect_global_flag_count
 };
 
+enum e_screen_flash_type : int16
+{
+	_screen_flash_type_none = 0,
+	_screen_flash_type_lighten = 1,
+	_screen_flash_type_darken = 2,
+	_screen_flash_type_max = 3,
+	_screen_flash_type_min = 4,
+	_screen_flash_type_invert = 5,
+	_screen_flash_type_tint = 6
+};
+
+enum e_screen_flash_priority : int16
+{
+	_screen_flash_priority_low = 0,
+	_screen_flash_priority_medium = 1,
+	_screen_flash_priority_high = 2
+};
+
+// equivalent to e_transition_function but zero and one spots are swapped?
+enum e_screen_flash_fade_function : int16
+{
+	_screen_flash_fade_function_linear = 0,
+	_screen_flash_fade_function_early = 1,
+	_screen_flash_fade_function_very_early = 2,
+	_screen_flash_fade_function_late = 3,
+	_screen_flash_fade_function_very_late = 4,
+	_screen_flash_fade_function_cosine = 5,
+	_screen_flash_fade_function_zero = 6,
+	_screen_flash_fade_function_one = 7
+};
+
+// max count: 1
+struct screen_flash_definition
+{
+	e_screen_flash_type type;
+	e_screen_flash_priority priority;
+	real32 duration;	// Seconds
+	e_screen_flash_fade_function fade_function;
+	int16 pad;
+	real32 maximum_intensity;
+	real_argb_color color;
+};
+CHECK_STRUCT_SIZE(screen_flash_definition, 32);
+
 struct s_temporary_camera_impulse
 {
 	real32 duration;
