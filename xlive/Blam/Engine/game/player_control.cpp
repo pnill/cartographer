@@ -17,7 +17,7 @@ real32 __cdecl player_control_get_autocenter_delta()
 {
 	if (halo_interpolator_update_in_progress())
 	{
-		return time_globals::get_seconds_per_tick();
+		return game_tick_length();
 	}
 
 	return g_player_control_dt;

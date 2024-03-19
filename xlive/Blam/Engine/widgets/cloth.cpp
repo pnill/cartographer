@@ -52,9 +52,9 @@ void cloth_frame_advance(real32 dt)
 		if (time_globals::available())
 		{
 			cloth->accum += dt;
-			if (cloth->accum > time_globals::get_seconds_per_tick())
+			if (cloth->accum > game_tick_length())
 			{
-				cloth->accum -= (int32)(cloth->accum / time_globals::get_seconds_per_tick()) * time_globals::get_seconds_per_tick();
+				cloth->accum -= (int32)(cloth->accum / game_tick_length()) * game_tick_length();
 				sub_58F279(cloth_it.get_current_datum_index());
 				sub_58E82F(cloth_it.get_current_datum_index());
 				sub_58EF0E(cloth_it.get_current_datum_index());

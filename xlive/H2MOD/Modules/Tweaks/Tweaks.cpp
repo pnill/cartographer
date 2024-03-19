@@ -135,7 +135,7 @@ void __stdcall biped_ground_mode_update_hook(int thisx,
 	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, float);
 	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
-	float edge_drop_per_tick = 30.f * edge_drop_value * time_globals::get_seconds_per_tick();
+	float edge_drop_per_tick = 30.f * edge_drop_value * game_tick_length();
 
 	// push last parameter despite the function taking just 5 parameters
 	p_biped_ground_mode_update(thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);

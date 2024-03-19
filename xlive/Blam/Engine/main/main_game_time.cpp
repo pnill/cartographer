@@ -20,7 +20,7 @@ bool g_main_game_time_frame_limiter_enabled = false;
 float get_ticks_leftover_time()
 {
 	time_globals* time_globals = time_globals::get();
-	float result = time_globals->seconds_per_tick - (float)(time_globals->game_ticks_leftover / (float)time_globals->ticks_per_second);
+	float result = time_globals->tick_length - (float)(time_globals->game_ticks_leftover / (float)time_globals->ticks_per_second);
 	return MAX(result, 0.0f);
 }
 

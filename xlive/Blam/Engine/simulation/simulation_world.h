@@ -182,14 +182,8 @@ public:
 
 	bool is_active() const
 	{
-		bool result = false;
-
-		if (exists())
-		{
-			result = m_world_state == _simulation_world_state_active;
-		}
-
-		return result;
+		ASSERT(exists());
+		return m_world_state == _simulation_world_state_active;
 	}
 
 	bool simulation_queues_empty()
