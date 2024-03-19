@@ -26,8 +26,9 @@ enum e_particle_flags : uint16
 	_particle_flag_bit_15 = 0xF,
 };
 
-struct c_particle
+class c_particle
 {
+public:
 	int8 gap_0[2];
 	uint16 flags;
 	datum next_particle;
