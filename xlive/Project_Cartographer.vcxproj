@@ -347,6 +347,7 @@
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
@@ -378,6 +379,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
     <ClCompile Include="Blam\Engine\math\periodic_functions.cpp" />
@@ -523,6 +525,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
@@ -539,6 +542,7 @@
     <ClInclude Include="Blam\Engine\main\main_screenshot.h" />
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
+    <ClInclude Include="Blam\Engine\main\main_time.h" />
     <ClInclude Include="Blam\Engine\math\color_math.h" />
     <ClInclude Include="Blam\Engine\math\function_definitions.h" />
     <ClInclude Include="Blam\Engine\math\math.h" />

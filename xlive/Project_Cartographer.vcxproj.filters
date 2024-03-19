@@ -303,6 +303,9 @@
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump_logs.cpp" />
+    <ClCompile Include="Blam\Engine\main\main_time.cpp" />
+    <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -840,6 +843,9 @@
     <ClInclude Include="Blam\Engine\main\levels.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump_logs.h" />
+    <ClInclude Include="Blam\Engine\main\main_time.h" />
+    <ClInclude Include="Blam\Engine\objects\damage_effects.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
