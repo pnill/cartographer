@@ -1,10 +1,11 @@
 #include "stdafx.h"
 #include "input_windows.h"
 
-rumble_state* controller_rumble_state_get(int32 controller_index)
-{
-	return Memory::GetAddress<rumble_state*>(0x47A704);
-}
+#include "input_xinput.h"
+
+#include "interface/user_interface_controller.h"
+
+s_vibration_state g_vibration_state[k_number_of_controllers]{};
 
 int32* hs_debug_simulate_gamepad_global_get(void)
 {
@@ -14,4 +15,23 @@ int32* hs_debug_simulate_gamepad_global_get(void)
 bool* input_suppress_global_get(void)
 {
 	return Memory::GetAddress<bool*>(0x479F52);
+}
+
+void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right)
+{
+    ASSERT(VALID_INDEX(gamepad_index, k_number_of_controllers));
+
+    s_vibration_state state = { left, right };
+    s_vibration_state state_none = { 0, 0 };
+
+    bool enabled = user_interface_controller_get_rumble_enabled(gamepad_index);
+    g_vibration_state[gamepad_index] = (enabled ? state : state_none);
+    return;
+}
+
+
+void input_windows_apply_patches(void)
+{
+    PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
+    return;
 }
