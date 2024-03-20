@@ -137,11 +137,7 @@ public:
 
 	bool is_playback() const
 	{
-		if (exists())
-		{
-			return false;
-		}
-
+		ASSERT(exists());
 		return false;
 	}
 
@@ -158,26 +154,14 @@ public:
 
 	bool runs_simulation() const
 	{
-		bool result = false;
-
-		if (exists())
-		{
-			result = m_world_type != _simulation_world_type_synchronous_client;
-		}
-
-		return result;
+		ASSERT(exists());
+		return m_world_type != _simulation_world_type_synchronous_client;
 	}
 
 	bool is_authority() const
 	{
-		bool result = false;
-		if (exists())
-		{
-			result = m_world_type != _simulation_world_type_distributed_client
-				&& m_world_type != _simulation_world_type_synchronous_client;
-		}
-
-		return result;
+		ASSERT(exists());
+		return m_world_type != _simulation_world_type_distributed_client && m_world_type != _simulation_world_type_synchronous_client;
 	}
 
 	bool is_active() const
