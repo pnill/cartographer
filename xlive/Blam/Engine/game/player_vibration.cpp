@@ -9,6 +9,8 @@
 #include "objects/damage_effects.h"
 #include "simulation/simulation.h"
 
+#include "H2MOD/Tags/TagInterface.h"
+
 s_vibration_globals* vibration_globals_get(void);
 s_vibration_state vibration_get_state_usercall(s_vibration_user_globals* user_globals);
 
