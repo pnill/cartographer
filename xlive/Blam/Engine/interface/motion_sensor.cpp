@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "motion_sensor.h"
 
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
+
 #include "hud_definitions.h"
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/game/players.h"
@@ -13,6 +16,8 @@
 real32 g_motion_sensor_observation_accumulator = 0.f;
 real32 g_motion_sensor_sample_accumulator = 0.f;
 real32 g_motion_sensor_sweeper_accumulator = 0.f;
+
+IDirect3DPixelShader9* motion_sensor_sweep_shader;
 
 void __cdecl motion_sensor_update_examine_nearby_players()
 {
@@ -112,9 +117,18 @@ void motion_sensor_update_with_delta(real32 delta)
 	}
 }
 
+void __cdecl rasterizer_dx9_create_motion_sensor_shader()
+{
+	INVOKE(0x28458C, 0x0, rasterizer_dx9_create_motion_sensor_shader);
+
+	IDirect3DDevice9Ex* d3d9_device = rasterizer_dx9_device_get_interface();
+	d3d9_device->CreatePixelShader((const DWORD*)motion_sensor_sweep_pixel_shader_bytecode, &motion_sensor_sweep_shader);
+}
+
 void radar_patch()
 {
-	WriteValue<byte>(Memory::GetAddress(0x2849C4), (byte)D3DBLEND_INVSRCCOLOR);
+	PatchCall(Memory::GetAddress(0x263563), rasterizer_dx9_create_motion_sensor_shader);
+	WritePointer(Memory::GetAddress(0x2849EA) + 2, &motion_sensor_sweep_shader);
 }
 
 void motion_sensor_apply_patches()
