@@ -1,6 +1,8 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "tag_files/string_id.h"
+#include "tag_files/tag_block.h"
 
+#include "memory/static_arrays.h"
 
 struct s_damage_owner
 {
@@ -59,3 +61,4 @@ struct s_damage_group_definition
 	int32 pad;
 };
 TAG_BLOCK_SIZE_ASSERT(s_damage_group_definition, 16);
+

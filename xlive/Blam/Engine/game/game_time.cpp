@@ -28,9 +28,13 @@ int time_globals::get_tickrate()
 	return get()->ticks_per_second;
 }
 
-real32 time_globals::get_seconds_per_tick()
+real32 game_tick_length(void)
 {
-	return get()->seconds_per_tick;
+	time_globals* game_time_globals = time_globals::get();
+	ASSERT(game_time_globals);
+	ASSERT(game_time_globals->initialized);
+
+	return game_time_globals->tick_length;
 }
 
 real32 time_globals::seconds_to_ticks_real(real32 s)
@@ -65,7 +69,7 @@ bool time_globals::available()
 
 real32 game_ticks_to_seconds(real32 ticks)
 {
-	return time_globals::get()->seconds_per_tick * ticks;
+	return time_globals::get()->tick_length * ticks;
 }
 
 bool game_time_get_paused(void)
@@ -115,7 +119,7 @@ void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_
 {
 	if (actual_ticks)
 	{
-		real32 result = *elapsed_game_dt - ((desired_ticks - actual_ticks) * time_globals::get()->seconds_per_tick);
+		real32 result = *elapsed_game_dt - ((desired_ticks - actual_ticks) * time_globals::get()->tick_length);
 		if (result <= 0.0f)
 		{
 			result = 0.0f;

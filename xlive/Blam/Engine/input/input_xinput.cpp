@@ -4,8 +4,6 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
 
-
-
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 xinput_device** g_xinput_devices;
@@ -17,7 +15,7 @@ void input_xinput_clear_rumble_state(void)
     // We set to 4 and check if if the controller is plugged in
     XINPUT_VIBRATION vibration{};
 
-    for (uint32 i = 0; i < 4; ++i)
+    for (uint32 i = 0; i < 4; i++)
     {
         xinput_device* device = g_xinput_devices[i];
         if (device && controller_button_state_get((e_controller_index)i)->plugged_in)
@@ -43,9 +41,8 @@ void input_xinput_update_rumble_state(void)
 
     if (controller_button_state_get(_controller_index_0)->plugged_in)
     {
-        rumble_state* rumble = controller_rumble_state_get(_controller_index_0);
-        g_xinput_vibration.wLeftMotorSpeed = (suppress_rumble ? 0 : rumble->left_rumble);
-        g_xinput_vibration.wRightMotorSpeed = (suppress_rumble ? 0 : rumble->right_rumble);
+        g_xinput_vibration.wLeftMotorSpeed = (suppress_rumble ? 0 : g_vibration_state[_controller_index_0].left);
+        g_xinput_vibration.wRightMotorSpeed = (suppress_rumble ? 0 : g_vibration_state[_controller_index_0].right);
         xinput_device* device = g_xinput_devices[*g_main_controller_index];
         
         if (device)

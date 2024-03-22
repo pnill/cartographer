@@ -15,7 +15,9 @@
 #include "game/game_globals.h"
 #include "game/game_time.h"
 #include "game/player_control.h"
+#include "game/player_vibration.h"
 #include "input/input_xinput.h"
+#include "input/input_windows.h"
 #include "interface/hud.h"
 #include "interface/hud_messaging.h"
 #include "interface/motion_sensor.h"
@@ -966,6 +968,8 @@ void H2MOD::ApplyHooks() {
 		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
+		player_vibration_apply_patches();
+		input_windows_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

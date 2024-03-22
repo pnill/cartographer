@@ -174,9 +174,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 	subtract_vector3d(&m_target_point, object_origin, &target_vector);
 
 	real32 remaining_distance_from_player_position = magnitude3d(&target_vector);
-	real32 max_speed_per_tick = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), m_distance, m_weapon_is_sword);
+	real32 max_speed_per_tick = melee_lunge_get_max_speed_per_tick(game_tick_length(), m_distance, m_weapon_is_sword);
 
-	real32 current_velocity_and_aiming_vector_dot_product = dot_product3d(&m_aiming_direction, current_velocity) * time_globals::get_seconds_per_tick();
+	real32 current_velocity_and_aiming_vector_dot_product = dot_product3d(&m_aiming_direction, current_velocity) * game_tick_length();
 
 	if (m_started_decelerating)
 	{
@@ -204,7 +204,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		real32 unk1 = m_field_28 * 1.5;
 		double unk2 = MAX(MIN(unk1, 3.5), 0.75);
 
-		real32 maybe_minimum_velocity = time_globals::get_seconds_per_tick() * unk2;
+		real32 maybe_minimum_velocity = game_tick_length() * unk2;
 
 		real32 current_velocity_per_tick = magnitude3d(&physics_output->translational_velocity);
 
@@ -230,7 +230,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		//decelerated_velocity > velocity_to_decelerate
 
 		/*real32 aiming_and_player_velocity_product = current_velocity->dot_product(m_aiming_direction);
-		aiming_and_player_velocity_product *= time_globals::get_seconds_per_tick();*/
+		aiming_and_player_velocity_product *= game_tick_length();*/
 
 		/*real32 unk5 = MAX(0.0f, compute_something(aiming_and_player_velocity_product, max_speed_per_tick));*/
 
@@ -403,7 +403,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				else
 					distance = MIN(distance_between_havok_components, m_maximum_distance);
 
-				real32 initial_max_speed_per_tick = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), distance, m_weapon_is_sword);
+				real32 initial_max_speed_per_tick = melee_lunge_get_max_speed_per_tick(game_tick_length(), distance, m_weapon_is_sword);
 
 				// this might not actually be melee_lunge_get_tick_count
 				real32 initial_lunge_tick_count = melee_lunge_get_tick_count(distance, initial_max_speed_per_tick);
@@ -421,7 +421,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					scale_vector3d(&vector_to_target, (distance_between_havok_components / distance_to_target), &vector_to_target);
 				}
 
-				scale_vector3d(target_translational_velocity, time_globals::get_seconds_per_tick() * initial_lunge_tick_count * (unk1 / 2.5f), &field_1C);
+				scale_vector3d(target_translational_velocity, game_tick_length() * initial_lunge_tick_count * (unk1 / 2.5f), &field_1C);
 
 				real_vector3d unk_vector1;
 				add_vectors3d(&field_1C, &vector_to_target, &unk_vector1);
@@ -434,7 +434,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				else
 					new_distance = MIN(unk_distance1, m_maximum_distance);
 
-				real32 max_speed_per_tick_2 = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), new_distance, m_weapon_is_sword);
+				real32 max_speed_per_tick_2 = melee_lunge_get_max_speed_per_tick(game_tick_length(), new_distance, m_weapon_is_sword);
 				real32 lunge_tick_count_2 = melee_lunge_get_tick_count(new_distance, max_speed_per_tick_2);
 
 				field_E = m_maximum_distance != 0.0f && unk_distance1 > m_maximum_distance;
@@ -483,13 +483,13 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		if (m_has_target)
 		{
 			// initialize some data
-			real32 max_speed_per_tick = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), m_distance, m_weapon_is_sword);
+			real32 max_speed_per_tick = melee_lunge_get_max_speed_per_tick(game_tick_length(), m_distance, m_weapon_is_sword);
 			real32 max_speed_per_legacy_tick = melee_lunge_get_max_speed_per_tick(1.0f / 30.f, m_distance, m_weapon_is_sword);
 
 			real32 acceleration = melee_get_acceleration(max_speed_per_tick);
 			real32 acceleration_per_legacy_tick = melee_get_acceleration(max_speed_per_legacy_tick);
 
-			real32 aiming_direction_translational_veloctity_product_per_tick = dot_product3d(&m_aiming_direction, translational_velocity) * time_globals::get_seconds_per_tick();
+			real32 aiming_direction_translational_veloctity_product_per_tick = dot_product3d(&m_aiming_direction, translational_velocity) * game_tick_length();
 			real32 aiming_direction_translational_veloctity_product_per_legacy_tick = dot_product3d(&m_aiming_direction, translational_velocity) * (1.0f / 30.f);
 
 			real32 unk1 = melee_lunge_compute_something_1(max_speed_per_tick, acceleration);
@@ -501,7 +501,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 			real32 distance_to_target_point = magnitude3d(&target_point_vector);
 
 			real_vector3d current_translational_velocity_per_tick = m_melee_tick == 0 ? global_zero_vector3d : *translational_velocity;
-			scale_vector3d(&current_translational_velocity_per_tick, time_globals::get_seconds_per_tick(), &current_translational_velocity_per_tick);
+			scale_vector3d(&current_translational_velocity_per_tick, game_tick_length(), &current_translational_velocity_per_tick);
 
 			// check if we should start decelerating
 			if (max_speed_per_tick > k_valid_real_epsilon)
@@ -518,7 +518,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					// but it looks like it
 					double temp = MAX(MIN(unk3, 3.5), 0.75);
 
-					real32 min_velocity_after_deceleration_per_tick = time_globals::get_seconds_per_tick() * temp;
+					real32 min_velocity_after_deceleration_per_tick = game_tick_length() * temp;
 
 					// magnitude3d might change the floating point unit settings
 					// apparently the issue is present in default code as well
@@ -699,8 +699,8 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 		real32 remaining_distance = magnitude3d(&vector_to_target);
 
 		real32 unk_real32_distance = dot_product3d(&m_aiming_direction, translational_velocity);
-		unk_real32_distance *= time_globals::get_seconds_per_tick();
-		real32 acceleration = melee_lunge_get_max_speed_per_tick(time_globals::get_seconds_per_tick(), m_distance, m_weapon_is_sword);
+		unk_real32_distance *= game_tick_length();
+		real32 acceleration = melee_lunge_get_max_speed_per_tick(game_tick_length(), m_distance, m_weapon_is_sword);
 		acceleration = melee_get_acceleration(acceleration);
 		real32 unk_velocity = MAX(0.0f, melee_lunge_compute_something_1(unk_real32_distance, acceleration));
 

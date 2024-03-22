@@ -118,7 +118,7 @@ void c_particle_system::adjust_initial_position(datum particle_location_index, c
 		/*if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
 		{
 			if (this->flags.test(_particle_system_bit_8))
-				particle_location->adjust_emitter_particle_intial_position(this, time_globals::get_seconds_per_tick(), matrix);
+				particle_location->adjust_emitter_particle_intial_position(this, game_tick_length(), matrix);
 		}*/
 	}
 }

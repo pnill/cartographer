@@ -1,4 +1,5 @@
 #pragma once
+#include "controllers.h"
 
 class input_device
 {
@@ -16,14 +17,18 @@ protected:
 	XINPUT_STATE state;
 };
 
-struct rumble_state
+struct s_vibration_state
 {
-	int16 left_rumble;
-	int16 right_rumble;
+	uint16 left;
+	uint16 right;
 };
 
-rumble_state* controller_rumble_state_get(int32 controller_index);
+extern s_vibration_state g_vibration_state[k_number_of_controllers];
 
 int32* hs_debug_simulate_gamepad_global_get(void);
 
 bool* input_suppress_global_get(void);
+
+void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
+
+void input_windows_apply_patches(void);
