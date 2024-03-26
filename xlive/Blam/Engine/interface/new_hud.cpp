@@ -94,7 +94,7 @@ void set_crosshair_scale(float scale)
 	size_t bitmap_size_vector_index = 0;
 
 	// Loops through every bitmap datum in the vector that's considered a crosshair
-	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		// Grab the bitmap definition
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
@@ -119,7 +119,7 @@ void set_crosshair_scale(float scale)
 // Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
 void initialize_crosshair_bitmap_data()
 {
-	for (int32 i = 0; i < crosshair_bitmap_datums.size(); ++i)
+	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
 		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)

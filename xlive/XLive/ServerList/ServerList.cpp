@@ -113,7 +113,7 @@ DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPro
 
 	if (pRequredPropertiesIDs)
 	{
-		for (int i = 0; i < cRequiredPropertyIDs; i++)
+		for (uint32 i = 0; i < cRequiredPropertyIDs; i++)
 		{
 			if ((pRequredPropertiesIDs[i] & 0xF0000000) == 0x40000000) // check if we have string properties
 				++stringProperties;
@@ -290,7 +290,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 		bool propertyNeeded = false;
 		DWORD propertyId = docProperty["dwPropertyId"].GetInt();
 
-		for (int i = 0; i < m_searchPropertiesIdCount; i++)
+		for (uint32 i = 0; i < m_searchPropertiesIdCount; i++)
 		{
 			if (propertyId == m_pSearchPropertyIds[i])
 			{
@@ -364,7 +364,7 @@ bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData,
 
 		for (auto property : propertiesWritten)
 		{
-			int i = 0;
+			uint32 i = 0;
 			bool matchFound = false;
 			for (; i < m_searchPropertiesIdCount; i++)
 			{
