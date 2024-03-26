@@ -3,13 +3,16 @@
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
 #include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_time.h"
+#include "interface/user_interface_controller.h"
 #include "Blam/Engine/scenario/scenario.h"
 #include "Blam/Engine/Networking/logic/life_cycle_manager.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "Blam/Engine/units/units.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -75,7 +78,7 @@ void Infection::sendTeamChange()
 				}
 				else if (!Memory::IsDedicatedServer()) {
 					bool is_player_zombie = playerIndex == zombiePlayerIndex;
-					h2mod->set_local_team_index(0, is_player_zombie ? k_zombie_team : k_humans_team);
+					user_interface_controller_set_desired_team_index(_controller_index_0, is_player_zombie ? k_zombie_team : k_humans_team);
 					LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_player_zombie);
 				}
 			}
@@ -107,7 +110,7 @@ void Infection::InitClient()
 	//(In case player wants to start as Alpha Zombie leave him green)
 	e_game_team team = (e_game_team)s_session_interface_globals::get()->users[0].properties.team_index;
 	if (team != k_zombie_team) {
-		h2mod->set_local_team_index(0, k_humans_team);
+		user_interface_controller_set_desired_team_index(_controller_index_0, k_humans_team);
 	}
 }
 
@@ -367,7 +370,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 				// check if the player being infected is local
 				if (player_id == s_player::get_id(player_index_from_user_index(0))) {
 					LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(0)), player_id);
-					h2mod->set_local_team_index(0, k_zombie_team);
+					user_interface_controller_set_desired_team_index(_controller_index_0, k_zombie_team);
 					s_player::set_unit_character_type(player_index, _character_type_flood);
 				}
 				else {
@@ -383,7 +386,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 		{
 			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
-				if (h2mod->get_unit_team_index(playerUnitDatum) != k_zombie_team) {
+				if (unit_get_team_index(playerUnitDatum) != k_zombie_team) {
 					Infection::setZombiePlayerStatus(s_player::get_id(player_index));
 				}
 				else {
@@ -479,13 +482,13 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			void* unit_object = object_try_and_get_and_verify_type(playerUnitDatum, FLAG(_object_type_biped));
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
-
-				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, h2mod->get_unit_team_index(playerUnitDatum));
-				if (h2mod->get_unit_team_index(playerUnitDatum) == k_humans_team) {
+				e_game_team team = unit_get_team_index(playerUnitDatum);
+				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, team);
+				if (team == k_humans_team) {
 					Infection::setPlayerAsHuman(absPlayerIdx);
 				}
 
-				if (h2mod->get_unit_team_index(playerUnitDatum) == k_zombie_team) {
+				if (team == k_zombie_team) {
 					Infection::setPlayerAsZombie(absPlayerIdx);
 				}
 			}

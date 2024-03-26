@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "units.h"
 
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "tag_files/global_string_ids.h"
 
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index)
@@ -62,6 +62,12 @@ void __cdecl unit_control(datum unit_index, unit_control_data* control_data)
 {
 	INVOKE(0x138B75, 0x1279C4, unit_control, unit_index, control_data);
 	return;
+}
+
+e_game_team unit_get_team_index(datum unit_index)
+{
+	const unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_type_flag_unit);
+	return (unit ? unit->unit_team : _game_team_none);
 }
 
 // Replace calls to use interpolated functions

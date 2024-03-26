@@ -1,6 +1,5 @@
 #pragma once
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 
 void InitH2Config();

@@ -19,4 +19,6 @@ enum e_object_type : int8
 	_object_type_crate = 11,
 	_object_type_creature = 12,
 	k_object_types_count,
+
+	_object_type_flag_unit = FLAG(_object_type_biped) | FLAG(_object_type_vehicle)
 };

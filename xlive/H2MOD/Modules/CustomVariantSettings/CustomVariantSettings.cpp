@@ -11,7 +11,6 @@
 #include "Blam/Engine/Networking/Session/NetworkSession.h"
 #include "Blam/Engine/physics/physics_constants.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 

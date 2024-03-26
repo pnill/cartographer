@@ -35,14 +35,10 @@ public:
 
 	void team_player_indicator_visibility(bool toggle);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
-	BYTE get_unit_team_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);
-	void set_local_team_index(int local_player_index, int team);
 	void disable_score_announcer_sounds(int sound);
 	void custom_sound_play(const wchar_t* soundName, int delay);
 	void disable_weapon_pickup(bool enable);
-	void set_local_rank(BYTE rank);
-
 
 	void toggle_ai_multiplayer(bool toggle);
 	bool drawTeamIndicators = true;

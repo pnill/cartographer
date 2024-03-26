@@ -143,7 +143,7 @@ struct s_request_map_filename
 
 struct s_team_change
 {
-	int32 team_index;
+	e_game_team team_index;
 };
 
 struct s_rank_change
@@ -179,7 +179,7 @@ namespace NetworkMessage
 {
 	void ApplyGamePatches();
 	void SendRequestMapFilename(int mapDownloadId);
-	void SendTeamChange(int peerIdx, int teamIdx);
+	void SendTeamChange(int peerIdx, e_game_team team);
 	void SendRankChange(int peerIdx, BYTE rank);
 	void SendAntiCheat(int peerIdx);
 }

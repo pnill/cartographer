@@ -2,6 +2,7 @@
 #include "NetworkMessageTypeCollection.h"
 
 #include "cartographer/twizzler/twizzler.h"
+#include "interface/user_interface_controller.h"
 #include "memory/bitstream.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
@@ -56,11 +57,11 @@ bool __cdecl decode_request_map_filename_message(c_bitstream* stream, int a2, s_
 
 void __cdecl encode_team_change_message(c_bitstream* stream, int a2, const s_team_change* data)
 {
-	stream->write_integer("team-index", data->team_index, 32);
+	stream->write_integer("team-index", data->team_index, SIZEOF_BITS(e_game_team));
 }
 bool __cdecl decode_team_change_message(c_bitstream* stream, int a2, s_team_change* data)
 {
-	data->team_index = stream->read_integer("team-index", 32);
+	data->team_index = (e_game_team)stream->read_integer("team-index", SIZEOF_BITS(e_game_team));
 	return stream->error_occured() == false;
 }
 
@@ -215,9 +216,8 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
-			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}",
-				received_data->team_index);
-			h2mod->set_local_team_index(0, received_data->team_index);
+			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", received_data->team_index);
+			user_interface_controller_set_desired_team_index(_controller_index_0, received_data->team_index);
 		}
 		break;
 	}
@@ -229,7 +229,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 			s_rank_change* recieved_data = (s_rank_change*)packet;
 			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}",
 				recieved_data->rank);
-			h2mod->set_local_rank(recieved_data->rank);
+			network_session_interface_set_local_user_rank(0, recieved_data->rank);
 		}
 		break;
 	}
@@ -321,13 +321,13 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 	}
 }
 
-void NetworkMessage::SendTeamChange(int peerIdx, int teamIdx)
+void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
 {
 	s_network_session* session = NetworkSession::GetActiveNetworkSession();
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		s_team_change data;
-		data.team_index = teamIdx;
+		data.team_index = team;
 
 		c_network_observer* observer = session->p_network_observer;
 		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIdx);

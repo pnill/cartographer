@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "PlaylistLoader.h"
-#include "H2MOD.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

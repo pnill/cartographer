@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/OnScreenDebug/OnScreenDebug.h"
 #include "H2MOD/Tags/TagInterface.h"
 

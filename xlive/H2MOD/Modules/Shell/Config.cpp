@@ -2,6 +2,8 @@
 #include "Config.h"
 
 #include "cartographer/twizzler/twizzler.h"
+
+#include "H2MOD.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"
