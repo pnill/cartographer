@@ -901,6 +901,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
     <ClInclude Include="Blam\Engine\render\render.h" />
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
+    <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
     <ClInclude Include="Blam\Engine\render\render_prt.h" />
     <ClInclude Include="Blam\Engine\render\render_sky.h" />
     <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />

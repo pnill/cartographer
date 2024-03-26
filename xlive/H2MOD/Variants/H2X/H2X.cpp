@@ -6,7 +6,6 @@
 #include "Blam/Engine/game/game_time.h"
 #include "Blam/Engine/math/math.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 
