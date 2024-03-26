@@ -258,7 +258,7 @@ void Infection::removeUnwantedItems()
 
 	//Replace vehicles with shotgun ammo
 	scenario* scenario_definition = get_global_scenario();
-	for (DWORD i = 0; i < scenario_definition->netgame_equipment.count; i++)
+	for (int32 i = 0; i < scenario_definition->netgame_equipment.count; i++)
 	{
 		scenario_netgame_equipment* netgame_equipment = scenario_definition->netgame_equipment[i];
 		if (netgame_equipment->item_vehicle_collection.group.group == _tag_group_vehicle_collection)

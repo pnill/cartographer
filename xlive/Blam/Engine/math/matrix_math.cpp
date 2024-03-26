@@ -57,6 +57,10 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		real32 forward_result_sqroot = square_root(forward_result);
 
 		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
+
+		// Make sure value set is greater than epsilon
+		ASSERT(quaternion->v.n[i] > k_real_math_epsilon);
+
 		real32 scalar = 0.25f / quaternion->v.n[i];
 
 		quaternion->w = (matrix->matrix[i_1][i_2] - matrix->matrix[i_2][i_1]) * scalar;
@@ -67,6 +71,9 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 	{
 		real32 v1_root = square_root(v1 + 1.0f);
 		quaternion->w = v1_root * 0.5f;
+		
+		// Make sure w is greater than epsilon
+		ASSERT(quaternion->w > k_real_math_epsilon);
 
 		real32 scalar = 0.25f / quaternion->w;
 		quaternion->i = (matrix->left.k - matrix->up.j) * scalar;
@@ -222,18 +229,18 @@ real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real
 	return out;
 }
 
-real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d *in, real_vector3d* out)
+real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d *point, real_vector3d* result)
 {
-	real_point3d in_copy = *in;
+	real_point3d point_copy = *point;
 	if (matrix->scale != 1.0f)
 	{
-		scale_vector3d(&in_copy, matrix->scale, &in_copy);
+		scale_vector3d(&point_copy, matrix->scale, &point_copy);
 	}
 
-	out->x = (((matrix->vectors.up.i * in_copy.z) + (matrix->vectors.left.i * in_copy.y)) + (matrix->vectors.forward.i * in_copy.x)) + matrix->position.x;
-	out->y = (((matrix->vectors.up.j * in_copy.z) + (matrix->vectors.left.j * in_copy.y)) + (matrix->vectors.forward.j * in_copy.x)) + matrix->position.y;
-	out->z = (((matrix->vectors.up.k * in_copy.z) + (matrix->vectors.left.k * in_copy.y)) + (matrix->vectors.forward.k * in_copy.x)) + matrix->position.z;
-	return out;
+	result->x = (((matrix->vectors.up.i * point_copy.z) + (matrix->vectors.left.i * point_copy.y)) + (matrix->vectors.forward.i * point_copy.x)) + matrix->position.x;
+	result->y = (((matrix->vectors.up.j * point_copy.z) + (matrix->vectors.left.j * point_copy.y)) + (matrix->vectors.forward.j * point_copy.x)) + matrix->position.y;
+	result->z = (((matrix->vectors.up.k * point_copy.z) + (matrix->vectors.left.k * point_copy.y)) + (matrix->vectors.forward.k * point_copy.x)) + matrix->position.z;
+	return result;
 }
 
 real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k)

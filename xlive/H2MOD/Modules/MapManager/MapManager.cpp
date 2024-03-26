@@ -58,7 +58,7 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks_t>(0x1AD782, 0x1A66FF);
 
 	s_network_session* session = nullptr;
-	int result_map_status, result_precache_percentage;
+	uint32 result_map_status, result_precache_percentage;
 	result_map_status = result_precache_percentage = 0;
 	bool someone_downloading_map = false;
 	e_map_status local_peer_map_status, host_peer_map_status; 
@@ -112,7 +112,7 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 					break;
 
 				case _network_session_map_status_precaching:
-					result_precache_percentage = min(membership->peers[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
+					result_precache_percentage = MIN(membership->peers[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
 					break;
 
 				case _network_session_map_status_loaded:

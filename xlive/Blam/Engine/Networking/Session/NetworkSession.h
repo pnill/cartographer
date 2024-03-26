@@ -9,7 +9,7 @@
 
 // ### TODO Cleanup
 
-enum e_map_status : int
+enum e_map_status : uint32
 {
 	_network_session_map_status_none,
 	_network_session_map_status_unable_to_precache,
