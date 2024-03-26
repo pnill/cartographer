@@ -1,9 +1,10 @@
 #pragma once
+#include "game/materials.h"
+#include "math/matrix_math.h"
+#include "objects/damage_reporting.h"
+#include "physics/physics_models.h"
+#include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/game/materials.h"
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/objects/damage_reporting.h"
-#include "Blam/Engine/physics/physics_models.h"
 
 #define k_maximum_variants_per_model 64
 #define MAXIMUM_PERMUTATIONS_PER_MODEL_REGION 32

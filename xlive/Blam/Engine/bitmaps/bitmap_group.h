@@ -1,9 +1,6 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-
-
-
+#include "tag_files/data_reference.h"
+#include "tag_files/tag_block.h"
 
 enum e_bitmap_tag_type : int16
 {

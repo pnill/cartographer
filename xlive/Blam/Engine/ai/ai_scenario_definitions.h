@@ -1,7 +1,7 @@
 #pragma once
-
+#include "cseries/cseries_strings.h"
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/objects/objects.h"
+#include "objects/objects.h"
 
 
 enum e_combination_rule : short

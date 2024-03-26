@@ -179,6 +179,15 @@ namespace TagFixes
 				shader->postprocess_definition[0]->pixel_constants[1]->color = D3DCOLOR_RGBA(180, 179, 189, 0);
 			}
 			return;
+
+			// Fix forerunner strips shader
+			datum panel_thin_strips_index = tags::find_tag(_tag_group_shader, "scenarios\\shaders\\forerunner\\industrial\\metals\\panels_thin_strips");
+			datum tex_bump_index = tags::find_tag(_tag_group_shader_template, "shaders\\shader_templates\\opaque\\tex_bump");
+			if (panel_thin_strips_index != NONE && tex_bump_index != NONE)
+			{
+				s_shader_definition* shader = (s_shader_definition*)tag_get_fast(brute_shader_index);
+				shader->postprocess_definition[0]->shader_template_index = tex_bump_index;
+			}
 		}
 
 		void font_table_fix()
@@ -242,7 +251,6 @@ namespace TagFixes
 			if (sound_classes_datum != NONE)
 			{
 				s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
-				if (sound_classes->soundClasses.count < 35) { return; }
 
 				sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
 				sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };
