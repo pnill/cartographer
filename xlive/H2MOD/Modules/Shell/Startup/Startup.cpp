@@ -5,9 +5,10 @@
 #include "../Config.h"
 #include "../H2MODShell.h"
 
-#include "Blam/Engine/cseries/cseries_windows_debug_pc.h"
-#include "Blam/Engine/shell/shell_windows.h"
+#include "cseries/cseries_windows_debug_pc.h"
+#include "shell/shell_windows.h"
 
+#include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Networking/Networking.h"

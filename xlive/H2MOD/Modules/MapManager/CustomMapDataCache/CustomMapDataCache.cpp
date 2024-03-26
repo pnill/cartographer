@@ -187,7 +187,7 @@ bool s_custom_map_data::read_custom_map_data_cache_from_file(const utf8* path, s
 	if (success)
 	{
 		LOG_TRACE_GAME("loaded custom map paths: ");
-		for (int i = 0; i < custom_map_data_cache->entries_count; i++)
+		for (uint32 i = 0; i < custom_map_data_cache->entries_count; i++)
 		{
 			LOG_TRACE_GAME(L"	custom map path: {}", custom_map_data_cache->entries[i].file_path);
 		}
@@ -348,7 +348,7 @@ void __thiscall s_custom_map_data::start_custom_map_sync()
 unsigned int __thiscall s_custom_map_data::get_custom_map_list_ids(s_custom_map_id* out_ids, unsigned int out_ids_count)
 {
 	EnterCriticalSection(custom_map_lock);
-	for (int i = 0; i < custom_map_count; i++)
+	for (uint32 i = 0; i < custom_map_count; i++)
 	{
 		new_custom_map_entries_buffer[i].entry_marked_for_deletion = false;
 		if (out_ids != nullptr
@@ -362,7 +362,7 @@ unsigned int __thiscall s_custom_map_data::get_custom_map_list_ids(s_custom_map_
 		}
 	}
 
-	unsigned int map_count = this->custom_map_count;
+	uint32 map_count = this->custom_map_count;
 	LeaveCriticalSection(custom_map_lock);
 
 	return map_count;

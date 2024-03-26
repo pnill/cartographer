@@ -208,4 +208,6 @@ void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point)
 
 void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 
+e_game_team unit_get_team_index(datum unit_index);
+
 void unit_apply_patches(void);

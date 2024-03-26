@@ -4,8 +4,6 @@
 #include "scenario_kill_trigger_volumes.h"
 
 
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
 #include "Blam/Engine/ai/ai_flocks.h"
 #include "Blam/Engine/ai/ai_mission_dialogue.h"
 #include "Blam/Engine/ai/ai_orders.h"
@@ -31,6 +29,7 @@
 #include "Blam/Engine/structures/cluster_partitions.h"
 #include "Blam/Engine/structures/structure_audibility.h"
 #include "Blam/Engine/tag_files/string_id.h"
+#include "Blam/Engine/tag_files/tag_block.h"
 
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16

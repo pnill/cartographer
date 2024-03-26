@@ -1,5 +1,6 @@
 #pragma once
-#include "Blam/Engine/bitmaps/bitmap_group.h"
+#include "bitmaps/bitmap_group.h"
+#include "cseries/cseries_strings.h"
 
 struct s_screenshot_globals
 {

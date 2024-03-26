@@ -1,5 +1,4 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
 namespace HaloScript
 {

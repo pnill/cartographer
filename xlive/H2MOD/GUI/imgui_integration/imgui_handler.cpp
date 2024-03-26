@@ -1,9 +1,8 @@
 #include "stdafx.h"
 
 #include "imgui_handler.h"
-#include "H2MOD.h"
 
-#include "Blam/Engine/game/player_control.h"
+#include "game/player_control.h"
 
 #include "imgui.h"
 #include "backends/imgui_impl_dx9.h"

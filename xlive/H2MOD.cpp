@@ -198,17 +198,6 @@ int H2MOD::get_player_index_from_unit_datum_index(datum unit_datum_index)
 	return NONE;
 }
 
-BYTE H2MOD::get_unit_team_index(datum unit_datum_index)
-{
-	BYTE team_index = NONE;
-	char* unit_object = (char*)object_try_and_get_and_verify_type(unit_datum_index, FLAG(_object_type_biped));
-	if (unit_object != NULL)
-	{
-		team_index = *(BYTE*)(unit_object + 0x13C);
-	}
-	return team_index;
-}
-
 void H2MOD::set_unit_speed_patch(bool hackit) {
 	static BYTE oldBytes[8];
 	static bool oldBytesRead = false;
@@ -349,25 +338,6 @@ void H2MOD::disable_weapon_pickup(bool enable)
 	{
 		NopFill(address, sizeof(oldBytes));
 	}
-}
-
-void H2MOD::set_local_rank(BYTE rank)
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	static bool initialized = false;
-
-	if (!initialized)
-	{
-		NopFill(Memory::GetAddress(0x1b2c29), 7);
-		initialized = true;
-	}
-
-	s_player_properties* local_player_properties = Memory::GetAddress<s_player_properties*>(0x51A638);
-
-	local_player_properties->player_overall_skill = rank;
-	local_player_properties->player_displayed_skill = rank;
 }
 
 int OnAutoPickUpHandler(datum player_datum, datum object_datum)
@@ -548,16 +518,6 @@ void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 			return;
 	}
 	p_change_local_team(localPlayerIndex, teamIndex);
-}
-
-void H2MOD::set_local_team_index(int local_player_index, int team_index)
-{
-	// we only use player index 0 due to no splitscreen support but whatever
-	typedef void(__cdecl* update_player_profile_t)(int local_player_index);
-	auto p_update_player_profile = Memory::GetAddress<update_player_profile_t>(0x206A97);
-
-	p_change_local_team(local_player_index, team_index);
-	p_update_player_profile(local_player_index); // fixes infection handicap glitch
 }
 
 void __cdecl print_to_console(const char* output)
@@ -764,7 +724,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 				std::swap(activePlayersIndices[vecPlayerIdx], activePlayersIndices[activePlayersIndices.size() - 1]);
 				activePlayersIndices.pop_back();
 
-				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), i);
+				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
 			}
 		}
 

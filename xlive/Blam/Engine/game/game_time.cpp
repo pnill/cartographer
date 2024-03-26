@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "game_time.h"
 
+#include "H2MOD.h"
+
 #include "Blam/Engine/cutscene/cinematics.h"
 #include "Blam/Engine/math/math.h"
 #include "Blam/Engine/shell/shell_windows.h"

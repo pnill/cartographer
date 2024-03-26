@@ -412,7 +412,7 @@ char* encode_rfc3986(const char* label_literal, size_t label_literal_length) {
 	char* label_escaped = (char*)malloc(escaped_buflen * sizeof(char));
 	int escaped_buff_i = 0;
 
-	for (int i = 0; i < label_literal_length; i++) {
+	for (size_t i = 0; i < label_literal_length; i++) {
 		unsigned char uletter = label_literal[i];
 		if (!rfc3986_allow(uletter)) {
 			sprintf_s(label_escaped + escaped_buff_i, 4, "%%%02X", uletter);
@@ -432,8 +432,8 @@ void wcstombs2(wchar_t* source, char* out_buffer, size_t buf_len) {
 	if (loop_len >= buf_len)
 		loop_len = buf_len - 1; // - 1 for null
 
-	int out_buffer_idx = 0;
-	for (int i = 0; i < loop_len; i++) {
+	size_t out_buffer_idx = 0;
+	for (size_t i = 0; i < loop_len; i++) {
 		if (source[i] >= 0 && source[i] <= 0xFF) {
 			out_buffer[out_buffer_idx++] = (char)source[i];
 		}
@@ -543,7 +543,7 @@ void CreateDirTree(const wchar_t* path) {
 	wchar_t* temp_path = (wchar_t*)malloc(sizeof(wchar_t) * buflen);
 	wcscpy_s(temp_path, buflen, path);
 
-	for (int i = 1; i < buflen; i++) {
+	for (size_t i = 1; i < buflen; i++) {
 		if (temp_path[i] == L'/' || temp_path[i] == L'\\') {
 			wchar_t temp_cut = 0;
 			if (temp_path[i + 1] != 0) {
@@ -563,7 +563,7 @@ void CreateDirTree(const wchar_t* path) {
 int TrimRemoveConsecutiveSpaces(char* text) {
 	int text_pos = 0;
 	size_t text_len = strlen(text);
-	for (int j = 0; j < text_len; j++) {
+	for (size_t j = 0; j < text_len; j++) {
 		if (text_pos == 0) {
 			if (text[j] != ' ')
 				text[text_pos++] = text[j];

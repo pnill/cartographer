@@ -216,7 +216,7 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 				particle_def_interface->vtbl->system_is_v_mirrored_or_one_shot(particle_def_interface),
 				particle_def_interface->vtbl->system_is_one_shot(particle_def_interface),
 				thisx->color,
-				global_black_pixel32
+				global_white_pixel32
 			);
 
 			// this in h2 might not be restart, could be update or something

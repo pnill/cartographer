@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/damage_reporting.h"
-#include "Blam/Engine/objects/emblems.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/units/units.h"
+#include "interface/user_interface_controller.h"
+#include "memory/data.h"
+#include "objects/damage_reporting.h"
+#include "objects/emblems.h"
+#include "objects/objects.h"
+#include "units/units.h"
 #include "simulation/machine_id.h"
 
 #define k_maximum_players 16
@@ -120,7 +121,7 @@ struct s_player
 	__int16 machine_index;
 	int machine_user_index;
 	int machine_controller_index;
-	int controller_index;
+	e_controller_index controller_index;
 	__int16 user_index;
 	__int16 player_bsp_location_index;
 	datum unit_index;

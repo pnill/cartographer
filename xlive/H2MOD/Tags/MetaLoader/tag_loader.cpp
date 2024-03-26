@@ -1004,7 +1004,7 @@ namespace tag_loader
 
 			int tags_first_d_index = (&t_ptr[0])->datum_index;
 
-			for (int i = 0; i < module_tag_table->size / sizeof(tags::tag_instance); i++)
+			for (uint32 i = 0; i < module_tag_table->size / sizeof(tags::tag_instance); i++)
 			{
 				injectRefs t_ref;
 
@@ -1386,7 +1386,7 @@ bool _cdecl LoadTagsandMapBases(int a)
 	bool result = pLoadTagsandSetMapBases(a);
 
 	//Clear the table
-	for (auto i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
+	for (uint32 i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
 	{
 		tag_loader::new_Tables[i] = tags::tag_instance{ (e_tag_group)NONE, NONE, 0, 0 };
 	}

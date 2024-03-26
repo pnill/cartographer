@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Variants/VariantSystem.h"
 

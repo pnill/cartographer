@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "input_windows.h"
 
+#include "controllers.h"
 #include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
@@ -24,7 +25,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
     s_vibration_state state = { left, right };
     s_vibration_state state_none = { 0, 0 };
 
-    bool enabled = user_interface_controller_get_rumble_enabled(gamepad_index);
+    bool enabled = user_interface_controller_get_rumble_enabled((e_controller_index)gamepad_index);
     g_vibration_state[gamepad_index] = (enabled ? state : state_none);
     return;
 }

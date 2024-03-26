@@ -3,10 +3,9 @@
 #include "emblems.h"
 #include "object_identifier.h"
 
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/math/color_math.h"
-
-#include "Blam/Engine/memory/static_arrays.h"
+#include "math/color_math.h"
+#include "memory/static_arrays.h"
+#include "tag_files/string_id.h"
 
 enum e_bsp_policy : int8
 {

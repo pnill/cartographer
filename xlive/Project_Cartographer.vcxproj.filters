@@ -846,6 +846,8 @@
     <ClInclude Include="Blam\Engine\main\main_time.h" />
     <ClInclude Include="Blam\Engine\objects\damage_effects.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
+    <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,11 +1,9 @@
 #pragma once
 
+
 struct pixel32
 {
-	uint8 alpha;
-	uint8 red;
-	uint8 green;
-	uint8 blue;
+	D3DCOLOR color;
 };
 CHECK_STRUCT_SIZE(pixel32, sizeof(uint8) * 4);
 
@@ -24,7 +22,7 @@ union real_rgb_color
 };
 CHECK_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
 
-const pixel32 global_black_pixel32 = { 255,255,255,255 };
+const pixel32 global_white_pixel32 = { D3DCOLOR_RGBA(255,255,255,255) };
 
 // h1/reach puts these in cseries.obj because it is the first file that includes them? or defines them?
 const real_argb_color global_real_argb_color_table[] =

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 
 class GunGame : public ICustomGameVariant

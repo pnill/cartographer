@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "PlaylistLoader.h"
-#include "H2MOD.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
@@ -121,7 +120,7 @@ namespace playlist_loader
 
 		//Scan the section buffer for the current variant name to associate it with the custom 
 		//setting as the property can be anywhere in the section buffer
-		for (auto i = 0; i < playlist_entry->section_buffer_current_index; i++)
+		for (uint32 i = 0; i < playlist_entry->section_buffer_current_index; i++)
 		{
 			temp_name = &playlist_entry->section_buffer[68 * i];
 

@@ -1,9 +1,5 @@
 #pragma once
-
-
-#include "Blam/Engine/game/game_time.h"
-
-#include "H2MOD.h"
+#include "game/game_time.h"
 
 #define k_valid_real_epsilon 0.001f
 // in practice the actual acceleration takes place in just 3 ticks, but it is defined as 5 for some reason

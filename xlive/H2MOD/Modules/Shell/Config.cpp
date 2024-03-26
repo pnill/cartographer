@@ -2,6 +2,8 @@
 #include "Config.h"
 
 #include "cartographer/twizzler/twizzler.h"
+#include "render/render_lod_new.h"
+
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/Updater/Updater.h"
@@ -38,7 +40,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
-int H2Config_static_lod_state = e_static_lod::disable;
+int H2Config_static_lod_state = _render_lod_disabled;
 int H2Config_field_of_view = 78;
 int H2Config_vehicle_field_of_view = 78;
 bool H2Config_static_first_person = false;
