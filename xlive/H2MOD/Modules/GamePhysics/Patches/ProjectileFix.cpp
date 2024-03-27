@@ -4,8 +4,8 @@
 #include "game/game_time.h"
 #include "objects/objects.h"
 
-#include "Blam/Cache/TagGroups/projectile_definition.hpp"
 #include "H2MOD/Tags/TagInterface.h"
+#include "items/projectile_definition.h"
 
 
 FLOATING_POINT_ENV_ACCESS();
@@ -156,7 +156,7 @@ void ProjectileFix::ApplyProjectileVelocity()
 		datum proj_index = tags::find_tag(_tag_group_projectile, tag_names[i]);
 		if (proj_index != NONE)
 		{
-			s_projectile_group_definition* projectile = (s_projectile_group_definition*)tag_get_fast(proj_index);
+			_projectile_definition* projectile = (_projectile_definition*)tag_get_fast(proj_index);
 			projectile->initial_velocity *= 2;
 			projectile->final_velocity *= 2;
 		}
