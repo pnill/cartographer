@@ -76,7 +76,7 @@ struct s_projectile_material_response_definition
 
 	string_id material_name;
 
-	PAD(4);
+	int32 pad_1;
 
 	e_projectile_material_response potential_response;
 	e_projectile_material_response_unit unit_response;
@@ -86,7 +86,7 @@ struct s_projectile_material_response_definition
 	// DO NOT USE
 	tag_reference old_effect_2;
 	e_projectile_material_response_scale_effects scale_effects_by;
-	PAD(2);
+	int16 pad_2;
 	/// the angle of incidence is randomly perturbed by at most this amount to simulate irregularity.
 	real_angle angular_noise;
 	/// the velocity is randomly perturbed by at most this amount to simulate irregularity.
@@ -158,7 +158,7 @@ struct _projectile_definition
 
 	e_damage_reporting_type damage_reporting_type;
 
-	PAD(3);
+	int8 pad_1[3];
 
 	tag_reference super_attached_detonation_damage; // jpt!
 
@@ -196,7 +196,7 @@ struct _projectile_definition
 
 	real_bounds acceleration_range;
 
-	PAD(4);
+	int32 pad_2;
 
 	real32 targeted_leading_fraction;
 
