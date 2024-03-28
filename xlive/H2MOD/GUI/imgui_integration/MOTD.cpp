@@ -2,7 +2,7 @@
 
 #include "imgui_handler.h"
 
-#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
+#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"

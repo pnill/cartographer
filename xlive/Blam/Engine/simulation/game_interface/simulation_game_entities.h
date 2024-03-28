@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/memory/bitstream.h"
+#include "memory/bitstream.h"
 
 enum e_simulation_entity_type : int16
 {

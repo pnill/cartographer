@@ -3,11 +3,11 @@
 #include "unit_action_system.h"
 #include "units.h"
 
-#include "Blam/Engine/ai/ai.h"
+#include "ai/ai.h"
 
-#include "Blam/Engine/interface/motion_sensor.h"
-#include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Engine/objects/objects.h"
+#include "interface/motion_sensor.h"
+#include "objects/object_definition.h"
+#include "objects/objects.h"
 
 enum e_unit_definition_flags : int32
 {

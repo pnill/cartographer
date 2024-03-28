@@ -5,8 +5,8 @@
 #include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
 
 #include "hud_definitions.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/game/players.h"
+#include "game/game_time.h"
+#include "game/players.h"
 #include "Networking/Session/NetworkSession.h"
 
 

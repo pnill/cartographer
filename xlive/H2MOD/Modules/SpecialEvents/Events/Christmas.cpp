@@ -5,11 +5,11 @@
 
 #include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 
-#include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Engine/units/biped_definitions.h"
+#include "items/weapon_definitions.h"
+#include "game/game_globals.h"
+#include "models/models.h"
+#include "scenario/scenario.h"
+#include "units/biped_definitions.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

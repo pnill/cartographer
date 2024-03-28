@@ -2,12 +2,12 @@
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
-#include "Blam/Engine/cache/predicted_resources.h"
-#include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/function_definitions.h"
+#include "cache/predicted_resources.h"
+#include "math/color_math.h"
+#include "math/function_definitions.h"
 
-#include "Blam/Engine/objects/object_type_list.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "objects/object_type_list.h"
+#include "tag_files/string_id.h"
 
 #define k_maximum_object_functions 256
 #define k_maximum_number_of_attachments_per_object 16

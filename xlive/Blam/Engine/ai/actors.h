@@ -3,9 +3,9 @@
 #include "actor_moving.h"
 #include "pathfinding_utilities.h"
 
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "memory/data.h"
+#include "objects/objects.h"
+#include "objects/object_placement.h"
 
 
 /*

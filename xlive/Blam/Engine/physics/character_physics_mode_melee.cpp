@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "character_physics_mode_melee.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/math/math.h"
+#include "game/game.h"
+#include "math/math.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "Util/Memory.h"
 

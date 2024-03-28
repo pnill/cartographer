@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/shell/shell_windows.h"
-#include "Blam/Engine/main/main_game_time.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "shell/shell_windows.h"
+#include "main/main_game_time.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"

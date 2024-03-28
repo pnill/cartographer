@@ -1,6 +1,6 @@
 #pragma once
 #include "scenario_definitions.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "objects/object_placement.h"
 
 scenario* get_global_scenario(void);
 

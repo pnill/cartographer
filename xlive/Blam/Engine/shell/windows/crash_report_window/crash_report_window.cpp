@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "crash_report_window.h"
 
-#include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Engine/cseries/cseries_windows.h"
-#include "Blam/Engine/cseries/cseries_windows_minidump_logs.h"
-#include "Blam/Engine/text/unicode.h"
-#include "Blam/Engine/tag_files/files_windows.h"
+#include "cseries/cseries_strings.h"
+#include "cseries/cseries_windows.h"
+#include "cseries/cseries_windows_minidump_logs.h"
+#include "text/unicode.h"
+#include "tag_files/files_windows.h"
 
 #include "resources/resource.h"
 

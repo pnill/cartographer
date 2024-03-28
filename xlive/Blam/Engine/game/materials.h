@@ -1,6 +1,6 @@
 #pragma once
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 #define NUMBER_OF_MATERIAL_TYPES 33
 

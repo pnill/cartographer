@@ -5,7 +5,7 @@
 #include "zone.h"
 
 
-#include "Blam/Engine/cseries/cseries_strings.h"
+#include "cseries/cseries_strings.h"
 
 enum e_order_flags : int
 {

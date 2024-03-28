@@ -3,13 +3,13 @@
 #include "object_placement.h"
 #include "object_type_list.h"
 
-#include "Blam/Engine/animations/animation_manager.h"
-#include "Blam/Engine/game/aim_assist.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/models/render_model_definitions.h"
-#include "Blam/Engine/memory/memory_pool.h"
-#include "Blam/Engine/memory/static_arrays.h"
+#include "animations/animation_manager.h"
+#include "game/aim_assist.h"
+#include "memory/data.h"
+#include "math/matrix_math.h"
+#include "models/render_model_definitions.h"
+#include "memory/memory_pool.h"
+#include "memory/static_arrays.h"
 
 #define k_maximum_objects_per_map 2048
 

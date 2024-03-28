@@ -4,11 +4,11 @@
 #include "simulation_game_interface.h"
 #include "simulation_game_internal.h"
 
-#include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/memory/bitstream.h"
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Engine/scenario/scenario.h"
+#include "cache/cache_files.h"
+#include "memory/bitstream.h"
+#include "models/models.h"
+#include "objects/object_definition.h"
+#include "scenario/scenario.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 

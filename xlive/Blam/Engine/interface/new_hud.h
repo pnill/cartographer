@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/game/players.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "game/players.h"
+#include "Networking/Session/NetworkSession.h"
 
 struct s_hud_scripted_globals
 {

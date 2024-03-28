@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "effects.h"
 
-#include "Blam/Engine/interface/first_person_weapons.h"
-#include "Blam/Engine/main/interpolator.h"
-#include "Blam/Engine/objects/objects.h"
+#include "interface/first_person_weapons.h"
+#include "main/interpolator.h"
+#include "objects/objects.h"
 
 s_data_array* get_effects_table()
 {

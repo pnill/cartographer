@@ -2,7 +2,7 @@
 #include "cseries_windows_minidump.h"
 
 #include "cseries_windows_minidump_logs.h"
-#include "Blam/Engine/tag_files/files_windows.h"
+#include "tag_files/files_windows.h"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 

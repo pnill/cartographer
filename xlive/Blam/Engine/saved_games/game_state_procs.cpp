@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_state_procs.h"
 
-#include "Blam/Engine/main/interpolator.h"
+#include "main/interpolator.h"
 
 void game_state_call_before_save_procs(int32 a1)
 {

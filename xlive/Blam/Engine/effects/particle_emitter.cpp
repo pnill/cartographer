@@ -6,7 +6,7 @@
 
 #include "objects/objects.h"
 
-#include "Blam/Engine/camera/camera.h"
+#include "camera/camera.h"
 
 s_data_array* get_particle_emitter_table()
 {

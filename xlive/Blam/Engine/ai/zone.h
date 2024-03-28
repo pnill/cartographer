@@ -1,8 +1,8 @@
 #pragma once
 
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/ai/path_flying.h"
-#include "Blam/Engine/cseries/cseries_strings.h"
+#include "ai/path_flying.h"
+#include "cseries/cseries_strings.h"
 
 
 enum e_zone_definition_flags : int

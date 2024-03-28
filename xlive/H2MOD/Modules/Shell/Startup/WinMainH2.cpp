@@ -2,9 +2,9 @@
 
 #include "WinMainH2.h"
 
-#include "Blam/Engine/shell/shell.h"
-#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
-#include "Blam/Engine/saved_games/game_state.h"
+#include "shell/shell.h"
+#include "Networking/Transport/NetworkObserver.h"
+#include "saved_games/game_state.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "game_statborg.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Networking/Session/NetworkSession.h"
 
 #define k_maximum_game_engine_event_responses_per_type 128
 

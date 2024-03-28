@@ -5,10 +5,10 @@
 
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/models/render_model_definitions.h"
+#include "game/game_globals.h"
+#include "items/weapon_definitions.h"
+#include "models/models.h"
+#include "models/render_model_definitions.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

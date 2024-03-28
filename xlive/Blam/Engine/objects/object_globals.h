@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 struct s_object_globals

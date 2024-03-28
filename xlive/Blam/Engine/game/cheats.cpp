@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "cheats.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "game/game.h"
+#include "game/game_globals.h"
+#include "tag_files/global_string_ids.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 

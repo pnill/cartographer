@@ -1,7 +1,7 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/math/function_definitions.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "math/function_definitions.h"
+#include "tag_files/string_id.h"
 
 enum e_new_hud_dashlight_flags : short
 {

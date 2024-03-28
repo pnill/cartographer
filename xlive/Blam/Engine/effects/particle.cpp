@@ -5,7 +5,7 @@
 #include "particle_state.h"
 #include "particle_location.h"
 #include "physics/collisions.h"
-#include "Blam/Engine/game/game_time.h"
+#include "game/game_time.h"
 
 
 s_data_array* get_particle_table()

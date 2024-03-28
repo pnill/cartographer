@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/game/game_options.h"
+#include "game/game_options.h"
 
 #define k_campaign_difficulty_levels_count 4
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/objects/object_definition.h"
+#include "objects/object_definition.h"
 
 enum e_device_definition_flags : int32
 {

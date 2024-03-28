@@ -4,7 +4,7 @@
 #include "objects.h"
 #include "object_definition.h"
 
-#include "Blam/Engine/cache/cache_files.h"
+#include "cache/cache_files.h"
 
 s_object_early_movers_globals* object_early_movers_globals_get(void)
 {

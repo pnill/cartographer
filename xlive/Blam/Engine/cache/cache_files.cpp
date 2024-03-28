@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cache_files.h"
 
-#include "Blam/Engine/game/game_globals.h"
+#include "game/game_globals.h"
 
 s_cache_header* cache_files_get_header(void)
 {

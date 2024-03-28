@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/game/game_options.h"
-#include "Blam/Engine/game/game_statborg.h"
+#include "game/game_options.h"
+#include "game/game_statborg.h"
 
 enum CustomVariantId
 {

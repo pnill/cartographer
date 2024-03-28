@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "game_globals.h"
 
-#include "Blam/Engine/units/unit_definitions.h"
+#include "units/unit_definitions.h"
 
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/scenario/scenario.h"
-#include "Blam/Engine/tag_files/global_string_ids.h"
-#include "Blam/Engine/cache/cache_files.h"
+#include "models/models.h"
+#include "scenario/scenario.h"
+#include "tag_files/global_string_ids.h"
+#include "cache/cache_files.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"

@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/memory/data.h"
+#include "math/matrix_math.h"
+#include "memory/data.h"
 
 #include "particle_system.h"
 #include "particle_location.h"

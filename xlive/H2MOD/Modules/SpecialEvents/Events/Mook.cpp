@@ -3,8 +3,8 @@
 #include "Mook.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/game/game_globals.h"
+#include "items/weapon_definitions.h"
+#include "game/game_globals.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 

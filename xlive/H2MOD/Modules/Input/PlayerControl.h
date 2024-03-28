@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/game/player_control.h"
-#include "Blam/Engine/Networking/player_motion.h"
+#include "game/player_control.h"
+#include "Networking/player_motion.h"
 
 namespace PlayerControl
 {

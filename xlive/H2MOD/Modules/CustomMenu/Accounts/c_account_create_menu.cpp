@@ -2,8 +2,8 @@
 
 #include "c_account_create_menu.h"
 
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
+#include "memory/data.h"
+#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"

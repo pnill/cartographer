@@ -1,8 +1,8 @@
 #include "stdafx.h"
 
 #include "XUserContext.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "Blam/Engine/game/game_engine.h"
+#include "Networking/NetworkMessageTypeCollection.h"
+#include "game/game_engine.h"
 #include "H2MOD/Discord/DiscordInterface.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"

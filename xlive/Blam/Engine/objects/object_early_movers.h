@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/matrix_math.h"
+#include "math/matrix_math.h"
 
 #define MAXIMUM_OBJECT_EARLY_MOVERS_PER_MAP 32
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 /*********************************************************************

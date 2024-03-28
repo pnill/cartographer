@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_engine_util.h"
 
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 
 int current_game_engine()
 {

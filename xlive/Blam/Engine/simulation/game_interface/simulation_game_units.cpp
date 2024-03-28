@@ -3,10 +3,10 @@
 
 #include "simulation_game_objects.h"
 
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/game/game_engine.h"
-#include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/units/units.h"
+#include "game/game_globals.h"
+#include "game/game_engine.h"
+#include "math/color_math.h"
+#include "units/units.h"
 
 
 
