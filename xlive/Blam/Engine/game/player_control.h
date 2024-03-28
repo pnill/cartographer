@@ -8,8 +8,8 @@ public:
 	real_vector2d throttle;
 	real32 trigger;
 	real32 secondary_trigger;
-	real32 field_10;
-	real32 field_14;
+	real32 yaw_change;
+	real32 pitch_change;
 	uint32 field_18;
 	uint32 flags_1C;
 	uint32 flags_20;
