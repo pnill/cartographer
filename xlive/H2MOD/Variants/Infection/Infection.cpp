@@ -79,6 +79,7 @@ void Infection::sendTeamChange()
 				else if (!Memory::IsDedicatedServer()) {
 					bool is_player_zombie = playerIndex == zombiePlayerIndex;
 					user_interface_controller_set_desired_team_index(_controller_index_0, is_player_zombie ? k_zombie_team : k_humans_team);
+					user_interface_controller_update_user_session_data(_controller_index_0);
 					LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_player_zombie);
 				}
 			}
@@ -111,6 +112,7 @@ void Infection::InitClient()
 	e_game_team team = (e_game_team)s_session_interface_globals::get()->users[0].properties.team_index;
 	if (team != k_zombie_team) {
 		user_interface_controller_set_desired_team_index(_controller_index_0, k_humans_team);
+		user_interface_controller_update_user_session_data(_controller_index_0);
 	}
 }
 
@@ -371,6 +373,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 				if (player_id == s_player::get_id(player_index_from_user_index(0))) {
 					LOG_TRACE_GAME(L"[h2mod-infection] Infected local player, Name={}, identifier={}", s_player::get_name(player_index_from_user_index(0)), player_id);
 					user_interface_controller_set_desired_team_index(_controller_index_0, k_zombie_team);
+					user_interface_controller_update_user_session_data(_controller_index_0);
 					s_player::set_unit_character_type(player_index, _character_type_flood);
 				}
 				else {

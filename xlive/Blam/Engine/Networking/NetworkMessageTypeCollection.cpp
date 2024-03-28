@@ -218,6 +218,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 			s_team_change* received_data = (s_team_change*)packet;
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", received_data->team_index);
 			user_interface_controller_set_desired_team_index(_controller_index_0, received_data->team_index);
+			user_interface_controller_update_user_session_data(_controller_index_0);
 		}
 		break;
 	}
