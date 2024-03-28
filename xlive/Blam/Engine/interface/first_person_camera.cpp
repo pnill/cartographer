@@ -11,9 +11,6 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 bool player_control_fov_overridden = false;
 float overridden_fov_radians;
 
