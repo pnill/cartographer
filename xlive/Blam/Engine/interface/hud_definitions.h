@@ -1,10 +1,10 @@
 #pragma once
 #include "Blam/Cache/DataTypes/BlamDataTypes.h"
 
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
-#include "Blam/Engine/interface/new_hud_definitions.h"
+#include "interface/new_hud_definitions.h"
 
 enum e_scaling_flags : short
 {

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Blam/Engine/objects/emblems.h"
-#include "Blam/Engine/objects/object_placement.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "objects/emblems.h"
+#include "objects/object_placement.h"
+#include "tag_files/string_id.h"
 
 struct s_simulation_object_state_data
 {

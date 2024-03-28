@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/game/aim_assist.h"
+#include "game/aim_assist.h"
 
 
 class c_player_input

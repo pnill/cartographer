@@ -3,7 +3,7 @@
 #include "imgui.h"
 #include "imgui_handler.h"
 
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 
 

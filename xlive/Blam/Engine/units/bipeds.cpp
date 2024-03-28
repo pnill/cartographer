@@ -1,15 +1,15 @@
 #include "stdafx.h"
 #include "bipeds.h"
 
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/main/interpolator.h"
-#include "Blam/Engine/math/periodic_functions.h"
-#include "Blam/Engine/physics/collisions.h"
-#include "Blam/Engine/render/render.h"
-#include "Blam/Engine/units/biped_definitions.h"
+#include "game/game_time.h"
+#include "cache/cache_files.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "main/interpolator.h"
+#include "math/periodic_functions.h"
+#include "physics/collisions.h"
+#include "render/render.h"
+#include "units/biped_definitions.h"
 
 
 

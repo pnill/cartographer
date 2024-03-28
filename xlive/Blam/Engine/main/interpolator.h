@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/models/render_models.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "models/render_models.h"
+#include "Networking/Session/NetworkSession.h"
 
 #define k_interpolation_first_person_weapon_slot_count 4
 #define k_interpolation_positions_count 2

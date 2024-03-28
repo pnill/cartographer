@@ -2,8 +2,8 @@
 #include "animation_definitions.h"
 
 
-#include "Blam/Engine/memory/static_arrays.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "memory/static_arrays.h"
+#include "tag_files/string_id.h"
 
 // TODO populate flags
 enum e_animation_state_flag_bits : int8

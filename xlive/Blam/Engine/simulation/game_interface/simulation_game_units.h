@@ -1,7 +1,7 @@
 #pragma once
 #include "simulation_game_entities.h"
 #include "simulation_game_objects.h"
-#include "Blam/Engine/game/players.h"
+#include "game/players.h"
 
 
 struct s_simulation_unit_state_data

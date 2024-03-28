@@ -1,7 +1,7 @@
 #pragma once
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 #define MAXIMUM_ANIMATIONS_PER_SKY 8

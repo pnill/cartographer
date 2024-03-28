@@ -2,7 +2,7 @@
 
 #include "bitstream.h"
 
-#include "Blam/Engine/math/real_quantization.h"
+#include "math/real_quantization.h"
 
 void c_bitstream::set_data(uint8* stream_buf, int32 stream_buf_size)
 {

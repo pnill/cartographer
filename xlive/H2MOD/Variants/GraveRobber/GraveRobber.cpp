@@ -3,13 +3,13 @@
 
 #include "H2MOD.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_engine_util.h"
-#include "Blam/Engine/game/game_statborg.h"
-#include "Blam/Engine/items/weapons.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "game/game.h"
+#include "game/game_engine_util.h"
+#include "game/game_statborg.h"
+#include "items/weapons.h"
+#include "Networking/Session/NetworkSession.h"
 #include "simulation/game_interface/simulation_game_action.h"
-#include "Blam/Engine/units/bipeds.h"
+#include "units/bipeds.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"

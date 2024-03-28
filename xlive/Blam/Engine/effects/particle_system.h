@@ -1,9 +1,9 @@
 #pragma once
 
 #include "particle_system_definition.h"
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "math/matrix_math.h"
+#include "memory/data.h"
+#include "objects/object_placement.h"
 
 #define k_max_particle_systems 128
 

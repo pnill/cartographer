@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "H2X.h"
 
-#include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/math/math.h"
+#include "items/weapon_definitions.h"
+#include "game/game_globals.h"
+#include "game/game_time.h"
+#include "math/math.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 

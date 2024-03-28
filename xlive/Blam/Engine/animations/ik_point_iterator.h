@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 #define k_max_ik_points 8
 

@@ -2,10 +2,10 @@
 #include "SpecialEventHelpers.h"
 
 
-#include "Blam/Engine/items/weapon_definitions.h"
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/models/render_model_definitions.h"
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "items/weapon_definitions.h"
+#include "models/models.h"
+#include "models/render_model_definitions.h"
+#include "tag_files/global_string_ids.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

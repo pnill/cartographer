@@ -1,17 +1,17 @@
 #include "stdafx.h"
 #include "first_person_weapons.h"
 
-#include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/camera/camera.h"
-#include "Blam/Engine/game/cheats.h"
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/items/weapons.h"
-#include "Blam/Engine/main/interpolator.h"
-#include "Blam/Engine/models/models.h"
-#include "Blam/Engine/models/render_model_definitions.h"
-#include "Blam/Engine/objects/object_definition.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "cache/cache_files.h"
+#include "camera/camera.h"
+#include "game/cheats.h"
+#include "game/game_globals.h"
+#include "items/weapons.h"
+#include "main/interpolator.h"
+#include "models/models.h"
+#include "models/render_model_definitions.h"
+#include "objects/object_definition.h"
+#include "objects/objects.h"
+#include "tag_files/global_string_ids.h"
 
 
 bool show_first_person = true;

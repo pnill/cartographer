@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "animation_channel.h"
 
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "tag_files/global_string_ids.h"
 
 void c_animation_channel::initialize()
 {

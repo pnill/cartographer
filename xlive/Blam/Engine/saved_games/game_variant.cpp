@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "game_variant.h"
 
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 
 s_game_variant* get_game_variant(void)
 {

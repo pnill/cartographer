@@ -1,5 +1,5 @@
 
-#include "Blam/Engine/items/weapon_definitions.h"
+#include "items/weapon_definitions.h"
 
 
 struct s_weapon_custom_offset {

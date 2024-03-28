@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "CustomLanguage.h"
-#include "Blam/Engine/text/unicode.h"
+#include "text/unicode.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

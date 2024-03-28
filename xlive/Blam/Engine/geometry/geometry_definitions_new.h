@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/rasterizer/rasterizer_vertex_buffers.h"
+#include "rasterizer/rasterizer_vertex_buffers.h"
 
 #define MAXIMUM_PARTS_PER_GEOMETRY_SECTION 255
 #define MAXIMUM_SUBPARTS_PER_SECTION 32768

@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 struct s_string_reference
 {

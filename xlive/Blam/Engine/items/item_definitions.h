@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/objects/object_definition.h"
+#include "objects/object_definition.h"
 
 enum e_item_definition_flags : uint32
 {
