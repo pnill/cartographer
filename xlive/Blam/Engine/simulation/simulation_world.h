@@ -7,6 +7,7 @@
 #include "simulation_view.h"
 
 #include "Networking/replication/replication_event_manager.h"
+#define k_simulation_world_maximum_views (k_maximum_players + 1)
 
 enum e_simulation_queue_type
 {
@@ -61,7 +62,7 @@ class c_simulation_world
 	e_simulation_world_state m_world_state;
 	int32 m_join_time_start;
 	int32 m_valid_machines_mask;
-	char m_time_running;
+	bool m_time_running;
 	bool m_time_immediate_update;
 	uint8 gap_26[2];
 	uint32 m_next_update_number;
@@ -74,8 +75,7 @@ class c_simulation_world
 	int field_38;
 	int32 m_join_timeout;
 	int32 m_view_count;
-	c_simulation_view* m_views[k_maximum_players];
-	uint8 gap_84[4];
+	c_simulation_view* m_views[k_simulation_world_maximum_views];
 	c_simulation_player m_players[k_maximum_players];
 	c_simulation_actor m_actors[k_maximum_players];
 	char field_1288;
@@ -180,6 +180,12 @@ public:
 	void send_player_acknowledgements(bool a1)
 	{
 		INVOKE_TYPE(0x1DD777, 0x1C4C37, void(__thiscall*)(c_simulation_world*, bool), this, a1);
+	}
+
+	bool time_running(void)
+	{
+		ASSERT(exists());
+		return m_time_running;
 	}
 };
 CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
