@@ -5,9 +5,9 @@
 #include "cseries_windows_modules.h"
 #include "cseries_windows_debug_pc.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_options.h"
-#include "Blam/Engine/rasterizer/dx9/rasterizer_dx9_main.h"
+#include "game/game.h"
+#include "game/game_options.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 // constants
 #define k_crash_message_header_break L"=============================================\n"

@@ -1,7 +1,7 @@
 #pragma once
 #include "unit_definitions.h"
 
-#include "Blam/Engine/physics/character_physics_definitions.h"
+#include "physics/character_physics_definitions.h"
 
 enum e_biped_definition_flags : uint32
 {

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "font_cache.h"
 
-#include "Blam/Engine/interface/hud.h"
+#include "interface/hud.h"
 
 
 // Multiply font size by the global text scale to fix scaling issues on resolutions higher than 1080 pixels vertically

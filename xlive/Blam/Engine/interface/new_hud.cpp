@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "new_hud.h"
 
-#include "Blam/Engine/bitmaps/bitmap_group.h"
-#include "Blam/Engine/camera/camera.h"
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/interface/hud.h"
-#include "Blam/Engine/interface/new_hud_definitions.h"
-#include "Blam/Engine/main/main_screenshot.h"
-#include "Blam/Engine/Networking/logic/life_cycle_manager.h"
+#include "bitmaps/bitmap_group.h"
+#include "camera/camera.h"
+#include "game/game.h"
+#include "interface/hud.h"
+#include "interface/new_hud_definitions.h"
+#include "main/main_screenshot.h"
+#include "Networking/logic/life_cycle_manager.h"
 
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"

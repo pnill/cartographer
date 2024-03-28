@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "first_person_camera.h"
 
-#include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/game/player_control.h"
-#include "Blam/Engine/objects/objects.h"
-#include "Blam/Engine/units/units.h"
-#include "Blam/Engine/units/unit_definitions.h"
+#include "cache/cache_files.h"
+#include "game/player_control.h"
+#include "objects/objects.h"
+#include "units/units.h"
+#include "units/unit_definitions.h"
 
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/Shell/Config.h"

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "screen_xbox_live_task_progress_dialog.h"
 
-#include "Blam/Engine/interface/user_interface_screen_widget_definition.h"
+#include "interface/user_interface_screen_widget_definition.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 void c_xbox_live_task_progress_menu::open(void* update_function)

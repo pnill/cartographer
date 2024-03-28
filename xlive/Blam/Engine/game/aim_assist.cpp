@@ -2,7 +2,7 @@
 #include "aim_assist.h"
 
 #include "H2MOD.h"
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 
 
 // sword-flying target clear patch

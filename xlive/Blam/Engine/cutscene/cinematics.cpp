@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cinematics.h"
 
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 
 
 s_cinematic_globals* get_cinematic_globals(void)

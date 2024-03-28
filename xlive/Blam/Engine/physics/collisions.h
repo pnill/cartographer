@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/objects/objects.h"
+#include "objects/objects.h"
 
 enum e_collision_test_flags : uint32
 {

@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/game/player_control.h"
-#include "Blam/Engine/objects/objects.h"
+#include "game/player_control.h"
+#include "objects/objects.h"
 
 #define MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
 #define NUMBER_OF_UNIT_HUD_TYPES 2

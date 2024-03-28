@@ -1,12 +1,12 @@
 #pragma once
-#include "Blam/Engine/errors/error_reports.h"
-#include "Blam/Engine/geometry/geometry_block.h"
-#include "Blam/Engine/geometry/geometry_definitions_new.h"
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/render/render_prt.h"
-#include "Blam/Engine/structures/structure_bsp_definitions.h"
-#include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Engine/tag_files/tag_import_definitions.h"
+#include "errors/error_reports.h"
+#include "geometry/geometry_block.h"
+#include "geometry/geometry_definitions_new.h"
+#include "math/matrix_math.h"
+#include "render/render_prt.h"
+#include "structures/structure_bsp_definitions.h"
+#include "tag_files/string_id.h"
+#include "tag_files/tag_import_definitions.h"
 
 enum e_render_model_definition_flags : int16
 {

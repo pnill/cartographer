@@ -15,10 +15,10 @@ struct geometry_block_resource
 {
     e_geometry_resource_type type;
     char pad[3];
-    short primary_locator;
-    short secondary_locator;
-    int resource_data_size;
-    int resource_data_offset;
+    int16 primary_locator;
+    int16 secondary_locator;
+    int32 resource_data_size;
+    int32 resource_data_offset;
 };
 TAG_BLOCK_SIZE_ASSERT(geometry_block_resource, 16);
 
@@ -26,16 +26,18 @@ TAG_BLOCK_SIZE_ASSERT(geometry_block_resource, 16);
 struct geometry_block_info
 {
     // Explaination("BLOCK INFO", "EMPTY STRING")
-    int block_offset;
-    int block_size;
-    int section_data_size;
-    int resource_data_size;
+    int32 block_offset;
+    int32 block_size;
+    int32 section_data_size;
+    int32 resource_data_size;
     tag_block<geometry_block_resource> resources;
 
-    int pad;
-    short owner_tag_section_offset;
-    short pad1;
-    int pad2;
+    datum geometry_tag_index;
+    int16 owner_tag_section_offset;
+    bool from_geometry_cache;
+    int8 pad;
+
+    datum geometry_cache_index;
 };
 CHECK_STRUCT_SIZE(geometry_block_info, 36);
 

@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "Tweaks.h"
 
-#include "Blam/Engine/interface/hud.h"
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/rasterizer/rasterizer_settings.h"
-#include "Blam/Engine/tag_files/files_windows.h"
-#include "Blam/Engine/shell/shell_windows.h"
+#include "interface/hud.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "rasterizer/rasterizer_settings.h"
+#include "tag_files/files_windows.h"
+#include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"

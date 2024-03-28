@@ -2,8 +2,8 @@
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_block.h"
 
-#include "Blam/Engine/memory/data.h"
-#include "Blam/Engine/objects/object_placement.h"
+#include "memory/data.h"
+#include "objects/object_placement.h"
 
 #define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 

@@ -3,8 +3,8 @@
 
 #include "players.h"
 
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/main/interpolator.h"
+#include "game/game_time.h"
+#include "main/interpolator.h"
 
 real32 g_player_control_dt = 0.0f;
 

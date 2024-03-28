@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 void __cdecl draw_string_get_color(real_argb_color* color);

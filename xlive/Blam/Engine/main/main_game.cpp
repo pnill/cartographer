@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "main_game.h"
 
-#include "Blam/Engine/cache/cache_files.h"
-#include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/saved_games/game_variant.h"
+#include "cache/cache_files.h"
+#include "cseries/cseries_strings.h"
+#include "game/game.h"
+#include "Networking/Session/NetworkSession.h"
+#include "saved_games/game_variant.h"
 
 
 

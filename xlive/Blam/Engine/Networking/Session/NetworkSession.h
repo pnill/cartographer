@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Blam/Engine/game/players.h"
-#include "Blam/Engine/input/controllers.h"
-#include "Blam/Engine/Networking/Transport/transport.h"
-#include "Blam/Engine/Networking/Transport/NetworkChannel.h"
-#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
-#include "Blam/Engine/saved_games/game_variant.h"
+#include "game/players.h"
+#include "input/controllers.h"
+#include "Networking/Transport/transport.h"
+#include "Networking/Transport/NetworkChannel.h"
+#include "Networking/Transport/NetworkObserver.h"
+#include "saved_games/game_variant.h"
 
 // ### TODO Cleanup
 

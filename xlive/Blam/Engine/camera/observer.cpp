@@ -3,14 +3,14 @@
 
 #include "director.h"
 
-#include "Blam/Engine/cutscene/cinematics.h"
-#include "Blam/Engine/effects/player_effects.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/interface/first_person_weapons.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/physics/collisions.h"
-#include "Blam/Engine/render/render_visibility_collection.h"
-#include "Blam/Engine/scenario/scenario.h"
+#include "cutscene/cinematics.h"
+#include "effects/player_effects.h"
+#include "game/game_time.h"
+#include "interface/first_person_weapons.h"
+#include "Networking/Session/NetworkSession.h"
+#include "physics/collisions.h"
+#include "render/render_visibility_collection.h"
+#include "scenario/scenario.h"
 
 
 real32 g_camera_speed = 1.0f;

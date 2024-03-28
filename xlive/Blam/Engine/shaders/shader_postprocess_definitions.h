@@ -1,9 +1,9 @@
 #pragma once
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/math/color_math.h"
-#include "Blam/Engine/math/function_definitions.h"
+#include "math/color_math.h"
+#include "math/function_definitions.h"
 
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 struct s_shader_postprocess_value_property
 {

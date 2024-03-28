@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "KeyboardInput.h"
 
-#include "Blam/Engine/input/input_abstraction.h"
+#include "input/input_abstraction.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"

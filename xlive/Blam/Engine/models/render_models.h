@@ -1,7 +1,7 @@
 #pragma once
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Engine/objects/objects.h"
+#include "math/matrix_math.h"
+#include "tag_files/string_id.h"
+#include "objects/objects.h"
 
 #define MAXIMUM_REGIONS_PER_MODEL 16
 #define MAXIMUM_PERMUTATIONS_PER_MODEL_REGION 32

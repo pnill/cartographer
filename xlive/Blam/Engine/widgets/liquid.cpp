@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "liquid.h"
 
-#include "Blam/Engine/objects/objects.h"
+#include "objects/objects.h"
 
 
 void liquid_apply_patches(void)

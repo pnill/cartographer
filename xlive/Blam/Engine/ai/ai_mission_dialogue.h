@@ -4,7 +4,7 @@
 
 
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 #define k_max_roles_per_scene 10
 #define k_max_variants_per_line 10

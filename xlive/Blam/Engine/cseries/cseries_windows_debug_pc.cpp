@@ -4,7 +4,7 @@
 #include "cseries_strings.h"
 #include "cseries_windows_minidump.h"
 
-#include "Blam/Engine/shell/windows/crash_report_window/crash_report_window.h"
+#include "shell/windows/crash_report_window/crash_report_window.h"
 
 
 LPTOP_LEVEL_EXCEPTION_FILTER pfn_SecondaryExceptionFilter = NULL;

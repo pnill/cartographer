@@ -1,7 +1,7 @@
 #pragma once
-#include "Blam/Engine/animations/animation_manager.h"
-#include "Blam/Engine/game/players.h"
-#include "Blam/Engine/math/matrix_math.h"
+#include "animations/animation_manager.h"
+#include "game/players.h"
+#include "math/matrix_math.h"
 
 #define MAXIMUM_NUMBER_OF_FIRST_PERSON_MODELS 4
 #define MAXIMUM_NODES_PER_FIRST_PERSON_MODEL 64

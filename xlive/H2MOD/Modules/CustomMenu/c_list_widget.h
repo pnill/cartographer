@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/memory/data.h"
+#include "memory/data.h"
 #include "c_user_interface_widget.h"
 
 #include "CustomMenuGlobals.h"

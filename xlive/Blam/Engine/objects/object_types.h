@@ -2,7 +2,7 @@
 #include "object_type_list.h"
 #include "object_placement.h"
 
-#include "Blam/Engine/scenario/scenario.h"
+#include "scenario/scenario.h"
 
 typedef void (*object_initialize_t)();
 typedef void (*object_dispose_t)();

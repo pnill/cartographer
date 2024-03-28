@@ -1,6 +1,6 @@
 #pragma once
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/effects/particle_system_definition.h"
+#include "effects/particle_system_definition.h"
 
 struct s_breakable_surface_definition
 {

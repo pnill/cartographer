@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "contrails.h"
 
-#include "Blam/Engine/objects/objects.h"
+#include "objects/objects.h"
 
 
 void contrails_apply_patches(void)

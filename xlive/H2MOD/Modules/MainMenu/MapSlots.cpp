@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "MapSlots.h"
 
-#include "Blam/Engine/game/game_globals.h"
-#include "Blam/Engine/main/level_definitions.h"
+#include "game/game_globals.h"
+#include "main/level_definitions.h"
 
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "Util/filesys.h"

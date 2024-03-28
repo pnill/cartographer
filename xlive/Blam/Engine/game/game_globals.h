@@ -6,11 +6,11 @@
 
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-#include "Blam/Engine/bitmaps/bitmap_group.h"
-#include "Blam/Engine/main/level_definitions.h"
-#include "Blam/Engine/objects/damage.h"
-#include "Blam/Engine/tag_files/string_id.h"
-#include "Blam/Engine/text/text_group.h"
+#include "bitmaps/bitmap_group.h"
+#include "main/level_definitions.h"
+#include "objects/damage.h"
+#include "tag_files/string_id.h"
+#include "text/text_group.h"
 
 
 #include "H2MOD/Tags/TagInterface.h"

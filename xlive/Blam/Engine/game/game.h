@@ -1,7 +1,7 @@
 #pragma once
 
 #include "game_options.h"
-#include "Blam/Engine/structures/cluster_partitions.h"
+#include "structures/cluster_partitions.h"
 
 #define k_game_maximum_ragdolls 3
 

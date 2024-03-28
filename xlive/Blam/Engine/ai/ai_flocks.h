@@ -2,7 +2,7 @@
 
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 
 #define k_max_flock_definitions_per_map 20

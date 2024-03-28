@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 #define k_maximum_projected_decal_count 32768

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/cseries/cseries_strings.h"
+#include "cseries/cseries_strings.h"
 
 
 #define MAXIMUM_EDITOR_COMMENTS 65536

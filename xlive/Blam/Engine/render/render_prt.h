@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/geometry/geometry_block.h"
+#include "geometry/geometry_block.h"
 
 #define k_max_cluster_data_size 34560
 #define k_max_pca_per_vertex_data_size 150405120

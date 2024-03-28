@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "input_xinput.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_time.h"
+#include "game/game.h"
+#include "game/game_time.h"
 
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};

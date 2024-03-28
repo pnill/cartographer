@@ -1,12 +1,12 @@
 #pragma once
 #include "item_definitions.h"
 
-#include "Blam/Engine/cache/predicted_resources.h"
-#include "Blam/Engine/game/aim_assist.h"
-#include "Blam/Engine/game/players.h"
+#include "cache/predicted_resources.h"
+#include "game/aim_assist.h"
+#include "game/players.h"
 
-#include "Blam/Engine/math/periodic_functions.h"
-#include "Blam/Engine/objects/damage_reporting.h"
+#include "math/periodic_functions.h"
+#include "objects/damage_reporting.h"
 
 enum e_weapon_definition_flags : int32
 {

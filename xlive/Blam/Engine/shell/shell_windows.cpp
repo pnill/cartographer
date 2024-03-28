@@ -2,7 +2,7 @@
 #include "shell_windows.h"
 #include "shell_windows_internals.h"
 
-#include "Blam/Engine/math/math.h"
+#include "math/math.h"
 
 
 

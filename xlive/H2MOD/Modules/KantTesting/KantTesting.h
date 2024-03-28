@@ -1,6 +1,6 @@
 #pragma once
 #define ENABLEKANTTEST 0
-#include "Blam/Engine/Networking/Transport/NetworkObserver.h"
+#include "Networking/Transport/NetworkObserver.h"
 
 namespace KantTesting
 {

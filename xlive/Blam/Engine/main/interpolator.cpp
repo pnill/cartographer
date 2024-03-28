@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "interpolator.h"
 
-#include "Blam/Engine/effects/particle.h"
-#include "Blam/Engine/cutscene/cinematics.h"
-#include "Blam/Engine/game/game_time.h"
+#include "effects/particle.h"
+#include "cutscene/cinematics.h"
+#include "game/game_time.h"
 
-#include "Blam/Engine/units/bipeds.h"
+#include "units/bipeds.h"
 
 s_frame_data_storage* g_frame_data_storage = NULL;
 s_interpolation_data* g_frame_data_intermediate = NULL;

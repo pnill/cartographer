@@ -3,7 +3,7 @@
 #include "new_hud_definitions.h"
 
 
-#include "Blam/Engine/game/game_globals.h"
+#include "game/game_globals.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"

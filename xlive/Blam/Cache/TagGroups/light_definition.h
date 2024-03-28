@@ -4,7 +4,7 @@
 #include "tag_files/tag_reference.h"
 
 
-#include "Blam/Engine/math/color_math.h"
+#include "math/color_math.h"
 
 
 /*********************************************************************

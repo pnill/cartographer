@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "GunGame.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "game/game.h"
+#include "Networking/Session/NetworkSession.h"
+#include "Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
 
 using namespace NetworkSession;

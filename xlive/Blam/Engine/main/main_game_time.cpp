@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "main_game_time.h"
 
-#include "Blam/Engine/game/game.h"
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/math/math.h"
-#include "Blam/Engine/shell/shell_windows.h"
-#include "Blam/Engine/game/player_control.h"
+#include "game/game.h"
+#include "game/game_time.h"
+#include "math/math.h"
+#include "shell/shell_windows.h"
+#include "game/player_control.h"
 
 #include "H2MOD/Utils/Utils.h"
 

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "animation_manager.h"
 
-#include "Blam/Engine/tag_files/global_string_ids.h"
+#include "tag_files/global_string_ids.h"
 
 c_animation_manager::c_animation_manager()
 {

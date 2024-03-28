@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "rasterizer_settings.h"
 
-#include "Blam/Engine/math/math.h"
-#include "Blam/Engine/shell/shell.h"
+#include "math/math.h"
+#include "shell/shell.h"
 #include "dx9/rasterizer_dx9_main.h"
-#include "Blam/Engine/interface/user_interface_text.h"
+#include "interface/user_interface_text.h"
 
 
 void __cdecl rasterizer_discard_refresh_rate();

@@ -3,8 +3,8 @@
 
 #include "tag_files/tag_block.h"
 
-#include "Blam/Engine/geometry/geometry_block.h"
-#include "Blam/Engine/math/color_math.h"
+#include "geometry/geometry_block.h"
+#include "math/color_math.h"
 
 
 #define k_maximum_cache_block_count 4096

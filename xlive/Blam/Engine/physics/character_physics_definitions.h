@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/physics/physics_models.h"
+#include "physics/physics_models.h"
 
 #define k_character_physics_dead_size 0
 #define k_character_physics_sentinel_size 0

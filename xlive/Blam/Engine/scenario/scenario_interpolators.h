@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Blam/Engine/math/function_definitions.h"
-#include "Blam/Engine/tag_files/string_id.h"
+#include "math/function_definitions.h"
+#include "tag_files/string_id.h"
 
 #define k_maximum_interpolators_per_scenario 16
 

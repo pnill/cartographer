@@ -4,7 +4,7 @@
 
 #include "particle_system.h"
 #include "particle_emitter.h"
-#include "Blam/Engine/memory/data.h"
+#include "memory/data.h"
 
 enum e_particle_flags : uint16
 {

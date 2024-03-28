@@ -3,8 +3,8 @@
 #include "CustomMenu.h"
 #include "CustomLanguage.h"
 
-#include "Blam/Engine/interface/screens/screen_xbox_live_task_progress_dialog.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
+#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
+#include "Networking/NetworkMessageTypeCollection.h"
 
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"

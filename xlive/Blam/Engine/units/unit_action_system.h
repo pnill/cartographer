@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/tag_files/string_id.h"
+#include "tag_files/string_id.h"
 
 #define MAXIMUM_POSTURES_PER_UNIT 20
 

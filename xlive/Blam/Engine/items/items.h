@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/objects/objects.h"
+#include "objects/objects.h"
 
 struct s_item_data_definition
 {

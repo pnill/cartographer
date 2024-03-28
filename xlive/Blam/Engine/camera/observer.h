@@ -1,6 +1,6 @@
 #pragma once
-#include "Blam/Engine/math/matrix_math.h"
-#include "Blam/Engine/objects/objects.h"
+#include "math/matrix_math.h"
+#include "objects/objects.h"
 
 #define k_observer_command_values 6
 

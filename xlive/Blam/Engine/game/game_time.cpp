@@ -3,9 +3,9 @@
 
 #include "H2MOD.h"
 
-#include "Blam/Engine/cutscene/cinematics.h"
-#include "Blam/Engine/math/math.h"
-#include "Blam/Engine/shell/shell_windows.h"
+#include "cutscene/cinematics.h"
+#include "math/math.h"
+#include "shell/shell_windows.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 

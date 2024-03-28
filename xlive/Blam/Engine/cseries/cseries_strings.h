@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Engine/text/unicode.h"
+#include "text/unicode.h"
 
 #define MAXIMUM_STRING_SIZE 262144
 

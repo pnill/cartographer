@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "hud_messaging.h"
 
-#include "Blam/Engine/interface/hud.h"
+#include "interface/hud.h"
 
 
 // Pointer to the crosshair and text scale for the below hook

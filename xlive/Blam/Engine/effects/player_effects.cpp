@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "player_effects.h"
 
-#include "Blam/Engine/game/game_time.h"
-#include "Blam/Engine/game/player_vibration.h"
-#include "Blam/Engine/main/interpolator.h"
-#include "Blam/Engine/math/random_math.h"
+#include "game/game_time.h"
+#include "game/player_vibration.h"
+#include "main/interpolator.h"
+#include "math/random_math.h"
 
 void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 translation, real32 rotation);
 real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);

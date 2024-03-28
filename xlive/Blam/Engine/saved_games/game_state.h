@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blam/Engine/game/game_options.h"
+#include "game/game_options.h"
 
 #pragma pack(push,1)
 struct s_game_state_header

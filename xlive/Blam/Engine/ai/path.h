@@ -6,8 +6,8 @@
 
 
 #include "tag_files/tag_block.h"
-#include "Blam/Engine/physics/collision_bsp.h"
-#include "Blam/Engine/structures/structures.h"
+#include "physics/collision_bsp.h"
+#include "structures/structures.h"
 
 enum e_pathfinding_hint_type : short
 {

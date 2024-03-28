@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "NetworkSession.h"
 
-#include "Blam/Engine/game/game.h"
+#include "game/game.h"
 
 // ### TODO Cleanup
 

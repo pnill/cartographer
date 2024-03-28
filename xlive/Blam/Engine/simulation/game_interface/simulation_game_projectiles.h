@@ -1,6 +1,6 @@
 #pragma once
 #include "simulation_game_objects.h"
-#include "Blam/Engine/objects/damage.h"
+#include "objects/damage.h"
 
 struct s_simulation_projectile_creation_data
 {
