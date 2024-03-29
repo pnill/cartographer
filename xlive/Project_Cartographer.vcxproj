@@ -861,7 +861,6 @@
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
@@ -897,6 +896,7 @@
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
     <ClInclude Include="Blam\Engine\objects\object_identifier.h" />
     <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
+    <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
