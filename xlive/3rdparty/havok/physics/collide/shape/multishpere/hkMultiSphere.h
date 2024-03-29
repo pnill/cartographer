@@ -4,6 +4,6 @@
 
 struct hkMultiSphereShape : hkSphereRepShape
 {
-	int m_numSpheres;
+	hkInt32 m_numSpheres;
 	hkVector4 m_spheres[8];
 };
