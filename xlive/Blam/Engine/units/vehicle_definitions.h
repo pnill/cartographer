@@ -142,7 +142,7 @@ struct s_friction_point_definition
 	real32 radius;
 	/// radius when the tire is blown off.
 	real32 damaged_radius;
-	e_friction_point_definition_friction_type friction type;
+	e_friction_point_definition_friction_type friction_type;
 	int16 pad_1;
 
 	real32 moving_friction_velocity_difference;
