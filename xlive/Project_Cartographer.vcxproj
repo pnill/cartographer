@@ -409,6 +409,17 @@
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
+    <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
+    <ClInclude Include="3rdparty\havok\common\base\math\vector\hkVector4.h" />
+    <ClInclude Include="3rdparty\havok\common\base\object\hkBaseObject.h" />
+    <ClInclude Include="3rdparty\havok\common\base\object\hkReferencedObject.h" />
+    <ClInclude Include="3rdparty\havok\common\base\types\hkBaseTypes.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\hkShapeCollection.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\list\hkListShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\heightfeild\hkpSphereRepShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\hkShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\multishpere\hkMultiSphere.h" />
+    <ClInclude Include="3rdparty\havok\serialize\hkSerializable.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_dx9.h" />
     <ClInclude Include="3rdparty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="3rdparty\imgui\imconfig.h" />
@@ -862,8 +873,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
@@ -907,6 +916,7 @@
     <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />
     <ClInclude Include="Blam\Engine\render\render_submit.h" />
     <ClInclude Include="Blam\Engine\render\render_visibility_collection.h" />
+    <ClInclude Include="Blam\Engine\render\weather_definitions.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state_procs.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
@@ -986,6 +996,7 @@
     <ClInclude Include="Blam\Engine\units\unit_action_system.h" />
     <ClInclude Include="Blam\Engine\units\unit_definitions.h" />
     <ClInclude Include="Blam\Engine\units\unit_dialogue.h" />
+    <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />
     <ClInclude Include="Blam\Engine\widgets\cloth.h" />
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />
