@@ -3,5 +3,5 @@
 
 struct hkShape : hkSerializable
 {
-	int m_userData;
+	hkInt32 m_userData;
 };
