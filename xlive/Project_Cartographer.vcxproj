@@ -551,6 +551,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
     <ClInclude Include="Blam\Engine\items\item_definitions.h" />
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
+    <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
@@ -880,7 +881,6 @@
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
