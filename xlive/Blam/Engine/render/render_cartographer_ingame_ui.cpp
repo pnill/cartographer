@@ -19,12 +19,13 @@
 // define this to enable queueing a test message in render_cartographer_achievements
 // #define ACHIVEMENT_RENDER_DEBUG_ENABLED
 
+#define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT true;
+
 const int32 k_status_text_font = 0;
 
 // defined in XLiveRendering.cpp
 extern char* buildText;
 
-bool cartographer_test_build_draw_text = true;
 
 void render_cartographer_status_text()
 {
@@ -68,7 +69,7 @@ void render_cartographer_status_text()
 	}
 
 #if defined(GEN_GIT_VER_VERSION_STRING)
-	if (cartographer_test_build_draw_text)
+#if CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
 	{
 		rasterizer_get_frame_bounds(&bounds);
 		int32 test_build_font = k_status_text_font;
@@ -91,6 +92,7 @@ void render_cartographer_status_text()
 		swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
 		draw_string_render(&bounds, result_text_buffer);
 	}
+#endif
 #endif
 }
 
