@@ -77,8 +77,6 @@ public:
 		const real_matrix4x3* matrix,
 		bool a4);
 
-	void adjust_initial_position(datum particle_location_index, const real_matrix4x3* matrix);
-
 	void change_parent_effect(datum* datum_1, datum* datum_2);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);
 	int32 get_particle_count() const;

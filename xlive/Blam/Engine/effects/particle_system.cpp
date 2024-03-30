@@ -102,26 +102,9 @@ void __thiscall c_particle_system::update_position(
 	c_particle_system_definition* particle_system_def = this->get_definition();
 	datum location_index = particle_system_update->particle_system_location_index;
 	p_update_position(this, particle_system_update, matrix, a4);
-	adjust_initial_position(location_index, matrix);
 }
 
 __declspec(naked) void jmp_c_particle_system_update_position() {__asm jmp c_particle_system::update_position}
-
-void c_particle_system::adjust_initial_position(datum particle_location_index, const real_matrix4x3* matrix)
-{
-	if (particle_location_index != NONE)
-	{
-		c_particle_system_definition* particle_system_def = this->get_definition();
-		c_particle_location* particle_location = (c_particle_location*)datum_get(get_particle_location_table(), particle_location_index);
-
-		// ### TODO FIXME info in particle emitter
-		/*if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
-		{
-			if (this->flags.test(_particle_system_bit_8))
-				particle_location->adjust_emitter_particle_intial_position(this, game_tick_length(), matrix);
-		}*/
-	}
-}
 
 typedef bool(__stdcall* c_particle_system_frame_advance_t)(c_particle_system* thisx, real32 dt);
 c_particle_system_frame_advance_t p_c_particle_system_frame_advance;

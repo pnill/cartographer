@@ -81,7 +81,7 @@ void c_bitstream::read_string_wchar(const char* name, void* string_buffer, int s
 
 void c_bitstream::write_integer(const char* name, int32 value, uint32 size_in_bits)
 {
-	typedef void(__thiscall* write_integer_t)(c_bitstream*, const char*, unsigned int, int);
+	typedef void(__thiscall* write_integer_t)(c_bitstream*, const char*, int32, uint32);
 	INVOKE_TYPE(0xD17C6, 0xCDD80, write_integer_t, this, name, value, size_in_bits);
 }
 
