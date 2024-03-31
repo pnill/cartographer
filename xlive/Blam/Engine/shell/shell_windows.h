@@ -7,6 +7,8 @@
 #define k_shell_time_msec_denominator 1000
 #define k_shell_time_usec_denominator 1000000
 
+uint32 __cdecl system_milliseconds();
+
 void shell_windows_initialize();
 void shell_windows_apply_patches();
 
