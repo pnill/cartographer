@@ -26,7 +26,9 @@ void c_particle::adjust_initial_position(
 	if (particle_system_def->coordinate_system == _particle_coordinate_system_world)
 	{
 		state->set_particle(this);
-		state->state_update(0xF80Fu);
+
+		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags(0xF80Fu);
+		state->state_update(flags);
 		emitter_definition->initialize_particle(state, this, particle_system);
 		scale_vector3d(&m_position, scale, &m_position);
 
