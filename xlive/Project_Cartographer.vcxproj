@@ -421,9 +421,12 @@
     <ClInclude Include="3rdparty\havok\physics\collide\shape\capsule\hkCapsuleShape.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\hkShapeCollection.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\list\hkListShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\mesh\hkMeshMaterial.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\convex\hkConvexShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\convex\triangle\hkTriangle.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\heightfeild\hkpSphereRepShape.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\hkShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\mesh\hkMeshShape.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\misc\transform\hkTransformShape.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\multishpere\hkMultiSphere.h" />
     <ClInclude Include="3rdparty\havok\physics\collide\shape\shpere\hkShpere.h" />
@@ -453,7 +456,6 @@
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zconf.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zlib.h" />
     <ClInclude Include="3rdparty\zlib-1.1.4\src\zutil.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\sound_classes_definition.hpp" />
     <ClInclude Include="Blam\Engine\ai\actors.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
@@ -904,7 +906,9 @@
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp_definition.h" />
     <ClInclude Include="Blam\Engine\physics\collision_models.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_model_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\havok.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
