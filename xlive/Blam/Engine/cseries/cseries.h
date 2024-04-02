@@ -52,6 +52,10 @@ static_assert(sizeof(datum) == 4);
 #define SHORT_BITS SIZEOF_BITS(int16)
 #define LONG_BITS SIZEOF_BITS(int32)
 
+#if(!__INTEL_LLVM_COMPILER)
+#define MSVC
+#endif
+
 // Invokes a function
 // ADDR_CLIENT: file offset in halo2.exe
 // ADDR_SERVER: file offset in h2server.exe
