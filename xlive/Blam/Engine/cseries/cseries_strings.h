@@ -9,10 +9,16 @@ template<size_t string_length>
 struct c_static_string
 {
 public:
-	c_static_string()
+	c_static_string(void)
 	{
-		this->text[0] = '\0';
+		text[0] = '\0';
 	}
+	
+	c_static_string(const char* string)
+	{
+		text.set(string);
+	}
+
 	~c_static_string() = default;
 
 	char* clear(void);
@@ -35,10 +41,16 @@ template<size_t string_length>
 class c_static_wchar_string
 {
 public:
-	c_static_wchar_string()
+	c_static_wchar_string(void)
 	{
-		this->text[0] = L'\0';
+		text[0] = L'\0';
 	}
+
+	c_static_wchar_string(const wchar_t* string)
+	{
+		text.set(string);
+	}
+
 	~c_static_wchar_string() = default;
 
 	wchar_t* clear(void);
@@ -267,11 +279,10 @@ bool c_static_wchar_string<T>::is_equal(const wchar_t* string) const
 	return !ustrncmp(text, string, T);
 }
 
-// TODO add asserts in the future
 size_t csstrnlen(const char* s, size_t size);
 
-// TODO add asserts in the future
-char* csstrnzcpy(char* dst, const char* src, size_t size);
+char* csstrnzcpy(char* s1, const char* s2, size_t size);
 
-// TODO add asserts in the future
 char* csstrnzcat(char* s1, char const* s2, size_t size);
+
+int32 cvsnzprintf(char* buffer, size_t size, char const* format, ...);

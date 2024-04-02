@@ -20,7 +20,6 @@ void error(int32 category, int32 priority, const char* format, ...)
 	return;
 }
 
-
 void error_internal(int32 category, int32 priority, const char* format, va_list va_args)
 {
 	LOG_ERROR_GAME(format, va_args);
