@@ -7,8 +7,7 @@
 
 struct c_particle_emitter
 {
-	bool active;
-	int8 gap_1[1];
+	uint16 datum_salt;
 	int16 m_particle_count;
 	datum particle_index;
 	datum m_next_emitter_index;

@@ -38,7 +38,7 @@ CHECK_STRUCT_SIZE(s_particle_system_update, 0xC);
 class c_particle_system
 {
 public:
-	int32 datum_salt;
+	uint16 datum_salt;
 	real32 update_dt;
 	real32 duration_in_ticks;
 	c_flags<e_particle_system_flags, uint16, k_particle_system_flags_count> flags;
