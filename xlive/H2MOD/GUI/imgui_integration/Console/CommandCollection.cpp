@@ -38,9 +38,9 @@ extern bool displayXyz;
 ComVarFromPtr(display_xyz_var, bool*, &displayXyz,
 	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
-extern float g_rumble_factor;
-ComVarFromPtr(rumble_var, float*, &g_rumble_factor,
-	"var_rumble_scale", "change controller vibration strength, 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
+extern real32 g_rumble_factor;
+ComVarFromPtr(rumble_var, real32*, &g_rumble_factor,
+	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
@@ -168,7 +168,7 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	ComVar<float> peerIdxVar;
+	ComVar<real32> peerIdxVar;
 	std::string exception;
 
 
@@ -179,7 +179,7 @@ int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, Co
 	}
 	else
 	{
-		g_rumble_factor = peerIdxVar.GetVal();
+		g_rumble_factor = PIN(peerIdxVar.GetVal(), 0.f, 1.f);
 	}
 
 	return 0;
