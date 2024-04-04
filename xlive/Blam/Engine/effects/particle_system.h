@@ -38,7 +38,7 @@ CHECK_STRUCT_SIZE(s_particle_system_update, 0xC);
 class c_particle_system
 {
 public:
-	int32 datum_salt;
+	uint16 datum_salt;
 	real32 update_dt;
 	real32 duration_in_ticks;
 	c_flags<e_particle_system_flags, uint16, k_particle_system_flags_count> flags;
@@ -76,8 +76,6 @@ public:
 		s_particle_system_update* particle_system_update,
 		const real_matrix4x3* matrix,
 		bool a4);
-
-	void adjust_initial_position(datum particle_location_index, const real_matrix4x3* matrix);
 
 	void change_parent_effect(datum* datum_1, datum* datum_2);
 	void update_colors(bool v_mirrored_or_one_shot, bool one_shot, pixel32 color, pixel32 color_2);

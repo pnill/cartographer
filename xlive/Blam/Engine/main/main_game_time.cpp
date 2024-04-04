@@ -71,26 +71,42 @@ void __cdecl compute_target_tick_count(float dt, float* out_time_delta, int* out
 #endif // USE_HALO_1_TARGET_TICK_COUNT_COMPUTE_CODE
 }
 
-float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta)
+uint64 __cdecl main_time_get_absolute_milliseconds()
 {
-	typedef float(__cdecl* compute_time_delta_t)(bool, float);
-	auto p_compute_time_delta = Memory::GetAddress<compute_time_delta_t>(0x28814);
+	uint64 milliseconds = system_milliseconds();
+	s_main_time_globals* main_time_globals = s_main_time_globals::get();
 
-	typedef void(__cdecl* translate_windows_messages_t)();
-	auto p_translate_windows_messages = Memory::GetAddress<translate_windows_messages_t>(0x7902);
+	// copy the high part
+	milliseconds |= (main_time_globals->last_milliseconds >> 32) << 32;
+
+	if (milliseconds < main_time_globals->last_milliseconds)
+	{
+		// adjust the time, a complete cycle of system_milliseconds has passed
+		milliseconds += UINT_MAX + 1llu;
+	}
+
+	ASSERT(milliseconds >= main_time_globals->last_milliseconds);
+	return milliseconds;
+}
+
+real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_delta)
+{
+	typedef real32(__cdecl* main_time_update_t)(bool, real32);
+	auto p_main_time_update = Memory::GetAddress<main_time_update_t>(0x28814);
+
+	typedef void(__cdecl* shell_update_t)();
+	auto p_shell_update = Memory::GetAddress<shell_update_t>(0x7902);
 
 	int game_time;
-	float dt_sec = 0.0f;
-	long long time_now_msec;
+	real32 dt_sec = 0.0f;
+	uint64 time_now_msec;
 
-	s_main_time_globals* main_time_globals;
-
-	main_time_globals = s_main_time_globals::get();
+	s_main_time_globals* main_time_globals = s_main_time_globals::get();
 	game_time = game_in_progress() ? time_globals::get_game_time() : 0;
 
 	// TranslateMessage()
 	// TODO move to function and cleanup
-	p_translate_windows_messages();
+	p_shell_update();
 
 	if (fixed_time_step)
 	{
@@ -98,12 +114,12 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 		if (time_globals::available())
 			time_globals::get()->game_ticks_leftover = 0.0f;
 
-		time_now_msec = main_time_globals->last_time_ms + (long long)(fixed_time_delta * 1000.0);
+		time_now_msec = main_time_globals->last_milliseconds + (long long)(fixed_time_delta * 1000.0);
 	}
 	else
 	{
-		time_now_msec = shell_time_now_msec();
-		dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
+		time_now_msec = main_time_get_absolute_milliseconds();
+		dt_sec = (double)(time_now_msec - main_time_globals->last_milliseconds) / 1000.;
 
 		// don't run the frame limiter when time step is fixed, because the code doesn't support it
 		// in case of fixed time step, frame limiter should be handled by the other frame limiter
@@ -115,33 +131,35 @@ float __cdecl main_time_update_hook(bool fixed_time_step, float fixed_time_delta
 				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
 				while (get_ticks_leftover_time() > dt_sec)
 				{
-					int yield_time_msec = 0;
-					float fMsSleep = (float)(get_ticks_leftover_time() - dt_sec) * 1000.f;
+					uint32 yield_time_msec = 0;
+					real32 fMsSleep = (real32)(get_ticks_leftover_time() - dt_sec) * 1000.f;
 
 					if ((int)fMsSleep > 0)
+					{
 						yield_time_msec = (int)fMsSleep;
+					}
 
 					// TODO FIXME to reduce stuttering, spend some of the time to sleep by CPU spinning,
 					// Sleep is not precise since Windows is not a RTOS
 					Sleep(yield_time_msec);
 
-					time_now_msec = shell_time_now_msec();
-					dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
+					time_now_msec = main_time_get_absolute_milliseconds();
+					dt_sec = (double)(time_now_msec - main_time_globals->last_milliseconds) / 1000.;
 				}
 			}
 			else
 			{
 				Sleep(15u);
 
-				time_now_msec = shell_time_now_msec();
-				dt_sec = (double)(time_now_msec - main_time_globals->last_time_ms) / 1000.;
+				time_now_msec = main_time_get_absolute_milliseconds();
+				dt_sec = (double)(time_now_msec - main_time_globals->last_milliseconds) / 1000.;
 			}
 		}
 	}
 
-	dt_sec = MIN(dt_sec, 10.f);
-	main_time_globals->last_time_ms = time_now_msec;
-	main_time_globals->game_time_passed = game_time;
+	dt_sec = PIN(dt_sec, 0.0f, 10.f);
+	main_time_globals->last_milliseconds = time_now_msec;
+	main_time_globals->previous_game_time = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
 	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
 

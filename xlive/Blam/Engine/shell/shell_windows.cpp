@@ -65,6 +65,11 @@ long long shell_time_now_msec()
 	return shell_time_now(k_shell_time_msec_denominator);
 }
 
+uint32 __cdecl system_milliseconds()
+{
+	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
+}
+
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {

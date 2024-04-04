@@ -11,8 +11,18 @@ struct s_main_time_globals
 	// this is somewhere in the middle of the base structure
 	bool field_0;
 	char pad_1[1];
-	int game_time_passed;
-	__int64 last_time_ms;
+	int previous_game_time;
+	
+	union
+	{
+		struct
+		{
+			uint32 low_time;
+			uint32 hi_time;
+		} last_milliseconds_parts;
+		uint64 last_milliseconds;
+	};
+
 	bool should_reset;
 	char pad_2[7];
 	__int64 field_16[2];

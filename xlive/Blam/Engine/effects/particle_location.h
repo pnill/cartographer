@@ -4,7 +4,7 @@
 
 struct c_particle_location
 {
-	int8 gap_0[2];
+	uint16 datum_salt;
 	bool parent_effect_has_bit_15_set;
 	int8 gap_3;
 	datum particle_emitter_index;

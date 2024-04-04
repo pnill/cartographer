@@ -130,9 +130,9 @@ void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* a4,
 	int a5)
 {
-	const float edge_drop_value = 0.117f;
+	const real32 edge_drop_value = 0.117f;
 
-	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, float);
+	typedef void(__thiscall* biped_ground_mode_update_t)(int, void*, void*, void*, int, real32);
 	auto p_biped_ground_mode_update = Memory::GetAddress<biped_ground_mode_update_t>(0x1067F0, 0xF8B10);
 
 	float edge_drop_per_tick = 30.f * edge_drop_value * game_tick_length();
@@ -321,7 +321,7 @@ void H2Tweaks::ApplyPatches() {
 	PatchCall(Memory::GetAddress(0x9B09F, 0x85F73), filo_write__encrypted_data_hook);
 
 	// fixes edge drop fast fall when using higher tickrates than 30
-	PatchCall(Memory::GetAddressRelative(0x5082B4, 0x4FA5D4), biped_ground_mode_update_to_stdcall);
+	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
 	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
 
 	// custom map hooks

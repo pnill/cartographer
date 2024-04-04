@@ -73,8 +73,7 @@ bool encode_simulation_queue_creation_to_buffer(
 	if (result)
 	{
 		SIM_ENT_QUEUE_DBG("#####");
-		SIM_ENT_QUEUE_DBG("entity encoding, stream is fine? %d, encoded size: %d",
-			!stream.error_occured(),
+		SIM_ENT_QUEUE_DBG("entity encoding, encoded size: %d",
 			stream.get_space_used_in_bytes());
 		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", data->entity_type, data->entity_index, initial_update_mask);
 	}
@@ -156,8 +155,7 @@ bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* enc
 	if (decode_success)
 	{
 		SIM_ENT_QUEUE_DBG("#####");
-		SIM_ENT_QUEUE_DBG("entity decoding, stream is fine? %d, decoded size: %d",
-			!stream.error_occured(),
+		SIM_ENT_QUEUE_DBG("entity decoding, decoded size: %d",
 			stream.get_space_used_in_bytes());
 		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", decoded_creation_data->entity_type, decoded_creation_data->entity_index, decoded_creation_data->initial_update_mask);
 	}
@@ -324,10 +322,7 @@ bool encode_simulation_queue_update_to_buffer(
 	// write the actual encode_buffer
 	c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(data->entity_type);
 	uint32 update_mask_written = 0;
-	if (entity_def->entity_update_encode(false, update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0))
-	{
-		SIM_ENT_QUEUE_DBG("enity update encode success!");
-	}
+	entity_def->entity_update_encode(false, update_mask, &update_mask_written, data->state_data_size, data->state_data, NULL, &stream, 0);
 
 	bool result = !stream.error_occured();
 	stream.finish_writing(NULL);
@@ -335,8 +330,7 @@ bool encode_simulation_queue_update_to_buffer(
 	if (result)
 	{
 		SIM_ENT_QUEUE_DBG("#####");
-		SIM_ENT_QUEUE_DBG("entity encoding, stream is fine? %d, encoded size: %d",
-			!stream.error_occured(),
+		SIM_ENT_QUEUE_DBG("entity encoding, encoded size: %d",
 			stream.get_space_used_in_bytes());
 		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", data->entity_type, data->entity_index, initial_update_mask);
 	}
@@ -405,8 +399,7 @@ bool decode_simulation_queue_update_from_buffer(int32 encoded_size, uint8* encod
 	if (decode_success)
 	{
 		SIM_ENT_QUEUE_DBG("#####");
-		SIM_ENT_QUEUE_DBG("entity decoding, stream is fine? %d, decoded size: %d",
-			!stream.error_occured(),
+		SIM_ENT_QUEUE_DBG("entity decoding, decoded size: %d",
 			stream.get_space_used_in_bytes());
 		SIM_ENT_QUEUE_DBG("entity type: %d, index: %X, initial update mask: 0x%X", out_decoded_data->entity_type, out_decoded_data->entity_index, out_decoded_data->initial_update_mask);
 	}
@@ -552,7 +545,7 @@ void simulation_queue_entity_deletion_apply(const s_simulation_queue_element* el
 		{
 			game_entity.object_index = NONE;
 		}
-
+		
 		if (entity_def->delete_game_entity(&game_entity))
 		{
 			// SUCCESS

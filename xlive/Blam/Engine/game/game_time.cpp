@@ -44,12 +44,12 @@ real32 time_globals::seconds_to_ticks_real(real32 s)
 	return (real32)get()->ticks_per_second * s;
 }
 
-int time_globals::seconds_to_ticks_round(real32 s)
+int32 time_globals::seconds_to_ticks_round(real32 s)
 {
 	return blam_ticks_real_to_integer((real32)get()->ticks_per_second * s);
 }
 
-int time_globals::get_ticks_difference()
+int32 time_globals::get_ticks_difference()
 {
 	return (get()->ticks_per_second / 30);
 }

@@ -19,8 +19,8 @@ struct time_globals
 	static int get_game_time();
 	static int get_tickrate();
 	static real32 seconds_to_ticks_real(real32 s);
-	static int seconds_to_ticks_round(real32 s);
-	static int get_ticks_difference();
+	static int32 seconds_to_ticks_round(real32 s);
+	static int32 get_ticks_difference();
 	static real32 get_ticks_difference_real();
 	static real32 get_ticks_fraction_leftover();
 };
