@@ -26,9 +26,9 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ComVarFromPtr(d3d9ex_var, bool*, &H2Config_d3d9ex, 
+ComVarFromPtr(d3d9ex_var, bool*, &H2Config_d3d9ex,
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
-ComVarFromPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay, 
+ComVarFromPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay,
 	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
 
 ComVarFromPtr(og_frame_limiter_var, bool*, &g_main_game_time_frame_limiter_enabled,
@@ -38,11 +38,16 @@ extern bool displayXyz;
 ComVarFromPtr(display_xyz_var, bool*, &displayXyz,
 	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
+extern real32 g_rumble_factor;
+ComVarFromPtr(rumble_var, real32*, &g_rumble_factor,
+	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
+
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
 std::vector<ConsoleCommand*> CommandCollection::commandTable = {
 	&d3d9ex_var_cmd,
 	&display_xyz_var_cmd,
+	&rumble_var_cmd,
 	&network_stats_overlay_var_cmd,
 	new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd),
 	new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
@@ -149,15 +154,35 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	
+
 	if (game_is_multiplayer()
-		&& !NetworkSession::LocalPeerIsSessionHost()) 
+		&& !NetworkSession::LocalPeerIsSessionHost())
 	{
 		output->Output(StringFlag_None, "# only host can see xyz for now...");
 		return 0;
 	}
 
 	return BoolVarHandlerCmd(tokens, cbData);
+}
+
+int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+{
+	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	ComVar<real32> peerIdxVar;
+	std::string exception;
+
+
+	if (!peerIdxVar.SetValFromStr(tokens[1], 10, exception))
+	{
+		output->Output(StringFlag_None, command_error_bad_arg);
+		output->Output(StringFlag_None, "	%s", exception.c_str());
+	}
+	else
+	{
+		g_rumble_factor = PIN(peerIdxVar.GetVal(), 0.f, 1.f);
+	}
+
+	return 0;
 }
 
 int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
@@ -175,7 +200,7 @@ int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens,
 int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	
+
 	if (Memory::IsDedicatedServer()) {
 		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
@@ -200,7 +225,7 @@ int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>&
 		output->Output(StringFlag_None, "# not in a network session");
 		return 0;
 	}
-	
+
 	std::string mapFileName;
 	std::wstring mapFilenameWide;
 	MapManager::GetMapFilename(mapFilenameWide);
@@ -305,7 +330,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	
+
 	if (!NetworkSession::LocalPeerIsSessionHost())
 	{
 		output->Output(StringFlag_None, "# cannot download map using command while not being the session host!");
@@ -469,10 +494,10 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 {
 	ConsoleLog* output = cbData.strOutput;
 
-	ComVar<int> value; 
+	ComVar<int> value;
 	std::string exception;
 
-	do 
+	do
 	{
 		if (!NetworkSession::LocalPeerIsSessionHost()) {
 			output->Output(StringFlag_None, "# can be only used by host");
@@ -560,7 +585,7 @@ int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>&
 int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = cbData.strOutput;
-	
+
 	int tokenArgPos = 1;
 
 	// spawn object_name count same_team near_player x y z i j k
@@ -672,7 +697,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 {
 	ConsoleLog* output = cbData.strOutput;
 
-	if (!NetworkSession::LocalPeerIsSessionHost() 
+	if (!NetworkSession::LocalPeerIsSessionHost()
 		&& !game_is_campaign())
 	{
 		output->Output(StringFlag_None, "# can only be used by the session host");
@@ -711,20 +736,20 @@ int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleComm
 //	commands end
 //////////////////////////////////////////////////////////////////////////
 
-void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam) 
+void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam)
 {
 	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_point3d* orient);
 	auto p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
 
-	for (int i = 0; i < count; i++) 
+	for (int i = 0; i < count; i++)
 	{
-		try 
+		try
 		{
 			object_placement_data new_object_placement;
 			datum localPlayerIdx = player_index_from_user_index(0);
 			real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
-			
-			if (!DATUM_IS_NONE(object_idx)) 
+
+			if (!DATUM_IS_NONE(object_idx))
 			{
 				object_placement_data_new(&new_object_placement, object_idx, -1, 0);
 
