@@ -1,6 +1,7 @@
 #pragma once
 
 #include "controllers.h"
+#include "input_windows.h"
 
 #define K_MAXIMUM_NUMBER_OF_GAME_FUNCTION_BINDS 8
 
@@ -119,12 +120,6 @@ struct s_gamepad_input_preferences
 	int16 gamepad_axial_deadzone_right_y;
 };
 CHECK_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
-
-struct s_key_state
-{
-	uint8 gap[0x8];
-};
-CHECK_STRUCT_SIZE(s_key_state, 0x8);
 
 struct s_keyboard_input_preferences
 {
