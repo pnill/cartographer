@@ -1,6 +1,9 @@
 #pragma once
 #include "controllers.h"
 
+#define K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES 256
+#define K_NUMBER_OF_XINPUT_BUTTONS 14
+
 class input_device
 {
 public:
@@ -36,7 +39,102 @@ public:
 CHECK_STRUCT_SIZE(dinput_device, 0x40);
 
 
+
+#pragma pack(push,1)
+struct s_key_state
+{
+	uint8 gap[0x8];
+};
+CHECK_STRUCT_SIZE(s_key_state, 0x8);
+
+struct s_gamepad_input_button_state
+{
+	uint8 trigger_msec_down[2];
+	uint8 max_trigger_msec_down[2];
+	uint8 trigger_button_frames_down[2];
+	uint8 button_frames_down[K_NUMBER_OF_XINPUT_BUTTONS];
+	uint16 trigger_button_msec_down[2];
+	uint16 button_msec_down[K_NUMBER_OF_XINPUT_BUTTONS];
+	point2d thumb_left;
+	point2d thumb_right;
+};
+CHECK_STRUCT_SIZE(s_gamepad_input_button_state, 0x3C);
+
+struct s_gamepad_input_state
+{
+	bool connected;
+	bool m_device_just_joined;
+	bool m_device_just_left;
+	uint8 gap_3;
+	s_gamepad_input_button_state state;
+};
+CHECK_STRUCT_SIZE(s_gamepad_input_state, 0x40);
+
+struct s_keyboard_input_state
+{
+	uint8 frames_down[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
+	uint16 msec_down[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
+	bool key_bool[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
+};
+CHECK_STRUCT_SIZE(s_keyboard_input_state, 0x400);
+
+class c_input_dx9_mouse_cursor; //TODO
+
+struct s_input_globals
+{
+	bool initialized;
+	bool mouse_acquired;
+	bool input_suppressed;
+	bool feedback_suppress;
+	uint32 update_time;
+	uint32 update_msec;
+	IDirectInput8A* dinput;
+	s_keyboard_input_state keyboard;
+	int16 buffered_key_read_index;
+	int16 buffered_key_read_count;
+	s_key_state buffered_keys[64];
+	LPDIRECTINPUTDEVICE8A mouse_dinput_device;
+	bool mouse_show;
+	uint8 gap_619[3];
+	uint32 field_61C;
+	DIMOUSESTATE2 mouse_state;
+	int16 mouse_buttons[8];
+	DIMOUSESTATE2 suppressed_mouse_state;
+	uint8 gap_658[24];
+	uint32 mouse_cursor_state;
+	void* mouse_cursor_dx9;
+	s_gamepad_input_state gamepad_states[4];
+	s_gamepad_input_button_state suppressed_gamepad_state;
+	XINPUT_VIBRATION rumble_states[4];
+	uint32 main_controller_index;
+	bool hardware_device_changed;
+	char gap[3];
+	int debug_simulate_gamepad;
+	int field7D0;
+	int field7D8;
+};
+CHECK_STRUCT_SIZE(s_input_globals, 0x7D8);
+
+#pragma pack(pop)
+
+
+
+
+extern s_input_globals* input_globals;
+
 extern XINPUT_VIBRATION g_vibration_state[k_number_of_controllers];
+
+
+void __cdecl input_initialize();
+void __cdecl input_dispose();
+void __cdecl input_update();
+void __cdecl input_update_gamepads(uint32 duration_ms);
+void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms);
+bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2);
+s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
+s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
+DIMOUSESTATE2* __cdecl input_get_mouse_state();
+bool __cdecl input_get_key(s_key_state* keystate);
 
 int32* hs_debug_simulate_gamepad_global_get(void);
 
