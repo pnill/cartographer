@@ -13,6 +13,11 @@ void __cdecl input_abstraction_dispose()
 	INVOKE(0x5E296, 0x0, input_abstraction_dispose);
 }
 
+void __cdecl input_abstraction_handle_device_change(uint32 flags)
+{
+	INVOKE(0x61C72, 0x0, input_abstraction_handle_device_change, flags);
+}
+
 void __cdecl input_abstraction_get_controller_preferences(e_controller_index controller_index, s_gamepad_input_preferences* preferences)
 {
 	INVOKE(0x61BF4, 0x0, input_abstraction_get_controller_preferences, controller_index, preferences);
