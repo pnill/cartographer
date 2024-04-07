@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "input_xinput.h"
+#include "input_abstraction.h"
 
 #include "game/game.h"
 #include "game/game_time.h"
@@ -8,6 +9,25 @@ bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
+
+uint32 XINPUT_BUTTON_FLAGS[K_NUMBER_OF_XINPUT_BUTTONS] =
+{
+	XINPUT_GAMEPAD_DPAD_UP,
+	XINPUT_GAMEPAD_DPAD_DOWN,
+	XINPUT_GAMEPAD_DPAD_LEFT,
+	XINPUT_GAMEPAD_DPAD_RIGHT,
+	XINPUT_GAMEPAD_START,
+	XINPUT_GAMEPAD_BACK,
+	XINPUT_GAMEPAD_LEFT_THUMB,
+	XINPUT_GAMEPAD_RIGHT_THUMB,
+	XINPUT_GAMEPAD_LEFT_SHOULDER,
+	XINPUT_GAMEPAD_RIGHT_SHOULDER,
+	XINPUT_GAMEPAD_A,
+	XINPUT_GAMEPAD_B,
+	XINPUT_GAMEPAD_X,
+	XINPUT_GAMEPAD_Y,
+}; // 0x39DEE0
+
 
 void input_xinput_clear_rumble_state(void)
 {
@@ -52,6 +72,104 @@ void input_xinput_update_rumble_state(void)
     }
 
     return;
+}
+
+
+void input_xinput_update_button(uint8* frames_down, uint16* msec_down, bool button_down, uint16 duration_ms)
+{
+	if (button_down)
+	{
+		*frames_down = MIN(*frames_down + 1, UINT8_MAX);
+		*msec_down = MIN(*msec_down + duration_ms, UINT16_MAX);
+	}
+	else
+	{
+		*frames_down = 0;
+		*msec_down = 0;
+	}
+}
+
+void input_xinput_update_trigger(uint8* trigger_msec_down, bool trigger_down, uint8 duration_ms)
+{
+	if (trigger_down)
+	{
+		uint8 msec_down = CLAMP_LOWER(duration_ms, 0, 32);
+		if (*trigger_msec_down <= msec_down)
+			*trigger_msec_down = msec_down;
+	}
+	else
+	{
+		uint8 msec_down = CLAMP_UPPER(duration_ms, 64, 255);
+		if (*trigger_msec_down >= msec_down)
+			*trigger_msec_down = msec_down;
+	}
+}
+
+int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_deadzone)
+{
+	if (thumb_axis > thumb_deadzone)
+		return  0x7FFF * (thumb_axis - thumb_deadzone) / (0x7FFF - thumb_deadzone);
+
+	if (thumb_axis < -thumb_deadzone)
+		return ~0x7FFF * (thumb_axis + thumb_deadzone) / (~0x7FFF + thumb_deadzone);
+
+	return 0;
+}
+
+bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gamepad_input_button_state* gamepad_state)
+{
+	input_device* gamepad = g_xinput_devices[gamepad_index];
+	XINPUT_STATE state;
+	bool any_button_pressed;
+
+
+	if (!gamepad || gamepad->XGetState(&state) != ERROR_SEVERITY_SUCCESS)
+	{
+		return false;
+	}
+
+	for (uint8 trigger_index = 0; trigger_index < 2; trigger_index++)
+	{
+		uint8& trigger_msec_down = gamepad_state->trigger_msec_down[trigger_index];
+		uint8& max_trigger_msec_down = gamepad_state->max_trigger_msec_down[trigger_index];
+		uint8& button_frames_down = gamepad_state->trigger_button_frames_down[trigger_index];
+		uint16& button_msec_down = gamepad_state->trigger_button_msec_down[trigger_index];
+
+		trigger_msec_down = trigger_index ? state.Gamepad.bRightTrigger : state.Gamepad.bLeftTrigger;
+		bool trigger_down = trigger_msec_down > max_trigger_msec_down;
+
+		input_xinput_update_button(&button_frames_down, &button_msec_down, trigger_down, (uint16)duration_ms);
+		input_xinput_update_trigger(&trigger_msec_down, trigger_down, (uint8)duration_ms);
+	}
+
+	for (uint8 button_index = 0; button_index < K_NUMBER_OF_XINPUT_BUTTONS; button_index++)
+	{
+		uint8& frames_down = gamepad_state->button_frames_down[button_index];
+		uint16& msec_down = gamepad_state->button_msec_down[button_index];
+
+		bool button_down = TEST_FLAG(state.Gamepad.wButtons, XINPUT_BUTTON_FLAGS[button_index]);
+		//if (button_down)
+		//	LOG_DEBUG_FUNC(" down {}", button_index);
+		if (button_down)
+			any_button_pressed = true;
+
+		input_xinput_update_button(&frames_down, &msec_down, button_down, (uint16)duration_ms);
+	}
+
+	e_controller_index controller = (e_controller_index)gamepad_index;
+	s_gamepad_input_preferences preference;
+	input_abstraction_get_controller_preferences(controller, &preference);
+
+	gamepad_state->thumb_left.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLX, preference.gamepad_axial_deadzone_left_x);
+	gamepad_state->thumb_left.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLY, preference.gamepad_axial_deadzone_left_y);
+	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right_x);
+	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right_y);
+
+	return gamepad_state->thumb_left.x > 0
+		|| gamepad_state->thumb_left.y > 0
+		|| gamepad_state->thumb_right.x
+		|| gamepad_state->thumb_right.y
+		|| any_button_pressed;
 }
 
 
