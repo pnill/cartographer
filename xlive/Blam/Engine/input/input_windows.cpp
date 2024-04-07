@@ -61,7 +61,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	if (input_handled
 		&& g_window_handle == GetFocus()
 		&& g_window_handle == GetForegroundWindow()
-		&& game_is_minimized())
+		&& !game_is_minimized())
 	{
 		if ((input_globals->field7D8 & 1) == 0)
 		{
