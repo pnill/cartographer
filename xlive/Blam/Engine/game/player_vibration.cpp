@@ -12,9 +12,9 @@
 #include "H2MOD/Tags/TagInterface.h"
 
 s_vibration_globals* vibration_globals_get(void);
-s_vibration_state vibration_get_state_usercall(s_vibration_user_globals* user_globals);
+XINPUT_VIBRATION vibration_get_state_usercall(s_vibration_user_globals* user_globals);
 
-s_vibration_state vibration_get_state(s_vibration_user_globals* user_globals);
+XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals);
 
 void __cdecl rumble_player_set_scripted_scale(real32 scale)
 {
@@ -58,7 +58,7 @@ void __cdecl vibration_update(real32 dt)
             for (uint32 user_index = 0; user_index < k_number_of_users; user_index++)
             {
                 s_vibration_user_globals* globals = vibration_get(user_index);
-                s_vibration_state state = vibration_get_state(globals);
+                XINPUT_VIBRATION state = vibration_get_state(globals);
                 datum player_index = player_index_from_user_index(user_index);
 
                 dt = tick_length;       // Increment by the tick_length instead of dt for now to fix issues when playing above 30fps
@@ -76,7 +76,7 @@ void __cdecl vibration_update(real32 dt)
                     s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
                     if (player->controller_index != NONE && user_interface_controller_get_rumble_enabled(player->controller_index))
                     {
-                        input_set_gamepad_rumbler_state(player->controller_index, state.left, state.right);
+                        input_set_gamepad_rumbler_state(player->controller_index, state.wLeftMotorSpeed, state.wRightMotorSpeed);
 
                         ASSERT(VALID_INDEX(player->controller_index, k_number_of_controllers));
                         controller_rumble_enabled[player->controller_index] = true;
@@ -105,9 +105,9 @@ s_vibration_globals* vibration_globals_get(void)
     return *Memory::GetAddress<s_vibration_globals**>(0x4CA378, 0x4F3DC4);
 }
 
-s_vibration_state vibration_get_state_usercall(s_vibration_user_globals* user_globals) 
+XINPUT_VIBRATION vibration_get_state_usercall(s_vibration_user_globals* user_globals)
 {
-    s_vibration_state state;
+    XINPUT_VIBRATION state;
     void* fn = (void*)Memory::GetAddress(0x90254);
     __asm {
         mov eax, user_globals
@@ -117,7 +117,7 @@ s_vibration_state vibration_get_state_usercall(s_vibration_user_globals* user_gl
     return state;
 }
 
-s_vibration_state vibration_get_state(s_vibration_user_globals* user_globals)
+XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals)
 {
     // Copy user values to calculate
     real32 intensities[2] = { user_globals->intensity[0],user_globals->intensity[1] };
@@ -165,7 +165,7 @@ s_vibration_state vibration_get_state(s_vibration_user_globals* user_globals)
     intensities[0] *= (real32)UINT16_MAX;
     intensities[1] *= (real32)UINT16_MAX;
 
-    s_vibration_state state
+    XINPUT_VIBRATION state
     {
         (uint16)PIN(intensities[0], 0.0f, (real32)UINT16_MAX),  // Left
         (uint16)PIN(intensities[1], 0.0f, (real32)UINT16_MAX)   // Right
