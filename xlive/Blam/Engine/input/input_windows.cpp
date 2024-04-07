@@ -1,8 +1,9 @@
 #include "stdafx.h"
+#include "input_xinput.h"
 #include "input_windows.h"
 #include "input_abstraction.h"
 #include "controllers.h"
-#include "input_xinput.h"
+#include "shell/shell_windows.h"
 
 #include "interface/user_interface_controller.h"
 
@@ -30,7 +31,59 @@ void __cdecl input_update()
 
 void __cdecl input_update_gamepads(uint32 duration_ms)
 {
-	INVOKE(0x2E7A4, 0x0, input_update_gamepads, duration_ms);
+	//INVOKE(0x2E7A4, 0x0, input_update_gamepads, duration_ms);
+
+	/*
+	* Reimplemented function removes dependency on input_globals.main_controller_index
+	* Actually Updates input_globals.gamepad_states[index] buffer from device state
+	*/
+
+	bool input_handled = false;
+	for (uint16 gamepad_index = 0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	{
+		if (input_has_gamepad(gamepad_index, nullptr))
+		{
+
+			s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(gamepad_index);
+
+			if (input_xinput_update_gamepad(gamepad_index, duration_ms, gamepad_state))
+			{
+				//handled successfully for any device
+				input_handled = true;
+			}
+		}
+	}
+	if (!input_handled)
+		return;
+
+	HWND g_window_handle = *Memory::GetAddress<HWND*>(0x46D9C4);
+
+	if (input_handled
+		&& g_window_handle == GetFocus()
+		&& g_window_handle == GetForegroundWindow()
+		&& game_is_minimized())
+	{
+		if ((input_globals->field7D8 & 1) == 0)
+		{
+			input_globals->field7D8 |= 1u;
+			//v26 = 0;
+			input_globals->field7D0 = system_milliseconds();
+			//v26 = 0xFFFFFFFF;
+		}
+		uint32 time = system_milliseconds();
+		if (time - input_globals->field7D0 > 15000 || time - input_globals->field7D0 < 0)
+		{
+			input_globals->field7D0 = time;
+			tagINPUT pInputs;
+			//csmemset(&pInputs, 0, sizeof(pInputs));
+			pInputs.type = INPUT_KEYBOARD;
+			pInputs.ki.wVk = 0;
+			pInputs.ki.wScan = 0;
+			pInputs.ki.dwFlags = KEYEVENTF_KEYUP;
+			pInputs.ki.dwExtraInfo = 0;
+			SendInput(1, &pInputs, sizeof(pInputs));
+		}
+	}
 }
 
 void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms)
@@ -73,7 +126,7 @@ bool __cdecl input_get_key(s_key_state* keystate)
 void __cdecl input_update_main_device_state()
 {
 	//INVOKE(0x2E709, 0x0, input_update_main_device_state);
-	
+
 	/*
 	* Reimplemented function removes dependency on input_globals.main_controller_index
 	* Updates input_globals.gamepad_states[index].connected
@@ -152,5 +205,6 @@ void input_windows_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x2FA62), input_update_main_device_state);		// Replace call in input_update
 	PatchCall(Memory::GetAddress(0x2FC2F), input_update_main_device_state);		// Replace call in input_update
+	PatchCall(Memory::GetAddress(0x2FBD2), input_update_gamepads);				// Replace call in input_update
 	return;
 }
