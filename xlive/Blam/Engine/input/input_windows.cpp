@@ -6,7 +6,7 @@
 
 #include "interface/user_interface_controller.h"
 
-s_vibration_state g_vibration_state[k_number_of_controllers]{};
+XINPUT_VIBRATION g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
 
 int32* hs_debug_simulate_gamepad_global_get(void)
@@ -23,11 +23,11 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 {
 	ASSERT(VALID_INDEX(gamepad_index, k_number_of_controllers));
 
-	s_vibration_state state = { left, right };
-	s_vibration_state state_none = { 0, 0 };
+	XINPUT_VIBRATION state = { left, right };
+	XINPUT_VIBRATION state_none = { 0, 0 };
 
-	state.left *= g_rumble_factor;
-	state.right *= g_rumble_factor;
+	state.wLeftMotorSpeed *= g_rumble_factor;
+	state.wRightMotorSpeed *= g_rumble_factor;
 
 	bool enabled = user_interface_controller_get_rumble_enabled((e_controller_index)gamepad_index);
 	g_vibration_state[gamepad_index] = (enabled ? state : state_none);
