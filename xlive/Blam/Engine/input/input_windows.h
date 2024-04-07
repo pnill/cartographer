@@ -135,6 +135,7 @@ s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
 s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
 DIMOUSESTATE2* __cdecl input_get_mouse_state();
 bool __cdecl input_get_key(s_key_state* keystate);
+void __cdecl input_update_main_device_state();
 
 int32* hs_debug_simulate_gamepad_global_get(void);
 

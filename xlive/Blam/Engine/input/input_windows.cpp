@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "input_windows.h"
-
+#include "input_abstraction.h"
 #include "controllers.h"
 #include "input_xinput.h"
 
 #include "interface/user_interface_controller.h"
+
+extern input_device** g_xinput_devices;
 
 s_input_globals* input_globals;
 
@@ -68,6 +70,53 @@ bool __cdecl input_get_key(s_key_state* keystate)
 	return INVOKE(0x2E3CB, 0x0, input_get_key, keystate);
 }
 
+void __cdecl input_update_main_device_state()
+{
+	//INVOKE(0x2E709, 0x0, input_update_main_device_state);
+	
+	/*
+	* Reimplemented function removes dependency on input_globals.main_controller_index
+	* Updates input_globals.gamepad_states[index].connected
+	* Allows game to actually detect multiple controllers as multi inputs rather single input
+	*/
+
+	uint8 device_index = _controller_index_0;
+	do
+	{
+		input_device* device = g_xinput_devices[device_index];
+		XINPUT_STATE state;
+		s_gamepad_input_state* gamepad = input_get_gamepad(device_index);
+		uint32 error_code = ERROR_DEVICE_NOT_CONNECTED;
+
+
+		if (!device
+			|| (error_code = device->XGetState(&state)) == ERROR_SEVERITY_SUCCESS
+			|| error_code == ERROR_DEVICE_NOT_CONNECTED)
+		{
+
+			bool dev_connected = gamepad->connected;
+			bool success = error_code == ERROR_SEVERITY_SUCCESS;
+			bool initially_not_connected = !gamepad->connected;
+			bool dev_state_joined = initially_not_connected && error_code == ERROR_SEVERITY_SUCCESS;
+			bool dev_state_left = dev_connected && !success;
+
+			gamepad->connected = error_code == ERROR_SEVERITY_SUCCESS;
+			gamepad->m_device_just_joined = dev_state_joined;
+			gamepad->m_device_just_left = dev_state_left;
+		}
+
+		uint32 device_flags = 0;
+		if (gamepad->m_device_just_left)
+			device_flags = 1;
+		if (gamepad->m_device_just_joined)
+			device_flags |= 0x2000;
+
+		input_abstraction_handle_device_change(device_flags);
+		device_index++;
+
+	} while (device_index < k_number_of_controllers);
+}
+
 
 int32* hs_debug_simulate_gamepad_global_get(void)
 {
@@ -100,5 +149,8 @@ void input_windows_apply_patches(void)
 	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
 
 	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
+
+	PatchCall(Memory::GetAddress(0x2FA62), input_update_main_device_state);		// Replace call in input_update
+	PatchCall(Memory::GetAddress(0x2FC2F), input_update_main_device_state);		// Replace call in input_update
 	return;
 }

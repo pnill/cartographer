@@ -166,6 +166,7 @@ extern s_input_abstraction_globals* input_abstraction_globals;
 
 void __cdecl input_abstraction_initialize();
 void __cdecl input_abstraction_dispose();
+void __cdecl input_abstraction_handle_device_change(uint32 flags);
 void __cdecl input_abstraction_get_controller_preferences(e_controller_index controller_index, s_gamepad_input_preferences* preferences);
 void __cdecl input_abstraction_get_input_state(e_controller_index controller_index, s_game_input_state* state);
 void __cdecl input_abstraction_get_player_look_angular_velocity(e_controller_index controller_index, real_euler_angles2d* angular_velocity);
