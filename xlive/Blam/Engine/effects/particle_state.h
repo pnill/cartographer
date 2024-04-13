@@ -107,14 +107,14 @@ struct s_particle_state
 	void state_update(uint32 flags)
 	{
 		particle_state_update(
-			m_system.flags.not() & flags,
+			~m_system.flags & flags,
 			m_system.particle_system,
 			m_system.particle_location,
 			m_system.particle,
 			this,
 			k_particle_state_values_count
 		);
-		m_system.flags.or(flags);
+		m_system.flags |= flags;
 	}
 };
 CHECK_STRUCT_SIZE(s_particle_state, 84);

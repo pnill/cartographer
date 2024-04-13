@@ -3,16 +3,18 @@
 template<typename t_type, typename t_storage_type, size_t k_count>
 class c_flags
 {
+	static_assert(std::is_unsigned_v<t_storage_type>, "error: t_storage_type is not an unsigned integral type");
+
 public:
 	c_flags() 
-		: m_storage(0)
 	{
+		clear();
 		return;
 	}
 
 	c_flags(t_storage_type raw_bits) 
-		: m_storage(raw_bits)
 	{
+		set_raw_bits(raw_bits);
 		return;
 	}
 
@@ -24,6 +26,7 @@ public:
 
 	void set(t_type bit, bool enable)
 	{
+		ASSERT(valid_bit(bit));
 		if (bit < k_count)
 		{
 			if (enable)
@@ -44,41 +47,37 @@ public:
 		return;
 	}
 
-	t_storage_type not()
-	{
-		return ~m_storage;
-	}
-
-	void or(t_storage_type flags)
-	{
-		m_storage |= flags;
-	}
-
 	bool valid_bit(t_type bit) const
 	{
-		return VALID_INDEX(0, k_count);
+		return VALID_INDEX(bit, k_count);
 	}
 
 	bool test(t_type bit) const
 	{
+		ASSERT(valid_bit(bit));
 		return TEST_BIT(m_storage, (t_storage_type)(bit));
 	}
 
-	bool operator==(c_flags<t_type, t_storage_type, k_count>& value)
+	t_storage_type operator|=(const t_storage_type& flags)
+	{
+		m_storage |= flags;
+		return m_storage;
+	}
+
+	t_storage_type operator~()
+	{
+		return ~m_storage;
+	}
+
+	bool operator==(const c_flags<t_type, t_storage_type, k_count>& value)
 	{
 		return m_storage == value.m_storage;
 	}
 
-	bool operator==(t_type value)
-	{
-		return !!(m_storage & FLAG(value));
-	}
-
-	template <class T>
-	void operator= (T value)
+	t_storage_type operator= (const t_storage_type& value)
 	{
 		m_storage = (t_storage_type)(value);
-		return;
+		return m_storage;
 	}
 
 	template <class T>
@@ -88,7 +87,7 @@ public:
 	}
 
 protected:
-	t_storage_type m_storage;
+	t_storage_type m_storage : k_count;
 };
 
 template<size_t k_maximum_bit_count>
