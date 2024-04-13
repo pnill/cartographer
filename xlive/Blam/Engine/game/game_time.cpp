@@ -119,7 +119,7 @@ bool __cdecl should_limit_framerate_hook()
 
 void game_time_discard(int32 desired_ticks, int32 actual_ticks, real32* elapsed_game_dt)
 {
-	if (actual_ticks)
+	if (actual_ticks > 0)
 	{
 		real32 result = *elapsed_game_dt - ((desired_ticks - actual_ticks) * time_globals::get()->tick_length);
 		if (result <= 0.0f)

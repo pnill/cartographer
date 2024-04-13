@@ -11,7 +11,7 @@ struct s_main_time_globals
 	// this is somewhere in the middle of the base structure
 	bool field_0;
 	char pad_1[1];
-	int previous_game_time;
+	int last_game_time;
 	
 	union
 	{

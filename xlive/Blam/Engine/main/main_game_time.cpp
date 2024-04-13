@@ -134,7 +134,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 					uint32 yield_time_msec = 0;
 					real32 fMsSleep = (real32)(get_ticks_leftover_time() - dt_sec) * 1000.f;
 
-					if ((int)fMsSleep > 0)
+					if (fMsSleep > 0.0f)
 					{
 						yield_time_msec = (int)fMsSleep;
 					}
@@ -159,7 +159,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 
 	dt_sec = PIN(dt_sec, 0.0f, 10.f);
 	main_time_globals->last_milliseconds = time_now_msec;
-	main_time_globals->previous_game_time = game_time;
+	main_time_globals->last_game_time = game_time;
 	main_time_globals->field_16[0] = *Memory::GetAddress<__int64*>(0xA3E440);
 	main_time_globals->field_16[1] = *Memory::GetAddress<__int64*>(0xA3E440);
 

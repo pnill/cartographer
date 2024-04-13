@@ -18,9 +18,9 @@ LARGE_INTEGER shell_get_startup_counter()
 	return g_startup_counter;
 }
 
-long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, long long denominator)
+unsigned long long shell_time_from_counter(LARGE_INTEGER counter, LARGE_INTEGER freq, unsigned long long denominator)
 {
-	long long _Whole, _Part;
+	unsigned long long _Whole, _Part;
 
 	_Whole = (counter.QuadPart / freq.QuadPart) * denominator;
 	_Part = (counter.QuadPart % freq.QuadPart) * denominator / freq.QuadPart;
@@ -40,7 +40,7 @@ LARGE_INTEGER shell_time_counter_now(LARGE_INTEGER* freq)
 	return counter;
 }
 
-long long shell_time_diff(LARGE_INTEGER t2, long long denominator)
+unsigned long long shell_time_diff(LARGE_INTEGER t2, unsigned long long denominator)
 {
 	LARGE_INTEGER counter, freq;
 	counter = shell_time_counter_now(&freq);
@@ -48,19 +48,19 @@ long long shell_time_diff(LARGE_INTEGER t2, long long denominator)
 	return shell_time_from_counter(counter, freq, denominator);
 }
 
-long long shell_time_now(long long denominator)
+unsigned long long shell_time_now(unsigned long long denominator)
 {
 	LARGE_INTEGER counter, freq;
 	counter = shell_time_counter_now(&freq);
 	return shell_time_from_counter(counter, freq, denominator) + (k_process_system_time_startup_offset_sec * denominator);
 }
 
-long long shell_time_now_sec()
+unsigned long long shell_time_now_sec()
 {
 	return shell_time_now(k_shell_time_sec_denominator);
 }
 
-long long shell_time_now_msec()
+unsigned long long shell_time_now_msec()
 {
 	return shell_time_now(k_shell_time_msec_denominator);
 }
@@ -73,7 +73,7 @@ uint32 __cdecl system_milliseconds()
 static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {
-	long long time_now_msec = shell_time_now_msec();
+	unsigned long long time_now_msec = shell_time_now_msec();
 	return (DWORD)time_now_msec;
 }
 static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>, "Invalid timeGetTime_hook signature");

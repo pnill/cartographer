@@ -95,8 +95,7 @@ void __cdecl main_game_time_initialize_defaults_hook()
 
 	timeBeginPeriod(TIMER_RESOLUTION_MS);
 
-	auto p_main_game_time_initialize_defaults = Memory::GetAddressRelative<void(__cdecl*)()>(0x42869F, 0x424841);
-	return p_main_game_time_initialize_defaults();
+	INVOKE(0x2869F, 0x24841, main_game_time_initialize_defaults_hook);
 }
 
 void __cdecl game_modules_dispose_hook() {
@@ -169,7 +168,7 @@ void InitRunLoop() {
 		} // switch (g_experimental_rendering_mode)
 	}
 
-	PatchCall(Memory::GetAddressRelative(0x439E3D, 0x40BA40), main_game_time_initialize_defaults_hook);
+	PatchCall(Memory::GetAddress(0x39E3D, 0xBA40), main_game_time_initialize_defaults_hook);
 	PatchCall(Memory::GetAddress(0x39E7C, 0xC6F7), game_modules_dispose_hook);
 
 	addDebugText("Post RunLoop Hooking.");

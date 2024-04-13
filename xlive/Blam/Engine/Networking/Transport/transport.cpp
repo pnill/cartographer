@@ -8,7 +8,7 @@ bool __cdecl transport_address_equivalent(const network_address* a1, const netwo
 	return INVOKE(0x1F1EB1, 0x1B3BE0, transport_address_equivalent, a1, a2, check_network_port);
 }
 
-bool transport_address_populate_from_network_channel_and_compare(s_network_channel* network_channel, network_address* a1, const network_address* a2, bool check_network_port)
+bool __cdecl transport_address_populate_from_network_channel_and_compare(s_network_channel* network_channel, network_address* a1, const network_address* a2, bool check_network_port)
 {
 	bool equal = false;
 	if (network_channel->get_network_address(a1))
