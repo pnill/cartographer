@@ -4,5 +4,5 @@
 
 struct hkMeshMaterial
 {
-	unsigned hkInt32 m_filterInfo;
+	hkUint32 m_filterInfo;
 };

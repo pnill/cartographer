@@ -15,7 +15,7 @@ public:
 		LOCKED_FLAG = hkInt32(0x40000000),  // Indicates that the array will never have its dtor called (read in from packfile for instance)
 		FORCE_SIGNED = -1
 	};
-	const unsigned hkInt32** m_data;
+	const hkUint32** m_data;
 	hkInt32 m_size;
 	hkInt32 m_capacityAndDeallocateFlag; // highest 2 bits indicate any special considerations about the allocation for the array
 };

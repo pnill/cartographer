@@ -4,6 +4,8 @@
 #include "cseries/cseries_strings.h"
 
 #define k_maximum_cluster_sound_palette_entries_per_structure 64
+#define k_maximum_machine_door_portal_associations 128
+
 enum e_background_sound_scale_flags : int
 {
     background_sound_scale_flag_override_default_scale = FLAG(0),
@@ -43,3 +45,30 @@ struct structure_sound_environment_palette_entry
     int pad[6];
 };
 TAG_BLOCK_SIZE_ASSERT(structure_sound_environment_palette_entry, 72);
+
+
+struct s_structure_audibility
+{
+    int32 door_portal_count;
+    real_bounds cluster_distance_bounds;
+
+    // max: k_maximum_machine_door_portal_associations*2*((((MAXIMUM_CLUSTERS_PER_STRUCTURE)+(LONG_BITS-1))>>LONG_BITS_BITS))
+    // 4096
+    tag_block<int32> encoded_door_pas;
+
+    // max: MAXIMUM_CLUSTERS_PER_STRUCTURE*((((k_maximum_machine_door_portal_associations)+(LONG_BITS-1))>>LONG_BITS_BITS))
+    // 2048
+    tag_block<int32> cluster_door_portal_encoded_pas;
+
+	// max: (((((MAXIMUM_CLUSTERS_PER_STRUCTURE*(MAXIMUM_CLUSTERS_PER_STRUCTURE-1))/2)+(LONG_BITS-1))>>LONG_BITS_BITS))
+    // 4088
+    tag_block<int32> ai_deafening_pas;
+
+    // max: (MAXIMUM_CLUSTERS_PER_STRUCTURE*(MAXIMUM_CLUSTERS_PER_STRUCTURE-1))/2
+    // 130816
+    tag_block<int8> cluster_distances;
+
+    // max: k_maximum_machine_door_portal_associations
+    tag_block<int8> machine_door_mapping;
+};
+TAG_BLOCK_SIZE_ASSERT(s_structure_audibility, 52);

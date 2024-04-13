@@ -62,7 +62,7 @@ struct s_collision_bsp_physics_definition
 	// todo: figure out which havok objects these are
 	int8 pad[52];
 };
-TAG_BLOCK_SIZE_ASSERT(s_collision_bsp_physics_definition, 0x74);
+TAG_BLOCK_SIZE_ASSERT(s_collision_bsp_physics_definition, 116);
 
 // max: MAXIMUM_BSPS_PER_COLLISION_REGION
 struct collision_model_bsp

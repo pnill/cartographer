@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
+#include "collision_bsp_definition.h"
 
 #include "H2MOD/Tags/TagInterface.h"
 
@@ -45,7 +45,7 @@ CHECK_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);
 
 struct test_sphere_result_buffer
 {
-	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp;
+	collision_bsp* collision_bsp;
 	int16 flags;
 	int16 pad;
 	void* breakable_surface_set;
@@ -62,7 +62,7 @@ struct test_sphere_result_buffer
 CHECK_STRUCT_SIZE(test_sphere_result_buffer, 552);
 
 bool __cdecl collision_bsp_test_sphere(
-	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
+	collision_bsp* collision_bsp,
 	int16 flags,
 	void* breakable_surface_set,
 	real_point3d* point,

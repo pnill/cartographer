@@ -6,9 +6,9 @@ scenario* get_global_scenario(void)
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
 }
 
-s_scenario_structure_bsp_group_definition::s_collision_bsp_block* global_collision_bsp_get(void)
+collision_bsp* global_collision_bsp_get(void)
 {
-    return *Memory::GetAddress<s_scenario_structure_bsp_group_definition::s_collision_bsp_block**>(0x479E64, 0x4A6420);
+    return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);
 }
 
 uint32 scenario_netgame_equipment_size(void)

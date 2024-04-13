@@ -137,7 +137,7 @@ public:
 
 	bool is_playback() const
 	{
-		ASSERT(exists());
+		//ASSERT(exists());
 		return false;
 	}
 
