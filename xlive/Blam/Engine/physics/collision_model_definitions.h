@@ -31,7 +31,7 @@ enum e_collision_model_definition_flags : uint32
 struct collision_model_node
 {
 	string_id name;
-	int16 pad_1;
+	int16 pad;
 	// BlockIndex1("collision_model_node_block")
 	uint16 parent_node;
 	// BlockIndex1("collision_model_node_block")
@@ -68,7 +68,7 @@ TAG_BLOCK_SIZE_ASSERT(s_collision_bsp_physics_definition, 116);
 struct collision_model_bsp
 {
 	uint16 node_index;
-	int16 pad_1;
+	int16 pad;
 	collision_bsp collision;
 };
 TAG_BLOCK_SIZE_ASSERT(collision_model_bsp, 68);

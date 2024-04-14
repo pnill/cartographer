@@ -189,9 +189,7 @@ struct structure_cluster
     tag_block<geometry_section> cluster_data;
 
     // Explaination("CLUSTER INFO", "EMPTY STRING")
-    real_bounds bounds_x;
-    real_bounds bounds_y;
-    real_bounds bounds_z;
+    real_rectangle3d bounds;
 
     uint8 scenario_sky_index;
     uint8 media_index;
@@ -306,11 +304,9 @@ struct structure_bsp
     tag_block<unused_structure_node> unused_nodes;
     tag_block<structure_leaf> leaves;
 
-    real_bounds world_bounds_x;
-    real_bounds world_bounds_y;
-    real_bounds world_bounds_z;
+    real_rectangle3d world_bounds;
 
-    tag_block<structure_surface_reference> surfance_references;
+    tag_block<structure_surface_reference> surface_references;
 
     data_reference cluster_data;
     tag_block<cluster_portal> cluster_portals;

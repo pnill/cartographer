@@ -796,8 +796,8 @@ namespace tag_loader
 		case 'weat':
 		{
 			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
-			for (auto i = 0; i < weather_tag->particle_system.count; i++)
-				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->geometry.block_offset, 3u);
+			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
+				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
 			break;
 		}
 		default:
@@ -891,8 +891,8 @@ namespace tag_loader
 		case 'weat':
 		{
 			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
-			for (auto i = 0; i < weather_tag->particle_system.count; i++)
-				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->geometry.block_offset, 3u);
+			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
+				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
 			break;
 		}
 		default:

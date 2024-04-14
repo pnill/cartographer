@@ -1,6 +1,7 @@
 #pragma once
 
 #include "leaf_map.h"
+#include "structures.h"
 #include "geometry/geometry_block.h"
 #include "geometry/geometry_definitions_new.h"
 #include "physics/collision_model_definitions.h"
@@ -37,7 +38,7 @@ struct structure_instanced_geometry_instance
 	uint16 instance_definition;
 	e_structure_instanced_geometry_instance_flags flags;
 
-	int8 pad_1[20];
+	int8 pad[20];
 
 	int32 checksum;
 	string_id name;
@@ -70,8 +71,7 @@ struct structure_instanced_geometry_definition
 	collision_bsp collision_info;
 	tag_block<s_collision_bsp_physics_definition> bsp_physics;
 	tag_block<structure_leaf> render_leaves;
-	//tag_block<structure_surface_reference> surface_references;
-	tag_block<int32> surface_references;
+	tag_block<structure_surface_reference> surface_references;
 };
 TAG_BLOCK_SIZE_ASSERT(structure_instanced_geometry_definition, 200);
 

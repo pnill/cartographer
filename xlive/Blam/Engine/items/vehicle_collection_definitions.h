@@ -11,6 +11,7 @@ struct vehicle_permutation_definition
 	tag_reference vehicle; // effe
 	string_id variant_name;
 };
+TAG_BLOCK_SIZE_ASSERT(vehicle_permutation_definition, 16);
 
 struct vehicle_collection_definition
 {
@@ -19,3 +20,4 @@ struct vehicle_collection_definition
 	uint16 spawn_time;
 	uint16 pad_1;
 };
+TAG_GROUP_SIZE_ASSERT(vehicle_collection_definition, 12);

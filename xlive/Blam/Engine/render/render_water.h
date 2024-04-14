@@ -8,8 +8,7 @@
 // max: 1
 struct s_water_definition
 {
-	// TagReference("shad")
-	tag_reference shader;
+	tag_reference shader; // shad
 
 	// max: 1
 	tag_block<geometry_section> section;

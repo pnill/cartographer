@@ -1,8 +1,9 @@
 #pragma once
 
-#define k_maximum_machine_door_portal_associations 128
 #include "objects/object_identifier.h"
 #include "tag_files/tag_block.h"
+
+#define k_maximum_machine_door_portal_associations 128
 
 // max: k_maximum_machine_door_portal_associations
 struct s_structure_portal_device_machine_association

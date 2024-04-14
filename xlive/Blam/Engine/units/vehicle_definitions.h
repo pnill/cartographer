@@ -119,13 +119,8 @@ struct s_vehicle_phantom_shape_definition
 
 	uint32 multi_sphere_count;
 	uint32 flags;
-	int32 pad_1[2];
-	real32 x0;
-	real32 x1;
-	real32 y1;
-	real32 y2;
-	real32 z0;
-	real32 z1;
+	int32 pad[2];
+	real_rectangle3d bounds;
 
 	hkMultiSphereShape multi_spheres[4];
 };

@@ -19,7 +19,7 @@ struct structure_precomputed_lighting_visiblity
 	uint16 projection_count;
 	uint16 cluster_count;
 	uint16 volumes_count;
-	int16 pad_1;
+	int16 pad;
 
 	/****************************************
 	* definition_name: projection_tag_data_definition
@@ -66,8 +66,7 @@ TAG_BLOCK_SIZE_ASSERT(structure_precomputed_lighting, 48);
 // max: MAXIMUM_LIGHTMAP_GROUPS_PER_STRUCTURE
 struct structure_lightmap_data
 {
-	// TagReference("bitm")
-	tag_reference bitmap_group;
+	tag_reference bitmap_group; // bitm
 };
 TAG_BLOCK_SIZE_ASSERT(structure_lightmap_data, 8);
 

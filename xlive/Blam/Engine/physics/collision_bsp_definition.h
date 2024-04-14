@@ -30,7 +30,7 @@ struct collision_vertex
 {
 	real_point3d point;
 	uint16 first_edge;
-	int16 pad_1;
+	int16 pad;
 };
 TAG_BLOCK_SIZE_ASSERT(collision_vertex, 16);
 

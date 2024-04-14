@@ -4,5 +4,5 @@
 class hkConvexShape : hkSphereRepShape
 {
 public:
-	float m_radius;
+	hkReal m_radius;
 };
