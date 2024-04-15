@@ -2,7 +2,8 @@
 #include "Infection.h"
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
-#include "Blam/Cache/TagGroups/vehicle_collection_definition.hpp"
+#include "Blam/Engine/items/vehicle_collection_definitions.h"
+
 
 #include "game/game.h"
 #include "game/game_time.h"

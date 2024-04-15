@@ -1,4 +1,5 @@
 #pragma once
+#include "H2MOD/Tags/TagInterface.h"
 
 // ### TODO Rename to c_tag_block and refactor
 

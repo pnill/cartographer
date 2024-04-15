@@ -1,6 +1,9 @@
 #pragma once
 
 #define k_maximum_shapes_per_physics_model 1024
+#include "havok/physics/collide/shape/capsule/hkCapsuleShape.h"
+#include "havok/physics/collide/shape/misc/transform/hkTransformShape.h"
+#include "havok/physics/collide/shape/shpere/hkShpere.h"
 
 enum e_physics_constraint : int16
 {
@@ -35,27 +38,13 @@ CHECK_STRUCT_SIZE(s_physics_model_shape, 32);
 
 struct s_physics_model_capsule
 {
-    void* runtime_code_pointer;
-    int16 size;
-    int16 count;
-    int32 user_data;    // The offset from the start of the block to the start of this shape (index * block element size). This becomes a pointer to this shape in memory at runtime.
-    real32 radius;
-    real_quaternion bottom;
-    real_quaternion top;
+    hkCapsuleShape shape;
 };
 CHECK_STRUCT_SIZE(s_physics_model_capsule, 48);
 
 struct s_physics_model_translation
 {
-    void* runtime_code_pointer;
-    int16 size;
-    int16 count;
-    int32 unknown;
-    int32 user_data;    // The offset from the start of the block to the start of this shape (index * block element size). This becomes a pointer to this shape in memory at runtime.
-    real_quaternion rotation_i;
-    real_quaternion rotation_j;
-    real_quaternion rotation_k;
-    real_quaternion translation;
+    hkTransformShape transform;
 };
 CHECK_STRUCT_SIZE(s_physics_model_translation, 80);
 
@@ -64,11 +53,7 @@ struct s_physics_model_sphere
 {
     s_physics_model_shape shape;
 
-    void* runtime_code_pointer;
-    int16 size;
-    int16 count;
-    int32 user_data;    // The offset from the start of the block to the start of this shape (index * block element size). This becomes a pointer to this shape in memory at runtime.
-    real32 radius;
+    hkSphereShape sphere;
 
     s_physics_model_translation translate;
 };

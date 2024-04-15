@@ -4,9 +4,9 @@
 #include "cache/cache_files.h"
 #include "game/game_options.h"
 #include "scenario/scenario.h"
+#include "render/weather_definitions.h"
 
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
-#include "Blam/Cache/TagGroups/weather_system_definition.hpp"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"
@@ -795,9 +795,9 @@ namespace tag_loader
 		}
 		case 'weat':
 		{
-			auto weather_tag = reinterpret_cast<s_weather_system_group_definition*>(tag_data);
-			for (auto i = 0; i < weather_tag->particle_system.count; i++)
-				((void(__cdecl*)(int*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->block_offset, 3u);
+			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
+			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
+				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
 			break;
 		}
 		default:
@@ -890,9 +890,9 @@ namespace tag_loader
 		}
 		case 'weat':
 		{
-			auto weather_tag = reinterpret_cast<s_weather_system_group_definition*>(tag_data);
-			for (auto i = 0; i < weather_tag->particle_system.count; i++)
-				((void(__cdecl*)(int*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->particle_system[i]->block_offset, 3u);
+			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
+			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
+				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
 			break;
 		}
 		default:

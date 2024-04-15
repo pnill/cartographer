@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "collision_bsp.h"
+#include "collision_bsp_definition.h"
 
 void __cdecl test_sphere_results(test_sphere_result_buffer* buffer, int32 starting_index)
 {
@@ -8,7 +9,7 @@ void __cdecl test_sphere_results(test_sphere_result_buffer* buffer, int32 starti
 }
 
 bool __cdecl collision_bsp_test_sphere(
-	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
+	collision_bsp* collision_bsp,
 	int16 flags,
 	void* breakable_surface_set,
 	real_point3d* point,

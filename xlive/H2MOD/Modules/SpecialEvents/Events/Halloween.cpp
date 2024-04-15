@@ -5,7 +5,6 @@
 #include "MapObjectPlacements/Halloween/Lockout.h"
 
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 #include "game/game_globals.h"
@@ -103,7 +102,7 @@ void halloween_event_map_load()
 	// Load specific tags from shared and modify placements depending on the map being played
 	const s_cache_header* cache_header = cache_files_get_header();
 	scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
-	auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(scenario_definition->structure_bsps[0]->structure_bsp.index);
+	auto bsp_definition = tags::get_tag_fast<structure_bsp>(scenario_definition->structure_bsps[0]->structure_bsp.index);
 	if (!strcmp(cache_header->name, "coagulation"))
 	{
 		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", _tag_group_bitmap, "carto_shared");
@@ -148,8 +147,8 @@ void halloween_event_map_load()
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour
-			bsp_definition->decorators_block.count = 0;
-			bsp_definition->decorators_block.data = 0;
+			bsp_definition->decorator_placement.count = 0;
+			bsp_definition->decorator_placement.data = 0;
 		}
 
 		// Add items to scenario

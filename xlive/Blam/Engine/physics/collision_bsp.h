@@ -1,7 +1,6 @@
 #pragma once
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
-
-#include "H2MOD/Tags/TagInterface.h"
+#include "collision_bsp_definition.h"
+#include "tag_files/tag_block.h"
 
 #define MAXIMUM_EDGES_PER_COLLISION_BSP 262144
 #define MAXIMUM_SURFACES_PER_COLLISION_BSP 131072
@@ -45,7 +44,7 @@ CHECK_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);
 
 struct test_sphere_result_buffer
 {
-	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp;
+	collision_bsp* collision_bsp;
 	int16 flags;
 	int16 pad;
 	void* breakable_surface_set;
@@ -62,7 +61,7 @@ struct test_sphere_result_buffer
 CHECK_STRUCT_SIZE(test_sphere_result_buffer, 552);
 
 bool __cdecl collision_bsp_test_sphere(
-	s_scenario_structure_bsp_group_definition::s_collision_bsp_block* collision_bsp,
+	collision_bsp* collision_bsp,
 	int16 flags,
 	void* breakable_surface_set,
 	real_point3d* point,

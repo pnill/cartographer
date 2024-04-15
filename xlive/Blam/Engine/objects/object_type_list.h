@@ -22,3 +22,4 @@ enum e_object_type : int8
 
 	_object_type_flag_unit = FLAG(_object_type_biped) | FLAG(_object_type_vehicle)
 };
+

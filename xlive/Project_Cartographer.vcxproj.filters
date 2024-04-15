@@ -306,6 +306,7 @@
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
+    <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -393,7 +394,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\antenna_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\creature_definition.hpp" />
@@ -404,11 +404,9 @@
     <ClInclude Include="Blam\Cache\TagGroups\garbage_definition.hpp" />
     <ClInclude Include="Blam\Engine\interface\hud_definitions.h" />
     <ClInclude Include="Blam\Cache\TagGroups\multiplayer_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\projectile_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\scenery_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\vehicle_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
@@ -489,7 +487,6 @@
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\item_collection_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\vehicle_collection_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
     <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
@@ -523,7 +520,6 @@
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />
-    <ClInclude Include="Blam\Cache\TagGroups\scenario_structure_bsp_definition.hpp" />
     <ClInclude Include="Blam\Engine\saved_games\game_variant.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\Networking\player_prediction.h" />
@@ -532,7 +528,6 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity.h" />
     <ClInclude Include="3rdparty\detours\include\detours.h" />
     <ClInclude Include="3rdparty\detours\include\detver.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\weather_system_definition.hpp" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9anim.h" />
@@ -563,7 +558,6 @@
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\collision_model_definition.hpp" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.h" />
     <ClInclude Include="Blam\Engine\camera\camera.h" />
@@ -848,6 +842,45 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
+    <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
+    <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
+    <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkRotation.h" />
+    <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkTransform.h" />
+    <ClInclude Include="3rdparty\havok\common\base\math\vector\hkVector4.h" />
+    <ClInclude Include="3rdparty\havok\common\base\object\hkBaseObject.h" />
+    <ClInclude Include="3rdparty\havok\common\base\object\hkReferencedObject.h" />
+    <ClInclude Include="3rdparty\havok\common\base\types\geometry\sphere\hkSphere.h" />
+    <ClInclude Include="3rdparty\havok\common\base\types\hkBaseTypes.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\capsule\hkCapsuleShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\hkShapeCollection.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\list\hkListShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\compund\mesh\hkMeshMaterial.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\convex\hkConvexShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\convex\triangle\hkTriangle.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\heightfeild\hkpSphereRepShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\hkShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\mesh\hkMeshShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\misc\transform\hkTransformShape.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\multishpere\hkMultiSphere.h" />
+    <ClInclude Include="3rdparty\havok\physics\collide\shape\shpere\hkShpere.h" />
+    <ClInclude Include="3rdparty\havok\serialize\hkSerializable.h" />
+    <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
+    <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
+    <ClInclude Include="Blam\Engine\objects\widgets\antenna_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_bsp_definition.h" />
+    <ClInclude Include="Blam\Engine\physics\collision_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\render\weather_definitions.h" />
+    <ClInclude Include="Blam\Engine\units\vehicle_definitions.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_runtime_decals.h" />
+    <ClInclude Include="Blam\Engine\structures\structure_lightmap_definitions.h" />
+    <ClInclude Include="Blam\Engine\structures\leaf_map.h" />
+    <ClInclude Include="Blam\Engine\structures\instanced_geometry_definitions.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />
+    <ClInclude Include="Blam\Engine\render\render_debug_structure.h" />
+    <ClInclude Include="Blam\Engine\render\render_water.h" />
+    <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
+    <ClInclude Include="Blam\Engine\game\game_portals.h" />
+    <ClInclude Include="Blam\Engine\render\render_lights.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

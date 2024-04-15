@@ -1,6 +1,9 @@
 #pragma once
 
 #include "rasterizer/rasterizer_vertex_buffers.h"
+#include "tag_files/tag_reference.h"
+#include "tag_files/data_reference.h"
+#include "math/color_math.h"
 
 #define MAXIMUM_PARTS_PER_GEOMETRY_SECTION 255
 #define MAXIMUM_SUBPARTS_PER_SECTION 32768

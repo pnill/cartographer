@@ -3,7 +3,6 @@
 #include "Christmas.h"
 #include "../SpecialEventHelpers.h"
 
-#include "Blam/Cache/TagGroups/scenario_structure_bsp_definition.hpp"
 
 #include "items/weapon_definitions.h"
 #include "game/game_globals.h"
@@ -76,16 +75,16 @@ void christmas_event_map_load()
 
 		if (!DATUM_IS_NONE(snow_datum))
 		{
-			auto bsp_definition = tags::get_tag_fast<s_scenario_structure_bsp_group_definition>(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
+			auto bsp_definition = tags::get_tag_fast<structure_bsp>(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
 
-			auto weat_block = MetaExtender::add_tag_block2<s_scenario_structure_bsp_group_definition::s_weather_palette_block>((unsigned long)std::addressof(bsp_definition->weather_palette));
+			auto weat_block = MetaExtender::add_tag_block2<structure_weather_palette_entry>((unsigned long)std::addressof(bsp_definition->weather_palette));
 			weat_block->name.set("snow_cs");
 			weat_block->weather_system.group.group = _tag_group_weather_system;
 			weat_block->weather_system.index = snow_datum;
 
 			for (auto& cluster : bsp_definition->clusters)
 			{
-				cluster.weather = (short)bsp_definition->weather_palette.count - 1;
+				cluster.weather_index = (short)bsp_definition->weather_palette.count - 1;
 			}
 		}
 	}
