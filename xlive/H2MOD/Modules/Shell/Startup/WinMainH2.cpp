@@ -156,7 +156,7 @@ bool engine_basic_init()
 			}
 			else if (_wcsnicmp(cmd_line_arg, L"-monitor:", 9) == 0) {
 				int monitor_id = _wtol(&cmd_line_arg[9]);
-				shell_startup_flag_set(_startup_flag_monitor_count, MIN(MAX(0, monitor_id), max_monitor_count));
+				shell_startup_flag_set(_startup_flag_monitor_count, PIN(0, monitor_id, max_monitor_count));
 			}
 			else if (_wcsicmp(cmd_line_arg, L"-highquality") == 0) {
 				shell_startup_flag_set(_startup_flag_high_quality, 1);
@@ -178,7 +178,7 @@ bool engine_basic_init()
 #ifdef _DEBUG
 			else if (_wcsnicmp(cmd_line_arg, L"-dev_flag:", 10) == 0) {
 				int flag_id = _wtol(&cmd_line_arg[10]);
-				shell_startup_flag_set((e_startup_flags)MIN(MAX(0, flag_id), e_startup_flags::k_startup_flags_count - 1), 1);
+				shell_startup_flag_set((e_startup_flags)PIN(0, flag_id, e_startup_flags::k_startup_flags_count - 1), 1);
 			}
 #endif
 		}
