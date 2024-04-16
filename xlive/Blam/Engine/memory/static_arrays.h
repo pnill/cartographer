@@ -13,13 +13,13 @@ public:
 
 	bool valid_bit(t_type bit) const
 	{
-		return VALID_INDEX(0, k_count);
+		return VALID_INDEX(bit, k_count);
 	}
 
 	// Checks if current value set for the bitflag is valud
 	bool valid(void) const
 	{
-		return !TEST_BIT(m_storage, !k_count);
+		return !TEST_FLAG(m_storage, ~(FLAG(k_count) - 1));
 	}
 
 	void clear(void)
