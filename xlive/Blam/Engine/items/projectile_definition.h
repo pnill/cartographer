@@ -106,7 +106,7 @@ struct s_projectile_material_response_definition
 	/// the fraction of the projectile's velocity perpendicular to the surface lost on impact
 	real32 perpendicular_friction;
 };
-TAG_GROUP_SIZE_ASSERT(s_projectile_material_response_definition, 0x58);
+ASSERT_STRUCT_SIZE(s_projectile_material_response_definition, 0x58);
 
 struct _projectile_definition
 {
@@ -202,4 +202,4 @@ struct _projectile_definition
 
 	tag_block< s_projectile_material_response_definition> material_responses;
 };
-TAG_GROUP_SIZE_ASSERT(_projectile_definition, 0x1A4);
+ASSERT_STRUCT_SIZE(_projectile_definition, 0x1A4);

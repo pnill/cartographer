@@ -12,7 +12,7 @@ struct cache_file_tag_instance
 	uint32 data_offset;
 	uint32 size;
 };
-CHECK_STRUCT_SIZE(cache_file_tag_instance, 16);
+ASSERT_STRUCT_SIZE(cache_file_tag_instance, 16);
 
 // Stores information about currently loaded tags
 struct s_tags_header
@@ -26,7 +26,7 @@ struct s_tags_header
 	int32 tag_count;
 	int32 type;
 };
-CHECK_STRUCT_SIZE(s_tags_header, 32);
+ASSERT_STRUCT_SIZE(s_tags_header, 32);
 
 struct s_cache_header
 {
@@ -85,7 +85,7 @@ struct s_cache_header
 	int8 field_2F8[1284];
 	int32 footer_signature;
 };
-CHECK_STRUCT_SIZE(s_cache_header, 0x800);
+ASSERT_STRUCT_SIZE(s_cache_header, 0x800);
 
 struct s_cache_file_globals
 {
@@ -97,7 +97,7 @@ struct s_cache_file_globals
 	s_tags_header* tags_header;
 	void* field_80C;
 };
-CHECK_STRUCT_SIZE(s_cache_file_globals, 0x810);
+ASSERT_STRUCT_SIZE(s_cache_file_globals, 0x810);
 
 struct tag_iterator
 {
@@ -107,7 +107,7 @@ struct tag_iterator
 	datum next_tag_index;
 	tag_group tag_type;
 };
-CHECK_STRUCT_SIZE(tag_iterator, 20);
+ASSERT_STRUCT_SIZE(tag_iterator, 20);
 
 s_cache_header* cache_files_get_header(void);
 

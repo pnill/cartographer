@@ -39,4 +39,4 @@ public:
 	bool valid(void) const;
 	bool validate_graph(datum jmad_tag_index, datum hlmt_tag_index);
 };
-CHECK_STRUCT_SIZE(c_animation_manager, 0x84);
+ASSERT_STRUCT_SIZE(c_animation_manager, 0x84);

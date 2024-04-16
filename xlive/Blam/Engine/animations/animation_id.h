@@ -17,4 +17,4 @@ public:
 
 	bool operator==(c_animation_id* animation_id);
 };
-CHECK_STRUCT_SIZE(c_animation_id, 4);
+ASSERT_STRUCT_SIZE(c_animation_id, 4);

@@ -16,7 +16,7 @@ struct tag_import_file
     data_reference zipped_data; // Data size: 134217728
     int8 pad2[128];
 };
-TAG_BLOCK_SIZE_ASSERT(tag_import_file, 0x210);
+ASSERT_STRUCT_SIZE(tag_import_file, 0x210);
 
 struct tag_import_info
 {
@@ -30,4 +30,4 @@ struct tag_import_info
     tag_block<tag_import_file> files;
     int8 pad2[128];
 };
-TAG_BLOCK_SIZE_ASSERT(tag_import_info, 592);
+ASSERT_STRUCT_SIZE(tag_import_info, 592);

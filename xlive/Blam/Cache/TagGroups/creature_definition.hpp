@@ -98,7 +98,7 @@ struct s_creature_group_definition
 		__int16 count1;//0x36
 		PAD(0x48);//0x38
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_dead_sphere_shapes_block, 0x80);
+	ASSERT_STRUCT_SIZE(s_dead_sphere_shapes_block, 0x80);
 	tag_block<s_dead_sphere_shapes_block> dead_sphere_shapes;//0xF4
 	struct s_pill_shapes_block
 	{
@@ -123,7 +123,7 @@ struct s_creature_group_definition
 		float radius;//0x2C
 		PAD(0x20);//0x30
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_pill_shapes_block, 0x50);
+	ASSERT_STRUCT_SIZE(s_pill_shapes_block, 0x50);
 	tag_block<s_pill_shapes_block> pill_shapes;//0xFC
 	struct s_sphere_shapes_block
 	{
@@ -151,7 +151,7 @@ struct s_creature_group_definition
 		__int16 count1;//0x36
 		PAD(0x48);//0x38
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_sphere_shapes_block, 0x80);
+	ASSERT_STRUCT_SIZE(s_sphere_shapes_block, 0x80);
 	tag_block<s_sphere_shapes_block> sphere_shapes;//0x104
 	struct {
 		real_angle maximum_slope_angle;//0x10C
@@ -191,6 +191,6 @@ struct s_creature_group_definition
 	}death_and_destruction;
 
 };
-TAG_GROUP_SIZE_ASSERT(s_creature_group_definition, 0x180);
+ASSERT_STRUCT_SIZE(s_creature_group_definition, 0x180);
 #pragma pack(pop)
 

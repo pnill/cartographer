@@ -43,4 +43,4 @@ struct _item_definition
     tag_reference detonating_effect;            // effe
     tag_reference detonation_effect;            // effe
 };
-TAG_GROUP_SIZE_ASSERT(_item_definition, 300);
+ASSERT_STRUCT_SIZE(_item_definition, 300);

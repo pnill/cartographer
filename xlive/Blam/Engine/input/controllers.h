@@ -17,13 +17,13 @@ struct s_controller_button_state
 	int8 pad_3;
 	int8 field_4[60];
 };
-CHECK_STRUCT_SIZE(s_controller_button_state, 64);
+ASSERT_STRUCT_SIZE(s_controller_button_state, 64);
 
 struct keybind_map
 {
 	int8 field_0[100];
 };
-CHECK_STRUCT_SIZE(keybind_map, 100);
+ASSERT_STRUCT_SIZE(keybind_map, 100);
 
 struct s_controller_profile
 {
@@ -46,7 +46,7 @@ struct s_controller_profile
 	int16 N01E30349;
 	int16 N01E4664D;
 };
-CHECK_STRUCT_SIZE(s_controller_profile, 5760);
+ASSERT_STRUCT_SIZE(s_controller_profile, 5760);
 
 s_controller_profile* controller_profile_get(e_controller_index index);
 

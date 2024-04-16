@@ -81,5 +81,5 @@ struct alignas(8) s_network_channel
 	bool has_simulation_interface() { return simulation_interface != NULL; }
 	bool is_simulation_authority() { return has_simulation_interface() && *(bool*)((uint8*)simulation_interface + 48); }
 };
-CHECK_STRUCT_SIZE(s_network_channel, 248);
+ASSERT_STRUCT_SIZE(s_network_channel, 248);
 

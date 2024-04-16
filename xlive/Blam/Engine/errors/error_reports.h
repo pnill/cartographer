@@ -37,7 +37,7 @@ struct s_error_report_point
     int8 node_indices[4];
     real32 node_weights[4];
 };
-CHECK_STRUCT_SIZE(s_error_report_point, 32);
+ASSERT_STRUCT_SIZE(s_error_report_point, 32);
 
 // max count: MAXIMUM_VERTICES_PER_ERROR_REPORT
 struct error_report_vertex
@@ -46,7 +46,7 @@ struct error_report_vertex
     real_argb_color color;
     real32 screen_size;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_vertex, 52);
+ASSERT_STRUCT_SIZE(error_report_vertex, 52);
 
 // max count: MAXIMUM_VECTORS_PER_ERROR_REPORT
 struct error_report_vector
@@ -56,7 +56,7 @@ struct error_report_vector
     real_vector3d normal;
     real32 screen_size;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_vector, 64);
+ASSERT_STRUCT_SIZE(error_report_vector, 64);
  
 // max count: MAXIMUM_LINES_PER_ERROR_REPORT
 struct error_report_line
@@ -64,7 +64,7 @@ struct error_report_line
     s_error_report_point points[2];
     real_argb_color color;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_line, 80);
+ASSERT_STRUCT_SIZE(error_report_line, 80);
 
 // max count: MAXIMUM_TRIANGLES_PER_ERROR_REPORT
 struct error_report_triangle
@@ -72,7 +72,7 @@ struct error_report_triangle
     s_error_report_point points[3];
     real_argb_color color;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_triangle, 112);
+ASSERT_STRUCT_SIZE(error_report_triangle, 112);
 
 // max count: MAXIMUM_QUADS_PER_ERROR_REPORT
 struct error_report_quad
@@ -80,7 +80,7 @@ struct error_report_quad
     s_error_report_point points[4];
     real_argb_color color;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_quad, 144);
+ASSERT_STRUCT_SIZE(error_report_quad, 144);
 
 // max count: MAXIMUM_COMMENTS_PER_ERROR_REPORT
 struct error_report_comment
@@ -89,7 +89,7 @@ struct error_report_comment
     s_error_report_point point;
     real_argb_color color;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_comment, 56);
+ASSERT_STRUCT_SIZE(error_report_comment, 56);
 
 // max count: MAXIMUM_REPORTS_PER_ERROR_REPORT_CATEGORY
 struct error_reports_block
@@ -113,7 +113,7 @@ struct error_reports_block
     real_argb_color color;
     int8 pad1[84];
 };
-TAG_BLOCK_SIZE_ASSERT(error_reports_block, 608);
+ASSERT_STRUCT_SIZE(error_reports_block, 608);
 
 // max count: MAXIMUM_ERROR_REPORT_CATEGORIES
 struct error_report_category
@@ -126,4 +126,4 @@ struct error_report_category
     int8 pad2[404];
     tag_block<error_reports_block> reports;
 };
-TAG_BLOCK_SIZE_ASSERT(error_report_category, 676);
+ASSERT_STRUCT_SIZE(error_report_category, 676);

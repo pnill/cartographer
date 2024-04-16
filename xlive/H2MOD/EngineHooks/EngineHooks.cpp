@@ -56,7 +56,7 @@ namespace EngineHooks
 		int32 executable_version;
 		int32 compatible_version;
 	};
-	CHECK_STRUCT_OFFSET(s_session_live_result, executable_type, 116);
+	ASSERT_STRUCT_OFFSET(s_session_live_result, executable_type, 116);
 
 	typedef bool(__stdcall* t_xlocator_parse_search_result)(void* thisx, int a2, s_session_live_result* session_out);
 	t_xlocator_parse_search_result p_xlocator_parse_search_result;

@@ -27,7 +27,7 @@ struct scenario_atmospheric_fog_mixer_block
     string_id interpolator_from_scenario_interpolators;
     short pad1[2];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_atmospheric_fog_mixer_block, 16);
+ASSERT_STRUCT_SIZE(scenario_atmospheric_fog_mixer_block, 16);
 
 // max count: MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
 struct s_scenario_atmospheric_fog_palette_entry
@@ -76,7 +76,7 @@ struct s_scenario_atmospheric_fog_palette_entry
     e_camera_immersion_flags camera_immersion_flags;
     short pad6;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_atmospheric_fog_palette_entry, 244);
+ASSERT_STRUCT_SIZE(s_scenario_atmospheric_fog_palette_entry, 244);
 
 // max count: MAXIMUM_PLANAR_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
 struct s_scenario_planar_fog_palette_entry
@@ -85,5 +85,5 @@ struct s_scenario_planar_fog_palette_entry
     tag_reference planar_fog;
     short pad[2];
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_planar_fog_palette_entry, 16);
+ASSERT_STRUCT_SIZE(s_scenario_planar_fog_palette_entry, 16);
 

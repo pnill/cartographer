@@ -19,7 +19,7 @@ struct leaf_connection
 
 	real32 area;
 };
-TAG_BLOCK_SIZE_ASSERT(leaf_connection, 24);
+ASSERT_STRUCT_SIZE(leaf_connection, 24);
 
 // max: MAXIMUM_FACES_PER_MAP_LEAF
 struct map_leaf_face
@@ -29,7 +29,7 @@ struct map_leaf_face
 	// max: MAXIMUM_VERTICES_PER_LEAF_CONNECTION
 	tag_block<real_point3d> vertices;
 };
-TAG_BLOCK_SIZE_ASSERT(map_leaf_face, 12);
+ASSERT_STRUCT_SIZE(map_leaf_face, 12);
 
 // max: MAXIMUM_LEAVES_PER_BSP3D
 struct map_leaf
@@ -39,7 +39,7 @@ struct map_leaf
 	// max: MAXIMUM_CONNECTIONS_PER_MAP_LEAF
 	tag_block<uint32> connection_indices;
 };
-TAG_BLOCK_SIZE_ASSERT(map_leaf, 16);
+ASSERT_STRUCT_SIZE(map_leaf, 16);
 
 // max count: MAXIMUM_LEAVES_PER_BSP3D
 struct structure_leaf
@@ -48,4 +48,4 @@ struct structure_leaf
 	uint16 surface_reference_count;
 	uint32 first_surface_reference_index;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_leaf, 8);
+ASSERT_STRUCT_SIZE(structure_leaf, 8);

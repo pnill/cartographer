@@ -14,4 +14,4 @@ public:
 	int32 m_gap_14;
 	unit_control_data m_control;
 };
-CHECK_STRUCT_SIZE(c_simulation_actor, 0x98);
+ASSERT_STRUCT_SIZE(c_simulation_actor, 0x98);

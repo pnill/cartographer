@@ -7,4 +7,4 @@ struct sector_vertex
 {
 	real_point3d point;
 };
-TAG_BLOCK_SIZE_ASSERT(sector_vertex, 12);
+ASSERT_STRUCT_SIZE(sector_vertex, 12);

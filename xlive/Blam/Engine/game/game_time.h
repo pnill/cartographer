@@ -24,7 +24,7 @@ struct time_globals
 	static real32 get_ticks_difference_real();
 	static real32 get_ticks_fraction_leftover();
 };
-CHECK_STRUCT_SIZE(time_globals, 36);
+ASSERT_STRUCT_SIZE(time_globals, 36);
 
 real32 game_tick_length(void);
 

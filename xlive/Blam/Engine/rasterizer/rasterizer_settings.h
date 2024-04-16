@@ -32,7 +32,7 @@ struct s_video_mode
 	uint32 refresh_rate_count;
 	int32 refresh_rate[8];
 };
-CHECK_STRUCT_SIZE(s_video_mode, 12 + 8 * 4);
+ASSERT_STRUCT_SIZE(s_video_mode, 12 + 8 * 4);
 
 struct s_video_settings
 {

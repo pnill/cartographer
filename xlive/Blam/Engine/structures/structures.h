@@ -16,14 +16,14 @@ struct structure_surface_reference
 	uint16 lightmap_triangle_index;
 	uint32 bsp_node_index;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_surface_reference, 8);
+ASSERT_STRUCT_SIZE(structure_surface_reference, 8);
 
 // max count: MAXIMUM_SURFACES_PER_COLLISION_BSP 131072
 struct bsp2d_ref
 {
 	int node_ref_or_sector_ref;
 };
-TAG_BLOCK_SIZE_ASSERT(bsp2d_ref, 4);
+ASSERT_STRUCT_SIZE(bsp2d_ref, 4);
 
 // max count: MAXIMUM_NODES_PER_BSP2D 131072
 struct large_bsp2d_node
@@ -32,7 +32,7 @@ struct large_bsp2d_node
 	int left_child;
 	int right_child;
 };
-TAG_BLOCK_SIZE_ASSERT(large_bsp2d_node, 20);
+ASSERT_STRUCT_SIZE(large_bsp2d_node, 20);
 
 #pragma pack(push, 1)
 struct s_structure_globals
@@ -47,7 +47,7 @@ struct s_structure_globals
 	int32 instanced_geometry_instances[1024];
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(s_structure_globals, 6159);
+ASSERT_STRUCT_SIZE(s_structure_globals, 6159);
 
 s_structure_globals* structure_globals_get(void);
 

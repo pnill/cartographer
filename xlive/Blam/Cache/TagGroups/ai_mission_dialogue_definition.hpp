@@ -19,13 +19,13 @@ struct s_ai_mission_dialogue_group_definition
 			tag_reference sound;//0x4
 			string_id sound_effect;//0xC
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_variants_block, 0x10);
+		ASSERT_STRUCT_SIZE(s_variants_block, 0x10);
 		tag_block<s_variants_block> variants;//0x4
 		string_id default_sound_effect;//0xC
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_lines_block, 0x10);
+	ASSERT_STRUCT_SIZE(s_lines_block, 0x10);
 	tag_block<s_lines_block> lines;//0x0
 };
 #pragma pack(pop)
-TAG_GROUP_SIZE_ASSERT(s_ai_mission_dialogue_group_definition, 0x8);
+ASSERT_STRUCT_SIZE(s_ai_mission_dialogue_group_definition, 0x8);
 

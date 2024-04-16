@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TagFixes.h"
 
-#include "Blam/Cache/TagGroups/light_definition.h"
 #include "Blam/Cache/TagGroups/sound_classes_definition.hpp"
 
 #include "shaders/shader_definitions.h"
@@ -9,6 +8,7 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Tags/TagInterface.h"
+#include "objects/light_definitions.h"
 
 // ### TODO Cleanup
 extern bool g_xbox_tickrate_enabled;
@@ -142,7 +142,7 @@ namespace TagFixes
 				s_shader_definition* smg_painted_metal = (s_shader_definition*)tag_get_fast(smg_painted_metal_index);
 
 				// Original values (Changed for some reason in h2v)
-				smg_painted_metal->lightmap_type = _lightmap_type_dull_specular;
+				smg_painted_metal->lightmap_type = _shader_lightmap_type_dull_specular;
 				smg_painted_metal->lightmap_specular_brightness = 2.f;
 
 				// Original template (Changed for some reason in h2v)
@@ -224,12 +224,12 @@ namespace TagFixes
 			auto lights = tags::find_tags(_tag_group_light);
 			for (auto& light_item : lights)
 			{
-				auto light = tags::get_tag_fast<s_light_group_definition>(light_item.first);
+				auto light = tags::get_tag_fast<light_definition>(light_item.first);
 				// Disabled since it caused issues where certain lights wouldnt render randomly
 				// TODO figure out why it does this at some other point in time
-				// light->flags |= s_light_group_definition::e_flags::light_framerate_killer;
+				// light->flags |= _light_definition_no_illumination_light_framerate_killer;
 
-				light->flags |= s_light_group_definition::e_flags::multiplayer_override;
+				light->flags |= _light_definition_no_illumination_multiplayer_override;
 			}
 		}
 

@@ -45,4 +45,4 @@ struct _device_definition
     tag_reference delay_effect;
     real32 automatic_activation_radius; // World units
 };
-TAG_GROUP_SIZE_ASSERT(_device_definition, 284);
+ASSERT_STRUCT_SIZE(_device_definition, 284);

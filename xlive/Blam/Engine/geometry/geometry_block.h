@@ -20,7 +20,7 @@ struct geometry_block_resource
     int32 resource_data_size;
     int32 resource_data_offset;
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_block_resource, 16);
+ASSERT_STRUCT_SIZE(geometry_block_resource, 16);
 
 // max count: 1
 struct geometry_block_info
@@ -39,11 +39,11 @@ struct geometry_block_info
 
     datum geometry_cache_index;
 };
-CHECK_STRUCT_SIZE(geometry_block_info, 36);
+ASSERT_STRUCT_SIZE(geometry_block_info, 36);
 
 // max count: 64*k_kilo 65536
 struct indices_block
 {
     short index;
 };
-TAG_BLOCK_SIZE_ASSERT(indices_block, 2);
+ASSERT_STRUCT_SIZE(indices_block, 2);

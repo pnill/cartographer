@@ -26,7 +26,7 @@ struct s_simulation_object_state_data
 	__int16 loosened_constraints;
 	char pad[42];
 };
-CHECK_STRUCT_SIZE(s_simulation_object_state_data, 0x90);
+ASSERT_STRUCT_SIZE(s_simulation_object_state_data, 0x90);
 
 struct s_simulation_object_creation_data
 {
@@ -41,7 +41,7 @@ struct s_simulation_object_creation_data
 	// Repurpose padding for variant index
 	int8 model_variant_index;
 };
-CHECK_STRUCT_SIZE(s_simulation_object_creation_data, 16);
+ASSERT_STRUCT_SIZE(s_simulation_object_creation_data, 16);
 
 datum simulation_object_get_replicated_object_from_entity(int32 entity_index);
 

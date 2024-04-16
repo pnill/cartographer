@@ -101,7 +101,7 @@ struct scenario_child_scenario_reference
 	tag_reference childScenario;	// scnr
 	char pad[16];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_child_scenario_reference, 24);
+ASSERT_STRUCT_SIZE(scenario_child_scenario_reference, 24);
 
 enum e_scenario_function_flags : int
 {
@@ -158,7 +158,7 @@ struct scenario_function
     short turn_off_with;
     int pad2[8];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_function, 120);
+ASSERT_STRUCT_SIZE(scenario_function, 120);
 
 // max count: MAXIMUM_ENVIRONMENT_OBJECTS_PER_SCENARIO 4096
 struct scenario_environment_object
@@ -172,7 +172,7 @@ struct scenario_environment_object
     int object;
     int pad1[11];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_environment_object, 64);
+ASSERT_STRUCT_SIZE(scenario_environment_object, 64);
 
 // max count: MAXIMUM_OBJECT_NAMES_PER_SCENARIO 640
 struct scenario_object_name
@@ -182,7 +182,7 @@ struct scenario_object_name
     int8 pad;
     short placement_index;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_object_name, 36);
+ASSERT_STRUCT_SIZE(scenario_object_name, 36);
 
 enum e_object_placement_flags : int
 {
@@ -236,7 +236,7 @@ struct s_scenario_object_datum
     char pad;
     short editor_folder_index;
 };
-CHECK_STRUCT_SIZE(s_scenario_object_datum, 48);
+ASSERT_STRUCT_SIZE(s_scenario_object_datum, 48);
 
 enum e_active_change_colors : int
 {
@@ -255,7 +255,7 @@ struct s_scenario_object_permutation
     pixel32 tertiary_color;
     pixel32 quaternary_color;
 };
-CHECK_STRUCT_SIZE(s_scenario_object_permutation, 24);
+ASSERT_STRUCT_SIZE(s_scenario_object_permutation, 24);
 
 enum e_pathfinding_policy : short
 {
@@ -279,7 +279,7 @@ struct pathfinding_object_index_list
     short bsp_index;
     short pathfinding_object_index;
 };
-TAG_BLOCK_SIZE_ASSERT(pathfinding_object_index_list, 4);
+ASSERT_STRUCT_SIZE(pathfinding_object_index_list, 4);
 
 struct s_scenario_scenery_datum
 {
@@ -289,7 +289,7 @@ struct s_scenario_scenery_datum
     short pad;
     e_valid_multiplayer_games valid_multiplayer_games;
 };
-CHECK_STRUCT_SIZE(s_scenario_scenery_datum, 16);
+ASSERT_STRUCT_SIZE(s_scenario_scenery_datum, 16);
 
 // max count: MAXIMUM_SCENERY_DATUMS_PER_SCENARIO 2000
 struct s_scenario_scenery
@@ -305,7 +305,7 @@ struct s_scenario_scenery
     s_scenario_object_permutation permutation_data;
     s_scenario_scenery_datum scenery_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_scenery, 92);
+ASSERT_STRUCT_SIZE(s_scenario_scenery, 92);
 
 // max count: MAXIMUM_SCENARIO_OBJECT_PALETTE_ENTRIES_PER_BLOCK 256
 struct scenario_object_palette_entry
@@ -313,7 +313,7 @@ struct scenario_object_palette_entry
     tag_reference name;
     uint64_t pad[4];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_object_palette_entry, 40);
+ASSERT_STRUCT_SIZE(scenario_object_palette_entry, 40);
 
 enum e_scenario_unit_datum_flags : int
 {
@@ -327,7 +327,7 @@ struct s_scenario_unit_datum
     float body_vitality;
     e_scenario_unit_datum_flags flags;
 };
-CHECK_STRUCT_SIZE(s_scenario_unit_datum, 8);
+ASSERT_STRUCT_SIZE(s_scenario_unit_datum, 8);
 
 // max count: MAXIMUM_BIPED_DATUMS_PER_SCENARIO 128
 struct s_scenario_biped
@@ -343,7 +343,7 @@ struct s_scenario_biped
     s_scenario_object_permutation permutation_data;
     s_scenario_unit_datum unit_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_biped, 84);
+ASSERT_STRUCT_SIZE(s_scenario_biped, 84);
 
 // max count: MAXIMUM_VEHICLE_DATUMS_PER_SCENARIO 256
 struct s_scenario_vehicle
@@ -359,7 +359,7 @@ struct s_scenario_vehicle
     s_scenario_object_permutation permutation_data;
     s_scenario_unit_datum unit_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_vehicle, 84);
+ASSERT_STRUCT_SIZE(s_scenario_vehicle, 84);
 
 enum e_item_datum_flags : int
 {
@@ -372,7 +372,7 @@ struct s_scenario_equipment_datum
 {
     e_item_datum_flags flags;
 };
-CHECK_STRUCT_SIZE(s_scenario_equipment_datum, 4);
+ASSERT_STRUCT_SIZE(s_scenario_equipment_datum, 4);
 
 // max count: MAXIMUM_EQUIPMENT_DATUMS_PER_SCENARIO 256
 struct s_scenario_equipment
@@ -387,7 +387,7 @@ struct s_scenario_equipment
     s_scenario_object_datum object_data;
     s_scenario_equipment_datum equipment_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_equipment, 56);
+ASSERT_STRUCT_SIZE(s_scenario_equipment, 56);
 
 struct s_scenario_weapon_datum
 {
@@ -395,7 +395,7 @@ struct s_scenario_weapon_datum
     short rounds_loaded;
     e_item_datum_flags flags;
 };
-CHECK_STRUCT_SIZE(s_scenario_weapon_datum, 8);
+ASSERT_STRUCT_SIZE(s_scenario_weapon_datum, 8);
 
 // max count: MAXIMUM_WEAPON_DATUMS_PER_SCENARIO 128
 struct s_scenario_weapon
@@ -411,7 +411,7 @@ struct s_scenario_weapon
     s_scenario_object_permutation permutation_data;
     s_scenario_weapon_datum weapon_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_weapon, 84);
+ASSERT_STRUCT_SIZE(s_scenario_weapon, 84);
 
 enum e_device_group_flags : int
 {
@@ -425,7 +425,7 @@ struct scenario_device_group
     float initial_value;
     e_device_group_flags flags;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_device_group, 40);
+ASSERT_STRUCT_SIZE(scenario_device_group, 40);
 
 enum e_scenario_device_datum_flags : int
 {
@@ -442,7 +442,7 @@ struct s_scenario_device_datum
     short position_group;    // Block index: scenario_device_group
     e_scenario_device_datum_flags flags;
 };
-CHECK_STRUCT_SIZE(s_scenario_device_datum, 8);
+ASSERT_STRUCT_SIZE(s_scenario_device_datum, 8);
 
 enum e_scenario_machine_datum_flags : int
 {
@@ -459,7 +459,7 @@ struct s_scenario_machine_datum
     e_scenario_machine_datum_flags flags;
     tag_block<pathfinding_object_index_list> pathfinding_references;
 };
-CHECK_STRUCT_SIZE(s_scenario_machine_datum, 12);
+ASSERT_STRUCT_SIZE(s_scenario_machine_datum, 12);
 
 // max count: MAXIMUM_MACHINE_DATUMS_PER_SCENARIO 400
 struct scenario_machine_block
@@ -475,7 +475,7 @@ struct scenario_machine_block
     s_scenario_device_datum device_data;
     s_scenario_machine_datum machine_data;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_machine_block, 72);
+ASSERT_STRUCT_SIZE(scenario_machine_block, 72);
 
 enum e_scenario_control_datum_flags : int
 {
@@ -488,7 +488,7 @@ struct s_scenario_control_datum
     short dont_touch_this;
     short pad;
 };
-CHECK_STRUCT_SIZE(s_scenario_control_datum, 8);
+ASSERT_STRUCT_SIZE(s_scenario_control_datum, 8);
 
 // max count: MAXIMUM_CONTROL_DATUMS_PER_SCENARIO 100
 struct s_scenario_control
@@ -504,7 +504,7 @@ struct s_scenario_control
     s_scenario_device_datum device_data;
     s_scenario_control_datum control_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_control, 68);
+ASSERT_STRUCT_SIZE(s_scenario_control, 68);
 
 struct s_scenario_light_fixture_datum
 {
@@ -528,7 +528,7 @@ struct s_scenario_light_fixture
     s_scenario_device_datum device_data;
     s_scenario_light_fixture_datum lightfixture_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_light_fixture, 84);
+ASSERT_STRUCT_SIZE(s_scenario_light_fixture, 84);
 
 struct s_scenario_sound_scenery_datum
 {
@@ -538,7 +538,7 @@ struct s_scenario_sound_scenery_datum
     real_bounds override_cone_real_bounds;
     float override_outer_cone_gain_db;
 };
-CHECK_STRUCT_SIZE(s_scenario_sound_scenery_datum, 28);
+ASSERT_STRUCT_SIZE(s_scenario_sound_scenery_datum, 28);
 
 // max count: MAXIMUM_SOUND_SCENERY_DATUMS_PER_SCENARIO 256
 struct s_scenario_sound_scenery
@@ -553,24 +553,7 @@ struct s_scenario_sound_scenery
     s_scenario_object_datum object_data;
     s_scenario_sound_scenery_datum soundscenery;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_sound_scenery, 80);
-
-struct s_scenario_light_datum
-{
-    e_light_type type;
-    e_light_placement_flags flags;
-    e_lightmap_type lightmap_type;
-    e_lightmap_flags lightmap_flags;
-    float lightmap_half_life;
-    float lightmap_light_scale;
-    real_point3d target_point;
-    float width_world_units;
-    float height_scale_world_units;
-    float field_of_view_degrees;
-    float falloff_distance_world_units;
-    float cutoff_distance_world_units_from_far_plane;
-};
-CHECK_STRUCT_SIZE(s_scenario_light_datum, 48);
+ASSERT_STRUCT_SIZE(s_scenario_sound_scenery, 80);
 
 // max count: MAXIMUM_LIGHTS_PER_SCENARIO 500
 struct s_scenario_light
@@ -590,7 +573,7 @@ struct s_scenario_light
     s_scenario_device_datum device_data;
     s_scenario_light_datum light_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_light, 108);
+ASSERT_STRUCT_SIZE(s_scenario_light, 108);
 
 // max count: MAXIMUM_SCENARIO_PLAYERS_PER_BLOCK 256
 struct scenario_starting_profile
@@ -609,7 +592,7 @@ struct scenario_starting_profile
     byte starting_spike_grenade_count;
     byte starting_firebomb_grenade_count;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_starting_profile, 68);
+ASSERT_STRUCT_SIZE(scenario_starting_profile, 68);
 
 enum e_item_spawn_game_type : short
 {
@@ -666,7 +649,7 @@ struct scenario_player
     e_campaign_player_type campaign_player_type;
     short pad[3];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_player, 52);
+ASSERT_STRUCT_SIZE(scenario_player, 52);
 
 // max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
 struct scenario_trigger_volume
@@ -682,7 +665,7 @@ struct scenario_trigger_volume
     float unk_float;
     short kill_triggger_volume_index;       // Block index: scenario_trigger_volume
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_trigger_volume, 68);
+ASSERT_STRUCT_SIZE(scenario_trigger_volume, 68);
 
 // max count: MAXIMUM_RECORDED_ANIMATIONS_PER_MAP 1024
 struct recorded_animation_definition
@@ -696,7 +679,7 @@ struct recorded_animation_definition
     short pad1[3];
     data_reference recorded_animation_event_stream; // DataSize: 2097152
 };
-TAG_BLOCK_SIZE_ASSERT(recorded_animation_definition, 52);
+ASSERT_STRUCT_SIZE(recorded_animation_definition, 52);
 
 enum e_netpoint_type : short
 {
@@ -741,7 +724,7 @@ struct scenario_netpoint
     string_id spawn_object_name;
     string_id spawn_marker_name;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_netpoint, 32);
+ASSERT_STRUCT_SIZE(scenario_netpoint, 32);
 
 enum e_respawn_timer_starts : short
 {
@@ -782,7 +765,7 @@ struct scenario_netgame_equipment
     tag_reference item_vehicle_collection;  // itmc/vehc but allows any tag
     int64_t pad3[6];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_netgame_equipment, 144);
+ASSERT_STRUCT_SIZE(scenario_netgame_equipment, 144);
 
 enum e_scenario_starting_equipment_flags : int
 {
@@ -807,7 +790,7 @@ struct scenario_starting_equipment
     tag_reference item_collection_6;    // itmc
     int pad1[12];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_starting_equipment, 156);
+ASSERT_STRUCT_SIZE(scenario_starting_equipment, 156);
 
 // max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
 struct scenario_bsp_switch_trigger_volume
@@ -817,7 +800,7 @@ struct scenario_bsp_switch_trigger_volume
     short destination_bsp_index; 
     short pad[4];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_bsp_switch_trigger_volume, 14);
+ASSERT_STRUCT_SIZE(scenario_bsp_switch_trigger_volume, 14);
 
 // max count: MAXIMUM_DECALS_PER_SCENARIO 65536
 struct scenario_decal
@@ -828,14 +811,14 @@ struct scenario_decal
     char pitch;             // -127 - 127
     real_point3d position;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_decal, 16);
+ASSERT_STRUCT_SIZE(scenario_decal, 16);
 
 // max count: MAXIMUM_DECAL_PALETTES_PER_SCENARIO 128
 struct scenario_decal_palette_entry
 {
     tag_reference reference;    // deca
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_decal_palette_entry, 8);
+ASSERT_STRUCT_SIZE(scenario_decal_palette_entry, 8);
 
 // max count: MAXIMUM_DETAIL_OBJECT_LAYERS_PER_STRUCTURE 32
 struct scenario_detail_object_collection_palette_entry
@@ -843,21 +826,21 @@ struct scenario_detail_object_collection_palette_entry
     tag_reference name;         // dobc
     int64_t pad[4];
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_detail_object_collection_palette_entry, 40);
+ASSERT_STRUCT_SIZE(scenario_detail_object_collection_palette_entry, 40);
 
 // max count: 50
 struct style_palette_entry
 {
     tag_reference reference;    // styl
 };
-TAG_BLOCK_SIZE_ASSERT(style_palette_entry, 8);
+ASSERT_STRUCT_SIZE(style_palette_entry, 8);
 
 // max count: 64
 struct character_palette_entry
 {
     tag_reference reference;    // char
 };
-TAG_BLOCK_SIZE_ASSERT(character_palette_entry, 8);
+ASSERT_STRUCT_SIZE(character_palette_entry, 8);
 
 // max count: k_maximum_hs_scripts_per_scenario 1024
 struct hs_script
@@ -867,7 +850,7 @@ struct hs_script
     e_hs_type return_type;
     datum root_expression_index;
 };
-TAG_BLOCK_SIZE_ASSERT(hs_script, 40);
+ASSERT_STRUCT_SIZE(hs_script, 40);
 
 // max count: MAXIMUM_CUTSCENE_FLAGS_PER_SCENARIO 512
 struct scenario_cutscene_flag
@@ -877,7 +860,7 @@ struct scenario_cutscene_flag
     real_point3d position;
     real_euler_angles2d facing;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_cutscene_flag, 56);
+ASSERT_STRUCT_SIZE(scenario_cutscene_flag, 56);
 
 enum e_cutscene_camera_point_flags : short
 {
@@ -904,7 +887,7 @@ struct scenario_cutscene_camera_point
     real_point3d position;
     real_vector3d orientation;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_cutscene_camera_point, 64);
+ASSERT_STRUCT_SIZE(scenario_cutscene_camera_point, 64);
 
 enum e_text_justification : short
 {
@@ -944,7 +927,7 @@ struct s_scenario_cutscene_title
     float up_time_seconds;
     float fade_out_time_seconds;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_cutscene_title, 36);
+ASSERT_STRUCT_SIZE(s_scenario_cutscene_title, 36);
 
 enum e_structure_bsp_reference_flags : short
 {
@@ -971,28 +954,28 @@ struct scenario_structure_bsp_reference
     short default_sky;   // Block Index: scenario_sky_reference
     short pad3;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_structure_bsp_reference, 68);
+ASSERT_STRUCT_SIZE(scenario_structure_bsp_reference, 68);
 
 // max count: NUMBER_OF_SCENARIO_RESOURCE_TYPES 16
 struct scenario_resource_reference
 {
     tag_reference reference;    // any tag type allowed
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_resource_reference, 8);
+ASSERT_STRUCT_SIZE(scenario_resource_reference, 8);
 
 // max count: k_maximum_hs_source_files_per_scenario 8
 struct s_hs_source_reference
 {
     tag_reference reference;    // hsc*
 };
-TAG_BLOCK_SIZE_ASSERT(s_hs_source_reference, 8);
+ASSERT_STRUCT_SIZE(s_hs_source_reference, 8);
 
 // max count: k_number_of_scenario_ai_types 2
 struct s_ai_resource_reference
 {
     tag_reference reference;    // ai**
 };
-TAG_BLOCK_SIZE_ASSERT(s_ai_resource_reference, 8);
+ASSERT_STRUCT_SIZE(s_ai_resource_reference, 8);
 
 // max count: 1
 struct scenario_resources_definition
@@ -1001,7 +984,7 @@ struct scenario_resources_definition
     tag_block<s_hs_source_reference> scriptSource;
     tag_block<s_ai_resource_reference> aIResources;
 };
-TAG_BLOCK_SIZE_ASSERT(scenario_resources_definition, 24);
+ASSERT_STRUCT_SIZE(scenario_resources_definition, 24);
 
 // max count: MAXIMUM_STRUCTURE_BSPS_PER_SCENARIO 16
 // What a wonderful structure name...
@@ -1021,7 +1004,7 @@ struct s_here_but_for_the_grace_of_god_go_this_poor_soul
     real_point3d mopp_bounds_min;
     real_point3d mopp_bounds_max;
 };
-TAG_BLOCK_SIZE_ASSERT(s_here_but_for_the_grace_of_god_go_this_poor_soul, 44);
+ASSERT_STRUCT_SIZE(s_here_but_for_the_grace_of_god_go_this_poor_soul, 44);
 
 // max count: 1
 struct s_scenario_spawn_data
@@ -1035,7 +1018,7 @@ struct s_scenario_spawn_data
     tag_block<s_static_spawn_zone> static_respawn_zones;
     tag_block<s_static_spawn_zone> static_initial_spawn_zones;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_spawn_data, 96);
+ASSERT_STRUCT_SIZE(s_scenario_spawn_data, 96);
 
 // max count: MAXIMUM_CRATE_DATUMS_PER_SCENARIO 1024
 struct s_scenario_crate
@@ -1050,7 +1033,7 @@ struct s_scenario_crate
     s_scenario_object_datum object_data;
     s_scenario_object_permutation permutation_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_crate, 76);
+ASSERT_STRUCT_SIZE(s_scenario_crate, 76);
 
 // max count: MAXIMUM_CREATURE_DATUMS_PER_SCENARIO 128
 struct s_scenario_creature
@@ -1063,14 +1046,14 @@ struct s_scenario_creature
     short name;
     s_scenario_object_datum object_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_creature, 52);
+ASSERT_STRUCT_SIZE(s_scenario_creature, 52);
 
 // max count: k_maximum_decorator_sets_per_scenario 32
 struct s_scenario_decorator_palette_entry
 {
     tag_reference decorator_set;  // DECR
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_decorator_palette_entry, 8);
+ASSERT_STRUCT_SIZE(s_scenario_decorator_palette_entry, 8);
 
 // max count: MAXIMUM_TRIGGER_VOLUMES_PER_SCENARIO 256
 struct s_scenario_bsp_switch_transition_volume
@@ -1079,7 +1062,7 @@ struct s_scenario_bsp_switch_transition_volume
     short trigger_volume;   // Block index: scenario_trigger_volume
     short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_bsp_switch_transition_volume, 8);
+ASSERT_STRUCT_SIZE(s_scenario_bsp_switch_transition_volume, 8);
 
 // max count: MAXIMUM_STRUCTURE_BSPS_PER_SCENARIO 16
 struct s_scenario_structure_bsp_spherical_harmonic_lighting
@@ -1087,7 +1070,7 @@ struct s_scenario_structure_bsp_spherical_harmonic_lighting
     tag_reference bsp;                              // sbsp
     tag_block<real_point3d> lighting_points;        // max count: k_maximum_structure_bsp_spherical_harmonic_lighting_points 32768
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_structure_bsp_spherical_harmonic_lighting, 16);
+ASSERT_STRUCT_SIZE(s_scenario_structure_bsp_spherical_harmonic_lighting, 16);
 
 // max count: k_maximum_scenario_editor_folders 32767
 struct s_scenario_editor_folder
@@ -1095,7 +1078,7 @@ struct s_scenario_editor_folder
     int parent_folder;                              // Block index: scenario_editor_folder
     static_string256 name;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_editor_folder, 260);
+ASSERT_STRUCT_SIZE(s_scenario_editor_folder, 260);
 
 // max count: 1
 struct s_scenario_level_data
@@ -1104,14 +1087,14 @@ struct s_scenario_level_data
     tag_block<s_campaign_ui_level_definition> campaign_level_data;
     tag_block<s_multiplayer_ui_level_definition> multiplayer;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_level_data, 24);
+ASSERT_STRUCT_SIZE(s_scenario_level_data, 24);
 
 // max count: 1
 struct ai_scenario_mission_dialogue
 {
     tag_reference mission_dialogue;     // mdlg
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scenario_mission_dialogue, 8);
+ASSERT_STRUCT_SIZE(ai_scenario_mission_dialogue, 8);
 
 // max count: k_maximum_screen_effect_references_per_scenario 16
 struct s_scenario_screen_effect_reference
@@ -1122,14 +1105,14 @@ struct s_scenario_screen_effect_reference
     string_id secondary_input_interpolator;
     short pad1[2];
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_screen_effect_reference, 36);
+ASSERT_STRUCT_SIZE(s_scenario_screen_effect_reference, 36);
 
 // max count: k_maximum_simulation_definition_table_elements_per_scenario 512
 struct s_scenario_simulation_definition_table_element
 {
     datum tag_datum;
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_simulation_definition_table_element, 4);
+ASSERT_STRUCT_SIZE(s_scenario_simulation_definition_table_element, 4);
 
 struct scenario
 {
@@ -1261,6 +1244,6 @@ struct scenario
     tag_block<s_scenario_screen_effect_reference> screen_effect_references;
     tag_block<s_scenario_simulation_definition_table_element> simulation_definition_table;
 };
-TAG_GROUP_SIZE_ASSERT(scenario, 992);
+ASSERT_STRUCT_SIZE(scenario, 992);
 
 typedef s_scenario_scenery s_scenario_object;

@@ -32,4 +32,4 @@ private:
 	int32 m_event_type_count;
 	c_simulation_event_definition* m_event_definitions[k_simulation_event_type_maximum_count];
 };
-CHECK_STRUCT_SIZE(c_simulation_type_collection, 264);
+ASSERT_STRUCT_SIZE(c_simulation_type_collection, 264);

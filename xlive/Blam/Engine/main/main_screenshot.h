@@ -17,6 +17,6 @@ struct s_screenshot_globals
 	static_string256 camera_name;
 	bitmap_data* bloom_bitmap;
 };
-CHECK_STRUCT_SIZE(s_screenshot_globals, 276);
+ASSERT_STRUCT_SIZE(s_screenshot_globals, 276);
 
 s_screenshot_globals* get_screenshot_globals();

@@ -43,7 +43,7 @@ public:
 	e_wind_primitive_type type;
 	int8 pad_1[2];
 };
-TAG_BLOCK_SIZE_ASSERT(c_wind_primitive, 24);
+ASSERT_STRUCT_SIZE(c_wind_primitive, 24);
 
 // max: 1
 class c_wind_model 
@@ -65,7 +65,7 @@ public:
 	tag_block<c_wind_primitive> wind_primitives;
 	int32 pad_3;
 };
-TAG_BLOCK_SIZE_ASSERT(c_wind_model, 156);
+ASSERT_STRUCT_SIZE(c_wind_model, 156);
 
 // max: 1
 class c_animated_background_plate
@@ -93,7 +93,7 @@ public:
 
 	int8 pad[736];
 };
-TAG_BLOCK_SIZE_ASSERT(c_animated_background_plate, 936);
+ASSERT_STRUCT_SIZE(c_animated_background_plate, 936);
 
 // TODO: Figure out where this actually goes.
 // max: MAX_PARTICLES_LITE
@@ -104,7 +104,7 @@ public:
 	real32 m_size;
 	pixel32 m_color;
 };
-TAG_BLOCK_SIZE_ASSERT(c_particle_lite_render, 20);
+ASSERT_STRUCT_SIZE(c_particle_lite_render, 20);
 
 // TODO: Figure out where this actually goes.
 // max: MAX_PARTICLES_LITE
@@ -116,7 +116,7 @@ public:
 	real32 m_mass;
 	real32 m_creation_time_stamp;
 };
-TAG_BLOCK_SIZE_ASSERT(c_particle_lite_data, 32);
+ASSERT_STRUCT_SIZE(c_particle_lite_data, 32);
 
 // TODO: Figure out where this actually goes.
 // max: 1
@@ -126,7 +126,7 @@ struct particle_system_data
 	tag_block<c_particle_lite_data> update_data;
 	int8 pad[32];
 };
-TAG_BLOCK_SIZE_ASSERT(particle_system_data, 48);
+ASSERT_STRUCT_SIZE(particle_system_data, 48);
 
 // TODO: Figure out where this actually goes.
 // max: 1
@@ -152,7 +152,7 @@ public:
 	real32 m_rain_line_width;
 	int32 m_pad_2[3];
 };
-TAG_BLOCK_SIZE_ASSERT(c_particle_system_lite, 140);
+ASSERT_STRUCT_SIZE(c_particle_system_lite, 140);
 
 class c_weather_system
 {
@@ -162,4 +162,4 @@ public:
 	c_wind_model m_wind_model;
 	real32 m_fade_radius;
 };
-TAG_BLOCK_SIZE_ASSERT(c_weather_system, 0xB0);
+ASSERT_STRUCT_SIZE(c_weather_system, 0xB0);

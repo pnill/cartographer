@@ -25,7 +25,7 @@ struct s_observer_result
 	real32 vertical_field_of_view;
 	real32 scale;
 };
-CHECK_STRUCT_SIZE(s_observer_result, 84);
+ASSERT_STRUCT_SIZE(s_observer_result, 84);
 
 union camera_displacement
 {
@@ -39,14 +39,14 @@ union camera_displacement
 	};
 	real32 n[13];
 };
-CHECK_STRUCT_SIZE(camera_displacement, 52);
+ASSERT_STRUCT_SIZE(camera_displacement, 52);
 
 struct s_observer_command_displacement
 {
 	real_point3d position;
 	real_vector3d orientation;
 };
-CHECK_STRUCT_SIZE(s_observer_command_displacement, 24);
+ASSERT_STRUCT_SIZE(s_observer_command_displacement, 24);
 
 struct s_observer_command
 {
@@ -67,7 +67,7 @@ struct s_observer_command
 	int16 field_92;
 	real32 observer_command_values[k_observer_command_values];
 };
-CHECK_STRUCT_SIZE(s_observer_command, 172);
+ASSERT_STRUCT_SIZE(s_observer_command, 172);
 
 struct s_observer
 {
@@ -93,7 +93,7 @@ struct s_observer
 	camera_displacement displacements;
 	int32 trailer_signature;
 };
-CHECK_STRUCT_SIZE(s_observer, 856);
+ASSERT_STRUCT_SIZE(s_observer, 856);
 
 s_observer* observer_get_from_user(int32 user_index);
 

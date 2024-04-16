@@ -14,4 +14,4 @@ struct s_scenario_interpolator
 	c_function_definition function;
 	short pad[2];
 };
-TAG_BLOCK_SIZE_ASSERT(s_scenario_interpolator, 24);
+ASSERT_STRUCT_SIZE(s_scenario_interpolator, 24);

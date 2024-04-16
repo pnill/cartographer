@@ -25,7 +25,7 @@ struct s_camera
 	float frustum_multiplier_x;
 	float frustum_multiplier_y;
 };
-CHECK_STRUCT_SIZE(s_camera, 0x74);
+ASSERT_STRUCT_SIZE(s_camera, 0x74);
 
 // Get global camera data
 s_camera* get_global_camera(void);

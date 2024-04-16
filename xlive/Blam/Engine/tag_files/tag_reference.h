@@ -6,4 +6,4 @@ struct tag_reference
 	tag_group group;
 	datum index;
 };
-CHECK_STRUCT_SIZE(tag_reference, 8);
+ASSERT_STRUCT_SIZE(tag_reference, 8);

@@ -35,4 +35,4 @@ struct hs_syntax_node
 	char value_02;
 	char value_03_msb;
 };
-TAG_BLOCK_SIZE_ASSERT(hs_syntax_node, 20);
+ASSERT_STRUCT_SIZE(hs_syntax_node, 20);

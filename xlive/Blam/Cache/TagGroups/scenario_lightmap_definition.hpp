@@ -44,14 +44,14 @@ struct s_scenario_structure_lightmap_group_definition
 			__int32 first_palette_color;//0x0
 			PAD(0x3FC);//0x4
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_section_palette_block, 0x400);
+		ASSERT_STRUCT_SIZE(s_section_palette_block, 0x400);
 		tag_block<s_section_palette_block> section_palette;//0x8
 		struct s_writable_palettes_block
 		{
 			__int32 first_palette_color;//0x0
 			PAD(0x3FC);//0x4
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_writable_palettes_block, 0x400);
+		ASSERT_STRUCT_SIZE(s_writable_palettes_block, 0x400);
 		tag_block<s_writable_palettes_block> writable_palettes;//0x10
 		tag_reference bitmap_group;//0x18
 		struct s_clusters_block
@@ -100,7 +100,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float secondary_texcoord_bounds_y_lower;//0x30
 				float secondary_texcoord_bounds_y_upper;//0x34
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
+			ASSERT_STRUCT_SIZE(s_NUM__block, 0x38);
 			tag_block<s_NUM__block> NUM_;//0x18
 			__int8 hardware_node_count;//0x20
 			__int8 node_map_size;//0x21
@@ -133,7 +133,7 @@ struct s_scenario_structure_lightmap_group_definition
 				__int32 resource_data_size;//0x8
 				__int32 resource_data_offset;//0xC
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_resources_block, 0x10);
+			ASSERT_STRUCT_SIZE(s_resources_block, 0x10);
 			tag_block<s_resources_block> resources;//0x38
 			PAD(0x4);//0x40
 			__int16 owner_tag_section_offset;//0x44
@@ -181,7 +181,7 @@ struct s_scenario_structure_lightmap_group_definition
 					float lod_mipmap_magic_number;//0x2C
 					PAD(0x18);//0x30
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_parts_block, 0x48);
+				ASSERT_STRUCT_SIZE(s_parts_block, 0x48);
 				tag_block<s_parts_block> parts;//0x0
 				struct s_subparts_block
 				{
@@ -190,7 +190,7 @@ struct s_scenario_structure_lightmap_group_definition
 					__int16 visibility_bounds_index;//0x4
 					__int16 part_index;//0x6
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_subparts_block, 0x8);
+				ASSERT_STRUCT_SIZE(s_subparts_block, 0x8);
 				tag_block<s_subparts_block> subparts;//0x8
 				struct s_visibility_bounds_block
 				{
@@ -201,7 +201,7 @@ struct s_scenario_structure_lightmap_group_definition
 					__int8 node_0;//0x10
 					PAD(0x3);//0x11
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_visibility_bounds_block, 0x14);
+				ASSERT_STRUCT_SIZE(s_visibility_bounds_block, 0x14);
 				tag_block<s_visibility_bounds_block> visibility_bounds;//0x10
 				struct s_raw_vertices_block
 				{
@@ -232,33 +232,33 @@ struct s_scenario_structure_lightmap_group_definition
 					float primary_lightmap_texcoord_y;//0x94
 					PAD(0x2C);//0x98
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_raw_vertices_block, 0xC4);
+				ASSERT_STRUCT_SIZE(s_raw_vertices_block, 0xC4);
 				tag_block<s_raw_vertices_block> raw_vertices;//0x18
 				struct s_strip_indices_block
 				{
 					__int16 index;//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
+				ASSERT_STRUCT_SIZE(s_strip_indices_block, 0x2);
 				tag_block<s_strip_indices_block> strip_indices;//0x20
 				data_reference visibility_mopp_code;//0x28
 				struct s_mopp_reorder_table_block
 				{
 					__int16 index;//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_mopp_reorder_table_block, 0x2);
+				ASSERT_STRUCT_SIZE(s_mopp_reorder_table_block, 0x2);
 				tag_block<s_mopp_reorder_table_block> mopp_reorder_table;//0x30
 				struct s_vertex_buffers_block
 				{
 					PAD(0x20);//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_vertex_buffers_block, 0x20);
+				ASSERT_STRUCT_SIZE(s_vertex_buffers_block, 0x20);
 				tag_block<s_vertex_buffers_block> vertex_buffers;//0x38
 				PAD(0x4);//0x40
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_cache_data_block, 0x44);
+			ASSERT_STRUCT_SIZE(s_cache_data_block, 0x44);
 			tag_block<s_cache_data_block> cache_data;//0x4C
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_clusters_block, 0x54);
+		ASSERT_STRUCT_SIZE(s_clusters_block, 0x54);
 		tag_block<s_clusters_block> clusters;//0x20
 		struct s_cluster_render_info_block
 		{
@@ -266,7 +266,7 @@ struct s_scenario_structure_lightmap_group_definition
 			__int8 palette_index;//0x2
 			PAD(0x1);//0x3
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_cluster_render_info_block, 0x4);
+		ASSERT_STRUCT_SIZE(s_cluster_render_info_block, 0x4);
 		tag_block<s_cluster_render_info_block> cluster_render_info;//0x28
 		struct s_poop_definitions_block
 		{
@@ -314,7 +314,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float secondary_texcoord_bounds_y_lower;//0x30
 				float secondary_texcoord_bounds_y_upper;//0x34
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_NUM__block, 0x38);
+			ASSERT_STRUCT_SIZE(s_NUM__block, 0x38);
 			tag_block<s_NUM__block> NUM_;//0x18
 			__int8 hardware_node_count;//0x20
 			__int8 node_map_size;//0x21
@@ -347,7 +347,7 @@ struct s_scenario_structure_lightmap_group_definition
 				__int32 resource_data_size;//0x8
 				__int32 resource_data_offset;//0xC
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_resources_block, 0x10);
+			ASSERT_STRUCT_SIZE(s_resources_block, 0x10);
 			tag_block<s_resources_block> resources;//0x38
 			PAD(0x4);//0x40
 			__int16 owner_tag_section_offset;//0x44
@@ -395,7 +395,7 @@ struct s_scenario_structure_lightmap_group_definition
 					float lod_mipmap_magic_number;//0x2C
 					PAD(0x18);//0x30
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_parts_block, 0x48);
+				ASSERT_STRUCT_SIZE(s_parts_block, 0x48);
 				tag_block<s_parts_block> parts;//0x0
 				struct s_subparts_block
 				{
@@ -404,7 +404,7 @@ struct s_scenario_structure_lightmap_group_definition
 					__int16 visibility_bounds_index;//0x4
 					__int16 part_index;//0x6
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_subparts_block, 0x8);
+				ASSERT_STRUCT_SIZE(s_subparts_block, 0x8);
 				tag_block<s_subparts_block> subparts;//0x8
 				struct s_visibility_bounds_block
 				{
@@ -415,7 +415,7 @@ struct s_scenario_structure_lightmap_group_definition
 					__int8 node_0;//0x10
 					PAD(0x3);//0x11
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_visibility_bounds_block, 0x14);
+				ASSERT_STRUCT_SIZE(s_visibility_bounds_block, 0x14);
 				tag_block<s_visibility_bounds_block> visibility_bounds;//0x10
 				struct s_raw_vertices_block
 				{
@@ -446,33 +446,33 @@ struct s_scenario_structure_lightmap_group_definition
 					float primary_lightmap_texcoord_y;//0x94
 					PAD(0x2C);//0x98
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_raw_vertices_block, 0xC4);
+				ASSERT_STRUCT_SIZE(s_raw_vertices_block, 0xC4);
 				tag_block<s_raw_vertices_block> raw_vertices;//0x18
 				struct s_strip_indices_block
 				{
 					__int16 index;//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_strip_indices_block, 0x2);
+				ASSERT_STRUCT_SIZE(s_strip_indices_block, 0x2);
 				tag_block<s_strip_indices_block> strip_indices;//0x20
 				data_reference visibility_mopp_code;//0x28
 				struct s_mopp_reorder_table_block
 				{
 					__int16 index;//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_mopp_reorder_table_block, 0x2);
+				ASSERT_STRUCT_SIZE(s_mopp_reorder_table_block, 0x2);
 				tag_block<s_mopp_reorder_table_block> mopp_reorder_table;//0x30
 				struct s_vertex_buffers_block
 				{
 					PAD(0x20);//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_vertex_buffers_block, 0x20);
+				ASSERT_STRUCT_SIZE(s_vertex_buffers_block, 0x20);
 				tag_block<s_vertex_buffers_block> vertex_buffers;//0x38
 				PAD(0x4);//0x40
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_cache_data_block, 0x44);
+			ASSERT_STRUCT_SIZE(s_cache_data_block, 0x44);
 			tag_block<s_cache_data_block> cache_data;//0x4C
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_poop_definitions_block, 0x54);
+		ASSERT_STRUCT_SIZE(s_poop_definitions_block, 0x54);
 		tag_block<s_poop_definitions_block> poop_definitions;//0x30
 		struct s_lighting_environments_block
 		{
@@ -535,7 +535,7 @@ struct s_scenario_structure_lightmap_group_definition
 			PAD(0x18);//0xC0
 			float procedural_param1w;//0xD8
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_lighting_environments_block, 0xDC);
+		ASSERT_STRUCT_SIZE(s_lighting_environments_block, 0xDC);
 		tag_block<s_lighting_environments_block> lighting_environments;//0x38
 		struct s_geometry_buckets_block
 		{
@@ -551,7 +551,7 @@ struct s_scenario_structure_lightmap_group_definition
 				real_rgb_color primary_lightmap_color;//0x0
 				PAD(0xC);//0xC
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_raw_vertices_block, 0x18);
+			ASSERT_STRUCT_SIZE(s_raw_vertices_block, 0x18);
 			tag_block<s_raw_vertices_block> raw_vertices;//0x4
 			__int32 block_offset;//0xC
 			__int32 block_size;//0x10
@@ -572,7 +572,7 @@ struct s_scenario_structure_lightmap_group_definition
 				__int32 resource_data_size;//0x8
 				__int32 resource_data_offset;//0xC
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_resources_block, 0x10);
+			ASSERT_STRUCT_SIZE(s_resources_block, 0x10);
 			tag_block<s_resources_block> resources;//0x1C
 			PAD(0x4);//0x24
 			__int16 owner_tag_section_offset;//0x28
@@ -583,13 +583,13 @@ struct s_scenario_structure_lightmap_group_definition
 				{
 					PAD(0x20);//0x0
 				};
-				TAG_BLOCK_SIZE_ASSERT(s_vertex_buffers_block, 0x20);
+				ASSERT_STRUCT_SIZE(s_vertex_buffers_block, 0x20);
 				tag_block<s_vertex_buffers_block> vertex_buffers;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_cache_data_block, 0x8);
+			ASSERT_STRUCT_SIZE(s_cache_data_block, 0x8);
 			tag_block<s_cache_data_block> cache_data;//0x30
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_geometry_buckets_block, 0x38);
+		ASSERT_STRUCT_SIZE(s_geometry_buckets_block, 0x38);
 		tag_block<s_geometry_buckets_block> geometry_buckets;//0x40
 		struct s_instance_render_info_block
 		{
@@ -597,7 +597,7 @@ struct s_scenario_structure_lightmap_group_definition
 			__int8 palette_index;//0x2
 			PAD(0x1);//0x3
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_instance_render_info_block, 0x4);
+		ASSERT_STRUCT_SIZE(s_instance_render_info_block, 0x4);
 		tag_block<s_instance_render_info_block> instance_render_info;//0x48
 		struct s_instance_bucket_refs_block
 		{
@@ -607,10 +607,10 @@ struct s_scenario_structure_lightmap_group_definition
 			{
 				__int16 section_offset;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_section_offsets_block, 0x2);
+			ASSERT_STRUCT_SIZE(s_section_offsets_block, 0x2);
 			tag_block<s_section_offsets_block> section_offsets;//0x4
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_instance_bucket_refs_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_instance_bucket_refs_block, 0xC);
 		tag_block<s_instance_bucket_refs_block> instance_bucket_refs;//0x50
 		struct s_scenery_object_info_block
 		{
@@ -620,7 +620,7 @@ struct s_scenario_structure_lightmap_group_definition
 			__int8 source;//0x7
 			__int32 render_model_checksum;//0x8
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_scenery_object_info_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_scenery_object_info_block, 0xC);
 		tag_block<s_scenery_object_info_block> scenery_object_info;//0x58
 		struct s_scenery_object_bucket_refs_block
 		{
@@ -630,13 +630,13 @@ struct s_scenario_structure_lightmap_group_definition
 			{
 				__int16 section_offset;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_section_offsets_block, 0x2);
+			ASSERT_STRUCT_SIZE(s_section_offsets_block, 0x2);
 			tag_block<s_section_offsets_block> section_offsets;//0x4
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_scenery_object_bucket_refs_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_scenery_object_bucket_refs_block, 0xC);
 		tag_block<s_scenery_object_bucket_refs_block> scenery_object_bucket_refs;//0x60
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_lightmap_groups_block, 0x68);
+	ASSERT_STRUCT_SIZE(s_lightmap_groups_block, 0x68);
 	tag_block<s_lightmap_groups_block> lightmap_groups;//0x80
 	PAD(0xC);//0x88
 	struct s_errors_block
@@ -698,7 +698,7 @@ struct s_scenario_structure_lightmap_group_definition
 				real_argb_color color;//0x20
 				float screen_size;//0x30
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x34);
+			ASSERT_STRUCT_SIZE(s_vertices_block, 0x34);
 			tag_block<s_vertices_block> vertices;//0x30
 			struct s_vectors_block
 			{
@@ -717,7 +717,7 @@ struct s_scenario_structure_lightmap_group_definition
 				PAD(0xC);//0x30
 				float screen_length;//0x3C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_vectors_block, 0x40);
+			ASSERT_STRUCT_SIZE(s_vectors_block, 0x40);
 			tag_block<s_vectors_block> vectors;//0x38
 			struct s_lines_block
 			{
@@ -740,7 +740,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float node_weight_2_C;//0x48
 				float node_weight_3_C;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_lines_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_lines_block, 0x50);
 			tag_block<s_lines_block> lines;//0x40
 			struct s_triangles_block
 			{
@@ -764,7 +764,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float node_weight_2;//0x68
 				float node_weight_3;//0x6C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_triangles_block, 0x70);
+			ASSERT_STRUCT_SIZE(s_triangles_block, 0x70);
 			tag_block<s_triangles_block> triangles;//0x48
 			struct s_quads_block
 			{
@@ -789,7 +789,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float node_weight_2;//0x88
 				float node_weight_3;//0x8C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_quads_block, 0x90);
+			ASSERT_STRUCT_SIZE(s_quads_block, 0x90);
 			tag_block<s_quads_block> quads;//0x50
 			struct s_comments_block
 			{
@@ -807,7 +807,7 @@ struct s_scenario_structure_lightmap_group_definition
 				float node_weight_3;//0x24
 				real_argb_color color;//0x28
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x38);
+			ASSERT_STRUCT_SIZE(s_comments_block, 0x38);
 			tag_block<s_comments_block> comments;//0x58
 			PAD(0x17C);//0x60
 			__int32 report_key;//0x1DC
@@ -821,11 +821,11 @@ struct s_scenario_structure_lightmap_group_definition
 			real_argb_color color;//0x1FC
 			PAD(0x54);//0x20C
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_reports_block, 0x260);
+		ASSERT_STRUCT_SIZE(s_reports_block, 0x260);
 		tag_block<s_reports_block> reports;//0x29C
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_errors_block, 0x2A4);
+	ASSERT_STRUCT_SIZE(s_errors_block, 0x2A4);
 	tag_block<s_errors_block> errors;//0x94
 	PAD(0x68);//0x9C
 };
-TAG_GROUP_SIZE_ASSERT(s_scenario_structure_lightmap_group_definition, 0x104);
+ASSERT_STRUCT_SIZE(s_scenario_structure_lightmap_group_definition, 0x104);

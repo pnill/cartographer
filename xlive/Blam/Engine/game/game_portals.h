@@ -12,7 +12,7 @@ struct s_structure_portal_device_machine_association
 	uint16 first_portal_index;
 	uint16 game_portal_count;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_portal_device_machine_association, 12);
+ASSERT_STRUCT_SIZE(s_structure_portal_device_machine_association, 12);
 
 // max: 1
 struct s_structure_portal_device_map
@@ -22,4 +22,4 @@ struct s_structure_portal_device_map
 	// max: k_maximum_machine_door_portal_associations
 	tag_block<int16> game_portal_to_portal_map;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_portal_device_map, 16);
+ASSERT_STRUCT_SIZE(s_structure_portal_device_map, 16);

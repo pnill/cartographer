@@ -23,6 +23,6 @@ struct c_particle_location
 		const real_matrix4x3* matrix
 	);
 };
-CHECK_STRUCT_SIZE(c_particle_location, 0x34);
+ASSERT_STRUCT_SIZE(c_particle_location, 0x34);
 
 s_data_array* get_particle_location_table();

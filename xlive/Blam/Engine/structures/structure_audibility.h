@@ -33,7 +33,7 @@ struct structure_background_sound_palette_entry
     float interpolation_speed;          // 1 sec
     int pad1[2];
 };
-TAG_BLOCK_SIZE_ASSERT(structure_background_sound_palette_entry, 100);
+ASSERT_STRUCT_SIZE(structure_background_sound_palette_entry, 100);
 
 // max count: k_maximum_cluster_sound_palette_entries_per_structure 64
 struct structure_sound_environment_palette_entry
@@ -44,7 +44,7 @@ struct structure_sound_environment_palette_entry
     float interpolation_speed;          // 1 sec
     int pad[6];
 };
-TAG_BLOCK_SIZE_ASSERT(structure_sound_environment_palette_entry, 72);
+ASSERT_STRUCT_SIZE(structure_sound_environment_palette_entry, 72);
 
 
 struct s_structure_audibility
@@ -71,4 +71,4 @@ struct s_structure_audibility
     // max: k_maximum_machine_door_portal_associations
     tag_block<int8> machine_door_mapping;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_audibility, 52);
+ASSERT_STRUCT_SIZE(s_structure_audibility, 52);

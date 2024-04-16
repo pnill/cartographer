@@ -51,7 +51,7 @@ struct s_first_person_weapon_data
 	int16 field_1004;
 	int16 pad;
 };
-CHECK_STRUCT_SIZE(s_first_person_weapon_data, 4112);
+ASSERT_STRUCT_SIZE(s_first_person_weapon_data, 4112);
 
 struct s_first_person_weapon
 {
@@ -71,15 +71,15 @@ struct s_first_person_weapon
 	int32 adjustment_matrix_index;
 	real_matrix4x3 adjustment_matrix;
 };
-CHECK_STRUCT_SIZE(s_first_person_weapon, 8396);
-CHECK_STRUCT_OFFSET(s_first_person_weapon, identity_matrix, 8288);
+ASSERT_STRUCT_SIZE(s_first_person_weapon, 8396);
+ASSERT_STRUCT_OFFSET(s_first_person_weapon, identity_matrix, 8288);
 
 struct s_first_person_orientations
 {
 	real_orientation weapon_orientations[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 	real_orientation hand_orientations[MAXIMUM_NODES_PER_FIRST_PERSON_MODEL];
 };
-CHECK_STRUCT_SIZE(s_first_person_orientations, 4096);
+ASSERT_STRUCT_SIZE(s_first_person_orientations, 4096);
 
 s_first_person_weapon* first_person_weapon_get_global(void);
 s_first_person_weapon* first_person_weapons_get(uint32 user_index);

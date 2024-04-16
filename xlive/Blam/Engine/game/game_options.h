@@ -39,7 +39,7 @@ struct game_player_options
 	s_player_properties properties;
 	s_persistent_campaign_player player_type[2]; // index 0 is masterchief, index 1 is dervish
 };
-CHECK_STRUCT_SIZE(game_player_options, 212);
+ASSERT_STRUCT_SIZE(game_player_options, 212);
 
 #pragma pack(push,1)
 struct s_game_options
@@ -81,7 +81,7 @@ struct s_game_options
 	char pad_444[3];
 	game_player_options players[16]; 
 };
-CHECK_STRUCT_SIZE(s_game_options, 4488);
+ASSERT_STRUCT_SIZE(s_game_options, 4488);
 #pragma pack(pop)
 
 // Initializes game options

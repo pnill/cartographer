@@ -117,4 +117,4 @@ struct s_particle_state
 		m_system.flags.or(flags);
 	}
 };
-CHECK_STRUCT_SIZE(s_particle_state, 84);
+ASSERT_STRUCT_SIZE(s_particle_state, 84);

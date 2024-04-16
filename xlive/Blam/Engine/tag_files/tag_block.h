@@ -53,4 +53,4 @@ struct tag_block
 		return NULL;
 	}
 };
-CHECK_STRUCT_SIZE(tag_block<>, 8);
+ASSERT_STRUCT_SIZE(tag_block<>, 8);

@@ -71,7 +71,7 @@ struct s_unit_camera_track
 {
     tag_reference track;
 };
-TAG_BLOCK_SIZE_ASSERT(s_unit_camera_track, 8);
+ASSERT_STRUCT_SIZE(s_unit_camera_track, 8);
 
 struct s_unit_camera
 {
@@ -81,7 +81,7 @@ struct s_unit_camera
     real_bounds pitch_range;
     tag_block<s_unit_camera_track> camera_tracks;
 };
-CHECK_STRUCT_SIZE(s_unit_camera, 28);
+ASSERT_STRUCT_SIZE(s_unit_camera, 28);
 
 struct unit_seat_acceleration
 {
@@ -89,13 +89,13 @@ struct unit_seat_acceleration
     real32 acceleration_action_scale;       // Actions Fail
     real32 acceleration_attach_scale;       // Actions Fail
 };
-CHECK_STRUCT_SIZE(unit_seat_acceleration, 20);
+ASSERT_STRUCT_SIZE(unit_seat_acceleration, 20);
 
 struct s_unit_additional_node_names
 {
     string_id preferredgunnode;    // if found, use this gun marker
 };
-CHECK_STRUCT_SIZE(s_unit_additional_node_names, 4);
+ASSERT_STRUCT_SIZE(s_unit_additional_node_names, 4);
 
 struct unit_boarding_melee_struct_block
 {
@@ -105,14 +105,14 @@ struct unit_boarding_melee_struct_block
     tag_reference flurry_melee_damage;      // jpt!
     tag_reference obstacle_smash_damage;    // jpt!
 };
-CHECK_STRUCT_SIZE(unit_boarding_melee_struct_block, 40);
+ASSERT_STRUCT_SIZE(unit_boarding_melee_struct_block, 40);
 
 // max count: NUMBER_OF_UNIT_HUD_TYPES 2
 struct unit_hud_reference
 {
     tag_reference new_unit_hud_interface;   // nhdt
 };
-TAG_BLOCK_SIZE_ASSERT(unit_hud_reference, 8);
+ASSERT_STRUCT_SIZE(unit_hud_reference, 8);
 
 // max count: k_powered_seats_count 2
 struct powered_seat_definition
@@ -120,14 +120,14 @@ struct powered_seat_definition
     real32 driver_powerup_time_seconds;
     real32 driver_powerdown_time_seconds;
 };
-TAG_BLOCK_SIZE_ASSERT(powered_seat_definition, 8);
+ASSERT_STRUCT_SIZE(powered_seat_definition, 8);
 
 // max count: MAXIMUM_INITIAL_WEAPONS_PER_UNIT 4
 struct unit_initial_weapon
 {
     tag_reference weapon;   // weap
 };
-TAG_BLOCK_SIZE_ASSERT(unit_initial_weapon, 8);
+ASSERT_STRUCT_SIZE(unit_initial_weapon, 8);
 
 // max count: MAXIMUM_SEATS_PER_UNIT_DEFINITION 32
 struct unit_seat
@@ -177,7 +177,7 @@ struct unit_seat
     string_id invisible_seat_region;
     real32 runtime_invisible_seat_region_index;
 };
-TAG_BLOCK_SIZE_ASSERT(unit_seat, 176);
+ASSERT_STRUCT_SIZE(unit_seat, 176);
 
 struct unit_boost_struct_block
 {
@@ -187,14 +187,14 @@ struct unit_boost_struct_block
     real32 boost_fall_power;
     real32 dead_time;
 };
-CHECK_STRUCT_SIZE(unit_boost_struct_block, 20);
+ASSERT_STRUCT_SIZE(unit_boost_struct_block, 20);
 
 struct s_unit_lipsync_scales
 {
     real32 attack_weight;
     real32 decay_weight;
 };
-CHECK_STRUCT_SIZE(s_unit_lipsync_scales, 8);
+ASSERT_STRUCT_SIZE(s_unit_lipsync_scales, 8);
 
 struct _unit_definition
 {
@@ -260,4 +260,4 @@ struct _unit_definition
     // Explaination("Lipsync", "")
     s_unit_lipsync_scales lipsync;
 };
-TAG_GROUP_SIZE_ASSERT(_unit_definition, 492);
+ASSERT_STRUCT_SIZE(_unit_definition, 492);

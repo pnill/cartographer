@@ -72,7 +72,7 @@ struct effect_datum
     int32 field_10C;
     s_effect_struct field_110[16];
 };
-CHECK_STRUCT_SIZE(effect_datum, 400);
+ASSERT_STRUCT_SIZE(effect_datum, 400);
 
 struct effect_location_datum
 {
@@ -82,7 +82,7 @@ struct effect_location_datum
     real_matrix4x3 matrix;
 };
 
-CHECK_STRUCT_SIZE(effect_location_datum, 60);
+ASSERT_STRUCT_SIZE(effect_location_datum, 60);
 
 datum __cdecl effect_new_from_object(
     datum effect_tag_index,

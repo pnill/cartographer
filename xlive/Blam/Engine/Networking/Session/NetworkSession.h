@@ -111,7 +111,7 @@ struct s_session_observer_channel
 	int vote_update_number;
 	int field_18;
 };
-CHECK_STRUCT_SIZE(s_session_observer_channel, 28);
+ASSERT_STRUCT_SIZE(s_session_observer_channel, 28);
 
 struct s_session_virtual_couch
 {
@@ -122,7 +122,7 @@ struct s_session_virtual_couch
 	DWORD xuid_count;
 	unsigned long long player_ids[k_maximum_players];
 };
-CHECK_STRUCT_SIZE(s_session_virtual_couch, 200);
+ASSERT_STRUCT_SIZE(s_session_virtual_couch, 200);
 
 struct s_session_parameters
 {
@@ -165,13 +165,13 @@ struct s_session_parameters
 	DWORD field_5F08;
 	DWORD field_5F0C;
 };
-CHECK_STRUCT_SIZE(s_session_parameters, 4784);
+ASSERT_STRUCT_SIZE(s_session_parameters, 4784);
 
 struct s_session_vote
 {
 	char gap_0[160];
 };
-CHECK_STRUCT_SIZE(s_session_vote, 160);
+ASSERT_STRUCT_SIZE(s_session_vote, 160);
 
 struct s_membership_peer
 {
@@ -196,7 +196,7 @@ struct s_membership_peer
 	DWORD update_number;
 	int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
 };
-CHECK_STRUCT_SIZE(s_membership_peer, 268);
+ASSERT_STRUCT_SIZE(s_membership_peer, 268);
 
 struct s_membership_player
 {
@@ -211,8 +211,8 @@ struct s_membership_player
 	unsigned int player_voice;
 	unsigned int player_text_chat;
 };
-CHECK_STRUCT_OFFSET(s_membership_player, controller_index, 20);
-CHECK_STRUCT_SIZE(s_membership_player, 296);
+ASSERT_STRUCT_OFFSET(s_membership_player, controller_index, 20);
+ASSERT_STRUCT_SIZE(s_membership_player, 296);
 
 struct s_session_membership
 {
@@ -227,14 +227,14 @@ struct s_session_membership
 	s_membership_player players[k_maximum_players]; // 0x125C
 	DWORD unk;
 };
-CHECK_STRUCT_SIZE(s_session_membership, 9328);
+ASSERT_STRUCT_SIZE(s_session_membership, 9328);
 
 struct s_player_identifier
 {
 	DWORD unk1;
 	DWORD unk2;
 };
-CHECK_STRUCT_SIZE(s_player_identifier, 8);
+ASSERT_STRUCT_SIZE(s_player_identifier, 8);
 
 struct s_session_interface_user
 {
@@ -249,7 +249,7 @@ struct s_session_interface_user
 	BYTE gap_A4[16];
 	char field_b4[4];
 };
-CHECK_STRUCT_SIZE(s_session_interface_user, 0xB8);
+ASSERT_STRUCT_SIZE(s_session_interface_user, 0xB8);
 
 struct s_session_interface_globals
 {
@@ -276,7 +276,7 @@ struct s_session_interface_globals
 	
 	static s_session_interface_globals* get();
 };
-CHECK_STRUCT_SIZE(s_session_interface_globals, 0x638);
+ASSERT_STRUCT_SIZE(s_session_interface_globals, 0x638);
 
 struct s_network_session
 {
@@ -376,9 +376,9 @@ struct s_network_session
 		return this->network_protocol > 2 ? network_protocols_str[3] : network_protocols_str[this->network_protocol];
 	}
 };
-CHECK_STRUCT_SIZE(s_network_session, 31624);
-CHECK_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
-CHECK_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
+ASSERT_STRUCT_SIZE(s_network_session, 31624);
+ASSERT_STRUCT_OFFSET(s_network_session, membership[0], 0x70);
+ASSERT_STRUCT_OFFSET(s_network_session, parameters[0], 0x4C60);
 #pragma pack(pop)
 
 bool network_session_interface_set_local_user_character_type(int user_index, e_character_type character_type);

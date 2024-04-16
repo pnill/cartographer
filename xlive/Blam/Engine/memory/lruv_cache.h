@@ -10,7 +10,7 @@ struct s_lruv_cache_block
 	int32 next_block_index;
 	int32 previous_block_index;
 };
-CHECK_STRUCT_SIZE(s_lruv_cache_block, 20);
+ASSERT_STRUCT_SIZE(s_lruv_cache_block, 20);
 
 struct s_lruv_cache
 {
@@ -29,4 +29,4 @@ struct s_lruv_cache
 	int8 signature[4];
 	void* allocate_proc;
 };
-CHECK_STRUCT_SIZE(s_lruv_cache, 112);
+ASSERT_STRUCT_SIZE(s_lruv_cache, 112);

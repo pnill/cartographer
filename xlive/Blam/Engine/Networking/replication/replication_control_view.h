@@ -36,7 +36,7 @@ struct s_replication_allocation_block
 	e_network_memory_block block_type;
 	void* block_data;
 };
-CHECK_STRUCT_SIZE(s_replication_allocation_block, 8);
+ASSERT_STRUCT_SIZE(s_replication_allocation_block, 8);
 
 struct s_replication_control_request
 {
@@ -61,4 +61,4 @@ class c_replication_control_view
 	int32 field_71C;
 	s_player_prediction player_prediction[k_maximum_players];
 };
-CHECK_STRUCT_SIZE(c_replication_control_view, 0xB20);
+ASSERT_STRUCT_SIZE(c_replication_control_view, 0xB20);

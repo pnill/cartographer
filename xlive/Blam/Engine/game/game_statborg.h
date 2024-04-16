@@ -27,14 +27,14 @@ struct s_statborg_player_data
 	int16 field_1C;
 	int16 field_1E;
 };
-CHECK_STRUCT_SIZE(s_statborg_player_data, 32);
+ASSERT_STRUCT_SIZE(s_statborg_player_data, 32);
 
 // TODO Confirm size on this struct
 struct s_statborg_team_data
 {
 	int16 statistic[k_statborg_entry_total_stat_count];
 };
-CHECK_STRUCT_SIZE(s_statborg_team_data, 18);
+ASSERT_STRUCT_SIZE(s_statborg_team_data, 18);
 
 // TODO reimplement the rest of the member functions for this class
 // TODO Confirm size on this struct
@@ -52,7 +52,7 @@ public:
 	int16 get_team_stat(int32 team_index, e_statborg_entry statistic);
 
 };
-CHECK_STRUCT_SIZE(c_game_statborg, 660);
+ASSERT_STRUCT_SIZE(c_game_statborg, 660);
 
 c_game_statborg* __cdecl game_engine_get_statborg();
 

@@ -33,7 +33,7 @@ struct c_simulation_player
 	player_action m_actions;
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(c_simulation_player, 0x88);
+ASSERT_STRUCT_SIZE(c_simulation_player, 0x88);
 
 struct simulation_player_update
 {
@@ -49,6 +49,6 @@ struct simulation_player_update
 	int32 swap_player_index;
 	s_player_identifier swap_player_identifier;
 };
-CHECK_STRUCT_SIZE(simulation_player_update, 0xB4);
+ASSERT_STRUCT_SIZE(simulation_player_update, 0xB4);
 
 bool __cdecl simulation_players_apply_update(simulation_player_update* player_update);

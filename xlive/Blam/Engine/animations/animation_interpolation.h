@@ -34,4 +34,4 @@ public:
 	void set_interpolation_type(e_interpolation_type interpolation_type);
 	void set_status(bool a2, real32 duration);
 };
-CHECK_STRUCT_SIZE(c_interpolator_control, 4);
+ASSERT_STRUCT_SIZE(c_interpolator_control, 4);

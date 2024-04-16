@@ -23,7 +23,7 @@ struct flock_source
     float radius;
     float weight;    // probability of producing at this source
 };
-TAG_BLOCK_SIZE_ASSERT(flock_source, 28);
+ASSERT_STRUCT_SIZE(flock_source, 28);
 
 // max count: k_max_sinks_per_flock 10
 struct flock_sink
@@ -31,7 +31,7 @@ struct flock_sink
     real_vector3d position;
     float radius;
 };
-TAG_BLOCK_SIZE_ASSERT(flock_sink, 16);
+ASSERT_STRUCT_SIZE(flock_sink, 16);
 
 // max count: k_max_flock_definitions_per_map 20
 struct flock_definition
@@ -93,4 +93,4 @@ struct flock_definition
     real_vector2d random_offset_period_seconds;
     string_id flock_name;
 };
-TAG_BLOCK_SIZE_ASSERT(flock_definition, 132);
+ASSERT_STRUCT_SIZE(flock_definition, 132);

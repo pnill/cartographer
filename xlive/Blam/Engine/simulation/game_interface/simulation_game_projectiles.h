@@ -10,4 +10,4 @@ struct s_simulation_projectile_creation_data
 	bool disable_deceleration;
 	int16 pad1;
 };
-CHECK_STRUCT_SIZE(s_simulation_projectile_creation_data, 32);
+ASSERT_STRUCT_SIZE(s_simulation_projectile_creation_data, 32);

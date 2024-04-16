@@ -20,4 +20,4 @@ struct predicted_resource
     int16 resource_index;
     int32 tag_index;
 };
-TAG_GROUP_SIZE_ASSERT(predicted_resource, 8);
+ASSERT_STRUCT_SIZE(predicted_resource, 8);

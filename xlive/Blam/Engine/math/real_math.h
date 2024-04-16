@@ -10,7 +10,7 @@ union real_point2d
 	real32 v[2];
 	struct { real32 x, y; };
 };
-CHECK_STRUCT_SIZE(real_point2d, sizeof(real32) * 2);
+ASSERT_STRUCT_SIZE(real_point2d, sizeof(real32) * 2);
 
 typedef real32 real_angle;
 
@@ -19,28 +19,28 @@ union real_euler_angles2d
 	real32 v[2];
 	struct { real_angle yaw, pitch; };
 };
-CHECK_STRUCT_SIZE(real_euler_angles2d, sizeof(real_angle) * 2);
+ASSERT_STRUCT_SIZE(real_euler_angles2d, sizeof(real_angle) * 2);
 
 union real_euler_angles3d
 {
 	real32 v[3];
 	struct { real_angle yaw, pitch, roll; };
 };
-CHECK_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
+ASSERT_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 
 union real_vector4d
 {
 	real32 v[4];
 	struct { real32 i, j, k, l; };
 };
-CHECK_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
+ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
 union real_vector2d
 {
 	real32 v[2];
 	struct { real32 i, j; };
 };
-CHECK_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
+ASSERT_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
 
 union real_vector3d
 {
@@ -49,7 +49,7 @@ union real_vector3d
 	struct { real32 i, j, k; };
 	struct { real32 x, y, z; };
 };
-CHECK_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
+ASSERT_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
 
 typedef real_vector3d real_point3d;
 
@@ -58,14 +58,14 @@ struct real_plane2d
 	real_vector2d normal;
 	real32 distance;
 };
-CHECK_STRUCT_SIZE(real_plane2d, sizeof(real_vector2d) + 4);
+ASSERT_STRUCT_SIZE(real_plane2d, sizeof(real_vector2d) + 4);
 
 struct real_plane3d
 {
 	real_vector3d normal;
 	real32 distance;
 };
-CHECK_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(real32));
+ASSERT_STRUCT_SIZE(real_plane3d, sizeof(real_vector3d) + sizeof(real32));
 
 union real_quaternion
 {
@@ -73,28 +73,28 @@ union real_quaternion
 	struct { real_vector3d vector; };
 	struct { real32 n[4]; } v;
 };
-CHECK_STRUCT_SIZE(real_quaternion, sizeof(real32) * 4);
+ASSERT_STRUCT_SIZE(real_quaternion, sizeof(real32) * 4);
 
 union real_bounds
 {
 	real32 v[2];
 	struct { real32 lower, upper; };
 };
-CHECK_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
+ASSERT_STRUCT_SIZE(real_bounds, sizeof(real32) * 2);
 
 union real_rectangle2d
 {
 	real32 v[4];
 	struct { real32 x0, x1, y0, y1; };
 };
-CHECK_STRUCT_SIZE(real_rectangle2d, sizeof(real32) * 4);
+ASSERT_STRUCT_SIZE(real_rectangle2d, sizeof(real32) * 4);
 
 union real_rectangle3d
 {
 	real32 v[6];
 	struct { real32 x0, x1, y0, y1, z0, z1; };
 };
-CHECK_STRUCT_SIZE(real_rectangle3d, sizeof(real32) * 6);
+ASSERT_STRUCT_SIZE(real_rectangle3d, sizeof(real32) * 6);
 
 class c_quantized_orientation
 {
@@ -106,7 +106,7 @@ public:
 	real_point3d default_translation;
 	real32 default_scale;
 };
-CHECK_STRUCT_SIZE(c_quantized_orientation, 24);
+ASSERT_STRUCT_SIZE(c_quantized_orientation, 24);
 
 struct real_orientation
 {
@@ -114,7 +114,7 @@ struct real_orientation
 	real_point3d position;
 	real32 scale;
 };
-CHECK_STRUCT_SIZE(real_orientation, 32);
+ASSERT_STRUCT_SIZE(real_orientation, 32);
 
 const real_vector2d global_forward2d = { 1.0f, 0.0f };
 const real_vector3d global_forward3d = { 1.0f, 0.0f, 0.0f };

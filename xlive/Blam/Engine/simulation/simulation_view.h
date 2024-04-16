@@ -80,7 +80,7 @@ struct c_simulation_view
 	signed int field_B0;
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(c_simulation_view, 0xB4);
+ASSERT_STRUCT_SIZE(c_simulation_view, 0xB4);
 
 class c_simulation_distributed_view
 {
@@ -96,4 +96,4 @@ class c_simulation_distributed_view
 	void* m_simulation_view_telemetry_provider_vftable;
 	int8 m_simulation_view_telemetry_provider[19616];
 };
-CHECK_STRUCT_SIZE(c_simulation_distributed_view, 44124);
+ASSERT_STRUCT_SIZE(c_simulation_distributed_view, 44124);

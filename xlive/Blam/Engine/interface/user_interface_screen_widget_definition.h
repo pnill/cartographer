@@ -424,7 +424,7 @@ struct s_button_widget_reference
     
     e_button_flags button_flags;
 };
-TAG_BLOCK_SIZE_ASSERT(s_button_widget_reference, 0x3C);
+ASSERT_STRUCT_SIZE(s_button_widget_reference, 0x3C);
 
 enum e_list_reference_flags : int
 {
@@ -500,7 +500,7 @@ struct s_text_value_pair_reference_UNUSED
     The string comes from the screen's string list tag.")*/
     string_id text_label_stringid;
 };
-TAG_BLOCK_SIZE_ASSERT(s_text_value_pair_reference_UNUSED, 20);
+ASSERT_STRUCT_SIZE(s_text_value_pair_reference_UNUSED, 20);
 
 #define k_max_list_reference_block_count 1
 struct s_list_reference
@@ -516,7 +516,7 @@ struct s_list_reference
     // Explaination("UNUSED", "This is unused")
     tag_block<s_text_value_pair_reference_UNUSED> uNUSED;
 };
-TAG_BLOCK_SIZE_ASSERT(s_list_reference, 24);
+ASSERT_STRUCT_SIZE(s_list_reference, 24);
 
 enum e_table_view_list_reference_flags : int
 {
@@ -537,7 +537,7 @@ struct table_view_list_item_reference_block
     short renderDepthBias;
     short pad2;
 };
-TAG_BLOCK_SIZE_ASSERT(table_view_list_item_reference_block, 0x1C);
+ASSERT_STRUCT_SIZE(table_view_list_item_reference_block, 0x1C);
 
 enum e_table_view_list_row_reference_flags : int
 {
@@ -552,7 +552,7 @@ struct s_table_view_list_row_reference_OBSOLETE
     short pad;
     tag_block<table_view_list_item_reference_block> rowCells;
 };
-TAG_BLOCK_SIZE_ASSERT(s_table_view_list_row_reference_OBSOLETE, 16);
+ASSERT_STRUCT_SIZE(s_table_view_list_row_reference_OBSOLETE, 16);
 
 #define k_maximum_number_of_table_view_list_blocks 1
 struct s_table_view_list_reference_OBSOLETE
@@ -567,7 +567,7 @@ struct s_table_view_list_reference_OBSOLETE
     point2d topleft;
     tag_block<s_table_view_list_row_reference_OBSOLETE> table_rows;
 };
-TAG_BLOCK_SIZE_ASSERT(s_table_view_list_reference_OBSOLETE, 40);
+ASSERT_STRUCT_SIZE(s_table_view_list_reference_OBSOLETE, 40);
 
 #define k_maximum_number_of_text_blocks 64
 struct s_text_block_reference
@@ -584,7 +584,7 @@ struct s_text_block_reference
     short render_depth_bias;
     short pad1;
 };
-TAG_BLOCK_SIZE_ASSERT(s_text_block_reference, 44);
+ASSERT_STRUCT_SIZE(s_text_block_reference, 44);
 
 enum e_bitmap_block_reference_flags : int
 {
@@ -621,7 +621,7 @@ struct s_bitmap_block_reference
     string_id string_identifier;
     real_vector2d progress_scale;
 };
-TAG_BLOCK_SIZE_ASSERT(s_bitmap_block_reference, 56);
+ASSERT_STRUCT_SIZE(s_bitmap_block_reference, 56);
 
 enum e_ui_model_scene_reference_flags : int
 {
@@ -633,14 +633,14 @@ struct s_ui_light_reference
 {
     static_string32 name;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ui_light_reference, 32);
+ASSERT_STRUCT_SIZE(s_ui_light_reference, 32);
 
 #define k_maximum_objects_per_ui_scene 32
 struct s_ui_object_reference
 {
     static_string32 name;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ui_object_reference, 32);
+ASSERT_STRUCT_SIZE(s_ui_object_reference, 32);
 
 #define k_maximum_object_scenes_per_screen 32
 struct s_ui_model_scene_reference
@@ -670,7 +670,7 @@ struct s_ui_model_scene_reference
     string_id unused_outro_anim;
     string_id unused_ambient_anim;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ui_model_scene_reference, 76);
+ASSERT_STRUCT_SIZE(s_ui_model_scene_reference, 76);
 
 #define k_maximum_text_value_pairs_per_block 100
 struct s_text_value_pair_block_UNUSED
@@ -679,7 +679,7 @@ struct s_text_value_pair_block_UNUSED
     static_string32 name;
     tag_block<s_text_value_pair_reference_UNUSED> text_value_pairs;
 };
-TAG_BLOCK_SIZE_ASSERT(s_text_value_pair_block_UNUSED, 40);
+ASSERT_STRUCT_SIZE(s_text_value_pair_block_UNUSED, 40);
 
 enum e_hud_block_reference_flags : int
 {
@@ -704,7 +704,7 @@ struct s_hud_block_reference
 
     rectangle2d bounds;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hud_block_reference, 36);
+ASSERT_STRUCT_SIZE(s_hud_block_reference, 36);
 
 enum class e_table_order : char
 {
@@ -727,7 +727,7 @@ struct s_player_block_reference
     short row_height;
     short column_width;
 }; 
-TAG_BLOCK_SIZE_ASSERT(s_player_block_reference, 24);
+ASSERT_STRUCT_SIZE(s_player_block_reference, 24);
 
 #define k_maximum_number_of_window_pane_tag_blocks 16
 struct s_window_pane_reference
@@ -758,7 +758,7 @@ struct s_window_pane_reference
 
     tag_block<s_player_block_reference> player_blocks;
 };
-TAG_BLOCK_SIZE_ASSERT(s_window_pane_reference, 0x4C);
+ASSERT_STRUCT_SIZE(s_window_pane_reference, 0x4C);
 
 // ### TODO Finish this
 struct s_user_interface_screen_widget_definition

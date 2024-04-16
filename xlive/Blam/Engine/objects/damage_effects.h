@@ -101,7 +101,7 @@ struct s_damage_effect_player_response_definition
 	// Explaination("sound effect", "EMPTY STRING")
 	s_damage_effect_sound_effect_definition sound_effect;
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_effect_player_response_definition, 76);
+ASSERT_STRUCT_SIZE(s_damage_effect_player_response_definition, 76);
 
 struct s_damage_effect_definition
 {
@@ -171,4 +171,4 @@ struct s_damage_effect_definition
 	real32 outward_radius;		// World Units
 	real32 outward_exponent;
 };
-TAG_GROUP_SIZE_ASSERT(s_damage_effect_definition, 200);
+ASSERT_STRUCT_SIZE(s_damage_effect_definition, 200);

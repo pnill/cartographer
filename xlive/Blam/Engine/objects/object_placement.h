@@ -71,4 +71,4 @@ struct object_placement_data
 	WORD unk_23;
 	s_location location;
 };
-CHECK_STRUCT_SIZE(object_placement_data, 0xC4);
+ASSERT_STRUCT_SIZE(object_placement_data, 0xC4);

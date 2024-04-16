@@ -9,4 +9,4 @@ struct flight_hint_reference
     short flight_hint_index;
     short point_index;
 };
-TAG_BLOCK_SIZE_ASSERT(flight_hint_reference, 4);
+ASSERT_STRUCT_SIZE(flight_hint_reference, 4);

@@ -7,7 +7,7 @@ union real_matrix3x3
 	struct { real32 n[9]; } v;						// Array of values
 	real32 matrix[3][3];							// Matrix of values
 };
-CHECK_STRUCT_SIZE(real_matrix3x3, 36);
+ASSERT_STRUCT_SIZE(real_matrix3x3, 36);
 
 struct real_matrix4x3
 {
@@ -15,7 +15,7 @@ struct real_matrix4x3
 	real_matrix3x3 vectors;
 	real_point3d position;
 };
-CHECK_STRUCT_SIZE(real_matrix4x3, 52);
+ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
 
 const real_matrix4x3 global_identity4x3 = { 1.0f, { global_forward3d, global_left3d, global_up3d }, global_zero_vector3d };
 

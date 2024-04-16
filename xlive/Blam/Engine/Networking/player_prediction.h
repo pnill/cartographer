@@ -11,4 +11,4 @@ struct s_player_prediction
 	real_point3d prediction_translation_velocity;
 	real_point3d prediction_angular_velocity;
 };
-CHECK_STRUCT_SIZE(s_player_prediction, 0x40);
+ASSERT_STRUCT_SIZE(s_player_prediction, 0x40);

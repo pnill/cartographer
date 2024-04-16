@@ -34,7 +34,7 @@ struct s_ui_level_descriptions
     c_static_wchar_string128 chinese_description;
     c_static_wchar_string128 portuguese_description;
 };
-CHECK_STRUCT_SIZE(s_ui_level_descriptions, 2880);
+ASSERT_STRUCT_SIZE(s_ui_level_descriptions, 2880);
 
 // max count: k_maximum_number_of_campaign_maps 20
 struct s_campaign_ui_level_definition
@@ -44,7 +44,7 @@ struct s_campaign_ui_level_definition
     tag_reference bitmap;   // bitm
     s_ui_level_descriptions level_descriptions;
 };
-TAG_BLOCK_SIZE_ASSERT(s_campaign_ui_level_definition, 2896);
+ASSERT_STRUCT_SIZE(s_campaign_ui_level_definition, 2896);
 
 // max count: k_maximum_number_of_multiplayer_maps 50
 struct s_multiplayer_ui_level_definition
@@ -73,7 +73,7 @@ struct s_multiplayer_ui_level_definition
     uint8 max_teams_stub_14;
     uint8 max_teams_stub_15;
 };
-TAG_BLOCK_SIZE_ASSERT(s_multiplayer_ui_level_definition, 3172);
+ASSERT_STRUCT_SIZE(s_multiplayer_ui_level_definition, 3172);
 
 // max count: k_maximum_number_of_campaign_maps
 struct s_campaign_runtime_level_definition
@@ -82,14 +82,14 @@ struct s_campaign_runtime_level_definition
     int32 map_id;
     static_string256 path;
 };
-TAG_BLOCK_SIZE_ASSERT(s_campaign_runtime_level_definition, 264);
+ASSERT_STRUCT_SIZE(s_campaign_runtime_level_definition, 264);
 
 // max count: 1
 struct s_runtime_levels_definition
 {
     tag_block<s_campaign_runtime_level_definition> campaign_levels;
 };
-TAG_BLOCK_SIZE_ASSERT(s_runtime_levels_definition, 8);
+ASSERT_STRUCT_SIZE(s_runtime_levels_definition, 8);
 
 // max count k_maximum_number_of_campaigns
 struct s_campaign_definition
@@ -97,7 +97,7 @@ struct s_campaign_definition
     int32 campaign_id;
     s_ui_level_descriptions level_descriptions;
 };
-TAG_BLOCK_SIZE_ASSERT(s_campaign_definition, 2884);
+ASSERT_STRUCT_SIZE(s_campaign_definition, 2884);
 
 // max count: 1
 struct s_ui_levels_definition
@@ -106,4 +106,4 @@ struct s_ui_levels_definition
     tag_block<s_campaign_ui_level_definition> campaign_levels;
     tag_block<s_multiplayer_ui_level_definition> multiplayer_levels;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ui_levels_definition, 24);
+ASSERT_STRUCT_SIZE(s_ui_levels_definition, 24);

@@ -35,7 +35,7 @@ struct firing_position_definition
     int pad;
     real_euler_angles2d normal;
 };
-TAG_BLOCK_SIZE_ASSERT(firing_position_definition, 32);
+ASSERT_STRUCT_SIZE(firing_position_definition, 32);
 
 enum e_area_flags : int
 {
@@ -69,7 +69,7 @@ struct area_definition
     short pad;
     tag_block<flight_hint_reference> flight_hints;
 };
-TAG_BLOCK_SIZE_ASSERT(area_definition, 136);
+ASSERT_STRUCT_SIZE(area_definition, 136);
 
 // max count: 128
 struct zone_definition
@@ -81,7 +81,7 @@ struct zone_definition
     tag_block<firing_position_definition> firing_positions;
     tag_block<area_definition> areas;
 };
-TAG_BLOCK_SIZE_ASSERT(zone_definition, 56);
+ASSERT_STRUCT_SIZE(zone_definition, 56);
 
 enum e_order_area_type : short
 {
@@ -98,4 +98,4 @@ struct orders_area_reference_definition
     short zone;             // Block index: zone_definition
     short area;             // Block index: the area tagblock index from the zone_definition block above
 };
-TAG_BLOCK_SIZE_ASSERT(orders_area_reference_definition, 8);
+ASSERT_STRUCT_SIZE(orders_area_reference_definition, 8);

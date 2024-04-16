@@ -83,9 +83,9 @@ struct s_sound_classes_block
         float obstructionMaxBend;
         float occlusionMaxBend;
     };
-    TAG_GROUP_SIZE_ASSERT(sound_class_block, 92);
+    ASSERT_STRUCT_SIZE(sound_class_block, 92);
     tag_block<sound_class_block> soundClasses;
     PAD(4);
 };
-TAG_GROUP_SIZE_ASSERT(s_sound_classes_block, 12);
+ASSERT_STRUCT_SIZE(s_sound_classes_block, 12);
 #pragma pack(pop)

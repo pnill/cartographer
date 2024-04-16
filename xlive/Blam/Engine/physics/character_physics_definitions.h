@@ -33,7 +33,7 @@ struct s_character_physics_ground_definition
     real32 sine_uphill_falloff_angle;
     real32 sine_uphill_cutoff_angle;
 };
-CHECK_STRUCT_SIZE(s_character_physics_ground_definition, 48);
+ASSERT_STRUCT_SIZE(s_character_physics_ground_definition, 48);
 
 struct s_character_physics_flying_definition
 {
@@ -51,7 +51,7 @@ struct s_character_physics_flying_definition
     real32 angular_acceleration_maximum;    // (Degrees Per Second Squared) turn acceleration rate
     real32 crouch_velocity_modifier;        // how much slower we fly if crouching (zero = same speed)
 };
-CHECK_STRUCT_SIZE(s_character_physics_flying_definition, 44);
+ASSERT_STRUCT_SIZE(s_character_physics_flying_definition, 44);
 
 struct s_character_physics_dead_definition
 {
@@ -90,4 +90,4 @@ struct s_character_physics_definition
     // Explaination("sentinel", "")
     //s_character_physics_sentinel_definition sentinel_physics;
 };
-CHECK_STRUCT_SIZE(s_character_physics_definition, 148);
+ASSERT_STRUCT_SIZE(s_character_physics_definition, 148);

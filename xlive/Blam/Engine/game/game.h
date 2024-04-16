@@ -30,7 +30,7 @@ struct s_main_game_globals
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?
 	datum pvs_object_datum;
 };
-CHECK_STRUCT_SIZE(s_main_game_globals, 0x1270);
+ASSERT_STRUCT_SIZE(s_main_game_globals, 0x1270);
 
 
 typedef void(__cdecl* initialize_proc_t)(void);
@@ -51,7 +51,7 @@ struct s_game_systems
 	void* unk7;
 	activation_proc_t activation_proc;
 };
-CHECK_STRUCT_SIZE(s_game_systems, 36);
+ASSERT_STRUCT_SIZE(s_game_systems, 36);
 
 struct s_date_and_time
 {

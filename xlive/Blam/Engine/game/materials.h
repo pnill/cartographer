@@ -80,7 +80,7 @@ struct material_definition
     real32 ground_damp_fraction_scale;      // fraction of original velocity perpendicular to the ground after one tick
     tag_reference melee_hit_sound;          // snd!
 };
-TAG_BLOCK_SIZE_ASSERT(material_definition, 36);
+ASSERT_STRUCT_SIZE(material_definition, 36);
 
 // max count: 1
 struct s_material_physics_properties
@@ -90,7 +90,7 @@ struct s_material_physics_properties
 	real32 restitution;
 	real32 density;			// Kilograms per meter cubed
 };
-TAG_BLOCK_SIZE_ASSERT(s_material_physics_properties, 16);
+ASSERT_STRUCT_SIZE(s_material_physics_properties, 16);
 
 // max count: 1
 struct s_global_material_sweeteners_definition
@@ -132,4 +132,4 @@ struct s_global_material_definition
 	s_global_material_sweeteners_definition sweeteners;
 	tag_reference material_effects;     // foot
 };
-TAG_BLOCK_SIZE_ASSERT(s_global_material_definition, 0xB4);
+ASSERT_STRUCT_SIZE(s_global_material_definition, 0xB4);

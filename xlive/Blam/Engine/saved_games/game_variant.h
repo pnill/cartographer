@@ -299,7 +299,7 @@ struct s_game_variant
 	//TODO : figure this out
 	PAD(0x130 - 0xD8);
 };
-CHECK_STRUCT_SIZE(s_game_variant, 0x130);
+ASSERT_STRUCT_SIZE(s_game_variant, 0x130);
 #pragma pack(pop)
 
 s_game_variant* get_game_variant(void);

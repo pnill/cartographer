@@ -10,7 +10,7 @@ struct prt_section_info
     uint32 section_index;
     uint32 pca_data_offset;
 };
-TAG_BLOCK_SIZE_ASSERT(prt_section_info, 8);
+ASSERT_STRUCT_SIZE(prt_section_info, 8);
 
 // max count: NUMBER_OF_GEOMETRY_DETAIL_LEVELS
 struct prt_lod_info
@@ -18,7 +18,7 @@ struct prt_lod_info
     int32 cluster_offset;
     tag_block<prt_section_info> sectionInfo;
 };
-TAG_BLOCK_SIZE_ASSERT(prt_lod_info, 12);
+ASSERT_STRUCT_SIZE(prt_lod_info, 12);
 
 struct prt_info
 {
@@ -38,4 +38,4 @@ struct prt_info
     tag_block<rasterizer_vertex_buffer> vertex_buffers; // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
     geometry_block_info geometry_block_info;
 };
-CHECK_STRUCT_SIZE(prt_info, 88);
+ASSERT_STRUCT_SIZE(prt_info, 88);

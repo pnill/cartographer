@@ -76,7 +76,7 @@ struct object_type_definition
 	object_type_definition* base_object_types[k_max_object_type_inheritence];
 	void* next;
 };
-CHECK_STRUCT_SIZE(object_type_definition, 0xC8);
+ASSERT_STRUCT_SIZE(object_type_definition, 0xC8);
 
 object_type_definition** get_object_type_definitions(void);
 object_type_definition* object_type_definition_get(e_object_type object_type);

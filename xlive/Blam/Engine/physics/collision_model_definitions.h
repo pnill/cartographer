@@ -39,7 +39,7 @@ struct collision_model_node
 	// BlockIndex1("collision_model_node_block")
 	uint16 first_child_node;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_node, 12);
+ASSERT_STRUCT_SIZE(collision_model_node, 12);
 
 // max: MAXIMUM_PATHFINDING_SPHERES_PER_COLLISION_MODEL
 struct collision_model_pathfinding_sphere
@@ -50,7 +50,7 @@ struct collision_model_pathfinding_sphere
 	real_point3d center;
 	real32 radius;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_pathfinding_sphere, 20);
+ASSERT_STRUCT_SIZE(collision_model_pathfinding_sphere, 20);
 
 // max: MAXIMUM_BSP_PHYSICS_PER_MODEL
 // This structure either stores or has something to do with generating the mopp code for havok physics
@@ -62,7 +62,7 @@ struct s_collision_bsp_physics_definition
 	// todo: figure out which havok objects these are
 	int8 pad[52];
 };
-TAG_BLOCK_SIZE_ASSERT(s_collision_bsp_physics_definition, 116);
+ASSERT_STRUCT_SIZE(s_collision_bsp_physics_definition, 116);
 
 // max: MAXIMUM_BSPS_PER_COLLISION_REGION
 struct collision_model_bsp
@@ -71,7 +71,7 @@ struct collision_model_bsp
 	int16 pad;
 	collision_bsp collision;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_bsp, 68);
+ASSERT_STRUCT_SIZE(collision_model_bsp, 68);
 
 // max: MAXIMUM_PERMUTATIONS_PER_MODEL_REGION
 struct collision_model_permutation
@@ -80,7 +80,7 @@ struct collision_model_permutation
 	tag_block<collision_model_bsp> collision_bsp;
 	tag_block<s_collision_bsp_physics_definition> physics;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_permutation, 20);
+ASSERT_STRUCT_SIZE(collision_model_permutation, 20);
 
 // max: MAXIMUM_REGIONS_PER_MODEL
 struct collision_model_region
@@ -88,14 +88,14 @@ struct collision_model_region
 	string_id name;
 	tag_block<collision_model_permutation> permutations;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_region, 12);
+ASSERT_STRUCT_SIZE(collision_model_region, 12);
 
 // max: MAXIMUM_MATERIALS_PER_MODEL
 struct collision_model_material
 {
 	string_id name;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_model_material, 4);
+ASSERT_STRUCT_SIZE(collision_model_material, 4);
 
 struct collision_model_definition
 {

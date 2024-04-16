@@ -39,7 +39,7 @@ struct s_structure_debug_info_render_line
 	real_point3d point_0;
 	real_point3d point_1;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_debug_info_render_line, 32);
+ASSERT_STRUCT_SIZE(s_structure_debug_info_render_line, 32);
 
 // max: MAXIMUM_CLUSTERS_PER_STRUCTURE
 struct s_structure_cluster_debug_info
@@ -58,7 +58,7 @@ struct s_structure_cluster_debug_info
 	// max: SHORT_MAX
 	tag_block<int32> containing_fog_zone_indices;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_cluster_debug_info, 72);
+ASSERT_STRUCT_SIZE(s_structure_cluster_debug_info, 72);
 
 // max: MAXIMUM_FOG_PLANES_PER_STRUCTURE
 struct s_structure_fog_plane_debug_info
@@ -73,7 +73,7 @@ struct s_structure_fog_plane_debug_info
 	// max: SHORT_MAX
 	tag_block<int32> inf_extent_cluster_indices;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_fog_plane_debug_info, 56);
+ASSERT_STRUCT_SIZE(s_structure_fog_plane_debug_info, 56);
 
 // max: MAXIMUM_FOG_ZONES_PER_STRUCTURE
 struct s_structure_fog_zone_debug_info
@@ -90,7 +90,7 @@ struct s_structure_fog_zone_debug_info
 	// max: SHORT_MAX
 	tag_block<int32> collision_fog_plance_indices;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_fog_zone_debug_info, 64);
+ASSERT_STRUCT_SIZE(s_structure_fog_zone_debug_info, 64);
 
 // max: 1
 struct s_structure_debug_info
@@ -100,4 +100,4 @@ struct s_structure_debug_info
 	tag_block<s_structure_fog_plane_debug_info> fog_planes;
 	tag_block<s_structure_fog_zone_debug_info> fog_zones;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_debug_info, 88);
+ASSERT_STRUCT_SIZE(s_structure_debug_info, 88);

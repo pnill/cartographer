@@ -115,7 +115,7 @@ struct object_ai_properties
 	e_object_ai_size ai_size;
 	e_object_leap_jump_speed leap_jump_speed;
 };
-TAG_BLOCK_SIZE_ASSERT(object_ai_properties, 16);
+ASSERT_STRUCT_SIZE(object_ai_properties, 16);
 
 // max count: k_maximum_object_functions
 struct s_object_function_definition
@@ -128,7 +128,7 @@ struct s_object_function_definition
 	c_function_definition default_function;		// fned
 	string_id scale_by;
 };
-TAG_BLOCK_SIZE_ASSERT(s_object_function_definition, 32);
+ASSERT_STRUCT_SIZE(s_object_function_definition, 32);
 
 // max count: k_maximum_number_of_attachments_per_object
 struct object_attachment_definition
@@ -140,14 +140,14 @@ struct object_attachment_definition
 	string_id primary_scale;
 	string_id secondary_scale;
 };
-TAG_BLOCK_SIZE_ASSERT(object_attachment_definition, 24);
+ASSERT_STRUCT_SIZE(object_attachment_definition, 24);
 
 // max count: MAXIMUM_WIDGETS_PER_OBJECT
 struct object_definition_widget
 {
 	tag_reference type;
 };
-TAG_BLOCK_SIZE_ASSERT(object_definition_widget, 8);
+ASSERT_STRUCT_SIZE(object_definition_widget, 8);
 
 // max count: 4
 struct s_old_object_function_definition
@@ -155,7 +155,7 @@ struct s_old_object_function_definition
 	int8 pad[76];
 	string_id unk;
 };
-TAG_BLOCK_SIZE_ASSERT(s_old_object_function_definition, 80);
+ASSERT_STRUCT_SIZE(s_old_object_function_definition, 80);
 
 // max count: MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_INITIAL_PERMUTATIONS
 struct object_change_color_initial_permutation
@@ -165,7 +165,7 @@ struct object_change_color_initial_permutation
 	real_rgb_color color_upper_bound;
 	string_id variant_name;		// if empty, may be used by any model variant
 };
-TAG_BLOCK_SIZE_ASSERT(object_change_color_initial_permutation, 32);
+ASSERT_STRUCT_SIZE(object_change_color_initial_permutation, 32);
 
 // max count: MAXIMUM_NUMBER_OF_OBJECT_CHANGE_COLOR_FUNCTIONS
 struct object_change_color_function
@@ -177,14 +177,14 @@ struct object_change_color_function
 	string_id darken_by;
 	string_id scale_by;
 };
-TAG_BLOCK_SIZE_ASSERT(object_change_color_function, 40);
+ASSERT_STRUCT_SIZE(object_change_color_function, 40);
 
 struct object_change_color_definition
 {
 	tag_block<object_change_color_initial_permutation> initialPermutations;
 	tag_block<object_change_color_function> functions;
 };
-TAG_BLOCK_SIZE_ASSERT(object_change_color_definition, 16);
+ASSERT_STRUCT_SIZE(object_change_color_definition, 16);
 
 struct object_definition
 {
@@ -235,4 +235,4 @@ struct object_definition
 	tag_block<object_change_color_definition> change_colors;
 	tag_block<predicted_resource> predicted_resources;
 };
-TAG_GROUP_SIZE_ASSERT(object_definition, 188);
+ASSERT_STRUCT_SIZE(object_definition, 188);

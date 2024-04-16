@@ -24,10 +24,10 @@ struct s_camera_track_group_definition
 		real_vector3d orientation;//0xC
 		float orientation_w;//0x18
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_control_points_block, 0x1C);
+	ASSERT_STRUCT_SIZE(s_control_points_block, 0x1C);
 	tag_block<s_control_points_block> control_points;//0x4
 };
-TAG_GROUP_SIZE_ASSERT(s_camera_track_group_definition, 0xC);
+ASSERT_STRUCT_SIZE(s_camera_track_group_definition, 0xC);
 #pragma pack(pop)
 
 

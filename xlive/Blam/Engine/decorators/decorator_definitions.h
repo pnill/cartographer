@@ -21,7 +21,7 @@ struct s_decorator_placement
     int compressed_light_direction;
     int compressed_light_2_direction;
 };
-TAG_BLOCK_SIZE_ASSERT(s_decorator_placement, 24);
+ASSERT_STRUCT_SIZE(s_decorator_placement, 24);
 
 // max count: 64*k_kilo 65536
 struct rasterizer_vertex_decorator_sprite
@@ -32,7 +32,7 @@ struct rasterizer_vertex_decorator_sprite
     real_point2d texcoord;
     pixel32 color;
 };
-TAG_BLOCK_SIZE_ASSERT(rasterizer_vertex_decorator_sprite, 48);
+ASSERT_STRUCT_SIZE(rasterizer_vertex_decorator_sprite, 48);
 
 // max count: 1
 struct s_decorator_cache_block_data
@@ -47,7 +47,7 @@ struct s_decorator_cache_block_data
     void* sprite_vertex_buffer;
     int pad1[4];
 };
-TAG_BLOCK_SIZE_ASSERT(s_decorator_cache_block_data, 80);
+ASSERT_STRUCT_SIZE(s_decorator_cache_block_data, 80);
  
 // max count: k_maximum_cache_block_count 4096
 class c_decorator_cache_block
@@ -61,7 +61,7 @@ public:
     const geometry_block_info* get_geometry_block() const;
     const s_decorator_cache_block_data* get_cache_block_data() const;
 };
-TAG_BLOCK_SIZE_ASSERT(c_decorator_cache_block, 52);
+ASSERT_STRUCT_SIZE(c_decorator_cache_block, 52);
 
 enum e_decorator_type : char
 {
@@ -90,7 +90,7 @@ struct s_decorator_group
     short index_count;
     int compressed_bounding_center;
 };
-TAG_BLOCK_SIZE_ASSERT(s_decorator_group, 24);
+ASSERT_STRUCT_SIZE(s_decorator_group, 24);
 
 // max count: k_maximum_cell_collection_count 65535
 class c_decorator_cell_collection
@@ -107,7 +107,7 @@ public:
     short get_group_count() const;
     int get_group_start_index() const;
 };
-TAG_BLOCK_SIZE_ASSERT(c_decorator_cell_collection, 24);
+ASSERT_STRUCT_SIZE(c_decorator_cell_collection, 24);
 
 // max count: 1
 class c_decorator_placement_definition
@@ -128,4 +128,4 @@ public:
     const c_decorator_cell_collection* get_cell(DWORD cell_index) const;
     const s_decorator_projected_decal* get_decal(DWORD decal_index) const;
 };
-TAG_BLOCK_SIZE_ASSERT(c_decorator_placement_definition, 48);
+ASSERT_STRUCT_SIZE(c_decorator_placement_definition, 48);

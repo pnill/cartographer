@@ -8,4 +8,4 @@ struct dialogue_variant_definition
     int16 pad;
     tag_reference dialogue; // udlg
 };
-TAG_BLOCK_SIZE_ASSERT(dialogue_variant_definition, 12);
+ASSERT_STRUCT_SIZE(dialogue_variant_definition, 12);

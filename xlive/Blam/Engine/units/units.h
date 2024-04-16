@@ -88,7 +88,7 @@ struct unit_control_data
 	s_aim_assist_targeting_result target_info;
 
 };
-CHECK_STRUCT_SIZE(unit_control_data, 0x80);
+ASSERT_STRUCT_SIZE(unit_control_data, 0x80);
 
 struct unit_datum
 {
@@ -193,7 +193,7 @@ struct unit_datum
 	object_header_block_reference object_header_358;
 	int32 field_35C;
 };
-CHECK_STRUCT_SIZE(unit_datum, 864);
+ASSERT_STRUCT_SIZE(unit_datum, 864);
 
 void __cdecl unit_delete_all_weapons(datum unit_datum_index);
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);

@@ -22,7 +22,7 @@ struct ai_scene_trigger
     short pad;
     tag_block<order_trigger_reference> triggers;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scene_trigger, 12);
+ASSERT_STRUCT_SIZE(ai_scene_trigger, 12);
 
 enum e_ai_scene_role_group : short
 {
@@ -36,7 +36,7 @@ struct ai_scene_role_variant
 {
     string_id variant_designation;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scene_role_variant, 4);
+ASSERT_STRUCT_SIZE(ai_scene_role_variant, 4);
 
 // max count: k_max_roles_per_scene 10
 struct ai_scene_role
@@ -46,7 +46,7 @@ struct ai_scene_role
     short pad;
     tag_block<ai_scene_role_variant> role_variants;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scene_role, 16);
+ASSERT_STRUCT_SIZE(ai_scene_role, 16);
 
 // max count: k_max_scenes_per_scenario 100
 struct ai_scene
@@ -56,7 +56,7 @@ struct ai_scene
     tag_block<ai_scene_trigger> trigger_conditions;
     tag_block<ai_scene_role> roles;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scene, 24);
+ASSERT_STRUCT_SIZE(ai_scene, 24);
 
 enum e_ai_conversation_flags : short
 {
@@ -86,7 +86,7 @@ struct ai_conversation_participant
     static_string32 encounter_name;
     int pad2[4];
 };
-TAG_BLOCK_SIZE_ASSERT(ai_conversation_participant, 84);
+ASSERT_STRUCT_SIZE(ai_conversation_participant, 84);
 
 enum e_ai_conversation_line_flags : short
 {
@@ -125,7 +125,7 @@ struct ai_conversation_line
     tag_reference variant_5;     // snd!
     tag_reference variant_6;     // snd!
 };
-TAG_BLOCK_SIZE_ASSERT(ai_conversation_participant, 84);
+ASSERT_STRUCT_SIZE(ai_conversation_participant, 84);
 
 // max count: 128
 struct ai_conversation
@@ -140,4 +140,4 @@ struct ai_conversation
     tag_block<ai_conversation_line> lines;
     tag_block<> null_tagblock;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_scene, 24);
+ASSERT_STRUCT_SIZE(ai_scene, 24);

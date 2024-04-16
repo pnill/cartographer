@@ -26,7 +26,7 @@ struct sector
     short hint_index;
     int first_link;     // Do not Set Manually
 };
-TAG_BLOCK_SIZE_ASSERT(sector, 8);
+ASSERT_STRUCT_SIZE(sector, 8);
 
 enum e_sector_link_flags : short
 {
@@ -58,4 +58,4 @@ struct sector_link_block
     short left_sector;
     short right_sector;
 };
-TAG_BLOCK_SIZE_ASSERT(sector_link_block, 16);
+ASSERT_STRUCT_SIZE(sector_link_block, 16);

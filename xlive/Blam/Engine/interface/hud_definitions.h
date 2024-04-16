@@ -32,7 +32,7 @@ struct icon_hud_element_definition
 	e_button_icon_flags flags;
 	short text_index;
 };
-TAG_BLOCK_SIZE_ASSERT(icon_hud_element_definition, 16);
+ASSERT_STRUCT_SIZE(icon_hud_element_definition, 16);
 
 enum e_flash_flags : short
 {
@@ -62,7 +62,7 @@ struct s_waypoint_arrows_block
 	e_waypoint_flags flags;
 	int pad3[6];
 };
-TAG_BLOCK_SIZE_ASSERT(s_waypoint_arrows_block, 104);
+ASSERT_STRUCT_SIZE(s_waypoint_arrows_block, 104);
 
 struct hud_globals_definition
 {
@@ -202,7 +202,7 @@ struct hud_globals_definition
 
 	s_new_hud_globals new_globals;
 };
-TAG_GROUP_SIZE_ASSERT(hud_globals_definition, 1160);
+ASSERT_STRUCT_SIZE(hud_globals_definition, 1160);
 
 // gets the current loaded hud globals tag
 hud_globals_definition* get_hud_globals();

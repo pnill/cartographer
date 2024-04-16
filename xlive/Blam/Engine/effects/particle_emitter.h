@@ -53,6 +53,6 @@ struct c_particle_emitter
 		const real_matrix4x3* matrix
 	);
 };
-CHECK_STRUCT_SIZE(c_particle_emitter, 0x4C);
+ASSERT_STRUCT_SIZE(c_particle_emitter, 0x4C);
 
 s_data_array* get_particle_emitter_table();

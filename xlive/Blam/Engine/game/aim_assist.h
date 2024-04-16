@@ -10,7 +10,7 @@ struct melee_aim_assist_parameters
 	real32 throttle_minimum_distance;
 	real32 throttle_maximum_adjustment_angle_degrees;
 };
-CHECK_STRUCT_SIZE(melee_aim_assist_parameters, 20);
+ASSERT_STRUCT_SIZE(melee_aim_assist_parameters, 20);
 
 struct aim_assist_parameters
 {
@@ -22,7 +22,7 @@ struct aim_assist_parameters
 
 	real32 unused[4];
 };
-CHECK_STRUCT_SIZE(aim_assist_parameters, 36);
+ASSERT_STRUCT_SIZE(aim_assist_parameters, 36);
 
 struct s_aim_assist_targeting_result
 {
@@ -35,6 +35,6 @@ struct s_aim_assist_targeting_result
 	real32 primary_auto_aim_level;
 	real32 secondary_auto_aim_level;
 };
-CHECK_STRUCT_SIZE(s_aim_assist_targeting_result, 36);
+ASSERT_STRUCT_SIZE(s_aim_assist_targeting_result, 36);
 
 void aim_assist_apply_patches();

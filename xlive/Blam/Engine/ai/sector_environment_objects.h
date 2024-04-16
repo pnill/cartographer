@@ -18,7 +18,7 @@ struct environment_object_bsp_reference
     short nodeindex;
     short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(environment_object_bsp_reference, 16);
+ASSERT_STRUCT_SIZE(environment_object_bsp_reference, 16);
 
 enum e_projection_sign_flag : byte
 {
@@ -32,7 +32,7 @@ struct environment_object_node_reference
     byte projection_axis;
     e_projection_sign_flag projection_sign;
 };
-TAG_BLOCK_SIZE_ASSERT(environment_object_node_reference, 4);
+ASSERT_STRUCT_SIZE(environment_object_node_reference, 4);
 
 // max count: k_maximum_environment_objects_per_scenario 2000
 struct environment_object_reference
@@ -45,4 +45,4 @@ struct environment_object_reference
     tag_block<environment_object_bsp_reference> bsps;
     tag_block<environment_object_node_reference> nodes;
 };
-TAG_BLOCK_SIZE_ASSERT(environment_object_reference, 28);
+ASSERT_STRUCT_SIZE(environment_object_reference, 28);
