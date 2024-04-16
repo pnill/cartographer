@@ -161,7 +161,7 @@ ASSERT_STRUCT_SIZE(object_attachment, 8);
 struct object_datum
 {
 	datum tag_definition_index;
-	c_flags<e_object_data_flags, int32, k_object_data_flags_count> object_flags;
+	c_flags<e_object_data_flags, uint32, k_object_data_flags_count> object_flags;
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;
