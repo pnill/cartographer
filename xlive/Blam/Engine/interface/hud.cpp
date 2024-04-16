@@ -64,8 +64,6 @@ void set_crosshair_offset(float offset)
 
 void hud_patches_on_map_load()
 {
-	if (Memory::IsDedicatedServer()) { return; }
-
 	set_crosshair_offset(H2Config_crosshair_offset);
 	set_primary_hud_scale(1.0f);
 	set_secondary_hud_scale(1.0f);

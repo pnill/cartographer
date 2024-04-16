@@ -37,7 +37,6 @@ namespace ImGuiHandler {
 			bool g_twizzler_checkbox = g_twizzler_status;
 			bool should_show_hud = true;
 			bool g_showFP = true;
-			int g_fpsLimit = 60;
 			int g_deadzone = 0;
 			int g_aiming = 0;
 			int g_shadows = 0;

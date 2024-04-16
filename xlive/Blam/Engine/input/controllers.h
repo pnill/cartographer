@@ -6,7 +6,8 @@ enum e_controller_index : int32
 	_controller_index_1 = 1,
 	_controller_index_2 = 2,
 	_controller_index_3 = 3,
-	k_number_of_controllers
+	k_number_of_controllers,
+	k_no_controller = NONE
 };
 
 struct s_controller_button_state

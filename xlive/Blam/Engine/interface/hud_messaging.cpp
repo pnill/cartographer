@@ -15,12 +15,12 @@ __declspec(naked) void ui_hud_left_messaging_top_scale()
 		// mov     dl, [esp + 27h]
 		// add     esp, 12
 
-		fild[esp + 18h]
+		fild dword ptr [esp + 18h]
 		push eax
 		mov eax, [p_text_scale_factor]
-		fmul[eax]
+		fmul dword ptr [eax]
 		pop eax
-		fistp[esp + 18h]
+		fistp dword ptr [esp + 18h]
 
 		// original code
 		mov     ecx, ebx

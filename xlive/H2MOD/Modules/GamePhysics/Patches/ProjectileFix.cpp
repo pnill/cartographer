@@ -79,7 +79,7 @@ static float __declspec(naked) get_tick_length_hook()
 #define _last_param_offset 4h + 8h
 	__asm
 	{
-		fld [esp + _stack_pointer_offset + _last_param_offset]
+		fld dword ptr [esp + _stack_pointer_offset + _last_param_offset]
 		ret
 	}
 #undef _stack_pointer_offset

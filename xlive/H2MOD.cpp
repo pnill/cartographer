@@ -3,6 +3,7 @@
 
 #include "camera/dead_camera.h"
 #include "camera/observer.h"
+#include "cartographer/tag_fixes/tag_fixes.h"
 #include "cutscene/cinematics.h"
 #include "effects/contrails.h"
 #include "effects/effects.h"
@@ -433,7 +434,12 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
 		MouseInput::SetSensitivity(H2Config_mouse_sens);
-		hud_patches_on_map_load();
+
+		if (!Memory::IsDedicatedServer())
+		{
+			hud_patches_on_map_load();
+			main_tag_fixes();
+		}
 
 		if (options->game_mode == _game_mode_multiplayer)
 		{
@@ -772,10 +778,10 @@ void H2MOD::RegisterEvents()
 	}
 }
 
+static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
+
 __declspec(naked) void object_function_value_adjust_primary_firing()
 {
-	static real32 seconds_trigger_hold = 1.0f / 30.0f; // 0.033333333 seconds takes 2 60hz seconds
-
 	__asm
 	{
 		// eax holds game_time_get()
@@ -786,9 +792,9 @@ __declspec(naked) void object_function_value_adjust_primary_firing()
 		// adjust the value first
 		fld seconds_trigger_hold
 		push eax
-		fstp [esp]
+		fstp dword ptr [esp]
 		call time_globals::seconds_to_ticks_real
-		fstp [esp]
+		fstp dword ptr [esp]
 		cvttss2si esi, [esp]
 		add esp, 4
 		pop eax
