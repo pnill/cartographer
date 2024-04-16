@@ -19,3 +19,7 @@ unsigned long long shell_time_now(unsigned long long denominator);
 void shell_windows_throttle_framerate(int desired_framerate);
 
 bool __cdecl game_is_minimized(void);
+
+bool __cdecl gfwl_gamestore_initialize(void);
+
+LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

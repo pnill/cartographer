@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "game_state.h"
 
-void __cdecl game_state_shell_initialize(void)
+void __cdecl game_state_initialize(void)
 {
-	INVOKE(0x30AA6, 0x53EAD, game_state_shell_initialize);
+	INVOKE(0x30AA6, 0x53EAD, game_state_initialize);
 	return;
 }
 

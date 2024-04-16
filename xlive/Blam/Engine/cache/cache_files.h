@@ -1,5 +1,5 @@
 #pragma once
-#include "game/game_preferences.h"
+#include "main/game_preferences.h"
 #include "tag_files/tag_groups.h"
 
 #define FIRST_SHARED_TAG_INSTANCE_INDEX 10000

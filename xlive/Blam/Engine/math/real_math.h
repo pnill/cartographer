@@ -265,6 +265,8 @@ static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32
 	return;
 }
 
+void __cdecl real_math_initialize(void);
+
 void __cdecl real_math_reset_precision(void);
 
 real32 distance_squared2d(const real_point2d* a, const real_point2d* b);

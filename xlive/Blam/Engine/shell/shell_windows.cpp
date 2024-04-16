@@ -1,12 +1,39 @@
 #include "stdafx.h"
 #include "shell_windows.h"
+
+#include "shell.h"
 #include "shell_windows_internals.h"
 
+#include "cseries/cseries_errors.h"
+#include "main/main.h"
 #include "math/math.h"
 
-
+#include "H2MOD/Modules/Shell/H2MODShell.h"
+#include "H2MOD/Utils/Utils.h"
 
 static LARGE_INTEGER g_startup_counter;
+static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
+
+DWORD WINAPI timeGetTime_hook();
+
+// WinMain replacement
+int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd);
+
+// Destroys global windows used by the game
+void destroy_windows(void);
+
+void __cdecl show_fatal_error(int32 error_id);
+
+bool __cdecl pcc_get_properties(void);
+
+LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+void shell_windows_apply_patches(void)
+{
+	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
+	WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
+	return;
+}
 
 bool __cdecl game_is_minimized(void)
 {
@@ -70,7 +97,6 @@ uint32 __cdecl system_milliseconds()
 	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
 }
 
-static DWORD(WINAPI* p_timeGetTime)() = timeGetTime;
 DWORD WINAPI timeGetTime_hook()
 {
 	unsigned long long time_now_msec = shell_time_now_msec();
@@ -81,11 +107,6 @@ static_assert(std::is_same_v<decltype(timeGetTime), decltype(timeGetTime_hook)>,
 void shell_windows_initialize()
 {
 	QueryPerformanceCounter(&g_startup_counter);
-}
-
-void shell_windows_apply_patches()
-{
-	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
 }
 
 static void shell_system_set_timer_resolution_max(bool enable)
@@ -192,4 +213,142 @@ void shell_windows_throttle_framerate(int desired_framerate)
 	}
 
 	last_counter = shell_time_counter_now(NULL);
+}
+
+int32 fatal_error_id_get(void)
+{
+	return *Memory::GetAddress<int*>(0x46DAD4);
+}
+
+int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	// set args
+	WriteValue(Memory::GetAddress(0x46D9BC), lpCmdLine); // command_line_args
+	WriteValue(Memory::GetAddress(0x46D9C0), hInstance); // g_instance
+	WriteValue(Memory::GetAddress(0x46D9CC), nShowCmd); // g_CmdShow
+
+	// window setup
+	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46D9D4), 0x40, L"halo"); // ClassName
+	wcscpy_s(Memory::GetAddress<wchar_t*>(0x46DA54), 0x40, L"Halo 2 - Project Cartographer"); // WindowName
+
+	WriteValue(Memory::GetAddress(0x46D9D0), H2WndProc); // g_WndProc_ptr
+
+	bool pcc_result = pcc_get_properties();
+	if (!pcc_result)
+	{
+		error(2, "Failed to get PCC info / insufficient system resources");
+		ASSERT(pcc_result == true);
+		
+		// ### TODO change this?
+		std::thread([]() {
+			_Shell::OpenMessageBox(NULL, MB_ICONEXCLAMATION, "PCC Error", "Failed to get compatibility info.");
+		}).detach();
+
+		show_fatal_error(108);
+	}
+
+	// mouse cursor setup
+	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
+	WriteValue(Memory::GetAddress(0x46D9B8), cursor); // g_hCursor
+
+	// mess around with xlive (not calling XLiveInitialize etc)
+	WriteValue<BYTE>(Memory::GetAddress(0x4FAD98), 1);
+
+
+	// intialize some basic game subsystems
+	if (shell_initialize())
+	{
+		main_loop();		// actually run game
+		shell_dispose();	// cleanup
+	}
+	else if (int32 g_fatal_error_id = fatal_error_id_get(); g_fatal_error_id)
+	{
+		error(2, "shell_initialize failed!");
+		show_fatal_error(g_fatal_error_id);
+	}
+
+	int result;
+	int32 g_fatal_error_id = fatal_error_id_get();
+	if (g_fatal_error_id)	// check if the game exited cleanly
+	{
+		destroy_windows();
+		show_fatal_error(g_fatal_error_id);
+		result = 1;
+	}
+	else
+	{
+		result = 0;
+	}
+
+	return result;
+}
+
+void destroy_windows(void)
+{
+	HWND hWnd = *Memory::GetAddress<HWND*>(0x46D9C4);
+	HWND d3d_window = *Memory::GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
+	if (hWnd)
+	{
+		DestroyWindow(hWnd);
+	}
+
+	if (d3d_window)
+	{
+		DestroyWindow(d3d_window);
+	}
+
+	return;
+}
+
+void __cdecl show_fatal_error(int32 error_id)
+{
+	error(2, "error_id: %d", error_id);
+	INVOKE(0x4A2E, 0x0, show_fatal_error, error_id);
+	return;
+}
+
+bool __cdecl pcc_get_properties(void)
+{
+	return INVOKE(0x260DDD, 0x0, pcc_get_properties);
+}
+
+bool __cdecl gfwl_gamestore_initialize(void)
+{
+	return INVOKE(0x202F3E, 0x0, gfwl_gamestore_initialize);
+}
+
+LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	static FrequencyLimiter frqLimiter(150);
+	bool* window_in_focus = Memory::GetAddress<bool*>(0x46DAD9);
+	bool* unk_condition1 = Memory::GetAddress<bool*>(0x46DAD8);
+	WNDPROC g_WndProc = Memory::GetAddress<WNDPROC>(0x790E);
+
+	LRESULT result;
+	if (uMsg != WM_SETCURSOR)
+	{
+		result = g_WndProc(hWnd, uMsg, wParam, lParam);
+	}
+	else
+	{
+		// if we have to set the cursor, limit the frequency of the cursor being set
+		// because it's very heavy on the CPU
+		bool enable_cursor = *window_in_focus && !*unk_condition1;
+		// if the cursor is about to get disabled, reset the frqLimiter
+		// and allow the cursor to be disabled
+		if (!enable_cursor)
+		{
+			frqLimiter.Reset();
+		}
+
+		result = 1;
+
+		// ShouldUpdate also updates the state of the frqLimiter
+		if (frqLimiter.ShouldUpdate())
+		{
+			result = g_WndProc(hWnd, uMsg, wParam, lParam);
+		}
+	}
+
+	return result;
 }

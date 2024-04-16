@@ -311,12 +311,14 @@
     <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\async.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
@@ -324,6 +326,7 @@
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump_logs.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\runtime_state.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
@@ -341,7 +344,6 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\game\game_options.cpp" />
-    <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\game\game_statborg.cpp" />
     <ClCompile Include="Blam\Engine\game\player_vibration.cpp" />
     <ClCompile Include="Blam\Engine\hs\hs.cpp" />
@@ -353,8 +355,10 @@
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
     <ClCompile Include="Blam\Engine\items\weapon_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\main\interpolator.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
+    <ClCompile Include="Blam\Engine\main\licensing.cpp" />
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\main\main.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
@@ -396,6 +400,7 @@
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
@@ -486,12 +491,14 @@
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
+    <ClInclude Include="Blam\Engine\cseries\async.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump.h" />
@@ -531,7 +538,6 @@
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\game_portals.h" />
-    <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\game_statborg.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\game\player_vibration.h" />
@@ -560,9 +566,11 @@
     <ClInclude Include="Blam\Engine\items\projectile_definition.h" />
     <ClInclude Include="Blam\Engine\items\vehicle_collection_definitions.h" />
     <ClInclude Include="Blam\Engine\items\weapon_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\game_preferences.h" />
     <ClInclude Include="Blam\Engine\main\interpolator.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
+    <ClInclude Include="Blam\Engine\main\licensing.h" />
     <ClInclude Include="Blam\Engine\main\loading.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
     <ClInclude Include="Blam\Engine\main\main_game.h" />
@@ -633,13 +641,16 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
+    <ClCompile Include="Blam\Engine\sound\sound_manager.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
+    <ClCompile Include="Blam\Engine\text\font_group.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
@@ -687,7 +698,6 @@
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\H2MODShell.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Birthday.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Christmas.cpp" />
     <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\Halloween.cpp" />
@@ -887,6 +897,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_globals_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
+    <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
@@ -991,6 +1002,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
     <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_manager.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />
     <ClInclude Include="Blam\Engine\structures\cluster_partitions.h" />
     <ClInclude Include="Blam\Engine\structures\instanced_geometry_definitions.h" />
@@ -1002,11 +1014,13 @@
     <ClInclude Include="Blam\Engine\structures\structure_runtime_decals.h" />
     <ClInclude Include="Blam\Engine\tag_files\data_reference.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
+    <ClInclude Include="Blam\Engine\text\font_group.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />
@@ -1066,7 +1080,6 @@
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Modules\Shell\H2MODShell.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Birthday.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Christmas.h" />
     <ClInclude Include="H2MOD\Modules\SpecialEvents\Events\Halloween.h" />
