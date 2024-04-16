@@ -18,7 +18,7 @@ struct cs_point
     int surface_index;
     real_euler_angles2d facing_direction;
 };
-TAG_BLOCK_SIZE_ASSERT(cs_point, 60);
+ASSERT_STRUCT_SIZE(cs_point, 60);
 
 // max count: 200
 struct cs_point_set
@@ -29,7 +29,7 @@ struct cs_point_set
     short manual_reference_frame;
     e_cs_point_set_flags flags;
 };
-TAG_BLOCK_SIZE_ASSERT(cs_point_set, 48);
+ASSERT_STRUCT_SIZE(cs_point_set, 48);
 
 // max count: 1
 struct cs_script_data
@@ -37,4 +37,4 @@ struct cs_script_data
 	tag_block<cs_point_set> point_sets;
 	byte pad[120];
 };
-TAG_BLOCK_SIZE_ASSERT(cs_script_data, 128);
+ASSERT_STRUCT_SIZE(cs_script_data, 128);

@@ -44,7 +44,7 @@ struct player_action
 	s_aim_assist_targeting_result aim_assist_data;
 	int32 unk;
 };
-CHECK_STRUCT_SIZE(player_action, 0x60);
+ASSERT_STRUCT_SIZE(player_action, 0x60);
 
 struct s_player_control
 {
@@ -66,7 +66,7 @@ struct s_player_control
 	int8 gap_A0[12];
 	int32 field_AC;
 };
-CHECK_STRUCT_SIZE(s_player_control, 0xB0);	
+ASSERT_STRUCT_SIZE(s_player_control, 0xB0);	
 
 struct s_player_control_globals
 {
@@ -79,7 +79,7 @@ struct s_player_control_globals
 	int8 pad[7];
 	s_player_control local_players[4];
 };
-CHECK_STRUCT_SIZE(s_player_control_globals, 728);
+ASSERT_STRUCT_SIZE(s_player_control_globals, 728);
 
 void player_control_disable_local_camera(bool state);
 

@@ -25,7 +25,7 @@ struct s_object_early_movers_globals
 	int32 object_index_count;
 	bool map_initialized;
 };
-CHECK_STRUCT_SIZE(s_object_early_movers_globals, 7560);
+ASSERT_STRUCT_SIZE(s_object_early_movers_globals, 7560);
 
 s_object_early_movers_globals* object_early_movers_globals_get(void);
 

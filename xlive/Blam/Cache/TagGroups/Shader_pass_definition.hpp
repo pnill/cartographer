@@ -135,7 +135,7 @@
 //		e_source_extern source_extern;//0x28
 //		PAD(0x2);//0x2A
 //	};
-//	TAG_BLOCK_SIZE_ASSERT(s_parameters_block, 0x2C);
+//	ASSERT_STRUCT_SIZE(s_parameters_block, 0x2C);
 //	tag_block<s_parameters_block> parameters;//0x8
 //	PAD(0x4);//0x10
 //	struct s_implementations_block
@@ -252,7 +252,7 @@
 //				e_w_address_mode w_address_mode;//0x4
 //				PAD(0x2);//0x6
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_address_state_block, 0x8);
+//			ASSERT_STRUCT_SIZE(s_address_state_block, 0x8);
 //			tag_block<s_address_state_block> address_state;//0x14
 //			struct s_filter_state_block
 //			{
@@ -298,7 +298,7 @@
 //				};
 //				e_anisotropy anisotropy;//0xE
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_filter_state_block, 0x10);
+//			ASSERT_STRUCT_SIZE(s_filter_state_block, 0x10);
 //			tag_block<s_filter_state_block> filter_state;//0x1C
 //			struct s_kill_state_block
 //			{
@@ -318,7 +318,7 @@
 //				e_colorkey_mode colorkey_mode;//0x4
 //				PAD(0x6);//0x6
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_kill_state_block, 0xC);
+//			ASSERT_STRUCT_SIZE(s_kill_state_block, 0xC);
 //			tag_block<s_kill_state_block> kill_state;//0x24
 //			struct s_misc_state_block
 //			{
@@ -332,7 +332,7 @@
 //				e_component_sign_flags component_sign_flags;//0x0
 //				PAD(0x6);//0x2
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_misc_state_block, 0x8);
+//			ASSERT_STRUCT_SIZE(s_misc_state_block, 0x8);
 //			tag_block<s_misc_state_block> misc_state;//0x2C
 //			struct s_constants_block
 //			{
@@ -353,10 +353,10 @@
 //				};
 //				e_constant constant;//0x6
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_constants_block, 0x8);
+//			ASSERT_STRUCT_SIZE(s_constants_block, 0x8);
 //			tag_block<s_constants_block> constants;//0x34
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_textures_block, 0x3C);
+//		ASSERT_STRUCT_SIZE(s_textures_block, 0x3C);
 //		tag_block<s_textures_block> textures;//0x4
 //		tag_reference vertex_shader;//0xC
 //		struct s_vs_constants_block
@@ -404,7 +404,7 @@
 //			};
 //			e_component_mask component_mask;//0xA
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_vs_constants_block, 0xC);
+//		ASSERT_STRUCT_SIZE(s_vs_constants_block, 0xC);
 //		tag_block<s_vs_constants_block> vs_constants;//0x14
 //		data_block pixel_shader_code_unused;//0x1C
 //		enum class e_channels : __int16
@@ -449,7 +449,7 @@
 //			e_flags flags;//0x0
 //			PAD(0x2);//0x2
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_channel_state_block, 0x4);
+//		ASSERT_STRUCT_SIZE(s_channel_state_block, 0x4);
 //		tag_block<s_channel_state_block> channel_state;//0x2C
 //		struct s_alphablend_state_block
 //		{
@@ -514,7 +514,7 @@
 //			e_logicop_flags logicop_flags;//0xC
 //			PAD(0x2);//0xE
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_alphablend_state_block, 0x10);
+//		ASSERT_STRUCT_SIZE(s_alphablend_state_block, 0x10);
 //		tag_block<s_alphablend_state_block> alphablend_state;//0x34
 //		struct s_alphatest_state_block
 //		{
@@ -540,7 +540,7 @@
 //			__int16 alphatest_ref;//0x4
 //			PAD(0x2);//0x6
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_alphatest_state_block, 0x8);
+//		ASSERT_STRUCT_SIZE(s_alphatest_state_block, 0x8);
 //		tag_block<s_alphatest_state_block> alphatest_state;//0x3C
 //		struct s_depth_state_block
 //		{
@@ -577,7 +577,7 @@
 //			float depth_bias_slope_scale;//0x8
 //			float depth_bias;//0xC
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_depth_state_block, 0x10);
+//		ASSERT_STRUCT_SIZE(s_depth_state_block, 0x10);
 //		tag_block<s_depth_state_block> depth_state;//0x44
 //		struct s_cull_state_block
 //		{
@@ -595,7 +595,7 @@
 //			};
 //			e_front_face front_face;//0x2
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_cull_state_block, 0x4);
+//		ASSERT_STRUCT_SIZE(s_cull_state_block, 0x4);
 //		tag_block<s_cull_state_block> cull_state;//0x4C
 //		struct s_fill_state_block
 //		{
@@ -622,7 +622,7 @@
 //			PAD(0x2);//0x6
 //			float line_width;//0x8
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_fill_state_block, 0xC);
+//		ASSERT_STRUCT_SIZE(s_fill_state_block, 0xC);
 //		tag_block<s_fill_state_block> fill_state;//0x54
 //		struct s_misc_state_block
 //		{
@@ -635,7 +635,7 @@
 //			e_flags flags;//0x0
 //			PAD(0x6);//0x2
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_misc_state_block, 0x8);
+//		ASSERT_STRUCT_SIZE(s_misc_state_block, 0x8);
 //		tag_block<s_misc_state_block> misc_state;//0x5C
 //		struct s_constants_block
 //		{
@@ -653,11 +653,11 @@
 //			};
 //			e_constant constant;//0x6
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_constants_block, 0x8);
+//		ASSERT_STRUCT_SIZE(s_constants_block, 0x8);
 //		tag_block<s_constants_block> constants;//0x64
 //		tag_reference pixel_shader;//0x6C
 //	};
-//	TAG_BLOCK_SIZE_ASSERT(s_implementations_block, 0x74);
+//	ASSERT_STRUCT_SIZE(s_implementations_block, 0x74);
 //	tag_block<s_implementations_block> implementations;//0x14
 //	struct s_postprocess_definition_block
 //	{
@@ -692,29 +692,29 @@
 //				{
 //					__int32 defaults;//0x0
 //				};
-//				TAG_BLOCK_SIZE_ASSERT(s_constant_register_defaults_block, 0x4);
+//				ASSERT_STRUCT_SIZE(s_constant_register_defaults_block, 0x4);
 //				tag_block<s_constant_register_defaults_block> constant_register_defaults;//0xC
 //				data_block compiled_shader_1;//0x14
 //				data_block compiled_shader_2;//0x1C
 //				data_block compiled_shader_3;//0x24
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_block, 0x2C);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_block, 0x2C);
 //			tag_block<s_pixel_shader_block> pixel_shader;//0x132
 //			struct s_pixel_shader_switch_extern_map_block
 //			{
 //				__int8 switch_parameter;//0x0
 //				__int8 case_scalar;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_switch_extern_map_block, 0x2);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_switch_extern_map_block, 0x2);
 //			tag_block<s_pixel_shader_switch_extern_map_block> pixel_shader_switch_extern_map;//0x13A
 //			struct s_pixel_shader_index_block_block
 //			{
 //				__int8 pixel_shader_index;//0x0
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_index_block_block, 0x1);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_index_block_block, 0x1);
 //			tag_block<s_pixel_shader_index_block_block> pixel_shader_index_block;//0x142
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_implementations_block, 0x14A);
+//		ASSERT_STRUCT_SIZE(s_implementations_block, 0x14A);
 //		tag_block<s_implementations_block> implementations;//0x0
 //		struct s_textures_block
 //		{
@@ -723,27 +723,27 @@
 //			__int8 texture_stage_index;//0x2
 //			__int8 flags;//0x3
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_textures_block, 0x4);
+//		ASSERT_STRUCT_SIZE(s_textures_block, 0x4);
 //		tag_block<s_textures_block> textures;//0x8
 //		struct s_render_states_block
 //		{
 //			__int8 state_index;//0x0
 //			__int32 state_value;//0x1
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_render_states_block, 0x5);
+//		ASSERT_STRUCT_SIZE(s_render_states_block, 0x5);
 //		tag_block<s_render_states_block> render_states;//0x10
 //		struct s_texture_states_block
 //		{
 //			PAD(0x18);//0x0
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_texture_states_block, 0x18);
+//		ASSERT_STRUCT_SIZE(s_texture_states_block, 0x18);
 //		tag_block<s_texture_states_block> texture_states;//0x18
 //		struct s_ps_fragments_block
 //		{
 //			__int8 switch_parameter_index;//0x0
 //			__int16 block_index_data;//0x1
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_ps_fragments_block, 0x3);
+//		ASSERT_STRUCT_SIZE(s_ps_fragments_block, 0x3);
 //		tag_block<s_ps_fragments_block> ps_fragments;//0x20
 //		struct s_ps_permutations_block
 //		{
@@ -751,7 +751,7 @@
 //			__int16 flags;//0x2
 //			__int16 block_index_data;//0x4
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_ps_permutations_block, 0x6);
+//		ASSERT_STRUCT_SIZE(s_ps_permutations_block, 0x6);
 //		tag_block<s_ps_permutations_block> ps_permutations;//0x28
 //		struct s_ps_combiners_block
 //		{
@@ -765,14 +765,14 @@
 //			__int8 alpha_c_register_ptr_index;//0x1E
 //			__int8 alpha_d_register_ptr_index;//0x1F
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_ps_combiners_block, 0x20);
+//		ASSERT_STRUCT_SIZE(s_ps_combiners_block, 0x20);
 //		tag_block<s_ps_combiners_block> ps_combiners;//0x30
 //		struct s_externs_block
 //		{
 //			PAD(0x3);//0x0
 //			__int8 extern_index;//0x3
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_externs_block, 0x4);
+//		ASSERT_STRUCT_SIZE(s_externs_block, 0x4);
 //		tag_block<s_externs_block> externs;//0x38
 //		struct s_constants_block
 //		{
@@ -781,14 +781,14 @@
 //			__int8 scale_by_texture_stage;//0x5
 //			__int8 function_index;//0x6
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_constants_block, 0x7);
+//		ASSERT_STRUCT_SIZE(s_constants_block, 0x7);
 //		tag_block<s_constants_block> constants;//0x40
 //		struct s_constant_info_block
 //		{
 //			string_id parameter_name;//0x0
 //			PAD(0x3);//0x4
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_constant_info_block, 0x7);
+//		ASSERT_STRUCT_SIZE(s_constant_info_block, 0x7);
 //		tag_block<s_constant_info_block> constant_info;//0x48
 //		struct s_old_implementations_block
 //		{
@@ -797,7 +797,7 @@
 //				__int8 state_index;//0x0
 //				__int32 state_value;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_render_states_block, 0x5);
+//			ASSERT_STRUCT_SIZE(s_render_states_block, 0x5);
 //			tag_block<s_render_states_block> render_states;//0x0
 //			struct s_texture_stage_states_block
 //			{
@@ -805,7 +805,7 @@
 //				__int8 stage_index;//0x1
 //				__int32 state_value;//0x2
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_texture_stage_states_block, 0x6);
+//			ASSERT_STRUCT_SIZE(s_texture_stage_states_block, 0x6);
 //			tag_block<s_texture_stage_states_block> texture_stage_states;//0x8
 //			struct s_render_state_parameters_block
 //			{
@@ -813,7 +813,7 @@
 //				__int8 parameter_type;//0x1
 //				__int8 state_index;//0x2
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_render_state_parameters_block, 0x3);
+//			ASSERT_STRUCT_SIZE(s_render_state_parameters_block, 0x3);
 //			tag_block<s_render_state_parameters_block> render_state_parameters;//0x10
 //			struct s_texture_stage_parameters_block
 //			{
@@ -822,7 +822,7 @@
 //				__int8 state_index;//0x2
 //				__int8 stage_index;//0x3
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_texture_stage_parameters_block, 0x4);
+//			ASSERT_STRUCT_SIZE(s_texture_stage_parameters_block, 0x4);
 //			tag_block<s_texture_stage_parameters_block> texture_stage_parameters;//0x18
 //			struct s_textures_block
 //			{
@@ -831,7 +831,7 @@
 //				__int8 global_texture_index;//0x2
 //				__int8 flags;//0x3
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_textures_block, 0x4);
+//			ASSERT_STRUCT_SIZE(s_textures_block, 0x4);
 //			tag_block<s_textures_block> textures;//0x20
 //			struct s_vn_constants_block
 //			{
@@ -840,7 +840,7 @@
 //				__int8 destination_mask;//0x2
 //				__int8 scale_by_texture_stage;//0x3
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_vn_constants_block, 0x4);
+//			ASSERT_STRUCT_SIZE(s_vn_constants_block, 0x4);
 //			tag_block<s_vn_constants_block> vn_constants;//0x28
 //			struct s_cn_constants_block
 //			{
@@ -849,7 +849,7 @@
 //				__int8 destination_mask;//0x2
 //				__int8 scale_by_texture_stage;//0x3
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_cn_constants_block, 0x4);
+//			ASSERT_STRUCT_SIZE(s_cn_constants_block, 0x4);
 //			tag_block<s_cn_constants_block> cn_constants;//0x30
 //			__int16 block_index_data;//0x38
 //			__int16 block_index_data;//0x3A
@@ -879,21 +879,21 @@
 //				__int8 parameter_index;//0x0
 //				__int8 extern_index;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_value_externs_block, 0x2);
+//			ASSERT_STRUCT_SIZE(s_value_externs_block, 0x2);
 //			tag_block<s_value_externs_block> value_externs;//0x82
 //			struct s_color_externs_block
 //			{
 //				__int8 parameter_index;//0x0
 //				__int8 extern_index;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_color_externs_block, 0x2);
+//			ASSERT_STRUCT_SIZE(s_color_externs_block, 0x2);
 //			tag_block<s_color_externs_block> color_externs;//0x8A
 //			struct s_switch_externs_block
 //			{
 //				__int8 parameter_index;//0x0
 //				__int8 extern_index;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_switch_externs_block, 0x2);
+//			ASSERT_STRUCT_SIZE(s_switch_externs_block, 0x2);
 //			tag_block<s_switch_externs_block> switch_externs;//0x92
 //			__int16 bitmap_parameter_count;//0x9A
 //			PAD(0xF2);//0x9C
@@ -902,7 +902,7 @@
 //				__int8 switch_parameter_index;//0x0
 //				__int16 block_index_data;//0x1
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_fragments_block, 0x3);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_fragments_block, 0x3);
 //			tag_block<s_pixel_shader_fragments_block> pixel_shader_fragments;//0x18E
 //			struct s_pixel_shader_permutations_block
 //			{
@@ -916,7 +916,7 @@
 //				__int16 block_index_data;//0x6
 //				PAD(0x8);//0x8
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_permutations_block, 0x10);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_permutations_block, 0x10);
 //			tag_block<s_pixel_shader_permutations_block> pixel_shader_permutations;//0x196
 //			struct s_pixel_shader_combiners_block
 //			{
@@ -930,7 +930,7 @@
 //				__int8 alpha_c_register_ptr_index;//0x1E
 //				__int8 alpha_d_register_ptr_index;//0x1F
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_combiners_block, 0x20);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_combiners_block, 0x20);
 //			tag_block<s_pixel_shader_combiners_block> pixel_shader_combiners;//0x19E
 //			struct s_pixel_shader_constants_block
 //			{
@@ -955,16 +955,16 @@
 //				e_component_mask component_mask;//0x3
 //				PAD(0x2);//0x4
 //			};
-//			TAG_BLOCK_SIZE_ASSERT(s_pixel_shader_constants_block, 0x6);
+//			ASSERT_STRUCT_SIZE(s_pixel_shader_constants_block, 0x6);
 //			tag_block<s_pixel_shader_constants_block> pixel_shader_constants;//0x1A6
 //			PAD(0x8);//0x1AE
 //		};
-//		TAG_BLOCK_SIZE_ASSERT(s_old_implementations_block, 0x1B6);
+//		ASSERT_STRUCT_SIZE(s_old_implementations_block, 0x1B6);
 //		tag_block<s_old_implementations_block> old_implementations;//0x50
 //	};
-//	TAG_BLOCK_SIZE_ASSERT(s_postprocess_definition_block, 0x58);
+//	ASSERT_STRUCT_SIZE(s_postprocess_definition_block, 0x58);
 //	tag_block<s_postprocess_definition_block> postprocess_definition;//0x1C
 //};
-//TAG_GROUP_SIZE_ASSERT(s_shader_pass_group_definition, 0x24);
+//ASSERT_STRUCT_SIZE(s_shader_pass_group_definition, 0x24);
 //#pragma pack(pop)
 

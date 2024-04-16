@@ -61,7 +61,7 @@ struct screen_flash_definition
 	real32 maximum_intensity;
 	real_argb_color color;
 };
-CHECK_STRUCT_SIZE(screen_flash_definition, 32);
+ASSERT_STRUCT_SIZE(screen_flash_definition, 32);
 
 struct s_temporary_camera_impulse
 {
@@ -72,7 +72,7 @@ struct s_temporary_camera_impulse
 	real32 pushback;
 	real_bounds jitter;
 };
-CHECK_STRUCT_SIZE(s_temporary_camera_impulse, 24);
+ASSERT_STRUCT_SIZE(s_temporary_camera_impulse, 24);
 
 struct s_player_effect_camera_shaking
 {
@@ -85,7 +85,7 @@ struct s_player_effect_camera_shaking
 	real32 wobble_function_period;
 	real32 wobble_weight;
 };
-CHECK_STRUCT_SIZE(s_player_effect_camera_shaking, 28);
+ASSERT_STRUCT_SIZE(s_player_effect_camera_shaking, 28);
 
 struct s_player_effect_user_globals
 {
@@ -119,7 +119,7 @@ struct s_player_effect_user_globals
 	real32 camera_shake_transition_scale;
 	real32 camera_impulse_transition_scale;
 };
-CHECK_STRUCT_SIZE(s_player_effect_user_globals, 160);
+ASSERT_STRUCT_SIZE(s_player_effect_user_globals, 160);
 
 struct s_player_effect_globals
 {
@@ -135,6 +135,6 @@ struct s_player_effect_globals
 	uint32 current_time_ticks;
 	s_player_effect_user_globals user_effects[k_number_of_users];
 };
-CHECK_STRUCT_SIZE(s_player_effect_globals, 688);
+ASSERT_STRUCT_SIZE(s_player_effect_globals, 688);
 
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix);

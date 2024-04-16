@@ -16,7 +16,7 @@ struct s_object_interpolation_data
 	real_matrix4x3 node_matrices[MAXIMUM_NODES_PER_MODEL];
 	real32 crouch;
 };
-//CHECK_STRUCT_SIZE(s_object_interpolation_data, 0x3400);
+//ASSERT_STRUCT_SIZE(s_object_interpolation_data, 0x3400);
 
 struct s_weapon_interpolation_data
 {
@@ -24,14 +24,14 @@ struct s_weapon_interpolation_data
 	int32 node_count;
 	real_matrix4x3 nodes[MAXIMUM_NODES_PER_MODEL];
 };
-//CHECK_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
+//ASSERT_STRUCT_SIZE(s_weapon_interpolation_data, 0x33D4);
 
 struct s_position_interpolation_data
 {
 	bool initialized;
 	real_matrix4x3 node;
 };
-//CHECK_STRUCT_SIZE(s_position_interpolation_data, 56);
+//ASSERT_STRUCT_SIZE(s_position_interpolation_data, 56);
 
 struct s_interpolation_data
 {
@@ -40,14 +40,14 @@ struct s_interpolation_data
 	s_weapon_interpolation_data weapon_data[k_number_of_users][k_interpolation_first_person_weapon_slot_count];
 	s_position_interpolation_data position_data[k_number_of_users][k_interpolation_positions_count];
 };
-//CHECK_STRUCT_SIZE(s_interpolation_data, 0x1A33F04);
+//ASSERT_STRUCT_SIZE(s_interpolation_data, 0x1A33F04);
 
 struct s_frame_data_storage
 {
 	s_interpolation_data previous_data;
 	s_interpolation_data target_data;
 };
-//CHECK_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
+//ASSERT_STRUCT_SIZE(s_frame_data_storage, 0x3467E08);
 
 extern s_interpolation_data* g_frame_data_intermediate;
 

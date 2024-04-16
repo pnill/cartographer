@@ -43,4 +43,4 @@ struct s_hs_unit_seat_mapping
 	datum unit_tag_datum_index;
 	e_seat_mapping_bitfield seats;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hs_unit_seat_mapping, 8);
+ASSERT_STRUCT_SIZE(s_hs_unit_seat_mapping, 8);

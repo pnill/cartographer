@@ -18,7 +18,7 @@ struct special_movement_definition
 {
 	e_special_movement special_movement;
 };
-TAG_BLOCK_SIZE_ASSERT(special_movement_definition, 4);
+ASSERT_STRUCT_SIZE(special_movement_definition, 4);
 
 // Unsure about the size for this struct...
 struct actor_input

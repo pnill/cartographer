@@ -16,4 +16,4 @@ struct render_lighting
 	uint16 sh_index;
 	int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(render_lighting, 84);
+ASSERT_STRUCT_SIZE(render_lighting, 84);

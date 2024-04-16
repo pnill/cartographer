@@ -29,7 +29,7 @@ struct s_object_globals
 	bool enable_warthog_turret_light;
 	bool pad83;
 };
-CHECK_STRUCT_SIZE(s_object_globals, 132);
+ASSERT_STRUCT_SIZE(s_object_globals, 132);
 
 s_object_globals* object_globals_get(void);
 bool objects_can_connect_to_map(void);

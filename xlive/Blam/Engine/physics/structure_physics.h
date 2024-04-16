@@ -12,7 +12,7 @@ struct s_structure_physics_breakable_surface_key_value
 	real_bounds y_bounds;
 	real_bounds z_bounds;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_physics_breakable_surface_key_value, 32);
+ASSERT_STRUCT_SIZE(s_structure_physics_breakable_surface_key_value, 32);
 
 // max: 1
 struct s_structure_physics
@@ -41,4 +41,4 @@ struct s_structure_physics
 	data_reference breakable_surfaces_mopp_code;
 	tag_block<s_structure_physics_breakable_surface_key_value> breakable_surface_keys;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_physics, 52);
+ASSERT_STRUCT_SIZE(s_structure_physics, 52);

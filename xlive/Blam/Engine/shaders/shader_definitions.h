@@ -29,20 +29,20 @@ enum e_shader_lod_bias : int16
 	_shader_lod_bias_cinematic = 6
 };
 
-enum e_specular_type : int16
+enum e_shader_specular_type : int16
 {
-	_specular_type_none = 0,
-	_specular_type_default = 1,
-	_specular_type_dull = 2,
-	_specular_type_shiny = 3
+	_shader_specular_type_none = 0,
+	_shader_specular_type_default = 1,
+	_shader_specular_type_dull = 2,
+	_shader_specular_type_shiny = 3
 };
 
-enum e_lightmap_type : int16
+enum e_shader_lightmap_type : int16
 {
-	_lightmap_type_diffuse = 0,
-	_lightmap_type_default_specular = 1,
-	_lightmap_type_dull_specular = 2,
-	_lightmap_type_shiny_specular = 3
+	_shader_lightmap_type_diffuse = 0,
+	_shader_lightmap_type_default_specular = 1,
+	_shader_lightmap_type_dull_specular = 2,
+	_shader_lightmap_type_shiny_specular = 3
 };
 
 enum e_shader_parameter_type : int16
@@ -89,7 +89,7 @@ struct s_shader_properties
 	real32 lightmap_transparent_alpha;
 	real32 lightmap_foliage_scale;
 };
-TAG_BLOCK_SIZE_ASSERT(s_shader_properties, 80);
+ASSERT_STRUCT_SIZE(s_shader_properties, 80);
 
 // max_count:    k_number_of_shader_animation_property_types = 14
 struct s_shader_animation_property
@@ -103,7 +103,7 @@ struct s_shader_animation_property
 	// Explaination("FUNCTION", "EMPTY STRING")
 	c_function_definition function;
 };
-TAG_BLOCK_SIZE_ASSERT(s_shader_animation_property, 24);
+ASSERT_STRUCT_SIZE(s_shader_animation_property, 24);
 
 // max_count:    k_maximum_parameters_per_shader = 64
 struct s_shader_parameter
@@ -116,7 +116,7 @@ struct s_shader_parameter
 	real_rgb_color const_color;
 	tag_block<s_shader_animation_property> animation_properties;
 };
-TAG_BLOCK_SIZE_ASSERT(s_shader_parameter, 40);
+ASSERT_STRUCT_SIZE(s_shader_parameter, 40);
 
 struct s_shader_definition
 {
@@ -133,8 +133,8 @@ struct s_shader_definition
 	tag_reference light_response;	// slit
 
 	e_shader_lod_bias shader_lod_bias;
-	e_specular_type specular_type;
-	e_lightmap_type lightmap_type;
+	e_shader_specular_type specular_type;
+	e_shader_lightmap_type lightmap_type;
 	int16 pad2;
 	
 	real32 lightmap_specular_brightness;
@@ -144,4 +144,4 @@ struct s_shader_definition
 	real32 added_depth_bias_offset;
 	real32 added_depth_bias_slope_scale;
 };
-TAG_GROUP_SIZE_ASSERT(s_shader_definition, 92);
+ASSERT_STRUCT_SIZE(s_shader_definition, 92);

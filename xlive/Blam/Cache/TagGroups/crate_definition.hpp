@@ -19,5 +19,5 @@ struct s_crate_group_definition
 	e_flags flags;//0xBC
 	PAD(0x2);//0xBE
 };
-TAG_GROUP_SIZE_ASSERT(s_crate_group_definition, 0xC0);
+ASSERT_STRUCT_SIZE(s_crate_group_definition, 0xC0);
 #pragma pack(pop)

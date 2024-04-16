@@ -182,7 +182,7 @@ struct s_model_variant_state
     string_id looping_effect_marker_name;
     real32 initial_probability;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_variant_state, 24);
+ASSERT_STRUCT_SIZE(s_model_variant_state, 24);
 
 // max count: MAXIMUM_PERMUTATIONS_PER_MODEL_REGION
 struct s_model_variant_permutation
@@ -197,7 +197,7 @@ struct s_model_variant_permutation
     int8 runtime_state_permutation_index[5];
     int8 pad1[7];
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_variant_permutation, 32);
+ASSERT_STRUCT_SIZE(s_model_variant_permutation, 32);
 
 // max count: MAXIMUM_REGIONS_PER_MODEL
 struct s_model_variant_region
@@ -210,7 +210,7 @@ struct s_model_variant_region
     e_sort_order sort_order;    // negative values mean closer to the camera
     int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_variant_region, 20);
+ASSERT_STRUCT_SIZE(s_model_variant_region, 20);
 
 struct s_model_variant_object
 {
@@ -218,7 +218,7 @@ struct s_model_variant_object
     string_id child_marker;
     tag_reference child_object; // obje
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_variant_object, 16);
+ASSERT_STRUCT_SIZE(s_model_variant_object, 16);
 
 // max count: k_maximum_variants_per_model
 struct s_model_variant
@@ -232,7 +232,7 @@ struct s_model_variant
     string_id dialogue_sound_effect;
     tag_reference dialogue;  // udlg
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_variant, 56);
+ASSERT_STRUCT_SIZE(s_model_variant, 56);
 
 // max count: MAXIMUM_MATERIALS_PER_MODEL
 struct s_model_material
@@ -247,7 +247,7 @@ struct s_model_material
     int16 global_material_index;
     int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_material, 20);
+ASSERT_STRUCT_SIZE(s_model_material, 20);
 
 // max count: MAXIMUM_RESPONSES_PER_DAMAGE_SECTION
 struct s_instantaneous_damage_response
@@ -300,7 +300,7 @@ struct s_instantaneous_damage_response
     // Explaination("total damage threshold", "scale on total damage section vitality")
     real32 total_damage_threshold;
 };
-TAG_BLOCK_SIZE_ASSERT(s_instantaneous_damage_response, 80);
+ASSERT_STRUCT_SIZE(s_instantaneous_damage_response, 80);
 
 // max count: MAXIMUM_DAMAGE_SECTIONS_PER_MODEL
 struct s_model_damage_section
@@ -325,7 +325,7 @@ struct s_model_damage_section
     int16 resurection_region_runtime_index;
     int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_damage_section, 56);
+ASSERT_STRUCT_SIZE(s_model_damage_section, 56);
 
 // max count: MAXIMUM_NODES_PER_MODEL
 struct s_damage_node
@@ -334,7 +334,7 @@ struct s_damage_node
     int16 pad;
     int32 unk[3];
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_node, 16);
+ASSERT_STRUCT_SIZE(s_damage_node, 16);
 
 // max count: MAXIMUM_DAMAGE_SEAT_INFOS_PER_MODEL
 struct s_damage_seat_info
@@ -345,7 +345,7 @@ struct s_damage_seat_info
     real32 maximum_transfer_damage_scale;
     real32 minimum_transfer_damage_scale;
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_seat_info, 20);
+ASSERT_STRUCT_SIZE(s_damage_seat_info, 20);
 
 // max count: MAXIMUM_DAMAGE_CONSTRAINT_INFOS_PER_MODEL
 struct s_damage_constraint_info
@@ -357,7 +357,7 @@ struct s_damage_constraint_info
     e_physics_constraint physics_constraint;
     int16 constraint_index;
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_constraint_info, 20);
+ASSERT_STRUCT_SIZE(s_damage_constraint_info, 20);
 
 // max count: 1
 struct s_model_damage_info
@@ -413,14 +413,14 @@ struct s_model_damage_info
     tag_reference overshield_first_person_shader;   // shad
     tag_reference overshield_shader;                // shad
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_damage_info, 248);
+ASSERT_STRUCT_SIZE(s_model_damage_info, 248);
 
 struct s_model_target_lock_on_data
 {
     e_target_flags flags;
     real32 lock_on_distance;
 };
-CHECK_STRUCT_SIZE(s_model_target_lock_on_data, 8);
+ASSERT_STRUCT_SIZE(s_model_target_lock_on_data, 8);
 
 // max count: MAXIMUM_MODEL_TARGETS_PER_MODEL
 struct s_model_target
@@ -433,7 +433,7 @@ struct s_model_target
     real32 targeting_relevance;     // higher relevances turn into stronger magnetisms
     s_model_target_lock_on_data lockon_data;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_target, 28);
+ASSERT_STRUCT_SIZE(s_model_target, 28);
 
 // max count: MAXIMUM_PERMUTATIONS_PER_MODEL_REGION
 struct s_model_permutation
@@ -444,7 +444,7 @@ struct s_model_permutation
     int8 physics_permutation_index;
     int8 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_permutation, 8);
+ASSERT_STRUCT_SIZE(s_model_permutation, 8);
 
 // max count: MAXIMUM_REGIONS_PER_MODEL
 struct s_model_region
@@ -455,7 +455,7 @@ struct s_model_region
     int16 pad;
     tag_block<s_model_permutation> permutations;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_region, 16);
+ASSERT_STRUCT_SIZE(s_model_region, 16);
 
 // max count: MAXIMUM_NODES_PER_MODEL
 struct s_model_node
@@ -470,7 +470,7 @@ struct s_model_node
     real_quaternion default_rotation;
     real_matrix4x3 default_inverse_matrix;
 };
-CHECK_STRUCT_SIZE(s_model_node, 92);
+ASSERT_STRUCT_SIZE(s_model_node, 92);
 
 // max count: 1
 struct s_model_object_data
@@ -480,7 +480,7 @@ struct s_model_object_data
     real_point3d offset;
     real32 radius;
 };
-TAG_BLOCK_SIZE_ASSERT(s_model_object_data, 20);
+ASSERT_STRUCT_SIZE(s_model_object_data, 20);
 
 // max count: k_scenario_load_maximum_parameter_blocks
 struct s_scenario_load_parameters
@@ -565,4 +565,4 @@ struct s_model_definition
     tag_reference hologram_shader;   // shad
     string_id hologram_control_function;
 };
-TAG_GROUP_SIZE_ASSERT(s_model_definition, 252);
+ASSERT_STRUCT_SIZE(s_model_definition, 252);

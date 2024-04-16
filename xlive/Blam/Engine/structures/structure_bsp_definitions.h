@@ -68,14 +68,14 @@ struct node_render_leaves
     tag_block<structure_leaf> collision_leaves;
     tag_block<structure_surface_reference> surface_references;
 };
-TAG_BLOCK_SIZE_ASSERT(node_render_leaves, 16);
+ASSERT_STRUCT_SIZE(node_render_leaves, 16);
 
 // max: MAXIMUM_NODES_PER_BSP3D
 struct unused_structure_node
 {
     int8 pad_1[6];
 };
-TAG_BLOCK_SIZE_ASSERT(unused_structure_node, 6);
+ASSERT_STRUCT_SIZE(unused_structure_node, 6);
 
 // max: MAXIMUM_COLLISION_MATERIALS_PER_STRUCTURE
 struct structure_collision_material
@@ -86,7 +86,7 @@ struct structure_collision_material
     uint16 conveyor_surface_index;
     tag_reference new_shader; // shad
 };
-TAG_BLOCK_SIZE_ASSERT(structure_collision_material, 20);
+ASSERT_STRUCT_SIZE(structure_collision_material, 20);
 
 // max: MAXIMUM_CLUSTER_PORTALS_PER_STRUCTURE
 struct cluster_portal
@@ -100,7 +100,7 @@ struct cluster_portal
     // max: MAXIMUM_VERTICES_PER_CLUSTER_PORTAL
     tag_block<real_point3d> vertices;
 };
-TAG_BLOCK_SIZE_ASSERT(cluster_portal, 36);
+ASSERT_STRUCT_SIZE(cluster_portal, 36);
 
 // max: MAXIMUM_FOG_PLANES_PER_STRUCTURE
 struct s_structure_fog_plane
@@ -111,7 +111,7 @@ struct s_structure_fog_plane
     e_structure_fog_plane_flags flags;
     int16 priority;
 };
-TAG_BLOCK_SIZE_ASSERT(s_structure_fog_plane, 24);
+ASSERT_STRUCT_SIZE(s_structure_fog_plane, 24);
 
 // max: MAXIMUM_WEATHER_POLYHEDRA_PER_STRUCTURE
 struct structure_weather_polyhedron
@@ -121,7 +121,7 @@ struct structure_weather_polyhedron
     // max: MAXIMUM_PLANES_PER_WEATHER_POLYHEDRON
     tag_block<real_plane3d> planes;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_weather_polyhedron, 24);
+ASSERT_STRUCT_SIZE(structure_weather_polyhedron, 24);
 
 // max count: MAXIMUM_WEATHER_PALETTE_ENTRIES_PER_STRUCTURE 32
 struct structure_weather_palette_entry
@@ -136,14 +136,14 @@ struct structure_weather_palette_entry
     int pad2;
     static_string32 wind_scale_function;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_weather_palette_entry, 136);
+ASSERT_STRUCT_SIZE(structure_weather_palette_entry, 136);
 
 // max: MAXIMUM_DETAIL_OBJECT_COUNT
 struct detail_object_count
 {
     int16 unknown_1;
 };
-TAG_BLOCK_SIZE_ASSERT(detail_object_count, 2);
+ASSERT_STRUCT_SIZE(detail_object_count, 2);
 
 // max: MAXIMUM_DETAIL_OBJECTS_PER_STRUCTURE
 struct detail_object
@@ -151,7 +151,7 @@ struct detail_object
     uint32 unknown_1;
     uint16 unknown_2;
 };
-TAG_BLOCK_SIZE_ASSERT(detail_object, 8);
+ASSERT_STRUCT_SIZE(detail_object, 8);
 
 // max: MAXIMUM_DETAIL_OBJECT_CELLS_PER_STRUCTURE
 struct detail_object_cell_definition
@@ -165,7 +165,7 @@ struct detail_object_cell_definition
     uint32 unknown_7;
     int8 pad_1[12];
 };
-TAG_BLOCK_SIZE_ASSERT(detail_object_cell_definition, 32);
+ASSERT_STRUCT_SIZE(detail_object_cell_definition, 32);
 
 // max: 1
 // names can be inferred from MCC 0x0103BBF at a future time for all child objects
@@ -178,7 +178,7 @@ struct structure_detail_object_data
     tag_block<real_vector4d> reference_z_vectors;
     int32 pad_1;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_detail_object_data, 36);
+ASSERT_STRUCT_SIZE(structure_detail_object_data, 36);
 
 // max: MAXIMUM_CLUSTERS_PER_STRUCTURE
 struct structure_cluster
@@ -226,7 +226,7 @@ struct structure_cluster
     // DataSize(1048576)
     data_reference collision_mopp_code;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_cluster, 176);
+ASSERT_STRUCT_SIZE(structure_cluster, 176);
 
 // max: MAXIMUM_COLLISION_MATERIALS_PER_STRUCTURE
 struct structure_conveyor_surface
@@ -234,7 +234,7 @@ struct structure_conveyor_surface
     real_vector3d u;
     real_vector3d v;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_conveyor_surface, 24);
+ASSERT_STRUCT_SIZE(structure_conveyor_surface, 24);
 
 // max: MAXIMUM_BREAKABLE_SURFACES_PER_STRUCTURE
 struct structure_breakable_surface
@@ -254,7 +254,7 @@ struct structure_marker
     real_quaternion rotation;
     real_point3d position;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_marker, 60);
+ASSERT_STRUCT_SIZE(structure_marker, 60);
 
 
 // max: MAXIMUM_ENVIRONMENT_OBJECT_PALETTE_ENTRIES_PER_STRUCTURE
@@ -266,7 +266,7 @@ struct structure_environment_object_palette_entry
     tag_reference model;
     c_flags<e_object_type, uint32, k_object_types_count> object_flags;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_environment_object_palette_entry, 20);
+ASSERT_STRUCT_SIZE(structure_environment_object_palette_entry, 20);
 
 // max: MAXIMUM_ENVIRONMENT_OBJECTS_PER_STRUCTURE
 struct structure_environment_object
@@ -280,7 +280,7 @@ struct structure_environment_object
     c_static_string<4> exported_object_type;
 	static_string32 scenario_object_name;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_environment_object, 104);
+ASSERT_STRUCT_SIZE(structure_environment_object, 104);
 
 // max: 32*k_kilo
 struct s_transparent_plane
@@ -289,7 +289,7 @@ struct s_transparent_plane
     uint16 part_index;
     real_plane3d plane;
 };
-TAG_BLOCK_SIZE_ASSERT(s_transparent_plane, 20);
+ASSERT_STRUCT_SIZE(s_transparent_plane, 20);
 
 struct structure_bsp
 {
@@ -380,7 +380,7 @@ struct structure_bsp
     tag_block<s_object_fake_lightprobe> fake_lightprobes;
     tag_block<c_decorator_placement_definition> decorator_placement;
 };
-TAG_GROUP_SIZE_ASSERT(structure_bsp, 572);
+ASSERT_STRUCT_SIZE(structure_bsp, 572);
 
 int16 get_global_structure_bsp_index(void);
 structure_bsp* get_global_structure_bsp(void);

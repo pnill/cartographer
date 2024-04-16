@@ -35,7 +35,7 @@ struct pathfinding_hint_data
     short hint_data_6;
     short hint_data_7;
 }; 
-TAG_BLOCK_SIZE_ASSERT(pathfinding_hint_data, 20);
+ASSERT_STRUCT_SIZE(pathfinding_hint_data, 20);
 
 // max count: MAXIMUM_STRUCTURE_BSPS_PER_SCENARIO 16
 struct pathfinding_data
@@ -53,4 +53,4 @@ struct pathfinding_data
     int pad[8];
     tag_block<user_hint_data> user_placed_hints;
 };
-TAG_BLOCK_SIZE_ASSERT(pathfinding_data, 116);
+ASSERT_STRUCT_SIZE(pathfinding_data, 116);

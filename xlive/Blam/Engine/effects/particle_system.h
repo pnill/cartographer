@@ -33,7 +33,7 @@ struct s_particle_system_update
 	real32 delta_time;
 	datum particle_system_location_index;
 };
-CHECK_STRUCT_SIZE(s_particle_system_update, 0xC);
+ASSERT_STRUCT_SIZE(s_particle_system_update, 0xC);
 
 class c_particle_system
 {
@@ -88,7 +88,7 @@ public:
 	static void __stdcall restart(c_particle_system* thisx, s_particle_system_update* timings, real_matrix4x3* matrix, int unused);
 	static void __cdecl destroy(datum particle_system_index);
 };
-CHECK_STRUCT_SIZE(c_particle_system, 0x54);
+ASSERT_STRUCT_SIZE(c_particle_system, 0x54);
 
 s_data_array* get_particle_system_table();
 

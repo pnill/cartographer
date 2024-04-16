@@ -8,7 +8,7 @@ struct s_hud_scripted_globals
 	bool show_help_text;
 	bool show_hud_messages;
 };
-CHECK_STRUCT_SIZE(s_hud_scripted_globals, 3);
+ASSERT_STRUCT_SIZE(s_hud_scripted_globals, 3);
 
 struct s_new_hud_globals_player_info
 {
@@ -19,7 +19,7 @@ struct s_new_hud_globals_player_info
 	void* text_chat_widget;
 	uint8 unk_5C[36];
 };
-CHECK_STRUCT_SIZE(s_new_hud_globals_player_info, 128);
+ASSERT_STRUCT_SIZE(s_new_hud_globals_player_info, 128);
 
 struct s_new_hud_engine_globals
 {
@@ -39,7 +39,7 @@ struct s_new_hud_engine_globals
 	real32 unk_22C;
 	real32 unk_230;
 };
-CHECK_STRUCT_SIZE(s_new_hud_engine_globals, 564);
+ASSERT_STRUCT_SIZE(s_new_hud_engine_globals, 564);
 
 struct s_new_hud_temporary_user_state
 {
@@ -67,7 +67,7 @@ struct s_new_hud_temporary_user_state
 	bool dead_unit_index_exists;
 	int8 gap_51[567];
 };
-CHECK_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
+ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 
 
 void should_draw_hud_override_set(bool flag);

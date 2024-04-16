@@ -27,6 +27,6 @@ public:
 	c_particle_definition_interface_vtable* vtbl;
 	int8 gap_4[8];
 };
-CHECK_STRUCT_SIZE(c_particle_definition_interface, 12);
+ASSERT_STRUCT_SIZE(c_particle_definition_interface, 12);
 
 c_particle_definition_interface* __cdecl get_particle_system_interface_from_tag_index(datum tag_index);

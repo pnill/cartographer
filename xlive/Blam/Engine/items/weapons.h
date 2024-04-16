@@ -19,7 +19,7 @@ struct s_weapon_magazine
 	int16 field_C;
 	int16 field_E;
 };
-CHECK_STRUCT_SIZE(s_weapon_magazine, 16);
+ASSERT_STRUCT_SIZE(s_weapon_magazine, 16);
 
 struct weapon_datum
 {
@@ -38,7 +38,7 @@ struct weapon_datum
 	s_weapon_magazine magazines[2];
 	int8 field_22E[24];
 };
-CHECK_STRUCT_SIZE(weapon_datum, 604);
+ASSERT_STRUCT_SIZE(weapon_datum, 604);
 
 int32 __cdecl weapon_get_rounds_total(datum object_index, int32 magazine_index, bool a3);
 void __cdecl weapons_fire_barrels(void);

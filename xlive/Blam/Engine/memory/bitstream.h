@@ -116,6 +116,6 @@ struct c_bitstream
 	void write_unit_vector(const char* name, const real_vector3d* unit_vector);
 	void read_unit_vector(const char* name, real_vector3d* out_unit_vector);
 };
-CHECK_STRUCT_SIZE(c_bitstream, 52);
+ASSERT_STRUCT_SIZE(c_bitstream, 52);
 
 void bitstream_serialization_apply_patches();

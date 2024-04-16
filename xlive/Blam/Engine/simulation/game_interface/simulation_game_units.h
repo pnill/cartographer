@@ -23,7 +23,7 @@ struct s_simulation_unit_state_data
 	real32 active_camo;
 	real32 active_camo_regrowth;
 };
-CHECK_STRUCT_SIZE(s_simulation_unit_state_data, 0xF8);
+ASSERT_STRUCT_SIZE(s_simulation_unit_state_data, 0xF8);
 
 struct s_simulation_unit_creation_data
 {
@@ -32,6 +32,6 @@ struct s_simulation_unit_creation_data
 	e_game_team team;
 	int8 pad1[2];
 };
-CHECK_STRUCT_SIZE(s_simulation_unit_creation_data, 36);
+ASSERT_STRUCT_SIZE(s_simulation_unit_creation_data, 36);
 
 void simulation_game_units_apply_patches(void);

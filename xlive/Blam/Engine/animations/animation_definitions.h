@@ -21,19 +21,19 @@ struct s_additional_node_data
     real_point3d min_bounds;
     real_point3d max_bounds;
 };
-TAG_BLOCK_SIZE_ASSERT(s_additional_node_data, 60);
+ASSERT_STRUCT_SIZE(s_additional_node_data, 60);
 
 struct inherited_animation_node_map_block
 {
     int16 local_node;
 };
-TAG_BLOCK_SIZE_ASSERT(inherited_animation_node_map_block, 2);
+ASSERT_STRUCT_SIZE(inherited_animation_node_map_block, 2);
 
 struct inherited_animation_node_map_flag_block
 {
     uint32 local_node_flags;
 };
-TAG_BLOCK_SIZE_ASSERT(inherited_animation_node_map_flag_block, 4);
+ASSERT_STRUCT_SIZE(inherited_animation_node_map_flag_block, 4);
 
 enum e_inheritance_flags : uint8
 {
@@ -51,7 +51,7 @@ struct s_animation_inheritence
     e_inheritance_flags inheritance_flags;
     int8 pad[3];
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_inheritence, 32);
+ASSERT_STRUCT_SIZE(s_animation_inheritence, 32);
 
 struct s_weapon_class_listing
 {
@@ -73,7 +73,7 @@ public:
     const uint32* get_left_arm_nodes(void) const;
     const uint32* get_right_arm_nodes(void) const;
 };
-TAG_BLOCK_SIZE_ASSERT(c_model_animation_runtime_data, 80);
+ASSERT_STRUCT_SIZE(c_model_animation_runtime_data, 80);
 
 enum e_node_model_flags : uint8
 {
@@ -106,7 +106,7 @@ struct animation_graph_node
     real32 vector_range;
     real32 zpos;
 };
-TAG_BLOCK_SIZE_ASSERT(animation_graph_node, 32);
+ASSERT_STRUCT_SIZE(animation_graph_node, 32);
 
 enum e_animation_graph_resources_flags : uint8
 {
@@ -134,7 +134,7 @@ struct animation_graph_sound_reference
     e_animation_graph_reference_flags flags;
     int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(animation_graph_sound_reference, 0xC);
+ASSERT_STRUCT_SIZE(animation_graph_sound_reference, 0xC);
 
 struct animation_graph_effect_reference
 {
@@ -142,7 +142,7 @@ struct animation_graph_effect_reference
     e_animation_graph_reference_flags flags;
     int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(animation_graph_effect_reference, 12);
+ASSERT_STRUCT_SIZE(animation_graph_effect_reference, 12);
 
 struct animation_aiming_screen_bounds
 {
@@ -155,14 +155,14 @@ struct animation_aiming_screen_bounds
     int16 down_pitch_frame_count;
     int16 up_pitch_frame_count;
 };
-TAG_BLOCK_SIZE_ASSERT(animation_aiming_screen_bounds, 24);
+ASSERT_STRUCT_SIZE(animation_aiming_screen_bounds, 24);
 
 struct s_animation_blend_screen
 {
     string_id label;
     animation_aiming_screen_bounds aiming_screen;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_blend_screen, 28);
+ASSERT_STRUCT_SIZE(s_animation_blend_screen, 28);
 
 enum e_animation_type : uint8
 {
@@ -238,7 +238,7 @@ public:
     int32 get_field8(void) const { return field_8; }
     int32 get_field12(void) const { return field_12; }
 };
-TAG_BLOCK_SIZE_ASSERT(c_animation_data_sizes, 16);
+ASSERT_STRUCT_SIZE(c_animation_data_sizes, 16);
 
 enum e_frame_event_type : int16
 {
@@ -260,7 +260,7 @@ struct s_frame_event
     e_frame_event_type type;
     int16 frame;
 };
-TAG_BLOCK_SIZE_ASSERT(s_frame_event, 4);
+ASSERT_STRUCT_SIZE(s_frame_event, 4);
 
 struct s_sound_event
 {
@@ -268,14 +268,14 @@ struct s_sound_event
     int16 frame;
     string_id marker_name;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sound_event, 8);
+ASSERT_STRUCT_SIZE(s_sound_event, 8);
 
 struct s_effect_event
 {
     int16 effect;
     int16 frame;
 };
-TAG_BLOCK_SIZE_ASSERT(s_effect_event, 4);
+ASSERT_STRUCT_SIZE(s_effect_event, 4);
 
 enum e_component_flags : int16
 {
@@ -290,7 +290,7 @@ struct s_object_space_node_data
     e_component_flags component_flags;
     c_quantized_orientation orientation;
 };
-TAG_BLOCK_SIZE_ASSERT(s_object_space_node_data, 28);
+ASSERT_STRUCT_SIZE(s_object_space_node_data, 28);
 
 class c_model_animation
 {
@@ -390,7 +390,7 @@ public:
     size_t get_sound_reference_count(void) const;
     tag_reference get_parent_graph(void) const;
 };
-TAG_BLOCK_SIZE_ASSERT(c_animation_graph_resources, 52);
+ASSERT_STRUCT_SIZE(c_animation_graph_resources, 52);
 
 struct s_animation_ik_point
 {
@@ -399,27 +399,27 @@ struct s_animation_ik_point
     /// the marker name object (weapon, vehicle, etc.) the above marker is being attached to
     string_id attach_to_marker;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_ik_point, 8);
+ASSERT_STRUCT_SIZE(s_animation_ik_point, 8);
 
 struct s_animation_entry
 {
     string_id label;
     c_animation_id animation;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_entry, 8);
+ASSERT_STRUCT_SIZE(s_animation_entry, 8);
 
 struct s_animation_damage_direction
 {
     tag_block<c_animation_id> regions;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_damage_direction, 8);
+ASSERT_STRUCT_SIZE(s_animation_damage_direction, 8);
 
 struct s_animation_damage_actions
 {
     string_id label;
     tag_block<s_animation_damage_direction> directions;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_damage_actions, 12);
+ASSERT_STRUCT_SIZE(s_animation_damage_actions, 12);
 
 enum e_frame_event_link : uint8
 {
@@ -440,7 +440,7 @@ struct s_animation_transition_state
     uint8 index_a;  // first level sub-index into state
     uint8 index_b;  // second level sub-index into state
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_transition_state, 8);
+ASSERT_STRUCT_SIZE(s_animation_transition_state, 8);
 
 struct s_animation_transition_destination
 {
@@ -451,7 +451,7 @@ struct s_animation_transition_destination
     s_animation_transition_state state_info;
     c_animation_id animation;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_transition_destination, 20);
+ASSERT_STRUCT_SIZE(s_animation_transition_destination, 20);
 
 struct s_animation_transition_source
 {
@@ -460,13 +460,13 @@ struct s_animation_transition_source
     s_animation_transition_state state_info;
     tag_block<s_animation_transition_destination> destinations;
 };
-TAG_BLOCK_SIZE_ASSERT(s_animation_damage_actions, 12);
+ASSERT_STRUCT_SIZE(s_animation_damage_actions, 12);
 
 struct precache_list_block
 {
     int32 cache_block_index;
 };
-TAG_BLOCK_SIZE_ASSERT(precache_list_block, 4);
+ASSERT_STRUCT_SIZE(precache_list_block, 4);
 
 struct c_weapon_type
 {
@@ -478,7 +478,7 @@ struct c_weapon_type
     tag_block<precache_list_block> high_precache;
     tag_block<precache_list_block> low_precache;
 };
-TAG_BLOCK_SIZE_ASSERT(c_weapon_type, 52);
+ASSERT_STRUCT_SIZE(c_weapon_type, 52);
 
 class c_weapon_class
 {
@@ -486,7 +486,7 @@ class c_weapon_class
     tag_block<c_weapon_type> weapon_type;
     tag_block<s_animation_ik_point> weapon_ik;
 };
-TAG_BLOCK_SIZE_ASSERT(c_weapon_class, 20);
+ASSERT_STRUCT_SIZE(c_weapon_class, 20);
 
 class c_animation_mode
 {
@@ -494,7 +494,7 @@ class c_animation_mode
     tag_block<c_weapon_class> weapon_class;
     tag_block<s_animation_ik_point> mode_ik;
 };
-TAG_BLOCK_SIZE_ASSERT(c_animation_mode, 20);
+ASSERT_STRUCT_SIZE(c_animation_mode, 20);
 
 struct c_vehicle_suspension
 {
@@ -512,7 +512,7 @@ struct c_vehicle_suspension
     real32 destroyed_full_extension_grounddepth;
     real32 destroyed_full_compression_grounddepth;
 };
-TAG_BLOCK_SIZE_ASSERT(c_vehicle_suspension, 40);
+ASSERT_STRUCT_SIZE(c_vehicle_suspension, 40);
 
 enum e_function_controls : int16
 {
@@ -529,7 +529,7 @@ struct s_object_overlay
     string_id function;
     int32 pad1;
 };
-TAG_BLOCK_SIZE_ASSERT(s_object_overlay, 20);
+ASSERT_STRUCT_SIZE(s_object_overlay, 20);
 
 class c_model_animation_graph_contents
 {
@@ -540,7 +540,7 @@ class c_model_animation_graph_contents
     tag_block<c_vehicle_suspension> vehicle_suspension;
     tag_block<s_object_overlay> object_overlays;
 };
-TAG_BLOCK_SIZE_ASSERT(c_model_animation_graph_contents, 24);
+ASSERT_STRUCT_SIZE(c_model_animation_graph_contents, 24);
 
 
 // TODO label and implement the rest of the member functions for this class
@@ -574,4 +574,4 @@ public:
     const animation_graph_node* get_node(uint8 node_index) const;
     int16 get_node_count(void) const;
 };
-TAG_GROUP_SIZE_ASSERT(c_model_animation_graph, 172);
+ASSERT_STRUCT_SIZE(c_model_animation_graph, 172);

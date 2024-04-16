@@ -10,4 +10,4 @@ struct runtime_state_globals
 	int32 unk_C;
 	int32 unk_10;
 };
-CHECK_STRUCT_SIZE(runtime_state_globals, 0x14);
+ASSERT_STRUCT_SIZE(runtime_state_globals, 0x14);

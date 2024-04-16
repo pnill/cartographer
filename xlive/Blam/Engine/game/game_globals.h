@@ -31,7 +31,7 @@ struct s_game_globals_havok_cleanup_resources
 {
     tag_reference object_cleanup_effect;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_havok_cleanup_resources, 8);
+ASSERT_STRUCT_SIZE(s_game_globals_havok_cleanup_resources, 8);
 
 // max count: 1
 struct s_game_globals_collision_damage
@@ -48,7 +48,7 @@ struct s_game_globals_collision_damage
 
     int32 pad[8];
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_collision_damage, 72);
+ASSERT_STRUCT_SIZE(s_game_globals_collision_damage, 72);
 
 // max count: 1
 struct s_sound_globals_definition
@@ -59,7 +59,7 @@ struct s_sound_globals_definition
     tag_reference sound_combat_dialogue_constants;  // spk!
     datum sound_gesalt;                             // ugh!
 };
-TAG_BLOCK_SIZE_ASSERT(s_sound_globals_definition, 36);
+ASSERT_STRUCT_SIZE(s_sound_globals_definition, 36);
 
 // max count: 1
 struct s_ai_globals_gravemind_definition
@@ -68,7 +68,7 @@ struct s_ai_globals_gravemind_definition
     real32 ideal_retreat_time_secs;
     real32 max_retreat_time_Secs;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ai_globals_gravemind_definition, 12);
+ASSERT_STRUCT_SIZE(s_ai_globals_gravemind_definition, 12);
 
 // max count: 1
 struct s_ai_globals_definition
@@ -116,14 +116,14 @@ struct s_ai_globals_definition
     real32 player_scariness;
     real32 berserking_actor_scariness;
 };
-TAG_BLOCK_SIZE_ASSERT(s_ai_globals_definition, 360);
+ASSERT_STRUCT_SIZE(s_ai_globals_definition, 360);
 
 // max count: 1
 struct s_damage_globals_definition
 {
     tag_block<s_damage_group_definition> damage_groups;
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_globals_definition, 8);
+ASSERT_STRUCT_SIZE(s_damage_globals_definition, 8);
 
 // max count: 1
 struct s_game_globals_camera
@@ -133,7 +133,7 @@ struct s_game_globals_camera
     real32 first_person_change_pause;
     real32 following_camera_change_pause;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_camera, 20);
+ASSERT_STRUCT_SIZE(s_game_globals_camera, 20);
 
 // max count: 1
 struct s_game_globals_player_control
@@ -177,7 +177,7 @@ struct s_game_globals_player_control
     tag_block<real32> look_function;                // max count: 16
     real32 minimum_action_hold_time_seconds;        // time that player needs to press ACTION to register as a HOLD
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_player_control, 128);
+ASSERT_STRUCT_SIZE(s_game_globals_player_control, 128);
 
 // max count: 1
 struct s_game_globals_difficulty_information
@@ -341,7 +341,7 @@ struct s_game_globals_difficulty_information
     int32 pad7[4];
     int32 pad8[21];
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_difficulty_information, 644);
+ASSERT_STRUCT_SIZE(s_game_globals_difficulty_information, 644);
 
 // max count: k_unit_grenade_types_count
 struct s_game_globals_grenade
@@ -353,14 +353,14 @@ struct s_game_globals_grenade
     tag_reference equipment;        // eqip
     tag_reference projectile;       // proj
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_grenade, 44);
+ASSERT_STRUCT_SIZE(s_game_globals_grenade, 44);
 
 // max count: k_global_vertex_shader_count
 struct s_vertex_shader_reference
 {
     tag_reference vertex_shader;  // vrtx
 };
-TAG_BLOCK_SIZE_ASSERT(s_vertex_shader_reference, 8);
+ASSERT_STRUCT_SIZE(s_vertex_shader_reference, 8);
 
 // max count: 1
 struct s_game_globals_rasterizer_data
@@ -411,7 +411,7 @@ struct s_game_globals_rasterizer_data
     // Explaination("PC textures", "The PC can't use 3D textures, so we use this instead.")
     tag_reference pc_3d_bitmap;     // bitm
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_rasterizer_data, 264);
+ASSERT_STRUCT_SIZE(s_game_globals_rasterizer_data, 264);
 
 // max count: 1
 struct s_game_globals_interface_tag_references
@@ -436,13 +436,13 @@ struct s_game_globals_interface_tag_references
     tag_reference singleplayer_ui_globals;      // wgtz
     tag_reference multiplayer_ui_globals;       // wgtz
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_interface_tag_references, 152);
+ASSERT_STRUCT_SIZE(s_game_globals_interface_tag_references, 152);
 
 struct s_game_globals_tag_reference
 {
     tag_reference reference;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_tag_reference, 8);
+ASSERT_STRUCT_SIZE(s_game_globals_tag_reference, 8);
 
 // max count: 1
 struct s_game_globals_multiplayer_information
@@ -465,7 +465,7 @@ struct s_game_globals_multiplayer_information
     tag_block<> unk_block;
     tag_block<s_multiplayer_event_response_definition> king_events;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_multiplayer_information, 152);
+ASSERT_STRUCT_SIZE(s_game_globals_multiplayer_information, 152);
 
 // max count: 1
 struct s_game_globals_player_information
@@ -509,7 +509,7 @@ struct s_game_globals_player_information
     tag_reference flashlight_off;   // snd!
     tag_reference ice_cream;        // snd!
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_player_information, 284);
+ASSERT_STRUCT_SIZE(s_game_globals_player_information, 284);
 
 // max count: k_player_character_type_count
 struct s_game_globals_player_representation
@@ -521,7 +521,7 @@ struct s_game_globals_player_representation
     tag_reference third_person_unit;    // unit
     string_id third_person_variant;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_player_representation, 188);
+ASSERT_STRUCT_SIZE(s_game_globals_player_representation, 188);
 
 // max count: 1
 struct s_game_globals_falling_damage
@@ -541,7 +541,7 @@ struct s_game_globals_falling_damage
     real32 field_60;
     real32 unk_gravity_64;
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_falling_damage, 104);
+ASSERT_STRUCT_SIZE(s_game_globals_falling_damage, 104);
 
 // max count: 1
 struct s_game_globals_multiplayer_ui
@@ -551,7 +551,7 @@ struct s_game_globals_multiplayer_ui
     tag_block<real_rgb_color> team_colors;              // max count: k_game_globals_maximum_multiplayer_colors
     tag_reference team_names;           // unic
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals_multiplayer_ui, 32);
+ASSERT_STRUCT_SIZE(s_game_globals_multiplayer_ui, 32);
 
 struct s_game_globals
 {
@@ -593,7 +593,7 @@ struct s_game_globals
     // Populated during game startup
     c_language_pack language_pack[k_language_count];
 };
-TAG_BLOCK_SIZE_ASSERT(s_game_globals, 644);
+ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
 s_game_globals* scenario_get_game_globals(void);
 s_ui_levels_definition* game_globals_get_ui_levels(void);

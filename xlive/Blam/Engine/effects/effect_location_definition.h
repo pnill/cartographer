@@ -34,4 +34,4 @@ struct effect_location_definition
      */
     string_id marker_name;
 };
-TAG_BLOCK_SIZE_ASSERT(effect_location_definition, 0x4);
+ASSERT_STRUCT_SIZE(effect_location_definition, 0x4);

@@ -7,4 +7,4 @@ struct s_simulation_generic_creation_data
 	s_simulation_object_creation_data object;
 	string_id variant;
 };
-CHECK_STRUCT_SIZE(s_simulation_generic_creation_data, 20);
+ASSERT_STRUCT_SIZE(s_simulation_generic_creation_data, 20);

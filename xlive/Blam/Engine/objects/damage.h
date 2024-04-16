@@ -11,7 +11,7 @@ struct s_damage_owner
 	uint16 target_model_abs_index;
 	int16 pad;
 };
-CHECK_STRUCT_SIZE(s_damage_owner, 12);
+ASSERT_STRUCT_SIZE(s_damage_owner, 12);
 
 struct s_damage_data
 {
@@ -41,7 +41,7 @@ struct s_damage_data
 	BYTE gap_80[4];					// 0x80
 	char field_84;					// 0x84
 };
-CHECK_STRUCT_SIZE(s_damage_data, 0x88);
+ASSERT_STRUCT_SIZE(s_damage_data, 0x88);
 
 // max_count: LONG_MAX
 struct s_armor_modifier_definition
@@ -49,7 +49,7 @@ struct s_armor_modifier_definition
 	string_id name;
 	real32 damage_multiplier;
 };
-TAG_BLOCK_SIZE_ASSERT(s_armor_modifier_definition, 8);
+ASSERT_STRUCT_SIZE(s_armor_modifier_definition, 8);
 
 // max_count: LONG_MAX
 struct s_damage_group_definition
@@ -60,5 +60,5 @@ struct s_damage_group_definition
 	// Runtime field?
 	int32 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_damage_group_definition, 16);
+ASSERT_STRUCT_SIZE(s_damage_group_definition, 16);
 

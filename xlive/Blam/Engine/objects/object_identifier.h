@@ -29,4 +29,4 @@ public:
 	e_object_type get_type() const;
 	int32 get_unique_id() const;
 };
-CHECK_STRUCT_SIZE(c_object_identifier, 8);
+ASSERT_STRUCT_SIZE(c_object_identifier, 8);

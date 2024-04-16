@@ -177,14 +177,14 @@ struct s_melee_damage_parameters
     // this is only important for the energy sword
     tag_reference lunge_melee_response;  // jpt!
 };
-CHECK_STRUCT_SIZE(s_melee_damage_parameters, 76);
+ASSERT_STRUCT_SIZE(s_melee_damage_parameters, 76);
 
 struct weapon_tracking_struct_block
 {
     e_tracking_type tracking_type;
     int16 pad;
 };
-CHECK_STRUCT_SIZE(weapon_tracking_struct_block, 4);
+ASSERT_STRUCT_SIZE(weapon_tracking_struct_block, 4);
 
 // max count: k_player_character_type_count
 struct weapon_first_person_interface_definition
@@ -192,7 +192,7 @@ struct weapon_first_person_interface_definition
     tag_reference model;        // mode
     tag_reference animations;   // jmad
 };
-TAG_BLOCK_SIZE_ASSERT(weapon_first_person_interface_definition, 16);
+ASSERT_STRUCT_SIZE(weapon_first_person_interface_definition, 16);
 
 struct weapon_interface_definition_new
 {
@@ -202,7 +202,7 @@ struct weapon_interface_definition_new
     tag_block<weapon_first_person_interface_definition> first_person;
     tag_reference new_hud_interface;  // nhdt
 };
-CHECK_STRUCT_SIZE(weapon_interface_definition_new, 32);
+ASSERT_STRUCT_SIZE(weapon_interface_definition_new, 32);
 
 // max count: MAXIMUM_NUMBER_OF_MAGAZINE_OBJECTS_PER_MAGAZINE
 struct weapon_ammunition_object
@@ -211,7 +211,7 @@ struct weapon_ammunition_object
     int16 pad;
     tag_reference equipment;    // eqip
 };
-TAG_BLOCK_SIZE_ASSERT(weapon_ammunition_object, 12);
+ASSERT_STRUCT_SIZE(weapon_ammunition_object, 12);
 
 // max count: MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON
 struct weapon_magazine_definition
@@ -236,7 +236,7 @@ struct weapon_magazine_definition
     tag_reference chambering_damage_effect;   // jpt!
     tag_block<weapon_ammunition_object> magazines;
 };
-TAG_BLOCK_SIZE_ASSERT(weapon_magazine_definition, 92);
+ASSERT_STRUCT_SIZE(weapon_magazine_definition, 92);
 
 // max count: k_weapon_trigger_count
 struct weapon_trigger_definition
@@ -257,7 +257,7 @@ struct weapon_trigger_definition
         e_autofire_action secondary_action;
         e_autofire_action primary_action;
     };
-    CHECK_STRUCT_SIZE(s_autofire_fields, 12);
+    ASSERT_STRUCT_SIZE(s_autofire_fields, 12);
 
     enum e_charging_overcharged_action : int16
     {
@@ -279,7 +279,7 @@ struct weapon_trigger_definition
         // the charging effect is created once when the trigger begins to charge
         tag_reference charging_damage_effect; // jpt!
     };
-    CHECK_STRUCT_SIZE(s_charging_fields, 36);
+    ASSERT_STRUCT_SIZE(s_charging_fields, 36);
 
     e_weapon_trigger_definition_flags flags;
     e_weapon_trigger_definition_input input;
@@ -293,7 +293,7 @@ struct weapon_trigger_definition
     s_autofire_fields autofire;
     s_charging_fields charging;
 };
-TAG_BLOCK_SIZE_ASSERT(weapon_trigger_definition, 64);
+ASSERT_STRUCT_SIZE(weapon_trigger_definition, 64);
 
 // max count: k_weapon_barrel_effect_count
 struct barrel_firing_effect
@@ -310,7 +310,7 @@ struct barrel_firing_effect
     // jpt!
     tag_reference empty_damage;     // this effect is used when the weapon is not loaded
 };
-TAG_BLOCK_SIZE_ASSERT(barrel_firing_effect, 52);
+ASSERT_STRUCT_SIZE(barrel_firing_effect, 52);
 
 // max count: k_weapon_barrel_count
 struct weapon_barrel_definition
@@ -393,7 +393,7 @@ struct weapon_barrel_definition
     real32 runtime_error_deceleration_rate;
     tag_block<barrel_firing_effect> firing_effects; // firing effects determine what happens when this trigger is fired
 };
-TAG_BLOCK_SIZE_ASSERT(weapon_barrel_definition, 236);
+ASSERT_STRUCT_SIZE(weapon_barrel_definition, 236);
 
 struct _weapon_definition
 {
@@ -514,7 +514,7 @@ struct _weapon_definition
     real_vector3d first_person_weapon_offset;
     real_vector2d first_person_scope_size;
 };
-TAG_GROUP_SIZE_ASSERT(_weapon_definition, 796);
+ASSERT_STRUCT_SIZE(_weapon_definition, 796);
 
 weapon_first_person_interface_definition* first_person_interface_definition_get(const _weapon_definition* definition, e_character_type character_type);
 

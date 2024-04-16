@@ -48,7 +48,7 @@ public:
 	c_simulation_entity_database m_entity_database;
 	c_simulation_event_handler m_event_handler;
 };
-CHECK_STRUCT_SIZE(c_simulation_distributed_world, 45260);
+ASSERT_STRUCT_SIZE(c_simulation_distributed_world, 45260);
 
 class c_simulation_world
 {
@@ -189,6 +189,6 @@ public:
 		return m_time_running;
 	}
 };
-CHECK_STRUCT_SIZE(c_simulation_world, 0x12B0);
+ASSERT_STRUCT_SIZE(c_simulation_world, 0x12B0);
 
 void simulation_world_apply_patches();

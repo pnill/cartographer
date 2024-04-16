@@ -45,7 +45,7 @@ struct structure_instanced_geometry_instance
 	e_structure_instanced_geometry_instance_pathfinding_policy pathfinding_policy;
 	e_structure_instanced_geometry_instance_lightmap_policy lightmap_policy;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_instanced_geometry_instance, 88);
+ASSERT_STRUCT_SIZE(structure_instanced_geometry_instance, 88);
 
 // max: 1
 struct structure_instanced_geometry_render_info
@@ -59,7 +59,7 @@ struct structure_instanced_geometry_render_info
 	// max: MAXIMUM_STRIP_INDICES_PER_GEOMETRY_SECTION
 	tag_block<uint16> index_reorder_table;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_instanced_geometry_render_info, 92);
+ASSERT_STRUCT_SIZE(structure_instanced_geometry_render_info, 92);
 
 // max: k_maximum_instance_geometry_definitions_per_structure_bsp
 struct structure_instanced_geometry_definition
@@ -73,7 +73,7 @@ struct structure_instanced_geometry_definition
 	tag_block<structure_leaf> render_leaves;
 	tag_block<structure_surface_reference> surface_references;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_instanced_geometry_definition, 200);
+ASSERT_STRUCT_SIZE(structure_instanced_geometry_definition, 200);
 
 // max count: k_maximum_instance_geometry_instances_per_structure_bsp
 struct instanced_geometry_reference
@@ -81,4 +81,4 @@ struct instanced_geometry_reference
 	short pathfinding_object_index;
 	short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(instanced_geometry_reference, 4);
+ASSERT_STRUCT_SIZE(instanced_geometry_reference, 4);

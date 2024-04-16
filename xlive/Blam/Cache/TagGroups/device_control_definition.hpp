@@ -31,7 +31,7 @@ struct s_device_control_group_definition
 	tag_reference off;//0x130
 	tag_reference deny;//0x138
 };
-TAG_GROUP_SIZE_ASSERT(s_device_control_group_definition, 0x140);
+ASSERT_STRUCT_SIZE(s_device_control_group_definition, 0x140);
 #pragma pack(pop)
 
 

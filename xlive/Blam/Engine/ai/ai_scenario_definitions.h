@@ -17,7 +17,7 @@ struct squad_group_definition
     short parent;           // Block index: squad_groups_definition
     short initial_orders;   // Block index: orders_definition
 };
-TAG_BLOCK_SIZE_ASSERT(squad_group_definition, 36);
+ASSERT_STRUCT_SIZE(squad_group_definition, 36);
 
 enum e_squad_definition_flags : int
 {
@@ -108,7 +108,7 @@ struct actor_starting_location_definition
     short placement_script_index;
     short unk;
 };
-TAG_BLOCK_SIZE_ASSERT(actor_starting_location_definition, 100);
+ASSERT_STRUCT_SIZE(actor_starting_location_definition, 100);
 
 // max count: 335
 struct squad_definition
@@ -139,7 +139,7 @@ struct squad_definition
     short placement_script_index;
     short unk;
 };
-TAG_BLOCK_SIZE_ASSERT(squad_definition, 116);
+ASSERT_STRUCT_SIZE(squad_definition, 116);
 
 // max count: 128
 struct ai_animation_reference_definition
@@ -149,7 +149,7 @@ struct ai_animation_reference_definition
     tag_reference animation_graph;   // jmad
     int padding540[3];
 };
-TAG_BLOCK_SIZE_ASSERT(ai_animation_reference_definition, 52);
+ASSERT_STRUCT_SIZE(ai_animation_reference_definition, 52);
 
 // max count: 128
 struct ai_script_reference_definition
@@ -157,7 +157,7 @@ struct ai_script_reference_definition
     static_string32 script_name;
     int64_t pad;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_script_reference_definition, 40);
+ASSERT_STRUCT_SIZE(ai_script_reference_definition, 40);
 
 // max count: 128
 struct ai_recording_reference_definition
@@ -165,4 +165,4 @@ struct ai_recording_reference_definition
     static_string32 recording_name;
     int64_t pad;
 };
-TAG_BLOCK_SIZE_ASSERT(ai_recording_reference_definition, 40);
+ASSERT_STRUCT_SIZE(ai_recording_reference_definition, 40);

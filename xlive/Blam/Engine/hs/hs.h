@@ -94,14 +94,14 @@ struct hs_global_internal
 	short pad;
 	datum initialization_expression_index;
 };
-TAG_BLOCK_SIZE_ASSERT(hs_global_internal, 40);
+ASSERT_STRUCT_SIZE(hs_global_internal, 40);
 
 // max count: k_maximum_hs_references_per_scenario 512
 struct hs_tag_reference
 {
 	tag_reference reference;	// any tag allowed
 };
-TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
+ASSERT_STRUCT_SIZE(hs_tag_reference, 8);
 
 // max count: k_maximum_hs_source_files_per_scenario 8
 struct hs_source_file
@@ -109,7 +109,7 @@ struct hs_source_file
 	 static_string32 name;
 	 data_reference source;		// DataSize: 262144
 };
-TAG_BLOCK_SIZE_ASSERT(hs_tag_reference, 8);
+ASSERT_STRUCT_SIZE(hs_tag_reference, 8);
 
 struct HaloScriptGlobal
 {

@@ -165,7 +165,7 @@ struct alignas(8) s_observer_channel
 	DWORD field_734;
 	LONGLONG field_738;
 };
-CHECK_STRUCT_SIZE(s_observer_channel, 0x740);
+ASSERT_STRUCT_SIZE(s_observer_channel, 0x740);
 
 struct alignas(8) c_network_observer
 {
@@ -250,7 +250,7 @@ public:
 private:
 	static void force_constant_network_rate();
 };
-CHECK_STRUCT_SIZE(c_network_observer, 0x75C8);
+ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);
 
 struct s_network_observer_configuration
 {
@@ -357,4 +357,4 @@ struct s_network_observer_configuration
 	float field_1FC;
 	DWORD field_200;
 };
-CHECK_STRUCT_SIZE(s_network_observer_configuration, 0x204);
+ASSERT_STRUCT_SIZE(s_network_observer_configuration, 0x204);

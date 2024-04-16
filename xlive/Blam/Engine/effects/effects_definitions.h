@@ -55,7 +55,7 @@ struct effect_acceleration_definition
     real_angle inner_cone_angle_degrees;
     real_angle outer_cone_angle_degrees;
 };
-TAG_BLOCK_SIZE_ASSERT(effect_acceleration_definition, 20);
+ASSERT_STRUCT_SIZE(effect_acceleration_definition, 20);
 
 struct c_beam_definition
 {
@@ -81,7 +81,7 @@ struct c_beam_definition
     // Explaination("PITCH", "rotate the marker")
     c_function_definition pitch;
 };
-TAG_BLOCK_SIZE_ASSERT(c_beam_definition, 60);
+ASSERT_STRUCT_SIZE(c_beam_definition, 60);
 
 // max count: k_maximum_effect_parts_per_event_count 32
 struct effect_part_definition
@@ -114,7 +114,7 @@ struct effect_event_definition
     tag_block<effect_acceleration_definition> accelerations;
     tag_block<c_particle_system_definition> particle_systems;
 };
-TAG_BLOCK_SIZE_ASSERT(effect_event_definition, 0x38);
+ASSERT_STRUCT_SIZE(effect_event_definition, 0x38);
 
 struct effect_definition
 {
@@ -132,4 +132,4 @@ struct effect_definition
     real32 always_play_distance;
     real32 never_play_distance;
 };
-TAG_GROUP_SIZE_ASSERT(effect_definition, 0x30);
+ASSERT_STRUCT_SIZE(effect_definition, 0x30);

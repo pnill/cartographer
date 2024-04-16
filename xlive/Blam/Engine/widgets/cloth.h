@@ -7,5 +7,5 @@ struct s_cloth {
 	real32 accum;
 	char gap_10[4680];
 };
-CHECK_STRUCT_SIZE(s_cloth, 4696);
+ASSERT_STRUCT_SIZE(s_cloth, 4696);
 

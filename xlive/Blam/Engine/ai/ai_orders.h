@@ -41,7 +41,7 @@ struct order_trigger_reference
     short trigger;                  // Block index: triggers_block
     short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(order_trigger_reference, 8);
+ASSERT_STRUCT_SIZE(order_trigger_reference, 8);
 
 // max count: 1
 struct secondary_set_triggers
@@ -50,7 +50,7 @@ struct secondary_set_triggers
     e_dialogue_type dialogue_type;              // when this ending is triggered, launch a dialogue event of the given type
     tag_block<order_trigger_reference> triggers;
 };
-TAG_BLOCK_SIZE_ASSERT(secondary_set_triggers, 12);
+ASSERT_STRUCT_SIZE(secondary_set_triggers, 12);
 
 // max count: 12
 struct order_ending_definition
@@ -84,7 +84,7 @@ struct orders_definition
     tag_block<special_movement_definition> special_movement;
     tag_block<order_ending_definition> order_endings;
 };
-TAG_BLOCK_SIZE_ASSERT(orders_definition, 124);
+ASSERT_STRUCT_SIZE(orders_definition, 124);
 
 enum e_trigger_flags : int
 {
@@ -136,7 +136,7 @@ struct order_completion_condition_definition
     short pad1;
     e_order_completion_condition_flags flags;
 };
-TAG_BLOCK_SIZE_ASSERT(order_completion_condition_definition, 56);
+ASSERT_STRUCT_SIZE(order_completion_condition_definition, 56);
 
 // max count: 256
 struct triggers_block
@@ -148,4 +148,4 @@ struct triggers_block
     short pad;
     tag_block<order_completion_condition_definition> conditions;
 };
-TAG_BLOCK_SIZE_ASSERT(triggers_block, 48);
+ASSERT_STRUCT_SIZE(triggers_block, 48);

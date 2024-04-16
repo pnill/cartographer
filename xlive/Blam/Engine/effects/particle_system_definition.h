@@ -108,7 +108,7 @@ public:
     void get_emitter_particle_color(s_particle_state* particle_state, real_argb_color* out_color);
     void get_emitter_particle_inverse_color(s_particle_state* particle_state, real_argb_color* out_color);
 };
-CHECK_STRUCT_SIZE(c_particle_emitter_definition, 0xB8);
+ASSERT_STRUCT_SIZE(c_particle_emitter_definition, 0xB8);
 
 // max count: k_maximum_particle_systems_per_block 32
 class c_particle_system_definition
@@ -141,7 +141,7 @@ public:
     bool spread_between_ticks(void) const;
     bool system_is_looping_particle(void) const;
 };
-CHECK_STRUCT_SIZE(c_particle_system_definition, 56);
+ASSERT_STRUCT_SIZE(c_particle_system_definition, 56);
 
 class c_particle_definition
 {
@@ -177,7 +177,7 @@ public:
 
     int8 pad_1[40];
 };
-TAG_GROUP_SIZE_ASSERT(c_particle_definition, 188);
+ASSERT_STRUCT_SIZE(c_particle_definition, 188);
 
 
 //class c_particle_interface;

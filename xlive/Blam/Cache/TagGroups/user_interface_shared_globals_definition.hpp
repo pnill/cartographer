@@ -322,10 +322,10 @@ struct s_user_interface_shared_globals_group_definition
 			string_id ok;//0x10
 			string_id cancel;//0x14
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_error_block_block, 0x18);
+		ASSERT_STRUCT_SIZE(s_error_block_block, 0x18);
 		tag_block<s_error_block_block> error_block;//0x20
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_errors_block, 0x28);
+	ASSERT_STRUCT_SIZE(s_errors_block, 0x28);
 	tag_block<s_errors_block> errors;//0x88
 	tag_reference cursor_sound_tag;//0x90
 	tag_reference selection_sound_tag;//0x98
@@ -361,7 +361,7 @@ struct s_user_interface_shared_globals_group_definition
 				float position_y;//0xC
 				float position_z;//0x10
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
+			ASSERT_STRUCT_SIZE(s_keyframes_block, 0x14);
 			tag_block<s_keyframes_block> keyframes;//0x8
 
 		}primary_intro;
@@ -377,7 +377,7 @@ struct s_user_interface_shared_globals_group_definition
 				float position_y;//0xC
 				float position_z;//0x10
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
+			ASSERT_STRUCT_SIZE(s_keyframes_block, 0x14);
 			tag_block<s_keyframes_block> keyframes;//0x14
 
 		}primary_outro;
@@ -402,13 +402,13 @@ struct s_user_interface_shared_globals_group_definition
 				float position_y;//0xC
 				float position_z;//0x10
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_keyframes_block, 0x14);
+			ASSERT_STRUCT_SIZE(s_keyframes_block, 0x14);
 			tag_block<s_keyframes_block> keyframes;//0x24
 
 		}ambient_animation;
 
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_screen_animations_block, 0x2C);
+	ASSERT_STRUCT_SIZE(s_screen_animations_block, 0x2C);
 	tag_block<s_screen_animations_block> screen_animations;//0x120
 	struct s_shape_groups_block
 	{
@@ -495,12 +495,12 @@ struct s_user_interface_shared_globals_group_definition
 				__int16 coordinates_x;//0x0
 				__int16 coordinates_y;//0x2
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_points_block, 0x4);
+			ASSERT_STRUCT_SIZE(s_points_block, 0x4);
 			tag_block<s_points_block> points;//0x18
 			__int16 render_depth_bias;//0x20
 			PAD(0xE);//0x22
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_shapes_block, 0x30);
+		ASSERT_STRUCT_SIZE(s_shapes_block, 0x30);
 		tag_block<s_shapes_block> shapes;//0x0
 		struct s_model_scene_blocks_block
 		{
@@ -585,13 +585,13 @@ struct s_user_interface_shared_globals_group_definition
 			{
 				tag_string32 name;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_objects_block, 0x20);
+			ASSERT_STRUCT_SIZE(s_objects_block, 0x20);
 			tag_block<s_objects_block> objects;//0xC
 			struct s_lights_block
 			{
 				tag_string32 name;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_lights_block, 0x20);
+			ASSERT_STRUCT_SIZE(s_lights_block, 0x20);
 			tag_block<s_lights_block> lights;//0x14
 			PAD(0xC);//0x1C
 			real_point3d camera_position;//0x28			
@@ -601,7 +601,7 @@ struct s_user_interface_shared_globals_group_definition
 			string_id unused_outro_anim;//0x44
 			string_id unused_ambient_anim;//0x48
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_model_scene_blocks_block, 0x4C);
+		ASSERT_STRUCT_SIZE(s_model_scene_blocks_block, 0x4C);
 		tag_block<s_model_scene_blocks_block> model_scene_blocks;//0x8
 		struct s_bitmap_blocks_block
 		{
@@ -704,10 +704,10 @@ struct s_user_interface_shared_globals_group_definition
 			float progress_scale_i;//0x30
 			float progress_scale_j;//0x34
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_bitmap_blocks_block, 0x38);
+		ASSERT_STRUCT_SIZE(s_bitmap_blocks_block, 0x38);
 		tag_block<s_bitmap_blocks_block> bitmap_blocks;//0x10
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_shape_groups_block, 0x18);
+	ASSERT_STRUCT_SIZE(s_shape_groups_block, 0x18);
 	tag_block<s_shape_groups_block> shape_groups;//0x128
 	struct s_animations_block
 	{
@@ -721,16 +721,16 @@ struct s_user_interface_shared_globals_group_definition
 			float position_y;//0xC
 			float position_z;//0x10
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_interpolated_keyframes_block, 0x14);
+		ASSERT_STRUCT_SIZE(s_interpolated_keyframes_block, 0x14);
 		tag_block<s_interpolated_keyframes_block> interpolated_keyframes;//0x8
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_animations_block, 0x10);
+	ASSERT_STRUCT_SIZE(s_animations_block, 0x10);
 	tag_block<s_animations_block> animations;//0x130
 	struct s_list_item_skins_block
 	{
 		tag_reference list_item_skins;//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_list_item_skins_block, 0x8);
+	ASSERT_STRUCT_SIZE(s_list_item_skins_block, 0x8);
 	tag_block<s_list_item_skins_block> list_item_skins;//0x138
 	tag_reference button_key_type_strings;//0x140
 	tag_reference game_type_strings;//0x148
@@ -740,7 +740,7 @@ struct s_user_interface_shared_globals_group_definition
 		__int16 skill_bounds_lower;//0x0
 		__int16 skill_bounds_upper;//0x2
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_skill_mappings_block, 0x4);
+	ASSERT_STRUCT_SIZE(s_skill_mappings_block, 0x4);
 	tag_block<s_skill_mappings_block> skill_mappings;//0x158
 	enum class e_full_screen_header_text_font : __int16
 	{
@@ -826,7 +826,7 @@ struct s_user_interface_shared_globals_group_definition
 	tag_reference main_menu_music;//0x1B8
 	__int32 music_fade_time;//0x1C0
 };
-TAG_GROUP_SIZE_ASSERT(s_user_interface_shared_globals_group_definition, 0x1C4);
+ASSERT_STRUCT_SIZE(s_user_interface_shared_globals_group_definition, 0x1C4);
 #pragma pack(pop)
 
 /* gets the current loaded user_interface_shared_globals tag aka wigl  */

@@ -27,7 +27,7 @@ struct s_character_physics_output
 	real_vector3d field_24;
 	BYTE gap_30[52];
 };
-CHECK_STRUCT_SIZE(s_character_physics_output, 0x64);
+ASSERT_STRUCT_SIZE(s_character_physics_output, 0x64);
 
 struct alignas(4) c_character_physics_mode_melee_datum
 {
@@ -74,7 +74,7 @@ struct alignas(4) c_character_physics_mode_melee_datum
 	void update_melee_deceleration();
 	void __thiscall update_internal(s_character_physics_output* a2, bool a3, real32 distance_world_units, const real_vector3d* target_translational_velocity, const real_point3d* target_origin, const real_vector3d* aiming_vector, const real_vector3d* translational_velocity, const real_point3d* object_origin);
 };
-CHECK_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
+ASSERT_STRUCT_SIZE(c_character_physics_mode_melee_datum, 0x88);
 
 void call_character_melee_physics_input_update_internal();
 

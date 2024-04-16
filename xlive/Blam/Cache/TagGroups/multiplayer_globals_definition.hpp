@@ -20,11 +20,11 @@ struct s_multiplayer_globals_group_definition
 		{
 			real_rgb_color color;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_team_colors_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_team_colors_block, 0xC);
 		tag_block<s_team_colors_block> team_colors;//0x10
 		tag_reference multiplayer_text;//0x18
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_universal_block, 0x20);
+	ASSERT_STRUCT_SIZE(s_universal_block, 0x20);
 	tag_block<s_universal_block> universal;//0x0
 	struct s_runtime_block
 	{
@@ -41,32 +41,32 @@ struct s_multiplayer_globals_group_definition
 		{
 			tag_reference weapon;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_weapons_block, 0x8);
+		ASSERT_STRUCT_SIZE(s_weapons_block, 0x8);
 		tag_block<s_weapons_block> weapons;//0x68
 		struct s_vehicles_block
 		{
 			tag_reference vehicle;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_vehicles_block, 0x8);
+		ASSERT_STRUCT_SIZE(s_vehicles_block, 0x8);
 		tag_block<s_vehicles_block> vehicles;//0x70
 		struct s_grenades_block
 		{
 			tag_reference weapon;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_grenades_block, 0x8);
+		ASSERT_STRUCT_SIZE(s_grenades_block, 0x8);
 		tag_block<s_grenades_block> grenades;//0x78
 		struct s_powerups_block
 		{
 			tag_reference weapon;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_powerups_block, 0x8);
+		ASSERT_STRUCT_SIZE(s_powerups_block, 0x8);
 		tag_block<s_powerups_block> powerups;//0x80
 		tag_reference in_game_text;//0x88
 		struct s_sounds_block
 		{
 			tag_reference sound;//0x0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_sounds_block, 0x8);
+		ASSERT_STRUCT_SIZE(s_sounds_block, 0x8);
 		tag_block<s_sounds_block> sounds;//0x90
 		struct s_general_events_block
 		{
@@ -198,10 +198,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_general_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_general_events_block, 0xA8);
 		tag_block<s_general_events_block> general_events;//0x98
 		struct s_flavor_events_block
 		{
@@ -297,10 +297,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_flavor_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_flavor_events_block, 0xA8);
 		tag_block<s_flavor_events_block> flavor_events;//0xA0
 		struct s_slayer_events_block
 		{
@@ -385,10 +385,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_slayer_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_slayer_events_block, 0xA8);
 		tag_block<s_slayer_events_block> slayer_events;//0xA8
 		struct s_ctf_events_block
 		{
@@ -485,10 +485,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_ctf_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_ctf_events_block, 0xA8);
 		tag_block<s_ctf_events_block> ctf_events;//0xB0
 		struct s_oddball_events_block
 		{
@@ -577,10 +577,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_oddball_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_oddball_events_block, 0xA8);
 		tag_block<s_oddball_events_block> oddball_events;//0xB8		
 		PAD(0x8);//0xC0
 		struct s_king_events_block
@@ -671,10 +671,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_king_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_king_events_block, 0xA8);
 		tag_block<s_king_events_block> king_events;//0xC8		
 		PAD(0x8);//0xD0
 		struct s_juggernaut_events_block
@@ -761,10 +761,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_juggernaut_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_juggernaut_events_block, 0xA8);
 		tag_block<s_juggernaut_events_block> juggernaut_events;//0xD8
 		struct s_territories_events_block
 		{
@@ -854,10 +854,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_territories_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_territories_events_block, 0xA8);
 		tag_block<s_territories_events_block> territories_events;//0xE0
 		struct s_invasion_events_block
 		{
@@ -957,10 +957,10 @@ struct s_multiplayer_globals_group_definition
 				tag_reference portuguese_sound;//0x44
 				float probability;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_sound_permutations_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_sound_permutations_block, 0x50);
 			tag_block<s_sound_permutations_block> sound_permutations;//0xA0
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_invasion_events_block, 0xA8);
+		ASSERT_STRUCT_SIZE(s_invasion_events_block, 0xA8);
 		tag_block<s_invasion_events_block> invasion_events;//0xE8
 		PAD(0x8);//0xF0
 		PAD(0x8);//0xF8
@@ -1046,7 +1046,7 @@ struct s_multiplayer_globals_group_definition
 			string_id blocked_teleporter_string;//0xF8
 			PAD(0x64);//0xFC
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_multiplayer_constants_block, 0x160);
+		ASSERT_STRUCT_SIZE(s_multiplayer_constants_block, 0x160);
 		tag_block<s_multiplayer_constants_block> multiplayer_constants;//0x530
 		struct s_state_responses_block
 		{
@@ -1094,7 +1094,7 @@ struct s_multiplayer_globals_group_definition
 			tag_reference NUM_;//0x10
 			PAD(0x4);//0x18
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_state_responses_block, 0x1C);
+		ASSERT_STRUCT_SIZE(s_state_responses_block, 0x1C);
 		tag_block<s_state_responses_block> state_responses;//0x538
 		tag_reference scoreboard_hud_definition;//0x540
 		tag_reference scoreboard_emblem_shader;//0x548
@@ -1102,9 +1102,9 @@ struct s_multiplayer_globals_group_definition
 		tag_reference scoreboard_dead_emblem_shader;//0x558
 		tag_reference scoreboard_dead_emblem_bitmap;//0x560
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_runtime_block, 0x568);
+	ASSERT_STRUCT_SIZE(s_runtime_block, 0x568);
 	tag_block<s_runtime_block> runtime;//0x8
 };
-TAG_GROUP_SIZE_ASSERT(s_multiplayer_globals_group_definition, 0x10);
+ASSERT_STRUCT_SIZE(s_multiplayer_globals_group_definition, 0x10);
 #pragma pack(pop)
 

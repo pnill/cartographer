@@ -33,14 +33,14 @@ struct s_biped_lock_on_data
     e_biped_lock_on_data_flags flags;
     real32 lock_on_distance;
 };
-CHECK_STRUCT_SIZE(s_biped_lock_on_data, 8);
+ASSERT_STRUCT_SIZE(s_biped_lock_on_data, 8);
 
 // max count: k_contact_point_count 3
 struct biped_contact_point
 {
     string_id marker_name;
 };
-TAG_BLOCK_SIZE_ASSERT(biped_contact_point, 4);
+ASSERT_STRUCT_SIZE(biped_contact_point, 4);
 
 struct _biped_definition
 {
@@ -98,4 +98,4 @@ struct _biped_definition
     int16 death_spawn_count;
     int16 pad1;
 };
-TAG_GROUP_SIZE_ASSERT(_biped_definition, 788)
+ASSERT_STRUCT_SIZE(_biped_definition, 788)

@@ -52,7 +52,7 @@ struct s_dynamic_spawn_zone_overload
     float outer_radius;
     float weight;
 };
-TAG_BLOCK_SIZE_ASSERT(s_dynamic_spawn_zone_overload, 16);
+ASSERT_STRUCT_SIZE(s_dynamic_spawn_zone_overload, 16);
 
 struct s_static_spawn_zone_data
 {
@@ -61,7 +61,7 @@ struct s_static_spawn_zone_data
     e_relevant_multiplayer_games releveant_games;
     e_static_spawn_flags flags;
 };
-CHECK_STRUCT_SIZE(s_static_spawn_zone_data, 16);
+ASSERT_STRUCT_SIZE(s_static_spawn_zone_data, 16);
 
 // max count: MAXIMUM_STATIC_SPAWN_ZONES_PER_SCENARIO 128
 struct s_static_spawn_zone
@@ -77,4 +77,4 @@ struct s_static_spawn_zone
     float outer_radius;
     float weight;
 };
-TAG_BLOCK_SIZE_ASSERT(s_static_spawn_zone, 48);
+ASSERT_STRUCT_SIZE(s_static_spawn_zone, 48);

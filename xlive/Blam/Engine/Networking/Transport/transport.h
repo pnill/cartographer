@@ -10,6 +10,6 @@ struct network_address
 	short port;
 	short address_type;
 };
-CHECK_STRUCT_SIZE(network_address, 20);
+ASSERT_STRUCT_SIZE(network_address, 20);
 
 void network_transport_apply_patches();

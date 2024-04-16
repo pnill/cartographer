@@ -38,13 +38,13 @@ struct s_simulation_game_entity
 	uint32 state_data_size;
 	void* state_data;
 };
-CHECK_STRUCT_SIZE(s_simulation_game_entity, 0x24);
+ASSERT_STRUCT_SIZE(s_simulation_game_entity, 0x24);
 
 struct s_simulation_baseline_state_data
 {
 	uint8 gap_0[248];
 };
-CHECK_STRUCT_SIZE(s_simulation_baseline_state_data, 248);
+ASSERT_STRUCT_SIZE(s_simulation_baseline_state_data, 248);
 
 class c_simulation_entity_definition
 {

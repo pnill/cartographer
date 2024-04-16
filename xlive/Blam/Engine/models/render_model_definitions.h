@@ -42,7 +42,7 @@ struct render_model_permutation
     int16 l5_section_index; // Super High
     int16 l6_section_index; // Hollywood
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_permutation, 16);
+ASSERT_STRUCT_SIZE(render_model_permutation, 16);
 
 // max count: MAXIMUM_REGIONS_PER_MODEL
 struct render_model_region
@@ -52,7 +52,7 @@ struct render_model_region
     int16 node_map_size;
     tag_block<render_model_permutation> permutations;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_region, 16);
+ASSERT_STRUCT_SIZE(render_model_region, 16);
 
 struct render_model_section_data
 {
@@ -61,7 +61,7 @@ struct render_model_section_data
     tag_block<uint8> node_map;
     int32 pad;
 };
-CHECK_STRUCT_SIZE(render_model_section_data, 112);
+ASSERT_STRUCT_SIZE(render_model_section_data, 112);
 
 // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
 struct render_model_section
@@ -75,7 +75,7 @@ struct render_model_section
     tag_block<render_model_section_data> section_data;
     geometry_block_info geometry_block_info;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_section, 92);
+ASSERT_STRUCT_SIZE(render_model_section, 92);
 
 // max count: MAXIMUM_NODES_PER_MODEL
 struct render_model_compound_node
@@ -83,7 +83,7 @@ struct render_model_compound_node
     int8 node_indices[4];
     real32 node_weights[3];
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_compound_node, 16);
+ASSERT_STRUCT_SIZE(render_model_compound_node, 16);
 
 // max count: NUMBER_OF_GEOMETRY_DETAIL_LEVELS
 struct render_model_section_group
@@ -92,7 +92,7 @@ struct render_model_section_group
     int16 pad;
     tag_block<render_model_compound_node> compound_nodes;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_section_group, 12);
+ASSERT_STRUCT_SIZE(render_model_section_group, 12);
 
 // max count: MAXIMUM_NODES_PER_MODEL
 struct render_model_node
@@ -108,7 +108,7 @@ struct render_model_node
     real_matrix4x3 default_inverse_matrix;
     real32 distance_from_parent;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_node, 96);
+ASSERT_STRUCT_SIZE(render_model_node, 96);
 
 // max count: MAXIMUM_MARKERS_PER_RENDER_MODEL_MARKER_GROUP
 struct render_model_marker
@@ -121,7 +121,7 @@ struct render_model_marker
     real_quaternion rotation;
     real32 scale;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_marker, 36);
+ASSERT_STRUCT_SIZE(render_model_marker, 36);
 
 // max count: MAXIMUM_MARKER_GROUPS_PER_RENDER_MODEL
 struct render_model_marker_group
@@ -129,14 +129,14 @@ struct render_model_marker_group
     string_id name;
     tag_block<render_model_marker> markers;
 };
-TAG_BLOCK_SIZE_ASSERT(render_model_marker_group, 12);
+ASSERT_STRUCT_SIZE(render_model_marker_group, 12);
 
 // max count: MAXIMUM_SECTIONS_PER_RENDER_MODEL
 struct section_render_leaves
 {
     tag_block<node_render_leaves> node_render_leaves;
 };
-TAG_BLOCK_SIZE_ASSERT(section_render_leaves, 8);
+ASSERT_STRUCT_SIZE(section_render_leaves, 8);
 
 struct render_model_definition
 {
@@ -170,4 +170,4 @@ struct render_model_definition
     tag_block<prt_info> prt_info;
     tag_block<section_render_leaves> section_render_leaves;
 };
-TAG_GROUP_SIZE_ASSERT(render_model_definition, 132);
+ASSERT_STRUCT_SIZE(render_model_definition, 132);

@@ -26,7 +26,7 @@ struct alignas(8) simulation_update
 	int32 game_time_ticks;
 	uint32 random_seed;
 };
-CHECK_STRUCT_SIZE(simulation_update, 0x3BD8);
+ASSERT_STRUCT_SIZE(simulation_update, 0x3BD8);
 
 struct s_simulation_globals
 {
@@ -42,7 +42,7 @@ struct s_simulation_globals
 	c_simulation_watcher* simulation_watcher;
 	c_simulation_type_collection* simulation_type_collection;
 };
-CHECK_STRUCT_SIZE(s_simulation_globals, 24);
+ASSERT_STRUCT_SIZE(s_simulation_globals, 24);
 
 c_simulation_world* simulation_get_world();
 s_simulation_globals* simulation_get_globals();

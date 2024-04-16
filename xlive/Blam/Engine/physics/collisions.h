@@ -58,7 +58,7 @@ struct collision_result
 	int16 field_58;
 	int16 field_5A;
 };
-CHECK_STRUCT_SIZE(collision_result, 0x5C);
+ASSERT_STRUCT_SIZE(collision_result, 0x5C);
 
 uint16 collision_compute_object_cull_flags(datum object_index);
 

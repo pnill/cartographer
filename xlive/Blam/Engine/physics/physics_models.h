@@ -34,19 +34,19 @@ struct s_physics_model_shape
     int8 phantom_type_index;
     int8 collision_group;
 };
-CHECK_STRUCT_SIZE(s_physics_model_shape, 32);
+ASSERT_STRUCT_SIZE(s_physics_model_shape, 32);
 
 struct s_physics_model_capsule
 {
     hkCapsuleShape shape;
 };
-CHECK_STRUCT_SIZE(s_physics_model_capsule, 48);
+ASSERT_STRUCT_SIZE(s_physics_model_capsule, 48);
 
 struct s_physics_model_translation
 {
     hkTransformShape transform;
 };
-CHECK_STRUCT_SIZE(s_physics_model_translation, 80);
+ASSERT_STRUCT_SIZE(s_physics_model_translation, 80);
 
 // max count: k_maximum_shapes_per_physics_model 1024
 struct s_physics_model_sphere
@@ -57,7 +57,7 @@ struct s_physics_model_sphere
 
     s_physics_model_translation translate;
 };
-TAG_BLOCK_SIZE_ASSERT(s_physics_model_sphere, 128);
+ASSERT_STRUCT_SIZE(s_physics_model_sphere, 128);
 
 
 // max count: k_maximum_shapes_per_physics_model 1024
@@ -66,4 +66,4 @@ struct s_physics_model_pill
     s_physics_model_shape shape;
     s_physics_model_capsule capsule;
 };
-TAG_BLOCK_SIZE_ASSERT(s_physics_model_pill, 80);
+ASSERT_STRUCT_SIZE(s_physics_model_pill, 80);

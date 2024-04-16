@@ -32,7 +32,7 @@ struct collision_vertex
 	uint16 first_edge;
 	int16 pad;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_vertex, 16);
+ASSERT_STRUCT_SIZE(collision_vertex, 16);
 
 // max: MAXIMUM_EDGES_PER_COLLISION_BSP
 struct collision_edge
@@ -44,7 +44,7 @@ struct collision_edge
 	uint16 left_surface;
 	uint16 right_surface;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_edge, 12);
+ASSERT_STRUCT_SIZE(collision_edge, 12);
 
 // max: MAXIMUM_SURFACES_PER_COLLISION_BSP
 struct collision_surface
@@ -55,7 +55,7 @@ struct collision_surface
 	int8 breakable_surface;
 	uint16 material;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_surface, 8);
+ASSERT_STRUCT_SIZE(collision_surface, 8);
 
 // max: MAXIMUM_NODES_PER_BSP2D
 struct bsp2d_node
@@ -64,7 +64,7 @@ struct bsp2d_node
 	uint16 left_child;
 	uint16 right_child;
 };
-TAG_BLOCK_SIZE_ASSERT(bsp2d_node, 16);
+ASSERT_STRUCT_SIZE(bsp2d_node, 16);
 
 // max: MAXIMUM_BSP2D_REFERENCES_PER_COLLISION_BSP
 struct bsp2d_reference
@@ -72,7 +72,7 @@ struct bsp2d_reference
 	uint16 plane;
 	uint16 bsp_2d_node;
 };
-TAG_BLOCK_SIZE_ASSERT(bsp2d_reference, 4);
+ASSERT_STRUCT_SIZE(bsp2d_reference, 4);
 
 // max: MAXIMUM_LEAVES_PER_BSP3D
 struct collision_leaf
@@ -81,14 +81,14 @@ struct collision_leaf
 	int8 bsp_2d_reference_count;
 	uint16 first_bsp_2d_reference;
 };
-TAG_BLOCK_SIZE_ASSERT(collision_leaf, 4);
+ASSERT_STRUCT_SIZE(collision_leaf, 4);
 
 // max: MAXIMUM_NODES_PER_BSP3D
 struct bsp3d_node
 {
 	int8 data[8];
 };
-TAG_BLOCK_SIZE_ASSERT(bsp3d_node, 8);
+ASSERT_STRUCT_SIZE(bsp3d_node, 8);
 
 struct collision_bsp
 {
@@ -102,4 +102,4 @@ struct collision_bsp
 	tag_block<collision_edge> edges;
 	tag_block<collision_vertex> vertices;
 };
-TAG_GROUP_SIZE_ASSERT(collision_bsp, 64);
+ASSERT_STRUCT_SIZE(collision_bsp, 64);

@@ -14,4 +14,4 @@ struct rasterizer_vertex_buffer
 	uint32 field_1C;
 };
 
-CHECK_STRUCT_SIZE(rasterizer_vertex_buffer, 32);
+ASSERT_STRUCT_SIZE(rasterizer_vertex_buffer, 32);

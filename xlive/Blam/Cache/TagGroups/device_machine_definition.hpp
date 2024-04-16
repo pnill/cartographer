@@ -45,6 +45,6 @@ struct s_device_machine_group_definition
 	e_pathfinding_policy pathfinding_policy;//0x130
 	PAD(0x2);//0x132
 };
-TAG_GROUP_SIZE_ASSERT(s_device_machine_group_definition, 0x134);
+ASSERT_STRUCT_SIZE(s_device_machine_group_definition, 0x134);
 #pragma pack(pop)
 

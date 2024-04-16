@@ -34,6 +34,6 @@ struct s_scenery_group_definition
 	e_lightmapping_policy lightmapping_policy;//0xC0
 	PAD(0x2);//0xC2
 };
-TAG_GROUP_SIZE_ASSERT(s_scenery_group_definition, 0xC4);
+ASSERT_STRUCT_SIZE(s_scenery_group_definition, 0xC4);
 #pragma pack(pop)
 

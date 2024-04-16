@@ -31,6 +31,6 @@ struct s_equipment_group_definition
 	float powerup_time;//0x130
 	tag_reference pickup_sound;//0x134
 };
-TAG_GROUP_SIZE_ASSERT(s_equipment_group_definition, 0x13C);
+ASSERT_STRUCT_SIZE(s_equipment_group_definition, 0x13C);
 #pragma pack(pop)
 

@@ -33,7 +33,7 @@ struct s_sky_animation
 	real32 period_sec;
 	int8 pad_2[28];
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_animation, 36);
+ASSERT_STRUCT_SIZE(s_sky_animation, 36);
 
 // max_count:    MAXIMUM_SHADER_FUNCTIONS_PER_SKY = 8
 struct s_sky_shader_function
@@ -41,7 +41,7 @@ struct s_sky_shader_function
 	int8 pad[4];
 	char global_function_name[32];
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_shader_function, 36);
+ASSERT_STRUCT_SIZE(s_sky_shader_function, 36);
 
 // max count 1
 struct sky_radiosity_light_block
@@ -53,7 +53,7 @@ struct sky_radiosity_light_block
 	int8 pad[12];
 	real32 diameter_degrees;
 };
-TAG_BLOCK_SIZE_ASSERT(sky_radiosity_light_block, 0x28);
+ASSERT_STRUCT_SIZE(sky_radiosity_light_block, 0x28);
 
 // max count 1
 struct s_sky_light_fog
@@ -67,7 +67,7 @@ struct s_sky_light_fog
 	real32 secondary_fog_influence;
 	real32 sky_fog_influence;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_light_fog, 0x2C);
+ASSERT_STRUCT_SIZE(s_sky_light_fog, 0x2C);
 
 // max_count:    MAXIMUM_LIGHTS_PER_SKY = 8
 struct s_sky_light
@@ -80,7 +80,7 @@ struct s_sky_light
 	tag_block<s_sky_light_fog> fog_opposite;
 	tag_block<sky_radiosity_light_block> radiosity;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_light, 0x34);
+ASSERT_STRUCT_SIZE(s_sky_light, 0x34);
 
 // max count 1
 struct s_sky_patchy_fog
@@ -92,7 +92,7 @@ struct s_sky_patchy_fog
 	int8 pad_2[32];
 	tag_reference patchy_fog; // fpch
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_patchy_fog, 0x50);
+ASSERT_STRUCT_SIZE(s_sky_patchy_fog, 0x50);
 
 // max count 1
 struct s_sky_fog
@@ -100,7 +100,7 @@ struct s_sky_fog
 	real_rgb_color color;
 	real32 density;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_fog, 16);
+ASSERT_STRUCT_SIZE(s_sky_fog, 16);
 
 // max count 1
 struct s_sky_atmospheric_fog
@@ -110,7 +110,7 @@ struct s_sky_atmospheric_fog
 	real32 start_distance_world_units;
 	real32 opaque_distance_world_units;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_atmospheric_fog, 24);
+ASSERT_STRUCT_SIZE(s_sky_atmospheric_fog, 24);
 
 // max count 1
 struct s_sky_cubemap
@@ -118,7 +118,7 @@ struct s_sky_cubemap
 	tag_reference cube_map_reference;
 	real32 power_scale;
 };
-TAG_BLOCK_SIZE_ASSERT(s_sky_cubemap, 0xC);
+ASSERT_STRUCT_SIZE(s_sky_cubemap, 0xC);
 
 struct s_sky_definition
 {
@@ -156,4 +156,4 @@ struct s_sky_definition
 	int8 pad_3[12];
 	real_rgb_color clear_color;
 };
-TAG_GROUP_SIZE_ASSERT(s_sky_definition, 0xAC);
+ASSERT_STRUCT_SIZE(s_sky_definition, 0xAC);

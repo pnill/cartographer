@@ -20,14 +20,14 @@ struct collision_bsp_test_vector_result
 	int32 flags;
 	int32 field_14;
 };
-CHECK_STRUCT_SIZE(collision_bsp_test_vector_result, 24);
+ASSERT_STRUCT_SIZE(collision_bsp_test_vector_result, 24);
 
 struct collision_bsp_test_buffer
 {
 	int32 leaf_index;
 	int32 unk[255];
 };
-CHECK_STRUCT_SIZE(collision_bsp_test_buffer, 1024);
+ASSERT_STRUCT_SIZE(collision_bsp_test_buffer, 1024);
 
 struct collision_bsp_test_sphere_result
 {
@@ -40,7 +40,7 @@ struct collision_bsp_test_sphere_result
 	int32 stack_depth;
 	collision_bsp_test_buffer buffer3;
 };
-CHECK_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);
+ASSERT_STRUCT_SIZE(collision_bsp_test_sphere_result, 4112);
 
 struct test_sphere_result_buffer
 {
@@ -58,7 +58,7 @@ struct test_sphere_result_buffer
 	bool field_21F;
 	real_point2d plane;
 };
-CHECK_STRUCT_SIZE(test_sphere_result_buffer, 552);
+ASSERT_STRUCT_SIZE(test_sphere_result_buffer, 552);
 
 bool __cdecl collision_bsp_test_sphere(
 	collision_bsp* collision_bsp,

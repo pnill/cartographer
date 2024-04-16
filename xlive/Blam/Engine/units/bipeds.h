@@ -32,7 +32,7 @@ struct biped_datum
 	e_biped_physics_mode biped_movement_type;
 	int8 gap1[139];
 };
-CHECK_STRUCT_SIZE(biped_datum, 0x480);
+ASSERT_STRUCT_SIZE(biped_datum, 0x480);
 
 void bipeds_apply_patches(void);
 

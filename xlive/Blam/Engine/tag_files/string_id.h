@@ -57,7 +57,7 @@ private:
 	uint32_t value;
 
 };
-CHECK_STRUCT_SIZE(string_id, 4);
+ASSERT_STRUCT_SIZE(string_id, 4);
 
 
 inline void string_id::operator= (const uint32_t &Value)

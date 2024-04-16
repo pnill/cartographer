@@ -72,7 +72,7 @@ private:
 
 	void entity_delete_gameworld(int32 entity_index);
 };
-CHECK_STRUCT_SIZE(c_simulation_entity_database, 36884);
+ASSERT_STRUCT_SIZE(c_simulation_entity_database, 36884);
 
 c_simulation_entity_database* simulation_get_entity_database();
 

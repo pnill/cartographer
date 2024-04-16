@@ -22,7 +22,7 @@ struct c_simulation_event_handler_vtbl
         return Memory::GetAddress<c_simulation_event_handler_vtbl*>(0x3C6268, 0x381D50);
     }
 };
-CHECK_STRUCT_SIZE(c_simulation_event_handler_vtbl, 6 * sizeof(void*));
+ASSERT_STRUCT_SIZE(c_simulation_event_handler_vtbl, 6 * sizeof(void*));
 
 class c_simulation_event_handler
 {

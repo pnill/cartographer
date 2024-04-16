@@ -101,7 +101,7 @@ struct bitmap_group_sprite
     float bottom;
     real_point2d registrationPoint;
 };
-TAG_BLOCK_SIZE_ASSERT(bitmap_group_sprite, 32);
+ASSERT_STRUCT_SIZE(bitmap_group_sprite, 32);
 
 #define MAXIMUM_SEQUENCES_PER_BITMAP_GROUP 256
 struct bitmap_group_sequence
@@ -112,7 +112,7 @@ struct bitmap_group_sequence
     DWORD pad[4];
     tag_block<bitmap_group_sprite> sprites;
 };
-TAG_BLOCK_SIZE_ASSERT(bitmap_group_sequence, 0x3C);
+ASSERT_STRUCT_SIZE(bitmap_group_sequence, 0x3C);
 
 enum e_more_bitmap_data_flags : byte
 {
@@ -230,7 +230,7 @@ struct bitmap_data
     int16 low_detail_depth;
     int32* field_70;
 };
-TAG_BLOCK_SIZE_ASSERT(bitmap_data, 116);
+ASSERT_STRUCT_SIZE(bitmap_data, 116);
 
 enum e_color_subsampling : byte
 {
@@ -321,7 +321,7 @@ struct bitmap_group
 #endif
 };
 #ifdef TAGS_BUILD
-TAG_GROUP_SIZE_ASSERT(bitmap_group, 112);
+ASSERT_STRUCT_SIZE(bitmap_group, 112);
 #else
-TAG_GROUP_SIZE_ASSERT(bitmap_group, 80);
+ASSERT_STRUCT_SIZE(bitmap_group, 80);
 #endif

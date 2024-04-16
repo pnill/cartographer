@@ -36,4 +36,4 @@ struct s_water_definition
 	real32 fog_far;
 	real32 dynamic_height_bias;
 };
-TAG_BLOCK_SIZE_ASSERT(s_water_definition, 172);
+ASSERT_STRUCT_SIZE(s_water_definition, 172);

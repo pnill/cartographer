@@ -12,7 +12,7 @@ struct s_local_player_motion_sensor_sample
 {
     byte gap[68];
 };
-CHECK_STRUCT_SIZE(s_local_player_motion_sensor_sample, 0x44);
+ASSERT_STRUCT_SIZE(s_local_player_motion_sensor_sample, 0x44);
 
 class c_local_player_motion_sensor_data
 {
@@ -24,7 +24,7 @@ public:
 
     void sort();
 };
-CHECK_STRUCT_SIZE(c_local_player_motion_sensor_data, 0x2F0);
+ASSERT_STRUCT_SIZE(c_local_player_motion_sensor_data, 0x2F0);
 
 struct s_motion_sensor_globals
 {
@@ -32,7 +32,7 @@ struct s_motion_sensor_globals
     int32 current_sample_index;
     int32 field_BC4;
 };
-CHECK_STRUCT_SIZE(s_motion_sensor_globals, 0xBC8);
+ASSERT_STRUCT_SIZE(s_motion_sensor_globals, 0xBC8);
 
 s_motion_sensor_globals* get_motion_sensor_globals();
 

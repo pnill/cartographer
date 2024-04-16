@@ -71,7 +71,7 @@ struct s_player_profile
 	e_character_type player_character_type;
 	s_emblem_info emblem_info;
 };
-CHECK_STRUCT_SIZE(s_player_profile, 8);
+ASSERT_STRUCT_SIZE(s_player_profile, 8);
 
 struct s_player_profile_traits
 {
@@ -79,7 +79,7 @@ struct s_player_profile_traits
 	int unk_48;
 	int unk_4C;
 };
-CHECK_STRUCT_SIZE(s_player_profile_traits, 16);
+ASSERT_STRUCT_SIZE(s_player_profile_traits, 16);
 
 struct s_clan_identifiers
 {
@@ -87,7 +87,7 @@ struct s_clan_identifiers
 	DWORD ID_2;
 	DWORD ID_3;
 };
-CHECK_STRUCT_SIZE(s_clan_identifiers, 12);
+ASSERT_STRUCT_SIZE(s_clan_identifiers, 12);
 
 struct s_player_properties
 {
@@ -108,7 +108,7 @@ struct s_player_properties
 	int8 achievement_flags;
 	int8 unk2;
 };
-CHECK_STRUCT_SIZE(s_player_properties, 132);
+ASSERT_STRUCT_SIZE(s_player_properties, 132);
 
 #pragma pack(push, 1)
 struct s_player
@@ -181,7 +181,7 @@ struct s_player
 	static real_vector3d* get_unit_coords(datum player_index);
 	static uint64 get_id(datum player_index);
 };
-CHECK_STRUCT_SIZE(s_player, 516);
+ASSERT_STRUCT_SIZE(s_player, 516);
 #pragma pack(pop)
 
 class player_iterator 
@@ -220,7 +220,7 @@ struct s_persistent_campaign_player
 	s_persistent_weapon_data weapon_2;
 	uint16 grenade_counts_mask;
 };
-CHECK_STRUCT_SIZE(s_persistent_campaign_player, 28);
+ASSERT_STRUCT_SIZE(s_persistent_campaign_player, 28);
 
 struct s_players_globals
 {
@@ -249,7 +249,7 @@ struct s_players_globals
 	int teleported_unit_datum;
 	int8 end_padding[128];
 };
-CHECK_STRUCT_SIZE(s_players_globals, 312);
+ASSERT_STRUCT_SIZE(s_players_globals, 312);
 
 s_players_globals* get_players_globals();
 

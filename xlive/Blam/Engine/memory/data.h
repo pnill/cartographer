@@ -32,7 +32,7 @@ struct s_data_array
 		return p_data_make_valid(data_array);
 	}
 };
-CHECK_STRUCT_SIZE(s_data_array, 0x4C);
+ASSERT_STRUCT_SIZE(s_data_array, 0x4C);
 
 template<typename T = void*>
 class s_data_iterator

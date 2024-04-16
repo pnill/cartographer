@@ -19,7 +19,7 @@ namespace KantTesting
 		char gapp[24];
 	};
 
-	CHECK_STRUCT_SIZE(s_session_informations_live, 0xAA8);
+	ASSERT_STRUCT_SIZE(s_session_informations_live, 0xAA8);
 
 	void Initialize();
 }

@@ -7,4 +7,4 @@ struct s_simulation_game_engine_player_creation_data
 {
 	uint16 absolute_player_index;
 };
-CHECK_STRUCT_SIZE(s_simulation_game_engine_player_creation_data, 2);
+ASSERT_STRUCT_SIZE(s_simulation_game_engine_player_creation_data, 2);

@@ -50,7 +50,7 @@ struct structure_precomputed_lighting_visiblity
 	// DataSize(135168)
 	data_reference visibility_volumes;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_precomputed_lighting_visiblity, 40);
+ASSERT_STRUCT_SIZE(structure_precomputed_lighting_visiblity, 40);
 
 // max: MAXIMUM_LIGHTS_PER_MAP
 struct structure_precomputed_lighting
@@ -61,14 +61,14 @@ struct structure_precomputed_lighting
 	uint8 object_type;
 	structure_precomputed_lighting_visiblity visiblity;
 };
-TAG_BLOCK_SIZE_ASSERT(structure_precomputed_lighting, 48);
+ASSERT_STRUCT_SIZE(structure_precomputed_lighting, 48);
 
 // max: MAXIMUM_LIGHTMAP_GROUPS_PER_STRUCTURE
 struct structure_lightmap_data
 {
 	tag_reference bitmap_group; // bitm
 };
-TAG_BLOCK_SIZE_ASSERT(structure_lightmap_data, 8);
+ASSERT_STRUCT_SIZE(structure_lightmap_data, 8);
 
 // max: k_maximum_fake_lightprobes_per_structure_bsp
 struct s_object_fake_lightprobe
@@ -76,4 +76,4 @@ struct s_object_fake_lightprobe
 	c_object_identifier object_identifier;
 	render_lighting render_lighting;
 };
-TAG_BLOCK_SIZE_ASSERT(s_object_fake_lightprobe, 92);
+ASSERT_STRUCT_SIZE(s_object_fake_lightprobe, 92);

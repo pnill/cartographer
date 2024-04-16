@@ -62,7 +62,7 @@ struct s_shader_postprocess_level_of_detail_new
 	int32 available_layer_flags;
 	int16 layers;
 };
-TAG_BLOCK_SIZE_ASSERT(s_shader_postprocess_level_of_detail_new, 6);
+ASSERT_STRUCT_SIZE(s_shader_postprocess_level_of_detail_new, 6);
 #pragma pack(pop)
 
 // max count: k_kilo
@@ -72,7 +72,7 @@ struct s_shader_postprocess_bitmap_new
 	datum bitmap_index;
 	real32 log_bitmap_dimension;
 };
-TAG_BLOCK_SIZE_ASSERT(s_shader_postprocess_bitmap_new, 12);
+ASSERT_STRUCT_SIZE(s_shader_postprocess_bitmap_new, 12);
 
 
 struct s_shader_postprocess_definition_new

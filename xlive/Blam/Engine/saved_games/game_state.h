@@ -29,7 +29,7 @@ struct s_game_state_header
 	int field_12F0;
 	int field_12F4;
 };
-CHECK_STRUCT_SIZE(s_game_state_header, 0x12F8);
+ASSERT_STRUCT_SIZE(s_game_state_header, 0x12F8);
 #pragma pack(pop)
 
 void __cdecl game_state_shell_initialize(void);

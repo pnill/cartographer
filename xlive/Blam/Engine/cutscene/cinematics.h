@@ -8,14 +8,14 @@ struct s_cinematic_globals_flags
 	bool cinematic_skip_start;
 	bool suppress_bsp_object_creation;
 };
-CHECK_STRUCT_SIZE(s_cinematic_globals_flags, 4);
+ASSERT_STRUCT_SIZE(s_cinematic_globals_flags, 4);
 
 struct s_cutscene_title
 {
 	int16 cutscene_title;
 	short cutscene_title_time;
 };
-CHECK_STRUCT_SIZE(s_cutscene_title, 4);
+ASSERT_STRUCT_SIZE(s_cutscene_title, 4);
 
 struct s_cinematic_globals_cutscene_flags
 {
@@ -24,7 +24,7 @@ struct s_cinematic_globals_cutscene_flags
 	bool is_outro_cutscene;
 	bool unk4;
 };
-CHECK_STRUCT_SIZE(s_cinematic_globals_cutscene_flags, 4);
+ASSERT_STRUCT_SIZE(s_cinematic_globals_cutscene_flags, 4);
 
 struct s_cinematic_globals
 {
@@ -35,7 +35,7 @@ struct s_cinematic_globals
 	real32 cinematic_title_time;
 	s_cinematic_globals_cutscene_flags cutscene_flags;
 };
-CHECK_STRUCT_SIZE(s_cinematic_globals, 36);
+ASSERT_STRUCT_SIZE(s_cinematic_globals, 36);
 
 s_cinematic_globals* get_cinematic_globals(void);
 

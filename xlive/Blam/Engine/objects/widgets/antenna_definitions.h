@@ -28,7 +28,7 @@ struct antenna_vertex
 
 	int8 pad_3[52];
 };
-TAG_BLOCK_SIZE_ASSERT(antenna_vertex, 128);
+ASSERT_STRUCT_SIZE(antenna_vertex, 128);
 
 struct antenna_definition
 {
@@ -49,4 +49,4 @@ struct antenna_definition
 
 	tag_block<antenna_vertex> vertices;
 };
-TAG_GROUP_SIZE_ASSERT(antenna_definition, 160);
+ASSERT_STRUCT_SIZE(antenna_definition, 160);

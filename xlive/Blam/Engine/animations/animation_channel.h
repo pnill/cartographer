@@ -53,4 +53,4 @@ public:
 	void set_frame_position(real32 position);
 	bool valid(void) const;
 };
-CHECK_STRUCT_SIZE(c_animation_channel, 0x20);
+ASSERT_STRUCT_SIZE(c_animation_channel, 0x20);

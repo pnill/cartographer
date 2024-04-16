@@ -170,7 +170,7 @@ struct s_text_chat
 	wchar_t text[122];
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(s_text_chat, 404);
+ASSERT_STRUCT_SIZE(s_text_chat, 404);
 
 const char* GetNetworkMessageName(int enumVal);
 void register_network_message(void *, int, const char*, int, int, int, void*, void*, void*);

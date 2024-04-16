@@ -8,7 +8,7 @@ struct s_player_predicted_aim_assist
 	int32 entity_index;
 	unsigned int model_target;
 };
-CHECK_STRUCT_SIZE(s_player_predicted_aim_assist, 0x10);
+ASSERT_STRUCT_SIZE(s_player_predicted_aim_assist, 0x10);
 
 struct s_player_motion
 {
@@ -31,5 +31,5 @@ struct s_player_motion
 	bool motion_sensor_velocity_threshold_exceeded;
 	BYTE gap33;
 };
-CHECK_STRUCT_SIZE(s_player_motion, 0x34);
+ASSERT_STRUCT_SIZE(s_player_motion, 0x34);
 #pragma pack(pop)

@@ -236,6 +236,6 @@ struct actor_datum
 	datum cs_script_datum;
 	BYTE gap_86C[44];
 };
-CHECK_STRUCT_SIZE(actor_datum, 0x898);
+ASSERT_STRUCT_SIZE(actor_datum, 0x898);
 
 s_data_array* get_actor_table();

@@ -124,7 +124,7 @@ struct s_vehicle_phantom_shape_definition
 
 	hkMultiSphereShape multi_spheres[4];
 };
-TAG_BLOCK_SIZE_ASSERT(s_vehicle_phantom_shape_definition, 672);
+ASSERT_STRUCT_SIZE(s_vehicle_phantom_shape_definition, 672);
 
 // max: k_maximum_friction_points_per_vehicle_physics_definition
 struct s_friction_point_definition
@@ -159,7 +159,7 @@ struct s_friction_point_definition
 
 	int32 pad_4;
 };
-TAG_BLOCK_SIZE_ASSERT(s_friction_point_definition, 76);
+ASSERT_STRUCT_SIZE(s_friction_point_definition, 76);
 
 // max: k_maximum_anti_gravity_points_per_vehicle_physics_definition
 struct s_anti_gravity_point_definition
@@ -185,7 +185,7 @@ struct s_anti_gravity_point_definition
 	real32 major_damage_error;
 	real32 destroyed_state_error;
 };
-TAG_BLOCK_SIZE_ASSERT(s_anti_gravity_point_definition, 76);
+ASSERT_STRUCT_SIZE(s_anti_gravity_point_definition, 76);
 
 struct s_havok_vehicle_physics_definition
 {
@@ -218,7 +218,7 @@ struct s_havok_vehicle_physics_definition
 
 	tag_block<s_vehicle_phantom_shape_definition> phantom_shapes;
 };
-TAG_BLOCK_SIZE_ASSERT(s_havok_vehicle_physics_definition, 84);
+ASSERT_STRUCT_SIZE(s_havok_vehicle_physics_definition, 84);
 
 struct s_torque_curve
 {
@@ -332,4 +332,4 @@ struct _vehicle_definition
 
 	s_havok_vehicle_physics_definition havok_vehicle_physics;
 };
-TAG_GROUP_SIZE_ASSERT(_vehicle_definition, 768);
+ASSERT_STRUCT_SIZE(_vehicle_definition, 768);

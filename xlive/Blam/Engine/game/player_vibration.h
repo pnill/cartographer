@@ -25,14 +25,14 @@ struct s_vibration_globals
 	real32 max_vibration_right;
 	real32 scripted_scale;
 };
-CHECK_STRUCT_SIZE(s_vibration_globals, 556);
+ASSERT_STRUCT_SIZE(s_vibration_globals, 556);
 
 struct s_vibration_frequency_definition
 {
 	real32 duration;
 	c_function_definition dirty_whore;	// Bungie's name for this not mine
 };
-CHECK_STRUCT_SIZE(s_vibration_frequency_definition, 12);
+ASSERT_STRUCT_SIZE(s_vibration_frequency_definition, 12);
 
 struct s_vibration_definition
 {
@@ -41,7 +41,7 @@ struct s_vibration_definition
 	// Index 0 = low || Index 1 = high
 	s_vibration_frequency_definition frequency_vibration[2];
 };
-CHECK_STRUCT_SIZE(s_vibration_definition, 24);
+ASSERT_STRUCT_SIZE(s_vibration_definition, 24);
 
 void __cdecl rumble_player_set_scripted_scale(real32 scale);
 

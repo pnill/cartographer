@@ -5,4 +5,4 @@ struct s_simulation_weapon_creation_data
 {
 	s_simulation_object_creation_data object;
 };
-CHECK_STRUCT_SIZE(s_simulation_weapon_creation_data, 16);
+ASSERT_STRUCT_SIZE(s_simulation_weapon_creation_data, 16);

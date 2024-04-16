@@ -19,4 +19,4 @@ struct editor_comment_definition
     static_string32 name;
     static_string256 comment;
 };
-TAG_BLOCK_SIZE_ASSERT(editor_comment_definition, 304);
+ASSERT_STRUCT_SIZE(editor_comment_definition, 304);

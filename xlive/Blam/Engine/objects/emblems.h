@@ -115,4 +115,4 @@ struct s_emblem_info
 	e__emblem_background background_emblem;
 	e_emblem_flags emblem_flags;
 };
-CHECK_STRUCT_SIZE(s_emblem_info, 3);
+ASSERT_STRUCT_SIZE(s_emblem_info, 3);

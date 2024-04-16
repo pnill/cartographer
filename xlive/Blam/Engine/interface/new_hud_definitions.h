@@ -17,7 +17,7 @@ struct s_new_hud_dashlight_definition
     e_new_hud_dashlight_flags flags;
     tag_reference sound;        // snd!
 };
-TAG_BLOCK_SIZE_ASSERT(s_new_hud_dashlight_definition, 28);
+ASSERT_STRUCT_SIZE(s_new_hud_dashlight_definition, 28);
 
 #define k_hud_waypoint_arrow_type_count 4
 struct s_new_hud_waypoint_arrow_definition
@@ -30,7 +30,7 @@ struct s_new_hud_waypoint_arrow_definition
     float smallest_distance;
     tag_reference border_bitmap;    // bitm
 };
-TAG_BLOCK_SIZE_ASSERT(s_new_hud_waypoint_arrow_definition, 36);
+ASSERT_STRUCT_SIZE(s_new_hud_waypoint_arrow_definition, 36);
 
 #define k_hud_waypoint_type_count 8
 struct s_new_hud_waypoint_definition
@@ -42,7 +42,7 @@ struct s_new_hud_waypoint_definition
     short offscreen_sequence_index;
     short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_new_hud_waypoint_definition, 24);
+ASSERT_STRUCT_SIZE(s_new_hud_waypoint_definition, 24);
 
 enum e_sound_latched_to : int
 {
@@ -87,7 +87,7 @@ struct s_player_training_entry_data
     e_player_training_flags flags;
     short pad;
 };
-TAG_BLOCK_SIZE_ASSERT(s_player_training_entry_data, 28);
+ASSERT_STRUCT_SIZE(s_player_training_entry_data, 28);
 
 
 struct s_new_hud_globals_constants
@@ -107,7 +107,7 @@ struct s_new_hud_globals_constants
     tag_reference elite_training_top_left;      // bitm
     tag_reference elite_training_middle;        // bitm
 };
-TAG_BLOCK_SIZE_ASSERT(s_new_hud_globals_constants, 96);
+ASSERT_STRUCT_SIZE(s_new_hud_globals_constants, 96);
 
 struct s_new_hud_globals  
 {
@@ -120,7 +120,7 @@ struct s_new_hud_globals
     tag_block<s_player_training_entry_data> player_training_data;
     s_new_hud_globals_constants constants;
 };
-TAG_BLOCK_SIZE_ASSERT(s_new_hud_globals, 144);
+ASSERT_STRUCT_SIZE(s_new_hud_globals, 144);
 
 enum e_hud_anchor : short
 {
@@ -250,7 +250,7 @@ struct s_hud_widget_inputs_definition
     e_hud_input_type input_3;
     e_hud_input_type input_4;
 };
-CHECK_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
+ASSERT_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
 
 enum e_widget_state_unit_flags : short
 {
@@ -331,7 +331,7 @@ struct s_hud_widget_state_definition
     byte total_cutoff;
     byte pad;
 };
-CHECK_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
+ASSERT_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
 
 enum e_hud_widget_effect_flags : short
 {
@@ -347,7 +347,7 @@ struct s_hud_widget_effect_function
     float time_period_in_seconds;
     c_function_definition function;
 };
-CHECK_STRUCT_SIZE(s_hud_widget_effect_function, 20);
+ASSERT_STRUCT_SIZE(s_hud_widget_effect_function, 20);
 
 #define k_maximum_hud_bitmap_widgets_per_tag 256
 struct s_hud_widget_effect_definition
@@ -370,7 +370,7 @@ struct s_hud_widget_effect_definition
     s_hud_widget_effect_function horizontal_offset;
     s_hud_widget_effect_function vertical_offset;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hud_widget_effect_definition, 104);
+ASSERT_STRUCT_SIZE(s_hud_widget_effect_definition, 104);
 
 #define k_maximum_hud_bitmap_widgets_per_tag 256
 struct s_hud_bitmap_widget_definition
@@ -402,7 +402,7 @@ struct s_hud_bitmap_widget_definition
     e_special_hud_type special_hud_type;
     short pad1;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hud_bitmap_widget_definition, 100);
+ASSERT_STRUCT_SIZE(s_hud_bitmap_widget_definition, 100);
 
 enum e_text_widget_flags : short
 {
@@ -456,7 +456,7 @@ struct s_hud_text_widget_definition
     point2d quarterscreen_offset;
     tag_block<s_hud_widget_effect_definition> effect;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hud_text_widget_definition, 84);
+ASSERT_STRUCT_SIZE(s_hud_text_widget_definition, 84);
 
 struct s_new_hud_dashlight_data
 {
@@ -466,7 +466,7 @@ struct s_new_hud_dashlight_data
     short low_ammo_cutoff;  // the cutoff for showing the low ammo dashlight
     float age_cutoff;       // the age cutoff for showing the low battery dashlight
 };
-CHECK_STRUCT_SIZE(s_new_hud_dashlight_data, 8);
+ASSERT_STRUCT_SIZE(s_new_hud_dashlight_data, 8);
 
 enum e_screen_effect_widget_flags : short
 {
@@ -478,7 +478,7 @@ struct s_screen_effect_bonus_struct_block
     tag_reference halfscreen_screen_effect;     // egor
     tag_reference quarterscreen_screen_effect;  // egor
 };
-CHECK_STRUCT_SIZE(s_screen_effect_bonus_struct_block, 16);
+ASSERT_STRUCT_SIZE(s_screen_effect_bonus_struct_block, 16);
 
 #define k_maximum_hud_screen_effect_widgets_per_tag 4
 struct s_hud_screen_effect_widget_definition
@@ -502,7 +502,7 @@ struct s_hud_screen_effect_widget_definition
     point2d halfscreen_offset;
     point2d quarterscreen_offset;
 };
-TAG_BLOCK_SIZE_ASSERT(s_hud_screen_effect_widget_definition, 80);
+ASSERT_STRUCT_SIZE(s_hud_screen_effect_widget_definition, 80);
 
 struct s_new_hud_definition
 {
@@ -512,4 +512,4 @@ struct s_new_hud_definition
     s_new_hud_dashlight_data dashlight_data;
     tag_block<s_hud_screen_effect_widget_definition> screen_effect_widgets;
 };
-TAG_GROUP_SIZE_ASSERT(s_new_hud_definition, 40);
+ASSERT_STRUCT_SIZE(s_new_hud_definition, 40);

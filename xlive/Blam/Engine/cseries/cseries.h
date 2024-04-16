@@ -115,17 +115,11 @@ static_assert(sizeof(datum) == 4);
 /// Creates a mask out of a count number of flags
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
 
-#define CHECK_STRUCT_SIZE(STRUCT,_SIZE)\
-static_assert (sizeof(STRUCT) == _SIZE, "Invalid size for struct (" #STRUCT")")
+#define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
+static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") excpected size (" #_SIZE")");
 
-#define CHECK_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
-static_assert (offsetof(STRUCT, FIELD) == OFFSET, #STRUCT " layout is invalid")
-
-#define TAG_BLOCK_SIZE_ASSERT(tagblock,size)\
-static_assert (sizeof(tagblock) == (size),"Invalid Size for TagBlock <" #tagblock ">")
-
-#define TAG_GROUP_SIZE_ASSERT(tagGroup,size)\
-static_assert (sizeof(tagGroup) == (size),"Invalid Size for TagGroup <" #tagGroup">");
+#define ASSERT_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
+static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #if defined(_DEBUG)
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION) \

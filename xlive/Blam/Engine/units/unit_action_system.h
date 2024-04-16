@@ -10,5 +10,5 @@ struct s_posture_definition
     string_id name;
     real_vector3d pill_offset;
 };
-TAG_BLOCK_SIZE_ASSERT(s_posture_definition, 16);
+ASSERT_STRUCT_SIZE(s_posture_definition, 16);
 

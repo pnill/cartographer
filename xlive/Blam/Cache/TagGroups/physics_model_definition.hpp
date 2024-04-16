@@ -96,7 +96,7 @@ struct s_physics_model_group_definition
 		float alignment_max_vel;//0x5C
 		PAD(0x8);//0x60
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_phantom_types_block, 0x68);
+	ASSERT_STRUCT_SIZE(s_phantom_types_block, 0x68);
 	tag_block<s_phantom_types_block> phantom_types;//0x28
 	struct s_node_edges_block
 	{
@@ -124,12 +124,12 @@ struct s_physics_model_group_definition
 			e_flags flags;//0x4
 			float friction;//0x8
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_constraints_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_constraints_block, 0xC);
 		tag_block<s_constraints_block> constraints;//0x8
 		string_id node_a_material;//0x10
 		string_id node_b_material;//0x14
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_node_edges_block, 0x18);
+	ASSERT_STRUCT_SIZE(s_node_edges_block, 0x18);
 	tag_block<s_node_edges_block> node_edges;//0x30
 	struct s_rigid_bodies_block
 	{
@@ -203,7 +203,7 @@ struct s_physics_model_group_definition
 		float bounding_sphere_pad;//0x80
 		PAD(0xC);//0x84
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_rigid_bodies_block, 0x90);
+	ASSERT_STRUCT_SIZE(s_rigid_bodies_block, 0x90);
 	tag_block<s_rigid_bodies_block> rigid_bodies;//0x38
 	struct s_materials_block
 	{
@@ -216,7 +216,7 @@ struct s_physics_model_group_definition
 		};
 		e_flags flags;//0xA
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_materials_block, 0xC);
+	ASSERT_STRUCT_SIZE(s_materials_block, 0xC);
 	tag_block<s_materials_block> materials;//0x40
 	struct s_spheres_block
 	{
@@ -244,7 +244,7 @@ struct s_physics_model_group_definition
 		__int16 count_2;//0x36
 		PAD(0x48);//0x38
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_spheres_block, 0x80);
+	ASSERT_STRUCT_SIZE(s_spheres_block, 0x80);
 	tag_block<s_spheres_block> spheres;//0x48
 	struct s_multi_spheres_block
 	{
@@ -269,7 +269,7 @@ struct s_physics_model_group_definition
 		__int32 num_spheres;//0x2C
 		PAD(0x80);//0x30
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_multi_spheres_block, 0xB0);
+	ASSERT_STRUCT_SIZE(s_multi_spheres_block, 0xB0);
 	tag_block<s_multi_spheres_block> multi_spheres;//0x50
 	struct s_pills_block
 	{
@@ -297,7 +297,7 @@ struct s_physics_model_group_definition
 		real_vector3d top;
 		float wtop;
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_pills_block, 0x50);
+	ASSERT_STRUCT_SIZE(s_pills_block, 0x50);
 	tag_block<s_pills_block> pills;//0x58
 	struct s_boxes_block
 	{
@@ -325,7 +325,7 @@ struct s_physics_model_group_definition
 		__int16 count_2;//0x46
 		PAD(0x48);//0x48
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_boxes_block, 0x90);
+	ASSERT_STRUCT_SIZE(s_boxes_block, 0x90);
 	tag_block<s_boxes_block> boxes;//0x60
 	struct s_triangles_block
 	{
@@ -350,7 +350,7 @@ struct s_physics_model_group_definition
 		float radius;//0x2C
 		PAD(0x30);//0x30
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_triangles_block, 0x60);
+	ASSERT_STRUCT_SIZE(s_triangles_block, 0x60);
 	tag_block<s_triangles_block> triangles;//0x68
 	struct s_polyhedra_block
 	{
@@ -382,25 +382,25 @@ struct s_physics_model_group_definition
 		__int32 plane_equations_capacity;//0xF8
 		PAD(0x4);//0xFC
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_polyhedra_block, 0x100);
+	ASSERT_STRUCT_SIZE(s_polyhedra_block, 0x100);
 	tag_block<s_polyhedra_block> polyhedra;//0x70
 	struct s_polyhedron_four_vectors_block
 	{
 		PAD(0x30);//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_polyhedron_four_vectors_block, 0x30);
+	ASSERT_STRUCT_SIZE(s_polyhedron_four_vectors_block, 0x30);
 	tag_block<s_polyhedron_four_vectors_block> polyhedron_four_vectors;//0x78
 	struct s_polyhedron_plane_equations_block
 	{
 		PAD(0x10);//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_polyhedron_plane_equations_block, 0x10);
+	ASSERT_STRUCT_SIZE(s_polyhedron_plane_equations_block, 0x10);
 	tag_block<s_polyhedron_plane_equations_block> polyhedron_plane_equations;//0x80
 	struct s_mass_distributions_block
 	{
 		PAD(0x40);//0x0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_mass_distributions_block, 0x40);
+	ASSERT_STRUCT_SIZE(s_mass_distributions_block, 0x40);
 	tag_block<s_mass_distributions_block> mass_distributions;//0x88
 	struct s_lists_block
 	{
@@ -445,7 +445,7 @@ struct s_physics_model_group_definition
 		__int16 shape_4;//0x32
 		__int32 collision_filter_4;//0x34
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_lists_block, 0x38);
+	ASSERT_STRUCT_SIZE(s_lists_block, 0x38);
 	tag_block<s_lists_block> lists;//0x90
 	struct s_list_shapes_block
 	{
@@ -472,7 +472,7 @@ struct s_physics_model_group_definition
 		__int16 shape;//0x2
 		__int32 collision_filter;//0x4
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_list_shapes_block, 0x8);
+	ASSERT_STRUCT_SIZE(s_list_shapes_block, 0x8);
 	tag_block<s_list_shapes_block> list_shapes;//0x98
 	struct s_mopps_block
 	{
@@ -483,7 +483,7 @@ struct s_physics_model_group_definition
 		__int16 list;//0xE
 		__int32 code_offset;//0x10
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_mopps_block, 0x14);
+	ASSERT_STRUCT_SIZE(s_mopps_block, 0x14);
 	tag_block<s_mopps_block> mopps;//0xA0
 	data_reference mopp_codes;//0xA8
 	struct s_hinge_constraints_block
@@ -504,7 +504,7 @@ struct s_physics_model_group_definition
 		__int16 edge_index;//0x70
 		PAD(0x6);//0x72
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_hinge_constraints_block, 0x78);
+	ASSERT_STRUCT_SIZE(s_hinge_constraints_block, 0x78);
 	tag_block<s_hinge_constraints_block> hinge_constraints;//0xB0
 	struct s_ragdoll_constraints_block
 	{
@@ -531,7 +531,7 @@ struct s_physics_model_group_definition
 		float max_plane;//0x8C
 		float max_friciton_torque;//0x90
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_ragdoll_constraints_block, 0x94);
+	ASSERT_STRUCT_SIZE(s_ragdoll_constraints_block, 0x94);
 	tag_block<s_ragdoll_constraints_block> ragdoll_constraints;//0xB8
 	struct s_regions_block
 	{
@@ -543,13 +543,13 @@ struct s_physics_model_group_definition
 			{
 				__int16 rigid_body;//0x0
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_rigid_bodies_block, 0x2);
+			ASSERT_STRUCT_SIZE(s_rigid_bodies_block, 0x2);
 			tag_block<s_rigid_bodies_block> rigid_bodies;//0x4
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_permutations_block, 0xC);
+		ASSERT_STRUCT_SIZE(s_permutations_block, 0xC);
 		tag_block<s_permutations_block> permutations;//0x4
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_regions_block, 0xC);
+	ASSERT_STRUCT_SIZE(s_regions_block, 0xC);
 	tag_block<s_regions_block> regions;//0xC0
 	struct s_nodes_block
 	{
@@ -563,7 +563,7 @@ struct s_physics_model_group_definition
 		__int16 sibling;//0x8
 		__int16 child;//0xA
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_nodes_block, 0xC);
+	ASSERT_STRUCT_SIZE(s_nodes_block, 0xC);
 	tag_block<s_nodes_block> nodes;//0xC8
 	struct s_import_info_block
 	{
@@ -584,11 +584,11 @@ struct s_physics_model_group_definition
 			data_reference zipped_data;//0x188
 			PAD(0x80);//0x190
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_files_block, 0x210);
+		ASSERT_STRUCT_SIZE(s_files_block, 0x210);
 		tag_block<s_files_block> files;//0x1C8
 		PAD(0x80);//0x1D0
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_import_info_block, 0x250);
+	ASSERT_STRUCT_SIZE(s_import_info_block, 0x250);
 	tag_block<s_import_info_block> import_info;//0xD0
 	struct s_errors_block
 	{
@@ -649,7 +649,7 @@ struct s_physics_model_group_definition
 				real_argb_color color;//0x20
 				float screen_size;//0x30
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_vertices_block, 0x34);
+			ASSERT_STRUCT_SIZE(s_vertices_block, 0x34);
 			tag_block<s_vertices_block> vertices;//0x30
 			struct s_vectors_block
 			{
@@ -668,7 +668,7 @@ struct s_physics_model_group_definition
 				PAD(0xC);//0x30
 				float screen_length;//0x3C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_vectors_block, 0x40);
+			ASSERT_STRUCT_SIZE(s_vectors_block, 0x40);
 			tag_block<s_vectors_block> vectors;//0x38
 			struct s_lines_block
 			{
@@ -699,7 +699,7 @@ struct s_physics_model_group_definition
 				float node_weight_11;//0x48
 				float node_weight_12;//0x4C
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_lines_block, 0x50);
+			ASSERT_STRUCT_SIZE(s_lines_block, 0x50);
 			tag_block<s_lines_block> lines;//0x40
 			struct s_triangles_block
 			{
@@ -742,7 +742,7 @@ struct s_physics_model_group_definition
 				//float node_weight[3];//0x6C
 				PAD(0x70);
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_triangles_block, 0x70);
+			ASSERT_STRUCT_SIZE(s_triangles_block, 0x70);
 			tag_block<s_triangles_block> triangles;//0x48
 			struct s_quads_block
 			{
@@ -796,7 +796,7 @@ struct s_physics_model_group_definition
 				//float node_weight[3];//0x8C
 				PAD(0x90);
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_quads_block, 0x90);
+			ASSERT_STRUCT_SIZE(s_quads_block, 0x90);
 			tag_block<s_quads_block> quads;//0x50
 			struct s_comments_block
 			{
@@ -815,7 +815,7 @@ struct s_physics_model_group_definition
 				//real_argb_color color;//0x28
 				PAD(0x38);
 			};
-			TAG_BLOCK_SIZE_ASSERT(s_comments_block, 0x38);
+			ASSERT_STRUCT_SIZE(s_comments_block, 0x38);
 			tag_block<s_comments_block> comments;//0x58
 			PAD(0x17C);//0x60
 			__int32 report_key;//0x1DC
@@ -829,10 +829,10 @@ struct s_physics_model_group_definition
 			real_argb_color color;//0x1FC
 			PAD(0x54);//0x20C
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_reports_block, 0x260);
+		ASSERT_STRUCT_SIZE(s_reports_block, 0x260);
 		tag_block<s_reports_block> reports;//0x29C
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_errors_block, 0x2A4);
+	ASSERT_STRUCT_SIZE(s_errors_block, 0x2A4);
 	tag_block<s_errors_block> errors;//0xD8
 	struct s_point_to_path_curves_block
 	{
@@ -846,10 +846,10 @@ struct s_physics_model_group_definition
 			float position_z;//0x8
 			float t_value;//0xC
 		};
-		TAG_BLOCK_SIZE_ASSERT(s_points_block, 0x10);
+		ASSERT_STRUCT_SIZE(s_points_block, 0x10);
 		tag_block<s_points_block> points;//0x8
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_point_to_path_curves_block, 0x10);
+	ASSERT_STRUCT_SIZE(s_point_to_path_curves_block, 0x10);
 	tag_block<s_point_to_path_curves_block> point_to_path_curves;//0xE0
 	struct s_limited_hinge_constraints_block
 	{
@@ -872,7 +872,7 @@ struct s_physics_model_group_definition
 		float limit_min_angle;//0x7C
 		float limit_max_angle;//0x80
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_limited_hinge_constraints_block, 0x84);
+	ASSERT_STRUCT_SIZE(s_limited_hinge_constraints_block, 0x84);
 	tag_block<s_limited_hinge_constraints_block> limited_hinge_constraints;//0xE8
 	struct s_ball_and_socket_constraints_block
 	{
@@ -892,7 +892,7 @@ struct s_physics_model_group_definition
 		__int16 edge_index;//0x70
 		PAD(0x6);//0x72
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_ball_and_socket_constraints_block, 0x78);
+	ASSERT_STRUCT_SIZE(s_ball_and_socket_constraints_block, 0x78);
 	tag_block<s_ball_and_socket_constraints_block> ball_and_socket_constraints;//0xF0
 	struct s_stiff_spring_constraints_block
 	{
@@ -913,7 +913,7 @@ struct s_physics_model_group_definition
 		PAD(0x6);//0x72
 		float spring_length;//0x78
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_stiff_spring_constraints_block, 0x7C);
+	ASSERT_STRUCT_SIZE(s_stiff_spring_constraints_block, 0x7C);
 	tag_block<s_stiff_spring_constraints_block> stiff_spring_constraints;//0xF8
 	struct s_prismatic_constraints_block
 	{
@@ -936,7 +936,7 @@ struct s_physics_model_group_definition
 		float max_limit;//0x7C
 		float max_friction_force;//0x80
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_prismatic_constraints_block, 0x84);
+	ASSERT_STRUCT_SIZE(s_prismatic_constraints_block, 0x84);
 	tag_block<s_prismatic_constraints_block> prismatic_constraints;//0x100
 	struct s_phantoms_block
 	{
@@ -948,8 +948,8 @@ struct s_physics_model_group_definition
 		__int16 count_2;//0x1A
 		PAD(0x4);//0x1C
 	};
-	TAG_BLOCK_SIZE_ASSERT(s_phantoms_block, 0x20);
+	ASSERT_STRUCT_SIZE(s_phantoms_block, 0x20);
 	tag_block<s_phantoms_block> phantoms;//0x108
 };
-TAG_GROUP_SIZE_ASSERT(s_physics_model_group_definition, 0x110);
+ASSERT_STRUCT_SIZE(s_physics_model_group_definition, 0x110);
 #pragma pack(pop)

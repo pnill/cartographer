@@ -71,7 +71,7 @@ struct geometry_compression_info
     real_rectangle2d texcoord_bounds;
     real_rectangle2d secondary_texcoord_bounds;
 };
-CHECK_STRUCT_SIZE(geometry_compression_info, 56);
+ASSERT_STRUCT_SIZE(geometry_compression_info, 56);
 
 struct geometry_section_info
 {
@@ -100,7 +100,7 @@ struct geometry_section_info
 
     e_section_lighting_flags section_lighting_flags;
 };
-CHECK_STRUCT_SIZE(geometry_section_info, 40);
+ASSERT_STRUCT_SIZE(geometry_section_info, 40);
 
 // max count: MAXIMUM_PARTS_PER_GEOMETRY_SECTION
 struct geometry_part
@@ -124,7 +124,7 @@ struct geometry_part
     real32 lod_mipmap_magic_number;
     int8 pad[24];
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_part, 72);
+ASSERT_STRUCT_SIZE(geometry_part, 72);
 
 // max count: MAXIMUM_SUBPARTS_PER_SECTION
 struct geometry_subpart
@@ -134,7 +134,7 @@ struct geometry_subpart
     uint16 visibility_bounds_index;
     uint16 part_index;
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_subpart, 8);
+ASSERT_STRUCT_SIZE(geometry_subpart, 8);
 
 // max count: MAXIMUM_SUBPARTS_PER_SECTION
 struct geometry_visibility
@@ -144,7 +144,7 @@ struct geometry_visibility
     int8 node;
     int8 pad[3];
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_visibility, 20);
+ASSERT_STRUCT_SIZE(geometry_visibility, 20);
 
 // max count: MAXIMUM_VERTICES_PER_GEOMETRY_SECTION
 struct geometry_point
@@ -156,7 +156,7 @@ struct geometry_point
     int32 use_new_node_indices;
     int32 adjusted_compound_node_index;
 };
-CHECK_STRUCT_SIZE(geometry_point, 68);
+ASSERT_STRUCT_SIZE(geometry_point, 68);
 
 // max count: MAXIMUM_VERTICES_PER_GEOMETRY_SECTION
 struct geometry_vertex
@@ -175,7 +175,7 @@ struct geometry_vertex
     real_point2d unk_1;
     real_point3d unk_2;
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_vertex, 196);
+ASSERT_STRUCT_SIZE(geometry_vertex, 196);
 
 struct geometry_section
 {
@@ -190,7 +190,7 @@ struct geometry_section
     tag_block<rasterizer_vertex_buffer> vertex_buffers;
     int32 pad;
 };
-CHECK_STRUCT_SIZE(geometry_section, 68);
+ASSERT_STRUCT_SIZE(geometry_section, 68);
 
 // max count: MAXIMUM_RIGID_POINT_GROUPS_PER_GEOMETRY_SECTION
 struct geometry_rigid_point_group
@@ -199,7 +199,7 @@ struct geometry_rigid_point_group
     uint8 nodes_point;
     uint16 point_count;
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_rigid_point_group, 4);
+ASSERT_STRUCT_SIZE(geometry_rigid_point_group, 4);
 
 struct geometry_point_data
 {
@@ -208,7 +208,7 @@ struct geometry_point_data
     tag_block<geometry_rigid_point_group> rigidPointGroups;
     tag_block<uint16> vertex_point_indices;
 };
-CHECK_STRUCT_SIZE(geometry_point_data, 32);
+ASSERT_STRUCT_SIZE(geometry_point_data, 32);
 
 // max count: MAXIMUM_PROPERTIES_PER_MATERIAL
 struct geometry_material_property
@@ -217,7 +217,7 @@ struct geometry_material_property
     int16 int_value;
     real32 real_value;
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_material_property, 8);
+ASSERT_STRUCT_SIZE(geometry_material_property, 8);
 
 // max count: MAXIMUM_MATERIALS_PER_GEOMETRY
 struct geometry_material
@@ -230,4 +230,4 @@ struct geometry_material
     int8 breakable_surface_index;
     int8 pad1[3];
 };
-TAG_BLOCK_SIZE_ASSERT(geometry_material, 32);
+ASSERT_STRUCT_SIZE(geometry_material, 32);

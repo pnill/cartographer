@@ -74,7 +74,7 @@ struct s_game_engine_global_player_info
 	short field_12;
 	byte field_14[4];
 };
-CHECK_STRUCT_SIZE(s_game_engine_global_player_info, 24);
+ASSERT_STRUCT_SIZE(s_game_engine_global_player_info, 24);
 
 struct s_game_engine_globals
 {
@@ -105,7 +105,7 @@ struct s_game_engine_globals
 	DWORD game_engine_index;
 	BYTE gapC58[132];
 };
-CHECK_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
+ASSERT_STRUCT_SIZE(s_game_engine_globals, 0xCDC);
 
 // max count: 1
 struct s_sound_response_extra_sounds
@@ -119,7 +119,7 @@ struct s_sound_response_extra_sounds
 	tag_reference chinese_sound;	// snd!
 	tag_reference portuguese_sound;	// snd!
 };
-TAG_BLOCK_SIZE_ASSERT(s_sound_response_extra_sounds, 64);
+ASSERT_STRUCT_SIZE(s_sound_response_extra_sounds, 64);
 
 
 // max count: 10
@@ -131,7 +131,7 @@ struct s_multiplayer_event_sound_response_definition
 	s_sound_response_extra_sounds extra_sounds;
 	real32 probability;
 };
-TAG_BLOCK_SIZE_ASSERT(s_multiplayer_event_sound_response_definition, 80);
+ASSERT_STRUCT_SIZE(s_multiplayer_event_sound_response_definition, 80);
 
 // max count: k_maximum_game_engine_event_responses_per_type
 struct s_multiplayer_event_response_definition
@@ -162,7 +162,7 @@ struct s_multiplayer_event_response_definition
 	int32 pad6[4];
     tag_block<s_multiplayer_event_sound_response_definition> sound_permutations;
 };
-TAG_BLOCK_SIZE_ASSERT(s_multiplayer_event_response_definition, 0xA8);
+ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 
 s_game_engine_globals* game_engine_globals_get(void);
 

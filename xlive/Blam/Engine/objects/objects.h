@@ -126,7 +126,7 @@ struct object_header_block_reference
 	int16 size;
 	int16 offset;
 };
-CHECK_STRUCT_SIZE(object_header_block_reference, 4);
+ASSERT_STRUCT_SIZE(object_header_block_reference, 4);
 
 struct s_object_header
 {
@@ -137,7 +137,7 @@ struct s_object_header
 	int16 object_data_size;
 	void* object;
 };
-CHECK_STRUCT_SIZE(s_object_header, 12);
+ASSERT_STRUCT_SIZE(s_object_header, 12);
 
 struct s_object_payload
 {
@@ -147,7 +147,7 @@ struct s_object_payload
 	real_point3d origin_point;
 	real32 bounding_sphere_radius;
 };
-CHECK_STRUCT_SIZE(s_object_payload, 20);
+ASSERT_STRUCT_SIZE(s_object_payload, 20);
 
 // Used in object_attachments_block
 struct object_attachment
@@ -156,7 +156,7 @@ struct object_attachment
 	int8 pad[3];
 	int32 field_4;
 };
-CHECK_STRUCT_SIZE(object_attachment, 8);
+ASSERT_STRUCT_SIZE(object_attachment, 8);
 
 struct object_datum
 {
@@ -231,7 +231,7 @@ struct object_datum
 	object_header_block_reference change_color_block;
 	object_header_block_reference animation_manager_block;
 };
-CHECK_STRUCT_SIZE(object_datum, 300);
+ASSERT_STRUCT_SIZE(object_datum, 300);
 
 struct object_marker
 {
@@ -241,7 +241,7 @@ struct object_marker
 	real_matrix4x3 matrix1;
 	int32 field_6C;
 };
-CHECK_STRUCT_SIZE(object_marker, 112);
+ASSERT_STRUCT_SIZE(object_marker, 112);
 
 s_data_array* object_header_data_get(void);
 
