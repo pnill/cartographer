@@ -42,14 +42,19 @@ enum e_particle_state_flags : uint32
 	k_particle_state_flags
 };
 
-void __cdecl particle_state_update(uint32 flags, c_particle_system* particle_system, c_particle_location* particle_location, c_particle* particle, s_particle_state* particle_state, int32 state_values_count);
+void __cdecl particle_state_update(c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> flags, 
+	c_particle_system* particle_system, 
+	c_particle_location* particle_location,
+	c_particle* particle,
+	s_particle_state* particle_state,
+	int32 state_values_count);
 
 struct s_particle_state
 {
 	real32 m_states[k_particle_state_values_count];
 	struct
 	{
-		c_flags<e_particle_state_flags, uint32, k_particle_state_flags> flags;
+		c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> flags;
 		c_particle_system* particle_system;
 		c_particle_location* particle_location;
 		c_particle* particle;
@@ -104,7 +109,7 @@ struct s_particle_state
 		}
 	}
 
-	void state_update(uint32 flags)
+	void state_update(c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> flags)
 	{
 		particle_state_update(
 			~m_system.flags & flags,

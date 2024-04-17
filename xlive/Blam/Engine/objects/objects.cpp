@@ -547,7 +547,7 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 	object->model_variant_id = NONE;
 	object->cached_object_render_state_index = NONE;
 	object->field_D0 = NONE;
-	object->physics_flags.set_raw_bits(0);
+	object->physics_flags.set_unsafe(0);
 	object->physics_flags.set(_object_physics_bit_8, placement->flags.test(_scenario_object_placement_bit_3));
 	object->havok_datum = NONE;
 	object->simulation_entity_index = NONE;

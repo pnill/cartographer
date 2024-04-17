@@ -1,32 +1,37 @@
 #pragma once
 
 template<typename t_type, typename t_storage_type, size_t k_count>
-class c_flags
+class c_flags_no_init 
 {
 	static_assert(std::is_unsigned_v<t_storage_type>, "error: t_storage_type is not an unsigned integral type");
 
 public:
-	c_flags() 
+	const t_type get_unsafe(void) const
 	{
-		clear();
-		return;
+		return m_storage;
 	}
 
-	c_flags(t_storage_type raw_bits) 
+	bool valid_bit(t_type bit) const
 	{
-		set_raw_bits(raw_bits);
-		return;
+		return VALID_INDEX(bit, k_count);
 	}
 
-	void set_raw_bits(t_storage_type raw_bits)
+	// Checks if current value set for the bitflag is valud
+	bool valid(void) const
 	{
-		m_storage = raw_bits;
+		return !TEST_FLAG(m_storage, ~(FLAG(k_count) - 1));
+	}
+
+	void clear(void)
+	{
+		m_storage = 0;
 		return;
 	}
 
 	void set(t_type bit, bool enable)
 	{
 		ASSERT(valid_bit(bit));
+
 		if (bit < k_count)
 		{
 			if (enable)
@@ -41,53 +46,78 @@ public:
 		return;
 	}
 
-	void clear()
+	// Set the bitflag value manually
+	void set_unsafe(t_storage_type raw_bits)
 	{
-		m_storage = 0;
+		m_storage = raw_bits;
+		ASSERT(valid());
 		return;
-	}
-
-	bool valid_bit(t_type bit) const
-	{
-		return VALID_INDEX(bit, k_count);
 	}
 
 	bool test(t_type bit) const
 	{
-		ASSERT(valid_bit(bit));
 		return TEST_BIT(m_storage, (t_storage_type)(bit));
 	}
 
-	t_storage_type operator|=(const t_storage_type& flags)
+	// Untested
+	bool test_range(t_type start_bit, t_type end_bit) const
 	{
-		m_storage |= flags;
-		return m_storage;
+		ASSERT(valid_bit(start_bit) && valid_bit(end_bit) && (start_bit <= end_bit));
+
+		t_type bit = (FLAG(end_bit - start_bit + 1) - 1) << start_bit;
+		return TEST_BIT(m_storage, bit);
 	}
 
-	t_storage_type operator~()
+	c_flags_no_init<t_type, t_storage_type, k_count> operator~(void) const
 	{
-		return ~m_storage;
+		c_flags_no_init<t_type, t_storage_type, k_count> result;
+		result.set_unsafe(~m_storage);
+		return result;
 	}
 
-	bool operator==(const c_flags<t_type, t_storage_type, k_count>& value)
+	c_flags_no_init<t_type, t_storage_type, k_count> operator&(c_flags_no_init<t_type, t_storage_type, k_count>& value) const
+	{
+		c_flags_no_init<t_type, t_storage_type, k_count> result;
+		result.set_unsafe(m_storage & value.m_storage);
+		return result;
+	}
+
+	void operator|=(c_flags_no_init<t_type, t_storage_type, k_count>& value)
+	{
+		m_storage |= value.m_storage;
+		ASSERT(valid());
+		return;
+	}
+
+	bool operator!=(c_flags_no_init<t_type, t_storage_type, k_count>& value) const
+	{
+		return m_storage != value.m_storage;
+	}
+
+	bool operator==(c_flags_no_init<t_type, t_storage_type, k_count>& value) const
 	{
 		return m_storage == value.m_storage;
 	}
 
-	t_storage_type operator= (const t_storage_type& value)
-	{
-		m_storage = (t_storage_type)(value);
-		return m_storage;
-	}
-
-	template <class T>
-	operator T () const
-	{
-		return (T)(m_storage);
-	}
-
 protected:
 	t_storage_type m_storage : k_count;
+};
+
+template<typename t_type, typename t_storage_type, size_t k_count>
+class c_flags : public c_flags_no_init<t_type, t_storage_type, k_count>
+{
+public:
+	c_flags(void) 
+	{ 
+		clear();
+		return; 
+	}
+
+	c_flags(t_storage_type raw_bits)  
+	{
+		set_unsafe(raw_bits);
+		return; 
+	}
 };
 
 template<size_t k_maximum_bit_count>

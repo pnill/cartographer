@@ -51,7 +51,7 @@ void main_game_launch_set_coop_player_count(int32 player_count)
 {
     if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
     {
-        error(2, __FUNCTION__": invalid player count %d (must be from 1-%d)", player_count, k_number_of_users);
+        error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
     }
     else
     {
@@ -66,7 +66,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 {
     if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
     {
-        error(2, __FUNCTION__": invalid player count %d (must be from 1-%d)", player_count, k_number_of_users);
+        error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
     }
     else
     {
@@ -103,7 +103,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
     if (i == k_variant_count)
     {
-        error(2, __FUNCTION__": invalid variant name [%s] provided, defaulting to slayer", variant_name);
+        error(2, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
         game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
     }
     else
@@ -120,7 +120,7 @@ void main_game_launch_set_game_mode(int32 game_mode)
 {
     if (!IN_RANGE_INCLUSIVE(game_mode, 1, (int)k_game_mode_count - 1))
     {
-        error(2, __FUNCTION__": invalid game mode [%d] provided", game_mode);
+        error(2, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
     }
     else
     {
@@ -166,8 +166,8 @@ void main_game_launch_setup_game_mode_details(void)
         break;
     }
     default:
-    {
-        error(2, __FUNCTION__": unknown game mode %d!", g_main_game_launch_options.game_mode);
+    {   
+        error(2, "%s: unknown game mode %d!", __FUNCTION__, (uint32)g_main_game_launch_options.game_mode);
     }
     }
 

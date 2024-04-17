@@ -285,7 +285,7 @@ void halo_interpolator_object_populate_interpolation_data(
     const real_point3d* center_of_mass)
 {
     object_datum* object = object_get_fast_unsafe(object_index);
-    s_object_header* object_header = object_get_header(object_index);
+    s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
     uint16 abs_object_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(object_index);
     if (g_frame_data_storage && g_update_in_progress)
     {
