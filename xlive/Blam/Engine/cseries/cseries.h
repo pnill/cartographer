@@ -53,7 +53,7 @@ static_assert(sizeof(datum) == 4);
 #define LONG_BITS SIZEOF_BITS(int32)
 
 #if(!__INTEL_LLVM_COMPILER)
-#define MSVC
+#define IS_MSVC_COMPILER
 #endif
 
 // Invokes a function
