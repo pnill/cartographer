@@ -9,10 +9,6 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 
-
-
-FLOATING_POINT_ENV_ACCESS();
-
 extern H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode;
 
 time_globals* time_globals::get()

@@ -315,6 +315,7 @@
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
@@ -489,6 +490,7 @@
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />
+    <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
@@ -500,6 +502,7 @@
     <ClInclude Include="Blam\Engine\decorators\decorator_definitions.h" />
     <ClInclude Include="Blam\Engine\decorators\decorator_projected_decals.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
+    <ClInclude Include="Blam\Engine\devices\device_machines.h" />
     <ClInclude Include="Blam\Engine\editor\editor_flags.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_debug_pc.h" />
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
