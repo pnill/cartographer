@@ -86,6 +86,7 @@ struct s_cache_header
 	int32 footer_signature;
 };
 ASSERT_STRUCT_SIZE(s_cache_header, 0x800);
+ASSERT_STRUCT_OFFSET(s_cache_header, tag_offset, 16);
 
 struct s_cache_file_globals
 {

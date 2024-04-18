@@ -2,7 +2,7 @@
 
 
 #include "meta_struct.h"
-#include "cache_loader.h"
+#include "cseries/cseries_strings.h"
 #include "H2MOD/Tags/TagInterface.h"
 
 constexpr int _INJECTED_TAG_START_ = 0x3BA4;
@@ -22,8 +22,10 @@ namespace tag_loader
 	bool Check_shared(std::ifstream* fin);
 	//Checks if the map file exists
 	bool Map_exists(std::string map);
+	// returns a path from the first directory a matching map name is found
+	void find_map_path(const char* map_name, c_static_string260* out_string);
 	//Find tag datum based off of tag name
-	datum Get_tag_datum(std::string tag_name, e_tag_group type, std::string map);
+	datum get_tag_datum_by_name(std::string tag_name, e_tag_group type, std::string map);
 	//Loads a tag from specified map in accordance with the datum index supplied
 	void Load_tag(int datum_index, bool recursive, std::string map, bool custom = false);
 	//Return the size of the meta that is currently in the que
@@ -69,8 +71,6 @@ namespace tag_loader
 	void Add_tags_to_simulation_table();
 	//Get new datum from old datum
 	datum ResolveNewDatum(int oldDatum);
-	//Temporary call
-	tags::tag_instance AddNewtagInstance(tag_group type, int data, size_t size);
 	///
 	//<-----------------The query parser or more of a script parser------------------------------->
 	///

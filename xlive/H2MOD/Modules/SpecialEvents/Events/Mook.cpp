@@ -11,7 +11,7 @@ void mook_event_map_load()
 {
 	datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-	datum mook_ball_weapon_datum = tag_loader::Get_tag_datum ("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", _tag_group_weapon, "carto_shared");
+	datum mook_ball_weapon_datum = tag_loader::get_tag_datum_by_name ("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", _tag_group_weapon, "carto_shared");
 
 	if (!DATUM_IS_NONE(mook_ball_weapon_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 	{

@@ -23,14 +23,14 @@ void christmas_event_map_load()
 	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 
 	// Carto Shared tags
-	datum santa_hat_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", _tag_group_scenery, "carto_shared");
-	datum beard_datum = tag_loader::Get_tag_datum("objects\\multi\\stpat_hat\\beard\\santa_beard", _tag_group_scenery, "carto_shared");
-	datum snow_datum = tag_loader::Get_tag_datum("scenarios\\multi\\lockout\\lockout_big", _tag_group_weather_system, "carto_shared");
-	datum candy_cane_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\candy_cane\\candy_cane", _tag_group_render_model, "carto_shared");
-	datum deer_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\reindeer_ghost\\reindeer_ghost", _tag_group_render_model, "carto_shared");
-	datum ornament_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\ornament\\ornament", _tag_group_render_model, "carto_shared");
-	datum present_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\present\\present", _tag_group_render_model, "carto_shared");
-	datum fp_present_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\present\\fp_present", _tag_group_render_model, "carto_shared");
+	datum santa_hat_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\christmas_hat_map\\hat\\hat", _tag_group_scenery, "carto_shared");
+	datum beard_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\beard\\santa_beard", _tag_group_scenery, "carto_shared");
+	datum snow_datum = tag_loader::get_tag_datum_by_name("scenarios\\multi\\lockout\\lockout_big", _tag_group_weather_system, "carto_shared");
+	datum candy_cane_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\candy_cane\\candy_cane", _tag_group_render_model, "carto_shared");
+	datum deer_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\reindeer_ghost\\reindeer_ghost", _tag_group_render_model, "carto_shared");
+	datum ornament_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\ornament\\ornament", _tag_group_render_model, "carto_shared");
+	datum present_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\present\\present", _tag_group_render_model, "carto_shared");
+	datum fp_present_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\present\\fp_present", _tag_group_render_model, "carto_shared");
 
 	if (!DATUM_IS_NONE(santa_hat_datum) && !DATUM_IS_NONE(beard_datum))
 	{
