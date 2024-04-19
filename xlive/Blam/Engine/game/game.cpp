@@ -186,9 +186,9 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
 }
 
 
-void __cdecl shell_initialize(void)
+void __cdecl game_initialize(void)
 {
-    game_state_shell_initialize();
+    game_state_initialize();
     s_main_game_globals* main_game_globals = (s_main_game_globals*)game_state_malloc("game globals", NULL, sizeof(s_main_game_globals));
     csmemset(main_game_globals, 0, sizeof(s_main_game_globals));
     main_game_globals->active_structure_bsp_index = NONE;
@@ -314,7 +314,7 @@ void game_apply_pre_winmain_patches(void)
     PatchCall(Memory::GetAddress(0x86BE, 0x1EB86), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
-    PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), shell_initialize);
+    PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), game_initialize);
     
     // Get original game_frame function
     if (!Memory::IsDedicatedServer())

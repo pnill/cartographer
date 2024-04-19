@@ -1,12 +1,12 @@
 #pragma once
 #include "game_engine.h"
 #include "game_options.h"
-#include "game_preferences.h"
 #include "materials.h"
 
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "bitmaps/bitmap_group.h"
+#include "main/game_preferences.h"
 #include "main/level_definitions.h"
 #include "objects/damage.h"
 #include "tag_files/string_id.h"

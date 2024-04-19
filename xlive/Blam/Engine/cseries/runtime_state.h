@@ -11,3 +11,5 @@ struct runtime_state_globals
 	int32 unk_10;
 };
 ASSERT_STRUCT_SIZE(runtime_state_globals, 0x14);
+
+void __cdecl runtime_state_initialize(void);

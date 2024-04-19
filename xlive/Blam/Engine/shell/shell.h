@@ -6,8 +6,6 @@ enum e_shell_tool_type
 	_shell_tool_type_game = 2
 };
 
-e_shell_tool_type shell_tool_type(void);
-
 enum e_startup_flags : int
 {
 	_startup_flag_windowed,
@@ -44,6 +42,17 @@ enum e_startup_flags : int
 };
 static_assert(e_startup_flags::k_startup_flags_count == 29, "bad startup flag count");
 
+
+void shell_apply_patches(void);
+
+e_shell_tool_type shell_tool_type(void);
+
 bool shell_startup_flag_is_set(e_startup_flags flag);
 void shell_startup_flag_set(e_startup_flags flag, int32 state);
 int32 shell_startup_flag_get(e_startup_flags flag);
+
+bool shell_initialize(void);
+
+void shell_dispose(void);
+
+void __cdecl timing_initialize(int32 a1);

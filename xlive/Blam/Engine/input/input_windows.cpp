@@ -9,6 +9,13 @@
 s_vibration_state g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
 
+
+void input_windows_apply_patches(void)
+{
+	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
+	return;
+}
+
 int32* hs_debug_simulate_gamepad_global_get(void)
 {
 	return Memory::GetAddress<int32*>(0x47A71C);
@@ -34,9 +41,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
-
-void input_windows_apply_patches(void)
+bool __cdecl input_initialize(void)
 {
-	PatchCall(Memory::GetAddress(0x9020F), input_set_gamepad_rumbler_state);    // Replace call in rumble_clear_all_now
-	return;
+	return INVOKE(0x2FD23, 0x0, input_initialize);
 }

@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "real_math.h"
 
+void __cdecl real_math_initialize(void)
+{
+	INVOKE(0x340D7, 0x27754, real_math_initialize);
+	return;
+}
+
 void __cdecl real_math_reset_precision(void)
 {
 	INVOKE(0x32D88, 0x26327, real_math_reset_precision);
