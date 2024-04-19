@@ -16,32 +16,6 @@
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 RECT rectScreenOriginal;
 
-void* __cdecl death_cam_get_controller_input(e_controller_index controller)
-{
-	//orignally 
-	// return input_get_gamepad_state(controller);
-
-	// instead we return abstracted_input_state
-	// then we test for abstracted _button_jump in the caller
-	return &input_abstraction_globals->input_states[controller];
-}
-
-// allows keyboards/gamepads/any device to switch death b/w targets
-void dead_camera_switch_patch()
-{
-	/*
-	*	we change from
-	*	input_get_gamepad_state(controller_index)->button_frames_down[_xinput_gamepad_a];
-	*		to
-	*	input_abstraction_globals->input_states[controller_index].m_down_frames[_button_jump];
-	*
-	*/
-
-	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
-	//uint8 orignal_opcodes[] = { 0x80 ,0x78 , _xinput_gamepad_a ,0x01 };
-	uint8 opcodes[] = { 0x80 ,0x78 ,_button_jump ,0x01 };
-	WriteBytes(Memory::GetAddress(0xCDEFF), opcodes, NUMBEROF(opcodes));
-}
 
 void KeyboardInput::ToggleKeyboardInput()
 {
@@ -231,7 +205,6 @@ void hotkeyFuncConsole() {
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	dead_camera_switch_patch();
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);

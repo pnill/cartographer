@@ -67,12 +67,5 @@ namespace ControllerInput
 		}
 	};
 
-	struct alignas(4) controller_info
-	{
-		void **xinput_device_vtbl;
-		DWORD dwUserIndex;
-		DWORD error_level;
-		XINPUT_STATE xinput_state;
-	};
 	void Initialize();
 }

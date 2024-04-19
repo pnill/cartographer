@@ -5,8 +5,9 @@
 #include "math/math.h"
 #include "Networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "input/input_xinput.h"
 
-
+extern input_device** g_xinput_devices;
 namespace ControllerInput
 {
 
@@ -14,46 +15,46 @@ namespace ControllerInput
 	void __cdecl update_xinput_devices()
 	{
 		WORD controller_button = 0;
-		auto InputDevices = Memory::GetAddress<controller_info**>(0x479F00);
 		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
 		for(auto i = 0; i < 20; i++)
 		{
-			auto InputDevice = InputDevices[i];
-			if (InputDevice->error_level == 0)
+			input_device* InputDevice = g_xinput_devices[i];
+			XINPUT_STATE xinput_state;
+			if (InputDevice->XGetState(&xinput_state) == ERROR_SEVERITY_SUCCESS)
 			{
-				(*reinterpret_cast<void(__thiscall *)(controller_info*)>(InputDevice->xinput_device_vtbl[2]))(InputDevice);
+				InputDevice->XUpdateState();
 				if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 				{
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)
 						controller_button |= H2Config_CustomLayout.DPAD_UP;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_DOWN)
 						controller_button |= H2Config_CustomLayout.DPAD_DOWN;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 						controller_button |= H2Config_CustomLayout.DPAD_LEFT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 						controller_button |= H2Config_CustomLayout.DPAD_RIGHT;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_START)
 						controller_button |= H2Config_CustomLayout.START;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_BACK)
 						controller_button |= H2Config_CustomLayout.BACK;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_THUMB)
 						controller_button |= H2Config_CustomLayout.LEFT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
 						controller_button |= H2Config_CustomLayout.RIGHT_THUMB;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 						controller_button |= H2Config_CustomLayout.LEFT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 						controller_button |= H2Config_CustomLayout.RIGHT_SHOULDER;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_A)
 						controller_button |= H2Config_CustomLayout.A;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_B)
 						controller_button |= H2Config_CustomLayout.B;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_X)
 						controller_button |= H2Config_CustomLayout.X;
-					if (InputDevice->xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
+					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_Y)
 						controller_button |= H2Config_CustomLayout.Y;
 
-					InputDevice->xinput_state.Gamepad.wButtons = controller_button;
+					xinput_state.Gamepad.wButtons = controller_button;
 				}
 			}
 		}

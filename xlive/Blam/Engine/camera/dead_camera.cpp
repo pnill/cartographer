@@ -2,7 +2,7 @@
 #include "dead_camera.h"
 
 #include "objects/objects.h"
-
+#include "input/input_abstraction.h"
 
 real_point3d* __cdecl object_try_and_get_interpolated_position(datum object_index, int16 node_index, real_point3d* out_pos)
 {
@@ -34,10 +34,42 @@ __declspec(naked) void object_try_get_node_position_interpolated_intermediate()
 #undef current_stack_offset
 }
 
+void* __cdecl death_cam_get_controller_input(e_controller_index controller)
+{
+	//orignally 
+	// return input_get_gamepad_state(controller);
+
+	// instead we return abstracted_input_state
+	// then we test for abstracted _button_jump in the caller
+	return &input_abstraction_globals->input_states[controller];
+}
+
+// allows keyboards/gamepads/any device to switch death b/w targets
+void dead_camera_switch_patch()
+{
+	/*
+	*	we change from
+	*	input_get_gamepad_state(controller_index)->button_frames_down[_xinput_gamepad_a];
+	*		to
+	*	input_abstraction_globals->input_states[controller_index].m_down_frames[_button_jump];
+	*
+	*/
+
+	// Patch call inside dead_camera update that gets input_get_gamepad_state
+	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
+	//uint8 orignal_opcodes[] = { 0x80 ,0x78 , _xinput_gamepad_a ,0x01 };
+
+
+	uint8 opcodes[] = { 0x80 ,0x78 ,_button_jump ,0x01 };
+	WriteBytes(Memory::GetAddress(0xCDEFF), opcodes, NUMBEROF(opcodes));
+}
+
 void apply_dead_camera_patches()
 {
 	// Patch call inside dead_camera update to try and get interpolated node matrix from the current target_datum
 	PatchCall(Memory::GetAddress(0xCDBAE), object_try_get_node_position_interpolated_intermediate);
 	// nop the rest of the unneeded instructions
 	NopFill(Memory::GetAddress(0xCDBB3), 22);
+
+	dead_camera_switch_patch();
 }

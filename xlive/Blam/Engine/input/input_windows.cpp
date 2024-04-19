@@ -155,10 +155,10 @@ void __cdecl input_update_main_device_state()
 			bool dev_connected = gamepad->connected;
 			bool success = error_code == ERROR_SEVERITY_SUCCESS;
 			bool initially_not_connected = !gamepad->connected;
-			bool dev_state_joined = initially_not_connected && error_code == ERROR_SEVERITY_SUCCESS;
+			bool dev_state_joined = initially_not_connected && success;
 			bool dev_state_left = dev_connected && !success;
 
-			gamepad->connected = error_code == ERROR_SEVERITY_SUCCESS;
+			gamepad->connected = success;
 			gamepad->m_device_just_joined = dev_state_joined;
 			gamepad->m_device_just_left = dev_state_left;
 		}
@@ -201,7 +201,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
-bool __cdecl input_initialize(void)
+void input_windows_apply_patches(void)
 {
 	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
 
