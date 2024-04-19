@@ -201,8 +201,7 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
-
-void input_windows_apply_patches(void)
+bool __cdecl input_initialize(void)
 {
 	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
 

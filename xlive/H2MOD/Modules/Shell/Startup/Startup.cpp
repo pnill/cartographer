@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Startup.h"
 
-#include "WinMainH2.h"
 #include "../Config.h"
 #include "../H2MODShell.h"
 
 #include "cseries/cseries_windows_debug_pc.h"
+#include "shell/shell.h"
 #include "shell/shell_windows.h"
 
 #include "H2MOD.h"
@@ -367,7 +367,10 @@ void InitH2Startup() {
 	//apply any network hooks
 	CustomNetwork::ApplyPatches();
 	H2Tweaks::ApplyPatches();
-	InitH2WinMainPatches();
+
+	shell_apply_patches();
+	shell_windows_apply_patches();
+
 	extern void InitCustomLanguage();
 	InitCustomLanguage();
 	extern void InitCustomMenu();
