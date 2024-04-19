@@ -52,3 +52,7 @@ ASSERT_STRUCT_SIZE(s_controller_profile, 5760);
 s_controller_profile* controller_profile_get(e_controller_index index);
 
 s_controller_button_state* controller_button_state_get(e_controller_index index);
+
+
+e_controller_index first_controller();
+e_controller_index next_controller(e_controller_index controller);
