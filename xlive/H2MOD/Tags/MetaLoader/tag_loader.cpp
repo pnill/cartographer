@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "tag_loader.h"
 
+#include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "game/game_options.h"
 #include "scenario/scenario.h"
@@ -10,6 +11,7 @@
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Tags/MetaExtender.h"
+#include "models/models.h"
 #include "Util/filesys.h"
 
 // TODO Cleanup
@@ -67,16 +69,16 @@ namespace tag_loader
 	std::string mods_directory;
 
 	static std::map<std::string, std::shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
-	std::map<int, std::shared_ptr<meta>> que_meta_list;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
-	std::vector<int> key_list;//another var just to keep the keys along with the correct order
+	std::map<int, std::shared_ptr<meta>> loaded_tag_data;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
+	std::vector<int> loaded_tag_data_order;//another var just to keep the keys along with the correct order
 	std::vector<int> injected_list;
 	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
 	std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
 	std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
-	std::list<injectRefs> injected_tag_refs;
-	unsigned int def_meta_size = 0;
+	std::list<loaded_tag_datum_mapping> injected_tag_reference_map;
+	unsigned int base_map_tag_size = 0;
 	unsigned int used_additional_meta = 0;
-	unsigned int new_datum_index = _INJECTED_TAG_START_;//first datum index
+	unsigned int next_available_datum_index = _INJECTED_TAG_START_;//first datum index
 	tags::tag_instance* reallocated_tag_table;//new tables pointer
 
 	std::string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
@@ -293,29 +295,29 @@ namespace tag_loader
 			file_stream->seekg(instance_table_offset);
 			file_stream->read((char*)&scenario_instance, sizeof(tags::tag_instance));
 
-			int scnr_memaddr;
-			file_stream->seekg(instance_table_offset + 0x8);
-			file_stream->read((char*)&scnr_memaddr, 4);
-
-			tags::tag_instance tag_info;
+			tags::tag_instance current_tag_instance;
 
 			//create a tag_list to load
-			std::list<int> load_tag_list;
-			load_tag_list.push_back(datum_index);
+			std::list<datum> tag_datums_to_load;
+			tag_datums_to_load.push_back(datum_index);
 
 			//----------------LOOPING STUFF
-			while (load_tag_list.size())
+			while (tag_datums_to_load.size())
 			{
-				if (*load_tag_list.cbegin() != -1 && *load_tag_list.cbegin() != 0)
+				// grab the first datum from the list
+				datum current_datum = *tag_datums_to_load.cbegin();
+
+				if (current_datum != NONE && current_datum != 0)
 				{
-					//method to read tag type
-					file_stream->seekg(instance_table_offset + (0xFFFF & *(load_tag_list.cbegin())) * sizeof(tags::tag_instance));
 
-					file_stream->read((char*)&tag_info, sizeof(tags::tag_instance));
+					// grab the instance from the tags header
+					file_stream->seekg(instance_table_offset + (0xFFFF & current_datum) * sizeof(tags::tag_instance));
+					file_stream->read((char*)&current_tag_instance, sizeof(tags::tag_instance));
 
-					if (*(load_tag_list.cbegin()) == tag_info.datum_index && tag_info.type.group != _tag_group_sound)
+					if (current_datum == current_tag_instance.datum_index && current_tag_instance.type.group != _tag_group_sound)
 					{
-						tag_group group_name = tag_group_get_name(tag_info.type);
+						tag_group group_name = tag_group_get_name(current_tag_instance.type);
+
 						char null_terminated_string[5] = { group_name.string[0], group_name.string[1], group_name.string[2], group_name.string[3], '\0' };
 						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(null_terminated_string);
 
@@ -324,29 +326,30 @@ namespace tag_loader
 							break;
 
 						//we first check the integrity of the datum_index
-						if (tag_info.datum_index == *(load_tag_list.cbegin()) && tag_info.data_offset && tag_info.size > 0 && (que_meta_list.find(tag_info.datum_index) == que_meta_list.cend()))
+						if (current_tag_instance.datum_index == current_datum && current_tag_instance.data_offset && current_tag_instance.size > 0 && (loaded_tag_data.find(current_tag_instance.datum_index) == loaded_tag_data.cend()))
 						{
-							//read the meta data from the map            
-							char* data = new char[tag_info.size];
+							// allocate a buffer to store the loaded tags data
+							char* tag_data = new char[current_tag_instance.size];
 
-							int map_off;
+							int tag_data_offset;
+
+							// check if the tag is being loaded from a shared cache type file
 							if (!Check_shared(file_stream))
-								map_off = tag_data_start_offset + (tag_info.data_offset - scenario_instance.data_offset);
+								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - scenario_instance.data_offset);
 							else
-								map_off = tag_data_start_offset + (tag_info.data_offset - 0x3C000);
-							file_stream->seekg(map_off);
-							//0x3c000 is a hardcoded value in blam engine
+								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - 0x3C000);
 
-							file_stream->read(data, tag_info.size);
+							// write the tag data to the buffer
+							file_stream->seekg(tag_data_offset);
+							file_stream->read(tag_data, current_tag_instance.size);
 
 							//create a meta object
-							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(data, tag_info.size, tag_info.data_offset, temp_plugin, file_stream, map_off, 1, *(load_tag_list.cbegin()), map_location.get_string(), tag_info.type);
-							//temp_meta->Rebase_meta(0x0);
-							//found unnecessary
+							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(tag_data, current_tag_instance.size, current_tag_instance.data_offset, temp_plugin, file_stream, tag_data_offset, 1, current_datum, map_location.get_string(), current_tag_instance.type);
 
-							que_meta_list.emplace(*(load_tag_list.cbegin()), temp_meta);
-							key_list.push_back(*(load_tag_list.cbegin()));
+							loaded_tag_data.emplace(current_datum, temp_meta);
+							loaded_tag_data_order.push_back(current_datum);
 
+							// todo: redo this
 							if (recursive)
 							{
 								std::list<int> temp_tag_ref = temp_meta->Get_all_tag_refs();
@@ -355,25 +358,25 @@ namespace tag_loader
 								std::list<int>::iterator ref_iter = temp_tag_ref.begin();
 								while (ref_iter != temp_tag_ref.end())
 								{
-									if (que_meta_list.find(*ref_iter) != que_meta_list.end())
+									if (loaded_tag_data.find(*ref_iter) != loaded_tag_data.end())
 										ref_iter = temp_tag_ref.erase(ref_iter);
 									else
 										ref_iter++;
 								}
 
-								load_tag_list.insert(load_tag_list.end(), temp_tag_ref.begin(), temp_tag_ref.end());
+								tag_datums_to_load.insert(tag_datums_to_load.end(), temp_tag_ref.begin(), temp_tag_ref.end());
 							}
 						}
 						else
 						{
 							//most of time this is caused due to shared stuff
-							std::string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(load_tag_list.cbegin()));
+							std::string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(tag_datums_to_load.cbegin()));
 							error_list.push_back(temp_error);
 						}
 					}
 				}
 				//list cleaning stuff
-				load_tag_list.pop_front();
+				tag_datums_to_load.pop_front();
 			}
 			file_stream->close();
 
@@ -395,7 +398,7 @@ namespace tag_loader
 	{
 		unsigned int ret = 0;
 
-		for (auto& i : que_meta_list)
+		for (auto& i : loaded_tag_data)
 		{
 			ret += i.second->Get_Total_size();
 		}
@@ -482,7 +485,7 @@ namespace tag_loader
 	{
 		if ((used_additional_meta + Que_meta_size() < _MAX_ADDITIONAL_TAG_SIZE_))
 			//does some maths to help u out
-			Push_Back(new_datum_index);
+			Push_Back(next_available_datum_index);
 		else
 		{
 			std::string error = "Coudn't inject, Max meta size reached";
@@ -493,94 +496,96 @@ namespace tag_loader
 	//usually i call this to overwrite tag_table of some preloaded tag(for replacing purpose)
 	void Push_Back(int datum_index)
 	{
-		int mem_off = def_meta_size + used_additional_meta;
+		// offset from tag_data_start the injected tag_data will be placed
+		uint32 injected_tag_data_offset = base_map_tag_size + used_additional_meta;
 
-		//build up inject refs
-		std::list<injectRefs> my_inject_refs;
+		// create a map of cache_index to injected_index
+		std::list<loaded_tag_datum_mapping> t_injected_tag_datum_map;
 
 		bool replaced = false;
-		for (size_t i = 0; i < key_list.size(); i++)
+		for (datum i : loaded_tag_data_order)
 		{
-			injectRefs temp;
-			temp.old_datum = key_list[i];
+			loaded_tag_datum_mapping loaded_tag_datum_map;
+			loaded_tag_datum_map.cache_index = i;
 
 			if (!replaced)
 			{
-				if ((datum_index & 0xFFFF) < new_datum_index)
-					temp.new_datum = datum_index;
+				if ((datum_index & 0xFFFF) < next_available_datum_index)
+					loaded_tag_datum_map.injected_index = datum_index;
 				else
-					temp.new_datum = new_datum_index++;
+					loaded_tag_datum_map.injected_index = next_available_datum_index++;
 				replaced = true;
 			}
 			else
 			{
-				temp.new_datum = new_datum_index++;
+				loaded_tag_datum_map.injected_index = next_available_datum_index++;
 			}
 
-			my_inject_refs.push_back(temp);
+			t_injected_tag_datum_map.push_back(loaded_tag_datum_map);
 		}
-		std::string temp = "Pushing back tag : " + meta_struct::to_hex_string(my_inject_refs.begin()->old_datum) + " to : " + meta_struct::to_hex_string(my_inject_refs.begin()->new_datum);
-		error_list.push_back(temp);
+
 
 		//StringID listing---IDC
 
 
-		//update the que list tags
-		for (auto& i : key_list)
+		// update the tag_references inside the loaded tag data
+		for (auto& i : loaded_tag_data_order)
 		{
-			que_meta_list[i]->Update_datum_indexes(my_inject_refs);
+			loaded_tag_data[i]->Update_datum_indexes(t_injected_tag_datum_map);
 			//<stringID stuff>
 			//-------------IDC anymore----------------
 		}
+
 		//Add them to the tables
 
-		for (auto& my_inject_refs_iter : my_inject_refs)
+		for (auto& current_tag_datum_map : t_injected_tag_datum_map)
 		{
-			if (def_meta_size)
+			if (base_map_tag_size)
 			{
-				injected_tag_refs.push_back(my_inject_refs_iter);
-				int meta_size = que_meta_list[my_inject_refs_iter.old_datum]->Get_Total_size();
+				injected_tag_reference_map.push_back(current_tag_datum_map);
 
-				que_meta_list[my_inject_refs_iter.old_datum]->Rebase_meta(mem_off);
-				char* meta_data = que_meta_list[my_inject_refs_iter.old_datum]->Generate_meta_file();
+				std::shared_ptr<meta> loaded_tag = loaded_tag_data[current_tag_datum_map.cache_index];
+				int total_tag_size = loaded_tag->Get_Total_size();
+
+				loaded_tag->Rebase_meta(injected_tag_data_offset);
+				char* tag_data = loaded_tag->Generate_meta_file();
 				
-				tags::tag_instance* new_instance = &tag_loader::reallocated_tag_table[my_inject_refs_iter.new_datum & 0xFFFF];
+				tags::tag_instance* new_instance = &tag_loader::reallocated_tag_table[current_tag_datum_map.injected_index & 0xFFFF];
 
-				new_instance->type = que_meta_list[my_inject_refs_iter.old_datum]->Get_type();
-				new_instance->data_offset = mem_off;
-				new_instance->size = meta_size;
-				new_instance->datum_index = datum(my_inject_refs_iter.new_datum);
+				new_instance->type = loaded_tag->Get_type();
+				new_instance->data_offset = injected_tag_data_offset;
+				new_instance->size = total_tag_size;
+				new_instance->datum_index = current_tag_datum_map.injected_index;
 
-				memcpy(tags::get_tag_data() + mem_off, meta_data, meta_size);//copy to the tag memory
+				memcpy(tags::get_tag_data() + injected_tag_data_offset, tag_data, total_tag_size);//copy to the tag memory
 
 				//Load RAW
-				Load_RAW_refs(my_inject_refs_iter.new_datum, que_meta_list[my_inject_refs_iter.old_datum]->Get_map_loc());
+				Load_RAW_refs(current_tag_datum_map.injected_index, loaded_tag->Get_map_loc());
 				//fix the global_refs
-				Fix_global_objects_ref(my_inject_refs_iter.new_datum);
+				Fix_global_objects_ref(current_tag_datum_map.injected_index);
 
-				delete[] meta_data;
-				mem_off += meta_size;
-				used_additional_meta += meta_size;
+				delete[] tag_data;
+				injected_tag_data_offset += total_tag_size;
+				used_additional_meta += total_tag_size;
 			}
-			else break;
-			//meta_list.emplace(my_inject_refs_iter->new_datum, que_iter->second);//add it to the meta _list				
+			else break;			
 		}
 		Fix_shader_templates();
-		key_list.clear();
-		my_inject_refs.clear();
-		que_meta_list.clear();
+		loaded_tag_data_order.clear();
+		t_injected_tag_datum_map.clear();
+		loaded_tag_data.clear();
 	}
 	//clears the tags in que_list
 	void Clear_que_list()
 	{
-		que_meta_list.clear();
+		loaded_tag_data.clear();
 	}
 	//Rebases to 0x0 and dumps meta data in que in the specified tag folder
 	void Dump_Que_meta()
 	{
 		std::ofstream fout;
 
-		for (auto& i : que_meta_list)
+		for (auto& i : loaded_tag_data)
 		{
 			std::string file_loc = custom_tags_directory + "\\que\\" + meta_struct::to_hex_string(i.first);
 
@@ -715,47 +720,39 @@ namespace tag_loader
 		switch (tag_info->type.group)
 		{
 		case 'mode':
-
-			if (*(int*)(tag_data + 0x24) > 0)
+		{
+			render_model_definition* model_definition = (render_model_definition*)tag_data;
+			if (model_definition->sections.count > 0)
 			{
-				int v15 = 0;
-
-				int off = 0;
+				int current_section_index = 0;
 				do
 				{
-					int sections_off = *(int*)(tag_data + 0x28);
-					int sections_base = 0;
-					if (sections_off != -1)
-						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl*)(int, unsigned int))Memory::GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
-					++v15;
-					off += 0x5C;
-				} while (v15 < *(int*)(tag_data + 0x24));
+					render_model_section* model_section = model_definition->sections[current_section_index];
+
+					((void(__cdecl*)(geometry_block_info*, unsigned int))Memory::GetAddress(0x2652BC))(&model_section->geometry_block_info, 3u);
+
+					++current_section_index;
+				} while (current_section_index < model_definition->sections.count);
 			}
 			break;
+		}
 
 		case 'bitm':
 		{
 
 			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
 
-			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
+			for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
 			{
+				bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
 
-				int bitmaps_field_off = *(int*)(tag_data + 0x48);
-
-				int bitmaps_field_base = 0;
-				if (bitmaps_field_off != -1)
-					bitmaps_field_base = bitmaps_field_off + ETCOFFSET;
-
-				int bitmaps_field = bitmaps_field_base + 0x74 * i;
-
-				*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+				*Memory::GetAddress<bitmap_data**>(0xA49270 + 0x1FC) = bitmap_item;
 
 				int temp = 0;
-				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
+				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 2, 0, &temp);
 
-				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 0, 0, &temp);
 
 			}
 			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
@@ -810,47 +807,38 @@ namespace tag_loader
 		switch (tag_info->type.group)
 		{
 		case 'mode':
-
-			if (*(int*)(tag_data + 0x24) > 0)
+		{
+			render_model_definition* model_definition = (render_model_definition*)tag_data;
+			if (model_definition->sections.count > 0)
 			{
-				int v15 = 0;
-
-				int off = 0;
+				int current_section_index = 0;
 				do
 				{
-					int sections_off = *(int*)(tag_data + 0x28);
-					int sections_base = 0;
-					if (sections_off != -1)
-						sections_base = ETCOFFSET + sections_off;
-					((void(__cdecl*)(int, unsigned int))Memory::GetAddress(0x2652BC))(sections_base + off + 0x38, 3u);
-					++v15;
-					off += 0x5C;
-				} while (v15 < *(int*)(tag_data + 0x24));
+					render_model_section* model_section = model_definition->sections[current_section_index];
+
+					((void(__cdecl*)(geometry_block_info*, unsigned int))Memory::GetAddress(0x2652BC))(&model_section->geometry_block_info, 3u);
+
+					++current_section_index;
+				} while (current_section_index < model_definition->sections.count);
 			}
 			break;
+		}
 
 		case 'bitm':
 		{
-
 			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
 
-			for (int i = 0; i < *(int*)(tag_data + 0x44); i++)
+			for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
 			{
+				bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
 
-				int bitmaps_field_off = *(int*)(tag_data + 0x48);
-
-				int bitmaps_field_base = 0;
-				if (bitmaps_field_off != -1)
-					bitmaps_field_base = bitmaps_field_off + ETCOFFSET;
-
-				int bitmaps_field = bitmaps_field_base + 0x74 * i;
-
-				*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = bitmaps_field;
+				*Memory::GetAddress<bitmap_data**>(0xA49270 + 0x1FC) = bitmap_item;
 
 				int temp = 0;
-				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 2, 0, &temp);
-				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 1, 0, &temp);
-				((int(__cdecl*)(int, char, int, void*))Memory::GetAddress(0x265986))(bitmaps_field, 0, 0, &temp);
+				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 2, 0, &temp);
+				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 1, 0, &temp);
+				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 0, 0, &temp);
 
 			}
 			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
@@ -911,9 +899,9 @@ namespace tag_loader
 		typedef bool(__cdecl t_init_shader_template)(int a1);
 		auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
 		tag_iterator* stem_iterator = Memory::GetAddress<tag_iterator*>(0xA4AF10);
-		for (auto ref : injected_tag_refs)
+		for (auto ref : injected_tag_reference_map)
 		{
-			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.new_datum)];
+			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.injected_index)];
 			if (inst.type.group == _tag_group_shader_template)
 			{
 				//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
@@ -956,10 +944,10 @@ namespace tag_loader
 
 	datum ResolveNewDatum(int oldDatum)
 	{
-		for (auto& ref : injected_tag_refs)
+		for (auto& ref : injected_tag_reference_map)
 		{
-			if (ref.old_datum == oldDatum)
-				return datum(ref.new_datum);
+			if (ref.cache_index == oldDatum)
+				return datum(ref.injected_index);
 		}
 		return NONE;
 	}
@@ -974,7 +962,7 @@ uint32 __cdecl datum_header_allocate(int32 allocation_size, int32 item_size)
 
 	//i need to allocate more space
 	int modified_allocation_size = allocation_size + _MAX_ADDITIONAL_TAG_SIZE_;
-	tag_loader::def_meta_size = allocation_size + 0x20;//spacing
+	tag_loader::base_map_tag_size = allocation_size + 0x20;//spacing
 
 	return INVOKE(0x37E69, 0, datum_header_allocate, modified_allocation_size, item_size);
 }
@@ -984,16 +972,16 @@ bool _cdecl scenario_tags_load_internal(char* scenario_path)
 	bool result = INVOKE(0x31348, 0, scenario_tags_load_internal, scenario_path);
 
 	//Clear the table
-	for (uint32 i = _INJECTED_TAG_START_; i < tag_loader::new_datum_index; i++)
+	for (uint32 i = _INJECTED_TAG_START_; i < tag_loader::next_available_datum_index; i++)
 	{
 		tag_loader::reallocated_tag_table[i] = tags::tag_instance{ (e_tag_group)NONE, NONE, 0, 0 };
 	}
-	tag_loader::que_meta_list.clear();
-	tag_loader::injected_tag_refs.clear();
-	tag_loader::key_list.clear();
+	tag_loader::loaded_tag_data.clear();
+	tag_loader::injected_tag_reference_map.clear();
+	tag_loader::loaded_tag_data_order.clear();
 	// reset starting_datum index
 	tag_loader::used_additional_meta = 0;
-	tag_loader::new_datum_index = _INJECTED_TAG_START_;
+	tag_loader::next_available_datum_index = _INJECTED_TAG_START_;
 
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map

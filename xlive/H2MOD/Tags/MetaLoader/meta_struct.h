@@ -30,10 +30,10 @@ namespace meta_struct
 	/// <summary>
 	/// just a struct to contain data about the meta that are being compiled
 	/// </summary>
-	struct injectRefs
+	struct loaded_tag_datum_mapping
 	{
-		int old_datum;
-		int new_datum;
+		datum cache_index;
+		datum injected_index;
 	};
 	/// <summary>
 	/// A class representing the structure halo2 plugins
@@ -117,7 +117,7 @@ namespace meta_struct
 		~meta();
 
 		void Rebase_meta(int new_base);//function that changes the mem_offset for which the tag is compiled 
-		std::string Update_datum_indexes(std::list<injectRefs>);
+		std::string Update_datum_indexes(std::list<loaded_tag_datum_mapping>);
 		std::string Update_StringID(std::list<StringIDRef> SID_list);
 		void null_StringID();
 

@@ -11,7 +11,7 @@ constexpr int _MAX_TAG_TABLE_SIZE_ = 65535;
 
 using meta_struct::meta;
 using meta_struct::plugins_field;
-using meta_struct::injectRefs;
+using meta_struct::loaded_tag_datum_mapping;
 
 //The TAG LOADER
 namespace tag_loader

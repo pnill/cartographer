@@ -715,7 +715,7 @@ namespace meta_struct
 	// a function that updates the datum indexes acoording to the list supplied
 	/// <returns>return a log about different encounters</returns>
 	//
-	std::string meta::Update_datum_indexes(std::list<injectRefs> tag_list)
+	std::string meta::Update_datum_indexes(std::list<loaded_tag_datum_mapping> tag_list)
 	{
 		std::string log = "\nUPDATE DATUM : " + to_hex_string(datum_index);
 
@@ -728,10 +728,10 @@ namespace meta_struct
 			//next we loop through each list
 			bool sucess = false;
 
-			for(injectRefs& temp_ref : tag_list)
+			for(loaded_tag_datum_mapping& temp_ref : tag_list)
 			{
-				int old_datum = temp_ref.old_datum;
-				int new_datum = temp_ref.new_datum;
+				int old_datum = temp_ref.cache_index;
+				int new_datum = temp_ref.injected_index;
 
 				if (old_datum == temp_old_datum)
 				{
@@ -739,7 +739,7 @@ namespace meta_struct
 					if (!sucess)
 					{
 
-						*(int*)(data + temp_off + 4) = new_datum;//DATA_READ.WriteINT_LE(new_datum, temp_off + 4, data);
+						*(int*)(data + temp_off + 4) = new_datum;//DATA_READ.WriteINT_LE(injected_index, temp_off + 4, data);
 						log += "\nSuccesfully refered " + to_hex_string(temp_old_datum) + " to " + to_hex_string(new_datum);
 						sucess = true;
 					}
@@ -757,17 +757,17 @@ namespace meta_struct
 			int temp_old_datum = *(int*)(data + temp_off);//DATA_READ.ReadINT_LE(temp_off, data);
 			bool sucess = false;
 
-			for(injectRefs& temp_ref : tag_list)
+			for(loaded_tag_datum_mapping& temp_ref : tag_list)
 			{
-				int old_datum = temp_ref.old_datum;
-				int new_datum = temp_ref.new_datum;
+				int old_datum = temp_ref.cache_index;
+				int new_datum = temp_ref.injected_index;
 
 				if (old_datum == temp_old_datum)
 				{
 					//we found a match
 					if (!sucess)
 					{
-						*(int*)(data + temp_off) = new_datum;//DATA_READ.WriteINT_LE(new_datum, temp_off, data);
+						*(int*)(data + temp_off) = new_datum;//DATA_READ.WriteINT_LE(injected_index, temp_off, data);
 						log += "\nSuccesfully refered " + to_hex_string(temp_old_datum) + " to " + to_hex_string(new_datum);
 						sucess = true;
 					}
