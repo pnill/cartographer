@@ -2,7 +2,6 @@
 #include "controllers.h"
 
 #define K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES 256
-#define K_NUMBER_OF_XINPUT_BUTTONS 14
 
 class input_device
 {
@@ -46,6 +45,28 @@ struct s_key_state
 	uint8 gap[0x8];
 };
 ASSERT_STRUCT_SIZE(s_key_state, 0x8);
+
+enum e_xinput_gamepad_buttons
+{
+	_xinput_gamepad_dpad_up = 0x0,
+	_xinput_gamepad_dpad_down = 0x1,
+	_xinput_gamepad_dpad_left = 0x2,
+	_xinput_gamepad_dpad_right = 0x3,
+	_xinput_gamepad_start = 0x4,
+	_xinput_gamepad_back = 0x5,
+	_xinput_gamepad_left_thumb = 0x6,
+	_xinput_gamepad_right_thumb = 0x7,
+	_xinput_gamepad_left_shoulder = 0x8,
+	_xinput_gamepad_right_shoulder = 0x9,
+	_xinput_gamepad_a = 0xa,
+	_xinput_gamepad_b = 0xb,
+	_xinput_gamepad_x = 0xc,
+	_xinput_gamepad_y = 0xd,
+	_xinput_gamepad_left_trigger = 0xe,
+	_xinput_gamepad_right_trigger = 0xf,
+
+	K_NUMBER_OF_XINPUT_BUTTONS = 0xE,
+};
 
 struct s_gamepad_input_button_state
 {

@@ -16,25 +16,31 @@
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 RECT rectScreenOriginal;
 
-__int16 last_user_index;
-//Patching this call to enable keyboards to switch death targets
-unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
+void* __cdecl death_cam_get_controller_input(e_controller_index controller)
 {
-	last_user_index = a1;
-	unsigned char* result = ControllerInput::get_controller_input(a1);
-	//Modifies the result for A button pressed if space is.
-	unsigned char keyboard_space_key_state = input_abstraction_get_key_state(VK_SPACE);
-	if (keyboard_space_key_state > 0)
-	{
-		result[16] = keyboard_space_key_state;
-	}
-	return result;
+	//orignally 
+	// return input_get_gamepad_state(controller);
+
+	// instead we return abstracted_input_state
+	// then we test for abstracted _button_jump in the caller
+	return &input_abstraction_globals->input_states[controller];
 }
 
-void __cdecl sub_B524F7(int a1)
+// allows keyboards/gamepads/any device to switch death b/w targets
+void dead_camera_switch_patch()
 {
-	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
-	result[16] = 0;
+	/*
+	*	we change from
+	*	input_get_gamepad_state(controller_index)->button_frames_down[_xinput_gamepad_a];
+	*		to
+	*	input_abstraction_globals->input_states[controller_index].m_down_frames[_button_jump];
+	*
+	*/
+
+	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
+	//uint8 orignal_opcodes[] = { 0x80 ,0x78 , _xinput_gamepad_a ,0x01 };
+	uint8 opcodes[] = { 0x80 ,0x78 ,_button_jump ,0x01 };
+	WriteBytes(Memory::GetAddress(0xCDEFF), opcodes, NUMBEROF(opcodes));
 }
 
 void KeyboardInput::ToggleKeyboardInput()
@@ -225,8 +231,7 @@ void hotkeyFuncConsole() {
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
-	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
+	dead_camera_switch_patch();
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);
