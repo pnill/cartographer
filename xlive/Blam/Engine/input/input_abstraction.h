@@ -77,6 +77,38 @@ enum e_button_functions
 	NUMBER_OF_ABSTRACT_BUTTONS = 0x2D,
 };
 
+
+enum e_gamepad_buttons
+{
+	_gamepad_analog_button_left_trigger = 0x0,
+	_gamepad_analog_button_right_trigger = 0x1,
+	_gamepad_binary_button_dpad_up = 0x2,
+	_gamepad_binary_button_dpad_down = 0x3,
+	_gamepad_binary_button_dpad_left = 0x4,
+	_gamepad_binary_button_dpad_right = 0x5,
+	_gamepad_binary_button_start = 0x6,
+	_gamepad_binary_button_back = 0x7,
+	_gamepad_binary_button_left_thumb = 0x8,
+	_gamepad_binary_button_right_thumb = 0x9,
+	_gamepad_binary_button_left_shoulder = 0xA,
+	_gamepad_binary_button_right_shoulder = 0xB,
+	_gamepad_binary_button_a = 0xC,
+	_gamepad_binary_button_b = 0xD,
+	_gamepad_binary_button_x = 0xE,
+	_gamepad_binary_button_y = 0xF,
+	_gamepad_analog_left_stick_up = 0x10,
+	_gamepad_analog_left_stick_down = 0x11,
+	_gamepad_analog_left_stick_left = 0x12,
+	_gamepad_analog_left_stick_right = 0x13,
+	_gamepad_analog_right_stick_up = 0x14,
+	_gamepad_analog_right_stick_down = 0x15,
+	_gamepad_analog_right_stick_left = 0x16,
+	_gamepad_analog_right_stick_right = 0x17,
+
+	NUMBER_OF_GAMEPAD_BUTTON_STRINGS = 0x18,
+	NUMBER_OF_GAMEPAD_BUTTONS = 0x10,
+};
+
 #pragma pack(push,1)
 struct s_game_function_bind
 {
@@ -174,7 +206,9 @@ void __cdecl input_abstraction_get_player_look_angular_velocity_for_mouse(e_cont
 bool __cdecl input_abstraction_controller_button_test(e_controller_index controller_index, e_button_functions button_index);
 e_button_functions __cdecl input_abstraction_get_primary_fire_button(datum unit);
 e_button_functions __cdecl input_abstraction_get_secondary_fire_button(datum unit);
-
 bool __cdecl input_abstraction_get_key_state(int16 key);
+void __cdecl input_abstraction_update();
+void __cdecl input_abstraction_update_input_state(int controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
+uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a3);
 
 void input_abstraction_patches_apply();

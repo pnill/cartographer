@@ -95,6 +95,11 @@ bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2)
 {
 	return INVOKE(0x2F3CD, 0x0, input_has_gamepad, gamepad_index, a2);
 }
+bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index)
+{
+	//return INVOKE_TYPE(0x2E186, 0x0, bool(__cdecl*)(uint16), gamepad_index);
+	return input_globals->gamepad_states[gamepad_index].connected;
+}
 s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index)
 {
 	//s_gamepad_input_state* global = Memory::GetAddress<s_gamepad_input_state*>(0x47A5C8);
