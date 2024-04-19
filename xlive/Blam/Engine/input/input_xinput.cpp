@@ -9,6 +9,7 @@ bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
+uint16 radialDeadzone = 0;
 
 uint32 XINPUT_BUTTON_FLAGS[K_NUMBER_OF_XINPUT_BUTTONS] =
 {
@@ -114,6 +115,38 @@ int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_dead
 	return 0;
 }
 
+void input_xinput_adjust_thumb_radial_deadzones(s_gamepad_input_button_state* gamepad_state)
+{
+
+	// Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given Radius 
+	// it is accepted as valid input otherwise it is rejected.
+
+	if (!radialDeadzone)
+		return;
+
+	uint32 radius = pow(radialDeadzone, 2);
+	uint32 lx = (int)gamepad_state->thumb_left.x;
+	uint32 ly = (int)gamepad_state->thumb_left.y;
+	uint32 rx = (int)gamepad_state->thumb_right.x;
+	uint32 ry = (int)gamepad_state->thumb_right.y;
+
+
+	uint32 lh = pow(lx, 2) + pow(ly, 2);
+	uint32 rh = pow(rx, 2) + pow(ry, 2);
+
+	if (lh <= radius)
+	{
+		gamepad_state->thumb_left.x = 0;
+		gamepad_state->thumb_left.y = 0;
+	}
+
+	if (rh <= radius)
+	{
+		gamepad_state->thumb_right.x = 0;
+		gamepad_state->thumb_right.y = 0;
+	}
+}
+
 bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gamepad_input_button_state* gamepad_state)
 {
 	input_device* gamepad = g_xinput_devices[gamepad_index];
@@ -162,6 +195,8 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 	gamepad_state->thumb_left.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbLY, preference.gamepad_axial_deadzone_left_y);
 	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right_x);
 	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right_y);
+
+	input_xinput_adjust_thumb_radial_deadzones(gamepad_state);
 
 	return gamepad_state->thumb_left.x > 0
 		|| gamepad_state->thumb_left.y > 0

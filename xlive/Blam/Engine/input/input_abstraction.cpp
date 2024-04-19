@@ -4,6 +4,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 s_input_abstraction_globals* input_abstraction_globals;
+extern uint16 radialDeadzone;
 
 void __cdecl input_abstraction_initialize()
 {
@@ -240,6 +241,57 @@ void input_abstraction_update_throttles_legacy(s_gamepad_input_button_state* gam
 	input_abstraction_post_update_all_throttles(left_stick, right_stick, &gamepad_state->thumb_left, &gamepad_state->thumb_right);
 }
 
+void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick, real_euler_angles2d* right_stick)
+{
+	left_stick->yaw = gamepad_state->thumb_left.x * 0.000030518509;
+	left_stick->pitch = gamepad_state->thumb_left.y * 0.000030518509;
+	right_stick->yaw = gamepad_state->thumb_right.x * 0.000030518509;
+	right_stick->pitch = gamepad_state->thumb_right.y * 0.000030518509;
+
+	left_stick->yaw = PIN(left_stick->yaw, -1.0f, 1.0f);
+	left_stick->pitch = PIN(left_stick->pitch, -1.0f, 1.0f);
+
+	right_stick->yaw = PIN(right_stick->yaw, -1.0f, 1.0f);
+	right_stick->pitch = PIN(right_stick->pitch, -1.0f, 1.0f);
+}
+
+void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
+{
+	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+
+	if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
+		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_A_X / 100));
+		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
+
+	}
+	else
+	{
+		preference->gamepad_axial_deadzone_right_x = 0;
+		preference->gamepad_axial_deadzone_right_y = 0;
+	}
+	if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+	{
+		radialDeadzone = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_Radial / 100));
+	}
+	else
+	{
+		radialDeadzone = 0;
+	}
+}
+void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value)
+{
+	if (value == 0.0f) return;
+
+	value = MAX(value - 1.0f, 0.0f);
+
+	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+
+	preference->gamepad_yaw_rate = 80.0f + 20.0f * value; //x-axis
+	preference->gamepad_pitch_rate = 40.0f + 10.0f * value; //y-axis
+}
+
+
+
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value)
 {
 	if (value == 0.0f)
@@ -324,16 +376,14 @@ void __cdecl input_abstraction_update()
 			else
 			{
 
-				// input_abstraction_update_default_throttle()
-				// if(!H2Config_controller_modern)
-				// {
-						input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
-				// }
-				// else
-				// {
-				//		input_abstraction_update_throttles_modern()
-				// }
-				//  
+				if (!H2Config_controller_modern)
+				{
+					input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
+				}
+				else
+				{
+					input_abstraction_update_throttles_modern(gamepad_state, &left_stick, &right_stick);
+				}
 
 				if (!input_abstraction_globals->input_has_gamepad[controller])
 					input_abstraction_globals->input_has_gamepad[controller] = true;
@@ -387,4 +437,6 @@ void input_abstraction_patches_apply()
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
 	input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+	input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
+	input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
 }
