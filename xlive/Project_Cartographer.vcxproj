@@ -728,7 +728,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\Input\Mouseinput.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
@@ -1117,7 +1116,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
-    <ClInclude Include="H2MOD\Modules\Input\Mouseinput.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />

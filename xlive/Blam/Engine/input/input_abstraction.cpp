@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "input_abstraction.h"
+#include "game/game_time.h"
+#include "H2MOD/Modules/Shell/Config.h"
 
 s_input_abstraction_globals* input_abstraction_globals;
 
@@ -238,11 +240,54 @@ void input_abstraction_update_throttles_legacy(s_gamepad_input_button_state* gam
 	input_abstraction_post_update_all_throttles(left_stick, right_stick, &gamepad_state->thumb_left, &gamepad_state->thumb_right);
 }
 
+void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value)
+{
+	if (value == 0.0f)
+		return;
+	if (H2Config_raw_input)
+		value = 1.0f;
+
+	value = MAX(value - 1.0f, 0.0f);
+
+	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+
+	preference->mouse_yaw_rate = (80.0f + 20.0f * value) - 30.0f;
+
+	if (H2Config_mouse_uniform)
+		preference->mouse_pitch_rate = preference->mouse_yaw_rate;
+	else
+		preference->mouse_pitch_rate = (40.0f + 10.0f * value) - 15.0f;
+}
+
+void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_game_input_state* input_state)
+{
+
+	if (H2Config_raw_input)
+	{
+		DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+		time_globals* time = time_globals::get();
+
+		input_abstraction_set_mouse_look_sensitivity(controller, 1.0f);
+		input_state->mouse.yaw = time->tick_length * (float)mouse_state->lX * -(H2Config_raw_mouse_scale / 100);
+		input_state->mouse.pitch = time->tick_length * (float)mouse_state->lY * -(H2Config_raw_mouse_scale / 100);
+
+		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+		if (preference->mouse_invert_look)
+		{
+			input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
+		}
+
+	}
+	else
+	{
+		input_abstraction_set_mouse_look_sensitivity(controller, H2Config_mouse_sens);
+	}
+}
 void __cdecl input_abstraction_update()
 {
 	//INVOKE(0x628A8, 0x0, input_abstraction_update);
 
-	bool any_gamepad_connected = true;
+	bool any_gamepad_connected = false;
 	real_euler_angles2d left_stick, right_stick;
 
 	for (e_controller_index controller = first_controller();
@@ -325,10 +370,7 @@ void __cdecl input_abstraction_update()
 			&right_stick,
 			&input_abstraction_globals->input_states[_controller_index_0]);
 
-		// if(H2Config_raw_input)
-		// {
-		//	 input_abstraction_apply_raw_mouse_update
-		// }
+		input_abstraction_apply_raw_mouse_update(_controller_index_0,&input_abstraction_globals->input_states[_controller_index_0]);
 	}
 }
 
@@ -344,4 +386,5 @@ void input_abstraction_patches_apply()
 	input_abstraction_globals = Memory::GetAddress<s_input_abstraction_globals*>(0x4A89B0);
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
+	input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 }

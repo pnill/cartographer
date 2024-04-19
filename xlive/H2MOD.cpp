@@ -63,7 +63,6 @@
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
@@ -434,7 +433,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		ControllerInput::SetDeadzones();
 		ControllerInput::SetSensitiviy(H2Config_controller_sens);
-		MouseInput::SetSensitivity(H2Config_mouse_sens);
+		input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 
 		if (!Memory::IsDedicatedServer())
 		{
@@ -956,7 +955,6 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
-		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		

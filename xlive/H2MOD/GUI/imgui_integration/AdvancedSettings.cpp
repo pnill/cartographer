@@ -3,6 +3,7 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "game/cheats.h"
 #include "game/game.h"
+#include "input/input_abstraction.h"
 #include "interface/hud.h"
 #include "interface/new_hud.h"
 #include "interface/first_person_camera.h"
@@ -12,7 +13,6 @@
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
@@ -349,7 +349,7 @@ namespace ImGuiHandler {
 					ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
 					{
-						MouseInput::SetSensitivity(H2Config_mouse_sens);
+						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -390,7 +390,7 @@ namespace ImGuiHandler {
 						if (ImGui::IsItemEdited())
 						{
 							H2Config_mouse_sens = (float)g_mouse_sens;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
 						ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
@@ -400,14 +400,14 @@ namespace ImGuiHandler {
 							if (g_mouse_sens < 1)
 								g_mouse_sens = 1;
 							g_mouse_sens = (int)H2Config_mouse_sens;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(GetString(reset, "Mousesens3"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
 							g_mouse_sens = 3;
 							H2Config_mouse_sens = 3.0f;
-							MouseInput::SetSensitivity(H2Config_mouse_sens);
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 						}
 					}
 				}
@@ -425,7 +425,7 @@ namespace ImGuiHandler {
 					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
 					if (ImGui::IsItemEdited())
 					{
-						MouseInput::SetSensitivity(H2Config_mouse_sens);
+						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 					}
 					if (ImGui::IsItemHovered())
 					{
