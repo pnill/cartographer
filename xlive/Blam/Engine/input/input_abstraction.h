@@ -84,14 +84,14 @@ struct s_game_function_bind
 	uint32 m_button_key;
 	uint32 unknown;
 };
-CHECK_STRUCT_SIZE(s_game_function_bind, 0xC);
+ASSERT_STRUCT_SIZE(s_game_function_bind, 0xC);
 
 struct s_game_function
 {
 	uint32 m_bind_count;
 	s_game_function_bind m_bind[K_MAXIMUM_NUMBER_OF_GAME_FUNCTION_BINDS];
 };
-CHECK_STRUCT_SIZE(s_game_function, 0x64);
+ASSERT_STRUCT_SIZE(s_game_function, 0x64);
 
 
 struct s_gamepad_input_preferences
@@ -119,13 +119,13 @@ struct s_gamepad_input_preferences
 	int16 gamepad_axial_deadzone_right_x;
 	int16 gamepad_axial_deadzone_right_y;
 };
-CHECK_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
+ASSERT_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
 
 struct s_keyboard_input_preferences
 {
 	s_key_state keys[NUMBER_OF_BUTTON_KEYS];
 };
-CHECK_STRUCT_SIZE(s_keyboard_input_preferences, 0x1C8);
+ASSERT_STRUCT_SIZE(s_keyboard_input_preferences, 0x1C8);
 
 // TODO : verify this struct and NUMBER_OF_ABSTRACT_BUTTONS
 struct s_game_input_state
@@ -144,7 +144,7 @@ struct s_game_input_state
 	uint32 field_B0;
 	uint32 field_B4;
 };
-CHECK_STRUCT_SIZE(s_game_input_state, 0xB8);
+ASSERT_STRUCT_SIZE(s_game_input_state, 0xB8);
 
 
 struct s_input_abstraction_globals
@@ -157,7 +157,7 @@ struct s_input_abstraction_globals
 	bool input_device_changed;
 	uint8 gap_5EB1[7];
 };
-CHECK_STRUCT_SIZE(s_input_abstraction_globals, 0x5EB8);
+ASSERT_STRUCT_SIZE(s_input_abstraction_globals, 0x5EB8);
 #pragma pack(pop)
 
 

@@ -36,7 +36,7 @@ public:
 	virtual void XSetState(XINPUT_VIBRATION* state) { return; };
 	virtual void XUpdateImmediate(void) { return; };
 };
-CHECK_STRUCT_SIZE(dinput_device, 0x40);
+ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 
 
@@ -45,7 +45,7 @@ struct s_key_state
 {
 	uint8 gap[0x8];
 };
-CHECK_STRUCT_SIZE(s_key_state, 0x8);
+ASSERT_STRUCT_SIZE(s_key_state, 0x8);
 
 struct s_gamepad_input_button_state
 {
@@ -58,7 +58,7 @@ struct s_gamepad_input_button_state
 	point2d thumb_left;
 	point2d thumb_right;
 };
-CHECK_STRUCT_SIZE(s_gamepad_input_button_state, 0x3C);
+ASSERT_STRUCT_SIZE(s_gamepad_input_button_state, 0x3C);
 
 struct s_gamepad_input_state
 {
@@ -68,7 +68,7 @@ struct s_gamepad_input_state
 	uint8 gap_3;
 	s_gamepad_input_button_state state;
 };
-CHECK_STRUCT_SIZE(s_gamepad_input_state, 0x40);
+ASSERT_STRUCT_SIZE(s_gamepad_input_state, 0x40);
 
 struct s_keyboard_input_state
 {
@@ -76,7 +76,7 @@ struct s_keyboard_input_state
 	uint16 msec_down[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
 	bool key_bool[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
 };
-CHECK_STRUCT_SIZE(s_keyboard_input_state, 0x400);
+ASSERT_STRUCT_SIZE(s_keyboard_input_state, 0x400);
 
 class c_input_dx9_mouse_cursor; //TODO
 
@@ -113,7 +113,7 @@ struct s_input_globals
 	int field7D0;
 	int field7D8;
 };
-CHECK_STRUCT_SIZE(s_input_globals, 0x7D8);
+ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 
 #pragma pack(pop)
 

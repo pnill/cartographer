@@ -15,7 +15,7 @@ public:
 	virtual void XSetState(XINPUT_VIBRATION* state) override;
 	virtual void XUpdateImmediate(void) override;
 };
-CHECK_STRUCT_SIZE(xinput_device, 0x1C);
+ASSERT_STRUCT_SIZE(xinput_device, 0x1C);
 
 bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, struct s_gamepad_input_button_state* gamepad_state);
 
