@@ -84,7 +84,7 @@ enum e_havok_vehicle_physics_definition_flags : uint32
 
 enum e_anti_gravity_point_definition_flags : uint32
 {
-	_anti_gravity_point_definition_gets_damage_from_regions = FLAG(O)
+	_anti_gravity_point_definition_gets_damage_from_regions = FLAG(0)
 };
 
 enum e_friction_point_definition : uint32
