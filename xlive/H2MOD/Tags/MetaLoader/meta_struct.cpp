@@ -288,7 +288,7 @@ namespace meta_struct
 	///
 	//constructor for in memory loading and rebasing
 	//houses both meta and extended meta types
-	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream, int map_off, __int8 count,  int datum_index , std::string loc, tag_group type)
+	meta::meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream, int map_off, __int8 count,  int datum_index , const char* loc, tag_group type)
 	{
 		this->data = meta;
 		this->size = size;
@@ -297,7 +297,7 @@ namespace meta_struct
 		this->map_stream = map_stream;
 		this->map_off = map_off;		
 		this->datum_index = datum_index;
-		this->map_loc = loc;
+		this->map_loc.set(loc);
 		this->type = type;
 
 		//this meta isnt loaded into in game tag_memory block
@@ -333,7 +333,7 @@ namespace meta_struct
 		this->map_stream = nullptr;
 		this->map_off = -1;
 		this->datum_index = datum_index;
-		this->map_loc = -1;
+		this->map_loc.clear();
 		this->type = { (e_tag_group)NONE };
 
 		NO_DELETE = true;
@@ -843,9 +843,9 @@ namespace meta_struct
 		if (!NO_DELETE)
 			delete[] data;
 	}
-	std::string meta::Get_map_loc()
+	c_static_string260* meta::Get_map_loc()
 	{
-		return map_loc;
+		return &map_loc;
 	}
 	///
 	//<---------------------------some usefull STRING functions------------------------------------------------->

@@ -5,6 +5,8 @@
 ///
 #pragma once
 #include "stdafx.h"
+
+#include "cseries/cseries_strings.h"
 #include "tag_files/tag_groups.h"
 #include "tinyxml/tinyxml2.h"
 
@@ -82,7 +84,7 @@ namespace meta_struct
 		int map_off;//offset of the map where the meta is located
 		int size;//size of the meta
 
-		std::string map_loc;//location of the concerned map
+		c_static_string260 map_loc;//location of the concerned map
 		std::ifstream* map_stream;//input stream object required for extended meta style metas
 
 		int entry_size;//used for extended_meta reflexive field
@@ -111,7 +113,7 @@ namespace meta_struct
 	public:
 		/// used to read meta data from a meta file along with ability to modify mem_off
 		///i kept file_loc,datum_index,type for debugging purposes
-		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream = nullptr, int map_off = -1, __int8 count = 1, int datum_index = -1, std::string loc = "", tag_group type = { (e_tag_group)NONE});
+		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, std::ifstream* map_stream = nullptr, int map_off = -1, __int8 count = 1, int datum_index = -1, const char* loc = "", tag_group type = { (e_tag_group)NONE });
 		//constructor supporting in Game modification of meta loaded into memory
 		meta(char* meta, int size, int mem_off, std::shared_ptr<plugins_field> plugin, int count, int datum_index = -1);
 		~meta();
@@ -124,7 +126,7 @@ namespace meta_struct
 		int Get_Total_size();
 		int Get_mem_addr();
 		tag_group Get_type();
-		std::string Get_map_loc();
+		c_static_string260* Get_map_loc();
 		std::list<int> Get_all_tag_refs();
 		char* Generate_meta_file();
 	};

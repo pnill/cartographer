@@ -46,57 +46,14 @@ namespace tag_loader
 	void Dump_Que_meta();
 	//return and clears all the error messages incurred
 	std::string Pop_messages();
-	//return a tag_name list
-	std::string Pop_tag_list();
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(datum datum_index, std::string map_loc);
-	//same as the previous implementation,but it utilises file handle to load from any file 
-	void Load_RAW_refs(datum datum_index, HANDLE file);
+	void load_raw_table_data(datum datum_index, c_static_string260* map_loc);
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(datum datum_index);
+	void setup_injected_tag_havok_vtables(datum datum_index);
 	//Fix shader templates
-	void Fix_shader_templates();
-	//Loads a file containing a a bunch of tags concerned with some specific element injecting the first tag onto the target datum
-	//modules cand be target onto a specific tag,they have to be loaded into free tag mem pool
-	//return the target_index of the first tag in the memory
-	int Load_tag_module(std::string loc);
-	//loades and execute instructions in the query file
-	void Parse_query_file(std::string loc);
-	//Adds reference of all the tags present in shared map into the tag_table
-	void Add_all_shared_refs();
-	//verifies and adds the Datum to  sync_tags list for the module loading
-	void Generate_sync_list(tag_group type, DWORD index);
-	//Adds the valid tags to GlobalScenario->SimulationDefinitionTable Block and clears the sync list
-	void Add_tags_to_simulation_table();
+	void initialize_injected_shader_templates();
 	//Get new datum from old datum
-	datum ResolveNewDatum(int oldDatum);
-	///
-	//<-----------------The query parser or more of a script parser------------------------------->
-	///
-	class query_parser
-	{
-	private:
-		std::unordered_map<std::string, int> DWORD_list;//hash table containing the variables allocated in the script   
-		//try parsing to int
-		int try_parse_int(std::string);
-		//bunch of log text
-		std::vector<std::string> logs;
-		//remove comments ,simplify assignment and others
-		std::vector<std::string> clean_string(std::string);
-		//_mov parser
-		void _mov_parser(std::string dest, std::string src);
-		//void replace_tag
-		void replace_tag(std::string dest, std::string src);
-		//check for keywords and standard functions and returns appropriately
-		int keyword_check(std::string);
-	public:
-		//reference to vector of queries
-		query_parser(std::vector<std::string>&);
-		//complete file location
-		query_parser(std::string file_loc);
-		//return all logs
-		std::string _getlogs();
-	};
+	datum resolve_cache_index_to_injected(int oldDatum);
 }
 void Initialise_tag_loader();

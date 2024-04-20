@@ -25,37 +25,31 @@ namespace global_handle_function
 	}
 }
 //certain functions which relate tags to their global object(such as Havok objects)(vftables perhaps)
-namespace global_objects_fix
+namespace tag_post_process_functions
 {
-	void __cdecl bipd_fix(datum datum_index)
+	void __cdecl biped_init_havok(datum datum_index)
 	{
-		void(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (void(_cdecl*)(datum))Memory::GetAddress(0x1389B0);
+		void (_cdecl *sub_EC23F)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x1389B0);
 		sub_EC23F(datum_index);
 	}
-
-	void __cdecl crea_fix(datum datum_index)
+	void __cdecl creature_init_havok(datum datum_index)
 	{
-		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x138985);
+		void (_cdecl *sub_EC23F)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x138985);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl vehi_fix(datum datum_index)
+	void __cdecl vehicle_init_havok(datum datum_index)
 	{
-		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x13895A);
+		void(_cdecl *sub_EC23F)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x13895A);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl coll_fix(datum datum_index)
+	void __cdecl collision_init_havok(datum datum_index)
 	{
-		int(_cdecl * sub_EC23F)(datum);
-		sub_EC23F = (int(_cdecl*)(datum))Memory::GetAddress(0x7BE5C);
+		void(_cdecl *sub_EC23F)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x7BE5C);
 		sub_EC23F(datum_index);
 	}
-	void __cdecl phmo_fix(datum datum_index, bool unk)
+	void __cdecl physics_model_init_havok(datum datum_index, bool unk)
 	{
-		int(_cdecl * sub_EC23F)(datum, bool);
-		sub_EC23F = (int(_cdecl*)(datum, bool))Memory::GetAddress(0x7B844);
+		void(_cdecl *sub_EC23F)(datum, bool) = (void(_cdecl*)(datum, bool))Memory::GetAddress(0x7B844);
 		sub_EC23F(datum_index, unk);
 	}
 }
@@ -559,10 +553,8 @@ namespace tag_loader
 
 				memcpy(tags::get_tag_data() + injected_tag_data_offset, tag_data, total_tag_size);//copy to the tag memory
 
-				//Load RAW
-				Load_RAW_refs(current_tag_datum_map.injected_index, loaded_tag->Get_map_loc());
-				//fix the global_refs
-				Fix_global_objects_ref(current_tag_datum_map.injected_index);
+				load_raw_table_data(current_tag_datum_map.injected_index, loaded_tag->Get_map_loc());
+				setup_injected_tag_havok_vtables(current_tag_datum_map.injected_index);
 
 				delete[] tag_data;
 				injected_tag_data_offset += total_tag_size;
@@ -570,7 +562,7 @@ namespace tag_loader
 			}
 			else break;			
 		}
-		Fix_shader_templates();
+		initialize_injected_shader_templates();
 		loaded_tag_data_order.clear();
 		t_injected_tag_datum_map.clear();
 		loaded_tag_data.clear();
@@ -580,30 +572,32 @@ namespace tag_loader
 	{
 		loaded_tag_data.clear();
 	}
+
+	// Commented out as it's unused but keeping as an example for future use
 	//Rebases to 0x0 and dumps meta data in que in the specified tag folder
-	void Dump_Que_meta()
-	{
-		std::ofstream fout;
+	//void Dump_Que_meta()
+	//{
+	//	std::ofstream fout;
 
-		for (auto& i : loaded_tag_data)
-		{
-			std::string file_loc = custom_tags_directory + "\\que\\" + meta_struct::to_hex_string(i.first);
+	//	for (auto& i : loaded_tag_data)
+	//	{
+	//		std::string file_loc = custom_tags_directory + "\\que\\" + meta_struct::to_hex_string(i.first);
 
-			i.second->Rebase_meta(0x0);
-			int size = i.second->Get_Total_size();
-			char* data = i.second->Generate_meta_file();
-			std::string type = i.second->Get_type().string;
+	//		i.second->Rebase_meta(0x0);
+	//		int size = i.second->Get_Total_size();
+	//		char* data = i.second->Generate_meta_file();
+	//		std::string type = i.second->Get_type().string;
 
-			file_loc += '.' + type;
-			fout.open(file_loc, std::ios::out | std::ios::binary);
+	//		file_loc += '.' + type;
+	//		fout.open(file_loc, std::ios::out | std::ios::binary);
 
-			fout.write(data, size);
+	//		fout.write(data, size);
 
-			delete[] data;
-			fout.close();
-		}
+	//		delete[] data;
+	//		fout.close();
+	//	}
+	//}
 
-	}
 	//return and clears all the error messages incurred
 	std::string Pop_messages()
 	{
@@ -615,72 +609,17 @@ namespace tag_loader
 		}
 		return ret;
 	}
-	//return and clears all the loaded tag list
-	std::string Pop_tag_list()
-	{
-		std::string ret;
-		while (!tag_list.empty())
-		{
-			ret = tag_list[tag_list.size() - 1] + '\n' + ret;
-			tag_list.pop_back();
-		}
-		return ret;
-	}
+
+
 	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
 	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
-	HANDLE try_find_map(std::string map)
+	HANDLE create_file_handle(c_static_string260* map_file)
 	{
-		std::string map_loc = map;
-		//checking for full path length
-		if (!PathFileExistsA(map_loc.c_str()))
-		{
-			if (map.find('\\') == std::string::npos)
-			{
-				//could be both map_name with or without extension
-				if (meta_struct::Get_file_type(map) == "map")
-					map_loc = mods_directory + "\\maps\\" + map;
-				else
-					map_loc = mods_directory + "\\maps\\" + map + ".map";
-
-				if (PathFileExistsA(map_loc.c_str()));
-				else
-				{
-					if (meta_struct::Get_file_type(map) == "map")
-						map_loc = maps_directory + '\\' + map;
-					else
-						map_loc = maps_directory + '\\' + map + ".map";
-
-					if (PathFileExistsA(map_loc.c_str()));
-					else
-					{
-						if (meta_struct::Get_file_type(map) == "map")
-							map_loc = custom_maps_directory + '\\' + map;
-						else
-							map_loc = custom_maps_directory + '\\' + map + ".map";
-					}
-				}
-				return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-			}
-			else
-			{
-				//scenario name
-				//try retrieving map_name from scenario
-				std::string map_name = map_loc.substr(map_loc.rfind('\\') + 1);
-				map_loc = mods_directory + "\\maps\\" + map_name + ".map";
-				//only tries to load from <mods_directory>\\maps cause game can auto load from default locations
-				///i suggest naming map_names same as scenario names--saves the trouble
-				return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-			}
-		}
-		else
-		{
-			//full path length
-			return CreateFileA(map_loc.c_str(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-		}
+		return CreateFileA(map_file->get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 	}
 	//function to load RAW_DATA of the concerned tag from meta_list
 	//Carefull the tag should be loaded in the meta_tables and meta,this function just fixes its RAW_DATA
-	void Load_RAW_refs(datum datum_index, std::string map_loc)
+	void load_raw_table_data(datum datum_index, c_static_string260* map_loc)
 	{
 		DWORD* PMapRawtableoffset = Memory::GetAddress<DWORD*>(0x4AE8B0);
 		DWORD* PRawTableSize = Memory::GetAddress<DWORD*>(0x4AE8B4);
@@ -692,10 +631,7 @@ namespace tag_loader
 		*PMapRawtableoffset = 0x0;
 		*PRawTableSize = 0x0;
 
-		DWORD ETCOFFSET = *Memory::GetAddress<DWORD*>(0x482290);
 		HANDLE old_file_handle = *Memory::GetAddress<HANDLE*>(0x4AE8A8);
-
-		//char* ripped_map = (char*)(SharedmapBase + tag_scenario_off);
 
 		tags::tag_instance* tag_info = &reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
 		char* tag_data = tags::get_tag_data() + reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
@@ -709,11 +645,11 @@ namespace tag_loader
 		}
 
 		//supposing full length
-		HANDLE new_file_handle = try_find_map(map_loc);
+		HANDLE new_file_handle = create_file_handle(map_loc);
 		if (new_file_handle == INVALID_HANDLE_VALUE)
 		{
 			//i suppose its in scenario fomat and placed in default and custom directories
-			new_file_handle = global_handle_function::get_map_Handle_from_scnr(map_loc.c_str());
+			new_file_handle = global_handle_function::get_map_Handle_from_scnr(map_loc->get_string());
 		}
 		*Memory::GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
 
@@ -774,93 +710,10 @@ namespace tag_loader
 		*PMapRawtableoffset = oldRtable_offset;
 		*PRawTableSize = oldRtable_size;
 	}
-	void Load_RAW_refs(datum datum_index, HANDLE file)
-	{
-		DWORD* PMapRawtableoffset = (DWORD*)(Memory::baseAddress + 0x4AE8B0);
-		DWORD* PRawTableSize = (DWORD*)(Memory::baseAddress + 0x4AE8B4);
-
-		//a little  precaution to circumvent unexpected behaviour
-		DWORD oldRtable_offset = *PMapRawtableoffset;
-		DWORD oldRtable_size = *PRawTableSize;
-
-		//hax to force loading from the disk
-		*PMapRawtableoffset = 0x0;
-		*PRawTableSize = 0x0;
-
-		DWORD ETCOFFSET = *(DWORD*)(Memory::baseAddress + 0x482290);
-		HANDLE old_file_handle = *(HANDLE*)(Memory::baseAddress + 0x4AE8A8);
 
 
-		tags::tag_instance* tag_info = &reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)];
-		char* tag_data = tags::get_tag_data() + reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].data_offset;
-
-		//fail safe
-		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
-		{
-			std::string error = "Tag: " + datum_index;
-			error += " not loaded into tag tables and tag memory";
-			throw new std::exception(error.c_str());
-		}
-
-		*(HANDLE*)(Memory::baseAddress + 0x4AE8A8) = file;
-
-		switch (tag_info->type.group)
-		{
-		case 'mode':
-		{
-			render_model_definition* model_definition = (render_model_definition*)tag_data;
-			if (model_definition->sections.count > 0)
-			{
-				int current_section_index = 0;
-				do
-				{
-					render_model_section* model_section = model_definition->sections[current_section_index];
-
-					((void(__cdecl*)(geometry_block_info*, unsigned int))Memory::GetAddress(0x2652BC))(&model_section->geometry_block_info, 3u);
-
-					++current_section_index;
-				} while (current_section_index < model_definition->sections.count);
-			}
-			break;
-		}
-
-		case 'bitm':
-		{
-			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
-			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
-
-			for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
-			{
-				bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
-
-				*Memory::GetAddress<bitmap_data**>(0xA49270 + 0x1FC) = bitmap_item;
-
-				int temp = 0;
-				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 2, 0, &temp);
-				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 1, 0, &temp);
-				((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 0, 0, &temp);
-
-			}
-			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
-			break;
-		}
-		case 'weat':
-		{
-			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
-			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
-				((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
-			break;
-		}
-		default:
-			break;
-		}
-		*(HANDLE*)(Memory::baseAddress + 0x4AE8A8) = old_file_handle;
-
-		*PMapRawtableoffset = oldRtable_offset;
-		*PRawTableSize = oldRtable_size;
-	}
 	//Fixes the reference of the tags to their global objects(vftables)
-	void Fix_global_objects_ref(datum datum_index)
+	void setup_injected_tag_havok_vtables(datum datum_index)
 	{
 		tag_group type = reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].type;
 		datum Tdatum_index = reallocated_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)].datum_index;
@@ -874,27 +727,27 @@ namespace tag_loader
 
 		switch (type.group)
 		{
-		case 'crea':
-			global_objects_fix::crea_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
+		case _tag_group_creature:
+			tag_post_process_functions::creature_init_havok(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
-		case 'bipd':
-			global_objects_fix::bipd_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
+		case _tag_group_biped:
+			tag_post_process_functions::biped_init_havok(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
-		case 'coll':
-			global_objects_fix::coll_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
+		case _tag_group_collision_model:
+			tag_post_process_functions::collision_init_havok(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
-		case 'phmo':
-			global_objects_fix::phmo_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index), false);
+		case _tag_group_physics_model:
+			tag_post_process_functions::physics_model_init_havok(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index), false);
 			break;
-		case 'vehi':
-			global_objects_fix::vehi_fix(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
+		case _tag_group_vehicle:
+			tag_post_process_functions::vehicle_init_havok(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index));
 			break;
 		default:
 			break;
 		}
 	}
 
-	void Fix_shader_templates()
+	void initialize_injected_shader_templates()
 	{
 		typedef bool(__cdecl t_init_shader_template)(int a1);
 		auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
@@ -910,39 +763,17 @@ namespace tag_loader
 			}
 		}
 	}
-		
-	void Add_all_shared_refs()
-	{
-		tags::tag_instance* SharedTables = reinterpret_cast<tags::tag_instance*>(tags::get_tag_data() + 0x20 + 0xC * *(DWORD*)(tags::get_tag_data() + 4));
 
-		for (int i = FIRST_SHARED_TAG_INSTANCE_INDEX; i < tags::get_tag_count(); i++)
-			memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
-	}
-	void Generate_sync_list(tag_group type, DWORD index)
-	{
-		switch (type.group)
-		{
-		case _tag_group_biped:
-		case _tag_group_vehicle:
-		case _tag_group_weapon:
-		case _tag_group_garbage:
-		case _tag_group_projectile:
-		case _tag_group_crate:
-		case _tag_group_damage_effect:
-		case _tag_group_device:
-		case _tag_group_scenery:
-		case _tag_group_device_light_fixture:
-		case _tag_group_sound_scenery:
-		case _tag_group_creature:
-		case _tag_group_device_machine:
-		case _tag_group_equipment:
-			sync_list.push_back(index);
-			break;
+	// not needed but left for any obscure future use. Forge?
+	//void Add_all_shared_refs()
+	//{
+	//	tags::tag_instance* SharedTables = reinterpret_cast<tags::tag_instance*>(tags::get_tag_data() + 0x20 + 0xC * *(DWORD*)(tags::get_tag_data() + 4));
 
-		}
-	}
+	//	for (int i = FIRST_SHARED_TAG_INSTANCE_INDEX; i < tags::get_tag_count(); i++)
+	//		memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
+	//}
 
-	datum ResolveNewDatum(int oldDatum)
+	datum resolve_cache_index_to_injected(int oldDatum)
 	{
 		for (auto& ref : injected_tag_reference_map)
 		{
@@ -953,7 +784,7 @@ namespace tag_loader
 	}
 }
 
-//Used to allocate somemore space for tagtables and tags
+//Used to allocate some more space for tag tables and tags
 uint32 __cdecl datum_header_allocate(int32 allocation_size, int32 item_size)
 {
 	typedef unsigned int(_cdecl* Allocate_memory)(int size, char arg_4);

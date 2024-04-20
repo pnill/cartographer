@@ -142,8 +142,8 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 		tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
 		tag_loader::Load_tag(skele_datum, true, "carto_shared");
 		tag_loader::Push_Back();
-		datum skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-		add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum);
+		datum skele_new_datum = tag_loader::resolve_cache_index_to_injected(skele_datum);
+		add_representation(tag_loader::resolve_cache_index_to_injected(skele_fp_datum), tag_loader::resolve_cache_index_to_injected(skele_body_datum), skele_new_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 		new_def->tag_datum = skele_new_datum;
 	}
@@ -165,8 +165,8 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 		tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
 		tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
 		tag_loader::Push_Back();
-		datum new_flood_index = tag_loader::ResolveNewDatum(flood_datum);
-		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), new_flood_index);
+		datum new_flood_index = tag_loader::resolve_cache_index_to_injected(flood_datum);
+		add_representation(tag_loader::resolve_cache_index_to_injected(flood_arms_datum), tag_loader::resolve_cache_index_to_injected(flood_body_datum), new_flood_index);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 		new_def->tag_datum = new_flood_index;
 	}
@@ -221,7 +221,7 @@ void game_globals_add_lmao_representation(void)
 			tag_loader::Load_tag(lmao_datum, true, "carto_shared");
 			tag_loader::Push_Back();
 
-			lmao_datum = tag_loader::ResolveNewDatum(lmao_datum);
+			lmao_datum = tag_loader::resolve_cache_index_to_injected(lmao_datum);
 			if (lmao_datum != NONE)
 			{
 				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));

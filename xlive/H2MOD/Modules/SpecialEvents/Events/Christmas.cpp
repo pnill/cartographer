@@ -38,8 +38,8 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(beard_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		santa_hat_datum = tag_loader::ResolveNewDatum(santa_hat_datum);
-		beard_datum = tag_loader::ResolveNewDatum(beard_datum);
+		santa_hat_datum = tag_loader::resolve_cache_index_to_injected(santa_hat_datum);
+		beard_datum = tag_loader::resolve_cache_index_to_injected(beard_datum);
 
 		// Give Santa Hat and Beard to Chief & Friends
 		if (datum hlmt_chief_datum = tags::find_tag(_tag_group_model, "objects\\characters\\masterchief\\masterchief");
@@ -70,7 +70,7 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(snow_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		snow_datum = tag_loader::ResolveNewDatum(snow_datum);
+		snow_datum = tag_loader::resolve_cache_index_to_injected(snow_datum);
 
 		if (!DATUM_IS_NONE(snow_datum))
 		{
@@ -92,7 +92,7 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(candy_cane_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		candy_cane_datum = tag_loader::ResolveNewDatum(candy_cane_datum);
+		candy_cane_datum = tag_loader::resolve_cache_index_to_injected(candy_cane_datum);
 
 		auto sword_weapon = tags::get_tag_fast<_weapon_definition>(sword_weapon_datum);
 
@@ -117,7 +117,7 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(deer_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		deer_datum = tag_loader::ResolveNewDatum(deer_datum);
+		deer_datum = tag_loader::resolve_cache_index_to_injected(deer_datum);
 
 		auto ghost_vehicle = tags::get_tag<_tag_group_vehicle, _unit_definition>(ghost_datum);
 		ghost_vehicle->object.attachments.data = 0;
@@ -132,7 +132,7 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(ornament_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		ornament_datum = tag_loader::ResolveNewDatum(ornament_datum);
+		ornament_datum = tag_loader::resolve_cache_index_to_injected(ornament_datum);
 
 		auto frag_model = tags::get_tag<_tag_group_model, s_model_definition>(frag_model_datum);
 		frag_model->render_model.index = ornament_datum;
@@ -146,8 +146,8 @@ void christmas_event_map_load()
 		tag_loader::Load_tag(fp_present_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		present_datum = tag_loader::ResolveNewDatum(present_datum);
-		fp_present_datum = tag_loader::ResolveNewDatum(fp_present_datum);
+		present_datum = tag_loader::resolve_cache_index_to_injected(present_datum);
+		fp_present_datum = tag_loader::resolve_cache_index_to_injected(fp_present_datum);
 
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, fp_present_datum, present_datum);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, fp_present_datum, present_datum);

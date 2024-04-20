@@ -18,7 +18,7 @@ void mook_event_map_load()
 		tag_loader::Load_tag(mook_ball_weapon_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		mook_ball_weapon_datum = tag_loader::ResolveNewDatum(mook_ball_weapon_datum);
+		mook_ball_weapon_datum = tag_loader::resolve_cache_index_to_injected(mook_ball_weapon_datum);
 
 		auto mook_ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(mook_ball_weapon_datum, true);
 

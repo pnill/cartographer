@@ -116,12 +116,12 @@ void halloween_event_map_load()
 		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
-		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-		large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
-		lbitm_datum = tag_loader::ResolveNewDatum(lbitm_datum);
-		sky_datum = tag_loader::ResolveNewDatum(sky_datum);
+		candle_datum = tag_loader::resolve_cache_index_to_injected(candle_datum);
+		candle_fire_datum = tag_loader::resolve_cache_index_to_injected(candle_fire_datum);
+		pump_datum = tag_loader::resolve_cache_index_to_injected(pump_datum);
+		large_candle_datum = tag_loader::resolve_cache_index_to_injected(large_candle_datum);
+		lbitm_datum = tag_loader::resolve_cache_index_to_injected(lbitm_datum);
+		sky_datum = tag_loader::resolve_cache_index_to_injected(sky_datum);
 
 		LOG_INFO_GAME("{:x}", candle_datum);
 		LOG_INFO_GAME("{:x}", candle_fire_datum);
@@ -162,9 +162,9 @@ void halloween_event_map_load()
 		tag_loader::Load_tag(candle_datum, true, "carto_shared");
 		tag_loader::Push_Back();
 
-		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
+		candle_datum = tag_loader::resolve_cache_index_to_injected(candle_datum);
+		candle_fire_datum = tag_loader::resolve_cache_index_to_injected(candle_fire_datum);
+		pump_datum = tag_loader::resolve_cache_index_to_injected(pump_datum);
 
 		LOG_INFO_GAME("{:x}", candle_datum);
 		LOG_INFO_GAME("{:x}", candle_fire_datum);

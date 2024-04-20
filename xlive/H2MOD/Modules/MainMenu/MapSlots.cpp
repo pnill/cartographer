@@ -117,7 +117,7 @@ namespace MapSlots
 					//Write the data loaded from the maps into the unused slot
 					memcpy(slot, &newSlot, sizeof(newSlot));
 					//Resolve the loaded bitmap datum
-					slot->bitmap.index = tag_loader::ResolveNewDatum(newSlot.bitmap.index);
+					slot->bitmap.index = tag_loader::resolve_cache_index_to_injected(newSlot.bitmap.index);
 
 					//Change the map id and sort ID so that the maps are 
 					//placed in order at the end of the list
