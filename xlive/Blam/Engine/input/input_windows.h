@@ -39,7 +39,6 @@ ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 
 
-#pragma pack(push,1)
 struct s_key_state
 {
 	uint8 gap[0x8];
@@ -136,7 +135,6 @@ struct s_input_globals
 };
 ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 
-#pragma pack(pop)
 
 
 
