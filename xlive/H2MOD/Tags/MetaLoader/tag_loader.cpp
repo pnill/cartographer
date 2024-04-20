@@ -104,18 +104,12 @@ namespace tag_loader
 		return temp_plugin;
 	}
 	//returns whether the map is a shared map or not
-	bool Check_shared(std::ifstream* fin)
+	bool check_if_currently_played_map_is_shared()
 	{
-		char* map_header = new char[0x800];
-		fin->seekg(0x0);
-		fin->read(map_header, 0x800);
-
 		if (cache_files_get_header()->type == _game_mode_mutiplayer_shared || cache_files_get_header()->type == _game_mode_single_player_shared)
 		{
-			delete[] map_header;
 			return true;
 		}
-		delete[] map_header;
 		return false;
 	}
 
@@ -259,7 +253,7 @@ namespace tag_loader
 	}
 	//Loads a tag from specified map in accordance with the datum index supplied
 	///custom flag is no more needed
-	void Load_tag(int datum_index, bool recursive, std::string map, bool custom)
+	void preload_tag_data_from_cache(int datum_index, bool recursive, std::string map, bool custom)
 	{
 		unused_target_map_name = map;
 
@@ -328,7 +322,7 @@ namespace tag_loader
 							int tag_data_offset;
 
 							// check if the tag is being loaded from a shared cache type file
-							if (!Check_shared(file_stream))
+							if (!check_if_currently_played_map_is_shared())
 								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - scenario_instance.data_offset);
 							else
 								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - 0x3C000);
@@ -388,7 +382,7 @@ namespace tag_loader
 		delete file_stream;//uh forgot that
 	}
 	//Return the size of the meta that is currently in the que
-	unsigned int Que_meta_size()
+	unsigned int get_total_preloaded_tag_data_size()
 	{
 		unsigned int ret = 0;
 
@@ -400,73 +394,76 @@ namespace tag_loader
 		return ret;
 	}
 
-	int Generate_SID(int table_index, int set, std::string STRING)
-	{
-		int l = (STRING.length() & 0xFF) << 24;
-		int s = (set & 0xFF) << 16;
-		int t = table_index & 0xFFFF;
+	
+	//int Generate_SID(int table_index, int set, std::string STRING)
+	//{
+	//	int l = (STRING.length() & 0xFF) << 24;
+	//	int s = (set & 0xFF) << 16;
+	//	int t = table_index & 0xFFFF;
 
-		return (l | s | table_index);
-	}
+	//	return (l | s | table_index);
+	//}
+
 	///
 	//Returns a list of strings along with their stringIDs
+	// commented out for potential future use
 	///
-	std::list<meta_struct::StringID_info> Get_SID_list(std::string map_loc)
-	{
-		std::list<meta_struct::StringID_info> ret;
+	//std::list<meta_struct::StringID_info> Get_SID_list(std::string map_loc)
+	//{
+	//	std::list<meta_struct::StringID_info> ret;
 
-		std::ifstream fin;
-		fin.open(map_loc.c_str(), std::ios::in | std::ios::binary);
+	//	std::ifstream fin;
+	//	fin.open(map_loc.c_str(), std::ios::in | std::ios::binary);
 
-		if (!fin.is_open())
-			return ret;
+	//	if (!fin.is_open())
+	//		return ret;
 
-		int string_table_count;
-		int string_index_table_offset;
-		int string_table_offset;
+	//	int string_table_count;
+	//	int string_index_table_offset;
+	//	int string_table_offset;
 
-		fin.seekg(0x170);
-		fin.read((char*)&string_table_count, 4);
-		fin.seekg(0x178);
-		fin.read((char*)&string_index_table_offset, 4);
-		fin.seekg(0x17C);
-		fin.read((char*)&string_table_offset, 4);
+	//	fin.seekg(0x170);
+	//	fin.read((char*)&string_table_count, 4);
+	//	fin.seekg(0x178);
+	//	fin.read((char*)&string_index_table_offset, 4);
+	//	fin.seekg(0x17C);
+	//	fin.read((char*)&string_table_offset, 4);
 
-		for (int index = 0; index < string_table_count; index++)
-		{
-			int table_off;
-			fin.seekg(string_index_table_offset + index * 0x4);
-			fin.read((char*)&table_off, 4);
-			table_off = table_off & 0xFFFF;
+	//	for (int index = 0; index < string_table_count; index++)
+	//	{
+	//		int table_off;
+	//		fin.seekg(string_index_table_offset + index * 0x4);
+	//		fin.read((char*)&table_off, 4);
+	//		table_off = table_off & 0xFFFF;
 
-			std::string STRING = "";
+	//		std::string STRING = "";
 
-			fin.seekg(string_table_offset + table_off);
-			char ch;
-			do
-			{
-				fin.read(&ch, 1);
-				STRING += ch;
-			} while (ch);
+	//		fin.seekg(string_table_offset + table_off);
+	//		char ch;
+	//		do
+	//		{
+	//			fin.read(&ch, 1);
+	//			STRING += ch;
+	//		} while (ch);
 
-			if (STRING.length() > 0)
-			{
-				int SID = Generate_SID(index, 0x0, STRING);//set is 0x0 cuz i couldnt figure out any other value
+	//		if (STRING.length() > 0)
+	//		{
+	//			int SID = Generate_SID(index, 0x0, STRING);//set is 0x0 cuz i couldnt figure out any other value
 
-				meta_struct::StringID_info SIDI;
+	//			meta_struct::StringID_info SIDI;
 
-				SIDI.StringID = SID;
-				SIDI.STRING = STRING;
+	//			SIDI.StringID = SID;
+	//			SIDI.STRING = STRING;
 
-				ret.push_back(SIDI);
-			}
-		}
+	//			ret.push_back(SIDI);
+	//		}
+	//	}
 
-		fin.close();
-		return ret;
-	}
+	//	fin.close();
+	//	return ret;
+	//}
 	//sets various directories required for working of tag stuff
-	void Set_directories(std::string default_maps, std::string custom_maps, std::string custom_tags, std::string plugin_loc)
+	void set_content_directories(std::string default_maps, std::string custom_maps, std::string custom_tags, std::string plugin_loc)
 	{
 		maps_directory = default_maps;
 		custom_maps_directory = custom_maps;
@@ -475,11 +472,11 @@ namespace tag_loader
 	}
 	//Updates datum_indexes and rebases tags before inserting into memory
 	//pushes the tag_data in que to the tag_tables and tag_memory in the custom_tags allocated space
-	void Push_Back()
+	void push_loaded_tag_data()
 	{
-		if ((used_additional_meta + Que_meta_size() < _MAX_ADDITIONAL_TAG_SIZE_))
+		if ((used_additional_meta + get_total_preloaded_tag_data_size() < _MAX_ADDITIONAL_TAG_SIZE_))
 			//does some maths to help u out
-			Push_Back(next_available_datum_index);
+			push_loaded_tag_data(next_available_datum_index);
 		else
 		{
 			std::string error = "Coudn't inject, Max meta size reached";
@@ -488,7 +485,7 @@ namespace tag_loader
 	}
 	//pushes the tag_data in que to the tag_tables and tag_memory at specified tag_table index
 	//usually i call this to overwrite tag_table of some preloaded tag(for replacing purpose)
-	void Push_Back(int datum_index)
+	void push_loaded_tag_data(int datum_index)
 	{
 		// offset from tag_data_start the injected tag_data will be placed
 		uint32 injected_tag_data_offset = base_map_tag_size + used_additional_meta;
@@ -598,21 +595,8 @@ namespace tag_loader
 	//	}
 	//}
 
-	//return and clears all the error messages incurred
-	std::string Pop_messages()
-	{
-		std::string ret;
-		while (!error_list.empty())
-		{
-			ret = error_list[error_list.size() - 1] + '\n' + ret;
-			error_list.pop_back();
-		}
-		return ret;
-	}
 
-
-	//function to try and return a handle to the map (map_name or scenario_name(same as the actual map_name) supported)
-	//Checks inside mods//maps folder first then maps folder and finally inside custom maps folder
+	// creates a handle for a given file path
 	HANDLE create_file_handle(c_static_string260* map_file)
 	{
 		return CreateFileA(map_file->get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
@@ -852,6 +836,6 @@ void Initialise_tag_loader()
 
 
 	tag_loader::mods_directory = game_dir + "\\mods";
-	tag_loader::Set_directories(def_maps_loc, "", tag_loader::mods_directory + "\\tags", tag_loader::mods_directory + "\\plugins");//no custom support yet
+	tag_loader::set_content_directories(def_maps_loc, "", tag_loader::mods_directory + "\\tags", tag_loader::mods_directory + "\\plugins");//no custom support yet
 	_Patch_calls();
 }

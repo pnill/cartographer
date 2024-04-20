@@ -34,9 +34,9 @@ void christmas_event_map_load()
 
 	if (!DATUM_IS_NONE(santa_hat_datum) && !DATUM_IS_NONE(beard_datum))
 	{
-		tag_loader::Load_tag(santa_hat_datum, true, "carto_shared");
-		tag_loader::Load_tag(beard_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(santa_hat_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(beard_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		santa_hat_datum = tag_loader::resolve_cache_index_to_injected(santa_hat_datum);
 		beard_datum = tag_loader::resolve_cache_index_to_injected(beard_datum);
@@ -67,8 +67,8 @@ void christmas_event_map_load()
 	}
 	if (!DATUM_IS_NONE(snow_datum))
 	{
-		tag_loader::Load_tag(snow_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(snow_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		snow_datum = tag_loader::resolve_cache_index_to_injected(snow_datum);
 
@@ -89,8 +89,8 @@ void christmas_event_map_load()
 	}
 	if (!DATUM_IS_NONE(candy_cane_datum) && !DATUM_IS_NONE(sword_weapon_datum))
 	{
-		tag_loader::Load_tag(candy_cane_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(candy_cane_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		candy_cane_datum = tag_loader::resolve_cache_index_to_injected(candy_cane_datum);
 
@@ -114,8 +114,8 @@ void christmas_event_map_load()
 	}
 	if (!DATUM_IS_NONE(deer_datum) && !DATUM_IS_NONE(ghost_datum))
 	{
-		tag_loader::Load_tag(deer_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(deer_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		deer_datum = tag_loader::resolve_cache_index_to_injected(deer_datum);
 
@@ -129,8 +129,8 @@ void christmas_event_map_load()
 	}
 	if (!DATUM_IS_NONE(ornament_datum) && !DATUM_IS_NONE(frag_model_datum) && !DATUM_IS_NONE(plasma_model_datum))
 	{
-		tag_loader::Load_tag(ornament_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(ornament_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		ornament_datum = tag_loader::resolve_cache_index_to_injected(ornament_datum);
 
@@ -142,9 +142,9 @@ void christmas_event_map_load()
 	}
 	if (!DATUM_IS_NONE(present_datum) && !DATUM_IS_NONE(fp_present_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 	{
-		tag_loader::Load_tag(present_datum, true, "carto_shared");
-		tag_loader::Load_tag(fp_present_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(present_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(fp_present_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		present_datum = tag_loader::resolve_cache_index_to_injected(present_datum);
 		fp_present_datum = tag_loader::resolve_cache_index_to_injected(fp_present_datum);

@@ -19,8 +19,8 @@ void birthday_event_map_load()
 
 	if (!DATUM_IS_NONE(bday_hat_datum))
 	{
-		tag_loader::Load_tag(bday_hat_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(bday_hat_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		bday_hat_datum = tag_loader::resolve_cache_index_to_injected(bday_hat_datum);
 
@@ -44,9 +44,9 @@ void birthday_event_map_load()
 
 	if (!DATUM_IS_NONE(bday_cake_datum) && !DATUM_IS_NONE(fp_bday_cake_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 	{
-		tag_loader::Load_tag(bday_cake_datum, true, "carto_shared");
-		tag_loader::Load_tag(fp_bday_cake_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(bday_cake_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(fp_bday_cake_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		bday_cake_datum = tag_loader::resolve_cache_index_to_injected(bday_cake_datum);
 		fp_bday_cake_datum = tag_loader::resolve_cache_index_to_injected(fp_bday_cake_datum);

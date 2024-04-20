@@ -19,10 +19,10 @@ void paddy_event_map_load()
 
 	if (!DATUM_IS_NONE(paddy_hat_datum) && !DATUM_IS_NONE(paddy_beard_datum) && !DATUM_IS_NONE(paddy_pot_datum))
 	{
-		tag_loader::Load_tag(paddy_hat_datum, true, "carto_shared");
-		tag_loader::Load_tag(paddy_beard_datum, true, "carto_shared");
-		tag_loader::Load_tag(paddy_pot_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(paddy_hat_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(paddy_beard_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(paddy_pot_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		paddy_hat_datum = tag_loader::resolve_cache_index_to_injected(paddy_hat_datum);
 		paddy_beard_datum = tag_loader::resolve_cache_index_to_injected(paddy_beard_datum);

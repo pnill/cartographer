@@ -138,10 +138,10 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 
 	if (skele_datum != NONE && skele_fp_datum != NONE && skele_body_datum != NONE && get_current_special_event() == _special_event_halloween && !H2Config_no_events)
 	{
-		tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
-		tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
-		tag_loader::Load_tag(skele_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(skele_fp_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(skele_body_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(skele_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 		datum skele_new_datum = tag_loader::resolve_cache_index_to_injected(skele_datum);
 		add_representation(tag_loader::resolve_cache_index_to_injected(skele_fp_datum), tag_loader::resolve_cache_index_to_injected(skele_body_datum), skele_new_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
@@ -161,10 +161,10 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 	datum flood_body_datum = tag_loader::get_tag_datum_by_name("objects\\characters\\flood_mp\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
 	if (flood_datum != NONE && flood_arms_datum != NONE && flood_body_datum != NONE)
 	{
-		tag_loader::Load_tag(flood_datum, true, "carto_shared");
-		tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
-		tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(flood_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(flood_arms_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(flood_body_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 		datum new_flood_index = tag_loader::resolve_cache_index_to_injected(flood_datum);
 		add_representation(tag_loader::resolve_cache_index_to_injected(flood_arms_datum), tag_loader::resolve_cache_index_to_injected(flood_body_datum), new_flood_index);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
@@ -218,8 +218,8 @@ void game_globals_add_lmao_representation(void)
 		datum lmao_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", _tag_group_scenery, "carto_shared");
 		if (lmao_datum != NONE)
 		{
-			tag_loader::Load_tag(lmao_datum, true, "carto_shared");
-			tag_loader::Push_Back();
+			tag_loader::preload_tag_data_from_cache(lmao_datum, true, "carto_shared");
+			tag_loader::push_loaded_tag_data();
 
 			lmao_datum = tag_loader::resolve_cache_index_to_injected(lmao_datum);
 			if (lmao_datum != NONE)

@@ -105,12 +105,12 @@ void halloween_event_map_load()
 		pump_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
 		large_candle_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", _tag_group_scenery, "carto_shared");
 
-		tag_loader::Load_tag(pump_datum, true, "carto_shared");
-		tag_loader::Load_tag(candle_datum, true, "carto_shared");
-		tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
-		tag_loader::Load_tag(sky_datum, true, "carto_shared");
-		tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(pump_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(candle_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(lbitm_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(sky_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(large_candle_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		// OG Halo 2 Coag lightmap
 		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
@@ -158,9 +158,9 @@ void halloween_event_map_load()
 		candle_fire_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", _tag_group_scenery, "carto_shared");
 		pump_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
 
-		tag_loader::Load_tag(pump_datum, true, "carto_shared");
-		tag_loader::Load_tag(candle_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_loader::preload_tag_data_from_cache(pump_datum, true, "carto_shared");
+		tag_loader::preload_tag_data_from_cache(candle_datum, true, "carto_shared");
+		tag_loader::push_loaded_tag_data();
 
 		candle_datum = tag_loader::resolve_cache_index_to_injected(candle_datum);
 		candle_fire_datum = tag_loader::resolve_cache_index_to_injected(candle_fire_datum);
