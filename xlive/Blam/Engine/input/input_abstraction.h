@@ -3,7 +3,7 @@
 #include "controllers.h"
 #include "input_windows.h"
 
-#define K_MAXIMUM_NUMBER_OF_GAME_FUNCTION_BINDS 8
+#define k_maximum_number_of_game_function_binds 8
 
 enum e_input_preference_device_type :uint32
 {
@@ -73,7 +73,7 @@ enum e_button_functions
 	_extended_button_gamepad_pitch_forward = 0x37,
 	_extended_button_gamepad_pitch_backward = 0x38,
 
-	NUMBER_OF_BUTTON_KEYS = 0x39,
+	NUMBER_OF_EXTENDED_CONTROL_BUTTONS = 0x39,
 	NUMBER_OF_ABSTRACT_BUTTONS = 0x2D,
 };
 
@@ -121,7 +121,7 @@ ASSERT_STRUCT_SIZE(s_game_function_bind, 0xC);
 struct s_game_function
 {
 	uint32 m_bind_count;
-	s_game_function_bind m_bind[K_MAXIMUM_NUMBER_OF_GAME_FUNCTION_BINDS];
+	s_game_function_bind m_bind[k_maximum_number_of_game_function_binds];
 };
 ASSERT_STRUCT_SIZE(s_game_function, 0x64);
 
@@ -136,7 +136,7 @@ struct s_gamepad_input_preferences
 	bool mouse_invert_look;
 	bool invert_aircraft_control;
 	uint8 gap_13;
-	s_game_function game_function_mapping[NUMBER_OF_BUTTON_KEYS];
+	s_game_function game_function_mapping[NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
 	uint32 field_1658;
 	real32 binary_yaw_rate;
 	real32 binary_pitch_rate;
@@ -155,7 +155,7 @@ ASSERT_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
 
 struct s_keyboard_input_preferences
 {
-	s_key_state keys[NUMBER_OF_BUTTON_KEYS];
+	s_key_state keys[NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
 };
 ASSERT_STRUCT_SIZE(s_keyboard_input_preferences, 0x1C8);
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "controllers.h"
 
-#define K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES 256
+#define k_number_of_windows_input_virtual_codes 256
 
 class input_device
 {
@@ -65,7 +65,7 @@ enum e_xinput_gamepad_buttons
 	_xinput_gamepad_left_trigger = 0xe,
 	_xinput_gamepad_right_trigger = 0xf,
 
-	K_NUMBER_OF_XINPUT_BUTTONS = 0xE,
+	k_number_of_xinput_buttons = 0xE,
 };
 
 struct s_gamepad_input_button_state
@@ -73,9 +73,9 @@ struct s_gamepad_input_button_state
 	uint8 trigger_msec_down[2];
 	uint8 max_trigger_msec_down[2];
 	uint8 trigger_button_frames_down[2];
-	uint8 button_frames_down[K_NUMBER_OF_XINPUT_BUTTONS];
+	uint8 button_frames_down[k_number_of_xinput_buttons];
 	uint16 trigger_button_msec_down[2];
-	uint16 button_msec_down[K_NUMBER_OF_XINPUT_BUTTONS];
+	uint16 button_msec_down[k_number_of_xinput_buttons];
 	point2d thumb_left;
 	point2d thumb_right;
 };
@@ -93,9 +93,9 @@ ASSERT_STRUCT_SIZE(s_gamepad_input_state, 0x40);
 
 struct s_keyboard_input_state
 {
-	uint8 frames_down[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
-	uint16 msec_down[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
-	bool key_bool[K_NUMBER_OF_WINDOWS_INPUT_VIRTUAL_CODES];
+	uint8 frames_down[k_number_of_windows_input_virtual_codes];
+	uint16 msec_down[k_number_of_windows_input_virtual_codes];
+	bool key_bool[k_number_of_windows_input_virtual_codes];
 };
 ASSERT_STRUCT_SIZE(s_keyboard_input_state, 0x400);
 

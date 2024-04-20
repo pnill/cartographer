@@ -82,15 +82,17 @@ uint32 input_abstraction_get_stick_type_for_function(e_button_functions function
 
 void input_abstraction_update_default_throttle(point2d* thumb, real_euler_angles2d* stick)
 {
+	constexpr real32 scale = 1.0f / INT16_MAX;
+
 	real32 pointy = (real32)thumb->y;
 	real32 pointx = (real32)thumb->x;
 	real_angle angle = atan2(pointy, pointx);
 
 	real32 magnitude = MAX(fabs(sin(angle)), fabs(cos(angle)));
-	real32 inverse_magnitude = 1.0 / magnitude;
+	real32 inverse_magnitude = 1.0f / magnitude;
 
-	real32 normalized_yaw = (real32)(pointx * inverse_magnitude) * 0.000030518509f;
-	real32 normalized_pitch = (real32)(pointy * inverse_magnitude) * 0.000030518509f;
+	real32 normalized_yaw = (real32)(pointx * inverse_magnitude) * scale;
+	real32 normalized_pitch = (real32)(pointy * inverse_magnitude) * scale;
 
 
 	stick->yaw = PIN(normalized_yaw, -1.0f, 1.0f);
@@ -101,23 +103,19 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 {
 	real_angle flt_7B9F78[] =
 	{
-		0.78539819f,
-		2.3561945f,
-		-0.78539819f,
-		-2.3561945f
+		DEGREES_TO_RADIANS(45.0f),
+		DEGREES_TO_RADIANS(135.0f),
+		DEGREES_TO_RADIANS(-45.0f),
+		DEGREES_TO_RADIANS(-135.0f)
 	};
 
-	uint8 index;
-	if (stick->pitch >= 0.0f)
-		index = 0 + (stick->yaw < 0.0f);
-	else
-		index = 2 + (stick->yaw < 0.0f);
+	uint8 index = ((stick->pitch >= 0.0f) ? 0 : 2) + (stick->yaw < 0.0f);
 
 	real_vector2d vec = { stick->yaw,stick->pitch };
 	real32 magnitude = square_root(dot_product2d(&vec, &vec));
 
 	real32 delta = fabs(angle - flt_7B9F78[index]);
-	real_angle min_delta = right_stick ? 0.17453292f : 0.61086524f;
+	real_angle min_delta = right_stick ? DEGREES_TO_RADIANS(10.0f) : DEGREES_TO_RADIANS(35.0f);
 
 	if (delta >= min_delta)
 	{
@@ -125,20 +123,14 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 		float sign = 0.0f;
 		if (fabs(stick->yaw) <= fabs(stick->pitch))
 		{
-			if (stick->pitch >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
+			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
 
 			stick->pitch = sign * magnitude;
 			stick->yaw = 0.0f;
 		}
 		else
 		{
-			if (stick->yaw >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
+			sign = (stick->yaw >= 0.0f) ? 1.0f : -1.0f;
 
 			stick->yaw = sign * magnitude;
 			stick->pitch = 0.0f;
@@ -146,37 +138,25 @@ void input_abstraction_post_update_throttle(real_euler_angles2d* stick, real_ang
 	}
 	else
 	{
+		constexpr real32 scale = 1.0f / DEGREES_TO_RADIANS(35.0f);
+
 		real_angle angle_abs = fabs(angle);
 		float sign = 0.f;
-		if (angle_abs < 0.78539819f || (angle_abs > 2.3561945f))
+		if (angle_abs < DEGREES_TO_RADIANS(45.0f) || (angle_abs > DEGREES_TO_RADIANS(135.0f)))
 		{
-			if (stick->yaw >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
-
+			sign = (stick->yaw >= 0.0f) ? 1.0f : -1.0f;
 			stick->yaw = sign * magnitude;
-			if (stick->pitch >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
 
-			stick->pitch = (1.0f - (delta * 1.6370223f)) * sign * magnitude;
+			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
+			stick->pitch = (1.0f - (delta * scale)) * sign * magnitude;
 		}
 		else
 		{
-			if (stick->pitch >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
-
+			sign = (stick->pitch >= 0.0f) ? 1.0f : -1.0f;
 			stick->pitch = sign * magnitude;
-			if (stick->yaw >= 0.0f)
-				sign = 1.0f;
-			else
-				sign = -1.0f;
 
-			stick->yaw = (1.0f - (delta * 1.6370223f)) * sign * magnitude;
+			sign = (stick->yaw >= 0.0f) ? 1.0f : -1.0f;
+			stick->yaw = (1.0f - (delta * scale)) * sign * magnitude;
 		}
 	}
 }
@@ -243,10 +223,12 @@ void input_abstraction_update_throttles_legacy(s_gamepad_input_button_state* gam
 
 void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick, real_euler_angles2d* right_stick)
 {
-	left_stick->yaw = gamepad_state->thumb_left.x * 0.000030518509;
-	left_stick->pitch = gamepad_state->thumb_left.y * 0.000030518509;
-	right_stick->yaw = gamepad_state->thumb_right.x * 0.000030518509;
-	right_stick->pitch = gamepad_state->thumb_right.y * 0.000030518509;
+	constexpr real32 scale = 1.0f / INT16_MAX;
+
+	left_stick->yaw = gamepad_state->thumb_left.x * scale;
+	left_stick->pitch = gamepad_state->thumb_left.y * scale;
+	right_stick->yaw = gamepad_state->thumb_right.x * scale;
+	right_stick->pitch = gamepad_state->thumb_right.y * scale;
 
 	left_stick->yaw = PIN(left_stick->yaw, -1.0f, 1.0f);
 	left_stick->pitch = PIN(left_stick->pitch, -1.0f, 1.0f);
@@ -260,8 +242,8 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 
 	if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_A_X / 100));
-		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_A_Y / 100));
+		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_X / 100));
+		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_Y / 100));
 
 	}
 	else
@@ -271,7 +253,7 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 	}
 	if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
 	{
-		radialDeadzone = (uint16)((real32)MAXSHORT * (H2Config_Deadzone_Radial / 100));
+		radialDeadzone = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_Radial / 100));
 	}
 	else
 	{
@@ -320,8 +302,8 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 		time_globals* time = time_globals::get();
 
 		input_abstraction_set_mouse_look_sensitivity(controller, 1.0f);
-		input_state->mouse.yaw = time->tick_length * (float)mouse_state->lX * -(H2Config_raw_mouse_scale / 100);
-		input_state->mouse.pitch = time->tick_length * (float)mouse_state->lY * -(H2Config_raw_mouse_scale / 100);
+		input_state->mouse.yaw = time->tick_length * (real32)mouse_state->lX * -(H2Config_raw_mouse_scale / 100);
+		input_state->mouse.pitch = time->tick_length * (real32)mouse_state->lY * -(H2Config_raw_mouse_scale / 100);
 
 		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 		if (preference->mouse_invert_look)
@@ -420,7 +402,7 @@ void __cdecl input_abstraction_update()
 			&right_stick,
 			&input_abstraction_globals->input_states[_controller_index_0]);
 
-		input_abstraction_apply_raw_mouse_update(_controller_index_0,&input_abstraction_globals->input_states[_controller_index_0]);
+		input_abstraction_apply_raw_mouse_update(_controller_index_0, &input_abstraction_globals->input_states[_controller_index_0]);
 	}
 }
 

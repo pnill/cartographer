@@ -11,7 +11,7 @@ input_device** g_xinput_devices;
 uint32* g_main_controller_index;
 uint16 radialDeadzone = 0;
 
-uint32 XINPUT_BUTTON_FLAGS[K_NUMBER_OF_XINPUT_BUTTONS] =
+uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
 {
 	XINPUT_GAMEPAD_DPAD_UP,
 	XINPUT_GAMEPAD_DPAD_DOWN,
@@ -173,7 +173,7 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 		input_xinput_update_trigger(&max_trigger_msec_down, trigger_down, trigger_msec_down);
 	}
 
-	for (uint8 button_index = 0; button_index < K_NUMBER_OF_XINPUT_BUTTONS; button_index++)
+	for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
 	{
 		uint8& frames_down = gamepad_state->button_frames_down[button_index];
 		uint16& msec_down = gamepad_state->button_msec_down[button_index];
