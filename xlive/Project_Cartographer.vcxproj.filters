@@ -306,6 +306,9 @@
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
+    <ClCompile Include="Blam\Engine\main\levels.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\math\math.cpp" />
   </ItemGroup>
@@ -834,6 +837,7 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_draw.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump_logs.h" />
     <ClInclude Include="Blam\Engine\main\main_time.h" />

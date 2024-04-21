@@ -4,6 +4,7 @@
 //	- manages network bandwidth based on network conditions
 
 #include "transport.h"
+#include "transport_qos.h"
 
 // enables/disables LIVE netcode, so we can use the LIVE serverlist
 // true  - LIVE network protocol enabled
@@ -34,135 +35,123 @@
 #define k_online_netcode_server_max_packet_size_bytes 1264
 
 // size in bits
-#define k_online_netcode_client_max_bandwidth_per_channel ((int)k_online_netcode_client_rate_real * k_online_netcode_client_max_packet_size_bytes * 8)
-#define k_online_netcode_server_max_bandwidth_per_channel ((int)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
+#define k_online_netcode_client_max_bandwidth_per_channel ((int32)k_online_netcode_client_rate_real * k_online_netcode_client_max_packet_size_bytes * 8)
+#define k_online_netcode_server_max_bandwidth_per_channel ((int32)k_online_netcode_server_rate_real * k_online_netcode_server_max_packet_size_bytes * 8)
 
 struct s_network_observer_configuration;
 
-struct s_qos_probe_data
-{
-	DWORD cProbesXmit;
-	DWORD cProbesRecv;
-	DWORD wRttMinInMsecs;
-	DWORD wRttMedInMsecs;
-	DWORD dwUpBitsPerSec;
-	DWORD dwDnBitsPerSec;
-	DWORD cbData;
-	DWORD pbData;
-};
-
 struct alignas(8) s_observer_channel
 {
-	enum e_observer_channel_state : int
+	enum e_observer_channel_state : int32
 	{
-		none = 0,
-		pending_transport_layer = 3, // waiting for xnet connection to be established
-		pending_game_layer = 4, // xnet layer connected, waiting for game to establish
-		connected = 7
+		_channel_state_none = 0,
+		_channel_state_pending_transport_layer = 3, // waiting for xnet connection to be established
+		_channel_state_pending_game_layer = 4, // xnet layer connected, waiting for game to establish
+		_channel_state_connected = 7
 	};
 
-	int state;
-	DWORD field_4;
-	BYTE observer_flags;
-	BYTE field_9;
-	WORD field_A;
-	DWORD channel_index;
-	DWORD field_10;
+	int32 state;
+	int32 field_4;
+	uint8 observer_flags;
+	uint8 field_9;
+	uint16 field_A;
+	int32 channel_index;
+	int32 field_10;
 	XNADDR xnaddr;
-	DWORD field_38;
-	DWORD session_index;
-	int field_40;
-	DWORD field_44;
-	DWORD field_48;
-	DWORD field_4C;
-	DWORD field_50;
-	DWORD field_54;
-	DWORD field_58;
+	int32 field_38;
+	int32 session_index;
+	int32 field_40;
+	int32 field_44;
+	int32 field_48;
+	int32 field_4C;
+	int32 field_50;
+	int32 field_54;
+	int32 field_58;
 	network_address address;
-	DWORD qos_probe_datum;
-	s_qos_probe_data qos_probe_result;
-	DWORD field_94;
-	DWORD field_98;
-	DWORD field_9C;
-	BYTE gap_A0[8];
-	DWORD field_A8;
-	BYTE gap_AC[212];
-	DWORD field_180;
-	BYTE gap_184[268];
-	DWORD field_290;
-	BYTE gap_294[156];
-	DWORD field_330;
-	BYTE gap_334[52];
-	DWORD field_368;
-	BYTE gap_36C[212];
-	DWORD field_440;
-	BYTE gap_444[236];
-	DWORD field_530;
-	BYTE gap_534[28];
-	DWORD field_550;
-	BYTE gap_554[268];
-	DWORD field_660;
-	DWORD field_664;
-	DWORD field_668;
-	DWORD field_66C;
-	DWORD field_670;
-	DWORD field_674;
-	DWORD field_678;
-	DWORD field_67C;
-	DWORD field_680;
-	DWORD field_684;
-	DWORD field_688;
-	BYTE gap_68C[4];
-	__int64 field_690;
-	DWORD unmanaged_stream_bandwidth;
-	float net_rate_unmanaged_stream;
-	DWORD unmanaged_stream_window_size;
+	datum qos_attempt_index;
+	s_qos_attempt_data qos_attempt;
+	int32 field_94;
+	int32 field_98;
+	int32 field_9C;
+	uint8 gap_A0[8];
+	int32 field_A8;
+	uint8 gap_AC[212];
+	int32 field_180;
+	uint8 gap_184[268];
+	int32 field_290;
+	uint8 gap_294[156];
+	int32 field_330;
+	uint8 gap_334[52];
+	int32 field_368;
+	uint8 gap_36C[212];
+	int32 field_440;
+	uint8 gap_444[236];
+	int32 field_530;
+	uint8 gap_534[28];
+	int32 field_550;
+	uint8 gap_554[268];
+	int32 field_660;
+	int32 field_664;
+	int32 field_668;
+	int32 field_66C;
+	int32 field_670;
+	int32 field_674;
+	int32 field_678;
+	int32 field_67C;
+	int32 field_680;
+	int32 field_684;
+	int32 field_688;
+	uint8 gap_68C[4];
+	int64 field_690;
+	int32 unmanaged_stream_bandwidth;
+	real32 net_rate_unmanaged_stream;
+	int32 unmanaged_stream_window_size;
 	bool managed_stream;
-	BYTE field_6A5;
+	uint8 field_6A5;
 	bool simulation_attached;
 	bool simulation_authority;
 	bool simulation_not_authority;
-	BYTE gap_6A9[3];
-	int net_managed_stream_bandwidth;
-	DWORD net_managed_stream_window_size;
-	float net_rate_managed_stream;
+	uint8 gap_6A9[3];
+	int32 net_managed_stream_bandwidth;
+	int32 net_managed_stream_window_size;
+	real32 net_rate_managed_stream;
 	bool field_6B8;
-	char field_6B9;
-	char field_6BA;
-	int field_6BC;
-	DWORD total_bits_received;
-	DWORD field_6C4;
-	DWORD field_6C8;
-	DWORD field_6CC;
-	DWORD field_6D0;
-	DWORD field_6D4;
+	int8 field_6B9;
+	int8 field_6BA;
+	int32 field_6BC;
+	int32 total_bits_received;
+	int32 field_6C4;
+	int32 field_6C8;
+	int32 field_6CC;
+	int32 field_6D0;
+	int32 field_6D4;
 	bool field_6D8;
-	DWORD field_6DC;
-	int field_6E0;
-	signed int field_6E4;
-	int field_6E8;
-	float field_6EC;
-	DWORD field_6F0;
-	DWORD field_6F4;
-	DWORD field_6F8;
-	DWORD field_6FC;
-	DWORD field_700;
-	signed int field_704;
-	DWORD field_708;
+	int32 field_6DC;
+	int32 field_6E0;
+	int32 field_6E4;
+	int32 field_6E8;
+	real32 field_6EC;
+	int32 field_6F0;
+	int32 field_6F4;
+	int32 field_6F8;
+	int32 field_6FC;
+	int32 field_700;
+	int32 field_704;
+	int32 field_708;
 	bool field_70C;
-	int field_710;
-	int field_714;
-	float field_718;
-	DWORD field_71C;
-	DWORD field_720;
-	BYTE field_724;
-	char field_725;
-	char field_726;
-	char field_727;
-	DWORD field_728;
-	int field_72C;
-	DWORD field_730;
-	DWORD field_734;
+	int32 field_710;
+	int32 field_714;
+	real32 field_718;
+	int32 field_71C;
+	int32 field_720;
+	uint8 field_724;
+	int8 field_725;
+	int8 field_726;
+	int8 field_727;
+	int32 field_728;
+	int32 field_72C;
+	int32 field_730;
+	int32 field_734;
 	LONGLONG field_738;
 };
 ASSERT_STRUCT_SIZE(s_observer_channel, 0x740);
@@ -175,77 +164,72 @@ public:
 	void* network_message_gateway;
 	void* message_types;
 	s_network_observer_configuration* configuration;
-	int *field_14;
-	BYTE gap_18[8];
-	XNKID sessionId;
-	BYTE gap28[32];
-	BYTE field_48;
+	int32 *field_14;
+	uint8 gap_18[8];
+	XNKID session_id;
+	uint8 gap28[32];
+	uint8 field_48;
 	XNKEY xnkey;
-	DWORD field_5C;
-	BYTE gap_60[4];
-	DWORD field_64;
-	BYTE gap_68[12];
-	DWORD field_74;
-	BYTE gap_78[8];
+	int32 field_5C;
+	uint8 gap_60[4];
+	int32 field_64;
+	uint8 gap_68[12];
+	int32 field_74;
+	uint8 gap_78[8];
 	s_observer_channel observer_channels[16];
-	bool network_obeserver_enabled;
-	char field_7481;
-	int field_7484;
-	DWORD throughput;
-	int congestion;
-	DWORD field_7490;
+	bool network_observer_enabled;
+	int8 field_7481;
+	int32 field_7484;
+	int32 throughput;
+	int32 congestion;
+	int32 field_7490;
 	bool field_7494;
-	BYTE gap_7495[3];
-	DWORD field_7498;
-	DWORD field_749C;
-	DWORD field_74A0;
-	DWORD field_74A4;
-	DWORD field_74A8;
-	BYTE gap_74AC[4];
-	float field_74B0;
-	BYTE gap_74B4[212];
-	int field_7588;
-	DWORD field_758C;
-	DWORD field_7590;
-	DWORD field_7594;
-	char field_7598;
-	int field_759C;
-	int bits_per_sec;
-	float field_75A4;
-	float packets_per_sec;
-	int field_75AC;
-	DWORD field_75B0;
-	int field_75B4;
-	DWORD field_75B8;
-	char field_75BC;
-	char field_75BD;
-	char field_75BE;
-	DWORD field_75C0;
-	DWORD field_75C4;
-
-	enum e_network_message_send_protocol : char
-	{
-		in_band,
-		out_of_band
-	};
+	uint8 gap_7495[3];
+	int32 field_7498;
+	int32 field_749C;
+	int32 field_74A0;
+	int32 field_74A4;
+	int32 field_74A8;
+	uint8 gap_74AC[4];
+	real32 field_74B0;
+	uint8 gap_74B4[212];
+	int32 field_7588;
+	int32 field_758C;
+	int32 field_7590;
+	int32 field_7594;
+	int8 field_7598;
+	int32 field_759C;
+	int32 bits_per_sec;
+	real32 field_75A4;
+	real32 packets_per_sec;
+	int32 field_75AC;
+	int32 field_75B0;
+	int32 field_75B4;
+	int32 field_75B8;
+	int8 field_75BC;
+	int8 field_75BD;
+	int8 field_75BE;
+	int32 field_75C0;
+	int32 field_75C4;
 
 	static void apply_patches();
 	static void reset_network_observer_bandwidth_preferences();
 
-	bool __thiscall channel_should_send_packet_hook(int network_channel_index,
+	bool __thiscall channel_should_send_packet_hook(
+		int32 network_channel_index,
 		bool a4,
 		bool a5,
-		int a6,
-		int* out_send_sequenced_packet,
-		int* out_force_fill_packet,
-		int* out_packet_size,
-		int* out_voice_size,
-		int out_voice_chat_data_buffer_size,
-		BYTE* out_voice_chat_data_buffer);
+		int32 a6,
+		int32* out_send_sequenced_packet,
+		int32* out_force_fill_packet,
+		int32* out_packet_size,
+		int32* out_voice_size,
+		int32 out_voice_chat_data_buffer_size,
+		uint8* out_voice_chat_data_buffer);
 
-	bool __thiscall get_bandwidth_results(int32 *out_throughput, float *out_satiation, int32 *a4);
-	int get_observer_channel_state(int observer_index) { return observer_channels[observer_index].state; };
-	void send_message(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data);
+	bool __thiscall get_bandwidth_results(int32 *out_throughput, real32 *out_satiation, int32 *a4);
+	int32 get_observer_channel_state(int32 observer_index) { return observer_channels[observer_index].state; };
+	void send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data);
 
 private:
 	static void force_constant_network_rate();
@@ -254,107 +238,107 @@ ASSERT_STRUCT_SIZE(c_network_observer, 0x75C8);
 
 struct s_network_observer_configuration
 {
-	DWORD field_0;
-	DWORD field_4;
-	BYTE gap_8[28];
-	DWORD field_24;
-	DWORD field_28;
-	DWORD field_2C;
-	DWORD field_30;
-	BYTE gap_34[20];
-	DWORD field_48;
-	DWORD field_4C;
-	DWORD field_50;
-	DWORD field_54;
-	DWORD field_58;
-	BYTE gap_5C[16];
-	DWORD field_6C;
-	DWORD field_70;
-	DWORD field_74;
-	DWORD field_78;
-	DWORD field_7C;
-	DWORD field_80;
-	DWORD field_84;
-	DWORD field_88;
-	DWORD field_8C;
-	float field_90;
-	float field_94;
-	float field_98;
-	DWORD unk_total_flt_array_elements;
-	float unk_floats_A0[7];
-	BYTE gap_BC[36];
-	DWORD field_E0;
-	float field_E4;
-	float field_E8;
-	float field_EC;
-	float field_F0;
-	DWORD field_F4;
-	DWORD field_F8;
-	DWORD field_FC;
-	DWORD field_100;
-	float field_104;
-	DWORD field_108;
-	DWORD field_10C;
-	float field_110;
-	int field_114;
-	int field_118;
-	float field_11C;
-	int field_120;
-	DWORD field_124;
-	DWORD field_128;
-	DWORD field_12C;
-	DWORD field_130;
-	DWORD field_134;
-	DWORD field_138;
-	DWORD field_13C;
-	DWORD field_140;
-	BYTE field_144;
-	DWORD field_148;
-	DWORD field_14C;
-	DWORD field_150;
-	DWORD field_154;
-	DWORD max_bits_per_second_single_player;
-	DWORD max_bits_per_second_full_lobby;
-	DWORD max_bits_per_second_splitscreen_players;
-	DWORD field_164;
-	DWORD field_168;
-	DWORD field_16C;
-	DWORD field_170;
-	DWORD field_174;
-	float field_178;
-	DWORD field_17C;
-	float field_180;
-	DWORD field_184;
-	DWORD field_188;
-	DWORD field_18C;
-	float field_190;
-	DWORD field_194;
-	float field_198;
-	DWORD field_19C;
-	DWORD field_1A0;
-	DWORD field_1A4;
-	DWORD field_1A8;
-	float field_1AC;
-	DWORD field_1B0;
-	DWORD field_1B4;
-	DWORD field_1B8;
-	DWORD field_1BC;
-	DWORD field_1C0;
-	float field_1C4;
-	float field_1C8;
-	DWORD field_1CC;
-	float field_1D0;
-	DWORD field_1D4;
-	DWORD field_1D8;
-	DWORD field_1DC;
-	DWORD field_1E0;
-	DWORD field_1E4;
-	DWORD field_1E8;
-	DWORD field_1EC;
-	DWORD field_1F0;
-	DWORD field_1F4;
-	DWORD field_1F8;
-	float field_1FC;
-	DWORD field_200;
+	int32 field_0;
+	int32 field_4;
+	uint8 gap_8[28];
+	int32 field_24;
+	int32 field_28;
+	int32 field_2C;
+	int32 field_30;
+	uint8 gap_34[20];
+	int32 field_48;
+	int32 field_4C;
+	int32 field_50;
+	int32 field_54;
+	int32 field_58;
+	uint8 gap_5C[16];
+	int32 field_6C;
+	int32 field_70;
+	int32 field_74;
+	int32 field_78;
+	int32 field_7C;
+	int32 field_80;
+	int32 field_84;
+	int32 field_88;
+	int32 field_8C;
+	real32 field_90;
+	real32 field_94;
+	real32 field_98;
+	int32 unk_total_flt_array_elements;
+	real32 unk_floats_A0[7];
+	uint8 gap_BC[36];
+	int32 field_E0;
+	real32 field_E4;
+	real32 field_E8;
+	real32 field_EC;
+	real32 field_F0;
+	int32 field_F4;
+	int32 field_F8;
+	int32 field_FC;
+	int32 field_100;
+	real32 field_104;
+	int32 field_108;
+	int32 field_10C;
+	real32 field_110;
+	int32 field_114;
+	int32 field_118;
+	real32 field_11C;
+	int32 field_120;
+	int32 field_124;
+	int32 field_128;
+	int32 field_12C;
+	int32 field_130;
+	int32 field_134;
+	int32 field_138;
+	int32 field_13C;
+	int32 field_140;
+	uint8 field_144;
+	int32 field_148;
+	int32 field_14C;
+	int32 field_150;
+	int32 field_154;
+	int32 max_bits_per_second_single_player;
+	int32 max_bits_per_second_full_lobby;
+	int32 max_bits_per_second_splitscreen_players;
+	int32 field_164;
+	int32 field_168;
+	int32 field_16C;
+	int32 field_170;
+	int32 field_174;
+	real32 field_178;
+	int32 field_17C;
+	real32 field_180;
+	int32 field_184;
+	int32 field_188;
+	int32 field_18C;
+	real32 field_190;
+	int32 field_194;
+	real32 field_198;
+	int32 field_19C;
+	int32 field_1A0;
+	int32 field_1A4;
+	int32 field_1A8;
+	real32 field_1AC;
+	int32 field_1B0;
+	int32 field_1B4;
+	int32 field_1B8;
+	int32 field_1BC;
+	int32 field_1C0;
+	real32 field_1C4;
+	real32 field_1C8;
+	int32 field_1CC;
+	real32 field_1D0;
+	int32 field_1D4;
+	int32 field_1D8;
+	int32 field_1DC;
+	int32 field_1E0;
+	int32 field_1E4;
+	int32 field_1E8;
+	int32 field_1EC;
+	int32 field_1F0;
+	int32 field_1F4;
+	int32 field_1F8;
+	real32 field_1FC;
+	int32 field_200;
 };
 ASSERT_STRUCT_SIZE(s_network_observer_configuration, 0x204);

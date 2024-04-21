@@ -10,8 +10,6 @@
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 
-
-
 uint8 g_network_message_type_collection[e_network_message_type_collection::k_network_message_type_collection_count * 32];
 
 void register_network_message(void* network_message_collection, int type, const char* name, int a4, int size1, int size2, void* write_packet_method, void* read_packet_method, void* unk_callback)
@@ -144,7 +142,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		s_request_map_filename* received_data = (s_request_map_filename*)packet;
 		LOG_TRACE_NETWORK("[H2MOD-CustomMessage] received on handle_channel_message_hook request-map-filename from XUID: {}",
 			received_data->player_id);
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5
 			&& peer_network_channel->get_network_address(&addr))
 		{
 			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
@@ -170,7 +168,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 					c_network_observer* observer = session->p_network_observer;
 					s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peer_index);
 
-					observer->send_message(session->session_index, observer_channel->observer_index, c_network_observer::e_network_message_send_protocol::in_band, _custom_map_filename, sizeof(s_custom_map_filename), &data);
+					observer->send_message(session->session_index, observer_channel->observer_index, false, _custom_map_filename, sizeof(s_custom_map_filename), &data);
 				}
 				else
 				{
@@ -184,7 +182,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _custom_map_filename:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5)
 		{
 			s_custom_map_filename* received_data = (s_custom_map_filename*)packet;
 			if (received_data->map_download_id != NONE)
@@ -213,7 +211,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _team_change:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5)
 		{
 			s_team_change* received_data = (s_team_change*)packet;
 			LOG_TRACE_NETWORK(L"[H2MOD-CustomMessage] recieved on handle_channel_message_hook team_change: {}", received_data->team_index);
@@ -225,7 +223,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _rank_change:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5)
 		{
 			s_rank_change* recieved_data = (s_rank_change*)packet;
 			LOG_TRACE_NETWORK(L"H2MOD-CustomMessage] recieved on handle_channel_message_hook rank_change: {}",
@@ -237,7 +235,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _anti_cheat:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5)
 		{
 			s_anti_cheat* recieved_data = (s_anti_cheat*)packet;
 			twizzler_set_status(recieved_data->enabled);
@@ -247,7 +245,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 
 	case _custom_variant_settings:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5)
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5)
 		{
 			auto recieved_data = (CustomVariantSettings::s_variant_settings*)packet;
 			CustomVariantSettings::UpdateCustomVariantSettings(recieved_data);
@@ -258,7 +256,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 	// default packet
 	case _leave_session:
 	{
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5
 			&& peer_network_channel->get_network_address(&addr))
 		{
 			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
@@ -286,7 +284,7 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 
 	if (message_type == _player_add) {
-		if (peer_network_channel->channel_state == s_network_channel::e_channel_state::_channel_state_5
+		if (peer_network_channel->channel_state == e_network_channel_state::_network_channel_state_5
 			&& peer_network_channel->get_network_address(&addr))
 		{
 			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
@@ -310,7 +308,7 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(session->session_host_peer_index);
 
 		if (observer_channel->field_1) {
-			observer->send_message(session->session_index, observer_channel->observer_index, c_network_observer::e_network_message_send_protocol::in_band, _request_map_filename, sizeof(s_request_map_filename), &data);
+			observer->send_message(session->session_index, observer_channel->observer_index, false, _request_map_filename, sizeof(s_request_map_filename), &data);
 
 			LOG_TRACE_NETWORK("{} session host peer index: {}, observer index {}, observer bool unk: {}, session index: {}",
 				__FUNCTION__,
@@ -336,7 +334,7 @@ void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
 		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx))
 		{
 			if (observer_channel->field_1) {
-				observer->send_message(session->session_index, observer_channel->observer_index, c_network_observer::e_network_message_send_protocol::in_band, _team_change, sizeof(s_team_change), &data);
+				observer->send_message(session->session_index, observer_channel->observer_index, false, _team_change, sizeof(s_team_change), &data);
 			}
 		}
 	}
@@ -356,7 +354,7 @@ void NetworkMessage::SendRankChange(int peerIdx, BYTE rank)
 		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx))
 		{
 			if (observer_channel->field_1) {
-				observer->send_message(session->session_index, observer_channel->observer_index, c_network_observer::e_network_message_send_protocol::in_band, _rank_change, sizeof(s_rank_change), &data);
+				observer->send_message(session->session_index, observer_channel->observer_index, false, _rank_change, sizeof(s_rank_change), &data);
 			}
 		}
 	}
@@ -374,7 +372,7 @@ void NetworkMessage::SendAntiCheat(int peerIdx)
 		data.enabled = g_twizzler_status;
 		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx)) {
 			if (observer_channel->field_1) {
-				observer->send_message(session->session_index, observer_channel->observer_index, c_network_observer::e_network_message_send_protocol::in_band, _anti_cheat, sizeof(s_anti_cheat), &data);
+				observer->send_message(session->session_index, observer_channel->observer_index, false, _anti_cheat, sizeof(s_anti_cheat), &data);
 			}
 		}
 	}
