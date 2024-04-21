@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct pixel32
 {
 	D3DCOLOR color;

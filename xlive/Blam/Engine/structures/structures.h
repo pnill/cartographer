@@ -1,6 +1,6 @@
 #pragma once
-
 #include "cseries/cseries_strings.h"
+#include "math/color_math.h"
 #include "tag_files/tag_reference.h"
 
 #define MAXIMUM_SURFACE_REFERENCES_PER_STRUCTURE 262144
@@ -51,4 +51,7 @@ ASSERT_STRUCT_SIZE(s_structure_globals, 6159);
 
 s_structure_globals* structure_globals_get(void);
 
-
+// CLIENT ONLY
+// Get index of sky block in the scenario that's currently visible
+// Grabs the clear color and sets a bool if the sky has a clear color 
+bool __cdecl structure_get_sky(int32 cluster_index, int32* visible_sky_index, real_rgb_color* clear_color, bool* has_clear_color);

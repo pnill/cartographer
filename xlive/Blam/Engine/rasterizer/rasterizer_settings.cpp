@@ -11,6 +11,12 @@ void __cdecl rasterizer_discard_refresh_rate();
 
 s_display_option g_display_options[k_max_display_option_count] = {};
 
+
+bool* get_render_fog_enabled(void)
+{
+	return Memory::GetAddress<bool*>(0x41F6AA, 0x3C2B7E);
+}
+
 typedef void(__cdecl* update_screen_settings_t)(int, int, short, short, short, short, float, float);
 update_screen_settings_t p_update_screen_settings;
 

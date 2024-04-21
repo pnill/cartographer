@@ -51,4 +51,6 @@ struct s_video_settings
 };
 static_assert(sizeof(s_video_settings) == 48, "s_video_settings total bytes wrong");
 
+bool* get_render_fog_enabled(void);
+
 void rasterizer_settings_apply_hooks();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "hud.h"
-#include "new_hud_definitions.h"
 
+#include "new_hud_definitions.h"
 
 #include "game/game_globals.h"
 
@@ -60,6 +60,12 @@ void set_crosshair_offset(float offset)
 	{
 		scenario_get_game_globals()->player_control[0]->crosshair_location.y = offset;
 	}
+}
+
+void __cdecl draw_hud(void)
+{
+	INVOKE(0x2278AA, 0x0, draw_hud);
+	return;
 }
 
 void hud_patches_on_map_load()

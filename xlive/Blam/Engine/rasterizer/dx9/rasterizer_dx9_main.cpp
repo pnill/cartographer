@@ -122,7 +122,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             {
                 result = false;
             }
-            rasterizer_set_render_target(global_d3d_surface_render_primary_get(), (IDirect3DSurface9*)NONE, true);
+            rasterizer_dx9_set_render_target(global_d3d_surface_render_primary_get(), NONE, true);
             clear_render_target(0, NONE, 0.0f, false);
         }
 
@@ -157,9 +157,9 @@ void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_i
     return;
 }
 
-bool __cdecl rasterizer_set_render_target(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
+bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3)
 {
-    return INVOKE(0x26EBF8, 0x0, rasterizer_set_render_target, target, z_stencil, a3);
+    return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target, target, z_stencil, a3);
 }
 
 void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
@@ -191,4 +191,24 @@ void __cdecl rasterizer_cache_bitmaps(void)
 {
     INVOKE(0x261720, 0x0, rasterizer_cache_bitmaps);
     return;
+}
+
+bool __cdecl rasterizer_window_begin(s_frame* preferences)
+{
+    return INVOKE(0x2620CF, 0x0, rasterizer_window_begin, preferences);
+}
+
+void __cdecl rasterizer_update_cameras(void)
+{
+    return INVOKE(0x26268D, 0x0, rasterizer_update_cameras);
+}
+
+void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode)
+{
+    return INVOKE(0x2603D2, 0x0, rasterizer_dx9_set_stencil_mode, mode);
+}
+
+void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE render_state, D3DBLEND blend)
+{
+    return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, render_state, blend);
 }

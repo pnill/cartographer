@@ -1,10 +1,9 @@
 #pragma once
+#include "camera/camera.h"
+#include "math/color_math.h"
+#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-
-#include "math/color_math.h"
-
-#include "tag_files/string_id.h"
 
 #define MAXIMUM_ATMOSPHERIC_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
 #define k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry 2
@@ -18,6 +17,20 @@ enum e_camera_immersion_flags : short
     camera_immersion_flag_invert_planar_fog_priorities = FLAG(3),
     camera_immersion_flag_disable_water = FLAG(4)
 };
+
+struct s_scenario_fog_result
+{
+    int32 field_0;
+    real_rgb_color color;
+    bool unk_bool_10;
+    bool unk_bool_11;
+    int8 pad_12[2];
+    real32 z_far;
+    bool unk_bool_18;
+    int8 pad[3];
+    int8 gap_18[260];
+};
+ASSERT_STRUCT_SIZE(s_scenario_fog_result, 288);
 
 // max count: k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry 2
 struct scenario_atmospheric_fog_mixer_block
@@ -87,3 +100,6 @@ struct s_scenario_planar_fog_palette_entry
 };
 ASSERT_STRUCT_SIZE(s_scenario_planar_fog_palette_entry, 16);
 
+// CLIENT ONLY
+// Renders the fog defined in the scenario
+bool __cdecl render_scenario_fog(int cluster_index, s_camera* camera_position, real_vector3d* camera_forward, bool a4, bool render_fog, s_scenario_fog_result* result);

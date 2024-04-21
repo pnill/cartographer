@@ -137,4 +137,14 @@ struct s_player_effect_globals
 };
 ASSERT_STRUCT_SIZE(s_player_effect_globals, 688);
 
+struct s_screen_flash
+{
+	int32 field_0;
+	real32 intensity;
+	real_argb_color color;
+};
+
 void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* matrix);
+
+// Render screen flash
+void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash);

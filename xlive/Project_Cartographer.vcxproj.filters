@@ -104,7 +104,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\Shell\Startup\WinMainH2.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_error_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
@@ -190,7 +189,6 @@
     <ClCompile Include="Blam\Engine\game\game.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\ai\actors.cpp" />
-    <ClCompile Include="Blam\Engine\game\game_preferences.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
@@ -308,6 +306,25 @@
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\math\math.cpp" />
+    <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
+    <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\async.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\runtime_state.cpp" />
+    <ClCompile Include="Blam\Engine\effects\beam.cpp" />
+    <ClCompile Include="Blam\Engine\main\game_preferences.cpp" />
+    <ClCompile Include="Blam\Engine\main\licensing.cpp" />
+    <ClCompile Include="Blam\Engine\math\math.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit_new.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_screen_effect.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_first_person.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario_fog.cpp" />
+    <ClCompile Include="Blam\Engine\sound\sound_manager.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
+    <ClCompile Include="Blam\Engine\text\font_group.cpp" />
+    <ClCompile Include="Blam\Engine\interface\interface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -544,7 +561,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
-    <ClInclude Include="H2MOD\Modules\Shell\Startup\WinMainH2.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
@@ -679,7 +695,6 @@
     <ClInclude Include="Blam\Engine\cseries\cseries.h" />
     <ClInclude Include="Blam\Engine\ai\pathfinding_utilities.h" />
     <ClInclude Include="Blam\Engine\ai\actor_firing_position.h" />
-    <ClInclude Include="Blam\Engine\game\game_preferences.h" />
     <ClInclude Include="Blam\Engine\game\materials.h" />
     <ClInclude Include="Blam\Engine\main\level_definitions.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />

@@ -3,28 +3,43 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 
+void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
 
-typedef void(__cdecl render_camera_build_projection_t)(s_camera*, float*, real_matrix4x3*);
-render_camera_build_projection_t* p_render_camera_build_projection;
-
-void __cdecl render_camera_build_projection_hook(s_camera* camera, float* frustum_bounds, real_matrix4x3* out_projection)
+void render_cameras_apply_patches(void)
 {
-	p_render_camera_build_projection = Memory::GetAddress<render_camera_build_projection_t*>(0x1953f5);
+	PatchCall(Memory::GetAddress(0x191440), render_camera_build_projection_static);
+	return;
+}
 
-	float old_camera_field_of_view = camera->vertical_field_of_view;
+render_projection* global_projection_get(void)
+{
+	return Memory::GetAddress<render_projection*>(0x4E673C);
+}
+
+void __cdecl render_camera_build_projection(s_camera* camera,
+	real_rectangle2d* frustum_bounds,
+	render_projection* projection)
+{
+	INVOKE(0x1953f5, 0x0, render_camera_build_projection, camera, frustum_bounds, projection);
+	return;
+}
+
+void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection)
+{
+	real32 old_camera_field_of_view = camera->vertical_field_of_view;
 	
 	if (H2Config_static_first_person) 
 	{
 		camera->vertical_field_of_view = DEGREES_TO_RADIANS(64.f) * 0.78500003f;
 	}
 	
-	p_render_camera_build_projection(camera, frustum_bounds, out_projection);
-	
+	render_camera_build_projection(camera, frustum_bounds, out_projection);
 	camera->vertical_field_of_view = old_camera_field_of_view;
+	return;
 }
 
-
-void render_cameras_apply_patches()
+void __cdecl render_camera_build_viewport_frustum_bounds(const s_camera* camera, real_rectangle2d* frustum_bounds)
 {
-	PatchCall(Memory::GetAddress(0x191440), render_camera_build_projection_hook);
+	INVOKE(0x194FBD, 0x180EB6, render_camera_build_viewport_frustum_bounds, camera, frustum_bounds);
+	return;
 }
