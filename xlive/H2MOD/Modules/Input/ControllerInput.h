@@ -67,20 +67,5 @@ namespace ControllerInput
 		}
 	};
 
-	struct alignas(4) controller_info
-	{
-		void **xinput_device_vtbl;
-		DWORD dwUserIndex;
-		DWORD error_level;
-		XINPUT_STATE xinput_state;
-	};
-
-
-	unsigned char* __cdecl get_controller_input(__int16 index);
-	void __cdecl procces_input();
-	void ToggleModern();
-	void SetSensitiviy(float value);
-	bool HasInput();
-	void SetDeadzones();
 	void Initialize();
 }

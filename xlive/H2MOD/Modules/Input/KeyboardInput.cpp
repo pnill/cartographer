@@ -16,26 +16,6 @@
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 RECT rectScreenOriginal;
 
-__int16 last_user_index;
-//Patching this call to enable keyboards to switch death targets
-unsigned char* __cdecl death_cam_get_controller_input(__int16 a1)
-{
-	last_user_index = a1;
-	unsigned char* result = ControllerInput::get_controller_input(a1);
-	//Modifies the result for A button pressed if space is.
-	unsigned char keyboard_space_key_state = input_abstraction_get_key_state(VK_SPACE);
-	if (keyboard_space_key_state > 0)
-	{
-		result[16] = keyboard_space_key_state;
-	}
-	return result;
-}
-
-void __cdecl sub_B524F7(int a1)
-{
-	unsigned char* result = ControllerInput::get_controller_input(last_user_index);
-	result[16] = 0;
-}
 
 void KeyboardInput::ToggleKeyboardInput()
 {
@@ -225,8 +205,6 @@ void hotkeyFuncConsole() {
 int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
-	PatchCall(Memory::GetAddress(0xCDEF3), death_cam_get_controller_input);
-	PatchCall(Memory::GetAddress(0xCDF5E), sub_B524F7);
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
 			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);

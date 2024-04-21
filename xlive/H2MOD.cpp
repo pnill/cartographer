@@ -19,6 +19,7 @@
 #include "game/player_vibration.h"
 #include "input/input_xinput.h"
 #include "input/input_windows.h"
+#include "input/input_abstraction.h"
 #include "interface/hud.h"
 #include "interface/hud_messaging.h"
 #include "interface/motion_sensor.h"
@@ -62,7 +63,6 @@
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Input/Mouseinput.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
@@ -431,9 +431,9 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		wchar_t* variant_name = NetworkSession::GetGameVariantName();
 		LOG_INFO_GAME(L"[h2mod] engine type: {}, game variant name: {}", (int)options->game_mode, variant_name);
 
-		ControllerInput::SetDeadzones();
-		ControllerInput::SetSensitiviy(H2Config_controller_sens);
-		MouseInput::SetSensitivity(H2Config_mouse_sens);
+		input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
+		input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
+		input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 
 		if (!Memory::IsDedicatedServer())
 		{
@@ -936,6 +936,7 @@ void H2MOD::ApplyHooks() {
 		xinput_apply_patches();
 		player_vibration_apply_patches();
 		input_windows_apply_patches();
+		input_abstraction_patches_apply();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
@@ -954,7 +955,6 @@ void H2MOD::Initialize()
 
 	if (!Memory::IsDedicatedServer())
 	{
-		MouseInput::Initialize();
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		
