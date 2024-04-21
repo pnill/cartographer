@@ -63,13 +63,13 @@ namespace tag_loader
 	std::string mods_directory;
 
 	static std::map<std::string, std::shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
-	std::map<int, std::shared_ptr<meta>> loaded_tag_data;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
-	std::vector<int> loaded_tag_data_order;//another var just to keep the keys along with the correct order
-	std::vector<int> injected_list;
+	//std::map<int, std::shared_ptr<meta>> loaded_tag_data;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
+	//std::vector<int> loaded_tag_data_order;//another var just to keep the keys along with the correct order
+	//std::vector<int> injected_list;
 	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
-	std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
-	std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
-	std::list<loaded_tag_datum_mapping> injected_tag_reference_map;
+	//std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
+	//std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
+	//std::list<loaded_tag_datum_mapping> injected_tag_reference_map;
 	unsigned int base_map_tag_size = 0;
 	unsigned int used_additional_meta = 0;
 	unsigned int next_available_datum_index = _INJECTED_TAG_START_;//first datum index
@@ -78,6 +78,8 @@ namespace tag_loader
 	std::string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
 	std::string unused_target_map_name;//name of the map from which the que list has been loaded(used for StringID retargeting)
 	std::vector<DWORD> sync_list;//container to store tag indices of sync-able Tags
+
+	c_tag_loading_table loader_table;
 
 	std::shared_ptr<plugins_field> Get_plugin(std::string type)
 	{
@@ -264,8 +266,7 @@ namespace tag_loader
 
 		if (file_stream->is_open())
 		{
-			std::string temp_string = "Loading tag : " + meta_struct::to_hex_string(datum_index) + " from " + map;
-			error_list.push_back(temp_string);
+			LOG_DEBUG_GAME("[tag_loader] loading tag {:x} from {}", datum_index, map.c_str());
 
 			s_cache_header cache_header;
 			s_tags_header tags_header;
@@ -313,53 +314,57 @@ namespace tag_loader
 						if (!temp_plugin)
 							break;
 
+						
 						//we first check the integrity of the datum_index
-						if (current_tag_instance.datum_index == current_datum && current_tag_instance.data_offset && current_tag_instance.size > 0 && (loaded_tag_data.find(current_tag_instance.datum_index) == loaded_tag_data.cend()))
+						if (current_tag_instance.datum_index == current_datum && current_tag_instance.data_offset && current_tag_instance.size > 0)
 						{
-							// allocate a buffer to store the loaded tags data
-							char* tag_data = new char[current_tag_instance.size];
-
-							int tag_data_offset;
-
-							// check if the tag is being loaded from a shared cache type file
-							if (!check_if_currently_played_map_is_shared())
-								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - scenario_instance.data_offset);
-							else
-								tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - 0x3C000);
-
-							// write the tag data to the buffer
-							file_stream->seekg(tag_data_offset);
-							file_stream->read(tag_data, current_tag_instance.size);
-
-							//create a meta object
-							std::shared_ptr<meta> temp_meta = std::make_shared<meta>(tag_data, current_tag_instance.size, current_tag_instance.data_offset, temp_plugin, file_stream, tag_data_offset, 1, current_datum, map_location.get_string(), current_tag_instance.type);
-
-							loaded_tag_data.emplace(current_datum, temp_meta);
-							loaded_tag_data_order.push_back(current_datum);
-
-							// todo: redo this
-							if (recursive)
+							if (!loader_table.has_existing_preloaded_entry_by_cache_index(current_datum))
 							{
-								std::list<int> temp_tag_ref = temp_meta->Get_all_tag_refs();
+								s_tag_loading_table_item* item = loader_table.init_entry(current_datum, current_tag_instance.type);
+								// allocate a buffer to store the loaded tags data
+								char* tag_data = new char[current_tag_instance.size];
 
-								//to remove redundancies
-								std::list<int>::iterator ref_iter = temp_tag_ref.begin();
-								while (ref_iter != temp_tag_ref.end())
+								int tag_data_offset;
+
+								// check if the tag is being loaded from a shared cache type file
+								if (!check_if_currently_played_map_is_shared())
+									tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - scenario_instance.data_offset);
+								else
+									tag_data_offset = tag_data_start_offset + (current_tag_instance.data_offset - 0x3C000);
+
+								// write the tag data to the buffer
+								file_stream->seekg(tag_data_offset);
+								file_stream->read(tag_data, current_tag_instance.size);
+
+								//create a meta object
+								item->loaded_data = std::make_shared<meta>(tag_data, current_tag_instance.size, current_tag_instance.data_offset, temp_plugin, file_stream, tag_data_offset, 1, current_datum, map_location.get_string(), current_tag_instance.type);
+								item->is_preloaded = true;
+
+								//loaded_tag_data.emplace(current_datum, temp_meta);
+								//loaded_tag_data_order.push_back(current_datum);
+
+								// todo: redo this
+								if (recursive)
 								{
-									if (loaded_tag_data.find(*ref_iter) != loaded_tag_data.end())
-										ref_iter = temp_tag_ref.erase(ref_iter);
-									else
-										ref_iter++;
-								}
+									std::list<int> temp_tag_ref = item->loaded_data->Get_all_tag_refs();
 
-								tag_datums_to_load.insert(tag_datums_to_load.end(), temp_tag_ref.begin(), temp_tag_ref.end());
+									//to remove redundancies
+									std::list<int>::iterator ref_iter = temp_tag_ref.begin();
+									while (ref_iter != temp_tag_ref.end())
+									{
+										if (loader_table.has_entry_by_cache_index(*ref_iter))
+											ref_iter = temp_tag_ref.erase(ref_iter);
+										else
+											ref_iter++;
+									}
+
+									tag_datums_to_load.insert(tag_datums_to_load.end(), temp_tag_ref.begin(), temp_tag_ref.end());
+								}
 							}
 						}
 						else
 						{
-							//most of time this is caused due to shared stuff
-							std::string temp_error = "Invalid Datum index :0x" + meta_struct::to_hex_string(*(tag_datums_to_load.cbegin()));
-							error_list.push_back(temp_error);
+							LOG_ERROR_GAME("[tag_loader] Invalid datum {:x} from {}", current_datum, map.c_str());
 						}
 					}
 				}
@@ -371,13 +376,7 @@ namespace tag_loader
 		}
 		else
 		{
-			std::string temp_error;
-			if (!custom)
-				temp_error = "Couldnt open default map " + map;
-			else
-				temp_error = "Couldnt open custom map " + map;
-
-			error_list.push_back(temp_error);
+			LOG_ERROR_GAME("[tag_loader] failed to load map {}", map.c_str());
 		}
 		delete file_stream;//uh forgot that
 	}
@@ -386,10 +385,15 @@ namespace tag_loader
 	{
 		unsigned int ret = 0;
 
-		for (auto& i : loaded_tag_data)
+
+		for(uint16 i = 0; i < loader_table.m_entry_count; i++)
+		{
+			ret += loader_table.get_entry(i)->loaded_data->Get_Total_size();
+		}
+		/*for (auto& i : loaded_tag_data)
 		{
 			ret += i.second->Get_Total_size();
-		}
+		}*/
 
 		return ret;
 	}
@@ -479,8 +483,7 @@ namespace tag_loader
 			push_loaded_tag_data(next_available_datum_index);
 		else
 		{
-			std::string error = "Coudn't inject, Max meta size reached";
-			error_list.push_back(error);
+			LOG_ERROR_GAME("[tag_loader] failed to push data onto tabel max sized reached");
 		}
 	}
 	//pushes the tag_data in que to the tag_tables and tag_memory at specified tag_table index
@@ -494,7 +497,7 @@ namespace tag_loader
 		std::list<loaded_tag_datum_mapping> t_injected_tag_datum_map;
 
 		bool replaced = false;
-		for (datum i : loaded_tag_data_order)
+		/*for (datum i : loaded_tag_data_order)
 		{
 			loaded_tag_datum_mapping loaded_tag_datum_map;
 			loaded_tag_datum_map.cache_index = i;
@@ -513,62 +516,73 @@ namespace tag_loader
 			}
 
 			t_injected_tag_datum_map.push_back(loaded_tag_datum_map);
-		}
+		}*/
 
+		for(uint16 i = 0; i < loader_table.m_entry_count; i++)
+		{
+			loaded_tag_datum_mapping t;
+			s_tag_loading_table_item* item = loader_table.get_entry(i);
+			t.cache_index = item->cache_index;
+			t.injected_index = item->injected_index;
+			t_injected_tag_datum_map.push_back(t);
+		}
 
 		//StringID listing---IDC
 
 
 		// update the tag_references inside the loaded tag data
-		for (auto& i : loaded_tag_data_order)
+		for(uint16 i = 0; i < loader_table.m_entry_count; i++)
 		{
-			loaded_tag_data[i]->Update_datum_indexes(t_injected_tag_datum_map);
-			//<stringID stuff>
-			//-------------IDC anymore----------------
+			s_tag_loading_table_item* item = loader_table.get_entry(i);
+			item->loaded_data->Update_datum_indexes(t_injected_tag_datum_map);
 		}
+		//for (auto& i : loaded_tag_data_order)
+		//{
+		//	loaded_tag_data[i]->Update_datum_indexes(t_injected_tag_datum_map);
+		//	//<stringID stuff>
+		//	//-------------IDC anymore----------------
+		//}
 
 		//Add them to the tables
 
-		for (auto& current_tag_datum_map : t_injected_tag_datum_map)
+		for(uint16 i = 0; i < loader_table.m_entry_count; i++)
 		{
+			s_tag_loading_table_item* item = loader_table.get_entry(i);
 			if (base_map_tag_size)
 			{
-				injected_tag_reference_map.push_back(current_tag_datum_map);
+				if (!item->is_injected)
+				{
+					LOG_DEBUG_GAME("[tag_loader] injecting tag {:x} - {:x} . {:4s}", item->cache_index, item->injected_index, item->type.string);
+					item->is_injected = true;
+					uint32 total_tag_size = item->loaded_data->Get_Total_size();
+					item->loaded_data->Rebase_meta(injected_tag_data_offset);
 
-				std::shared_ptr<meta> loaded_tag = loaded_tag_data[current_tag_datum_map.cache_index];
-				int total_tag_size = loaded_tag->Get_Total_size();
+					char* tag_data = item->loaded_data->Generate_meta_file();
 
-				loaded_tag->Rebase_meta(injected_tag_data_offset);
-				char* tag_data = loaded_tag->Generate_meta_file();
-				
-				tags::tag_instance* new_instance = &tag_loader::reallocated_tag_table[current_tag_datum_map.injected_index & 0xFFFF];
+					tags::tag_instance* new_instance = &tag_loader::reallocated_tag_table[item->injected_index & 0xFFFF];
 
-				new_instance->type = loaded_tag->Get_type();
-				new_instance->data_offset = injected_tag_data_offset;
-				new_instance->size = total_tag_size;
-				new_instance->datum_index = current_tag_datum_map.injected_index;
+					new_instance->type = item->type;
+					new_instance->data_offset = injected_tag_data_offset;
+					new_instance->size = total_tag_size;
+					new_instance->datum_index = item->injected_index;
 
-				memcpy(tags::get_tag_data() + injected_tag_data_offset, tag_data, total_tag_size);//copy to the tag memory
+					memcpy(tags::get_tag_data() + injected_tag_data_offset, tag_data, total_tag_size);
 
-				load_raw_table_data(current_tag_datum_map.injected_index, loaded_tag->Get_map_loc());
-				setup_injected_tag_havok_vtables(current_tag_datum_map.injected_index);
+					load_raw_table_data(item->injected_index, item->loaded_data->Get_map_loc());
+					setup_injected_tag_havok_vtables(item->injected_index);
 
-				delete[] tag_data;
-				injected_tag_data_offset += total_tag_size;
-				used_additional_meta += total_tag_size;
+					delete[] tag_data;
+
+					injected_tag_data_offset += total_tag_size;
+					used_additional_meta += total_tag_size;
+				}
 			}
-			else break;			
+			else
+				break;
 		}
 		initialize_injected_shader_templates();
-		loaded_tag_data_order.clear();
-		t_injected_tag_datum_map.clear();
-		loaded_tag_data.clear();
 	}
 	//clears the tags in que_list
-	void Clear_que_list()
-	{
-		loaded_tag_data.clear();
-	}
 
 	// Commented out as it's unused but keeping as an example for future use
 	//Rebases to 0x0 and dumps meta data in que in the specified tag folder
@@ -623,9 +637,7 @@ namespace tag_loader
 		//fail safe
 		if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index))
 		{
-			std::string error = "Tag: " + datum_index;
-			error += " not loaded into tag tables and tag memory";
-			throw new std::exception(error.c_str());
+			LOG_ERROR_GAME("[tag_loader] failed to resolve datum to correct instance, game will crash");
 		}
 
 		//supposing full length
@@ -736,16 +748,26 @@ namespace tag_loader
 		typedef bool(__cdecl t_init_shader_template)(int a1);
 		auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
 		tag_iterator* stem_iterator = Memory::GetAddress<tag_iterator*>(0xA4AF10);
-		for (auto ref : injected_tag_reference_map)
+
+		for(uint16 i = 0; i < loader_table.m_entry_count; i++)
 		{
-			auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.injected_index)];
-			if (inst.type.group == _tag_group_shader_template)
+			s_tag_loading_table_item* item = loader_table.get_entry(i);
+			if(item->type.group == _tag_group_shader_template)
 			{
-				//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
-				stem_iterator->next_tag_index = inst.datum_index;
+				stem_iterator->next_tag_index = item->injected_index;
 				p_init_shader_template(1);
 			}
 		}
+		//for (auto ref : injected_tag_reference_map)
+		//{
+		//	auto inst = tags::get_tag_instances()[DATUM_INDEX_TO_ABSOLUTE_INDEX(ref.injected_index)];
+		//	if (inst.type.group == _tag_group_shader_template)
+		//	{
+		//		//Change the iterators next tag datum index to the instance to force the next call to s_tag_data_iterator::get_next_datum() to return it.
+		//		stem_iterator->next_tag_index = inst.datum_index;
+		//		p_init_shader_template(1);
+		//	}
+		//}
 	}
 
 	// not needed but left for any obscure future use. Forge?
@@ -757,13 +779,15 @@ namespace tag_loader
 	//		memcpy(&tags::get_tag_instances()[i], &SharedTables[i], sizeof(tags::tag_instance));
 	//}
 
-	datum resolve_cache_index_to_injected(int oldDatum)
+	datum resolve_cache_index_to_injected(int cache_index)
 	{
-		for (auto& ref : injected_tag_reference_map)
+		s_tag_loading_table_item* item = loader_table.get_entry_by_cache_index(cache_index);
+		if (item != nullptr)
 		{
-			if (ref.cache_index == oldDatum)
-				return datum(ref.injected_index);
+			LOG_DEBUG_GAME("[tag_loadaer] resolving index {:x} to {:x}", cache_index, item->injected_index);
+			return item->injected_index;
 		}
+		LOG_DEBUG_GAME("[tag_loadaer] resolving index {:x} to NOT FOUND", cache_index);
 		return NONE;
 	}
 }
@@ -791,9 +815,11 @@ bool _cdecl scenario_tags_load_internal(char* scenario_path)
 	{
 		tag_loader::reallocated_tag_table[i] = tags::tag_instance{ (e_tag_group)NONE, NONE, 0, 0 };
 	}
-	tag_loader::loaded_tag_data.clear();
-	tag_loader::injected_tag_reference_map.clear();
-	tag_loader::loaded_tag_data_order.clear();
+	//tag_loader::loaded_tag_data.clear();
+	//tag_loader::injected_tag_reference_map.clear();
+	//tag_loader::loaded_tag_data_order.clear();
+
+	tag_loader::loader_table.reset();
 	// reset starting_datum index
 	tag_loader::used_additional_meta = 0;
 	tag_loader::next_available_datum_index = _INJECTED_TAG_START_;
@@ -838,4 +864,74 @@ void Initialise_tag_loader()
 	tag_loader::mods_directory = game_dir + "\\mods";
 	tag_loader::set_content_directories(def_maps_loc, "", tag_loader::mods_directory + "\\tags", tag_loader::mods_directory + "\\plugins");//no custom support yet
 	_Patch_calls();
+}
+
+
+c_tag_loading_table::c_tag_loading_table() = default;
+
+c_tag_loading_table::~c_tag_loading_table()
+{
+}
+
+s_tag_loading_table_item* c_tag_loading_table::get_entry(uint16 index)
+{
+	return &this->m_entries[index];
+}
+
+// this is a slow operation
+s_tag_loading_table_item* c_tag_loading_table::get_entry_by_cache_index(datum datum_index)
+{
+	for (uint16 i = 0; i < this->m_entry_count; i++)
+	{
+		if (this->m_entries[i].cache_index == datum_index)
+			return &this->m_entries[i];
+	}
+	return nullptr;
+}
+
+
+s_tag_loading_table_item* c_tag_loading_table::get_entry_by_injected_index(datum datum_index)
+{
+	return &this->m_entries[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index) - _INJECTED_TAG_START_];
+}
+
+bool c_tag_loading_table::has_entry_by_cache_index(datum datum_index) const
+{
+	for (uint16 i = 0; i < this->m_entry_count; i++)
+	{
+		if (this->m_entries[i].cache_index == datum_index)
+			return &this->m_entries[i].is_initialized;
+	}
+	return false;
+}
+
+bool c_tag_loading_table::has_entry_by_injected_index(datum datum_index) const
+{
+	return &this->m_entries[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index) - _INJECTED_TAG_START_].is_initialized;
+}
+
+bool c_tag_loading_table::has_existing_preloaded_entry_by_cache_index(datum datum_index)
+{
+	s_tag_loading_table_item* item = this->get_entry_by_cache_index(datum_index);
+	if (item == nullptr)
+		return false;
+
+	return item->is_preloaded;
+}
+
+s_tag_loading_table_item* c_tag_loading_table::init_entry(datum cache_index, tag_group type)
+{
+	s_tag_loading_table_item* result = &this->m_entries[m_entry_count];
+	result->cache_index = cache_index;
+	result->injected_index = _INJECTED_TAG_START_ + this->m_entry_count;
+	result->type = type;
+	result->is_initialized = true;
+	this->m_entry_count++;
+	return result;
+}
+
+void c_tag_loading_table::reset()
+{
+	memset(this->m_entries, 0, sizeof(s_tag_loading_table_item) * this->m_entry_count);
+	this->m_entry_count = 0;
 }

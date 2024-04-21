@@ -13,6 +13,41 @@ using meta_struct::meta;
 using meta_struct::plugins_field;
 using meta_struct::loaded_tag_datum_mapping;
 
+struct s_tag_loading_table_item
+{
+	bool is_initialized;
+	bool is_injected;
+	bool is_preloaded;
+	datum cache_index;
+	datum injected_index;
+	tag_group type;
+	std::shared_ptr<meta> loaded_data;
+	uint8* injected_data;
+};
+
+class c_tag_loading_table
+{
+private:
+	s_tag_loading_table_item m_entries[_MAX_TAG_TABLE_SIZE_ - _INJECTED_TAG_START_];
+
+public:
+	uint16 m_entry_count;
+
+	c_tag_loading_table();
+	~c_tag_loading_table();
+
+	s_tag_loading_table_item* get_entry(uint16 index);
+	s_tag_loading_table_item* get_entry_by_cache_index(datum datum_index);
+	s_tag_loading_table_item* get_entry_by_injected_index(datum datum_index);
+	bool has_entry_by_cache_index(datum datum_index) const;
+	bool has_entry_by_injected_index(datum datum_index) const;
+	bool has_existing_preloaded_entry_by_cache_index(datum datum_index);
+
+	s_tag_loading_table_item* init_entry(datum cache_index, tag_group type);
+	void reset();
+};
+
+
 //The TAG LOADER
 namespace tag_loader
 {
@@ -46,6 +81,6 @@ namespace tag_loader
 	//Fix shader templates
 	void initialize_injected_shader_templates();
 	//Get new datum from old datum
-	datum resolve_cache_index_to_injected(int oldDatum);
+	datum resolve_cache_index_to_injected(int cache_index);
 }
 void Initialise_tag_loader();
