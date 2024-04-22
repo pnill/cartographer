@@ -13,6 +13,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "models/models.h"
 #include "Util/filesys.h"
+#include "xml_loader.h"
 
 // TODO Cleanup
 
@@ -56,32 +57,22 @@ namespace tag_post_process_functions
 //actual tag_loader namespace
 namespace tag_loader
 {
-	std::string maps_directory;
-	std::string custom_maps_directory;
-	std::string custom_tags_directory;
-	std::string plugins_directory;
-	std::string mods_directory;
+	c_static_string260 maps_directory;
+	c_static_string260 custom_maps_directory;
+	c_static_string260 custom_tags_directory;
+	c_static_string260 plugins_directory;
+	c_static_string260 mods_directory;
 
 	static std::map<std::string, std::shared_ptr<plugins_field>> plugins_list;//contains list of various plugin structures
-	//std::map<int, std::shared_ptr<meta>> loaded_tag_data;//<datum_index,meta_junk>contains the list of tags that are currently in que to loaded in memory
-	//std::vector<int> loaded_tag_data_order;//another var just to keep the keys along with the correct order
-	//std::vector<int> injected_list;
-	//map<int, shared_ptr<meta>> meta_list;//<datum_index,meta_junk>contains the the list of tags that are currently loaded in memory(never gonna use it anyway)
-	//std::vector<std::string> error_list;//contains various messages generated during various processes,shouldnt had named it error list
-	//std::vector<std::string> tag_list;//contains a list of tag_indices along with their names(currently implemented only for module loading)
-	//std::list<loaded_tag_datum_mapping> injected_tag_reference_map;
-	unsigned int base_map_tag_size = 0;
-	unsigned int used_additional_meta = 0;
-	unsigned int next_available_datum_index = _INJECTED_TAG_START_;//first datum index
-	tags::tag_instance* reallocated_tag_table;//new tables pointer
 
-	std::string meta_list_target_map;//name of the map for which the meta list has been target(used for StringIDs)
-	std::string unused_target_map_name;//name of the map from which the que list has been loaded(used for StringID retargeting)
-	std::vector<DWORD> sync_list;//container to store tag indices of sync-able Tags
+	uint32 base_map_tag_size = 0;
+	uint32 used_additional_meta = 0;
+	datum next_available_datum_index = _INJECTED_TAG_START_;//first datum index
+	tags::tag_instance* reallocated_tag_table;//new tables pointer
 
 	c_tag_loading_table loader_table;
 
-	std::shared_ptr<plugins_field> Get_plugin(std::string type)
+	std::shared_ptr<plugins_field> Get_plugin(tag_group tag_type, std::string type)
 	{
 		//we first look into the already loaded plugin list
 		for (auto& i : plugins_list)
@@ -91,16 +82,17 @@ namespace tag_loader
 		}
 
 		type.erase(remove(type.begin(), type.end(), ' '), type.end());
-		std::string plugin_loc = plugins_directory + '\\' + type + ".xml";
-		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc);
-
+		c_static_string260 plugin_loc = plugins_directory;
+		plugin_loc.append("\\");
+		plugin_loc.append(type.c_str());
+		plugin_loc.append(".xml");
+		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc.get_string());
+		c_xml_definition_agent lol(tag_type, plugin_loc.get_string());
 		if (temp_plugin)
 			plugins_list.emplace(type, temp_plugin);
 		else
 		{
-			std::string error = "Couldnt load plugin " + type + ".xml";
-			throw error;
-			//error_list.push_back(error);
+			LOG_ERROR_GAME("[tag_loader] failed to load plugin {}", plugin_loc.get_string());
 		}
 
 		return temp_plugin;
@@ -115,34 +107,62 @@ namespace tag_loader
 		return false;
 	}
 
-	bool Map_exists(std::string map)
+	bool Map_exists(const char* map)
 	{
-		std::string map_loc;
+		c_static_string260 map_path;
 		if (meta_struct::Get_file_type(map) == "map")
-			map_loc = mods_directory + "\\maps\\" + map;
+		{
+			map_path = mods_directory;
+			map_path.append("\\maps\\");
+			map_path.append(map);
+		}
 		else
-			map_loc = mods_directory + "\\maps\\" + map + ".map";
+		{
+			map_path = mods_directory;
+			map_path.append("\\maps\\");
+			map_path.append(map);
+			map_path.append(".map");
+		}
 
-		if (PathFileExistsA(map_loc.c_str()))
+		if (PathFileExistsA(map_path.get_string()))
 		{
 			return true;
 		}
 		if (meta_struct::Get_file_type(map) == "map")
-			map_loc = maps_directory + '\\' + map;
+		{
+			map_path = maps_directory;
+			map_path.append("\\");
+			map_path.append(map);
+		}
 		else
-			map_loc = maps_directory + '\\' + map + ".map";
+		{
+			map_path = maps_directory;
+			map_path.append("\\");
+			map_path.append(map);
+			map_path.append(".map");
+		}
 
-		if (PathFileExistsA(map_loc.c_str()))
+		if (PathFileExistsA(map_path.get_string()))
 		{
 			return true;
 		}
 
 		if (meta_struct::Get_file_type(map) == "map")
-			map_loc = custom_maps_directory + '\\' + map;
+		{
+			map_path = custom_maps_directory;
+			map_path.append("\\");
+			map_path.append(map);
+		}
 		else
-			map_loc = custom_maps_directory + '\\' + map + ".map";
+		{
+			map_path = custom_maps_directory;
+			map_path.append("\\");
+			map_path.append(map);
+			map_path.append(".map");
+			}
 
-		return PathFileExistsA(map_loc.c_str());
+
+		return PathFileExistsA(map_path.get_string());
 
 	}
 
@@ -151,7 +171,7 @@ namespace tag_loader
 		//logic to check the existence of the map at subsequent directories
 		//mods->default->custom
 		out_string->clear();
-		out_string->set(mods_directory.c_str());
+		out_string->set(mods_directory.get_string());
 		out_string->append("\\maps\\");
 		if (meta_struct::Get_file_type(map_name) == "map")
 		{
@@ -166,7 +186,7 @@ namespace tag_loader
 		if (PathFileExistsA(out_string->get_string())){}
 		else
 		{
-			out_string->set(maps_directory.c_str());
+			out_string->set(maps_directory.get_string());
 			out_string->append("\\");
 			if (meta_struct::Get_file_type(map_name) == "map")
 			{
@@ -181,7 +201,7 @@ namespace tag_loader
 			if (PathFileExistsA(out_string->get_string()));
 			else
 			{
-				out_string->set(custom_maps_directory.c_str());
+				out_string->set(custom_maps_directory.get_string());
 				out_string->append("\\");
 				if (meta_struct::Get_file_type(map_name) == "map")
 				{
@@ -257,7 +277,6 @@ namespace tag_loader
 	///custom flag is no more needed
 	void preload_tag_data_from_cache(int datum_index, bool recursive, std::string map, bool custom)
 	{
-		unused_target_map_name = map;
 
 		c_static_string260 map_location;
 		find_map_path(map.c_str(), &map_location);
@@ -308,7 +327,7 @@ namespace tag_loader
 						tag_group group_name = tag_group_get_name(current_tag_instance.type);
 
 						char null_terminated_string[5] = { group_name.string[0], group_name.string[1], group_name.string[2], group_name.string[3], '\0' };
-						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(null_terminated_string);
+						std::shared_ptr<plugins_field> temp_plugin = Get_plugin(group_name, null_terminated_string);
 
 						//precaution for plugin load errors
 						if (!temp_plugin)
@@ -469,10 +488,10 @@ namespace tag_loader
 	//sets various directories required for working of tag stuff
 	void set_content_directories(std::string default_maps, std::string custom_maps, std::string custom_tags, std::string plugin_loc)
 	{
-		maps_directory = default_maps;
-		custom_maps_directory = custom_maps;
-		custom_tags_directory = custom_tags;
-		plugins_directory = plugin_loc;
+		maps_directory.set(default_maps.c_str());
+		custom_maps_directory.set(custom_maps.c_str());
+		custom_tags_directory.set(custom_tags.c_str());
+		plugins_directory.set(plugin_loc.c_str());
 	}
 	//Updates datum_indexes and rebases tags before inserting into memory
 	//pushes the tag_data in que to the tag_tables and tag_memory in the custom_tags allocated space
@@ -861,8 +880,17 @@ void Initialise_tag_loader()
 	std::string def_maps_loc = game_dir + "\\maps";
 
 
-	tag_loader::mods_directory = game_dir + "\\mods";
-	tag_loader::set_content_directories(def_maps_loc, "", tag_loader::mods_directory + "\\tags", tag_loader::mods_directory + "\\plugins");//no custom support yet
+	tag_loader::mods_directory.set(game_dir.c_str());
+	tag_loader::mods_directory.append("\\mods");
+
+	tag_loader::maps_directory.set(def_maps_loc.c_str());
+	tag_loader::custom_maps_directory.set("");
+	tag_loader::custom_tags_directory.set(tag_loader::mods_directory.get_string());
+	tag_loader::custom_tags_directory.append("\\tags");
+	tag_loader::plugins_directory.set(tag_loader::mods_directory.get_string());
+	tag_loader::plugins_directory.append("\\plugins");
+
+	//tag_loader::set_content_directories(def_maps_loc, "", tag_loader::mods_directory + "\\tags", tag_loader::mods_directory + "\\plugins");//no custom support yet
 	_Patch_calls();
 }
 

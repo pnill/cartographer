@@ -52,11 +52,11 @@ public:
 namespace tag_loader
 {
 	//returns reference to plugin of specified type
-	std::shared_ptr<plugins_field> Get_plugin(std::string type);
+	std::shared_ptr<plugins_field> Get_plugin(tag_group tag_type, std::string type);
 	//returns whether the map is a shared map or not
 	bool check_if_currently_played_map_is_shared();
 	//Checks if the map file exists
-	bool Map_exists(std::string map);
+	bool Map_exists(const char* map);
 	// returns a path from the first directory a matching map name is found
 	void find_map_path(const char* map_name, c_static_string260* out_string);
 	//Find tag datum based off of tag name

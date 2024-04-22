@@ -386,6 +386,7 @@
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_favorites.cpp" />
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_achievements.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1036,6 +1037,7 @@
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_favorites.h" />
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_user_history.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
