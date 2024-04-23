@@ -105,9 +105,9 @@ bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* poin
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
 }
 
-void __cdecl render_scene_wrapper(bool is_texture_camera) 
+void __cdecl rasterizer_render_scene(bool is_texture_camera) 
 {
-    INVOKE(0x25F015, 0x0, render_scene_wrapper, is_texture_camera);
+    INVOKE(0x25F015, 0x0, rasterizer_render_scene, is_texture_camera);
     return;
 }
 
@@ -123,8 +123,8 @@ void render_view(
     int16 render_type,
     int32 user_index,
     int32 controller_index,
-    bool sky_active,
-    int32 sky_id,
+    bool draw_sky,
+    int32 sky_index,
     s_scenario_fog_result* fog,
     int8 zero_1,
     int16 neg_one,
@@ -134,20 +134,22 @@ void render_view(
 {
     ASSERT(render_camera);
     s_camera* camera = (rasterizer_camera ? rasterizer_camera : render_camera);
+
     ++*global_frame_num_get();
 
     ASSERT(fog);
+    
     *curent_window_bound_index_get() = window_bound_index;
     *global_cluster_index_get() = cluster_index;
     *global_leaf_index_get() = leaf_index;
     *global_bsp_test_failed_get() = bsp_test_failed;
     *global_user_render_index_get() = user_index;
-    *global_sky_active_get() = sky_active;
-    *global_sky_index_get() = sky_id;
-
-    *global_fog_result_get() = *fog;
-    *global_byte_4E6938_get() = 0;
+    *global_sky_active_get() = draw_sky;
+    *global_sky_index_get() = sky_index;
     
+    *global_fog_result_get() = *fog;
+    *global_byte_4E6938_get() = false;
+
     s_camera* global_camera = get_global_camera();
     *global_camera = *render_camera;
 
@@ -165,7 +167,8 @@ void render_view(
     frame.window_bound_index = window_bound_index;
     frame.is_texture_camera = is_texture_camera;
     frame.field_4 = neg_one;
-    frame.color = fog->color;
+    frame.render_fog = true;
+    frame.color = fog->clear_color;
     frame.alpha = 2;
     frame.fog_result = *fog;
     frame.screen_flash = *screen_flash;
@@ -185,8 +188,8 @@ void render_view(
             pc_geometry_cache_block_count_clear();
             render_beam();
             render_light_clear_data();
-            render_scene_visibility_to_usercall(user_index);
-            render_scene_wrapper(is_texture_camera);
+            render_view_visibility_compute_to_usercall(user_index);
+            rasterizer_render_scene(is_texture_camera);
 
             IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
             IDirect3DSurface9* surface = NULL;
@@ -201,7 +204,7 @@ void render_view(
                 global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &surface);
             }
 
-            rasterizer_dx9_set_render_target(surface, NONE, 1);
+            rasterizer_dx9_set_render_target(surface, NONE, true);
             if (surface)
             {
                 surface->Release();
@@ -222,12 +225,13 @@ void render_view(
                 global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &surface);
             }
 
-            rasterizer_dx9_set_render_target(surface, NONE, 1);
+            rasterizer_dx9_set_render_target(surface, NONE, true);
             if (surface)
             {
                 surface->Release();
                 surface = NULL;
             }
+
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
         }
@@ -257,24 +261,24 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     int32 visible_sky_index;
     real_rgb_color clear_color = *global_real_rgb_white;
     bool clear_color_active = false;
-    bool sky_bool = structure_get_sky(cluster_index, &visible_sky_index, &clear_color, &clear_color_active);
+    bool draw_sky = structure_get_sky(cluster_index, &visible_sky_index, &clear_color, &clear_color_active);
 
     s_scenario_fog_result fog;
-    render_scenario_fog(cluster_index, &window->render_camera, &window->render_camera.forward, sky_bool, *get_render_fog_enabled(), &fog);
+    render_scenario_fog(cluster_index, &window->render_camera, &window->render_camera.forward, draw_sky, *get_render_fog_enabled(), &fog);
     if (clear_color_active)
     {
-        fog.color = clear_color;
+        fog.clear_color = clear_color;
     }
 
-    if (fog.unk_bool_18 && window->render_camera.z_far > fog.z_far && fog.z_far > window->render_camera.z_near)
+    if (fog.view_max_distance_changed && window->render_camera.z_far > fog.view_max_distance && fog.view_max_distance > window->render_camera.z_near)
     {
-        window->render_camera.z_far = fog.z_far;
+        window->render_camera.z_far = fog.view_max_distance;
     }
 
     real_rectangle2d frustum_bounds;
     render_camera_build_viewport_frustum_bounds(&window->render_camera, &frustum_bounds);
     
-    int32 controller_index = NONE;
+    e_controller_index controller_index = k_no_controller;
     if (window->user_index != NONE)
     {
         controller_index = s_player::get(player_index_from_user_index(window->user_index))->controller_index;
@@ -299,7 +303,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
             0,
             window->user_index,
             controller_index,
-            sky_bool,
+            draw_sky,
             visible_sky_index,
             &fog,
             0,

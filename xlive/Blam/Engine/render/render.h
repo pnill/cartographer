@@ -18,7 +18,7 @@ struct s_frame
 	s_camera camera;
 	render_projection projection;
 	s_scenario_fog_result fog_result;
-	bool field_14C;
+	bool render_fog;
 	int8 pad_26D[3];
 	s_screen_flash screen_flash;
 	int8 field_288[8];

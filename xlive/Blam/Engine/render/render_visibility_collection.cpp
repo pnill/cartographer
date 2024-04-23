@@ -18,7 +18,7 @@ bool __cdecl render_visibility_check_location_cluster_active(s_location* locatio
 	return INVOKE(0x19447C, 0, render_visibility_check_location_cluster_active, location);
 }
 
-void render_scene_visibility_to_usercall(int32 user_index)
+void render_view_visibility_compute_to_usercall(int32 user_index)
 {
 	void* render_scene_visibility = (void*)Memory::GetAddress(0x190755);
 	__asm {

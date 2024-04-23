@@ -12,7 +12,6 @@ typedef void(__cdecl* sub_65F600_t)(int16, datum, int16, real32);
 sub_65F600_t p_sub_65F600;
 
 void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
-bool __cdecl rasterizer_set_render_target(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
 void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
 void __cdecl rasterizer_set_stream_source(void);
 void __cdecl debug_frame_usage_draw(void);
@@ -34,7 +33,7 @@ bool* rasterizer_clear_screen_global_get(void)
     return Memory::GetAddress<bool*>(0xA3E4D5);
 }
 
-rectangle2d* rasterizer_globals_screen_bounds_get(void)
+rectangle2d* rasterizer_draw_on_main_back_buffer_get(void)
 {
     return Memory::GetAddress<rectangle2d*>(0xA3E410);
 }
@@ -84,7 +83,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
         *g_clear_screen = false;
         if (screenshot_bitmap && screenshot_bitmap->base_address)
         {
-            const rectangle2d* screen_bounds = rasterizer_globals_screen_bounds_get();
+            const rectangle2d* screen_bounds = rasterizer_draw_on_main_back_buffer_get();
             int16 right = screen_bounds->right;
             if (screen_bounds->right > screen_bounds->left + screenshot_bitmap->width_pixels)
             {
@@ -135,7 +134,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             debug_frame_usage_draw();
             rasterizer_present_backbuffer();
 #endif
-            ++ * frame_presented_count_get();
+            ++*frame_presented_count_get();
             // nullsub_69();
             if (!loading_screen_in_progress())
             {
