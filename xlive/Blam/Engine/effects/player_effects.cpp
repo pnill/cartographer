@@ -177,3 +177,9 @@ real32 player_effect_transition_function_evaluate(e_transition_function_type fun
     real32 function_value = 1.0f - (elapsed_time / duration);
     return transition_function_evaluate(function_type, function_value) * scale;
 }
+
+void __cdecl render_screen_flash(int32 player_index, s_screen_flash* screen_flash)
+{
+    INVOKE(0xA408F, 0x0, render_screen_flash, player_index, screen_flash);
+    return;
+}

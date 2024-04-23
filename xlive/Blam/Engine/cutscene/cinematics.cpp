@@ -55,7 +55,13 @@ bool cinematic_in_progress(void)
 	return result;
 }
 
-void cinematics_apply_patches()
+void cinematics_draw_line(rectangle2d* points, pixel32 rect_color)
+{
+	INVOKE(0x3B101, 0x0, cinematics_draw_line, points, rect_color);
+	return;
+}
+
+void cinematics_apply_patches(void)
 {
 	// allow cinematics to run at 60 fps
 	// Don't run these since interpolation does not currently work in cutscenes

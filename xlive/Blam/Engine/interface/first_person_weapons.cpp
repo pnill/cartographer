@@ -914,7 +914,7 @@ void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 u
 
 	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-	s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
+	s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
 	if (TEST_BIT(weapon_data->flags, 0)
 		&& weapon_data->weapon_index != NONE)
 	{
@@ -932,7 +932,7 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
     real_matrix4x3* result = NULL;
     s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-    s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(user_index, first_person_data);
+    s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
     if (TEST_BIT(weapon_data->flags, 0)
         && weapon_data->weapon_index != NONE)
     {

@@ -22,6 +22,7 @@
 #include "input/input_abstraction.h"
 #include "interface/hud.h"
 #include "interface/hud_messaging.h"
+#include "interface/interface.h"
 #include "interface/motion_sensor.h"
 #include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
@@ -40,6 +41,7 @@
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "render/render.h"
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"
@@ -937,6 +939,8 @@ void H2MOD::ApplyHooks() {
 		player_vibration_apply_patches();
 		input_windows_apply_patches();
 		input_abstraction_patches_apply();
+		render_apply_patches();
+		apply_interface_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

@@ -17,3 +17,8 @@ struct render_lighting
 	int16 pad;
 };
 ASSERT_STRUCT_SIZE(render_lighting, 84);
+
+
+void __cdecl render_lights(void);
+
+void __cdecl render_light_clear_data(void);

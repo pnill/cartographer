@@ -12,5 +12,8 @@ float* get_ui_scale();
 float* get_primary_hud_scale();
 float* get_secondary_hud_scale();
 void set_crosshair_offset(float offset);
+
+void __cdecl draw_hud(void);
+
 void hud_patches_on_map_load();
 void hud_apply_pre_winmain_patches();

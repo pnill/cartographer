@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 struct s_camera
 {
 	real_point3d point;

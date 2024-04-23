@@ -1,4 +1,5 @@
 #pragma once
+#include "math/color_math.h"
 #include "tag_files/string_id.h"
 
 struct s_cinematic_globals_flags
@@ -43,4 +44,6 @@ bool cinematic_is_running(void);
 
 bool cinematic_in_progress(void);
 
-void cinematics_apply_patches();
+void cinematics_draw_line(rectangle2d* points, pixel32 rect_color);
+
+void cinematics_apply_patches(void);
