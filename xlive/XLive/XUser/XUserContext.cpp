@@ -5,8 +5,8 @@
 #include "Blam/Engine/game/game.h"
 #include "Blam/Engine/game/game_globals.h"
 #include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
-#include "H2MOD/Modules/Shell/Shell.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"
 
 struct s_context_campaign_map_info

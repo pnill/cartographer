@@ -3,14 +3,24 @@
 
 #include <discord_game_sdk.h>
 
-#include "Blam/Engine/cseries/cseries_strings.h"
-#include "Blam/Engine/game/players.h"
-#include "Blam/Engine/interface/user_interface_guide.h"
-#include "Blam/Engine/interface/user_interface_networking.h"
-#include "Blam/Engine/Networking/couch/xsession_manager.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "cseries/cseries_strings.h"
+#include "main/main_game.h"
+#include "game/game.h"
+#include "game/players.h"
+#include "interface/user_interface_guide.h"
+#include "interface/user_interface_networking.h"
+#include "Networking/couch/xsession_manager.h"
+#include "Networking/Session/NetworkSession.h"
 
-#define DISCORD_CLIENT_ID 1158452985882493049
+//#define TEST_DISCORD_INSTANCE
+#ifdef TEST_DISCORD_INSTANCE
+#define DISCORD_INSTANCE L"0"
+#endif
+
+#define k_discord_client_id 379371722685808641
+const char* k_discord_difficulty_image_names[k_campaign_difficulty_levels_count] = { "easy", "normal", "medium", "hard" };
+const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
+
 
 struct s_discord_data
 {
@@ -21,71 +31,84 @@ struct s_discord_data
 	DiscordUserId user_id;
 };
 
-volatile LONG g_should_stop = FALSE;
-HANDLE discord_thread = INVALID_HANDLE_VALUE;
-DiscordActivity g_discord_activity = {};
-bool g_update_rich_presence = true;
-bool g_set_live_invite_accepted_flag = false;
-
-
-bool* global_set_live_invite_accepted_flag_get(void)
+struct s_discord_globals
 {
-	return &g_set_live_invite_accepted_flag;
-}
+	DiscordActivity activity;
+	HANDLE thread;
+	bool update_rich_presence;
+	volatile LONG should_stop;
+};
 
-void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
+s_discord_globals g_discord_globals =
 {
-	assert(res == DiscordResult_Ok);
+	{},
+	INVALID_HANDLE_VALUE,
+	true,
+	FALSE
+};
+
+
+unsigned __stdcall discord_thread_proc(void* pArguments);
+uint32 discord_update(s_discord_data* discord);
+void discord_rich_presence_update(s_discord_data* discord);
+void discord_interface_encode_xsession_info(XSESSION_INFO* session_info);
+
+void discord_interface_zero_player_count(void);
+
+// Update player count for discord interface
+void discord_interface_set_player_counts(void);
+
+void discord_interface_update_details(void);
+
+void DISCORD_CALLBACK on_user_updated(void* data);
+void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret);
+void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message);
+void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
+
+
+
+void discord_game_status_create(void)
+{
+	g_discord_globals.thread = (HANDLE)_beginthreadex(NULL, 0, &discord_thread_proc, NULL, 0, NULL);
 	return;
 }
 
-void discord_interface_zero_player_count(void)
+void discord_game_status_dispose(void)
 {
-	g_discord_activity.party.size.current_size = 0;
-	g_discord_activity.party.size.max_size = 0;
-	return;
-}
-
-void discord_interface_update_details()
-{
-	c_static_string<512> details;
-	details.set(g_discord_activity.assets.small_text);
-	details.append(" on ");
-	details.append(g_discord_activity.assets.large_text);
-
-	strcpy(g_discord_activity.details, details.get_string());
-	g_update_rich_presence = true;
+	InterlockedAdd(&g_discord_globals.should_stop, 1);
+	WaitForSingleObject(g_discord_globals.thread, INFINITE);
+	CloseHandle(g_discord_globals.thread);
 	return;
 }
 
 void discord_interface_set_details(const char* details)
 {
-	strcpy(g_discord_activity.details, details);
-	g_update_rich_presence = true;
+	csstrnzcpy(g_discord_globals.activity.details, details, sizeof(g_discord_globals.activity.details));
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 void discord_interface_set_state(const char* state)
 {
 	discord_interface_set_player_counts();
-	strcpy(g_discord_activity.state, state);
-	g_update_rich_presence = true;
+	csstrnzcpy(g_discord_globals.activity.state, state, sizeof(g_discord_globals.activity.state));
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 void discord_interface_set_small_image(const char* small_image, const char* small_text)
 {
-	strcpy(g_discord_activity.assets.small_image, small_image);
-	strcpy(g_discord_activity.assets.small_text, small_text);
-	g_update_rich_presence = true;
+	csstrnzcpy(g_discord_globals.activity.assets.small_image, small_image, sizeof(g_discord_globals.activity.assets.small_image));
+	csstrnzcpy(g_discord_globals.activity.assets.small_text, small_text, sizeof(g_discord_globals.activity.assets.small_text));
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 void discord_interface_set_large_image(const char* large_image, const char* large_text)
 {
-	strcpy(g_discord_activity.assets.large_image, large_image);
-	strcpy(g_discord_activity.assets.large_text, large_text);
-	g_update_rich_presence = true;
+	csstrnzcpy(g_discord_globals.activity.assets.large_image, large_image, sizeof(g_discord_globals.activity.assets.large_image));
+	csstrnzcpy(g_discord_globals.activity.assets.large_text, large_text, sizeof(g_discord_globals.activity.assets.large_text));
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
@@ -113,156 +136,31 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 	return;
 }
 
-
 void discord_interface_set_difficulty(int16 difficulty)
 {
 	// Make sure we don't go out of bounds
-	if (difficulty > 3 || difficulty < 0)
-	{
-		difficulty = 0;
-	}
-
-	// Convert difficulty to string
-	char number_string[2];
-	snprintf(number_string, sizeof(number_string), "%hd", difficulty);
+	difficulty = PIN(difficulty, 0, k_campaign_difficulty_levels_count - 1);
 
 	// Create image name we select for the difficulty
 	c_static_string<16> difficulty_image_name;
-	difficulty_image_name.set("diff_");
-	difficulty_image_name.append(number_string);
+	difficulty_image_name.set("campaign_");
+	difficulty_image_name.append(k_discord_difficulty_image_names[difficulty]);
 
 	// Set image name and text
-	const char* difficulty_names[4] = { "Easy", "Normal", "Heroic", "Legendary" };
-	strcpy(g_discord_activity.assets.small_image, difficulty_image_name.get_string());
-	strcpy(g_discord_activity.assets.small_text, difficulty_names[difficulty]);
+	csstrnzcpy(g_discord_globals.activity.assets.small_image, difficulty_image_name.get_string(), difficulty_image_name.max_length());
+	csstrnzcpy(g_discord_globals.activity.assets.small_text, k_discord_difficulty_names[difficulty], 16);
 	discord_interface_update_details();
-	g_update_rich_presence = true;
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
-void discord_interface_set_player_counts(void)
-{
-	s_network_session* session = nullptr;
-	if (NetworkSession::GetActiveNetworkSession(&session))
-	{
-		g_discord_activity.party.size.current_size = session->membership[0].player_count;
-		g_discord_activity.party.size.max_size = session->parameters[0].max_party_players;
-	}
-	else
-	{
-		discord_interface_zero_player_count();
-	}
-	g_update_rich_presence = true;
-	return;
-}
-
-void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
-{
-	snprintf(g_discord_activity.secrets.join, sizeof(g_discord_activity.secrets.join), 
-		"%llu/%llu/%llu/%lu/%lu/%hu/%lu/%hu/%llu/%llu/%lu", 
-		session_info->sessionID,
-		session_info->keyExchangeKey.ab[0],
-		session_info->keyExchangeKey.ab[8],
-		session_info->hostAddress.ina,
-		session_info->hostAddress.inaOnline,
-		session_info->hostAddress.wPortOnline,
-		session_info->hostAddress.abEnet[0], 
-		session_info->hostAddress.abEnet[4],
-		session_info->hostAddress.abOnline[0],
-		session_info->hostAddress.abOnline[8],
-		session_info->hostAddress.abOnline[16]);
-}
-
-void discord_rich_presence_update(s_discord_data* discord)
-{
-	g_discord_activity.application_id = DISCORD_CLIENT_ID;
-	g_discord_activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
-	
-	s_network_session* session = nullptr;
-	if (NetworkSession::GetActiveNetworkSession(&session))
-	{
-		XSESSION_INFO* session_info = global_xsession_manager_get()->get_session();
-		XUID host;
-		XUserGetXUID(0, &host);
-
-		snprintf(g_discord_activity.party.id, sizeof(g_discord_activity.party.id), "%016llx", host);
-		g_discord_activity.party.privacy = DiscordActivityPartyPrivacy_Public;
-		discord_interface_encode_xsession_info(session_info);
-
-		LOG_INFO_FUNC("Join secret:");
-		for (uint32 i = 0; i < 128; ++i)
-			LOG_INFO_FUNC("{}", g_discord_activity.secrets.join[i]);
-	}
-	else
-	{
-		memset(g_discord_activity.secrets.join, 0, sizeof(DiscordActivitySecrets::join));
-	}
-
-
-	discord->activities->update_activity(discord->activities, &g_discord_activity, discord, on_rich_presence_updated);
-	return;
-}
-
-uint32 discord_update(s_discord_data* discord)
-{
-	discord->core->run_callbacks(discord->core);
-
-	if (g_update_rich_presence)
-	{
-		discord_rich_presence_update(discord);
-		g_update_rich_presence = false;
-	}
-
-	return 50;
-}
-
-void DISCORD_CALLBACK on_user_updated(void* data)
-{
-	s_discord_data* discord = (s_discord_data*)data;
-	DiscordUser user;
-	discord->users->get_current_user(discord->users, &user);
-	discord->user_id = user.id;
-	return;
-}
-
-void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
-{
-	for (uint32 i = 0; i < 128; ++i)
-		LOG_INFO_FUNC("{}", secret[i]);
-
-	XSESSION_INFO session = {};
-	sscanf(secret, 
-		"%llu/%llu/%llu/%lu/%lu/%hu/%lu/%hu/%llu/%llu/%lu",
-		&session.sessionID,
-		&session.keyExchangeKey.ab[0],
-		&session.keyExchangeKey.ab[8],
-		&session.hostAddress.ina,
-		&session.hostAddress.inaOnline,
-		&session.hostAddress.wPortOnline,
-		&session.hostAddress.abEnet[0],
-		&session.hostAddress.abEnet[4],
-		&session.hostAddress.abOnline[0],
-		&session.hostAddress.abOnline[8],
-		&session.hostAddress.abOnline[16]);
-
-	c_user_interface_guide_state_manager* manager = user_interface_guide_state_manager_get();
-	memcpy(&manager->m_xsession_info, &session, sizeof(XSESSION_INFO));
-	manager->m_from_game_invite = 1;
-	manager->m_unk_bool_D = true;
-	manager->m_unk_bool_F = false;
-	g_set_live_invite_accepted_flag = true; 
-	return;
-}
-
-void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
-{
-	LOG_INFO_FUNC("{}", message);
-	return;
-}
 
 unsigned __stdcall discord_thread_proc(void* pArguments)
 {
-	SetEnvironmentVariable(L"DISCORD_INSTANCE_ID", L"0");
+#ifdef TEST_DISCORD_INSTANCE
+	SetEnvironmentVariable(L"DISCORD_INSTANCE_ID", DISCORD_INSTANCE);
+#endif
+
 	uint32 result = 0;
 
 	IDiscordUserEvents users_events = {};
@@ -274,7 +172,7 @@ unsigned __stdcall discord_thread_proc(void* pArguments)
 
 	DiscordCreateParams params = {};
 	DiscordCreateParamsSetDefault(&params);
-	params.client_id = DISCORD_CLIENT_ID;
+	params.client_id = k_discord_client_id;
 	params.flags = DiscordCreateFlags_NoRequireDiscord;
 	params.event_data = &discord;
 	params.user_events = &users_events;
@@ -290,7 +188,7 @@ unsigned __stdcall discord_thread_proc(void* pArguments)
 		discord.activities->register_command(discord.activities, "halo2.exe");
 
 		// Main loop
-		while (!g_should_stop)
+		while (!g_discord_globals.should_stop)
 		{
 			Sleep(discord_update(&discord));
 		}
@@ -301,23 +199,141 @@ unsigned __stdcall discord_thread_proc(void* pArguments)
 	}
 	else
 	{
-		LOG_ERROR_FUNC("Failed to create Discord Game SDK instance ({})\n", res);
+		error(2, "Failed to create Discord Game SDK instance: %d\n", res);
 		result = 1;
 	}
 
 	return result;
 }
 
-void discord_game_status_create(void)
+uint32 discord_update(s_discord_data* discord)
 {
-	discord_thread = (HANDLE)_beginthreadex(NULL, 0, &discord_thread_proc, NULL, 0, NULL);
+	discord->core->run_callbacks(discord->core);
+
+	if (g_discord_globals.update_rich_presence)
+	{
+		discord_rich_presence_update(discord);
+		g_discord_globals.update_rich_presence = false;
+	}
+
+	return 50;
+}
+
+void discord_rich_presence_update(s_discord_data* discord)
+{
+	g_discord_globals.activity.application_id = k_discord_client_id;
+	g_discord_globals.activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
+
+	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
+	if (network_session)
+	{
+		bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
+
+		XSESSION_INFO session;
+		const int32 observer_index = NetworkSession::GetPeerObserverChannel(network_session->session_host_peer_index)->observer_index;
+
+		session.sessionID = network_session->session_id;
+		session.keyExchangeKey = network_session->xnkey;
+		session.hostAddress = (not_session_host ? network_session->p_network_observer->observer_channels[observer_index].xnaddr : network_session->virtual_couch[0].xsession_info.hostAddress);
+
+		XUID host;
+		XUserGetXUID(0, &host);
+
+		snprintf(g_discord_globals.activity.party.id, sizeof(g_discord_globals.activity.party.id), "%016llx", host);
+		g_discord_globals.activity.party.privacy = DiscordActivityPartyPrivacy_Public;
+		discord_interface_encode_xsession_info(&session);
+	}
+	else
+	{
+		memset(g_discord_globals.activity.secrets.join, 0, sizeof(g_discord_globals.activity.secrets.join));
+	}
+
+
+	discord->activities->update_activity(discord->activities, &g_discord_globals.activity, discord, on_rich_presence_updated);
 	return;
 }
 
-void discord_game_status_dispose(void)
+void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 {
-	InterlockedAdd(&g_should_stop, 1);
-	WaitForSingleObject(discord_thread, INFINITE);
-	CloseHandle(discord_thread);
+	uint8* session_bytes = (uint8*)session_info;
+
+	// Encode the data into hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		sprintf(&g_discord_globals.activity.secrets.join[2 * i], "%02hhX", session_bytes[i]);
+	}
+
+	error(0, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
+	return;
+}
+
+void discord_interface_zero_player_count(void)
+{
+	g_discord_globals.activity.party.size.current_size = 0;
+	g_discord_globals.activity.party.size.max_size = 0;
+	return;
+}
+
+void discord_interface_set_player_counts(void)
+{
+	s_network_session* session = nullptr;
+	if (NetworkSession::GetActiveNetworkSession(&session))
+	{
+		g_discord_globals.activity.party.size.current_size = session->membership[0].player_count;
+		g_discord_globals.activity.party.size.max_size = session->parameters[0].max_party_players;
+	}
+	else
+	{
+		discord_interface_zero_player_count();
+	}
+	g_discord_globals.update_rich_presence = true;
+	return;
+}
+
+void discord_interface_update_details(void)
+{
+	c_static_string<128> details;
+	details.set(g_discord_globals.activity.assets.small_text);
+	details.append(" on ");
+	details.append(g_discord_globals.activity.assets.large_text);
+
+	discord_interface_set_details(details.get_string());
+	return;
+}
+
+void DISCORD_CALLBACK on_user_updated(void* data)
+{
+	s_discord_data* discord = (s_discord_data*)data;
+	DiscordUser user;
+	discord->users->get_current_user(discord->users, &user);
+	discord->user_id = user.id;
+	return;
+}
+
+void DISCORD_CALLBACK on_activity_join(void* event_data, const char* secret)
+{
+	XSESSION_INFO session;
+	uint8* session_bytes = (uint8*)&session;
+	error(0, "Join secret: %s", secret);
+
+	// Decode the data from hex string
+	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
+	{
+		(void)sscanf(&secret[2 * i], "%02hhX", &session_bytes[i]);
+	}
+
+	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+	return;
+}
+
+void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLevel level, const char* message)
+{
+	error(0, message);
+	return;
+}
+
+void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res)
+{
+	ASSERT(res == DiscordResult_Ok);
 	return;
 }

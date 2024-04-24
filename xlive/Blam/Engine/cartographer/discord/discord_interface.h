@@ -11,7 +11,11 @@ enum e_context_variant : uint32
 	_context_variant_assault = 6
 };
 
-bool* global_set_live_invite_accepted_flag_get(void);
+// Initialize discord interface
+void discord_game_status_create(void);
+
+// Deinitialize discord interface
+void discord_game_status_dispose(void);
 
 // Set small image for discord interface
 void discord_interface_set_small_image(const char* small_image, const char* small_text);
@@ -34,11 +38,3 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 // Update difficulty info for discord interface
 void discord_interface_set_difficulty(int16 difficulty);
 
-// Update player count for discord interface
-void discord_interface_set_player_counts(void);
-
-// Initialize discord interface
-void discord_game_status_create(void);
-
-// Deinitialize discord interface
-void discord_game_status_dispose(void);

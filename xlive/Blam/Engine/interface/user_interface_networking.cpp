@@ -51,7 +51,7 @@ void __cdecl user_interface_networking_open_join_screen(void)
     return;
 }
 
-void __cdecl sub_5AD5AB(XSESSION_INFO* session, XNKEY* key, XNADDR* host_address, int32 local_player_count, uint32** user_identifiers, wchar_t** player_names, bool from_game_invite)
+void __cdecl sub_5AD5AB(XSESSION_INFO* session, XNKEY* key, XNADDR* host_address, int32 local_player_count, s_player_identifier* user_identifiers, wchar_t** player_names, bool from_game_invite)
 {
     INVOKE(0x1AD5AB, 0x0, sub_5AD5AB, session, key, host_address, local_player_count, user_identifiers, player_names, from_game_invite);
     return;
@@ -62,9 +62,8 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
     //INVOKE(0x2161E1, 0x1FD827, user_interface_networking_join_game, session_info, a2, from_game_invite);
     int32 local_player_count;
     wchar_t player_names[k_number_of_users][32];
-    uint32 user_identifiers[k_number_of_users][2];
+    s_player_identifier user_identifiers[k_number_of_users];
     wchar_t* p_player_names[k_number_of_users];
-    uint32* p_user_identifiers[k_number_of_users];
 
     if (user_interface_local_player_count() <= 0)
     {
@@ -78,8 +77,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
         do
         {
             s_player_properties player_properties;
-            p_user_identifiers[local_player_count] = user_identifiers[local_player_count];
-            if (network_session_interface_get_local_user_identifier(local_player_count, p_user_identifiers[local_player_count])
+            if (network_session_interface_get_local_user_identifier(local_player_count, &user_identifiers[local_player_count])
                 && network_session_interface_get_local_user_properties(local_player_count, NULL, &player_properties, NULL, NULL))
             {
                 p_player_names[local_player_count] = player_names[local_player_count];
@@ -89,7 +87,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
         } while (local_player_count < k_number_of_users);
 
         sub_40B8B9();
-        sub_5AD5AB(session, &session->keyExchangeKey, &session->hostAddress, local_player_count, p_user_identifiers, p_player_names, from_game_invite);
+        sub_5AD5AB(session, &session->keyExchangeKey, &session->hostAddress, local_player_count, user_identifiers, p_player_names, from_game_invite);
         user_interface_networking_open_join_screen();
 
         return;

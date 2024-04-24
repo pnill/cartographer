@@ -3,6 +3,7 @@
 
 #include "camera/dead_camera.h"
 #include "camera/observer.h"
+#include "cartographer/discord/discord_interface.h"
 #include "cartographer/tag_fixes/tag_fixes.h"
 #include "cutscene/cinematics.h"
 #include "effects/contrails.h"

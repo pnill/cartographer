@@ -30,7 +30,6 @@ public:
 	XOVERLAPPED m_overlap;
 	uint32 m_state;
 };
-
-CHECK_STRUCT_SIZE(c_xsession_manager, 600);
+ASSERT_STRUCT_SIZE(c_xsession_manager, 600);
 
 c_xsession_manager* global_xsession_manager_get(void);

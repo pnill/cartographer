@@ -7,7 +7,7 @@ struct s_user_interface_guide_state_manager_string
 	int field_34;
 	int field_38;
 };
-CHECK_STRUCT_SIZE(s_user_interface_guide_state_manager_string, 60);
+ASSERT_STRUCT_SIZE(s_user_interface_guide_state_manager_string, 60);
 
 // Not 100% on the size yet
 #pragma pack(push, 1)
@@ -36,6 +36,6 @@ public:
 	char m_pad_609[6];
 };
 #pragma pack(pop)
-CHECK_STRUCT_SIZE(c_user_interface_guide_state_manager, 1552);
+ASSERT_STRUCT_SIZE(c_user_interface_guide_state_manager, 1552);
 
 c_user_interface_guide_state_manager* user_interface_guide_state_manager_get(void);

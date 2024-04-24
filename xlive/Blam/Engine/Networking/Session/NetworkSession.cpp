@@ -269,7 +269,7 @@ bool network_session_interface_set_local_user_character_type(int user_index, e_c
 
 bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier)
 {
-	s_session_interface_user* user_properties = network_session_interface_get_local_user_properties(user_index);
+	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
 	if(user_properties->user_exists)
 	{
 		*out_identifier = user_properties->network_user_identifier;
@@ -280,15 +280,15 @@ bool network_session_interface_get_local_user_identifier(int user_index, s_playe
 
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank)
 {
-	s_session_interface_user* user_properties = network_session_interface_get_local_user_properties(user_index);
+	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
 	user_properties->properties.player_displayed_skill = rank;
 	user_properties->properties.player_overall_skill = rank;
 	return;
 }
 
-bool __cdecl network_session_interface_get_local_user_properties_out(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
+bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
 {
-	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties_out, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
+	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);
 }
 
 void __cdecl network_session_init_session(int unk, char unk_2)

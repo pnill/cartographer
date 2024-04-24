@@ -111,11 +111,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 		else if (sys_controller_force == 0)
 			dwMsgFilter = XN_SYS_INPUTDEVICECONFIGCHANGED;
 		
-		else if (bool* flag = global_set_live_invite_accepted_flag_get(); *flag == true)
-		{
-			dwMsgFilter = XN_LIVE_INVITE_ACCEPTED;
-			*flag = false;
-		}
 	}
 
 
