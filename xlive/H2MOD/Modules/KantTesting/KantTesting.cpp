@@ -9,7 +9,5 @@ namespace KantTesting
 
 	void Initialize()
 	{
-		if (ENABLEKANTTEST) {
-		}
 	}
 }

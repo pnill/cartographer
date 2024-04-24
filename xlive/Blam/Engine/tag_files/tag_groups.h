@@ -121,7 +121,8 @@ enum e_tag_group : uint32
 	_tag_group_cellular_automata2d = 'whip',
 	_tag_group_user_interface_shared_globals_definition = 'wigl',
 	_tag_group_wind = 'wind',
-	_tag_group_weapon_hud_interface = 'wphi'
+	_tag_group_weapon_hud_interface = 'wphi',
+	_tag_group_none = -1
 };
 
 union tag_group 
