@@ -897,6 +897,20 @@
     <ClInclude Include="Blam\Engine\render\render_lights.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\devices\device_machines.h" />
+    <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
+    <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
+    <ClInclude Include="Blam\Engine\cseries\async.h" />
+    <ClInclude Include="Blam\Engine\effects\beam.h" />
+    <ClInclude Include="Blam\Engine\interface\interface.h" />
+    <ClInclude Include="Blam\Engine\main\game_preferences.h" />
+    <ClInclude Include="Blam\Engine\main\licensing.h" />
+    <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_screen_effect.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit_new.h" />
+    <ClInclude Include="Blam\Engine\render\render_first_person.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
+    <ClInclude Include="Blam\Engine\text\font_group.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
