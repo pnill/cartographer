@@ -758,6 +758,9 @@
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
     <ClCompile Include="Blam\Engine\text\font_cache.cpp" />
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
@@ -820,7 +823,6 @@
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
@@ -1153,6 +1155,9 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_reference.h" />
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
@@ -1231,7 +1236,6 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.h" />
     <ClInclude Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\Tags\MetaExtender.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />

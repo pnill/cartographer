@@ -13,7 +13,6 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "models/models.h"
 #include "Util/filesys.h"
-#include "xml_loader.h"
 
 // TODO Cleanup
 
@@ -87,7 +86,6 @@ namespace tag_loader
 		plugin_loc.append(type.c_str());
 		plugin_loc.append(".xml");
 		std::shared_ptr<plugins_field> temp_plugin = meta_struct::Get_Tag_stucture_from_plugin(plugin_loc.get_string());
-		c_xml_definition_agent lol(tag_type, plugin_loc.get_string());
 		if (temp_plugin)
 			plugins_list.emplace(type, temp_plugin);
 		else

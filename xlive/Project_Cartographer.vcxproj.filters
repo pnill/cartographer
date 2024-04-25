@@ -387,6 +387,9 @@
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_achievements.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1038,6 +1041,9 @@
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_user_history.h" />
     <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
