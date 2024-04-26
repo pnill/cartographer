@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "NetworkObserver.h"
-#include "NetworkChannel.h"
+#include "network_observer.h"
+#include "network_channel.h"
 
 
 

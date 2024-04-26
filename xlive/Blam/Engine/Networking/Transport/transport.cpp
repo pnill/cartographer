@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "transport.h"
 
-#include "NetworkChannel.h"
+#include "network_channel.h"
 
 bool __cdecl transport_address_equivalent(const network_address* a1, const network_address* a2, bool check_network_port)
 {

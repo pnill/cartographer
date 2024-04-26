@@ -3,8 +3,8 @@
 #include "game/players.h"
 #include "input/controllers.h"
 #include "Networking/Transport/transport.h"
-#include "Networking/Transport/NetworkChannel.h"
-#include "Networking/Transport/NetworkObserver.h"
+#include "Networking/Transport/network_channel.h"
+#include "Networking/Transport/network_observer.h"
 #include "saved_games/game_variant.h"
 
 // ### TODO Cleanup

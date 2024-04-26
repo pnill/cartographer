@@ -694,8 +694,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
     <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
@@ -1075,8 +1075,8 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_channel.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />

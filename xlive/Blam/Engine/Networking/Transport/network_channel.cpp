@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "NetworkChannel.h"
+#include "network_channel.h"
 
 s_network_channel* s_network_channel::get(int32 channel_index)
 {
