@@ -15,6 +15,8 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
+#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 // for XNet connection logging
 #include "XLive/xnet/IpManagement/XnIp.h"
