@@ -1,15 +1,24 @@
 #pragma once
 
+struct s_transport_qos_attempt
+{
+	int16 field_0;
+	int16 xnqos_count;
+	XNQOS* xnqos;
+	uint8 gap_8[24];
+};
+ASSERT_STRUCT_SIZE(s_transport_qos_attempt, 32);
+
 struct s_qos_attempt_data
 {
-	DWORD cProbesXmit;
-	DWORD cProbesRecv;
-	DWORD wRttMinInMsecs;
-	DWORD wRttMedInMsecs;
-	DWORD dwUpBitsPerSec;
-	DWORD dwDnBitsPerSec;
-	DWORD cbData;
-	DWORD pbData;
+	uint32 cProbesXmit;
+	uint32 cProbesRecv;
+	uint32 wRttMinInMsecs;
+	uint32 wRttMedInMsecs;
+	uint32 dwUpBitsPerSec;
+	uint32 dwDnBitsPerSec;
+	uint32 cbData;
+	void* pbData;
 };
 ASSERT_STRUCT_SIZE(s_qos_attempt_data, 32);
 

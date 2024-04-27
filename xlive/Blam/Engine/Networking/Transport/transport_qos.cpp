@@ -14,12 +14,12 @@ s_data_array* transport_qos_attempts_array()
 // stub qos lookup function in-game between peers in a network session
 datum __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
 {
-	s_data_array* qos_probes_datum_array = transport_qos_attempts_array();
+	s_data_array* qos_attempts_array = transport_qos_attempts_array();
 
-	datum new_qos_datum_index = s_data_array::datum_new_in_range(qos_probes_datum_array);
-	if (new_qos_datum_index != NONE)
+	datum qos_attempt_index = s_data_array::datum_new_in_range(qos_attempts_array);
+	if (qos_attempt_index != NONE)
 	{
-		uint8* qos_probe_data = (uint8*)datum_get(transport_qos_attempts_array(), new_qos_datum_index);
+		s_transport_qos_attempt* qos_probe_data = (s_transport_qos_attempt*)datum_get(transport_qos_attempts_array(), qos_attempt_index);
 		placeholder_xnqos.cxnqos = 1;
 		placeholder_xnqos.cxnqosPending = 0;
 
@@ -34,9 +34,9 @@ datum __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
 		placeholder_xnqos.axnqosinfo[0].cbData = 0;
 		placeholder_xnqos.axnqosinfo[0].pbData = nullptr;
 
-		*(int16*)(qos_probe_data + 2) = (int16)1;
-		*(XNQOS**)(qos_probe_data + 4) = &placeholder_xnqos;
+		qos_probe_data->xnqos_count = (int16)1;
+		qos_probe_data->xnqos = &placeholder_xnqos;
 	}
 	
-	return new_qos_datum_index;
+	return qos_attempt_index;
 }

@@ -80,8 +80,9 @@ struct alignas(8) s_network_channel
 	static s_network_channel* get(int32 channel_index);
 	bool get_network_address(network_address* address_out);
 
-	bool has_simulation_interface() { return simulation_interface != NULL; }
-	bool is_simulation_authority() { return has_simulation_interface() && *(bool*)((uint8*)simulation_interface + 48); }
+	bool has_simulation_interface() const { return simulation_interface != NULL; }
+	bool is_simulation_authority() const { return has_simulation_interface() && *(bool*)((uint8*)simulation_interface + 48); }
+	bool is_channel_state_5() const { return channel_state == _network_channel_state_5; }
 };
 ASSERT_STRUCT_SIZE(s_network_channel, 248);
 
