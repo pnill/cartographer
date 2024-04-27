@@ -12,15 +12,64 @@
 #include "Networking/couch/xsession_manager.h"
 #include "Networking/Session/NetworkSession.h"
 
+#include "H2MOD/Modules/Shell/H2MODShell.h"
+
 //#define TEST_DISCORD_INSTANCE
-#ifdef TEST_DISCORD_INSTANCE
-#define DISCORD_INSTANCE L"0"
-#endif
 
 #define k_discord_client_id 379371722685808641
+#define k_thread_close_wait_time_ms 2000
+
 const char* k_discord_difficulty_image_names[k_campaign_difficulty_levels_count] = { "easy", "normal", "medium", "hard" };
 const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
+const char* k_valid_scenario_names[]
+{
+	// singleplayer maps
+	"00a_introduction",
+	"01a_tutorial",
+	"01b_spacestation",
+	"03a_oldmombasa",
+	"03b_newmombasa",
+	"04a_gasgiant",
+	"04b_floodlab",
+	"05a_deltaapproach",
+	"05b_deltatowers",
+	"06a_sentinelwalls",
+	"06b_floodzone",
+	"07a_highcharity",
+	"07b_forerunnership",
+	"08a_deltacliffs",
+	"08b_deltacontrol",
 
+	// multiplayer maps
+	"ascension",
+	"backwash",
+	"beavercreek",
+	"burial_mounds",
+	"coagulation",
+	"colossus",
+	"containment",
+	"cyclotron",
+	"deltatap",
+	"dune",
+	"elongation",
+	"foundation",
+	"gemini",
+	"headlong",
+	"highplains",
+	"lockout",
+	"midship",
+	"needle",
+	"street_sweeper",
+	"triplicate",
+	"tombstone",
+	"turf",
+	"warlock",
+	"waterworks",
+	"zanzibar",
+
+	// custom maps
+	"salvation",
+};
 
 struct s_discord_data
 {
@@ -35,6 +84,7 @@ struct s_discord_globals
 {
 	DiscordActivity activity;
 	HANDLE thread;
+	HMODULE dll_module;
 	bool update_rich_presence;
 	volatile LONG should_stop;
 };
@@ -43,6 +93,7 @@ s_discord_globals g_discord_globals =
 {
 	{},
 	INVALID_HANDLE_VALUE,
+	0,
 	true,
 	FALSE
 };
@@ -67,8 +118,9 @@ void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
 
 
 
-void discord_game_status_create(void)
+void discord_game_status_create(HMODULE module)
 {
+	g_discord_globals.dll_module = module;
 	g_discord_globals.thread = (HANDLE)_beginthreadex(NULL, 0, &discord_thread_proc, NULL, 0, NULL);
 	return;
 }
@@ -76,8 +128,9 @@ void discord_game_status_create(void)
 void discord_game_status_dispose(void)
 {
 	InterlockedAdd(&g_discord_globals.should_stop, 1);
-	WaitForSingleObject(g_discord_globals.thread, INFINITE);
+	WaitForSingleObject(g_discord_globals.thread, k_thread_close_wait_time_ms);
 	CloseHandle(g_discord_globals.thread);
+	FreeLibrary(g_discord_globals.dll_module);
 	return;
 }
 
@@ -127,7 +180,7 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 
 	// Create image name we select for the difficulty
 	c_static_string<16> variant_image_name;
-	variant_image_name.set("variant_");
+	variant_image_name.set("gamemode_");
 	variant_image_name.append(number_string);
 
 	// Set image name and text
@@ -150,15 +203,18 @@ void discord_interface_set_difficulty(int16 difficulty)
 	csstrnzcpy(g_discord_globals.activity.assets.small_image, difficulty_image_name.get_string(), difficulty_image_name.max_length());
 	csstrnzcpy(g_discord_globals.activity.assets.small_text, k_discord_difficulty_names[difficulty], 16);
 	discord_interface_update_details();
-	g_discord_globals.update_rich_presence = true;
 	return;
 }
 
 
 unsigned __stdcall discord_thread_proc(void* pArguments)
 {
+	// Set discord instance based on instance ID
 #ifdef TEST_DISCORD_INSTANCE
-	SetEnvironmentVariable(L"DISCORD_INSTANCE_ID", DISCORD_INSTANCE);
+	int32 instance_id = _Shell::GetInstanceId();
+	wchar_t instance[2]{};
+	swprintf(instance, 2, L"%d", instance_id - 1);
+	SetEnvironmentVariableW(L"DISCORD_INSTANCE_ID", instance);
 #endif
 
 	uint32 result = 0;
@@ -177,7 +233,10 @@ unsigned __stdcall discord_thread_proc(void* pArguments)
 	params.event_data = &discord;
 	params.user_events = &users_events;
 	params.activity_events = &activities_events;
-	EDiscordResult res = DiscordCreate(DISCORD_VERSION, &params, &discord.core);
+
+	typedef int(__cdecl* MYPROC)(LPCWSTR);
+	decltype(DiscordCreate)* create = (decltype(DiscordCreate)*)GetProcAddress(g_discord_globals.dll_module, "DiscordCreate");
+	EDiscordResult res = create(DISCORD_VERSION, &params, &discord.core);
 
 	if (res == DiscordResult_Ok)
 	{
@@ -298,6 +357,7 @@ void discord_interface_update_details(void)
 	details.append(g_discord_globals.activity.assets.large_text);
 
 	discord_interface_set_details(details.get_string());
+	g_discord_globals.update_rich_presence = true;
 	return;
 }
 

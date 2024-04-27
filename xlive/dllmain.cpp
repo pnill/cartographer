@@ -4,14 +4,13 @@
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
 
-std::wstring dlcbasepath;
-//CHAR g_profileDirectory[512] = "Profiles";
+
+#define k_discord_dll_filename L"discord_game_sdk.dll"
 
 std::string ModulePathA(HMODULE hModule = NULL)
 {
@@ -56,9 +55,10 @@ void HeapDebugInitialize()
 
 void discord_initialize()
 {
-	if (!Memory::IsDedicatedServer() && H2Config_discord_enable)//&& _Shell::GetInstanceId() == 1)
+	HMODULE module = LoadLibraryW(k_discord_dll_filename);
+	if (module && !Memory::IsDedicatedServer() && H2Config_discord_enable)
 	{
-		discord_game_status_create();
+		discord_game_status_create(module);
 	}
 
 	return;
@@ -76,8 +76,6 @@ void InitInstance()
 		H2DedicatedServerStartup();
 
 		discord_initialize();
-
-		dlcbasepath = L"DLC";
 	}
 }
 
@@ -88,6 +86,7 @@ void ExitInstance()
 	{
 		discord_game_status_dispose();
 	}
+
 #ifndef NO_TRACE
 	EnterCriticalSection(&log_section);
 	delete xlive_log;

@@ -124,7 +124,6 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 	{
 		utf8 variant_name[32];
 		wchar_string_to_utf8_string(NetworkSession::GetGameVariantName(), variant_name, sizeof(variant_name));
-
 		discord_interface_set_variant((e_context_variant)dwContextValue, variant_name);
 		break;
 	}
@@ -161,7 +160,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		{
 			discord_interface_set_state("In main menu");
 			discord_interface_set_details("");
-			discord_interface_set_large_image("mainmenu", "Mainmenu");
+			discord_interface_set_large_image("default", "");
 			discord_interface_set_small_image("", "");
 			break;
 		}
@@ -169,7 +168,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		{
 			discord_interface_set_state("In Lobby");
 			discord_interface_set_details("");
-			discord_interface_set_large_image("mainmenu", "Mainmenu");
+			discord_interface_set_large_image("default", "");
 			discord_interface_set_small_image("", "");
 			break;
 		}
@@ -177,7 +176,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		{
 			discord_interface_set_state("Browsing server list");
 			discord_interface_set_details("");
-			discord_interface_set_large_image("mainmenu", "Mainmenu");
+			discord_interface_set_large_image("default", "");
 			discord_interface_set_small_image("", "");
 			break;
 		}
@@ -185,12 +184,11 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		{
 			discord_interface_set_state("Reading carnage report");
 			discord_interface_set_details("");
-			discord_interface_set_large_image("mainmenu", "Mainmenu");
+			discord_interface_set_large_image("default", "");
 			discord_interface_set_small_image("", "");
 			break;
 		}
 		case _context_presence_settings:
-
 			discord_interface_set_state("Adjusting settings");
 			break;
 		}

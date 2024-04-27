@@ -12,7 +12,7 @@ enum e_context_variant : uint32
 };
 
 // Initialize discord interface
-void discord_game_status_create(void);
+void discord_game_status_create(HMODULE module);
 
 // Deinitialize discord interface
 void discord_game_status_dispose(void);
