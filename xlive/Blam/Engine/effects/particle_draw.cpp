@@ -64,7 +64,8 @@ void __cdecl particle_system_draw(
 				);
 			}
 
-			particle_state->state_update(emitter_definition->runtime_flags_2 & 0x107F0u);
+			c_flags<e_particle_state_flags, uint32, k_particle_state_flags> rt_flags2(emitter_definition->runtime_flags_2 & 0x107F0u);
+			particle_state->state_update(rt_flags2);
 
 			emitter_definition->get_emitter_particle_color(particle_state, &particle_color);
 
@@ -83,7 +84,8 @@ void __cdecl particle_system_draw(
 				particle_position = particle->m_position;
 				particle_velocity = particle->m_velocity;
 
-				particle_state->state_update(emitter_definition->runtime_flags_2 & 0xF80Fu);
+				rt_flags2 = emitter_definition->runtime_flags_2 & 0xF80Fu;
+				particle_state->state_update(rt_flags2);
 
 				emitter_definition->get_emitter_particle_inverse_color(particle_state, &particle_color);
 

@@ -11,7 +11,6 @@
 #include "H2MOD.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
-#include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Utils/Utils.h"
@@ -365,7 +364,6 @@ void InitH2Startup() {
 		exit(EXIT_FAILURE);
 
 	//apply any network hooks
-	CustomNetwork::ApplyPatches();
 	H2Tweaks::ApplyPatches();
 
 	shell_apply_patches();

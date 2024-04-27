@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
-#include "NetworkObserver.h"
-#include "NetworkChannel.h"
+#include "network_observer.h"
+#include "network_channel.h"
 
 
 
@@ -11,15 +11,14 @@ s_network_observer_configuration* g_network_configuration;
 #	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 
 // variables, TODO configurable
-float _online_netcode_client_rate_real = k_online_netcode_client_rate_real;
-float _online_netcode_server_rate_real = k_online_netcode_server_rate_real;
+real32 _online_netcode_client_rate_real = k_online_netcode_client_rate_real;
+real32 _online_netcode_server_rate_real = k_online_netcode_server_rate_real;
 
-int _online_netcode_client_max_bandwidth_per_channel = k_online_netcode_client_max_bandwidth_per_channel;
-int _online_netcode_server_max_bandwidth_per_channel = k_online_netcode_server_max_bandwidth_per_channel;
+int32 _online_netcode_client_max_bandwidth_per_channel = k_online_netcode_client_max_bandwidth_per_channel;
+int32 _online_netcode_server_max_bandwidth_per_channel = k_online_netcode_server_max_bandwidth_per_channel;
 
-// TODO:
-int	_online_netcode_window_size = -1;
-bool _online_netcode_use_local_network_time = true;
+// ### TODO FIXME:
+int32	_online_netcode_window_size = -1;
 
 #	endif // LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
 #endif // defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS)
@@ -137,9 +136,9 @@ void __cdecl initialize_network_observer_configuration()
 	g_network_configuration->field_200 = 4096 * 4; // H2v - 4096, 60 tick  = H2v * 4 = 16384
 }
 
-void c_network_observer::send_message(int session_index, int observer_index, e_network_message_send_protocol send_out_of_band, int type, int size, void* data)
+void c_network_observer::send_message(int32 session_index, int32 observer_index, bool send_out_of_band, int32 type, int32 size, void* data)
 {
-	typedef void(__thiscall* observer_channel_send_message_t)(c_network_observer*, int, int, e_network_message_send_protocol, int, int, void*);
+	typedef void(__thiscall* observer_channel_send_message_t)(c_network_observer*, int32, int32, bool, int32, int32, void*);
 	INVOKE_TYPE(0x1BED40, 0x1B8C1A, observer_channel_send_message_t, this, session_index, observer_index, send_out_of_band, type, size, data);
 }
 
@@ -157,7 +156,7 @@ void c_network_observer::reset_network_observer_bandwidth_preferences()
 	SecureZeroMemory(Memory::GetAddress<void*>(0x47E9D8 + 0x1DC), k_network_preferences_size);
 }
 
-bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput, float *out_satiation, int32 *a4)
+bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput, real32 *out_satiation, int32 *a4)
 {
 	// let the game know we don't have any bandwidth measurements available to save
 	return false;
@@ -166,9 +165,9 @@ bool __thiscall c_network_observer::get_bandwidth_results(int32 *out_throughput,
 void __declspec(naked) call_get_bandwidth_results() { __asm jmp c_network_observer::get_bandwidth_results }
 
 // raw WinSock has a 28 bytes packet overhead for the packet header, unlike Xbox LIVE, which has 44 bytes (28 bytes + whatever LIVE packet header adds)
-int __cdecl transport_get_packet_overhead_hook(int protocol_type)
+int32 __cdecl transport_get_packet_overhead_hook(int32 protocol_type)
 {
-	enum e_protocol_type : int
+	enum e_protocol_type : int32
 	{
 		_protocol_udp_loopback = 2,
 		_protocol_udp,
@@ -199,24 +198,24 @@ int __cdecl transport_get_packet_overhead_hook(int protocol_type)
 }
 
 bool __thiscall c_network_observer::channel_should_send_packet_hook(
-	int network_channel_index,
+	int32 network_channel_index,
 	bool a3,
 	bool a4,
-	int a5,
-	int* out_send_sequenced_packet,
-	int* out_force_fill_packet,
-	int* out_packet_size,
-	int* out_voice_size,
-	int out_voice_chat_data_buffer_size,
-	BYTE* out_voice_chat_data_buffer)
+	int32 a5,
+	int32* out_send_sequenced_packet,
+	int32* out_force_fill_packet,
+	int32* out_packet_size,
+	int32* out_voice_size,
+	int32 out_voice_chat_data_buffer_size,
+	uint8* out_voice_chat_data_buffer)
 {
-	typedef bool(__thiscall* channel_should_send_packet_t)(c_network_observer*, int, bool, bool, int, int*, int*, int*, int*, int, BYTE*);
+	typedef bool(__thiscall* channel_should_send_packet_t)(c_network_observer*, int32, bool, bool, int32, int32*, int32*, int32*, int32*, int32, uint8*);
 	auto p_channel_should_send_packet = Memory::GetAddressRelative<channel_should_send_packet_t>(0x5BEE8D, 0x5B8D67);
 
-	int observer_index = -1;
-	for (int i = 0; i < 16; i++)
+	int32 observer_index = -1;
+	for (int32 i = 0; i < 16; i++)
 	{
-		if (this->observer_channels[i].state != s_observer_channel::e_observer_channel_state::none
+		if (this->observer_channels[i].state != s_observer_channel::e_observer_channel_state::_channel_state_none
 			&& this->observer_channels[i].channel_index == network_channel_index)
 		{
 			observer_index = i;
@@ -231,9 +230,9 @@ bool __thiscall c_network_observer::channel_should_send_packet_hook(
 	s_observer_channel* observer_channel = &this->observer_channels[observer_index];
 
 	// we modify the network channel paramters to force the network tickrate
-	const auto _temp_network_rate					= observer_channel->net_rate_managed_stream;
-	const auto _temp_network_bandwidth_per_stream	= observer_channel->net_managed_stream_bandwidth;
-	const auto _temp_network_window_size			= observer_channel->net_managed_stream_window_size;
+	const real32 _temp_network_rate					= observer_channel->net_rate_managed_stream;
+	const int32	 _temp_network_bandwidth_per_stream	= observer_channel->net_managed_stream_bandwidth;
+	const int32  _temp_network_window_size			= observer_channel->net_managed_stream_window_size;
 
 #if defined(LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS) 
 #	if LIVE_NETWORK_PROTOCOL_FORCE_CONSTANT_NETWORK_PARAMETERS == true
@@ -296,7 +295,7 @@ void c_network_observer::apply_patches()
 #if USE_LIVE_NETWORK_PROTOCOL
 #	if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 	// increase the network tickrate of hosts to 60
-	static float netcode_tickrate = k_online_netcode_tickrate_real;
+	static real32 netcode_tickrate = k_online_netcode_tickrate_real;
 
 	WritePointer(Memory::GetAddress(0x1BDE27, 0x1B7D01) + 4, &netcode_tickrate);
 	WritePointer(Memory::GetAddress(0x1BE2FA, 0x1B81D4) + 4, &netcode_tickrate);
@@ -308,26 +307,26 @@ void c_network_observer::apply_patches()
 	PatchCall(Memory::GetAddress(0x1ABE23, 0x1AC328), initialize_network_observer_configuration);
 
 	// other config patches
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB4A1, 0x1AB9A6) + 6, 20480 * 4); // 60 tick = H2v * 4
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB4AB, 0x1AB9B0) + 6, 51200 * 4); // 60 tick = H2v * 4
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB4C9, 0x1AB9CE) + 6, 65536 * 4); // 60 tick = H2v * 4
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB4D3, 0x1AB9D8) + 6, 32768 * 4); // 60 tick = H2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB4A1, 0x1AB9A6) + 6, 20480 * 4); // 60 tick = H2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB4AB, 0x1AB9B0) + 6, 51200 * 4); // 60 tick = H2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB4C9, 0x1AB9CE) + 6, 65536 * 4); // 60 tick = H2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB4D3, 0x1AB9D8) + 6, 32768 * 4); // 60 tick = H2v * 4
 
-	WriteValue<float>(Memory::GetAddress(0x3A03CC, 0x360E54), 8192.f * 2.f);  // 60 tick = H2v * 2, H2v = 8192
-	WriteValue<float>(Memory::GetAddress(0x3C60F0, 0x381BDC), 40960.f * 4.f); // 60 tick = H2v * 4, H2v = 40960
-	WriteValue<float>(Memory::GetAddress(0x3C60F4, 0x381BE0), 30720.f * 4.f); // 60 tick = H2v * 4, H2v = 30720
-	WriteValue<float>(Memory::GetAddress(0x3C60F8, 0x381BE4), 53248.f);		 // 60 tick = 53248, H2v = 9216
+	WriteValue<real32>(Memory::GetAddress(0x3A03CC, 0x360E54), 8192.f * 2.f);  // 60 tick = H2v * 2, H2v = 8192
+	WriteValue<real32>(Memory::GetAddress(0x3C60F0, 0x381BDC), 40960.f * 4.f); // 60 tick = H2v * 4, H2v = 40960
+	WriteValue<real32>(Memory::GetAddress(0x3C60F4, 0x381BE0), 30720.f * 4.f); // 60 tick = H2v * 4, H2v = 30720
+	WriteValue<real32>(Memory::GetAddress(0x3C60F8, 0x381BE4), 53248.f);		 // 60 tick = 53248, H2v = 9216
 
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB4FF, 0x1ABA04) + 1, 8192 * 2);  // h2v = 8192, 60 tick = h2v * 4
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB504, 0x1ABA09) + 1, 40960 * 4); // h2v = 40960, 60 tick = h2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB4FF, 0x1ABA04) + 1, 8192 * 2);  // h2v = 8192, 60 tick = h2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB504, 0x1ABA09) + 1, 40960 * 4); // h2v = 40960, 60 tick = h2v * 4
 
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB558, 0x1ABA5D) + 1, 15360 * 4); // h2v = 15360, 60 tick = h2v * 4
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB55D, 0x1ABA62) + 2, 61440 * 4); // h2v = 61440, 60 tick = h2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB558, 0x1ABA5D) + 1, 15360 * 4); // h2v = 15360, 60 tick = h2v * 4
+	WriteValue<int32>(Memory::GetAddress(0x1AB55D, 0x1ABA62) + 2, 61440 * 4); // h2v = 61440, 60 tick = h2v * 4
 
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB582, 0x1ABA87) + 1, 131072 * 4); // 60 tick - 524288
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB587, 0x1ABA8C) + 1, 262144 * 4); // 60 tick - 1048576
+	WriteValue<int32>(Memory::GetAddress(0x1AB582, 0x1ABA87) + 1, 131072 * 4); // 60 tick - 524288
+	WriteValue<int32>(Memory::GetAddress(0x1AB587, 0x1ABA8C) + 1, 262144 * 4); // 60 tick - 1048576
 
-	WriteValue<DWORD>(Memory::GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 60 tick - 40960
+	WriteValue<int32>(Memory::GetAddress(0x1AB5B6, 0x1ABABB) + 6, 10240 * 4); // 60 tick - 40960
 
 	// prevent the game from setting the client's tickrate to half of host network tickrate
 	NopFill(Memory::GetAddress(0x1BFBE7, 0x1B9AC7), 19);
@@ -336,14 +335,14 @@ void c_network_observer::apply_patches()
 #	endif // if INCREASE_NETWORK_TICKRATE_OBSOLETE == true
 #else
 	// disables LIVE netcode
-	WriteValue<BYTE>(Memory::GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
+	WriteValue<uint8>(Memory::GetAddress(0x1B555B, 0x1A92B9) + 1, 0);
 	// disable ping bars
 	NopFill(Memory::GetAddress(0x1D4E33, 0x1C1B7D), 2);
-	WriteValue<BYTE>(Memory::GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
+	WriteValue<uint8>(Memory::GetAddress(0x1D4E35, 0x1C1B7F), 0xEB); // jmp
 #endif
 
 	// increase the network heap size
-	WriteValue<DWORD>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
+	WriteValue<int32>(Memory::GetAddress(0x1ACCC8, 0x1ACE96) + 6, k_network_heap_size);
 
 	PatchCall(Memory::GetAddress(0x1E0FEE, 0x1B5EDE), call_get_bandwidth_results);
 

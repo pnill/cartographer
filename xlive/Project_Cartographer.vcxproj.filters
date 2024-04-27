@@ -7,8 +7,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
     <ClCompile Include="Blam\Engine\Memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
@@ -33,7 +33,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
@@ -304,6 +303,9 @@
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
+    <ClCompile Include="Blam\Engine\main\levels.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\math\math.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
@@ -428,8 +430,8 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\Memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_channel.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
@@ -460,7 +462,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />
@@ -849,6 +850,7 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\main\levels.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_draw.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump_logs.h" />
     <ClInclude Include="Blam\Engine\main\main_time.h" />

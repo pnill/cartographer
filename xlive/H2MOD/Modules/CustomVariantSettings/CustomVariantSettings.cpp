@@ -69,9 +69,7 @@ namespace CustomVariantSettings
 					if (peerIndex != -1 && !NetworkSession::IsPeerIndexLocal(peerIndex))
 					{
 						if (observer_channel->field_1)
-							observer->send_message(session->session_index, observer_channel->observer_index,
-								c_network_observer::e_network_message_send_protocol::in_band, _custom_variant_settings,
-								CustomVariantSettingsPacketSize, &currentVariantSettings);
+							observer->send_message(session->session_index, observer_channel->observer_index, false, _custom_variant_settings, CustomVariantSettingsPacketSize, &currentVariantSettings);
 					}
 				}
 			}

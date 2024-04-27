@@ -332,6 +332,7 @@
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />
     <ClCompile Include="Blam\Engine\effects\contrails.cpp" />
     <ClCompile Include="Blam\Engine\effects\effects.cpp" />
+    <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_location.cpp" />
     <ClCompile Include="Blam\Engine\effects\player_effects.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle.cpp" />
@@ -409,6 +410,7 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\transport_qos.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -524,6 +526,7 @@
     <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
     <ClInclude Include="Blam\Engine\effects\effect_location_definition.h" />
     <ClInclude Include="Blam\Engine\effects\particle_definition_interface.h" />
+    <ClInclude Include="Blam\Engine\effects\particle_draw.h" />
     <ClInclude Include="Blam\Engine\effects\particle_model_definitions.h" />
     <ClInclude Include="Blam\Engine\effects\particle_movement_definition.h" />
     <ClInclude Include="Blam\Engine\effects\particle_property.h" />
@@ -702,8 +705,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
     <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkChannel.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\NetworkObserver.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
@@ -750,7 +753,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
-    <ClCompile Include="H2MOD\Modules\Networking\Networking.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Startup\Startup.cpp" />
@@ -912,6 +914,7 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\transport_qos.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
@@ -1085,8 +1088,8 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkChannel.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\NetworkObserver.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_channel.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
@@ -1144,7 +1147,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
-    <ClInclude Include="H2MOD\Modules\Networking\Networking.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Startup\Startup.h" />

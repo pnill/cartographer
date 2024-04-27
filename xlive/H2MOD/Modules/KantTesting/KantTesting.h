@@ -1,6 +1,6 @@
 #pragma once
 #define ENABLEKANTTEST 0
-#include "Networking/Transport/NetworkObserver.h"
+#include "Networking/Transport/transport_qos.h"
 
 namespace KantTesting
 {
@@ -12,7 +12,7 @@ namespace KantTesting
 		BYTE bAlways_1_1;
 		BYTE bQoSDataAcquired;
 		WORD unk_word;
-		s_qos_probe_data qos;
+		s_qos_attempt_data qos;
 		WORD wAlways_1_2;
 		char gap6[6];
 		int8 session_info[0xA1C];

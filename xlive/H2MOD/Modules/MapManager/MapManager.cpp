@@ -4,10 +4,11 @@
 #include "CustomMapDataCache/CustomMapDataCache.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Networking/Networking.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
+#include "Networking/NetworkMessageTypeCollection.h"
+#include "Networking/Session/NetworkSession.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"
 
