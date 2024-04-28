@@ -14,8 +14,10 @@
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 
-//#define TEST_DISCORD_INSTANCE
 
+/* constants */
+
+//#define TEST_DISCORD_INSTANCE
 #define k_discord_client_id 379371722685808641
 #define k_thread_close_wait_time_ms 2000
 
@@ -72,6 +74,8 @@ const char* k_valid_scenario_names[] = {
 
 #define k_valid_scenario_name_count NUMBEROF(k_valid_scenario_names)
 
+/* structures */
+
 struct s_discord_data
 {
 	IDiscordCore* core;
@@ -99,6 +103,8 @@ s_discord_globals g_discord_globals =
 	FALSE
 };
 
+/* prototypes */
+
 // Entry point for discord thread
 unsigned __stdcall discord_thread_proc(void* pArguments);
 
@@ -114,12 +120,6 @@ bool discord_interface_scenario_name_vaild(const utf8* scnr_name);
 // Encode xsession info as a string
 void discord_interface_encode_xsession_info(XSESSION_INFO* session_info);
 
-// Sets player counts to 0 and removes player info text from status
-void discord_interface_zero_player_count(void);
-
-// Update player count for discord interface
-void discord_interface_set_player_counts(void);
-
 void discord_interface_update_details(void);
 
 void DISCORD_CALLBACK on_user_updated(void* data);
@@ -128,6 +128,7 @@ void DISCORD_CALLBACK on_discord_log_print(void* hook_data, enum EDiscordLogLeve
 void DISCORD_CALLBACK on_rich_presence_updated(void* data, EDiscordResult res);
 
 
+/* public code */
 
 void discord_game_status_create(HMODULE module)
 {
@@ -237,7 +238,24 @@ void discord_interface_zero_player_count(void)
 	return;
 }
 
+void discord_interface_set_player_counts(void)
+{
+	s_network_session* session = nullptr;
+	if (NetworkSession::GetActiveNetworkSession(&session))
+	{
+		g_discord_globals.activity.party.size.current_size = session->membership[0].player_count;
+		g_discord_globals.activity.party.size.max_size = session->parameters[0].max_party_players;
+	}
+	else
+	{
+		discord_interface_zero_player_count();
+	}
+	g_discord_globals.update_rich_presence = true;
+	return;
+}
 
+
+/* private code */
 
 unsigned __stdcall discord_thread_proc(void* pArguments)
 {
@@ -370,22 +388,6 @@ void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 	}
 
 	error(0, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
-	return;
-}
-
-void discord_interface_set_player_counts(void)
-{
-	s_network_session* session = nullptr;
-	if (NetworkSession::GetActiveNetworkSession(&session))
-	{
-		g_discord_globals.activity.party.size.current_size = session->membership[0].player_count;
-		g_discord_globals.activity.party.size.max_size = session->parameters[0].max_party_players;
-	}
-	else
-	{
-		discord_interface_zero_player_count();
-	}
-	g_discord_globals.update_rich_presence = true;
 	return;
 }
 

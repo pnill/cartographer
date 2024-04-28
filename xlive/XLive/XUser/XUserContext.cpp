@@ -175,6 +175,10 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		case _context_presence_server_browser:
 		{
 			discord_interface_set_state("Browsing server list");
+			
+			// Zero player counts here as the game still thinks we are in a network session after leaving a match
+			discord_interface_zero_player_count();
+
 			discord_interface_set_details("");
 			discord_interface_set_large_image("default", "");
 			discord_interface_set_small_image("", "");

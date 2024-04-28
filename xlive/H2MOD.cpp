@@ -46,6 +46,7 @@
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"
+#include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
@@ -858,6 +859,7 @@ void H2MOD::ApplyHooks() {
 	bitstream_serialization_apply_patches();
 
 	simulation_apply_patches();
+	simulation_players_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

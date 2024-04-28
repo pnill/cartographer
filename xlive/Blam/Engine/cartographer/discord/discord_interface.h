@@ -39,5 +39,8 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 // Update difficulty info for discord interface
 void discord_interface_set_difficulty(int16 difficulty);
 
-// Set player counts to 0 and remove player count text
+// Sets player counts to 0 and removes player info text from status
 void discord_interface_zero_player_count(void);
+
+// Update player count for discord interface
+void discord_interface_set_player_counts(void);
