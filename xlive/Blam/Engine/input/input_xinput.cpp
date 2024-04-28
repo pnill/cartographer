@@ -115,36 +115,33 @@ int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_dead
 	return 0;
 }
 
+// Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given Radius 
+// it is accepted as valid input otherwise it is rejected.
 void input_xinput_adjust_thumb_radial_deadzones(s_gamepad_input_button_state* gamepad_state)
 {
+	int16 lx = gamepad_state->thumb_left.x;
+	int16 ly = gamepad_state->thumb_left.y;
+	int16 rx = gamepad_state->thumb_right.x;
+	int16 ry = gamepad_state->thumb_right.y;
+	
+	// Calculate radius of the left and right sticks
+	uint32 lh = (lx * lx) + (ly * ly);
+	uint32 rh = (rx * rx) + (ry * ry);
 
-	// Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given Radius 
-	// it is accepted as valid input otherwise it is rejected.
-
-	if (!radialDeadzone)
-		return;
-
-	uint32 radius = pow(radialDeadzone, 2);
-	uint32 lx = (int)gamepad_state->thumb_left.x;
-	uint32 ly = (int)gamepad_state->thumb_left.y;
-	uint32 rx = (int)gamepad_state->thumb_right.x;
-	uint32 ry = (int)gamepad_state->thumb_right.y;
-
-
-	uint32 lh = pow(lx, 2) + pow(ly, 2);
-	uint32 rh = pow(rx, 2) + pow(ry, 2);
-
+	// If the radius of the stick moved is less than the deadzone radius set the stick positions to zero
+	uint32 radius = radialDeadzone * radialDeadzone;
 	if (lh <= radius)
 	{
 		gamepad_state->thumb_left.x = 0;
 		gamepad_state->thumb_left.y = 0;
 	}
-
 	if (rh <= radius)
 	{
 		gamepad_state->thumb_right.x = 0;
 		gamepad_state->thumb_right.y = 0;
 	}
+
+	return;
 }
 
 bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gamepad_input_button_state* gamepad_state)
@@ -196,7 +193,10 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right_x);
 	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right_y);
 
-	input_xinput_adjust_thumb_radial_deadzones(gamepad_state);
+	if (radialDeadzone)
+	{
+		input_xinput_adjust_thumb_radial_deadzones(gamepad_state);
+	}
 
 	return gamepad_state->thumb_left.x > 0
 		|| gamepad_state->thumb_left.y > 0
