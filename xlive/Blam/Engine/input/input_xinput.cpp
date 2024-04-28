@@ -124,15 +124,15 @@ void input_xinput_adjust_thumb_radial_deadzones(s_gamepad_input_button_state* ga
 	if (!radialDeadzone)
 		return;
 
-	uint32 radius = pow(radialDeadzone, 2);
-	uint32 lx = (int)gamepad_state->thumb_left.x;
-	uint32 ly = (int)gamepad_state->thumb_left.y;
-	uint32 rx = (int)gamepad_state->thumb_right.x;
-	uint32 ry = (int)gamepad_state->thumb_right.y;
+    uint64 radius = pow(radialDeadzone, 2);
+    int32 lx = gamepad_state->thumb_left.x;
+    int32 ly = gamepad_state->thumb_left.y;
+    int32 rx = gamepad_state->thumb_right.x;
+    int32 ry = gamepad_state->thumb_right.y;
 
 
-	uint32 lh = pow(lx, 2) + pow(ly, 2);
-	uint32 rh = pow(rx, 2) + pow(ry, 2);
+    uint64 lh = pow(lx, 2) + pow(ly, 2);
+    uint64 rh = pow(rx, 2) + pow(ry, 2);
 
 	if (lh <= radius)
 	{
