@@ -19,7 +19,6 @@
 #define k_discord_client_id 379371722685808641
 #define k_thread_close_wait_time_ms 2000
 
-const char* k_discord_difficulty_image_names[k_campaign_difficulty_levels_count] = { "easy", "normal", "medium", "hard" };
 const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
 const char* k_discord_gamemode_names[] = { "ctf", "slayer", "oddball", "koth", "juggernaut", "territories", "assault" };
 const char* k_valid_scenario_names[] = {
@@ -214,11 +213,15 @@ void discord_interface_set_difficulty(int16 difficulty)
 {
 	// Make sure we don't go out of bounds
 	difficulty = PIN(difficulty, 0, k_campaign_difficulty_levels_count - 1);
+	
+	// Convert difficulty to string
+	char number_string[2];
+	snprintf(number_string, sizeof(number_string), "%hd", difficulty);
 
 	// Create image name we select for the difficulty
 	c_static_string<16> difficulty_image_name;
-	difficulty_image_name.set("campaign_");
-	difficulty_image_name.append(k_discord_difficulty_image_names[difficulty]);
+	difficulty_image_name.set("diff_");
+	difficulty_image_name.append(number_string);
 
 	// Set image name and text
 	csstrnzcpy(g_discord_globals.activity.assets.small_image, difficulty_image_name.get_string(), difficulty_image_name.max_length());
@@ -313,7 +316,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 	g_discord_globals.activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
 
 	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
-	if (network_session)
+	if (network_session && network_session->session_host_peer_index != NONE)
 	{
 		bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
 
