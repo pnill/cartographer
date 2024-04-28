@@ -3,6 +3,8 @@
 #include "input_windows.h"
 #include "input_abstraction.h"
 #include "controllers.h"
+
+#include "game/game.h"
 #include "shell/shell_windows.h"
 
 #include "interface/user_interface_controller.h"
@@ -53,8 +55,8 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 			}
 		}
 	}
-	if (!input_handled)
-		return;
+
+	TEST_N_DEF(PC1);
 
 	HWND g_window_handle = *Memory::GetAddress<HWND*>(0x46D9C4);
 
