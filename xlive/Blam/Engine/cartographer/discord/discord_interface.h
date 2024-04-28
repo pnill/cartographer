@@ -8,7 +8,8 @@ enum e_context_variant : uint32
 	_context_variant_koth = 3,
 	_context_variant_juggernaut = 4,
 	_context_variant_territories = 5,
-	_context_variant_assault = 6
+	_context_variant_assault = 6,
+	k_context_variant_count
 };
 
 // Initialize discord interface
@@ -38,3 +39,5 @@ void discord_interface_set_variant(e_context_variant variant, const utf8* varian
 // Update difficulty info for discord interface
 void discord_interface_set_difficulty(int16 difficulty);
 
+// Set player counts to 0 and remove player count text
+void discord_interface_zero_player_count(void);

@@ -21,8 +21,8 @@
 
 const char* k_discord_difficulty_image_names[k_campaign_difficulty_levels_count] = { "easy", "normal", "medium", "hard" };
 const char* k_discord_difficulty_names[k_campaign_difficulty_levels_count] = { "Easy", "Normal", "Heroic", "Legendary" };
-const char* k_valid_scenario_names[]
-{
+const char* k_discord_gamemode_names[] = { "ctf", "slayer", "oddball", "koth", "juggernaut", "territories", "assault" };
+const char* k_valid_scenario_names[] = {
 	// singleplayer maps
 	"00a_introduction",
 	"01a_tutorial",
@@ -68,8 +68,10 @@ const char* k_valid_scenario_names[]
 	"zanzibar",
 
 	// custom maps
-	"salvation",
+	"salvation"
 };
+
+#define k_valid_scenario_name_count NUMBEROF(k_valid_scenario_names)
 
 struct s_discord_data
 {
@@ -98,12 +100,22 @@ s_discord_globals g_discord_globals =
 	FALSE
 };
 
-
+// Entry point for discord thread
 unsigned __stdcall discord_thread_proc(void* pArguments);
+
+// Main loop for discord logic
 uint32 discord_update(s_discord_data* discord);
+
+// Update function for rich presence
 void discord_rich_presence_update(s_discord_data* discord);
+
+// Returns true if the scenario name has a valid discord image associated with it
+bool discord_interface_scenario_name_vaild(const utf8* scnr_name);
+
+// Encode xsession info as a string
 void discord_interface_encode_xsession_info(XSESSION_INFO* session_info);
 
+// Sets player counts to 0 and removes player info text from status
 void discord_interface_zero_player_count(void);
 
 // Update player count for discord interface
@@ -167,21 +179,30 @@ void discord_interface_set_large_image(const char* large_image, const char* larg
 
 void discord_interface_set_map_name(const utf8* scenario_name, const utf8* map_name)
 {
-	discord_interface_set_large_image(scenario_name, map_name);
+	bool valid_scnr = discord_interface_scenario_name_vaild(scenario_name);
+
+	// If the scenario has a valid image set it to that name
+	// If not set it to "unknown_map" to display the proper image
+	const utf8* name = (valid_scnr ? scenario_name : "unknown_map");
+
+	discord_interface_set_large_image(name, map_name);
 	discord_interface_update_details();
 	return;
 }
 
 void discord_interface_set_variant(e_context_variant variant, const utf8* variant_name)
 {
-	// Convert difficulty to string
-	char number_string[2];
-	snprintf(number_string, sizeof(number_string), "%lu", variant);
+	bool valid_variant = VALID_INDEX(variant, k_context_variant_count);
+
+	// If the variant is valid set the name
+	// If not set it to "unknown" to display the proper image
+	const utf8* name = (valid_variant ? k_discord_gamemode_names[variant] : "unknown");
+
 
 	// Create image name we select for the difficulty
 	c_static_string<16> variant_image_name;
 	variant_image_name.set("gamemode_");
-	variant_image_name.append(number_string);
+	variant_image_name.append(name);
 
 	// Set image name and text
 	discord_interface_set_small_image(variant_image_name.get_string(), variant_name);
@@ -205,6 +226,14 @@ void discord_interface_set_difficulty(int16 difficulty)
 	discord_interface_update_details();
 	return;
 }
+
+void discord_interface_zero_player_count(void)
+{
+	g_discord_globals.activity.party.size.current_size = 0;
+	g_discord_globals.activity.party.size.max_size = 0;
+	return;
+}
+
 
 
 unsigned __stdcall discord_thread_proc(void* pArguments)
@@ -312,6 +341,21 @@ void discord_rich_presence_update(s_discord_data* discord)
 	return;
 }
 
+bool discord_interface_scenario_name_vaild(const utf8* scnr_name)
+{
+	bool result = false;
+	for (size_t i = 0; i < k_valid_scenario_name_count; i++)
+	{
+		if (!csstricmp(scnr_name, k_valid_scenario_names[i]))
+		{
+			result = true;
+			break;
+		}
+	}
+
+	return result;
+}
+
 void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 {
 	uint8* session_bytes = (uint8*)session_info;
@@ -323,13 +367,6 @@ void discord_interface_encode_xsession_info(XSESSION_INFO* session_info)
 	}
 
 	error(0, "Encoded join secret: %s", g_discord_globals.activity.secrets.join);
-	return;
-}
-
-void discord_interface_zero_player_count(void)
-{
-	g_discord_globals.activity.party.size.current_size = 0;
-	g_discord_globals.activity.party.size.max_size = 0;
 	return;
 }
 
