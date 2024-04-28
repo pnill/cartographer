@@ -316,7 +316,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 	g_discord_globals.activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
 
 	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
-	if (network_session && network_session->session_host_peer_index != NONE)
+	if (network_session && (network_session->session_host_peer_index != NONE && network_session->local_session_state != _network_session_state_peer_leaving))
 	{
 		bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
 
@@ -336,7 +336,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 	}
 	else
 	{
-		memset(g_discord_globals.activity.secrets.join, 0, sizeof(g_discord_globals.activity.secrets.join));
+		csmemset(g_discord_globals.activity.secrets.join, 0, sizeof(g_discord_globals.activity.secrets.join));
 	}
 
 
