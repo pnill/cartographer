@@ -39,8 +39,8 @@ bool __cdecl render_water_refraction(void)
             IDirect3DSurface9* surface = rasterizer_dx9_target_get_surface(_rasterizer_target_20);
             s_rasterizer_target* target_data = rasterizer_dx9_target_get(_rasterizer_target_20);
 
-            e_rasterizer_target g_rasterizer_target = *rasterizer_dx9_global_target_get();
-            IDirect3DSurface9* present_surface = rasterizer_dx9_get_target_surface((uint16)g_rasterizer_target, 0);
+            e_rasterizer_target present_target = *rasterizer_dx9_present_target_get();
+            IDirect3DSurface9* present_surface = rasterizer_dx9_get_target_surface((uint16)present_target, 0);
 
             s_camera* camera = get_global_camera();
             RECT rect = { camera->viewport_bounds.left, camera->viewport_bounds.top, camera->viewport_bounds.right, camera->viewport_bounds.bottom };

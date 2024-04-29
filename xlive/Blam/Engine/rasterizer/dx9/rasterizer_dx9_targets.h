@@ -60,7 +60,7 @@ struct s_rasterizer_target
 
 /* public code */
 
-e_rasterizer_target* rasterizer_dx9_global_target_get(void);
+e_rasterizer_target* rasterizer_dx9_present_target_get(void);
 
 s_rasterizer_target* rasterizer_dx9_target_get(e_rasterizer_target rasterizer_target);
 

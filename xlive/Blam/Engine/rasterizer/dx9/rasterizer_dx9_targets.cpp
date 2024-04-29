@@ -3,7 +3,7 @@
 
 /* public code */
 
-e_rasterizer_target* rasterizer_dx9_global_target_get(void)
+e_rasterizer_target* rasterizer_dx9_present_target_get(void)
 {
 	return Memory::GetAddress<e_rasterizer_target*>(0xA3E228);
 }
