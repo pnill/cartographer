@@ -74,6 +74,11 @@ bool __cdecl rasterizer_initialize(void)
     return INVOKE(0x0263359, 0x0, rasterizer_initialize);
 }
 
+void __cdecl rasterizer_dx9_reset_depth_buffer(void)
+{
+    return INVOKE(0x269835, 0x0, rasterizer_dx9_reset_depth_buffer);
+}
+
 void rasterizer_present(bitmap_data* screenshot_bitmap)
 {
     bool result = true;

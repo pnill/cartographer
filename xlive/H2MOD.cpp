@@ -41,6 +41,7 @@
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "render/render.h"
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
@@ -918,7 +919,10 @@ void H2MOD::ApplyHooks() {
 		screens_apply_patches();
 		aim_assist_apply_patches();
 		main_game_apply_patches();
+		
 		rasterizer_dx9_main_apply_patches();
+		rasterizer_dx9_water_apply_patches();
+
 		cinematics_apply_patches();
 		game_time_apply_patches();
 		game_state_procs_apply_patches();

@@ -20,6 +20,8 @@ void rasterizer_dx9_main_apply_patches(void);
 
 bool __cdecl rasterizer_initialize(void);
 
+void __cdecl rasterizer_dx9_reset_depth_buffer(void);
+
 void __cdecl rasterizer_present(bitmap_data* screenshot_bitmap);
 
 bool __cdecl rasterizer_window_begin(s_frame* preferences);
