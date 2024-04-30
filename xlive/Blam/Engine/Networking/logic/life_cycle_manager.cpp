@@ -19,6 +19,7 @@ void c_game_life_cycle_handler::initialize(void* life_cycle_manager, e_game_life
 void __cdecl c_game_life_cycle_handler_joining::check_joining_capability()
 {
 	INVOKE(0x1AD643, 0x1A65C0, c_game_life_cycle_handler_joining::check_joining_capability);
+	return;
 }
 
 bool c_game_life_cycle_manager::game_life_cycle_initialized()

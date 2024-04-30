@@ -3,7 +3,8 @@
 
 #include "user_interface.h"
 
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
+#include "Networking/logic/life_cycle_manager.h"
+#include "Networking/Session/NetworkSession.h"
 
 bool* byte_D6840E_get(void)
 {
@@ -31,12 +32,6 @@ void user_interface_networking_set_globals(bool a1, XSESSION_INFO* session, int3
     memcpy(global_session_info_get(), session, sizeof(XSESSION_INFO));
     *dword_86EEE0_get() = unused;
     *from_game_invite_global_get() = from_game_invite;
-}
-
-void __cdecl sub_5AD643(void)
-{
-    INVOKE(0x1AD643, 0x0, sub_5AD643);
-    return;
 }
 
 void __cdecl user_interface_networking_reset_player_counts(void)
@@ -72,7 +67,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
     }
     else
     {
-        sub_5AD643();
+        c_game_life_cycle_handler_joining::check_joining_capability();
         local_player_count = 0;
         do
         {
