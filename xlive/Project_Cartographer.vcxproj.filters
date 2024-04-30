@@ -327,6 +327,9 @@
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
     <ClCompile Include="Blam\Engine\interface\interface.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\Transport\transport_qos.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -913,6 +916,9 @@
     <ClInclude Include="Blam\Engine\sound\sound_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\text\font_group.h" />
+    <ClInclude Include="Blam\Engine\Networking\Transport\transport_qos.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
