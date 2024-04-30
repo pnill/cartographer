@@ -7,13 +7,14 @@
 #include "effects/particle_emitter.h"
 #include "cseries/cseries.h"
 #include "effects/particle.h"
+#include "interface/motion_sensor.h"
+#include "interface/user_interface_networking.h"
 #include "main/interpolator.h"
 #include "main/main.h"
 #include "Networking/logic/life_cycle_manager.h"
 #include "saved_games/game_state.h"
 #include "saved_games/saved_film.h"
 #include "shell/shell.h"
-#include "interface/motion_sensor.h"
 #include "simulation/simulation.h"
 
 
@@ -120,11 +121,6 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 	return;
 }
 
-void __cdecl reset_global_player_counts(void)
-{
-	INVOKE(0xB8B9, 0x219B9, reset_global_player_counts);
-    return;
-}
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time)
 {
@@ -167,7 +163,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_
                 valid_local_player_count++;
             }
         }
-        reset_global_player_counts();
+        user_interface_networking_reset_player_counts();
         network_session_init_session(2, 1);
         csmemset(&handler->player_identifiers, 0, sizeof(handler->player_identifiers));
         csmemcpy(&handler->player_identifiers, local_identifiers, sizeof(s_player_identifier) * valid_local_player_count);

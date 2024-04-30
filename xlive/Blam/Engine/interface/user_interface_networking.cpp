@@ -39,9 +39,9 @@ void __cdecl sub_5AD643(void)
     return;
 }
 
-void __cdecl sub_40B8B9(void)
+void __cdecl user_interface_networking_reset_player_counts(void)
 {
-    INVOKE(0xB8B9, 0x0, sub_40B8B9);
+    INVOKE(0xB8B9, 0x219B9, user_interface_networking_reset_player_counts);
     return;
 }
 
@@ -86,7 +86,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
             ++local_player_count;
         } while (local_player_count < k_number_of_users);
 
-        sub_40B8B9();
+        user_interface_networking_reset_player_counts();
         sub_5AD5AB(session, &session->keyExchangeKey, &session->hostAddress, local_player_count, user_identifiers, p_player_names, from_game_invite);
         user_interface_networking_open_join_screen();
 
