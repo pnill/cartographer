@@ -108,7 +108,7 @@ void context_update_map_info_campaign(uint32 map_id, const utf8* scenario_name)
 }
 
 // #5277: XUserSetContext
-DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD dwContextValue)
+DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
 {
 	LOG_TRACE_XLIVE("XUserSetContext  (userIndex = {0}, contextId = {1}, contextValue = {2})",
 		dwUserIndex, dwContextId, dwContextValue);
@@ -118,7 +118,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 		return ERROR_SUCCESS;
 	}
 
-	switch (dwContextId)
+	switch ((e_context_id)dwContextId)
 	{
 	case _context_id_variant:
 	{
@@ -141,7 +141,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, e_context_id dwContextId, DWORD 
 	}
 	case _context_id_presence:
 	{
-		switch (dwContextValue)
+		switch ((e_context_variant)dwContextValue)
 		{
 		case _context_presence_singleplayer:
 		{
