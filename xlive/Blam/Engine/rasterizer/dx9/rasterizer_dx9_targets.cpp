@@ -3,7 +3,7 @@
 
 /* public code */
 
-e_rasterizer_target* rasterizer_dx9_present_target_get(void)
+e_rasterizer_target* rasterizer_dx9_main_render_target_get(void)
 {
 	return Memory::GetAddress<e_rasterizer_target*>(0xA3E228);
 }
@@ -14,9 +14,9 @@ s_rasterizer_target* rasterizer_dx9_target_get(e_rasterizer_target rasterizer_ta
 	return &Memory::GetAddress<s_rasterizer_target*>(0xA8D658)[rasterizer_target];
 }
 
-IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_surface(uint16 rasterizer_target, uint16 mipmap_index)
+IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(uint16 rasterizer_target, uint16 mipmap_index)
 {
-	return INVOKE(0x25FB67, 0x0, rasterizer_dx9_get_target_surface, rasterizer_target, mipmap_index);
+	return INVOKE(0x25FB67, 0x0, rasterizer_dx9_get_render_target_surface, rasterizer_target, mipmap_index);
 }
 
 IDirect3DSurface9* rasterizer_dx9_target_get_surface(e_rasterizer_target rasterizer_target)
