@@ -9,44 +9,45 @@
 
 /* prototypes */
 
-bool __cdecl render_water_refraction(void);
+bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface(void);
 
 /* public code */
 
-bool* water_reflection_rendered_get(void)
+bool* rasterizer_water_refraction_surface_updated_get(void)
 {
     return Memory::GetAddress<bool*>(0x4F5048);
 }
 
 void rasterizer_dx9_water_apply_patches(void)
 {
-    PatchCall(Memory::GetAddress(0xA07B5, 0x0), render_water_refraction);
-    PatchCall(Memory::GetAddress(0x28158F, 0x0), render_water_refraction);
+    PatchCall(Memory::GetAddress(0x1A07B5, 0x0), rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface);
+    PatchCall(Memory::GetAddress(0x28158F, 0x0), rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface);
     return;
 }
 
 /* private code */
 
-bool __cdecl render_water_refraction(void)
+bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface(void)
 {
-    bool* water_reflection_rendered = water_reflection_rendered_get();
+    bool* rasterizer_water_refraction_surface_updated = rasterizer_water_refraction_surface_updated_get();
 
-    if (!*water_reflection_rendered)
+    if (!*rasterizer_water_refraction_surface_updated)
     {
         rasterizer_dx9_reset_depth_buffer();
         if (get_global_structure_bsp()->water_definitions.count > 0)
         {
-            IDirect3DSurface9* surface = rasterizer_dx9_target_get_surface(_rasterizer_target_20);
-            s_rasterizer_target* target_data = rasterizer_dx9_target_get(_rasterizer_target_20);
+            IDirect3DSurface9* surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_20);
 
             e_rasterizer_target render_target = *rasterizer_dx9_main_render_target_get();
             IDirect3DSurface9* render_surface = rasterizer_dx9_get_render_target_surface((uint16)render_target, 0);
 
-            s_camera* camera = get_global_camera();
-            RECT rect = { camera->viewport_bounds.left, camera->viewport_bounds.top, camera->viewport_bounds.right, camera->viewport_bounds.bottom };
+            D3DVIEWPORT9 d3d_viewport; 
+            rasterizer_dx9_device_get_interface()->GetViewport(&d3d_viewport);
+
+            RECT rect = { d3d_viewport.X, d3d_viewport.Y, d3d_viewport.X + d3d_viewport.Width, d3d_viewport.Y + d3d_viewport.Height };
             rasterizer_dx9_device_get_interface()->StretchRect(render_surface, &rect, surface, NULL, D3DTEXF_LINEAR);
         }
-        *water_reflection_rendered = true;
+        *rasterizer_water_refraction_surface_updated = true;
         rasterizer_dx9_reset_depth_buffer();
     }
     return true;

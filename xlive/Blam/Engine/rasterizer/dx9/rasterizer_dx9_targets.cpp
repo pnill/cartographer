@@ -19,8 +19,8 @@ IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(uint16 raste
 	return INVOKE(0x25FB67, 0x0, rasterizer_dx9_get_render_target_surface, rasterizer_target, mipmap_index);
 }
 
-IDirect3DSurface9* rasterizer_dx9_target_get_surface(e_rasterizer_target rasterizer_target)
+IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target)
 {
 	s_rasterizer_target* target = rasterizer_dx9_target_get(rasterizer_target);
-	return (target->texture && !target->unk_bool_20 && target->field_14 > 0 ? target->surfaces[0] : NULL);
+	return (target->texture != NULL && !target->unk_bool_20 && target->mip_count > 0 ? target->mip_surfaces[0] : NULL);
 }
