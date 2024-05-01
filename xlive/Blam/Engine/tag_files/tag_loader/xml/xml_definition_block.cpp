@@ -61,7 +61,7 @@ void c_xml_definition_block::get_element_counts()
 		}
 		if (strcmp(element_name, "tagRef") == 0 || strcmp(element_name, "tagref") == 0)
 		{
-			if (element->BoolAttribute("withClass") && element->Attribute("withClass"))
+			if (element->BoolAttribute("withClass") || element->Attribute("withClass"))
 				this->m_classless_tag_reference_count++;
 			else
 				this->m_tag_reference_count++;
@@ -131,7 +131,7 @@ void c_xml_definition_block::populate_buffers()
 		}
 		if (strcmp(element_name, "tagRef") == 0 || strcmp(element_name, "tagref") == 0)
 		{
-			if (element->BoolAttribute("withClass") && element->Attribute("withClass"))
+			if (element->BoolAttribute("withClass") || element->Attribute("withClass"))
 			{
 				this->m_classless_tag_references[this->m_classless_tag_reference_count] = offset;
 				this->m_classless_tag_reference_count++;

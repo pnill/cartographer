@@ -4,14 +4,14 @@
 
 class c_xml_definition_agent
 {
-	tag_group m_type;
+private:
+	e_tag_group type;
 	c_xml_definition_block m_definition;
-
-	c_static_string260 m_plugin_path;
-	tinyxml2::XMLDocument m_document;
 
 public:
 	c_xml_definition_agent(tag_group type, const char* plugin_path);
+	c_xml_definition_agent() = default;
 	~c_xml_definition_agent();
+	void init(tag_group type, const char* plugin_path);
 	c_xml_definition_block* get_definition();
 };

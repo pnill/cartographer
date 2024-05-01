@@ -15,7 +15,8 @@
 #define lazy_malloc_buffer(TYPE, COUNT)\
 	(TYPE*)malloc(sizeof(TYPE) * COUNT)
 
-c_xml_definition_loader::c_xml_definition_loader(c_xml_definition_block* definition, FILE* file_handle, datum cache_index)
+void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
+	s_cache_header* cache_header, s_tags_header* tags_header, tags::tag_instance* scenario_instance, datum cache_index)
 {
 	this->m_tag_reference_offsets = nullptr;
 	this->m_classless_tag_reference_offsets = nullptr;
@@ -27,10 +28,15 @@ c_xml_definition_loader::c_xml_definition_loader(c_xml_definition_block* definit
 	this->m_used_data = 0;
 	this->m_definition = definition;
 	this->m_file_handle = file_handle;
+	this->m_cache_header = cache_header;
+	this->m_tags_header = tags_header;
+	this->m_scenario_instance = scenario_instance;
+
 	this->m_cache_index = cache_index;
 	this->m_total_data_size = this->m_definition->get_size();
 
 	this->load_cache_info();
+
 	this->reset_counts();
 	// set the initial size of the data_loader
 	this->calculate_total_data_size(this->m_definition, this->m_file_offset);
@@ -43,27 +49,12 @@ c_xml_definition_loader::c_xml_definition_loader(c_xml_definition_block* definit
 	this->load_tag_data();
 
 	LOG_INFO_GAME("[uhh] {:x} - {:x}", this->m_instance.data_offset, this->m_instance.data_offset + this->m_instance.size);
-
-	// because breakpoints are too hard.
-	ASSERT(true);
 }
 
 void c_xml_definition_loader::load_cache_info()
 {
-	// read cache header from file
-	fseek(this->m_file_handle, 0, SEEK_SET);
-	fread(&this->m_cache_header, sizeof(s_cache_header), 1, this->m_file_handle);
-
-	// read tags header from file
-	fseek(this->m_file_handle, this->m_cache_header.tag_offset, SEEK_SET);
-	fread(&this->m_tags_header, sizeof(s_tags_header), 1, this->m_file_handle);
-
-	uint32 instance_table_offset = this->m_cache_header.tag_offset + 0xC * this->m_tags_header.tag_parent_info_count + 0x20;
-	uint32 tag_data_start_offset = this->m_cache_header.tag_offset + this->m_cache_header.data_offset;
-
-	// read scenario instance from file
-	fseek(this->m_file_handle, instance_table_offset, SEEK_SET);
-	fread(&this->m_scenario_instance, sizeof(tags::tag_instance), 1, this->m_file_handle);
+	uint32 instance_table_offset = this->m_cache_header->tag_offset + 0xC * this->m_tags_header->tag_parent_info_count + 0x20;
+	uint32 tag_data_start_offset = this->m_cache_header->tag_offset + this->m_cache_header->data_offset;
 
 	uint32 tag_instance_offset = instance_table_offset + sizeof(tags::tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);
 
@@ -71,12 +62,12 @@ void c_xml_definition_loader::load_cache_info()
 	fseek(this->m_file_handle, tag_instance_offset, SEEK_SET);
 	fread(&this->m_instance, sizeof(tags::tag_instance), 1, this->m_file_handle);
 
-	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance.data_offset;
+	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance->data_offset;
 }
 
 uint32 c_xml_definition_loader::resolve_cache_tag_data_offset(uint32 offset) const
 {
-	return (this->m_cache_header.tag_offset + this->m_cache_header.data_offset) + (offset - this->m_scenario_instance.data_offset);
+	return (this->m_cache_header->tag_offset + this->m_cache_header->data_offset) + (offset - this->m_scenario_instance->data_offset);
 }
 
 void c_xml_definition_loader::reset_counts()
@@ -89,7 +80,7 @@ void c_xml_definition_loader::reset_counts()
 	this->m_tag_reference_count = 0;
 }
 
-void c_xml_definition_loader::clear() const
+void c_xml_definition_loader::clear()
 {
 	if (this->m_tag_reference_offset_count)
 		free(this->m_tag_reference_offsets);
@@ -111,6 +102,8 @@ void c_xml_definition_loader::clear() const
 
 	if (this->m_data)
 		free(this->m_data);
+
+	this->reset_counts();
 }
 
 tag_reference t_tag_reference;
@@ -318,7 +311,7 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 
 		c_xml_definition_block* definition_block = definition->get_tag_block(i);
 
-		lazy_fread(this->m_file_handle, base_offset + definition->get_offset(), &block, sizeof(tag_block<>), 1);
+		lazy_fread(this->m_file_handle, base_offset + definition->get_tag_block(i)->get_offset(), &block, sizeof(tag_block<>), 1);
 		if (block.count > 0)
 		{
 			this->m_total_data_size += definition_block->get_size() * block.count;
@@ -360,16 +353,6 @@ void c_xml_definition_loader::validate_data() const
 			LOG_ERROR_GAME("[c_xml_definition_loader::validate_data] tag_block is invalid");
 		}
 	}
-}
-
-bool c_xml_definition_loader::is_persisted() const
-{
-	return this->m_persist;
-}
-
-void c_xml_definition_loader::set_persistence(bool state)
-{
-	this->m_persist = true;
 }
 
 #undef lazy_fread

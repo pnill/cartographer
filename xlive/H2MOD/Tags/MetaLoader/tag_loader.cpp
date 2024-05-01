@@ -10,6 +10,7 @@
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "models/models.h"
 #include "Util/filesys.h"
@@ -873,7 +874,6 @@ void _Patch_calls()
 void Initialise_tag_loader()
 {
 	tag_loader::reallocated_tag_table = new tags::tag_instance[_MAX_TAG_TABLE_SIZE_];
-
 	std::string game_dir(GetExeDirectoryNarrow());
 	std::string def_maps_loc = game_dir + "\\maps";
 

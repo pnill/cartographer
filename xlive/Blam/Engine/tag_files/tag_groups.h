@@ -1,5 +1,7 @@
 #pragma once
 
+#define k_tag_group_count 120
+
 enum e_tag_group : uint32
 {
 	_tag_group_cache_file_sound = '$#!+',
@@ -137,6 +139,14 @@ struct s_tag_block
 	int32 data;
 };
 
+constexpr tag_group tag_group_from_enum(e_tag_group type)
+{
+	const tag_group temp{ type };
+	return temp;
+}
+
 tag_group tag_group_get_name(tag_group group);
+
+uint32 tag_group_get_as_index(tag_group group);
 
 void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 index, int32 block_size);
