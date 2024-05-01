@@ -39,7 +39,7 @@ bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_ren
             IDirect3DSurface9* surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_20);
 
             e_rasterizer_target render_target = *rasterizer_dx9_main_render_target_get();
-            IDirect3DSurface9* render_surface = rasterizer_dx9_get_render_target_surface((uint16)render_target, 0);
+            IDirect3DSurface9* render_surface = rasterizer_dx9_get_render_target_surface(render_target, 0);
 
             D3DVIEWPORT9 d3d_viewport; 
             rasterizer_dx9_device_get_interface()->GetViewport(&d3d_viewport);

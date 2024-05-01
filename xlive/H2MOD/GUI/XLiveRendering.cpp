@@ -96,6 +96,13 @@ int WINAPI XLiveUninitialize()
 	LOG_TRACE_XLIVE("XLiveUninitialize");
 	
 	XLiveRendering::D3D9ReleaseResources();
+
+	if (g_pD3DDevice9)
+	{
+		g_pD3DDevice9->Release();
+		g_pD3DDevice9 = NULL;
+	}
+
 	return 0;
 }
 

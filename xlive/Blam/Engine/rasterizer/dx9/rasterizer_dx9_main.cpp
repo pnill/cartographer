@@ -4,6 +4,7 @@
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
 
+#include "rasterizer_dx9_targets.h"
 #include "rasterizer/rasterizer_loading.h"
 
 datum last_bitmap_tag_index = 0;
@@ -28,7 +29,7 @@ bool* rasterizer_reset_screen_global_get(void)
     return Memory::GetAddress<bool*>(0xA3E4D4);
 }
 
-bool* rasterizer_clear_screen_global_get(void)
+bool* rasterizer_target_back_buffer(void)
 {
     return Memory::GetAddress<bool*>(0xA3E4D5);
 }
@@ -84,7 +85,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
     bool result = true;
     if (!media_foundation_player_running())
     {
-        bool* g_clear_screen = rasterizer_clear_screen_global_get();
+        bool* g_clear_screen = rasterizer_target_back_buffer();
         *g_clear_screen = false;
         if (screenshot_bitmap && screenshot_bitmap->base_address)
         {
@@ -159,11 +160,6 @@ void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_i
     last_bitmap_tag_index = bitmap_tag_index;
     p_sub_65F600(stage, bitmap_tag_index, bitmap_data_index, a4);
     return;
-}
-
-bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3)
-{
-    return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target, target, z_stencil, a3);
 }
 
 void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)

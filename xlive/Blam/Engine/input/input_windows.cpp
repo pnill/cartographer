@@ -74,14 +74,14 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 		if (time - input_globals->field7D0 > 15000 || time - input_globals->field7D0 < 0)
 		{
 			input_globals->field7D0 = time;
-			tagINPUT pInputs;
-			//csmemset(&pInputs, 0, sizeof(pInputs));
-			pInputs.type = INPUT_KEYBOARD;
-			pInputs.ki.wVk = 0;
-			pInputs.ki.wScan = 0;
-			pInputs.ki.dwFlags = KEYEVENTF_KEYUP;
-			pInputs.ki.dwExtraInfo = 0;
-			SendInput(1, &pInputs, sizeof(pInputs));
+			INPUT input;
+			//csmemset(&input, 0, sizeof(input));
+			input.type = INPUT_KEYBOARD;
+			input.ki.wVk = 0;
+			input.ki.wScan = 0;
+			input.ki.dwFlags = KEYEVENTF_KEYUP;
+			input.ki.dwExtraInfo = 0;
+			SendInput(1, &input, sizeof(input));
 		}
 	}
 }

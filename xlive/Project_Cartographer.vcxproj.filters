@@ -330,6 +330,7 @@
     <ClCompile Include="Blam\Engine\Networking\Transport\transport_qos.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_vertex_cache.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\discord\discord_register.h" />
@@ -919,6 +920,7 @@
     <ClInclude Include="Blam\Engine\Networking\Transport\transport_qos.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_cache.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

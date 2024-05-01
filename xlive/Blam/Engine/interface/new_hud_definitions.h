@@ -122,14 +122,14 @@ struct s_new_hud_globals
 };
 ASSERT_STRUCT_SIZE(s_new_hud_globals, 144);
 
-enum e_hud_anchor : short
+enum e_hud_anchor : int16
 {
-    hud_anchor_health_and_shield = 0,
-    hud_anchor_weapon_hud = 1,
-    hud_anchor_motion_sensor = 2,
-    hud_anchor_scoreboard = 3,
-    hud_anchor_crosshair = 4,
-    hud_anchor_lockon_target = 5
+    _hud_anchor_health_and_shield = 0,
+    _hud_anchor_weapon_hud = 1,
+    _hud_anchor_motion_sensor = 2,
+    _hud_anchor_scoreboard = 3,
+    _hud_anchor_crosshair = 4,
+    _hud_anchor_lockon_target = 5
 };
 
 enum e_bitmap_widget_flags : short

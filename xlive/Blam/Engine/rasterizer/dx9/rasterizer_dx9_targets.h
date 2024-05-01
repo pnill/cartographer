@@ -61,8 +61,10 @@ struct s_rasterizer_target
 
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void);
 
-s_rasterizer_target* rasterizer_dx9_target_get(e_rasterizer_target rasterizer_target);
+s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target rasterizer_target);
 
-IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(uint16 rasterizer_target, uint16 mipmap_index);
+bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3);
+
+IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(e_rasterizer_target rasterizer_target, uint16 mipmap_index);
 
 IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target);

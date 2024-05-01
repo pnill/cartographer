@@ -21,12 +21,31 @@
 #include "rasterizer/rasterizer_settings.h"
 #include "scenario/scenario_fog.h"
 #include "structures/structures.h"
+#include "rasterizer/rasterizer_vertex_cache.h"
 
+
+/* prototypes */
+bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+    D3DPRIMITIVETYPE PrimitiveType,
+    UINT PrimitiveCount,
+    const void* pVertexStreamZeroData,
+    UINT VertexStreamZeroStride);
+
+void rasterizer_get_screen_frame_bounds(rectangle2d* rect);
 
 void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
+
+    PatchCall(Memory::GetAddress(0x284BF3), rasterizer_set_render_target_internal_hook_set_main_render_surface);
+    PatchCall(Memory::GetAddress(0x27DA9D), rasterizer_set_render_target_internal_hook_set_main_render_surface);
+
+    PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
+
+    // ### FIXME re-enable text/user interface text
+    // *Memory::GetAddress<bool*>(0x46818E) = false;
+
     return;
 }
 
@@ -111,6 +130,96 @@ void __cdecl rasterizer_render_scene(bool is_texture_camera)
     return;
 }
 
+//struct s_vs_shader_decl_36
+//{
+//    D3DXVECTOR4 position;
+//    D3DXVECTOR2 texcoord;
+//    D3DCOLOR color;
+//};
+
+bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
+{
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    IDirect3DVertexDeclaration9* vertex_dcl;
+    global_d3d_device->GetVertexDeclaration(&vertex_dcl);
+    bool res = !FAILED(vertex_dcl->GetDeclaration(vertex_elements, vertex_element_count));
+
+    vertex_dcl->Release();
+
+    return res;
+}
+
+bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+    D3DPRIMITIVETYPE PrimitiveType,
+    UINT PrimitiveCount,
+    const void* pVertexStreamZeroData,
+    UINT VertexStreamZeroStride)
+{
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    /*D3DVERTEXELEMENT9 vertex_elements[MAXD3DDECLLENGTH];
+    UINT vertex_element_couunt;
+
+    if (rasterizer_dx9_get_vertex_declaration_format(vertex_elements, &vertex_element_couunt))
+    {
+    }*/
+
+    return !FAILED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
+}
+
+void rasterizer_setup_2d_vertex_shader_user_interface_constants()
+{
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    real32 vc[20];
+    int16 width, height;
+
+    s_camera* global_camera = get_global_camera();
+
+    rectangle2d screen_bounds = global_camera->viewport_bounds;
+    width = screen_bounds.right - screen_bounds.left;
+    height = screen_bounds.bottom - screen_bounds.top;
+
+    // vertex shaders use normalized device coordinates system (NDC)
+	vc[0 + 0] = 2.0f / (real32)width; // x
+	vc[0 + 1] = 0.0f;
+	vc[0 + 2] = 0.0f;
+    vc[0 + 3] = -(1.0f / (real32)width + 1.0f) - (((real32)global_camera->viewport_bounds.left / width) * 2.0f); // offset from x
+
+	vc[4 + 0] = 0.0f;
+	vc[4 + 1] = -(2.0f / (real32)height); // y
+	vc[4 + 2] = 0.0f;
+	vc[4 + 3] = (1.0f / (real32)height + 1.0f) + (((real32)global_camera->viewport_bounds.top / height) * 2.0f); // offset from y
+
+    vc[8 + 0] = 0.0f;
+    vc[8 + 1] = 0.0f;
+    vc[8 + 2] = 0.0f; // z
+    vc[8 + 3] = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
+
+    vc[12 + 0] = 0.0f;
+    vc[12 + 1] = 0.0f;
+    vc[12 + 2] = 0.0f;
+    vc[12 + 3] = 1.0f; // w scaling component (1.0f * (width * height / (offset_x * offset_y)))
+
+    // the c181 register seems unused?
+    vc[16 + 0] = 0.0f;
+    vc[16 + 1] = 0.0f;
+    vc[16 + 2] = 0.0f;
+    vc[16 + 3] = 0.0f;
+
+    // avoid unnecessary API calls by testing the user mode memory cache
+    if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, 5))
+    {
+        global_d3d_device->SetVertexShaderConstantF(177, (float*)vc, 5);
+    }
+}
+
+void rasterizer_get_screen_frame_bounds(rectangle2d* rect)
+{
+    *rect = *Memory::GetAddress<rectangle2d*>(0xA3E418);
+}
+
 void render_view(
     real_rectangle2d* frustum_bounds,
     s_camera* rasterizer_camera,
@@ -192,48 +301,35 @@ void render_view(
             rasterizer_render_scene(is_texture_camera);
 
             IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-            IDirect3DSurface9* surface = NULL;
-            IDirect3DSurface9* global_d3d_surface_screenshot = global_d3d_surface_screenshot_get();
-            if (screenshot_in_progress())
-            {
-                surface = global_d3d_surface_screenshot;
-                global_d3d_surface_screenshot->AddRef();
-            }
-            else
-            {
-                global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &surface);
-            }
 
-            rasterizer_dx9_set_render_target(surface, NONE, true);
-            if (surface)
-            {
-                surface->Release();
-                surface = NULL;
-            }
+            *rasterizer_target_back_buffer() = false;
+            rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+
+            rasterizer_setup_2d_vertex_shader_user_interface_constants();
 
             rasterizer_dx9_set_stencil_mode(0);
             draw_hud();
             rasterizer_dx9_render_screen_effect();
 
+            render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
+            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
+
+            IDirect3DSurface9* main_render_target = rasterizer_dx9_get_render_target_surface(*rasterizer_dx9_main_render_target_get(), 0);
+
+            IDirect3DSurface9* backbuffer_surface = NULL;
             if (screenshot_in_progress())
             {
-                surface = global_d3d_surface_screenshot;
-                global_d3d_surface_screenshot->AddRef();
+                backbuffer_surface = global_d3d_surface_screenshot_get();
+                backbuffer_surface->AddRef();
             }
             else
             {
-                global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &surface);
+                global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer_surface);
             }
 
-            rasterizer_dx9_set_render_target(surface, NONE, true);
-            if (surface)
-            {
-                surface->Release();
-                surface = NULL;
-            }
+            global_d3d_device->StretchRect(main_render_target, NULL, backbuffer_surface, NULL, D3DTEXF_LINEAR);
 
-            render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
-            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
+            backbuffer_surface->Release();
         }
     }
 
@@ -288,7 +384,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     ASSERT(!memcmp(&window->render_camera.viewport_bounds, &window->rasterizer_camera.viewport_bounds, sizeof(rectangle2d)));
     ASSERT(!memcmp(&window->render_camera.window_bounds, &window->rasterizer_camera.window_bounds, sizeof(rectangle2d)));
 
-    *rasterizer_clear_screen_global_get() = false;
+    *rasterizer_target_back_buffer() = false;
     if (window->render_camera.vertical_field_of_view > k_real_math_epsilon)
     {
         render_view(
@@ -316,6 +412,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     {
         error(2, "Tried to render a view with a field of view of %f", window->render_camera.vertical_field_of_view);
     }
+    *rasterizer_target_back_buffer() = true;
 
     return;
 }
