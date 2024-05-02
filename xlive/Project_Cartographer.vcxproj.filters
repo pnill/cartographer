@@ -392,6 +392,7 @@
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1048,6 +1049,7 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

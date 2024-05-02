@@ -760,6 +760,7 @@
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
@@ -1159,6 +1160,7 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_files.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />

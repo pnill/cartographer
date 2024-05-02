@@ -5,6 +5,7 @@
 #include "main/level_definitions.h"
 
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "Util/filesys.h"
 
 
@@ -32,7 +33,7 @@ namespace MapSlots
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 		for (const auto& map : AddedMaps)
 		{
-			std::string map_location = def_maps_loc + "\\" + map;
+			std::string map_location = def_maps_loc + "\\" + map + ".map";
 			if (std::filesystem::exists(map_location))
 			{
 				LOG_TRACE_GAME("[Map Slots]: Startup - Caching {}", map);
@@ -117,7 +118,7 @@ namespace MapSlots
 					//Write the data loaded from the maps into the unused slot
 					memcpy(slot, &newSlot, sizeof(newSlot));
 					//Resolve the loaded bitmap datum
-					slot->bitmap.index = tag_loader::resolve_cache_index_to_injected(newSlot.bitmap.index);
+					slot->bitmap.index = tag_injection_resolve_cache_datum(newSlot.bitmap.index);
 
 					//Change the map id and sort ID so that the maps are 
 					//placed in order at the end of the list
@@ -200,14 +201,16 @@ namespace MapSlots
 	{
 		if (!AddedMaps.empty())
 		{
-			//Load all the added maps bitmaps
-			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-			for (const auto& item : BitmapsToLoad)
-			{
-				tag_loader::preload_tag_data_from_cache(item.first, false, item.second);
-			}
-			tag_loader::push_loaded_tag_data();
-			add_new_multiplayer_map_slots_game();
+			////Load all the added maps bitmaps
+			//LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+			//for (const auto& item : BitmapsToLoad)
+			//{
+			//	tag_injection_set_active_map(item.second.c_str());
+			//	tag_injection_load(_tag_group_bitmap, item.first, false);
+			//	tag_injection_inject();
+			//}
+
+			//add_new_multiplayer_map_slots_game();
 		}
 
 		return;
@@ -215,8 +218,8 @@ namespace MapSlots
 
 	void Initialize(void)
 	{
-		AddedMaps.emplace_back("highplains.map");
-		AddedMaps.emplace_back("derelict.map");
+		AddedMaps.emplace_back("highplains");
+		AddedMaps.emplace_back("derelict");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())

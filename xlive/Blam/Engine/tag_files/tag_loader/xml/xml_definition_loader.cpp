@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "xml_definition_loader.h"
 #include "xml_definition_block.h"
+#include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
 #include "H2MOD/Tags/TagInterface.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 #define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
 	fseek(FILE, OFFSET, SEEK_SET);\
@@ -197,7 +199,7 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 
 void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* loader, c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count)
 {
-	int8* cache_data = (int8*)malloc(definition->get_size() * block_count);
+	int8* cache_data = (int8*)calloc(block_count,definition->get_size());
 	fseek(loader->m_file_handle, file_offset, SEEK_SET);
 	fread(cache_data, definition->get_size() * block_count, 1, loader->m_file_handle);
 	memcpy(buffer, cache_data, definition->get_size() * block_count);
@@ -353,6 +355,62 @@ void c_xml_definition_loader::validate_data() const
 			LOG_ERROR_GAME("[c_xml_definition_loader::validate_data] tag_block is invalid");
 		}
 	}
+}
+
+uint32 c_xml_definition_loader::get_total_size() const
+{
+	return this->m_total_data_size;
+}
+
+int8* c_xml_definition_loader::get_data() const
+{
+	return this->m_data;
+}
+
+void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset) const
+{
+	// copy the data into the out buffer
+	memcpy(out_buffer, this->m_data, this->m_total_data_size);
+
+	
+	if(this->m_instance.type.group == _tag_group_render_model)
+	{
+		auto a = 213123;
+	}
+
+	// resolve and update tag references
+	for(uint32 i = 0; i < this->m_tag_reference_offset_count; i++)
+	{
+		s_offset_link* link = &this->m_tag_reference_offsets[i];
+		tag_reference* reference = (tag_reference*)(out_buffer + link->memory_offset - this->m_data);
+		reference->index = tag_injection_resolve_cache_datum(reference->index);
+	}
+
+	// resolve and update classless tag references
+	for(uint32 i = 0; i < this->m_classless_tag_reference_offset_count; i++)
+	{
+		s_offset_link* link = &this->m_classless_tag_reference_offsets[i];
+		datum* reference = (datum*)(out_buffer + link->memory_offset - this->m_data);
+		*reference = tag_injection_resolve_cache_datum(*reference);
+	}
+
+	// update data references
+	for(uint32 i = 0; i < this->m_data_reference_offset_count; i++)
+	{
+		s_memory_link* link = &this->m_data_reference_offsets[i];
+		data_reference* reference = (data_reference*)(out_buffer + link->memory_offset - this->m_data);
+		reference->data = (uint32)base_offset + ((uint32)link->data - (uint32)this->m_data);
+	}
+
+	// update tag blocks
+	for(uint32 i = 0; i < this->m_tag_block_offset_count; i++)
+	{
+		s_memory_link* link = &this->m_tag_block_offsets[i];
+		tag_block<>* reference = (tag_block<>*)(out_buffer + link->memory_offset - this->m_data);
+		//reference->data = (uint32)base_offset + (reference->data - this->m_instance.data_offset);
+		reference->data = (uint32)base_offset + ((uint32)link->data - (uint32)this->m_data);
+	}
+	auto a = 1234234;
 }
 
 #undef lazy_fread

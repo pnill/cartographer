@@ -71,6 +71,10 @@ public:
 	void init(c_xml_definition_block* definition, FILE* file_handle, s_cache_header* cache_header, s_tags_header* tags_header, tags::tag_instance* scenario_instance, datum cache_index);
 	void clear();
 	void validate_data() const;
+	uint32 get_total_size() const;
 
+	int8* get_data() const;
+
+	void copy_tag_data(int8* out_buffer, uint32 base_offset) const;
 };
 

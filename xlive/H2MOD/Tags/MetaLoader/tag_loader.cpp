@@ -810,61 +810,13 @@ namespace tag_loader
 	}
 }
 
-//Used to allocate some more space for tag tables and tags
-uint32 __cdecl datum_header_allocate(int32 allocation_size, int32 item_size)
-{
-	typedef unsigned int(_cdecl* Allocate_memory)(int size, char arg_4);
-	Allocate_memory pAllocate_memory;
-	pAllocate_memory = Memory::GetAddress<Allocate_memory>(0x37E69);
-
-	//i need to allocate more space
-	int modified_allocation_size = allocation_size + _MAX_ADDITIONAL_TAG_SIZE_;
-	tag_loader::base_map_tag_size = allocation_size + 0x20;//spacing
-
-	return INVOKE(0x37E69, 0, datum_header_allocate, modified_allocation_size, item_size);
-}
-//function patching to load custom tags
-bool _cdecl scenario_tags_load_internal(char* scenario_path)
-{
-	bool result = INVOKE(0x31348, 0, scenario_tags_load_internal, scenario_path);
-
-	//Clear the table
-	for (uint32 i = _INJECTED_TAG_START_; i < tag_loader::next_available_datum_index; i++)
-	{
-		tag_loader::reallocated_tag_table[i] = tags::tag_instance{ (e_tag_group)NONE, NONE, 0, 0 };
-	}
-	//tag_loader::loaded_tag_data.clear();
-	//tag_loader::injected_tag_reference_map.clear();
-	//tag_loader::loaded_tag_data_order.clear();
-
-	tag_loader::loader_table.reset();
-	// reset starting_datum index
-	tag_loader::used_additional_meta = 0;
-	tag_loader::next_available_datum_index = _INJECTED_TAG_START_;
 
 
-	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
-	{
-		// Grab the current 
-		uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50);
-		memset((BYTE*)tag_loader::reallocated_tag_table, 0, 0x3BA40);
-
-		if (*tag_table_start != NULL)
-		{
-			memcpy(tag_loader::reallocated_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
-			*tag_table_start = (uint32)tag_loader::reallocated_tag_table;
-		}
-	}
-
-	return result;
-}
 void _Patch_calls()
 {
 	//Todo :: Update Offsets for Dedi
-	PatchCall(Memory::GetAddress(0x313B2), datum_header_allocate);//allocating more space for meta loading
-	PatchCall(Memory::GetAddress(0x3166B), scenario_tags_load_internal);//default maps meta loading
-	PatchCall(Memory::GetAddress(0x315ED), scenario_tags_load_internal);//custom maps meta loading,i know i am taking risks	
+	
+	
 
 	//client side desync fix
 	///(noping out jump instructions)	
