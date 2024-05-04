@@ -65,7 +65,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 
 		quaternion->w = (matrix->matrix[i_1][i_2] - matrix->matrix[i_2][i_1]) * scalar;
 		quaternion->v.n[i_1] = (matrix->matrix[i][i_1] + matrix->matrix[i_1][i]) * scalar;
-		quaternion->v.n[i_2] = scalar * (matrix->matrix[i][i_2] + matrix->matrix[i_2][i]);
+		quaternion->v.n[i_2] = (matrix->matrix[i][i_2] + matrix->matrix[i_2][i]) * scalar;
 	}
 	else
 	{

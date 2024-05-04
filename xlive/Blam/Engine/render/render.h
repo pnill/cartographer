@@ -5,6 +5,13 @@
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
+enum e_vertex_shader_input_type
+{
+	_vertex_shader_input_type_position,
+	_vertex_shader_input_type_texcoord,
+	_vertex_shader_input_type_color,
+};
+
 struct s_frame
 {
 	int16 window_bound_index;

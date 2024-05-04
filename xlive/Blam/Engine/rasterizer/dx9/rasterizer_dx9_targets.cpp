@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_targets.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "camera/camera.h"
 
 /* prototypes */
 
@@ -10,6 +12,11 @@
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void)
 {
 	return Memory::GetAddress<e_rasterizer_target*>(0xA3E228);
+}
+
+bool* rasterizer_target_back_buffer(void)
+{
+	return Memory::GetAddress<bool*>(0xA3E4D5);
 }
 
 s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target texture_target)
@@ -42,4 +49,21 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, i
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
 	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+}
+
+void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
+{
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+	s_camera* global_camera = get_global_camera();
+
+	// set the viewport
+	rasterizer_dx9_set_render_target(target, (int32)z_stencil, a3);
+	D3DVIEWPORT9 vp = {
+		global_camera->viewport_bounds.left,
+		global_camera->viewport_bounds.top,
+		rectangle2d_width(&global_camera->viewport_bounds),
+		rectangle2d_height(&global_camera->viewport_bounds)
+	};
+	global_d3d_device->SetViewport(&vp);
 }

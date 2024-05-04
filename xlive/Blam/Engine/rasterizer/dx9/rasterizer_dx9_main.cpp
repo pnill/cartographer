@@ -29,11 +29,6 @@ bool* rasterizer_reset_screen_global_get(void)
     return Memory::GetAddress<bool*>(0xA3E4D4);
 }
 
-bool* rasterizer_target_back_buffer(void)
-{
-    return Memory::GetAddress<bool*>(0xA3E4D5);
-}
-
 rectangle2d* rasterizer_draw_on_main_back_buffer_get(void)
 {
     return Memory::GetAddress<rectangle2d*>(0xA3E410);
@@ -208,7 +203,7 @@ void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode)
     return INVOKE(0x2603D2, 0x0, rasterizer_dx9_set_stencil_mode, mode);
 }
 
-void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE render_state, D3DBLEND blend)
+void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD value)
 {
-    return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, render_state, blend);
+    return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, state, value);
 }
