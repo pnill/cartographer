@@ -25,6 +25,11 @@ s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target textu
 	return &Memory::GetAddress<s_rasterizer_target*>(0xA8D658)[texture_target];
 }
 
+void __cdecl rasterizer_get_texture_target_surface_size(e_rasterizer_target target, int32* out_width, int32* out_height)
+{
+	return INVOKE(0x280413, 0x0, rasterizer_get_texture_target_surface_size, target, out_width, out_height);
+}
+
 IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(e_rasterizer_target render_target_type, uint16 mipmap_index)
 {
 	return INVOKE(0x25FB67, 0x0, rasterizer_dx9_get_render_target_surface, render_target_type, mipmap_index);
@@ -57,7 +62,6 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 
 	s_camera* global_camera = get_global_camera();
 
-	// set the viewport
 	rasterizer_dx9_set_render_target(target, (int32)z_stencil, a3);
 	D3DVIEWPORT9 vp = {
 		global_camera->viewport_bounds.left,
@@ -65,5 +69,7 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 		rectangle2d_width(&global_camera->viewport_bounds),
 		rectangle2d_height(&global_camera->viewport_bounds)
 	};
+	// set the viewport, after setting the main render target
+	// to note that the viewport will always gets reset when a new render target is set
 	global_d3d_device->SetViewport(&vp);
 }

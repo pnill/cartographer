@@ -207,3 +207,13 @@ void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD val
 {
     return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, state, value);
 }
+
+c_rasterizer_constant_4f_cache* rasterizer_get_main_vertex_shader_cache()
+{
+    return Memory::GetAddress< c_rasterizer_constant_4f_cache*>(0xA3C7B0);
+}
+
+bool c_rasterizer_constant_4f_cache::test_cache(int32 index, real32* vertex_constants, int32 count_4f)
+{
+    return INVOKE_TYPE(0x4FF5B, 0x0, bool(__thiscall*)(c_rasterizer_constant_4f_cache*, int32, real32*, int32), this, index, vertex_constants, count_4f);
+}

@@ -21,8 +21,6 @@
 #include "rasterizer/rasterizer_settings.h"
 #include "scenario/scenario_fog.h"
 #include "structures/structures.h"
-#include "rasterizer/rasterizer_vertex_cache.h"
-
 
 /* prototypes */
 bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
@@ -40,7 +38,7 @@ void __cdecl sub_67D4EF(
     float* a1,
     unsigned __int8(__cdecl* a2)(int),
     bool(__cdecl* a3)(
-        e_vertex_shader_input_type input_type,
+        e_vertex_output_type input_type,
         real32* bounds,
         real32* location,
         void* output,
@@ -72,18 +70,13 @@ void render_apply_patches(void)
     return;
 }
 
-void __cdecl rasterizer_get_texture_surface_size(e_rasterizer_target target, int32* out_width, int32* out_height)
-{
-    return INVOKE(0x280413, 0x0, rasterizer_get_texture_surface_size, target, out_width, out_height);
-}
-
 void __cdecl rasterizer_fullscreen_apply_gamma(e_rasterizer_target target_surface)
 {
 	INVOKE(0x27D8E5, 0x0, rasterizer_fullscreen_apply_gamma, target_surface);
 }
 
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
-    e_vertex_shader_input_type input_type, 
+    e_vertex_output_type output_type, 
     real32* bounds, 
     real32* location, 
     void* output, 
@@ -93,7 +86,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     real32 bounds_width = bounds[1] - bounds[0];
     real32 bounds_height = bounds[3] - bounds[2];
 
-    if (input_type == _vertex_shader_input_type_position)
+    if (output_type == _vertex_output_type_position)
     {
         real32* position_output = (real32*)output;
 
@@ -107,7 +100,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
 
         return true;
     }
-    else if (input_type == _vertex_shader_input_type_texcoord)
+    else if (output_type == _vertex_output_type_texcoord)
     {
         real32* texcoord_output = (real32*)output;
 
@@ -115,7 +108,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
         // set the tex coords based on the texture set to be drawn on the screen
         int32 main_resolved_surface_size_x, main_resolved_surface_size_y;
         // get the size of the surface
-        rasterizer_get_texture_surface_size(_rasterizer_target_37, &main_resolved_surface_size_x, &main_resolved_surface_size_y);
+        rasterizer_get_texture_target_surface_size(_rasterizer_target_37, &main_resolved_surface_size_x, &main_resolved_surface_size_y);
 
         // explanation: locations are per vertex, this draw call will take 4 vertices
         // this function will get called 4 times, for each single vertex
@@ -131,7 +124,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
 
         return true;
     }
-    else if (input_type == _vertex_shader_input_type_color)
+    else if (output_type == _vertex_output_type_color)
     {
         D3DCOLOR* color = (D3DCOLOR*)output;
         *color = global_white_pixel32.color;
@@ -147,7 +140,7 @@ void __cdecl sub_67D4EF(
     float* a1,
     unsigned __int8(__cdecl* a2)(int),
     bool(__cdecl* a3)(
-        e_vertex_shader_input_type input_type,
+        e_vertex_output_type input_type,
         real32* bounds,
         real32* location,
         void* output,
@@ -319,7 +312,7 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 	vc[12 + 0] = 0.0f;
 	vc[12 + 1] = 0.0f;
 	vc[12 + 2] = 0.0f;
-	vc[12 + 3] = 1.0f; // w scaling component (1.0f * (width * height / (offset_x * offset_y)))
+	vc[12 + 3] = 1.0f; // w scaling component
 
 	// the c181 register seems unused?
 	vc[16 + 0] = 0.0f;
@@ -508,7 +501,6 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     {
         error(2, "Tried to render a view with a field of view of %f", window->render_camera.vertical_field_of_view);
     }
-    *rasterizer_target_back_buffer() = true;
 
     return;
 }

@@ -4,6 +4,12 @@
 
 #include "rasterizer_dx9_targets.h"
 
+class c_rasterizer_constant_4f_cache
+{
+public:
+	bool test_cache(int32 index, real32* vertex_constants, int32 count_4f);
+};
+
 static D3DFORMAT g_supported_depth_stencil_formats[] = { D3DFMT_D24S8, D3DFMT_D24X4S4 };
 
 datum last_bitmap_tag_index_get(void);
@@ -29,3 +35,5 @@ void __cdecl rasterizer_update_cameras(void);
 void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode);
 
 void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD value);
+
+c_rasterizer_constant_4f_cache* rasterizer_get_main_vertex_shader_cache();
