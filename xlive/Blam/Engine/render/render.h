@@ -5,6 +5,13 @@
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
+enum e_vertex_output_type
+{
+	_vertex_output_type_position,
+	_vertex_output_type_texcoord,
+	_vertex_output_type_color,
+};
+
 struct s_frame
 {
 	int16 window_bound_index;

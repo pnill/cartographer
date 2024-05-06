@@ -66,22 +66,21 @@ bool __cdecl render_ingame_chat_check()
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
 void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bounds)
 {
-	float safe_area = *Memory::GetAddress<float*>(0x9770F0);
+	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
 	s_camera* camera_data = get_global_camera();
 
-	float scale_factor = *get_secondary_hud_scale();
+	real32 scale_factor = *get_secondary_hud_scale();
 
-	typedef void(__cdecl* ui_get_hud_elemets_anchor_t)(e_hud_anchor, real_bounds*);
-	auto p_ui_get_hud_elemet_bounds = Memory::GetAddress<ui_get_hud_elemets_anchor_t>(0x223969);
+	int32 render_view_player_index = *Memory::GetAddress<int32*>(0x4E6800);
 
 	switch (anchor)
 	{
-	case hud_anchor_weapon_hud:
+	case _hud_anchor_weapon_hud:
 		bounds->lower = (float)camera_data->window_bounds.left + safe_area;
 		bounds->upper = (float)camera_data->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
 		break;
 	default:
-		p_ui_get_hud_elemet_bounds(anchor, bounds);
+		INVOKE(0x223969, 0x0, ui_get_hud_elemet_bounds_hook, anchor, bounds);
 		break;
 	}
 }
@@ -161,7 +160,7 @@ void get_crosshair_bitmap_datums()
 			s_hud_bitmap_widget_definition* bitmap_widget_definition = nhdt_definition->bitmap_widgets[i];
 
 			if (bitmap_widget_definition->widget_inputs.input_1 == hud_input_type_unit_autoaimed && 
-				bitmap_widget_definition->anchor == hud_anchor_crosshair && 
+				bitmap_widget_definition->anchor == _hud_anchor_crosshair && 
 				!crosshair_bitmap_vector_contains_datum(bitmap_widget_definition->bitmap.index))
 			{
 				crosshair_bitmap_datums.push_back(bitmap_widget_definition->bitmap.index);

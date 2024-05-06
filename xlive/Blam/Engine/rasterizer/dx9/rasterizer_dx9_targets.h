@@ -49,9 +49,8 @@ enum e_rasterizer_target : uint32
 struct s_rasterizer_target
 {
 	IDirect3DTexture9* texture;
-	IDirect3DSurface9* surfaces[2];
-	int gap_C[2];
-	int field_14;
+	IDirect3DSurface9* mip_surfaces[4];
+	int32 mip_count;
 	uint32 size_x;
 	uint32 size_y;
 	bool unk_bool_20;
@@ -60,10 +59,22 @@ struct s_rasterizer_target
 
 /* public code */
 
+bool* rasterizer_target_back_buffer(void);
+
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void);
 
-s_rasterizer_target* rasterizer_dx9_target_get(e_rasterizer_target rasterizer_target);
+s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target rasterizer_target);
 
-IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(uint16 rasterizer_target, uint16 mipmap_index);
+void __cdecl rasterizer_get_texture_target_surface_size(e_rasterizer_target target, int32* out_width, int32* out_height);
 
-IDirect3DSurface9* rasterizer_dx9_target_get_surface(e_rasterizer_target rasterizer_target);
+bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3);
+
+void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
+
+void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
+
+void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3);
+
+IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(e_rasterizer_target rasterizer_target, uint16 mipmap_index);
+
+IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target);

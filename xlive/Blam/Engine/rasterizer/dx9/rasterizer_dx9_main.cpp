@@ -4,6 +4,7 @@
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
 
+#include "rasterizer_dx9_targets.h"
 #include "rasterizer/rasterizer_loading.h"
 
 datum last_bitmap_tag_index = 0;
@@ -26,11 +27,6 @@ uint64* frame_presented_count_get(void)
 bool* rasterizer_reset_screen_global_get(void)
 {
     return Memory::GetAddress<bool*>(0xA3E4D4);
-}
-
-bool* rasterizer_clear_screen_global_get(void)
-{
-    return Memory::GetAddress<bool*>(0xA3E4D5);
 }
 
 rectangle2d* rasterizer_draw_on_main_back_buffer_get(void)
@@ -84,7 +80,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
     bool result = true;
     if (!media_foundation_player_running())
     {
-        bool* g_clear_screen = rasterizer_clear_screen_global_get();
+        bool* g_clear_screen = rasterizer_target_back_buffer();
         *g_clear_screen = false;
         if (screenshot_bitmap && screenshot_bitmap->base_address)
         {
@@ -161,11 +157,6 @@ void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_i
     return;
 }
 
-bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3)
-{
-    return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target, target, z_stencil, a3);
-}
-
 void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
 {
     INVOKE(0x25FC2A, 0x0, clear_render_target, flags, color, z, stencil);
@@ -212,7 +203,17 @@ void __cdecl rasterizer_dx9_set_stencil_mode(int16 mode)
     return INVOKE(0x2603D2, 0x0, rasterizer_dx9_set_stencil_mode, mode);
 }
 
-void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE render_state, D3DBLEND blend)
+void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD value)
 {
-    return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, render_state, blend);
+    return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, state, value);
+}
+
+c_rasterizer_constant_4f_cache* rasterizer_get_main_vertex_shader_cache()
+{
+    return Memory::GetAddress< c_rasterizer_constant_4f_cache*>(0xA3C7B0);
+}
+
+bool c_rasterizer_constant_4f_cache::test_cache(int32 index, real32* vertex_constants, int32 count_4f)
+{
+    return INVOKE_TYPE(0x4FF5B, 0x0, bool(__thiscall*)(c_rasterizer_constant_4f_cache*, int32, real32*, int32), this, index, vertex_constants, count_4f);
 }
