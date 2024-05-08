@@ -49,7 +49,13 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 {
 	s_tag_injecting_table_entry* entry = g_manager.get_table()->get_entry_by_cache_index(cache_datum);
 	if (!entry)
+	{
+		tags::tag_instance inst = g_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum)];
+		if (inst.data_offset != 0)
+			return inst.datum_index;
+
 		return NONE;
+	}
 
 	return entry->injected_index;
 }

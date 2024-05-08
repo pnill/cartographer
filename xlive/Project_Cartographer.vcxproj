@@ -1161,6 +1161,7 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_groups.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_import_definitions.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />

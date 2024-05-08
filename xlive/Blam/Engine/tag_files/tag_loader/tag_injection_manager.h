@@ -54,10 +54,10 @@ public:
 	uint16 get_entry_count() const;
 	c_tag_injection_table* get_table();
 
-	bool find_map(const char* map_name, c_static_string260* out_string);
+	bool find_map(const char* map_name, c_static_string260* out_string) const;
 	void set_active_map(const char* map_name);
 	
-	bool get_active_map_verified();
+	bool get_active_map_verified() const;
 	void reset();
 	datum get_tag_datum_by_name(e_tag_group group, const char* tag_name) const;
 	void get_name_by_tag_datum(e_tag_group group, datum cache_datum, char* out_name) const;

@@ -1050,6 +1050,7 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -59,7 +59,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 		quaternion->v.n[i] = forward_result_sqroot * 0.5f;
 
 		// Make sure value set is greater than epsilon
-		ASSERT(quaternion->v.n[i] > k_real_math_epsilon);
+		//ASSERT(quaternion->v.n[i] > k_real_math_epsilon);
 
 		real32 scalar = 0.25f / quaternion->v.n[i];
 

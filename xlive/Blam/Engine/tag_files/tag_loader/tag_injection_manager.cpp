@@ -53,7 +53,7 @@ c_tag_injection_table* c_tag_injecting_manager::get_table()
 	return &this->m_table;
 }
 
-bool c_tag_injecting_manager::find_map(const char* map_name, c_static_string260* out_string)
+bool c_tag_injecting_manager::find_map(const char* map_name, c_static_string260* out_string) const
 {
 	c_static_string260 test_path;
 	test_path.set(this->m_base_map_directory.get_string());
@@ -111,7 +111,7 @@ void c_tag_injecting_manager::set_active_map(const char* map_name)
 	lazy_fread(this->m_active_map_file_handle, m_active_map_instance_table_offset, &this->m_active_map_scenario_instance, sizeof(tags::tag_instance), 1);
 }
 
-bool c_tag_injecting_manager::get_active_map_verified()
+bool c_tag_injecting_manager::get_active_map_verified() const
 {
 	return this->m_active_map_verified;
 }
@@ -190,6 +190,8 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 			do
 			{
 				render_model_section* model_section = model_definition->sections[current_section_index];
+
+				geometry_block_resource* t_res = model_section->geometry_block_info.resources[0];
 
 				((void(__cdecl*)(geometry_block_info*, unsigned int))Memory::GetAddress(0x2652BC))(&model_section->geometry_block_info, 3u);
 
@@ -477,7 +479,9 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	c_static_string260 name;
 	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
-	LOG_INFO_GAME("[c_tag_injection_manager::load_tag] loading dependency {}", name.get_string());
+#if K_TAG_INJECTION_DEBUG
+	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {}", name.get_string());
+#endif
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
 	c_xml_definition_agent* agent = manager->get_agent(group);
@@ -524,6 +528,20 @@ void c_tag_injecting_manager::inject_tags()
 		injection_instance->data_offset = injection_offset;
 		injection_instance->size = entry->loaded_data.get_total_size();
 		injection_instance->datum_index = entry->injected_index;
+
+		char null_terminated_class[5];
+		null_terminated_class[0] = entry->type.string[3];
+		null_terminated_class[1] = entry->type.string[2];
+		null_terminated_class[2] = entry->type.string[1];
+		null_terminated_class[3] = entry->type.string[0];
+		null_terminated_class[4] = '\0';
+
+		c_static_string260 tag_name;
+		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
+
+#if K_TAG_INJECTION_DEBUG
+		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {}", null_terminated_class, injection_offset, injection_instance->size, tag_name.get_string());
+#endif
 
 		entry->loaded_data.copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
 

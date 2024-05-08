@@ -1,7 +1,7 @@
 #pragma once
 #include "xml_definition_block.h"
 #include "tag_files/tag_groups.h"
-
+#include "tag_files/tag_loader/tag_injection_define.h"
 class c_xml_definition_agent
 {
 private:
@@ -14,4 +14,9 @@ public:
 	~c_xml_definition_agent();
 	void init(tag_group type, const char* plugin_path);
 	c_xml_definition_block* get_definition();
+
+#if K_TAG_INJECTION_DEBUG
+	static void print_definition_internal(c_xml_definition_block* definition, uint32 depth);
+	void print_definition();
+#endif
 };

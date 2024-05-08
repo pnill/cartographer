@@ -20,6 +20,14 @@ c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_elemen
 	this->m_string_ids = nullptr;
 	this->m_data_references = nullptr;
 	this->m_tag_blocks = nullptr;
+
+#if K_TAG_INJECTION_DEBUG
+	this->m_tag_reference_names = nullptr;
+	this->m_classless_tag_reference_names = nullptr;
+	this->m_data_reference_names = nullptr;
+	this->m_tag_block_names = nullptr;
+#endif
+
 	this->reset_counts();
 
 	if (this->m_element->Attribute("name"))
@@ -104,6 +112,20 @@ void c_xml_definition_block::allocate_buffers()
 
 	if (this->m_tag_block_count)
 		this->m_tag_blocks = (c_xml_definition_block*)malloc(sizeof(c_xml_definition_block) * this->m_tag_block_count);
+
+#if K_TAG_INJECTION_DEBUG
+	if (this->m_tag_reference_count)
+		this->m_tag_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_tag_reference_count);
+
+	if (this->m_classless_tag_reference_count)
+		this->m_classless_tag_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_classless_tag_reference_count);
+
+	if (this->m_data_reference_count)
+		this->m_data_reference_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_data_reference_count);
+
+	if (this->m_tag_block_count)
+		this->m_tag_block_names = (c_static_string64*)malloc(sizeof(c_static_string64) * this->m_tag_block_count);
+#endif
 }
 
 void c_xml_definition_block::populate_buffers()
@@ -124,6 +146,11 @@ void c_xml_definition_block::populate_buffers()
 				size = strtoul(element->Attribute("elementSize"), nullptr, 16);
 
 			new (&this->m_tag_blocks[this->m_tag_block_count]) c_xml_definition_block(element, offset, size);
+
+#if K_TAG_INJECTION_DEBUG
+			this->m_tag_block_names[this->m_tag_block_count].set(element->Attribute("name"));
+#endif
+
 			this->m_tag_block_count++;
 
 			element = element->NextSiblingElement();
@@ -134,11 +161,21 @@ void c_xml_definition_block::populate_buffers()
 			if (element->BoolAttribute("withClass") || element->Attribute("withClass"))
 			{
 				this->m_classless_tag_references[this->m_classless_tag_reference_count] = offset;
+
+#if K_TAG_INJECTION_DEBUG
+				this->m_classless_tag_reference_names[this->m_classless_tag_reference_count].set(element->Attribute("name"));
+#endif
+
 				this->m_classless_tag_reference_count++;
 			}
 			else
 			{
 				this->m_tag_references[this->m_tag_reference_count] = offset;
+
+#if K_TAG_INJECTION_DEBUG
+				this->m_tag_reference_names[this->m_tag_reference_count].set(element->Attribute("name"));
+#endif
+
 				this->m_tag_reference_count++;
 			}
 
@@ -156,6 +193,11 @@ void c_xml_definition_block::populate_buffers()
 		if (strcmp(element_name, "dataref") == 0)
 		{
 			this->m_data_references[this->m_data_reference_count] = offset;
+
+#if K_TAG_INJECTION_DEBUG
+			this->m_data_reference_names[this->m_data_reference_count].set(element->Attribute("name"));
+#endif
+
 			this->m_data_reference_count++;
 
 			element = element->NextSiblingElement();
@@ -178,6 +220,20 @@ void c_xml_definition_block::clear()
 
 	if (this->m_tag_reference_count)
 		free(this->m_data_references);
+
+#if K_TAG_INJECTION_DEBUG
+	if (this->m_tag_reference_count)
+		free(this->m_tag_reference_names);
+
+	if (this->m_classless_tag_reference_count)
+		free(this->m_classless_tag_reference_names);
+
+	if (this->m_tag_reference_count)
+		free(this->m_data_reference_names);
+
+	if (this->m_tag_block_count)
+		free(this->m_tag_reference_names);
+#endif
 
 	if (this->m_tag_block_count)
 	{
@@ -255,3 +311,27 @@ c_xml_definition_block* c_xml_definition_block::get_tag_block(uint32 index) cons
 {
 	return &this->m_tag_blocks[index];
 }
+
+#if K_TAG_INJECTION_DEBUG
+
+c_static_string64* c_xml_definition_block::get_tag_reference_name(uint32 index) const
+{
+	return &this->m_tag_reference_names[index];
+}
+
+c_static_string64* c_xml_definition_block::get_classless_tag_reference_name(uint32 index) const
+{
+	return &this->m_classless_tag_reference_names[index];
+}
+
+c_static_string64* c_xml_definition_block::get_data_reference_name(uint32 index) const
+{
+	return &this->m_data_reference_names[index];
+}
+
+c_static_string64* c_xml_definition_block::get_tag_block_name(uint32 index) const
+{
+	return &this->m_tag_block_names[index];
+}
+
+#endif
