@@ -333,6 +333,11 @@
     <ClCompile Include="Blam\Engine\Networking\Transport\transport_qos.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_submit.cpp" />
     <ClCompile Include="Blam\Engine\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
@@ -927,7 +932,12 @@
     <ClInclude Include="Blam\Engine\Networking\Transport\transport_qos.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_shader_submit.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />
     <ClInclude Include="Blam\Engine\effects\lens_flares.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_submit.h" />
     <ClInclude Include="Blam\Engine\saved_games\player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />

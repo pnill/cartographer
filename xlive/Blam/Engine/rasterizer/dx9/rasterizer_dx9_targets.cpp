@@ -46,11 +46,6 @@ bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z
 	return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target, target, z_stencil, a3);
 }
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3)
-{
-	return INVOKE(0x25FDC0, 0x0, rasterizer_dx9_set_target, render_target_type, mip_level, a3);
-}
-
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
 	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
@@ -72,4 +67,9 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 	// set the viewport, after setting the main render target
 	// to note that the viewport will always gets reset when a new render target is set
 	global_d3d_device->SetViewport(&vp);
+}
+
+e_rasterizer_target __cdecl rasterizer_dx9_get_overlay_destination_target(void)
+{
+	return INVOKE(0x19DAFB, 0x0, rasterizer_dx9_get_overlay_destination_target);
 }

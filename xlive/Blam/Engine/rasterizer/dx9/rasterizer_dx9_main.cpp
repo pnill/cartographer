@@ -7,12 +7,63 @@
 #include "rasterizer_dx9_targets.h"
 #include "rasterizer/rasterizer_loading.h"
 
+/* globals */
 datum last_bitmap_tag_index = 0;
 
-typedef void(__cdecl* sub_65F600_t)(int16, datum, int16, real32);
-sub_65F600_t p_sub_65F600;
 
-void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
+D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
+{
+  D3DBLEND_ZERO,
+  D3DBLEND_ZERO,
+  D3DBLEND_ZERO,
+  D3DBLEND_ZERO,
+  D3DBLEND_SRCCOLOR,
+  D3DBLEND_INVSRCCOLOR,
+  D3DBLEND_SRCALPHA,
+  D3DBLEND_ZERO,
+  D3DBLEND_ZERO,
+  D3DBLEND_ZERO,
+  (D3DBLEND)NONE
+};
+
+D3DBLEND g_dst_blend[k_shader_framebuffer_blend_function_count] =
+{
+  D3DBLEND_INVSRCALPHA,
+  D3DBLEND_ZERO,
+  D3DBLEND_SRCCOLOR,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_INVSRCALPHA,
+  (D3DBLEND)0,
+  (D3DBLEND)0,
+  (D3DBLEND)NONE
+};
+
+D3DBLEND g_src_blend[k_shader_framebuffer_blend_function_count] =
+{
+  D3DBLEND_SRCALPHA,
+  D3DBLEND_DESTCOLOR,
+  D3DBLEND_DESTCOLOR,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  D3DBLEND_ONE,
+  (D3DBLEND)0,
+  (D3DBLEND)0,
+  (D3DBLEND)NONE
+};
+
+
+/* typedefs */
+
+typedef void(__cdecl* rasterizer_dx9_set_texture_stage_t)(int16, datum, int16, real32);
+rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
+
+/* prototypes */
+
 void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
 void __cdecl rasterizer_set_stream_source(void);
 void __cdecl debug_frame_usage_draw(void);
@@ -59,9 +110,19 @@ IDirect3DSurface9* global_d3d_surface_render_primary_get(void)
     return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C64C);
 }
 
+IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void)
+{
+    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C650);
+}
+
+IDirect3DPixelShader9** local_pixel_shaders_get(void)
+{
+    return Memory::GetAddress<IDirect3DPixelShader9**>(0xA56C0C);
+}
+
 void rasterizer_dx9_main_apply_patches(void)
 {
-    DETOUR_ATTACH(p_sub_65F600, Memory::GetAddress<sub_65F600_t>(0x25F600, 0x0), sub_65F600);
+    DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_stage);
     return;
 }
 
@@ -150,10 +211,10 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
 }
 
 
-void __cdecl sub_65F600(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
+void __cdecl rasterizer_dx9_set_texture_stage(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
 {
     last_bitmap_tag_index = bitmap_tag_index;
-    p_sub_65F600(stage, bitmap_tag_index, bitmap_data_index, a4);
+    p_rasterizer_dx9_set_texture_stage(stage, bitmap_tag_index, bitmap_data_index, a4);
     return;
 }
 
@@ -208,12 +269,59 @@ void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD val
     return INVOKE(0x26F8E2, 0x0, rasterizer_dx9_set_render_state, state, value);
 }
 
-c_rasterizer_constant_4f_cache* rasterizer_get_main_vertex_shader_cache()
+void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuffer_blend_function)
 {
-    return Memory::GetAddress< c_rasterizer_constant_4f_cache*>(0xA3C7B0);
+    bool alpha_blend_enabled = framebuffer_blend_function != _framebuffer_blend_function_none;
+    rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, alpha_blend_enabled);
+    if (alpha_blend_enabled)
+    {
+        rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, g_src_blend[framebuffer_blend_function]);
+        rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, g_dst_blend[framebuffer_blend_function]);
+        rasterizer_dx9_set_render_state(D3DRS_BLENDOP, g_blend_operation[framebuffer_blend_function]);
+    }
+    return;
 }
 
-bool c_rasterizer_constant_4f_cache::test_cache(int32 index, real32* vertex_constants, int32 count_4f)
+void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3)
 {
-    return INVOKE_TYPE(0x4FF5B, 0x0, bool(__thiscall*)(c_rasterizer_constant_4f_cache*, int32, real32*, int32), this, index, vertex_constants, count_4f);
+    INVOKE(0x25FDC0, 0x0, rasterizer_dx9_set_target, render_target_type, mip_level, a3);
+    return;
+}
+
+bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, int16 rasterizer_target)
+{
+    return INVOKE(0x260256, 0x0, rasterizer_dx9_set_target_as_texture, stage, rasterizer_target);
+}
+
+void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
+{
+    rasterizer_dx9_device_get_interface()->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
+    return;
+}
+
+e_rasterizer_target __cdecl sub_66C2CA(
+    real32 a1,
+    real32 a2,
+    real32 a3,
+    int32 a4,
+    int32 a5,
+    int32 a6,
+    int32 a7,
+    int32 a8,
+    int32 a9,
+    real32 a10,
+    real32 a11)
+{
+    return INVOKE(0x26C2CA, 0x0, sub_66C2CA,
+        a1,
+        a2,
+        a3,
+        a4,
+        a5,
+        a6,
+        a7,
+        a8,
+        a9,
+        a10,
+        a11);
 }

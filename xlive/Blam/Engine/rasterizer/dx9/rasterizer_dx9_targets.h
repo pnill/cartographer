@@ -73,8 +73,8 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3);
-
 IDirect3DSurface9* __cdecl rasterizer_dx9_get_render_target_surface(e_rasterizer_target rasterizer_target, uint16 mipmap_index);
 
 IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target);
+
+e_rasterizer_target __cdecl rasterizer_dx9_get_overlay_destination_target(void);

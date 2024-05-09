@@ -5,13 +5,6 @@
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
-enum e_vertex_output_type
-{
-	_vertex_output_type_position,
-	_vertex_output_type_texcoord,
-	_vertex_output_type_color,
-};
-
 struct s_frame
 {
 	int16 window_bound_index;
@@ -47,9 +40,15 @@ struct window_bound
 };
 ASSERT_STRUCT_SIZE(window_bound, 280);
 
+/* public code */
+
 void render_apply_patches(void);
 
+s_frame* global_window_parameters_get(void);
+
 real64 get_current_render_time(void);
+
+bool* hs_texture_camera_view_get(void);
 
 // CLIENT ONLY
 // Get cluster index and leaf index from render position provided
