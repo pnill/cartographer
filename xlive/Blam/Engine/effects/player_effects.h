@@ -139,7 +139,7 @@ ASSERT_STRUCT_SIZE(s_player_effect_globals, 688);
 
 struct s_screen_flash
 {
-	int32 field_0;
+	int32 type;	// e_screen_flash_type
 	real32 intensity;
 	real_argb_color color;
 };
