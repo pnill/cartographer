@@ -394,6 +394,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_text.cpp" />
     <ClCompile Include="Blam\Engine\interface\hud_definitions.cpp" />
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
+    <ClCompile Include="Blam\Engine\math\color_math.cpp" />
     <ClCompile Include="Blam\Engine\math\function_definitions.cpp" />
     <ClCompile Include="Blam\Engine\math\math.cpp" />
     <ClCompile Include="Blam\Engine\math\matrix_math.cpp" />
@@ -533,6 +534,7 @@
     <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
     <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
     <ClInclude Include="Blam\Engine\effects\effect_location_definition.h" />
+    <ClInclude Include="Blam\Engine\effects\lens_flares.h" />
     <ClInclude Include="Blam\Engine\effects\particle_definition_interface.h" />
     <ClInclude Include="Blam\Engine\effects\particle_draw.h" />
     <ClInclude Include="Blam\Engine\effects\particle_model_definitions.h" />

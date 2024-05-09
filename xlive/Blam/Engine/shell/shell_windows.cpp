@@ -28,6 +28,16 @@ bool __cdecl pcc_get_properties(void);
 
 LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+int32* global_window_bounds_x_get(void)
+{
+	return Memory::GetAddress<int32*>(0xA3E408);
+}
+
+int32* global_window_bounds_y_get(void)
+{
+	return Memory::GetAddress<int32*>(0xA3E40C);
+}
+
 void shell_windows_apply_patches(void)
 {
 	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);

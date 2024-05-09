@@ -31,7 +31,7 @@ ASSERT_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 union real_vector4d
 {
 	real32 v[4];
-	struct { real32 i, j, k, l; };
+	struct { real32 i, j, k, w; };
 };
 ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
