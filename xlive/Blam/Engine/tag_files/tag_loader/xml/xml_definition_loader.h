@@ -65,7 +65,7 @@ class c_xml_definition_loader
 	int8* reserve_data(uint32 size);
 	static void load_tag_data_internal(c_xml_definition_loader* loader, c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count);
 	void load_tag_data();
-	void calculate_total_data_size(const c_xml_definition_block* definition, uint32 base_offset);
+	void calculate_total_data_size(const c_xml_definition_block* definition, uint32 base_offset, uint32 block_size);
 public:
 	uint32 m_tag_reference_count;
 	datum* m_tag_references;
@@ -83,6 +83,7 @@ public:
 
 #if K_TAG_INJECTION_DEBUG
 	void validate_data() const;
+	//void compare_buffers(int8* injected_buffer);
 #endif
 };
 

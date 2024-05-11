@@ -35,7 +35,7 @@ public:
 
 	s_tag_injecting_table_entry* get_entry(uint16 index) const;
 	s_tag_injecting_table_entry* get_entry_by_cache_index(datum datum_index) const;
-	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index);
+	s_tag_injecting_table_entry* get_entry_by_injected_index(datum datum_index) const;
 	bool has_entry_by_cache_index(datum datum_index) const;
 	bool has_entry_by_injected_index(datum datum_index) const;
 	bool has_existing_preloaded_entry_by_cache_index(datum datum_index);

@@ -131,8 +131,8 @@ void game_globals_remove_singleplayer_representation(void)
 
 void game_globals_add_skeleton_representation(scenario* scenario_definition)
 {
-	// Add skeleton
-	datum skele_datum = tag_loader::get_tag_datum_by_name("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", _tag_group_biped, "carto_shared");
+		// Add skeleton
+	/*datum skele_datum = tag_loader::get_tag_datum_by_name("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", _tag_group_biped, "carto_shared");
 	datum skele_fp_datum = tag_loader::get_tag_datum_by_name("objects\\characters\\masterchief_skeleton\\fp\\fp", _tag_group_render_model, "carto_shared");
 	datum skele_body_datum = tag_loader::get_tag_datum_by_name("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
 
@@ -148,10 +148,10 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 		new_def->tag_datum = skele_new_datum;
 	}
 	else
-	{
+	{*/
 		clone_representation(_character_type_spartan);
-	}
-	return;
+	//}
+	//return;
 }
 
 void game_globals_add_flood_representation(scenario* scenario_definition)

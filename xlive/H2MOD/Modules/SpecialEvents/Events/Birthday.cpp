@@ -5,6 +5,7 @@
 
 #include "items/weapon_definitions.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "shaders/shader_definitions.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 void birthday_event_map_load()
@@ -81,5 +82,4 @@ void birthday_event_map_load()
 			}
 		}
 	}
-
 }

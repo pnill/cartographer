@@ -173,6 +173,12 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 		LOG_ERROR_GAME("[tag_loader] failed to resolve datum to correct instance, game will crash");
 	}
 
+#if K_TAG_INJECTION_DEBUG
+	c_static_string260 str;
+	this->get_name_by_tag_datum(tag_info->type.group, this->m_table.get_entry_by_injected_index(injected_index)->cache_index, str.get_buffer());
+	LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_raw] loading {} index {:x}", str.get_string(), injected_index);
+#endif
+
 	//supposing full length
 	HANDLE new_file_handle = CreateFileA(this->m_active_map.get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 		//(HANDLE)_get_osfhandle(_fileno(this->m_active_map_file_handle));
@@ -395,6 +401,9 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 	null_terminated_class[3] = group.string[0];
 	null_terminated_class[4] = '\0';
 
+	if (null_terminated_class[3] == ' ')
+		null_terminated_class[3] = '\0';
+
 	c_static_string260 plugin_path;
 	plugin_path.set(this->m_plugins_directory.get_string());
 	plugin_path.append(null_terminated_class);
@@ -423,6 +432,9 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 		null_terminated_class[3] = group.string[0];
 		null_terminated_class[4] = '\0';
 
+		if (null_terminated_class[3] == ' ')
+			null_terminated_class[3] = '\0';
+
 		LOG_ERROR_GAME("[c_tag_injecting_manager::get_agent] failed to initialize agent for {}", null_terminated_class);
 		return nullptr;
 	}
@@ -432,7 +444,14 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name, bool load_dependencies)
 {
 	datum cache_datum = this->get_tag_datum_by_name(group, tag_name);
-	return this->load_tag(group, cache_datum, load_dependencies);
+	if (!DATUM_IS_NONE(cache_datum))
+	{
+#if K_TAG_INJECTION_DEBUG
+		LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_tag] loading {} with depencies {} datum {}", tag_name, load_dependencies, cache_datum);
+#endif
+		return this->load_tag(group, cache_datum, load_dependencies);
+	}
+	return NONE;
 }
 
 datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bool load_dependencies)
@@ -480,7 +499,14 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
 #if K_TAG_INJECTION_DEBUG
-	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {}", name.get_string());
+	char null_terminated_class[5];
+	null_terminated_class[0] = group.string[3];
+	null_terminated_class[1] = group.string[2];
+	null_terminated_class[2] = group.string[1];
+	null_terminated_class[3] = group.string[0];
+	null_terminated_class[4] = '\0';
+
+	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), null_terminated_class);
 #endif
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
@@ -505,6 +531,21 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 
 void c_tag_injecting_manager::inject_tags()
 {
+#if K_TAG_INJECTION_DEBUG
+	for (uint16 i = 0; i < this->m_table.get_entry_count(); i++)
+	{
+		s_tag_injecting_table_entry* entry = this->m_table.get_entry(i);
+		char null_terminated_class[5];
+		null_terminated_class[0] = entry->type.string[3];
+		null_terminated_class[1] = entry->type.string[2];
+		null_terminated_class[2] = entry->type.string[1];
+		null_terminated_class[3] = entry->type.string[0];
+		null_terminated_class[4] = '\0';
+		c_static_string260 tag_name;
+		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
+		LOG_DEBUG_GAME("[table_dump]: cache_index: {:x} injected_index: {:x} type: {} tag_name: {}", entry->cache_index, entry->injected_index, null_terminated_class, tag_name.get_string());
+	}
+#endif
 	for(uint16 i = 0; i < this->m_table.get_entry_count(); i++)
 	{
 		s_tag_injecting_table_entry* entry = this->m_table.get_entry(i);
@@ -540,19 +581,24 @@ void c_tag_injecting_manager::inject_tags()
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 
 #if K_TAG_INJECTION_DEBUG
-		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {}", null_terminated_class, injection_offset, injection_instance->size, tag_name.get_string());
+		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", null_terminated_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
 #endif
 
 		entry->loaded_data.copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
 
-		this->load_raw_data_from_cache(entry->injected_index);
-		this->setup_havok_vtables(entry->type.group, entry->injected_index);
+		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model)
+			this->load_raw_data_from_cache(entry->injected_index);
+
+		//this->setup_havok_vtables(entry->type.group, entry->injected_index);
 
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);
 
 		this->m_injectable_used_size += entry->loaded_data.get_total_size();
 	}
+#if K_TAG_INJECTION_DEBUG
+	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");
+#endif
 }
 
 

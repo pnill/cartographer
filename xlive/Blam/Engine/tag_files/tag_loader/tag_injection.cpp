@@ -45,6 +45,13 @@ void tag_injection_inject()
 	g_manager.inject_tags();
 }
 
+bool tag_injection_is_injected(datum injected_index)
+{
+	if (DATUM_IS_NONE(injected_index))
+		return false;
+	return g_manager.get_table()->get_entry_by_injected_index(injected_index)->is_injected;
+}
+
 datum tag_injection_resolve_cache_datum(datum cache_datum)
 {
 	s_tag_injecting_table_entry* entry = g_manager.get_table()->get_entry_by_cache_index(cache_datum);
@@ -54,8 +61,12 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 		if (inst.data_offset != 0)
 			return inst.datum_index;
 
+		// 0xE7052CA0
+		// 0x00003ba7
 		return NONE;
 	}
+	//if (entry->injected_index == 0x00003ba7u)
+	//	return 0xE7052CA0u;
 
 	return entry->injected_index;
 }

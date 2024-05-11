@@ -15,6 +15,8 @@ datum tag_injection_load(e_tag_group group, datum cache_datum, bool load_depende
 
 void tag_injection_inject();
 
+bool tag_injection_is_injected(datum injected_index);
+
 datum tag_injection_resolve_cache_datum(datum cache_datum);
 
 void tag_injection_apply_hooks();

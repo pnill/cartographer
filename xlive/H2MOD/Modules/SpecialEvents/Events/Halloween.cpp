@@ -12,13 +12,14 @@
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
-datum lbitm_datum;
-datum sky_datum;
-datum candle_datum;
-datum candle_fire_datum;
-datum large_candle_datum;
-datum pump_datum;
+datum lbitm_datum = NONE;
+datum sky_datum = NONE;
+datum candle_datum = NONE;
+datum candle_fire_datum = NONE;
+datum large_candle_datum = NONE;
+datum pump_datum = NONE;
 
 void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
@@ -91,6 +92,51 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 }
 
 void halloween_event_map_load()
+{
+	// Load specific tags from shared and modify placements depending on the map being played
+	const s_cache_header* cache_header = cache_files_get_header();
+	scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
+	auto bsp_definition = tags::get_tag_fast<structure_bsp>(scenario_definition->structure_bsps[0]->structure_bsp.index);
+	tag_injection_set_active_map("carto_shared");
+	if(!strcmp(cache_header->name, "coagulation"))
+	{
+		lbitm_datum = tag_injection_load(_tag_group_bitmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", true);
+		sky_datum = tag_injection_load(_tag_group_sky, "scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", true);
+		//candle_fire_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", true);
+		candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", true);
+		pump_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", true);
+		large_candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", true);
+
+		//datum test = tag_injection_load(_tag_group_shader, "scenarios\\skies\\multi\\halo\\coagulation\\shaders\\coag_night_stars", true);
+		//datum test2 = tag_injection_load(_tag_group_shader, "scenarios\\skies\\multi\\halo\\coagulation\\shaders\\coag_night_moon", true);
+
+		tag_injection_inject();
+
+		// OG Halo 2 Coag lightmap
+		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
+			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
+
+		if(tag_injection_is_injected(lbitm_datum) && !DATUM_IS_NONE(ltmp_datum))
+		{
+			s_scenario_structure_lightmap_group_definition* lightmap = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+			lightmap->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
+		}
+
+		if (tag_injection_is_injected(sky_datum))
+		{
+			scenario_definition->skies[0]->index = sky_datum;
+		}
+
+		if(tag_injection_is_injected(candle_datum) && tag_injection_is_injected(pump_datum) && tag_injection_is_injected(large_candle_datum))
+		{
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
+			// We execute this after a bluescreen since our new objects arent recreated automatically
+			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
+		}
+	}
+}
+
+void halloween_event_map_load_old()
 {
 	// Load specific tags from shared and modify placements depending on the map being played
 	const s_cache_header* cache_header = cache_files_get_header();

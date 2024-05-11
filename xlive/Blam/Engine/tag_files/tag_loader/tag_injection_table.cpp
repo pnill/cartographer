@@ -65,6 +65,11 @@ s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_cache_index(dat
 	return nullptr;
 }
 
+s_tag_injecting_table_entry* c_tag_injection_table::get_entry_by_injected_index(datum datum_index) const
+{
+	return this->get_entry(DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index) - k_first_injected_datum);
+}
+
 bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const
 {
 	for (uint16 i = 0; i < this->m_entry_count; i++)

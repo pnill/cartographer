@@ -60,7 +60,7 @@ void c_xml_definition_block::get_element_counts()
 	{
 		const char* element_name = element->Name();
 
-		if (strcmp(element_name, "tagBlock") == 0 || strcmp(element_name, "reflexive") == 0)
+		if (strcmp(element_name, "tagblock") == 0 || strcmp(element_name, "reflexive") == 0)
 		{
 			this->m_tag_block_count++;
 
@@ -69,7 +69,8 @@ void c_xml_definition_block::get_element_counts()
 		}
 		if (strcmp(element_name, "tagRef") == 0 || strcmp(element_name, "tagref") == 0)
 		{
-			if (element->BoolAttribute("withClass") || element->Attribute("withClass"))
+			if (element->BoolAttribute("withClass") || element->Attribute("withClass") 
+				|| element->BoolAttribute("withGroup") || element->Attribute("withGroup"))
 				this->m_classless_tag_reference_count++;
 			else
 				this->m_tag_reference_count++;
@@ -137,7 +138,7 @@ void c_xml_definition_block::populate_buffers()
 		uint32 offset = UINT_MAX;
 		if (element->Attribute("offset") != nullptr)
 			offset = strtoul(element->Attribute("offset"), nullptr, 16);
-		if (strcmp(element_name, "tagBlock") == 0 || strcmp(element_name, "reflexive") == 0)
+		if (strcmp(element_name, "tagblock") == 0 || strcmp(element_name, "reflexive") == 0)
 		{
 			uint32 size = UINT_MAX;
 			if (element->Attribute("entrySize") != nullptr)
@@ -158,7 +159,8 @@ void c_xml_definition_block::populate_buffers()
 		}
 		if (strcmp(element_name, "tagRef") == 0 || strcmp(element_name, "tagref") == 0)
 		{
-			if (element->BoolAttribute("withClass") || element->Attribute("withClass"))
+			if (element->BoolAttribute("withClass") || element->Attribute("withClass")
+				|| element->BoolAttribute("withGroup") || element->Attribute("withGroup"))
 			{
 				this->m_classless_tag_references[this->m_classless_tag_reference_count] = offset;
 
