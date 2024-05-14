@@ -1,13 +1,61 @@
 #include "stdafx.h"
-
 #include "XUserContext.h"
-#include "Networking/NetworkMessageTypeCollection.h"
-#include "game/game_engine.h"
-#include "H2MOD/Discord/DiscordInterface.h"
-#include "H2MOD/Modules/Shell/H2MODShell.h"
+
+#include "Blam/Engine/cartographer/discord/discord_interface.h"
+#include "Blam/Engine/game/game.h"
+#include "Blam/Engine/game/game_globals.h"
+#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"
+
+struct s_context_campaign_map_info
+{
+	int32 map_id;
+	char map_name[32];
+};
+
+s_context_campaign_map_info g_context_campaign_map_info[] = {
+	1, "The Heretic",
+	101, "Armory",
+	105, "Cairo Station",
+	301, "Outskirts",
+	305, "Metropolis",
+	401, "The Arbiter",
+	405, "Oracle",
+	501, "Delta Halo",
+	505, "Regret",
+	601, "Sacred Icon",
+	605, "Quarantine Zone",
+	701, "Gravemind",
+	801, "High Charity",
+	705, "Uprising",
+	805, "The Great Journey"
+};
+
+enum e_context_id : uint32
+{
+	_context_id_variant = 2,
+	_context_id_difficulty = 3,
+	_context_id_map = 5,
+	_context_id_presence = X_CONTEXT_PRESENCE,
+	_context_id_game_type = X_CONTEXT_GAME_TYPE,
+	_context_id_game_mode = X_CONTEXT_GAME_MODE
+};
+
+enum e_context_presence : uint32
+{
+	_context_presence_mainmenu = 0,
+	_context_presence_settings = 1,
+	_context_presence_server_browser = 2,
+	_context_presence_singleplayer = 3,
+	_context_presence_lobby = 4,
+	_context_presence_results = 5,
+	_context_presence_live_in_game = 6,
+	_context_presence_public_game = 7,
+	_context_presence_invite_only_game = 8,
+	_context_presence_network_in_game = 9
+};
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 extern XSESSION_LOCAL_DETAILS sessionDetails;
@@ -18,97 +66,46 @@ DWORD WINAPI XUserGetContext(DWORD dwUserIndex, XUSER_CONTEXT* pContext, PXOVERL
 	return S_OK;
 }
 
-/* This should be cleaned up and moved to an H2MODs module instead of being defined here. */
-static const std::unordered_map <std::string, std::string> singleplayer_maps
+void context_update_map_info_multiplayer(void)
 {
-	{ "00a_introduction", "The Heretic" },
-	{ "01a_tutorial", "The Armory" },
-	{ "01b_spacestation", "Cairo Station" },
-	{ "03a_oldmombasa", "Outskirts" },
-	{ "03b_newmombasa", "Metropolis" },
-	{ "04a_gasgiant", "The Arbiter" },
-	{ "04b_floodlab", "The Oracle" },
-	{ "05a_deltaapproach", "Delta Halo" },
-	{ "05b_deltatowers", "Regret" },
-	{ "06a_sentinelwalls", "Sacred Icon" },
-	{ "06b_floodzone", "Quarantine Zone" },
-	{ "07a_highcharity", "Gravemind" },
-	{ "07b_forerunnership", "High Charity" },
-	{ "08a_deltacliffs", "Uprising" },
-	{ "08b_deltacontrol", "The Great Journey" }
-};
+	// Get map name and convert to utf8
+	wchar_t* wide_map_name = Memory::GetAddress<wchar_t*>(0x97737C);
+	utf8 map_name[512];
+	wchar_string_to_utf8_string(wide_map_name, map_name, sizeof(map_name));
 
-static const std::unordered_map <int, std::pair<std::string, std::string>> campaign_difficulty_list
-{
-	{ 0,{ "campaign_easy", "Easy" } },
-	{ 1,{ "campaign_normal", "Normal" } },
-	{ 2,{ "campaign_medium", "Heroic" } },
-	{ 3,{ "campaign_hard", "Legendary" } }
-};
+	// Get scenario name and convert to utf8
+	c_static_wchar_string260* scenario_path = &game_options_get()->scenario_path;
+	int32 index = scenario_path->last_index_of(L"\\");
+	const wchar_t* scenario_name_wide = &scenario_path->get_string()[index + 1];
+	utf8 scenario_name[MAX_PATH];
+	wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
 
-static const std::unordered_map <int, std::string> game_mode_list
-{
-	{ 1,"gamemode_ctf" },
-	{ 2,"gamemode_slayer" },
-	{ 3,"gamemode_oddball" },
-	{ 4,"gamemode_KotH" },
-	{ 7,"gamemode_juggernaut" },
-	{ 8,"gamemode_territories" },
-	{ 9,"gamemode_assault" }
-};
+	// Update interface
+	discord_interface_set_map_name(scenario_name, map_name);
+}
 
-void update_player_count()
+void context_update_map_info_campaign(uint32 map_id, const utf8* scenario_name)
 {
-	s_network_session* session = nullptr;
-	if (NetworkSession::GetActiveNetworkSession(&session))
+	// Get map name
+	const char* map_name = NULL;
+	for (uint32 i = 0; i < NUMBEROF(g_context_campaign_map_info); ++i)
 	{
-		DiscordInterface::SetPlayerCountInfo(
-			session->membership[0].player_count, 
-			session->parameters[0].max_party_players);
+		if (g_context_campaign_map_info[i].map_id == map_id)
+		{
+			map_name = g_context_campaign_map_info[i].map_name;
+			break;
+		}
 	}
-	else
+
+	// Convert map_name to utf8
+	if (map_name == NULL)
 	{
-		DiscordInterface::SetPlayerCountInfo(0, 0);
+		map_name = scenario_name;
 	}
+
+	// Update interface
+	discord_interface_set_map_name(scenario_name, map_name);
 }
-
-std::string getEnglishMapName()
-{
-	wchar_t* p_englishMapName = Memory::GetAddress<wchar_t*>(0x97737C);
-	std::wstring englishMapName(p_englishMapName);
-	return  std::string(englishMapName.begin(), englishMapName.end());
-}
-
-std::string getVariantName()
-{
-	std::wstring variant = NetworkSession::GetGameVariantName();
-	variant = variant.substr(0, variant.find_last_not_of(L"\xE008\t\n ") + 1);
-	return std::string(variant.begin(), variant.end());
-}
-
-std::string gamemode_id_to_string(int id)
-{
-	std::string gamemode = "gamemode_unknown";
-	auto it = game_mode_list.find(id);
-	if (it != game_mode_list.end())
-		gamemode = it->second;
-	return gamemode;
-}
-
-enum class ContextPresence {
-	mainmenu,
-	unknown,
-	server_browser,
-	singleplayer,
-	lobby,
-	results,
-	live_in_game,
-	public_game,
-	invite_only_game,
-	network_in_game
-};
-
-DWORD diff_level;
 
 // #5277: XUserSetContext
 DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwContextValue)
@@ -117,106 +114,99 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 		dwUserIndex, dwContextId, dwContextValue);
 
 	if (Memory::IsDedicatedServer() || !H2Config_discord_enable || _Shell::GetInstanceId() > 1)
+	{
 		return ERROR_SUCCESS;
-
-	if (dwContextId == 0x00000003)
-		diff_level = dwContextValue;
-
-	if (dwContextId == X_CONTEXT_PRESENCE)
-	{
-		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {}", dwContextValue);
-
-		std::wstring map_name_wide = Memory::GetAddress<wchar_t*>(0x46DAE8);
-		map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L'\\') + 1);
-
-		if(map_name_wide.empty())
-		{
-			std::string custom_map_wide_s = Memory::GetAddress<char*>(0x47CF0C);
-			map_name_wide = std::wstring(custom_map_wide_s.begin(), custom_map_wide_s.end());
-			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L'\\') + 1);
-		}
-
-		std::string map_name(map_name_wide.begin(), map_name_wide.end());
-
-		LOG_TRACE_GAME(L"[Discord] map_name: {}", map_name_wide.c_str());
-
-		switch (static_cast<ContextPresence>(dwContextValue)) {
-		case ContextPresence::singleplayer:
-		{
-			std::wstring map_name_wide = Memory::GetAddress<wchar_t*>(0x46DD88);
-			map_name_wide = map_name_wide.substr(map_name_wide.find_last_of(L'\\') + 1);
-
-			std::string map_name(map_name_wide.begin(), map_name_wide.end());
-
-			std::string level_name = map_name;
-			auto it = singleplayer_maps.find(map_name);
-			if (it != singleplayer_maps.end())
-				level_name = it->second;
-
-			auto diff = campaign_difficulty_list.at(diff_level);
-			DiscordInterface::SetGameState(
-				map_name,
-				"Campaign",
-				level_name,
-				diff.first,
-				diff.second
-			);
-			break;
-		}
-		case ContextPresence::public_game:
-		case ContextPresence::invite_only_game:
-		case ContextPresence::network_in_game:
-		case ContextPresence::live_in_game:
-		{
-			DiscordInterface::SetGameState(
-				map_name,
-				"Multiplayer",
-				getEnglishMapName(),
-				gamemode_id_to_string(game_engine_globals_get()->game_engine_index),
-				getVariantName()
-			);
-			update_player_count();
-			break;
-		}
-		case ContextPresence::mainmenu:
-		{
-			DiscordInterface::SetGameState("default", "In main menu");
-			break;
-		}
-		case ContextPresence::lobby:
-		{
-			DiscordInterface::SetGameState("default", "In Lobby");
-			update_player_count();
-			break;
-		}
-		case ContextPresence::server_browser:
-		{
-			DiscordInterface::SetGameState("default", "Browsing server list");
-			break;
-		}
-		case ContextPresence::results:
-		{
-			DiscordInterface::SetGameState("default", "Reading carnage report", true);
-			break;
-		}
-		}
 	}
 
-	else if (dwContextId == X_CONTEXT_GAME_TYPE)
+	switch ((e_context_id)dwContextId)
 	{
+	case _context_id_variant:
+	{
+		utf8 variant_name[32];
+		wchar_string_to_utf8_string(NetworkSession::GetGameVariantName(), variant_name, sizeof(variant_name));
+		discord_interface_set_variant((e_context_variant)dwContextValue, variant_name);
+		break;
+	}
+	/* The way hired gun calls XUserSetContext in this situation is bad, don't do this here
+	* Instead we set difficulty on map load with the singleplayer map name
+	case _context_id_difficulty:
+	{
+		discord_interface_set_difficulty(dwContextValue);
+		break;
+	}*/
+	case _context_id_map:
+	{
+		context_update_map_info_multiplayer();
+		break;
+	}
+	case _context_id_presence:
+	{
+		switch ((e_context_variant)dwContextValue)
+		{
+		case _context_presence_singleplayer:
+		{
+			discord_interface_set_state("Singleplayer");
+			break;
+		}
+		case _context_presence_public_game:
+		case _context_presence_invite_only_game:
+		case _context_presence_network_in_game:
+		case _context_presence_live_in_game:
+		{
+			discord_interface_set_state("Multiplayer");
+			break;
+		}
+		case _context_presence_mainmenu:
+		{
+			discord_interface_set_state("In main menu");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		}
+		case _context_presence_lobby:
+		{
+			discord_interface_set_state("In Lobby");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		}
+		case _context_presence_server_browser:
+		{
+			discord_interface_set_state("Browsing server list");
+			
+			// Zero player counts here as the game still thinks we are in a network session after leaving a match
+			discord_interface_zero_player_count();
+
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		}
+		case _context_presence_results:
+		{
+			discord_interface_set_state("Reading carnage report");
+			discord_interface_set_details("");
+			discord_interface_set_large_image("default", "");
+			discord_interface_set_small_image("", "");
+			break;
+		}
+		case _context_presence_settings:
+			discord_interface_set_state("Adjusting settings");
+			break;
+		}
+		break;
+	}
+	case _context_id_game_type:
 		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_TYPE = {}", dwContextValue);
-
 		sessionDetails.dwGameType = dwContextValue;
-	}
-
-	else if (dwContextId == X_CONTEXT_GAME_MODE)
-	{
+		break;
+	case _context_id_game_mode:
 		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_MODE = {:x}", dwContextValue);
-
 		sessionDetails.dwGameMode = dwContextValue;
+		break;
 	}
-
-
 
 	return ERROR_SUCCESS;
 }

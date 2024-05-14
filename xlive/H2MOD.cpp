@@ -3,6 +3,7 @@
 
 #include "camera/dead_camera.h"
 #include "camera/observer.h"
+#include "cartographer/discord/discord_interface.h"
 #include "cartographer/tag_fixes/tag_fixes.h"
 #include "cutscene/cinematics.h"
 #include "effects/contrails.h"
@@ -46,6 +47,7 @@
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"
+#include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
@@ -103,8 +105,6 @@ std::unordered_map<const wchar_t*, bool&> GametypesMap
 };
 
 #pragma region engine calls
-
-TEST_N_DEF(PC1);
 
 // Used to get damage on any object
 typedef void(__cdecl* object_cause_damage_t)(s_damage_data* damage_data, int damaged_object_indexes, __int16 a4, __int16 a5, __int16 a6, int a7);
@@ -481,6 +481,16 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
 			toggle_xbox_tickrate(options, true);
+			if ( H2Config_discord_enable)
+			{
+				int32 index = options->scenario_path.last_index_of(L"\\");
+				const wchar_t* scenario_name_wide = &options->scenario_path.get_string()[index + 1];
+				utf8 scenario_name[MAX_PATH];
+				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
+
+				context_update_map_info_campaign(options->map_id, scenario_name);
+				discord_interface_set_difficulty(options->difficulty);
+			}
 		}
 
 		resetAfterMatch = true;
@@ -850,6 +860,7 @@ void H2MOD::ApplyHooks() {
 	bitstream_serialization_apply_patches();
 
 	simulation_apply_patches();
+	simulation_players_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -883,8 +894,6 @@ void H2MOD::ApplyHooks() {
 		//string_display_hook_method = (string_display_hook)DetourFunc(Memory::GetAddress<BYTE*>(0x287AB5), (BYTE*)stringDisplayHook, 5);
 
 		//pResetRound = (ResetRounds)DetourFunc(Memory::GetAddress<BYTE*>(0x6B1C8), (BYTE*)OnNextRound, 7);
-
-		TEST_N_DEF(PC2);
 		
 		DETOUR_ATTACH(p_change_local_team, Memory::GetAddress<change_team_t>(0x2068F2), changeTeam);
 

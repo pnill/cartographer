@@ -20,7 +20,6 @@
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
-    <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
     <ClCompile Include="H2MOD\GUI\XLiveRendering.cpp" />
     <ClCompile Include="H2MOD\Modules\Accounts\AccountCreate.cpp" />
     <ClCompile Include="H2MOD\Modules\Accounts\AccountLogin.cpp" />
@@ -302,7 +301,11 @@
     <ClCompile Include="Blam\Engine\main\main_time.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_guide.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_networking.cpp" />
     <ClCompile Include="Blam\Engine\effects\particle_draw.cpp" />
     <ClCompile Include="Blam\Engine\game\game_engine_simulation.cpp" />
     <ClCompile Include="Blam\Engine\main\levels.cpp" />
@@ -332,8 +335,6 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="3rdparty\discord\discord_register.h" />
-    <ClInclude Include="3rdparty\discord\discord_rpc.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h" />
@@ -452,7 +453,6 @@
     <ClInclude Include="Blam\Engine\game\player_control.h" />
     <ClInclude Include="Blam\Engine\game\players.h" />
     <ClInclude Include="H2MOD.h" />
-    <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
     <ClInclude Include="H2MOD\Modules\Accounts\AccountCreate.h" />
     <ClInclude Include="H2MOD\Modules\Accounts\AccountLogin.h" />
@@ -719,7 +719,6 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\objects\object_globals.h" />
-    <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\devices\devices.h" />
@@ -861,6 +860,12 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
+    <ClInclude Include="Blam\Engine\memory\static_arrays.h" />
+    <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
+    <ClInclude Include="Blam\Engine\cartographer\discord\discord_interface.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
+    <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkRotation.h" />

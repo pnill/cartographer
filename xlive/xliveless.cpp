@@ -7,6 +7,8 @@
 #include "XLive/ServerList/ServerList.h"
 #include "XLive/achievements/XAchievements.h"
 
+#include "Blam/Engine/interface/user_interface_guide.h"
+
 HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwFakeFriendsEnumerator = INVALID_HANDLE_VALUE;
@@ -25,9 +27,6 @@ HANDLE* g_dwEnumeratorHandleObjects[] =
 
 extern void InitInstance();
 extern void ExitInstance();
-extern std::wstring dlcbasepath;
-
-int dlcinit = 0;
 
 char str[8192];
 WCHAR strw[8192];
@@ -132,169 +131,6 @@ BOOL SkipText( FILE *fp, const char *str )
 			return FALSE;
 	}
 }
-
-WCHAR dlcpath[256][512];
-BOOL SetDlcBasepath( int num )
-{
-	static int pathinit = -1;
-
-
-	if( pathinit == -1 )
-	{
-		pathinit = 0;
-		marketplaceDlcCount = 0;
-
-
-		WCHAR fileString[2048];
-		WIN32_FIND_DATA ffd;
-		HANDLE hFind = INVALID_HANDLE_VALUE;
-
-
-
-
-		wcscpy( fileString, L"DLC\\*" );
-
-
-		// Find the first file in the directory.
-		hFind = FindFirstFile( fileString, &ffd );
-		if( INVALID_HANDLE_VALUE != hFind )
-		{
-			// List all the files in the directory with some info about them.
-			do
-			{
-				if( ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY )
-				{
-					if( wcscmp( ffd.cFileName, L"." ) == 0 )
-						continue;
-					if( wcscmp( ffd.cFileName, L".." ) == 0 )
-						continue;
-
-
-
-					// check valid folder
-					std::wstring wnum;
-					wnum = L"DLC\\";
-					wnum += ffd.cFileName;
-					wnum += L"\\content.xbx";
-
-
-					// check file exists
-					FILE *fp_dlc = nullptr;
-					errno_t err = _wfopen_s(&fp_dlc, wnum.c_str(), L"rb");
-					if( err )
-						continue;
-
-
-					//LOG_TRACE_XLIVE(L"- %s", wnum.c_str() );
-
-
-					wcscpy( dlcpath[pathinit], ffd.cFileName );
-					LOG_TRACE_XLIVE(L"- DLC{0} = {1}", pathinit, ffd.cFileName );
-
-
-
-					// skip UTF-16LE header
-					fseek( fp_dlc, 2, SEEK_SET );
-
-
-					SkipText( fp_dlc, "[All]" );
-
-
-					// Premium
-					ReadLine( fp_dlc, str );
-
-
-					// TitleID
-					ReadLine( fp_dlc, str );
-					sscanf( str, "TitleID=%X", &marketplaceDlc[pathinit].dwTitleID );
-					LOG_TRACE_XLIVE( "=== TitleID = {:x}", marketplaceDlc[pathinit].dwTitleID );
-
-
-					// ContentPackageType, LicenseBits, BaseVersion, UpdateVersion, ThumbnailImage
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-
-
-					// OfferingID
-					ReadLine( fp_dlc, str );
-					sscanf( str, "OfferingID=%I64X", &marketplaceDlc[pathinit].qwOfferID );
-					LOG_TRACE_XLIVE( "=== OfferingID = {:x}", marketplaceDlc[pathinit].qwOfferID );
-
-
-					// AdminFriendlyName, TitleName, PurchaseOnceOnly
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-					ReadLine( fp_dlc, str );
-
-
-					// ContentFlags
-					ReadLine( fp_dlc, str );
-
-
-					// ContentID
-					ReadLine( fp_dlc, str );
-
-
-					// convert to hex format
-					for( int lcv2 = 0; lcv2 < 40; lcv2 += 2 )
-					{
-						char a,b;
-
-						a = *( str + strlen("ContentID=") + ( lcv2 + 0 ) );
-						b = *( str + strlen("ContentID=") + ( lcv2 + 1 ) );
-
-						if( a >= '0' && a <= '9' ) a -= '0' - 0;
-						if( a >= 'A' && a <= 'F' ) a -= 'A' - 10;
-
-						if( b >= '0' && b <= '9' ) b -= '0' - 0;
-						if( b >= 'A' && b <= 'F' ) b -= 'A' - 10;
-
-
-
-
-						marketplaceDlc[pathinit].contentId[ lcv2 / 2 ] = a * 16 + b;
-					}
-
-
-					strw[0] = 0;
-					for( int lcv2 = 0; lcv2 < 20; lcv2++ )
-						wsprintf( strw, L"%s%02X", strw, marketplaceDlc[pathinit].contentId[lcv2] );
-					strw[40] = 0;
-
-					LOG_TRACE_XLIVE(L"=== ContentID = {}", strw );
-
-
-
-					fclose( fp_dlc );
-
-
-					marketplaceDlcCount++;
-					pathinit++;
-				}
-			} while( FindNextFile(hFind, &ffd) != 0 );
-
-
-			FindClose(hFind);
-		}
-	}
-
-
-	if( num > pathinit )
-		return FALSE;
-
-
-
-	dlcbasepath = L"DLC\\";
-	dlcbasepath += dlcpath[num];
-
-
-	return TRUE;
-}
-
-
 
 void Check_Overlapped( PXOVERLAPPED pOverlapped )
 {
@@ -527,54 +363,7 @@ int WINAPI XEnumerate(HANDLE hEnum, CHAR *pvBuffer, DWORD cbBuffer, PDWORD pcIte
 		return ERROR_INVALID_PARAMETER;
 	}
 
-	if( hEnum == g_dwFakeContent && dlcinit != 0x7FFFFFFF )
-	{
-		DWORD total = 0;
-
-		while( dlcinit < 256 && dlcinit < marketplaceDlcCount )
-		{
-			XCONTENT_DATA aaa;
-
-			if( total >= cbBuffer )
-			{
-				break;
-			}
-
-			// Credit: virusek, JorjVirus69
-			aaa.ContentNum = dlcinit;
-			aaa.ContentPackageType = 2;
-			memcpy( &aaa.TitleId, &marketplaceDlc[ dlcinit ].dwTitleID, sizeof(aaa.TitleId) );
-			memcpy( &aaa.ContentId, &marketplaceDlc[ dlcinit ].contentId, sizeof(aaa.ContentId) );
-			dlcinit++;
-
-			if( async == FALSE )
-				(*pcItemsReturned)++;
-
-			else
-				pOverlapped->InternalHigh++;
-
-			if(pvBuffer)
-			{
-				memcpy(pvBuffer,&aaa,sizeof(aaa));
-
-				pvBuffer += 32;
-				total += 32;
-			}
-		}
-
-		if( async == FALSE )
-		{
-			if( *pcItemsReturned == 0 )
-				dlcinit = 0x7fffffff;
-		}
-
-		else
-		{
-			if( pOverlapped->InternalHigh == 0 )
-				dlcinit = 0x7fffffff;
-		}
-	}
-	else if ( hEnum == g_dwFakeAchievementContent )
+	if ( hEnum == g_dwFakeAchievementContent )
 	{
 		return AchievementEnumerator(cbBuffer, pvBuffer, pcItemsReturned, pOverlapped);
 	}
@@ -727,9 +516,11 @@ int WINAPI XUserMuteListQuery (DWORD dwUserIndex, XUID XuidRemoteTalker, BOOL *p
 
 
 // #5315: XInviteGetAcceptedInfo
-int WINAPI XInviteGetAcceptedInfo (DWORD, DWORD)
+int WINAPI XInviteGetAcceptedInfo(DWORD dwUserIndex, XINVITE_INFO* pInfo)
 {
     LOG_TRACE_XLIVE("XInviteGetAcceptedInfo");
+	pInfo->hostInfo = user_interface_guide_state_manager_get()->m_xsession_info;
+	pInfo->fFromGameInvite = true;
     return 1;
 }
 
@@ -863,57 +654,6 @@ LONG WINAPI XLiveContentGetPath (DWORD dwUserIndex, PXCONTENT_DATA pContentData,
 {
 	LOG_TRACE_XLIVE("XLiveContentGetPath  (dwUserIndex = {0:x}, pXContentData = {1:p}, pszPath = {2:p}, pcchPath = {3})",
 		dwUserIndex, (void*)pContentData, (void*)pszPath, *pcchPath );
-
-
-	// for breakpoint debugging
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
-
-	if( dwUserIndex || !pContentData || !pcchPath || ( !pszPath && (*pcchPath) ) )
-	{
-		LOG_TRACE_XLIVE("- ERROR_INVALID_PARAMETER" );
-
-		return HRESULT_FROM_WIN32( ERROR_INVALID_PARAMETER );
-	}
-
-
-	LOG_TRACE_XLIVE("- ContentNum = {0}, TitleId = {1:x}, ContentId = {2:x}{3:x}{4:x}{5:x}",
-		pContentData->ContentNum, pContentData->TitleId, pContentData->ContentId[0], pContentData->ContentId[1], pContentData->ContentId[2], pContentData->ContentId[3] );
-
-
-	SetDlcBasepath( pContentData->ContentNum );
-
-
-
-	if(pszPath == 0 && (*pcchPath) == 0)
-	{
-		*pcchPath = dlcbasepath.size() + + 1;
-
-
-		LOG_TRACE_XLIVE("- ERROR_INSUFFICIENT_BUFFER  (pcchPath = {})", *pcchPath );
-
-		return HRESULT_FROM_WIN32( ERROR_INSUFFICIENT_BUFFER );
-	}
-
-
-	// copy name to Buffer
-	if( pszPath )
-	{
-		wcscpy(pszPath, dlcbasepath.c_str());
-
-		*pcchPath = wcslen( pszPath ) + 1;
-	}
-	else
-	{
-		*pcchPath = dlcbasepath.size() + 1;
-		return HRESULT_FROM_WIN32( ERROR_INSUFFICIENT_BUFFER );
-	}
-
-
-	LOG_TRACE_XLIVE(L"- pszPath = {}, pcchPath = {}", pszPath, *pcchPath );
 	return 0;
 }
 
@@ -923,57 +663,6 @@ DWORD WINAPI XContentCreatePackage(DWORD dwUserIndex, PXCONTENT_DATA pContentDat
 {
 	LOG_TRACE_XLIVE(L"XContentCreatePackage (?) (dwUserIndex = {0:x}, pXContentData = {1:p}, pszPath = {2:p}, pcchPath = {3})",
 		dwUserIndex, (void*)pContentData, (void*)pszPath, *pcchPath );
-
-
-	// for breakpoint debugging
-#if 0
-	while(1)
-		Sleep(1);
-#endif
-
-
-	if( dwUserIndex || !pContentData || !pcchPath || ( !pszPath && (*pcchPath) ) )
-	{
-		LOG_TRACE_XLIVE("- ERROR_INVALID_PARAMETER" );
-
-		return HRESULT_FROM_WIN32( ERROR_INVALID_PARAMETER );
-	}
-
-
-
-	LOG_TRACE_XLIVE("- ContentNum = {0}, TitleId = {1:x}, ContentId = {2:x}{3:x}{4:x}{5:x}",
-		pContentData->ContentNum, pContentData->TitleId, pContentData->ContentId[0], pContentData->ContentId[1], pContentData->ContentId[2], pContentData->ContentId[3] );
-
-
-	SetDlcBasepath( pContentData->ContentNum );
-
-
-
-	if(pszPath == 0 && (*pcchPath) == 0)
-	{
-		LOG_TRACE_XLIVE("- pszPath = NULL, pcchPath = 0  (ERROR_INSUFFICIENT_BUFFER)" );
-
-
-		// return size XContent string = 128 max  (BioShock 2)
-		*pcchPath = dlcbasepath.size() + 1;
-		return HRESULT_FROM_WIN32( ERROR_INSUFFICIENT_BUFFER );
-	}
-
-
-	// copy name to Buffer
-	if( pszPath )
-	{
-		wcscpy(pszPath,dlcbasepath.c_str());
-		*pcchPath = dlcbasepath.size() + 1;
-	}
-	else
-	{
-		*pcchPath = dlcbasepath.size() + 1;
-		return HRESULT_FROM_WIN32( ERROR_INSUFFICIENT_BUFFER );
-	}
-
-
-	LOG_TRACE_XLIVE(L"- pszPath = {}, pcchPath = {}", pszPath, *pcchPath );
 	return 0;
 }
 
@@ -983,24 +672,6 @@ DWORD WINAPI XContentCreateEnumerator(DWORD MaxEnumerator, PDWORD a2, PDWORD pch
 {
 	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XContentCreateEnumerator  (MaxEnumerator = {0:x}, a2 = {1:p}, pchBuffer = {2:p}, phEnum = {3:p}",
 		MaxEnumerator, (void*)a2, (void*)pchBuffer, (void*)phEnum);
-
-	// init DLC list
-	SetDlcBasepath(0);
-
-
-	if (pchBuffer) *pchBuffer = MaxEnumerator * sizeof(XCONTENT_DATA);
-	if (phEnum) *phEnum = g_dwFakeContent = CreateMutex(NULL, NULL, NULL);
-
-
-	// recount DLCs again
-	dlcinit = 0;
-
-
-	if (pchBuffer) 
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "- pchBuffer = {0:x}  ({1})", *pchBuffer, *pchBuffer / sizeof(XCONTENT_DATA));
-
-	LIMITED_LOG(15, LOG_TRACE_XLIVE, "- phEnum = {:p}", (void*)*phEnum);
-
 	return 0;
 }
 
@@ -1268,42 +939,6 @@ HRESULT WINAPI XLiveProtectedCreateFile (HANDLE hContentAccess, void * pvReserve
 {
 	LOG_TRACE_XLIVE(L"XLiveProtectedCreateFile  (hContentAccess = {0:p}, pvReserved = {1:p}, pszFilePath = {2}, dwDesiredAccess = {3}, dwShareMode = {4}, dwSecurityAttributes = {5:p}, dwCreationDisposition = {6:p}, flagsAndAttributes = {7}, phModule = {8:p})",
 		(void*)hContentAccess, pvReserved, pszFilePath, dwDesiredAccess, dwShareMode, (void*)pSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, (void*)phModule );
-
-
-	WCHAR dlcfile[2048];
-
-
-	// FIXME: assume DLC folder handle
-	if( hContentAccess )
-	{
-		wcscpy( dlcfile, dlcbasepath.c_str() );
-		wcscat( dlcfile, L"\\Content\\" );
-		wcscat( dlcfile, pszFilePath );
-	}
-
-	else
-		wcscpy( dlcfile, pszFilePath );
-
-
-	*phModule = CreateFileW(
-		dlcfile,
-		dwDesiredAccess,
-		dwShareMode,
-		pSecurityAttributes,
-		dwCreationDisposition,
-		dwFlagsAndAttributes,
-		0 );
-
-
-	if( (HANDLE) (*phModule) == (HANDLE) INVALID_HANDLE_VALUE )
-	{
-		LOG_TRACE_XLIVE( "- INVALID_HANDLE" );
-
-		return -1;
-	}
-
-
-	LOG_TRACE_XLIVE( "- File opened" );
 	return 0;
 }
 

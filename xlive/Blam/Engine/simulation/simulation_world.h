@@ -118,7 +118,10 @@ public:
 	void destroy_world();
 	void disconnect(void);
 
-	void queues_dispose();
+	void queues_dispose(void);
+
+	void create_player(datum player_index);
+	void delete_player(datum player_index);
 
 	void queues_update_statistsics()
 	{

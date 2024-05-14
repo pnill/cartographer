@@ -883,7 +883,7 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 	// Encode the data into hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		sprintf(connect_string + (2 * i), "%02hhX", session_bytes[i]);
+		sprintf(&connect_string[2 * i], "%02hhX", session_bytes[i]);
 	}
 
 	output->Output(StringFlag_None, "Invite code generated:");
@@ -900,7 +900,7 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 	// Decode the data from hex string
 	for (uint32 i = 0; i < sizeof(XSESSION_INFO); i++)
 	{
-		sscanf(tokens[1].c_str() + (2 * i), "%02hhX", &session_bytes[i]);
+		(void)sscanf(&tokens[1].c_str()[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
 	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);

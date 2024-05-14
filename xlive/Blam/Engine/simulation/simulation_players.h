@@ -51,4 +51,10 @@ struct simulation_player_update
 };
 ASSERT_STRUCT_SIZE(simulation_player_update, 0xB4);
 
+void simulation_players_apply_patches(void);
+
 bool __cdecl simulation_players_apply_update(simulation_player_update* player_update);
+
+void __cdecl simulation_player_joined_game(datum player_index);
+
+void __cdecl simulation_player_left_game(datum player_index);

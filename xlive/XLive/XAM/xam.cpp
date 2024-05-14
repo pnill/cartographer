@@ -1,6 +1,8 @@
 #include "stdafx.h"
-
 #include "xam.h"
+
+#include "Blam/Engine/cartographer/discord/discord_interface.h"
+#include "Blam/Engine/interface/user_interface_guide.h"
 
 struct NOTIFY_LISTEN
 {
@@ -108,6 +110,7 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 
 		else if (sys_controller_force == 0)
 			dwMsgFilter = XN_SYS_INPUTDEVICECONFIGCHANGED;
+		
 	}
 
 
@@ -334,8 +337,6 @@ BOOL WINAPI XNotifyGetNext(HANDLE hNotification, DWORD dwMsgFilter, PDWORD pdwId
 	default:
 		break;
 	} // switch (dwMsgFilter)
-
-
 
 	// check for more messages
 	if (exit_code)

@@ -51,7 +51,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord;3rdparty/libcurl/lib;3rdparty/libcurl/lib/release;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib;3rdparty/libcurl/lib/release;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)Halo2\</OutDir>
@@ -59,7 +59,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord;3rdparty/libcurl/lib;3rdparty/libcurl/lib/debug/;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib;3rdparty/libcurl/lib/debug/;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -89,7 +89,7 @@
       <ProgramDataBaseFileName>.\Release/</ProgramDataBaseFileName>
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\3rdparty\discord\include;.\Blam/Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -110,7 +110,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc.lib;detours.lib;libminiupnpc.lib;libcurl.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;libcurl.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -165,12 +165,13 @@
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\;.\3rdparty\;.\3rdparty\libcurl;.\3rdparty\imgui;.\3rdparty\spdlog\include;.\3rdparty\miniupnpc\include;.\3rdparty\detours\include;.\3rdparty\directx\include;.\3rdparty\zlib-1.1.4\src;.\3rdparty\discord\include;Blam\Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <ExceptionHandling>Async</ExceptionHandling>
-      <DisableSpecificWarnings>4800;4244</DisableSpecificWarnings>
+      <DisableSpecificWarnings>
+      </DisableSpecificWarnings>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -182,7 +183,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;discord-rpc-debug.lib;detours.lib;libminiupnpc.lib;libcurl-d.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;libcurl-d.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -321,6 +322,7 @@
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
     <ClCompile Include="Blam\Engine\cseries\async.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
+    <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows.cpp" />
@@ -365,6 +367,8 @@
     <ClCompile Include="Blam\Engine\main\licensing.cpp" />
     <ClCompile Include="Blam\Engine\main\loading.cpp" />
     <ClCompile Include="Blam\Engine\main\main.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_guide.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_networking.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game.cpp" />
     <ClCompile Include="Blam\Engine\main\main_game_time.cpp" />
     <ClCompile Include="Blam\Engine\main\main_render.cpp" />
@@ -402,6 +406,7 @@
     <ClCompile Include="Blam\Engine\math\real_math.cpp" />
     <ClCompile Include="Blam\Engine\memory\rockall_heap_manager.cpp" />
     <ClCompile Include="Blam\Engine\models\render_models.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\couch\xsession_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
@@ -421,6 +426,7 @@
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
+    <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
     <ClInclude Include="3rdparty\havok\common\base\container\array\hkArray.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkMatrix3.h" />
     <ClInclude Include="3rdparty\havok\common\base\math\matrix\hkRotation.h" />
@@ -505,6 +511,7 @@
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
     <ClInclude Include="Blam\Engine\cseries\async.h" />
+    <ClInclude Include="Blam\Engine\cartographer\discord\discord_interface.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_windows_minidump.h" />
@@ -568,6 +575,8 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_controller.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_screen_widget_definition.h" />
@@ -604,6 +613,7 @@
     <ClInclude Include="Blam\Engine\models\models.h" />
     <ClInclude Include="Blam\Engine\models\render_models.h" />
     <ClInclude Include="Blam\Engine\models\render_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\Networking\couch\xsession_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\life_cycle_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
     <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
@@ -742,7 +752,6 @@
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="H2MOD.cpp" />
-    <ClCompile Include="H2MOD\Discord\DiscordInterface.cpp" />
     <ClCompile Include="H2MOD\GUI\XLiveRendering.cpp" />
     <ClCompile Include="H2MOD\Modules\Accounts\AccountCreate.cpp" />
     <ClCompile Include="H2MOD\Modules\Accounts\AccountLogin.cpp" />
@@ -803,8 +812,6 @@
     <ClInclude Include="3rdparty\directx\include\d3dx9shape.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9tex.h" />
     <ClInclude Include="3rdparty\directx\include\d3dx9xof.h" />
-    <ClInclude Include="3rdparty\discord\discord_register.h" />
-    <ClInclude Include="3rdparty\discord\discord_rpc.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\connecthostport.h" />
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\igd_desc_parse.h" />
@@ -1138,7 +1145,6 @@
     <ClInclude Include="Blam\Engine\game\players.h" />
     <ClInclude Include="Blam\Engine\game\game_options.h" />
     <ClInclude Include="H2MOD.h" />
-    <ClInclude Include="H2MOD\Discord\DiscordInterface.h" />
     <ClInclude Include="H2MOD\GUI\XLiveRendering.h" />
     <ClInclude Include="H2MOD\Modules\Accounts\AccountCreate.h" />
     <ClInclude Include="H2MOD\Modules\Accounts\AccountLogin.h" />

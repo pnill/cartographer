@@ -86,8 +86,6 @@ s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 // Setup default player data in the game options structure
 void game_options_setup_default_players(int player_count, s_game_options* game_options);
 
-void __cdecl reset_global_player_counts();
-
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 
 void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version);

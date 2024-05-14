@@ -296,13 +296,28 @@ void c_simulation_world::queues_initialize()
 	}
 }
 
-void c_simulation_world::queues_dispose()
+void c_simulation_world::queues_dispose(void)
 {
 	for (int32 i = 0; i < k_simulation_queue_count; i++)
 	{
 		queue_get((e_simulation_queue_type)i)->dispose();
 	}
 }
+
+void c_simulation_world::create_player(datum player_index)
+{
+	typedef void(__thiscall* create_player_t)(c_simulation_world*, datum);
+	INVOKE_TYPE(0x1DC05C, 0x1C3511, create_player_t, this, player_index);
+	return;
+}
+
+void c_simulation_world::delete_player(datum player_index)
+{
+	typedef void(__thiscall* delete_player_t)(c_simulation_world*, datum);
+	INVOKE_TYPE(0x1DC124, 0x1C35D8, delete_player_t, this, player_index);
+	return;
+}
+
 
 void simulation_world_apply_patches()
 {
