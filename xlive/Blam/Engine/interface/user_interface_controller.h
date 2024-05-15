@@ -201,3 +201,5 @@ void user_interface_controller_get_profile_data(e_controller_index controller_in
 
 void __cdecl user_interface_controller_update_user_session_data(e_controller_index gamepad_index);
 
+
+void user_inteface_controller_apply_patches();

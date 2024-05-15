@@ -1,5 +1,8 @@
 #include "stdafx.h"
 #include "user_interface_controller.h"
+#include "user_interface_guide.h"
+#include "Networking/online/online_account_xbox.h"
+#include "tag_files/global_string_ids.h"
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 {
@@ -110,6 +113,48 @@ void user_interface_controller_get_profile_data(e_controller_index controller_in
 void __cdecl user_interface_controller_update_user_session_data(e_controller_index gamepad_index)
 {
     return INVOKE(0x206A97, 0x0, user_interface_controller_update_user_session_data, gamepad_index);
+}
+
+void guest_name_signin_fix(e_controller_index controller_index)
+{
+	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	if (user_interface_guide_state_manager_get()->m_sign_in_state == eXUserSigninState_SignedInToLive)
+	{
+		XUID* controller_xuid = (XUID*)(&controller->controller_user_identifier);
+		if (online_xuid_is_guest_account(*controller_xuid))
+		{
+			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
+			c_static_wchar_string32 format;
+			global_string_resolve_stringid_to_value(HS_GUEST_OF_ASCII_GAMERTAG_UNICODE_FORMAT_STRING, format.get_buffer());// %d %hs
+			swprintf(controller->player_name.get_buffer(),
+				controller->player_name.max_length(),
+				format.get_string(),
+				guest_no,
+				user_interface_guide_state_manager_get()->m_username);
+			
+		}
+		else
+		{
+			swprintf(controller->player_name.get_buffer(),
+				controller->player_name.max_length(),
+				L"%hs",
+				user_interface_guide_state_manager_get()->m_username);
+		}
+	}
+	else if (user_interface_controller_is_player_profile_valid(controller_index))
+	{
+		controller->player_name.set(controller->player_profile.player_name.get_string());
+	}
+	else
+	{
+		controller->player_name.clear();
+	}
+	user_interface_controller_update_user_session_data(controller_index);
+}
+
+void user_inteface_controller_apply_patches()
+{
+	PatchCall(Memory::GetAddress(0x20887A), guest_name_signin_fix); // fixes guest-signin names in ONLINE mode
 }
 
 
