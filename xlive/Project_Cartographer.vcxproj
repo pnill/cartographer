@@ -984,7 +984,9 @@
     <ClInclude Include="Blam\Engine\Networking\player_motion.h" />
     <ClInclude Include="Blam\Engine\Networking\player_prediction.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\saved_games\player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
+    <ClInclude Include="Blam\Engine\saved_games\saved_game_files.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />
