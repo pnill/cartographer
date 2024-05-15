@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Blam/Engine/cseries/cseries.h"
-#include "Blam/Engine/game/players.h"
+#include "cseries/cseries.h"
+#include "cseries/cseries_strings.h"
+#include "game/players.h"
 
 #define k_default_profiles_count 1
 
 
-
-#pragma pack(push,1)
 struct s_saved_game_controller_settings
 {
 	PAD(3660);
@@ -32,4 +31,3 @@ struct s_saved_game_file_player_profile
 	PAD(176);
 };
 ASSERT_STRUCT_SIZE(s_saved_game_file_player_profile, 4616);
-#pragma pack(pop)

@@ -1,12 +1,12 @@
 #pragma once
 
-#include "interface/user_interface_controller.h"
+#include "input/controllers.h"
 #include "memory/data.h"
 #include "objects/damage_reporting.h"
 #include "objects/emblems.h"
 #include "objects/objects.h"
-#include "units/units.h"
 #include "simulation/machine_id.h"
+#include "units/units.h"
 
 #define k_maximum_players 16
 #define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
