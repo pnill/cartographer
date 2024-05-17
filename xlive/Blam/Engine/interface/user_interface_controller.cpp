@@ -6,7 +6,17 @@
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 {
-    return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
+	return Memory::GetAddress<s_user_interface_controller_globals*>(0x96C858, 0x999038);
+}
+
+void __cdecl user_interface_controller_initialize()
+{
+	INVOKE(0x208608, 0x0, user_interface_controller_initialize);
+}
+
+void __cdecl user_interface_controller_update()
+{
+	INVOKE(0x208C5D, 0x0, user_interface_controller_update);
 }
 
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index)
@@ -39,14 +49,14 @@ e_game_team __cdecl user_interface_controller_get_user_active_team(e_controller_
 	return INVOKE(0x206907, 0, user_interface_controller_get_user_active_team, controller_index);
 }
 
-void __cdecl user_interface_controller_set_desired_team_index(e_controller_index gamepad_index, e_game_team team)
+void __cdecl user_interface_controller_set_desired_team_index(e_controller_index controller_index, e_game_team team)
 {
-	return INVOKE(0x2068F2, 0x0, user_interface_controller_set_desired_team_index, gamepad_index, team);
+	INVOKE(0x2068F2, 0x0, user_interface_controller_set_desired_team_index, controller_index, team);
 }
 
-bool __cdecl user_interface_controller_get_rumble_enabled(e_controller_index gamepad_index)
+bool __cdecl user_interface_controller_get_rumble_enabled(e_controller_index controller_index)
 {
-    return INVOKE(0x207600, 0x0, user_interface_controller_get_rumble_enabled, gamepad_index);
+	return INVOKE(0x207600, 0x0, user_interface_controller_get_rumble_enabled, controller_index);
 }
 
 bool __cdecl user_interface_controller_get_autolevel_enabled(e_controller_index controller_index)
@@ -107,18 +117,31 @@ void __cdecl user_interface_controller_sign_out_all_controllers()
 
 void user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index)
 {
-	INVOKE_TYPE(0x206890, 0x0, void(__cdecl*)(e_controller_index, s_saved_game_file_player_profile*, uint32*), controller_index, profile, profile_index);
+	INVOKE(0x206890, 0x0, user_interface_controller_get_profile_data, controller_index, profile, profile_index);
 }
 
-void __cdecl user_interface_controller_update_user_session_data(e_controller_index gamepad_index)
+void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_properties* properties)
 {
-    return INVOKE(0x206A97, 0x0, user_interface_controller_update_user_session_data, gamepad_index);
+	INVOKE(0x20696F, 0x0, user_interface_controller_get_user_properties, controller_index, controller_user_identifier, properties);
+}
+
+void __cdecl user_interface_controller_event_submit(s_event_record* event)
+{
+	INVOKE(0x20D0C5, 0x0, user_interface_controller_event_submit, event);
+}
+
+void __cdecl user_interface_controller_update_network_properties(e_controller_index controller_index)
+{
+	INVOKE(0x206A97, 0x0, user_interface_controller_update_network_properties, controller_index);
 }
 
 void guest_name_signin_fix(e_controller_index controller_index)
 {
+	// INVOKE(0x208312, 0x0, guest_sign_in_name_fix, controller_index);
+
 	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
-	if (user_interface_guide_state_manager_get()->m_sign_in_state == eXUserSigninState_SignedInToLive)
+	c_user_interface_guide_state_manager* guide = user_interface_guide_state_manager_get();
+	if (guide->m_sign_in_state == eXUserSigninState_SignedInToLive)
 	{
 		XUID* controller_xuid = (XUID*)(&controller->controller_user_identifier);
 		if (online_xuid_is_guest_account(*controller_xuid))
@@ -130,15 +153,15 @@ void guest_name_signin_fix(e_controller_index controller_index)
 				controller->player_name.max_length(),
 				format.get_string(),
 				guest_no,
-				user_interface_guide_state_manager_get()->m_username);
-			
+				guide->m_gamertag);
+
 		}
 		else
 		{
 			swprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				L"%hs",
-				user_interface_guide_state_manager_get()->m_username);
+				guide->m_gamertag);
 		}
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
@@ -149,7 +172,7 @@ void guest_name_signin_fix(e_controller_index controller_index)
 	{
 		controller->player_name.clear();
 	}
-	user_interface_controller_update_user_session_data(controller_index);
+	user_interface_controller_update_network_properties(controller_index);
 }
 
 void user_inteface_controller_apply_patches()
