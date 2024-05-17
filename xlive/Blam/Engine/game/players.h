@@ -82,11 +82,11 @@ struct s_player_profile_traits
 ASSERT_STRUCT_SIZE(s_player_profile_traits, 16);
 
 #pragma pack(push, 1)
+// same as XUID
 struct s_player_identifier
 {
-	// same as XUID
-	DWORD unk1;
-	DWORD unk2;
+	uint32 unk1;
+	uint32 unk2;
 };
 ASSERT_STRUCT_SIZE(s_player_identifier, 8);
 #pragma pack(pop)

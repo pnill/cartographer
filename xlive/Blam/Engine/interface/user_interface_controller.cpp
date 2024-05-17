@@ -135,9 +135,23 @@ void __cdecl user_interface_controller_update_network_properties(e_controller_in
 	INVOKE(0x206A97, 0x0, user_interface_controller_update_network_properties, controller_index);
 }
 
-void guest_name_signin_fix(e_controller_index controller_index)
+void __cdecl user_interface_controller_pick_profile_dialog(e_controller_index controller_index, bool online_user)
 {
-	// INVOKE(0x208312, 0x0, guest_sign_in_name_fix, controller_index);
+	// second argument is not used by the function although it is pushed to the stack
+	// TODO : reimplement this to make use of the second argument
+	INVOKE(0x209236, 0x0, user_interface_controller_pick_profile_dialog, controller_index, online_user);
+}
+
+bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index controller_index)
+{
+	// INVOKE(0x212F56, 0x0, user_interface_controller_pick_profile_dialog_wrapper, controller_index);
+	user_interface_controller_pick_profile_dialog(controller_index, false);
+	return true;
+}
+
+void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index)
+{
+	// INVOKE(0x208312, 0x0, user_interface_controller_update_player_name, controller_index);
 
 	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
 	c_user_interface_guide_state_manager* guide = user_interface_guide_state_manager_get();
@@ -177,7 +191,7 @@ void guest_name_signin_fix(e_controller_index controller_index)
 
 void user_inteface_controller_apply_patches()
 {
-	PatchCall(Memory::GetAddress(0x20887A), guest_name_signin_fix); // fixes guest-signin names in ONLINE mode
+	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 }
 
 

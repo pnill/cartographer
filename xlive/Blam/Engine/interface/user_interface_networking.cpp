@@ -2,6 +2,7 @@
 #include "user_interface_networking.h"
 
 #include "user_interface.h"
+#include "user_interface_controller.h"
 
 #include "Networking/logic/life_cycle_manager.h"
 #include "Networking/Session/NetworkSession.h"
@@ -52,7 +53,7 @@ void __cdecl sub_5AD5AB(XSESSION_INFO* session, XNKEY* key, XNADDR* host_address
     return;
 }
 
-void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool from_game_invite)
+void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_index, bool from_game_invite)
 {
     //INVOKE(0x2161E1, 0x1FD827, user_interface_networking_join_game, session_info, a2, from_game_invite);
     int32 local_player_count;
@@ -60,10 +61,10 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 a2, bool 
     s_player_identifier user_identifiers[k_number_of_users];
     wchar_t* p_player_names[k_number_of_users];
 
-    if (user_interface_local_player_count() <= 0)
+    if (user_interface_controller_get_signed_in_controller_count() <= 0)
     {
-        user_interface_networking_set_globals(true, session, a2, from_game_invite);
-        error_message_menu_open(1, 272, 4, 1 << a2, user_interface_controller_pick_profile_dialog_wrapper, 0);
+        user_interface_networking_set_globals(true, session, user_index, from_game_invite);
+        error_message_menu_open(1, _ui_error_invite_requires_signin, 4, 1 << user_index, user_interface_controller_pick_profile_offline, 0);
     }
     else
     {

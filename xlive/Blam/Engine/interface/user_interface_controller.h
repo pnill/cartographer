@@ -125,7 +125,7 @@ struct s_event_record
 	e_controller_index controller;
 	e_user_interface_controller_component component;	
 	uint16 value; // // holds e_user_interface_automation_mode during _user_interface_event_type_automation
-	PAD(2);
+	PAD16;
 };
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(s_event_record, 16);
@@ -139,6 +139,8 @@ enum e_controller_state_flags
 	_controller_state_has_xbox_live_bit = 4,
 	_controller_state_save_in_progress_bit = 5,
 	_controller_state_bit6,
+
+	//TODO : figure out all flags
 	k_controller_state_flags_count,
 };
 
@@ -153,13 +155,13 @@ struct s_user_interface_controller
 	e_game_team player_team;
 	PAD16;
 	e_handicap player_handicap_level;
-	PAD(3);
+	PAD24;
 	int8 bungienet_user;
-	PAD(3);
+	PAD24;
 	int8 player_is_griefer;
-	PAD(3);
+	PAD24;
 	int8 achievement_flags;
-	PAD(3);
+	PAD24;
 	s_player_identifier field_1234;
 	c_static_wchar_string32 player_name;
 };
@@ -171,7 +173,7 @@ struct s_user_interface_controller_globals
 	s_event_record event_records[k_number_of_controllers];
 	bool controller_detached[k_number_of_controllers];
 	bool event_manager_suppress;
-	PAD(3);
+	PAD24;
 };
 ASSERT_STRUCT_SIZE(s_user_interface_controller_globals, 19000);
 
@@ -204,6 +206,7 @@ void __cdecl user_interface_controller_get_user_properties(e_controller_index co
 void __cdecl user_interface_controller_event_submit(s_event_record* event);
 
 void __cdecl user_interface_controller_update_network_properties(e_controller_index controller_index);
-
+void __cdecl user_interface_controller_pick_profile_dialog(e_controller_index controller_index, bool online_user);
+bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index controller_index);
 
 void user_inteface_controller_apply_patches();

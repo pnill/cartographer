@@ -86,7 +86,7 @@ static_assert(sizeof(datum) == 4);
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
 // Pad the desired length of BYTES and also hides it
-#define PAD(BYTES) private: char J(Unused_, __LINE__ )[BYTES];  public:       
+#define PAD(BYTES)  char J(Unused_, __LINE__ )[BYTES];       
 
 /// Add an anonymous 8-bit (1 byte) field to a structure.
 #define PAD8 unsigned char : 8;
