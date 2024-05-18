@@ -120,7 +120,7 @@ static_assert(sizeof(datum) == 4);
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
-static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") excpected size (" #_SIZE")");
+static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");
 
 #define ASSERT_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
