@@ -81,7 +81,6 @@ struct s_player_profile_traits
 };
 ASSERT_STRUCT_SIZE(s_player_profile_traits, 16);
 
-#pragma pack(push, 1)
 // same as XUID
 struct s_player_identifier
 {
@@ -89,7 +88,6 @@ struct s_player_identifier
 	uint32 unk2;
 };
 ASSERT_STRUCT_SIZE(s_player_identifier, 8);
-#pragma pack(pop)
 
 struct s_clan_identifiers
 {
@@ -225,6 +223,7 @@ struct s_persistent_weapon_data
 struct s_persistent_campaign_player
 {
 	bool initialized;
+	int8 pad;
 	s_persistent_weapon_data weapon_0;
 	s_persistent_weapon_data weapon_1;
 	s_persistent_weapon_data weapon_2;
