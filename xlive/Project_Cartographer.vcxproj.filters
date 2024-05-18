@@ -334,6 +334,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />

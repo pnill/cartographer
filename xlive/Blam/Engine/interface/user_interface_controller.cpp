@@ -115,7 +115,7 @@ void __cdecl user_interface_controller_sign_out_all_controllers()
 	INVOKE(0x208A28, 0x1F4E9F, user_interface_controller_sign_out_all_controllers);
 }
 
-void user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index)
+void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index)
 {
 	INVOKE(0x206890, 0x0, user_interface_controller_get_profile_data, controller_index, profile, profile_index);
 }

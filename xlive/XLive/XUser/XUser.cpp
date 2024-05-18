@@ -57,7 +57,7 @@ XUSER_SIGNIN_INFO* UserGetSignInInfo(DWORD dwUserIndex)
 
 void XUserSetupGuests(XUID primary_xuid,bool online)
 {
-	for (int dwUserIndex = 1; dwUserIndex < 4; dwUserIndex++)
+	for (DWORD dwUserIndex = 1; dwUserIndex < 4; dwUserIndex++)
 	{
 		if (online)
 		{
@@ -105,6 +105,7 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
 
+	//fixes guest_signins
 	XUserSetupGuests(xuid, online);
 
 	gXnIpMgr.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
@@ -130,9 +131,6 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 	if (pXuid == NULL)
 		return ERROR_INVALID_PARAMETER;
 
-	// removed this to make guest_signins work
-	//if (dwUserIndex != 0)
-	//	dwUserIndex = 0;
 
 	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XUserGetXUID()");
 
