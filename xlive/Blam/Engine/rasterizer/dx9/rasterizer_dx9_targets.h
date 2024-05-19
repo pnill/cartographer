@@ -6,31 +6,31 @@ enum e_rasterizer_target : uint32
 	_rasterizer_target_0 = 0,
 	_rasterizer_target_1 = 1,
 	_rasterizer_target_2 = 2,
-	_rasterizer_target_3 = 3,
+	_rasterizer_target_backbuffer = 3,
 	_rasterizer_target_4 = 4,
 	_rasterizer_target_5 = 5,
 	_rasterizer_target_6 = 6,
-	_rasterizer_target_7 = 7,
-	_rasterizer_target_8 = 8,
-	_rasterizer_target_9 = 9,
+	_rasterizer_target_dynamic_shadow = 7,
+	_rasterizer_target_lightmap_shadows_1 = 8,
+	_rasterizer_target_lightmap_shadows_2 = 9,
 	_rasterizer_target_10 = 10,
 	_rasterizer_target_11 = 11,
 	_rasterizer_target_12 = 12,
 	_rasterizer_target_13 = 13,
-	_rasterizer_target_14 = 14,
-	_rasterizer_target_15 = 15,
+	_rasterizer_target_sun_glow_primary = 14,
+	_rasterizer_target_sun_glow_secondary = 15,
 	_rasterizer_target_16 = 16,
-	_rasterizer_target_17 = 17,
+	_rasterizer_target_transparent_geometry = 17,
 	_rasterizer_target_18 = 18,
-	_rasterizer_target_19 = 19,
-	_rasterizer_target_20 = 20,
+	_rasterizer_target_water = 19,
+	_rasterizer_target_water_refraction = 20,
 	_rasterizer_target_21 = 21,
 	_rasterizer_target_22 = 22,
-	_rasterizer_target_23 = 23,
+	_rasterizer_target_depth_of_field = 23,
 	_rasterizer_target_24 = 24,
 	_rasterizer_target_25 = 25,
 	_rasterizer_target_26 = 26,
-	_rasterizer_target_27 = 27,
+	_rasterizer_target_motion_sensor = 27,
 	_rasterizer_target_28 = 28,
 	_rasterizer_target_29 = 29,
 	_rasterizer_target_30 = 30,
@@ -40,7 +40,7 @@ enum e_rasterizer_target : uint32
 	_rasterizer_target_34 = 34,
 	_rasterizer_target_35 = 35,
 	_rasterizer_target_36 = 36,
-	_rasterizer_target_37 = 37,
+	_rasterizer_target_render_resolved = 37,
 	k_rasterizer_target_count
 };
 
@@ -48,8 +48,8 @@ enum e_rasterizer_target : uint32
 
 struct s_rasterizer_target
 {
-	IDirect3DTexture9* texture;
-	IDirect3DSurface9* mip_surfaces[4];
+	IDirect3DTexture9* d3d_texture_storage;
+	IDirect3DSurface9* d3d_surface_storage[4];
 	int32 mip_count;
 	uint32 size_x;
 	uint32 size_y;

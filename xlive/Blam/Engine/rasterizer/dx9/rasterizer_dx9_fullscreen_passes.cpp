@@ -11,7 +11,6 @@
 
 real32* rasterizer_dx9_gamma_get(void);
 real32* rasterizer_dx9_brightness_get(void);
-void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target surface_index);
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     e_vertex_output_type output_type,
     real32* bounds,
@@ -46,19 +45,7 @@ void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     return;
 }
 
-/* private code */
-
-real32* rasterizer_dx9_gamma_get(void)
-{
-    return Memory::GetAddress<real32*>(0xA3E4C0);
-}
-
-real32* rasterizer_dx9_brightness_get(void)
-{
-    return Memory::GetAddress<real32*>(0xA3E4C4);
-}
-
-void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target rasterizer_target) 
+void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target rasterizer_target)
 {
     IDirect3DSurface9* backbuffer = NULL;
     const s_frame* global_window_parameters = global_window_parameters_get();
@@ -78,16 +65,25 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 
         real32* gamma = rasterizer_dx9_gamma_get();
         real32* brightness = rasterizer_dx9_brightness_get();
+
+
         
+
         if (*brightness == 0.f && *gamma == 1.f)
         {
             IDirect3DSurface9* target_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
+
+            int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+            int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+            int16 left = global_window_parameters->camera.viewport_bounds.left;
+            int16 top = global_window_parameters->camera.viewport_bounds.top;
+
             const RECT rect =
             {
-                global_window_parameters->camera.viewport_bounds.left,
-                global_window_parameters->camera.viewport_bounds.top,
-                global_window_parameters->camera.viewport_bounds.left + rectangle2d_width(&global_window_parameters->camera.viewport_bounds),
-                global_window_parameters->camera.viewport_bounds.top + rectangle2d_height(&global_window_parameters->camera.viewport_bounds)
+                left,
+                top,
+                width + left,
+                height + top
             };
             rasterizer_set_render_target_internal_hook_set_viewport(backbuffer, (IDirect3DSurface9*)NONE, true);
             global_d3d_device->StretchRect(target_surface, &rect, backbuffer, &rect, D3DTEXF_NONE);
@@ -135,19 +131,37 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
         e_rasterizer_target rasterizer_target_dst = rasterizer_dx9_get_overlay_destination_target();
         if (rasterizer_target_dst != NONE)
         {
+            int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+            int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+            int16 left = global_window_parameters->camera.viewport_bounds.left;
+            int16 top = global_window_parameters->camera.viewport_bounds.top;
+
             const RECT rect =
             {
-                global_window_parameters->camera.viewport_bounds.left,
-                global_window_parameters->camera.viewport_bounds.top,
-                rectangle2d_width(&global_window_parameters->camera.viewport_bounds),
-                rectangle2d_height(&global_window_parameters->camera.viewport_bounds)
+                left,
+                top,
+                width + left,
+                height + top
             };
+
             IDirect3DSurface9* dst_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target_dst, 0);
             IDirect3DSurface9* src_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
             global_d3d_device->StretchRect(src_surface, &rect, dst_surface, NULL, D3DTEXF_POINT);
         }
     }
     return;
+}
+
+/* private code */
+
+real32* rasterizer_dx9_gamma_get(void)
+{
+    return Memory::GetAddress<real32*>(0xA3E4C0);
+}
+
+real32* rasterizer_dx9_brightness_get(void)
+{
+    return Memory::GetAddress<real32*>(0xA3E4C4);
 }
 
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
@@ -183,7 +197,7 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
         // set the tex coords based on the texture set to be drawn on the screen
         int32 main_resolved_surface_size_x, main_resolved_surface_size_y;
         // get the size of the surface
-        rasterizer_get_texture_target_surface_size(_rasterizer_target_37, &main_resolved_surface_size_x, &main_resolved_surface_size_y);
+        rasterizer_get_texture_target_surface_size(_rasterizer_target_render_resolved, &main_resolved_surface_size_x, &main_resolved_surface_size_y);
 
         // explanation: locations are per vertex, this draw call will take 4 vertices
         // this function will get called 4 times, for each single vertex

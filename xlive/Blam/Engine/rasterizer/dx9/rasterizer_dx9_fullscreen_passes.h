@@ -1,4 +1,5 @@
 #pragma once
+#include "rasterizer_dx9_targets.h"
 
 /* enums */
 
@@ -28,3 +29,5 @@ void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     int32 a5,
     int16 a6,
     bool a7);
+
+void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target rasterizer_target);

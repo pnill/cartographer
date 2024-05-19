@@ -115,6 +115,13 @@ IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void)
     return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C650);
 }
 
+
+
+IDirect3DSurface9* global_d3d_surface_render_resolved_get(void)
+{
+    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C65C);
+}
+
 IDirect3DPixelShader9** local_pixel_shaders_get(void)
 {
     return Memory::GetAddress<IDirect3DPixelShader9**>(0xA56C0C);
@@ -141,8 +148,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
     bool result = true;
     if (!media_foundation_player_running())
     {
-        bool* g_clear_screen = rasterizer_target_back_buffer();
-        *g_clear_screen = false;
+        *rasterizer_target_back_buffer() = false;
         if (screenshot_bitmap && screenshot_bitmap->base_address)
         {
             const rectangle2d* screen_bounds = rasterizer_draw_on_main_back_buffer_get();
@@ -324,4 +330,10 @@ e_rasterizer_target __cdecl sub_66C2CA(
         a9,
         a10,
         a11);
+}
+
+void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright)
+{
+    INVOKE(0x25F17D, 0x0, rasterizer_get_bloom_brightness, brightness, overbright);
+    return;
 }

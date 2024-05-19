@@ -36,6 +36,8 @@ IDirect3DSurface9* global_d3d_surface_render_primary_get(void);
 
 IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void);
 
+IDirect3DSurface9* global_d3d_surface_render_resolved_get(void);
+
 void rasterizer_dx9_main_apply_patches(void);
 
 bool __cdecl rasterizer_initialize(void);
@@ -74,3 +76,5 @@ e_rasterizer_target __cdecl sub_66C2CA(
 	int32 a9,
 	real32 a10,
 	real32 a11);
+
+void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright);
