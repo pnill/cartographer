@@ -456,12 +456,19 @@ void render_view(
             render_view_visibility_compute_to_usercall(user_index);
             rasterizer_render_scene(is_texture_camera);
 
+            rasterizer_dx9_perf_event_begin("interface", 0);
             rasterizer_dx9_set_stencil_mode(0);
             rasterizer_setup_2d_vertex_shader_user_interface_constants();
             draw_hud();
             rasterizer_dx9_render_screen_flash();
-
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
+            rasterizer_dx9_perf_event_end();
+
+#ifndef NDEBUG
+            rasterizer_dx9_perf_event_begin("debug", 0);
+            rasterizer_dx9_perf_event_end();
+#endif
+
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
         }
     }

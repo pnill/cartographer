@@ -1,3 +1,5 @@
 #pragma once
 
-void main_render_apply_patches();
+/* public code */
+
+void main_render_apply_patches(void);

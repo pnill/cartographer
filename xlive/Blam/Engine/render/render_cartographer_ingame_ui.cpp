@@ -5,6 +5,7 @@
 #include "game/game.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "interface/hud.h"
+#include "rasterizer/dx9/rasterizer_dx9.h"
 #include "shell/shell_windows.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
@@ -16,17 +17,33 @@
 
 #include "version_git.h"
 
+/* constants */
+
 // define this to enable queueing a test message in render_cartographer_achievements
 // #define ACHIVEMENT_RENDER_DEBUG_ENABLED
 #define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
 
-const int32 k_status_text_font = 0;
+#define k_status_text_font 0
+
+#define k_cheevo_display_lifetime (5 * k_shell_time_msec_denominator)
+#define k_cheevo_title_font 10
+#define k_cheevo_message_font 1
+
+#define k_update_status_font 5
+
+/* globals */
 
 // defined in XLiveRendering.cpp
 extern char* buildText;
 
+// defined in Modules\Updater\Updater.cpp
+extern char* autoUpdateText;
+extern long long sizeOfDownload;
+extern long long sizeOfDownloaded;
 
-void render_cartographer_status_text()
+/* public code */
+
+void render_cartographer_status_text(void)
 {
 	rectangle2d bounds;
 	rasterizer_get_frame_bounds(&bounds);
@@ -93,11 +110,7 @@ void render_cartographer_status_text()
 #endif
 }
 
-const uint64 k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator);
-const uint32 k_cheevo_title_font = 10;
-const uint32 k_cheevo_message_font = 1;
-
-void render_cartographer_achievements()
+void render_cartographer_achievements(void)
 {
 	static int64 x_cheevo_timer = 0;
 	int64 time_now = shell_time_now_msec();
@@ -157,14 +170,7 @@ void render_cartographer_achievements()
 	}
 }
 
-// defined in Modules\Updater\Updater.cpp
-extern char* autoUpdateText;
-extern long long sizeOfDownload;
-extern long long sizeOfDownloaded;
-
-const uint32 k_update_status_font = 5;
-
-void render_cartographer_update()
+void render_cartographer_update(void)
 {
 	if (autoUpdateText)
 	{
@@ -208,5 +214,8 @@ void render_cartographer_update()
 			swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
 			draw_string_render(&bounds, update_message_buffer);
 		}
+
+		rasterizer_dx9_perf_event_end();
 	}
+	return;
 }
