@@ -650,6 +650,7 @@
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_fog.cpp" />
+    <ClCompile Include="Blam\Engine\scenario\scenario_interpolators.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell.cpp" />
     <ClCompile Include="Blam\Engine\shell\shell_windows.cpp" />

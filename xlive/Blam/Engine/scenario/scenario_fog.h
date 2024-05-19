@@ -72,7 +72,8 @@ struct s_scenario_fog_result
     real32 planar_override_min_distance_bias;
     real32 planar_override_amount;
     real32 gamma_override;
-    int8 gap_E4[8];
+    real32 field_E4;
+    real32 field_E8;
     real32 gamma_ramp;
     uint32 flags;
     real_plane3d fog_plane;

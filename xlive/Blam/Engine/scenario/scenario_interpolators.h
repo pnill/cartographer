@@ -1,9 +1,13 @@
 #pragma once
-
 #include "math/function_definitions.h"
 #include "tag_files/string_id.h"
 
+/* constants */
+
 #define k_maximum_interpolators_per_scenario 16
+
+
+/* structures */
 
 // max count: 1
 struct s_scenario_interpolator
@@ -15,3 +19,8 @@ struct s_scenario_interpolator
 	short pad[2];
 };
 ASSERT_STRUCT_SIZE(s_scenario_interpolator, 24);
+
+
+/* public code */
+
+real32 __cdecl scenario_interpolator_get_result(int32 index);
