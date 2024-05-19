@@ -633,6 +633,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_submit.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_cinematics.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_globals.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
@@ -973,6 +974,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_cinematics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_globals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />

@@ -66,7 +66,7 @@ void render_view(
     s_scenario_fog_result* fog,
     int8 zero_1,
     int16 neg_one,
-    void* window_bound_unk_data,
+    s_bloom_window_data* window_bound_unk_data,
     int8 zero_2,
     s_screen_flash* screen_flash);
 
@@ -94,6 +94,11 @@ s_frame* global_window_parameters_get(void)
     return Memory::GetAddress<s_frame*>(0xA3DF70);
 }
 
+s_frame_parameters* global_frame_parameters_get(void)
+{
+    return Memory::GetAddress<s_frame_parameters*>(0xA3E208);
+}
+
 real64 get_current_render_time(void)
 {
     return *Memory::GetAddress<real64*>(0x4E6968);
@@ -104,9 +109,25 @@ bool* hs_texture_camera_view_get(void)
     return Memory::GetAddress<bool*>(0x4F435C);
 }
 
+s_scenario_fog_result* global_fog_result_get(void)
+{
+    return Memory::GetAddress<s_scenario_fog_result*>(0x4E6818);
+}
+
+
+uint32* global_effect_flag_get(void)
+{
+    return Memory::GetAddress<uint32*>(0xA3DA34);
+}
+
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
 {
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
+}
+
+bool frame_parameters_type_is_above_or_equal_to_7(void)
+{
+    return global_frame_parameters_get()->frame_type - 5 <= 2;
 }
 
 void __cdecl render_window(window_bound* window, bool is_texture_camera)
@@ -176,7 +197,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
             &fog,
             0,
             -1,
-            window->gap_f4,
+            &window->bloom_data,
             0,
             &screen_flash);
     }
@@ -243,11 +264,6 @@ bool* global_sky_active_get(void)
 int32* global_sky_index_get(void)
 {
     return Memory::GetAddress<int32*>(0x4E6814);
-}
-
-s_scenario_fog_result* global_fog_result_get(void)
-{
-    return Memory::GetAddress<s_scenario_fog_result*>(0x4E6818);
 }
 
 bool* global_byte_4E6938_get(void)
@@ -377,7 +393,7 @@ void render_view(
     s_scenario_fog_result* fog,
     int8 zero_1,
     int16 neg_one,
-    void* window_bound_unk_data,
+    s_bloom_window_data* bloom_data,
     int8 zero_2,
     s_screen_flash* screen_flash) 
 {
@@ -421,7 +437,7 @@ void render_view(
     frame.alpha = 2;
     frame.fog_result = *fog;
     frame.screen_flash = *screen_flash;
-    frame.field_290 = window_bound_unk_data;
+    frame.bloom_data = bloom_data;
     frame.field_294_zero = zero_2;
 
     bool result = rasterizer_window_begin(&frame);
@@ -443,7 +459,7 @@ void render_view(
             rasterizer_dx9_set_stencil_mode(0);
             rasterizer_setup_2d_vertex_shader_user_interface_constants();
             draw_hud();
-            rasterizer_dx9_render_screen_effect();
+            rasterizer_dx9_render_screen_flash();
 
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
