@@ -25,7 +25,7 @@ public:
 	bool m_strings_initialized;
 	XSESSION_INFO m_xsession_info;
 	bool m_from_game_invite;
-	char m_username[16];
+	char m_gamertag[XUSER_NAME_SIZE];
 	char m_gap_10[1166];
 	s_user_interface_guide_state_manager_string m_strings[4];
 	char m_gap_5DC[12];

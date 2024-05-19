@@ -12,16 +12,6 @@ void __cdecl error_message_menu_open(int32 a1, int32 ui_error_index, int32 a3, i
 	return;
 }
 
-bool __cdecl user_interface_controller_pick_profile_dialog_wrapper(int32 controller_index)
-{
-	return INVOKE(0x212F56, 0x0, user_interface_controller_pick_profile_dialog_wrapper, controller_index);
-}
-
-int32 __cdecl user_interface_local_player_count(void)
-{
-	return INVOKE(0x215BBD, 0x0, user_interface_local_player_count);
-}
-
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d)
 {
 	static void* render_menu_user_interface = (void*)Memory::GetAddress(0x20B697);

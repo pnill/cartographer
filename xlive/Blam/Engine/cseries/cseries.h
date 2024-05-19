@@ -86,7 +86,7 @@ static_assert(sizeof(datum) == 4);
 #define J( symbol1, symbol2 ) _DO_JOIN( symbol1, symbol2 )
 #define _DO_JOIN( symbol1, symbol2 ) symbol1##symbol2
 // Pad the desired length of BYTES and also hides it
-#define PAD(BYTES) private: BYTE J(Unused_, __LINE__ )[BYTES];  public:       
+#define PAD(BYTES)  char J(Unused_, __LINE__ )[BYTES];       
 
 /// Add an anonymous 8-bit (1 byte) field to a structure.
 #define PAD8 unsigned char : 8;
@@ -120,7 +120,7 @@ static_assert(sizeof(datum) == 4);
 #define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
-static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") excpected size (" #_SIZE")");
+static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");
 
 #define ASSERT_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");

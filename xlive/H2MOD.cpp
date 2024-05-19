@@ -29,6 +29,7 @@
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/user_interface_text.h"
+#include "interface/user_interface_controller.h"
 #include "interface/screens/screens_patches.h"
 #include "items/weapon_definitions.h"
 #include "main/levels.h"
@@ -923,6 +924,7 @@ void H2MOD::ApplyHooks() {
 		unit_apply_patches();
 
 		user_interface_text_apply_hooks();
+		user_inteface_controller_apply_patches();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
 		screens_apply_patches();

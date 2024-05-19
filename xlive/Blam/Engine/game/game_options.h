@@ -27,21 +27,22 @@ enum e_game_mode : int
 	k_game_mode_count
 };
 
+#pragma pack(push, 1)
 struct game_player_options
 {
 	bool player_valid;
 	bool player_left_game;
-	short user_index;
-	long controller_index;
+	int16 user_index;
+	int32 controller_index;
 	s_machine_identifier machine_identifier;
 	s_player_identifier player_identifier;
-	short field_16;
+	int16 field_16;
 	s_player_properties properties;
 	s_persistent_campaign_player player_type[2]; // index 0 is masterchief, index 1 is dervish
 };
 ASSERT_STRUCT_SIZE(game_player_options, 212);
+#pragma pack(pop)
 
-#pragma pack(push,1)
 struct s_game_options
 {
 	e_game_mode game_mode;
@@ -82,7 +83,6 @@ struct s_game_options
 	game_player_options players[16]; 
 };
 ASSERT_STRUCT_SIZE(s_game_options, 4488);
-#pragma pack(pop)
 
 // Initializes game options
 void game_options_new(s_game_options* game_options);

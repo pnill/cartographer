@@ -410,6 +410,7 @@
     <ClCompile Include="Blam\Engine\Networking\logic\life_cycle_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
+    <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
@@ -672,6 +673,7 @@
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
     <ClCompile Include="Blam\Engine\structures\structure_bsp_definitions.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files_windows.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\string_id.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_files.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_groups.cpp" />
     <ClCompile Include="Blam\Engine\text\draw_string.cpp" />
@@ -919,6 +921,7 @@
     <ClInclude Include="Blam\Cache\TagGroups\user_interface_shared_globals_definition.hpp" />
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
+    <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
@@ -984,7 +987,9 @@
     <ClInclude Include="Blam\Engine\Networking\player_motion.h" />
     <ClInclude Include="Blam\Engine\Networking\player_prediction.h" />
     <ClInclude Include="Blam\Engine\render\render_cameras.h" />
+    <ClInclude Include="Blam\Engine\saved_games\player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_film.h" />
+    <ClInclude Include="Blam\Engine\saved_games\saved_game_files.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />

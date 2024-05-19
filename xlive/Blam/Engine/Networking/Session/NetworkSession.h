@@ -229,12 +229,6 @@ struct s_session_membership
 };
 ASSERT_STRUCT_SIZE(s_session_membership, 9328);
 
-struct s_player_identifier
-{
-	DWORD unk1;
-	DWORD unk2;
-};
-ASSERT_STRUCT_SIZE(s_player_identifier, 8);
 
 struct s_session_interface_user
 {

@@ -84,3 +84,5 @@ inline bool string_id::operator!= (const string_id &string_id) const
 {
 	return this->value != string_id.value;
 }
+
+void  global_string_resolve_stringid_to_value(string_id id, wchar_t* dest);

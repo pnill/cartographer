@@ -55,6 +55,34 @@ XUSER_SIGNIN_INFO* UserGetSignInInfo(DWORD dwUserIndex)
 	return &usersSignInInfo[dwUserIndex];
 }
 
+void XUserSetupGuests(XUID primary_xuid,bool online)
+{
+	for (DWORD dwUserIndex = 1; dwUserIndex < 4; dwUserIndex++)
+	{
+		if (online)
+		{
+			usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_LIVE_ENABLED | XUSER_INFO_FLAG_GUEST;
+			usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInToLive;
+			// primary_xuid in ONLINE is sure to have last 2 bits 0
+			// we can just use OR operator to append the guest_index to make them different
+			// this is then used to create online_guest_names which are tied to this guest_index
+			usersSignInInfo[dwUserIndex].xuid = primary_xuid | dwUserIndex;
+		}
+		else
+		{
+			usersSignInInfo[dwUserIndex].dwInfoFlags |= XUSER_INFO_FLAG_GUEST;
+			usersSignInInfo[dwUserIndex].UserSigninState = eXUserSigninState_SignedInLocally;
+			// primary_xuid in OFFLINE is returned by rand() and we have no idea which bits are set
+			// in this case we will just add the local_user_index to make the xuids slightly different
+			// offline_guest_names are determined by profile names so it doesnt matter what we set the xuid as
+			usersSignInInfo[dwUserIndex].xuid = primary_xuid + dwUserIndex;
+		}
+
+		usersSignInInfo[dwUserIndex].dwGuestNumber = dwUserIndex;
+		usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+	}
+}
+
 void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned long xnaddr, unsigned long lanaddr, unsigned short baseport, const char* abEnet, const char* abOnline, bool online)
 {
 	// GFWL supports only 1 user logged in at the time
@@ -76,6 +104,9 @@ void XUserSetup(DWORD dwUserIndex, XUID xuid, const char* userName, unsigned lon
 	usersSignInInfo[dwUserIndex].xuid = xuid;
 	usersSignInInfo[dwUserIndex].dwGuestNumber = 0;
 	usersSignInInfo[dwUserIndex].dwSponsorUserIndex = 0;
+
+	//fixes guest_signins
+	XUserSetupGuests(xuid, online);
 
 	gXnIpMgr.SetupLocalConnectionInfo(xnaddr, lanaddr, baseport, abEnet, abOnline);
 }
@@ -100,8 +131,6 @@ int WINAPI XUserGetXUID(DWORD dwUserIndex, PXUID pXuid)
 	if (pXuid == NULL)
 		return ERROR_INVALID_PARAMETER;
 
-	if (dwUserIndex != 0)
-		dwUserIndex = 0;
 
 	LIMITED_LOG(35, LOG_TRACE_XLIVE, "XUserGetXUID()");
 

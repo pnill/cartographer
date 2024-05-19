@@ -1,12 +1,12 @@
 #pragma once
 
-#include "interface/user_interface_controller.h"
+#include "input/controllers.h"
 #include "memory/data.h"
 #include "objects/damage_reporting.h"
 #include "objects/emblems.h"
 #include "objects/objects.h"
-#include "units/units.h"
 #include "simulation/machine_id.h"
+#include "units/units.h"
 
 #define k_maximum_players 16
 #define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
@@ -80,6 +80,14 @@ struct s_player_profile_traits
 	int unk_4C;
 };
 ASSERT_STRUCT_SIZE(s_player_profile_traits, 16);
+
+// same as XUID
+struct s_player_identifier
+{
+	uint32 unk1;
+	uint32 unk2;
+};
+ASSERT_STRUCT_SIZE(s_player_identifier, 8);
 
 struct s_clan_identifiers
 {
@@ -215,6 +223,7 @@ struct s_persistent_weapon_data
 struct s_persistent_campaign_player
 {
 	bool initialized;
+	int8 pad;
 	s_persistent_weapon_data weapon_0;
 	s_persistent_weapon_data weapon_1;
 	s_persistent_weapon_data weapon_2;
