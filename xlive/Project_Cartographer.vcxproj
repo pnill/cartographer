@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -638,6 +638,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_globals.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_screen_effects.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_settings.cpp" />
     <ClCompile Include="Blam\Engine\render\render.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
@@ -980,6 +981,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_globals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_screen_effects.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
     <ClInclude Include="Blam\Engine\render\render.h" />
