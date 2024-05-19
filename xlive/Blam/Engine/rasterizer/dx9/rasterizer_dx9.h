@@ -1,4 +1,5 @@
 #pragma once
+#include "math/color_math.h"
 #include "math/real_math.h"
 
 /* classes */
@@ -22,10 +23,10 @@ public:
             int32 i = 0;
             for (;
                 !(
-                    (int32)values[index].i ^ (int32)constants[i].i |
-                    (int32)values[index].j ^ (int32)constants[i].j |
-                    (int32)values[index].k ^ (int32)constants[i].k |
-                    (int32)values[index].w ^ (int32)constants[i].w
+                    (uint32)values[index].i ^ (uint32)constants[i].i |
+                    (uint32)values[index].j ^ (uint32)constants[i].j |
+                    (uint32)values[index].k ^ (uint32)constants[i].k |
+                    (uint32)values[index].w ^ (uint32)constants[i].w
                     );
                 i++)
             {
@@ -43,7 +44,8 @@ public:
                 {
                     for (int32 j = i + index; j < size; j++)
                     {
-                        values[j] = constants[j];
+                        values[j] = constants[i];
+                        ++i;
                     }
 
                 }
@@ -62,3 +64,7 @@ bool* rasterizer_dx9_disable_stencil_get(void);
 c_rasterizer_constant_4f_cache<256>* rasterizer_get_main_vertex_shader_cache(void);
 
 c_rasterizer_constant_4f_cache<32>* rasterizer_get_main_pixel_shader_cache(void);
+
+void rasterizer_dx9_perf_event_begin(const char* string, real_argb_color* color);
+
+void rasterizer_dx9_perf_event_end(void);
