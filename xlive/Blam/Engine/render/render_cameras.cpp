@@ -47,7 +47,7 @@ void __cdecl render_camera_build_viewport_frustum_bounds(const s_camera* camera,
 }
 
 bool __cdecl render_projection_point_to_screen(
-	const real_point3d* point,
+	const real_point3d* camera_position,
 	real32  occlusion_radius,
 	real_rectangle2d* rect,
 	real_bounds* bounds)
@@ -58,42 +58,45 @@ bool __cdecl render_projection_point_to_screen(
 		s_frame* global_window_parameters = global_window_parameters_get();
 
 		real_point3d transformed_point;
-		matrix4x3_transform_point(&global_window_parameters->projection.world_to_view, point, &transformed_point);
+		matrix4x3_transform_point(&global_window_parameters->projection.world_to_view, camera_position, &transformed_point);
 		
 		s_oriented_bounding_box* obb = &global_window_parameters->projection.projection_matrix;
 
-		real32 v1 = 
-			  obb->matrix[0][1] * transformed_point.x
-			+ obb->matrix[1][1] * transformed_point.y
-			+ obb->matrix[2][1] * transformed_point.z
-			+ obb->matrix[3][1];
 		real32 v2 = 
 			  obb->matrix[0][2] * transformed_point.x
 			+ obb->matrix[1][2] * transformed_point.y
 			+ obb->matrix[2][2] * transformed_point.z
 			+ obb->matrix[3][2];
-		real32 divisor = 
-			  obb->matrix[0][3] * transformed_point.x
-			+ obb->matrix[1][3] * transformed_point.y
-			+ obb->matrix[2][3] * transformed_point.z
-			+ obb->matrix[3][3];
-
-		real32 v4 = obb->matrix[0][0] * occlusion_radius;
-		real32 v5 = obb->matrix[1][1] * occlusion_radius;
 
 		if (v2 > 0.f)
 		{
+			real32 divisor =
+				  obb->matrix[0][3] * transformed_point.x
+				+ obb->matrix[1][3] * transformed_point.y
+				+ obb->matrix[2][3] * transformed_point.z
+				+ obb->matrix[3][3];
+
+			real32 matrix_scale_x = obb->matrix[0][0] * occlusion_radius;
+			real32 matrix_scale_y = obb->matrix[1][1] * occlusion_radius;
+
+			real32 v1 =
+				  obb->matrix[0][1] * transformed_point.x
+				+ obb->matrix[1][1] * transformed_point.y
+				+ obb->matrix[2][1] * transformed_point.z
+				+ obb->matrix[3][1];
 			real32 v6 = 
-				  transformed_point.x * obb->matrix[0][0]
-				+ transformed_point.y * obb->matrix[1][0]
-				+ transformed_point.z * obb->matrix[2][0]
-				+ obb->matrix[3][0];
+				  obb->matrix[0][0] * transformed_point.x
+				+ obb->matrix[1][0] * transformed_point.y
+				+ obb->matrix[2][0] * transformed_point.z
+				+ obb->matrix[3][0];			
+
+
 			rect->x0 = v6 / divisor;
 			rect->x1 = v1 / divisor;
 			rect->y0 = v2 / divisor;
 			rect->y1 = 1.f;
-			bounds->lower = v4 / divisor;
-			bounds->upper = v5 / divisor;
+			bounds->lower = matrix_scale_x / divisor;
+			bounds->upper = matrix_scale_y / divisor;
 			result = true;
 		}
 	}
