@@ -623,6 +623,7 @@
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
@@ -963,6 +964,7 @@
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />
