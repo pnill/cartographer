@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "hud.h"
 
+#include "new_hud.h"
 #include "new_hud_definitions.h"
 
 #include "game/game_globals.h"
@@ -9,47 +10,72 @@
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 
+/* constants */
 
 #define k_redraw_map_name "ui_redraw"
 
-static float original_primary_hud_scale;
-static float original_secondary_hud_scale;
+/* globals */
+
+real32 g_original_primary_hud_scale;
+real32 g_original_secondary_hud_scale;
+
+/* typedefs */
 
 // Used to grab the default crosshair size before we modify it
-typedef void(__cdecl* update_hud_elements_display_settings_t)(int new_hud_size, int new_safe_area);
+typedef void(__cdecl* update_hud_elements_display_settings_t)(int32 new_hud_size, int32 new_safe_area);
 update_hud_elements_display_settings_t p_update_hud_elements_display_settings;
 
-void __cdecl update_hud_elements_display_settings_hook(int new_hud_size, int new_safe_area)
-{
-	p_update_hud_elements_display_settings(new_hud_size, new_safe_area);
-	original_primary_hud_scale = *Memory::GetAddress<float*>(0x46402C);
-	original_secondary_hud_scale = *Memory::GetAddress<float*>(0x464028);
+/* prototypes */
 
-	set_primary_hud_scale(1.0f);
-	set_secondary_hud_scale(1.0f);
+void __cdecl update_hud_elements_display_settings_hook(int32 new_hud_size, int32 new_safe_area);
+
+/* public code */
+
+void hud_patches_on_map_load(void)
+{
+	set_crosshair_offset(H2Config_crosshair_offset);
+	set_primary_hud_scale(1.f);
+	set_secondary_hud_scale(1.f);
+	return;
 }
 
-void set_primary_hud_scale(float scale)
+void hud_apply_pre_winmain_patches(void)
 {
-	*get_primary_hud_scale() = original_primary_hud_scale * scale * k_primary_upscale_size;
+	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18);
+
+	// Replace all calls to update_hud_elements_display_settings with our hook
+	PatchCall(Memory::GetAddress(0x25E1FC), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x264058), update_hud_elements_display_settings_hook);
+	PatchCall(Memory::GetAddress(0x26406F), update_hud_elements_display_settings_hook);
+	return;
 }
 
-void set_secondary_hud_scale(float scale)
+real32* get_ui_scale(void)
 {
-	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * k_primary_upscale_size;
+	return Memory::GetAddress<real32*>(0xA3E424);
 }
 
-float* get_primary_hud_scale()
+real32* get_primary_hud_scale(void)
 {
-	return Memory::GetAddress<float*>(0x46402C);
+	return Memory::GetAddress<real32*>(0x46402C);
 }
 
-float* get_secondary_hud_scale()
+real32* get_secondary_hud_scale(void)
 {
-	return Memory::GetAddress<float*>(0x464028);
+	return Memory::GetAddress<real32*>(0x464028);
 }
 
-void set_crosshair_offset(float offset)
+void set_primary_hud_scale(real32 scale)
+{
+	*get_primary_hud_scale() = g_original_primary_hud_scale * scale * k_primary_upscale_size;
+}
+
+void set_secondary_hud_scale(real32 scale)
+{
+	*get_secondary_hud_scale() = g_original_secondary_hud_scale * scale * k_primary_upscale_size;
+}
+
+void set_crosshair_offset(real32 offset)
 {
 	if (!FloatIsNaN(offset))
 	{
@@ -63,21 +89,15 @@ void __cdecl draw_hud(void)
 	return;
 }
 
-void hud_patches_on_map_load()
+/* private code */
+
+void __cdecl update_hud_elements_display_settings_hook(int32 new_hud_size, int32 new_safe_area)
 {
-	set_crosshair_offset(H2Config_crosshair_offset);
-	set_primary_hud_scale(1.0f);
-	set_secondary_hud_scale(1.0f);
-}
+	p_update_hud_elements_display_settings(new_hud_size, new_safe_area);
+	g_original_primary_hud_scale = *Memory::GetAddress<float*>(0x46402C);
+	g_original_secondary_hud_scale = *Memory::GetAddress<float*>(0x464028);
 
-void hud_apply_pre_winmain_patches()
-{
-	if (Memory::IsDedicatedServer()) { return; }
-
-	p_update_hud_elements_display_settings = Memory::GetAddress<update_hud_elements_display_settings_t>(0x264A18);
-
-	// Replace all calls to update_hud_elements_display_settings with our hook
-	PatchCall(Memory::GetAddress(0x25E1FC), update_hud_elements_display_settings_hook);
-	PatchCall(Memory::GetAddress(0x264058), update_hud_elements_display_settings_hook);
-	PatchCall(Memory::GetAddress(0x26406F), update_hud_elements_display_settings_hook);
+	set_primary_hud_scale(1.f);
+	set_secondary_hud_scale(1.f);
+	return;
 }

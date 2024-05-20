@@ -2,6 +2,8 @@
 #include "game/players.h"
 #include "Networking/Session/NetworkSession.h"
 
+/* structures */
+
 struct s_hud_scripted_globals
 {
 	bool unused_bool;
@@ -69,12 +71,19 @@ struct s_new_hud_temporary_user_state
 };
 ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 
+/* public code */
+
+void new_hud_apply_patches(void);
+
+void new_hud_patches_on_map_load(bool game_mode_ui_shell);
 
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
-s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(const int local_user_index);
+s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);
 
-void set_crosshair_scale(float scale);
-void new_hud_apply_patches();
-void new_hud_patches_on_map_load(bool game_mode_ui_shell);
+// We scale crosshairs by adjusting the bitmap data size in the bitmap tag
+// It doesn't seem to actually downscale the bitmap since the data loaded still remains the same
+void set_crosshair_scale(real32 scale);
+
+
