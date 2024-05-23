@@ -6,7 +6,7 @@
 
 struct s_hud_scripted_globals
 {
-	bool unused_bool;
+	bool field_0;
 	bool show_help_text;
 	bool show_hud_messages;
 };
@@ -86,4 +86,6 @@ s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_use
 // It doesn't seem to actually downscale the bitmap since the data loaded still remains the same
 void set_crosshair_scale(real32 scale);
 
+// Checks if we shouldn't draw the hud
+bool new_hud_dont_draw(void);
 

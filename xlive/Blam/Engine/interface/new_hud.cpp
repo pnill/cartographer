@@ -40,7 +40,6 @@ void get_crosshair_bitmap_datums(void);
 
 void initialize_crosshair_scale(bool game_mode_ui_shell);
 
-bool new_hud_dont_draw(void);
 
 /* public code */
 
@@ -113,6 +112,22 @@ void set_crosshair_scale(real32 scale)
 			++bitmap_size_vector_index;
 		}
 	}
+}
+
+bool new_hud_dont_draw(void)
+{
+	s_screenshot_globals* globals = get_screenshot_globals();
+
+	// Added check for get_new_hud_engine_globals()->show_hud since it will still render other parts of the hud if show_hud is set to false
+	// This does not match legacy behaviour, however the text for picking up weapons is a part of the hud so I assume this is a mistake from bungie
+	bool dont_draw_hud = !g_should_draw_hud_override;
+
+
+	bool original_check = globals->taking_screenshot && globals->resolution_multiplier > 1;
+
+	// If original check or show_hud check are true we don't draw the hud
+	// Otherwise return false so we show the hud
+	return (original_check || dont_draw_hud ? true : false);
 }
 
 /* private code */
@@ -227,21 +242,4 @@ void initialize_crosshair_scale(bool game_mode_ui_shell)
 	}
 
 	return;
-}
-
-// Checks if we shouldn't draw the hud
-bool new_hud_dont_draw(void)
-{
-	s_screenshot_globals* globals = get_screenshot_globals();
-
-	// Added check for get_new_hud_engine_globals()->show_hud since it will still render other parts of the hud if show_hud is set to false
-	// This does not match legacy behaviour, however the text for picking up weapons is a part of the hud so I assume this is a mistake from bungie
-	bool dont_draw_hud = !g_should_draw_hud_override;
-
-
-	bool original_check = globals->taking_screenshot && globals->resolution_multiplier > 1;
-
-	// If original check or show_hud check are true we don't draw the hud
-	// Otherwise return false so we show the hud
-	return (original_check || dont_draw_hud ? true : false);
 }

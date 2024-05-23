@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -315,6 +315,7 @@
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
+    <ClCompile Include="Blam\Engine\cache\pc_texture_cache.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
@@ -357,7 +358,10 @@
     <ClCompile Include="Blam\Engine\input\input_abstraction.cpp" />
     <ClCompile Include="Blam\Engine\input\input_windows.cpp" />
     <ClCompile Include="Blam\Engine\input\input_xinput.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud_draw.cpp" />
+    <ClCompile Include="Blam\Engine\interface\hud_nav_points.cpp" />
     <ClCompile Include="Blam\Engine\interface\interface.cpp" />
+    <ClCompile Include="Blam\Engine\interface\new_hud_draw.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
     <ClCompile Include="Blam\Engine\items\item_definitions.cpp" />
     <ClCompile Include="Blam\Engine\items\weapons.cpp" />
@@ -507,6 +511,7 @@
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
+    <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
@@ -571,10 +576,14 @@
     <ClInclude Include="Blam\Engine\interface\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\interface\first_person_weapons.h" />
     <ClInclude Include="Blam\Engine\interface\hud.h" />
+    <ClInclude Include="Blam\Engine\interface\hud_draw.h" />
     <ClInclude Include="Blam\Engine\interface\hud_messaging.h" />
+    <ClInclude Include="Blam\Engine\interface\hud_nav_points.h" />
     <ClInclude Include="Blam\Engine\interface\interface.h" />
+    <ClInclude Include="Blam\Engine\interface\meter_definitions.h" />
     <ClInclude Include="Blam\Engine\interface\motion_sensor.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud.h" />
+    <ClInclude Include="Blam\Engine\interface\new_hud_draw.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screens_patches.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
@@ -625,6 +634,8 @@
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_main.cpp" />
@@ -967,6 +978,8 @@
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fog.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_fullscreen_passes.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_lens_flares.h" />

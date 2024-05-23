@@ -5,7 +5,11 @@
 
 #include "H2MOD/Modules/Shell/Config.h"
 
+/* prototypes */
+
 void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection);
+
+/* public code */
 
 void render_cameras_apply_patches(void)
 {
@@ -104,4 +108,48 @@ bool render_projection_point_to_screen(
 
 	return result;
 	//return INVOKE(0x2799A3, 0x0, render_projection_point_to_screen, point, occlusion_radius, rect, bounds);
+}
+
+bool render_camera_world_to_screen(
+	const s_camera* camera,
+	const render_projection* projection,
+	const rectangle2d* viewport_bounds,
+	const real_point3d* view_point,
+	real_point2d* screen_point)
+{
+	ASSERT(camera);
+	ASSERT(projection);
+	ASSERT(view_point);
+	ASSERT(screen_point);
+
+	const rectangle2d* bounds = (viewport_bounds ? viewport_bounds : &camera->viewport_bounds);
+
+	bool within_screen_bounds;
+	if (view_point->z >= 0.f)
+	{
+		screen_point->x = 0.f;
+		screen_point->y = 0.f;
+		within_screen_bounds = false;
+	}
+	else
+	{
+		int16 width = rectangle2d_width(bounds);
+		int16 height = rectangle2d_height(bounds);
+
+		real32 view_z = -1.f / view_point->z;
+		screen_point->x = (
+			  projection->projection_matrix.matrix[0][0] * view_point->x
+			+ projection->projection_matrix.matrix[2][0] * view_point->z) * view_z;
+
+		screen_point->y = (
+			  projection->projection_matrix.matrix[1][1] * view_point->y
+			+ projection->projection_matrix.matrix[2][1] * view_point->z) * -view_z;
+
+		within_screen_bounds = screen_point->x >= -1.f && screen_point->x <= 1.f && screen_point->y >= -1.f && screen_point->y <= 1.f;
+
+		screen_point->x = (screen_point->x * 0.5f + 0.5f) * width + bounds->left;
+		screen_point->y = (screen_point->y * 0.5f + 0.5f) * height + bounds->top;
+	}
+
+	return within_screen_bounds;
 }

@@ -100,6 +100,7 @@ void unit_apply_interpolation_patches()
 	unit_get_camera_position_patch_mass_functions();
 	unit_get_camera_position_patch_marker_functions();
 	unit_get_head_position_patch_functions();
+	return;
 }
 
 void unit_apply_patches(void)
