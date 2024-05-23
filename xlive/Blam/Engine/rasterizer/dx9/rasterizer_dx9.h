@@ -23,10 +23,10 @@ public:
             int32 i = 0;
             for (;
                 !(
-                    (uint32)values[index].i ^ (uint32)constants[i].i |
-                    (uint32)values[index].j ^ (uint32)constants[i].j |
-                    (uint32)values[index].k ^ (uint32)constants[i].k |
-                    (uint32)values[index].w ^ (uint32)constants[i].w
+                    *(uint32*)&values[index].i ^ *(uint32*)&constants[i].i |
+                    *(uint32*)&values[index].j ^ *(uint32*)&constants[i].j |
+                    *(uint32*)&values[index].k ^ *(uint32*)&constants[i].k |
+                    *(uint32*)&values[index].w ^ *(uint32*)&constants[i].w
                     );
                 i++)
             {
