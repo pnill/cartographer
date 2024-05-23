@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -311,6 +311,7 @@
     <ClCompile Include="Blam\Engine\animations\ik_point_iterator.cpp" />
     <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_group.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
