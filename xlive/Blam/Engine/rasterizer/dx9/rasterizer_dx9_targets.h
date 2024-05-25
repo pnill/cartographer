@@ -67,7 +67,7 @@ s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target raste
 
 void __cdecl rasterizer_get_texture_target_surface_size(e_rasterizer_target target, int32* out_width, int32* out_height);
 
-bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3);
+bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target, int32 z_stencil, bool use_depth);
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
 

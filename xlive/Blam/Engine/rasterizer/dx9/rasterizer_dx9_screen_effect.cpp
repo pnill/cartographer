@@ -53,6 +53,17 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 	int16 left = global_window_parameters->camera.viewport_bounds.left;
 	int16 top = global_window_parameters->camera.viewport_bounds.top;
 
+	const RECT rect =
+	{
+		left,
+		top,
+		left + width,
+		top + height
+	};
+
+	global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), &rect, global_d3d_surface_render_resolved_get(), &rect, D3DTEXF_NONE);
+	*rasterizer_target_back_buffer() = true;
+
 	if (render_layer_selfibloomination && !g_disable_bloom)
 	{
 		real32 brightness;
@@ -96,7 +107,11 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 		}
 	}
 
-	e_rasterizer_target target = _rasterizer_target_0;
+	// this is the main output surface
+	// already contains the processed image of the game
+	// and is used for post-processing (e.g. brightness, bloom, sun etc.)
+	// which is later copied in the backbuffer to be displayed on the screen
+	e_rasterizer_target target = _rasterizer_target_render_resolved;
 	scenario* global_scenario = get_global_scenario();
 	if (global_scenario)
 	{
@@ -185,7 +200,6 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 			}
 		}
 	}
-	
 
 	if (lens_flare_occlusion_test)
 	{
@@ -195,9 +209,6 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 	rasterizer_dx9_perf_event_begin("gamma_brightness", NULL);
 	rasterizer_dx9_apply_gamma_and_brightness(target);
 	rasterizer_dx9_perf_event_end();
-
-	global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), NULL, global_d3d_surface_render_resolved_get(), NULL, D3DTEXF_NONE);
-	*rasterizer_target_back_buffer() = true;
 
 	rasterizer_dx9_perf_event_end();
 }

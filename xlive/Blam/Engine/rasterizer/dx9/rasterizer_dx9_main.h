@@ -58,13 +58,13 @@ void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD val
 
 void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuffer_blend_function);
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3);
+void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool use_depth);
 
 bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, int16 rasterizer_target);
 
 void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader);
 
-e_rasterizer_target __cdecl sub_66C2CA(
+e_rasterizer_target __cdecl rasterizer_dx9_get_screen_render_surface(
 	real32 a1,
 	real32 a2,
 	real32 a3,

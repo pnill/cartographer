@@ -63,11 +63,9 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
         }
 
-        real32* gamma = rasterizer_dx9_gamma_get();
-        real32* brightness = rasterizer_dx9_brightness_get();
+        const real32* gamma = rasterizer_dx9_gamma_get();
+        const real32* brightness = rasterizer_dx9_brightness_get();
 
-
-        
 
         if (*brightness == 0.f && *gamma == 1.f)
         {
@@ -140,8 +138,8 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             {
                 left,
                 top,
-                width + left,
-                height + top
+                left + width,
+                top + height
             };
 
             IDirect3DSurface9* dst_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target_dst, 0);

@@ -41,9 +41,9 @@ IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_targe
 	return ((target->d3d_texture_storage != NULL && !target->unk_bool_20 && target->mip_count > 0) ? target->d3d_surface_storage[0] : NULL);
 }
 
-bool __cdecl rasterizer_dx9_set_render_target(IDirect3DSurface9* target, int32 z_stencil, bool a3)
+bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target, int32 z_stencil, bool use_depth)
 {
-	return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target, target, z_stencil, a3);
+	return INVOKE(0x26EBF8, 0x0, rasterizer_dx9_set_render_target_internal, target, z_stencil, use_depth);
 }
 
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
@@ -57,7 +57,7 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 
 	s_camera* global_camera = get_global_camera();
 
-	rasterizer_dx9_set_render_target(target, (int32)z_stencil, a3);
+	rasterizer_dx9_set_render_target_internal(target, (int32)z_stencil, a3);
 	D3DVIEWPORT9 vp = {
 		global_camera->viewport_bounds.left,
 		global_camera->viewport_bounds.top,

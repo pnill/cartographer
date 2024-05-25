@@ -115,8 +115,6 @@ IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void)
     return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C650);
 }
 
-
-
 IDirect3DSurface9* global_d3d_surface_render_resolved_get(void)
 {
     return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C65C);
@@ -189,7 +187,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             {
                 result = false;
             }
-            rasterizer_dx9_set_render_target(global_d3d_surface_render_primary_get(), NONE, true);
+            rasterizer_dx9_set_render_target_internal(global_d3d_surface_render_primary_get(), NONE, true);
             clear_render_target(0, NONE, 0.0f, false);
         }
 
@@ -288,9 +286,9 @@ void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuf
     return;
 }
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool a3)
+void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool use_depth)
 {
-    INVOKE(0x25FDC0, 0x0, rasterizer_dx9_set_target, render_target_type, mip_level, a3);
+    INVOKE(0x25FDC0, 0x0, rasterizer_dx9_set_target, render_target_type, mip_level, use_depth);
     return;
 }
 
@@ -305,7 +303,7 @@ void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
     return;
 }
 
-e_rasterizer_target __cdecl sub_66C2CA(
+e_rasterizer_target __cdecl rasterizer_dx9_get_screen_render_surface(
     real32 a1,
     real32 a2,
     real32 a3,
@@ -318,7 +316,7 @@ e_rasterizer_target __cdecl sub_66C2CA(
     real32 a10,
     real32 a11)
 {
-    return INVOKE(0x26C2CA, 0x0, sub_66C2CA,
+    return INVOKE(0x26C2CA, 0x0, rasterizer_dx9_get_screen_render_surface,
         a1,
         a2,
         a3,
