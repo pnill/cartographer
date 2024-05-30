@@ -64,17 +64,23 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, int16 rasterizer_
 
 void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader);
 
-e_rasterizer_target __cdecl rasterizer_dx9_get_screen_render_surface(
+e_rasterizer_target __cdecl rasterizer_dx9_convolve_screen_surfaces(
 	real32 a1,
 	real32 a2,
 	real32 a3,
-	int32 a4,
-	int32 a5,
-	int32 a6,
-	int32 a7,
+	e_rasterizer_target surface_source,
+	e_rasterizer_target surface_destination,
+	e_rasterizer_target target_3,
+	e_rasterizer_target stretch_destination,
 	int32 a8,
 	int32 a9,
 	real32 a10,
 	real32 a11);
 
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright);
+
+bool rasterizer_dx9_draw_primitive_up(
+	D3DPRIMITIVETYPE PrimitiveType,
+	uint32 PrimitiveCount,
+	const void* pVertexStreamZeroData,
+	uint32 VertexStreamZeroStride);

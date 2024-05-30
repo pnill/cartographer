@@ -1,10 +1,12 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_main.h"
 
+#include "rasterizer_dx9_dof.h"
+#include "rasterizer_dx9_targets.h"
+
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
 
-#include "rasterizer_dx9_targets.h"
 #include "rasterizer/rasterizer_loading.h"
 
 /* globals */
@@ -303,27 +305,27 @@ void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
     return;
 }
 
-e_rasterizer_target __cdecl rasterizer_dx9_get_screen_render_surface(
+e_rasterizer_target __cdecl rasterizer_dx9_convolve_screen_surfaces(
     real32 a1,
     real32 a2,
     real32 a3,
-    int32 a4,
-    int32 a5,
-    int32 a6,
-    int32 a7,
+    e_rasterizer_target source,
+    e_rasterizer_target destination,
+    e_rasterizer_target stretch_source,
+    e_rasterizer_target stretch_destination,
     int32 a8,
     int32 a9,
     real32 a10,
     real32 a11)
 {
-    return INVOKE(0x26C2CA, 0x0, rasterizer_dx9_get_screen_render_surface,
+    return INVOKE(0x26C2CA, 0x0, rasterizer_dx9_convolve_screen_surfaces,
         a1,
         a2,
         a3,
-        a4,
-        a5,
-        a6,
-        a7,
+        source,
+        destination,
+        stretch_source,
+        stretch_destination,
         a8,
         a9,
         a10,
@@ -334,4 +336,17 @@ void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbri
 {
     INVOKE(0x25F17D, 0x0, rasterizer_get_bloom_brightness, brightness, overbright);
     return;
+}
+
+bool rasterizer_dx9_draw_primitive_up(
+    D3DPRIMITIVETYPE PrimitiveType,
+    uint32 PrimitiveCount,
+    const void* pVertexStreamZeroData,
+    uint32 VertexStreamZeroStride)
+{
+    return rasterizer_dx9_device_get_interface()->DrawPrimitiveUP(
+        PrimitiveType,
+        PrimitiveCount,
+        pVertexStreamZeroData,
+        VertexStreamZeroStride) >= 0;
 }

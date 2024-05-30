@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_lens_flares.h"
 
+#include "rasterizer_dx9.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_submit.h"
@@ -11,6 +12,8 @@
 #include "rasterizer/rasterizer_globals.h"
 #include "render/render.h"
 #include "shell/shell_windows.h"
+
+
 
 /* constants */
 #define k_sun_quad_pass_count 16
@@ -41,6 +44,10 @@ IDirect3DSurface9* rasterizer_dx9_sun_alpha_surface_get(void)
     return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C684);
 }
 
+uint32* rasterizer_dx9_sun_glow_target_width_get(void)
+{
+    return Memory::GetAddress<uint32*>(0xA3C674);
+}
 
 /* private code */
 
@@ -50,6 +57,7 @@ IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void)
 }
 
 // Is the sun outside of our viewport
+// TODO: change the bounds depending on viewport bounds on the screen
 bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* rect)
 {
     return rect->x0 < 1.f && rect->y0 < 1.f && rect->x1 > -1.f && rect->y1 > -1.f;
@@ -88,7 +96,7 @@ int32 __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* poi
         {
             //real32 depth_range = global_window_parameters->camera.z_near / global_window_parameters->camera.z_far;
 
-            rasterizer_dx9_set_shader_code(10);
+            rasterizer_dx9_set_vertex_shader_permutation(10);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, (DWORD)0);
@@ -148,7 +156,7 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
 
             IDirect3DPixelShader9** lens_flare_pixel_shaders = lens_flare_pixel_shaders_get();
 
-            rasterizer_dx9_set_shader_code(10);
+            rasterizer_dx9_set_vertex_shader_permutation(10);
 
             real32 x_result = viewport_width / 2.f;
             real32 y_result = viewport_height / 2.f;
@@ -172,6 +180,8 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
             *rasterizer_target_back_buffer() = true;
             
+            rasterizer_dx9_perf_event_begin("clear_alpha", NULL);
+
             rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVDESTALPHA);
             rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (DWORD)0);
@@ -191,9 +201,10 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             // real32 depth_range = 0.06f / 1024.f;
 
             rasterizer_dx9_draw_rect(&sun_alpha_rect, 1.f, { 0 });
+            rasterizer_dx9_perf_event_end();
 
+            rasterizer_dx9_perf_event_begin("write_alpha", NULL);
 
-            // write_alpha
             rasterizer_dx9_set_texture_stage(0, rasterizer_globals_get_data()->glow.index, 0, 0.f);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, 3);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, 3);
@@ -210,20 +221,45 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2]);
             rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
             rasterizer_dx9_draw_rect(&sun_screen_position_center, 1.f, global_yellow_pixel32);
+            
+            rasterizer_dx9_perf_event_end();
+
             rasterizer_dx9_set_stencil_mode(0);
+
 
             // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
             // this definitely needs a helper function to pass just the target surfaces from the enum
             // and posibly the size to be copied with the rects
-            global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), &rect, rasterizer_dx9_sun_alpha_surface_get(), NULL, D3DTEXF_LINEAR);
+            
+            rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
+            global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(),
+                &rect,
+                rasterizer_dx9_sun_alpha_surface_get(),
+                NULL,
+                D3DTEXF_LINEAR);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (DWORD)0);
+
+            rasterizer_dx9_perf_event_end();
+
+
+            rasterizer_dx9_perf_event_begin("sun_glow_convolve", NULL);
+            e_rasterizer_target target = rasterizer_dx9_convolve_screen_surfaces(1.f,
+                1.f,
+                0.f,
+                _rasterizer_target_sun_glow_secondary,
+                _rasterizer_target_sun_glow_primary,
+                _rasterizer_target_none,
+                _rasterizer_target_none,
+                1,
+                0,
+                1.f,
+                1.f);
+            rasterizer_dx9_perf_event_end();
 
             // render the sun on the actual output surface
             // that is later copied to the back buffer (rasterizer_target should be the resolved or 37th surface)
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (DWORD)0);
-            e_rasterizer_target target = rasterizer_dx9_get_screen_render_surface(1.f, 1.f, 0.f,
-                _rasterizer_target_sun_glow_secondary, _rasterizer_target_sun_glow_primary,
-                -1, -1, 1, 0, 1.f, 1.f);
-
+            rasterizer_dx9_perf_event_begin("sun_glow_halo", NULL);
+            
             rasterizer_dx9_set_target(rasterizer_target, 0, 0);
             rasterizer_dx9_set_target_as_texture(0, target);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, 3u);
@@ -278,6 +314,7 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
                 pixel32 color = real_argb_color_to_pixel32(&real_color);
                 rasterizer_dx9_draw_rect(&sun_quad, 0.f, color);
             }
+            rasterizer_dx9_perf_event_end();
         }
     }
 

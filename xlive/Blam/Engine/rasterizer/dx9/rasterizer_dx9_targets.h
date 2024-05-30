@@ -1,8 +1,9 @@
 #pragma once
 
 /* enums */
-enum e_rasterizer_target : uint32
+enum e_rasterizer_target : int32
 {
+	_rasterizer_target_none = NONE,
 	_rasterizer_target_0 = 0,
 	_rasterizer_target_1 = 1,
 	_rasterizer_target_2 = 2,
@@ -27,7 +28,7 @@ enum e_rasterizer_target : uint32
 	_rasterizer_target_21 = 21,
 	_rasterizer_target_22 = 22,
 	_rasterizer_target_depth_of_field = 23,
-	_rasterizer_target_24 = 24,
+	_rasterizer_target_depth_of_field_secondary = 24,
 	_rasterizer_target_25 = 25,
 	_rasterizer_target_26 = 26,
 	_rasterizer_target_motion_sensor = 27,

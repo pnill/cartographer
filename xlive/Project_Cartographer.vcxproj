@@ -977,6 +977,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_targets.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\sun_glow_convolve.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_cinematics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_globals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
