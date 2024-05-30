@@ -39,11 +39,6 @@ void set_secondary_hud_scale(float scale)
 	*get_secondary_hud_scale() = original_secondary_hud_scale * scale * k_primary_upscale_size;
 }
 
-float* get_ui_scale()
-{
-	return Memory::GetAddress<float*>(0xA3E424);
-}
-
 float* get_primary_hud_scale()
 {
 	return Memory::GetAddress<float*>(0x46402C);

@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "user_interface.h"
 
-float* get_ui_scale_factor()
-{
-	return Memory::GetAddress<float*>(0xA3E424);
-}
-
 void __cdecl error_message_menu_open(int32 a1, int32 ui_error_index, int32 a3, int16 a4, void* a5, void* a6)
 {
 	INVOKE(0x20E1D8, 0x0, error_message_menu_open, a1, ui_error_index, a3, a4, a5, a6);

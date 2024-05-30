@@ -3,8 +3,8 @@
 
 #include "cartographer/twizzler/twizzler.h"
 #include "game/game.h"
-#include "rasterizer/rasterizer_globals.h"
 #include "interface/hud.h"
+#include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "shell/shell_windows.h"
 #include "text/draw_string.h"
@@ -86,13 +86,15 @@ void render_cartographer_status_text(void)
 
 #if defined(GEN_GIT_VER_VERSION_STRING) && defined(CARTOGRAPHER_TEST_BUILD_DRAW_TEXT) 
 	{
+		const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
 		rasterizer_get_frame_bounds(&bounds);
 		int32 test_build_font = k_status_text_font;
 		line_height = get_text_size_from_font_cache(test_build_font);
 
 		text_color_console.alpha = .55f;
-		bounds.top += (1050 * *get_ui_scale());
-		bounds.left = bounds.right - (765 * *get_ui_scale());
+		bounds.top += (1050 * rasterizer_globals->ui_scale);
+		bounds.left = bounds.right - (765 * rasterizer_globals->ui_scale);
 		bounds.bottom = bounds.top + line_height;
 		
 		draw_string_reset();

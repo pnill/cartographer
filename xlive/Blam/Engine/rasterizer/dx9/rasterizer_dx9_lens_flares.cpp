@@ -81,14 +81,14 @@ int32 __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* poi
     point_from_line3d(&global_window_parameters->camera.point, &direction, length, &sun_position);
     
     real_bounds bounds;
-    real_rectangle2d rect;
-    if (render_projection_point_to_screen(&sun_position, definition->occlusion_radius, &rect, &bounds))
+    real_vector4d center;
+    if (render_projection_point_to_screen(&sun_position, definition->occlusion_radius, &center, &bounds))
     {        
         real_rectangle2d sun_occlusion_rect;
-        sun_occlusion_rect.x0 = rect.x0 - bounds.lower;
-        sun_occlusion_rect.x1 = rect.x0 + bounds.lower;
-        sun_occlusion_rect.y0 = rect.x1 - bounds.upper;
-        sun_occlusion_rect.y1 = rect.x1 + bounds.upper;
+        sun_occlusion_rect.x0 = center.i - bounds.lower;
+        sun_occlusion_rect.x1 = center.i + bounds.lower;
+        sun_occlusion_rect.y0 = center.j - bounds.upper;
+        sun_occlusion_rect.y1 = center.j + bounds.upper;
 
 
         bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_occlusion_rect);
@@ -133,8 +133,8 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
     point_from_line3d(&global_window_parameters->camera.point, &direction, length, &position);
    
     real_bounds bounds;
-    real_rectangle2d rect;
-    if (render_projection_point_to_screen(&position, definition->occlusion_radius, &rect, &bounds))
+    real_vector4d center;
+    if (render_projection_point_to_screen(&position, definition->occlusion_radius, &center, &bounds))
     {
         real32 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
         real32 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
@@ -144,10 +144,10 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
 
         // holds the position of the center of the sun
         real_rectangle2d sun_screen_position_center;
-        sun_screen_position_center.v[0] = rect.x0 - bounds.lower;    // Leftmost point on the screen
-        sun_screen_position_center.v[1] = rect.x0 + bounds.lower;    // Rightmost point on the screen
-        sun_screen_position_center.v[2] = rect.x1 - bounds.upper;    // Topmost point on the screen
-        sun_screen_position_center.v[3] = rect.x1 + bounds.upper;    // Bottommost point on the screen
+        sun_screen_position_center.v[0] = center.i - bounds.lower;    // Leftmost point on the screen
+        sun_screen_position_center.v[1] = center.i + bounds.lower;    // Rightmost point on the screen
+        sun_screen_position_center.v[2] = center.j - bounds.upper;    // Topmost point on the screen
+        sun_screen_position_center.v[3] = center.j + bounds.upper;    // Bottommost point on the screen
 
         bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_screen_position_center);
         if (in_bounds)
@@ -176,9 +176,11 @@ void __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, 
             // in this case the main render target (backbuffer or the intermediary buffer)
             // then it copies the image from the surface including the mask in the sun's alpha calc surface
             // to produce the actual image with alpha 
-            *rasterizer_target_back_buffer() = false;
+            s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+            rasterizer_globals->rasterizer_draw_on_main_back_buffer = false;
             rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
-            *rasterizer_target_back_buffer() = true;
+            rasterizer_globals->rasterizer_draw_on_main_back_buffer = true;
             
             rasterizer_dx9_perf_event_begin("clear_alpha", NULL);
 

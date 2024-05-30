@@ -19,6 +19,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
+#include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_settings.h"
 #include "scenario/scenario_fog.h"
 #include "structures/structures.h"
@@ -46,8 +47,6 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     UINT PrimitiveCount,
     const void* pVertexStreamZeroData,
     UINT VertexStreamZeroStride);
-
-void rasterizer_get_screen_frame_bounds(rectangle2d* rect);
 
 void render_view(
     real_rectangle2d* frustum_bounds,
@@ -177,7 +176,7 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     ASSERT(!memcmp(&window->render_camera.viewport_bounds, &window->rasterizer_camera.viewport_bounds, sizeof(rectangle2d)));
     ASSERT(!memcmp(&window->render_camera.window_bounds, &window->rasterizer_camera.window_bounds, sizeof(rectangle2d)));
 
-    *rasterizer_target_back_buffer() = false;
+    rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = false;
     if (window->render_camera.vertical_field_of_view > k_real_math_epsilon)
     {
         render_view(
@@ -369,11 +368,6 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 		global_d3d_device->SetVertexShaderConstantF(177, (real32*)vc, NUMBEROF(vc));
 	}
     return;
-}
-
-void rasterizer_get_screen_frame_bounds(rectangle2d* rect)
-{
-    *rect = *Memory::GetAddress<rectangle2d*>(0xA3E418);
 }
 
 void render_view(

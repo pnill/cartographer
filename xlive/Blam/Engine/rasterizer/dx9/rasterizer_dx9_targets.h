@@ -60,8 +60,6 @@ struct s_rasterizer_target
 
 /* public code */
 
-bool* rasterizer_target_back_buffer(void);
-
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void);
 
 s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target rasterizer_target);

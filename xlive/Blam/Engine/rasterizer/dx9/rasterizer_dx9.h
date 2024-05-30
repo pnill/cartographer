@@ -9,7 +9,7 @@ class c_rasterizer_constant_4f_cache
 {
     real_vector4d values[size];
 public:
-    bool test_cache(int32 index, real_vector4d* constants, int32 count)
+    bool test_cache(int32 index, const real_vector4d* constants, int32 count)
     {
         ASSERT(index < size && index + count <= size);
 

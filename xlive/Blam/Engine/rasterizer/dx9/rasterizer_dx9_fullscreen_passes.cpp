@@ -5,12 +5,11 @@
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_shader_submit.h"
 
+#include "rasterizer/rasterizer_globals.h"
 #include "main/main_screenshot.h"
 
 /* prototypes */
 
-real32* rasterizer_dx9_gamma_get(void);
-real32* rasterizer_dx9_brightness_get(void);
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     e_vertex_output_type output_type,
     real32* bounds,
@@ -63,11 +62,8 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             global_d3d_device->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &backbuffer);
         }
 
-        const real32* gamma = rasterizer_dx9_gamma_get();
-        const real32* brightness = rasterizer_dx9_brightness_get();
-
-
-        if (*brightness == 0.f && *gamma == 1.f)
+        const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+        if (rasterizer_globals->fullscreen_parameters.brightness == 0.f && rasterizer_globals->fullscreen_parameters.gamma == 1.f)
         {
             IDirect3DSurface9* target_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
 
@@ -111,9 +107,9 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             rasterizer_dx9_set_target_as_texture(0, (int16)rasterizer_target);
 
             c_rasterizer_constant_4f_cache<32>* main_pixel_shader_constants = rasterizer_get_main_pixel_shader_cache();
-            if (main_pixel_shader_constants->test_cache(0, (real_vector4d*)gamma, 1))
+            if (main_pixel_shader_constants->test_cache(0, (real_vector4d*)&rasterizer_globals->fullscreen_parameters, 1))
             {
-                global_d3d_device->SetPixelShaderConstantF(0, gamma, 1);
+                global_d3d_device->SetPixelShaderConstantF(0, (real32*)&rasterizer_globals->fullscreen_parameters, 1);
             }
 
             rasterizer_dx9_set_screen_effect_pixel_shader(3);
@@ -151,16 +147,6 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 }
 
 /* private code */
-
-real32* rasterizer_dx9_gamma_get(void)
-{
-    return Memory::GetAddress<real32*>(0xA3E4C0);
-}
-
-real32* rasterizer_dx9_brightness_get(void)
-{
-    return Memory::GetAddress<real32*>(0xA3E4C4);
-}
 
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     e_vertex_output_type output_type,

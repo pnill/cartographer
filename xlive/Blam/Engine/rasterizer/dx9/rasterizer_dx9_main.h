@@ -84,3 +84,5 @@ bool rasterizer_dx9_draw_primitive_up(
 	uint32 PrimitiveCount,
 	const void* pVertexStreamZeroData,
 	uint32 VertexStreamZeroStride);
+
+bool __cdecl rasterizer_dx9_create_texture(uint32 width, uint32 height, int32 levels, uint32 usage, e_bitmap_data_format format, bool linear, IDirect3DTexture9** texture);

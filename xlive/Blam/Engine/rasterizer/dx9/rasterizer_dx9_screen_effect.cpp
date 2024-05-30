@@ -9,6 +9,7 @@
 #include "cutscene/cinematics.h"
 #include "render/render.h"
 #include "rasterizer/rasterizer_cinematics.h"
+#include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/rasterizer_screen_effects.h"
 #include "scenario/scenario.h"
@@ -62,7 +63,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 	};
 
 	global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), &rect, global_d3d_surface_render_resolved_get(), &rect, D3DTEXF_NONE);
-	*rasterizer_target_back_buffer() = true;
+	rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = true;
 
 	if (render_layer_selfibloomination && !g_disable_bloom)
 	{

@@ -4,9 +4,10 @@
 #include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_targets.h"
 
+
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
-
+#include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_loading.h"
 
 /* globals */
@@ -72,21 +73,6 @@ void __cdecl debug_frame_usage_draw(void);
 void __cdecl rasterizer_present_backbuffer(void);
 void __cdecl rasterizer_cache_bitmaps(void);
 
-uint64* frame_presented_count_get(void)
-{
-    return Memory::GetAddress<uint64*>(0xA3E430);
-}
-
-bool* rasterizer_reset_screen_global_get(void)
-{
-    return Memory::GetAddress<bool*>(0xA3E4D4);
-}
-
-rectangle2d* rasterizer_draw_on_main_back_buffer_get(void)
-{
-    return Memory::GetAddress<rectangle2d*>(0xA3E410);
-}
-
 datum last_bitmap_tag_index_get(void)
 {
     return last_bitmap_tag_index;
@@ -148,24 +134,19 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
     bool result = true;
     if (!media_foundation_player_running())
     {
-        *rasterizer_target_back_buffer() = false;
+        s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+        rasterizer_globals->rasterizer_draw_on_main_back_buffer = false;
         if (screenshot_bitmap && screenshot_bitmap->base_address)
         {
-            const rectangle2d* screen_bounds = rasterizer_draw_on_main_back_buffer_get();
-            int16 right = screen_bounds->right;
-            if (screen_bounds->right > screen_bounds->left + screenshot_bitmap->width_pixels)
-            {
-                right = screen_bounds->left + screenshot_bitmap->width_pixels;
-            }
+            rectangle2d screen_bounds = rasterizer_globals->screen_bounds;
 
-            int16 bottom = screen_bounds->bottom;
-            if (screen_bounds->bottom > screen_bounds->top + screenshot_bitmap->height_pixels)
-            {
-                bottom = screen_bounds->top + screenshot_bitmap->height_pixels;
-            }
+            const int16 calc_width = screen_bounds.left + screenshot_bitmap->width_pixels;
+            const int16 calc_height = screen_bounds.top + screenshot_bitmap->height_pixels;
+            screen_bounds.right = (screen_bounds.right > calc_width ? calc_width : screen_bounds.right);
+            screen_bounds.bottom = (screen_bounds.bottom > calc_height ? calc_height : screen_bounds.bottom);
 
-            int16 screenshot_height = bottom - screen_bounds->top;
-            int32 width = right - screen_bounds->left;
+            int16 screenshot_height = rectangle2d_height(&screen_bounds);
+            int32 screenshot_width = rectangle2d_width(&screen_bounds);
             IDirect3DSurface9* global_d3d_surface_screenshot = global_d3d_surface_screenshot_get();
 
             D3DLOCKED_RECT locked_rect;
@@ -175,7 +156,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             {
                 if (locked_rect.pBits)
                 {
-                    int32 screenshot_pitch = width * (bitmap_format_get_bits_per_pixel(screenshot_bitmap->format) / 8);
+                    int32 screenshot_pitch = screenshot_width * (bitmap_format_get_bits_per_pixel(screenshot_bitmap->format) / 8);
                     for (int16 row_index = 0; row_index < screenshot_height; ++row_index)
                     {
                         uint8* base_address = bitmap_get_base_address(screenshot_bitmap, 0, row_index, 0);
@@ -202,7 +183,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             debug_frame_usage_draw();
             rasterizer_present_backbuffer();
 #endif
-            ++*frame_presented_count_get();
+            ++rasterizer_globals->display_parameters.frame_presented_count;
             // nullsub_69();
             if (!loading_screen_in_progress())
             {
@@ -211,7 +192,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
         }
         else
         {
-            *rasterizer_reset_screen_global_get() = true;
+            rasterizer_globals->reset_screen = true;
         }
     }
 }
@@ -349,4 +330,9 @@ bool rasterizer_dx9_draw_primitive_up(
         PrimitiveCount,
         pVertexStreamZeroData,
         VertexStreamZeroStride) >= 0;
+}
+
+bool __cdecl rasterizer_dx9_create_texture(uint32 width, uint32 height, int32 levels, uint32 usage, e_bitmap_data_format format, bool linear, IDirect3DTexture9** texture)
+{
+    return INVOKE(0x260820, 0x0, rasterizer_dx9_create_texture, width, height, levels, usage, format, linear, texture);
 }

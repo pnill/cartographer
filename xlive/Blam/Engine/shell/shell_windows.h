@@ -11,9 +11,6 @@
 
 /* public code */
 
-int32* global_window_bounds_x_get(void);
-int32* global_window_bounds_y_get(void);
-
 uint32 __cdecl system_milliseconds();
 
 void shell_windows_initialize();
@@ -29,4 +26,3 @@ bool __cdecl game_is_minimized(void);
 
 bool __cdecl gfwl_gamestore_initialize(void);
 
-LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

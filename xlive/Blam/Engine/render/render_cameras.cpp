@@ -49,7 +49,7 @@ void __cdecl render_camera_build_viewport_frustum_bounds(const s_camera* camera,
 bool render_projection_point_to_screen(
 	const real_point3d* camera_position,
 	real32  occlusion_radius,
-	real_rectangle2d* rect,
+	real_vector4d* out_view_position,
 	real_bounds* bounds)
 {
 	bool result = false;
@@ -91,10 +91,10 @@ bool render_projection_point_to_screen(
 				+ obb->matrix[3][0];			
 
 
-			rect->x0 = (v6 / divisor);
-			rect->x1 = (v1 / divisor);
-			rect->y0 = v2 / divisor;
-			rect->y1 = 1.f;
+			out_view_position->i = v6 / divisor;
+			out_view_position->j = v1 / divisor;
+			out_view_position->k = v2 / divisor;
+			out_view_position->w = 1.f;
 
 			bounds->lower = matrix_scale_x / divisor;
 			bounds->upper = matrix_scale_y / divisor;

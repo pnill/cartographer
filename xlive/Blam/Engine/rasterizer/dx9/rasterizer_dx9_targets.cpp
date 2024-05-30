@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_targets.h"
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
+
+#include "rasterizer_dx9_main.h"
+
 #include "camera/camera.h"
+#include "rasterizer/rasterizer_globals.h"
 
 /* prototypes */
 
@@ -12,11 +15,6 @@
 e_rasterizer_target* rasterizer_dx9_main_render_target_get(void)
 {
 	return Memory::GetAddress<e_rasterizer_target*>(0xA3E228);
-}
-
-bool* rasterizer_target_back_buffer(void)
-{
-	return Memory::GetAddress<bool*>(0xA3E4D5);
 }
 
 s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target texture_target)
