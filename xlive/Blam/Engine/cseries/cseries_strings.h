@@ -16,7 +16,7 @@ public:
 	
 	c_static_string(const char* string)
 	{
-		text.set(string);
+		this->set(string);
 	}
 
 	~c_static_string() = default;
@@ -48,7 +48,7 @@ public:
 
 	c_static_wchar_string(const wchar_t* string)
 	{
-		text.set(string);
+		this->set(string);
 	}
 
 	~c_static_wchar_string() = default;
@@ -64,6 +64,7 @@ public:
 	int next_index_of(const wchar_t* src, size_t starting_index) const;
 	int last_index_of(const wchar_t* src) const;
 	bool is_equal(const wchar_t* string) const;
+	errno_t to_lower(void);
 
 private:
 	wchar_t text[string_length];
@@ -278,6 +279,13 @@ bool c_static_wchar_string<T>::is_equal(const wchar_t* string) const
 {
 	return !ustrncmp(text, string, T);
 }
+
+template<size_t T>
+errno_t c_static_wchar_string<T>::to_lower(void)
+{
+	return _wcslwr_s(text, T);
+}
+
 
 size_t csstrnlen(const char* s, size_t size);
 

@@ -23,33 +23,37 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	if (command[0] == L'$') {
 		ServerConsole::LogToDedicatedServerConsole(L"# running custom command: ");
 		
-		std::string command_line;
-		command_line.reserve(MAX_CONSOLE_INPUT_BUFFER);
+		c_static_string<256> command_line;
+		c_static_wchar_string<256> token_wide;
+
 		for (int i = 0; i < split_count; i++)
 		{
 			std::wstring tokenWide;
 
 			if (i > 0)
 			{
-				tokenWide = command_line_split_wide[i];
+				token_wide.append(command_line_split_wide[i]);
 			}
 			else
 			{
 				// skip $ character
-				tokenWide = &command_line_split_wide[i][1];
+				token_wide.append(&command_line_split_wide[i][1]);
 			}
 
-			command_line += std::string(tokenWide.begin(), tokenWide.end());
-			command_line += " ";
+			utf8 converted[256];
+			wchar_string_to_utf8_string(token_wide.get_string(), converted, NUMBEROF(converted));
+
+			command_line.append(converted);
+			command_line.append(" ");
 		}
 
-		ConsoleCommand::HandleCommandLine(command_line.c_str(), command_line.length(), &dediOutput);
+		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), &dediOutput);
 		return 0;
 	}
 
 	// Transform the command into lower invariant so that we can convert the string to it's enum value
-	auto lowerCommand = std::wstring(command);
-	std::transform(lowerCommand.begin(), lowerCommand.end(), lowerCommand.begin(), [](unsigned char c) { return std::tolower(c); });
+	c_static_wchar_string<256> lower_command(command);
+	lower_command.to_lower();
 
 	// Execute any events that may be linked to that command.
 	// EventHandler::executeServerCommandCallback(ServerConsole::s_commandsMap[LowerCommand]);
@@ -82,13 +86,13 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	auto playCommandFind = ServerConsole::s_commandsMap.find(lowerCommand);
-	if (playCommandFind != ServerConsole::s_commandsMap.end()
+	auto playCommandFind = ServerConsole::commands_map.find(lower_command.get_string());
+	if (playCommandFind != ServerConsole::commands_map.end()
 		&& playCommandFind->second == ServerConsole::play)
 		playCommand = true;
 
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::s_commandsMap[lowerCommand]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::commands_map[lower_command.get_string()]);
 
 	void* result = p_dedi_command(command_line_split_wide, split_count, a3);
 
@@ -96,7 +100,7 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	// all server command functions will be hooked in the future and these executes will be removed.
 	
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::s_commandsMap[lowerCommand]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::commands_map[lower_command.get_string()]);
 
 	return result;
 }
@@ -117,23 +121,23 @@ void ServerConsole::ApplyHooks()
 {
 	if (!Memory::IsDedicatedServer())
 		return;
-	s_commandsMap[L"ban"] = e_server_console_commands::ban;
-	s_commandsMap[L"description"] = e_server_console_commands::description;
-	s_commandsMap[L"exit"] = e_server_console_commands::exit;
-	s_commandsMap[L"kick"] = e_server_console_commands::kick;
-	s_commandsMap[L"live"] = e_server_console_commands::live;
-	s_commandsMap[L"name"] = e_server_console_commands::name;
-	s_commandsMap[L"play"] = e_server_console_commands::play;
-	s_commandsMap[L"players"] = e_server_console_commands::players;
-	s_commandsMap[L"playing"] = e_server_console_commands::playing;
-	s_commandsMap[L"privacy"] = e_server_console_commands::privacy;
-	s_commandsMap[L"sendmsg"] = e_server_console_commands::sendmsg;
-	s_commandsMap[L"skip"] = e_server_console_commands::skip;
-	s_commandsMap[L"statsfolder"] = e_server_console_commands::statsfolder;
-	s_commandsMap[L"status"] = e_server_console_commands::status;
-	s_commandsMap[L"unban"] = e_server_console_commands::unban;
-	s_commandsMap[L"vip"] = e_server_console_commands::vip;
-	s_commandsMap[L"any"] = e_server_console_commands::any;
+	commands_map[L"ban"] = e_server_console_commands::ban;
+	commands_map[L"description"] = e_server_console_commands::description;
+	commands_map[L"exit"] = e_server_console_commands::exit;
+	commands_map[L"kick"] = e_server_console_commands::kick;
+	commands_map[L"live"] = e_server_console_commands::live;
+	commands_map[L"name"] = e_server_console_commands::name;
+	commands_map[L"play"] = e_server_console_commands::play;
+	commands_map[L"players"] = e_server_console_commands::players;
+	commands_map[L"playing"] = e_server_console_commands::playing;
+	commands_map[L"privacy"] = e_server_console_commands::privacy;
+	commands_map[L"sendmsg"] = e_server_console_commands::sendmsg;
+	commands_map[L"skip"] = e_server_console_commands::skip;
+	commands_map[L"statsfolder"] = e_server_console_commands::statsfolder;
+	commands_map[L"status"] = e_server_console_commands::status;
+	commands_map[L"unban"] = e_server_console_commands::unban;
+	commands_map[L"vip"] = e_server_console_commands::vip;
+	commands_map[L"any"] = e_server_console_commands::any;
 	p_dedi_command = (dedi_command_t)DetourFunc(Memory::GetAddress<BYTE*>(0, 0x1CCFC), (BYTE*)DediCommandHook, 7);
 	p_kablam_vip_add = Memory::GetAddress<kablam_vip_add_t>(0, 0x1D932);
 	p_kablam_vip_clear = Memory::GetAddress<kablam_vip_clear_t>(0, 0x1DB16);
@@ -229,13 +233,21 @@ int ServerConsole::DediConsoleOutput::Output(StringHeaderFlags flags, const char
 	va_list valist;
 	va_start(valist, fmt);
 	int buffer_size_needed = _vsnprintf(NULL, 0, fmt, valist) + 1;
+	
+	// Malloc buffers
 	char* buffer = (char*)_malloca(buffer_size_needed);
+	wchar_t* wide_buffer = (wchar_t*)_malloca(buffer_size_needed * sizeof(wchar_t*));
+	
 	int copied_characters = _vsnprintf(buffer, buffer_size_needed, fmt, valist);
-	std::string outputStr(buffer);
-	std::wstring outputStrWide(outputStr.begin(), outputStr.end());
-	ServerConsole::LogToDedicatedServerConsole(outputStrWide.c_str());
+
+	utf8_string_to_wchar_string(buffer, wide_buffer, buffer_size_needed);
+
+	ServerConsole::LogToDedicatedServerConsole(wide_buffer);
 	ServerConsole::LogToDedicatedServerConsole(L"\n");
+
+	// Free
 	_freea(buffer);
+	_freea(wide_buffer);
 	va_end(valist);
 	return 0;
 }

@@ -487,7 +487,7 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 			if (unit_object) {
 				//if the unit_object data pointer is not nullptr, the spawned object is "alive"
 				e_game_team team = unit_get_team_index(playerUnitDatum);
-				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, team);
+				LOG_TRACE_GAME("[h2mod-infection] Spawn player server index={}, unit team index={}", absPlayerIdx, (int16)team);
 				if (team == k_humans_team) {
 					Infection::setPlayerAsHuman(absPlayerIdx);
 				}

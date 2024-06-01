@@ -156,7 +156,7 @@ void ClientQoSLookUp(UINT cxna, XNADDR* pxna, UINT cProbes, IN_ADDR aina[], XNQO
 			auto ping_result = std::minmax_element(ping_storage.begin(), ping_storage.end());
 			long long min_ping = *ping_result.first;
 			long long max_ping = *ping_result.second;
-			unsigned int average = (std::accumulate(ping_storage.begin(), ping_storage.end(), 0) / ping_storage.size());
+			long average = (long)(std::accumulate(ping_storage.begin(), ping_storage.end(), 0ll) / ping_storage.size());
 
 			ping_storage.clear();
 

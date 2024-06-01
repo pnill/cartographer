@@ -103,7 +103,7 @@ namespace meta_struct
 			message += file_loc + "\n";
 			message += "Code: " + std::to_string(error);
 			MessageBoxA(NULL, message.c_str(), "Crash!", 0);
-			LOG_ERROR_GAME("[{}] Failed to load plugin: {} -  error code {}", __FUNCTION__, file_loc, error);
+			LOG_ERROR_GAME("[{}] Failed to load plugin: {} -  error code {}", __FUNCTION__, file_loc, (uint32)error);
 			exit(-1);
 			//std::string exception_text = "Error opening :" + file_loc + " - Error Code : ";//  +std::to_string(error);
 			//throw std::runtime_error(exception_text.c_str());

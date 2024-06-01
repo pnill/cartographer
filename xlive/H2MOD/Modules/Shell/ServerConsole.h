@@ -1,4 +1,5 @@
 #pragma once
+#include "cseries/cseries_strings.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 
@@ -29,7 +30,7 @@ namespace ServerConsole
 		int Output(StringHeaderFlags flags, const char* fmt, ...) override;
 	};
 
-	static std::map<std::wstring, e_server_console_commands> s_commandsMap;
+	static std::map<const wchar_t*, e_server_console_commands> commands_map;
 	void ApplyHooks();
 	void LogToDedicatedServerConsole(const wchar_t* fmt, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);
