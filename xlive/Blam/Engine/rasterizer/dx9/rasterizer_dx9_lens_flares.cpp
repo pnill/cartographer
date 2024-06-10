@@ -94,7 +94,6 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, rea
         sun_occlusion_rect.y0 = center.j - bounds.upper;
         sun_occlusion_rect.y1 = center.j + bounds.upper;
 
-
         bool in_bounds = rasterizer_dx9_sun_is_in_bounds(&sun_occlusion_rect);
         if (in_bounds)
         {
@@ -246,6 +245,7 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_p
             global_d3d_device->StretchRect(global_d3d_surface_render_primary, &rect, global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
+            // FIXME
             // Ideally we'd use this instead of the stretch rect but we do not have access to the texture of the render target
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_primary);
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_secondary);
@@ -295,8 +295,6 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_p
                 square_half_size -= 4.f;    // minor offset
                 square_half_size /= 640.f;  // baseline resolution
 
-                // FIXME determine the vertex positions
-                // these probably use the entire screen size to compute them
                 real_rectangle2d sun_quad;
                 // create the required quad from the sun surface quad
                 sun_quad.x0 = sun_surface_quad.v[0] - square_half_size; // go left square_half_size
