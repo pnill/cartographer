@@ -28,13 +28,6 @@ union real_euler_angles3d
 };
 ASSERT_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 
-union real_vector4d
-{
-	real32 v[4];
-	struct { real32 i, j, k, w; };
-};
-ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
-
 union real_vector2d
 {
 	real32 v[2];
@@ -52,6 +45,13 @@ union real_vector3d
 ASSERT_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
 
 typedef real_vector3d real_point3d;
+
+union real_vector4d
+{
+	real32 v[4];
+	struct { real32 i, j, k, w; };
+};
+ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
 struct real_plane2d
 {
