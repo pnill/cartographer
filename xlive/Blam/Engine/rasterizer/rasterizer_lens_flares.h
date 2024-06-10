@@ -5,4 +5,4 @@
 
 void lens_flare_fix(void);
 
-e_rasterizer_target __cdecl rasterizer_suns_glow_draw(e_rasterizer_target target);
+e_rasterizer_target rasterizer_suns_glow_draw(e_rasterizer_target target);
