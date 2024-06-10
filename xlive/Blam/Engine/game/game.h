@@ -88,6 +88,6 @@ void game_options_setup_default_players(int player_count, s_game_options* game_o
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version);
+void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version);
 
 void game_apply_pre_winmain_patches(void);

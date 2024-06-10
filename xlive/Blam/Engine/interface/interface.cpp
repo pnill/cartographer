@@ -25,7 +25,9 @@ void render_splitscreen_line(void)
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 	const int32 resolution_x = rasterizer_globals->resolution_x;
 	const int32 resolution_y = rasterizer_globals->resolution_y;
-	const int32 line_width = resolution_y / 480;
+
+	// We calculate the size of the line by dividing our resolution by the height the original game ran at
+	const int32 line_size = resolution_y / 480;		
 	
 	rectangle2d line;
 	pixel32 color;
@@ -34,34 +36,34 @@ void render_splitscreen_line(void)
 	{
 		if (get_splitscreen_split_type() == _split_type_vertical)
 		{
-			line.top = (resolution_y / 2) - line_width;
+			line.top = (resolution_y / 2) - line_size;
 			line.left = 0;
-			line.bottom = (resolution_y / 2) + line_width;
+			line.bottom = (resolution_y / 2) + line_size;
 			line.right = resolution_x;
 			cinematics_draw_line(&line, color);
 
 			// Draw horizontal line between players
 			if (player_window_count > 2)
 			{
-				line.left = (resolution_x / 2) - line_width;
+				line.left = (resolution_x / 2) - line_size;
 				line.bottom = resolution_y;
-				line.right = (resolution_x / 2) + line_width;
+				line.right = (resolution_x / 2) + line_size;
 				line.top = (player_window_count == 3 ? resolution_y / 2 : 0);
 			}
 		}
 		else
 		{
 			line.top = 0;
-			line.left = (resolution_x / 2) - line_width;
+			line.left = (resolution_x / 2) - line_size;
 			line.bottom = resolution_y;
-			line.right = (resolution_x / 2) + line_width;
+			line.right = (resolution_x / 2) + line_size;
 			cinematics_draw_line(&line, color);
 
 			// Draw vertical line between players
 			if (player_window_count > 2)
 			{
-				line.top = (resolution_y / 2) - line_width;
-				line.bottom = (resolution_y / 2) + line_width;
+				line.top = (resolution_y / 2) - line_size;
+				line.bottom = (resolution_y / 2) + line_size;
 				line.right = resolution_x;
 				line.left = (player_window_count == 3 ? resolution_x / 2 : 0);
 			}

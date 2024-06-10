@@ -250,7 +250,7 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_p
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_primary);
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_secondary);
             
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, false);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
 
             rasterizer_dx9_perf_event_end("copy_to_sun_glow_primary");
 
@@ -278,9 +278,9 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_draw(datum tag_index, real_p
             rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLEND_ZERO);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, false);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVDESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, false);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, FALSE);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[4]);
 
             real32 alpha = 1.f - global_window_parameters->fog_result.sky_fog_alpha;
@@ -342,7 +342,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
         D3DBLEND render_state = rasterizer_dx9_get_render_state(D3DRS_COLORWRITEENABLE);
         rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
         rasterizer_dx9_set_screen_effect_pixel_shader(1);
-        rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, false);
+        rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
         rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
         rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
         rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);

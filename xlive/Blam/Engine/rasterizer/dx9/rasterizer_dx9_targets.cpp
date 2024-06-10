@@ -26,8 +26,8 @@ rasterizer_dx9_set_render_target_internal_t p_rasterizer_dx9_set_render_target_i
 
 real32 g_sun_size = 0.2f;
 
-IDirect3DTexture9* g_backbuffer_texture;
-IDirect3DSurface9* g_backbuffer_surface;
+IDirect3DTexture9* g_backbuffer_texture = NULL;
+IDirect3DSurface9* g_backbuffer_surface = NULL;
 
 IDirect3DSurface9* global_d3d_surface_render_primary = NULL;
 IDirect3DSurface9* global_d3d_surface_render_primary_z = NULL;
@@ -844,6 +844,7 @@ bool __cdecl rasterizer_secondary_targets_initialize(void)
             &g_backbuffer_texture,
             NULL));
 
+    HRESULT hr;
     if (succeeded)
     {
         if (g_backbuffer_texture->GetSurfaceLevel(0, &g_backbuffer_surface) >= 0)
@@ -854,7 +855,6 @@ bool __cdecl rasterizer_secondary_targets_initialize(void)
             const D3DMULTISAMPLE_TYPE type = (render_depth ? *d3d_multisample_type_get() : D3DMULTISAMPLE_NONE);
             const uint32 quality = (render_depth ? *d3d_multisample_quality_get() : 0);
 
-            HRESULT hr;
             if (render_depth)
             {
                 hr = global_d3d_device->CreateRenderTarget(screen_bounds_width, screen_bounds_height, format, type, quality, false, &global_d3d_surface_render_z_as_target_z, NULL);
@@ -873,12 +873,12 @@ bool __cdecl rasterizer_secondary_targets_initialize(void)
 
     uint32 g_motion_sensor_texture_size = *motion_sensor_texture_size_get();
     rasterizer_dx9_create_texture(g_motion_sensor_texture_size, g_motion_sensor_texture_size, 0, 1, bitmap_data_format_a8r8g8b8, false, &global_d3d_texture_motion_sensor);
-    HRESULT hr = global_d3d_texture_motion_sensor->GetSurfaceLevel(0, &global_d3d_surface_motion_sensor);
 
-    bool result = succeeded && SUCCEEDED(hr);
-    if (!global_d3d_texture_motion_sensor || !global_d3d_surface_motion_sensor)
+    bool result = false;
+    if (global_d3d_texture_motion_sensor)
     {
-        result = false;
+        hr = global_d3d_texture_motion_sensor->GetSurfaceLevel(0, &global_d3d_surface_motion_sensor);
+        result = succeeded && SUCCEEDED(hr) && global_d3d_surface_motion_sensor != NULL;
     }
 
     // We calculate the sun glow target width and height based on the viewport resolution
