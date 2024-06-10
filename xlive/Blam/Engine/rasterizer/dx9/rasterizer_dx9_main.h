@@ -28,15 +28,9 @@ datum last_bitmap_tag_index_get(void);
 
 IDirect3D9* rasterizer_dx9_get_interface(void);
 
-IDirect3DSurface9* global_d3d_surface_screenshot_get(void);
+IDirect3DSurface9** global_d3d_surface_screenshot_get(void);
 
 IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
-
-IDirect3DSurface9* global_d3d_surface_render_primary_get(void);
-
-IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void);
-
-IDirect3DSurface9* global_d3d_surface_render_resolved_get(void);
 
 void rasterizer_dx9_main_apply_patches(void);
 
@@ -46,7 +40,7 @@ void __cdecl rasterizer_dx9_reset_depth_buffer(void);
 
 void __cdecl rasterizer_present(bitmap_data* screenshot_bitmap);
 
-void __cdecl rasterizer_dx9_set_texture_stage(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
+void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
 
 bool __cdecl rasterizer_window_begin(s_frame* preferences);
 
@@ -58,24 +52,7 @@ void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD val
 
 void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuffer_blend_function);
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool use_depth);
-
-bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, int16 rasterizer_target);
-
 void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader);
-
-e_rasterizer_target __cdecl rasterizer_dx9_convolve_screen_surfaces(
-	real32 a1,
-	real32 a2,
-	real32 a3,
-	e_rasterizer_target surface_source,
-	e_rasterizer_target surface_destination,
-	e_rasterizer_target target_3,
-	e_rasterizer_target stretch_destination,
-	int32 a8,
-	int32 a9,
-	real32 a10,
-	real32 a11);
 
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright);
 

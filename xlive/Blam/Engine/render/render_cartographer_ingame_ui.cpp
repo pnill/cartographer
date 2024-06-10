@@ -216,8 +216,6 @@ void render_cartographer_update(void)
 			swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
 			draw_string_render(&bounds, update_message_buffer);
 		}
-
-		rasterizer_dx9_perf_event_end();
 	}
 	return;
 }

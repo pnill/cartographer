@@ -43,6 +43,13 @@ void rasterizer_dx9_screen_effect_apply_patches(void)
 
 void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool lens_flare_occlusion_test, bool render_layer_selfibloomination)
 {
+	// Cleanup before starting
+	// Removes textures staged from previously drawing the first person geometry
+	for (uint8 i = 0; i < 8; i++)
+	{
+		rasterizer_dx9_set_texture(i, NULL);
+	}
+
 	rasterizer_dx9_perf_event_begin("screen effects", NULL);
 	rasterizer_dx9_reset_depth_buffer();
 
@@ -62,7 +69,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 		top + height
 	};
 
-	global_d3d_device->StretchRect(global_d3d_surface_render_primary_get(), &rect, global_d3d_surface_render_resolved_get(), &rect, D3DTEXF_NONE);
+	global_d3d_device->StretchRect(global_d3d_surface_render_primary, &rect, global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
 	rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = true;
 
 	if (render_layer_selfibloomination && !g_disable_bloom)
@@ -104,7 +111,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 
 			rasterizer_dx9_perf_event_begin("bloom", NULL);
 			rasterizer_dx9_dof_render_bloom(k_bloom_blur_amount, bloom_threshold, brightness, k_bloom_box_factor, k_bloom_max_factor, true, global_frame_parameters_get()->frame_type == 6);
-			rasterizer_dx9_perf_event_end();
+			rasterizer_dx9_perf_event_end("bloom");
 		}
 	}
 
@@ -112,7 +119,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 	// already contains the processed image of the game
 	// and is used for post-processing (e.g. brightness, bloom, sun etc.)
 	// which is later copied in the backbuffer to be displayed on the screen
-	e_rasterizer_target target = _rasterizer_target_render_resolved;
+	e_rasterizer_target target = _rasterizer_target_resolved;
 	scenario* global_scenario = get_global_scenario();
 	if (global_scenario)
 	{
@@ -140,7 +147,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 						rasterizer_dx9_render_crossfade(
 							rasterizer_cinematic_globals->field_AC.lower,
 							rasterizer_cinematic_globals->field_AC.upper);
-						rasterizer_dx9_perf_event_end();
+						rasterizer_dx9_perf_event_end("crossfade");
 					}
 				}
 			}
@@ -209,9 +216,9 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 
 	rasterizer_dx9_perf_event_begin("gamma_brightness", NULL);
 	rasterizer_dx9_apply_gamma_and_brightness(target);
-	rasterizer_dx9_perf_event_end();
+	rasterizer_dx9_perf_event_end("gamma_brightness");
 
-	rasterizer_dx9_perf_event_end();
+	rasterizer_dx9_perf_event_end("screen effects");
 }
 
 void __cdecl rasterizer_dx9_render_screen_flash(void)

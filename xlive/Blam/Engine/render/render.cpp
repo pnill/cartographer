@@ -76,9 +76,6 @@ void render_apply_patches(void)
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
 
-    // fix the missing motion sensor blip
-    PatchCall(Memory::GetAddress(0x284BF3), rasterizer_set_render_target_internal_hook_set_main_render_surface);
-
     //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
     //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
 
@@ -98,9 +95,19 @@ s_frame_parameters* global_frame_parameters_get(void)
     return Memory::GetAddress<s_frame_parameters*>(0xA3E208);
 }
 
+int32* global_rasterizer_stage_get(void)
+{
+    return Memory::GetAddress<int32*>(0xA49494);
+}
+
 real64 get_current_render_time(void)
 {
     return *Memory::GetAddress<real64*>(0x4E6968);
+}
+
+real32* hs_texture_camera_scale_get(void)
+{
+    return Memory::GetAddress<real32*>(0x41F850);
 }
 
 bool* hs_texture_camera_view_get(void)
@@ -450,17 +457,17 @@ void render_view(
             render_view_visibility_compute_to_usercall(user_index);
             rasterizer_render_scene(is_texture_camera);
 
-            rasterizer_dx9_perf_event_begin("interface", 0);
+            rasterizer_dx9_perf_event_begin("interface", NULL);
             rasterizer_dx9_set_stencil_mode(0);
             rasterizer_setup_2d_vertex_shader_user_interface_constants();
             draw_hud();
             rasterizer_dx9_render_screen_flash();
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
-            rasterizer_dx9_perf_event_end();
+            rasterizer_dx9_perf_event_end("interface");
 
 #ifndef NDEBUG
-            rasterizer_dx9_perf_event_begin("debug", 0);
-            rasterizer_dx9_perf_event_end();
+            rasterizer_dx9_perf_event_begin("debug", NULL);
+            rasterizer_dx9_perf_event_end("debug");
 #endif
 
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);

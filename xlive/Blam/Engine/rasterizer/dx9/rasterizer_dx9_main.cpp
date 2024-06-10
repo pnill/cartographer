@@ -4,7 +4,6 @@
 #include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_targets.h"
 
-
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
 #include "rasterizer/rasterizer_globals.h"
@@ -88,24 +87,9 @@ IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void)
     return *Memory::GetAddress<IDirect3DDevice9Ex**>(0xA3C6B4);
 }
 
-IDirect3DSurface9* global_d3d_surface_screenshot_get(void)
+IDirect3DSurface9** global_d3d_surface_screenshot_get(void)
 {
-    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C660);
-}
-
-IDirect3DSurface9* global_d3d_surface_render_primary_get(void)
-{
-    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C64C);
-}
-
-IDirect3DSurface9* global_d3d_surface_render_primary_z_get(void)
-{
-    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C650);
-}
-
-IDirect3DSurface9* global_d3d_surface_render_resolved_get(void)
-{
-    return *Memory::GetAddress<IDirect3DSurface9**>(0xA3C65C);
+    return Memory::GetAddress<IDirect3DSurface9**>(0xA3C660);
 }
 
 IDirect3DPixelShader9** local_pixel_shaders_get(void)
@@ -115,7 +99,7 @@ IDirect3DPixelShader9** local_pixel_shaders_get(void)
 
 void rasterizer_dx9_main_apply_patches(void)
 {
-    DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_stage);
+    DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_direct);
     return;
 }
 
@@ -147,7 +131,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
 
             int16 screenshot_height = rectangle2d_height(&screen_bounds);
             int32 screenshot_width = rectangle2d_width(&screen_bounds);
-            IDirect3DSurface9* global_d3d_surface_screenshot = global_d3d_surface_screenshot_get();
+            IDirect3DSurface9* global_d3d_surface_screenshot = *global_d3d_surface_screenshot_get();
 
             D3DLOCKED_RECT locked_rect;
             if ((screenshot_bitmap->format == bitmap_data_format_a8r8g8b8 || screenshot_bitmap->format == bitmap_data_format_x8r8g8b8)
@@ -170,7 +154,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             {
                 result = false;
             }
-            rasterizer_dx9_set_render_target_internal(global_d3d_surface_render_primary_get(), NONE, true);
+            rasterizer_dx9_set_render_target_internal(global_d3d_surface_render_primary, (IDirect3DSurface9*)NONE, true);
             clear_render_target(0, NONE, 0.0f, false);
         }
 
@@ -198,7 +182,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
 }
 
 
-void __cdecl rasterizer_dx9_set_texture_stage(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
+void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
 {
     last_bitmap_tag_index = bitmap_tag_index;
     p_rasterizer_dx9_set_texture_stage(stage, bitmap_tag_index, bitmap_data_index, a4);
@@ -269,48 +253,10 @@ void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuf
     return;
 }
 
-void __cdecl rasterizer_dx9_set_target(e_rasterizer_target render_target_type, int32 mip_level, bool use_depth)
-{
-    INVOKE(0x25FDC0, 0x0, rasterizer_dx9_set_target, render_target_type, mip_level, use_depth);
-    return;
-}
-
-bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, int16 rasterizer_target)
-{
-    return INVOKE(0x260256, 0x0, rasterizer_dx9_set_target_as_texture, stage, rasterizer_target);
-}
-
 void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
 {
     rasterizer_dx9_device_get_interface()->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
     return;
-}
-
-e_rasterizer_target __cdecl rasterizer_dx9_convolve_screen_surfaces(
-    real32 a1,
-    real32 a2,
-    real32 a3,
-    e_rasterizer_target source,
-    e_rasterizer_target destination,
-    e_rasterizer_target stretch_source,
-    e_rasterizer_target stretch_destination,
-    int32 a8,
-    int32 a9,
-    real32 a10,
-    real32 a11)
-{
-    return INVOKE(0x26C2CA, 0x0, rasterizer_dx9_convolve_screen_surfaces,
-        a1,
-        a2,
-        a3,
-        source,
-        destination,
-        stretch_source,
-        stretch_destination,
-        a8,
-        a9,
-        a10,
-        a11);
 }
 
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright)

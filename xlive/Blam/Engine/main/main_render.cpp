@@ -25,7 +25,6 @@ void main_render_hook(void)
 	render_cartographer_status_text();
 	render_cartographer_achievements();
 	render_cartographer_update();
-	rasterizer_dx9_perf_event_end();
+	rasterizer_dx9_perf_event_end("render cartographer text");
 	return;
 }
-

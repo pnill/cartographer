@@ -66,7 +66,11 @@ s_frame* global_window_parameters_get(void);
 
 s_frame_parameters* global_frame_parameters_get(void);
 
+int32* global_rasterizer_stage_get(void);
+
 real64 get_current_render_time(void);
+
+real32* hs_texture_camera_scale_get(void);
 
 bool* hs_texture_camera_view_get(void);
 

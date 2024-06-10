@@ -28,11 +28,11 @@ c_rasterizer_constant_4f_cache<32>* rasterizer_get_main_pixel_shader_cache(void)
     return Memory::GetAddress<c_rasterizer_constant_4f_cache<32>*>(0xA3D7B0);
 }
 
-void rasterizer_dx9_perf_event_begin(const char* string, real_argb_color* color)
+void rasterizer_dx9_perf_event_begin(const char* event_description, real_argb_color* color)
 {
 #ifdef D3D9_PERF_EVENTS
     wchar_t wide_string[256];
-    utf8_string_to_wchar_string(string, wide_string, NUMBEROF(wide_string));
+    utf8_string_to_wchar_string(event_description, wide_string, NUMBEROF(wide_string));
         
     // If color is null set the color of the event to white
     pixel32 d3dcolor = (color ? real_argb_color_to_pixel32(color) : global_white_pixel32 );
@@ -41,7 +41,7 @@ void rasterizer_dx9_perf_event_begin(const char* string, real_argb_color* color)
     return;
 }
 
-void rasterizer_dx9_perf_event_end(void)
+void rasterizer_dx9_perf_event_end(const char* event_description)
 {
 #ifdef D3D9_PERF_EVENTS
     D3DPERF_EndEvent();

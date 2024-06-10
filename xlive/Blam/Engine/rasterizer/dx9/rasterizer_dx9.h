@@ -65,6 +65,6 @@ c_rasterizer_constant_4f_cache<256>* rasterizer_get_main_vertex_shader_cache(voi
 
 c_rasterizer_constant_4f_cache<32>* rasterizer_get_main_pixel_shader_cache(void);
 
-void rasterizer_dx9_perf_event_begin(const char* string, real_argb_color* color);
+void rasterizer_dx9_perf_event_begin(const char* event_description, real_argb_color* color);
 
-void rasterizer_dx9_perf_event_end(void);
+void rasterizer_dx9_perf_event_end(const char* event_description);

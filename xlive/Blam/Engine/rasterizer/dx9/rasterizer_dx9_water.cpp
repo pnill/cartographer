@@ -55,7 +55,7 @@ bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_ren
         *rasterizer_water_refraction_surface_updated = true;
         rasterizer_dx9_reset_depth_buffer();
 
-        rasterizer_dx9_perf_event_end();
+        rasterizer_dx9_perf_event_end("water refraction");
     }
     return true;
 }

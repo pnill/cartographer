@@ -10,13 +10,8 @@
 
 /* prototypes */
 
-bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
-    e_vertex_output_type output_type,
-    real32* bounds,
-    real32* location,
-    void* output,
-    void* ctx
-);
+real32 rasterizer_dx9_fullscreen_effect_calculate_position_z(real32 z_far, int32 a2);
+void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location, real32 z_far, real_vector4d* output);
 
 /* public code */
 
@@ -27,12 +22,12 @@ void rasterizer_dx9_fullscreen_passes_apply_patches(void)
 }
 
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
-    real32* a1,
+    real_rectangle2d* a1,
     unsigned __int8(__cdecl* a2)(int32),
     bool(__cdecl* a3)(
-        e_vertex_output_type input_type,
-        real32* bounds,
-        real32* location,
+        e_vertex_output_type output_type,
+        real_rectangle2d* bounds,
+        real_vector4d* location,
         void* output,
         void* ctx),
     int32(__cdecl* a4)(int32),
@@ -54,7 +49,7 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
     {
         if (screenshot_in_progress())
         {
-            backbuffer = global_d3d_surface_screenshot_get();
+            backbuffer = *global_d3d_surface_screenshot_get();
             backbuffer->AddRef();
         }
         else
@@ -104,7 +99,7 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
 
             rasterizer_dx9_set_blend_render_state(_framebuffer_blend_function_none);
             rasterizer_set_render_target_internal_hook_set_viewport(backbuffer, (IDirect3DSurface9*)NONE, true);
-            rasterizer_dx9_set_target_as_texture(0, (int16)rasterizer_target);
+            rasterizer_dx9_set_target_as_texture(0, rasterizer_target);
 
             c_rasterizer_constant_4f_cache<32>* main_pixel_shader_constants = rasterizer_get_main_pixel_shader_cache();
             if (main_pixel_shader_constants->test_cache(0, (real_vector4d*)&rasterizer_globals->fullscreen_parameters, 1))
@@ -146,42 +141,37 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
     return;
 }
 
-/* private code */
-
 bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     e_vertex_output_type output_type,
-    real32* bounds,
-    real32* location,
+    real_rectangle2d* bounds,
+    real_vector4d* location,
     void* output,
     void* ctx
 )
 {
-    real32 bounds_width = bounds[1] - bounds[0];
-    real32 bounds_height = bounds[3] - bounds[2];
+    bool result = true;
+    real32 bounds_width;
+    real32 bounds_height;
+    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-    if (output_type == _vertex_output_type_position)
+    ASSERT(output);
+
+    switch (output_type)
     {
-        real32* position_output = (real32*)output;
-
+    case _vertex_output_type_position:
         // position normalized device coordinates
         // make sure to set the viewport, otherwise it'll represent the entire surface
         // which is not good during split-screen
-        position_output[0] = location[0] * 2.0f - 1.0f; // x
-        position_output[1] = -(location[1] * 2.0f - 1.0f); // y
-        position_output[2] = 1.0f; // z
-        position_output[3] = 1.0f; // scale
-
-        return true;
-    }
-    else if (output_type == _vertex_output_type_texcoord)
-    {
-        real32* texcoord_output = (real32*)output;
+        rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
+        break;
+    case _vertex_output_type_texcoord:
+        ASSERT(bounds);
+        ASSERT(location);
 
         // texcoords normalized device coordinates (origin in 0,0 bottom left, max 1,1 top right)
         // set the tex coords based on the texture set to be drawn on the screen
-        int32 main_resolved_surface_size_x, main_resolved_surface_size_y;
-        // get the size of the surface
-        rasterizer_get_texture_target_surface_size(_rasterizer_target_render_resolved, &main_resolved_surface_size_x, &main_resolved_surface_size_y);
+        bounds_width = bounds->x1 - bounds->x0;
+        bounds_height = bounds->y1 - bounds->y0;
 
         // explanation: locations are per vertex, this draw call will take 4 vertices
         // this function will get called 4 times, for each single vertex
@@ -189,22 +179,41 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
         // then it goes counter-clockwise until it forms a rectangle, so 0,0 -> 1,0 (right down) -> 1,1 (right top) -> 0,1 (left top) -> (end) 0,0 (left bottom)
         // if the location is 1, for each component we scale it with the bounds width/lenght and offset that with the verticies located on the left
         // if it is 0, then the vertex is either at the left of the screen, or at the bottom, depending on which component is 0
-        texcoord_output[0] = (0.5f / bounds_width) + (location[0] * bounds_width) / main_resolved_surface_size_x + bounds[0] / main_resolved_surface_size_x;
-        texcoord_output[1] = (0.5f / bounds_height) + (location[1] * bounds_height) / main_resolved_surface_size_y + bounds[2] / main_resolved_surface_size_y;
+        ((real_vector4d*)output)->i = ((location->i * bounds_width) / rasterizer_globals->resolution_x) + (bounds->x0 / rasterizer_globals->resolution_x);
+        ((real_vector4d*)output)->j = ((location->j * bounds_height) / rasterizer_globals->resolution_y) + (bounds->y0 / rasterizer_globals->resolution_y);
+        ((real_vector4d*)output)->k = 0.f;
+        ((real_vector4d*)output)->w = 1.f;
+        break;
+    case _vertex_output_type_color:
+        *(pixel32*)output = global_white_pixel32;
+        break;
+    default:
+        DISPLAY_ASSERT("unreachable");
+        result = false;
+    }
 
-        texcoord_output[2] = 0.0f;
-        texcoord_output[3] = 1.0f;
+    return result;
+}
 
-        return true;
-    }
-    else if (output_type == _vertex_output_type_color)
-    {
-        D3DCOLOR* color = (D3DCOLOR*)output;
-        *color = global_white_pixel32.color;
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+/* private code */
+
+real32 rasterizer_dx9_fullscreen_effect_calculate_position_z(real32 z_far, int32 a2)
+{
+    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+    real32 z = (a2 != 2 ? z_far : rasterizer_globals->clipping_parameters.z_far);
+    return PIN(z, 0.f, 1.f);
+}
+
+void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location, real32 z_far, real_vector4d* output)
+{
+    ASSERT(location);
+
+    real32 z = (z_far != 0.f ? rasterizer_dx9_fullscreen_effect_calculate_position_z(z_far, 1) : 1.f);
+    
+    output->i = location->i * 2.f - 1.f;    // x
+    output->j = -(location->j * 2.f - 1.f); // y
+    output->k = z;                          // z
+    output->w = 1.f;                        // scale
+    return;
 }
