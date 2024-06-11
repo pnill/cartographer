@@ -432,7 +432,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary
             target = (alternate_targets ? primary_target : secondary_target);
             rasterizer_dx9_set_target(target, 0, false);
             uint8 alpha = (pass_index > 0 ? 127 : 255);
-            rasterizer_dx9_draw_convolution_rect(0, 0, D3DCOLOR_ARGB(alpha, 0, 0, 0));
+            rasterizer_dx9_draw_overlay_rect(0, 0, D3DCOLOR_ARGB(alpha, 0, 0, 0));
         }
     }
 

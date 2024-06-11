@@ -37,11 +37,11 @@ void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper);
 
 void rasterizer_dx9_screen_effect_apply_patches(void)
 {
-	PatchCall(Memory::GetAddress(0x191BB1), rasterizer_dx9_render_screen_effects);
+	PatchCall(Memory::GetAddress(0x191BB1), rasterizer_dx9_postprocess_scene);
 	return;
 }
 
-void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool lens_flare_occlusion_test, bool render_layer_selfibloomination)
+void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_flare_occlusion_test, bool render_layer_selfibloomination)
 {
 	// Cleanup before starting
 	// Removes textures staged from previously drawing the first person geometry
@@ -50,7 +50,7 @@ void rasterizer_dx9_render_screen_effects(int32 render_layer_debug_view, bool le
 		rasterizer_dx9_set_texture(i, NULL);
 	}
 
-	rasterizer_dx9_perf_event_begin("screen effects", NULL);
+	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
 	rasterizer_dx9_reset_depth_buffer();
 
 	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();

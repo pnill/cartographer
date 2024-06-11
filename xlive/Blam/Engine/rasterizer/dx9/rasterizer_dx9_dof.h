@@ -20,4 +20,4 @@ e_rasterizer_target rasterizer_dx9_convolve_screen_surfaces(
 	real32 a10,
 	real32 a11);
 
-void rasterizer_dx9_draw_convolution_rect(uint32 screen_resolution_x, uint32 screen_resolution_y, D3DCOLOR color);
+void rasterizer_dx9_draw_overlay_rect(uint32 screen_resolution_x, uint32 screen_resolution_y, D3DCOLOR color);
