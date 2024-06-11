@@ -95,10 +95,8 @@ void set_crosshair_offset(real32 offset)
 	}
 }
 
-void __cdecl hud_draw_screen(void)
+void hud_draw_screen(void)
 {
-	// INVOKE(0x2278AA, 0x0, draw_hud);
-
 	int32 g_user_render_index = *global_user_render_index_get();
 	if (g_user_render_index != NONE && !new_hud_dont_draw())
 	{

@@ -93,6 +93,8 @@ void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader);
 
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright);
 
+bool __cdecl rasterizer_set_texture_bitmap_data(int16 stage, bitmap_data* texture);
+
 bool rasterizer_dx9_draw_primitive_up(
 	D3DPRIMITIVETYPE PrimitiveType,
 	uint32 PrimitiveCount,

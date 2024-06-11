@@ -21,5 +21,5 @@ void set_primary_hud_scale(real32 scale);
 void set_secondary_hud_scale(real32 scale);
 void set_crosshair_offset(real32 offset);
 
-void __cdecl hud_draw_screen(void);
+void hud_draw_screen(void);
 

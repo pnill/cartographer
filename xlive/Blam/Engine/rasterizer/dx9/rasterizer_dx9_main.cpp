@@ -287,3 +287,8 @@ void rasterizer_dx9_texture_stage_dimensions(uint8 stage, uint32 width, uint32 h
     rasterizer_globals->bitmaps.textures_staged_height[stage] = height;
     return;
 }
+
+bool __cdecl rasterizer_set_texture_bitmap_data(int16 stage, bitmap_data* texture)
+{
+    return INVOKE(0x25F5AC, 0x0, rasterizer_set_texture_bitmap_data, stage, texture);
+}

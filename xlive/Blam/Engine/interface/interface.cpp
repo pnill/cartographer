@@ -44,8 +44,6 @@ void __cdecl interface_draw_bitmap(
 	real32 rotation,
 	real32 alpha)
 {
-	//INVOKE(0x227A2E, 0x0, interface_draw_bitmap, bitmap, position, rectangle, size, rotation, alpha);
-
 	real_rectangle2d default_rectangle = { 0.f, 1.f, 0.f, 1.f };
 	const real_rectangle2d* rectangle_used = (rectangle ? rectangle : &default_rectangle);
 
@@ -86,8 +84,8 @@ void __cdecl interface_draw_bitmap(
 
 	parameters.height_ratio = 1.f;
 	parameters.width_ratio = 1.f;
-	parameters.field_2C = 1.f;
-	parameters.field_28 = 1.f;
+	parameters.vs_constants_second_4.j = 1.f;
+	parameters.vs_constants_second_4.i = 1.f;
 	parameters.meter_parameters = NULL;
 	parameters.point_interpolation = false;
 	parameters.blend_function = _framebuffer_blend_function_alpha_multiply_add;
