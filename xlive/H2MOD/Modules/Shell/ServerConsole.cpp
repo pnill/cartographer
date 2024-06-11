@@ -32,12 +32,12 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 
 			if (i > 0)
 			{
-				token_wide.append(command_line_split_wide[i]);
+				token_wide.set(command_line_split_wide[i]);
 			}
 			else
 			{
 				// skip $ character
-				token_wide.append(&command_line_split_wide[i][1]);
+				token_wide.set(&command_line_split_wide[i][1]);
 			}
 
 			utf8 converted[256];
