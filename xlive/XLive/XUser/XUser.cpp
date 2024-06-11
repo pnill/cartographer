@@ -240,39 +240,15 @@ int WINAPI XUserAreUsersFriends(DWORD dwUserIndex, DWORD * pXuids, DWORD dwXuidC
 // #5265: XUserCheckPrivilege
 DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeType, PBOOL pfResult)
 {
-	switch (privilegeType)
+	LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {})", dwUserIndex, (DWORD)privilegeType);
+	bool result_valid = pfResult != NULL;
+
+	if (result_valid)
 	{
-	case XPRIVILEGE_COMMUNICATIONS:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - COMMUNICATIONS", dwUserIndex, privilegeType);
-		break;
-
-	case XPRIVILEGE_MULTIPLAYER_SESSIONS:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - MULTIPLAYER_SESSIONS", dwUserIndex, privilegeType);
-		break;
-
-	case XPRIVILEGE_PROFILE_VIEWING:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PROFILE_VIEWING", dwUserIndex, privilegeType);
-		break;
-
-	case XPRIVILEGE_PRESENCE:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - PRESCENCE", dwUserIndex, privilegeType);
-		break;
-
-	case XPRIVILEGE_USER_CREATED_CONTENT:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - USER_CREATED_CONTENT", dwUserIndex, privilegeType);
-		break;
-
-	default:
-		LIMITED_LOG(15, LOG_TRACE_XLIVE, "XUserCheckPrivilege  (userIndex = {}, privilegeType = {}) - UNKNOWN PRIVILEGE", dwUserIndex, privilegeType);
-		break;
+		*pfResult = true;
 	}
 
-	if (pfResult) {
-		*pfResult = TRUE;
-		return ERROR_SUCCESS;
-	}
-
-	return ERROR_NOT_LOGGED_ON;
+	return (result_valid ? ERROR_SUCCESS : ERROR_NOT_LOGGED_ON);
 }
 
 
@@ -663,7 +639,7 @@ DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, c
 
 		LOG_TRACE_XLIVE("- {} source = {}, id = {:x}, type = {}, size = {:x}, sub-id = {:x}, type2 = {}",
 			lcv,
-			pSettings[lcv].source,
+			(DWORD)pSettings[lcv].source,
 			pSettings[lcv].dwSettingId,
 			type,
 			size,

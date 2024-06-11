@@ -38,5 +38,7 @@ int32 cvsnzprintf(char* buffer, size_t size, char const* format, ...)
 	va_start(va_args, format);
 	int32 result = vsnprintf(buffer, size, format, va_args);
 	buffer[size - 1] = '\0';
+	
+	va_end(va_args);
 	return result;
 }

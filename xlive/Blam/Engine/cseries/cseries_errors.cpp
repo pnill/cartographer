@@ -9,6 +9,7 @@ void error(int32 priority, const char* format, ...)
 	va_list va_args;
 	va_start(va_args, format);
 	error_internal(0, priority, format, va_args);
+	va_end(va_args);
 	return;
 }
 
@@ -17,6 +18,7 @@ void error(int32 category, int32 priority, const char* format, ...)
 	va_list va_args;
 	va_start(va_args, format);
 	error_internal(category, priority, format, va_args);
+	va_end(va_args);
 	return;
 }
 
