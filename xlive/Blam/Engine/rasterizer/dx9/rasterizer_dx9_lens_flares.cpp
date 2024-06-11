@@ -71,8 +71,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
     real_vector4d sun_center;
     if (render_projection_point_to_screen(&position, definition->occlusion_radius, &sun_center, &bounds))
     {
-        const real32 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-        const real32 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+        const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+        const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
         const int16 viewport_left = global_window_parameters->camera.viewport_bounds.left;
         const int16 viewport_top = global_window_parameters->camera.viewport_bounds.top;
         const int16 viewport_bottom = global_window_parameters->camera.viewport_bounds.bottom;
@@ -93,8 +93,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_vertex_shader_permutation(10);
 
-            real32 viewport_middle_x = ((real32)viewport_width / 2.f);
-            real32 viewport_middle_y = ((real32)viewport_height / 2.f);
+            int16 viewport_middle_x = viewport_width / 2;
+            int16 viewport_middle_y = viewport_height / 2;
 
             RECT rect;
             rect.left = viewport_left + (viewport_width * sun_surface_quad.x0 / 2.f + viewport_middle_x);
@@ -172,7 +172,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             // this definitely needs a helper function to pass just the rasterizer_target surfaces from the enum
             // and posibly the size to be copied with the rects
             rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
-            global_d3d_device->StretchRect(global_d3d_surface_render_primary, &rect, global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
+            global_d3d_device->StretchRect(*global_d3d_surface_render_primary_get(), &rect, *global_d3d_surface_sun_glow_primary_get(), NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
             // FIXME

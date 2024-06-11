@@ -154,7 +154,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             {
                 result = false;
             }
-            rasterizer_dx9_set_render_target_internal(global_d3d_surface_render_primary, (IDirect3DSurface9*)NONE, true);
+            rasterizer_dx9_set_render_target_internal(*global_d3d_surface_render_primary_get(), (IDirect3DSurface9*)NONE, true);
             clear_render_target(0, NONE, 0.0f, false);
         }
 

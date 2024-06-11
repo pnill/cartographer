@@ -67,18 +67,18 @@ struct s_rasterizer_target
 /* globals */
 
 extern IDirect3DTexture9* g_backbuffer_texture;
-extern IDirect3DSurface9* g_backbuffer_surface;
+// extern IDirect3DSurface9* g_backbuffer_surface;
 
-extern IDirect3DSurface9* global_d3d_surface_render_primary;
-extern IDirect3DSurface9* global_d3d_surface_render_primary_z;
+// extern IDirect3DSurface9* global_d3d_surface_render_primary;
+// extern IDirect3DSurface9* global_d3d_surface_render_primary_z;
 
 extern IDirect3DTexture9* global_d3d_texture_render_resolved;
-extern IDirect3DSurface9* global_d3d_surface_render_resolved;
+// extern IDirect3DSurface9* global_d3d_surface_render_resolved;
 
-extern IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
+// extern IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
 
 extern IDirect3DTexture9* global_d3d_texture_sun_glow_primary;
-extern IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
+// extern IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
 extern IDirect3DTexture9* global_d3d_texture_sun_glow_secondary;
 extern IDirect3DSurface9* global_d3d_surface_sun_glow_secondary;
 
@@ -118,6 +118,14 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 bool __cdecl rasterizer_dx9_set_texture(uint32 stage, IDirect3DTexture9* texture);
 
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y);
+
+IDirect3DSurface9** global_d3d_surface_render_primary_get(void);
+
+IDirect3DSurface9** global_d3d_surface_render_primary_z_get(void);
+
+IDirect3DSurface9** global_d3d_surface_render_resolved_get(void);
+
+IDirect3DSurface9** global_d3d_surface_sun_glow_primary_get(void);
 
 IDirect3DSurface9** rasterizer_dx9_last_target_get(void);
 

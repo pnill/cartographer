@@ -31,6 +31,7 @@ uint16 g_bloom_info_log_timer = 0;
 //real32 x_rasterizer_screen_effect_inputs[4];	// Unused for now, only used for size
 
 /* prototypes */
+
 void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper);
 
 /* public code */
@@ -69,7 +70,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 		top + height
 	};
 
-	global_d3d_device->StretchRect(global_d3d_surface_render_primary, &rect, global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
+	global_d3d_device->StretchRect(*global_d3d_surface_render_primary_get(), &rect, *global_d3d_surface_render_resolved_get(), &rect, D3DTEXF_NONE);
 	rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = true;
 
 	if (render_layer_selfibloomination && !g_disable_bloom)
