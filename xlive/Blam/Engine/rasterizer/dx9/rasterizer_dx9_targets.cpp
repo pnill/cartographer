@@ -12,7 +12,27 @@
 // This is no longer used
 // #define USE_CUBEMAP_TARGETS
 
+/* typedefs */
+
+typedef void(__cdecl* rasterizer_dx9_set_target_t)(e_rasterizer_target, int32, bool);
+typedef void(__cdecl* rasterizer_dx9_set_target_as_texture_t)(int16, e_rasterizer_target);
+typedef bool(__cdecl* rasterizer_dx9_set_render_target_internal_t)(IDirect3DSurface9*, IDirect3DSurface9*, bool);
+
+typedef bool(__cdecl* rasterizer_dx9_init_t)(void);
+typedef void(__cdecl* rasterizer_dx9_dispose_t)(void);
+typedef void(__cdecl* rasterizer_dx9_get_render_target_surface_t)(e_rasterizer_target, int16);
+
 /* globals */
+
+rasterizer_dx9_set_target_t p_rasterizer_dx9_set_target;
+rasterizer_dx9_set_target_as_texture_t p_rasterizer_dx9_set_target_as_texture;
+rasterizer_dx9_set_render_target_internal_t p_rasterizer_dx9_set_render_target_internal;
+
+rasterizer_dx9_init_t p_rasterizer_dx9_primary_targets_initialize;
+rasterizer_dx9_init_t p_rasterizer_dx9_secondary_targets_initialize;
+rasterizer_dx9_dispose_t p_rasterizer_dx9_primary_targets_dispose;
+rasterizer_dx9_dispose_t p_rasterizer_dx9_secondary_targets_dispose;
+rasterizer_dx9_get_render_target_surface_t p_rasterizer_dx9_get_render_target_surface;
 
 real32 g_sun_size = 0.2f;
 
@@ -64,20 +84,18 @@ void __cdecl rasterizer_dx9_secondary_targets_dispose(void);
 
 void rasterizer_dx9_targets_apply_patches(void)
 {
-    WriteJmpTo(Memory::GetAddress(0x25FDC0), rasterizer_dx9_set_target);
-    WriteJmpTo(Memory::GetAddress(0x260256), rasterizer_dx9_set_target_as_texture);
-    WriteJmpTo(Memory::GetAddress(0x26EBF8), rasterizer_dx9_set_render_target_internal);
+    DETOUR_ATTACH(p_rasterizer_dx9_set_target, Memory::GetAddress<decltype(rasterizer_dx9_set_target)*>(0x25FDC0), rasterizer_dx9_set_target);
+    DETOUR_ATTACH(p_rasterizer_dx9_set_target_as_texture, Memory::GetAddress<rasterizer_dx9_set_target_as_texture_t>(0x260256), rasterizer_dx9_set_target_as_texture);
+    DETOUR_ATTACH(p_rasterizer_dx9_set_render_target_internal, Memory::GetAddress<rasterizer_dx9_set_render_target_internal_t>(0x26EBF8), rasterizer_dx9_set_render_target_internal);
 
     // fix the missing motion sensor blip
     PatchCall(Memory::GetAddress(0x284BF3), rasterizer_set_render_target_internal_hook_set_main_render_surface);
 
-    WriteJmpTo(Memory::GetAddress(0x25F902), rasterizer_dx9_primary_targets_initialize);
-    WriteJmpTo(Memory::GetAddress(0x2628EB), rasterizer_dx9_secondary_targets_initialize);
-
-    WriteJmpTo(Memory::GetAddress(0x25FAC1), rasterizer_dx9_primary_targets_dispose);
-    WriteJmpTo(Memory::GetAddress(0x262B00), rasterizer_dx9_secondary_targets_dispose);
-
-    WriteJmpTo(Memory::GetAddress(0x25FB67), rasterizer_dx9_get_render_target_surface);
+    DETOUR_ATTACH(p_rasterizer_dx9_primary_targets_initialize, Memory::GetAddress<rasterizer_dx9_init_t>(0x25F902), rasterizer_dx9_primary_targets_initialize);
+    DETOUR_ATTACH(p_rasterizer_dx9_secondary_targets_initialize, Memory::GetAddress<rasterizer_dx9_init_t>(0x2628EB), rasterizer_dx9_secondary_targets_initialize);
+    DETOUR_ATTACH(p_rasterizer_dx9_primary_targets_dispose, Memory::GetAddress<rasterizer_dx9_dispose_t>(0x25FAC1), rasterizer_dx9_primary_targets_dispose);
+    DETOUR_ATTACH(p_rasterizer_dx9_secondary_targets_dispose, Memory::GetAddress<rasterizer_dx9_dispose_t>(0x262B00), rasterizer_dx9_secondary_targets_dispose);
+    DETOUR_ATTACH(p_rasterizer_dx9_get_render_target_surface, Memory::GetAddress<rasterizer_dx9_get_render_target_surface_t>(0x25FB67), rasterizer_dx9_get_render_target_surface);
     return;
 }
 
