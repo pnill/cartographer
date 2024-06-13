@@ -1099,11 +1099,12 @@ ASSERT_STRUCT_SIZE(ai_scenario_mission_dialogue, 8);
 // max count: k_maximum_screen_effect_references_per_scenario 16
 struct s_scenario_screen_effect_reference
 {
-    int pad[4];
+    int32 pad_0[4];
     tag_reference screen_effect;         // egor
     string_id primary_input_interpolator;
     string_id secondary_input_interpolator;
-    short pad1[2];
+    int16 primary_scenario_interpolator_index;
+    int16 secondary_scenario_interpolator_index;
 };
 ASSERT_STRUCT_SIZE(s_scenario_screen_effect_reference, 36);
 

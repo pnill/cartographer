@@ -1,11 +1,15 @@
 #pragma once
 
+/* constants */
+
 // 1 hour offset
 #define k_process_system_time_startup_offset_sec (1 * 60 * 60)
 
 #define k_shell_time_sec_denominator 1
 #define k_shell_time_msec_denominator 1000
 #define k_shell_time_usec_denominator 1000000
+
+/* public code */
 
 uint32 __cdecl system_milliseconds();
 
@@ -22,4 +26,3 @@ bool __cdecl game_is_minimized(void);
 
 bool __cdecl gfwl_gamestore_initialize(void);
 
-LRESULT WINAPI WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

@@ -903,7 +903,7 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 		(void)sscanf(&tokens[1].c_str()[2 * i], "%02hhX", &session_bytes[i]);
 	}
 
-	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
+	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
 
 	return 0;
 }

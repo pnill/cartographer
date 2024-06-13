@@ -42,7 +42,10 @@
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
+#include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
+#include "rasterizer/dx9/rasterizer_dx9_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "render/render.h"
 #include "saved_games/game_state_procs.h"
@@ -931,7 +934,11 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		
+		rasterizer_dx9_fullscreen_passes_apply_patches();
+		rasterizer_dx9_lens_flares_apply_patches();
 		rasterizer_dx9_main_apply_patches();
+		rasterizer_dx9_screen_effect_apply_patches();
+		rasterizer_dx9_targets_apply_patches();
 		rasterizer_dx9_water_apply_patches();
 
 		cinematics_apply_patches();

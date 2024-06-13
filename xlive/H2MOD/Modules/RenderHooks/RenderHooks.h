@@ -66,7 +66,6 @@ namespace RenderHooks
 		hud = 0x18,
 	};
 
-	void ResetDevice();
 	void ApplyHooks();
 	void Initialize();
 }

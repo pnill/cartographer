@@ -1,7 +1,7 @@
 #pragma once
 
 //------------------------------------------------------------
-// File    : cartographer\xlive\Blam\Engine\rasterizer\dx9\shaders\bin\motion_sensor_sweep.pso
+// File    : cartographer\xlive\Blam\Engine\rasterizer\dx9\shaders\compiled\sun_glow_convolve.pso
 //------------------------------------------------------------
 static const unsigned char motion_sensor_sweep_pixel_shader_bytecode[336] = {
     0x00, 0x02, 0xFF, 0xFF, 0xFE, 0xFF, 0x2C, 0x00, 0x43, 0x54, 0x41, 0x42, 0x1C, 0x00, 0x00, 0x00,

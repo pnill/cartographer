@@ -914,12 +914,16 @@ void __cdecl first_person_weapon_get_worldspace_node_matrix_interpolated(int32 u
 
 	s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-	s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-	if (TEST_BIT(weapon_data->flags, 0)
-		&& weapon_data->weapon_index != NONE)
-	{
-		matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
-	}
+    if (weapon_slot != NONE)
+    {
+        s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+        if (TEST_BIT(weapon_data->flags, 0)
+            && weapon_data->weapon_index != NONE)
+        {
+            matrix4x3_multiply(&first_person_data->identity_matrix, &result, out_matrix);
+        }
+    }
+    return;
 }
 
 real_matrix4x3* first_person_weapon_get_relative_node_matrix(int32 user_index, datum weapon_index, int16 node_index)
@@ -932,33 +936,36 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
     real_matrix4x3* result = NULL;
     s_first_person_weapon* first_person_data = first_person_weapons_get(user_index);
     int32 weapon_slot = first_person_weapon_slot_by_weapon_datum_index(user_index, weapon_index);
-    s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
-    if (TEST_BIT(weapon_data->flags, 0)
-        && weapon_data->weapon_index != NONE)
+    if (weapon_slot != NONE)
     {
-        weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
-        _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
-        weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
-        datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
+        s_first_person_weapon_data* weapon_data = first_person_weapon_data_get(weapon_slot, first_person_data);
+        if (TEST_BIT(weapon_data->flags, 0)
+            && weapon_data->weapon_index != NONE)
+        {
+            weapon_datum* weapon = (weapon_datum*)object_get_fast_unsafe(weapon_data->weapon_index);
+            _weapon_definition* weapon_def = (_weapon_definition*)tag_get_fast(weapon->item.object.tag_definition_index);
+            weapon_first_person_interface_definition* interface_def = first_person_interface_definition_get(weapon_def, first_person_data->character_type);
+            datum weapon_animations_index = (interface_def ? interface_def->animations.index : NONE);
 
-        // ### FIXME either make use across the entire code of the intermediate buffer
-        // or remove it entirely
+            // ### FIXME either make use across the entire code of the intermediate buffer
+            // or remove it entirely
 
-        result = &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index];
-        if (!halo_interpolator_interpolate_weapon_node(user_index, weapon_animations_index, node_index, weapon_slot, result))
+            result = &g_frame_data_intermediate->weapon_data[user_index][weapon_slot].nodes[node_index];
+            if (!halo_interpolator_interpolate_weapon_node(user_index, weapon_animations_index, node_index, weapon_slot, result))
+            {
+                result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
+            }
+        }
+        else
         {
             result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
         }
     }
-    else
-    {
-        result = first_person_weapon_get_relative_node_matrix(user_index, weapon_index, node_index);
-    }
-
+    
     return result;
 }
 
-void first_persoon_apply_interpolation_patches()
+void first_persoon_apply_interpolation_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19D281), first_person_weapon_get_node_data);
     PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);

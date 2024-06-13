@@ -50,8 +50,6 @@ namespace RenderHooks
 		0x2265E2
 	};
 
-	bool* reset_screen;
-
 	typedef bool(__cdecl initialize_rasterizer_layer_t)(e_layer_type type, unsigned int width, unsigned int height, bool fmt, int a5);
 	initialize_rasterizer_layer_t* p_initialize_rasterizer_layer;
 
@@ -164,11 +162,6 @@ namespace RenderHooks
 		}
 	}
 
-	void ResetDevice()
-	{
-		*reset_screen = true;
-	}
-
 	void ApplyHooks()
 	{
 		//p_initialize_rasterizer_layer = (p_initialize_rasterizer_layer)DetourFunc(Memory::GetAddress<BYTE*>(0x28024C), (BYTE*)initialize_rasterizer_layer_hook, 7);
@@ -187,7 +180,6 @@ namespace RenderHooks
 
 	void Initialize()
 	{
-		reset_screen = Memory::GetAddress<bool*>(0xA3E4D4);
 		ApplyHooks();
 	}
 }

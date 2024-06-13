@@ -205,7 +205,7 @@ int32 rasterizer_get_default_display_monitor()
 
 	if (shell_startup_flag_is_set(_startup_flag_monitor_count))
 	{
-		if ((uint32)shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_get_interface()->GetAdapterCount())
+		if ((uint32)shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
 		{
 			monitor_index = shell_startup_flag_get(_startup_flag_monitor_count);
 		}
@@ -255,7 +255,7 @@ void __cdecl video_settings_get_available_monitor_display_modes_hook()
 	static bool initialized = false;
 	if (!initialized)
 	{
-		IDirect3D9* d3d9 = rasterizer_dx9_get_interface();
+		IDirect3D9* d3d9 = rasterizer_dx9_main_globals_get()->global_d3d_interface;
 
 		int32 adapter_index = rasterizer_get_default_display_monitor();
 

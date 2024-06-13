@@ -9,6 +9,7 @@
 #include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
 #include "Networking/NetworkMessageTypeCollection.h"
+#include "rasterizer/rasterizer_globals.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
@@ -250,6 +251,7 @@ namespace ImGuiHandler {
 			}
 			void VideoSettings()
 			{
+				s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 				ImVec2 item_size = ImGui::GetItemRectSize();
 				if (ImGui::CollapsingHeader(GetString(video_title)))
 				{
@@ -301,7 +303,7 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Shadows", &g_shadows, s_items, 4))
 					{
 						H2Config_Override_Shadows = (e_override_texture_resolution)g_shadows;
-						RenderHooks::ResetDevice();
+						rasterizer_globals->reset_screen = true;
 					}
 					ImGui::NextColumn();
 					ImGui::Text(GetString(water_title));
@@ -309,7 +311,7 @@ namespace ImGuiHandler {
 					if (ImGui::Combo("##Water", &g_water, s_items, 4))
 					{
 						H2Config_Override_Water = (e_override_texture_resolution)g_water;
-						RenderHooks::ResetDevice();
+						rasterizer_globals->reset_screen = true;
 					}
 
 					ImGui::Columns(1);
@@ -940,6 +942,7 @@ namespace ImGuiHandler {
 #ifndef NDEBUG
 				if (ImGui::CollapsingHeader("Dev Testing"))
 				{
+					s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 					/*
 					if(ImGui::CollapsingHeader("Misc"))
 					{
@@ -1001,7 +1004,7 @@ namespace ImGuiHandler {
 						{
 							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
 							{
-								RenderHooks::ResetDevice();
+								rasterizer_globals->reset_screen = true;
 							}
 							ImGui::NextColumn();
 						}

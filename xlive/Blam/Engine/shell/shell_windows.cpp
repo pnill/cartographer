@@ -237,7 +237,6 @@ int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	if (!pcc_result)
 	{
 		error(2, "Failed to get PCC info / insufficient system resources");
-		ASSERT(pcc_result == true);
 		
 		// ### TODO change this?
 		std::thread([]() {

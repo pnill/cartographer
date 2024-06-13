@@ -126,19 +126,30 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
 #if defined(_DEBUG)
-#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION) \
-if (!(STATEMENT)) \
-{                                                                   \
-    display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
-    if (!is_debugger_present() && g_catch_exceptions)               \
-        exit(-1);                                                   \
-    else                                                            \
-        __debugbreak();                                             \
+
+#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
+display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
+if (!is_debugger_present() && g_catch_exceptions)               \
+    exit(-1);                                                   \
+else                                                            \
+    __debugbreak();                                             \
+
+#define DISPLAY_ASSERT(STATEMENT) DISPLAY_ASSERT_EXCEPTION(STATEMENT, true)
+
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)               \
+if (!(STATEMENT))                                               \
+{                                                               \
+    DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           \
 }
+
 #define ASSERT(STATEMENT)   ASSERT_EXCEPTION(STATEMENT, true)
 #else
-#define ASSERT_EXCEPTION(STATEMENT, ...) (void)(#STATEMENT)
-#define ASSERT(STATEMENT, ...) (void)(#STATEMENT)
+#define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)   (void)(#STATEMENT)
+#define DISPLAY_ASSERT(STATEMENT)                           (void)(#STATEMENT)
+#define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           (void)(#STATEMENT)
+#define ASSERT(STATEMENT)                                   (void)(#STATEMENT)
+
+
 #endif // _DEBUG
 
 

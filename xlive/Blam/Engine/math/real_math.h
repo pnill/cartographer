@@ -28,13 +28,6 @@ union real_euler_angles3d
 };
 ASSERT_STRUCT_SIZE(real_euler_angles3d, sizeof(real_angle) * 3);
 
-union real_vector4d
-{
-	real32 v[4];
-	struct { real32 i, j, k, l; };
-};
-ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
-
 union real_vector2d
 {
 	real32 v[2];
@@ -52,6 +45,13 @@ union real_vector3d
 ASSERT_STRUCT_SIZE(real_vector3d, sizeof(real32) * 3);
 
 typedef real_vector3d real_point3d;
+
+union real_vector4d
+{
+	real32 v[4];
+	struct { real32 i, j, k, w; };
+};
+ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
 struct real_plane2d
 {
@@ -151,6 +151,17 @@ static BLAM_MATH_INL real32 dot_product3d(const real_vector3d* a, const real_vec
 static BLAM_MATH_INL real32 dot_product4d_quaternion(const real_quaternion* a, const real_quaternion* b)
 {
 	return a->i * b->i + a->j * b->j + a->k * b->k + a->w * b->w;
+}
+
+static BLAM_MATH_INL real32 magnitude_squared2d(const real_vector2d* vector)
+{
+	return vector->i * vector->i + vector->j * vector->j;
+}
+
+static BLAM_MATH_INL real32 magnitude2d(const real_vector2d* vector)
+{
+	real32 magnitude_squared = magnitude_squared2d(vector);
+	return square_root(magnitude_squared);
 }
 
 static BLAM_MATH_INL real32 magnitude_squared3d(const real_vector3d* vector)
@@ -264,6 +275,43 @@ static BLAM_MATH_INL void set_real_point3d(real_point3d* point, real32 x, real32
 	point->z = z;
 	return;
 }
+
+static BLAM_MATH_INL real32 cosine(real32 x)
+{
+	return cos(x);
+}
+
+static BLAM_MATH_INL real32 sine(real32 x)
+{
+	return sin(x);
+}
+
+static BLAM_MATH_INL real32 tangent(real32 x)
+{
+	return tan(x);
+}
+
+static BLAM_MATH_INL real32 arccosine(real32 x)
+{
+	ASSERT(x >= -1.f - k_real_math_epsilon && x <= +1.f + k_real_math_epsilon);
+
+	// Pin parameter between -1 and 1
+	return acos(PIN(x, -1.f, 1.f));
+}
+
+static BLAM_MATH_INL real32 arcsine(real32 x)
+{
+	ASSERT(x >= -1.f - k_real_math_epsilon && x <= +1.f + k_real_math_epsilon);
+
+	// Pin parameter between -1 and 1
+	return asin(PIN(x, -1.f, 1.0f));
+}
+
+static BLAM_MATH_INL real32 arctangent(real32 a, real32 b)
+{
+	return atan2(a, b);
+}
+
 
 void __cdecl real_math_initialize(void);
 

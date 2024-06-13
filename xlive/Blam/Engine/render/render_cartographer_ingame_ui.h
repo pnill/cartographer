@@ -1,5 +1,7 @@
 #pragma once
 
-void render_cartographer_status_text();
-void render_cartographer_achievements();
-void render_cartographer_update();
+/* public code */
+
+void render_cartographer_status_text(void);
+void render_cartographer_achievements(void);
+void render_cartographer_update(void);

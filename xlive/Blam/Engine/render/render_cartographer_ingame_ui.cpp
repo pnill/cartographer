@@ -3,8 +3,9 @@
 
 #include "cartographer/twizzler/twizzler.h"
 #include "game/game.h"
-#include "rasterizer/rasterizer_globals.h"
 #include "interface/hud.h"
+#include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/dx9/rasterizer_dx9.h"
 #include "shell/shell_windows.h"
 #include "text/draw_string.h"
 #include "text/font_cache.h"
@@ -16,17 +17,33 @@
 
 #include "version_git.h"
 
+/* constants */
+
 // define this to enable queueing a test message in render_cartographer_achievements
 // #define ACHIVEMENT_RENDER_DEBUG_ENABLED
 #define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
 
-const int32 k_status_text_font = 0;
+#define k_status_text_font 0
+
+#define k_cheevo_display_lifetime (5 * k_shell_time_msec_denominator)
+#define k_cheevo_title_font 10
+#define k_cheevo_message_font 1
+
+#define k_update_status_font 5
+
+/* globals */
 
 // defined in XLiveRendering.cpp
 extern char* buildText;
 
+// defined in Modules\Updater\Updater.cpp
+extern char* autoUpdateText;
+extern long long sizeOfDownload;
+extern long long sizeOfDownloaded;
 
-void render_cartographer_status_text()
+/* public code */
+
+void render_cartographer_status_text(void)
 {
 	rectangle2d bounds;
 	rasterizer_get_frame_bounds(&bounds);
@@ -69,13 +86,15 @@ void render_cartographer_status_text()
 
 #if defined(GEN_GIT_VER_VERSION_STRING) && defined(CARTOGRAPHER_TEST_BUILD_DRAW_TEXT) 
 	{
+		const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
 		rasterizer_get_frame_bounds(&bounds);
 		int32 test_build_font = k_status_text_font;
 		line_height = get_text_size_from_font_cache(test_build_font);
 
 		text_color_console.alpha = .55f;
-		bounds.top += (1050 * *get_ui_scale());
-		bounds.left = bounds.right - (765 * *get_ui_scale());
+		bounds.top += (1050 * rasterizer_globals->ui_scale);
+		bounds.left = bounds.right - (765 * rasterizer_globals->ui_scale);
 		bounds.bottom = bounds.top + line_height;
 		
 		draw_string_reset();
@@ -93,11 +112,7 @@ void render_cartographer_status_text()
 #endif
 }
 
-const uint64 k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator);
-const uint32 k_cheevo_title_font = 10;
-const uint32 k_cheevo_message_font = 1;
-
-void render_cartographer_achievements()
+void render_cartographer_achievements(void)
 {
 	static int64 x_cheevo_timer = 0;
 	int64 time_now = shell_time_now_msec();
@@ -157,14 +172,7 @@ void render_cartographer_achievements()
 	}
 }
 
-// defined in Modules\Updater\Updater.cpp
-extern char* autoUpdateText;
-extern long long sizeOfDownload;
-extern long long sizeOfDownloaded;
-
-const uint32 k_update_status_font = 5;
-
-void render_cartographer_update()
+void render_cartographer_update(void)
 {
 	if (autoUpdateText)
 	{
@@ -209,4 +217,5 @@ void render_cartographer_update()
 			draw_string_render(&bounds, update_message_buffer);
 		}
 	}
+	return;
 }

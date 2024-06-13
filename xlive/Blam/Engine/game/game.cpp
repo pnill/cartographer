@@ -135,12 +135,12 @@ void game_time_get_date_and_time(s_date_and_time* date_and_time)
     return;
 }
 
-void game_direct_connect_to_session(XNKID kid, XNKEY key, XNADDR addr, int8 exe_type, int32 exe_version, int32 comp_version)
+void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, int8 exe_type, int32 exe_version, int32 comp_version)
 {
     auto handler = (c_game_life_cycle_handler_joining*)c_game_life_cycle_manager::get()->life_cycle_handlers[e_game_life_cycle::_life_cycle_joining];
     handler->joining_xnkid = kid;
     handler->joining_xnkey = key;
-    handler->joining_xnaddr = addr;
+    handler->joining_xnaddr = *addr;
     if (exe_type != EXECUTABLE_TYPE || exe_version != EXECUTABLE_VERSION || comp_version != COMPATIBLE_VERSION)
     {
         handler->join_attempt_result_code = 9;
