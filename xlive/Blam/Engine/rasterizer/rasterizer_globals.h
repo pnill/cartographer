@@ -69,7 +69,6 @@ struct s_rasterizer_fullscreen_parameters
 };
 ASSERT_STRUCT_SIZE(s_rasterizer_fullscreen_parameters, 16);
 
-// TODO: Finish this, some data above might be included in it
 struct s_rasterizer_globals
 {
 	bool rasterizer_initialized;
@@ -110,7 +109,6 @@ ASSERT_STRUCT_SIZE(s_rasterizer_globals, 4336);
 
 /* public code */
 
-// TODO: Starting offset might not be right
 s_rasterizer_globals* rasterizer_globals_get(void);
 
 s_game_globals_rasterizer_data* rasterizer_globals_get_data(void);
