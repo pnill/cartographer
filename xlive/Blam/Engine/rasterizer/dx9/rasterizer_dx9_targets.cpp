@@ -88,7 +88,7 @@ void rasterizer_dx9_copy_target(e_rasterizer_target src_target, e_rasterizer_tar
 {
     IDirect3DSurface9* dst_surface = rasterizer_dx9_target_get_main_mip_surface(dst_target);
     IDirect3DSurface9* src_surface = rasterizer_dx9_target_get_main_mip_surface(src_target);
-    rasterizer_dx9_main_globals_get()->global_d3d_device->StretchRect(src_surface, NULL, dst_surface, NULL, D3DTEXF_POINT);
+    rasterizer_dx9_device_get_interface()->StretchRect(src_surface, NULL, dst_surface, NULL, D3DTEXF_POINT);
     return;
 }
 
@@ -105,7 +105,7 @@ IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_targe
 
 bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool use_depth)
 {
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
 
     IDirect3DSurface9** last_target = rasterizer_dx9_last_target_get();
@@ -170,7 +170,7 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 	};
 	// set the viewport, after setting the main render target
 	// to note that the viewport will always gets reset when a new render target is set
-    rasterizer_dx9_main_globals_get()->global_d3d_device->SetViewport(&vp);
+    rasterizer_dx9_device_get_interface()->SetViewport(&vp);
 	return;
 }
 
@@ -619,7 +619,7 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
 {
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
     const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-    IDirect3DDevice9Ex* global_d3d_device = dx9_globals->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
     const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
     const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
@@ -722,7 +722,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
 {
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
     const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-    IDirect3DDevice9Ex* global_d3d_device = dx9_globals->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
     const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
     const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);

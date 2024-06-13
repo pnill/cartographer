@@ -50,7 +50,7 @@ bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_ren
             int16 top = global_window_parameters->camera.viewport_bounds.top;
 
             const RECT rect = { left, top, width + left, height + top };
-            rasterizer_dx9_main_globals_get()->global_d3d_device->StretchRect(render_surface, &rect, surface, NULL, D3DTEXF_LINEAR);
+            rasterizer_dx9_device_get_interface()->StretchRect(render_surface, &rect, surface, NULL, D3DTEXF_LINEAR);
         }
         *rasterizer_water_refraction_surface_updated = true;
         rasterizer_dx9_reset_depth_buffer();

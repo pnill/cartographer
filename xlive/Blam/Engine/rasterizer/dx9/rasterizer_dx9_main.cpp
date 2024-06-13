@@ -79,6 +79,11 @@ s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void)
     return Memory::GetAddress<s_rasterizer_dx9_main_globals*>(0xA3C640);
 }
 
+IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void)
+{
+    return rasterizer_dx9_main_globals_get()->global_d3d_device;
+}
+
 datum last_bitmap_tag_index_get(void)
 {
     return last_bitmap_tag_index;
@@ -247,7 +252,7 @@ void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuf
 
 void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
 {
-    rasterizer_dx9_main_globals_get()->global_d3d_device->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
+    rasterizer_dx9_device_get_interface()->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
     return;
 }
 
@@ -263,7 +268,7 @@ bool rasterizer_dx9_draw_primitive_up(
     const void* pVertexStreamZeroData,
     uint32 VertexStreamZeroStride)
 {
-    return rasterizer_dx9_main_globals_get()->global_d3d_device->DrawPrimitiveUP(
+    return rasterizer_dx9_device_get_interface()->DrawPrimitiveUP(
         PrimitiveType,
         PrimitiveCount,
         pVertexStreamZeroData,

@@ -65,6 +65,8 @@ struct s_rasterizer_dx9_main_globals
 
 s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
+IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
+
 datum last_bitmap_tag_index_get(void);
 
 void rasterizer_dx9_main_apply_patches(void);

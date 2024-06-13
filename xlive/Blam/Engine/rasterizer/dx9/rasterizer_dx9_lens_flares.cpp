@@ -43,7 +43,7 @@ void rasterizer_dx9_lens_flares_apply_patches(void)
 
 e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
 {
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
     ASSERT(global_d3d_device);
 
     const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
@@ -263,7 +263,7 @@ void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
 {
     INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
 
-    rasterizer_dx9_main_globals_get()->global_d3d_device->CreatePixelShader((const DWORD*)sun_glow_convolve_pixel_shader_bytecode, &sun_glow_convolve_shader);
+    rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)sun_glow_convolve_pixel_shader_bytecode, &sun_glow_convolve_shader);
     return;
 }
 
@@ -371,7 +371,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary
 
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 
-    IDirect3DDevice9Ex* global_d3d_device = dx9_globals->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
     if (pass_count > 0)
     {

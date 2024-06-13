@@ -45,7 +45,7 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
     const s_frame* global_window_parameters = global_window_parameters_get();
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 
-    IDirect3DDevice9Ex* global_d3d_device = dx9_globals->global_d3d_device;
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
     if (!global_window_parameters->is_texture_camera || *hs_texture_camera_view_get())
     {
