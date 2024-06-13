@@ -1,6 +1,10 @@
 #pragma once
 #include "game/game_globals.h"
 
+/* constants */
+
+#define k_max_texture_stages 4
+
 /* enums */
 
 enum e_rasterizer_window_mode : uint32
@@ -55,8 +59,8 @@ struct s_rasterizer_globals_bitmaps
 	bool field_90;
 	bool field_91;
 	int8 pad_2[2];
-	uint32 textures_staged_width[4];
-	uint32 textures_staged_height[4];
+	uint32 textures_staged_width[k_max_texture_stages];
+	uint32 textures_staged_height[k_max_texture_stages];
 };
 ASSERT_STRUCT_SIZE(s_rasterizer_globals_bitmaps, 48);
 

@@ -121,8 +121,8 @@ void __cdecl rasterizer_dx9_create_motion_sensor_shader()
 {
 	INVOKE(0x28458C, 0x0, rasterizer_dx9_create_motion_sensor_shader);
 
-	IDirect3DDevice9Ex* d3d9_device = rasterizer_dx9_device_get_interface();
-	d3d9_device->CreatePixelShader((const DWORD*)motion_sensor_sweep_pixel_shader_bytecode, &motion_sensor_sweep_shader);
+	rasterizer_dx9_main_globals_get()->global_d3d_device->CreatePixelShader((const DWORD*)motion_sensor_sweep_pixel_shader_bytecode, &motion_sensor_sweep_shader);
+	return;
 }
 
 void radar_patch()

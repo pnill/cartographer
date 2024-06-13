@@ -43,7 +43,7 @@ void rasterizer_dx9_lens_flares_apply_patches(void)
 
 e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
 {
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
     ASSERT(global_d3d_device);
 
     const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
@@ -167,12 +167,13 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_stencil_mode(0);
 
+            s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 
             // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
             // this definitely needs a helper function to pass just the rasterizer_target surfaces from the enum
             // and posibly the size to be copied with the rects
             rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
-            global_d3d_device->StretchRect(*global_d3d_surface_render_primary_get(), &rect, *global_d3d_surface_sun_glow_primary_get(), NULL, D3DTEXF_LINEAR);
+            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
             // FIXME
@@ -262,8 +263,7 @@ void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
 {
     INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
 
-    IDirect3DDevice9Ex* d3d9_device = rasterizer_dx9_device_get_interface();
-    d3d9_device->CreatePixelShader((const DWORD*)sun_glow_convolve_pixel_shader_bytecode, &sun_glow_convolve_shader);
+    rasterizer_dx9_main_globals_get()->global_d3d_device->CreatePixelShader((const DWORD*)sun_glow_convolve_pixel_shader_bytecode, &sun_glow_convolve_shader);
     return;
 }
 
@@ -369,7 +369,9 @@ e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary
     ASSERT(VALID_INDEX(primary_target, k_rasterizer_target_count));
     ASSERT(VALID_INDEX(secondary_target, k_rasterizer_target_count));
 
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+
+    IDirect3DDevice9Ex* global_d3d_device = dx9_globals->global_d3d_device;
 
     if (pass_count > 0)
     {
@@ -385,7 +387,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary
         rasterizer_dx9_set_vertex_shader_permutation(1);
         rasterizer_dx9_submit_resolve();
 
-        const real32 width_ratio = 1.f / (real32)*sun_glow_target_width_get();
+        const real32 width_ratio = 1.f / (real32)dx9_globals->global_d3d_sun_width;
         const real32 top = width_ratio * 0.5f;
         const real32 bottom = width_ratio * -0.5f;
 

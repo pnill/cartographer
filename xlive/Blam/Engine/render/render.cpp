@@ -300,7 +300,7 @@ void __cdecl rasterizer_render_scene(bool is_texture_camera)
 
 bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
 {
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
 
     IDirect3DVertexDeclaration9* vertex_dcl;
     global_d3d_device->GetVertexDeclaration(&vertex_dcl);
@@ -317,7 +317,7 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     const void* pVertexStreamZeroData,
     UINT VertexStreamZeroStride)
 {
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
 
     D3DVERTEXELEMENT9 vertex_elements[MAXD3DDECLLENGTH];
     UINT vertex_element_couunt;
@@ -331,7 +331,7 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
 
 void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 {
-	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_main_globals_get()->global_d3d_device;
 
 	real_vector4d vc[5];
 	int16 width, height;

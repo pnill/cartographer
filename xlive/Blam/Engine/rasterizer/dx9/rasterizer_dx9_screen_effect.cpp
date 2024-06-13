@@ -54,7 +54,6 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
 	rasterizer_dx9_reset_depth_buffer();
 
-	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 	const s_frame* global_window_parameters = global_window_parameters_get();
 
 	int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
@@ -70,7 +69,8 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 		top + height
 	};
 
-	global_d3d_device->StretchRect(*global_d3d_surface_render_primary_get(), &rect, *global_d3d_surface_render_resolved_get(), &rect, D3DTEXF_NONE);
+	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+	dx9_globals->global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
 	rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = true;
 
 	if (render_layer_selfibloomination && !g_disable_bloom)

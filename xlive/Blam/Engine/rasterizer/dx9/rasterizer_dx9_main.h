@@ -22,15 +22,50 @@ enum e_framebuffer_blend_function : int16
 	k_shader_framebuffer_blend_function_count
 };
 
-static D3DFORMAT g_supported_depth_stencil_formats[] = { D3DFMT_D24S8, D3DFMT_D24X4S4 };
+/* structures */
+
+struct s_rasterizer_dx9_main_globals
+{
+    IDirect3D9* global_d3d_interface;
+    D3DMULTISAMPLE_TYPE global_d3d_primary_multisampletype;
+    uint32 global_d3d_primary_multisamplequality;
+    IDirect3DSurface9* global_d3d_surface_render_primary;
+    IDirect3DSurface9* global_d3d_surface_render_primary_z;
+    IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
+    IDirect3DTexture9* global_d3d_texture_render_resolved;
+    IDirect3DSurface9* global_d3d_surface_render_resolved;
+    IDirect3DSurface9* global_d3d_surface_screenshot;
+    IDirect3DTexture9* global_d3d_texture_render_primary;
+    IDirect3DTexture9* global_d3d_backbuffer_texture;
+    IDirect3DSurface9* global_d3d_backbuffer_surface;
+    uint32 global_d3d_sun_height;
+    uint32 global_d3d_sun_width;
+    IDirect3DTexture9* global_d3d_texture_sun_glow_primary;
+    IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
+    IDirect3DTexture9* global_d3d_texture_sun_glow_secondary;
+    IDirect3DSurface9* global_d3d_surface_sun_glow_secondary;
+    IDirect3DTexture9* global_d3d_texture_motion_sensor;
+    IDirect3DSurface9* global_d3d_surface_motion_sensor;
+
+    /* TODO: these cubemap surfaces are unused, eventually remove these once we gain ownership */
+    IDirect3DTexture9* global_d3d_texture_cubemap;
+    IDirect3DSurface9* global_d3d_surface_cubemap_pos_x;
+    IDirect3DSurface9* global_d3d_surface_cubemap_neg_x;
+    IDirect3DSurface9* global_d3d_surface_cubemap_pos_y;
+    IDirect3DSurface9* global_d3d_surface_cubemap_neg_y;
+    IDirect3DSurface9* global_d3d_surface_cubemap_pos_z;
+    IDirect3DSurface9* global_d3d_surface_cubemap_neg_z;
+    IDirect3DSurface9* global_d3d_surface_cubemap_depth;
+
+    uint32 global_d3d_palette_count;
+    IDirect3DDevice9Ex* global_d3d_device;
+};
+
+/* public code */
+
+s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
 datum last_bitmap_tag_index_get(void);
-
-IDirect3D9* rasterizer_dx9_get_interface(void);
-
-IDirect3DSurface9** global_d3d_surface_screenshot_get(void);
-
-IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
 
 void rasterizer_dx9_main_apply_patches(void);
 
@@ -63,3 +98,5 @@ bool rasterizer_dx9_draw_primitive_up(
 	uint32 VertexStreamZeroStride);
 
 bool __cdecl rasterizer_dx9_create_texture(uint32 width, uint32 height, int32 levels, uint32 usage, e_bitmap_data_format format, bool linear, IDirect3DTexture9** texture);
+
+void rasterizer_dx9_texture_stage_dimensions(uint8 stage, uint32 width, uint32 height);

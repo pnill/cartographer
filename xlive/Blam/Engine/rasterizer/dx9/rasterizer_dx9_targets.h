@@ -66,24 +66,7 @@ struct s_rasterizer_target
 
 /* globals */
 
-extern IDirect3DTexture9* g_backbuffer_texture;
-// extern IDirect3DSurface9* g_backbuffer_surface;
 
-// extern IDirect3DSurface9* global_d3d_surface_render_primary;
-// extern IDirect3DSurface9* global_d3d_surface_render_primary_z;
-
-extern IDirect3DTexture9* global_d3d_texture_render_resolved;
-// extern IDirect3DSurface9* global_d3d_surface_render_resolved;
-
-// extern IDirect3DSurface9* global_d3d_surface_render_z_as_target_z;
-
-extern IDirect3DTexture9* global_d3d_texture_sun_glow_primary;
-// extern IDirect3DSurface9* global_d3d_surface_sun_glow_primary;
-extern IDirect3DTexture9* global_d3d_texture_sun_glow_secondary;
-extern IDirect3DSurface9* global_d3d_surface_sun_glow_secondary;
-
-extern IDirect3DTexture9* global_d3d_texture_motion_sensor;
-extern IDirect3DSurface9* global_d3d_surface_motion_sensor;
 
 /* public code */
 
@@ -95,7 +78,7 @@ s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target raste
 
 void rasterizer_dx9_copy_target(e_rasterizer_target src_target, e_rasterizer_target dst_target);
 
-void __cdecl rasterizer_dx9_texture_target_surface_size(e_rasterizer_target target, int32* out_width, int32* out_height);
+void __cdecl rasterizer_dx9_texture_target_surface_size(e_rasterizer_target target, uint32* out_width, uint32* out_height);
 
 IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target);
 
@@ -119,20 +102,8 @@ bool __cdecl rasterizer_dx9_set_texture(uint32 stage, IDirect3DTexture9* texture
 
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y);
 
-IDirect3DSurface9** global_d3d_surface_render_primary_get(void);
-
-IDirect3DSurface9** global_d3d_surface_render_primary_z_get(void);
-
-IDirect3DSurface9** global_d3d_surface_render_resolved_get(void);
-
-IDirect3DSurface9** global_d3d_surface_sun_glow_primary_get(void);
-
 IDirect3DSurface9** rasterizer_dx9_last_target_get(void);
 
 IDirect3DSurface9** rasterizer_dx9_last_z_target_get(void);
 
 IDirect3DSurface9** rasterizer_dx9_last_z_stencil_get(void);
-
-uint32* sun_glow_target_height_get(void);
-
-uint32* sun_glow_target_width_get(void);
