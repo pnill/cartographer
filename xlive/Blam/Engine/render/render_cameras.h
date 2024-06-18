@@ -18,6 +18,8 @@ struct render_projection
 };
 ASSERT_STRUCT_SIZE(render_projection, 192);
 
+/* public code */
+
 void render_cameras_apply_patches(void);
 
 render_projection* global_projection_get(void);
@@ -34,3 +36,10 @@ bool render_projection_point_to_screen(
 	real32  occlusion_radius,
 	real_vector4d* out_view_position,
 	real_bounds* bounds);
+
+bool render_camera_world_to_screen(
+	const s_camera* camera,
+	const render_projection* projection,
+	const rectangle2d* viewport_bounds,
+	const real_point3d* view_point,
+	real_point2d* screen_point);

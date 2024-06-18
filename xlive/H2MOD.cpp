@@ -419,7 +419,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		gametype_it.second = false;
 
 	bool game_mode_ui_shell = options->game_mode == _game_mode_ui_shell;
-	new_hud_patches_on_map_load(game_mode_ui_shell);
 
 	if (game_mode_ui_shell)
 	{
@@ -445,6 +444,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 		if (!Memory::IsDedicatedServer())
 		{
 			hud_patches_on_map_load();
+			new_hud_patches_on_map_load(game_mode_ui_shell);
 			main_tag_fixes();
 		}
 

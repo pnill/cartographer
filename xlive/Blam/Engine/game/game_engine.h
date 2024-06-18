@@ -2,7 +2,11 @@
 #include "game_statborg.h"
 #include "Networking/Session/NetworkSession.h"
 
+/* constants */
+
 #define k_maximum_game_engine_event_responses_per_type 128
+
+/* enums */
 
 enum e_valid_multiplayer_games : short
 {
@@ -64,6 +68,8 @@ enum e_multiplayer_event_sound_flags : int16
 {
 	_multiplayer_event_sound_flag_announcer_sound = FLAG(0),
 };
+
+/* structures */
 
 struct s_game_engine_global_player_info
 {
@@ -164,6 +170,8 @@ struct s_multiplayer_event_response_definition
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 
+/* public code */
+
 s_game_engine_globals* game_engine_globals_get(void);
 
 bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_game_team team_index, real_rgb_color* change_colors);
@@ -171,3 +179,5 @@ bool __cdecl game_engine_get_change_colors(s_player_profile* player_profile, e_g
 bool __cdecl game_engine_variant_cleanup(uint16* flags);
 
 void __cdecl game_engine_player_activated(datum player_index);
+
+bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);

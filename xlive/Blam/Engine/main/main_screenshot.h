@@ -2,10 +2,12 @@
 #include "bitmaps/bitmap_group.h"
 #include "cseries/cseries_strings.h"
 
+/* structures */
+
 struct s_screenshot_globals
 {
 	bool taking_screenshot;
-	bool unused;
+	bool cubemap_screenshot;
 	bool take_screenshot;
 	bool web_map;
 	bool save_as_tga;
@@ -19,6 +21,10 @@ struct s_screenshot_globals
 };
 ASSERT_STRUCT_SIZE(s_screenshot_globals, 276);
 
+/* public code */
+
 s_screenshot_globals* get_screenshot_globals(void);
 
 bool screenshot_in_progress(void);
+
+bool cubemap_screenshot_in_progress(void);

@@ -76,6 +76,8 @@ bool* hs_texture_camera_view_get(void);
 
 s_scenario_fog_result* global_fog_result_get(void);
 
+int32* global_user_render_index_get(void);
+
 uint32* global_effect_flag_get(void);
 
 // ### TODO: better function name

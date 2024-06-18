@@ -3,6 +3,8 @@
 
 #include "game/game.h"
 
+/* public code */
+
 int current_game_engine()
 {
 	typedef int(__cdecl* get_game_mode_engine_t)();
@@ -32,4 +34,9 @@ bool game_engine_has_teams()
 	}
 
 	return false;
+}
+
+bool __cdecl sub_4701B6(datum player_index)
+{
+	return INVOKE(0x701B6, 0x0, sub_4701B6, player_index);
 }

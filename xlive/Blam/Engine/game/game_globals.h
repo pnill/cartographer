@@ -3,13 +3,14 @@
 #include "game_options.h"
 #include "materials.h"
 
-#include "tag_files/tag_block.h"
-#include "tag_files/tag_reference.h"
 #include "bitmaps/bitmap_group.h"
+#include "interface/interface.h"
 #include "main/game_preferences.h"
 #include "main/level_definitions.h"
 #include "objects/damage.h"
 #include "tag_files/string_id.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 #include "text/text_group.h"
 
 
@@ -416,22 +417,7 @@ ASSERT_STRUCT_SIZE(s_game_globals_rasterizer_data, 264);
 // max count: 1
 struct s_game_globals_interface_tag_references
 {
-    tag_reference spinner;              // bitm
-    tag_reference obsolete;             // bitm
-    tag_reference screen_color_table;   // colo
-    tag_reference hud_color_table;      // colo
-    tag_reference editor_color_table;   // colo
-    tag_reference dialog_color_table;   // colo
-    tag_reference hud_globals;          // hudg
-    tag_reference motion_sensor_sweep_bitmap;       // bitm 
-    tag_reference motion_sensor_sweep_bitmap_mask;  // bitm
-    tag_reference multiplayer_hud_bitmap;           // bitm
-    tag_reference unknown_field;
-    tag_reference hud_digits_definition;        // hud#
-    tag_reference motion_sensor_blip_bitmap;    // bitm
-    tag_reference interface_goo_map_1;          // bitm
-    tag_reference interface_goo_map_2;          // bitm
-    tag_reference interface_goo_map_3;          // bitm
+    tag_reference interface_tag_references[NUMBER_OF_INTERFACE_TAGS];
     tag_reference mainmenu_ui_globals;          // wgtz
     tag_reference singleplayer_ui_globals;      // wgtz
     tag_reference multiplayer_ui_globals;       // wgtz
@@ -595,8 +581,15 @@ struct s_game_globals
 };
 ASSERT_STRUCT_SIZE(s_game_globals, 644);
 
+/* public code */
+
 s_game_globals* scenario_get_game_globals(void);
 s_ui_levels_definition* game_globals_get_ui_levels(void);
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
 
 void game_globals_apply_tag_patches(s_game_options* options);
+
+static tag_reference game_globals_get_interface_tag_reference(e_interface_tag interface_tag_index)
+{
+    return scenario_get_game_globals()->interface_tags[0]->interface_tag_references[interface_tag_index];
+}

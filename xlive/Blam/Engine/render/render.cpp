@@ -32,7 +32,6 @@ int32* get_global_window_out_leaf_index(int32 index);
 uint32* global_frame_num_get(void);
 int32* curent_window_bound_index_get(void);
 int32* global_cluster_index_get(void);
-int32* global_user_render_index_get(void);
 int32* global_leaf_index_get(void);
 bool* global_bsp_test_failed_get(void);
 bool* global_sky_active_get(void);
@@ -120,6 +119,10 @@ s_scenario_fog_result* global_fog_result_get(void)
     return Memory::GetAddress<s_scenario_fog_result*>(0x4E6818);
 }
 
+int32* global_user_render_index_get(void)
+{
+    return Memory::GetAddress<int32*>(0x4E6800);
+}
 
 uint32* global_effect_flag_get(void)
 {
@@ -245,11 +248,6 @@ int32* curent_window_bound_index_get(void)
 int32* global_cluster_index_get(void)
 {
     return Memory::GetAddress<int32*>(0x4E680C);
-}
-
-int32* global_user_render_index_get(void)
-{
-    return Memory::GetAddress<int32*>(0x4E6800);
 }
 
 int32* global_leaf_index_get(void)
@@ -460,7 +458,7 @@ void render_view(
             rasterizer_dx9_perf_event_begin("interface", NULL);
             rasterizer_dx9_set_stencil_mode(0);
             rasterizer_setup_2d_vertex_shader_user_interface_constants();
-            draw_hud();
+            hud_draw_screen();
             rasterizer_dx9_render_screen_flash();
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);
             rasterizer_dx9_perf_event_end("interface");
