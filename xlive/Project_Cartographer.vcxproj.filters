@@ -356,6 +356,7 @@
     <ClCompile Include="Blam\Engine\scenario\scenario_interpolators.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -970,6 +971,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_screen_effects.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_text.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
