@@ -120,13 +120,13 @@ void render_cartographer_status_bar(const char *build_text)
 		if (g_twizzler_status)
 		{
 			draw_string_set_format(0, 1, 0, false);
-			draw_unicode_string(&bounds, L"Anti-cheat is enabled");
+			rasterizer_draw_unicode_string(&bounds, L"Anti-cheat is enabled");
 			draw_string_set_format(0, 0, 0, false);
 		}
-		draw_unicode_string(&bounds, build_string_buffer);
+		rasterizer_draw_unicode_string(&bounds, build_string_buffer);
 		bounds.top += line_height;
 		bounds.bottom = bounds.top + line_height;
-		draw_unicode_string(&bounds, master_state_string_buffer);
+		rasterizer_draw_unicode_string(&bounds, master_state_string_buffer);
 	}
 
 	return;
@@ -151,11 +151,11 @@ void render_cartographer_git_build_info(void)
 	wchar_t result_text_buffer[1024];
 
 	swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S", __DATE__, __TIME__);
-	draw_unicode_string(&bounds, result_text_buffer);
+	rasterizer_draw_unicode_string(&bounds, result_text_buffer);
 	bounds.top += line_height;
 	bounds.bottom = bounds.top + line_height;
 	swprintf(result_text_buffer, NUMBEROF(result_text_buffer), L"%S %S branch: %S", GEN_GIT_VER_VERSION_STRING, GET_GIT_VER_USERNAME, GET_GIT_VER_BRANCH);
-	draw_unicode_string(&bounds, result_text_buffer);
+	rasterizer_draw_unicode_string(&bounds, result_text_buffer);
 #endif
 }
 
@@ -190,13 +190,13 @@ bool render_cartographer_achievement_message(const char *achivement_message)
 
 		rasterizer_get_screen_bounds(&bounds);
 		bounds.top += rectangle2d_height(&bounds) / 3 - (widget_total_height / 2);
-		draw_unicode_string(&bounds, L"Achievement Unlocked");
+		rasterizer_draw_unicode_string(&bounds, L"Achievement Unlocked");
 		bounds.top += get_text_size_from_font_cache(k_cheevo_title_font);
 
 		draw_string_set_font(k_cheevo_message_font);
-		draw_unicode_string(&bounds, cheevo_message);
+		rasterizer_draw_unicode_string(&bounds, cheevo_message);
 		bounds.top += get_text_size_from_font_cache(k_cheevo_message_font);
-		draw_unicode_string(&bounds, divider_position ? (divider_position + 1) : L"<invalid achievement description>");
+		rasterizer_draw_unicode_string(&bounds, divider_position ? (divider_position + 1) : L"<invalid achievement description>");
 	}
 	else
 	{
@@ -240,7 +240,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 
 		for (int32 line_index = 0; line_index < line_count; line_index++)
 		{
-			draw_unicode_string(&bounds, lines[line_index].get_string());
+			rasterizer_draw_unicode_string(&bounds, lines[line_index].get_string());
 			bounds.top += get_text_size_from_font_cache(k_update_status_font);
 		}
 	}
@@ -250,7 +250,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 		wchar_t update_message_buffer[256];
 		float percent_complate = 100.f * ((float)update_downloaded_bytes / update_size_bytes);
 		swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
-		draw_unicode_string(&bounds, update_message_buffer);
+		rasterizer_draw_unicode_string(&bounds, update_message_buffer);
 	}
 
 	return;
