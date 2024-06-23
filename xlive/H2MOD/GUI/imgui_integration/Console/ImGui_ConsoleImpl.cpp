@@ -148,7 +148,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 
 			if (command->CommandSetsVariable())
 			{
-				command->VarAsStr(console_data->m_completion_data->CompletionCandidate[i].CompletionVariable, 512);
+				command->VarAsStr(console_data->m_completion_data->CompletionCandidate[i].CompletionVariable, ARRAYSIZE(ImGuiTextInputCompletionCandidate::CompletionVariable));
 			}
 		}
 
