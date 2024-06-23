@@ -10,9 +10,9 @@ namespace CommandCollection
 	extern std::vector<ConsoleCommand*> commandTable;
 
 	void InsertCommand(ConsoleCommand* newCommand);
-	ConsoleVarCommand* GetVarCommandByName(const std::string& name);
+	ConsoleCommand* GetCommandByName(const std::string& name);
 	void SetVarCommandPtr(const std::string& name, IComVar* varPtr);
-	void InitializeCommandsMap();
+	void InitializeCommands();
 
 	// commands
 	int DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);

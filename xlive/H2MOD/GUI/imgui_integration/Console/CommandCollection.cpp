@@ -28,67 +28,69 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ComVarFromPtr(d3d9ex_var, bool*, &H2Config_d3d9ex,
+ComVarFromPtr(d3d9ex_var_cmd, bool*, &H2Config_d3d9ex,
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
-ComVarFromPtr(network_stats_overlay_var, bool*, &ImGuiHandler::g_network_stats_overlay,
+ComVarFromPtr(network_stats_overlay_var_cmd, bool*, &ImGuiHandler::g_network_stats_overlay,
 	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
 
-ComVarFromPtr(og_frame_limiter_var, bool*, &g_main_game_time_frame_limiter_enabled,
+ComVarFromPtr(og_frame_limiter_var_cmd, bool*, &g_main_game_time_frame_limiter_enabled,
 	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
-ComVarFromPtr(display_xyz_var, bool*, &displayXyz,
+ComVarFromPtr(display_xyz_var_cmd, bool*, &displayXyz,
 	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
 extern real32 g_rumble_factor;
-ComVarFromPtr(rumble_var, real32*, &g_rumble_factor,
+ComVarFromPtr(rumble_var_cmd, real32*, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
 // don't forget to add '_cmd' after the name, 
 // if you add a variable command created using `DECL_ComVarCommandPtr` macro
-std::vector<ConsoleCommand*> CommandCollection::commandTable = {
-	&d3d9ex_var_cmd,
-	&display_xyz_var_cmd,
-	&rumble_var_cmd,
-	&network_stats_overlay_var_cmd,
-	new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd),
-	new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd),
-	new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0,CommandCollection::LogPlayersCmd),
-	new ConsoleCommand("kick_peer", "kicks peer from network session, 1 parameter(s): <int>: peer index", 1, 1, CommandCollection::KickPeerCmd),
-	new ConsoleCommand("leave_session", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd),
-	new ConsoleCommand("is_host", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd),
-	new ConsoleCommand("map_download", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd),
-	new ConsoleCommand("reload_maps", "re-load custom map data cache into memory, 0 parameter(s)", 0, 0, CommandCollection::ReloadMapsCmd),
-	new ConsoleCommand("log_map_file_name", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd),
-	new ConsoleCommand("request_map_file", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd),
-	new ConsoleCommand("max_players", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd),
-	new ConsoleCommand("delete_object", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd),
-	new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
-		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd),
-	new ConsoleCommand("spawn_reload_command_list", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd),
-	new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden),
-	new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash),
-	new ConsoleCommand("map_name", "load a map with the following name, 1 parameter(s): <string>", 1, 1, CommandCollection::map_name),
-	new ConsoleCommand("game_difficulty", "set the difficulty when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_difficulty),
-	new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players),
-	new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer),
-	new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen),
-	new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode),
-	new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite),
-	new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect)
-};
+std::vector<ConsoleCommand*> CommandCollection::commandTable;
 
-void CommandCollection::InitializeCommandsMap()
+void CommandCollection::InitializeCommands()
 {
 	static bool InitializeCommandsMap_initialized = false;
 	if (InitializeCommandsMap_initialized) return;
 	InitializeCommandsMap_initialized = true;
 
+	InsertCommand(new ConsoleCommand(d3d9ex_var_cmd));
+	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
+	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
+	InsertCommand(new ConsoleCommand(display_xyz_var_cmd));
+	InsertCommand(new ConsoleCommand(rumble_var_cmd));
+	InsertCommand(new ConsoleCommand("help", "outputs all commands, 0 - 1 parameter(s): <string>(optional): command name", 0, 1, CommandCollection::HelpCmd));
+	InsertCommand(new ConsoleCommand("log_peers", "logs all peers to console, 0 parameter(s)", 0, 0, CommandCollection::LogPeersCmd));
+	InsertCommand(new ConsoleCommand("log_players", "logs all players to console, 0 parameter(s)", 0, 0, CommandCollection::LogPlayersCmd));
+	InsertCommand(new ConsoleCommand("kick_peer", "kicks peer from network session, 1 parameter(s): <int>: peer index", 1, 1, CommandCollection::KickPeerCmd));
+	InsertCommand(new ConsoleCommand("leave_session", "leave current session, 0 parameter(s)", 0, 0, CommandCollection::LeaveNetworkSessionCmd));
+	InsertCommand(new ConsoleCommand("is_host", "logs if you are session host or not, 0 parameter(s)", 0, 0, CommandCollection::IsSessionHostCmd));
+	InsertCommand(new ConsoleCommand("map_download", "download specified map, 1 parameter(s): <string>", 1, 1, CommandCollection::DownloadMapCmd));
+	InsertCommand(new ConsoleCommand("reload_maps", "re-load custom map data cache into memory, 0 parameter(s)", 0, 0, CommandCollection::ReloadMapsCmd));
+	InsertCommand(new ConsoleCommand("log_map_file_name", "logs selected map filename, 0 parameter(s)", 0, 0, CommandCollection::LogSelectedMapFilenameCmd));
+	InsertCommand(new ConsoleCommand("request_map_file", "requests map file name from host, 0 parameter(s)", 0, 0, CommandCollection::RequestFileNameCmd));
+	InsertCommand(new ConsoleCommand("max_players", "set maximum players that can join, 1 parameter(s): <int>", 1, 1, CommandCollection::SetMaxPlayersCmd));
+	InsertCommand(new ConsoleCommand("delete_object", "deletes an object, 1 parameter(s): <int>: object datum index", 1, 1, CommandCollection::DestroyObjectCmd));
+	InsertCommand(new ConsoleCommand("warp_fix", "(EXPERIMENTAL) increases client position update control threshold", 1, 1, CommandCollection::WarpFixCmd, CommandFlags_::CommandFlag_Hidden));
+	InsertCommand(new ConsoleCommand("log_xnet_connections", "logs the xnet connections for debugging purposes, 0 parameter(s)", 0, 0, CommandCollection::LogXNetConnectionsCmd, CommandFlags_::CommandFlag_Hidden));
+	InsertCommand(new ConsoleCommand("spawn", "spawn an object from the list, 4 - 10 parameter(s): "
+		"<string>: object name <int>: count <bool>: same team, near player <float3>: (only if near player false) position xyz, rotation (optional) ijk", 4, 10, CommandCollection::SpawnCmd));
+	InsertCommand(new ConsoleCommand("spawn_reload_command_list", "reload object ids for spawn command from file, 0 parameter(s)", 0, 0, CommandCollection::ReloadSpawnCommandListCmd));
+	InsertCommand(new ConsoleCommand("tag_inject", "injects tag into memory, 3 parameter(s): <string>: tag_name, tag_type, map_name", 3, 3, CommandCollection::InjectTagCmd, CommandFlags_::CommandFlag_Hidden));
+	InsertCommand(new ConsoleCommand("crash", "crashes the game", 0, 0, CommandCollection::Crash));
+	InsertCommand(new ConsoleCommand("map_name", "load a map with the following name, 1 parameter(s): <string>", 1, 1, CommandCollection::map_name));
+	InsertCommand(new ConsoleCommand("game_difficulty", "set the difficulty when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_difficulty));
+	InsertCommand(new ConsoleCommand("game_coop_players", "set the coop player count when using the map_load command, 1 parameter(s): <int>", 1, 1, CommandCollection::game_coop_players));
+	InsertCommand(new ConsoleCommand("game_multiplayer", "sets the multiplayer variant for the next map, 1 parameter(s): <string>", 1, 1, CommandCollection::game_multiplayer));
+	InsertCommand(new ConsoleCommand("game_splitscreen", "sets the number of multiplayer splitscreen players for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_splitscreen));
+	InsertCommand(new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode));
+	InsertCommand(new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite));
+	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
+
 	atexit([]() -> void {
 		for (auto command : commandTable)
 		{
+			delete command;
 		}
 
 		commandTable.clear();
@@ -112,14 +114,16 @@ void CommandCollection::InsertCommand(ConsoleCommand* newCommand)
 	commandTable.emplace_back(newCommand);
 }
 
-ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& name)
+ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
 {
 	std::scoped_lock lock(commandInsertMtx);
 
 	for (auto command : commandTable)
 	{
 		if (!strcmp(name.c_str(), command->GetName()))
-			return dynamic_cast<ConsoleVarCommand*>(command);
+		{
+			return command;
+		}
 	}
 
 	return nullptr;
@@ -128,10 +132,10 @@ ConsoleVarCommand* CommandCollection::GetVarCommandByName(const std::string& nam
 // in case your variable needs to be set/updated
 void CommandCollection::SetVarCommandPtr(const std::string& name, IComVar* varPtr)
 {
-	ConsoleVarCommand* varCmdPtr = GetVarCommandByName(name);
-	if (varCmdPtr != nullptr)
+	ConsoleCommand* commandPtr = GetCommandByName(name);
+	if (commandPtr != nullptr)
 	{
-		varCmdPtr->UpdateVarPtr(varPtr);
+		commandPtr->SetCommandVarPtr(varPtr);
 	}
 }
 
@@ -145,7 +149,7 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 	auto var = reinterpret_cast<ComVarT<bool*>*>(cbData.commandVar);
 
 	std::string exception;
-	if (!var->SetValFromStr(tokens[1], 10, exception))
+	if (!var->SetValFromStr(tokens[1], 0, exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
 		output->Output(StringFlag_None, "	%s", exception.c_str());
@@ -170,18 +174,18 @@ int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, Con
 int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
 	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	ComVar<real32> peerIdxVar;
+	ComVar<real32> rumbleScale;
 	std::string exception;
 
 
-	if (!peerIdxVar.SetValFromStr(tokens[1], 10, exception))
+	if (!rumbleScale.SetValFromStr(tokens[1], exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
 		output->Output(StringFlag_None, "	%s", exception.c_str());
 	}
 	else
 	{
-		g_rumble_factor = PIN(peerIdxVar.GetVal(), 0.f, 1.f);
+		g_rumble_factor = PIN(rumbleScale.GetVal(), 0.f, 1.f);
 	}
 
 	return 0;
@@ -300,7 +304,7 @@ int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, Conso
 
 	do
 	{
-		if (!peerIdxVar.SetValFromStr(tokens[1], 10, exception))
+		if (!peerIdxVar.SetValFromStr(tokens[1], 0, exception))
 		{
 			output->Output(StringFlag_None, command_error_bad_arg);
 			output->Output(StringFlag_None, "	%s", exception.c_str());
@@ -505,7 +509,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 			output->Output(StringFlag_None, "# can be only used by host");
 			break;
 		}
-		else if (!value.SetValFromStr(tokens[1], 10, exception))
+		else if (!value.SetValFromStr(tokens[1], 0, exception))
 		{
 			output->Output(StringFlag_None, command_error_bad_arg);
 			output->Output(StringFlag_None, "	%s", exception.c_str());
@@ -538,7 +542,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 	}
 
 	std::string exception;
-	if (!warpFixVar.SetValFromStr(tokens[1], 10, exception))
+	if (!warpFixVar.SetValFromStr(tokens[1], 0, exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
 		output->Output(StringFlag_None, "	%s", exception.c_str());
@@ -822,7 +826,7 @@ int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, C
 {
 	ComVar<int> difficulty;
 	std::string exception;
-	difficulty.SetValFromStr(tokens[1], 10, exception);
+	difficulty.SetValFromStr(tokens[1], 0, exception);
 
 	main_game_launch_set_difficulty(difficulty.GetVal());
 	return 0;
@@ -832,7 +836,7 @@ int CommandCollection::game_coop_players(const std::vector<std::string>& tokens,
 {
 	ComVar<int> player_count;
 	std::string exception;
-	player_count.SetValFromStr(tokens[1], 10, exception);
+	player_count.SetValFromStr(tokens[1], 0, exception);
 
 	main_game_launch_set_coop_player_count(player_count.GetVal());
 	return 0;
@@ -848,7 +852,7 @@ int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, 
 {
 	ComVar<int> player_count;
 	std::string exception;
-	player_count.SetValFromStr(tokens[1], 10, exception);
+	player_count.SetValFromStr(tokens[1], 0, exception);
 
 	main_game_launch_set_multiplayer_splitscreen_count(player_count.GetVal());
 	return 0;
@@ -858,7 +862,7 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 {
 	ComVar<int> game_mode;
 	std::string exception;
-	game_mode.SetValFromStr(tokens[1], 10, exception);
+	game_mode.SetValFromStr(tokens[1], 0, exception);
 
 	main_game_launch_set_game_mode(game_mode.GetVal());
 	return 0;

@@ -4852,7 +4852,7 @@ bool ImGui::InputTextEx(const char* label, const char* hint, char* buf, int buf_
                 ImGuiTextInputCompletionCandidate* completionData = &completion->CompletionCandidate[i];
                 strncpy(completion_candidate_display, completionData->CompletionText, sizeof(completion_candidate_display));
 
-                if (completionData->CompletionVariable != nullptr)
+                if (strnlen(completionData->CompletionVariable, IM_ARRAYSIZE(completionData->CompletionVariable) - 1) > 0)
                 {
                     strncat(completion_candidate_display, " : ", sizeof(completion_candidate_display));
                     strncat(completion_candidate_display, completionData->CompletionVariable, sizeof(completion_candidate_display));

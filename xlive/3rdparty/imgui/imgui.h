@@ -2266,7 +2266,7 @@ struct ImGuiTextInputCompletionCandidate
 {
     const char* CompletionText;
     const char* CompletionDescription; // optional
-    const char* CompletionVariable;
+    char        CompletionVariable[512];
     ImColor     CompletionTextColor;
     ImColor     CompletionDescriptionTextColor;
 };

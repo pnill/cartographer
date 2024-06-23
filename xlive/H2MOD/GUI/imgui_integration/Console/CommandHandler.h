@@ -34,9 +34,16 @@ enum CommandFlags_
     CommandFlag_SetsVariable = 1 << 1  // internal, do not set by yourself, but you can test it
 };
 
-class ConsoleCommand
+class ConsoleCommand final
 {
 public:
+    ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback,
+        CommandFlags _flags = CommandFlag_None);
+
+    ConsoleCommand(IComVar* _command_var, const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _input_callback, CommandFlags _flags = CommandFlag_None);
+
+    ~ConsoleCommand() = default;
+
     bool Hidden() const { return (m_flags & CommandFlag_Hidden) != 0;  }
     bool CommandSetsVariable() const { return (m_flags & CommandFlag_SetsVariable) != 0;  }
 
@@ -60,9 +67,18 @@ public:
 		return m_max_parameter_count;
 	}
 
-    template<typename T = void*> T GetUserData() const 
-    { 
-        return (T)m_user_data; 
+    void SetCommandVarPtr(IComVar* varPtr)
+    {
+        if (varPtr != nullptr)
+        {
+            m_flags |= CommandFlag_SetsVariable;
+        }
+        else
+        {
+            m_flags &= ~CommandFlag_SetsVariable;
+        }
+
+        m_var_ptr = varPtr;
     }
 
     CommandFlags GetFlags() const
@@ -74,52 +90,27 @@ public:
 	
     static bool ExecCommand(const char* command_line, size_t command_line_length, const std::vector<std::string>& tokens, ConsoleLog* output, ConsoleCommand* command);
    
-    ConsoleCommand(const char* _name, const char* _command_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback,
-        CommandFlags _flags = CommandFlag_None);
-
-    virtual ~ConsoleCommand() = default;
-
     // handles command line
     // returns true if command line has been handled
     static bool HandleCommandLine(const char* command_line, size_t command_line_length, ConsoleLog* context);
 
+    void VarAsStr(char* outVar, size_t outSize)
+    {
+        if (CommandSetsVariable())
+        {
+            strncpy(outVar, m_var_ptr->GetValStr().c_str(), outSize - 1);
+        }
+    }
+
 protected:
 
     CommandFlags m_flags;
-    const char* m_name;
-    const char* m_command_description;
+    char m_name[32];
+    char m_command_description[256];
     size_t m_min_parameter_count;
     size_t m_max_parameter_count;
-    void* m_user_data;
+    IComVar* m_var_ptr;
 
 private:
     ExecuteCommandCallbackT* p_exec_command_cb;
 };
-
-// this is needed because we want to display the value inside the 
-// and display it in 
-class ConsoleVarCommand final : public ConsoleCommand
-{
-public:
-    ConsoleVarCommand(const char* _name, const char* _var_description, int _min_parameter_count, int _max_parameter_count, ExecuteCommandCallbackT* _callback, IComVar* _var_ptr = nullptr, CommandFlags _flags = CommandFlag_None);
-    
-    ~ConsoleVarCommand() override = default;
-
-    void UpdateVarPtr(IComVar* varPtr)
-    {
-        m_var_ptr = varPtr;
-    }
-
-    const char* VarAsStr()
-    {
-        strncpy(m_var_str, m_var_ptr->GetValStr().c_str(), sizeof(m_var_str));
-        return m_var_str;
-    }
-
-    IComVar* m_var_ptr;
-    char m_var_str[1024];
-
-private:
-};
-
-
