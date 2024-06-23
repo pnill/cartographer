@@ -8,7 +8,7 @@
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ConsoleVarCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, Console::set_opacity_cb);
+ConsoleCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, Console::set_opacity_cb);
 
 std::string Console::windowName = "console";
 
@@ -37,7 +37,7 @@ Console::Console() :
 	}
 
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
-	console_opacity_var_cmd.UpdateVarPtr((IComVar*)&m_console_opacity);
+	console_opacity_var_cmd.SetCommandVarPtr((IComVar*)&m_console_opacity);
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
 	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, Console::clear_cb));
 }
@@ -144,12 +144,11 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 			ConsoleCommand* command = completion_commands[i];
 			memset(&console_data->m_completion_data->CompletionCandidate[i], 0, sizeof(ImGuiTextInputCompletionCandidate));
 			console_data->m_completion_data->CompletionCandidate[i].CompletionText = command->GetName();
-			console_data->m_completion_data->CompletionCandidate[i].CompletionVariable = nullptr;
 			console_data->m_completion_data->CompletionCandidate[i].CompletionDescription = command->GetDescription();
 
-			if (auto * var_command = dynamic_cast<ConsoleVarCommand*>(command))
+			if (command->CommandSetsVariable())
 			{
-				console_data->m_completion_data->CompletionCandidate[i].CompletionVariable = var_command->VarAsStr();
+				command->VarAsStr(console_data->m_completion_data->CompletionCandidate[i].CompletionVariable, ARRAYSIZE(ImGuiTextInputCompletionCandidate::CompletionVariable));
 			}
 		}
 
@@ -590,7 +589,7 @@ int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleComma
 	const ConsoleCommand* command_data = cbData.consoleCommandData;
 
 	std::string exception;
-	if (!console_data->m_console_opacity.SetValFromStr(tokens[1], 10, exception))
+	if (!console_data->m_console_opacity.SetValFromStr(tokens[1]))
 	{
 		console_data->Output(StringFlag_None, command_error_bad_arg);
 		console_data->Output(StringFlag_None, "	%s", exception.c_str());

@@ -9,8 +9,8 @@ static std::string empty = std::string();
 
 // useful macros
 #define ComVarFromPtr(_var_name, _var_type, _var_ptr, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback) \
-ComVarT<_var_type> _var_name(_var_ptr); \
-ConsoleVarCommand _var_name## _cmd(_command_name, _description, _min_parameter_count, _max_parameter_count, _callback, (IComVar*)&_var_name);
+ComVarT<_var_type> _var_name##__LINE__(_var_ptr); \
+ConsoleCommand _var_name((IComVar*)&_var_name##__LINE__, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback);
 
 class IComVar
 {
@@ -25,7 +25,71 @@ public:
 };
 
 template<typename T>
-class ComVarT : public IComVar
+class CStrToValue
+{
+public:
+	template<typename Type = T>
+	static Type ToIntegral(const std::string& str, int _Base);
+
+	template<>
+	static int ToIntegral<int>(const std::string& str, int _Base)
+	{
+		return std::stoi(str, nullptr, _Base);
+	}
+
+	template<>
+	static unsigned int ToIntegral<unsigned int>(const std::string& str, int _Base)
+	{
+		return std::stoul(str, nullptr, _Base);
+	}
+
+	template<>
+	static long ToIntegral<long>(const std::string& str, int _Base)
+	{
+		return std::stol(str, nullptr, _Base);
+	}
+
+	template<>
+	static long long ToIntegral<long long>(const std::string& str, int _Base)
+	{
+		return std::stoll(str, nullptr, _Base);
+	}
+
+	// for boolean, _Base param does nothing
+	template<>
+	static bool ToIntegral<bool>(const std::string& str, int _Base)
+	{
+		bool result = false;
+		if (str != "true"
+			&& str != "false"
+			&& str != "1"
+			&& str != "0"
+			)
+			throw std::runtime_error("error: invalid boolean format (must be true/false)");
+		else
+			result = str == "true" ? true : false;
+
+		return result;
+	}
+
+	template<typename Type = T>
+	static Type ToFloat(const std::string& str);
+
+	template<>
+	static float ToFloat<float>(const std::string& str)
+	{
+		return std::stof(str);
+	}
+
+	template<>
+	static double ToFloat<double>(const std::string& str)
+	{
+		return std::stod(str);
+	}
+};
+
+template<typename T>
+class ComVarT : public CStrToValue<T>, public IComVar
 {
 	using baseTypeT = typename std::remove_all_pointers<T>::type;
 
@@ -35,43 +99,44 @@ class ComVarT : public IComVar
 		// || !std::is_same<std::remove_all_pointers<T> const, T>::value
 		, "ComVarT: template parameter not a pointer");
 
+	baseTypeT* m_var_ptr;
 public:
-	ComVarT(baseTypeT* _value) :
-		m_var_ptr(_value)
+	// for custom types, the class should implement the equal operator overload
+	// othewise default is used
+	ComVarT(baseTypeT* ptr)
 	{
+		m_var_ptr = ptr;
 	}
 
 	virtual ~ComVarT() = default;
 
-	const baseTypeT& GetVal() const
-	{
-		return Get();
-	}
-
-	template<typename Type = baseTypeT>
-	std::string AsString()
-	{
-		return std::to_string(*m_var_ptr);
-	}
-
-	template<>
-	std::string AsString<bool>()
-	{
-		return *m_var_ptr ? "true" : "false";
-	}
-
-	std::string GetValStr() override
-	{
-		return AsString();
-	}
-
-	template<typename Type = baseTypeT>
-	bool SetValFromStr(const std::string& str, int _Base = 10, std::string& potentialException = empty)
+	template<typename Type = std::enable_if<std::is_integral<baseTypeT>::value, baseTypeT>::type>
+	bool SetValFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try
 		{
-			SetValFromStrInternal<Type>(str, _Base);
+			*m_var_ptr = ToIntegral<Type>(str, _Base);
+		}
+		catch (const std::exception& e)
+		{
+			success = false;
+			potentialException.assign(e.what());
+		}
+
+		return success;
+	}
+
+	template<typename Type = std::enable_if<std::is_floating_point<baseTypeT>::value, baseTypeT>::type>
+	bool SetValFromStr(const std::string& str, std::string& potentialException = empty);
+
+	template<>
+	bool SetValFromStr<baseTypeT>(const std::string& str, std::string& potentialException)
+	{
+		bool success = true;
+		try
+		{
+			*m_var_ptr = ToFloat<baseTypeT>(str);
 		}
 		catch (const std::exception& e)
 		{
@@ -83,78 +148,30 @@ public:
 	}
 
 	template<typename Type = baseTypeT>
-	void SetVal(const Type _val)
+	std::string AsString(Type* var) const
 	{
-		baseTypeT& val = Get();
-		val = _val;
-	}
-
-protected:
-	// variable or pointer to variable
-	baseTypeT* m_var_ptr;
-
-	template<typename Type = baseTypeT>
-	void SetValFromStrInternal(const std::string& str, int _Base = 10);
-
-	template<>
-	void SetValFromStrInternal<int>(const std::string& str, int _Base)
-	{
-		baseTypeT& val = Get();
-		val = std::stoi(str, nullptr, _Base);
+		return std::to_string(*var);
 	}
 
 	template<>
-	void SetValFromStrInternal<unsigned int>(const std::string& str, int _Base)
+	std::string AsString<bool>(bool* var) const
 	{
-		baseTypeT& val = Get();
-		val = std::stoul(str, nullptr, _Base);
+		return *var ? "true" : "false";
 	}
 
-	template<>
-	void SetValFromStrInternal<long>(const std::string& str, int _Base)
+	std::string GetValStr() override
 	{
-		baseTypeT& val = Get();
-		val = std::stol(str, nullptr, _Base);
+		return AsString(m_var_ptr);
 	}
 
-	template<>
-	void SetValFromStrInternal<long long>(const std::string& str, int _Base)
+	baseTypeT GetVal() const
 	{
-		baseTypeT& val = Get();
-		val = std::stoll(str, nullptr, _Base);
+		return *m_var_ptr;
 	}
 
-	// for floating point, _Base param does nothing
-	template<>
-	void SetValFromStrInternal<float>(const std::string& str, int _Base)
+	void SetVal(baseTypeT val)
 	{
-		baseTypeT& val = Get();
-		val = std::stof(str);
-	}
-
-	// for boolean, _Base param does nothing
-	template<>
-	void SetValFromStrInternal<bool>(const std::string& str, int _Base)
-	{
-		baseTypeT& val = Get();
-		if (str != "true" 
-			&& str != "false"
-			&& str != "1"
-			&& str != "0"
-			)
-			throw std::runtime_error("error: invalid boolean format (must be true/false)");
-		else
-			val = str == "true" ? true : false;
-	}
-
-	baseTypeT* GetPtr() const
-	{
-		return m_var_ptr;
-	}
-
-	baseTypeT& Get() const
-	{
-		return *GetPtr();
+		*m_var_ptr = val;
 	}
 };
 
@@ -166,20 +183,17 @@ class ComVar : public ComVarT<T*>
 		, "ComVar: template parameter is invalid (possibly a pointer instead of a type)");
 
 	T m_var;
+
 public:
-	// for custom types, the class should implement the equal operator overload
-	// othewise default is used
+	ComVar() :
+		ComVarT(&m_var)
+	{
+	}
+
 	ComVar(T value) :
 		ComVarT(&m_var)
 	{
 		m_var = value;
-	}
-
-	// TODO FIXME might want to set value defaults
-	// based on the type using specializations
-	ComVar() :
-		ComVarT(&m_var)
-	{
 	}
 
 	virtual ~ComVar() = default;

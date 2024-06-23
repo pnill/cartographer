@@ -129,7 +129,7 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     c_simulation_queue simulation_bookkeeping_queue, game_simulation_queue;
     c_simulation_world* sim_world = simulation_get_world();
 
-    simulation_get_globals()->world->queues_update_statistsics();
+    simulation_get_globals()->world->queues_update_statistics();
 
     // only during distributed system or server synchronous
     // but not client synchronous
@@ -236,7 +236,7 @@ void __cdecl simulation_update_pregame(void)
         }
         else
         {
-            globals->world->queues_update_statistsics();
+            globals->world->queues_update_statistics();
         }
     }
 }

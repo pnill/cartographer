@@ -764,8 +764,6 @@ void vip_lock(e_game_life_cycle state)
 	{
 		ServerConsole::ClearVip();
 		*Memory::GetAddress<byte*>(0, 0x534850) = 0;
-		//ServerConsole::SendCommand2(1, L"vip", L"clear");
-		//ServerConsole::SendCommand2(1, L"Privacy", L"Open");
 	}
 	if(state == _life_cycle_in_game)
 	{
@@ -773,9 +771,7 @@ void vip_lock(e_game_life_cycle state)
 		{
 			if (NetworkSession::PlayerIsActive(i))
 				ServerConsole::AddVip(NetworkSession::GetPlayerName(i));
-			//ServerConsole::SendCommand2(2, L"vip", L"add", NetworkSession::getPeerPlayerName(i));
 		}
-		//ServerConsole::SendCommand2(1, L"Privacy", L"VIP");
 		*Memory::GetAddress<byte*>(0, 0x534850) = 2;
 	}
 }
@@ -997,6 +993,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
