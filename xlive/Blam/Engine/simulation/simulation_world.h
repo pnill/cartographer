@@ -123,7 +123,7 @@ public:
 	void create_player(datum player_index);
 	void delete_player(datum player_index);
 
-	void queues_update_statistsics()
+	void queues_update_statistics()
 	{
 		for (int32 i = 0; i < k_simulation_queue_count; i++)
 		{
