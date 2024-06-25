@@ -16,9 +16,7 @@
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
-#if defined(GEN_GIT_VER_VERSION_STRING)
 #include "version_git.h"
-#endif
 
 /* defines */
 
@@ -137,10 +135,12 @@ void render_cartographer_git_build_info(void)
 #if defined(GEN_GIT_VER_VERSION_STRING) && defined(CARTOGRAPHER_TEST_BUILD_DRAW_TEXT) 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-	rasterizer_get_frame_bounds(&bounds);
 	const int32 line_height = get_text_size_from_font_cache(k_status_text_font);
-
+	real_argb_color text_color_console = *global_real_argb_white;
 	text_color_console.alpha = .55f;
+
+	rectangle2d bounds;
+	rasterizer_get_frame_bounds(&bounds);
 	bounds.top += (1050 * rasterizer_globals->ui_scale);
 	bounds.left = bounds.right - (765 * rasterizer_globals->ui_scale);
 	bounds.bottom = bounds.top + line_height;
