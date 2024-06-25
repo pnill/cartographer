@@ -4,7 +4,6 @@
 #include "render_first_person.h"
 #include "render_lights.h"
 #include "render_sky.h"
-#include "render_visibility_collection.h"
 
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
@@ -137,6 +136,19 @@ bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* poin
 bool frame_parameters_type_is_above_or_equal_to_7(void)
 {
     return global_frame_parameters_get()->frame_type - 5 <= 2;
+}
+
+void draw_specific_render_layer(e_collection_type collection_type, e_render_layer render_layer)
+{
+    ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
+    ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
+
+    if (render_layer != _render_layer_debug_view && prepare_render_layer(render_layer))
+    {
+        draw_render_layer();
+        reset_after_render_layer_draw();
+    }
+    return;
 }
 
 void __cdecl render_window(window_bound* window, bool is_texture_camera)

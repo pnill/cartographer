@@ -52,7 +52,9 @@ struct s_scenario_fog_result
     real_rgb_color sky_fog_color;
     real32 sky_fog_alpha;
     datum patchy_fog_tag_index;
-    int8 gap_6C[38];
+    int8 gap_6C[24];
+    real_bounds field_88;
+    int8 gap_90[8];
     bool field_96;
     bool field_97;
     bool sort_behind_transparents;

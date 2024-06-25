@@ -357,6 +357,9 @@
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_text.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_primitive.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_section_visibility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -972,6 +975,9 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_text.h" />
+    <ClInclude Include="Blam\Engine\render\render_layers.h" />
+    <ClInclude Include="Blam\Engine\render\render_primitive.h" />
+    <ClInclude Include="Blam\Engine\render\render_section_visibility.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_templates.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_passes.h" />
     <ClInclude Include="Blam\Engine\shaders\pixel_shader.h" />

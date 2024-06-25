@@ -3,6 +3,7 @@
 #include "RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
+// TODO: remove all this code
 
 bool ras_layer_overrides[RenderHooks::end];
 bool geo_render_overrides[24];
