@@ -20,7 +20,7 @@
 
 /* defines */
 
-// define this to enable queueing a test message in render_cartographer_achievements
+// define this to enable queueing a test message in render_cartographer_achievement_message
 //#define ACHIVEMENT_RENDER_DEBUG_ENABLED
 
 // define this to render git branch information (if GEN_GIT_VER_VERSION_STRING is defined)
