@@ -4,11 +4,11 @@
 #include "render/render_cartographer_ingame_ui.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 
-/* -------- prototypes */
+/*  prototypes */
 
 void main_render_hook(void);
 
-/* -------- public code */
+/* public code */
 
 void main_render_apply_patches(void)
 {
@@ -18,7 +18,7 @@ void main_render_apply_patches(void)
 	return;
 }
 
-/* -------- private code */
+/* private code */
 
 void main_render_hook(void)
 {

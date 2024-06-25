@@ -1,7 +1,7 @@
 #pragma once
 #include "math/color_math.h"
 
-/* -------- prototypes */
+/* prototypes */
 
 void __cdecl draw_string_get_color(real_argb_color* color);
 void __cdecl draw_string_set_color(real_argb_color const* color);

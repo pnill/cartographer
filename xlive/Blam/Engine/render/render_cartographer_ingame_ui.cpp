@@ -20,7 +20,7 @@
 #include "version_git.h"
 #endif
 
-/* -------- defines */
+/* defines */
 
 // define this to enable queueing a test message in render_cartographer_achievements
 //#define ACHIVEMENT_RENDER_DEBUG_ENABLED
@@ -28,7 +28,7 @@
 // define this to render git branch information (if GEN_GIT_VER_VERSION_STRING is defined)
 //#define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
 
-/* -------- constants */
+/* constants */
 
 enum
 {
@@ -39,14 +39,14 @@ enum
 	k_cheevo_display_lifetime = (5 * k_shell_time_msec_denominator),
 };
 
-/* -------- prototypes */
+/* prototypes */
 
 static void render_cartographer_status_bar(const char* build_text);
 static void render_cartographer_git_build_info(void);
 static bool render_cartographer_achievement_message(const char* achivement_message);
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
 
-/* -------- public code */
+/* public code */
 
 void render_cartographer_ingame_ui(void)
 {
@@ -87,7 +87,7 @@ void render_cartographer_ingame_ui(void)
 	return;
 }
 
-/* -------- private code */
+/* private code */
 
 void render_cartographer_status_bar(const char *build_text)
 {

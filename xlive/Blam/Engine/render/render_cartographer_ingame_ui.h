@@ -1,5 +1,5 @@
 #pragma once
 
-/* -------- public code */
+/* public code */
 
 void render_cartographer_ingame_ui(void);
