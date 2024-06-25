@@ -54,3 +54,9 @@ struct tag_block
 	}
 };
 ASSERT_STRUCT_SIZE(tag_block<>, 8);
+
+struct s_tag_block_index
+{
+	int16 count;
+};
+ASSERT_STRUCT_SIZE(s_tag_block_index, 2);

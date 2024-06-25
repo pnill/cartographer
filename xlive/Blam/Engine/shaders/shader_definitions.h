@@ -47,10 +47,10 @@ enum e_shader_lightmap_type : int16
 
 enum e_shader_parameter_type : int16
 {
-	_shader_parameter_bitmap,
-	_shader_parameter_value,
-	_shader_parameter_color,
-	_shader_parameter_switch
+	_shader_parameter_type_bitmap = 0,
+	_shader_parameter_type_value = 1,
+	_shader_parameter_type_color = 2,
+	_shader_parameter_type_switch = 3
 };
 
 enum e_shader_animation_property_type : int16

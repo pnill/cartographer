@@ -112,17 +112,6 @@ namespace TagFixes
 			}
 		}
 
-		//Hacky thingy for flags in the light tagblock
-		//Should Prob Remove when a better solution is found
-		//Apparently this is the best solution?????
-		template<class T> inline T operator~ (T a) { return (T)~(int)a; }
-		template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
-		template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
-		template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
-		template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
-		template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
-		template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
-
 		void light_framerate_killer()
 		{
 			auto lights = tags::find_tags(_tag_group_light);
@@ -131,9 +120,9 @@ namespace TagFixes
 				auto light = tags::get_tag_fast<light_definition>(light_item.first);
 				// Disabled since it caused issues where certain lights wouldnt render randomly
 				// TODO figure out why it does this at some other point in time
-				// light->flags |= _light_definition_no_illumination_light_framerate_killer;
+				// light->flags.set(_light_definition_light_framerate_killer, true);
 
-				light->flags |= _light_definition_no_illumination_multiplayer_override;
+				light->flags.set(_light_definition_multiplayer_override, true);
 			}
 		}
 

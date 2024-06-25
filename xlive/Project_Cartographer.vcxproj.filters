@@ -972,6 +972,10 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_text.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_templates.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_passes.h" />
+    <ClInclude Include="Blam\Engine\shaders\pixel_shader.h" />
+    <ClInclude Include="Blam\Engine\shaders\vertex_shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -1031,8 +1031,12 @@
     <ClInclude Include="Blam\Engine\scenario\scenario_fog.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_interpolators.h" />
     <ClInclude Include="Blam\Engine\scenario\scenario_kill_trigger_volumes.h" />
+    <ClInclude Include="Blam\Engine\shaders\pixel_shader.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_definitions.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_passes.h" />
     <ClInclude Include="Blam\Engine\shaders\shader_postprocess_definitions.h" />
+    <ClInclude Include="Blam\Engine\shaders\shader_templates.h" />
+    <ClInclude Include="Blam\Engine\shaders\vertex_shader.h" />
     <ClInclude Include="Blam\Engine\shell\shell.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows.h" />
     <ClInclude Include="Blam\Engine\shell\shell_windows_internals.h" />
