@@ -365,7 +365,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
 
         rasterizer_dx9_render_fullscreen_overlay_geometry(p_rect, 0, rasterizer_fullscreen_effects_build_vertex_buffer_cb, 0, 0, 1, true);
         rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, render_state);
-        rasterizer_dx9_set_texture(0, NULL);
+        rasterizer_dx9_device_set_texture(0, NULL);
         rasterizer_dx9_set_target(_rasterizer_target_render_primary, 0, true);
     }
     return;

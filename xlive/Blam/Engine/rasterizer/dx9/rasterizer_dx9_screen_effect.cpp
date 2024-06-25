@@ -48,7 +48,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 	// Removes textures staged from previously drawing the first person geometry
 	for (uint8 i = 0; i < 8; i++)
 	{
-		rasterizer_dx9_set_texture(i, NULL);
+		rasterizer_dx9_device_set_texture(i, NULL);
 	}
 
 	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
