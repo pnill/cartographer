@@ -26,7 +26,7 @@
 //#define ACHIVEMENT_RENDER_DEBUG_ENABLED
 
 // define this to render git branch information (if GEN_GIT_VER_VERSION_STRING is defined)
-//#define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
+#define CARTOGRAPHER_TEST_BUILD_DRAW_TEXT
 
 /* constants */
 
@@ -248,7 +248,7 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	if (update_size_bytes > 0)
 	{
 		wchar_t update_message_buffer[256];
-		float percent_complate = 100.f * ((float)update_downloaded_bytes / update_size_bytes);
+		real32 percent_complate = 100.f * ((real32)update_downloaded_bytes / update_size_bytes);
 		swprintf_s(update_message_buffer, NUMBEROF(update_message_buffer), L"(progress: %.2f%%)", percent_complate);
 		rasterizer_draw_unicode_string(&bounds, update_message_buffer);
 	}
