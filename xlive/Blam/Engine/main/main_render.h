@@ -1,5 +1,5 @@
 #pragma once
 
-/* public code */
+/* prototypes */
 
 void main_render_apply_patches(void);
