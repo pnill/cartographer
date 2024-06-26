@@ -26,7 +26,7 @@ bool g_use_gel_map_bitmap = true;
 void __fastcall c_shader_submission_interface_new__stage_texture(
     c_shader_submission_interface_new* _this,
     uint32 _edx,
-    uint32 texture_stage_index,
+    int16 stage,
     e_shader_pass_texture_source_extern bitmap_extern_index,
     uint32* res_x,
     uint32* res_y
@@ -41,7 +41,7 @@ void rasterizer_dx9_shader_submit_new_apply_patches(void)
 }
 
 void c_shader_submission_interface_new::stage_texture(
-    uint32 texture_stage_index,
+    int16 stage,
     e_shader_pass_texture_source_extern bitmap_extern_index,
     uint32* res_x,
     uint32* res_y)
@@ -68,53 +68,52 @@ void c_shader_submission_interface_new::stage_texture(
         switch (bitmap_extern_index)
         {
         case _shader_pass_texture_source_extern_global_vector_normalization:
-            rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->vector_normalization.index, 0, 0.f);
+            rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->vector_normalization.index, 0, 0.f);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_unused_2:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_1);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_texaccum:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_1);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
             rasterizer_target_get_resolution(_rasterizer_target_1, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_utility_buffer:
             DISPLAY_ASSERT("shader uses utility buffer but it no longer exists");
-            rasterizer_dx9_device_set_texture(texture_stage_index, NULL);
+            rasterizer_dx9_device_set_texture(stage, NULL);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_frame_buffer:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, *rasterizer_dx9_main_render_target_get());
+            rasterizer_dx9_set_target_as_texture(stage, *rasterizer_dx9_main_render_target_get());
             rasterizer_target_get_resolution(*rasterizer_dx9_main_render_target_get(), res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_z:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_backbuffer);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_backbuffer);
             rasterizer_target_get_resolution(_rasterizer_target_backbuffer, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_shadow:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_shadow);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_shadow);
             rasterizer_target_get_resolution(_rasterizer_target_shadow, res_x, res_y);
-            continue_staging = false;
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_light_falloff:
-            rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->distance_attenuation.index, 0, 0.f);
+            rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->distance_attenuation.index, 0, 0.f);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_light_gel:
             light_def = current_light_definition_get();
             if (!light_type_is_spherical(current_lght_type_get()) && light_def)
             {
-                if (light_def->flags.test(_light_definition_texture_camera_gel))
+                if (!light_def->flags.test(_light_definition_texture_camera_gel))
                 {
                     if (light_def->shader.index == NONE|| rasterizer_rendering_light_get())
                     {
                         rasterizer_dx9_set_texture(
-                            texture_stage_index,
+                            stage,
                             _bitmap_type_2d,
                             1,
                             (g_use_gel_map_bitmap ? light_def->gel_map.index : NONE),
@@ -123,12 +122,14 @@ void c_shader_submission_interface_new::stage_texture(
                     }
                     else
                     {
-                        rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_shadow_alias_swizzled);
+                        rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_shadow_alias_swizzled);
                     }
                     continue_staging = false;
-                    break;
                 }
-                bitmap_extern_index = _shader_pass_texture_source_extern_global_texture_camera;
+                else
+                {
+                    bitmap_extern_index = _shader_pass_texture_source_extern_global_texture_camera;
+                }
                 break;
             }
 
@@ -142,18 +143,18 @@ void c_shader_submission_interface_new::stage_texture(
             }
 #endif
 
-            rasterizer_dx9_set_texture(texture_stage_index, _bitmap_type_2d, 1, NONE, 0, 0.f);
+            rasterizer_dx9_set_texture(stage, _bitmap_type_2d, 1, NONE, 0, 0.f);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_unused_12:
             if (light_type_is_spherical(current_lght_type_get()))
             {
-                rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->distance_attenuation.index, 0, 0.f);
+                rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->distance_attenuation.index, 0, 0.f);
             }
             else
             {
                 rasterizer_dx9_set_texture(
-                    texture_stage_index,
+                    stage,
                     _bitmap_type_2d,
                     1,
                     (g_use_gel_map_bitmap ? current_light_definition_get()->gel_map.index : NONE),
@@ -163,20 +164,20 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_shadow_buffer:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_shadow_buffer);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_shadow_buffer);
             rasterizer_target_get_resolution(_rasterizer_target_shadow_buffer, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_gradient_separate:
-            rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->gradients.index, g_use_secondary_gradient_index ? 2 : 0, 0.f);
+            rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->gradients.index, g_use_secondary_gradient_index ? 2 : 0, 0.f);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_gradient_product:
-            rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->gradients.index, (2 * g_use_secondary_gradient_index) + 1, 0.f);
+            rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->gradients.index, (2 * g_use_secondary_gradient_index) + 1, 0.f);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_hud_bitmap:
-            rasterizer_dx9_set_texture_direct(texture_stage_index, hud_bitmap_tag_index_get(), hud_bitmap_data_index_get(), 0.0);
+            rasterizer_dx9_set_texture_direct(stage, hud_bitmap_tag_index_get(), hud_bitmap_data_index_get(), 0.0);
             
             if (hud_bitmap_tag_index_get() != NONE)
             {
@@ -193,7 +194,7 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_active_camo:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_active_camo);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_active_camo);
             rasterizer_target_get_resolution(_rasterizer_target_active_camo, res_x, res_y);
             continue_staging = false;
             break;
@@ -201,32 +202,32 @@ void c_shader_submission_interface_new::stage_texture(
             target = rasterizer_dx9_get_overlay_destination_target();
             if (global_window_parameters_get()->is_texture_camera || target == _rasterizer_target_none)
             {
-                rasterizer_dx9_set_texture_direct(texture_stage_index, rasterizer_globals_get_data()->default_textures[_bitmap_type_2d].index, 0, 0.f);
+                rasterizer_dx9_set_texture_direct(stage, rasterizer_globals_get_data()->default_textures[_bitmap_type_2d].index, 0, 0.f);
             }
             else
             {
-                rasterizer_dx9_set_target_as_texture(texture_stage_index, target);
+                rasterizer_dx9_set_target_as_texture(stage, target);
                 rasterizer_target_get_resolution(target, res_x, res_y);
             }
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_water_reflection:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_water_reflection);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_water_reflection);
             rasterizer_target_get_resolution(_rasterizer_target_water_reflection, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_water_refraction:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_water_refraction);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_water_refraction);
             rasterizer_target_get_resolution(_rasterizer_target_water_refraction, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_aux1:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_shadow_alias_swizzled);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_shadow_alias_swizzled);
             rasterizer_target_get_resolution(_rasterizer_target_shadow_alias_swizzled, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_aux2:
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_sun_glow_secondary);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_sun_glow_secondary);
             rasterizer_target_get_resolution(_rasterizer_target_sun_glow_secondary, res_x, res_y);
             continue_staging = false;
             break;
@@ -240,7 +241,7 @@ void c_shader_submission_interface_new::stage_texture(
                 NULL,
                 D3DTEXF_LINEAR);
 
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_particle_distortion);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_particle_distortion);
             rasterizer_target_get_resolution(_rasterizer_target_particle_distortion, res_x, res_y);
             continue_staging = false;
             break;
@@ -255,12 +256,12 @@ void c_shader_submission_interface_new::stage_texture(
                 target == _rasterizer_target_convolution_scratch2 ||
                 target == _rasterizer_target_active_camo)
             {
-                rasterizer_dx9_set_target_as_texture(texture_stage_index, target);
+                rasterizer_dx9_set_target_as_texture(stage, target);
                 rasterizer_target_get_resolution(target, res_x, res_y);
             }
             else
             {
-                rasterizer_dx9_set_target_as_texture(texture_stage_index, _rasterizer_target_1);
+                rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
             }
             continue_staging = false;
             break;
@@ -280,13 +281,13 @@ void c_shader_submission_interface_new::stage_texture(
             }
 
             bitmap = pp_def->bitmap_get(bitmap_index);
-            rasterizer_dx9_set_texture_direct(texture_stage_index, bitmap->bitmap_group, bitmap->bitmap_index, 0.f);
+            rasterizer_dx9_set_texture_direct(stage, bitmap->bitmap_group, bitmap->bitmap_index, 0.f);
             continue_staging = false;
             break;
 
         case _shader_pass_texture_source_extern_firstperson_scope:
             target = (*rendering_fp_weapon_get() ? _rasterizer_target_sun_glow_primary : _rasterizer_target_active_camo);
-            rasterizer_dx9_set_target_as_texture(texture_stage_index, target);
+            rasterizer_dx9_set_target_as_texture(stage, target);
             rasterizer_target_get_resolution(target, res_x, res_y);
             continue_staging = false;
             break;
@@ -317,12 +318,12 @@ void __cdecl rasterizer_shader_level_of_detail_bias_update(void)
 void __fastcall c_shader_submission_interface_new__stage_texture(
     c_shader_submission_interface_new* _this,
     uint32 _edx,
-    uint32 texture_stage_index,
+    int16 stage,
     e_shader_pass_texture_source_extern bitmap_extern_index,
     uint32* res_x,
     uint32* res_y
 )
 {
-    _this->stage_texture(texture_stage_index, bitmap_extern_index, res_x, res_y);
+    _this->stage_texture(stage, bitmap_extern_index, res_x, res_y);
     return;
 }
