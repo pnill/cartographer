@@ -43,13 +43,8 @@ bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_ren
             e_rasterizer_target render_target = *rasterizer_dx9_main_render_target_get();
             IDirect3DSurface9* render_surface = rasterizer_dx9_get_render_target_surface(render_target, 0);
 
-            const s_frame* global_window_parameters = global_window_parameters_get();
-            int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-            int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-            int16 left = global_window_parameters->camera.viewport_bounds.left;
-            int16 top = global_window_parameters->camera.viewport_bounds.top;
-
-            const RECT rect = { left, top, width + left, height + top };
+            RECT rect;
+            rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
             rasterizer_dx9_device_get_interface()->StretchRect(render_surface, &rect, surface, NULL, D3DTEXF_LINEAR);
         }
         *rasterizer_water_refraction_surface_updated = true;

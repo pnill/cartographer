@@ -55,19 +55,10 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 	rasterizer_dx9_reset_depth_buffer();
 
 	const s_frame* global_window_parameters = global_window_parameters_get();
+	
+	RECT rect;
+	rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
 
-	int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-	int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-	int16 left = global_window_parameters->camera.viewport_bounds.left;
-	int16 top = global_window_parameters->camera.viewport_bounds.top;
-
-	const RECT rect =
-	{
-		left,
-		top,
-		left + width,
-		top + height
-	};
 
 	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 	dx9_globals->global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
@@ -156,6 +147,9 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 
 		if (global_scenario->screen_effect_references.count > 0)
 		{
+			int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+			int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+
 			real32 x = -0.5f / width;
 			real32 y = -0.5f / height;
 

@@ -52,15 +52,15 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 	// Copy render primary viewport to active camo
 	// Make sure to create a rect so that only the content in the viewport is copied over rather than the whole screen
 	{
-		const s_frame* global_window_parameters = global_window_parameters_get();
-		const int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-		const int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-		const int16 left = global_window_parameters->camera.viewport_bounds.left;
-		const int16 top = global_window_parameters->camera.viewport_bounds.top;
-		const RECT rect = { left, top, width + left, height + top };
+		RECT rect;
+		rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
 
-		IDirect3DSurface9* main_mip_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_active_camo);
-		rasterizer_dx9_device_get_interface()->StretchRect(rasterizer_dx9_main_globals_get()->global_d3d_surface_render_primary, &rect, main_mip_surface, NULL, D3DTEXF_LINEAR);
+		rasterizer_dx9_device_get_interface()->StretchRect(
+			rasterizer_dx9_main_globals_get()->global_d3d_surface_render_primary,
+			&rect,
+			rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_active_camo),
+			NULL,
+			D3DTEXF_LINEAR);
 	}
 
 
@@ -123,17 +123,18 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 	// Copy render primary viewport to active camo
 	// Make sure to create a rect so that only the content in the viewport is copied over rather than the whole screen
 	{
-		const s_frame* global_window_parameters = global_window_parameters_get();
-		const int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-		const int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-		const int16 left = global_window_parameters->camera.viewport_bounds.left;
-		const int16 top = global_window_parameters->camera.viewport_bounds.top;
-		const RECT rect = { left, top, width + left, height + top };
+		RECT rect;
+		rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
 
 		IDirect3DSurface9* main_mip_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_active_camo);
 		IDirect3DSurface9* render_target_surface = rasterizer_dx9_get_render_target_surface(*rasterizer_dx9_main_render_target_get(), 0);
 
-		rasterizer_dx9_device_get_interface()->StretchRect(render_target_surface, &rect, main_mip_surface, NULL, D3DTEXF_LINEAR);
+		rasterizer_dx9_device_get_interface()->StretchRect(
+			render_target_surface,
+			&rect,
+			main_mip_surface,
+			NULL,
+			D3DTEXF_LINEAR);
 	}
 
 	render_section_visibility_compute(0, flags | 0xFFFFFFCF, model_group_index, NONE, 0, NONE, 0, true);

@@ -5,7 +5,9 @@
 
 /* constants */
 
+#ifndef NDEBUG
 #define D3D9_PERF_EVENTS
+#endif
 
 /* globals */
 

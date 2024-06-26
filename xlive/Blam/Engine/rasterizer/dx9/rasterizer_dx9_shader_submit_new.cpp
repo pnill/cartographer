@@ -232,7 +232,7 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_particle_distortion:
-            rectangle2d_to_rect(&global_window_parameters_get()->camera.window_bounds, &rect);
+            rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
 
             rasterizer_dx9_device_get_interface()->StretchRect(
                 rasterizer_dx9_main_globals_get()->global_d3d_surface_render_primary,

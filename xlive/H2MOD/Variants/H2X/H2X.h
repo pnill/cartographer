@@ -8,7 +8,7 @@ namespace H2X
 
 	struct h2x_mod_info
 	{
-		std::string tag_string;
+		char tag_string[64];
 		float h2x_rate_of_fire; // on 60 tick
 		float original_rate_of_fire;
 		int barrel_data_block_index;
