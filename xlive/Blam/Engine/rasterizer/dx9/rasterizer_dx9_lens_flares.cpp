@@ -29,7 +29,7 @@ void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void);
 bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* rect);
 e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target);
 void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target);
-e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count);
+e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count);
 
 /* public code */
 
@@ -93,14 +93,14 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_vertex_shader_permutation(10);
 
-            int16 viewport_middle_x = viewport_width / 2;
-            int16 viewport_middle_y = viewport_height / 2;
+            real32 viewport_middle_x = viewport_width / 2;
+            real32 viewport_middle_y = viewport_height / 2;
 
             RECT rect;
-            rect.left = viewport_left + (viewport_width * sun_surface_quad.x0 / 2.f + viewport_middle_x);
-            rect.top = viewport_bottom - (viewport_height * sun_surface_quad.y1 / 2.f + viewport_middle_y);
-            rect.right = viewport_left + (viewport_width * sun_surface_quad.x1 / 2.f + viewport_middle_x);
-            rect.bottom = viewport_bottom - (viewport_height * sun_surface_quad.y0 / 2.f + viewport_middle_y);
+            rect.left = viewport_left + (viewport_width * sun_surface_quad.x0 / 2.0f + viewport_middle_x);
+            rect.top = viewport_bottom - (viewport_height * sun_surface_quad.y1 / 2.0f + viewport_middle_y);
+            rect.right = viewport_left + (viewport_width * sun_surface_quad.x1 / 2.0f + viewport_middle_x);
+            rect.bottom = viewport_bottom - (viewport_height * sun_surface_quad.y0 / 2.0f + viewport_middle_y);
 
             // Make sure we limit the rect to within the bounds of the viewport
             // Without this the StretchRect call to copy to the sun target will fail
@@ -172,8 +172,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
             // this definitely needs a helper function to pass just the rasterizer_target surfaces from the enum
             // and posibly the size to be copied with the rects
-            rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
-            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
+            rasterizer_dx9_perf_event_begin("copy_to_sun_glow_secondary", NULL);
+            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_secondary, NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
             // FIXME
@@ -183,10 +183,18 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
 
-            rasterizer_dx9_perf_event_end("copy_to_sun_glow_primary");
+            rasterizer_dx9_perf_event_end("copy_to_sun_glow_secondary");
 
             rasterizer_dx9_perf_event_begin("sun_glow_convolve", NULL);
-            e_rasterizer_target target = rasterizer_dx9_sun_glow_convolve(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
+
+            // ### TODO FIXME does not work properly
+            // e_rasterizer_target target = rasterizer_dx9_convolve_surfaces_original(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
+
+            e_rasterizer_target target = rasterizer_dx9_convolve_screen_surfaces(
+                1.0f, 1.0f, 0.0f, 
+                _rasterizer_target_sun_glow_secondary, _rasterizer_target_sun_glow_primary, _rasterizer_target_none, _rasterizer_target_none, 
+                1, 0, 1.0f, 1.0f
+            );
             rasterizer_dx9_perf_event_end("sun_glow_convolve");
 
             // render the sun on the actual output surface
@@ -364,7 +372,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
     return;
 }
 
-e_rasterizer_target rasterizer_dx9_sun_glow_convolve(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count)
+e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count)
 {
     ASSERT(VALID_INDEX(primary_target, k_rasterizer_target_count));
     ASSERT(VALID_INDEX(secondary_target, k_rasterizer_target_count));

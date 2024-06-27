@@ -284,7 +284,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	bool cluster_overflow = false;
 	if (object->object_flags.test(_object_cinematic_visibility_bit))
 	{
-		memset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 31) / 32));
+		csmemset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 31) / 32));
 		p_cluster_bitvector = cluster_bitvector;
 	}
 
