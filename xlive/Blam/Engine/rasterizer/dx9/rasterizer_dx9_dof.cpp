@@ -50,15 +50,15 @@ e_rasterizer_target rasterizer_dx9_convolve_screen_surfaces(
 {
     e_rasterizer_target source_target = source;
     e_rasterizer_target stretch = (stretch_source == _rasterizer_target_none ? source : stretch_source);
-    real32 acc = 0.f;
+    real32 accum = 0.f;
 
     if (a1 > 0.f)
     {
         e_rasterizer_target dst = destination;
         do
         {
-            real32 res = a1 - acc;
-            res = PIN(res, 0.f, 1.f);
+            real32 res = a1 - accum;
+            res = MIN(res, 1.f);
 
             if (res > 0.f)
             {
@@ -70,9 +70,9 @@ e_rasterizer_target rasterizer_dx9_convolve_screen_surfaces(
                 dst = temp;
             }
             a2 *= (1.f - a3 + a3 + a3);
-            acc += 1.f;
+            accum += 1.f;
         }
-        while (acc < a1);
+        while (accum < a1);
     }
 
     if (stretch_destination != source_target && stretch_destination != _rasterizer_target_none)

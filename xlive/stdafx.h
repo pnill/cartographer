@@ -39,6 +39,9 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <psapi.h>
 #include <TlHelp32.h>
 
+// initialize GUIDs locally
+#include <initguid.h>
+
 // game input
 #include <xinput.h>
 #include <dinput.h>
@@ -51,6 +54,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 //#include <Objbase.h>
 //#include <Shlwapi.h>
 #include <set>
+#include <unordered_set>
 #include <map>
 #include <mutex>
 #include <queue>
