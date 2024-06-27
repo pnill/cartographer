@@ -16,6 +16,8 @@
 #include "saved_games/saved_film.h"
 #include "shell/shell.h"
 #include "simulation/simulation.h"
+#include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 
 s_game_systems* get_game_systems()
@@ -216,6 +218,20 @@ bool __cdecl main_events_pending(void)
     return INVOKE(0x396B1, 0x411D0, main_events_pending);
 }
 
+typedef void (__cdecl *t_main_loop_process_global_state_changes)();
+t_main_loop_process_global_state_changes p_main_loop_process_global_state_changes;
+
+void __cdecl main_loop_process_global_state_changes_hook()
+{
+    IDirect3DDevice9* d3d_device = rasterizer_dx9_device_get_interface();
+
+    if (d3d_device && FAILED(d3d_device->TestCooperativeLevel()))
+    {
+        rasterizer_globals_get()->reset_screen = true;
+    }
+	p_main_loop_process_global_state_changes();
+}
+
 void __cdecl game_tick(void)
 {
     INVOKE(0x4A4AF, 0x4372D, game_tick);
@@ -318,6 +334,13 @@ void game_apply_pre_winmain_patches(void)
         p_game_frame = Memory::GetAddress<game_frame_t>(0x48CDC, 0x41F7D);
 
         PatchCall(Memory::GetAddress(0x39D45, 0xC0D4), game_frame);
+
+        // main_loop_process_global_state
+        // nop cmp
+        NopFill(Memory::GetAddress(0x3978B), 2);
+        // then force jmp
+        WriteValue(Memory::GetAddress(0x3978D), (uint8)0xEB);
+        DETOUR_ATTACH(p_main_loop_process_global_state_changes, Memory::GetAddress<t_main_loop_process_global_state_changes>(0x39783), main_loop_process_global_state_changes_hook);
     }
     return;
 }
