@@ -174,6 +174,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             // and posibly the size to be copied with the rects
             rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
             global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
+            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_secondary, NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
             // FIXME
