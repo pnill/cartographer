@@ -172,8 +172,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             // copy the surface drawn with the mask on it, also by specifying the size to be copied from the src surface
             // this definitely needs a helper function to pass just the rasterizer_target surfaces from the enum
             // and posibly the size to be copied with the rects
-            rasterizer_dx9_perf_event_begin("copy_to_sun_glow_secondary", NULL);
-            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_secondary, NULL, D3DTEXF_LINEAR);
+            rasterizer_dx9_perf_event_begin("copy_to_sun_glow_primary", NULL);
+            global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_sun_glow_primary, NULL, D3DTEXF_LINEAR);
 
             // These are currently broken...
             // FIXME
@@ -183,18 +183,17 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
 
-            rasterizer_dx9_perf_event_end("copy_to_sun_glow_secondary");
+            rasterizer_dx9_perf_event_end("copy_to_sun_glow_primary");
 
             rasterizer_dx9_perf_event_begin("sun_glow_convolve", NULL);
 
-            // ### TODO FIXME does not work properly
-            // e_rasterizer_target target = rasterizer_dx9_convolve_surfaces_original(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
+            e_rasterizer_target target = rasterizer_dx9_convolve_surfaces_original(_rasterizer_target_sun_glow_primary, _rasterizer_target_sun_glow_secondary, 4);
 
-            e_rasterizer_target target = rasterizer_dx9_convolve_screen_surfaces(
+           /*e_rasterizer_target target = rasterizer_dx9_convolve_screen_surfaces(
                 1.0f, 1.0f, 0.0f, 
                 _rasterizer_target_sun_glow_secondary, _rasterizer_target_sun_glow_primary, _rasterizer_target_none, _rasterizer_target_none, 
                 1, 0, 1.0f, 1.0f
-            );
+            );*/
             rasterizer_dx9_perf_event_end("sun_glow_convolve");
 
             // render the sun on the actual output surface
