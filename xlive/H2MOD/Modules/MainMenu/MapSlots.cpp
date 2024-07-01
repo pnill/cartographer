@@ -4,7 +4,6 @@
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
 
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "Util/filesys.h"
 
@@ -202,15 +201,15 @@ namespace MapSlots
 		if (!AddedMaps.empty())
 		{
 			////Load all the added maps bitmaps
-			//LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
-			//for (const auto& item : BitmapsToLoad)
-			//{
-			//	tag_injection_set_active_map(item.second.c_str());
-			//	tag_injection_load(_tag_group_bitmap, item.first, false);
-			//	tag_injection_inject();
-			//}
+			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
+			for (const auto& item : BitmapsToLoad)
+			{
+				tag_injection_set_active_map(item.second.c_str());
+				tag_injection_load(_tag_group_bitmap, item.first, false);
+				tag_injection_inject();
+			}
 
-			//add_new_multiplayer_map_slots_game();
+			add_new_multiplayer_map_slots_game();
 		}
 
 		return;

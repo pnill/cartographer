@@ -11,7 +11,7 @@
 #include "main/level_definitions.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 
 /* macro defines */
@@ -690,15 +690,14 @@ void c_screen_squad_settings::apply_instance_patches()
 
 void c_screen_squad_settings::apply_patches_on_map_load()
 {
-	datum xbox_live_bitmap_datum = tag_loader::Get_tag_datum("ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live", _tag_group_bitmap, "mainmenu_bitmaps");
+	tag_injection_set_active_map("mainmenu_bitmaps");
+	datum xbox_live_bitmap_datum = tag_injection_load(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live", true);
 
-	if (!DATUM_IS_NONE(xbox_live_bitmap_datum))
+	if (xbox_live_bitmap_datum != NONE)
 	{
-		tag_loader::Load_tag(xbox_live_bitmap_datum, true, "mainmenu_bitmaps");
-		tag_loader::Push_Back();
-		new_xbox_live_bitmap_datum = tag_loader::ResolveNewDatum(xbox_live_bitmap_datum);
+		tag_injection_inject();
+		new_xbox_live_bitmap_datum = tag_injection_resolve_cache_datum(xbox_live_bitmap_datum);
 		LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
-
 	}
 	else
 	{

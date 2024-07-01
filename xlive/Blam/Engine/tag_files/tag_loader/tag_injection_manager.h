@@ -49,6 +49,7 @@ public:
 	void init_directories();
 
 	void set_base_map_tag_data_size(uint32 size);
+	uint32 get_base_map_tag_data_size() const;
 	void set_instance_table(tags::tag_instance* table);
 
 	uint16 get_entry_count() const;
@@ -66,7 +67,7 @@ public:
 	c_xml_definition_agent* get_agent(tag_group type);
 
 	datum load_tag(e_tag_group group, const char* tag_name, bool load_dependencies);
-	datum load_tag(e_tag_group group, datum tag_name, bool load_dependencies);
+	datum load_tag(e_tag_group group, datum cache_datum, bool load_dependencies);
 	static void load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum, bool load_dependencies);
 
 	void inject_tags();

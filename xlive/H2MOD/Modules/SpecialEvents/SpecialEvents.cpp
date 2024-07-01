@@ -11,7 +11,6 @@
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 // Enables event if the current date and time line up with an event time

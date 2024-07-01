@@ -2,9 +2,9 @@
 #include "tag_injection_table.h"
 
 #define lazy_malloc_buffer(TYPE, COUNT)\
-	(TYPE*)malloc(sizeof(TYPE) * COUNT)
+	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
-constexpr uint32 entry_count_per_resize = 50;
+constexpr uint32 entry_count_per_resize = 100;
 
 c_tag_injection_table::c_tag_injection_table()
 {
@@ -23,6 +23,19 @@ c_tag_injection_table::~c_tag_injection_table()
 	free(this->m_table);
 }
 
+void c_tag_injection_table::clear()
+{
+	for (uint16 i = 0; i < this->m_entry_count; i++)
+	{
+		this->m_table[i].loaded_data.clear();
+	}
+	free(this->m_table);
+	this->m_entry_count = 0;
+	this->m_table_size = 0;
+	this->m_table = nullptr;
+	this->resize_table();
+}
+
 uint16 c_tag_injection_table::get_entry_count() const
 {
 	return this->m_entry_count;
@@ -32,6 +45,12 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 {
 	//tag_group temp;
 	//temp.group = type;
+
+	if (this->m_entry_count + 1 == this->m_table_size)
+	{
+		this->resize_table();
+	}
+
 	s_tag_injecting_table_entry* result = &this->m_table[this->m_entry_count];
 	result->cache_index = cache_index;
 	result->injected_index = k_first_injected_datum + this->m_entry_count;
@@ -41,11 +60,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 	this->m_entry_count++;
 	
 
-	if (this->m_entry_count == this->m_table_size)
-	{
-		this->resize_table();
-		return &this->m_table[this->m_entry_count - 1];
-	}
+
 
 	return result;
 }
@@ -83,7 +98,9 @@ bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const
 void c_tag_injection_table::resize_table()
 {
 	// Allocate new larger buffer
-	s_tag_injecting_table_entry* new_buffer = lazy_malloc_buffer(s_tag_injecting_table_entry, this->m_table_size + entry_count_per_resize);
+	//s_tag_injecting_table_entry* new_buffer = lazy_malloc_buffer(s_tag_injecting_table_entry, this->m_table_size + entry_count_per_resize);
+	s_tag_injecting_table_entry* new_buffer =
+		(s_tag_injecting_table_entry*)calloc(this->m_table_size + entry_count_per_resize, sizeof(s_tag_injecting_table_entry));
 
 	if (this->m_table)
 	{

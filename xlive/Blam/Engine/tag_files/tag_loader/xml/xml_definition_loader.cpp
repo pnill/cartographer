@@ -15,7 +15,7 @@
 	fread(OUT, SIZE, COUNT, FILE)
 
 #define lazy_malloc_buffer(TYPE, COUNT)\
-	(TYPE*)malloc(sizeof(TYPE) * COUNT)
+	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
 void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
 	s_cache_header* cache_header, s_tags_header* tags_header, tags::tag_instance* scenario_instance, datum cache_index)
@@ -70,10 +70,13 @@ void c_xml_definition_loader::load_cache_info()
 
 	uint32 tag_instance_offset = instance_table_offset + sizeof(tags::tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);
 
+	tags::tag_instance t_instance;
 	// read requested tag instance from file
 	fseek(this->m_file_handle, tag_instance_offset, SEEK_SET);
-	fread(&this->m_instance, sizeof(tags::tag_instance), 1, this->m_file_handle);
+	//fread(&this->m_instance, sizeof(tags::tag_instance), 1, this->m_file_handle);
+	fread(&t_instance, sizeof(tags::tag_instance), 1, this->m_file_handle);
 
+	this->m_instance = t_instance;
 	this->m_file_offset = tag_data_start_offset + this->m_instance.data_offset - this->m_scenario_instance->data_offset;
 }
 
@@ -337,7 +340,6 @@ void c_xml_definition_loader::load_tag_data()
 #if K_TAG_INJECTION_DEBUG
 	this->validate_data();
 #endif
-	auto bbb = 0;
 }
 
 void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_block* definition, uint32 base_offset, uint32 block_count)
@@ -399,11 +401,6 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 	// copy the data into the out buffer
 	memcpy(out_buffer, this->m_data, this->m_total_data_size);
 
-	
-	if(this->m_instance.type.group == _tag_group_render_model)
-	{
-		auto a = 213123;
-	}
 	// resolve and update tag references
 	for(uint32 i = 0; i < this->m_tag_reference_offset_count; i++)
 	{
@@ -460,7 +457,6 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 		LOG_DEBUG_GAME("[c_xml_definition_loader::copy_tag_data]: rebase tag_block: {} base_offset: {:x} block_offset {:x} block_size: {:x} total size: {:x} in bounds: {}", link->name.get_string(), base_offset, resolved_offset, link->size, this->m_total_data_size, in_bounds);
 #endif
 	}
-	auto a = 1234234;
 }
 
 #if K_TAG_INJECTION_DEBUG
@@ -495,7 +491,9 @@ void c_xml_definition_loader::validate_data() const
 		{
 			LOG_ERROR_GAME("[c_xml_definition_loader::validate_data] tag_block is invalid");
 		}
+		free(block_data);
 	}
+	free(cache_data);
 }
 
 //void c_xml_definition_loader::compare_buffers(int8* cache_buffer, int8* loaded_buffer, int8* injected_buffer)

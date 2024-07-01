@@ -16,9 +16,10 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
+#include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 std::mutex commandInsertMtx;
@@ -722,10 +723,11 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	tag_type.string[1] = p_string[2];
 	tag_type.string[0] = p_string[3];
 
-	auto tagDatum = tag_loader::get_tag_datum_by_name(tagName, tag_type.group, mapName);
-	tag_loader::Load_tag(tagDatum, true, mapName);
-	tag_loader::Push_Back();
-	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
+	tag_injection_set_active_map(mapName.c_str());
+	auto tag_datum = tag_injection_load(tag_type.group, tagName.c_str(), true);
+	tag_injection_inject();
+
+	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
 	return 0;

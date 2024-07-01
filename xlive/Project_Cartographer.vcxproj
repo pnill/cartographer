@@ -829,8 +829,6 @@
     <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -1248,8 +1246,6 @@
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
     <ClInclude Include="H2MOD\Variants\GraveRobber\GraveRobber.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="resources\version_resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\curl-interface.h" />

@@ -1,6 +1,6 @@
 #pragma once
 #include "tag_files/tag_groups.h"
-
+#include "tag_injection_define.h"
 
 bool tag_injection_check_map_exists(const char* map_name);
 /**

@@ -29,6 +29,8 @@ public:
 	c_tag_injection_table();
 	~c_tag_injection_table();
 
+	void clear();
+
 	uint16 get_entry_count() const;
 
 	s_tag_injecting_table_entry* init_entry(datum cache_index, e_tag_group type);

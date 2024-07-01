@@ -9,24 +9,24 @@
 #include "models/models.h"
 #include "models/render_model_definitions.h"
 
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 void paddy_event_map_load()
 {
-	datum paddy_hat_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\stpat_hat", _tag_group_scenery, "carto_shared");
-	datum paddy_beard_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\beard\\beard", _tag_group_scenery, "carto_shared");
-	datum paddy_pot_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", _tag_group_scenery, "carto_shared");
+	tag_injection_set_active_map("carto_shared");
+
+	datum paddy_hat_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\stpat_hat", true);
+	datum paddy_beard_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\beard\\beard", true);
+	datum paddy_pot_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", true);
+
+	//datum paddy_hat_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\stpat_hat", _tag_group_scenery, "carto_shared");
+	//datum paddy_beard_datum = tag_loader::get_tag_datum_by_name("objects\\multi\\stpat_hat\\beard\\beard", _tag_group_scenery, "carto_shared");
+	//datum paddy_pot_datum = tag_loader::get_tag_datum_by_name("scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", _tag_group_scenery, "carto_shared");
 
 	if (!DATUM_IS_NONE(paddy_hat_datum) && !DATUM_IS_NONE(paddy_beard_datum) && !DATUM_IS_NONE(paddy_pot_datum))
 	{
-		tag_loader::preload_tag_data_from_cache(paddy_hat_datum, true, "carto_shared");
-		tag_loader::preload_tag_data_from_cache(paddy_beard_datum, true, "carto_shared");
-		tag_loader::preload_tag_data_from_cache(paddy_pot_datum, true, "carto_shared");
-		tag_loader::push_loaded_tag_data();
-
-		paddy_hat_datum = tag_loader::resolve_cache_index_to_injected(paddy_hat_datum);
-		paddy_beard_datum = tag_loader::resolve_cache_index_to_injected(paddy_beard_datum);
-		paddy_pot_datum = tag_loader::resolve_cache_index_to_injected(paddy_pot_datum);
+		tag_injection_inject();
 
 		auto paddy_pot = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(paddy_pot_datum, true);
 		auto paddy_pot_model = tags::get_tag<_tag_group_model, s_model_definition>(paddy_pot->objectTag.model.index, true);

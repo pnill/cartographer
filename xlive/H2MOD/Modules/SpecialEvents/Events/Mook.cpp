@@ -4,21 +4,26 @@
 #include "../SpecialEventHelpers.h"
 
 #include "items/weapon_definitions.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "game/game_globals.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 
 void mook_event_map_load()
 {
 	datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
 	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
-	datum mook_ball_weapon_datum = tag_loader::get_tag_datum_by_name ("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", _tag_group_weapon, "carto_shared");
+	//datum mook_ball_weapon_datum = tag_loader::get_tag_datum_by_name ("scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", _tag_group_weapon, "carto_shared");
+
+	tag_injection_set_active_map("carto_shared");
+	if (!tag_injection_active_map_verified())
+		return;
+
+	datum mook_ball_weapon_datum = tag_injection_load(_tag_group_weapon, "scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", true);
 
 	if (!DATUM_IS_NONE(mook_ball_weapon_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
 	{
-		tag_loader::preload_tag_data_from_cache(mook_ball_weapon_datum, true, "carto_shared");
-		tag_loader::push_loaded_tag_data();
-
-		mook_ball_weapon_datum = tag_loader::resolve_cache_index_to_injected(mook_ball_weapon_datum);
+		tag_injection_inject();
 
 		auto mook_ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(mook_ball_weapon_datum, true);
 

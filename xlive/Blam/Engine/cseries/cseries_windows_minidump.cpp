@@ -205,7 +205,7 @@ void write_crash_dump_files(_EXCEPTION_POINTERS* ExceptionInfo, c_static_wchar_s
 	DWORD error = GetLastError();
 	if (error != 0)
 	{
-		LOG_ERROR_FUNCW(L"CreateFileW returned error: {}", error);
+		LOG_ERROR_FUNCW(L"CreateFileW returned error: {} {}", error, minidump_path.get_string());
 	}
 	
 

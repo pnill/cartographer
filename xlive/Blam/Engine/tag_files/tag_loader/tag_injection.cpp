@@ -61,12 +61,8 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 		if (inst.data_offset != 0)
 			return inst.datum_index;
 
-		// 0xE7052CA0
-		// 0x00003ba7
 		return NONE;
 	}
-	//if (entry->injected_index == 0x00003ba7u)
-	//	return 0xE7052CA0u;
 
 	return entry->injected_index;
 }
@@ -98,9 +94,6 @@ bool _cdecl scenario_tags_load_internal(char* scenario_path)
 	}
 
 	g_manager.reset();
-	//tag_loader::used_additional_meta = 0;
-	//tag_loader::next_available_datum_index = _INJECTED_TAG_START_;
-
 
 	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
 	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)

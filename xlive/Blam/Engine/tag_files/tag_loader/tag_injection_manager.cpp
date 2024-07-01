@@ -38,6 +38,11 @@ void c_tag_injecting_manager::set_base_map_tag_data_size(const uint32 size)
 	this->m_base_tag_data_size = size;
 }
 
+uint32 c_tag_injecting_manager::get_base_map_tag_data_size() const
+{
+	return this->m_base_tag_data_size;
+}
+
 void c_tag_injecting_manager::set_instance_table(tags::tag_instance* table)
 {
 	this->m_instances = table;
@@ -88,13 +93,20 @@ bool c_tag_injecting_manager::find_map(const char* map_name, c_static_string260*
 
 void c_tag_injecting_manager::set_active_map(const char* map_name)
 {
+	c_static_string260 t_path;
+	if (!this->find_map(map_name, &t_path))
+		return;
+
+	// if the requested map is already the active map of the loader no need to do any more work.
+	if (t_path.is_equal(this->m_active_map.get_string()))
+		return;
+
+	this->m_active_map.set(t_path.get_string());
+
 	this->m_active_map_verified = false;
 
 	if (this->m_active_map_file_handle)
 		fclose(this->m_active_map_file_handle);
-
-	if (!this->find_map(map_name, &this->m_active_map))
-		return;
 
 	this->m_active_map_verified = true;
 	this->m_active_map_file_handle = fopen(this->m_active_map.get_string(), "rb");
@@ -132,7 +144,7 @@ void c_tag_injecting_manager::reset()
 	memset(&this->m_active_map_scenario_instance, 0, sizeof(tags::tag_instance));
 
 	// todo: clear entry table
-	//this->m_table.clear();
+	this->m_table.clear();
 }
 
 
@@ -316,9 +328,14 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		{
 			if (memcmp(tag_name, buff, strlen(tag_name)) == 0)
 			{
+				fpos_t position;
+				fgetpos(this->m_active_map_file_handle, &position);
+
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
 				if (temp_instance.type.group == group)
 					return temp_instance.datum_index;
+
+				fseek(this->m_active_map_file_handle, position, SEEK_SET);
 			}
 			current_index++;
 			buff_size = 0;
@@ -475,7 +492,8 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 		for (uint32 i = 0; i < new_entry->loaded_data.m_tag_reference_count; i++)
 		{
 			tag_group t_group = this->get_tag_group_by_datum(new_entry->loaded_data.m_tag_references[i]);
-			load_tag_internal(this, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
+			if(t_group.group != _tag_group_sound)
+				load_tag_internal(this, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
 		}
 	}
 
@@ -524,7 +542,8 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 		for (uint32 i = 0; i < new_entry->loaded_data.m_tag_reference_count; i++)
 		{
 			tag_group t_group = manager->get_tag_group_by_datum(new_entry->loaded_data.m_tag_references[i]);
-			load_tag_internal(manager, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
+			if (t_group.group != _tag_group_sound)
+				load_tag_internal(manager, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
 		}
 	}
 }
@@ -563,6 +582,16 @@ void c_tag_injecting_manager::inject_tags()
 
 		uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
 
+#if K_TAG_INJECTION_DEBUG
+		const uint32 start = (uint32)tags::get_tag_data();
+		const uint32 end = start + this->get_base_map_tag_data_size() + k_injectable_allocation_size;
+		bool in_range = ((uint32)tags::get_tag_data() + injection_offset) >= start && ((uint32)tags::get_tag_data() + injection_offset) < end;
+
+		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] injection_offset: {:x} is valid: {} start: {:x} end: {:x}",
+			(uint32)tags::get_tag_data() + injection_offset, in_range, start, end);
+#endif
+
+
 		tags::tag_instance* injection_instance = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(entry->injected_index)];
 
 		injection_instance->type = entry->type;
@@ -589,7 +618,7 @@ void c_tag_injecting_manager::inject_tags()
 		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model)
 			this->load_raw_data_from_cache(entry->injected_index);
 
-		//this->setup_havok_vtables(entry->type.group, entry->injected_index);
+		this->setup_havok_vtables(entry->type.group, entry->injected_index);
 
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);
@@ -600,6 +629,5 @@ void c_tag_injecting_manager::inject_tags()
 	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");
 #endif
 }
-
 
 #undef lazy_fread
