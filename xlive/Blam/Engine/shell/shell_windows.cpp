@@ -31,7 +31,10 @@ LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 void shell_windows_apply_patches(void)
 {
 	DETOUR_ATTACH(p_timeGetTime, timeGetTime, timeGetTime_hook);
-	WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
+	if (!Memory::IsDedicatedServer())
+	{
+		WriteJmpTo(Memory::GetAddress(0x7E43), H2WinMain);
+	}
 	return;
 }
 
