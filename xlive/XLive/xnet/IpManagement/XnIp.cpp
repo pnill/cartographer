@@ -75,21 +75,21 @@ void XnIpManager::UpdatePacketReceivedCounters(IN_ADDR ipIdentifier, unsigned in
 	}
 }
 
-void XnIpManager::LogConnectionsToConsole(ConsoleLog* consoleLog) const
+void XnIpManager::LogConnectionsToConsole(TextOutputCb* outputCb) const
 {
 	if (!(GetRegisteredKeyCount() > 0))
 	{
 		const char* err_message = "cannot log XNet connections when no keys are registerd (you need to host/be in a game)";
 		LOG_CRITICAL_NETWORK(err_message);
-		if (consoleLog)
-			consoleLog->Output(StringFlag_None, "# %s", err_message);
+		if (outputCb)
+			outputCb(StringFlag_None, "# %s", err_message);
 		return;
 	}
 
 	const char* xnet_connections_str = "XNet connections: ";
 	LOG_CRITICAL_NETWORK(xnet_connections_str);
-	if (consoleLog)
-		consoleLog->Output(StringFlag_None, "# %s", xnet_connections_str);
+	if (outputCb)
+		outputCb(StringFlag_None, "# %s", xnet_connections_str);
 
 	for (int i = 0; i < GetMaxXnConnections(); i++)
 	{
@@ -110,14 +110,14 @@ void XnIpManager::LogConnectionsToConsole(ConsoleLog* consoleLog) const
 				"Time since last packet received: " + std::to_string((float)(timeGetTime() - pckStats->lastPacketReceivedTime) / 1000.f);
 
 			LOG_CRITICAL_NETWORK(logString);
-			if (consoleLog)
-				consoleLog->Output(StringFlag_None, "# %s", logString.c_str());
+			if (outputCb)
+				outputCb(StringFlag_None, "# %s", logString.c_str());
 		}
 	}
 
 	LOG_CRITICAL_NETWORK("available XnIp connection slots: {}", GetMaxXnConnections());
-	if (consoleLog)
-		consoleLog->Output(StringFlag_None, "# available XnIp connection slots: %d", GetMaxXnConnections());
+	if (outputCb)
+		outputCb(StringFlag_None, "# available XnIp connection slots: %d", GetMaxXnConnections());
 }
 
 void XnIpManager::LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const

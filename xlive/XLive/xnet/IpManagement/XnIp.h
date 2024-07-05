@@ -435,7 +435,7 @@ public:
 	XnKeyPair* KeyPairLookup(const XNKID* xnkid) const;
 	
 	// Logging 
-	void LogConnectionsToConsole(ConsoleLog* consoleLog) const;
+	void LogConnectionsToConsole(TextOutputCb* outputCb) const;
 	void LogConnectionsErrorDetails(const sockaddr_in* address, int errorCode, const XNKID* receivedKey) const;
 
 	// XNet startup parameters

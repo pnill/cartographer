@@ -7,10 +7,11 @@
 #include "CommandCollection.h"
 #include "H2MOD/Modules/Input/PlayerControl.h"
 
-class Console;
+class CartographerConsole;
+typedef CartographerConsole CartConsole;
 
 // used to get the main console instance
-Console* GetMainConsoleInstance();
+CartographerConsole* GetMainConsoleInstance();
 
 #define CONSOLE_TABS 2
 
@@ -28,12 +29,12 @@ enum ConsoleTabs
     _console_tab_end
 };
 
-class Console : public ConsoleLog
+class CartographerConsole
 {
 private:
-	Console(const Console&) = delete;
-	Console(Console&&) = delete;
-	Console operator=(Console&) = delete;
+	CartographerConsole(const CartographerConsole&) = delete;
+	CartographerConsole(CartographerConsole&&) = delete;
+	CartographerConsole operator=(CartographerConsole&) = delete;
 
     // variables
     bool                                m_auto_scroll;
@@ -47,14 +48,17 @@ private:
     ImGuiTextFilter                     m_filter;
     int                                 m_selected_tab;
     bool                                m_selected_tab_dirty;
+
 	std::vector<CircularStringBuffer>
                                         m_output;
+
+    bool                                m_docked;
 
     static int TextEditCallback(ImGuiInputTextCallbackData* data);
 
     void ExecCommand(const char* command_line, size_t command_line_length);
 
-    void ClearMainOutput();
+    static void ClearMainOutput();
 
     CircularStringBuffer* GetMainOutput()
     {
@@ -63,19 +67,18 @@ private:
 
 public:
     static std::string                 windowName;
-    ComVar<float>                      m_console_opacity;
+    float                              m_console_opacity;
+    ComVar<float>                      m_console_opacity_comvar;
 
-    Console();
-    ~Console() = default;
-
-    int Output(StringHeaderFlags flags, const char* fmt, ...) override;
+    CartographerConsole();
+    ~CartographerConsole() = default;
 
 	void Draw(const char* title, bool* p_open);
 
     void AllocateCompletionCandidatesBuf(unsigned int candidates_count);
     void DiscardCompletionCandidatesBuf();
 
-    void SelectTab(ConsoleTabs tab);
+    void SwitchToTab(ConsoleTabs tab);
 
     bool CompletionAvailable() const
     {
@@ -114,6 +117,8 @@ public:
         va_end(valist);
     }
 
+    static int __cdecl LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...);
+
     // commands
 	static int clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
 	static int set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData);
@@ -122,7 +127,7 @@ public:
 
 #define QUICK_DBG(header, fmt, ...) \
 do { \
-Console::LogToTab(_console_tab_logs, \
+CartographerConsole::LogToTab(_console_tab_logs, \
 	header ": " "   %s() -> " fmt, __FUNCTION__, __VA_ARGS__); \
 } while (0)
 
