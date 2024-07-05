@@ -149,7 +149,7 @@ int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens,
 	auto var = reinterpret_cast<ComVarT<bool*>*>(cbData.commandVar);
 
 	std::string exception;
-	if (!var->SetValFromStr(tokens[1], 0, exception))
+	if (!var->SetValFromStr(tokens[1], exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
 		output->Output(StringFlag_None, "	%s", exception.c_str());
@@ -542,7 +542,7 @@ int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, Consol
 	}
 
 	std::string exception;
-	if (!warpFixVar.SetValFromStr(tokens[1], 0, exception))
+	if (!warpFixVar.SetValFromStr(tokens[1], exception))
 	{
 		output->Output(StringFlag_None, command_error_bad_arg);
 		output->Output(StringFlag_None, "	%s", exception.c_str());

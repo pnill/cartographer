@@ -55,9 +55,8 @@ public:
 		return std::stoll(str, nullptr, _Base);
 	}
 
-	// for boolean, _Base param does nothing
-	template<>
-	static bool ToIntegral<bool>(const std::string& str, int _Base)
+	template<typename Type = T>
+	static bool ToBoolean(const std::string& str)
 	{
 		bool result = false;
 		if (str != "true"
@@ -88,11 +87,9 @@ public:
 	}
 };
 
-template<typename T>
-class ComVarT : public CStrToValue<T>, public IComVar
+template<typename T, typename baseTypeT = typename std::remove_all_pointers<T>::type>
+class ComVarT : private CStrToValue<baseTypeT>, public IComVar
 {
-	using baseTypeT = typename std::remove_all_pointers<T>::type;
-
 	static_assert(!std::is_same_v<baseTypeT, T>
 		// not caring about the const versions, they shouldn't be const in the first place
 		// || !std::is_same<const std::remove_all_pointers<T>, T>::value
@@ -110,13 +107,14 @@ public:
 
 	virtual ~ComVarT() = default;
 
-	template<typename Type = std::enable_if<std::is_integral<baseTypeT>::value, baseTypeT>::type>
-	bool SetValFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
+	template<typename Type = baseTypeT>
+	std::enable_if_t<!std::is_same_v<Type, bool>&& std::is_integral_v<Type>, Type> 
+		SetValFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try
 		{
-			*m_var_ptr = ToIntegral<Type>(str, _Base);
+			*m_var_ptr = this->ToIntegral<Type>(str, _Base);
 		}
 		catch (const std::exception& e)
 		{
@@ -127,16 +125,32 @@ public:
 		return success;
 	}
 
-	template<typename Type = std::enable_if<std::is_floating_point<baseTypeT>::value, baseTypeT>::type>
-	bool SetValFromStr(const std::string& str, std::string& potentialException = empty);
-
-	template<>
-	bool SetValFromStr<baseTypeT>(const std::string& str, std::string& potentialException)
+	template<typename Type = baseTypeT>
+	std::enable_if_t<std::is_same_v<Type, bool>, bool>
+		SetValFromStr(const std::string& str, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try
 		{
-			*m_var_ptr = ToFloat<baseTypeT>(str);
+			*m_var_ptr = this->ToBoolean<Type>(str);
+		}
+		catch (const std::exception& e)
+		{
+			success = false;
+			potentialException.assign(e.what());
+		}
+
+		return success;
+	}
+
+	template<typename Type = baseTypeT>
+	std::enable_if_t<std::is_floating_point_v<Type>, bool>
+		SetValFromStr(const std::string& str, std::string& potentialException = empty)
+	{
+		bool success = true;
+		try
+		{
+			*m_var_ptr = this->ToFloat<Type>(str);
 		}
 		catch (const std::exception& e)
 		{
@@ -186,12 +200,12 @@ class ComVar : public ComVarT<T*>
 
 public:
 	ComVar() :
-		ComVarT(&m_var)
+		ComVarT<T*>(&m_var)
 	{
 	}
 
 	ComVar(T value) :
-		ComVarT(&m_var)
+		ComVarT<T*>(&m_var)
 	{
 		m_var = value;
 	}
