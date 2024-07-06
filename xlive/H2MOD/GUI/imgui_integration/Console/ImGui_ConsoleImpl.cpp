@@ -8,26 +8,28 @@
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ConsoleCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, Console::set_opacity_cb);
+ConsoleCommand console_opacity_var_cmd("var_console_opacity", "set console opacity, 1 parameter(s): <float>", 1, 1, CartographerConsole::set_opacity_cb);
 
-std::string Console::windowName = "console";
+std::string CartographerConsole::windowName = "console";
 
-Console* GetMainConsoleInstance()
+CartographerConsole* GetMainConsoleInstance()
 {
-	static std::unique_ptr<Console> console(std::make_unique<Console>());
+	static std::unique_ptr<CartographerConsole> console(std::make_unique<CartographerConsole>());
 	return console.get();
 }
 
-Console::Console() :
+CartographerConsole::CartographerConsole() :
 	m_completion_text_buffer(32, 64),
-	m_console_opacity(.75f)
+	m_console_opacity_comvar(&m_console_opacity)
 {
+	m_docked = true;
 	m_auto_scroll = true;
 	m_scroll_to_botom = false;
 	m_history_string_index = -1;
 	m_completion_data = NULL;
 	m_selected_tab = 0;
 	m_selected_tab_dirty = false;
+	m_console_opacity = .75f;
 	memset(m_input_buffer, 0, sizeof(m_input_buffer));
 
 	m_output.reserve(CONSOLE_TABS);
@@ -37,24 +39,24 @@ Console::Console() :
 	}
 
 	// you can pass nullptr to ImGui_ConsoleVar if you can get the variable from context data
-	console_opacity_var_cmd.SetCommandVarPtr((IComVar*)&m_console_opacity);
+	console_opacity_var_cmd.SetCommandVarPtr(&m_console_opacity_comvar);
 	CommandCollection::InsertCommand(&console_opacity_var_cmd);
-	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, Console::clear_cb));
+	CommandCollection::InsertCommand(new ConsoleCommand("clear", "clear the output of the current console and history, 0 parameter(s)", 0, 0, CartographerConsole::clear_cb));
 }
 
-int Console::Output(StringHeaderFlags flags, const char* fmt, ...)
+int CartographerConsole::LogToMainTabCb(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);
-	GetMainOutput()->AddStringFmt(flags, fmt, valist);
+	GetMainConsoleInstance()->GetMainOutput()->AddStringFmt(flags, fmt, valist);
 	va_end(valist);
 	return 0;
 }
 
 // ImGui text callback
-int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
+int CartographerConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
 {
-	Console* console_data = (Console*)data->UserData;
+	CartographerConsole* console_data = (CartographerConsole*)data->UserData;
 	data->CompletionData = NULL;
 	bool skip_completion_find = false;
 
@@ -146,7 +148,7 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 			console_data->m_completion_data->CompletionCandidate[i].CompletionText = command->GetName();
 			console_data->m_completion_data->CompletionCandidate[i].CompletionDescription = command->GetDescription();
 
-			if (command->CommandSetsVariable())
+			if (command->SetsVariable())
 			{
 				command->VarAsStr(console_data->m_completion_data->CompletionCandidate[i].CompletionVariable, ARRAYSIZE(ImGuiTextInputCompletionCandidate::CompletionVariable));
 			}
@@ -299,22 +301,22 @@ int Console::TextEditCallback(ImGuiInputTextCallbackData* data)
 	return 0;
 }
 
-void Console::ClearMainOutput() 
+void CartographerConsole::ClearMainOutput() 
 {
-	GetMainOutput()->Clear();
+	GetMainConsoleInstance()->GetMainOutput()->Clear();
 };
 
-void Console::ExecCommand(const char* command_line, size_t command_line_length)
+void CartographerConsole::ExecCommand(const char* command_line, size_t command_line_length)
 {
 	m_history_string_index = -1;
 
-	if (!ConsoleCommand::HandleCommandLine(command_line, command_line_length, this))
+	if (!ConsoleCommand::HandleCommandLine(command_line, command_line_length, this->LogToMainTabCb))
 	{
 		m_scroll_to_botom = true;
 	}
 }
 
-void Console::AllocateCompletionCandidatesBuf(unsigned int candidates_count)
+void CartographerConsole::AllocateCompletionCandidatesBuf(unsigned int candidates_count)
 {
 	DiscardCompletionCandidatesBuf();
 	// TODO maybe move this to function for object using dynamic allocated memory
@@ -326,7 +328,7 @@ void Console::AllocateCompletionCandidatesBuf(unsigned int candidates_count)
 	m_completion_data->CompletionCandidate = (ImGuiTextInputCompletionCandidate*)((char*)m_completion_data + sizeof(ImGuiTextInputCompletion));
 }
 
-void Console::DiscardCompletionCandidatesBuf()
+void CartographerConsole::DiscardCompletionCandidatesBuf()
 {
 	if (m_completion_data != NULL)
 	{
@@ -336,13 +338,13 @@ void Console::DiscardCompletionCandidatesBuf()
 	m_completion_data = NULL;
 }
 
-void Console::SelectTab(ConsoleTabs tab)
+void CartographerConsole::SwitchToTab(ConsoleTabs tab)
 {
 	m_selected_tab_dirty = true;
 	m_selected_tab = tab;
 }
 
-void Console::Draw(const char* title, bool* p_open)
+void CartographerConsole::Draw(const char* title, bool* p_open)
 {
 	if (!*p_open) return;
 
@@ -350,18 +352,20 @@ void Console::Draw(const char* title, bool* p_open)
 	const ImGuiStyle& style = ImGui::GetStyle();
 	const ImGuiViewport* main_viewport = ImGui::GetMainViewport();
 
-	ImGui::SetNextWindowSizeConstraints(
-		ImVec2(main_viewport->WorkSize.x, main_viewport->WorkSize.y / 3.0f), 
-		ImVec2(main_viewport->WorkSize.x, main_viewport->WorkSize.y / 2.0f)
-	);
+	if (m_docked)
+	{
+		ImGui::SetNextWindowSizeConstraints(
+			ImVec2(main_viewport->WorkSize.x, main_viewport->WorkSize.y / 3.0f),
+			ImVec2(main_viewport->WorkSize.x, main_viewport->WorkSize.y / 2.0f)
+		);
 
-	ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_FirstUseEver); // in the left upside corner
+		ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_None); // in the left upside corner
+	}
 
 	ImGuiWindowFlags console_main_window_flags = 0
 		| ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoSavedSettings
 		// | ImGuiWindowFlags_NoResize
-		| ImGuiWindowFlags_NoMove
 		| ImGuiWindowFlags_NoCollapse
 		| ImGuiWindowFlags_MenuBar
 		//| ImGuiWindowFlags_NoScrollbar
@@ -369,7 +373,10 @@ void Console::Draw(const char* title, bool* p_open)
 		//| ImGuiWindowFlags_AlwaysAutoResize
 		;
 
-	ImGui::SetNextWindowBgAlpha(m_console_opacity.GetVal());
+	if (m_docked)
+		console_main_window_flags |= ImGuiWindowFlags_NoMove;
+
+	ImGui::SetNextWindowBgAlpha(m_console_opacity);
 
 	if (!ImGui::Begin(title, NULL, console_main_window_flags))
 	{
@@ -385,6 +392,7 @@ void Console::Draw(const char* title, bool* p_open)
 		if (ImGui::BeginMenu("Menu"))
 		{
 			if (ImGui::MenuItem("Clear")) { ClearMainOutput(); }
+			if (ImGui::MenuItem(m_docked ? "Undock console" : "Dock console", NULL)) { m_docked = !m_docked; }
 			if (ImGui::MenuItem("Close Window")) { ImGuiHandler::ToggleWindow(windowName); }
 			ImGui::EndMenu();
 		}
@@ -445,7 +453,7 @@ void Console::Draw(const char* title, bool* p_open)
 	if (m_selected_tab != _console_tab_commands)
 		footer_height_to_reserve = 0.0f;
 	ImGui::PushStyleColor(ImGuiCol_ChildBg, style.Colors[ImGuiCol_FrameBg]);
-	ImGui::SetNextWindowBgAlpha(m_console_opacity.GetVal());
+	ImGui::SetNextWindowBgAlpha(m_console_opacity);
 	ImGui::BeginChild("##consolelog", ImVec2(-1, -footer_height_to_reserve), true, console_log_child_window_flags);
 	
 	// Child log Poput Context Window
@@ -575,24 +583,24 @@ void Console::Draw(const char* title, bool* p_open)
 // TODO remove function prolog code duplication
 
 // clear command
-int Console::clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CartographerConsole::clear_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	Console* console_data = (Console*)cbData.strOutput;
-	console_data->ClearMainOutput();
+	ClearMainOutput();
 	return 0;
 }
 
 // set opacity command
-int Console::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CartographerConsole::set_opacity_cb(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
 {
-	Console* console_data = (Console*)cbData.strOutput;
-	const ConsoleCommand* command_data = cbData.consoleCommandData;
+	TextOutputCb* console_output_cb = cbData.outputCb;
+	const ConsoleCommand* command_data = cbData.consoleCommand;
+	auto consoleOpacityVar = cbData.consoleCommand->GetVar<ComVar<float>>();
 
 	std::string exception;
-	if (!console_data->m_console_opacity.SetValFromStr(tokens[1]))
+	if (!consoleOpacityVar->SetFromStr(tokens[1], exception))
 	{
-		console_data->Output(StringFlag_None, command_error_bad_arg);
-		console_data->Output(StringFlag_None, "	%s", exception.c_str());
+		console_output_cb(StringFlag_None, command_error_bad_arg);
+		console_output_cb(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
 }

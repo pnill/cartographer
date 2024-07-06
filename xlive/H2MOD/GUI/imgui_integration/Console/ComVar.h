@@ -3,20 +3,18 @@
 
 static std::string empty = std::string();
 
-// remove pointer
-
 /// Command Variable
 
 // useful macros
 #define ComVarFromPtr(_var_name, _var_type, _var_ptr, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback) \
-ComVarT<_var_type> _var_name##__LINE__(_var_ptr); \
-ConsoleCommand _var_name((IComVar*)&_var_name##__LINE__, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback);
+ComVar<_var_type> _var_name##__LINE__(_var_ptr); \
+ConsoleCommand _var_name((ComVarBase*)&_var_name##__LINE__, _command_name, _description, _min_parameter_count, _max_parameter_count, _callback);
 
-class IComVar
+class ComVarBase
 {
 public:
-	IComVar() = default;
-	virtual ~IComVar() = default;
+	ComVarBase() = default;
+	virtual ~ComVarBase() = default;
 
 	virtual std::string GetValStr()
 	{
@@ -55,9 +53,8 @@ public:
 		return std::stoll(str, nullptr, _Base);
 	}
 
-	// for boolean, _Base param does nothing
-	template<>
-	static bool ToIntegral<bool>(const std::string& str, int _Base)
+	template<typename Type = T>
+	static bool ToBoolean(const std::string& str)
 	{
 		bool result = false;
 		if (str != "true"
@@ -89,34 +86,27 @@ public:
 };
 
 template<typename T>
-class ComVarT : public CStrToValue<T>, public IComVar
+class ComVar : private CStrToValue<T>, public ComVarBase
 {
-	using baseTypeT = typename std::remove_all_pointers<T>::type;
-
-	static_assert(!std::is_same_v<baseTypeT, T>
-		// not caring about the const versions, they shouldn't be const in the first place
-		// || !std::is_same<const std::remove_all_pointers<T>, T>::value
-		// || !std::is_same<std::remove_all_pointers<T> const, T>::value
-		, "ComVarT: template parameter not a pointer");
-
-	baseTypeT* m_var_ptr;
+	T* m_var_ptr;
 public:
 	// for custom types, the class should implement the equal operator overload
 	// othewise default is used
-	ComVarT(baseTypeT* ptr)
+	ComVar(T* ptr)
 	{
 		m_var_ptr = ptr;
 	}
 
-	virtual ~ComVarT() = default;
+	virtual ~ComVar() = default;
 
-	template<typename Type = std::enable_if<std::is_integral<baseTypeT>::value, baseTypeT>::type>
-	bool SetValFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
+	template<typename Type = T>
+	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, Type> 
+		SetFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try
 		{
-			*m_var_ptr = ToIntegral<Type>(str, _Base);
+			*m_var_ptr = this->ToIntegral<Type>(str, _Base);
 		}
 		catch (const std::exception& e)
 		{
@@ -127,16 +117,14 @@ public:
 		return success;
 	}
 
-	template<typename Type = std::enable_if<std::is_floating_point<baseTypeT>::value, baseTypeT>::type>
-	bool SetValFromStr(const std::string& str, std::string& potentialException = empty);
-
-	template<>
-	bool SetValFromStr<baseTypeT>(const std::string& str, std::string& potentialException)
+	template<typename Type = T>
+	std::enable_if_t<std::is_same_v<Type, bool>, bool>
+		SetFromStr(const std::string& str, std::string& potentialException = empty)
 	{
 		bool success = true;
 		try
 		{
-			*m_var_ptr = ToFloat<baseTypeT>(str);
+			*m_var_ptr = this->ToBoolean<Type>(str);
 		}
 		catch (const std::exception& e)
 		{
@@ -147,7 +135,25 @@ public:
 		return success;
 	}
 
-	template<typename Type = baseTypeT>
+	template<typename Type = T>
+	std::enable_if_t<std::is_floating_point_v<Type>, bool>
+		SetFromStr(const std::string& str, std::string& potentialException = empty)
+	{
+		bool success = true;
+		try
+		{
+			*m_var_ptr = this->ToFloat<Type>(str);
+		}
+		catch (const std::exception& e)
+		{
+			success = false;
+			potentialException.assign(e.what());
+		}
+
+		return success;
+	}
+
+	template<typename Type = T>
 	std::string AsString(Type* var) const
 	{
 		return std::to_string(*var);
@@ -164,37 +170,13 @@ public:
 		return AsString(m_var_ptr);
 	}
 
-	baseTypeT GetVal() const
+	T GetVal() const
 	{
 		return *m_var_ptr;
 	}
 
-	void SetVal(baseTypeT val)
+	void SetVal(T val)
 	{
 		*m_var_ptr = val;
 	}
-};
-
-template<typename T>
-class ComVar : public ComVarT<T*>
-{
-	static_assert(!std::is_pointer_v<T>
-		|| std::is_same_v<std::remove_all_pointers<T>::type, T>
-		, "ComVar: template parameter is invalid (possibly a pointer instead of a type)");
-
-	T m_var;
-
-public:
-	ComVar() :
-		ComVarT(&m_var)
-	{
-	}
-
-	ComVar(T value) :
-		ComVarT(&m_var)
-	{
-		m_var = value;
-	}
-
-	virtual ~ComVar() = default;
 };

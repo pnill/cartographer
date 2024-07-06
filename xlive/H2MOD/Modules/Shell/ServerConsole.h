@@ -25,10 +25,7 @@ namespace ServerConsole
 		any
 	};
 
-	class DediConsoleOutput : public ConsoleLog
-	{
-		int Output(StringHeaderFlags flags, const char* fmt, ...) override;
-	};
+	static int __cdecl OutputCb(StringHeaderFlags flags, const char* fmt, ...);
 
 	static std::map<const wchar_t*, e_server_console_commands> commands_map;
 	void ApplyHooks();

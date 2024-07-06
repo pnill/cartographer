@@ -15,8 +15,6 @@ kablam_vip_add_t p_kablam_vip_add;
 typedef signed int(__cdecl* kablam_vip_clear_t)();
 kablam_vip_clear_t p_kablam_vip_clear;
 
-ServerConsole::DediConsoleOutput dediOutput;
-
 void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count, char a3) {
 
 	wchar_t* command = command_line_split_wide[0];
@@ -47,7 +45,7 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 			command_line.append(" ");
 		}
 
-		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), &dediOutput);
+		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), ServerConsole::OutputCb);
 		return 0;
 	}
 
@@ -228,7 +226,7 @@ void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 	}
 }
 
-int ServerConsole::DediConsoleOutput::Output(StringHeaderFlags flags, const char* fmt, ...)
+static int __cdecl ServerConsole::OutputCb(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);

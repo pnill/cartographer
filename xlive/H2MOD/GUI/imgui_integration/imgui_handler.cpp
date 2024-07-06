@@ -161,7 +161,7 @@ namespace ImGuiHandler
 		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
 		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
 		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
-		imgui_windows.emplace_back(Console::windowName, false, Console::Render, Console::Open, Console::Close);
+		imgui_windows.emplace_back(CartographerConsole::windowName, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close);
 
 		atexit([]() {
 			ImGui_ImplDX9_Shutdown();
