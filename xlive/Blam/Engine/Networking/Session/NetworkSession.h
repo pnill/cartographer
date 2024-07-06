@@ -45,7 +45,7 @@ struct s_membership_player;
 struct s_membership_peer;
 struct s_session_observer_channel;
 
-#define NETWORK_SESSION_PEERS_MAX (16 + 1)
+#define K_NETWORK_SESSION_NUMBER_OF_PEERS (16 + 1)
 #define k_number_of_users 4
 
 namespace NetworkSession
@@ -194,7 +194,7 @@ struct s_membership_peer
 	DWORD field_F0;
 	DWORD field_F4;
 	DWORD update_number;
-	int player_index[4]; // stores local players indexes of the peer (BIG TODO: maybe fix splitscreen at some point)
+	datum local_players_indexes[4];
 };
 ASSERT_STRUCT_SIZE(s_membership_peer, 268);
 
@@ -221,9 +221,9 @@ struct s_session_membership
 	unsigned long long dedicated_server_xuid; // 0x78
 	int xbox_session_leader_peer_index; // 0x80
 	int peer_count; // 0x84
-	s_membership_peer peers[NETWORK_SESSION_PEERS_MAX]; // 0x88
+	s_membership_peer peers[K_NETWORK_SESSION_NUMBER_OF_PEERS]; // 0x88
 	int player_count; // 0x1254
-	DWORD players_active_mask; // 0x1258
+	uint32 players_active_mask; // 0x1258
 	s_membership_player players[k_maximum_players]; // 0x125C
 	DWORD unk;
 };
@@ -298,7 +298,7 @@ struct s_network_session
 	BYTE gap_4B84[64];
 	s_session_parameters parameters[2];
 	int local_peer_index;
-	s_session_observer_channel observer_channels[NETWORK_SESSION_PEERS_MAX];
+	s_session_observer_channel observer_channels[K_NETWORK_SESSION_NUMBER_OF_PEERS];
 	e_network_session_state local_session_state;
 	DWORD time_unk_2;
 	DWORD time_unk_3;
@@ -357,7 +357,7 @@ struct s_network_session
 	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 
-	const char* get_game_network_protocol()
+	const char* desribe_network_protocol_type() const
 	{
 		static const char* network_protocols_str[] =
 		{

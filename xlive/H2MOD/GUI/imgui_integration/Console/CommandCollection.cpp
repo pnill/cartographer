@@ -183,7 +183,6 @@ int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, Co
 	real32 rumbleScale;
 	std::string exception;
 
-
 	if (!ComVar(&rumbleScale).SetFromStr(tokens[1], exception))
 	{
 		outputCb(StringFlag_None, command_error_bad_arg);
@@ -473,26 +472,26 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 
 	outputCb(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
 
-	for (int peerIdx = 0; peerIdx < NetworkSession::GetPeerCount(); peerIdx++)
+	for (int32 peer_index = 0; peer_index < NetworkSession::GetPeerCount(); peer_index++)
 	{
-		auto peer_observer_channel = &observer->observer_channels[session->observer_channels[peerIdx].observer_index];
+		auto peer_observer_channel = &observer->observer_channels[session->observer_channels[peer_index].observer_index];
 
-		std::wstring peerNameWide(session->membership[0].peers[peerIdx].name);
+		std::wstring peerNameWide(session->membership[0].peers[peer_index].name);
 		std::string peerName(peerNameWide.begin(), peerNameWide.end());
 
-		std::string outStr = "# Peer index=" + std::to_string(peerIdx);
+		std::string outStr = "# Peer index=" + std::to_string(peer_index);
 		outStr += ", Peer Name=" + peerName;
 		outStr += ", Connection Status=" + std::to_string(peer_observer_channel->state);
-		outStr += ", Peer map state: " + std::to_string(session->membership[0].peers[peerIdx].map_status);
-		int playerIdx = session->membership[0].peers[peerIdx].player_index[0];
-		if (playerIdx != -1)
+		outStr += ", Peer map state: " + std::to_string(session->membership[0].peers[peer_index].map_status);
+		datum player_index = session->membership[0].peers[peer_index].local_players_indexes[0];
+		if (player_index != NONE)
 		{
-			std::wstring playerNameWide(NetworkSession::GetPlayerName(playerIdx));
+			std::wstring playerNameWide(NetworkSession::GetPlayerName(player_index));
 			std::string playerName(playerNameWide.begin(), playerNameWide.end());
-			outStr += ", Player index=" + std::to_string(playerIdx);
+			outStr += ", Player index=" + std::to_string(player_index);
 			outStr += ", Player name=" + playerName;
 
-			playerNameWide = s_player::get_name(playerIdx);
+			playerNameWide = s_player::get_name(player_index);
 			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
 			outStr += ", Name from game player state=" + playerName;
 		}
@@ -506,7 +505,7 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
-	int maxPlayers;
+	int max_players;
 	std::string exception;
 
 	do
@@ -515,23 +514,23 @@ int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, 
 			outputCb(StringFlag_None, "# can be only used by host");
 			break;
 		}
-		else if (!ComVar(&maxPlayers).SetFromStr(tokens[1], 0, exception))
+		else if (!ComVar(&max_players).SetFromStr(tokens[1], 0, exception))
 		{
 			outputCb(StringFlag_None, command_error_bad_arg);
 			outputCb(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
-		else if (maxPlayers < 1 || maxPlayers > 16) {
+		else if (max_players < 1 || max_players > 16) {
 			outputCb(StringFlag_None, "# the value needs to be between 1 and 16");
 			break;
 		}
-		else if (maxPlayers < NetworkSession::GetPlayerCount()) {
+		else if (max_players < NetworkSession::GetPlayerCount()) {
 			outputCb(StringFlag_None, "# you can't set a value of max players smaller than the actual number of players on the server");
 			break;
 		}
 
-		NetworkSession::GetActiveNetworkSession()->parameters[0].max_party_players = maxPlayers;
-		outputCb(StringFlag_None, "# maximum players set: %i", maxPlayers);
+		NetworkSession::GetActiveNetworkSession()->parameters[0].max_party_players = max_players;
+		outputCb(StringFlag_None, "# maximum players set: %i", max_players);
 	} while (0);
 
 	return 0;
@@ -604,8 +603,8 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	datum objectDatum = NONE;
 	int count;
-	float varPos[3];
-	float varRotation[3];
+	real_point3d position;
+	real_vector3d rotation;
 	bool sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
@@ -635,17 +634,17 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 		if (localPlayerPos != nullptr)
 		{
-			varPos[0] = localPlayerPos->x + 0.5f;
-			varPos[1] = localPlayerPos->y + 0.5f;
-			varPos[2] = localPlayerPos->z + 0.5f;
+			position.x = localPlayerPos->x + 0.5f;
+			position.y = localPlayerPos->y + 0.5f;
+			position.z = localPlayerPos->z + 0.5f;
 		}
 	}
 	else
 	{
 		if (parameterCount < 7
-			|| !ComVar(&varPos[0]).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&varPos[1]).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&varPos[2]).SetFromStr(tokens[tokenArgPos++]))
+			|| !ComVar(&position.x).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&position.y).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&position.z).SetFromStr(tokens[tokenArgPos++]))
 		{
 			outputCb(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
 			return 0;
@@ -661,9 +660,9 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	{
 		if ((parameterCount < 7 && nearPlayerSpawn)
 			|| (parameterCount < 10 && !nearPlayerSpawn)
-			|| !ComVar(&varRotation[0]).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&varRotation[1]).SetFromStr(tokens[tokenArgPos++])
-			|| !ComVar(&varRotation[2]).SetFromStr(tokens[tokenArgPos++]))
+			|| !ComVar(&rotation.i).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&rotation.j).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&rotation.k).SetFromStr(tokens[tokenArgPos++]))
 		{
 			outputCb(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
 			return 0;
@@ -681,21 +680,17 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		objectDatum = objectIds[objectName];
 	}
 
-	real_vector3d rotation;
 	real_vector3d* pRotation = nullptr;
-	real_point3d position;
 	real_point3d* pPosition = nullptr;
 
 	if (!nearPlayerSpawn)
 	{
 		pPosition = &position;
-		position = { varPos[0], varPos[1], varPos[2] };
 	}
 
 	if (withRotation)
 	{
 		pRotation = &rotation;
-		rotation = { varRotation[0], varRotation[1], varRotation[2] };
 	}
 
 	ObjectSpawn(objectDatum, count, pPosition, pRotation, 1.0f, sameTeam);

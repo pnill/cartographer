@@ -85,10 +85,10 @@ public:
 	}
 };
 
-template<typename T, typename baseTypeT = typename std::remove_all_pointers<T>::type>
-class ComVar : private CStrToValue<baseTypeT>, public ComVarBase
+template<typename T>
+class ComVar : private CStrToValue<T>, public ComVarBase
 {
-	baseTypeT* m_var_ptr;
+	T* m_var_ptr;
 public:
 	// for custom types, the class should implement the equal operator overload
 	// othewise default is used
@@ -99,8 +99,8 @@ public:
 
 	virtual ~ComVar() = default;
 
-	template<typename Type = baseTypeT>
-	std::enable_if_t<!std::is_same_v<Type, bool>&& std::is_integral_v<Type>, Type> 
+	template<typename Type = T>
+	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, Type> 
 		SetFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
@@ -117,7 +117,7 @@ public:
 		return success;
 	}
 
-	template<typename Type = baseTypeT>
+	template<typename Type = T>
 	std::enable_if_t<std::is_same_v<Type, bool>, bool>
 		SetFromStr(const std::string& str, std::string& potentialException = empty)
 	{
@@ -135,7 +135,7 @@ public:
 		return success;
 	}
 
-	template<typename Type = baseTypeT>
+	template<typename Type = T>
 	std::enable_if_t<std::is_floating_point_v<Type>, bool>
 		SetFromStr(const std::string& str, std::string& potentialException = empty)
 	{
@@ -153,7 +153,7 @@ public:
 		return success;
 	}
 
-	template<typename Type = baseTypeT>
+	template<typename Type = T>
 	std::string AsString(Type* var) const
 	{
 		return std::to_string(*var);
@@ -170,12 +170,12 @@ public:
 		return AsString(m_var_ptr);
 	}
 
-	baseTypeT GetVal() const
+	T GetVal() const
 	{
 		return *m_var_ptr;
 	}
 
-	void SetVal(baseTypeT val)
+	void SetVal(T val)
 	{
 		*m_var_ptr = val;
 	}

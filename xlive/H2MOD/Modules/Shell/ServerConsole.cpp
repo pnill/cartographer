@@ -45,7 +45,7 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 			command_line.append(" ");
 		}
 
-		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), ServerConsole::OotputCb);
+		ConsoleCommand::HandleCommandLine(command_line.get_string(), command_line.length(), ServerConsole::OutputCb);
 		return 0;
 	}
 
@@ -226,7 +226,7 @@ void ServerConsole::SendMsg(const wchar_t* message, bool timeout)
 	}
 }
 
-static int __cdecl ServerConsole::OotputCb(StringHeaderFlags flags, const char* fmt, ...)
+static int __cdecl ServerConsole::OutputCb(StringHeaderFlags flags, const char* fmt, ...)
 {
 	va_list valist;
 	va_start(valist, fmt);
