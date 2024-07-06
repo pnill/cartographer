@@ -16,7 +16,6 @@ struct ConsoleCommandCtxData
 {
     TextOutputCb* outputCb;
     const ConsoleCommand* consoleCommand;
-    void* commandCtx;
 };
 
 enum CommandFlags_
