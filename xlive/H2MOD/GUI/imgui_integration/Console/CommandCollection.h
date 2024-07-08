@@ -11,7 +11,7 @@ namespace CommandCollection
 
 	void InsertCommand(ConsoleCommand* newCommand);
 	ConsoleCommand* GetCommandByName(const std::string& name);
-	void SetVarCommandPtr(const std::string& name, IComVar* varPtr);
+	void SetVarCommandPtr(const std::string& name, ComVarBase* varPtr);
 	void InitializeCommands();
 
 	// commands

@@ -28,20 +28,20 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ComVarFromPtr(d3d9ex_var_cmd, bool*, &H2Config_d3d9ex,
+ComVarFromPtr(d3d9ex_var_cmd, bool, &H2Config_d3d9ex,
 	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
-ComVarFromPtr(network_stats_overlay_var_cmd, bool*, &ImGuiHandler::g_network_stats_overlay,
+ComVarFromPtr(network_stats_overlay_var_cmd, bool, &ImGuiHandler::g_network_stats_overlay,
 	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
 
-ComVarFromPtr(og_frame_limiter_var_cmd, bool*, &g_main_game_time_frame_limiter_enabled,
+ComVarFromPtr(og_frame_limiter_var_cmd, bool, &g_main_game_time_frame_limiter_enabled,
 	"var_og_frame_limiter", "enabled/disable original h2 frame limiter", 1, 1, CommandCollection::BoolVarHandlerCmd);
 
 extern bool displayXyz;
-ComVarFromPtr(display_xyz_var_cmd, bool*, &displayXyz,
+ComVarFromPtr(display_xyz_var_cmd, bool, &displayXyz,
 	"var_display_xyz", "enable/disable players's xyz, 1 parameter(s): <bool>", 1, 1, CommandCollection::DisplayXyzCmd);
 
 extern real32 g_rumble_factor;
-ComVarFromPtr(rumble_var_cmd, real32*, &g_rumble_factor,
+ComVarFromPtr(rumble_var_cmd, real32, &g_rumble_factor,
 	"var_rumble_scale", "change controller vibration strength (0.0 to 1.0), 1 parameter(s): <float>", 1, 1, CommandCollection::RumbleScaleCmd);
 
 // don't forget to add '_cmd' after the name, 
@@ -130,7 +130,7 @@ ConsoleCommand* CommandCollection::GetCommandByName(const std::string& name)
 }
 
 // in case your variable needs to be set/updated
-void CommandCollection::SetVarCommandPtr(const std::string& name, IComVar* varPtr)
+void CommandCollection::SetVarCommandPtr(const std::string& name, ComVarBase* varPtr)
 {
 	ConsoleCommand* commandPtr = GetCommandByName(name);
 	if (commandPtr != nullptr)
@@ -143,117 +143,121 @@ void CommandCollection::SetVarCommandPtr(const std::string& name, IComVar* varPt
 //	commands
 //////////////////////////////////////////////////////////////////////////
 
-int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::BoolVarHandlerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	auto var = reinterpret_cast<ComVarT<bool*>*>(cbData.commandVar);
+	TextOutputCb* outputCb = ctx.outputCb;
+	auto booleanCmdVar = ctx.consoleCommand->GetVar<ComVar<bool>>();
+
+	if (!ctx.consoleCommand->SetsVariable())
+	{
+		outputCb(StringFlag_None, "# command does not set a variable");
+		return 0;
+	}
 
 	std::string exception;
-	if (!var->SetValFromStr(tokens[1], 0, exception))
+	if (!booleanCmdVar->SetFromStr(tokens[1], exception))
 	{
-		output->Output(StringFlag_None, command_error_bad_arg);
-		output->Output(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
 	}
 	return 0;
 }
 
-int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::DisplayXyzCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (game_is_multiplayer()
 		&& !NetworkSession::LocalPeerIsSessionHost())
 	{
-		output->Output(StringFlag_None, "# only host can see xyz for now...");
+		outputCb(StringFlag_None, "# only host can see xyz for now...");
 		return 0;
 	}
 
-	return BoolVarHandlerCmd(tokens, cbData);
+	return BoolVarHandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::RumbleScaleCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	ComVar<real32> rumbleScale;
+	TextOutputCb* outputCb = ctx.outputCb;
+	real32 rumbleScale;
 	std::string exception;
 
-
-	if (!rumbleScale.SetValFromStr(tokens[1], exception))
+	if (!ComVar(&rumbleScale).SetFromStr(tokens[1], exception))
 	{
-		output->Output(StringFlag_None, command_error_bad_arg);
-		output->Output(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
 	}
 	else
 	{
-		g_rumble_factor = PIN(rumbleScale.GetVal(), 0.f, 1.f);
+		g_rumble_factor = PIN(rumbleScale, 0.f, 1.f);
 	}
 
 	return 0;
 }
 
-int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::NetworkMetricsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (Memory::IsDedicatedServer()) {
-		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
-	return BoolVarHandlerCmd(tokens, cbData);
+	return BoolVarHandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::SetD3D9ExStateCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (Memory::IsDedicatedServer()) {
-		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
-	return BoolVarHandlerCmd(tokens, cbData);
+	return BoolVarHandlerCmd(tokens, ctx);
 }
 
-int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::LogXNetConnectionsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	gXnIpMgr.LogConnectionsToConsole(output);
+	TextOutputCb* outputCb = ctx.outputCb;
+	gXnIpMgr.LogConnectionsToConsole(outputCb);
 	return 0;
 }
 
-int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::LogSelectedMapFilenameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (!NetworkSession::GetActiveNetworkSession(nullptr))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 
-	std::string mapFileName;
 	std::wstring mapFilenameWide;
 	MapManager::GetMapFilename(mapFilenameWide);
 
 	utf8 map_name[256];
 	wchar_string_to_utf8_string(mapFilenameWide.c_str(), map_name, NUMBEROF(map_name));
-	output->Output(StringFlag_None, "# map file name: %s", map_name);
+  outputCb(StringFlag_None, "# map file name: %s", map_name);
 	return 0;
 }
 
-int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (!NetworkSession::GetActiveNetworkSession(nullptr))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 	else if (NetworkSession::LocalPeerIsSessionHost())
 	{
-		output->Output(StringFlag_None, "# only clients can request map file name");
+		outputCb(StringFlag_None, "# only clients can request map file name");
 		return 0;
 	}
 
@@ -261,17 +265,17 @@ int CommandCollection::RequestFileNameCmd(const std::vector<std::string>& tokens
 	return 0;
 }
 
-int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (!NetworkSession::GetActiveNetworkSession(nullptr))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 	else if (Memory::IsDedicatedServer()) {
-		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
@@ -279,14 +283,14 @@ int CommandCollection::LeaveNetworkSessionCmd(const std::vector<std::string>& to
 	return 0;
 }
 
-int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	s_network_session* session;
 	if (!NetworkSession::GetActiveNetworkSession(&session))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 
@@ -294,54 +298,54 @@ int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, 
 	isHostStr += "# Session host: ";
 	isHostStr += (NetworkSession::LocalPeerIsSessionHost() ? "yes" : "no");
 	isHostStr += ", value=" + std::to_string(session->local_session_state);
-	output->Output(StringFlag_None, isHostStr.c_str());
+	outputCb(StringFlag_None, isHostStr.c_str());
 	return 0;
 }
 
-int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::KickPeerCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
-	ComVar<int> peerIdxVar;
+	TextOutputCb* outputCb = ctx.outputCb;
+	int peerIndex;
 	std::string exception;
 
 	do
 	{
-		if (!peerIdxVar.SetValFromStr(tokens[1], 0, exception))
+		if (!ComVar(&peerIndex).SetFromStr(tokens[1], 0, exception))
 		{
-			output->Output(StringFlag_None, command_error_bad_arg);
-			output->Output(StringFlag_None, "	%s", exception.c_str());
+			outputCb(StringFlag_None, command_error_bad_arg);
+			outputCb(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
 		else if (Memory::IsDedicatedServer()) {
-			output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+			outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 			break;
 		}
 		else if (!NetworkSession::LocalPeerIsSessionHost()) {
-			output->Output(StringFlag_None, "# only the host can kick players");
+			outputCb(StringFlag_None, "# only the host can kick players");
 			break;
 		}
-		else if (NetworkSession::GetLocalPeerIndex() == peerIdxVar.GetVal()) {
-			output->Output(StringFlag_None, "# don't kick yourself");
+		else if (NetworkSession::GetLocalPeerIndex() == peerIndex) {
+			outputCb(StringFlag_None, "# don't kick yourself");
 			break;
 		}
-		else if (peerIdxVar.GetVal() >= NetworkSession::GetPeerCount()) {
-			output->Output(StringFlag_None, "# peer at the specified index doesn't exist");
+		else if (peerIndex >= NetworkSession::GetPeerCount()) {
+			outputCb(StringFlag_None, "# peer at the specified index doesn't exist");
 			break;
 		}
 
-		NetworkSession::KickPeer(peerIdxVar.GetVal());
+		NetworkSession::KickPeer(peerIndex);
 	} while (0);
 
 	return 0;
 }
 
-int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = (ConsoleLog*)cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (!NetworkSession::LocalPeerIsSessionHost())
 	{
-		output->Output(StringFlag_None, "# cannot download map using command while not being the session host!");
+		outputCb(StringFlag_None, "# cannot download map using command while not being the session host!");
 		return 0;
 	}
 
@@ -351,16 +355,16 @@ int CommandCollection::DownloadMapCmd(const std::vector<std::string>& tokens, Co
 	return 0;
 }
 
-int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::ReloadMapsCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	mapManager->ReloadAllMaps();
 	return 0;
 }
 
-int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	const ConsoleCommand* command_data = cbData.consoleCommandData;
+	TextOutputCb* outputCb = ctx.outputCb;
+	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	const std::string* commandToHelp = nullptr;
 
@@ -372,7 +376,7 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 		commandToHelp = &tokens[1];
 
 	if (!singleCommandHelp)
-		output->Output(StringFlag_None, "# available commands: ");
+		outputCb(StringFlag_None, "# available commands: ");
 
 	for (auto command_entry : CommandCollection::commandTable)
 	{
@@ -381,14 +385,14 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 
 		if (!command_entry->Hidden())
 		{
-			output->Output(StringFlag_None, "# %s ", command_entry->GetName());
+			outputCb(StringFlag_None, "# %s ", command_entry->GetName());
 			if (command_entry->GetDescription() != NULL)
 			{
-				output->Output(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
+				outputCb(StringFlag_None, "    # command description: %s", command_entry->GetDescription());
 			}
 			else
 			{
-				output->Output(StringFlag_None, "	# command has no description");
+				outputCb(StringFlag_None, "	# command has no description");
 			}
 
 			if (singleCommandHelp)
@@ -400,28 +404,28 @@ int CommandCollection::HelpCmd(const std::vector<std::string>& tokens, ConsoleCo
 	}
 
 	if (singleCommandHelp && !singleCommandHelpFound)
-		output->Output(StringFlag_None, "	# unknown command: %s", commandToHelp->c_str());
+		outputCb(StringFlag_None, "	# unknown command: %s", commandToHelp->c_str());
 
 	return 0;
 }
 
-int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	const ConsoleCommand* command_data = cbData.consoleCommandData;
+	TextOutputCb* outputCb = ctx.outputCb;
+	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	if (!NetworkSession::GetActiveNetworkSession(nullptr))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 	else if (!NetworkSession::LocalPeerIsSessionHost())
 	{
-		output->Output(StringFlag_None, "# must be network session host");
+		outputCb(StringFlag_None, "# must be network session host");
 		return 0;
 	}
 
-	output->Output(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
+	outputCb(StringFlag_None, "# %i players: ", NetworkSession::GetPlayerCount());
 
 	for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
 	{
@@ -440,169 +444,169 @@ int CommandCollection::LogPlayersCmd(const std::vector<std::string>& tokens, Con
 			outStr += ", Team=" + std::to_string(NetworkSession::GetPlayerTeam(playerIdx));
 			outStr += ", Identifier=" + std::to_string(NetworkSession::GetPlayerId(playerIdx));
 
-			output->Output(StringFlag_None, outStr.c_str());
+			outputCb(StringFlag_None, outStr.c_str());
 		}
 	}
 
 	return 0;
 }
 
-int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	const ConsoleCommand* command_data = cbData.consoleCommandData;
+	TextOutputCb* outputCb = ctx.outputCb;
+	const ConsoleCommand* command_data = ctx.consoleCommand;
 
 	s_network_session* session;
 
 	if (!NetworkSession::GetActiveNetworkSession(&session))
 	{
-		output->Output(StringFlag_None, "# not in a network session");
+		outputCb(StringFlag_None, "# not in a network session");
 		return 0;
 	}
 	else if (!NetworkSession::LocalPeerIsSessionHost())
 	{
-		output->Output(StringFlag_None, "# must be network session host");
+		outputCb(StringFlag_None, "# must be network session host");
 		return 0;
 	}
 
 	c_network_observer* observer = NetworkSession::GetActiveNetworkSession()->p_network_observer;
 
-	output->Output(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
+	outputCb(StringFlag_None, "# %i peers: ", NetworkSession::GetPeerCount());
 
-	for (int peerIdx = 0; peerIdx < NetworkSession::GetPeerCount(); peerIdx++)
+	for (int32 peer_index = 0; peer_index < NetworkSession::GetPeerCount(); peer_index++)
 	{
-		auto peer_observer_channel = &observer->observer_channels[session->observer_channels[peerIdx].observer_index];
+		auto peer_observer_channel = &observer->observer_channels[session->observer_channels[peer_index].observer_index];
 
-		std::wstring peerNameWide(session->membership[0].peers[peerIdx].name);
+		std::wstring peerNameWide(session->membership[0].peers[peer_index].name);
 		std::string peerName(peerNameWide.begin(), peerNameWide.end());
 
-		std::string outStr = "# Peer index=" + std::to_string(peerIdx);
+		std::string outStr = "# Peer index=" + std::to_string(peer_index);
 		outStr += ", Peer Name=" + peerName;
 		outStr += ", Connection Status=" + std::to_string(peer_observer_channel->state);
-		outStr += ", Peer map state: " + std::to_string(session->membership[0].peers[peerIdx].map_status);
-		int playerIdx = session->membership[0].peers[peerIdx].player_index[0];
-		if (playerIdx != -1)
+		outStr += ", Peer map state: " + std::to_string(session->membership[0].peers[peer_index].map_status);
+		datum player_index = session->membership[0].peers[peer_index].local_players_indexes[0];
+		if (player_index != NONE)
 		{
-			std::wstring playerNameWide(NetworkSession::GetPlayerName(playerIdx));
+			std::wstring playerNameWide(NetworkSession::GetPlayerName(player_index));
 			std::string playerName(playerNameWide.begin(), playerNameWide.end());
-			outStr += ", Player index=" + std::to_string(playerIdx);
+			outStr += ", Player index=" + std::to_string(player_index);
 			outStr += ", Player name=" + playerName;
 
-			playerNameWide = s_player::get_name(playerIdx);
+			playerNameWide = s_player::get_name(player_index);
 			playerName = std::string(playerNameWide.begin(), playerNameWide.end());
 			outStr += ", Name from game player state=" + playerName;
 		}
-		output->Output(StringFlag_None, outStr.c_str());
+		outputCb(StringFlag_None, outStr.c_str());
 	}
 
 	return 0;
 }
 
-int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::SetMaxPlayersCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
-	ComVar<int> value;
+	int max_players;
 	std::string exception;
 
 	do
 	{
 		if (!NetworkSession::LocalPeerIsSessionHost()) {
-			output->Output(StringFlag_None, "# can be only used by host");
+			outputCb(StringFlag_None, "# can be only used by host");
 			break;
 		}
-		else if (!value.SetValFromStr(tokens[1], 0, exception))
+		else if (!ComVar(&max_players).SetFromStr(tokens[1], 0, exception))
 		{
-			output->Output(StringFlag_None, command_error_bad_arg);
-			output->Output(StringFlag_None, "	%s", exception.c_str());
+			outputCb(StringFlag_None, command_error_bad_arg);
+			outputCb(StringFlag_None, "	%s", exception.c_str());
 			break;
 		}
-		else if (value.GetVal() < 1 || value.GetVal() > 16) {
-			output->Output(StringFlag_None, "# the value needs to be between 1 and 16");
+		else if (max_players < 1 || max_players > 16) {
+			outputCb(StringFlag_None, "# the value needs to be between 1 and 16");
 			break;
 		}
-		else if (value.GetVal() < NetworkSession::GetPlayerCount()) {
-			output->Output(StringFlag_None, "# you can't set a value of max players smaller than the actual number of players on the server");
+		else if (max_players < NetworkSession::GetPlayerCount()) {
+			outputCb(StringFlag_None, "# you can't set a value of max players smaller than the actual number of players on the server");
 			break;
 		}
 
-		NetworkSession::GetActiveNetworkSession()->parameters[0].max_party_players = value.GetVal();
-		output->Output(StringFlag_None, "# maximum players set: %i", value.GetVal());
+		NetworkSession::GetActiveNetworkSession()->parameters[0].max_party_players = max_players;
+		outputCb(StringFlag_None, "# maximum players set: %i", max_players);
 	} while (0);
 
 	return 0;
 }
 
-int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::WarpFixCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	ComVar<bool> warpFixVar;
+	TextOutputCb* outputCb = ctx.outputCb;
+	bool warpFixVar;
 
 	if (Memory::IsDedicatedServer()) {
-		output->Output(StringFlag_None, "# command unavailable on dedicated servers");
+		outputCb(StringFlag_None, "# command unavailable on dedicated servers");
 		return 0;
 	}
 
 	std::string exception;
-	if (!warpFixVar.SetValFromStr(tokens[1], 0, exception))
+	if (!ComVar(&warpFixVar).SetFromStr(tokens[1], exception))
 	{
-		output->Output(StringFlag_None, command_error_bad_arg);
-		output->Output(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
 		return 0;
 	}
 
-	H2Tweaks::WarpFix(warpFixVar.GetVal());
+	H2Tweaks::WarpFix(warpFixVar);
 	return 0;
 }
 
-int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::DestroyObjectCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	ComVar<datum> datumIdx;
+	TextOutputCb* outputCb = ctx.outputCb;
+	datum datumIdx;
 
 	std::string exception;
-	if (!datumIdx.SetValFromStr(tokens[1], 0, exception))
+	if (!ComVar(&datumIdx).SetFromStr(tokens[1], 0, exception))
 	{
-		output->Output(StringFlag_None, command_error_bad_arg);
-		output->Output(StringFlag_None, "	%s", exception.c_str());
+		outputCb(StringFlag_None, command_error_bad_arg);
+		outputCb(StringFlag_None, "	%s", exception.c_str());
 		return 0;
 	}
 
-	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx.GetVal(), -1);
+	void* object_data = (void*)object_try_and_get_and_verify_type(datumIdx, -1);
 	if (object_data != NULL)
 	{
-		DeleteObject(datumIdx.GetVal());
-		output->Output(StringFlag_None, "# deleted object idx: 0x%X", datumIdx.GetVal());
+		DeleteObject(datumIdx);
+		outputCb(StringFlag_None, "# deleted object idx: 0x%X", datumIdx);
 	}
 	else
 	{
-		output->Output(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx.GetVal());
+		outputCb(StringFlag_None, "# failed to delete object idx: 0x%X", datumIdx);
 	}
 
 	return 0;
 }
 
-int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::ReloadSpawnCommandListCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
-	output->Output(StringFlag_None, "# object ids reset next time spawn is used");
+	TextOutputCb* outputCb = ctx.outputCb;
+	outputCb(StringFlag_None, "# object ids reset next time spawn is used");
 	readObjectIds = false;
 	return 0;
 }
 
-int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	int tokenArgPos = 1;
 
 	// spawn object_name count same_team near_player x y z i j k
 
 	datum objectDatum = NONE;
-	ComVar<int> count;
-	ComVar<float> varPos[3];
-	ComVar<float> varRotation[3];
-	ComVar<bool> sameTeam, nearPlayerSpawn;
+	int count;
+	real_point3d position;
+	real_vector3d rotation;
+	bool sameTeam, nearPlayerSpawn;
 	int parameterCount = tokens.size() - 1; // only parameters
 
 	datum localPlayerIdx = player_index_from_user_index(0);
@@ -610,58 +614,58 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 	std::string objectName = tokens[tokenArgPos++];
 
 	if (game_is_ui_shell()) {
-		output->Output(StringFlag_None, "# can only be used ingame");
+		outputCb(StringFlag_None, "# can only be used ingame");
 		return 0;
 	}
 	else if (!NetworkSession::LocalPeerIsSessionHost()) {
-		output->Output(StringFlag_None, "# can only be used by the session host");
+		outputCb(StringFlag_None, "# can only be used by the session host");
 		return 0;
 	}
-	else if (!count.SetValFromStr(tokens[tokenArgPos++])
-		|| !sameTeam.SetValFromStr(tokens[tokenArgPos++])
-		|| !nearPlayerSpawn.SetValFromStr(tokens[tokenArgPos++])
+	else if (!ComVar(&count).SetFromStr(tokens[tokenArgPos++])
+		|| !ComVar(&sameTeam).SetFromStr(tokens[tokenArgPos++])
+		|| !ComVar(&nearPlayerSpawn).SetFromStr(tokens[tokenArgPos++])
 		)
 	{
-		output->Output(StringFlag_None, "# one or more invalid spawn arguments");
+		outputCb(StringFlag_None, "# one or more invalid spawn arguments");
 		return 0;
 	}
 
-	if (nearPlayerSpawn.GetVal())
+	if (nearPlayerSpawn)
 	{
 		real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 		if (localPlayerPos != nullptr)
 		{
-			varPos[0].SetVal(localPlayerPos->x + 0.5f);
-			varPos[1].SetVal(localPlayerPos->y + 0.5f);
-			varPos[2].SetVal(localPlayerPos->z + 0.5f);
+			position.x = localPlayerPos->x + 0.5f;
+			position.y = localPlayerPos->y + 0.5f;
+			position.z = localPlayerPos->z + 0.5f;
 		}
 	}
 	else
 	{
 		if (parameterCount < 7
-			|| !varPos[0].SetValFromStr(tokens[tokenArgPos++])
-			|| !varPos[1].SetValFromStr(tokens[tokenArgPos++])
-			|| !varPos[2].SetValFromStr(tokens[tokenArgPos++]))
+			|| !ComVar(&position.x).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&position.y).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&position.z).SetFromStr(tokens[tokenArgPos++]))
 		{
-			output->Output(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
+			outputCb(StringFlag_None, "# insufficient/invalid xyz position spawn arguments");
 			return 0;
 		}
 	}
 
 	// check if rotation parameters were passed
 	// even if invalid, error handled after
-	bool withRotation = (parameterCount >= 5 && nearPlayerSpawn.GetVal())
-		|| (parameterCount >= 8 && !nearPlayerSpawn.GetVal());
+	bool withRotation = (parameterCount >= 5 && nearPlayerSpawn)
+		|| (parameterCount >= 8 && !nearPlayerSpawn);
 
 	if (withRotation)
 	{
-		if ((parameterCount < 7 && nearPlayerSpawn.GetVal())
-			|| (parameterCount < 10 && !nearPlayerSpawn.GetVal())
-			|| !varRotation[0].SetValFromStr(tokens[tokenArgPos++])
-			|| !varRotation[1].SetValFromStr(tokens[tokenArgPos++])
-			|| !varRotation[2].SetValFromStr(tokens[tokenArgPos++]))
+		if ((parameterCount < 7 && nearPlayerSpawn)
+			|| (parameterCount < 10 && !nearPlayerSpawn)
+			|| !ComVar(&rotation.i).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&rotation.j).SetFromStr(tokens[tokenArgPos++])
+			|| !ComVar(&rotation.k).SetFromStr(tokens[tokenArgPos++]))
 		{
-			output->Output(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
+			outputCb(StringFlag_None, "# insufficient/invalid ijk rotation spawn arguments");
 			return 0;
 		}
 	}
@@ -677,38 +681,34 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 		objectDatum = objectIds[objectName];
 	}
 
-	real_vector3d rotation;
 	real_vector3d* pRotation = nullptr;
-	real_point3d position;
 	real_point3d* pPosition = nullptr;
 
-	if (!nearPlayerSpawn.GetVal())
+	if (!nearPlayerSpawn)
 	{
 		pPosition = &position;
-		position = { varPos[0].GetVal(), varPos[1].GetVal(), varPos[2].GetVal() };
 	}
 
 	if (withRotation)
 	{
 		pRotation = &rotation;
-		rotation = { varRotation[0].GetVal(), varRotation[1].GetVal(), varRotation[2].GetVal() };
 	}
 
-	ObjectSpawn(objectDatum, count.GetVal(), pPosition, pRotation, 1.0f, sameTeam.GetVal());
+	ObjectSpawn(objectDatum, count, pPosition, pRotation, 1.0f, sameTeam);
 
-	// output->OutputFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.GetValStr().c_str(), withRotation);
+	// outputCbFmt(StringFlag_None, "# spawned: %s, near player: %s with rotation: %i", objectName.c_str(), nearPlayerSpawn.GetValStr().c_str(), withRotation);
 
 	return 0;
 }
 
-int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 
 	if (!NetworkSession::LocalPeerIsSessionHost()
 		&& !game_is_campaign())
 	{
-		output->Output(StringFlag_None, "# can only be used by the session host");
+		outputCb(StringFlag_None, "# can only be used by the session host");
 		return 0;
 	}
 
@@ -725,13 +725,13 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	auto tagDatum = tag_loader::Get_tag_datum(tagName, tag_type.group, mapName);
 	tag_loader::Load_tag(tagDatum, true, mapName);
 	tag_loader::Push_Back();
-	output->Output(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
+	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
 
 	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
 	return 0;
 }
 
-int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	int* test = nullptr;
 #pragma warning( push )
@@ -818,61 +818,61 @@ void CommandCollection::DeleteObject(datum objectDatumIdx)
 	}
 }
 
-int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::map_name(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_game_launch(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::game_difficulty(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ComVar<int> difficulty;
+	int difficulty;
 	std::string exception;
-	difficulty.SetValFromStr(tokens[1], 0, exception);
+	ComVar(&difficulty).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_difficulty(difficulty.GetVal());
+	main_game_launch_set_difficulty(difficulty);
 	return 0;
 }
 
-int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::game_coop_players(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ComVar<int> player_count;
+	int player_count;
 	std::string exception;
-	player_count.SetValFromStr(tokens[1], 0, exception);
+	ComVar(&player_count).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_coop_player_count(player_count.GetVal());
+	main_game_launch_set_coop_player_count(player_count);
 	return 0;
 }
 
-int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::game_multiplayer(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	main_game_launch_set_multiplayer_variant(tokens[1].c_str());
 	return 0;
 }
 
-int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::game_splitscreen(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ComVar<int> player_count;
+	int player_count;
 	std::string exception;
-	player_count.SetValFromStr(tokens[1], 0, exception);
+	ComVar(&player_count).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_multiplayer_splitscreen_count(player_count.GetVal());
+	main_game_launch_set_multiplayer_splitscreen_count(player_count);
 	return 0;
 }
 
-int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::game_mode(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ComVar<int> game_mode;
+	int game_mode;
 	std::string exception;
-	game_mode.SetValFromStr(tokens[1], 0, exception);
+	ComVar(&game_mode).SetFromStr(tokens[1], 0, exception);
 
-	main_game_launch_set_game_mode(game_mode.GetVal());
+	main_game_launch_set_game_mode(game_mode);
 	return 0;
 }
 
-int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
-	ConsoleLog* output = cbData.strOutput;
+	TextOutputCb* outputCb = ctx.outputCb;
 	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
 	bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
 
@@ -892,13 +892,13 @@ int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCom
 		sprintf(&connect_string[2 * i], "%02hhX", session_bytes[i]);
 	}
 
-	output->Output(StringFlag_None, "Invite code generated:");
-	output->Output(StringFlag_CopyToClipboard, connect_string);
-	output->Output(StringFlag_None, "Invite code has been copied to your clipboard.");
+	outputCb(StringFlag_None, "Invite code generated:");
+	outputCb(StringFlag_CopyToClipboard, connect_string);
+	outputCb(StringFlag_None, "Invite code has been copied to your clipboard.");
 	return 0;
 }
 
-int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData cbData)
+int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	XSESSION_INFO session;
 	uint8* session_bytes = (uint8*)&session;

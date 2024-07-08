@@ -7,19 +7,19 @@
 
 bool NetworkSession::PlayerIsActive(datum player_index)
 {
-	return (NetworkSession::GetActiveNetworkSession()->membership[0].players_active_mask & FLAG(DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index))) != 0;
+	return TEST_BIT(GetActiveNetworkSession()->membership[0].players_active_mask, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 }
 
 std::vector<uint64> NetworkSession::GetActivePlayerIdList()
 {
 	std::vector<uint64> activePlayerIdList;
-	if (NetworkSession::GetPlayerCount() > 0)
+	if (GetPlayerCount() > 0)
 	{
-		for (int playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
+		for (int32 playerIdx = 0; playerIdx < k_maximum_players; playerIdx++)
 		{
-			if (NetworkSession::PlayerIsActive(playerIdx))
+			if (PlayerIsActive(playerIdx))
 			{
-				uint64 playerId = NetworkSession::GetPlayerId(playerIdx);
+				uint64 playerId = GetPlayerId(playerIdx);
 				activePlayerIdList.emplace_back(playerId);
 			}
 		}
@@ -31,11 +31,11 @@ std::vector<uint64> NetworkSession::GetActivePlayerIdList()
 std::vector<int32> NetworkSession::GetActivePlayerIndicesList()
 {
 	std::vector<int32> activePlayersIndices;
-	if (NetworkSession::GetPlayerCount() > 0)
+	if (GetPlayerCount() > 0)
 	{
 		for (int32 playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
 		{
-			if (NetworkSession::PlayerIsActive(playerIndex))
+			if (PlayerIsActive(playerIndex))
 				activePlayersIndices.emplace_back(playerIndex);
 		}
 	}
@@ -270,7 +270,7 @@ bool network_session_interface_set_local_user_character_type(int user_index, e_c
 bool network_session_interface_get_local_user_identifier(int user_index, s_player_identifier* out_identifier)
 {
 	s_session_interface_user* user_properties = session_interface_get_local_user_properties(user_index);
-	if(user_properties->user_exists)
+	if (user_properties->user_exists)
 	{
 		*out_identifier = user_properties->network_user_identifier;
 		return true;

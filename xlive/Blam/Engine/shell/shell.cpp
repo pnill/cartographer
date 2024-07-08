@@ -22,7 +22,11 @@
 
 void shell_apply_patches(void)
 {
-	WriteJmpTo(Memory::GetAddress(0x4544), shell_startup_flag_get);
+	if (!Memory::IsDedicatedServer())
+	{
+		WriteJmpTo(Memory::GetAddress(0x4544), shell_startup_flag_get);
+	}
+
 	return;
 }
 
