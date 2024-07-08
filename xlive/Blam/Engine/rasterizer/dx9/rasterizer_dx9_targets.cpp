@@ -312,7 +312,7 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
         break;
     }
 
-    return rasterizer_dx9_set_texture(stage, d3d_texture);
+    return rasterizer_dx9_device_set_texture(stage, d3d_texture);
 }
 
 bool rasterizer_dx9_set_target_as_texture_internal(int16 stage, e_rasterizer_target rasterizer_target, IDirect3DTexture9* d3d_texture)
@@ -321,7 +321,7 @@ bool rasterizer_dx9_set_target_as_texture_internal(int16 stage, e_rasterizer_tar
     uint32 resolution_y;
     rasterizer_dx9_texture_target_surface_size(rasterizer_target, &resolution_x, &resolution_y);
     rasterizer_dx9_texture_stage_dimensions(stage, resolution_x, resolution_y);    
-    return rasterizer_dx9_set_texture(stage, d3d_texture);
+    return rasterizer_dx9_device_set_texture(stage, d3d_texture);
 }
 
 void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, int32 mipmap_index, bool use_depth)
@@ -539,10 +539,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     return;
 }
 
-bool __cdecl rasterizer_dx9_set_texture(uint32 stage, IDirect3DTexture9* texture)
-{
-    return INVOKE(0x26EBC7, 0x0, rasterizer_dx9_set_texture, stage, texture);
-}
+
 
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y)
 {

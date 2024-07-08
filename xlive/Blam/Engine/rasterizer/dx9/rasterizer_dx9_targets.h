@@ -98,8 +98,6 @@ bool rasterizer_dx9_set_target_as_texture_internal(int16 stage, e_rasterizer_tar
 
 void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, int32 mipmap_index, bool use_depth);
 
-bool __cdecl rasterizer_dx9_set_texture(uint32 stage, IDirect3DTexture9* texture);
-
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y);
 
 IDirect3DSurface9** rasterizer_dx9_last_target_get(void);

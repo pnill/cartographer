@@ -1,5 +1,8 @@
 #pragma once
+
 #include "render_cameras.h"
+#include "render_layers.h"
+#include "render_visibility_collection.h"
 
 #include "camera/camera.h"
 #include "effects/player_effects.h"
@@ -82,6 +85,8 @@ uint32* global_effect_flag_get(void);
 
 // ### TODO: better function name
 bool frame_parameters_type_is_above_or_equal_to_7(void);
+
+void draw_specific_render_layer(e_collection_type collection_type, e_render_layer render_layer);
 
 // CLIENT ONLY
 // Get cluster index and leaf index from render position provided

@@ -64,18 +64,9 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
         {
             IDirect3DSurface9* target_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);
 
-            int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-            int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-            int16 left = global_window_parameters->camera.viewport_bounds.left;
-            int16 top = global_window_parameters->camera.viewport_bounds.top;
+            RECT rect;
+            rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
 
-            const RECT rect =
-            {
-                left,
-                top,
-                width + left,
-                height + top
-            };
             rasterizer_set_render_target_internal_hook_set_viewport(backbuffer, (IDirect3DSurface9*)NONE, true);
             global_d3d_device->StretchRect(target_surface, &rect, backbuffer, &rect, D3DTEXF_NONE);
         }
@@ -122,18 +113,8 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
         e_rasterizer_target rasterizer_target_dst = rasterizer_dx9_get_overlay_destination_target();
         if (rasterizer_target_dst != NONE)
         {
-            int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-            int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-            int16 left = global_window_parameters->camera.viewport_bounds.left;
-            int16 top = global_window_parameters->camera.viewport_bounds.top;
-
-            const RECT rect =
-            {
-                left,
-                top,
-                left + width,
-                top + height
-            };
+            RECT rect;
+            rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
 
             IDirect3DSurface9* dst_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target_dst, 0);
             IDirect3DSurface9* src_surface = rasterizer_dx9_get_render_target_surface(rasterizer_target, 0);

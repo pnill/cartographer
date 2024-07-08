@@ -262,6 +262,12 @@ void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbri
     return;
 }
 
+
+bool __cdecl rasterizer_set_texture_bitmap_data(int16 stage, bitmap_data* texture)
+{
+    return INVOKE(0x25F5AC, 0x0, rasterizer_set_texture_bitmap_data, stage, texture);
+}
+
 bool rasterizer_dx9_draw_primitive_up(
     D3DPRIMITIVETYPE PrimitiveType,
     uint32 PrimitiveCount,
@@ -288,7 +294,13 @@ void rasterizer_dx9_texture_stage_dimensions(uint8 stage, uint32 width, uint32 h
     return;
 }
 
-bool __cdecl rasterizer_set_texture_bitmap_data(int16 stage, bitmap_data* texture)
+bool __cdecl rasterizer_dx9_device_set_texture(uint32 stage, IDirect3DTexture9* texture)
 {
-    return INVOKE(0x25F5AC, 0x0, rasterizer_set_texture_bitmap_data, stage, texture);
+    return INVOKE(0x26EBC7, 0x0, rasterizer_dx9_device_set_texture, stage, texture);
+}
+
+void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32 usage, datum tag_index, int16 bitmap_index, real32 a6)
+{
+    INVOKE(0x25F74C, 0x0, rasterizer_dx9_set_texture, stage, type, usage, tag_index, bitmap_index, a6);
+    return;
 }

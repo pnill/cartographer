@@ -46,7 +46,7 @@ struct object_placement_data
 	e_bsp_policy placement_policy;
 	BYTE unk_15;
 	WORD unk_16;
-	c_flags<e_scenario_object_placement_flags, uint32, k_scenario_object_placement_flags> flags;
+	c_flags_no_init<e_scenario_object_placement_flags, uint32, k_scenario_object_placement_flags> flags;
 	real_point3d position;
 	real_vector3d forward;
 	real_vector3d up;

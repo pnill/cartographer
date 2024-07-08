@@ -1,6 +1,7 @@
 #pragma once
-
-
+#include "math/function_definitions.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 
 enum e_light_placement_flags : short
 {
@@ -24,37 +25,38 @@ enum e_lightmap_flags: short
 
 enum e_light_definition_flags : uint32
 {
-    _light_definition_no_illumination_dont_cast_any_per_pixel_dynamic_light = FLAG(0),
-	_light_definition_no_illumination_no_specular_dont_cast_any_specular_highlights = FLAG(1),
-	_light_definition_no_illumination_force_cast_environment_shadows_through_portals = FLAG(2),
-	_light_definition_no_illumination_no_shadow_dont_cast_any_stencil_shadows = FLAG(3),
-	_light_definition_no_illumination_force_frustum_visibility_on_small_light = FLAG(4),
-	_light_definition_no_illumination_only_render_in_first_person = FLAG(5),
-	_light_definition_no_illumination_only_render_in_third_person = FLAG(6),
-	_light_definition_no_illumination_dont_fade_when_invisible = FLAG(7),
-	_light_definition_no_illumination_multiplayer_override = FLAG(8),
-	_light_definition_no_illumination_animated_gel = FLAG(9),
-	_light_definition_no_illumination_only_in_dynamic_envmap = FLAG(10),
-	_light_definition_no_illumination_ignore_parent_object = FLAG(11),
-	_light_definition_no_illumination_dont_shadow_parent = FLAG(12),
-	_light_definition_no_illumination_ignore_all_parents = FLAG(13),
-	_light_definition_no_illumination_march_milestone_hack = FLAG(14),
-	_light_definition_no_illumination_force_light_inside_world = FLAG(15),
-	_light_definition_no_illumination_environment_doesnt_cast_stencil_shadows = FLAG(16),
-	_light_definition_no_illumination_objects_dont_cast_stencil_shadows = FLAG(17),
-	_light_definition_no_illumination_first_person_from_camera = FLAG(18),
-	_light_definition_no_illumination_texture_camera_gel = FLAG(19),
-	_light_definition_no_illumination_light_framerate_killer = FLAG(20),
-	_light_definition_no_illumination_allowed_in_split_screen = FLAG(21),
-	_light_definition_no_illumination_only_on_parent_bipeds = FLAG(22),
+    _light_definition_no_illumination_dont_cast_any_per_pixel_dynamic_light = 0,
+	_light_definition_no_specular_dont_cast_any_specular_highlights = 1,
+	_light_definition_force_cast_environment_shadows_through_portals = 2,
+	_light_definition_no_shadow_dont_cast_any_stencil_shadows = 3,
+	_light_definition_force_frustum_visibility_on_small_light = 4,
+	_light_definition_only_render_in_first_person = 5,
+	_light_definition_only_render_in_third_person = 6,
+	_light_definition_dont_fade_when_invisible = 7,
+	_light_definition_multiplayer_override = 8,
+	_light_definition_animated_gel = 9,
+	_light_definition_only_in_dynamic_envmap = 10,
+	_light_definition_ignore_parent_object = 11,
+	_light_definition_dont_shadow_parent = 12,
+	_light_definition_ignore_all_parents = 13,
+	_light_definition_march_milestone_hack = 14,
+	_light_definition_force_light_inside_world = 15,
+	_light_definition_environment_doesnt_cast_stencil_shadows = 16,
+	_light_definition_objects_dont_cast_stencil_shadows = 17,
+	_light_definition_first_person_from_camera = 18,
+	_light_definition_texture_camera_gel = 19,
+	_light_definition_light_framerate_killer = 20,
+	_light_definition_allowed_in_split_screen = 21,
+	_light_definition_only_on_parent_bipeds = 22,
+	k_light_definition_flag_count
 };
 
-enum e_light_definition_type : uint16
+enum e_light_type : int16
 {
-	light_type_sphere = 0,
-	light_type_orthogonal = 1,
-	light_type_projective = 2,
-	light_type_pyramid = 3,
+	_light_type_sphere = 0,
+	_light_type_orthogonal = 1,
+	_light_type_projective = 2,
+	_light_type_pyramid = 3,
 	NUMBER_OF_LIGHT_TYPES
 };
 
@@ -148,7 +150,7 @@ enum e_light_definition_animation_flags : uint32
 
 struct s_scenario_light_datum
 {
-    e_light_definition_type type;
+    e_light_type type;
     e_light_placement_flags flags;
 	e_lightmap_type lightmap_type;
     e_lightmap_flags lightmap_flags;
@@ -165,8 +167,8 @@ ASSERT_STRUCT_SIZE(s_scenario_light_datum, 48);
 
 struct light_definition
 {
-	e_light_definition_flags flags;
-	e_light_definition_type type;
+	c_flags<e_light_definition_flags, uint32, k_light_definition_flag_count> flags;
+	e_light_type type;
 	int16 pad_1;
 
 	/// how the light's size changes with external scale
@@ -269,3 +271,21 @@ struct light_definition
 	tag_reference shader; // shad
 };
 ASSERT_STRUCT_SIZE(light_definition, 228);
+
+/* public code */
+
+static light_definition* current_light_definition_get(void)
+{
+	return *Memory::GetAddress<light_definition**>(0xA3E234);
+}
+
+static e_light_type current_lght_type_get(void)
+{
+	return *Memory::GetAddress<e_light_type*>(0xA3E238);
+}
+
+static bool light_type_is_spherical(e_light_type light_type)
+{
+	ASSERT(VALID_INDEX(light_type, NUMBER_OF_LIGHT_TYPES));
+	return light_type == _light_type_sphere;
+}

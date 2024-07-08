@@ -45,6 +45,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer/dx9/rasterizer_dx9_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "render/render.h"
@@ -934,6 +935,7 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_lens_flares_apply_patches();
 		rasterizer_dx9_main_apply_patches();
 		rasterizer_dx9_screen_effect_apply_patches();
+		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
 		rasterizer_dx9_water_apply_patches();
 
