@@ -200,8 +200,7 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 {
 	if (this->m_used_data + size > this->m_total_data_size)
 	{
-		LOG_ERROR_GAME("[c_xml_definition_loader::reserve_data]: RAN OUT OF SPACE");
-		throw;
+		DISPLAY_ASSERT("[c_xml_definition_loader::reserve_data]: RAN OUT OF SPACE");
 	}
 	if (!this->m_data)
 		return nullptr;
@@ -215,7 +214,7 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 	return &this->m_data[old_size];
 }
 
-void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* loader, c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count)
+void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* loader, const c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count)
 {
 	int8* cache_data = (int8*)calloc(block_count,definition->get_size());
 	fseek(loader->m_file_handle, file_offset, SEEK_SET);
@@ -305,25 +304,26 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 
 		for (uint32 i = 0; i < definition->get_tag_block_count(); i++)
 		{
-			uint32 calc_offset = definition->get_tag_block(i)->get_offset() + definition->get_size() * block_index;
+			const c_xml_definition_block* definition_block = definition->get_tag_block(i);
+			uint32 calc_offset = definition_block->get_offset() + definition->get_size() * block_index;
 			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_tag_block, sizeof(tag_block<>), 1);
 			if (t_tag_block.count > 0)
 			{
-				int8* block_buffer = loader->reserve_data(definition->get_tag_block(i)->get_size() * t_tag_block.count);
+				int8* block_buffer = loader->reserve_data(definition_block->get_size() * t_tag_block.count);
 
 				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].cache_offset = file_offset + calc_offset;
 				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].memory_offset = (uint32)buffer + calc_offset;
-				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].size = definition->get_tag_block(i)->get_size() * t_tag_block.count;
+				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].size = definition_block->get_size() * t_tag_block.count;
 				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].data = block_buffer;
 
 #if K_TAG_INJECTION_DEBUG
-				LOG_DEBUG_GAME("[c_xml_definition_loader::load_tag_internal] tag_block: {} name: {} count: {}, size: {:x}", i, definition->get_tag_block_name(i)->get_string(), t_tag_block.count, definition->get_tag_block(i)->get_size());
+				LOG_DEBUG_GAME("[c_xml_definition_loader::load_tag_internal] tag_block: {} name: {} count: {}, size: {:x}", i, definition->get_tag_block_name(i)->get_string(), t_tag_block.count, definition_block->get_size());
 				loader->m_tag_block_offsets[loader->m_tag_block_offset_count].name.set(definition->get_tag_block_name(i)->get_string());
 #endif
 
 				loader->m_tag_block_offset_count++;
 
-				load_tag_data_internal(loader, definition->get_tag_block(i), loader->resolve_cache_tag_data_offset(t_tag_block.data), block_buffer, t_tag_block.count);
+				load_tag_data_internal(loader, definition_block, loader->resolve_cache_tag_data_offset(t_tag_block.data), block_buffer, t_tag_block.count);
 			}
 		}
 	}
@@ -366,16 +366,22 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 		{
 			tag_block<> block;
 
-			c_xml_definition_block* definition_block = definition->get_tag_block(i);
-
-			lazy_fread(this->m_file_handle, base_offset + definition->get_tag_block(i)->get_offset() + block_index * definition->get_size(), &block, sizeof(tag_block<>), 1);
+			const c_xml_definition_block* definition_block = definition->get_tag_block(i);
+			lazy_fread(this->m_file_handle, base_offset + definition_block->get_offset() + block_index * definition->get_size(), &block, sizeof(tag_block<>), 1);
 			if (block.count != 0 && block.data != 0 && block.count != -1 && block.data != -1)
 			{
 				this->m_total_data_size += definition_block->get_size() * block.count;
 
 #if K_TAG_INJECTION_DEBUG
 				bool in_bounds = (this->m_instance.data_offset < block.data && this->m_instance.data_offset + this->m_instance.size > block.data);
-				LOG_DEBUG_GAME("[c_xml_definition_loader::calc_data_size] {:x} {} {} {} {:x} {}", base_offset, definition_block->get_name()->get_string(), definition_block->get_offset(), block.count, block.data, in_bounds);
+				LOG_DEBUG_GAME(
+					"[c_xml_definition_loader::calc_data_size] {:x} {} {} {} {:x} {}",
+					base_offset,
+					definition_block->get_name(),
+					definition_block->get_offset(),
+					block.count,
+					block.data,
+					in_bounds);
 #endif
 
 				this->calculate_total_data_size(definition->get_tag_block(i), resolve_cache_tag_data_offset(block.data), block.count);

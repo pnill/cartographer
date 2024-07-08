@@ -63,7 +63,7 @@ class c_xml_definition_loader
 	static void initialize_arrays_internal(c_xml_definition_loader* loader, const c_xml_definition_block* definition, uint32 file_offset, uint32 block_count);
 	void initialize_arrays();
 	int8* reserve_data(uint32 size);
-	static void load_tag_data_internal(c_xml_definition_loader* loader, c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count);
+	static void load_tag_data_internal(c_xml_definition_loader* loader, const c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count);
 	void load_tag_data();
 	void calculate_total_data_size(const c_xml_definition_block* definition, uint32 base_offset, uint32 block_size);
 public:

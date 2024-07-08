@@ -23,7 +23,7 @@ void christmas_event_map_load()
 	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 
 	// Carto Shared tags
-	tag_injection_set_active_map("carto_shared");
+	tag_injection_set_active_map(k_events_map);
 
 	if (!tag_injection_active_map_verified())
 		return;

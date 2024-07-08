@@ -259,9 +259,9 @@ uint32 c_xml_definition_block::get_offset() const
 	return this->m_offset;
 }
 
-c_static_string64* c_xml_definition_block::get_name()
+const char* c_xml_definition_block::get_name() const
 {
-	return &this->m_name;
+	return this->m_name.get_string();
 }
 
 uint32 c_xml_definition_block::get_tag_references_count() const

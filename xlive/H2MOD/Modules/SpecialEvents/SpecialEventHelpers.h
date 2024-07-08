@@ -1,6 +1,7 @@
 #pragma once
 #include "tag_files/string_id.h"
 
+/* structs */
 
 struct s_event_scenery_placement
 {
@@ -11,7 +12,11 @@ struct s_event_scenery_placement
 	float scale;
 };
 
+/* globals */
+
 const string_id new_elite_head_marker(0xFEE01234);
+
+/* prototypes */
 
 void add_special_event_markers();
 void replace_fp_and_3p_models_from_weapon(datum weapon_datum, datum fp_model_datum, datum _3p_model_datum);

@@ -133,10 +133,8 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 {
 	// Add skeleton
 
-	tag_injection_set_active_map("carto_shared");
+	tag_injection_set_active_map(k_carto_shared_map);
 	datum skele_datum = tag_injection_load(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
-	//objects\\characters\\masterchief_skeleton\\fp\\fp
-	//objects\\characters\\masterchief_skeleton\\fp\\fp
 	datum skele_fp_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp\\fp", true);
 	datum skele_body_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", true);
 
@@ -157,7 +155,7 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 
 void game_globals_add_flood_representation(scenario* scenario_definition)
 {
-	tag_injection_set_active_map("carto_shared");
+	tag_injection_set_active_map(k_carto_shared_map);
 
 	datum flood_datum = tag_injection_load(_tag_group_biped, "objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", true);
 	datum flood_arms_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\flood_mp\\fp_arms\\fp_arms", true);
@@ -215,7 +213,7 @@ void game_globals_add_lmao_representation(void)
 			}
 		}
 
-		tag_injection_set_active_map("carto_shared");
+		tag_injection_set_active_map(k_carto_shared_map);
 		// Add lmao head as an attachment on the new variant
 		datum lmao_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", true);
 		if (lmao_datum != NONE)

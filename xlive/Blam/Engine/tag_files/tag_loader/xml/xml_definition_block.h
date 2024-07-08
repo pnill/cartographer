@@ -47,7 +47,7 @@ public:
 
 	uint32 get_size() const;
 	uint32 get_offset() const;
-	c_static_string64* get_name();
+	const char* get_name() const;
 
 	uint32 get_tag_references_count() const;
 	uint32 get_tag_reference_offset(uint32 index) const;

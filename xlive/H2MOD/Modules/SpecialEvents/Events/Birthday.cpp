@@ -11,7 +11,7 @@
 
 void birthday_event_map_load()
 {
-	tag_injection_set_active_map("carto_shared");
+	tag_injection_set_active_map(k_events_map);
 	if (tag_injection_active_map_verified())
 	{
 		datum hat_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\birthday_hat\\birthday_hat", true);

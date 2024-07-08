@@ -690,7 +690,7 @@ void c_screen_squad_settings::apply_instance_patches()
 
 void c_screen_squad_settings::apply_patches_on_map_load()
 {
-	tag_injection_set_active_map("mainmenu_bitmaps");
+	tag_injection_set_active_map(L"mainmenu_bitmaps");
 	datum xbox_live_bitmap_datum = tag_injection_load(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live", true);
 
 	if (xbox_live_bitmap_datum != NONE)

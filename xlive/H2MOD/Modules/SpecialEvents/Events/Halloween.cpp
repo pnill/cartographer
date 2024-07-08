@@ -98,7 +98,7 @@ void halloween_event_map_load()
 
 	const s_cache_header* cache_header = cache_files_get_header();
 
-	tag_injection_set_active_map("carto_shared");
+	tag_injection_set_active_map(k_events_map);
 
 	if(!strcmp(cache_header->name, "coagulation"))
 	{

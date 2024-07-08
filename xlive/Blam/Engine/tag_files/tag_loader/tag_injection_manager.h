@@ -19,16 +19,16 @@ private:
 	c_static_flags<k_tag_group_count> m_agents_initialized;
 	c_xml_definition_agent m_agents[k_tag_group_count];
 
-	c_static_string260 m_base_map_directory;
-	c_static_string260 m_mods_map_directory;
-	c_static_string260 m_plugins_directory;
+	c_static_wchar_string<MAX_PATH> m_base_map_directory;
+	c_static_wchar_string<MAX_PATH> m_mods_map_directory;
+	c_static_wchar_string<MAX_PATH> m_plugins_directory;
 
 	uint32 m_base_tag_data_size;
 	uint32 m_injectable_used_size;
 	tags::tag_instance* m_instances;
 
 	bool m_active_map_verified;
-	c_static_string260 m_active_map;
+	c_static_wchar_string<MAX_PATH> m_active_map;
 	s_cache_header m_active_map_cache_header;
 	s_tags_header m_active_map_tags_header;
 	tags::tag_instance m_active_map_scenario_instance;
@@ -55,8 +55,8 @@ public:
 	uint16 get_entry_count() const;
 	c_tag_injection_table* get_table();
 
-	bool find_map(const char* map_name, c_static_string260* out_string) const;
-	void set_active_map(const char* map_name);
+	bool find_map(const wchar_t* map_name, c_static_wchar_string<MAX_PATH>* out_string) const;
+	void set_active_map(const wchar_t* map_name);
 	
 	bool get_active_map_verified() const;
 	void reset();

@@ -714,7 +714,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	}
 
 	std::string tagName = tokens[1];
-	std::string mapName = tokens[3];
+	std::wstring mapName(tokens[3].begin(), tokens[3].end());
 
 	const char* p_string = tokens[2].c_str();
 	tag_group tag_type;
@@ -729,7 +729,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 
 	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
 
-	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
+	LOG_INFO_GAME("{} - {} {}", tagName, tag_type.string);
 	return 0;
 }
 

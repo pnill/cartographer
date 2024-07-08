@@ -19,23 +19,22 @@
 
 namespace MapSlots
 {
-	std::vector<std::string> AddedMaps;
+	std::vector<std::wstring> AddedMaps;
 	std::vector<s_multiplayer_ui_level_definition> MapData;
-	std::map<datum, std::string> BitmapsToLoad;
+	std::map<datum, std::wstring> BitmapsToLoad;
 
 	void CacheMapData(void)
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		std::string game_dir(GetExeDirectoryNarrow());
-		std::string def_maps_loc = game_dir + "\\maps";
+		std::wstring def_maps_loc = GetExeDirectoryWide() + L"\\maps";
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 		for (const auto& map : AddedMaps)
 		{
-			std::string map_location = def_maps_loc + "\\" + map + ".map";
+			std::wstring map_location = def_maps_loc + L"\\" + map + L".map";
 			if (std::filesystem::exists(map_location))
 			{
-				LOG_TRACE_GAME("[Map Slots]: Startup - Caching {}", map);
+				LOG_TRACE_GAME(L"[Map Slots]: Startup - Caching {}", map);
 				std::ifstream fin(map_location.c_str(), std::ios::binary);
 				if (fin.is_open())
 				{
@@ -93,7 +92,7 @@ namespace MapSlots
 			}
 			else
 			{
-				LOG_TRACE_GAME("[Map Slots]: Startup - Map File Missing {}", map);
+				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map);
 			}
 		}
 
@@ -217,8 +216,8 @@ namespace MapSlots
 
 	void Initialize(void)
 	{
-		AddedMaps.emplace_back("highplains");
-		AddedMaps.emplace_back("derelict");
+		AddedMaps.emplace_back(L"highplains");
+		AddedMaps.emplace_back(L"derelict");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())

@@ -11,6 +11,13 @@
 	fseek(FILE, OFFSET, SEEK_SET);\
 	fread(OUT, SIZE, COUNT, FILE)
 
+/* constants */
+
+#define k_relative_maps_directory L"\\maps\\"
+#define k_relative_mods_directory L"\\mods\\"
+#define k_relative_mods_maps_directory k_relative_mods_directory L"maps\\"
+#define k_relative_mods_plugin_directory k_relative_mods_directory L"plugins\\"
+
 
 c_tag_injecting_manager::c_tag_injecting_manager():
 	m_agents{}, m_base_tag_data_size(0), m_injectable_used_size(0), m_instances(nullptr),
@@ -23,14 +30,14 @@ c_tag_injecting_manager::c_tag_injecting_manager():
 
 void c_tag_injecting_manager::init_directories()
 {
-	this->m_base_map_directory.set(GetExeDirectoryNarrow().c_str());
-	this->m_base_map_directory.append("\\maps\\");
+	this->m_base_map_directory.set(GetExeDirectoryWide().c_str());
+	this->m_base_map_directory.append(k_relative_maps_directory);
 
-	this->m_mods_map_directory.set(GetExeDirectoryNarrow().c_str());
-	this->m_mods_map_directory.append("\\mods\\maps\\");
+	this->m_mods_map_directory.set(GetExeDirectoryWide().c_str());
+	this->m_mods_map_directory.append(k_relative_mods_maps_directory);
 
-	this->m_plugins_directory.set(GetExeDirectoryNarrow().c_str());
-	this->m_plugins_directory.append("\\mods\\plugins\\");
+	this->m_plugins_directory.set(GetExeDirectoryWide().c_str());
+	this->m_plugins_directory.append(k_relative_mods_plugin_directory);
 }
 
 void c_tag_injecting_manager::set_base_map_tag_data_size(const uint32 size)
@@ -58,16 +65,18 @@ c_tag_injection_table* c_tag_injecting_manager::get_table()
 	return &this->m_table;
 }
 
-bool c_tag_injecting_manager::find_map(const char* map_name, c_static_string260* out_string) const
+bool c_tag_injecting_manager::find_map(const wchar_t* map_name, c_static_wchar_string<MAX_PATH>* out_string) const
 {
-	c_static_string260 test_path;
+	c_static_wchar_string<MAX_PATH> test_path;
 	test_path.set(this->m_base_map_directory.get_string());
 	test_path.append(map_name);
-	test_path.append(".map");
-	if (PathFileExistsA(test_path.get_string()))
+	test_path.append(L".map");
+	if (PathFileExists(test_path.get_string()))
 	{
 		if (out_string)
+		{
 			out_string->set(test_path.get_string());
+		}
 		return true;
 	}
 	else
@@ -75,25 +84,27 @@ bool c_tag_injecting_manager::find_map(const char* map_name, c_static_string260*
 		// Test if map exists in mods folder
 		test_path.set(this->m_mods_map_directory.get_string());
 		test_path.append(map_name);
-		test_path.append(".map");
-		if (PathFileExistsA(test_path.get_string()))
+		test_path.append(L".map");
+		if (PathFileExists(test_path.get_string()))
 		{
 			if (out_string)
+			{
 				out_string->set(test_path.get_string());
+			}
 			return true;
 		}
 		else
 		{
 			// if map is found in neither location then return the function early
-			LOG_ERROR_GAME("[c_tag_injecting_manager::set_active_map] could not locate {}.map in any valid content location", map_name);
+			LOG_ERROR_GAME(L"[c_tag_injecting_manager::set_active_map] could not locate {}.map in any valid content location", map_name);
 			return false;
 		}
 	}
 }
 
-void c_tag_injecting_manager::set_active_map(const char* map_name)
+void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 {
-	c_static_string260 t_path;
+	c_static_wchar_string<MAX_PATH> t_path;
 	if (!this->find_map(map_name, &t_path))
 		return;
 
@@ -109,7 +120,9 @@ void c_tag_injecting_manager::set_active_map(const char* map_name)
 		fclose(this->m_active_map_file_handle);
 
 	this->m_active_map_verified = true;
-	this->m_active_map_file_handle = fopen(this->m_active_map.get_string(), "rb");
+	
+	// TODO: write out error
+	_wfopen_s(&this->m_active_map_file_handle, this->m_active_map.get_string(), L"rb");
 
 	// Read cache header from map file
 	lazy_fread(this->m_active_map_file_handle, 0, &this->m_active_map_cache_header, sizeof(s_cache_header), 1);
@@ -192,7 +205,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 #endif
 
 	//supposing full length
-	HANDLE new_file_handle = CreateFileA(this->m_active_map.get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+	HANDLE new_file_handle = CreateFile(this->m_active_map.get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
 		//(HANDLE)_get_osfhandle(_fileno(this->m_active_map_file_handle));
 	
 	*Memory::GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
@@ -363,7 +376,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 
 	fseek(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset, SEEK_SET);
 	uint32 current_index = 0;
-	uint32 chars_read = 0;
+	int32 chars_read = 0;
 	uint16 buff_size = 0;
 	char buff[MAX_PATH];
 
@@ -411,24 +424,26 @@ bool c_tag_injecting_manager::initialize_agent(tag_group group)
 
 	// non-terminated sting correction
 	// flip string and terminate
-	char null_terminated_class[5];
-	null_terminated_class[0] = group.string[3];
-	null_terminated_class[1] = group.string[2];
-	null_terminated_class[2] = group.string[1];
-	null_terminated_class[3] = group.string[0];
-	null_terminated_class[4] = '\0';
+	char tag_class[5];
+	tag_class[0] = group.string[3];
+	tag_class[1] = group.string[2];
+	tag_class[2] = group.string[1];
+	tag_class[3] = group.string[0];
+	tag_class[4] = '\0';
 
-	if (null_terminated_class[3] == ' ')
-		null_terminated_class[3] = '\0';
+	tag_class[3] = (tag_class[3] == ' ' ? '\0' : tag_class[3]);
 
-	c_static_string260 plugin_path;
+	wchar_t wide_tag_class[5];
+	utf8_string_to_wchar_string(tag_class, wide_tag_class, NUMBEROF(wide_tag_class));
+
+	c_static_wchar_string<MAX_PATH> plugin_path;
 	plugin_path.set(this->m_plugins_directory.get_string());
-	plugin_path.append(null_terminated_class);
-	plugin_path.append(".xml");
+	plugin_path.append(wide_tag_class);
+	plugin_path.append(L".xml");
 
-	if (!PathFileExistsA(plugin_path.get_string()))
+	if (!PathFileExists(plugin_path.get_string()))
 	{
-		LOG_ERROR_GAME("[c_tag_injecting_manager::initialize_agent] Plugin file could not be located {}", plugin_path.get_string());
+		LOG_ERROR_GAME(L"[c_tag_injecting_manager::initialize_agent] Plugin file could not be located {}", plugin_path.get_string());
 		return false;
 	}
 	this->m_agents[tag_group_index].init(group, plugin_path.get_string());
@@ -517,14 +532,17 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
 #if K_TAG_INJECTION_DEBUG
-	char null_terminated_class[5];
-	null_terminated_class[0] = group.string[3];
-	null_terminated_class[1] = group.string[2];
-	null_terminated_class[2] = group.string[1];
-	null_terminated_class[3] = group.string[0];
-	null_terminated_class[4] = '\0';
+	char tag_class[5];
+	tag_class[0] = group.string[3];
+	tag_class[1] = group.string[2];
+	tag_class[2] = group.string[1];
+	tag_class[3] = group.string[0];
+	tag_class[4] = '\0';
 
-	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), null_terminated_class);
+	c_static_string260 name;
+	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
+
+	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), tag_class);
 #endif
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
@@ -554,15 +572,15 @@ void c_tag_injecting_manager::inject_tags()
 	for (uint16 i = 0; i < this->m_table.get_entry_count(); i++)
 	{
 		s_tag_injecting_table_entry* entry = this->m_table.get_entry(i);
-		char null_terminated_class[5];
-		null_terminated_class[0] = entry->type.string[3];
-		null_terminated_class[1] = entry->type.string[2];
-		null_terminated_class[2] = entry->type.string[1];
-		null_terminated_class[3] = entry->type.string[0];
-		null_terminated_class[4] = '\0';
+		char tag_class[5];
+		tag_class[0] = entry->type.string[3];
+		tag_class[1] = entry->type.string[2];
+		tag_class[2] = entry->type.string[1];
+		tag_class[3] = entry->type.string[0];
+		tag_class[4] = '\0';
 		c_static_string260 tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
-		LOG_DEBUG_GAME("[table_dump]: cache_index: {:x} injected_index: {:x} type: {} tag_name: {}", entry->cache_index, entry->injected_index, null_terminated_class, tag_name.get_string());
+		LOG_DEBUG_GAME("[table_dump]: cache_index: {:x} injected_index: {:x} type: {} tag_name: {}", entry->cache_index, entry->injected_index, tag_class, tag_name.get_string());
 	}
 #endif
 	for(uint16 i = 0; i < this->m_table.get_entry_count(); i++)
@@ -599,18 +617,18 @@ void c_tag_injecting_manager::inject_tags()
 		injection_instance->size = entry->loaded_data.get_total_size();
 		injection_instance->datum_index = entry->injected_index;
 
-		char null_terminated_class[5];
-		null_terminated_class[0] = entry->type.string[3];
-		null_terminated_class[1] = entry->type.string[2];
-		null_terminated_class[2] = entry->type.string[1];
-		null_terminated_class[3] = entry->type.string[0];
-		null_terminated_class[4] = '\0';
+#if K_TAG_INJECTION_DEBUG
+		char tag_class[5];
+		tag_class[0] = entry->type.string[3];
+		tag_class[1] = entry->type.string[2];
+		tag_class[2] = entry->type.string[1];
+		tag_class[3] = entry->type.string[0];
+		tag_class[4] = '\0';
 
 		c_static_string260 tag_name;
 		this->get_name_by_tag_datum(entry->type.group, entry->cache_index, tag_name.get_buffer());
 
-#if K_TAG_INJECTION_DEBUG
-		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", null_terminated_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
+		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
 #endif
 
 		entry->loaded_data.copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);

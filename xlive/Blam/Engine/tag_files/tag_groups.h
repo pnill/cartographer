@@ -2,7 +2,7 @@
 
 #define k_tag_group_count 120
 
-enum e_tag_group : uint32
+enum e_tag_group : int32
 {
 	_tag_group_cache_file_sound = '$#!+',
 	_tag_group_scenario_scenery_resource = '*cen',
@@ -124,7 +124,7 @@ enum e_tag_group : uint32
 	_tag_group_user_interface_shared_globals_definition = 'wigl',
 	_tag_group_wind = 'wind',
 	_tag_group_weapon_hud_interface = 'wphi',
-	_tag_group_none = -1
+	_tag_group_none = NONE
 };
 
 union tag_group 

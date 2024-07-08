@@ -2,12 +2,19 @@
 #include "tag_files/tag_groups.h"
 #include "tag_injection_define.h"
 
-bool tag_injection_check_map_exists(const char* map_name);
+/* constants */
+
+#define k_carto_shared_map L"carto_shared"
+#define k_events_map k_carto_shared_map
+
+/* prototypes */
+
+bool tag_injection_check_map_exists(const wchar_t* map_name);
 /**
  * \brief Sets the map that will be accessed for loading tag data
  * \param map_name the filename of the map file without .map
  */
-void tag_injection_set_active_map(const char* map_name);
+void tag_injection_set_active_map(const wchar_t* map_name);
 bool tag_injection_active_map_verified();
 
 datum tag_injection_load(e_tag_group group, const char* tag_name, bool load_dependencies);

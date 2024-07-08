@@ -15,12 +15,12 @@ c_tag_injecting_manager g_manager;
 tags::tag_instance* g_tag_table;
 
 
-bool tag_injection_check_map_exists(const char* map_name)
+bool tag_injection_check_map_exists(const wchar_t* map_name)
 {
 	return g_manager.find_map(map_name, nullptr);
 }
 
-void tag_injection_set_active_map(const char* map_name)
+void tag_injection_set_active_map(const wchar_t* map_name)
 {
 	g_manager.set_active_map(map_name);
 }
