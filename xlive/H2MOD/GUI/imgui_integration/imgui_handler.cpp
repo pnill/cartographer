@@ -154,7 +154,6 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_Init(pDevice);
 		p_d3d_device = pDevice;
 
-		WeaponOffsets::BuildStringsTable();
 		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
 		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
 		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);

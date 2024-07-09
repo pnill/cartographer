@@ -4,6 +4,8 @@
 /* constants */
 
 #define k_advanced_settings_window_name "advanced_settings"
+#define k_weapon_offsets_window_name "Weapon Offsets"
+
 
 namespace ImGuiHandler
 {
@@ -101,33 +103,6 @@ namespace ImGuiHandler
 	}
 	namespace WeaponOffsets
 	{
-		enum e_weapon_offsets_string : int
-		{
-			title,
-			combo_title,
-			battle_rifle_title,
-			beam_rifle_title,
-			brute_plasma_rifle_title,
-			brute_shot_title,
-			carbine_title,
-			energy_sword_title,
-			fuel_rod_title,
-			magnum_title,
-			needler_title,
-			plasma_pistol_title,
-			plasma_rifle_title,
-			rocket_launcher_title,
-			sentinel_beam_title,
-			shotgun_title,
-			sniper_title,
-			smg_title,
-			weapon_offset_x,
-			weapon_offset_y,
-			weapon_offset_z,
-			reset
-		};
-		void BuildStringsTable();
-		const char* GetString(e_weapon_offsets_string string, const std::string& id = "");
 		void Render(bool* p_open);
 		void Open();
 		void Close();

@@ -1128,6 +1128,7 @@
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
