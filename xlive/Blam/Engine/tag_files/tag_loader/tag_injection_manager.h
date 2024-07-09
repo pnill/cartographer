@@ -39,7 +39,7 @@ private:
 	tag_group get_tag_group_by_datum(datum cache_datum) const;
 
 	void load_raw_data_from_cache(datum injected_index) const;
-	static void setup_havok_vtables(e_tag_group group, datum injected_index);
+	static void apply_definition_fixup(e_tag_group group, datum injected_index);
 	static void initialize_shader_template(datum injected_datum);
 public:
 

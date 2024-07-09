@@ -324,6 +324,7 @@
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
+    <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
     <ClCompile Include="Blam\Engine\cseries\async.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
@@ -461,6 +462,7 @@
     <ClCompile Include="Blam\Engine\objects\widgets\widgets.cpp" />
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_constants.cpp" />
     <ClInclude Include="3rdparty\discord\include\discord_game_sdk.h" />
@@ -549,6 +551,7 @@
     <ClInclude Include="Blam\Engine\camera\observer.h" />
     <ClInclude Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.h" />
     <ClInclude Include="Blam\Engine\cartographer\twizzler\twizzler.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
     <ClInclude Include="Blam\Engine\cseries\async.h" />
     <ClInclude Include="Blam\Engine\cartographer\discord\discord_interface.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_errors.h" />
@@ -688,6 +691,7 @@
     <ClInclude Include="Blam\Engine\Networking\memory\networking_memory.h" />
     <ClCompile Include="Blam\Engine\game\players.cpp" />
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
@@ -771,8 +775,10 @@
     <ClCompile Include="Blam\Engine\text\font_group.cpp" />
     <ClCompile Include="Blam\Engine\text\unicode.cpp" />
     <ClCompile Include="Blam\Engine\units\bipeds.cpp" />
+    <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
     <ClCompile Include="Blam\Engine\units\units.cpp" />
     <ClCompile Include="Blam\Engine\objects\objects.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
     <ClCompile Include="Blam\Engine\widgets\cloth.cpp" />
     <ClCompile Include="Blam\Engine\widgets\liquid.cpp" />
     <ClCompile Include="H2MOD\EngineHooks\EngineHooks.cpp" />
@@ -1041,6 +1047,7 @@
     <ClInclude Include="Blam\Engine\physics\havok.h" />
     <ClInclude Include="Blam\Engine\physics\havok_memory.h" />
     <ClInclude Include="Blam\Engine\physics\physics_models.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.h" />

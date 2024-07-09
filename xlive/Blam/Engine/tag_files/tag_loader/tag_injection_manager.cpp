@@ -2,9 +2,13 @@
 #include "tag_injection_manager.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "creatures/creature_definitions.h"
 #include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
+#include "physics/physics_model_definitions.h"
 #include "render/weather_definitions.h"
+#include "units/biped_definitions.h"
+#include "units/vehicle_definitions.h"
 #include "Util/filesys.h"
 
 #define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
@@ -270,40 +274,37 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	*PRawTableSize = oldRtable_size;
 }
 
-void c_tag_injecting_manager::setup_havok_vtables(e_tag_group group, datum injected_index)
+void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum injected_index)
 {
 	switch(group)
 	{
 		case _tag_group_biped:
 			{
-				void(_cdecl * biped_post_load_init_havok)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x1389B0);
-				biped_post_load_init_havok(injected_index);
+				biped_definitions_fixup(injected_index);;
 				break;
 			}
 		case _tag_group_creature:
 			{
-				void(_cdecl * creature_post_load_init_havok)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x138985);
-				creature_post_load_init_havok(injected_index);
+				creature_definitions_fixup(injected_index);
 				break;
 			}
 		case _tag_group_vehicle:
 			{
-				void(_cdecl * vehicle_post_load_init_havok)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x13895A);
-				vehicle_post_load_init_havok(injected_index);
+				vehicle_definitions_fixup(injected_index);
 				break;
 			}
 		case _tag_group_collision_model:
 			{
-				void(_cdecl * collision_post_load_init_havok)(datum) = (void(_cdecl*)(datum))Memory::GetAddress(0x7BE5C);
-				collision_post_load_init_havok(injected_index);
+				collision_model_definitions_fixup(injected_index);
 				break;
 			}
 		case _tag_group_physics_model:
 			{
-				void(_cdecl * physics_model_post_load_init_havok)(datum, bool) = (void(_cdecl*)(datum, bool))Memory::GetAddress(0x7B844);
-				physics_model_post_load_init_havok(injected_index, false);
+				physics_model_definitions_fixup(injected_index, false);
 				break;
 			}
+		default:
+			break;
 	}
 }
 
@@ -636,7 +637,7 @@ void c_tag_injecting_manager::inject_tags()
 		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model)
 			this->load_raw_data_from_cache(entry->injected_index);
 
-		this->setup_havok_vtables(entry->type.group, entry->injected_index);
+		this->apply_definition_fixup(entry->type.group, entry->injected_index);
 
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);

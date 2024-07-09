@@ -391,6 +391,12 @@
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1047,6 +1053,9 @@
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
     <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
