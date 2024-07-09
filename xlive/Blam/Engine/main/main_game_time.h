@@ -29,7 +29,7 @@ struct s_main_time_globals
 
 	static s_main_time_globals* get()
 	{
-		return Memory::GetAddress<s_main_time_globals*>(0x479E92);
+		return Memory::GetAddress<s_main_time_globals*>(0x479E92, 0x4A2982);
 	}
 };
 #pragma pack(pop)
