@@ -18,6 +18,9 @@ void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location,
 void rasterizer_dx9_fullscreen_passes_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x262684), rasterizer_dx9_apply_gamma_and_brightness);
+    // splitscreen patchy fog fix, take just a portion of the render target
+    // that is used as a texture in the patchy fog draw code shader
+    WritePointer(Memory::GetAddress(0x2774CF) + 1, rasterizer_fullscreen_effects_build_vertex_buffer_cb);
     return;
 }
 
