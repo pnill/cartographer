@@ -17,10 +17,16 @@ void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location,
 
 void rasterizer_dx9_fullscreen_passes_apply_patches(void)
 {
-    PatchCall(Memory::GetAddress(0x262684), rasterizer_dx9_apply_gamma_and_brightness);
-    // splitscreen patchy fog fix, take just a portion of the render target
+    // PatchCall(Memory::GetAddress(0x262684), rasterizer_dx9_apply_gamma_and_brightness);
+    
+    // splitscreen patchy fog fix, take just the viewport portion of the main render target
     // that is used as a texture in the patchy fog draw code shader
     WritePointer(Memory::GetAddress(0x2774CF) + 1, rasterizer_fullscreen_effects_build_vertex_buffer_cb);
+
+    // splitscreen bloom fullscreen passes fix
+    WritePointer(Memory::GetAddress(0x27D8C5) + 1, rasterizer_fullscreen_effects_build_vertex_buffer_color_ctx_cb);
+    WritePointer(Memory::GetAddress(0x27D8BB) + 1, rasterizer_fullscreen_effects_build_vertex_buffer_cb);
+
     return;
 }
 
@@ -138,7 +144,8 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     bool result = true;
     real32 bounds_width;
     real32 bounds_height;
-    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+    uint32 tex_width, tex_height;
 
     ASSERT(output);
 
@@ -159,15 +166,17 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
         bounds_width = bounds->x1 - bounds->x0;
         bounds_height = bounds->y1 - bounds->y0;
 
+        rasterizer_dx9_staged_texture_surface_size(0, &tex_width, &tex_height);
+
         // explanation: locations are per vertex, this draw call will take 4 vertices
         // this function will get called 4 times, for each single vertex
         // the location of the first vertex is at 0, 0. and according to texcoords normalized device coordinates, the origin is in bottom left corner of the texture surface
         // then it goes counter-clockwise until it forms a rectangle, so 0,0 -> 1,0 (right down) -> 1,1 (right top) -> 0,1 (left top) -> (end) 0,0 (left bottom)
         // if the location is 1, for each component we scale it with the bounds width/lenght and offset that with the verticies located on the left
         // if it is 0, then the vertex is either at the left of the screen, or at the bottom, depending on which component is 0
-        ((real_vector4d*)output)->i = ((location->i * bounds_width) / rasterizer_globals->resolution_x) + (bounds->x0 / rasterizer_globals->resolution_x);
-        ((real_vector4d*)output)->j = ((location->j * bounds_height) / rasterizer_globals->resolution_y) + (bounds->y0 / rasterizer_globals->resolution_y);
-        ((real_vector4d*)output)->k = 0.f;
+        ((real_vector4d*)output)->x = (0.5f / bounds_width)  + ((location->x * bounds_width) / tex_width) + (bounds->x0 / tex_width);
+        ((real_vector4d*)output)->y = (0.5f / bounds_height) + ((location->y * bounds_height) / tex_height) + (bounds->y0 / tex_height);
+        ((real_vector4d*)output)->z = 0.f;
         ((real_vector4d*)output)->w = 1.f;
         break;
     case _vertex_output_type_color:
@@ -176,6 +185,34 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     default:
         DISPLAY_ASSERT("unreachable");
         result = false;
+    }
+
+    return result;
+}
+
+bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_color_ctx_cb(
+    e_vertex_output_type output_type,
+    real_rectangle2d* bounds,
+    real_vector4d* location,
+    void* output,
+    void* ctx
+)
+{
+    bool result = true;
+
+    switch (output_type)
+    {
+    case _vertex_output_type_position:
+    case _vertex_output_type_texcoord:
+        result = rasterizer_fullscreen_effects_build_vertex_buffer_cb(output_type, bounds, location, output, ctx);
+        break;
+    case _vertex_output_type_color:
+        *(pixel32*)output = *(pixel32*)ctx;
+        break;
+    default:
+        DISPLAY_ASSERT("unreachable");
+        result = false;
+        break;
     }
 
     return result;

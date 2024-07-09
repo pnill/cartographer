@@ -50,6 +50,7 @@ union real_vector4d
 {
 	real32 v[4];
 	struct { real32 i, j, k, w; };
+	struct { real32 x, y, z, w; };
 };
 ASSERT_STRUCT_SIZE(real_vector4d, sizeof(real32) * 4);
 
