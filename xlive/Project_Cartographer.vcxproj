@@ -764,7 +764,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
-    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />

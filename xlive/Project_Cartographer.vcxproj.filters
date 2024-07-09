@@ -109,7 +109,7 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
-    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="H2MOD\Variants\GraveRobber\GraveRobber.cpp" />
