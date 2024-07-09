@@ -99,11 +99,6 @@ void rasterizer_dx9_copy_target(e_rasterizer_target src_target, e_rasterizer_tar
     return;
 }
 
-void __cdecl rasterizer_dx9_texture_target_surface_size(e_rasterizer_target target, uint32* out_width, uint32* out_height)
-{
-	return INVOKE(0x280413, 0x0, rasterizer_dx9_texture_target_surface_size, target, out_width, out_height);
-}
-
 void __cdecl rasterizer_dx9_staged_texture_surface_size(int32 texture_stage, uint32* out_width, uint32* out_height)
 {
     return INVOKE(0x25F58D, 0x0, rasterizer_dx9_staged_texture_surface_size, texture_stage, out_width, out_height);
@@ -331,7 +326,7 @@ bool rasterizer_dx9_set_target_as_texture_internal(int16 stage, e_rasterizer_tar
 {
     uint32 resolution_x;
     uint32 resolution_y;
-    rasterizer_dx9_texture_target_surface_size(rasterizer_target, &resolution_x, &resolution_y);
+    rasterizer_target_get_resolution(rasterizer_target, &resolution_x, &resolution_y);
     rasterizer_dx9_texture_stage_dimensions(stage, resolution_x, resolution_y);    
     return rasterizer_dx9_device_set_texture(stage, d3d_texture);
 }
@@ -550,8 +545,6 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 
     return;
 }
-
-
 
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y)
 {

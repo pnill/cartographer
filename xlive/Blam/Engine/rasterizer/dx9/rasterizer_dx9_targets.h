@@ -78,8 +78,6 @@ s_rasterizer_target* rasterizer_dx9_texture_target_get(e_rasterizer_target raste
 
 void rasterizer_dx9_copy_target(e_rasterizer_target src_target, e_rasterizer_target dst_target);
 
-void __cdecl rasterizer_dx9_texture_target_surface_size(e_rasterizer_target target, uint32* out_width, uint32* out_height);
-
 void __cdecl rasterizer_dx9_staged_texture_surface_size(int32 texture_stage, uint32* out_width, uint32* out_height);
 
 IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target);
