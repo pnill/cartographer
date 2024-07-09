@@ -39,3 +39,11 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
     void* output,
     void* ctx
 );
+
+bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_color_ctx_cb(
+    e_vertex_output_type output_type,
+    real_rectangle2d* bounds,
+    real_vector4d* location,
+    void* output,
+    void* ctx
+);

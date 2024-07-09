@@ -39,11 +39,19 @@ void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper);
 void rasterizer_dx9_screen_effect_apply_patches(void)
 {
 	PatchCall(Memory::GetAddress(0x191BB1), rasterizer_dx9_postprocess_scene);
+
+	// fix bloom in splitscreen
+	// to note that for some reason bloom is disabled by design (both in H2v and H2x) in splitscreen mode
+	// possibly because of the additional rendering/processing overhead
+	// function at halo2.exe+0x2728EE is responsible for telling the game to draw the bloom
+	WriteValue<bool>(Memory::GetAddress(0x26C6FA) + 1, false);
 	return;
 }
 
 void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_flare_occlusion_test, bool render_layer_selfibloomination)
 {
+	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
+
 	// Cleanup before starting
 	// Removes textures staged from previously drawing the first person geometry
 	for (uint8 i = 0; i < 8; i++)
@@ -51,14 +59,12 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 		rasterizer_dx9_device_set_texture(i, NULL);
 	}
 
-	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
 	rasterizer_dx9_reset_depth_buffer();
 
 	const s_frame* global_window_parameters = global_window_parameters_get();
 	
 	RECT rect;
 	rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
-
 
 	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 	dx9_globals->global_d3d_device->StretchRect(dx9_globals->global_d3d_surface_render_primary, &rect, dx9_globals->global_d3d_surface_render_resolved, &rect, D3DTEXF_NONE);
@@ -76,9 +82,9 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 			bloom_threshold *= (1.f - (1.f - global_window_parameters->bloom_data->field_10) * 1.f);
 		}
 
-		if (brightness > 0.0)
+		if (brightness > 0.0f)
 		{
-			real32 brightness_calculation = (overbrightness + 1.0) * (brightness * 0.5);
+			real32 brightness_calculation = (overbrightness + 1.0f) * (brightness * 0.5f);
 			brightness = PIN(brightness_calculation, 0.f, 1.f);
 			
 			s_scenario_fog_result* g_fog_result = global_fog_result_get();

@@ -70,6 +70,13 @@ void rasterizer_dx9_targets_apply_patches(void)
     DETOUR_ATTACH(p_rasterizer_dx9_primary_targets_dispose, Memory::GetAddress<rasterizer_dx9_dispose_t>(0x25FAC1), rasterizer_dx9_primary_targets_dispose);
     DETOUR_ATTACH(p_rasterizer_dx9_secondary_targets_dispose, Memory::GetAddress<rasterizer_dx9_dispose_t>(0x262B00), rasterizer_dx9_secondary_targets_dispose);
     DETOUR_ATTACH(p_rasterizer_dx9_get_render_target_surface, Memory::GetAddress<rasterizer_dx9_get_render_target_surface_t>(0x25FB67), rasterizer_dx9_get_render_target_surface);
+
+    // split-screen bloom fixes
+    PatchCall(Memory::GetAddress(0x26C5E2), rasterizer_set_render_target_internal_hook_set_viewport);
+    PatchCall(Memory::GetAddress(0x26C761), rasterizer_set_render_target_internal_hook_set_viewport);
+    // discard unnecessary set render target call(s)
+    NopFill(Memory::GetAddress(0x26C81A), 5);
+
     return;
 }
 
@@ -92,9 +99,9 @@ void rasterizer_dx9_copy_target(e_rasterizer_target src_target, e_rasterizer_tar
     return;
 }
 
-void __cdecl rasterizer_dx9_texture_target_surface_size(e_rasterizer_target target, uint32* out_width, uint32* out_height)
+void __cdecl rasterizer_dx9_staged_texture_surface_size(int32 texture_stage, uint32* out_width, uint32* out_height)
 {
-	return INVOKE(0x280413, 0x0, rasterizer_dx9_texture_target_surface_size, target, out_width, out_height);
+    return INVOKE(0x25F58D, 0x0, rasterizer_dx9_staged_texture_surface_size, texture_stage, out_width, out_height);
 }
 
 IDirect3DSurface9* rasterizer_dx9_target_get_main_mip_surface(e_rasterizer_target rasterizer_target)
@@ -107,7 +114,6 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
 {
     IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
-
     IDirect3DSurface9** last_target = rasterizer_dx9_last_target_get();
     IDirect3DSurface9** last_z_target = rasterizer_dx9_last_z_target_get();
     IDirect3DSurface9** last_z_stencil = rasterizer_dx9_last_z_stencil_get();
@@ -118,7 +124,6 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
         valid = SUCCEEDED(global_d3d_device->SetRenderTarget(0, target));
         *last_target = target;
     }
-
 
     bool target_set = false;
     if (*global_rasterizer_stage_get() == 2)
@@ -160,6 +165,8 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
 void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
 {
 	const s_camera* global_camera = get_global_camera();
+
+    // NOTE: *ONLY* use this function for entire screen surfaces (e.g the backbuffer, a render target)
 
 	rasterizer_dx9_set_render_target_internal(target, z_stencil, a3);
 	D3DVIEWPORT9 vp = {
@@ -319,7 +326,7 @@ bool rasterizer_dx9_set_target_as_texture_internal(int16 stage, e_rasterizer_tar
 {
     uint32 resolution_x;
     uint32 resolution_y;
-    rasterizer_dx9_texture_target_surface_size(rasterizer_target, &resolution_x, &resolution_y);
+    rasterizer_target_get_resolution(rasterizer_target, &resolution_x, &resolution_y);
     rasterizer_dx9_texture_stage_dimensions(stage, resolution_x, resolution_y);    
     return rasterizer_dx9_device_set_texture(stage, d3d_texture);
 }
@@ -538,8 +545,6 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 
     return;
 }
-
-
 
 bool __cdecl rasterizer_target_get_resolution(e_rasterizer_target rasterizer_target, uint32* resolution_x, uint32* resolution_y)
 {
