@@ -494,7 +494,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 	s_tag_injecting_table_entry* new_entry = this->m_table.init_entry(cache_datum, group);
 
 	c_xml_definition_agent* agent = this->get_agent(tag_group_from_enum(group));
-	new_entry->loaded_data.init(
+	new_entry->loaded_data->init(
 		agent->get_definition(),
 		this->m_active_map_file_handle,
 		&this->m_active_map_cache_header,
@@ -504,11 +504,11 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 
 	if (load_dependencies)
 	{
-		for (uint32 i = 0; i < new_entry->loaded_data.m_tag_reference_count; i++)
+		for (uint32 i = 0; i < new_entry->loaded_data->m_tag_reference_count; i++)
 		{
-			tag_group t_group = this->get_tag_group_by_datum(new_entry->loaded_data.m_tag_references[i]);
+			tag_group t_group = this->get_tag_group_by_datum(new_entry->loaded_data->m_tag_references[i]);
 			if(t_group.group != _tag_group_sound)
-				load_tag_internal(this, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
+				load_tag_internal(this, t_group, new_entry->loaded_data->m_tag_references[i], load_dependencies);
 		}
 	}
 
@@ -547,7 +547,7 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
 	c_xml_definition_agent* agent = manager->get_agent(group);
-	new_entry->loaded_data.init(
+	new_entry->loaded_data->init(
 		agent->get_definition(),
 		manager->m_active_map_file_handle,
 		&manager->m_active_map_cache_header,
@@ -557,11 +557,11 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 
 	if (load_dependencies)
 	{
-		for (uint32 i = 0; i < new_entry->loaded_data.m_tag_reference_count; i++)
+		for (uint32 i = 0; i < new_entry->loaded_data->m_tag_reference_count; i++)
 		{
-			tag_group t_group = manager->get_tag_group_by_datum(new_entry->loaded_data.m_tag_references[i]);
+			tag_group t_group = manager->get_tag_group_by_datum(new_entry->loaded_data->m_tag_references[i]);
 			if (t_group.group != _tag_group_sound)
-				load_tag_internal(manager, t_group, new_entry->loaded_data.m_tag_references[i], load_dependencies);
+				load_tag_internal(manager, t_group, new_entry->loaded_data->m_tag_references[i], load_dependencies);
 		}
 	}
 }
@@ -594,7 +594,7 @@ void c_tag_injecting_manager::inject_tags()
 
 		if(entry->type.group == _tag_group_bitmap)
 		{
-			bitmap_group* test =(bitmap_group*)entry->loaded_data.get_data();
+			bitmap_group* test = (bitmap_group*)entry->loaded_data->get_data();
 			auto sdfsd = 213123;
 		}
 
@@ -614,7 +614,7 @@ void c_tag_injecting_manager::inject_tags()
 
 		injection_instance->type = entry->type;
 		injection_instance->data_offset = injection_offset;
-		injection_instance->size = entry->loaded_data.get_total_size();
+		injection_instance->size = entry->loaded_data->get_total_size();
 		injection_instance->datum_index = entry->injected_index;
 
 #if K_TAG_INJECTION_DEBUG
@@ -631,7 +631,7 @@ void c_tag_injecting_manager::inject_tags()
 		LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] type: {} injection_offset: {:x} data_size: {:x} tag_name: {} datum: {:x}", tag_class, injection_offset, injection_instance->size, tag_name.get_string(), entry->injected_index);
 #endif
 
-		entry->loaded_data.copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
+		entry->loaded_data->copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
 
 		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model)
 			this->load_raw_data_from_cache(entry->injected_index);
@@ -641,7 +641,7 @@ void c_tag_injecting_manager::inject_tags()
 		if (entry->type.group == _tag_group_shader_template)
 			this->initialize_shader_template(entry->injected_index);
 
-		this->m_injectable_used_size += entry->loaded_data.get_total_size();
+		this->m_injectable_used_size += entry->loaded_data->get_total_size();
 	}
 #if K_TAG_INJECTION_DEBUG
 	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");

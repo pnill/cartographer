@@ -18,7 +18,8 @@ c_tag_injection_table::~c_tag_injection_table()
 {
 	for(uint16 i = 0; i < this->m_entry_count; i++)
 	{
-		this->m_table[i].loaded_data.clear();
+		this->m_table[i].loaded_data->clear();
+		free(this->m_table->loaded_data);
 	}
 	free(this->m_table);
 }
@@ -27,7 +28,8 @@ void c_tag_injection_table::clear()
 {
 	for (uint16 i = 0; i < this->m_entry_count; i++)
 	{
-		this->m_table[i].loaded_data.clear();
+		this->m_table[i].loaded_data->clear();
+		free(this->m_table[i].loaded_data);
 	}
 	free(this->m_table);
 	this->m_entry_count = 0;
@@ -57,6 +59,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 	result->type = tag_group_from_enum(type);
 	result->is_initialized = true;
 	result->is_injected = false;
+	result->loaded_data = (c_xml_definition_loader*)calloc(1, sizeof(c_xml_definition_loader));
 	this->m_entry_count++;
 	
 

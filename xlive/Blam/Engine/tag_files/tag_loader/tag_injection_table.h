@@ -13,7 +13,7 @@ struct s_tag_injecting_table_entry
 	datum cache_index;
 	datum injected_index;
 	tag_group type;
-	c_xml_definition_loader loaded_data;
+	c_xml_definition_loader* loaded_data;
 	uint8* injected_data;
 };
 
