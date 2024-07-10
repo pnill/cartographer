@@ -1219,7 +1219,7 @@ __declspec(naked) void sub_2111ab_CMLTD_nak_Guide() {//__thiscall
 
 static bool CMButtonHandler_Guide(int button_id) {
 	if (button_id == 0) {
-		ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
+		ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 	}
 	else if (button_id == 1) {
 		ShellExecuteA(NULL, "open", "https://cartographer.online/", NULL, NULL, SW_SHOWDEFAULT);

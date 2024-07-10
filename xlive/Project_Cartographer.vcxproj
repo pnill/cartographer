@@ -1120,6 +1120,7 @@
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\AdvancedSettingsStringTable.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
