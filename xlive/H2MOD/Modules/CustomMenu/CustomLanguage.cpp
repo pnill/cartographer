@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "main/game_preferences.h"
+
 #include "CustomLanguage.h"
 #include "text/unicode.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -488,28 +490,28 @@ void setGameLanguage() {
 		switch (GetUserDefaultLangID() & 0x3FF)
 		{
 		case 0x11:
-			language_id = _lang_id_japanese;
+			language_id = _language_japanese;
 			break;
 		case 7:
-			language_id = _lang_id_german;
+			language_id = _language_german;
 			break;
 		case 0xC:
-			language_id = _lang_id_french;
+			language_id = _language_french;
 			break;
 		case 0xA:
-			language_id = _lang_id_spanish;
+			language_id = _language_spanish;
 			break;
 		case 0x10:
-			language_id = _lang_id_italian;
+			language_id = _language_italian;
 			break;
 		case 0x12:
-			language_id = _lang_id_korean;
+			language_id = _language_korean;
 			break;
 		case 4:
-			language_id = _lang_id_chinese;
+			language_id = _language_chinese;
 			break;
 		default:
-			language_id = _lang_id_english;
+			language_id = _language_english;
 			break;
 		}
 	}
@@ -521,7 +523,7 @@ void setGameLanguage() {
 	{
 		int result = atol(DstBuf);
 		if (result > 0 || result > 9)
-			language_id = _lang_id_english;
+			language_id = _language_english;
 	}
 
 	*HasLoadedLanguage = true;

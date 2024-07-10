@@ -1636,12 +1636,6 @@ void InitCustomMenu() {
 
 #pragma region Init_Cartographer_Labels
 
-	add_cartographer_label(CMLabelMenuId_EscSettings, 0xFFFFFFF0, "Esc Settings");
-	add_cartographer_label(CMLabelMenuId_EscSettings, 0xFFFFFFF1, "Esc Settings Here.");
-	add_cartographer_label(CMLabelMenuId_EscSettings, 1, "btn 1");
-	add_cartographer_label(CMLabelMenuId_EscSettings, 2, "btn 2");
-
-
 	//add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF0, "Virtual Keyboard Test!", true);
 	//add_cartographer_label(CMLabelMenuId_VKeyTest, 0xFFFFFFF1, "Enter something... please?", true);
 
@@ -1728,76 +1722,6 @@ void InitCustomMenu() {
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF3, "Select Language Variant");
 	add_cartographer_label(CMLabelMenuId_Language, 0xFFFFFFF4, "Select the variant of the language you would like to play the game in.");
 
-
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF0, "Edit Crosshair Offset");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFFFFF1, "Use the buttons below to modify the in-game Crosshair Offset.");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 1, "+0.02");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 2, "+0.001");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0003, "Offset: %f");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 0xFFFF0013, "Offset Alteration Disabled");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 4, "-0.001");
-	add_cartographer_label(CMLabelMenuId_EditCrosshair, 5, "-0.02");
-
-
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF0, "Edit Player Field of View");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFFFFF1, "Use the buttons below to modify the in-game first person Field of View (FoV).");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 1, "+10");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 2, "+1");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0003, "FoV: %d");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 0xFFFF0013, "FoV Alteration Disabled");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 4, "-1");
-	add_cartographer_label(CMLabelMenuId_EditFOV, 5, "-10");
-
-
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFFFFF0, "Edit Vehicle Field of View");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFFFFF1, "Use the buttons below to modify the Field of View (FoV) of vehicles.");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 1, "+10");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 2, "+1");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0003, "FoV: %d");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 0xFFFF0013, "FoV Alteration Disabled");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 4, "-1");
-	add_cartographer_label(CMLabelMenuId_VehicleEditFOV, 5, "-10");
-
-
-	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFFFFF0, "Edit FPS Limit");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFFFFF1, "Use the buttons below to modify the FPS limit of Halo 2.");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 1, "+10");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 2, "+1");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFF0003, "FPS Limit: %d");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 0xFFFF0013, "Xlive FPS Limiter Disabled");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 4, "-1");
-	add_cartographer_label(CMLabelMenuId_EditFPS, 5, "-10");
-
-	add_cartographer_label(CMLabelMenuId_EditHz, 0xFFFFFFF0, "Force a refresh rate");
-	add_cartographer_label(CMLabelMenuId_EditHz, 0xFFFFFFF1, "Use the buttons below to force your refresh rate on startup. Requires a restart");
-	add_cartographer_label(CMLabelMenuId_EditHz, 1, "+10");
-	add_cartographer_label(CMLabelMenuId_EditHz, 2, "+1");
-	add_cartographer_label(CMLabelMenuId_EditHz, 0xFFFF0003, "Refresh Rate Value: %d");
-	add_cartographer_label(CMLabelMenuId_EditHz, 0xFFFF0013, "No Refresh Rate Forced");
-	add_cartographer_label(CMLabelMenuId_EditHz, 4, "-1");
-	add_cartographer_label(CMLabelMenuId_EditHz, 5, "-10");
-
-
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF0, "Static Model Level of Detail");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 0xFFFFFFF1, "Use the buttons below to set a static level on a model's Level of Detail.");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 1, "Default");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 2, "L1 - Very Low");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 3, "L2 - Low");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 4, "L3 - Medium");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 5, "L4 - High");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 6, "L5 - Very High");
-	add_cartographer_label(CMLabelMenuId_EditStaticLoD, 7, "L6 - Cinematic");
-
-
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF0, "Crosshair Settings");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 0xFFFFFFF1, "Use the buttons below to set a preset crosshair size. Use the config file to modify crosshairs in more detail.");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 1, "Default");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 2, "Disabled");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 3, "Very Small");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 4, "Small");
-	add_cartographer_label(CMLabelMenuId_EditCrosshairSize, 5, "Large");
-
-
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF0, "Update");
 	add_cartographer_label(CMLabelMenuId_Update, 0xFFFFFFF1, "Update Project Cartographer.");
 	add_cartographer_label(CMLabelMenuId_Update, 1, (char*)0, true);
@@ -1824,93 +1748,6 @@ void InitCustomMenu() {
 
 	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF0, "Message of the Day!");
 	add_cartographer_label(CMLabelMenuId_Login_Warn, 0xFFFFFFF1, "DO NOT CHEAT ONLINE!\r\nRanks are on the way!\r\nInitial testing phase is beginning now.\r\nNew variant OGH2, try it out!");
-
-
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF0, "Customise HUD / GUI");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF1, "Customise your heads up display and user interface with the following settings.");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF2, "Enable %s");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF3, "Disable %s");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF4, "Show %s");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFFFFF5, "Hide %s");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 1, "> Player FOV");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 2, "> Vehicle FOV");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 3, "> Crosshair Offset");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 4, "> Crosshair Size");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0005, "Ingame Chat");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0006, "HUD");
-	add_cartographer_label(CMLabelMenuId_EditHudGui, 0xFFFF0007, "First Person Model");
-
-
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF0, "Toggle Skulls");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF1, "Enable and disable Halo 2's Skulls.\r\nWhat ice cream flavor would you like to choose today?");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF2, "Enable %s");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF3, "Disable %s");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFFFFF4, "???");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0000, "Anger");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0001, "Assassins");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0002, "Black Eye");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0003, "Blind");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0004, "Catch");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0005, "Envy");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0006, "Famine");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0007, "Ghost");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0008, "Grunt Birthday Party");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF0009, "Iron");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000A, "IWHBYD");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000B, "Mythic");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000C, "Sputnik");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000D, "Thunderstorm");
-	add_cartographer_label(CMLabelMenuId_ToggleSkulls, 0xFFFF000E, "Whuppopotamus");
-
-
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF0, "Other Settings");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF1, "Customise other settings and features of Halo 2 / Project Cartographer.");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF2, "Enable %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF3, "Disable %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF4, "Show %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF5, "Hide %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF6, "Play %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFFFFF7, "Skip %s");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 1, "> FPS Limit");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 2, "> Static Model LoD");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 3, "> Refresh Rate");
-	//	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0003, "Controller Aim-Assist");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0004, "Discord Rich Presence");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0005, "xDelay");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0006, "Game Intro Video");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0007, "In-game Keyb. CTRLs");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0008, "Raw Mouse Input");
-	add_cartographer_label(CMLabelMenuId_OtherSettings, 0xFFFF0009, "Hi Res Fix");
-
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF0, "Advanced Settings");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 0xFFFFFFF1, "Alter additional settings for the game.");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 1, "Change Language");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 2, "Customise HUD/GUI");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 3, "Other Settings");
-	add_cartographer_label(CMLabelMenuId_AdvSettings, 4, "Toggle Skulls");
-	//	add_cartographer_label(CMLabelMenuId_AdvSettings, 5, "Extra Game Settings");
-
-
-	//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF0, "Extra Game Settings");
-	//	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF1, "Customise the game with some extra features / hacks.");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF2, "Enable %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF3, "Disable %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF4, "Show %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF5, "Hide %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF6, "Play %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFFFFF7, "Skip %s");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0002, "Vehicle Flip Eject");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0003, "Kill Volumes");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0004, "MP Explosion Physics");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0005, "MP Sputnik");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0006, "MP Grunt B-Day Party");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0007, "Grenade Chain React");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0008, "Banshee Bomb");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF0009, "HUD");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF000A, "First Person Model");
-	add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 0xFFFF000B, "Flashlight");
-	//add_cartographer_label(CMLabelMenuId_AdvLobbySettings, 7, "Zombie Movement Speed");
-
 
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF0, "Credits");
 	add_cartographer_label(CMLabelMenuId_Credits, 0xFFFFFFF1, "Praise the Following.");
