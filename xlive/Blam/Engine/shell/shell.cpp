@@ -74,6 +74,9 @@ bool shell_initialize(void)
 	shell_startup_flag_set(_startup_flag_nointro, H2Config_skip_intro);
 	shell_startup_flag_set(_startup_flag_d3d9ex_enabled, H2Config_d3d9ex);
 
+	// ### TODO FIXME: voice-chat is disabled for now
+	shell_startup_flag_set(_startup_flag_disable_voice_chat, true);
+
 	// Don't check the result of this because we're not using GFWL
 	gfwl_gamestore_initialize();
 
@@ -116,7 +119,7 @@ bool shell_initialize(void)
 #if COMPILE_WITH_VOICE
 			else if (_wcsicmp(cmd_line_arg, L"-voicechat") == 0)
 			{
-				shell_startup_flag_set(_startup_flag_disable_voice_chat, 0);
+				shell_startup_flag_set(_startup_flag_disable_voice_chat, false);
 				H2Config_voice_chat = true;
 			}
 #endif
