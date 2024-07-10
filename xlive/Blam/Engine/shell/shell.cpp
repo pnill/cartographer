@@ -72,6 +72,7 @@ bool shell_initialize(void)
 	}
 
 	shell_startup_flag_set(_startup_flag_nointro, H2Config_skip_intro);
+	shell_startup_flag_set(_startup_flag_d3d9ex_enabled, H2Config_d3d9ex);
 
 	// Don't check the result of this because we're not using GFWL
 	gfwl_gamestore_initialize();
