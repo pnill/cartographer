@@ -33,9 +33,9 @@ void c_bitmap_widget::render_widget(rectangle2d* viewport_bounds)
 	return INVOKE_TYPE(0x21D046, 0x0, void(__thiscall*)(void*,rectangle2d*), this, viewport_bounds);
 }
 
-int c_bitmap_widget::get_intro_delay()
+int32 c_bitmap_widget::get_intro_delay()
 {
-	return INVOKE_TYPE(0x21C2EF, 0x0, int(__thiscall*)(c_bitmap_widget*), this);
+	return INVOKE_TYPE(0x21C2EF, 0x0, int32(__thiscall*)(c_bitmap_widget*), this);
 }
 
 void* c_bitmap_widget::sub_611703(rectangle2d* unprojected_bounds)

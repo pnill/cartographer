@@ -21,9 +21,9 @@ void c_hud_widget::render_widget(rectangle2d* viewport_bounds)
 	INVOKE_TYPE(0x240E84, 0x0, void(__thiscall*)(c_hud_widget*, rectangle2d*), this, viewport_bounds);
 }
 
-int c_hud_widget::get_intro_delay()
+int32 c_hud_widget::get_intro_delay()
 {
-	return INVOKE_TYPE(0x240E15, 0x0, int(__thiscall*)(c_hud_widget*), this);
+	return INVOKE_TYPE(0x240E15, 0x0, int32(__thiscall*)(c_hud_widget*), this);
 }
 
 c_user_interface_text* c_hud_widget::get_interface()

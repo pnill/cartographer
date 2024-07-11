@@ -157,9 +157,9 @@ c_user_interface_widget::~c_user_interface_widget()
 }
 
 
-int c_user_interface_widget::setup_children()
+int32 c_user_interface_widget::setup_children()
 {
-	return INVOKE_TYPE(0x211E23, 0x0, int(__thiscall*)(c_user_interface_widget*), this);
+	return INVOKE_TYPE(0x211E23, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
 }
 
 void c_user_interface_widget::on_screen_leave()
@@ -182,14 +182,14 @@ void* c_user_interface_widget::get_mouse_region(rectangle2d* mouse_region_out)
 	return INVOKE_TYPE(0x2114E0, 0x0, void* (__thiscall*)(c_user_interface_widget*, rectangle2d*), this, mouse_region_out);
 }
 
-int c_user_interface_widget::initialize_child_animations(s_animation_transform* a2)
+int32 c_user_interface_widget::initialize_child_animations(s_animation_transform* a2)
 {
-	return INVOKE_TYPE(0x211692, 0x0, int(__thiscall*)(c_user_interface_widget*, s_animation_transform*), this, a2);
+	return INVOKE_TYPE(0x211692, 0x0, int32(__thiscall*)(c_user_interface_widget*, s_animation_transform*), this, a2);
 }
 
-int c_user_interface_widget::get_intro_delay()
+int32 c_user_interface_widget::get_intro_delay()
 {
-	return INVOKE_TYPE(0x2116BD, 0x0, int(__thiscall*)(c_user_interface_widget*), this);
+	return INVOKE_TYPE(0x2116BD, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
 }
 
 void* c_user_interface_widget::sub_611703(rectangle2d* unprojected_bounds)
@@ -212,9 +212,9 @@ c_user_interface_widget* c_user_interface_widget::sub_612BCA()
 	return INVOKE_TYPE(0x212BCA, 0x0, c_user_interface_widget * (__thiscall*)(c_user_interface_widget*), this);
 }
 
-char c_user_interface_widget::handle_event(s_event_record* a2)
+uint8 c_user_interface_widget::handle_event(s_event_record* a2)
 {
-	return INVOKE_TYPE(0x2118F0, 0x0, char(__thiscall*)(c_user_interface_widget*, s_event_record*), this, a2);
+	return INVOKE_TYPE(0x2118F0, 0x0, uint8(__thiscall*)(c_user_interface_widget*, s_event_record*), this, a2);
 }
 
 e_user_interface_channel_type c_user_interface_widget::get_parent_channel()
@@ -227,16 +227,16 @@ e_user_interface_render_window c_user_interface_widget::get_parent_render_window
 	return INVOKE_TYPE(0x212120, 0x0, e_user_interface_render_window(__thiscall*)(c_user_interface_widget*), this);
 }
 
-void c_user_interface_widget::construct_animation_on_region_enter(int a1)
+void c_user_interface_widget::construct_animation_on_region_enter(int32 a1)
 {
 	// does nothing for base class
-	//INVOKE_TYPE(0x211903, 0x0, void(__thiscall*)(c_user_interface_widget*, int), this, a1);
+	//INVOKE_TYPE(0x211903, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, a1);
 }
 
-void c_user_interface_widget::construct_animation_on_region_leave(int a1)
+void c_user_interface_widget::construct_animation_on_region_leave(int32 a1)
 {
 	// does nothing for base class
-	//INVOKE_TYPE(0x211906, 0x0, void(__thiscall*)(c_user_interface_widget*, int), this, a1);
+	//INVOKE_TYPE(0x211906, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, a1);
 }
 
 c_user_interface_widget* c_user_interface_widget::sub_6121F6(rectangle2d* point)

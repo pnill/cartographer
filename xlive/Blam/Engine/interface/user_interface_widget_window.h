@@ -70,11 +70,11 @@ protected:
 	bool field_A01;
 	uint8 gap_A02[2];
 	c_user_interface_widget* m_special_widgets[K_MAXIMUM_NUMBER_OF_SPECIAL_WIDGETS];
-	c_slot1<c_screen_widget, long> m_screen_slot;
+	c_slot1<c_screen_widget, int32> m_screen_slot;
 
 
 	void destroy();
-	char switch_panes(long* pane_index_ptr);
+	char switch_panes(int32* pane_index_ptr);
 
 public:
 	c_screen_widget(e_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
@@ -87,7 +87,7 @@ public:
 	// c_screen_widget virtual functions
 
 	virtual ~c_screen_widget();
-	virtual char handle_event(s_event_record* event) override;
+	virtual uint8 handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 	virtual bool sub_6114B9() override;
 
@@ -98,21 +98,21 @@ public:
 	virtual void cache_local_bitmaps_and_cursor();
 	virtual void setup_special_widgets();
 	virtual c_user_interface_widget* sub_6102C5();
-	virtual char sub_6103D6();
-	virtual int sub_60F1F4(s_event_record* a2);
-	virtual char sub_60EFC1(s_event_record* event);
-	virtual int sub_60F081(s_event_record* a2);
-	virtual int sub_60F151(int a2);
-	virtual char sub_40AD53();
+	virtual uint8 sub_6103D6();
+	virtual int32 sub_60F1F4(s_event_record* a2);
+	virtual uint8 sub_60EFC1(s_event_record* event);
+	virtual int32 sub_60F081(s_event_record* a2);
+	virtual int32 sub_60F151(int32 a2);
+	virtual uint8 sub_40AD53();
 	virtual e_user_interface_channel_type  get_channel();
 	virtual e_user_interface_render_window  get_render_window();
-	virtual int sub_60EB92(int a2);
-	virtual void sub_60EBC2(int a1);
+	virtual int32 sub_60EB92(int32 a2);
+	virtual void sub_60EBC2(int32 a1);
 	virtual void* sub_60EC5C(s_screen_state* state);
 	virtual void sub_60ECC9(s_screen_state* state);
 	virtual void* load_proc() = 0;
 	virtual bool overlay_effect_is_disabled();
-	virtual void sub_60F2A4(char bitmap_index);
+	virtual void sub_60F2A4(uint8 bitmap_index);
 
 };
 ASSERT_STRUCT_SIZE(c_screen_widget, 0xA5C);

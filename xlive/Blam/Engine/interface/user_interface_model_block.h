@@ -17,9 +17,9 @@ public:
 	// c_model_widget virtual functions
 
 	virtual ~c_model_widget();
-	virtual int setup_children() override;
+	virtual int32 setup_children() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
-	virtual int get_intro_delay() override;
+	virtual int32 get_intro_delay() override;
 	virtual c_user_interface_text* get_interface() override;
 };
 ASSERT_STRUCT_SIZE(c_model_widget, 0x74);

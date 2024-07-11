@@ -14,8 +14,8 @@ public:
 	// c_tab_view_widget virtual functions
 
 	virtual ~c_tab_view_widget();
-	virtual int setup_children() override;
-	virtual char handle_event(s_event_record* event) override;
+	virtual int32 setup_children() override;
+	virtual uint8 handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 
 };

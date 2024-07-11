@@ -23,8 +23,8 @@ public:
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out) override;
-	virtual int get_intro_delay() override;
-	virtual char handle_event(s_event_record* event) override;
+	virtual int32 get_intro_delay() override;
+	virtual uint8 handle_event(s_event_record* event) override;
 	virtual bool can_interact() override;
 	virtual c_user_interface_text* get_interface() override;
 

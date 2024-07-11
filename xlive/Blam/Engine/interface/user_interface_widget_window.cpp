@@ -83,9 +83,9 @@ c_screen_widget::~c_screen_widget()
 }
 
 
-char c_screen_widget::handle_event(s_event_record* event)
+uint8 c_screen_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x20EB2B, 0x0, char(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x20EB2B, 0x0, uint8(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
 }
 
 c_user_interface_text* c_screen_widget::get_interface()
@@ -122,34 +122,34 @@ c_user_interface_widget* c_screen_widget::sub_6102C5()
 	return INVOKE_TYPE(0x2102C5, 0x0, c_user_interface_widget * (__thiscall*)(c_screen_widget*), this);
 }
 
-char c_screen_widget::sub_6103D6()
+uint8 c_screen_widget::sub_6103D6()
 {
-	return INVOKE_TYPE(0x2103D6, 0x0, char(__thiscall*)(c_screen_widget*), this);
+	return INVOKE_TYPE(0x2103D6, 0x0, uint8(__thiscall*)(c_screen_widget*), this);
 }
 
-int c_screen_widget::sub_60F1F4(s_event_record* a2)
+int32 c_screen_widget::sub_60F1F4(s_event_record* a2)
 {
-	return INVOKE_TYPE(0x20F1F4, 0x0, int(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
+	return INVOKE_TYPE(0x20F1F4, 0x0, int32(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
 }
 
-char c_screen_widget::sub_60EFC1(s_event_record* event)
+uint8 c_screen_widget::sub_60EFC1(s_event_record* event)
 {
-	return INVOKE_TYPE(0x20EFC1, 0x0, char(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x20EFC1, 0x0, uint8(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
 }
 
-int c_screen_widget::sub_60F081(s_event_record* a2)
+int32 c_screen_widget::sub_60F081(s_event_record* a2)
 {
-	return INVOKE_TYPE(0x20F081, 0x0, int(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
+	return INVOKE_TYPE(0x20F081, 0x0, int32(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
 }
 
-int c_screen_widget::sub_60F151(int a2)
+int32 c_screen_widget::sub_60F151(int32 a2)
 {
-	return INVOKE_TYPE(0x20F151, 0x0, int(__thiscall*)(c_screen_widget*, int), this, a2);
+	return INVOKE_TYPE(0x20F151, 0x0, int32(__thiscall*)(c_screen_widget*, int32), this, a2);
 }
 
-char c_screen_widget::sub_40AD53()
+uint8 c_screen_widget::sub_40AD53()
 {
-	return INVOKE_TYPE(0xAD53, 0x0, char(__thiscall*)(c_screen_widget*), this);
+	return INVOKE_TYPE(0xAD53, 0x0, uint8(__thiscall*)(c_screen_widget*), this);
 }
 
 e_user_interface_channel_type c_screen_widget::get_channel()
@@ -164,12 +164,12 @@ e_user_interface_render_window c_screen_widget::get_render_window()
 	return this->m_window_index;
 }
 
-int c_screen_widget::sub_60EB92(int a2)
+int32 c_screen_widget::sub_60EB92(int32 a2)
 {
-	return INVOKE_TYPE(0x20EB92, 0x0, int(__thiscall*)(c_screen_widget*, int), this, a2);
+	return INVOKE_TYPE(0x20EB92, 0x0, int32(__thiscall*)(c_screen_widget*, int32), this, a2);
 }
 
-void c_screen_widget::sub_60EBC2(int a1)
+void c_screen_widget::sub_60EBC2(int32 a1)
 {
 	//INVOKE_TYPE(0x20EBC2, 0x0, void(__thiscall*)(c_screen_widget*, int), this, a1);
 	return;
@@ -191,9 +191,9 @@ bool c_screen_widget::overlay_effect_is_disabled()
 	return this->m_disable_overlay_effect;
 }
 
-void c_screen_widget::sub_60F2A4(char bitmap_index)
+void c_screen_widget::sub_60F2A4(uint8 bitmap_index)
 {
-	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, char), this, bitmap_index);
+	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, uint8), this, bitmap_index);
 }
 
 

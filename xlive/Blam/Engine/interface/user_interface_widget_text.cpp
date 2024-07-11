@@ -39,9 +39,9 @@ void c_text_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x21BD11, 0x0, void(__thiscall*)(c_text_widget*, rectangle2d*), this, viewport_bounds);
 }
-int c_text_widget::get_intro_delay()
+int32 c_text_widget::get_intro_delay()
 {
-	return INVOKE_TYPE(0x21BA94, 0x0, int(__thiscall*)(c_text_widget*), this);
+	return INVOKE_TYPE(0x21BA94, 0x0, int32(__thiscall*)(c_text_widget*), this);
 }
 
 

@@ -36,25 +36,25 @@ void c_list_item_widget::update()
 	INVOKE_TYPE(0x220075, 0x0, void(__thiscall*)(c_list_item_widget*), this);
 }
 
-int c_list_item_widget::get_intro_delay()
+int32 c_list_item_widget::get_intro_delay()
 {
-	//return INVOKE_TYPE(0x220053, 0x0, int(__thiscall*)(c_list_item_widget*), this);
+	//return INVOKE_TYPE(0x220053, 0x0, int32(__thiscall*)(c_list_item_widget*), this);
 	return this->m_intro_delay_milliseconds;
 }
 
-char c_list_item_widget::handle_event(s_event_record* event)
+uint8 c_list_item_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x22009E, 0x0, char(__thiscall*)(c_list_item_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x22009E, 0x0, uint8(__thiscall*)(c_list_item_widget*, s_event_record*), this, event);
 }
 
-void c_list_item_widget::construct_animation_on_region_enter(int a1)
+void c_list_item_widget::construct_animation_on_region_enter(int32 a1)
 {
-	INVOKE_TYPE(0x2201EF, 0x0, void(__thiscall*)(c_list_item_widget*, int), this, a1);
+	INVOKE_TYPE(0x2201EF, 0x0, void(__thiscall*)(c_list_item_widget*, int32), this, a1);
 }
 
-void c_list_item_widget::construct_animation_on_region_leave(int a1)
+void c_list_item_widget::construct_animation_on_region_leave(int32 a1)
 {
-	INVOKE_TYPE(0x2202FA, 0x0, void(__thiscall*)(c_list_item_widget*, int), this, a1);
+	INVOKE_TYPE(0x2202FA, 0x0, void(__thiscall*)(c_list_item_widget*, int32), this, a1);
 }
 
 bool c_list_item_widget::can_interact()

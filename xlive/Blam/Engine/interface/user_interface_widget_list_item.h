@@ -22,10 +22,10 @@ public:
 
 	virtual ~c_list_item_widget();
 	virtual void update() override;
-	virtual int get_intro_delay() override;
-	virtual char handle_event(s_event_record* event) override;
-	virtual void construct_animation_on_region_enter(int a1) override;
-	virtual void construct_animation_on_region_leave(int a1) override;
+	virtual int32 get_intro_delay() override;
+	virtual uint8 handle_event(s_event_record* event) override;
+	virtual void construct_animation_on_region_enter(int32 a1) override;
+	virtual void construct_animation_on_region_leave(int32 a1) override;
 	virtual bool can_interact() override;
 	virtual bool sub_6114B9() override;
 

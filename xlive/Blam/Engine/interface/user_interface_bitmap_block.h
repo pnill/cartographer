@@ -30,7 +30,7 @@ public:
 	virtual ~c_bitmap_widget();
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
-	virtual int get_intro_delay() override;
+	virtual int32 get_intro_delay() override;
 	virtual void* sub_611703(rectangle2d* unprojected_bounds) override;
 	virtual c_user_interface_text* get_interface() override;
 };

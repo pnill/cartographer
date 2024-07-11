@@ -81,9 +81,9 @@ c_list_widget::~c_list_widget()
 	//return INVOKE_TYPE(0x213BBF, 0x0, void*(__thiscall*)(c_list_widget*, char), lpMem, a2);
 }
 
-int c_list_widget::setup_children()
+int32 c_list_widget::setup_children()
 {
-	return INVOKE_TYPE(0x213FE5, 0x0, int(__thiscall*)(c_list_widget*), this);
+	return INVOKE_TYPE(0x213FE5, 0x0, int32(__thiscall*)(c_list_widget*), this);
 }
 
 void c_list_widget::on_screen_leave()
@@ -101,20 +101,20 @@ void c_list_widget::render_widget(rectangle2d* viewport_bounds)
 	INVOKE_TYPE(0x21401F, 0x0, void(__thiscall*)(c_list_widget*, rectangle2d*), this, viewport_bounds);
 }
 
-int c_list_widget::get_intro_delay()
+int32 c_list_widget::get_intro_delay()
 {
-	//return INVOKE_TYPE(0xB69B, 0x0, int(__thiscall*)(c_list_widget*), this);
+	//return INVOKE_TYPE(0xB69B, 0x0, int32(__thiscall*)(c_list_widget*), this);
 	return this->m_intro_delay_milliseconds;
 }
 
-char c_list_widget::handle_event(s_event_record* event)
+uint8 c_list_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x214CA9, 0x0, char(__thiscall*)(c_list_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x214CA9, 0x0, uint8(__thiscall*)(c_list_widget*, s_event_record*), this, event);
 }
 
-void c_list_widget::construct_animation_on_region_enter(int a1)
+void c_list_widget::construct_animation_on_region_enter(int32 a1)
 {
-	INVOKE_TYPE(0x21447E, 0x0, void(__thiscall*)(c_list_widget*, int), this, a1);
+	INVOKE_TYPE(0x21447E, 0x0, void(__thiscall*)(c_list_widget*, int32), this, a1);
 }
 
 c_user_interface_text* c_list_widget::get_interface()
@@ -123,9 +123,9 @@ c_user_interface_text* c_list_widget::get_interface()
 	return nullptr;
 }
 
-int c_list_widget::link_item_widgets()
+int32 c_list_widget::link_item_widgets()
 {
-	return INVOKE_TYPE(0x213BDD, 0x0, int(__thiscall*)(c_list_widget*), this);
+	return INVOKE_TYPE(0x213BDD, 0x0, int32(__thiscall*)(c_list_widget*), this);
 }
 
 bool c_list_widget::verify_item_in_focus(c_list_item_widget* item)

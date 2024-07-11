@@ -14,9 +14,9 @@ c_tab_view_widget::~c_tab_view_widget()
 	//return INVOKE_TYPE(0x220B33, 0x0, c_tab_view_widget(*__thiscall*)(c_tab_view_widget*, char), lpMem,a2);
 }
 
-int c_tab_view_widget::setup_children()
+int32 c_tab_view_widget::setup_children()
 {
-	//return INVOKE_TYPE(0x220A5F, 0x0, int(__thiscall*)(c_tab_view_widget*), this);
+	//return INVOKE_TYPE(0x220A5F, 0x0, int32(__thiscall*)(c_tab_view_widget*), this);
 
 	if (get_children())
 	{
@@ -26,9 +26,9 @@ int c_tab_view_widget::setup_children()
 	return this->setup_children();
 }
 
-char c_tab_view_widget::handle_event(s_event_record* event)
+uint8 c_tab_view_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x220A6E, 0x0, char(__thiscall*)(c_tab_view_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x220A6E, 0x0, uint8(__thiscall*)(c_tab_view_widget*, s_event_record*), this, event);
 }
 
 c_user_interface_text* c_tab_view_widget::get_interface()

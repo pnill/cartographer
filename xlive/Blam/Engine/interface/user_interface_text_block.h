@@ -16,9 +16,9 @@ public:
 	// c_small_user_interface_text virtual functions
 
 	virtual ~c_small_user_interface_text();
-	virtual void  initial_raw_string(wchar_t* raw_text) override;
-	virtual void  update_raw_string(wchar_t* Source) override;
-	virtual wchar_t* get_raw_string() override;
+	virtual void  initial_raw_string(const wchar_t* raw_text) override;
+	virtual void  update_raw_string(const wchar_t* Source) override;
+	virtual const wchar_t* get_raw_string() override;
 };
 ASSERT_STRUCT_SIZE(c_small_user_interface_text, 0x84);
 
@@ -33,9 +33,9 @@ public:
 	// c_normal_user_interface_text virtual functions
 
 	virtual ~c_normal_user_interface_text();
-	virtual void  initial_raw_string(wchar_t* raw_text) override;
-	virtual void  update_raw_string(wchar_t* Source) override;
-	virtual wchar_t* get_raw_string() override;
+	virtual void  initial_raw_string(const wchar_t* raw_text) override;
+	virtual void  update_raw_string(const wchar_t* Source) override;
+	virtual const wchar_t* get_raw_string() override;
 };
 ASSERT_STRUCT_SIZE(c_normal_user_interface_text, 0x444);
 
@@ -50,8 +50,8 @@ public:
 	// c_normal_user_interface_text virtual functions
 
 	virtual ~c_long_user_interface_text();
-	virtual void  initial_raw_string(wchar_t* raw_text) override;
-	virtual void  update_raw_string(wchar_t* Source) override;
-	virtual wchar_t* get_raw_string() override;
+	virtual void  initial_raw_string(const wchar_t* raw_text) override;
+	virtual void  update_raw_string(const wchar_t* Source) override;
+	virtual const wchar_t* get_raw_string() override;
 };
 ASSERT_STRUCT_SIZE(c_long_user_interface_text, 0x844);

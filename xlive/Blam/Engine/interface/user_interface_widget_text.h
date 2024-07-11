@@ -25,7 +25,7 @@ public:
 
 	virtual ~c_text_widget();
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
-	virtual int get_intro_delay() override;
+	virtual int32 get_intro_delay() override;
 
 };
 ASSERT_STRUCT_SIZE(c_text_widget, 0x78);

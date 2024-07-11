@@ -69,21 +69,21 @@ public:
 	// c_list_widget virtual functions
 
 	virtual ~c_list_widget();
-	virtual int setup_children() override;
+	virtual int32 setup_children() override;
 	virtual void on_screen_leave() override;
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
-	virtual int get_intro_delay() override;
-	virtual char handle_event(s_event_record* event) override;
-	virtual void construct_animation_on_region_enter(int a1) override;
+	virtual int32 get_intro_delay() override;
+	virtual uint8 handle_event(s_event_record* event) override;
+	virtual void construct_animation_on_region_enter(int32 a1) override;
 	virtual c_user_interface_text* get_interface() override;
 
 	// c_list_widget additions
 
-	virtual int link_item_widgets();
+	virtual int32 link_item_widgets();
 	virtual c_list_item_widget* get_list_items() = 0;
-	virtual int get_list_items_count() = 0;
-	virtual void update_list_items(c_list_item_widget* item, int skin_index) = 0;
+	virtual int32 get_list_items_count() = 0;
+	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) = 0;
 	virtual bool verify_item_in_focus(c_list_item_widget* item);
 };
 ASSERT_STRUCT_SIZE(c_list_widget, 0xB0);

@@ -108,22 +108,22 @@ public:
 	// c_user_interface_widget virtual functions
 
 	virtual ~c_user_interface_widget();
-	virtual int setup_children();
+	virtual int32 setup_children();
 	virtual void on_screen_leave();
 	virtual void update();
 	virtual void render_widget(rectangle2d* viewport_bounds);
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out);
-	virtual int initialize_child_animations(s_animation_transform* a2);
-	virtual int get_intro_delay();
+	virtual int32 initialize_child_animations(s_animation_transform* a2);
+	virtual int32 get_intro_delay();
 	virtual void* sub_611703(rectangle2d* unprojected_bounds);
 	virtual void sub_612A7C(c_user_interface_widget* a2);
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();
-	virtual char handle_event(s_event_record* event);
+	virtual uint8 handle_event(s_event_record* event);
 	virtual e_user_interface_channel_type get_parent_channel();
 	virtual e_user_interface_render_window get_parent_render_window();
-	virtual void construct_animation_on_region_enter(int a1);
-	virtual void construct_animation_on_region_leave(int a1);
+	virtual void construct_animation_on_region_enter(int32 a1);
+	virtual void construct_animation_on_region_leave(int32 a1);
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point);
 	virtual bool can_interact();
 	virtual c_user_interface_text* get_interface() = 0;

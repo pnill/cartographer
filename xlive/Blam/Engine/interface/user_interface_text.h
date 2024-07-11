@@ -33,9 +33,9 @@ public:
 	// c_user_interface_text virtual functions
 
 	virtual ~c_user_interface_text();
-	virtual void  initial_raw_string(wchar_t* raw_text) = 0;
-	virtual void  update_raw_string(wchar_t* Source) = 0;
-	virtual wchar_t* get_raw_string() = 0;
+	virtual void  initial_raw_string(const wchar_t* raw_text) = 0;
+	virtual void  update_raw_string(const wchar_t* Source) = 0;
+	virtual const wchar_t* get_raw_string() = 0;
 };
 ASSERT_STRUCT_SIZE(c_user_interface_text, 0x44);
 
