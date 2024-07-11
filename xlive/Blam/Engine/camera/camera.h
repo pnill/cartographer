@@ -11,8 +11,8 @@ struct s_camera
 	float scale;
 	rectangle2d viewport_bounds;
 	rectangle2d window_bounds;
-	float z_near;
-	float z_far;
+	real32 z_near;
+	real32 z_far;
 	real_point3d point1;
 	__int8 gap_4C[4];
 	bool bool_1;

@@ -9,7 +9,6 @@
 
 #include "H2MOD/Utils/Utils.h"
 
-extern bool g_xbox_tickrate_enabled;
 bool g_main_game_time_frame_limiter_enabled = false;
 
 float get_ticks_leftover_time()

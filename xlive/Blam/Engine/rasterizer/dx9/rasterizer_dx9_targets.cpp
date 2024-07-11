@@ -339,7 +339,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 
     IDirect3DSurface9* d3d_surface = NULL;
-    IDirect3DSurface9* d3d9_depth_buffer_stencil = NULL;
+    IDirect3DSurface9* d3d_depth_buffer_stencil = NULL;
     bool valid_target = true;
     bool depth_provided = false;
 
@@ -360,12 +360,12 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
                 d3d_surface->Release();
             }
 
-            d3d9_depth_buffer_stencil = NULL;
+            d3d_depth_buffer_stencil = NULL;
         }
         else
         {
             d3d_surface = dx9_globals->global_d3d_surface_render_primary;
-            d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
+            d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         }
         break;
     case _rasterizer_target_1:
@@ -374,7 +374,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     case _rasterizer_target_gamma_remap_lut:
     case _rasterizer_target_scratch:
         d3d_surface = rasterizer_dx9_target_get_main_mip_surface(target);
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         break;
     case _rasterizer_target_frontbuffer:
         DISPLAY_ASSERT("###ERROR### attempt to set front buffer as the render target");
@@ -382,12 +382,12 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
         break;
     case _rasterizer_target_backbuffer:
         d3d_surface = dx9_globals->global_d3d_backbuffer_surface;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_z_as_target_z;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_z_as_target_z;
         depth_provided = true;
         break;
     case _rasterizer_target_shadow_buffer:
         d3d_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_shadow_buffer);
-        d3d9_depth_buffer_stencil = rasterizer_dx9_get_target_mip_surface(_rasterizer_target_shadow_buffer, 1);
+        d3d_depth_buffer_stencil = rasterizer_dx9_get_target_mip_surface(_rasterizer_target_shadow_buffer, 1);
         break;
     case _rasterizer_target_shadow:
     case _rasterizer_target_shadow_scratch1:
@@ -411,7 +411,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
         break;
     case _rasterizer_target_cinematic:
         d3d_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_cinematic);
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         break;
     case _rasterizer_target_active_camo:
         d3d_surface = rasterizer_dx9_target_get_main_mip_surface(_rasterizer_target_active_camo);
@@ -434,32 +434,32 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
 #ifdef USE_CUBEMAP_TARGETS
     case _rasterizer_target_cubemap_pos_x:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_pos_x;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
     case _rasterizer_target_cubemap_neg_x:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_neg_x;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
     case _rasterizer_target_cubemap_pos_y:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_pos_y;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
     case _rasterizer_target_cubemap_neg_y:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_neg_y;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
     case _rasterizer_target_cubemap_pos_z:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_pos_z;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
     case _rasterizer_target_cubemap_neg_z:
         d3d_surface = dx9_globals->global_d3d_surface_cubemap_neg_z;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_cubemap_depth;
         break;
 #endif
     case _rasterizer_target_resolved:
         d3d_surface = dx9_globals->global_d3d_surface_render_resolved;
-        d3d9_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
+        d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         depth_provided = true;
         break;
     default:
@@ -477,7 +477,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
         viewport.MinZ = 0.f;
         viewport.MaxZ = 1.f;
 
-        rasterizer_dx9_set_render_target_internal(d3d_surface, (use_depth ? d3d9_depth_buffer_stencil : NULL), depth_provided);
+        rasterizer_dx9_set_render_target_internal(d3d_surface, (use_depth ? d3d_depth_buffer_stencil : NULL), depth_provided);
 
         // Change viewport parameters based on circumstances
 

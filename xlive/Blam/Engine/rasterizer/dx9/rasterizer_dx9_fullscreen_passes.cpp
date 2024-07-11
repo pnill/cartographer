@@ -89,14 +89,14 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 0);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 15);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
             rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
-            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
             if (!*rasterizer_dx9_disable_stencil_get())
             {
-                rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, 0);
+                rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, FALSE);
             }
 
             rasterizer_dx9_set_blend_render_state(_framebuffer_blend_function_none);
@@ -224,7 +224,8 @@ real32 rasterizer_dx9_fullscreen_effect_calculate_position_z(real32 z_far, int32
 {
     const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
-    real32 z = (a2 != 2 ? z_far : rasterizer_globals->clipping_parameters.z_far);
+    real32 z = (a2 != 2 ? z_far : z_far / rasterizer_globals->clipping_parameters.z_far);
+
     return PIN(z, 0.f, 1.f);
 }
 
