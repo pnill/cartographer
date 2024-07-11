@@ -2,6 +2,8 @@
 #include "tag_injection_manager.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "cache/pc_geometry_cache.h"
+#include "cache/pc_texture_cache.h"
 #include "creatures/creature_definitions.h"
 #include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
@@ -181,17 +183,20 @@ tag_group c_tag_injecting_manager::get_tag_group_by_datum(datum cache_datum) con
 
 void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) const
 {
-	DWORD* PMapRawtableoffset = Memory::GetAddress<DWORD*>(0x4AE8B0);
-	DWORD* PRawTableSize = Memory::GetAddress<DWORD*>(0x4AE8B4);
+	// There is probably a struct here but can't identify anything
+	HANDLE* g_cache_handle = Memory::GetAddress<HANDLE*>(0x4AE8A8);
+	uint32* g_cache_handle_geometry_block_offset = Memory::GetAddress<DWORD*>(0x4AE8B0);
+	uint32* g_cache_handle_geometry_block_size = Memory::GetAddress<DWORD*>(0x4AE8B4);
+	
 
-	//a little  precaution to circumvent unexpected behaviour
-	DWORD oldRtable_offset = *PMapRawtableoffset;
-	DWORD oldRtable_size = *PRawTableSize;
+	// a little precaution to circumvent unexpected behaviour
+	const uint32 previous_geometry_block_offset = *g_cache_handle_geometry_block_offset;
+	const uint32 previous_geometry_block_size = *g_cache_handle_geometry_block_size;
+	const HANDLE previous_cache_handle = *g_cache_handle;
 
-	*PMapRawtableoffset = 0x0;
-	*PRawTableSize = 0x0;
-
-	HANDLE old_file_handle = *Memory::GetAddress<HANDLE*>(0x4AE8A8);
+	// Reset geometry block values to allow functions to reset them when called.
+	*g_cache_handle_geometry_block_offset = 0x0;
+	*g_cache_handle_geometry_block_size = 0x0;
 
 	tags::tag_instance* tag_info = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)];
 	char* tag_data = tags::get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
@@ -210,68 +215,67 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	//supposing full length
 	HANDLE new_file_handle = CreateFile(this->m_active_map.get_string(), GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
-		//(HANDLE)_get_osfhandle(_fileno(this->m_active_map_file_handle));
-	
-	*Memory::GetAddress<HANDLE*>(0x4AE8A8) = new_file_handle;
+
+	*g_cache_handle = new_file_handle;
 
 	switch (tag_info->type.group)
 	{
-	case 'mode':
-	{
-		render_model_definition* model_definition = (render_model_definition*)tag_data;
-		if (model_definition->sections.count > 0)
+		case 'mode':
 		{
-			int current_section_index = 0;
-			do
+			render_model_definition* model_definition = (render_model_definition*)tag_data;
+			if (model_definition->sections.count > 0)
 			{
-				render_model_section* model_section = model_definition->sections[current_section_index];
+				int current_section_index = 0;
+				do
+				{
+					render_model_section* model_section = model_definition->sections[current_section_index];
 
-				geometry_block_resource* t_res = model_section->geometry_block_info.resources[0];
+					geometry_block_resource* t_res = model_section->geometry_block_info.resources[0];
+					pc_geometry_cache_preload_geometry(&model_section->geometry_block_info, (e_pc_geometry_cache_preload_flags)(_pc_geometry_cache_preload_flag_2 | _pc_geometry_cache_preload_blocking));
 
-				((void(__cdecl*)(geometry_block_info*, unsigned int))Memory::GetAddress(0x2652BC))(&model_section->geometry_block_info, 3u);
-
-				++current_section_index;
-			} while (current_section_index < model_definition->sections.count);
+					++current_section_index;
+				} while (current_section_index < model_definition->sections.count);
+			}
+			break;
 		}
-		break;
-	}
 
-	case 'bitm':
-	{
-
-		int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
-		bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
-
-		for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
+		case 'bitm':
 		{
-			bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
 
-			*Memory::GetAddress<bitmap_data**>(0xA49270 + 0x1FC) = bitmap_item;
+			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
+			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
 
-			int temp = 0;
-			((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 2, 0, &temp);
-			((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 1, 0, &temp);
-			((int(__cdecl*)(bitmap_data*, char, int, void*))Memory::GetAddress(0x265986))(bitmap_item, 0, 0, &temp);
+			for (int i = 0; i < bitmap_definition->bitmaps.count; i++)
+			{
+				bitmap_data* bitmap_item = bitmap_definition->bitmaps[i];
 
+				*Memory::GetAddress<bitmap_data**>(0xA49270 + 0x1FC) = bitmap_item;
+
+				pc_texture_cache_preload_bitmap(bitmap_item, 2, 0, nullptr);
+				pc_texture_cache_preload_bitmap(bitmap_item, 1, 0, nullptr);
+				pc_texture_cache_preload_bitmap(bitmap_item, 0, 0, nullptr);
+			}
+			*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
+			break;
 		}
-		*Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC) = old_list_field;
-		break;
-	}
-	case 'weat':
-	{
-		auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
-		for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
-			((void(__cdecl*)(long*, unsigned int))Memory::GetAddress(0x2652BC))(&weather_tag->m_particle_system[i]->m_geometry.block_offset, 3u);
-		break;
+		case 'weat':
+		{
+			auto weather_tag = reinterpret_cast<c_weather_system*>(tag_data);
+			for (auto i = 0; i < weather_tag->m_particle_system.count; i++)
+			{
+				pc_geometry_cache_preload_geometry(&weather_tag->m_particle_system[i]->m_geometry, (e_pc_geometry_cache_preload_flags)(_pc_geometry_cache_preload_flag_2 | _pc_geometry_cache_preload_blocking));
+			}
+			break;
 	}
 	default:
 		break;
 	}
-	*Memory::GetAddress<HANDLE*>(0x4AE8A8) = old_file_handle;
+	*g_cache_handle = previous_cache_handle;
+
 	CloseHandle(new_file_handle);
 
-	*PMapRawtableoffset = oldRtable_offset;
-	*PRawTableSize = oldRtable_size;
+	*g_cache_handle_geometry_block_offset = previous_geometry_block_offset;
+	*g_cache_handle_geometry_block_size = previous_geometry_block_size;
 }
 
 void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum injected_index)
