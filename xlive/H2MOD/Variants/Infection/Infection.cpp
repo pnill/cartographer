@@ -30,7 +30,7 @@ bool initialSpawn;
 bool infectedPlayed;
 int zombiePlayerIndex = NONE;
 int last_time_at_game_should_not_end = 0;
-const wchar_t* infectionSoundTable[e_language_ids::_lang_id_end][e_infection_sounds::_infection_end]
+const wchar_t* infectionSoundTable[k_language_count][e_infection_sounds::_infection_end]
 {
 	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
 	{SND_INFECTION_JP, SND_INFECTED_JP, SND_NEW_ZOMBIE_JP },

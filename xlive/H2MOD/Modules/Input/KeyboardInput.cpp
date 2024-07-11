@@ -193,7 +193,7 @@ void hotkeyFuncToggleHideIngameChat() {
 	}
 }
 void hotkeyFuncGuide() {
-	ImGuiHandler::ToggleWindow(ImGuiHandler::ImAdvancedSettings::windowName);
+	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 }
 void hotkeyFuncDebug() {
 	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);

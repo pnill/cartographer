@@ -154,13 +154,11 @@ namespace ImGuiHandler
 		ImGui_ImplDX9_Init(pDevice);
 		p_d3d_device = pDevice;
 
-		ImAdvancedSettings::BuildStringsTable();
-		WeaponOffsets::BuildStringsTable();
 		imgui_windows.emplace_back("Weapon Offsets", false, WeaponOffsets::Render, WeaponOffsets::Open, WeaponOffsets::Close);
 		imgui_windows.emplace_back(ImMOTD::windowName, false, ImMOTD::Render, ImMOTD::Open, ImMOTD::Close);
 		imgui_windows.emplace_back(ImDebugOverlay::windowName, false, ImDebugOverlay::Render, ImDebugOverlay::Open, ImDebugOverlay::Close);
 		imgui_windows.emplace_back(ImMessageBox::windowName, false, ImMessageBox::Render, ImMessageBox::Open, ImMessageBox::Close);
-		imgui_windows.emplace_back(ImAdvancedSettings::windowName, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
+		imgui_windows.emplace_back(k_advanced_settings_window_name, false, ImAdvancedSettings::Render, ImAdvancedSettings::Open, ImAdvancedSettings::Close);
 		imgui_windows.emplace_back(CartographerConsole::windowName, false, CartographerConsole::Render, CartographerConsole::Open, CartographerConsole::Close);
 
 		atexit([]() {

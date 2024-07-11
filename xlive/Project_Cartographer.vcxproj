@@ -764,7 +764,7 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_xbox_live_task_progress_dialog.cpp" />
     <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsetConfig.cpp" />
-    <ClCompile Include="H2MOD\Modules\WeaponOffsets\WeaponOffsets.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\WeaponOffsets.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
@@ -1120,6 +1120,7 @@
     <ClInclude Include="Blam\Engine\widgets\liquid.h" />
     <ClInclude Include="CartographerDllConf.h" />
     <ClInclude Include="H2MOD\EngineHooks\EngineHooks.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\AdvancedSettingsStringTable.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
@@ -1127,6 +1128,7 @@
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
