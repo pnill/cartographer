@@ -21,6 +21,13 @@ union rectangle2d
 };
 ASSERT_STRUCT_SIZE(rectangle2d, sizeof(int16) * 4);
 
+
+static BLAM_MATH_INL void point2d_scale(point2d* point, int16 scale)
+{
+	point->v[0] *= scale;
+	point->v[1] *= scale;
+}
+
 static BLAM_MATH_INL int16 rectangle2d_width(const rectangle2d* rect)
 {
 	return rect->right - rect->left;
@@ -43,4 +50,12 @@ static BLAM_MATH_INL void rectangle2d_to_rect(const rectangle2d* rect2d, RECT* r
 		rect2d->top + height
 	};
 	return;
+}
+
+static BLAM_MATH_INL void rectangle2d_scale(rectangle2d* rect, int16 scale)
+{
+	rect->v[0] *= scale;
+	rect->v[1] *= scale;
+	rect->v[2] *= scale;
+	rect->v[3] *= scale;
 }

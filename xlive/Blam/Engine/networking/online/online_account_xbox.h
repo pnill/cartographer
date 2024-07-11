@@ -12,3 +12,5 @@ constexpr bool ONLINE_USER_VALID(XUID account)
 bool online_xuid_is_guest_account(XUID xuid);
 
 uint8 online_xuid_get_guest_account_number(XUID xuid);
+
+bool __cdecl online_connected_to_xbox_live();

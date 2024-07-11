@@ -27,6 +27,11 @@ bool* from_game_invite_global_get(void)
     return Memory::GetAddress<bool*>(0x46EEA0);
 }
 
+bool __cdecl user_interface_create_new_squad(bool a1, bool online)
+{
+    return INVOKE(0x216345, 0x0, user_interface_create_new_squad, a1, online);
+}
+
 void user_interface_networking_set_globals(bool a1, XSESSION_INFO* session, int32 unused, bool from_game_invite)
 {
     *byte_D6840E_get() = a1;
@@ -53,6 +58,27 @@ void __cdecl sub_5AD5AB(XSESSION_INFO* session, XNKEY* key, XNADDR* host_address
     return;
 }
 
+void user_interface_squad_clear_match_playlist()
+{
+    return INVOKE_TYPE(0x209DF4, 0x0, void(*__cdecl)(void));
+}
+
+void __cdecl user_interface_squad_clear_game_settings()
+{
+    INVOKE(0x2171A0, 0x0, user_interface_squad_clear_game_settings);
+}
+
+void __cdecl user_interface_squad_set_campaign_difficulty(int32 difficulty)
+{
+    INVOKE(0x215624, 0x0, user_interface_squad_set_campaign_difficulty, difficulty);
+}
+
+void __cdecl user_interface_set_desired_multiplayer_mode(int32 desired_mode)
+{
+    INVOKE(0x217138, 0x0, user_interface_set_desired_multiplayer_mode, desired_mode);
+}
+
+
 void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_index, bool from_game_invite)
 {
     //INVOKE(0x2161E1, 0x1FD827, user_interface_networking_join_game, session_info, a2, from_game_invite);
@@ -64,7 +90,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
     if (user_interface_controller_get_signed_in_controller_count() <= 0)
     {
         user_interface_networking_set_globals(true, session, user_index, from_game_invite);
-        error_message_menu_open(1, _ui_error_invite_requires_signin, 4, 1 << user_index, user_interface_controller_pick_profile_offline, 0);
+        screen_error_ok_dialog_show(1, _ui_error_invite_requires_signin, 4, 1 << user_index, user_interface_controller_pick_profile_offline, 0);
     }
     else
     {

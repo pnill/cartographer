@@ -61,7 +61,7 @@ class c_user_interface_widget
 protected:
 	//void* __vtable;
 	e_user_interface_widget_type m_widget_type;
-	int16 m_user_flags;
+	int16 m_controllers_mask;
 	int16 m_block_index;
 	int32 m_hierarchy_order;
 	c_user_interface_widget* parent_widget;
@@ -103,7 +103,8 @@ public:
 	void set_allocated(bool allocated);
 	void add_new_child(c_user_interface_widget* child);
 	void set_bounds(rectangle2d* bounds);
-	
+	void set_controller_mask(uint32 user_mask);
+
 	
 	// c_user_interface_widget virtual functions
 

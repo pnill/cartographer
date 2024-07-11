@@ -317,6 +317,7 @@ enum e_user_interface_render_window
 	k_number_of_render_windows = 0x5
 };
 
+enum e_screen_id : short;
 
 /* structures */
 
@@ -342,7 +343,11 @@ ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
 /* public methods */
 
-void __cdecl error_message_menu_open(int32 a1, int32 ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
-
 
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d);
+
+void __cdecl screen_error_ok_dialog_show(int32 a1, e_ui_error_types ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
+bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
+void __cdecl user_interface_error_display_ok_cancle_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
+bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_screen_id id);
+void __cdecl user_interface_enter_game_shell(int32 context);

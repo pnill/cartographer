@@ -8,7 +8,7 @@ c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type wi
 
 
 	this->m_widget_type = widget_type;
-	this->m_user_flags = user_flags;
+	this->m_controllers_mask = user_flags;
 	//this->interface_widget_vtable = &c_user_interface_widget::`vftable';
 	this->m_block_index = NONE;
 	this->m_hierarchy_order = NONE;
@@ -144,6 +144,10 @@ void c_user_interface_widget::set_bounds(rectangle2d* bounds)
 	this->m_bounds.right = bounds->right;
 }
 
+void c_user_interface_widget::set_controller_mask(uint32 user_mask)
+{
+	INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
+}
 
 
 
