@@ -123,11 +123,11 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_perf_event_begin("clear_alpha", NULL);
 
-            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVDESTALPHA);
+            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 8);
             rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (DWORD)0);
             rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (DWORD)0);
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
             rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (DWORD)0);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[1]);
 
@@ -155,12 +155,12 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DBLEND_ZERO);
-            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_TRUE);
+            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
             rasterizer_dx9_set_stencil_mode(8);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2]);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 15);
             rasterizer_dx9_draw_rect(&sun_surface_quad, 1.f, global_yellow_pixel32);
 
             rasterizer_dx9_perf_event_end("write_alpha");
@@ -182,7 +182,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_primary);
             //rasterizer_dx9_sun_glow_copy_source(&rect, _rasterizer_target_sun_glow_secondary);
 
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
 
             rasterizer_dx9_perf_event_end("copy_to_sun_glow_primary");
 
@@ -211,15 +211,15 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1u);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
-            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
+            rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 7);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
             rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
-            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVDESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[4]);
 
             real32 alpha = 1.f - global_window_parameters->fog_result.sky_fog_alpha;
@@ -316,9 +316,9 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, rea
 
             rasterizer_dx9_set_target(rasterizer_target, 0, true);
             rasterizer_dx9_set_vertex_shader_permutation(10);
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DBLEND_ZERO);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_TRUE);
             rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DBLEND_INVSRCCOLOR);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 0);
             rasterizer_dx9_set_stencil_mode(7);
             rasterizer_dx9_draw_rect(&sun_occlusion_rect, 1.0f, global_yellow_pixel32);
         }
@@ -345,7 +345,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
         rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_render_primary);
 
         D3DBLEND render_state = rasterizer_dx9_get_render_state(D3DRS_COLORWRITEENABLE);
-        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 15);
         rasterizer_dx9_set_screen_effect_pixel_shader(1);
         rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
         rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -383,14 +383,14 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
 
     if (pass_count > 0)
     {
-        rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
-        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
+        rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
+        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, 7);
         rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
         rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_DESTALPHA);
         rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ZERO);
         rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLEND_ZERO);
         rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
-        rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 0);
+        rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
         rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
         rasterizer_dx9_set_vertex_shader_permutation(1);
         rasterizer_dx9_submit_resolve();
