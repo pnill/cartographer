@@ -159,12 +159,12 @@ bool __stdcall c_particle_system::frame_advance(c_particle_system* thisx, real32
 				string_id marker_name = location_definitions[current_particle_system->definition_location_index].marker_name;
 				switch (marker_name.get_id())
 				{
-				case HS_UP:
+				case _string_id_up:
 					marker_matrix.vectors.forward = global_up3d;
 					marker_matrix.vectors.up = global_forward3d;
 					marker_matrix.vectors.left = global_left3d;
 					break;
-				case HS_GRAVITY:
+				case _string_id_gravity:
 					marker_matrix.vectors.forward = global_down3d;
 					marker_matrix.vectors.up = global_back3d;
 					marker_matrix.vectors.left = global_left3d;

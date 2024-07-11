@@ -144,9 +144,9 @@ namespace MeleeFix
 			}*/
 			
 			// this is used only for sword
-			if (melee_type == e_global_string_id::HS_MELEE_DASH || melee_type == e_global_string_id::HS_MELEE_DASH_AIRBORNE)
+			if (melee_type == _string_id_melee_dash || melee_type == _string_id_melee_dash_airborne)
 			{
-				float melee_max_duration = melee_type == e_global_string_id::HS_MELEE_DASH_AIRBORNE ? 0.22 : 0.15000001;
+				float melee_max_duration = melee_type == _string_id_melee_dash_airborne ? 0.22 : 0.15000001;
 				int melee_max_ticks = time_globals::seconds_to_ticks_round(melee_max_duration);
 				if (melee_max_ticks < 0 || p_melee_get_time_to_target(object_index) <= melee_max_ticks)
 					abort_melee_action = true;

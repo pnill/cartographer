@@ -20,10 +20,10 @@ void c_animation_manager::initialize()
     this->jmad_tag_datum = NONE;
     this->interpolator_controls[0].disable();
     this->interpolator_controls[1].disable();
-    this->animation_string_ids[0] = HS_ID_NONE;
-    this->animation_string_ids[1] = HS_ID_NONE;
-    this->animation_string_ids[2] = HS_ID_NONE;
-    this->animation_string_ids[3] = HS_ID_NONE;
+    this->animation_string_ids[0] = _string_id_invalid;
+    this->animation_string_ids[1] = _string_id_invalid;
+    this->animation_string_ids[2] = _string_id_invalid;
+    this->animation_string_ids[3] = _string_id_invalid;
     this->field_80 = 0;
 }
 

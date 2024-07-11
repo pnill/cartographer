@@ -162,7 +162,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		{
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
 			c_static_wchar_string32 format;
-			global_string_resolve_stringid_to_value(HS_GUEST_OF_ASCII_GAMERTAG_UNICODE_FORMAT_STRING, format.get_buffer());// %d %hs
+			global_string_resolve_stringid_to_value(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
 			swprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				format.get_string(),

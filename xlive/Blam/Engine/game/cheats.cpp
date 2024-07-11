@@ -15,22 +15,22 @@ ice_cream_activation_t p_ice_cream_activation;
 bool skull_enabled[k_skull_count] = { };
 const string_id skull_string_ids[k_skull_count] =
 {
-	HS_UNLOCKED_EXTRA_1,	// Envy
-	HS_UNLOCKED_EXTRA_2,	// Grunt Birthday Party
-	HS_UNLOCKED_EXTRA_3,	// Assassins
-	HS_UNLOCKED_EXTRA_4,	// Thunderstorm
-	HS_UNLOCKED_EXTRA_5,	// Famine
-	HS_UNLOCKED_EXTRA_6,	// I Would Have Been Your Daddy
-	HS_UNLOCKED_EXTRA_7,	// Blind
-	HS_UNLOCKED_EXTRA_8,	// Ghost
-	HS_UNLOCKED_EXTRA_9,	// Black Eye
-	HS_UNLOCKED_EXTRA_10,	// Catch
-	HS_UNLOCKED_EXTRA_11,	// Sputnik
-	HS_UNLOCKED_EXTRA_12,	// Iron
-	HS_UNLOCKED_EXTRA_13,	// Mythic
-	HS_UNLOCKED_EXTRA_14,	// Angry
-	HS_UNLOCKED_EXTRA_16,	// That's Just... Wrong
-	HS_UNLOCKED_EXTRA_15,	// Cow Bell
+	_string_id_unlocked_extra_1,	// Envy
+	_string_id_unlocked_extra_2,	// Grunt Birthday Party
+	_string_id_unlocked_extra_3,	// Assassins
+	_string_id_unlocked_extra_4,	// Thunderstorm
+	_string_id_unlocked_extra_5,	// Famine
+	_string_id_unlocked_extra_6,	// I Would Have Been Your Daddy
+	_string_id_unlocked_extra_7,	// Blind
+	_string_id_unlocked_extra_8,	// Ghost
+	_string_id_unlocked_extra_9,	// Black Eye
+	_string_id_unlocked_extra_10,	// Catch
+	_string_id_unlocked_extra_11,	// Sputnik
+	_string_id_unlocked_extra_12,	// Iron
+	_string_id_unlocked_extra_13,	// Mythic
+	_string_id_unlocked_extra_14,	// Angry
+	_string_id_unlocked_extra_16,	// That's Just... Wrong
+	_string_id_unlocked_extra_15,	// Cow Bell
 };
 
 

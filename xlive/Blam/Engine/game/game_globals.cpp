@@ -225,7 +225,7 @@ void game_globals_add_lmao_representation(void)
 			if (lmao_datum != NONE)
 			{
 				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));
-				new_object->parent_marker = e_global_string_id::HS_HEAD;
+				new_object->parent_marker = _string_id_head;
 				new_object->child_object.group.group = _tag_group_scenery;
 				new_object->child_object.index = lmao_datum;
 			}
