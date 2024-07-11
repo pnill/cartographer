@@ -173,7 +173,9 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_viewport(IDirect3DSu
 		global_camera->viewport_bounds.left,
 		global_camera->viewport_bounds.top,
 		rectangle2d_width(&global_camera->viewport_bounds),
-		rectangle2d_height(&global_camera->viewport_bounds)
+		rectangle2d_height(&global_camera->viewport_bounds),
+        0.0f,
+        1.0f
 	};
 	// set the viewport, after setting the main render target
 	// to note that the viewport will always gets reset when a new render target is set
