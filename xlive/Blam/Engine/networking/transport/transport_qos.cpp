@@ -15,7 +15,7 @@ datum __cdecl transport_qos_target_new_hook(int a1, int a2, int a3, int a4)
 {
 	s_data_array* qos_attempts_array = transport_qos_attempts_array();
 
-	datum qos_attempt_index = s_data_array::datum_new_in_range(qos_attempts_array);
+	datum qos_attempt_index = datum_new(qos_attempts_array);
 	if (qos_attempt_index != NONE)
 	{
 		s_transport_qos_attempt* qos_probe_data = (s_transport_qos_attempt*)datum_get(transport_qos_attempts_array(), qos_attempt_index);

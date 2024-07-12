@@ -216,9 +216,9 @@ c_user_interface_widget* c_user_interface_widget::sub_612BCA()
 	return INVOKE_TYPE(0x212BCA, 0x0, c_user_interface_widget * (__thiscall*)(c_user_interface_widget*), this);
 }
 
-uint8 c_user_interface_widget::handle_event(s_event_record* a2)
+bool c_user_interface_widget::handle_event(s_event_record* a2)
 {
-	return INVOKE_TYPE(0x2118F0, 0x0, uint8(__thiscall*)(c_user_interface_widget*, s_event_record*), this, a2);
+	return INVOKE_TYPE(0x2118F0, 0x0, bool(__thiscall*)(c_user_interface_widget*, s_event_record*), this, a2);
 }
 
 e_user_interface_channel_type c_user_interface_widget::get_parent_channel()

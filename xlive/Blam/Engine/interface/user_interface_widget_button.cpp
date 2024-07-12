@@ -38,9 +38,9 @@ int32 c_button_widget::get_intro_delay()
 	return INVOKE_TYPE(0x23FCE5, 0x0, int32(__thiscall*)(c_button_widget*), this);
 }
 
-uint8 c_button_widget::handle_event(s_event_record* event)
+bool c_button_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x23FCFF, 0x0, uint8(__thiscall*)(c_button_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x23FCFF, 0x0, bool(__thiscall*)(c_button_widget*, s_event_record*), this, event);
 }
 
 bool c_button_widget::can_interact()

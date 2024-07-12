@@ -74,7 +74,7 @@ public:
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;
-	virtual uint8 handle_event(s_event_record* event) override;
+	virtual bool handle_event(s_event_record* event) override;
 	virtual void construct_animation_on_region_enter(int32 a1) override;
 	virtual c_user_interface_text* get_interface() override;
 

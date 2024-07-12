@@ -81,7 +81,7 @@ public:
 template <class X = c_user_interface_widget, typename type = short>
 class c_slot1 : public _slot1<type>
 {
-	typedef char(X::* handler_t)(type*);
+	typedef bool(X::* handler_t)(type*);
 
 	X* m_class_ptr;
 	handler_t m_handler;
@@ -110,7 +110,7 @@ public:
 template <class X = c_list_widget, typename Y = s_event_record*, typename type = short>
 class c_slot2 : public _slot2<Y, type>
 {
-	typedef char(X::* handler_t)(Y*, type*);
+	typedef bool(X::* handler_t)(Y*, type*);
 
 	X* m_class_ptr;
 	handler_t m_handler;

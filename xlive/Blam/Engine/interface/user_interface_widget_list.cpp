@@ -107,9 +107,9 @@ int32 c_list_widget::get_intro_delay()
 	return this->m_intro_delay_milliseconds;
 }
 
-uint8 c_list_widget::handle_event(s_event_record* event)
+bool c_list_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x214CA9, 0x0, uint8(__thiscall*)(c_list_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x214CA9, 0x0, bool(__thiscall*)(c_list_widget*, s_event_record*), this, event);
 }
 
 void c_list_widget::construct_animation_on_region_enter(int32 a1)

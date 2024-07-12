@@ -649,6 +649,7 @@ enum e_global_string_id : uint32
 	_string_id_vault = 0x5000282,
 	_string_id_hint_vault = 0xa000283,
 	_string_id_xbox_live = 0x9000284,
+	_string_id_splitscreen = 0xb0019cc, //yes this is missing from every halo 2 on pc
 	_string_id_systemlink = 0xa000285,
 	_string_id_settings = 0x8000286,
 	_string_id_saved_films = 0xb000287,

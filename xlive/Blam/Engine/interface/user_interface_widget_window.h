@@ -74,7 +74,7 @@ protected:
 
 
 	void destroy();
-	char switch_panes(int32* pane_index_ptr);
+	bool switch_panes(int32* pane_index_ptr);
 
 public:
 	c_screen_widget(e_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
@@ -87,7 +87,7 @@ public:
 	// c_screen_widget virtual functions
 
 	virtual ~c_screen_widget();
-	virtual uint8 handle_event(s_event_record* event) override;
+	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 	virtual bool sub_6114B9() override;
 

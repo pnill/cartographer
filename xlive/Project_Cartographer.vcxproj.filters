@@ -371,6 +371,14 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_list.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_list_item.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_text.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_globals.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_memory.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_widget_tab_view.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_widget_window.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
+    <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1007,6 +1015,14 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list_item.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_4way_signin.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_globals.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_memory.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_utilities.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_tab_view.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_window.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
+    <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
   </ItemGroup>
   <ItemGroup>

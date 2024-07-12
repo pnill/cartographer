@@ -267,10 +267,10 @@ void c_screen_4way_signin::update()
 	c_user_interface_widget::update();
 }
 
-uint8 c_screen_4way_signin::handle_event(s_event_record* event)
+bool c_screen_4way_signin::handle_event(s_event_record* event)
 {
 
-	uint8 result = false;
+	bool result = false;
 
 	if (user_interface_channel_is_busy(_user_interface_channel_type_game_error))
 		return true;
@@ -288,9 +288,11 @@ uint8 c_screen_4way_signin::handle_event(s_event_record* event)
 			result = this->handle_main_events(event);
 
 		}
+
+		if (result)
+			return result;
 	}
-	if (result)
-		return result;
+
 
 	return c_screen_widget::handle_event(event);
 }
@@ -340,7 +342,7 @@ void* c_screen_4way_signin::load_proc()
 	return nullptr;
 }
 
-char __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_index controller_index)
+bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_index controller_index)
 {
 	//return INVOKE(0xA421, 0x0, user_interface_mainmenu_sign_out_controller_callback, controller_index);
 	user_interface_controller_sign_out(controller_index);
@@ -348,13 +350,13 @@ char __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_i
 	return true;
 
 }
-uint8 __cdecl user_inteface_sign_out_controller_default_callback(e_controller_index controller_index)
+bool __cdecl user_inteface_sign_out_controller_default_callback(e_controller_index controller_index)
 {
 	user_interface_controller_sign_out(controller_index);
 	return true;
 }
 
-uint8 c_screen_4way_signin::handle_main_events(s_event_record* event)
+bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 {
 	char sucess = true;
 	if (event->component == _user_interface_controller_component_button_a ||
@@ -461,7 +463,7 @@ uint8 c_screen_4way_signin::handle_main_events(s_event_record* event)
 	return sucess;
 }
 
-uint8 c_screen_4way_signin::handle_default_events(s_event_record* event)
+bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 {
 	if (event->component == _user_interface_controller_component_button_a
 		|| event->component == _user_interface_controller_component_button_start)
@@ -550,8 +552,6 @@ void* c_screen_4way_signin::load_for_campaign(s_screen_parameters* parameters)
 
 void c_screen_4way_signin::apply_patches_on_map_load()
 {
-	if (!game_is_ui_shell())
-		return;
 
 	const char* main_widget_tag_path = "ui\\screens\\game_shell\\4way_multiplayer_signin\\4way_signin_main";
 	const char* player_skins_tag_path = "ui\\player_skins\\player_skin_signin";
@@ -683,13 +683,4 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	}
 
 }
-
-void c_screen_4way_signin::apply_patches_on_init()
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-
-}
-
 	

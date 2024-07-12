@@ -15,7 +15,7 @@ public:
 
 	virtual ~c_tab_view_widget();
 	virtual int32 setup_children() override;
-	virtual uint8 handle_event(s_event_record* event) override;
+	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 
 };

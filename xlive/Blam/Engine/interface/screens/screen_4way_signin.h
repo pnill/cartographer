@@ -17,8 +17,8 @@ class c_screen_4way_signin : protected c_screen_widget
 protected:
 	e_4_way_signin_type m_call_context;
 
-	uint8 handle_main_events(s_event_record* event);
-	uint8 handle_default_events(s_event_record* event);
+	bool handle_main_events(s_event_record* event);
+	bool handle_default_events(s_event_record* event);
 public:
 
 	static void* load(s_screen_parameters* parameters);
@@ -29,7 +29,6 @@ public:
 	static void* load_for_campaign(s_screen_parameters* parameters);
 	
 	static void apply_patches_on_map_load();
-	static void apply_patches_on_init();
 
 	c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 
@@ -37,7 +36,7 @@ public:
 
 	virtual ~c_screen_4way_signin();
 	virtual void update() override;
-	virtual uint8 handle_event(s_event_record* event) override;
+	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;
 	virtual void* load_proc() override;
 };

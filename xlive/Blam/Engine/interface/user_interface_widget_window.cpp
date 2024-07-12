@@ -50,9 +50,9 @@ void c_screen_widget::destroy()
 	INVOKE_TYPE(0x20F6FF, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
 
-char c_screen_widget::switch_panes(long* pane_index_ptr)
+bool c_screen_widget::switch_panes(int32* pane_index_ptr)
 {
-	return INVOKE_TYPE(0x210227, 0x0, char(__thiscall*)(c_screen_widget*, long*), this, pane_index_ptr);
+	return INVOKE_TYPE(0x210227, 0x0, bool(__thiscall*)(c_screen_widget*, int32*), this, pane_index_ptr);
 }
 
 void c_screen_widget::verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout)
@@ -83,9 +83,9 @@ c_screen_widget::~c_screen_widget()
 }
 
 
-uint8 c_screen_widget::handle_event(s_event_record* event)
+bool c_screen_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x20EB2B, 0x0, uint8(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x20EB2B, 0x0, bool(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
 }
 
 c_user_interface_text* c_screen_widget::get_interface()

@@ -23,6 +23,13 @@ datum c_list_item_widget::get_last_data_index()
 	return this->m_last_data_index;
 }
 
+void c_list_item_widget::set_item_transitioning()
+{
+	// only used by main_menu_list ?
+	// maybe transitioning?
+	this->field_78 = true;
+}
+
 
 // c_list_item_widget virtual functions
 
@@ -42,9 +49,9 @@ int32 c_list_item_widget::get_intro_delay()
 	return this->m_intro_delay_milliseconds;
 }
 
-uint8 c_list_item_widget::handle_event(s_event_record* event)
+bool c_list_item_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x22009E, 0x0, uint8(__thiscall*)(c_list_item_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x22009E, 0x0, bool(__thiscall*)(c_list_item_widget*, s_event_record*), this, event);
 }
 
 void c_list_item_widget::construct_animation_on_region_enter(int32 a1)

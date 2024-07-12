@@ -3,6 +3,7 @@
 #include "math/color_math.h"
 
 /* enums */
+
 enum e_user_interface_widget_type : int32
 {
 	_widget_type_screen = 0x0,
@@ -120,7 +121,7 @@ public:
 	virtual void sub_612A7C(c_user_interface_widget* a2);
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();
-	virtual uint8 handle_event(s_event_record* event);
+	virtual bool handle_event(s_event_record* event);
 	virtual e_user_interface_channel_type get_parent_channel();
 	virtual e_user_interface_render_window get_parent_render_window();
 	virtual void construct_animation_on_region_enter(int32 a1);

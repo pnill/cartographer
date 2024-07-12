@@ -26,9 +26,9 @@ int32 c_tab_view_widget::setup_children()
 	return this->setup_children();
 }
 
-uint8 c_tab_view_widget::handle_event(s_event_record* event)
+bool c_tab_view_widget::handle_event(s_event_record* event)
 {
-	return INVOKE_TYPE(0x220A6E, 0x0, uint8(__thiscall*)(c_tab_view_widget*, s_event_record*), this, event);
+	return INVOKE_TYPE(0x220A6E, 0x0, bool(__thiscall*)(c_tab_view_widget*, s_event_record*), this, event);
 }
 
 c_user_interface_text* c_tab_view_widget::get_interface()
