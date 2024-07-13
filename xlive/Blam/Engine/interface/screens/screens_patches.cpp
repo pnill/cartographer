@@ -13,6 +13,7 @@ void screens_apply_patches_on_map_load()
 	c_xbox_live_task_progress_menu::apply_patches();
 	c_screen_4way_signin::apply_patches_on_map_load();
 	c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load();
+	c_screen_squad_settings::apply_patches_on_map_load();
 }
 
 void screens_apply_patches()

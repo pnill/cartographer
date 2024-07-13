@@ -11,6 +11,8 @@
 #include "main/level_definitions.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
+#include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 
 /* macro defines */
@@ -94,7 +96,45 @@ enum e_local_bitmap_mp_games
 	_mp_game_type_territories,
 };
 
+enum e_xbox_live_bitmap_type
+{
+	//h2x
+	//_xbox_live_bitmap_type_match_settings=0,
+	//_xbox_live_bitmap_type_2,
+	//_xbox_live_bitmap_type_quick_options,
+	//_xbox_live_bitmap_type_3,
+	//_xbox_live_bitmap_type_change_hopper,
+	//_xbox_live_bitmap_type_5,
+	//_xbox_live_bitmap_type_switch_to_arranged,
+	//_xbox_live_bitmap_type_switch_to_coop,
 
+	//h2v
+	_xbox_live_bitmap_type_unknown_map = 0,
+	_xbox_live_bitmap_type_party_management,
+	_xbox_live_bitmap_type_quick_options,
+	
+	//custom bitmaps additions
+	_xbox_live_bitmap_type_switch_to_arranged,
+	_xbox_live_bitmap_type_switch_to_coop,
+	k_number_of_xbox_live_bitmap_types,
+};
+
+enum e_xbox_live_menu_bitmap_type
+{
+	//h2v
+	_xbox_live_menu_bitmap_type_0 = 0,
+	_xbox_live_menu_bitmap_type_switch_to_optimatch,
+	_xbox_live_menu_bitmap_type_2,
+	_xbox_live_menu_bitmap_type_3,
+	_xbox_live_menu_bitmap_type_4,
+	_xbox_live_menu_bitmap_type_5,
+
+	k_number_of_xbox_live_menu_bitmap_types,
+};
+
+
+datum new_xbox_live_bitmap_datum = NONE;
+datum xbox_live_menu_bitmap_datum = NONE;
 
 c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	c_list_widget(user_flags),
@@ -528,25 +568,41 @@ void c_screen_squad_settings::update()
 		help_string = _string_id_quick_options_help;
 		header_string = _string_id_current_variant;
 		value_string = _string_id_variant;
-		bitm_index = 2;
+		bitm_index = _xbox_live_bitmap_type_quick_options;
 		break;
 	case _item_switch_to_coop:
 		help_string = _string_id_switch_to_coop_help;
 		header_string = _string_id_switch_to_coop;
 		value_string = _string_id_empty_string;
-		bitm_index = 7;
+		//bitm_index = 7;
+		if (option_bitmap && !DATUM_IS_NONE(new_xbox_live_bitmap_datum))
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_coop);
+			option_bitmap->assign_new_bitmap_block(bitmap_block);
+		}
 		break;
 	case _item_switch_to_arranged:
 		help_string = _string_id_switch_to_custom_game_help;
 		header_string = _string_id_switch_to_arranged;
 		value_string = _string_id_empty_string;
-		bitm_index = 6;
+		//bitm_index = 6;
+		if (option_bitmap && !DATUM_IS_NONE(new_xbox_live_bitmap_datum))
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_arranged);
+			option_bitmap->assign_new_bitmap_block(bitmap_block);
+		}
 		break;
 	case _item_switch_to_optimatch:
 		help_string = _string_id_switch_to_optimatch_help;
 		header_string = _string_id_switch_to_optimatch;
 		value_string = _string_id_empty_string;
-		bitm_index = 0;
+		//bitm_index = 0;
+		if (option_bitmap && !DATUM_IS_NONE(xbox_live_menu_bitmap_datum))
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(xbox_live_menu_bitmap_datum, _xbox_live_menu_bitmap_type_switch_to_optimatch);
+			option_bitmap->assign_new_bitmap_block(bitmap_block);
+		}		
+
 		break;
 	case _item_change_hopper:
 		help_string = _string_id_change_hopper_help;
@@ -558,13 +614,13 @@ void c_screen_squad_settings::update()
 		help_string = _string_id_party_management_help;
 		header_string = _string_id_party_management_header;
 		value_string = _string_id_player_options;
-		bitm_index = 1;
+		bitm_index = _xbox_live_bitmap_type_party_management;
 		break;
 	default:
 		help_string = _string_id_empty_string;
 		header_string = _string_id_empty_string;
 		value_string = _string_id_empty_string;
-		bitm_index = 0;
+		bitm_index = _xbox_live_bitmap_type_unknown_map;
 
 	}
 
@@ -631,4 +687,26 @@ void c_screen_squad_settings::apply_instance_patches()
 {
 	//Replace orignal call with custom one inside pregame_lobby
 	WriteValue(Memory::GetAddress(0x246356) + 1, c_screen_squad_settings::load);
+}
+
+void c_screen_squad_settings::apply_patches_on_map_load()
+{
+	datum xbox_live_bitmap_datum = tag_loader::Get_tag_datum("ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live", _tag_group_bitmap, "mainmenu_bitmaps");
+
+	if (!DATUM_IS_NONE(xbox_live_bitmap_datum))
+	{
+		tag_loader::Load_tag(xbox_live_bitmap_datum, true, "mainmenu_bitmaps");
+		tag_loader::Push_Back();
+		new_xbox_live_bitmap_datum = tag_loader::ResolveNewDatum(xbox_live_bitmap_datum);
+		LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
+
+	}
+	else
+	{
+		new_xbox_live_bitmap_datum = NONE;
+	}
+
+	xbox_live_menu_bitmap_datum = tags::find_tag(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live_menu");
+
+	return;
 }

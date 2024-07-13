@@ -56,6 +56,7 @@ protected:
 public:
 	static void* load(s_screen_parameters* parameters);	
 	static void apply_instance_patches();	
+	static void apply_patches_on_map_load();
 	c_screen_squad_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 
 	// c_screen_squad_settings virtual functions
