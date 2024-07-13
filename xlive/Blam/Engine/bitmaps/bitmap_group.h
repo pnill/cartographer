@@ -313,3 +313,4 @@ struct bitmap_group
 ASSERT_STRUCT_SIZE(bitmap_group, 80);
 
 bitmap_data* __cdecl bitmap_group_get_bitmap_from_sequence(datum tag_index, int16 sequence_index, int16 sprite_index);
+bitmap_data* bitmap_group_get_bitmap(datum bitmap_tag_index, int16 bitmap_index);

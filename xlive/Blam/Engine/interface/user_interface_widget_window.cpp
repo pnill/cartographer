@@ -3,7 +3,7 @@
 #include "user_interface_widget_window.h"
 #include "rasterizer/rasterizer_globals.h"
 
-c_screen_widget::c_screen_widget(e_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
 	c_user_interface_widget(_widget_type_screen, user_flags),
 	m_header_text((int16)0),
 	m_screen_button_key_text((int16)0),
@@ -28,7 +28,7 @@ c_screen_widget::c_screen_widget(e_screen_id menu_id, e_user_interface_channel_t
 
 	//h2v writes screen_id to some global variable ,
 	//probably a leftover stuff from gfwl
-	WriteValue<e_screen_id>(Memory::GetAddress(0x9758D8), menu_id);
+	WriteValue<e_user_interface_screen_id>(Memory::GetAddress(0x9758D8), menu_id);
 
 	this->m_widget_type = _widget_type_screen;
 	this->field_6D = true;

@@ -17,7 +17,7 @@ void __cdecl user_interface_error_display_ok_cancle_dialog_with_ok_callback(e_us
 	INVOKE(0x20E3BB, 0x0, user_interface_error_display_ok_cancle_dialog_with_ok_callback, channel_type, window_index, user_flags, ok_callback_handle, error_type);
 }
 
-bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_screen_id id)
+bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id)
 {
 	return INVOKE(0x209850, 0x0, user_interface_back_out_from_channel_by_id, channel_type, window_index, id);
 }

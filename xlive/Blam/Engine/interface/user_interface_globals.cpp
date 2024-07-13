@@ -33,3 +33,13 @@ void* __cdecl c_screen_network_squad_browser_load(s_screen_parameters* params)
 {
 	return INVOKE(0x21A238, 0x0, c_screen_network_squad_browser_load, params);
 }
+
+void* __cdecl c_screen_single_player_level_select_load_lobby(s_screen_parameters* parameters)
+{
+	return INVOKE(0x213552, 0x0, c_screen_single_player_level_select_load_lobby, parameters);
+}
+
+void* __cdecl c_screen_single_player_difficulty_select_load_lobby(s_screen_parameters* parameters)
+{
+	return INVOKE(0x24201D, 0x0, c_screen_single_player_difficulty_select_load_lobby, parameters);
+}

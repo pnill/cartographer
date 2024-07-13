@@ -16,6 +16,8 @@
 #include "Networking/online/online_account_xbox.h"
 #include "tag_files/global_string_ids.h"
 
+/* enums */
+
 enum e_4way_signin_main_text_blocks
 {
 
