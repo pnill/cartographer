@@ -252,6 +252,7 @@ void user_inteface_controller_apply_patches()
 {
 	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match
+	WriteValue<uint8>(Memory::GetAddress(0x20CEB5 + 6), 0); // disable _ui_error_demo_version_no_more_for_you
 }
 
 
