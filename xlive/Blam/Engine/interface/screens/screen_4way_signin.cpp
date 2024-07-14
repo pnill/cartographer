@@ -77,6 +77,12 @@ enum e_4way_signin_main_model_blocks
 	_4way_signin_main_pane_0_model_ui_player4b,
 };
 
+/* globals */
+
+uint32 ui_recover_from_disconnection_return_address = NULL;
+
+/* public code */
+
 c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
 	c_screen_widget(_screen_4way_join_screen, channel_type, window_index, user_flags)
 {
@@ -420,7 +426,9 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 	{
 		if (user_interface_controller_get_signed_in_controller_count() == 1)
 		{
-			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_xbox_live_main_menu)
+			// _screen_xbox_live_main_menu is replaced by _screen_bungie_news in h2v
+			//if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_xbox_live_main_menu)
+			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_bungie_news)
 				&& !user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_main_menu))
 			{
 				user_interface_enter_game_shell(1);
@@ -684,5 +692,93 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 		base_hud_block->shader.index = shader_datum_index;
 	}
 
+}
+
+void user_interface_recover_4way_screen(e_session_protocol protocol)
+{
+	s_screen_parameters params;
+	params.m_flags = 7; //retreating or recovering?
+	params.m_window_index = _window_4;
+	params.field_C = 0;
+	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
+	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.field_4 = 0xFFFFFFFF;
+	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
+
+	if (session_protocol_has_coop(protocol))
+	{
+		params.m_load_function = &c_screen_4way_signin::load_for_campaign;
+	}
+
+	params.m_load_function(&params);
+}
+
+void user_interface_recover_4way_screen_pregame(e_session_protocol protocol, e_user_interface_screen_id screen_id)
+{
+	if (screen_id == _screen_4way_join_screen)
+	{
+		//simply return if we are already in the 4way screen
+		return;
+	}
+	else if (screen_id == _screen_multiplayer_pregame_lobby)
+	{
+		user_interface_recover_4way_screen(protocol);
+	}
+
+}
+
+__declspec(naked) void jmp_to_recover_4way_for_splitscreen_for_network_pregame()
+{
+	__asm
+	{
+		push	edi //screen_id
+		push	eax //protocol
+		call    user_interface_recover_4way_screen_pregame
+
+		pop		eax
+		pop		edi
+
+		//remaining function epilog can handle rest
+		jmp		ui_recover_from_disconnection_return_address
+	}
+}
+
+__declspec(naked) void jmp_to_recover_4way_for_splitscreen_for_network_postgame()
+{
+	__asm
+	{
+		push	eax //protocol
+		jmp		user_interface_recover_4way_screen
+		pop		eax
+
+		//remaining function epilog can handle rest
+		jmp		ui_recover_from_disconnection_return_address
+	}
+}
+
+void user_interface_recover_from_disconnection_patches()
+{
+	// Use _screen_4way_join_screen instead of _screen_main_menu when backing out from splitscreen lobby
+	WriteValue<uint8>(Memory::GetAddress(0x217583) + 1, _screen_4way_join_screen); //inside user_interface_recover_from_disconnection
+
+	//patch jmptables
+	WritePointer(Memory::GetAddress(0x217678), jmp_to_recover_4way_for_splitscreen_for_network_pregame);//case _session_protocol_splitscreen_coop
+	WritePointer(Memory::GetAddress(0x21767C), jmp_to_recover_4way_for_splitscreen_for_network_pregame);//case _session_protocol_splitscreen_custom
+
+	WritePointer(Memory::GetAddress(0x217694), jmp_to_recover_4way_for_splitscreen_for_network_postgame);//case _session_protocol_splitscreen_coop
+	WritePointer(Memory::GetAddress(0x217698), jmp_to_recover_4way_for_splitscreen_for_network_postgame);//case _session_protocol_splitscreen_custom
+
+	ui_recover_from_disconnection_return_address = Memory::GetAddress(0x2174DB);
+
+}
+
+void c_screen_4way_signin::apply_instance_patches()
+{
+	if (Memory::IsDedicatedServer())
+		return;
+
+	user_interface_recover_from_disconnection_patches();
 }
 	

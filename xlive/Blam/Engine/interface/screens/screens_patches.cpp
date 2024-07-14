@@ -19,6 +19,7 @@ void screens_apply_patches_on_map_load()
 void screens_apply_patches()
 {
 	c_screen_esrb_warning::apply_patches();
+	c_screen_4way_signin::apply_instance_patches();
 	c_main_menu_list::apply_instance_patches();
 	c_screen_multiplayer_pregame_lobby::apply_instance_patches();
 	c_screen_squad_settings::apply_instance_patches();

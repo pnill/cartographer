@@ -29,6 +29,7 @@ public:
 	static void* load_for_campaign(s_screen_parameters* parameters);
 	
 	static void apply_patches_on_map_load();
+	static void apply_instance_patches();
 
 	c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 

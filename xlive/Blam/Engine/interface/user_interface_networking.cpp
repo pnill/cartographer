@@ -27,6 +27,13 @@ bool* from_game_invite_global_get(void)
     return Memory::GetAddress<bool*>(0x46EEA0);
 }
 
+bool session_protocol_has_coop(e_session_protocol protocol)
+{
+    return protocol == _session_protocol_splitscreen_coop
+        || protocol == _session_protocol_system_link_coop
+        || protocol == _session_protocol_xbox_live_coop;
+}
+
 bool __cdecl user_interface_create_new_squad(bool a1, bool online)
 {
     return INVOKE(0x216345, 0x0, user_interface_create_new_squad, a1, online);
