@@ -9,15 +9,23 @@ struct s_sound_global_mix_configuration
 	real32 mono_upsatialized_gain_db;
 	real32 stereo_to_3d_gain_db;
 	real32 rear_surround_to_front_stereo_gain_db;
+
 	// Explaination("surround center mix", "for sounds that use the center speaker")
+
 	real32 surround_center_front_speaker_gain_db;
 	real32 surround_center_rear_speaker_gain_db;
+
 	// Explaination("stereo center mix", "for sounds that use the center speaker")
+
 	real32 stereo_center_front_speaker_gain_db;
 	real32 stereo_center_rear_speaker_gain_db;
+
 	// Explaination("more sound lovin'", "for sounds that use the center speaker")
+
 	real32 stereo_unspatialized_gain_db;
+
 	// Explaination("last minute values", "")
+
 	real32 solo_player_fade_out_delay_seconds;
 	real32 solo_player_fade_out_time_seconds;
 	real32 solo_player_fade_in_time_seconds;
@@ -28,21 +36,32 @@ ASSERT_STRUCT_SIZE(s_sound_global_mix_configuration, 48);
 struct s_sound_mix_configuration_definition
 {
 	// Explaination("first person left side mix", "for first person sounds to the left of you")
+
 	real32 first_person_left_side_left_stereo_gain_db;
 	real32 first_person_left_side_right_stereo_gain_db;
+
 	// Explaination("first person middle mix", "for first person sounds between your ears")
+
 	real32 first_person_middle_left_stereo_gain_db;
 	real32 first_person_middle_right_stereo_gain_db;
+
 	// Explaination("first person right side mix", "for first person sounds to the right of you")
+
 	real32 first_person_right_side_left_stereo_gain_db;
 	real32 first_person_right_side_right_stereo_gain_db;
+
 	// Explaination("first person stereo mix", "")
+
 	real32 first_person_front_speaker_gain_db;
 	real32 first_person_rear_speaker_gain_db;
+
 	// Explaination("ambient stereo mix", "")
+
 	real32 ambient_front_speaker_gain_db;
 	real32 ambient_rear_speaker_gain_db;
+
 	// Explaination("global mix", "")
+
 	s_sound_global_mix_configuration global_mix;
 };
 ASSERT_STRUCT_SIZE(s_sound_mix_configuration_definition, 88);
