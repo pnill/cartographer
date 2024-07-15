@@ -57,12 +57,6 @@ int get_path_from_id(e_directory_id id, LPCWSTR pMore, LPWSTR pszPath, bool is_f
 	return p_get_directory_path_by_id(id, pMore, pszPath, is_folder);
 }
 
-// TODO move to util or some other place
-static void* system_heap_alloc(SIZE_T dwBytes)
-{
-	return HeapAlloc(GetProcessHeap(), 0, dwBytes);
-}
-
 void s_custom_map_data::create_custom_map_data_directory()
 {
 	auto p__create_custom_map_data_directory = Memory::GetAddressRelative<void(__cdecl*)()>(0x4C1FD4, 0x48F715);

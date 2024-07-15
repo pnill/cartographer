@@ -2,7 +2,7 @@
 #include "scenario_kill_trigger_volumes.h"
 #include "scenario.h"
 
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 DWORD get_scenario_volume_count() 
 {

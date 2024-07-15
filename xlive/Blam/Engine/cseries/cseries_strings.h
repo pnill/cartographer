@@ -3,8 +3,6 @@
 
 #define MAXIMUM_STRING_SIZE 262144
 
-size_t csstrnlen(char* string, size_t size);
-int csstricmp(const char* s1, const char* s2);
 template<size_t string_length>
 struct c_static_string
 {
@@ -292,5 +290,10 @@ size_t csstrnlen(const char* s, size_t size);
 char* csstrnzcpy(char* s1, const char* s2, size_t size);
 
 char* csstrnzcat(char* s1, char const* s2, size_t size);
+
+
+int32 csstricmp(const char* s1, const char* s2);
+
+int32 csstrncmp(const char* s1, const char* s2, size_t size);
 
 int32 cvsnzprintf(char* buffer, size_t size, char const* format, ...);
