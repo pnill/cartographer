@@ -45,7 +45,6 @@
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
-    <ClCompile Include="Util\Hooks\Detour.cpp" />
     <ClCompile Include="Util\Hooks\Hook.cpp" />
     <ClCompile Include="xliveless.cpp" />
     <ClCompile Include="XLive\achievements\XAchievements.cpp" />
@@ -361,6 +360,7 @@
     <ClCompile Include="Blam\Engine\render\render_primitive.cpp" />
     <ClCompile Include="Blam\Engine\render\render_section_visibility.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lights.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -507,7 +507,6 @@
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="util\filesys.h" />
     <ClInclude Include="Util\hash.h" />
-    <ClInclude Include="Util\Hooks\Detour.h" />
     <ClInclude Include="Util\Hooks\Hook.h" />
     <ClInclude Include="Util\log.h" />
     <ClInclude Include="xlivedefs.h" />
@@ -985,6 +984,8 @@
     <ClInclude Include="Blam\Engine\shaders\vertex_shader.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lights.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\AdvancedSettingsStringTable.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

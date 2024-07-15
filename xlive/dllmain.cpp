@@ -5,7 +5,6 @@
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "Util/Hooks/Detour.h"
 
 HMODULE hThis = NULL;
 
@@ -113,7 +112,6 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		hThis = hModule;
 		srand((unsigned int)time(NULL));
 		InitH2Startup();
-		Detour();
 		break;
 
 	case DLL_THREAD_ATTACH:
