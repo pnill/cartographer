@@ -5,7 +5,6 @@
 
 /* macro defines */
 
-#define K_MAXIMUM_NUMBER_OF_SPECIAL_WIDGETS 16
 
 #define K_HEADER_TEXT_BLOCK_INDEX 0
 #define K_BUTTON_KEY_TEXT_BLOCK_INDEX 1
@@ -320,6 +319,28 @@ enum e_user_interface_screen_id : uint32
 	_screen_about_dialog = 0x129,
 };
 
+enum e_special_widgets_type
+{
+	_special_widget_type_0,
+	_special_widget_type_1,
+	_special_widget_type_2,
+	_special_widget_type_3,
+	_special_widget_type_4,
+	_special_widget_type_5,
+	_special_widget_bitmap_favourites,
+	_special_widget_bitmap_arrow_up,
+	_special_widget_bitmap_arrow_down,
+	_special_widget_type_9,
+	_special_widget_type_10,
+	_special_widget_type_11,
+	_special_widget_type_12,
+	_special_widget_type_13,
+	_special_widget_type_14,
+	_special_widget_type_15,
+
+	k_maximum_number_of_special_widgets = 16
+};
+
 /* forward declarations */
 
 class c_button_widget;
@@ -371,7 +392,7 @@ protected:
 	bool field_A00;
 	bool field_A01;
 	uint8 gap_A02[2];
-	c_user_interface_widget* m_special_widgets[K_MAXIMUM_NUMBER_OF_SPECIAL_WIDGETS];
+	c_user_interface_widget* m_special_widgets[k_maximum_number_of_special_widgets];
 	c_slot1<c_screen_widget, int32> m_screen_slot;
 
 
@@ -397,7 +418,7 @@ public:
 
 	virtual void sub_60E884();
 	virtual void initialize(s_screen_parameters* parameters) = 0;
-	virtual void cache_local_bitmaps_and_cursor();
+	virtual void post_initialize();
 	virtual void setup_special_widgets();
 	virtual c_user_interface_widget* sub_6102C5();
 	virtual uint8 sub_6103D6();

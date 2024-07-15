@@ -104,6 +104,7 @@ public:
 	void set_child_visible(e_user_interface_widget_type type, uint32 idx,  bool visible);
 	void set_allocated(bool allocated);
 	void add_new_child(c_user_interface_widget* child);
+	void get_bounds(rectangle2d* bounds);
 	void set_bounds(rectangle2d* bounds);
 	void set_controller_mask(uint32 user_mask);
 	void start_widget_animation(int32 type);

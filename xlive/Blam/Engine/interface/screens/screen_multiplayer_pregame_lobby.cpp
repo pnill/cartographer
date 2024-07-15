@@ -77,7 +77,7 @@ enum e_pregame_lobby_text_blocks
 	_pregame_lobby_pane_0_text_view_postgame,
 	_pregame_lobby_pane_0_text_online_single_xbox_pregame_lobby_help,
 	_pregame_lobby_pane_0_text_active_protocol,
-	_pregame_lobby_pane_0_text_text_chat_body,
+	_pregame_lobby_pane_0_text_chat_body,
 	_pregame_lobby_pane_0_text_map_download_progress,
 	_pregame_lobby_pane_0_text_vote_status,
 	_pregame_lobby_pane_0_text_vote_tally,
@@ -134,10 +134,12 @@ enum e_pregame_lobby_text_blocks
 	_pregame_lobby_pane_1_text_server_party_leader,
 	
 	//custom addition	
-	_pregame_lobby_pane_1_text_text_chat_body,
+	_pregame_lobby_pane_1_text_chat_body,
 
 
 	k_pregame_lobby_pane_1_text_count,
+	k_pregame_lobby_pane_1_text_count_orignal = 44,
+	k_number_of_pregame_pane_1_text_addons = k_pregame_lobby_pane_1_text_count - k_pregame_lobby_pane_1_text_count_orignal,
 
 };
 
@@ -183,8 +185,8 @@ enum e_pregame_lobby_bitmap_blocks
 	_pregame_lobby_pane_0_bitmap_settings_framing,
 	_pregame_lobby_pane_0_bitmap_game_settings,// last h2x bitmap
 
-	_pregame_lobby_pane_0_bitmap_arrows_1, // h2v starts from here
-	_pregame_lobby_pane_0_bitmap_arrows_2,
+	_pregame_lobby_pane_0_bitmap_arrows_up, // h2v starts from here
+	_pregame_lobby_pane_0_bitmap_arrows_down,
 	_pregame_lobby_pane_0_bitmap_favorites_icon,
 	_pregame_lobby_pane_0_bitmap_download_progress_1,
 	_pregame_lobby_pane_0_bitmap_download_progress_2,
@@ -247,11 +249,12 @@ enum e_pregame_lobby_bitmap_blocks
 	_pregame_lobby_pane_1_bitmap_settings_framing,
 	_pregame_lobby_pane_1_bitmap_game_settings,// last h2x bitmap
 
-	_pregame_lobby_pane_1_bitmap_39, // h2v starts here
-	_pregame_lobby_pane_1_bitmap_40,
-	_pregame_lobby_pane_1_bitmap_rank_icons,
-	k_pregame_lobby_pane_1_bitmap_count,
+	// h2v starts here...these were orignally broken
+	_pregame_lobby_pane_1_bitmap_arrows_up, 
+	_pregame_lobby_pane_1_bitmap_arrows_down,
+	_pregame_lobby_pane_1_bitmap_favorites_icon,
 
+	k_pregame_lobby_pane_1_bitmap_count,
 };
 
 const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(const e_pregame_lobby_text_blocks pane_1)
@@ -461,15 +464,15 @@ void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 
 void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
 {
-	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_text_chat_body;
+	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
 	if (m_pregame_pane_type == _pregame_pane_cooperative)
 	{
-		chat_box_receiver = _pregame_lobby_pane_1_text_text_chat_body;
+		chat_box_receiver = _pregame_lobby_pane_1_text_chat_body;
 
 	}
 	else if (m_pregame_pane_type == _pregame_pane_custom_game)
 	{
-		chat_box_receiver = _pregame_lobby_pane_0_text_text_chat_body;
+		chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
 	}
 	else
 	{
@@ -535,18 +538,79 @@ void c_screen_multiplayer_pregame_lobby::update_protocol()
 		// add lobby_switch_codes_here
 		initialize_long_text_chat();
 		fix_server_party_leader_texts(pane_type);
+		update_chat_icons();
 	}
+	update_favourites_icons();
 
-
-	c_bitmap_widget* favourites_icon = this->try_find_bitmap_widget(_pregame_lobby_pane_0_bitmap_favorites_icon);
-	this->m_special_widgets[6] = (c_user_interface_widget*)favourites_icon;
-
-	if (favourites_icon)
-	{
-		this->m_special_widgets[6]->set_visible(user_interface_squad_session_is_xbox_live());
-	}
 }
 __declspec(naked) void jmp_update_protocol() { __asm { jmp c_screen_multiplayer_pregame_lobby::update_protocol } }
+
+
+void c_screen_multiplayer_pregame_lobby::update_chat_icons()
+{
+	e_pregame_lobby_bitmap_blocks up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
+	e_pregame_lobby_bitmap_blocks down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
+	if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
+		down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
+
+		c_text_widget* map_download_progress_text = try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_0_text_map_download_progress));
+		if (map_download_progress_text)
+		{
+			rectangle2d new_bounds;
+			map_download_progress_text->get_bounds(&new_bounds);
+			new_bounds.bottom = 2 * new_bounds.bottom - new_bounds.top;
+			map_download_progress_text->set_bounds(&new_bounds);
+		}
+	}
+	else if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		up_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_up;
+		down_arrow_icon_id = _pregame_lobby_pane_1_bitmap_arrows_down;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+
+	this->m_special_widgets[_special_widget_bitmap_arrow_up] = (c_user_interface_widget*)try_find_bitmap_widget(up_arrow_icon_id);
+	this->m_special_widgets[_special_widget_bitmap_arrow_down] = (c_user_interface_widget*)try_find_bitmap_widget(down_arrow_icon_id);
+	
+	if (!this->m_communications_allowed)
+	{
+		if (this->m_special_widgets[_special_widget_bitmap_arrow_up])
+			this->m_special_widgets[_special_widget_bitmap_arrow_up]->set_visible(false);
+
+		if (this->m_special_widgets[_special_widget_bitmap_arrow_down])
+			this->m_special_widgets[_special_widget_bitmap_arrow_down]->set_visible(false);
+	}
+
+}
+
+void c_screen_multiplayer_pregame_lobby::update_favourites_icons()
+{
+	e_pregame_lobby_bitmap_blocks favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
+	if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		favourites_icon_id = _pregame_lobby_pane_0_bitmap_favorites_icon;
+	}
+	else if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		favourites_icon_id = _pregame_lobby_pane_1_bitmap_favorites_icon;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+	this->m_special_widgets[_special_widget_bitmap_favourites] = (c_user_interface_widget*)this->try_find_bitmap_widget(favourites_icon_id);
+	if (this->m_special_widgets[_special_widget_bitmap_favourites])
+	{
+		this->m_special_widgets[_special_widget_bitmap_favourites]->set_visible(user_interface_squad_session_is_xbox_live());
+	}
+}
 
 
 void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
@@ -557,7 +621,7 @@ void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 	NopFill(Memory::GetAddress(0x244F15), 4); //	vote_countdown_text_block->m_visible = 0;
 
 	// fix chatbox for cooperative_pane
-	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_text_chat_body));
+	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_chat_body));
 	PatchCall(Memory::GetAddress(0x24589A), jmp_update_protocol); //inside c_screen_multiplayer_pregame_lobby::update
 
 }
@@ -579,7 +643,8 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
 	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
 
-	s_text_block_reference* text_chat_body_reference = MetaExtender::add_tag_block2<s_text_block_reference>((uint32)&cooperative_pane->text_blocks);
+	//	add missing text_chat block
+	MetaExtender::add_tag_block3<s_bitmap_block_reference>((uint32)&cooperative_pane->text_blocks, k_number_of_pregame_pane_1_text_addons);
 
 	//	fix bitmap offsets
 	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)
@@ -590,6 +655,10 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	//	creates a big box in the middle so nopped the bitmap it references
 	//	edit : turns out its the remnant of y-menu
 	cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_name_field]->bitmap_tag.index = NONE;
+	//copy data for broken bitmap blocks
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_up], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_up], sizeof(s_bitmap_block_reference));
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_arrows_down], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_arrows_down], sizeof(s_bitmap_block_reference));
+	csmemcpy(cooperative_pane->bitmap_blocks[_pregame_lobby_pane_1_bitmap_favorites_icon], custom_games_pane->bitmap_blocks[_pregame_lobby_pane_0_bitmap_favorites_icon], sizeof(s_bitmap_block_reference));
 
 
 	//	fix player fields
@@ -612,7 +681,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	}
 
 	//	fix text bounds
-	for (uint8 block_idx = 0; block_idx < _pregame_lobby_pane_1_text_text_chat_body; block_idx++)
+	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count_orignal; block_idx++)
 	{
 		const uint8 custom_game_block_idx = c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
 		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
@@ -623,6 +692,6 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.bottom = -400;
 
 	//copy data for _pregame_lobby_pane_1_text_text_chat_body block
-	csmemcpy(text_chat_body_reference, custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_text_chat_body], sizeof(s_text_block_reference));
+	csmemcpy(cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_chat_body], custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_chat_body], sizeof(s_text_block_reference));
 
 }

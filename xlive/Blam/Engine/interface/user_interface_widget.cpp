@@ -140,6 +140,14 @@ void c_user_interface_widget::add_new_child(c_user_interface_widget* child)
 	INVOKE_TYPE(0x21208E, 0x0, void(__thiscall*)(c_user_interface_widget*, c_user_interface_widget*), this, child);
 }
 
+void c_user_interface_widget::get_bounds(rectangle2d* bounds)
+{
+	if (bounds)
+	{
+		*bounds = this->m_bounds;
+	}
+}
+
 void c_user_interface_widget::set_bounds(rectangle2d* bounds)
 {
 	//return INVOKE_TYPE(0x2116D2, 0x0, void(__thiscall*)(c_user_interface_widget*, rectangle2d*), this, bounds);

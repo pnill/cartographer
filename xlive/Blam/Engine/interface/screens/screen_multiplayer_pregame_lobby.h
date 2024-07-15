@@ -81,6 +81,8 @@ protected:
 
 	void initialize_long_text_chat();
 	void update_protocol();
+	void update_chat_icons();
+	void update_favourites_icons();
 
 public:
 	static void apply_instance_patches();

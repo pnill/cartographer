@@ -102,7 +102,7 @@ void c_screen_widget::sub_60E884()
 	return;
 }
 
-void c_screen_widget::cache_local_bitmaps_and_cursor()
+void c_screen_widget::post_initialize()
 {
 	INVOKE_TYPE(0x20F790, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
