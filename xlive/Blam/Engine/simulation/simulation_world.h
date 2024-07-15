@@ -6,7 +6,7 @@
 #include "simulation_queue.h"
 #include "simulation_view.h"
 
-#include "Networking/replication/replication_event_manager.h"
+#include "networking/replication/replication_event_manager.h"
 #define k_simulation_world_maximum_views (k_maximum_players + 1)
 
 enum e_simulation_queue_type

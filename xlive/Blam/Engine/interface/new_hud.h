@@ -1,6 +1,6 @@
 #pragma once
 #include "game/players.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 /* structures */
 

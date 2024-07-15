@@ -5,8 +5,9 @@
 #include "game/game_time.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
-#include "Networking/NetworkMessageTypeCollection.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
+#include "networking/NetworkMessageTypeCollection.h"
+
 #include "simulation/game_interface/simulation_game_action.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
@@ -15,8 +16,6 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
-#include "Blam/Engine/Networking/Session/NetworkSession.h"
-#include "Blam/Engine/Networking/NetworkMessageTypeCollection.h"
 
 // for XNet connection logging
 #include "XLive/xnet/IpManagement/XnIp.h"

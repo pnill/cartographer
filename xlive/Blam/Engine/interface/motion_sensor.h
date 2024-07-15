@@ -1,5 +1,5 @@
 #pragma once
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 enum e_motion_sensor_blip_size : int16
 {

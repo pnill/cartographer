@@ -1,6 +1,6 @@
 #pragma once
 #include "math/function_definitions.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 #define k_count_of_effects_that_effect_vibration 8 
 

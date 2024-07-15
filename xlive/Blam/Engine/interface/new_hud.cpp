@@ -7,7 +7,7 @@
 #include "interface/hud.h"
 #include "interface/new_hud_definitions.h"
 #include "main/main_screenshot.h"
-#include "Networking/logic/life_cycle_manager.h"
+#include "networking/logic/life_cycle_manager.h"
 
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"

@@ -10,7 +10,7 @@
 #include "interface/new_hud.h"
 #include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
-#include "Networking/NetworkMessageTypeCollection.h"
+#include "networking/NetworkMessageTypeCollection.h"
 #include "rasterizer/rasterizer_globals.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"

@@ -3,7 +3,7 @@
 
 #include "game/game.h"
 #include "math/math.h"
-#include "Networking/logic/life_cycle_manager.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "input/input_xinput.h"
 

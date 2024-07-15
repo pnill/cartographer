@@ -5,8 +5,8 @@
 
 #include "effects/player_effects.h"
 #include "game/game_time.h"
-#include "Networking/memory/networking_memory.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/memory/networking_memory.h"
+#include "networking/Session/NetworkSession.h"
 #include "simulation/simulation.h"
 
 #include "XLive/xnet/IpManagement/XnIp.h"

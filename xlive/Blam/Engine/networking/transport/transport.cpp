@@ -2,7 +2,7 @@
 #include "transport.h"
 
 #include "network_channel.h"
-#include "Networking/NetworkMessageTypeCollection.h"
+#include "networking/NetworkMessageTypeCollection.h"
 
 bool __cdecl transport_address_equivalent(const network_address* a1, const network_address* a2, bool check_network_port)
 {

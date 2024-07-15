@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Networking/logic/network_session_interface.h"
+#include "networking/logic/network_session_interface.h"
 #include "simulation/game_interface/simulation_game_engine_player.h"
 #define k_statborg_entry_total_stat_count 9
 

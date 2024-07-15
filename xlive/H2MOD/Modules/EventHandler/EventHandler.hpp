@@ -1,6 +1,6 @@
 #pragma once
 #include "game/game_options.h"
-#include "Networking/logic/life_cycle_manager.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/ServerConsole.h"
 
 /*

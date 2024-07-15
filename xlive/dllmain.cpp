@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Blam/Engine/cartographer/discord/discord_interface.h"
+#include "cartographer/discord/discord_interface.h"
 
 #include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"

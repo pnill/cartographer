@@ -1,5 +1,5 @@
 #pragma once
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 enum e_game_life_cycle : int32
 {

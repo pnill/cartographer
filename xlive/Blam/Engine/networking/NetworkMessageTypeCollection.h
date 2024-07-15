@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 #define player_identifier_size_bits (sizeof(unsigned long long) * CHAR_BIT)
 
