@@ -12,7 +12,7 @@ c_tag_injecting_manager g_manager;
 
 	possible solution.. Scan the tag table for available empty tag instances and use those, they will exist.
 */
-tags::tag_instance* g_tag_table;
+cache_file_tag_instance* g_tag_table;
 
 
 bool tag_injection_check_map_exists(const wchar_t* map_name)
@@ -57,9 +57,9 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 	s_tag_injecting_table_entry* entry = g_manager.get_table()->get_entry_by_cache_index(cache_datum);
 	if (!entry)
 	{
-		tags::tag_instance inst = g_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum)];
-		if (inst.data_offset != 0)
-			return inst.datum_index;
+		cache_file_tag_instance* inst = &g_tag_table[DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum)];
+		if (inst->data_offset != 0)
+			return inst->tag_index;
 
 		return NONE;
 	}
@@ -90,7 +90,7 @@ bool _cdecl scenario_tags_load_internal(char* scenario_path)
 	//Clear the table
 	for (uint16 i = k_first_injected_datum; i < g_manager.get_entry_count(); i++)
 	{
-		g_tag_table[i] = tags::tag_instance{(e_tag_group)NONE, NONE, 0, 0};
+		g_tag_table[i] = cache_file_tag_instance{ _tag_group_none, NONE, 0, 0 };
 	}
 
 	g_manager.reset();
@@ -129,7 +129,7 @@ void tag_injection_apply_hooks()
 
 void tag_injection_initialize()
 {
-	g_tag_table = (tags::tag_instance*)malloc(sizeof(tags::tag_instance) * k_max_tag_instance_count);
+	g_tag_table = (cache_file_tag_instance*)malloc(sizeof(cache_file_tag_instance) * k_max_tag_instance_count);
 	g_manager.set_instance_table(g_tag_table);
 	g_manager.init_directories();
 	tag_injection_apply_hooks();

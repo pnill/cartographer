@@ -42,6 +42,7 @@ c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_elemen
 	// inside the array the current item should be placed
 	this->reset_counts();
 	this->populate_buffers();
+	return;
 }
 
 void c_xml_definition_block::reset_counts()
@@ -112,7 +113,7 @@ void c_xml_definition_block::allocate_buffers()
 		this->m_data_references = (uint32*)malloc(sizeof(uint32) * this->m_data_reference_count);
 
 	if (this->m_tag_block_count)
-		this->m_tag_blocks = (c_xml_definition_block*)malloc(sizeof(c_xml_definition_block) * this->m_tag_block_count);
+		this->m_tag_blocks = new c_xml_definition_block[this->m_tag_block_count];
 
 #if K_TAG_INJECTION_DEBUG
 	if (this->m_tag_reference_count)

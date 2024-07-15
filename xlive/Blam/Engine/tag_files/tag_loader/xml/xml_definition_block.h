@@ -36,9 +36,10 @@ class c_xml_definition_block
 
 
 public:
+	c_xml_definition_block(void) = default;
 	c_xml_definition_block(tinyxml2::XMLElement* base_element, uint32 offset, uint32 size);
-	c_xml_definition_block() = default;
-	~c_xml_definition_block() = default;
+	~c_xml_definition_block(void) = default;
+
 	void reset_counts();
 	void get_element_counts();
 	void allocate_buffers();

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "tag_injection_table.h"
 
-#define lazy_malloc_buffer(TYPE, COUNT)\
-	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
-
-constexpr uint32 entry_count_per_resize = 100;
+enum
+{
+	k_injection_table_entry_count_per_resize = 100
+};
 
 c_tag_injection_table::c_tag_injection_table()
 {
@@ -12,6 +12,7 @@ c_tag_injection_table::c_tag_injection_table()
 	this->m_table_size = 0;
 	this->m_table = nullptr;
 	this->resize_table();
+	return;
 }
 
 c_tag_injection_table::~c_tag_injection_table()
@@ -22,6 +23,7 @@ c_tag_injection_table::~c_tag_injection_table()
 		free(this->m_table->loaded_data);
 	}
 	free(this->m_table);
+	return;
 }
 
 void c_tag_injection_table::clear()
@@ -101,9 +103,9 @@ bool c_tag_injection_table::has_entry_by_cache_index(datum datum_index) const
 void c_tag_injection_table::resize_table()
 {
 	// Allocate new larger buffer
-	//s_tag_injecting_table_entry* new_buffer = lazy_malloc_buffer(s_tag_injecting_table_entry, this->m_table_size + entry_count_per_resize);
-	s_tag_injecting_table_entry* new_buffer =
-		(s_tag_injecting_table_entry*)calloc(this->m_table_size + entry_count_per_resize, sizeof(s_tag_injecting_table_entry));
+	s_tag_injecting_table_entry* new_buffer = (s_tag_injecting_table_entry*)calloc(
+		this->m_table_size + k_injection_table_entry_count_per_resize,
+		sizeof(s_tag_injecting_table_entry));
 
 	if (this->m_table)
 	{
@@ -114,9 +116,8 @@ void c_tag_injection_table::resize_table()
 		free(this->m_table);
 	}
 	// Increase the size of the table
-	this->m_table_size += entry_count_per_resize;
+	this->m_table_size += k_injection_table_entry_count_per_resize;
 	// Place the new buffer
 	this->m_table = new_buffer;
+	return;
 }
-
-#undef lazy_malloc_buffer

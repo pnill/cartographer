@@ -28,7 +28,7 @@
 c_tag_injecting_manager::c_tag_injecting_manager():
 	m_agents{}, m_base_tag_data_size(0), m_injectable_used_size(0), m_instances(nullptr),
 	m_active_map_verified(false), m_active_map_cache_header(),
-	m_active_map_tags_header(), m_active_map_scenario_instance(),
+	m_active_map_tags_header(), m_active_map_scenario_instance_offset(),
 	m_active_map_instance_table_offset(0), m_active_map_file_handle(nullptr)
 {
 	this->m_agents_initialized.clear();
@@ -56,7 +56,7 @@ uint32 c_tag_injecting_manager::get_base_map_tag_data_size() const
 	return this->m_base_tag_data_size;
 }
 
-void c_tag_injecting_manager::set_instance_table(tags::tag_instance* table)
+void c_tag_injecting_manager::set_instance_table(cache_file_tag_instance* table)
 {
 	this->m_instances = table;
 }
@@ -139,7 +139,11 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + 0xC * this->m_active_map_tags_header.tag_parent_info_count + 0x20;
 
 	// Read the scenario instance from map file
-	lazy_fread(this->m_active_map_file_handle, m_active_map_instance_table_offset, &this->m_active_map_scenario_instance, sizeof(tags::tag_instance), 1);
+	cache_file_tag_instance temp_instance;
+	lazy_fread(this->m_active_map_file_handle, m_active_map_instance_table_offset, &temp_instance, sizeof(cache_file_tag_instance), 1);
+
+	this->m_active_map_scenario_instance_offset = temp_instance.data_offset;
+
 }
 
 bool c_tag_injecting_manager::get_active_map_verified() const
@@ -160,7 +164,7 @@ void c_tag_injecting_manager::reset()
 	this->m_active_map.clear();
 	memset(&this->m_active_map_cache_header, 0, sizeof(s_cache_header));
 	memset(&this->m_active_map_tags_header, 0, sizeof(s_tags_header));
-	memset(&this->m_active_map_scenario_instance, 0, sizeof(tags::tag_instance));
+	this->m_active_map_scenario_instance_offset = 0;
 
 	// todo: clear entry table
 	this->m_table.clear();
@@ -168,17 +172,17 @@ void c_tag_injecting_manager::reset()
 
 
 
-tags::tag_instance c_tag_injecting_manager::get_tag_instance_from_cache(datum cache_datum) const
+cache_file_tag_instance c_tag_injecting_manager::get_tag_instance_from_cache(datum cache_datum) const
 {
-	tags::tag_instance temp_instance;
-	uint32 instance_offset = this->m_active_map_instance_table_offset + sizeof(tags::tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
-	lazy_fread(this->m_active_map_file_handle, instance_offset, &temp_instance, sizeof(tags::tag_instance), 1);
+	cache_file_tag_instance temp_instance;
+	uint32 instance_offset = this->m_active_map_instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
+	lazy_fread(this->m_active_map_file_handle, instance_offset, &temp_instance, sizeof(cache_file_tag_instance), 1);
 	return temp_instance;
 }
 
 tag_group c_tag_injecting_manager::get_tag_group_by_datum(datum cache_datum) const
 {
-	return this->get_tag_instance_from_cache(cache_datum).type;
+	return this->get_tag_instance_from_cache(cache_datum).tag_group;
 }
 
 void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) const
@@ -198,11 +202,11 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	*g_cache_handle_geometry_block_offset = 0x0;
 	*g_cache_handle_geometry_block_size = 0x0;
 
-	tags::tag_instance* tag_info = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)];
+	cache_file_tag_instance* tag_info = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)];
 	char* tag_data = tags::get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
 
 	//fail safe
-	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->datum_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->tag_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))
 	{
 		LOG_ERROR_GAME("[tag_loader] failed to resolve datum to correct instance, game will crash");
 	}
@@ -218,7 +222,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	*g_cache_handle = new_file_handle;
 
-	switch (tag_info->type.group)
+	switch (tag_info->tag_group.group)
 	{
 		case 'mode':
 		{
@@ -330,7 +334,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		return NONE;
 	}
 	
-	tags::tag_instance temp_instance;
+	cache_file_tag_instance temp_instance;
 
 	fseek(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset, SEEK_SET);
 	uint32 current_index = 0;
@@ -350,8 +354,8 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 				fgetpos(this->m_active_map_file_handle, &position);
 
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
-				if (temp_instance.type.group == group)
-					return temp_instance.datum_index;
+				if (temp_instance.tag_group.group == group)
+					return temp_instance.tag_index;
 
 				fseek(this->m_active_map_file_handle, position, SEEK_SET);
 			}
@@ -377,7 +381,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		LOG_ERROR_GAME("[c_tag_injecting_mananger::get_name_by_tag_datum] active map has not be set for tag: {:x}", cache_datum);
 	}
 
-	tags::tag_instance temp_instance;
+	cache_file_tag_instance temp_instance;
 
 	fseek(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset, SEEK_SET);
 	uint32 current_index = 0;
@@ -393,10 +397,10 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		{
 			fpos_t position;
 			fgetpos(this->m_active_map_file_handle, &position);
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
-			if (temp_instance.datum_index == cache_datum)
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), &temp_instance, sizeof(cache_file_tag_instance), 1);
+			if (temp_instance.tag_index == cache_datum)
 			{
-				if (temp_instance.type.group == group)
+				if (temp_instance.tag_group.group == group)
 					memcpy(out_name, buff, MAX_PATH);
 			}
 			fseek(this->m_active_map_file_handle, position, SEEK_SET);
@@ -504,17 +508,12 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 		this->m_active_map_file_handle,
 		&this->m_active_map_cache_header,
 		&this->m_active_map_tags_header,
-		&this->m_active_map_scenario_instance,
+		this->m_active_map_scenario_instance_offset,
 		cache_datum);
 
 	if (load_dependencies)
 	{
-		for (uint32 i = 0; i < new_entry->loaded_data->m_tag_reference_count; i++)
-		{
-			tag_group t_group = this->get_tag_group_by_datum(new_entry->loaded_data->m_tag_references[i]);
-			if(t_group.group != _tag_group_sound)
-				load_tag_internal(this, t_group, new_entry->loaded_data->m_tag_references[i], load_dependencies);
-		}
+		c_tag_injecting_manager::load_dependencies(this, new_entry);
 	}
 
 	return new_entry->injected_index;
@@ -523,8 +522,8 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum,
                                                 bool load_dependencies)
 {
-	tags::tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
-	if (inst.datum_index != cache_datum || inst.type.group != group.group)
+	cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
+	if (inst.tag_index != cache_datum || inst.tag_group.group != group.group)
 		return;
 
 	if (inst.size == 0 || inst.data_offset == 0)
@@ -557,18 +556,27 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 		manager->m_active_map_file_handle,
 		&manager->m_active_map_cache_header,
 		&manager->m_active_map_tags_header,
-		&manager->m_active_map_scenario_instance,
+		manager->m_active_map_scenario_instance_offset,
 		cache_datum);
 
 	if (load_dependencies)
 	{
-		for (uint32 i = 0; i < new_entry->loaded_data->m_tag_reference_count; i++)
+		c_tag_injecting_manager::load_dependencies(manager, new_entry);
+	}
+}
+
+void c_tag_injecting_manager::load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry)
+{
+	for (uint32 i = 0; i < new_entry->loaded_data->get_tag_reference_count(); i++)
+	{
+		datum tag_index = new_entry->loaded_data->get_tag_reference(i);
+		tag_group t_group = manager->get_tag_group_by_datum(tag_index);
+		if (t_group.group != _tag_group_sound)
 		{
-			tag_group t_group = manager->get_tag_group_by_datum(new_entry->loaded_data->m_tag_references[i]);
-			if (t_group.group != _tag_group_sound)
-				load_tag_internal(manager, t_group, new_entry->loaded_data->m_tag_references[i], load_dependencies);
+			load_tag_internal(manager, t_group, tag_index, load_dependencies);
 		}
 	}
+	return;
 }
 
 void c_tag_injecting_manager::inject_tags()
@@ -615,12 +623,12 @@ void c_tag_injecting_manager::inject_tags()
 #endif
 
 
-		tags::tag_instance* injection_instance = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(entry->injected_index)];
+		cache_file_tag_instance* injection_instance = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(entry->injected_index)];
 
-		injection_instance->type = entry->type;
+		injection_instance->tag_group = entry->type;
 		injection_instance->data_offset = injection_offset;
 		injection_instance->size = entry->loaded_data->get_total_size();
-		injection_instance->datum_index = entry->injected_index;
+		injection_instance->tag_index = entry->injected_index;
 
 #if K_TAG_INJECTION_DEBUG
 		char tag_class[5];

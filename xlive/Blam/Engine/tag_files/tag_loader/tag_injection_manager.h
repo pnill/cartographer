@@ -14,35 +14,7 @@
 
 class c_tag_injecting_manager
 {
-private:
-	c_tag_injection_table m_table;
-	c_static_flags<k_tag_group_count> m_agents_initialized;
-	c_xml_definition_agent m_agents[k_tag_group_count];
-
-	c_static_wchar_string<MAX_PATH> m_base_map_directory;
-	c_static_wchar_string<MAX_PATH> m_mods_map_directory;
-	c_static_wchar_string<MAX_PATH> m_plugins_directory;
-
-	uint32 m_base_tag_data_size;
-	uint32 m_injectable_used_size;
-	tags::tag_instance* m_instances;
-
-	bool m_active_map_verified;
-	c_static_wchar_string<MAX_PATH> m_active_map;
-	s_cache_header m_active_map_cache_header;
-	s_tags_header m_active_map_tags_header;
-	tags::tag_instance m_active_map_scenario_instance;
-	uint32 m_active_map_instance_table_offset;
-	FILE* m_active_map_file_handle;
-
-	tags::tag_instance get_tag_instance_from_cache(datum cache_datum) const;
-	tag_group get_tag_group_by_datum(datum cache_datum) const;
-
-	void load_raw_data_from_cache(datum injected_index) const;
-	static void apply_definition_fixup(e_tag_group group, datum injected_index);
-	static void initialize_shader_template(datum injected_datum);
 public:
-
 	c_tag_injecting_manager();
 	~c_tag_injecting_manager() = default;
 
@@ -50,7 +22,7 @@ public:
 
 	void set_base_map_tag_data_size(uint32 size);
 	uint32 get_base_map_tag_data_size() const;
-	void set_instance_table(tags::tag_instance* table);
+	void set_instance_table(cache_file_tag_instance* table);
 
 	uint16 get_entry_count() const;
 	c_tag_injection_table* get_table();
@@ -69,6 +41,35 @@ public:
 	datum load_tag(e_tag_group group, const char* tag_name, bool load_dependencies);
 	datum load_tag(e_tag_group group, datum cache_datum, bool load_dependencies);
 	static void load_tag_internal(c_tag_injecting_manager* manager, tag_group group, datum cache_datum, bool load_dependencies);
+	static void load_dependencies(c_tag_injecting_manager* manager, const s_tag_injecting_table_entry* new_entry);
 
 	void inject_tags();
+private:
+	c_tag_injection_table m_table;
+	c_static_flags<k_tag_group_count> m_agents_initialized;
+	c_xml_definition_agent m_agents[k_tag_group_count];
+
+	c_static_wchar_string<MAX_PATH> m_base_map_directory;
+	c_static_wchar_string<MAX_PATH> m_mods_map_directory;
+	c_static_wchar_string<MAX_PATH> m_plugins_directory;
+
+	uint32 m_base_tag_data_size;
+	uint32 m_injectable_used_size;
+	cache_file_tag_instance* m_instances;
+
+	bool m_active_map_verified;
+	c_static_wchar_string<MAX_PATH> m_active_map;
+	s_cache_header m_active_map_cache_header;
+	s_tags_header m_active_map_tags_header;
+	uint32 m_active_map_scenario_instance_offset;
+	uint32 m_active_map_instance_table_offset;
+	FILE* m_active_map_file_handle;
+
+	cache_file_tag_instance get_tag_instance_from_cache(datum cache_datum) const;
+	tag_group get_tag_group_by_datum(datum cache_datum) const;
+
+	void load_raw_data_from_cache(datum injected_index) const;
+	static void apply_definition_fixup(e_tag_group group, datum injected_index);
+	static void initialize_shader_template(datum injected_datum);
+
 };
