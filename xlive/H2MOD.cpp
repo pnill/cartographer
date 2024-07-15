@@ -395,9 +395,11 @@ bool __cdecl OnMapLoad(s_game_options* options)
 	if (result == false) // verify if the game didn't fail to load the map
 		return false;
 
-	game_globals_apply_tag_patches(options);
 
+	MetaExtender::free_tag_blocks();
 	tags::run_callbacks();
+	
+	game_globals_apply_tag_patches(options);
 	ImGuiHandler::WeaponOffsets::MapLoad();
 
 	// when the game is minimized, the game might skip loading the main menu
@@ -429,7 +431,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			screens_apply_patches_on_map_load();
 		}
 
-		MetaExtender::free_tag_blocks();
 	}
 	else
 	{

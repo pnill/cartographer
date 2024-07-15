@@ -380,6 +380,8 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\game\preferences.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_widget_text_entry.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1025,6 +1027,8 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\game\preferences.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_text_entry.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
   </ItemGroup>
   <ItemGroup>

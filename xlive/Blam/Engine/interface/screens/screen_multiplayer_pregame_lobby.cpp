@@ -4,6 +4,8 @@
 #include "screen_multiplayer_pregame_lobby.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
+#include "interface/user_interface_networking.h"
+#include "H2MOD/Tags/MetaExtender.h"
 
 
 enum e_pregame_lobby_button_blocks
@@ -130,6 +132,11 @@ enum e_pregame_lobby_text_blocks
 	_pregame_lobby_pane_1_text_online_single_xbox_pregame_lobby_help,
 	_pregame_lobby_pane_1_text_active_protocol,
 	_pregame_lobby_pane_1_text_server_party_leader,
+	
+	//custom addition	
+	_pregame_lobby_pane_1_text_text_chat_body,
+
+
 	k_pregame_lobby_pane_1_text_count,
 
 };
@@ -431,6 +438,117 @@ const e_pregame_lobby_text_blocks c_screen_pregame_lobby_text_pane_1_mapping(con
 	return k_pregame_lobby_pane_1_text_count;
 }
 
+void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
+{
+	e_pregame_lobby_text_blocks party_leader_text_id = _pregame_lobby_pane_0_text_party_leader;
+	e_pregame_lobby_text_blocks server_party_leader_text_id = _pregame_lobby_pane_0_text_server_party_leader;
+
+	if (pane_type == _pregame_pane_custom_game)
+	{
+		party_leader_text_id = _pregame_lobby_pane_0_text_party_leader;
+		server_party_leader_text_id = _pregame_lobby_pane_0_text_server_party_leader;
+	}
+	else if (pane_type == _pregame_pane_cooperative)
+	{
+		party_leader_text_id = _pregame_lobby_pane_1_text_party_leader;
+		server_party_leader_text_id = _pregame_lobby_pane_1_text_server_party_leader;
+	}
+	// fixes code breaking _pregame_lobby_pane_1_text_party_leader
+	// fixes code breaking _pregame_lobby_pane_1_text_server_party_leader
+	WriteValue<uint8>(Memory::GetAddress(0x2452DD) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(party_leader_text_id));
+	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
+}
+
+void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
+{
+	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_text_chat_body;
+	if (m_pregame_pane_type == _pregame_pane_cooperative)
+	{
+		chat_box_receiver = _pregame_lobby_pane_1_text_text_chat_body;
+
+	}
+	else if (m_pregame_pane_type == _pregame_pane_custom_game)
+	{
+		chat_box_receiver = _pregame_lobby_pane_0_text_text_chat_body;
+	}
+	else
+	{
+		// complete this once we have matchmaking lobby
+		return;
+	}
+
+	c_text_widget* chat_box_text = try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(chat_box_receiver));
+	if (chat_box_text && this->m_communications_allowed)
+	{
+		rectangle2d chat_text_bounds;
+		chat_box_text->get_unprojected_bounds(&chat_text_bounds);
+
+		const real_rgb_color* rgb_text_color = chat_box_text->get_interface()->get_color();
+		real_argb_color argb_text_color;
+		argb_text_color.alpha = 1.0f;
+		argb_text_color.red = rgb_text_color->red;
+		argb_text_color.blue = rgb_text_color->blue;
+		argb_text_color.green = rgb_text_color->green;
+
+		this->add_new_child(&this->m_long_chat_text);
+
+		this->m_long_chat_text.set_text_properties(
+			text_flag_left_justify_text,
+			chat_box_text->get_animation_type(),
+			&argb_text_color,
+			chat_box_text->get_interface()->get_font(),
+			&chat_text_bounds);
+
+		this->m_long_chat_text.set_field74();
+	}
+
+}
+
+void c_screen_multiplayer_pregame_lobby::update_protocol()
+{
+	//INVOKE_TYPE(0x24300D, 0x0, void(__thiscall*)(c_screen_multiplayer_pregame_lobby*), this);
+
+	e_pregame_pane_type pane_type = this->m_pregame_pane_type;
+	switch (user_interface_squad_get_active_protocol())
+	{
+	case _session_protocol_splitscreen_coop:
+	case _session_protocol_system_link_coop:
+	case _session_protocol_xbox_live_coop:
+		pane_type = _pregame_pane_cooperative;
+		break;
+	case _session_protocol_splitscreen_custom:
+	case _session_protocol_system_link_custom:
+	case _session_protocol_xbox_live_custom:
+		pane_type = _pregame_pane_custom_game;
+		break;
+	case _session_protocol_xbox_live_optimatch:
+		pane_type = _pregame_pane_optimatch;
+		break;
+	}
+
+	if (pane_type != this->m_pregame_pane_type)
+	{
+		int32 new_pane_type = (int32)pane_type;
+		this->switch_panes(&new_pane_type);
+		this->m_pregame_pane_type = pane_type;
+
+		// add lobby_switch_codes_here
+		initialize_long_text_chat();
+		fix_server_party_leader_texts(pane_type);
+	}
+
+
+	c_bitmap_widget* favourites_icon = this->try_find_bitmap_widget(_pregame_lobby_pane_0_bitmap_favorites_icon);
+	this->m_special_widgets[6] = (c_user_interface_widget*)favourites_icon;
+
+	if (favourites_icon)
+	{
+		this->m_special_widgets[6]->set_visible(user_interface_squad_session_is_xbox_live());
+	}
+}
+__declspec(naked) void jmp_update_protocol() { __asm { jmp c_screen_multiplayer_pregame_lobby::update_protocol } }
+
+
 void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 {
 	// should probably replace these with asserts
@@ -438,14 +556,10 @@ void c_screen_multiplayer_pregame_lobby::apply_instance_patches()
 	NopFill(Memory::GetAddress(0x244F0E), 4); //	vote_tally_text_block->m_visible = 0;
 	NopFill(Memory::GetAddress(0x244F15), 4); //	vote_countdown_text_block->m_visible = 0;
 
-	//	fix chatbox breaking _pregame_lobby_pane_1_text_active_protocol
-	//	todo : fix text chat ui messages not working (probably missing a tag block)
-	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_server_party_leader));
-	//	currently redirecting a code to stop server_party_leader text from showing up
-	//	things to do :
-	//		- add text chat text block
-	//		- fix code breaking _pregame_lobby_pane_1_text_party_leader
-	//		- fix code breaking _pregame_lobby_pane_1_text_server_party_leader
+	// fix chatbox for cooperative_pane
+	WriteValue<uint8>(Memory::GetAddress(0x2435AE) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_1_text_text_chat_body));
+	PatchCall(Memory::GetAddress(0x24589A), jmp_update_protocol); //inside c_screen_multiplayer_pregame_lobby::update
+
 }
 
 void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
@@ -464,6 +578,8 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 
 	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
 	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];
+
+	s_text_block_reference* text_chat_body_reference = MetaExtender::add_tag_block2<s_text_block_reference>((uint32)&cooperative_pane->text_blocks);
 
 	//	fix bitmap offsets
 	for (uint8 block_idx = 0; block_idx <= _pregame_lobby_pane_1_bitmap_game_settings; block_idx++)
@@ -496,14 +612,17 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	}
 
 	//	fix text bounds
-	for (uint8 block_idx = 0; block_idx < k_pregame_lobby_pane_1_text_count; block_idx++)
+	for (uint8 block_idx = 0; block_idx < _pregame_lobby_pane_1_text_text_chat_body; block_idx++)
 	{
 		const uint8 custom_game_block_idx = c_screen_pregame_lobby_text_pane_1_mapping((e_pregame_lobby_text_blocks)block_idx);
 		cooperative_pane->text_blocks[block_idx]->text_bounds = custom_games_pane->text_blocks[custom_game_block_idx]->text_bounds;
 	}
 
 	//	_pregame_lobby_pane_1_text_level_description_placeholder bottom and right still need to be adjusted
-	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.right = -300;
+	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.right = -290;
 	cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_level_description_placeholder]->text_bounds.bottom = -400;
+
+	//copy data for _pregame_lobby_pane_1_text_text_chat_body block
+	csmemcpy(text_chat_body_reference, custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_text_chat_body], sizeof(s_text_block_reference));
 
 }

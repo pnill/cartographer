@@ -11,7 +11,6 @@
 #include "main/level_definitions.h"
 #include "saved_games/game_variant.h"
 #include "tag_files/global_string_ids.h"
-#include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 
@@ -394,7 +393,7 @@ bool c_squad_settings_list::handle_item_switch_to_coop(s_event_record** pevent)
 		user_interface_globals_set_loading_from_persistent_storage(false);
 		user_interface_squad_set_campaign_difficulty(difficulty);
 
-		this->get_parent_screen()->animate_screen(3);
+		this->get_parent_screen()->start_widget_animation(3);
 	}
 
 	return true;

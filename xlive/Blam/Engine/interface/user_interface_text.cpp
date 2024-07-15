@@ -21,6 +21,16 @@ c_user_interface_text::c_user_interface_text()
 	this->m_text_color.red = 1.0;
 }
 
+const real_rgb_color* c_user_interface_text::get_color()
+{
+	return &this->m_text_color;
+}
+
+const int32 c_user_interface_text::get_font()
+{
+	return this->m_custom_font_type;
+}
+
 void c_user_interface_text::set_font(int32 font_type)
 {
 	this->m_custom_font_type = font_type;

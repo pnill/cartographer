@@ -19,7 +19,7 @@ public:
 	void set_text(wchar_t const* text);
 	void set_text_from_string_id(string_id sid);
 	void set_text_properties(int32 flags, int16 animation_index, real_argb_color* text_color, int32 font, rectangle2d* bounds);
-
+	void set_field74();
 
 	// c_text_widget virtual functions
 
@@ -66,7 +66,7 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_normal_text_widget, 0x4BC);
 
-class c_long_text_widget : protected c_text_widget
+class c_long_text_widget : public c_text_widget
 {
 protected:
 	c_long_user_interface_text m_interface;

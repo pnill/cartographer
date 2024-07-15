@@ -86,6 +86,7 @@ protected:
 public:
 	c_user_interface_widget(e_user_interface_widget_type widget_type, int16 user_flags);
 
+	int16 get_animation_type();
 	e_user_interface_widget_type get_type();
 	c_user_interface_widget* get_next();
 	c_user_interface_widget* get_previous();
@@ -105,6 +106,7 @@ public:
 	void add_new_child(c_user_interface_widget* child);
 	void set_bounds(rectangle2d* bounds);
 	void set_controller_mask(uint32 user_mask);
+	void start_widget_animation(int32 type);
 
 	
 	// c_user_interface_widget virtual functions
@@ -117,7 +119,7 @@ public:
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out);
 	virtual int32 initialize_child_animations(s_animation_transform* a2);
 	virtual int32 get_intro_delay();
-	virtual void* sub_611703(rectangle2d* unprojected_bounds);
+	virtual void* get_unprojected_bounds(rectangle2d* unprojected_bounds);
 	virtual void sub_612A7C(c_user_interface_widget* a2);
 	virtual c_user_interface_widget* sub_612ABC();
 	virtual c_user_interface_widget* sub_612BCA();

@@ -31,7 +31,7 @@ public:
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;
-	virtual void* sub_611703(rectangle2d* unprojected_bounds) override;
+	virtual void* get_unprojected_bounds(rectangle2d* unprojected_bounds) override;
 	virtual c_user_interface_text* get_interface() override;
 };
 ASSERT_STRUCT_SIZE(c_bitmap_widget, 0x98);

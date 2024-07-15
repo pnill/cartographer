@@ -31,6 +31,11 @@ void c_text_widget::set_text_properties(int32 flags, int16 animation_index, real
 	INVOKE_TYPE(0x21BC81, 0x0, void(__thiscall*)(c_text_widget*, int32, int16, real_argb_color*, int32, rectangle2d*), this, flags, animation_index, text_color, font, bounds);
 }
 
+void c_text_widget::set_field74()
+{
+	field_74 = true;
+}
+
 c_text_widget::~c_text_widget()
 {
 	//return INVOKE_TYPE(0x21B9E9, 0x0, c_user_interface_widget*(__thiscall*)(c_text_widget*, char), lpMem, a2);

@@ -352,7 +352,7 @@ ASSERT_STRUCT_SIZE(s_interface_expected_screen_layout, 0x6C);
 
 /* classes */
 
-class c_screen_widget : protected c_user_interface_widget
+class c_screen_widget : public c_user_interface_widget
 {
 protected:
 	e_user_interface_screen_id m_screen_id;
@@ -384,8 +384,8 @@ public:
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
 	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
 	void* get_screen_definition();
-	void animate_screen(int32 type);
-
+	
+	
 	// c_screen_widget virtual functions
 
 	virtual ~c_screen_widget();

@@ -49,6 +49,11 @@ bool __cdecl user_interface_session_get_map(uint32* campaign_id, uint32* map_id,
     return INVOKE(0x21564E, 0x0, user_interface_session_get_map, campaign_id, map_id, custom_map_id);
 }
 
+bool __cdecl user_interface_squad_session_is_xbox_live()
+{
+    return INVOKE(0x2156B9, 0x0, user_interface_squad_local_peer_is_leader);
+}
+
 int16 __cdecl user_interface_session_get_campaign_difficulty(void)
 {
     return INVOKE(0x215697, 0x0, user_interface_session_get_campaign_difficulty);

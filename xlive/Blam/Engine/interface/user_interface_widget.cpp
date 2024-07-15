@@ -51,6 +51,11 @@ void c_user_interface_widget::initialize_animation(s_animation_transform* animat
 
 /* public methods */
 
+int16 c_user_interface_widget::get_animation_type()
+{
+	return this->m_animation_index;
+}
+
 e_user_interface_widget_type c_user_interface_widget::get_type()
 {
 	return this->m_widget_type;
@@ -149,6 +154,11 @@ void c_user_interface_widget::set_controller_mask(uint32 user_mask)
 	INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
 }
 
+void c_user_interface_widget::start_widget_animation(int32 type)
+{
+	INVOKE_TYPE(0x212604, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, type);
+}
+
 
 
 
@@ -196,7 +206,7 @@ int32 c_user_interface_widget::get_intro_delay()
 	return INVOKE_TYPE(0x2116BD, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
 }
 
-void* c_user_interface_widget::sub_611703(rectangle2d* unprojected_bounds)
+void* c_user_interface_widget::get_unprojected_bounds(rectangle2d* unprojected_bounds)
 {
 	return INVOKE_TYPE(0x211703, 0x0, void* (__thiscall*)(c_user_interface_widget*, rectangle2d*), this, unprojected_bounds);
 }

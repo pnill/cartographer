@@ -24,6 +24,9 @@ protected:
 public:
 	c_user_interface_text();
 
+	const real_rgb_color* get_color();
+	const int32 get_font();
+
 	void set_font(int32 font_type);
 	void set_pulsating(bool pulsating);
 	void set_color(real_rgb_color* color);

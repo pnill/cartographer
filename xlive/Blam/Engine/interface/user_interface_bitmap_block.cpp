@@ -38,7 +38,7 @@ int32 c_bitmap_widget::get_intro_delay()
 	return INVOKE_TYPE(0x21C2EF, 0x0, int32(__thiscall*)(c_bitmap_widget*), this);
 }
 
-void* c_bitmap_widget::sub_611703(rectangle2d* unprojected_bounds)
+void* c_bitmap_widget::get_unprojected_bounds(rectangle2d* unprojected_bounds)
 {
 	return INVOKE_TYPE(0x21C364, 0x0, void*(__thiscall*)(c_bitmap_widget*, rectangle2d*), this, unprojected_bounds);
 }
