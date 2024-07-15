@@ -421,8 +421,8 @@
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_event_manager.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\transport.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\transport_qos.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_qos.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
@@ -748,8 +748,8 @@
     <ClCompile Include="H2MOD\Modules\MapManager\MapManager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\NetworkMessageTypeCollection.cpp" />
     <ClCompile Include="Blam\Engine\memory\bitstream.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\network_channel.cpp" />
-    <ClCompile Include="Blam\Engine\Networking\Transport\network_observer.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\network_channel.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Modules\ObserverMode\ObserverMode.cpp" />
     <ClCompile Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.cpp" />
@@ -954,8 +954,8 @@
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\transport.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\transport_qos.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_qos.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
@@ -1155,8 +1155,8 @@
     <ClInclude Include="H2MOD\Modules\MapManager\MapManager.h" />
     <ClInclude Include="Blam\Engine\Networking\NetworkMessageTypeCollection.h" />
     <ClInclude Include="Blam\Engine\memory\bitstream.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\network_channel.h" />
-    <ClInclude Include="Blam\Engine\Networking\Transport\network_observer.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\network_channel.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\network_observer.h" />
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\ObserverMode\ObserverMode.h" />
     <ClInclude Include="H2MOD\Modules\PlaylistLoader\PlaylistLoader.h" />
