@@ -76,11 +76,9 @@ namespace MapSlots
 					fin.read((char*)&newBlock, sizeof(s_multiplayer_ui_level_definition));
 
 					//Fix incase the maps level data is incorrectly setup
-					if (strlen(newBlock.path.get_string()) == 0) {
+					if (strlen(newBlock.path) == 0) {
 						fin.seekg(0x1C8);
-						char* buffer = new char[128];
-						fin.read(buffer, 128);
-						newBlock.path.set(buffer);
+						fin.read(newBlock.path, NUMBEROF(s_multiplayer_ui_level_definition::path));
 					}
 
 					MapData.emplace_back(newBlock);
@@ -110,7 +108,7 @@ namespace MapSlots
 			{
 				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
-					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.english_name.get_string());
+					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.name[_language_english]);
 					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
@@ -145,7 +143,7 @@ namespace MapSlots
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
 				s_multiplayer_ui_level_definition* slot = &multiplayer_levels[k_multiplayer_first_unused_slot + added_map_count];
-				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.english_name.get_string());
+				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.name[_language_english]);
 				DWORD dwBack[2];
 				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 

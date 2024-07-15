@@ -146,7 +146,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
     else
     {
         c_game_life_cycle_handler_joining::check_joining_capability();
-        wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE];
+        wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE] = {};
         s_player_identifier local_identifiers[k_number_of_users];
         int valid_local_player_count = 0;
         for (auto i = 0; i < 4; i++)
