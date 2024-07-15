@@ -492,6 +492,7 @@
     <ClInclude Include="Blam\Engine\ai\ai_mission_dialogue.h" />
     <ClInclude Include="Blam\Engine\ai\ai_orders.h" />
     <ClInclude Include="Blam\Engine\ai\ai_scenario_definitions.h" />
+    <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
     <ClInclude Include="Blam\Engine\ai\cl_engine.h" />
     <ClInclude Include="Blam\Engine\ai\path.h" />
     <ClInclude Include="Blam\Engine\ai\pathfinding_utilities.h" />
@@ -1190,7 +1191,6 @@
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
     <ClInclude Include="Blam\Engine\tag_files\string_id.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_strings.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
