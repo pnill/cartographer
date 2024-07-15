@@ -117,8 +117,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
-		if (!DATUM_IS_NONE(damage_data->creator_datum) 
-			&& damage_data->field_10 != -1)
+		if (damage_data->creator_datum != NONE && damage_data->field_10 != NONE)
 		{
 			LOG_TRACE_GAME(
 				"{} {} {:X} {:X} {:X} {:X} {:X} {:X} {:X} {:X}",
@@ -175,7 +174,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	datum unit_datum = s_player::get_unit_index(playerIndex);
-	if (!DATUM_IS_NONE(unit_datum))
+	if (unit_datum != NONE)
 	{
 		object_placement_data nObject;
 
@@ -234,7 +233,7 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 	{
 		datum multiplayerGlobalsTagIndex = tags::find_tag(_tag_group_multiplayer_globals, multiplayerGlobalsTag);
 
-		if (!DATUM_IS_NONE(multiplayerGlobalsTagIndex))
+		if (multiplayerGlobalsTagIndex != NONE)
 		{
 			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<_tag_group_multiplayer_globals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
 
@@ -583,14 +582,14 @@ bool FlashlightIsEngineSPCheck() {
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
-	if (!DATUM_IS_NONE(unit_datum))
+	if (unit_datum != NONE)
 	{
 		object_placement_data object_placement;
 
 		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, 0);
 
 		datum object_idx = object_new(&object_placement);
-		if (!DATUM_IS_NONE(object_idx))
+		if (object_idx != NONE)
 		{
 			unit_delete_all_weapons(unit_datum);
 			unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);

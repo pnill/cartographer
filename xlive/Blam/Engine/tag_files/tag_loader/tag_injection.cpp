@@ -47,7 +47,7 @@ void tag_injection_inject()
 
 bool tag_injection_is_injected(datum injected_index)
 {
-	if (DATUM_IS_NONE(injected_index))
+	if (injected_index == NONE)
 		return false;
 	return g_manager.get_table()->get_entry_by_injected_index(injected_index)->is_injected;
 }

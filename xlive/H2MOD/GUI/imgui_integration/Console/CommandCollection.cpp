@@ -759,7 +759,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 			datum localPlayerIdx = player_index_from_user_index(0);
 			real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 
-			if (!DATUM_IS_NONE(object_idx))
+			if (object_idx != NONE)
 			{
 				object_placement_data_new(&new_object_placement, object_idx, -1, 0);
 
@@ -814,7 +814,7 @@ void CommandCollection::ReadObjectDatumIdx() {
 
 void CommandCollection::DeleteObject(datum objectDatumIdx)
 {
-	if (!DATUM_IS_NONE(objectDatumIdx))
+	if (objectDatumIdx != NONE)
 	{
 		object_delete(objectDatumIdx);
 	}

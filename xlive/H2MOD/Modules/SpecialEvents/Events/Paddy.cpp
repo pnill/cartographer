@@ -20,7 +20,7 @@ void paddy_event_map_load()
 	datum paddy_beard_datum = tag_injection_load(_tag_group_scenery, "objects\\multi\\stpat_hat\\beard\\beard", true);
 	datum paddy_pot_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\pot_of_gold\\pot_of_gold", true);
 
-	if (!DATUM_IS_NONE(paddy_hat_datum) && !DATUM_IS_NONE(paddy_beard_datum) && !DATUM_IS_NONE(paddy_pot_datum))
+	if (paddy_hat_datum != NONE && paddy_beard_datum != NONE && paddy_pot_datum != NONE)
 	{
 		tag_injection_inject();
 

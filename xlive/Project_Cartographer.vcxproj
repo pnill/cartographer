@@ -330,11 +330,11 @@
     <ClCompile Include="Blam\Engine\cartographer\discord\discord_interface.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_errors.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_strings.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_minidump_logs.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_windows_modules.cpp" />
-    <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
     <ClCompile Include="Blam\Engine\cseries\runtime_state.cpp" />
     <ClCompile Include="Blam\Engine\cutscene\cinematics.cpp" />
     <ClCompile Include="Blam\Engine\effects\beam.cpp" />

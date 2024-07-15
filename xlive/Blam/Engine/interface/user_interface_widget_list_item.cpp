@@ -77,5 +77,5 @@ bool c_list_item_widget::sub_6114B9()
 bool c_list_item_widget::last_data_index_valid()
 {
 	//return INVOKE_TYPE(0x21FF26, 0x0, bool(__thiscall*)(c_list_item_widget*), this);
-	return !DATUM_IS_NONE(m_last_data_index);
+	return m_last_data_index != NONE;
 }

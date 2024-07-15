@@ -22,7 +22,7 @@ namespace TagFixes
 			datum bitmap_to_fix = tags::find_tag(_tag_group_bitmap, bitmap_name);
 			datum borked_template = tags::find_tag(_tag_group_shader_template, template_name);
 			LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix, borked_template);
-			if (DATUM_IS_NONE(bitmap_to_fix) || DATUM_IS_NONE(borked_template))
+			if (bitmap_to_fix == NONE || borked_template == NONE)
 				return;
 			LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
 			auto shaders = tags::find_tags(_tag_group_shader);

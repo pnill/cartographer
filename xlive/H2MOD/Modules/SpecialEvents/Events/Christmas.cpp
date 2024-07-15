@@ -37,10 +37,20 @@ void christmas_event_map_load()
 	datum present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\present", true);
 	datum fp_present_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\present\\fp_present", true);
 
-	if(!DATUM_IS_NONE(santa_hat_datum) && !DATUM_IS_NONE(beard_datum) && !DATUM_IS_NONE(snow_datum) && !DATUM_IS_NONE(candy_cane_datum) && 
-		!DATUM_IS_NONE(sword_weapon_datum) && !DATUM_IS_NONE(deer_datum) && !DATUM_IS_NONE(ghost_datum) && !DATUM_IS_NONE(ornament_datum) && 
-		!DATUM_IS_NONE(frag_model_datum) && !DATUM_IS_NONE(plasma_model_datum) && !DATUM_IS_NONE(present_datum) && !DATUM_IS_NONE(fp_present_datum) && 
-		!DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
+	if(santa_hat_datum != NONE && 
+		beard_datum != NONE && 
+		snow_datum != NONE &&
+		candy_cane_datum != NONE &&
+		sword_weapon_datum != NONE &&
+		deer_datum != NONE &&
+		ghost_datum != NONE &&
+		ornament_datum != NONE &&
+		frag_model_datum != NONE &&
+		plasma_model_datum != NONE &&
+		present_datum != NONE &&
+		fp_present_datum != NONE &&
+		ball_weapon_datum != NONE &&
+		bomb_weapon_datum != NONE)
 	{
 		tag_injection_inject();
 

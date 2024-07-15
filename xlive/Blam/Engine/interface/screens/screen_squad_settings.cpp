@@ -289,7 +289,7 @@ bool c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 {
 	//return INVOKE_TYPE(0x24FA19, 0x0, char(__thiscall*)(c_squad_settings_list*, s_event_record**, long*), this, pevent, pitem_index);
 
-	if (!DATUM_IS_NONE(*pitem_index))
+	if (!*pitem_index != NONE)
 	{
 		s_dynamic_list_item* item = (s_dynamic_list_item*)datum_try_and_get(m_list_data, *pitem_index);
 		e_squad_list_items item_type = (e_squad_list_items)item->item_id;
@@ -574,7 +574,7 @@ void c_screen_squad_settings::update()
 		header_string = _string_id_switch_to_coop;
 		value_string = _string_id_empty_string;
 		//bitm_index = 7;
-		if (option_bitmap && !DATUM_IS_NONE(new_xbox_live_bitmap_datum))
+		if (option_bitmap && new_xbox_live_bitmap_datum != NONE)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_coop);
 			option_bitmap->assign_new_bitmap_block(bitmap_block);
@@ -585,7 +585,7 @@ void c_screen_squad_settings::update()
 		header_string = _string_id_switch_to_arranged;
 		value_string = _string_id_empty_string;
 		//bitm_index = 6;
-		if (option_bitmap && !DATUM_IS_NONE(new_xbox_live_bitmap_datum))
+		if (option_bitmap && new_xbox_live_bitmap_datum != NONE)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_arranged);
 			option_bitmap->assign_new_bitmap_block(bitmap_block);
@@ -596,7 +596,7 @@ void c_screen_squad_settings::update()
 		header_string = _string_id_switch_to_optimatch;
 		value_string = _string_id_empty_string;
 		//bitm_index = 0;
-		if (option_bitmap && !DATUM_IS_NONE(xbox_live_menu_bitmap_datum))
+		if (option_bitmap && xbox_live_menu_bitmap_datum != NONE)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(xbox_live_menu_bitmap_datum, _xbox_live_menu_bitmap_type_switch_to_optimatch);
 			option_bitmap->assign_new_bitmap_block(bitmap_block);

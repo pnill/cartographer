@@ -8,7 +8,7 @@ struct s_event_scenery_placement
 	short type;
 	short variant_id;
 	real_point3d position;
-	real_vector3d rotation;
+	real_euler_angles3d rotation;
 	float scale;
 };
 

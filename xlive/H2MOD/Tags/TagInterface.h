@@ -138,7 +138,7 @@ namespace tags
 	{
 		s_tags_header* header = cache_files_get_tags_header();
 
-		if (DATUM_IS_NONE(tag))
+		if (tag == NONE)
 		{
 			LOG_ERROR_FUNC("Bad tag datum - null datum: {}, tag count: {}", DATUM_INDEX_TO_ABSOLUTE_INDEX(tag), header->tag_count);
 			return nullptr;
@@ -188,7 +188,7 @@ namespace tags
 			while (current_index < get_tag_count())
 			{
 				auto tag_instance = &get_tag_instances()[current_index++];
-				if (tag_instance && tag_instance->type.group != NONE && !DATUM_IS_NONE(tag_instance->datum_index))
+				if (tag_instance && tag_instance->type.group != NONE && tag_instance->datum_index != NONE)
 				{
 					if (type.group == NONE|| is_tag_or_parent_tag(tag_instance->type, type.group))
 					{

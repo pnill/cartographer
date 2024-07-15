@@ -55,7 +55,7 @@ bool tags::load_tag_debug_name()
 	size_t name_buffer_offset = header->tag_name_buffer_offset;
 	size_t name_buffer_size = header->tag_name_buffer_size;
 	size_t tag_indices_offset = header->tag_name_offsets_offset;
-	size_t tag_count = header->tag_name_count;
+	size_t tag_count = header->debug_tag_name_count;
 
 	if (name_buffer_offset == 0 || name_buffer_size == 0 || tag_indices_offset == 0 || tag_count == 0
 		|| (name_buffer_offset + name_buffer_size) > header->file_size || (tag_indices_offset + (tag_count * 4)) > header->file_size)

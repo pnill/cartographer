@@ -13,7 +13,7 @@
 void add_special_event_markers()
 {
 	auto mode_elite_datum = tags::find_tag(_tag_group_render_model, "objects\\characters\\elite\\elite_mp");
-	if (!DATUM_IS_NONE(mode_elite_datum))
+	if (mode_elite_datum != NONE)
 	{
 		auto mode_elite = tags::get_tag<_tag_group_render_model, render_model_definition>(mode_elite_datum);
 		auto new_marker_group = MetaExtender::add_tag_block2<render_model_marker_group>((unsigned long)std::addressof(mode_elite->marker_groups));

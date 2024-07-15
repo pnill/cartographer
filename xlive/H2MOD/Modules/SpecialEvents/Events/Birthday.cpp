@@ -20,7 +20,7 @@ void birthday_event_map_load()
 		datum bday_cake_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\birthday_cake\\birthday_cake", true);
 		datum fp_bday_cake_datum = tag_injection_load(_tag_group_render_model, "scenarios\\objects\\multi\\carto_shared\\birthday_cake\\fp\\fp", true);
 
-		if (hat_datum != NONE && !DATUM_IS_NONE(bday_cake_datum) && !DATUM_IS_NONE(fp_bday_cake_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
+		if (hat_datum != NONE && bday_cake_datum != NONE && fp_bday_cake_datum != NONE && ball_weapon_datum != NONE && bomb_weapon_datum != NONE)
 		{
 			tag_injection_inject();
 

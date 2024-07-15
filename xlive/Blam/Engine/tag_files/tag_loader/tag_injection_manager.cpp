@@ -182,7 +182,7 @@ cache_file_tag_instance c_tag_injecting_manager::get_tag_instance_from_cache(dat
 
 tag_group c_tag_injecting_manager::get_tag_group_by_datum(datum cache_datum) const
 {
-	return this->get_tag_instance_from_cache(cache_datum).tag_group;
+	return this->get_tag_instance_from_cache(cache_datum).group_tag;
 }
 
 void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) const
@@ -222,7 +222,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 	*g_cache_handle = new_file_handle;
 
-	switch (tag_info->tag_group.group)
+	switch (tag_info->group_tag.group)
 	{
 		case 'mode':
 		{
@@ -354,7 +354,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 				fgetpos(this->m_active_map_file_handle, &position);
 
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
-				if (temp_instance.tag_group.group == group)
+				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
 
 				fseek(this->m_active_map_file_handle, position, SEEK_SET);
@@ -400,7 +400,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 			lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(cache_file_tag_instance)), &temp_instance, sizeof(cache_file_tag_instance), 1);
 			if (temp_instance.tag_index == cache_datum)
 			{
-				if (temp_instance.tag_group.group == group)
+				if (temp_instance.group_tag.group == group)
 					memcpy(out_name, buff, MAX_PATH);
 			}
 			fseek(this->m_active_map_file_handle, position, SEEK_SET);
@@ -485,7 +485,7 @@ c_xml_definition_agent* c_tag_injecting_manager::get_agent(tag_group group)
 datum c_tag_injecting_manager::load_tag(e_tag_group group, const char* tag_name, bool load_dependencies)
 {
 	datum cache_datum = this->get_tag_datum_by_name(group, tag_name);
-	if (!DATUM_IS_NONE(cache_datum))
+	if (cache_datum != NONE)
 	{
 #if K_TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_tag] loading {} with depencies {} datum {}", tag_name, load_dependencies, cache_datum);
@@ -523,7 +523,7 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
                                                 bool load_dependencies)
 {
 	cache_file_tag_instance inst = manager->get_tag_instance_from_cache(cache_datum);
-	if (inst.tag_index != cache_datum || inst.tag_group.group != group.group)
+	if (inst.tag_index != cache_datum || inst.group_tag.group != group.group)
 		return;
 
 	if (inst.size == 0 || inst.data_offset == 0)
@@ -625,7 +625,7 @@ void c_tag_injecting_manager::inject_tags()
 
 		cache_file_tag_instance* injection_instance = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(entry->injected_index)];
 
-		injection_instance->tag_group = entry->type;
+		injection_instance->group_tag = entry->type;
 		injection_instance->data_offset = injection_offset;
 		injection_instance->size = entry->loaded_data->get_total_size();
 		injection_instance->tag_index = entry->injected_index;

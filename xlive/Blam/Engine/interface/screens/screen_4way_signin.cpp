@@ -313,7 +313,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 
 
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
-	if (!DATUM_IS_NONE(widget_tag_datum))
+	if (widget_tag_datum != NONE)
 	{
 		this->verify_and_load_from_layout(NONE, &layout);
 	}
@@ -588,7 +588,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 	datum player_skins_datum_index = tags::find_tag(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index) || DATUM_IS_NONE(player_skins_datum_index))
+	if (main_widget_datum_index == NONE || player_skins_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;
@@ -705,7 +705,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	// ui_medium_emblem is bugged for guest profiles so we use ui_small_emblem shader
 	// but the bitmap quality is lowered
 	// fixme
-	if (!DATUM_IS_NONE(shader_datum_index))
+	if (shader_datum_index != NONE)
 	{
 		base_hud_block->shader.index = shader_datum_index;
 	}

@@ -7,7 +7,7 @@
 
 struct cache_file_tag_instance
 {
-	tag_group tag_group;
+	tag_group group_tag;
 	int32 tag_index;
 	uint32 data_offset;
 	uint32 size;
@@ -71,7 +71,7 @@ struct s_cache_header
 	e_language language;
 	char scenario_path[256];
 	int32 minor_version;
-	int32 tag_name_count;
+	int32 debug_tag_name_count;
 	int32 tag_name_buffer_offset;
 	int32 tag_name_buffer_size;
 	int32 tag_name_offsets_offset;
@@ -86,7 +86,6 @@ struct s_cache_header
 	int32 footer_signature;
 };
 ASSERT_STRUCT_SIZE(s_cache_header, 0x800);
-ASSERT_STRUCT_OFFSET(s_cache_header, tag_offset, 16);
 
 struct s_cache_file_globals
 {
@@ -94,7 +93,7 @@ struct s_cache_file_globals
 	bool custom_map;
 	int8 pad[2];
 	int32 tag_cache_base_address;
-	s_cache_header cache_header;
+	s_cache_header header;
 	s_tags_header* tags_header;
 	void* field_80C;
 };

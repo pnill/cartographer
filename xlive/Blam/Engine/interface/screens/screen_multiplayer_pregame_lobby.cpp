@@ -632,7 +632,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 
 	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index))
+	if (main_widget_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;

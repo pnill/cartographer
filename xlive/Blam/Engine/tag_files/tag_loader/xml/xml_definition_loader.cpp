@@ -40,7 +40,7 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 
 	this->load_cache_info();
 
-	if (this->m_instance.tag_group.group == _tag_group_render_model)
+	if (this->m_instance.group_tag.group == _tag_group_render_model)
 		auto sdf = 0;
 
 	this->reset_counts();

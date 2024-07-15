@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "real_math.h"
 
+#include "matrix_math.h"
+
 void __cdecl real_math_initialize(void)
 {
 	INVOKE(0x340D7, 0x27754, real_math_initialize);
@@ -156,4 +158,17 @@ real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* o
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up)
 {
 	return INVOKE(0x346E2, 0x27D5F, generate_up_vector3d, forward, up);
+}
+
+void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles)
+{
+	ASSERT(forward);
+	ASSERT(up);
+	ASSERT(angles);
+
+	real_point3d point;
+	real_matrix4x3 matrix;
+	matrix4x3_rotation_from_angles(&matrix, angles->yaw, angles->pitch, angles->roll);
+	matrix4x3_to_point_and_vectors(&matrix, &point, forward, up);
+	return;
 }

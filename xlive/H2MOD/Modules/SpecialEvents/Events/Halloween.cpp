@@ -26,9 +26,6 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
-		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
-
 		object_placement_data placement;
 
 		auto pump = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(pump_datum, true);
@@ -57,7 +54,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
@@ -82,7 +79,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
@@ -115,7 +112,7 @@ void halloween_event_map_load()
 		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
-		if(tag_injection_is_injected(lbitm_datum) && !DATUM_IS_NONE(ltmp_datum))
+		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
 		{
 			s_scenario_structure_lightmap_group_definition* lightmap = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
 			lightmap->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
@@ -129,7 +126,7 @@ void halloween_event_map_load()
 			scenario_definition->skies[0]->index = sky_datum;
 		}
 
-		if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
+		if (ltmp_datum != NONE && lbitm_datum != NONE)
 		{
 			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
@@ -155,7 +152,7 @@ void halloween_event_map_load()
 
 		tag_injection_inject();
 
-		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
+		if (candle_datum != NONE && pump_datum != NONE)
 		{
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 			// We execute this after a bluescreen since our new objects arent recreated automatically

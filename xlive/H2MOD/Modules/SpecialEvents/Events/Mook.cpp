@@ -20,7 +20,7 @@ void mook_event_map_load()
 
 	datum mook_ball_weapon_datum = tag_injection_load(_tag_group_weapon, "scenarios\\objects\\multi\\carto_shared\\basketball\\basketball", true);
 
-	if (!DATUM_IS_NONE(mook_ball_weapon_datum) && !DATUM_IS_NONE(ball_weapon_datum) && !DATUM_IS_NONE(bomb_weapon_datum))
+	if (mook_ball_weapon_datum != NONE && ball_weapon_datum != NONE && bomb_weapon_datum != NONE)
 	{
 		tag_injection_inject();
 
