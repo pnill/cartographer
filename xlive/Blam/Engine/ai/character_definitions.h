@@ -1,4 +1,5 @@
 #pragma once
+#include "memory/static_arrays.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
@@ -8,7 +9,8 @@
 
 enum e_character_vehicle_flags : uint32
 {
-	_character_vehicle_flag_passengers_adopt_original_squad = FLAG(0)
+	_character_vehicle_flag_passengers_adopt_original_squad = 0,
+	k_character_vehicle_flags_count
 };
 
 enum e_character_grenade_trajectory_type : uint16
@@ -26,7 +28,8 @@ enum e_character_grenade_type : uint16
 
 enum e_character_grenade_flags : uint32
 {
-	_character_grenade_flag_1 = FLAG(0)
+	_character_grenade_flag_1 = 0,
+	k_character_grenade_flags_count
 };
 
 enum e_character_weapon_special_fire_situation : uint16
@@ -46,60 +49,69 @@ enum e_character_weapon_special_fire_mode : uint16
 
 enum e_character_weapon_flags : uint32
 {
-	_character_weapon_flag_bursting_inhibits_movement = FLAG(0),
-	_character_weapon_flag_must_crouch_to_shoot = FLAG(1),
-	_character_weapon_flag_use_extended_safe_to_save_range = FLAG(2)
+	_character_weapon_flag_bursting_inhibits_movement = 0,
+	_character_weapon_flag_must_crouch_to_shoot = 1,
+	_character_weapon_flag_use_extended_safe_to_save_range = 2,
+	k_character_weapon_flag_count
 };
 
 enum e_character_boarding_flags : uint32
 {
-	_character_boarding_flag_airborne_boarding = FLAG(0)
+	_character_boarding_flag_airborne_boarding = 0,
+	k_character_boarding_flag_count
 };
 
 enum e_character_presearch_flags : uint32
 {
-	_character_presearch_flag_1 = FLAG(0)
+	_character_presearch_flag_1 = 0,
+	k_character_presearch_flag_count
 };
 
 enum e_character_search_flags : uint32
 {
-	_character_search_flag_crouch_on_investigate = FLAG(0),
-	_character_search_flag_walk_on_pursuit = FLAG(1)
+	_character_search_flag_crouch_on_investigate = 0,
+	_character_search_flag_walk_on_pursuit = 1,
+	k_character_search_flag_count
 };
 
 enum e_character_retreat_flags : uint32
 {
-	_character_retreat_flag_zig_zag_when_fleeing = FLAG(0),
-	_character_retreat_flag_unused = FLAG(1)
+	_character_retreat_flag_zig_zag_when_fleeing = 0,
+	_character_retreat_flag_unused = 1,
+	k_character_retreat_flag_count
 };
 
 enum e_character_cover_flags : uint32
 {
-	_character_cover_flags_1 = FLAG(0)
+	_character_cover_flags_1 = 0,
+	k_character_cover_flag_count
 };
 
 enum e_character_charge_flags : uint32
 {
-	_character_charge_flag_offhand_melee_allowed = FLAG(0),
-	_character_charge_flag_berserk_whenever_charge = FLAG(1)
+	_character_charge_flag_offhand_melee_allowed = 0,
+	_character_charge_flag_berserk_whenever_charge = 1,
+	k_character_char_flag_count
 };
 
 enum e_character_engage_flags : uint32
 {
-	_character_engage_flag_engage_perch = FLAG(0),
-	_character_engage_flag_flight_constant_move = FLAG(1),
-	_character_engage_flag_flight_fight_constant_movement = FLAG(2)
+	_character_engage_flag_engage_perch = 0,
+	_character_engage_flag_flight_constant_move = 1,
+	_character_engage_flag_flight_fight_constant_movement = 2,
+	k_character_engage_flag_count
 };
 
 enum e_character_movement_hint_flags : uint32
 {
-	_character_movement_hint_flag_vault_step = FLAG(0),
-	_character_movement_hint_flag_vault_crouch = FLAG(1),
-	_character_movement_hint_flag_mount_step = FLAG(5),
-	_character_movement_hint_flag_mount_crouch = FLAG(6),
-	_character_movement_hint_flag_mount_stand = FLAG(7),
-	_character_movement_hint_flag_hoist_crouch = FLAG(11),
-	_character_movement_hint_flag_hoist_stand = FLAG(12)
+	_character_movement_hint_flag_vault_step = 0,
+	_character_movement_hint_flag_vault_crouch = 1,
+	_character_movement_hint_flag_mount_step = 5,
+	_character_movement_hint_flag_mount_crouch = 6,
+	_character_movement_hint_flag_mount_stand = 7,
+	_character_movement_hint_flag_hoist_crouch = 11,
+	_character_movement_hint_flag_hoist_stand = 12,
+	k_character_movement_hint_flag_count = 8
 };
 
 enum e_character_movement_jump_height : uint16
@@ -127,23 +139,26 @@ enum e_character_obstacle_size : uint16
 
 enum e_character_movement_flags : uint32
 {
-	_character_movement_flag_danger_crouch_allow_movement = FLAG(0),
-	_character_movement_flag_no_side_step = FLAG(1),
-	_character_movement_flag_prefer_to_combat_near_friends = FLAG(2),
-	_character_movement_flag_hop_to_cover_path_segements = FLAG(3),
-	_character_movement_flags_perch = FLAG(4),
-	_character_movement_flags_has_flying_move = FLAG(5),
-	_character_movement_flags_disallow_crouch = FLAG(6)
+	_character_movement_flag_danger_crouch_allow_movement = 0,
+	_character_movement_flag_no_side_step = 1,
+	_character_movement_flag_prefer_to_combat_near_friends = 2,
+	_character_movement_flag_hop_to_cover_path_segments = 3,
+	_character_movement_flags_perch = 4,
+	_character_movement_flags_has_flying_move = 5,
+	_character_movement_flags_disallow_crouch = 6,
+	k_character_movement_flags_count
 };
 
 enum e_character_perception_flags : uint32
 {
-	_character_perception_flag_1 = FLAG(0)
+	_character_perception_flag_1 = 0,
+	k_character_perception_flag_count
 };
 
 enum e_character_vitality_flags : uint32
 {
-	_character_vitality_flag_unused = FLAG(0)
+	_character_vitality_flag_unused = 0,
+	k_character_vitality_flag_count
 };
 
 enum e_character_general_type : uint16
@@ -172,15 +187,17 @@ enum e_character_general_type : uint16
 
 enum e_character_general_flags : uint32
 {
-	_character_general_flag_swarm = FLAG(0),
-	_character_general_flag_flying = FLAG(1),
-	_character_general_flag_dual_wields = FLAG(2),
-	_character_general_flag_uses_gravemind = FLAG(3)
+	_character_general_flag_swarm = 0,
+	_character_general_flag_flying = 1,
+	_character_general_flag_dual_wields = 2,
+	_character_general_flag_uses_gravemind = 3,
+	k_character_general_flag_count
 };
 
 enum e_character_flags : uint32
 {
-	_character_flag_1 = FLAG(0)
+	_character_flag_1 = 0,
+	k_character_flag_count
 };
 
 // max: 100
@@ -189,7 +206,7 @@ struct character_vehicle_properties
 	tag_reference unit; // unit
 	tag_reference style; // style;
 
-	e_character_vehicle_flags flags;
+	c_flags_no_init<e_character_vehicle_flags, uint32, k_character_vehicle_flags_count> flags;
 
 	// Explaination("Pathfinding", "")
 
@@ -324,7 +341,7 @@ ASSERT_STRUCT_SIZE(character_vehicle_properties, 180);
 // max: 10
 struct character_grenade_properties
 {
-	e_character_grenade_flags flags;
+	c_flags_no_init<e_character_grenade_flags, uint32, k_character_grenade_flags_count> flags;
 	e_character_grenade_type type;
 	e_character_grenade_trajectory_type trajectory;
 
@@ -430,7 +447,7 @@ ASSERT_STRUCT_SIZE(character_firing_pattern_properties, 16);
 // max: 100
 struct character_weapon_properties
 {
-	e_character_weapon_flags flags;
+	c_flags_no_init<e_character_weapon_flags, uint32, k_character_weapon_flag_count> flags;
 
 	tag_reference weapon; // weap
 
@@ -555,7 +572,7 @@ ASSERT_STRUCT_SIZE(character_boss_properties, 12);
 // max: 1
 struct character_boarding_properties
 {
-	e_character_boarding_flags flags;
+	c_flags_no_init<e_character_boarding_flags, uint32, k_character_boarding_flag_count> flags;
 
 	/// maximum distance from entry point that we will consider boarding
 	real32 maximum_distance_world_units;
@@ -592,7 +609,7 @@ ASSERT_STRUCT_SIZE(character_idle_properties, 12);
 // max: k_style_attitude_count
 struct character_presearch_properties
 {
-	e_character_presearch_flags flags;
+	c_flags_no_init<e_character_presearch_flags, uint32, k_character_presearch_flag_count> flags;
 
 	/// If the min presearch time expires and the target is (actually) outside the min-certainty radius, presearch turns off
 	real_bounds minimum_presearch_time_bounds;
@@ -611,7 +628,7 @@ ASSERT_STRUCT_SIZE(character_presearch_properties, 36);
 // max: k_style_attitude_count
 struct character_search_properties
 {
-	e_character_search_flags flags;
+	c_flags_no_init<e_character_search_flags, uint32, k_character_search_flag_count> flags;
 
 	real_bounds search_time;
 
@@ -625,7 +642,7 @@ ASSERT_STRUCT_SIZE(character_search_properties, 20);
 // max: k_style_attitude_count
 struct character_retreat_properties
 {
-	e_character_retreat_flags flags;
+	c_flags_no_init<e_character_retreat_flags, uint32, k_character_retreat_flag_count> flags;
 
 	/// When shield vitality drops below given amount, retreat is triggered by low_shield_retreat_impulse
 	real32 shield_threshold;
@@ -677,7 +694,7 @@ ASSERT_STRUCT_SIZE(character_retreat_properties, 76);
 // max: k_style_attitude_count
 struct character_cover_properties
 {
-	e_character_cover_flags flags;
+	c_flags_no_init<e_character_cover_flags, uint32, k_character_cover_flag_count> flags;
 
 	/// how long we stay behind cover after seeking cover
 	real_bounds hide_behind_cover_time_seconds;
@@ -749,7 +766,7 @@ ASSERT_STRUCT_SIZE(character_evasion_properties, 20)
 // max: k_style_attitude_count
 struct character_charge_properties
 {
-	e_character_charge_flags flags;
+	c_flags_no_init<e_character_charge_flags, uint32, k_character_char_flag_count> flags;
 
 	real32 melee_consider_range;
 
@@ -781,7 +798,7 @@ ASSERT_STRUCT_SIZE(character_charge_properties, 64);
 // max: k_style_attitude_count
 struct character_engage_properties
 {
-	e_character_engage_flags flags;
+	c_flags_no_init<e_character_engage_flags, uint32, k_character_engage_flag_count> flags;
 
 	/// When danger rises above the threshold, the actor crouches
 	real32 crouch_danger_threshold;
@@ -834,7 +851,7 @@ ASSERT_STRUCT_SIZE(character_swarm_properties, 40);
 // max: 1
 struct character_movement_properties
 {
-	e_character_movement_flags flags;
+	c_flags_no_init<e_character_movement_flags, uint32, k_character_movement_flags_count> flags;
 
 	real32 pathfinding_radius;
 	real32 destination_radius;
@@ -848,7 +865,7 @@ struct character_movement_properties
 	int16 pad;
 
 	e_character_movement_jump_height jump_height;
-	e_character_movement_hint_flags movement_hints;
+	c_flags_no_init<e_character_movement_hint_flags, uint32, k_character_movement_hint_flag_count> movement_hints;
 
 	real32 throttle_scale;
 };
@@ -888,7 +905,7 @@ ASSERT_STRUCT_SIZE(character_look_properties, 80);
 // max: 4
 struct character_perception_properties
 {
-	e_character_perception_flags flags;
+	c_flags_no_init<e_character_perception_flags, uint32, k_character_perception_flag_count> flags;
 
 	/// maximum range of sight
 	real32 max_vision_dstance_world_units;
@@ -952,7 +969,7 @@ struct character_placement_properties
 // max: 1
 struct character_vitality_properties
 {
-	e_character_vitality_flags flags;
+	c_flags_no_init<e_character_vitality_flags, uint32, k_character_vitality_flag_count> flags;
 
 	/// maximum body vitality of our unit
 	real32 normal_body_vitality;
@@ -1030,7 +1047,7 @@ ASSERT_STRUCT_SIZE(character_vitality_properties, 104)
 // max: 1
 struct character_general_properties
 {
-	e_character_general_flags flags;
+	c_flags_no_init<e_character_general_flags, uint32, k_character_general_flag_count> flags;
 	e_character_general_type type;
 	int16 pad;
 
@@ -1051,7 +1068,7 @@ ASSERT_STRUCT_SIZE(character_variant, 12);
 
 struct character_definition
 {
-	e_character_flags flags;
+	c_flags_no_init<e_character_flags, uint32, k_character_flag_count> flags;
 
 	tag_reference parent_character; // char
 	tag_reference unit; // unit
