@@ -11,7 +11,7 @@
 #include "interface/user_interface_networking.h"
 #include "main/interpolator.h"
 #include "main/main.h"
-#include "Networking/logic/life_cycle_manager.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "saved_games/game_state.h"
 #include "saved_games/saved_film.h"
 #include "shell/shell.h"

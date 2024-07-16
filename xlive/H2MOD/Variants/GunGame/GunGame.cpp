@@ -2,8 +2,8 @@
 #include "GunGame.h"
 
 #include "game/game.h"
-#include "Networking/Session/NetworkSession.h"
-#include "Networking/NetworkMessageTypeCollection.h"
+#include "networking/Session/NetworkSession.h"
+#include "networking/NetworkMessageTypeCollection.h"
 #include "H2MOD.h"
 
 using namespace NetworkSession;

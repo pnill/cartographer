@@ -7,7 +7,7 @@
 #include "XLive/ServerList/ServerList.h"
 #include "XLive/achievements/XAchievements.h"
 
-#include "Blam/Engine/interface/user_interface_guide.h"
+#include "interface/user_interface_guide.h"
 
 HANDLE g_dwFakeContent = INVALID_HANDLE_VALUE;
 HANDLE g_dwMarketplaceContent = INVALID_HANDLE_VALUE;

@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "xam.h"
 
-#include "Blam/Engine/cartographer/discord/discord_interface.h"
-#include "Blam/Engine/interface/user_interface_guide.h"
+#include "cartographer/discord/discord_interface.h"
+#include "interface/user_interface_guide.h"
 
 struct NOTIFY_LISTEN
 {

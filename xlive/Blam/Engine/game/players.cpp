@@ -347,19 +347,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     }
 
     // Handicap verification
-    e_handicap player_handicap_level = configuration_data->player_handicap_level;
-    if (player_handicap_level >= _handicap_none)
-    {
-        if (player_handicap_level > _handicap_severe)
-        {
-            player_handicap_level = _handicap_severe;
-        }
-    }
-    else
-    {
-        player_handicap_level = _handicap_none;
-    }
-    configuration_data->player_handicap_level = player_handicap_level;
+    configuration_data->player_handicap_level = PIN(configuration_data->player_handicap_level, _handicap_none, _handicap_severe);
     
     // User role verification
     int8 bungie_user_role = configuration_data->bungie_user_role;

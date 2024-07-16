@@ -11,15 +11,19 @@ size_t ustrnlen(const wchar_t* string, size_t max_count)
 	return wcsnlen(string, max_count);
 }
 
-wchar_t* ustrncpy(wchar_t* dst, const wchar_t* src, size_t count)
+wchar_t* ustrncpy(wchar_t* dest, const wchar_t* src, size_t count)
 {
-	return wcsncpy(dst, src, count);
+	ASSERT(dest);
+	ASSERT(src);
+	ASSERT(count > 0);
+	wcsncpy_s(dest, count, src, UINT_MAX);
+	return dest;
 }
 
-wchar_t* ustrnzcpy(wchar_t* dst, const wchar_t* src, size_t count)
+wchar_t* ustrnzcpy(wchar_t* dest, const wchar_t* src, size_t count)
 {
-	wchar_t* result = ustrncpy(dst, src, count - 1);
-	dst[count - 1] = 0;
+	wchar_t* result = ustrncpy(dest, src, count - 1);
+	dest[count - 1] = 0;
 	return result;
 }
 

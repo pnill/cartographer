@@ -6,9 +6,9 @@
 #include "game/game.h"
 #include "game/game_time.h"
 #include "game/player_control.h"
-#include "Networking/logic/life_cycle_manager.h"
-#include "Networking/NetworkMessageTypeCollection.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/Session/NetworkSession.h"
 #include "physics/physics_constants.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"

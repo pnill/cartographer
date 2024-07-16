@@ -11,7 +11,7 @@
 #include "game/players.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 #include "objects/objects.h"
 #include "scenario/scenario_definitions.h"
 

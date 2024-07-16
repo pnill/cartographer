@@ -4,7 +4,7 @@
 #include "cache/cache_files.h"
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 #include "saved_games/game_variant.h"
 
 

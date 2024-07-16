@@ -4,7 +4,7 @@
 #include "CustomLanguage.h"
 
 #include "interface/screens/screen_xbox_live_task_progress_dialog.h"
-#include "Networking/NetworkMessageTypeCollection.h"
+#include "networking/NetworkMessageTypeCollection.h"
 
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"

@@ -38,6 +38,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <ShlObj.h>
 #include <psapi.h>
 #include <TlHelp32.h>
+#include <iphlpapi.h>
 
 // initialize GUIDs locally
 #include <initguid.h>
@@ -73,6 +74,7 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 // Cartographer includes
 #include "cseries/cseries.h"
 #include "cseries/cseries_errors.h"
+#include "cseries/cseries_system_memory.h"
 #include "cseries/cseries_windows.h"
 #include "math/math.h"
 #include "math/integer_math.h"
@@ -91,6 +93,8 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <contrib/minizip/zip.h>
 
 #include "CartographerDllConf.h"
+
+#pragma comment(lib, "IPHLPAPI.lib")
 
 extern std::random_device rd;
 

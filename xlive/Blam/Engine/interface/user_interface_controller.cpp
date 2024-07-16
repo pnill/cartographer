@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "user_interface_controller.h"
 #include "user_interface_guide.h"
-#include "Networking/online/online_account_xbox.h"
+#include "networking/online/online_account_xbox.h"
 #include "tag_files/global_string_ids.h"
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)

@@ -7,7 +7,7 @@
 #include "effects/player_effects.h"
 #include "game/game_time.h"
 #include "interface/first_person_weapons.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 #include "physics/collisions.h"
 #include "render/render_visibility_collection.h"
 #include "scenario/scenario.h"

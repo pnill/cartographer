@@ -9,8 +9,8 @@
 #include "game/players.h"
 #include "interface/user_interface_guide.h"
 #include "interface/user_interface_networking.h"
-#include "Networking/couch/xsession_manager.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/couch/xsession_manager.h"
+#include "networking/Session/NetworkSession.h"
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "simulation_type_collection.h"
-#include "Networking/replication/replication_entity_manager.h"
+#include "networking/replication/replication_entity_manager.h"
 
 #define ENTITY_INDEX_TO_ABSOLUTE_INDEX(_entity_index)  ((_entity_index) & (k_simulation_entity_database_maximum_entities - 1))
 #define ENTITY_INDEX_TO_SEED(_entity_index) ((_entity_index) >> 28)

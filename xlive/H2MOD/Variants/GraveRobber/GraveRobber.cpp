@@ -7,7 +7,7 @@
 #include "game/game_engine_util.h"
 #include "game/game_statborg.h"
 #include "items/weapons.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 #include "simulation/game_interface/simulation_game_action.h"
 #include "units/bipeds.h"
 

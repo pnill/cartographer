@@ -36,8 +36,9 @@
 #include "main/loading.h"
 #include "main/main_game.h"
 #include "main/main_render.h"
-#include "Networking/NetworkMessageTypeCollection.h"
-#include "Networking/Transport/transport.h"
+#include "networking/network_configuration.h"
+#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/Transport/transport.h"
 #include "objects/damage.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
@@ -862,6 +863,8 @@ void H2MOD::ApplyHooks() {
 
 	simulation_apply_patches();
 	simulation_players_apply_patches();
+
+	network_configuration_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);

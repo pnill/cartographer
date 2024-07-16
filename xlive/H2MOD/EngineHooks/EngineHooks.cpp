@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "EngineHooks.h"
-#include "Networking/logic/life_cycle_manager.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 
 

@@ -2,7 +2,7 @@
 #include "cseries/cseries_strings.h"
 #include "game/players.h"
 #include "math/random_math.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 

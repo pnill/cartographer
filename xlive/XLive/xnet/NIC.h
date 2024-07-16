@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iphlpapi.h>
-
 class CNic
 {
 public:

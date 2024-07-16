@@ -2,7 +2,7 @@
 #include "camera/observer.h"
 #include "math/matrix_math.h"
 #include "math/periodic_functions.h"
-#include "Networking/Session/NetworkSession.h"
+#include "networking/Session/NetworkSession.h"
 
 enum e_player_effect_user_global_flags : uint8
 {

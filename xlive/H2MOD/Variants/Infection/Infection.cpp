@@ -2,15 +2,15 @@
 #include "Infection.h"
 
 #include "Blam/Cache/TagGroups/item_collection_definition.hpp"
-#include "Blam/Engine/items/vehicle_collection_definitions.h"
+#include "items/vehicle_collection_definitions.h"
 
 
 #include "game/game.h"
 #include "game/game_time.h"
 #include "interface/user_interface_controller.h"
 #include "scenario/scenario.h"
-#include "Networking/logic/life_cycle_manager.h"
-#include "Networking/NetworkMessageTypeCollection.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "networking/NetworkMessageTypeCollection.h"
 #include "units/units.h"
 
 #include "H2MOD.h"
