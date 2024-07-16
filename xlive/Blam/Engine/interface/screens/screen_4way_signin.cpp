@@ -774,11 +774,38 @@ void user_interface_recover_from_disconnection_patches()
 
 }
 
+//context is unused
+void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
+{
+	s_screen_parameters params;
+	params.m_flags = 7; //retreating or recovering?
+	params.m_window_index = _window_4;
+	params.field_C = 0;
+	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
+	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.field_4 = 0xFFFFFFFF;
+	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+
+	params.m_load_function(&params);
+}
+
+void user_interface_backout_to_mainmenu_patches()
+{
+	// use _screen_4way_join_screen instead of _screen_main_menu
+	WriteValue<uint8>(Memory::GetAddress(0x219E91) + 1, _screen_4way_join_screen); // inside c_screen_network_squad_browser::handle_event
+	WriteValue<uint8>(Memory::GetAddress(0x21FD22) + 1, _screen_4way_join_screen); // inside c_screen_bungie_news::handle_event
+	PatchCall(Memory::GetAddress(0x219EA7), screen_network_squad_browser_backout_to_4way_screen);// replace call to user_interface_enter_game_shell
+	WriteValue(Memory::GetAddress(0x21FD3D) + 1, c_screen_4way_signin::load_for_xbox_live);// replace call to c_screen_main_menu::load
+}
+
 void c_screen_4way_signin::apply_instance_patches()
 {
 	if (Memory::IsDedicatedServer())
 		return;
 
 	user_interface_recover_from_disconnection_patches();
+	user_interface_backout_to_mainmenu_patches();
 }
 	
