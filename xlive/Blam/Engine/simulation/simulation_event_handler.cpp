@@ -2,11 +2,10 @@
 #include "simulation_event_handler.h"
 
 #include "simulation_queue_events.h"
-#include "simulation/simulation_world.h"
 #include "simulation/game_interface/simulation_game_events.h"
 
 #include "networking/memory/networking_memory.h"
-
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
 
 bool g_use_network_queue_storage = true;

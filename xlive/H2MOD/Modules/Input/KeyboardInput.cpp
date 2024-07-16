@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "KeyboardInput.h"
 
-#include "input/input_abstraction.h"
-
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/GUI/XLiveRendering.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"

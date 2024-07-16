@@ -3,7 +3,6 @@
 
 #include "cartographer/twizzler/twizzler.h"
 #include "game/game.h"
-#include "interface/hud.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_text.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
@@ -14,7 +13,6 @@
 
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Achievements/Achievements.h"
-#include "H2MOD/Modules/Shell/Config.h"
 
 #include "version_git.h"
 

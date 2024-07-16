@@ -1,21 +1,13 @@
 #include "stdafx.h"
 #include "particle_system.h"
 
-#include "effects.h"
-#include "effects_definitions.h"
 #include "particle.h"
 #include "particle_emitter.h"
 #include "particle_location.h"
-#include "particle_state.h"
-#include "particle_model_definitions.h"
 #include "particle_system_definition.h"
 #include "game/game_time.h"
-#include "physics/breakable_surface_definitions.h"
 #include "tag_files/global_string_ids.h"
-#include "main/interpolator.h"
 #include "render/render_visibility_collection.h"
-
-#include "H2MOD/Tags/TagInterface.h"
 
 
 int particle_system_game_time[k_max_particle_systems];

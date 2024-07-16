@@ -2,7 +2,6 @@
 #include "transport_qos.h"
 
 #include "memory/data.h"
-#include "memory/bitstream.h"
 
 static XNQOS placeholder_xnqos;
 

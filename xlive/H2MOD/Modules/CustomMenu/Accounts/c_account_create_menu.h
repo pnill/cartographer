@@ -1,10 +1,8 @@
 #pragma once
 
 #include "../CustomMenuGlobals.h"
-#include "../c_brightness_menu.h"
 
 #include "c_account_list_menu.h"
-#include "H2MOD/Modules/Accounts/Accounts.h"
 
 class c_account_create_list : public c_list_widget
 {

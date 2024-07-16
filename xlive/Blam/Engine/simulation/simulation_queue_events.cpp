@@ -4,7 +4,6 @@
 #include "game/game.h"
 #include "simulation.h"
 #include "simulation/simulation_world.h"
-#include "simulation/game_interface/simulation_game_entities.h"
 #include "simulation/simulation_gamestate_entities.h"
 
 #include "H2MOD/GUI/ImGui_Integration/Console/ImGui_ConsoleImpl.h"

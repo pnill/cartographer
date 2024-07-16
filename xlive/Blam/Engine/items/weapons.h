@@ -1,6 +1,5 @@
 #pragma once
 #include "items.h"
-#include "weapon_definitions.h"
 
 #define MAXIMUM_NUMBER_OF_MAGAZINES_PER_WEAPON 2
 #define MAXIMUM_NUMBER_OF_MAGAZINE_OBJECTS_PER_MAGAZINE 8

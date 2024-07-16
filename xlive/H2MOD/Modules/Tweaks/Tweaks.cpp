@@ -15,9 +15,6 @@
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Variants/VariantMPGameEngine.h"
 
-
-#include "XLive/xnet/IpManagement/XnIp.h"
-
 #pragma region Done_Tweaks
 
 typedef int(__cdecl * hookServ1_t)(HKEY, LPCWSTR);

@@ -9,8 +9,6 @@
 
 #include "resources/resource.h"
 
-#include "Util/filesys.h"
-
 #define k_id_edit 1
 #define k_id_button 2
 

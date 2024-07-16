@@ -3,7 +3,6 @@
 #include "VariantSystem.h"
 
 #include "Variants.h"
-#include "networking/NetworkMessageTypeCollection.h"
 
 ICustomGameVariant* currentRunningVariant;
 std::vector<ICustomGameVariant*> CustomVariantHandler::customVariants;

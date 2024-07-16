@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "cache_files.h"
 
-#include "game/game_globals.h"
+#include "H2MOD/Tags/TagInterface.h"
 
 s_cache_header* cache_files_get_header(void)
 {

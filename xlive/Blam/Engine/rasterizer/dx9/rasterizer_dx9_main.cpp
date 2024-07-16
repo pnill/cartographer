@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_main.h"
 
-#include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_targets.h"
 
 #include "bitmaps/bitmaps.h"

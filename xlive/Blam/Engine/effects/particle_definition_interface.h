@@ -1,6 +1,4 @@
 #pragma once
-
-#include "effects_creation.h"
 #include "effect_location_definition.h"
 
 class c_particle_definition_interface;

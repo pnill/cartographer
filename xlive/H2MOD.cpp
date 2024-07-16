@@ -8,8 +8,6 @@
 #include "cutscene/cinematics.h"
 #include "effects/contrails.h"
 #include "effects/effects.h"
-#include "effects/particle.h"
-#include "effects/particle_emitter.h"
 #include "effects/particle_update.h"
 #include "game/aim_assist.h"
 #include "game/cheats.h"
@@ -36,6 +34,7 @@
 #include "main/loading.h"
 #include "main/main_game.h"
 #include "main/main_render.h"
+#include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Transport/transport.h"
@@ -52,7 +51,6 @@
 #include "render/render.h"
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
-#include "simulation/simulation_entity_database.h"
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
@@ -65,6 +63,7 @@
 
 #include "Blam/Cache/TagGroups/multiplayer_globals_definition.hpp"
 #include "H2MOD/EngineHooks/EngineHooks.h"
+#include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
@@ -74,25 +73,23 @@
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 #include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
+#ifndef NDEBUG
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#endif
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
-#include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Variants/Variants.h"
-
+#include "H2MOD/Variants/VariantSystem.h"
+#include "H2MOD/Variants/H2X/H2X.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -860,6 +857,8 @@ void H2MOD::ApplyHooks() {
 	observer_apply_patches();
 	network_transport_apply_patches();
 	bitstream_serialization_apply_patches();
+
+	network_memory_apply_patches();
 
 	simulation_apply_patches();
 	simulation_players_apply_patches();

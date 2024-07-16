@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "rasterizer_dx9.h"
 
+#ifndef NDEBUG
 #include "text/unicode.h"
+#endif
+
+
 
 /* constants */
 

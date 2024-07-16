@@ -1,5 +1,4 @@
 #pragma once
-
 #include "physics/physics_constants.h"
 #include "memory/bitstream.h"
 

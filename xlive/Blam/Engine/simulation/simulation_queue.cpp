@@ -3,6 +3,8 @@
 
 #include "simulation_queue_global_events.h"
 
+#include "networking/memory/networking_memory.h"
+
 void c_simulation_queue::allocate(int32 data_size, s_simulation_queue_element** out_allocated_elem)
 {
 	*out_allocated_elem = NULL;

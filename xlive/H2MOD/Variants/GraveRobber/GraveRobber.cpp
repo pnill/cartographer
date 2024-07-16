@@ -9,9 +9,6 @@
 #include "items/weapons.h"
 #include "networking/Session/NetworkSession.h"
 #include "simulation/game_interface/simulation_game_action.h"
-#include "units/bipeds.h"
-
-#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
 
 bool firstPlayerSpawn;

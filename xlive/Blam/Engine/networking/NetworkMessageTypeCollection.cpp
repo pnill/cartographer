@@ -4,8 +4,8 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "interface/user_interface_controller.h"
 #include "memory/bitstream.h"
+#include "networking/transport/network_channel.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"

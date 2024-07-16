@@ -1,5 +1,4 @@
 #pragma once
-
 #include "c_user_interface_widget.h"
 
 // very similar to c_screen_with_menu

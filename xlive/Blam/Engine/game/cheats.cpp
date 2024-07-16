@@ -4,9 +4,6 @@
 #include "game/game.h"
 #include "game/game_globals.h"
 #include "tag_files/global_string_ids.h"
-#include "H2MOD/Tags/TagInterface.h"
-
-
 
 
 typedef bool(__cdecl* ice_cream_flavor_available_t)(unsigned int skull);

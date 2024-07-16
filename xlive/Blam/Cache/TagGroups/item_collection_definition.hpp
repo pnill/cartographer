@@ -1,6 +1,7 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
+#include "tag_files/string_id.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 
 /*********************************************************************
 * name: item_collection

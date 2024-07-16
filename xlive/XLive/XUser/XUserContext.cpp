@@ -3,8 +3,7 @@
 
 #include "cartographer/discord/discord_interface.h"
 #include "game/game.h"
-#include "game/game_globals.h"
-#include "networking/NetworkMessageTypeCollection.h"
+#include "networking/Session/NetworkSession.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"

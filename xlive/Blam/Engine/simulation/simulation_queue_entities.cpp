@@ -4,7 +4,10 @@
 #include "simulation_gamestate_entities.h"
 
 #include "game/game.h"
+#include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"
+
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
 // We get the absolute entity_def index from here as well as h2 needs it in order to create the game entity_def
 bool encode_simulation_queue_creation_to_buffer(uint8* out_buffer, int32 out_buffer_size, datum gamestate_index, s_simulation_queue_entity_data* data, uint32 initial_update_mask, int32* out_written_size);

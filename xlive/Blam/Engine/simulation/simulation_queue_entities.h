@@ -1,6 +1,6 @@
 #pragma once
-#include "simulation.h"
 #include "simulation_queue.h"
+#include "simulation_type_collection.h"
 
 struct s_simulation_queue_entity_data
 {

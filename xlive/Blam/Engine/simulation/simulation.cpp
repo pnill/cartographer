@@ -262,9 +262,6 @@ void __cdecl simulation_build_player_updates(int32* player_update_count, int32 m
 
 void simulation_apply_patches(void)
 {
-    // ### TODO move somewhere else, network related
-    network_memory_apply_patches();
-
     simulation_event_handler_apply_patches();
     simulation_world_apply_patches();
     simulation_entity_database_apply_patches();

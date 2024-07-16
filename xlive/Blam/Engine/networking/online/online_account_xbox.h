@@ -1,7 +1,5 @@
 #pragma once
 
-#include "xlivedefs.h"
-
 /* macros */
 
 constexpr bool ONLINE_USER_VALID(XUID account)

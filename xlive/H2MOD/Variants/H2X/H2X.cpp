@@ -2,7 +2,6 @@
 #include "H2X.h"
 
 #include "items/weapon_definitions.h"
-#include "game/game_globals.h"
 #include "game/game_time.h"
 #include "math/math.h"
 

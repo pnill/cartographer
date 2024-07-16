@@ -6,14 +6,7 @@
 #include "cseries/cseries_strings.h"
 #include "main/main_game.h"
 #include "game/game.h"
-#include "game/players.h"
-#include "interface/user_interface_guide.h"
-#include "interface/user_interface_networking.h"
-#include "networking/couch/xsession_manager.h"
 #include "networking/Session/NetworkSession.h"
-
-#include "H2MOD/Modules/Shell/H2MODShell.h"
-
 
 /* constants */
 

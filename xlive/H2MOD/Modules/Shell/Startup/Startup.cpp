@@ -14,7 +14,6 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Modules/Updater/Updater.h"
 
 #include "Util/filesys.h"
 #include "Util/hash.h"

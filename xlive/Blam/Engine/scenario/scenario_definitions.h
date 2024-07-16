@@ -16,7 +16,6 @@
 #include "decorators/decorator_definitions.h"
 #include "editor/editor_flags.h"
 #include "game/game_engine_spawning.h"
-#include "game/players.h"
 #include "hs/hs.h"
 #include "hs/hs_library_internal_runtime.h"
 #include "hs/hs_unit_seats.h"

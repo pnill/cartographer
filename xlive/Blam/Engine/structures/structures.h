@@ -1,7 +1,5 @@
 #pragma once
-#include "cseries/cseries_strings.h"
 #include "math/color_math.h"
-#include "tag_files/tag_reference.h"
 
 #define MAXIMUM_SURFACE_REFERENCES_PER_STRUCTURE 262144
 #define MAXIMUM_NODES_PER_BSP2D 131072

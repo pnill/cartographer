@@ -1,10 +1,8 @@
 #pragma once
-#include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
 #include "cseries/cseries_strings.h"
 #include "tag_files/data_reference.h"
-#include "tag_files/string_id.h"
 
 #define k_maximum_hs_globals_per_scenario 256
 #define k_maximum_hs_references_per_scenario 512

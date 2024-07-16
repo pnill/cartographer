@@ -1,22 +1,17 @@
 #include "stdafx.h"
 #include "RunLoop.h"
 
-#include "game/game.h"
-#include "game/game_time.h"
 #include "shell/shell_windows.h"
 #include "main/main_game_time.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "H2MOD/Modules/Stats/StatsHandler.h"
 #include "H2MOD/Utils/Utils.h"
 
 

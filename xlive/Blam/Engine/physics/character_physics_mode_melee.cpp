@@ -2,8 +2,8 @@
 #include "character_physics_mode_melee.h"
 
 #include "game/game.h"
+#include "game/game_time.h"
 #include "math/math.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "Util/Memory.h"
 
 FLOATING_POINT_ENV_ACCESS();

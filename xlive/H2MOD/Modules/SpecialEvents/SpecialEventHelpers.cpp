@@ -8,7 +8,6 @@
 #include "tag_files/global_string_ids.h"
 
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // Add new marker for elites
 void add_special_event_markers()

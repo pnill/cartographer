@@ -1,6 +1,5 @@
 #pragma once
 #include "units.h"
-#include "tag_files/string_id.h"
 
 #define k_contact_point_count 3
 

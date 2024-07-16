@@ -4,7 +4,6 @@
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
 
-#include "hud_definitions.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "networking/Session/NetworkSession.h"

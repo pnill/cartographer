@@ -2,7 +2,7 @@
 #include "object_type_list.h"
 #include "object_placement.h"
 
-#include "scenario/scenario.h"
+#include "scenario/scenario_definitions.h"
 
 typedef void (*object_initialize_t)();
 typedef void (*object_dispose_t)();

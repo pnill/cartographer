@@ -7,17 +7,10 @@
 #include "Blam/Cache/TagGroups/scenario_lightmap_definition.hpp"
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
-#include "game/game_globals.h"
-#include "game/players.h"
 #include "models/models.h"
-#include "models/render_model_definitions.h"
-#include "networking/Session/NetworkSession.h"
-#include "objects/objects.h"
 #include "scenario/scenario_definitions.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 datum lbitm_datum;

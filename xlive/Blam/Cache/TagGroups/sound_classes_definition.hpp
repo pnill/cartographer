@@ -1,8 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-
-#include <wtypes.h>
+#include "tag_files/tag_block.h"
 
 #pragma pack(push,1)
 struct s_sound_classes_block

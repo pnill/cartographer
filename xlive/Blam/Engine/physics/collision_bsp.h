@@ -1,6 +1,5 @@
 #pragma once
 #include "collision_bsp_definition.h"
-#include "tag_files/tag_block.h"
 
 #define MAXIMUM_EDGES_PER_COLLISION_BSP 262144
 #define MAXIMUM_SURFACES_PER_COLLISION_BSP 131072

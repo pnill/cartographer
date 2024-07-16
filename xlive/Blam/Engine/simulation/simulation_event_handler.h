@@ -1,7 +1,6 @@
 #pragma once
 #include "simulation_entity_database.h"
 
-#include "simulation/game_interface/simulation_game_entities.h"
 #include "networking/replication/replication_control_view.h"
 
 #define k_entity_reference_indices_count_max 2

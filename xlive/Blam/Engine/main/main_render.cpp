@@ -2,7 +2,6 @@
 #include "main_render.h"
 
 #include "render/render_cartographer_ingame_ui.h"
-#include "rasterizer/dx9/rasterizer_dx9.h"
 
 /*  prototypes */
 

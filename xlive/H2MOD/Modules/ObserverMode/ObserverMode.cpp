@@ -2,6 +2,7 @@
 #include "ObserverMode.h"
 
 #include "game/players.h"
+#include "networking/player_motion.h"
 
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"

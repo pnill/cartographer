@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "CustomMenuGlobals.h"
-#include "CustomLanguage.h"
 
 #include "game/game_globals.h"
 #include "H2MOD/Tags/TagInterface.h"

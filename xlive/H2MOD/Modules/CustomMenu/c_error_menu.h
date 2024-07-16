@@ -1,7 +1,5 @@
 #pragma once
-
 #include "c_brightness_menu.h"
-
 #include "CustomLanguage.h"
 
 class c_error_edit_list : public c_list_widget

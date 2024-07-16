@@ -4,7 +4,6 @@
 #include "object_type_list.h"
 
 #include "animations/animation_manager.h"
-#include "game/aim_assist.h"
 #include "memory/data.h"
 #include "math/matrix_math.h"
 #include "models/render_model_definitions.h"

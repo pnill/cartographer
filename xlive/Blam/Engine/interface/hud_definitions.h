@@ -1,10 +1,6 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-
-#include "math/color_math.h"
-
-
 #include "interface/new_hud_definitions.h"
+#include "math/color_math.h"
 
 enum e_scaling_flags : short
 {
@@ -48,7 +44,7 @@ enum e_waypoint_flags : int
 #define MAXIMUM_NUMBER_OF_WAYPOINTS 16
 struct s_waypoint_arrows_block
 {
-	static_string32 name;
+	char name[32];
 	int pad_0[2];
 	pixel32 color;
 	float opacity;

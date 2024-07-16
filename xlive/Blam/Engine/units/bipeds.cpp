@@ -1,14 +1,10 @@
 #include "stdafx.h"
 #include "bipeds.h"
 
-#include "game/game_time.h"
 #include "cache/cache_files.h"
-#include "game/game.h"
-#include "game/game_time.h"
 #include "main/interpolator.h"
 #include "math/periodic_functions.h"
 #include "physics/collisions.h"
-#include "render/render.h"
 #include "units/biped_definitions.h"
 
 

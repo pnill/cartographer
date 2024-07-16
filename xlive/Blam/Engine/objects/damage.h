@@ -2,8 +2,6 @@
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 
-#include "memory/static_arrays.h"
-
 struct s_damage_owner
 {
 	datum owner_index;

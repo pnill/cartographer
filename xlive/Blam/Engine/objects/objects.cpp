@@ -8,24 +8,19 @@
 
 #include "animations/animation_manager.h"
 #include "cache/cache_files.h"
-#include "cutscene/cinematics.h"
 #include "devices/devices.h"
 #include "effects/effects.h"
 #include "game/game.h"
-#include "game/game_time.h"
-#include "game/players.h"
 #include "items/weapons.h"
 #include "main/interpolator.h"
-#include "memory/bitstream.h"
 #include "models/models.h"
 #include "objects/widgets/widgets.h"
 #include "physics/collisions.h"
 #include "physics/havok.h"
 #include "physics/havok_memory.h"
-#include "simulation/game_interface/simulation_game_units.h"
+#include "scenario/scenario.h"
 #include "simulation/simulation.h"
 #include "structures/cluster_partitions.h"
-#include "units/bipeds.h"
 
 
 

@@ -1,8 +1,6 @@
 #pragma once
 #include "cseries/cseries_strings.h"
 #include "game/players.h"
-#include "math/random_math.h"
-#include "networking/Session/NetworkSession.h"
 #include "saved_games/game_variant.h"
 #include "simulation/machine_id.h"
 
