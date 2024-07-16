@@ -33,15 +33,15 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
             real32 vibration_intensity = player_effects_globals->max_intensity;
             effect_matrix = global_identity4x3;
 
-            if (player_effects_globals->attack_time_ticks > 0)
+            if (player_effects_globals->attack_time_passed_ticks > 0)
             {
-                real32 attack_time = player_effects_globals->attack_time_ticks / player_effects_globals->attack_time_ticks_1;
+                real32 attack_normalized_time_passed = (real32)player_effects_globals->attack_time_passed_ticks / (real32)player_effects_globals->attack_max_time_in_ticks;
                 if (!player_effects_globals->flags.test(_player_effect_global_bit_1))
                 {
-                    attack_time = 1.0f - attack_time;
+                    attack_normalized_time_passed = 1.0f - attack_normalized_time_passed;
                 }
 
-                vibration_intensity *= attack_time;
+                vibration_intensity *= attack_normalized_time_passed;
             }
 
             vibration_intensity = PIN(vibration_intensity, 0.0f, 1.0f);
