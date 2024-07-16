@@ -137,7 +137,6 @@ void __cdecl simulation_apply_before_game(simulation_update* update)
     if (sim_world->runs_simulation())
     {
 		sim_world->attach_simulation_queues_to_update(
-			update->simulation_in_progress,
 			&simulation_bookkeeping_queue,
 			&game_simulation_queue
 		);

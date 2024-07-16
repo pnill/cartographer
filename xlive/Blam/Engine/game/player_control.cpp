@@ -75,9 +75,9 @@ int16 __cdecl unit_rotate_zoom_level_hook(datum object_index, __int16 a2)
 		s_player* player = s_player::get_from_unit_index(object_index);
 		if (player)
 		{
-			int16 local_user_index = player->user_index;
-			if(local_user_index != NONE)
-				local_player_held_zoom_delta_time[local_user_index] = 0.f;
+			int16 user_index = player->user_index;
+			if(user_index != NONE)
+				local_player_held_zoom_delta_time[user_index] = 0.f;
 		}
 	}
 	return result;
@@ -92,7 +92,7 @@ __declspec(naked) void update_player_control_zoom_updates_held_jmp()
 		pushad
 		pushfd
 
-		mov ebx, [esp + pushfdoffset + pushadoffset + 78h] // move current delta onto ebx
+		mov ebx, [esp + pushfdoffset + pushadoffset + 78h] // move current delta into ebx
 
 		push ebx
 		push ebp // push pointer to s_player_control

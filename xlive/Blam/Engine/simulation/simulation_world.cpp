@@ -173,7 +173,6 @@ void c_simulation_world::apply_simulation_queue(const c_simulation_queue* queue,
 }
 
 void c_simulation_world::attach_simulation_queues_to_update(
-	bool simulation_in_progress,
 	c_simulation_queue* out_bookkeepin_queue,
 	c_simulation_queue* out_game_simulation_queue)
 {

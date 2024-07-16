@@ -18,11 +18,11 @@ namespace ControllerInput
 		//Game checks for only a max of 20 inputs, if someone ever exceeds this.. I'll be impressed
 		for(auto i = 0; i < 20; i++)
 		{
-			input_device* InputDevice = g_xinput_devices[i];
+			input_device* input_device = g_xinput_devices[i];
 			XINPUT_STATE xinput_state;
-			if (InputDevice->XGetState(&xinput_state) == ERROR_SEVERITY_SUCCESS)
+			if (input_device->XGetState(&xinput_state) == ERROR_SEVERITY_SUCCESS)
 			{
-				InputDevice->XUpdateState();
+				input_device->XUpdateState();
 				if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 				{
 					if (xinput_state.Gamepad.wButtons & XINPUT_GAMEPAD_DPAD_UP)

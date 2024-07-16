@@ -100,7 +100,7 @@ public:
 	void queues_initialize();
 	void apply_simulation_queue(const c_simulation_queue* queue, struct simulation_update* update);
 
-	void attach_simulation_queues_to_update(bool simulation_in_progress, c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
+	void attach_simulation_queues_to_update(c_simulation_queue* out_bookkeepin_queue, c_simulation_queue* out_game_simulation_queue);
 
 	c_simulation_queue* queue_get(e_simulation_queue_type type) const;
 
