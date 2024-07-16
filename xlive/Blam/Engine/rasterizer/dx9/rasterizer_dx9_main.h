@@ -19,7 +19,7 @@ enum e_framebuffer_blend_function : int16
 	_framebuffer_blend_function_constant_color_blend = 8,
 	_framebuffer_blend_function_inverse_constant_color_blend = 9,
 	_framebuffer_blend_function_none = 10,
-	k_shader_framebuffer_blend_function_count
+	k_shader_framebuffer_blend_function_count = 12
 };
 
 /* structures */

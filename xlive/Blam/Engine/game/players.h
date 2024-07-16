@@ -130,7 +130,7 @@ struct s_player
 	int machine_user_index;
 	int machine_controller_index;
 	e_controller_index controller_index;
-	__int16 user_index;
+	int16 user_index;
 	__int16 player_bsp_location_index;
 	datum unit_index;
 	datum dead_unit_index;

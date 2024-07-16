@@ -129,8 +129,8 @@ struct s_player_effect_globals
 	int8 field_7;
 	s_observer_command_displacement position;
 	real32 max_intensity;
-	int16 attack_time_ticks;
-	int16 attack_time_ticks_1;
+	int16 attack_time_passed_ticks;
+	int16 attack_max_time_in_ticks;
 	c_flags<e_player_effect_global_flags, uint32, k_player_effect_global_flag_count> flags;
 	uint32 current_time_ticks;
 	s_player_effect_user_globals user_effects[k_number_of_users];

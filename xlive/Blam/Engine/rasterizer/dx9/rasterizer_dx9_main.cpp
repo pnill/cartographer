@@ -25,6 +25,7 @@ D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
@@ -40,6 +41,7 @@ D3DBLEND g_dst_blend[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_INVSRCALPHA,
   (D3DBLEND)0,
   (D3DBLEND)0,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
@@ -55,6 +57,7 @@ D3DBLEND g_src_blend[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_ONE,
   (D3DBLEND)0,
   (D3DBLEND)0,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
@@ -66,7 +69,7 @@ rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
 
 /* prototypes */
 
-void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
+void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
 void __cdecl rasterizer_set_stream_source(void);
 void __cdecl debug_frame_usage_draw(void);
 void __cdecl rasterizer_present_backbuffer(void);
@@ -96,6 +99,10 @@ IDirect3DPixelShader9** local_pixel_shaders_get(void)
 
 void rasterizer_dx9_main_apply_patches(void)
 {
+    // debugging, get vertex decls currently set
+    //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
+    //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
+
     DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_direct);
     return;
 }
@@ -133,7 +140,7 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
             D3DLOCKED_RECT locked_rect;
             if ((screenshot_bitmap->format == bitmap_data_format_a8r8g8b8 || screenshot_bitmap->format == bitmap_data_format_x8r8g8b8)
                 && !screenshot_bitmap->mipmap_count
-                && dx9_globals->global_d3d_surface_screenshot->LockRect(&locked_rect, NULL, D3DLOCK_READONLY) >= 0)
+                && SUCCEEDED(dx9_globals->global_d3d_surface_screenshot->LockRect(&locked_rect, NULL, D3DLOCK_READONLY)))
             {
                 if (locked_rect.pBits)
                 {
@@ -142,9 +149,9 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
                     {
                         uint8* base_address = bitmap_get_base_address(screenshot_bitmap, 0, row_index, 0);
                         uint8* data = (uint8*)locked_rect.pBits;
-                        csmemcpy(base_address, (void*)&data[row_index * locked_rect.Pitch], screenshot_pitch);
+                        csmemcpy(base_address, data + row_index * locked_rect.Pitch, screenshot_pitch);
                     }
-                    result = dx9_globals->global_d3d_surface_screenshot->UnlockRect() >= 0;
+                    result = SUCCEEDED(dx9_globals->global_d3d_surface_screenshot->UnlockRect());
                 }
             }
             else
@@ -152,12 +159,12 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
                 result = false;
             }
             rasterizer_dx9_set_render_target_internal(dx9_globals->global_d3d_surface_render_primary, (IDirect3DSurface9*)NONE, true);
-            clear_render_target(0, NONE, 0.0f, false);
+            rasterizer_dx9_clear_target(0, global_white_pixel32.color, 0.0f, false);
         }
 
         rasterizer_set_stream_source();
         HRESULT present_result = dx9_globals->global_d3d_device->Present(NULL, NULL, *Memory::GetAddress<HWND*>(0x46D9C8), NULL);
-        if (result && present_result >= 0)
+        if (result && SUCCEEDED(present_result))
         {
 
 #ifdef _DEBUG
@@ -186,9 +193,9 @@ void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_ind
     return;
 }
 
-void __cdecl clear_render_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
 {
-    INVOKE(0x25FC2A, 0x0, clear_render_target, flags, color, z, stencil);
+    INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_target, flags, color, z, stencil);
     return;
 }
 
@@ -303,4 +310,51 @@ void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32
 {
     INVOKE(0x25F74C, 0x0, rasterizer_dx9_set_texture, stage, type, usage, tag_index, bitmap_index, a6);
     return;
+}
+
+
+//struct s_vs_shader_decl_draw_screen
+//{
+//    D3DXVECTOR4 pos;
+//    D3DXVECTOR3 texCoord;
+//    D3DCOLOR color;
+//};
+//
+//struct s_vs_shader_decl_36
+//{
+//    D3DXVECTOR4 position;
+//    D3DXVECTOR2 texcoord;
+//    D3DCOLOR color;
+//};
+
+
+bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
+{
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    IDirect3DVertexDeclaration9* vertex_dcl;
+    global_d3d_device->GetVertexDeclaration(&vertex_dcl);
+    bool res = SUCCEEDED(vertex_dcl->GetDeclaration(vertex_elements, vertex_element_count));
+
+    vertex_dcl->Release();
+
+    return res;
+}
+
+bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+    D3DPRIMITIVETYPE PrimitiveType,
+    UINT PrimitiveCount,
+    const void* pVertexStreamZeroData,
+    UINT VertexStreamZeroStride)
+{
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    D3DVERTEXELEMENT9 vertex_elements[MAXD3DDECLLENGTH];
+    UINT vertex_element_couunt;
+
+    if (rasterizer_dx9_get_vertex_declaration_format(vertex_elements, &vertex_element_couunt))
+    {
+    }
+
+    return SUCCEEDED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
 }

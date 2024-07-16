@@ -357,7 +357,7 @@ struct s_network_session
 	void* c_kablam_session_join_request_handler; // dedicated server session join handler
 	char field_7B7C[12];
 
-	const char* desribe_network_protocol_type() const
+	const char* describe_network_protocol_type() const
 	{
 		static const char* network_protocols_str[] =
 		{

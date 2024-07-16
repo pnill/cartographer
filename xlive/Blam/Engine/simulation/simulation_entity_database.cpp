@@ -40,6 +40,9 @@ bool c_simulation_entity_database::process_creation(int32 entity_index, e_simula
 
     csmemset(blocks, 0, sizeof(s_replication_allocation_block) * block_count);
 
+    // ### TODO FIXME create objects during game tick
+    // works-around an issue where desync could occur because the entity wouldn't get an object index allocated 
+    // amd attached until very late
     simulation_queue_entity_creation_apply(queue_element);
     simulation_get_world()->simulation_queue_free(queue_element);
     //simulation_queue_entity_creation_insert(queue_element);

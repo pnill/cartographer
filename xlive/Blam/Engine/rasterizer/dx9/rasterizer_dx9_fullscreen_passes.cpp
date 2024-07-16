@@ -32,7 +32,7 @@ void rasterizer_dx9_fullscreen_passes_apply_patches(void)
 
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     real_rectangle2d* a1,
-    unsigned __int8(__cdecl* a2)(int32),
+    bool(__cdecl* a2)(int32),
     bool(__cdecl* a3)(
         e_vertex_output_type output_type,
         real_rectangle2d* bounds,
@@ -235,9 +235,9 @@ void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location,
 
     real32 z = (z_far != 0.f ? rasterizer_dx9_fullscreen_effect_calculate_position_z(z_far, 1) : 1.f);
     
-    output->i = location->i * 2.f - 1.f;    // x
-    output->j = -(location->j * 2.f - 1.f); // y
-    output->k = z;                          // z
+    output->x = location->i * 2.f - 1.f;    // x
+    output->y = -(location->j * 2.f - 1.f); // y
+    output->z = z;                          // z
     output->w = 1.f;                        // scale
     return;
 }
