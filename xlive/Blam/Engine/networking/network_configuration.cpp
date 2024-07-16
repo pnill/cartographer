@@ -40,8 +40,8 @@ void __cdecl load_network_adapter(void);
 
 void network_configuration_apply_patches(void)
 {
-    PatchCall(Memory::GetAddress(0x1AC071), get_network_adapters);
-    WriteJmpTo(Memory::GetAddress(0x215C68), get_network_adapters);
+    PatchCall(Memory::GetAddress(0x1AC071, 0x1AC576), get_network_adapters);
+    WriteJmpTo(Memory::GetAddress(0x215C68, 0x1FD500), get_network_adapters);
     return;
 }
 
