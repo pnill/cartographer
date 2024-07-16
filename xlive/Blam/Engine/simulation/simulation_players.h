@@ -3,7 +3,6 @@
 
 #include "game/player_control.h"
 #include "game/players.h"
-#include "networking/Session/NetworkSession.h"
 
 enum e_simulation_player_type   //TODO: determine actual names for this enum field
 {

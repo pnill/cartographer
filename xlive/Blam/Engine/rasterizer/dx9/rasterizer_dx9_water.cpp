@@ -6,7 +6,6 @@
 #include "rasterizer_dx9_targets.h"
 
 #include "camera/camera.h"
-#include "structures/structures.h"
 
 /* prototypes */
 

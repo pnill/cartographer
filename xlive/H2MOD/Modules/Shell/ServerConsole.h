@@ -1,6 +1,4 @@
 #pragma once
-#include "cseries/cseries_strings.h"
-
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 
 namespace ServerConsole

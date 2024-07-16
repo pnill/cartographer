@@ -1,8 +1,6 @@
 #pragma once
-
 #include "objects/emblems.h"
 #include "objects/object_placement.h"
-#include "tag_files/string_id.h"
 
 struct s_simulation_object_state_data
 {

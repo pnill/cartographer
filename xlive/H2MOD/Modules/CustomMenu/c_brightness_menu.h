@@ -1,9 +1,5 @@
 #pragma once
-
-#pragma once
-
 #include "CustomMenuGlobals.h"
-#include "c_brightness_menu.h"
 #include "c_list_widget.h"
 
 #define BRIGHTNESS_MENU_ID 272

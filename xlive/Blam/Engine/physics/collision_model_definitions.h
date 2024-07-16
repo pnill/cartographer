@@ -2,7 +2,6 @@
 #include "collision_bsp_definition.h"
 #include "errors/error_reports.h"
 #include "havok/physics/collide/shape/convex/triangle/hkTriangle.h"
-#include "havok/physics/collide/shape/mesh/hkMeshShape.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_import_definitions.h"

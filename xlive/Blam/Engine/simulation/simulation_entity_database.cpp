@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "simulation_entity_database.h"
 
+#include "simulation.h"
 #include "simulation_queue_entities.h"
 
+#include "networking/memory/networking_memory.h"
 
 
 c_simulation_entity_database* simulation_get_entity_database()

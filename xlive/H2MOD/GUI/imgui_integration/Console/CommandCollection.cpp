@@ -1,8 +1,10 @@
 #include "stdafx.h"
-#include "ImGui_ConsoleImpl.h"
+
+#include "CommandCollection.h"
+#include "CommandsUtil.h"
+#include "ComVar.h"
 
 #include "game/game.h"
-#include "game/game_time.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
 #include "networking/Session/NetworkSession.h"
@@ -15,7 +17,6 @@
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
 #include "XLive/xnet/IpManagement/XnIp.h"

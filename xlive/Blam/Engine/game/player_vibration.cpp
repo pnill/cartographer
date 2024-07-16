@@ -5,11 +5,9 @@
 #include "interface/user_interface_controller.h"
 #include "game/game.h"
 #include "main/main_time.h"
-#include "game/game_time.h"
 #include "objects/damage_effects.h"
 #include "simulation/simulation.h"
 
-#include "H2MOD/Tags/TagInterface.h"
 
 s_vibration_globals* vibration_globals_get(void);
 XINPUT_VIBRATION vibration_get_state_usercall(s_vibration_user_globals* user_globals);

@@ -5,7 +5,6 @@
 #include "hud_messaging.h"
 #include "hud_nav_points.h"
 #include "new_hud.h"
-#include "new_hud_definitions.h"
 #include "new_hud_draw.h"
 
 #include "camera/director.h"
@@ -17,7 +16,6 @@
 #include "render/render.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Utils/Utils.h"
 
 /* constants */

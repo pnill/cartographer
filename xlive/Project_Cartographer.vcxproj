@@ -930,7 +930,6 @@
     <ClInclude Include="3rdparty\spdlog\include\spdlog\tweakme.h" />
     <ClInclude Include="3rdparty\spdlog\include\spdlog\version.h" />
     <ClInclude Include="3rdparty\tinyxml\tinyxml2.h" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Cache\TagGroups\ai_mission_dialogue_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\camera_track_definition.hpp" />
     <ClInclude Include="Blam\Cache\TagGroups\crate_definition.hpp" />

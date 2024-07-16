@@ -8,7 +8,6 @@
 #include "Events/Paddy.h"
 
 #include "game/game.h"
-#include "networking/NetworkMessageTypeCollection.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"

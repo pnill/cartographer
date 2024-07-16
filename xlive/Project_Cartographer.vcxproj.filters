@@ -563,7 +563,6 @@
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Variants\Variants.h" />
     <ClInclude Include="Blam\Cache\TagGroups\shader_pass_definition.hpp" />
-    <ClInclude Include="Blam\Cache\DataTypes\BlamDataTypes.h" />
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\game\game_engine.h" />
     <ClInclude Include="Blam\Cache\TagGroups\scenario_lightmap_definition.hpp" />

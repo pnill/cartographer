@@ -14,8 +14,6 @@
 #include "text/text_group.h"
 
 
-#include "H2MOD/Tags/TagInterface.h"
-
 #define NUMBER_OF_GLOBAL_SOUNDS 2
 #define k_unit_grenade_types_count 2
 #define k_global_vertex_shader_count 32

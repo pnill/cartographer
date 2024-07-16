@@ -2,7 +2,6 @@
 
 #include "cartographer/discord/discord_interface.h"
 
-#include "H2MOD.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Config.h"
 

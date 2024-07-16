@@ -1,6 +1,6 @@
 #pragma once
 #include "math/matrix_math.h"
-#include "objects/objects.h"
+#include "objects/object_placement.h"
 
 #define k_observer_command_values 6
 

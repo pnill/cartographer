@@ -13,7 +13,6 @@
 #include "rasterizer/dx9/shaders/compiled/sun_glow_convolve.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "render/render.h"
-#include "shell/shell_windows.h"
 
 /* constants */
 #define k_sun_quad_pass_count 16

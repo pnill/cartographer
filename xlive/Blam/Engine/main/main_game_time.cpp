@@ -7,8 +7,6 @@
 #include "shell/shell_windows.h"
 #include "game/player_control.h"
 
-#include "H2MOD/Utils/Utils.h"
-
 bool g_main_game_time_frame_limiter_enabled = false;
 
 float get_ticks_leftover_time()

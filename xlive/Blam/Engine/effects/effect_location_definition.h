@@ -1,5 +1,5 @@
 #pragma once
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
+#include "tag_files/string_id.h"
 
 #define k_maximum_effect_locations_count 32
 

@@ -1,9 +1,7 @@
 #pragma once
-
-#include "memory/data.h"
 #include "c_user_interface_widget.h"
+#include "memory/data.h"
 
-#include "CustomMenuGlobals.h"
 
 class c_list_widget : protected c_user_interface_widget
 {

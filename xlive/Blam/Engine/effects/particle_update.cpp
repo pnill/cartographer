@@ -2,7 +2,6 @@
 #include "particle_update.h"
 
 #include "particle_system.h"
-#include "particle_emitter.h"
 
 real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_point3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
 {

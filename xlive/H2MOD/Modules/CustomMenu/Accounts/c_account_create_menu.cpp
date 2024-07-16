@@ -3,20 +3,11 @@
 #include "c_account_create_menu.h"
 
 #include "memory/data.h"
-#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
-
-#include "H2MOD/Modules/Accounts/Accounts.h"
-#include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/AccountCreate.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "../c_error_menu.h"
 #include "../c_virtual_keyboard_menu.h"
 #include "../CustomLanguage.h"
-
-#include "H2MOD/Modules/Shell/Config.h"
-
-#include "H2MOD/Utils/Utils.h"
 
 HANDLE hThreadCreate = 0;
 

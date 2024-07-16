@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "decorator_definitions.h"
 
-#include "H2MOD/Tags/TagInterface.h"
-
 const geometry_block_info* c_decorator_cache_block::get_geometry_block() const
 {
     return &this->m_geometry_block;

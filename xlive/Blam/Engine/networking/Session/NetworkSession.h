@@ -3,7 +3,6 @@
 #include "game/players.h"
 #include "input/controllers.h"
 #include "networking/Transport/transport.h"
-#include "networking/Transport/network_channel.h"
 #include "networking/Transport/network_observer.h"
 #include "saved_games/game_variant.h"
 

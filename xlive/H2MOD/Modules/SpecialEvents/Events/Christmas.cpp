@@ -3,7 +3,6 @@
 #include "Christmas.h"
 #include "../SpecialEventHelpers.h"
 
-
 #include "items/weapon_definitions.h"
 #include "game/game_globals.h"
 #include "models/models.h"

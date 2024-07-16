@@ -1,6 +1,6 @@
 #pragma once
 
-#include "objects/objects.h"
+#include "objects/object_placement.h"
 
 enum e_collision_test_flags : uint32
 {

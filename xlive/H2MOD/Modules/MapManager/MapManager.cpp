@@ -4,13 +4,11 @@
 #include "CustomMapDataCache/CustomMapDataCache.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Session/NetworkSession.h"
 
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 

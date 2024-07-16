@@ -10,7 +10,6 @@
 #include "rasterizer/rasterizer_lights.h"
 #include "render/render_first_person.h"
 #include "shaders/shader_definitions.h"
-#include "shaders/shader_templates.h"
 
 /* globals */
 

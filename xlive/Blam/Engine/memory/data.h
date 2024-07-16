@@ -1,5 +1,4 @@
 #pragma once
-#include "memory/static_arrays.h"
 
 // The game is using some sort of heap manager developed by Microsoft in 2000's named RockAll Heap Manager 
 struct s_data_array

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "xbox.h"
 
 #include "resources/resource.h"

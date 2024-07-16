@@ -6,7 +6,6 @@
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Utils/Utils.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 

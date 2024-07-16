@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "game_statborg.h"
 
-#include "H2MOD/Variants/Variants.h"
-
+#include "H2MOD/Variants/GraveRobber/GraveRobber.h"
 
 c_game_statborg* __cdecl game_engine_get_statborg(void)
 {

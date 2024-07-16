@@ -1,9 +1,8 @@
 #pragma once
-
+#include "tag_files/tag_block.h"
 
 #define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 #define MAXIMUM_CLUSTER_PORTALS_PER_STRUCTURE 512
-#include "tag_files/tag_block.h"
 
 // max: MAXIMUM_CLUSTERS_PER_STRUCTURE
 struct s_structure_sound_cluster

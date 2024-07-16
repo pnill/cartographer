@@ -4,8 +4,6 @@
 #include "../SpecialEventHelpers.h"
 
 #include "items/weapon_definitions.h"
-#include "game/game_globals.h"
-#include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 void birthday_event_map_load()

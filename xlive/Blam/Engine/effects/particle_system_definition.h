@@ -8,7 +8,6 @@
 #include "tag_files/tag_reference.h"
 #include "shaders/shader_definitions.h"
 #include "shaders/shader_postprocess_definitions.h"
-#include "H2MOD/Tags/TagInterface.h"
 
 #define k_maximum_emitters_per_definition 8
 #define k_maximum_particle_systems_per_block 32

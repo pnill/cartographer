@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "animation_definitions.h"
 
-#include "H2MOD/Tags/TagInterface.h"
-
 const uint32* c_model_animation_runtime_data::get_left_arm_nodes(void) const
 {
 	return this->left_arm_nodes;

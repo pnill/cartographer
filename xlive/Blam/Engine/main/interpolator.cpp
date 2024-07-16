@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "interpolator.h"
 
-#include "effects/particle.h"
 #include "cutscene/cinematics.h"
 #include "game/game_time.h"
 

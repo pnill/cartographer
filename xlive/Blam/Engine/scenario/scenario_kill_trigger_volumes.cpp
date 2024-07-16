@@ -2,8 +2,6 @@
 #include "scenario_kill_trigger_volumes.h"
 #include "scenario.h"
 
-#include "networking/Session/NetworkSession.h"
-
 DWORD get_scenario_volume_count() 
 {
 	return get_global_scenario()->scenario_kill_triggers.count;

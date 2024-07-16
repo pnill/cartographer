@@ -3,10 +3,6 @@
 #include "particle_system.h"
 #include "particle.h"
 
-#include "Blam/Cache/DataTypes/BlamDataTypes.h"
-#include "H2MOD/Tags/TagInterface.h"
-
-
 void c_particle_emitter_definition::get_emitter_particle_color(s_particle_state* particle_state,
 	real_argb_color* out_color)
 {

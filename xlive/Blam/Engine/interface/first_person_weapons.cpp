@@ -6,13 +6,13 @@
 #include "game/cheats.h"
 #include "game/game_globals.h"
 #include "items/weapons.h"
+#include "items/weapon_definitions.h"
 #include "main/interpolator.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
 #include "objects/object_definition.h"
 #include "objects/objects.h"
 #include "tag_files/global_string_ids.h"
-
 
 bool show_first_person = true;
 

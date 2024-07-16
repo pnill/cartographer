@@ -12,7 +12,6 @@
 #include "game/players.h"
 #include "interface/hud.h"
 #include "interface/user_interface.h"
-#include "main/main_screenshot.h"
 #include "math/color_math.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"

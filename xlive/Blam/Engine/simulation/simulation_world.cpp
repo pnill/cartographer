@@ -5,9 +5,11 @@
 #include "simulation_queue_entities.h"
 #include "simulation_queue_global_events.h"
 
-#include "game/game.h"
+#include "simulation.h"
+
 #include "saved_games/game_state_procs.h"
-#include "shell/shell_windows.h"
+
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
 // TODO verify if these buffers get saturated quickly
 // if that's the case, increse the buffer size

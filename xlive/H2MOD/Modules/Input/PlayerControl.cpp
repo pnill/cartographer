@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "PlayerControl.h"
+
+#include "networking/player_motion.h"
 
 typedef void __cdecl p_network_player_actions_to_player_actions(s_player_motion* nActions, player_action* pActions);
 p_network_player_actions_to_player_actions* network_player_actions_to_player_actions;

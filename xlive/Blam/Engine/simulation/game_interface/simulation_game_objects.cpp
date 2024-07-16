@@ -2,15 +2,12 @@
 #include "simulation_game_objects.h"
 
 #include "simulation_game_interface.h"
-#include "simulation_game_internal.h"
 
 #include "cache/cache_files.h"
 #include "memory/bitstream.h"
 #include "models/models.h"
+#include "objects/objects.h"
 #include "objects/object_definition.h"
-#include "scenario/scenario.h"
-
-#include "H2MOD/Tags/TagInterface.h"
 
 
 

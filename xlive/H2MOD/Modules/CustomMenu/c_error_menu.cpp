@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "c_error_menu.h"
 
 #include "CustomLanguage.h"

@@ -1,8 +1,5 @@
 #pragma once
 
-#include "H2MOD/Modules/Accounts/Accounts.h"
-
-#include "../c_brightness_menu.h"
 #include "../CustomMenuGlobals.h"
 #include "../CustomLanguage.h"
 

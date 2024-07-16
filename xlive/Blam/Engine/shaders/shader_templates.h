@@ -2,7 +2,6 @@
 #include "shader_definitions.h"
 #include "shader_postprocess_definitions.h"
 
-#include "bitmaps/bitmaps.h"
 #include "math/color_math.h"
 #include "memory/static_arrays.h"
 #include "tag_files/data_reference.h"

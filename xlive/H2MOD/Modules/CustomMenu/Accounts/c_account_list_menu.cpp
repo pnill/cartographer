@@ -6,12 +6,10 @@
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
+#include "H2MOD/Modules/CustomMenu/c_brightness_menu.h"
+#include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-
-#include "../CustomLanguage.h"
-
 #include "H2MOD/Modules/Shell/Config.h"
-
 #include "H2MOD/Utils/Utils.h"
 
 static bool accountRemoveMode;

@@ -1,14 +1,11 @@
 #include "stdafx.h"
-
 #include "XnIp.h"
-#include "../../Cryptography/Rc4.h"
 
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
 
-#include "../NIC.h"
-#include "../net_utils.h"
+#include "XLive/Cryptography/Rc4.h"
+#include "XLive/xnet/NIC.h"
+#include "XLive/xnet/net_utils.h"
 
 // The only needed sockets
 const uint16 g_needed_sockets[2] = { 1000, 1001 };

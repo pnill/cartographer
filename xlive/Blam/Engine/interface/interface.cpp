@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "interface.h"
 
-#include "meter_definitions.h"
-
 #include "cutscene/cinematics.h"
 #include "game/game_globals.h"
 #include "rasterizer/dx9/rasterizer_dx9_dynamic_geometry.h"

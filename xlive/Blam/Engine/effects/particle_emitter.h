@@ -3,7 +3,6 @@
 #include "memory/data.h"
 
 #include "particle_system.h"
-#include "particle_location.h"
 
 struct c_particle_emitter
 {

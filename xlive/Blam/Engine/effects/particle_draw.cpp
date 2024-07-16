@@ -8,7 +8,6 @@
 #include "particle_emitter.h"
 #include "particle_location.h"
 #include "render/render_sky.h"
-#include "game/game_time.h"
 
 #include "Util/Hooks/Hook.h"
 

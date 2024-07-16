@@ -1,9 +1,5 @@
 #include "stdafx.h"
-
 #include "c_screen_with_menu.h"
-
-#include "CustomMenuGlobals.h"
-
 
 
 #pragma region Live list fix for disappearing labels
