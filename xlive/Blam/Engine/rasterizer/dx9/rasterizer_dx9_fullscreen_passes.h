@@ -18,7 +18,7 @@ void rasterizer_dx9_fullscreen_passes_apply_patches(void);
 // ### TOOD rename
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     real_rectangle2d* a1,
-    unsigned __int8(__cdecl* a2)(int32),
+    bool(__cdecl* a2)(int32),
     bool(__cdecl* a3)(
         e_vertex_output_type output_type,
         real_rectangle2d* bounds,

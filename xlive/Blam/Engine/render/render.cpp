@@ -38,13 +38,6 @@ int32* global_sky_index_get(void);
 s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
 void __cdecl rasterizer_render_scene(bool is_texture_camera);
-bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count);
-
-bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
-    D3DPRIMITIVETYPE PrimitiveType,
-    UINT PrimitiveCount,
-    const void* pVertexStreamZeroData,
-    UINT VertexStreamZeroStride);
 
 void render_view(
     real_rectangle2d* frustum_bounds,
@@ -73,9 +66,6 @@ void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
-
-    //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
-    //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
 
     // ### FIXME re-enable text/user interface text
     // *Memory::GetAddress<bool*>(0x46818E) = false;
@@ -291,52 +281,6 @@ void __cdecl rasterizer_render_scene(bool is_texture_camera)
 {
     INVOKE(0x25F015, 0x0, rasterizer_render_scene, is_texture_camera);
     return;
-}
-
-//struct s_vs_shader_decl_draw_screen
-//{
-//    D3DXVECTOR4 pos;
-//    D3DXVECTOR3 texCoord;
-//    D3DCOLOR color;
-//};
-//
-//struct s_vs_shader_decl_36
-//{
-//    D3DXVECTOR4 position;
-//    D3DXVECTOR2 texcoord;
-//    D3DCOLOR color;
-//};
-
-
-bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
-{
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-    IDirect3DVertexDeclaration9* vertex_dcl;
-    global_d3d_device->GetVertexDeclaration(&vertex_dcl);
-    bool res = !FAILED(vertex_dcl->GetDeclaration(vertex_elements, vertex_element_count));
-
-    vertex_dcl->Release();
-
-    return res;
-}
-
-bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
-    D3DPRIMITIVETYPE PrimitiveType,
-    UINT PrimitiveCount,
-    const void* pVertexStreamZeroData,
-    UINT VertexStreamZeroStride)
-{
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-    D3DVERTEXELEMENT9 vertex_elements[MAXD3DDECLLENGTH];
-    UINT vertex_element_couunt;
-
-    if (rasterizer_dx9_get_vertex_declaration_format(vertex_elements, &vertex_element_couunt))
-    {
-    }
-
-    return !FAILED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
 }
 
 void rasterizer_setup_2d_vertex_shader_user_interface_constants()
