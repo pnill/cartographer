@@ -25,6 +25,7 @@ D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
@@ -40,6 +41,7 @@ D3DBLEND g_dst_blend[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_INVSRCALPHA,
   (D3DBLEND)0,
   (D3DBLEND)0,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
@@ -55,6 +57,7 @@ D3DBLEND g_src_blend[k_shader_framebuffer_blend_function_count] =
   D3DBLEND_ONE,
   (D3DBLEND)0,
   (D3DBLEND)0,
+  (D3DBLEND)NONE,
   (D3DBLEND)NONE
 };
 
