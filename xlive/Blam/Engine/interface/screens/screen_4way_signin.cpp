@@ -735,7 +735,7 @@ __declspec(naked) void jmp_to_recover_4way_for_splitscreen_for_network_pregame()
 	{
 		push	edi //screen_id
 		push	eax //protocol
-		call    user_interface_recover_4way_screen_pregame
+		call	user_interface_recover_4way_screen_pregame
 
 		pop		eax
 		pop		edi
@@ -750,7 +750,7 @@ __declspec(naked) void jmp_to_recover_4way_for_splitscreen_for_network_postgame(
 	__asm
 	{
 		push	eax //protocol
-		jmp		user_interface_recover_4way_screen
+		call	user_interface_recover_4way_screen
 		pop		eax
 
 		//remaining function epilog can handle rest
@@ -771,6 +771,9 @@ void user_interface_recover_from_disconnection_patches()
 	WritePointer(Memory::GetAddress(0x217698), jmp_to_recover_4way_for_splitscreen_for_network_postgame);//case _session_protocol_splitscreen_custom
 
 	ui_recover_from_disconnection_return_address = Memory::GetAddress(0x2174DB);
+
+	// fixes broken main_menu when leaving cooperative game
+	WriteValue<uint8>(Memory::GetAddress(0x9112) + 1, 3);
 
 }
 
