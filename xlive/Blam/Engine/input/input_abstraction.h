@@ -13,6 +13,13 @@ enum e_input_preference_device_type :uint32
 	_input_preference_device_gamepad = 0x2,
 };
 
+struct s_abstract_input_button_state
+{
+	real32	hold_time_real;
+	uint8	hold_time_byte;
+	uint16	hold_time_short;
+};
+
 enum e_button_functions
 {
 	_button_jump = 0x0,

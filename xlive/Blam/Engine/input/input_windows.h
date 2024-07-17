@@ -118,7 +118,7 @@ struct s_input_globals
 	uint8 gap_619[3];
 	uint32 field_61C;
 	DIMOUSESTATE2 mouse_state;
-	int16 mouse_buttons[8];
+	uint16 mouse_buttons[8];
 	DIMOUSESTATE2 suppressed_mouse_state;
 	uint8 gap_658[24];
 	uint32 mouse_cursor_state;
@@ -154,6 +154,7 @@ bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index);
 s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
 s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
 DIMOUSESTATE2* __cdecl input_get_mouse_state();
+uint16* __cdecl input_get_mouse_button_state();
 bool __cdecl input_get_key(s_key_state* keystate);
 void __cdecl input_update_main_device_state();
 
