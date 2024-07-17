@@ -77,11 +77,11 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 		*g_rasterizer_dx9_disable_stencil = true;
 	}
 
-	draw_specific_render_layer(_collection_type_0, _render_layer_lightmap_indirect);
-	draw_specific_render_layer(_collection_type_0, _render_layer_enviroment_map);
-	draw_specific_render_layer(_collection_type_0, _render_layer_decal);
-	draw_specific_render_layer(_collection_type_0, _render_layer_selfillumination);
-	draw_specific_render_layer(_collection_type_0, _render_layer_overlay);
+	draw_render_layer(_collection_type_0, _render_layer_lightmap_indirect);
+	draw_render_layer(_collection_type_0, _render_layer_enviroment_map);
+	draw_render_layer(_collection_type_0, _render_layer_decal);
+	draw_render_layer(_collection_type_0, _render_layer_selfillumination);
+	draw_render_layer(_collection_type_0, _render_layer_overlay);
 
 	if (render_layer_globals->first_person_render_in_progress)
 	{
@@ -90,8 +90,8 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 		*g_rasterizer_dx9_disable_stencil = true;
 	}
 
-	draw_specific_render_layer(_collection_type_0, _render_layer_fog);
-	draw_specific_render_layer(_collection_type_0, _render_layer_active_camo);
+	draw_render_layer(_collection_type_0, _render_layer_fog);
+	draw_render_layer(_collection_type_0, _render_layer_active_camo);
 
 	if (g_fog_result->patchy_fog_tag_index != NONE && !g_fog_result->field_96)
 	{
@@ -99,11 +99,11 @@ void __cdecl render_submit_transparent_geometry(s_model_group_submit_data* model
 
 		if (result > 0.f)
 		{
-			draw_specific_render_layer(_collection_type_0, _render_layer_active_camo_stencil_modulate);
+			draw_render_layer(_collection_type_0, _render_layer_active_camo_stencil_modulate);
 		}
 	}
 
-	draw_specific_render_layer(_collection_type_0, _render_layer_transparent);
+	draw_render_layer(_collection_type_0, _render_layer_transparent);
 	primitive_list->m_render_layer_flags = primitive_list->m_render_layer_flags_backup;
 	primitive_list->m_field_C = 0;
 
@@ -139,14 +139,14 @@ void __cdecl render_submit_transparent_hologram_geometry(uint32* a1)
 
 	render_section_visibility_compute(0, flags | 0xFFFFFFCF, model_group_index, NONE, 0, NONE, 0, true);
 
-	draw_specific_render_layer(_collection_type_0, _render_layer_texture_accumulate);
-	draw_specific_render_layer(_collection_type_0, _render_layer_lightmap_indirect);
-	draw_specific_render_layer(_collection_type_0, _render_layer_enviroment_map);
-	draw_specific_render_layer(_collection_type_0, _render_layer_selfillumination);
-	draw_specific_render_layer(_collection_type_0, _render_layer_overlay);
-	draw_specific_render_layer(_collection_type_0, _render_layer_fog);
-	draw_specific_render_layer(_collection_type_0, _render_layer_transparent);
-	draw_specific_render_layer(_collection_type_0, _render_layer_hologram);
+	draw_render_layer(_collection_type_0, _render_layer_texture_accumulate);
+	draw_render_layer(_collection_type_0, _render_layer_lightmap_indirect);
+	draw_render_layer(_collection_type_0, _render_layer_enviroment_map);
+	draw_render_layer(_collection_type_0, _render_layer_selfillumination);
+	draw_render_layer(_collection_type_0, _render_layer_overlay);
+	draw_render_layer(_collection_type_0, _render_layer_fog);
+	draw_render_layer(_collection_type_0, _render_layer_transparent);
+	draw_render_layer(_collection_type_0, _render_layer_hologram);
 
 	primitive_list->m_render_layer_flags = primitive_list->m_render_layer_flags_backup;
 	primitive_list->m_field_C = 0;

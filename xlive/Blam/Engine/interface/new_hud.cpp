@@ -26,7 +26,7 @@ std::vector<point2d> crosshair_original_bitmap_sizes;	// We use point2d struct t
 bool __cdecl render_ingame_chat_check(void);
 
 // Hook for ui_get_hud_elements for modifying the hud anchor for text
-void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bounds);
+real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point);
 
 // Stores the bitmap width and height in crosshair_original_bitmap_sizes for use when scaling the crosshair bitmaps
 void initialize_crosshair_bitmap_data(void);
@@ -56,7 +56,7 @@ void new_hud_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x226628), render_ingame_chat_check);
 
 	// Hook ui_get_hud_elements for modifying the hud anchor for text
-	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_elemet_bounds_hook);
+	PatchCall(Memory::GetAddress(0x22D25A), ui_get_hud_element_position_hook);
 	return;
 }
 
@@ -155,10 +155,10 @@ bool __cdecl render_ingame_chat_check(void)
 	}
 }
 
-void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bounds)
+real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real_point2d* point)
 {
 	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
-	s_camera* camera_data = get_global_camera();
+	s_camera* global_camera = get_global_camera();
 
 	real32 scale_factor = *get_secondary_hud_scale();
 
@@ -167,14 +167,14 @@ void __cdecl ui_get_hud_elemet_bounds_hook(e_hud_anchor anchor, real_bounds* bou
 	switch (anchor)
 	{
 	case _hud_anchor_weapon_hud:
-		bounds->lower = (float)camera_data->window_bounds.left + safe_area;
-		bounds->upper = (float)camera_data->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
+		point->x = (real32)global_camera->window_bounds.left + safe_area;
+		point->y = (real32)global_camera->window_bounds.top + (safe_area / scale_factor); // (100.f * scale_factor) - 100.f;
 		break;
 	default:
-		INVOKE(0x223969, 0x0, ui_get_hud_elemet_bounds_hook, anchor, bounds);
+		INVOKE(0x223969, 0x0, ui_get_hud_element_position_hook, anchor, point);
 		break;
 	}
-	return;
+	return point;
 }
 
 void initialize_crosshair_bitmap_data(void)

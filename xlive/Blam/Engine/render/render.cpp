@@ -22,6 +22,19 @@
 #include "scenario/scenario_fog.h"
 #include "structures/structures.h"
 
+/* type definitions */
+typedef bool (__cdecl* t_draw_ingame_user_interface_element)(
+    real32 left,
+    real32 top,
+    int16 x,
+    int16 y,
+    real32 scale,
+    real32 rotation_rad,
+    int32 bitmap_tag_index,
+    int32 bitmap,
+    real32* a9,
+    int32 shader_tag_index);
+
 /* prototypes */
 
 int32* get_global_window_bound_index(void);
@@ -37,6 +50,18 @@ int32* global_sky_index_get(void);
 s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
 void __cdecl rasterizer_render_scene(bool is_texture_camera);
+
+bool __cdecl draw_ingame_user_interface_element_hook(
+    real32 left,
+    real32 top,
+    int16 x,
+    int16 y,
+    real32 scale,
+    real32 rotation_rad,
+    int32 bitmap_tag_index,
+    int32 bitmap,
+    real32* a9,
+    int32 shader_tag_index);
 
 void render_view(
     real_rectangle2d* frustum_bounds,
@@ -61,10 +86,14 @@ void render_view(
 
 /* public code */
 
+t_draw_ingame_user_interface_element p_draw_ingame_user_interface_element;
+
 void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
+
+    DETOUR_ATTACH(p_draw_ingame_user_interface_element, Memory::GetAddress<t_draw_ingame_user_interface_element>(0x221E3B), draw_ingame_user_interface_element_hook);
 
     // ### FIXME re-enable text/user interface text
     // *Memory::GetAddress<bool*>(0x46818E) = false;
@@ -127,7 +156,7 @@ bool frame_parameters_type_is_above_or_equal_to_7(void)
     return global_frame_parameters_get()->frame_type - 5 <= 2;
 }
 
-void draw_specific_render_layer(e_collection_type collection_type, e_render_layer render_layer)
+void draw_render_layer(e_collection_type collection_type, e_render_layer render_layer)
 {
     ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
     ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
@@ -299,12 +328,12 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 	vc[0].i = 2.0f / (real32)width; // x
 	vc[0].j = 0.0f;
 	vc[0].k = 0.0f;
-	vc[0].w = -(1.0f / (real32)width + 1.0f) - ((real32)global_camera->viewport_bounds.left * 2.0f / width); // offset from x
+	vc[0].w = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
 
 	vc[1].i = 0.0f;
 	vc[1].j = -(2.0f / (real32)height); // y
 	vc[1].k = 0.0f;
-	vc[1].w = (1.0f / (real32)height + 1.0f) + ((real32)global_camera->viewport_bounds.top * 2.0f / height); // offset from y
+	vc[1].w = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
 
 	vc[2].i = 0.0f;
 	vc[2].j = 0.0f;
@@ -325,9 +354,25 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 	// avoid unnecessary API calls by testing the user mode memory cache
 	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))
 	{
-		global_d3d_device->SetVertexShaderConstantF(177, (real32*)vc, NUMBEROF(vc));
+		global_d3d_device->SetVertexShaderConstantF(177, (const real32*)vc, NUMBEROF(vc));
 	}
     return;
+}
+
+bool __cdecl draw_ingame_user_interface_element_hook(
+    real32 left,
+    real32 top,
+    int16 x,
+    int16 y,
+    real32 scale,
+    real32 rotation_rad,
+    int32 bitmap_tag_index,
+    int32 bitmap,
+    real32* a9,
+    int32 shader_tag_index)
+{
+    rasterizer_setup_2d_vertex_shader_user_interface_constants();
+    return p_draw_ingame_user_interface_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, a9, shader_tag_index);
 }
 
 void render_view(
@@ -412,7 +457,6 @@ void render_view(
 
             rasterizer_dx9_perf_event_begin("interface", NULL);
             rasterizer_dx9_set_stencil_mode(0);
-            rasterizer_setup_2d_vertex_shader_user_interface_constants();
             hud_draw_screen();
             rasterizer_dx9_render_screen_flash();
             render_menu_user_interface_to_usercall(0, controller_index, NONE, &camera->viewport_bounds);

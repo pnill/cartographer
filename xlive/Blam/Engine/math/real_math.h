@@ -5,13 +5,6 @@
 #define DEGREES_TO_RADIANS(angle) ((real32)((angle) * M_PI / 180.0))
 #define RADIANS_TO_DEGREES(angle) ((real32)((angle) * 180.0 / M_PI))
 
-union real_point2d
-{
-	real32 v[2];
-	struct { real32 x, y; };
-};
-ASSERT_STRUCT_SIZE(real_point2d, sizeof(real32) * 2);
-
 typedef real32 real_angle;
 
 union real_euler_angles2d
@@ -32,8 +25,11 @@ union real_vector2d
 {
 	real32 v[2];
 	struct { real32 i, j; };
+	struct { real32 x, y; };
 };
 ASSERT_STRUCT_SIZE(real_vector2d, sizeof(real32) * 2);
+
+typedef real_vector2d real_point2d;
 
 union real_vector3d
 {
