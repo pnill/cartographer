@@ -383,6 +383,10 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_text_entry.cpp" />
     <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_friends.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_favorites.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_user_history.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_achievements.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -495,7 +499,6 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
-    <ClInclude Include="Blam\Cache\TagGroups\character_definition.hpp" />
     <ClInclude Include="Blam\Engine\tag_files\files_windows.h" />
     <ClInclude Include="Blam\Engine\game\game_time.h" />
     <ClInclude Include="Blam\Engine\hs\hs.h" />
@@ -1030,6 +1033,11 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text_entry.h" />
     <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
+    <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
+    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_friends.h" />
+    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_favorites.h" />
+    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_achievements.h" />
+    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_user_history.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

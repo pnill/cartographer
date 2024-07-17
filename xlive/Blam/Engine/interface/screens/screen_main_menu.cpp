@@ -7,7 +7,11 @@
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_widget_text.h"
+#include "interface/user_interface_guide.h"
+#include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
+#include "Networking/transport/transport.h"
+#include "Networking/panaroma/panorama_friends.h"
 #include "tag_files/global_string_ids.h"
 #include "shell/shell.h"
 
@@ -49,6 +53,8 @@ enum e_main_menu_list_skin_texts
 /* forward declarations*/
 
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index);
+bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index);
+bool __cdecl screen_show_screen_4way_signin_xbox_live_callback();
 
 
 c_main_menu_list::c_main_menu_list(int16 user_flags) :
@@ -203,7 +209,60 @@ bool c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 
 bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0xB257, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	//return INVOKE_TYPE(0xB257, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+
+	//disabling activation check as we dont need it
+	/*
+	XLivePBufferGetByte(dword_879E78, 0, &game_activated);
+	if (!game_activated)
+		return true;
+	*/
+
+	bool success = true;
+
+	c_networking_panaroma_friends* friends = get_networking_panaroma_friends();
+	if (!friends->has_active_task())
+	{
+		friends->initialize_startup();
+	}
+
+	//xbox checks if there are any live-controllers signed in
+	//h2v on the other hand checks for live-connection-status and the flag
+	if (online_connected_to_xbox_live() || shell_startup_flag_is_set(_startup_flag_unlock_xbox_live_menus))
+	{
+		s_screen_parameters params;
+		params.m_flags = 0;
+		params.m_window_index = _window_4;
+		params.field_C = 0;
+		params.user_flags = FLAG((*pevent)->controller);
+		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_screen_state.field_0 = 0xFFFFFFFF;
+		params.m_screen_state.field_4 = 0xFFFFFFFF;
+		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		//params.m_load_function = &c_screen_bungie_news::load; // replacing with 4way_screen
+		params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
+
+		params.m_load_function(&params);
+
+		return success;
+	}
+
+	if (transport_available())
+	{
+		user_interface_guide_state_manager_get()->add_user_signin_task(true, screen_show_screen_4way_signin_xbox_live_callback);
+	}
+	else
+	{
+		screen_error_ok_dialog_show(
+			_user_interface_channel_type_game_error,
+			_ui_error_xblive_cannot_access_service,
+			_window_4,
+			FLAG((*pevent)->controller),
+			nullptr,
+			nullptr);
+	}
+
+	return success;
 }
 
 bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
@@ -252,7 +311,61 @@ bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 
 bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0xA978, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	//return INVOKE_TYPE(0xA978, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+
+	bool success = true;
+	if (user_interface_globals_is_beta_build())
+	{
+		screen_error_ok_dialog_show(
+			_user_interface_channel_type_game_error,
+			_ui_error_beta_feature_disabled,
+			_window_4,
+			FLAG((*pevent)->controller),
+			nullptr,
+			nullptr);
+
+		return success;
+	}
+
+	if (online_connected_to_xbox_live())
+	{
+		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
+			_user_interface_channel_type_interface,
+			_window_4,
+			FLAG((*pevent)->controller),
+			screen_show_screen_4way_signin_system_link_offline,
+			_ui_error_confirm_xbox_live_sign_out);
+
+		return success;
+	}
+
+	if(transport_available())
+	{
+		s_screen_parameters params;
+		params.m_flags = 0;
+		params.m_window_index = _window_4;
+		params.field_C = 0;
+		params.user_flags = FLAG((*pevent)->controller);
+		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_screen_state.field_0 = 0xFFFFFFFF;
+		params.m_screen_state.field_4 = 0xFFFFFFFF;
+		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+
+		params.m_load_function(&params);
+	}
+	else
+	{
+		screen_error_ok_dialog_show(
+			_user_interface_channel_type_game_error,
+			_ui_error_network_link_required,
+			_window_4,
+			user_interface_controller_get_signed_in_controllers_mask(),
+			nullptr,
+			nullptr);
+	}
+
+	return success;
 }
 
 bool c_main_menu_list::handle_item_settings(s_event_record** pevent)
@@ -282,8 +395,7 @@ void c_main_menu_list::apply_instance_patches()
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
 
-	//user_interface_controller_sign_out_all_controllers();
-	XUserSignOut(_controller_index_0);
+	user_interface_transition_to_offline();
 	
 	if (user_interface_controller_get_signed_in_controller_count() <= 0)
 	{
@@ -305,5 +417,53 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 		params.m_load_function(&params);
 	}
 
+	return true;
+}
+
+bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index)
+{
+	user_interface_transition_to_offline();
+
+	if (user_interface_controller_get_signed_in_controller_count() <= 0)
+	{
+		user_interface_enter_game_shell(0);
+	}
+	else
+	{
+		s_screen_parameters params;
+		params.m_flags = 0;
+		params.m_window_index = _window_4;
+		params.field_C = 0;
+		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
+		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_screen_state.field_0 = 0xFFFFFFFF;
+		params.m_screen_state.field_4 = 0xFFFFFFFF;
+		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+
+		params.m_load_function(&params);
+	}
+
+	return true;
+}
+
+bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
+{
+	if (!UserSignedOnline(_controller_index_0))
+		return true;
+	
+
+	s_screen_parameters params;
+	params.m_flags = 0;
+	params.m_window_index = _window_4;
+	params.field_C = 0;
+	params.user_flags = NONE;// allow all
+	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.field_4 = 0xFFFFFFFF;
+	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
+
+	params.m_load_function(&params);
 	return true;
 }

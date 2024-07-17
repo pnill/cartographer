@@ -12,3 +12,4 @@ void GSCustomMenuCall_Invalid_Login_Token();
 extern bool CMForce_Update;
 
 void GSCustomMenuCall_Obscure();
+void XUiShowSignInH2();

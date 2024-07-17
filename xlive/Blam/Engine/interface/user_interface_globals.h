@@ -11,3 +11,4 @@ void* __cdecl c_screen_bungie_news_load(s_screen_parameters* params);
 void* __cdecl c_screen_network_squad_browser_load(s_screen_parameters* params);
 void* __cdecl c_screen_single_player_level_select_load_lobby(s_screen_parameters* parameters);
 void* __cdecl c_screen_single_player_difficulty_select_load_lobby(s_screen_parameters* parameters);
+void* __cdecl c_screen_press_start_introduction_load(s_screen_parameters* parameters);

@@ -32,6 +32,19 @@ wchar_t* ustrnzcat(wchar_t* dst, const wchar_t* src, size_t count)
 	return wcsncat(dst, src, count);
 }
 
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
+{
+	va_list va_args;
+	va_start(va_args, format);
+
+	ASSERT(string != NULL);
+	ASSERT(size > 0);
+
+	int32 result = _vsnwprintf_s(string, size - 1, UINT_MAX, format, va_args);
+	va_end(va_args);
+	return result;
+}
+
 void wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int buffer_count)
 {
 	typedef void (__cdecl* wchar_string_to_utf8_string_t)(const wchar_t*, utf8*, int);

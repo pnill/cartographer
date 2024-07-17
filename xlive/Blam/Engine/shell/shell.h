@@ -14,7 +14,7 @@ enum e_startup_flags : int
 	_startup_flag_d3d9ex_enabled, // allows the d3d ex version to be used instead
 	_startup_flag_disable_hardware_vertex_processing, // force hardware vertex processing off
 	_startup_flag_novsync,
-	_startup_flag_unk6, // squad browser/xlive/ui?
+	_startup_flag_unlock_xbox_live_menus, // allows access to xbox live menus even in offline
 	_startup_flag_nointro, // disables intro movie
 	_startup_flag_unk8, // some tag thing?
 	_startup_flag_unk9, // some tag thing?

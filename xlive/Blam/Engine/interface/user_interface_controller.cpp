@@ -188,8 +188,6 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 		if (controller_idx == master_controller_index)
 			continue;
 
-		//	if(g_user_interface_controller_globals->controllers[controller_idx].m_flags.test(_controller_state_has_xbox_live_bit))
-		//	we dont use xbox live sign in in cartographer , but we should do when online
 
 		if (g_user_interface_controller_globals->controllers[controller_idx].m_flags.test(_controller_state_has_xbox_live_bit))
 		{
@@ -208,6 +206,24 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 
 }
 
+void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active)
+{
+	//INVOKE(0x208A01, 0x0, user_interface_controller_xbox_live_account_set_signed_in, controller_index, active);
+	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	if (active)
+	{
+		controller->m_flags.set(_controller_state_has_xbox_live_bit, true);
+	}
+	else
+	{
+		controller->m_flags.set(_controller_state_has_xbox_live_bit, false);
+
+		// not calling update_name here to prevent recursion lock
+		//user_interface_controller_update_player_name(controller_index);
+	}
+}
+
+
 void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index)
 {
 	// INVOKE(0x208312, 0x0, user_interface_controller_update_player_name, controller_index);
@@ -222,7 +238,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
 			c_static_wchar_string32 format;
 			global_string_resolve_stringid_to_value(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
-			swprintf(controller->player_name.get_buffer(),
+			usnzprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				format.get_string(),
 				guest_no,
@@ -231,11 +247,15 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		}
 		else
 		{
-			swprintf(controller->player_name.get_buffer(),
+			usnzprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				L"%hs",
 				guide->m_gamertag);
+
 		}
+
+		//todo move this out of here and figure out why the guide live signin fails to set the bit
+		user_interface_controller_xbox_live_account_set_signed_in(controller_index, true);
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{

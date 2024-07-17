@@ -363,6 +363,22 @@ bool __cdecl user_inteface_sign_out_controller_default_callback(e_controller_ind
 	user_interface_controller_sign_out(controller_index);
 	return true;
 }
+bool __cdecl user_inteface_decline_invite_callback(e_controller_index controller_index)
+{
+	s_screen_parameters params;
+	params.m_flags = 0;
+	params.m_window_index = _window_4;
+	params.field_C = 0;
+	params.user_flags = FLAG(controller_index);
+	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.field_4 = 0xFFFFFFFF;
+	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_load_function = c_screen_press_start_introduction_load;
+
+	params.m_load_function(&params);
+	return true;
+}
 
 bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 {
@@ -485,14 +501,16 @@ bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 		}
 		user_interface_controller_pick_profile_dialog(event->controller, online);
 	}
-	else if (event->component == _user_interface_controller_component_button_b 
+	else if ((event->component == _user_interface_controller_component_button_b 
 		|| event->component == _user_interface_controller_component_button_back)
+		&& !user_interface_controller_get_signed_in_controller_count())
 	{
-		user_interface_error_display_ok_cancle_dialog_with_ok_callback(_user_interface_channel_type_interface,
+		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
+			_user_interface_channel_type_interface,
 			_window_4,
 			FLAG(event->controller),
-			user_interface_mainmenu_sign_out_controller_callback,
-			_ui_error_confirm_controller_sign_out);
+			user_inteface_decline_invite_callback,
+			_ui_confirm_decline_crossgame_invite);
 	}
 	return true;
 }
