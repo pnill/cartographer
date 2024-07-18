@@ -309,9 +309,9 @@ void get_map_download_source(int a1, wchar_t* out_string)
 	This is hooked to fix/re-add removed custom map images.
 */
 void* user_interface_data = nullptr;
-void __declspec(naked) load_map_data_for_display() {
+void __declspec(naked) load_map_data_for_display_nak() {
 	__asm {
-		mov eax, [esp + 0x10] // grab map_data pointer from stack
+		mov eax, [esp + 4 + 0xC] // grab map_data pointer from stack (callee frame)
 		mov ecx, [eax + 0x964] // mov bitmap pointer into ecx
 		mov[ebx], ecx // mov bitmap pointer into map_data on stack
 		mov eax, user_interface_data
@@ -338,7 +338,7 @@ void MapManager::ApplyPatches() {
 		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
 
 		//Hooked to fix custom map images.
-		Codecave(Memory::GetAddress(0x593F0), load_map_data_for_display, 0);
+		PatchCall(Memory::GetAddress(0x593F0), load_map_data_for_display_nak);
 		user_interface_data = Memory::GetAddress<void*>(0x9712C8);
 	}
 	
@@ -350,15 +350,15 @@ void MapManager::ApplyPatches() {
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
 
 	// custom map cache patches/hooks
-	s_custom_map_data::ApplyCustomMapExtensionLimitPatches();
+	c_custom_map_manager::ApplyCustomMapExtensionLimitPatches();
 }
 
 /**
 * Actually calls the real map reload function in halo2.exe
 */
 void MapManager::ReloadAllMaps() {
-	getCustomMapData()->load_custom_map_data_cache();
-	getCustomMapData()->start_custom_map_sync();
+	get_custom_map_manager()->load_custom_map_data_cache();
+	get_custom_map_manager()->start_custom_map_sync();
 }
 
 bool MapManager::GetMapFilename(std::wstring& buffer) {
@@ -434,7 +434,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 	CURL *curl = nullptr;
 	CURLcode res;
 
-	std::wstring mapFilePathWide(getCustomMapFolderPath());
+	std::wstring mapFilePathWide(get_custom_map_folder_path());
 	std::string nonUnicodeMapFilePath(mapFilePathWide.begin(), mapFilePathWide.end());
 	nonUnicodeMapFilePath += m_clientMapFilename;
 
@@ -468,7 +468,7 @@ bool MapDownloadQuery::DownloadFromRepo() {
 
 		if (res == CURLE_OK)
 		{
-			if (http_code != 404 && getCustomMapData()->add_custom_map_entry_by_map_file_path(mapFilePathWide + m_clientMapFilenameWide)) {
+			if (http_code != 404 && get_custom_map_manager()->add_custom_map_entry_by_map_file_path(mapFilePathWide + m_clientMapFilenameWide)) {
 				//if we succesfully downloaded the map, return true
 				return true;
 			}
