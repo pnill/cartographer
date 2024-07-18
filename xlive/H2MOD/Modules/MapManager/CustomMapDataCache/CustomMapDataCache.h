@@ -90,7 +90,7 @@ struct s_custom_map_data
 			s_custom_map_entry* new_custom_map_entries_buffer;
 			s_custom_map_file_cache* custom_map_file_data_cache;
 		};
-		// we replace this buffer bellow with a pointer to some dynamic heap allocated memory
+		// we replace this buffer below with a pointer to some dynamic heap allocated memory
 		s_custom_map_entry custom_map_entries[VANILLA_MAP_LIMIT];
 	};
 

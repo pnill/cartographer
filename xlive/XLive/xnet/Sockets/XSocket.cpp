@@ -741,7 +741,7 @@ int XSocket::SetBufferSize(int optname, INT bufSize)
 
 	LOG_TRACE_NETWORK("{} - getsockopt() - {}: {} - {}", __FUNCTION__, sockOpt_string(optname), bufOpt, bufSize);
 
-	// this may only affect Windows 7/Server 2008 R2 and bellow, as Windows 10 uses an 64K buffer already
+	// this may only affect Windows 7/Server 2008 R2 and below, as Windows 10 uses an 64K buffer already
 	if (bufOpt < bufSize)
 	{
 		bufOpt = bufSize; // set the recvbuf to needed size

@@ -558,7 +558,7 @@ void SaveH2Config() {
 				"# teams_enabled_bit_flags (Server)"
 				"\n# By default, the game reads team bitflags from the current map."
 				"\n# With this option, you can enable which teams are enabled."
-				"\n# Each bit corresponds to a team. Example bellow where we disable Blue, Green and Pink teams:"
+				"\n# Each bit corresponds to a team. Example below where we disable Blue, Green and Pink teams:"
 				"\n# Teams:   Red  Blue  Yellow  Green  Purple  Orange  Brown  Pink"
 				"\n#           |     |     |       |       |       |      |      |  "
 				"\n#          \\/    \\/    \\/      \\/      \\/      \\/     \\/     \\/  "

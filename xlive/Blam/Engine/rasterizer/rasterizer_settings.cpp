@@ -97,7 +97,7 @@ void create_new_display_setting_array()
 
 		bool populate_setting = true;
 
-		// discard anything bellow 640x480 (which is already very low res)
+		// discard anything below 640x480 (which is already very low res)
 		if (screen.dmPelsWidth < 640
 			|| screen.dmPelsHeight < 480)
 		{

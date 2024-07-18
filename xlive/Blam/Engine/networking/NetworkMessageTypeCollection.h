@@ -56,7 +56,7 @@ enum e_network_message_type_collection : unsigned int
 	_text_chat,
 	_test,
 
-	// custom network meesages bellow
+	// custom network meesages below
 	_request_map_filename,
 	_custom_map_filename,
 	_team_change,
@@ -118,7 +118,7 @@ static const char* network_message_type_collection_name[] = {
 	"text_chat",
 	"test",
 
-	//custom packets bellow
+	//custom packets below
 	"request_map_filename",
 	"map_file_name",
 	"team_change",

@@ -78,7 +78,7 @@ void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, 
 	void(__thiscall * sub_38F7A)(void*, int, int) = (void(__thiscall*)(void*, int, int))((char*)H2BaseAddr + 0x38F7A);
 
 	// VirtualKeyboardTypes - original
-	// -1 allows all symbols and does not check the output string if valid for any purpose as bellow options do
+	// -1 allows all symbols and does not check the output string if valid for any purpose as below options do
 
 	// 0 to 4 - profile name
 	// 5,6 - variant name

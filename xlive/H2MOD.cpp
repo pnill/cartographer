@@ -249,7 +249,7 @@ void H2MOD::disable_score_announcer_sounds(int sound_flags)
 					runtime_tag_block_data->slayer_events.data = 0;
 				}
 
-				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code bellow
+				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code below
 				{
 					for (int i = 0; i < runtime_tag_block_data->general_events.count; i++)
 					{
@@ -873,7 +873,7 @@ void H2MOD::ApplyHooks() {
 	DETOUR_ATTACH(p_object_deplete_body_internal, Memory::GetAddress<object_deplete_body_internal_t>(0x17B674, 0x152ED4), OnObjectDamage);
 	DETOUR_ATTACH(p_get_enabled_teams_flags, Memory::GetAddress<get_enabled_teams_flags_t>(0x1B087B, 0x19698B), get_enabled_team_flags);
 
-	// bellow hooks applied to specific executables
+	// below hooks applied to specific executables
 	if (!Memory::IsDedicatedServer()) {
 
 		LOG_INFO_GAME("{} - applying client hooks", __FUNCTION__);
