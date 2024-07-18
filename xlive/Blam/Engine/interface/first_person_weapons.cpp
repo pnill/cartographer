@@ -458,7 +458,7 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                 const c_model_animation* weapon_state_animation = weapon_channel.get_state_animation();
                 string_id state_name = weapon_data->animation_manager.get_state_name();
                 if (weapon_definition->weapon_type == _weapon_type_needler &&
-                    (state_name == HS_RELOAD_EMPTY || state_name == HS_RELOAD_FULL))
+                    (state_name == _string_id_reload_empty || state_name == _string_id_reload_full))
                 {
                     int16 rounds_loaded_maximum = weapon->magazines[0].rounds_loaded_maximum;
                     int16 ammunition_result = weapon->magazines[0].field_4 - weapon->magazines[0].field_2;

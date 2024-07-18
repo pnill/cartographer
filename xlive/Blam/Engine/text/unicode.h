@@ -15,6 +15,8 @@ wchar_t* ustrnzcpy(wchar_t* dst, const wchar_t* src, size_t count);
 // TODO add asserts in the future
 wchar_t* ustrnzcat(wchar_t* dst, const wchar_t* src, size_t count);
 
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...);
+
 // Converts a wide char string to a utf8 string with the specified length
 void wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int buffer_count);
 

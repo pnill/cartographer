@@ -26,7 +26,9 @@ public:
 	XSESSION_INFO m_xsession_info;
 	bool m_from_game_invite;
 	char m_gamertag[XUSER_NAME_SIZE];
-	char m_gap_10[1166];
+	uint8 gap_5E[2];
+	void* m_callback_task;
+	uint8 gap_64[1160];
 	s_user_interface_guide_state_manager_string m_strings[4];
 	char m_gap_5DC[12];
 	XOVERLAPPED m_xoverlapped;
@@ -34,6 +36,8 @@ public:
 	bool m_unk_bool_608;
 	bool m_unk_bool_609;
 	char m_pad_609[6];
+
+	void add_user_signin_task(bool sign_to_live, void* signin_callback);
 };
 #pragma pack(pop)
 ASSERT_STRUCT_SIZE(c_user_interface_guide_state_manager, 1552);

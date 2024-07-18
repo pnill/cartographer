@@ -263,7 +263,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 
 				// this shit apparently is not converted back to a vector that
 				// - defines the velocity in units per seconds instead of units per tick
-				// either some numb nut at bungie forgot to add the line bellow or it was intentional
+				// either some numb nut at bungie forgot to add the line below or it was intentional
 				// so we just convert the current velocity and deceleration to 30 tick values
 				// and output them like that
 				// output->out_translational_velocity = output->out_translational_velocity * (real32)time_globals::get()->ticks_per_second;

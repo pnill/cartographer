@@ -149,21 +149,96 @@ bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index c
 	return true;
 }
 
+bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller_index)
+{
+	if (VALID_INDEX(controller_index, k_number_of_controllers))
+	{
+		return input_has_gamepad(controller_index, nullptr);
+		//return input_has_gamepad_plugged(controller_index);
+	}
+	return false;
+}
+
+bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index)
+{
+	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
+	XUID* identifier = (XUID*)&g_user_interface_controller_globals->controllers[controller_index].controller_user_identifier;
+	if (!ONLINE_USER_VALID(*identifier))
+		return false;
+
+	return online_xuid_is_guest_account(*identifier);
+}
+
+uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(e_controller_index master_controller_index)
+{
+	if (user_interface_controller_is_guest(master_controller_index))
+		return 0;
+
+
+	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
+	XUID master_identifier = *(XUID*)&g_user_interface_controller_globals->controllers[master_controller_index].controller_user_identifier;
+	if (!ONLINE_USER_VALID(master_identifier))
+		return 0;
+
+	uint32 count = 0;
+	for (e_controller_index controller_idx = first_controller();
+		controller_idx != k_no_controller;
+		controller_idx = next_controller(controller_idx))
+	{
+		if (controller_idx == master_controller_index)
+			continue;
+
+
+		if (g_user_interface_controller_globals->controllers[controller_idx].m_flags.test(_controller_state_has_xbox_live_bit))
+		{
+			s_player_identifier player_id = g_user_interface_controller_globals->controllers[controller_idx].controller_user_identifier;
+			XUID compare_id = *(XUID*)&g_user_interface_controller_globals->controllers[controller_idx].controller_user_identifier;
+			if (!ONLINE_USER_VALID(compare_id))
+				continue;
+
+			if ((compare_id & ~0x3ULL) == (master_identifier & ~0x3ULL))
+				count++;
+		}
+
+	}
+
+	return count;
+
+}
+
+void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active)
+{
+	//INVOKE(0x208A01, 0x0, user_interface_controller_xbox_live_account_set_signed_in, controller_index, active);
+	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
+	if (active)
+	{
+		controller->m_flags.set(_controller_state_has_xbox_live_bit, true);
+	}
+	else
+	{
+		controller->m_flags.set(_controller_state_has_xbox_live_bit, false);
+
+		// not calling update_name here to prevent recursion lock
+		//user_interface_controller_update_player_name(controller_index);
+	}
+}
+
+
 void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index)
 {
 	// INVOKE(0x208312, 0x0, user_interface_controller_update_player_name, controller_index);
 
 	s_user_interface_controller* controller = &user_interface_controller_globals_get()->controllers[controller_index];
 	c_user_interface_guide_state_manager* guide = user_interface_guide_state_manager_get();
-	if (guide->m_sign_in_state == eXUserSigninState_SignedInToLive)
+	if (online_connected_to_xbox_live())
 	{
 		XUID* controller_xuid = (XUID*)(&controller->controller_user_identifier);
 		if (online_xuid_is_guest_account(*controller_xuid))
 		{
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
 			c_static_wchar_string32 format;
-			global_string_resolve_stringid_to_value(HS_GUEST_OF_ASCII_GAMERTAG_UNICODE_FORMAT_STRING, format.get_buffer());// %d %hs
-			swprintf(controller->player_name.get_buffer(),
+			global_string_resolve_stringid_to_value(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
+			usnzprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				format.get_string(),
 				guest_no,
@@ -172,11 +247,15 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		}
 		else
 		{
-			swprintf(controller->player_name.get_buffer(),
+			usnzprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				L"%hs",
 				guide->m_gamertag);
+
 		}
+
+		//todo move this out of here and figure out why the guide live signin fails to set the bit
+		user_interface_controller_xbox_live_account_set_signed_in(controller_index, true);
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{
@@ -193,6 +272,7 @@ void user_inteface_controller_apply_patches()
 {
 	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match
+	WriteValue<uint8>(Memory::GetAddress(0x20CEB5 + 6), 0); // disable _ui_error_demo_version_no_more_for_you
 }
 
 

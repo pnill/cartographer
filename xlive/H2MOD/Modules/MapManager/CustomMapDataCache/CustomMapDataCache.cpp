@@ -842,7 +842,7 @@ public:
 		if (custom_map_available_count > 0)
 		{
 			*custom_map_menu_list = c_list_widget::allocate_list_data("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
-			s_data_array::data_make_valid(*custom_map_menu_list);
+			data_make_valid(*custom_map_menu_list);
 			map_ids_buffer = new s_custom_map_id[custom_map_available_count];
 			getCustomMapData()->get_custom_map_list_ids(map_ids_buffer, custom_map_available_count);
 		}
@@ -856,7 +856,7 @@ public:
 		{
 			for (int i = custom_map_available_count - 1; i >= 0; i--)
 			{
-				s_custom_map_id* list_entry = (s_custom_map_id*)((*custom_map_menu_list)->data + (sizeof(s_custom_map_id) * DATUM_INDEX_TO_ABSOLUTE_INDEX(s_data_array::datum_new_in_range(*custom_map_menu_list))));
+				s_custom_map_id* list_entry = (s_custom_map_id*)((*custom_map_menu_list)->data + (sizeof(s_custom_map_id) * DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_new(*custom_map_menu_list))));
 				memcpy(list_entry, &map_ids_buffer[i], sizeof(s_custom_map_id));
 			}
 		}

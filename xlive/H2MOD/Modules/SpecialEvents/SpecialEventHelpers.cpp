@@ -51,7 +51,7 @@ void add_hat_to_model(datum player_hlmt_datum, datum hat_scenery_datum, bool is_
 	auto hlmt = tags::get_tag_fast<s_model_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];
 	auto hat = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
-	hat->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
+	hat->parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
 	hat->child_object.group.group = _tag_group_scenery;
 	hat->child_object.index = hat_scenery_datum;
 }
@@ -63,7 +63,7 @@ void add_hat_and_beard_to_model(datum player_hlmt_datum, datum hat_scenery_datum
 	auto hlmt = tags::get_tag_fast<s_model_definition>(player_hlmt_datum);
 	auto variant = hlmt->variants[0];
 	auto beard = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(variant->objects));
-	beard->parent_marker = (is_elite == false ? string_id(e_global_string_id::HS_HEAD) : new_elite_head_marker);
+	beard->parent_marker = (is_elite == false ? string_id(_string_id_head) : new_elite_head_marker);
 	beard->child_object.group.group = _tag_group_scenery;
 	beard->child_object.index = beard_scenery_datum;
 }

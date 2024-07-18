@@ -178,7 +178,7 @@ public:
 		return (this->* * pFn)();
 	}
 
-	// bellow class_type's specific virtual functions
+	// below class_type's specific virtual functions
 
 	virtual void IUnkFunc22()
 	{

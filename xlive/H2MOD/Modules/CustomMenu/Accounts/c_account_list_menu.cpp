@@ -92,10 +92,10 @@ c_account_edit_list::c_account_edit_list(int _flags, int _account_count, int _de
 	s_data_array* account_list_data = allocate_list_data("account list edit list", button_count, 4);
 	this->list_data_array = account_list_data;
 
-	s_data_array::data_make_valid(account_list_data);
+	data_make_valid(account_list_data);
 
 	for (int32 i = 0; i < this->list_data_array->datum_max_elements; i++) {
-		s_data_array::datum_new_in_range(this->list_data_array);
+		datum_new(this->list_data_array);
 	}
 
 	// no fucking clue what's this, maybe related to this->slot_2_unk.c_slot_vtbl data offset

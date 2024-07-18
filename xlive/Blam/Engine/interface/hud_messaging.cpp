@@ -35,6 +35,18 @@ __declspec(naked) void ui_hud_left_messaging_top_scale()
 
 void hud_messaging_apply_hooks(void)
 {
+	// remove checks preventing pick-up messaging from displaying
+	// in splitscreen mode
+	NopFill(Memory::GetAddress(0x2217BE), 10);
+	NopFill(Memory::GetAddress(0x221879), 10);
+	NopFill(Memory::GetAddress(0x220DF7), 10);
+	NopFill(Memory::GetAddress(0x220DAC), 10);
+
+	// nop call + cmp
+	NopFill(Memory::GetAddress(0x5D928), 8);
+	// force jmp
+	WriteValue(Memory::GetAddress(0x5D930), (uint8)0xEB);
+
 	p_text_scale_factor = get_secondary_hud_scale();
 	Codecave(Memory::GetAddress(0x22D29E), ui_hud_left_messaging_top_scale, 3);
 	return;

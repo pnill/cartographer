@@ -6,6 +6,8 @@
 s_input_abstraction_globals* input_abstraction_globals;
 extern uint16 radialDeadzone;
 
+s_abstract_input_button_state g_abstract_input_button_hold_state[k_number_of_controllers][NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
+
 void __cdecl input_abstraction_initialize()
 {
 	INVOKE(0x61D43, 0x0, input_abstraction_initialize);
@@ -332,6 +334,10 @@ void __cdecl input_abstraction_update()
 			any_gamepad_connected = true;
 	}
 
+	DIMOUSESTATE2 old_mouse_state;
+	uint16 old_mouse_buttons[8];
+	s_keyboard_input_state old_keyboard_state;
+
 	if (any_gamepad_connected)
 	{
 
@@ -339,11 +345,32 @@ void __cdecl input_abstraction_update()
 			controller != k_no_controller;
 			controller = next_controller(controller))
 		{
-
 			left_stick.yaw = 0.0f;
 			left_stick.pitch = 0.0f;
 			right_stick.yaw = 0.0f;
 			right_stick.pitch = 0.0f;
+
+			if (controller > _controller_index_0 && controller == _controller_index_1)
+			{
+				DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+
+				if (mouse_state)
+				{
+					csmemcpy(&old_mouse_state, mouse_state, sizeof(*mouse_state));
+					csmemset(mouse_state, 0, sizeof(*mouse_state));
+
+					uint16* mouse_buttons = input_get_mouse_button_state();
+
+					if (mouse_buttons)
+					{
+						csmemcpy(old_mouse_buttons, mouse_buttons, sizeof(old_mouse_buttons));
+						csmemset(mouse_buttons, 0, sizeof(old_mouse_buttons));
+					}
+				}
+
+				csmemcpy(&old_keyboard_state, &input_globals->keyboard, sizeof(input_globals->keyboard));
+				csmemset(&input_globals->keyboard, 0, sizeof(input_globals->keyboard));
+			}
 
 			s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 			s_game_input_state* abstracted_input_state = &input_abstraction_globals->input_states[controller];
@@ -374,6 +401,11 @@ void __cdecl input_abstraction_update()
 
 			if (input_has_gamepad_plugged(controller))
 			{
+				csmemcpy(
+					Memory::GetAddress<s_abstract_input_button_state*>(0x4AE3B0), 
+					g_abstract_input_button_hold_state[controller],
+					sizeof(g_abstract_input_button_hold_state[controller]));
+
 				input_abstraction_update_input_state(
 					controller,
 					preference,
@@ -381,8 +413,29 @@ void __cdecl input_abstraction_update()
 					&left_stick,
 					&right_stick,
 					abstracted_input_state);
+
+				csmemcpy(
+					g_abstract_input_button_hold_state[controller], 
+					Memory::GetAddress<s_abstract_input_button_state*>(0x4AE3B0), 
+					sizeof(g_abstract_input_button_hold_state[controller]));
 			}
 
+
+			if (controller == _controller_index_3)
+			{
+				DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+				if (mouse_state)
+				{
+					csmemcpy(mouse_state, &old_mouse_state, sizeof(*mouse_state));
+
+					uint16* mouse_buttons = input_get_mouse_button_state();
+					if (mouse_buttons)
+					{
+						csmemcpy(mouse_buttons, old_mouse_buttons, sizeof(input_globals->mouse_buttons));
+					}
+				}
+				csmemcpy(&input_globals->keyboard, &old_keyboard_state, sizeof(input_globals->keyboard));
+			}
 		}
 	}
 	else

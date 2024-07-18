@@ -71,7 +71,7 @@ void c_animation_channel::reset(void)
 	this->field_18 = 1.0f;
 	this->frame_event_types[1] = animation_frame_event_type_none;
 	this->frame_event_types[2] = animation_frame_event_type_none;
-	this->animation_string = HS_ID_NONE;
+	this->animation_string = _string_id_invalid;
 	this->field_E = -1;
 	this->animation_mode = -1;
 	this->field_D = -1;

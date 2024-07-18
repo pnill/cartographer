@@ -1,7 +1,61 @@
 #include "stdafx.h"
 #include "user_interface_text.h"
 
-#include "interface/hud.h"
+#include "Blam/Engine/interface/hud.h"
+
+c_user_interface_text::c_user_interface_text()
+{
+	this->m_custom_font_type = 0;
+	this->m_text_is_pulsating = 0;
+	this->field_16 = 1;
+	this->field_18 = NONE;
+	this->m_text_justification = 2;
+	this->field_20 = 1.0;
+	this->field_24 = NONE;
+	this->field_38 = 0;
+	this->field_3C = NONE;
+	this->text_length = 0;
+	this->m_ui_start_time = 0;
+	this->m_text_color.blue = 1.0;
+	this->m_text_color.green = 1.0;
+	this->m_text_color.red = 1.0;
+}
+
+const real_rgb_color* c_user_interface_text::get_color()
+{
+	return &this->m_text_color;
+}
+
+const int32 c_user_interface_text::get_font()
+{
+	return this->m_custom_font_type;
+}
+
+void c_user_interface_text::set_font(int32 font_type)
+{
+	this->m_custom_font_type = font_type;
+}
+
+void c_user_interface_text::set_pulsating(bool pulsating)
+{
+	this->m_text_is_pulsating = pulsating;
+}
+
+void c_user_interface_text::set_color(real_rgb_color* color)
+{
+	this->m_text_color = *color;
+}
+
+void c_user_interface_text::set_color(const real_rgb_color* color)
+{
+	this->m_text_color = *color;
+}
+
+
+c_user_interface_text::~c_user_interface_text()
+{
+
+}
 
 
 // Seperated scale for the text labels (carto addition)

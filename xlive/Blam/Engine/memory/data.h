@@ -18,18 +18,6 @@ struct s_data_array
 	char* data;						// 0x44
 	int32 *in_use_bit_vector;		// 0x48
 
-	static datum datum_new_in_range(s_data_array* data_array)
-	{
-		auto p_datum_new_in_range = Memory::GetAddress<datum(__cdecl*)(s_data_array*)>(0x667A0, 0x3248C);
-		return p_datum_new_in_range(data_array);
-	}
-
-	static void data_make_valid(s_data_array* data_array)
-	{
-		// not entirely sure what this actually does
-		auto p_data_make_valid = Memory::GetAddress<void(_cdecl*)(s_data_array*)>(0x66B33, 0x3281F);
-		return p_data_make_valid(data_array);
-	}
 };
 ASSERT_STRUCT_SIZE(s_data_array, 0x4C);
 
@@ -121,8 +109,11 @@ private:
 	int m_current_absolute_index;
 };
 
+
 // Get data in s_data_array from datum index
 void* datum_get(const s_data_array* data, datum datum_index);
 void* datum_try_and_get(const s_data_array* data_array, datum datum_index);
+datum __cdecl datum_new(s_data_array* data_array);
 
+void __cdecl data_make_valid(s_data_array* data_array);
 void __cdecl datum_delete(s_data_array* data_array, datum datum_index);

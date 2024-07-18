@@ -1,5 +1,7 @@
 #pragma once
 
+/* enums */
+
 //TODO : figure out proper place to keep this enum
 enum e_ui_error_types : uint32
 {
@@ -293,8 +295,61 @@ enum e_ui_error_types : uint32
 	_ui_error_map_download_profane_name = 0x11F,
 };
 
+enum e_user_interface_channel_type
+{
+	_user_interface_channel_type_hardware_error = 0x0,
+	_user_interface_channel_type_game_error = 0x1,
+	_user_interface_channel_type_keyboard = 0x2,
+	_user_interface_channel_type_interface = 0x3,
+	_user_interface_channel_type_dialog = 0x4,
+	_user_interface_channel_type_gameshell = 0x5,
+	_user_interface_channel_type_gameshell_background = 0x6,
+	k_number_of_user_interface_channels = 0x7
+};
 
-void __cdecl error_message_menu_open(int32 a1, int32 ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
+enum e_user_interface_render_window
+{
+	_window_0 = 0x0,
+	_window_1 = 0x1,
+	_window_2 = 0x2,
+	_window_3 = 0x3,
+	_window_4 = 0x4,
+	k_number_of_render_windows = 0x5
+};
+
+/* forward declations*/
+
+enum e_user_interface_screen_id : uint32;
+
+/* structures */
+
+struct s_screen_state
+{
+	int32 field_0;
+	int32 field_4;
+	int32 field_8;
+};
+
+struct s_screen_parameters
+{
+	int16 m_flags;
+	uint16 user_flags;
+	e_user_interface_channel_type m_channel_type;
+	e_user_interface_render_window m_window_index;
+	int32 field_C;
+	s_screen_state m_screen_state;
+	void* (__cdecl* m_load_function)(s_screen_parameters*);
+};
+ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
+
+
+/* public methods */
 
 
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d);
+
+void __cdecl screen_error_ok_dialog_show(int32 a1, e_ui_error_types ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
+bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
+void __cdecl user_interface_error_display_ok_cancle_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
+bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
+void __cdecl user_interface_enter_game_shell(int32 context);

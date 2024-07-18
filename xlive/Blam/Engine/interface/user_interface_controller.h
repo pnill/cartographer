@@ -208,5 +208,8 @@ void __cdecl user_interface_controller_event_submit(s_event_record* event);
 void __cdecl user_interface_controller_update_network_properties(e_controller_index controller_index);
 void __cdecl user_interface_controller_pick_profile_dialog(e_controller_index controller_index, bool online_user);
 bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index controller_index);
-
+bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller_index);
+bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index);
+uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(e_controller_index master_controller_index);
+void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active);
 void user_inteface_controller_apply_patches();

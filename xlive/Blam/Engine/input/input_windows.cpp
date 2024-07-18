@@ -41,11 +41,10 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 	*/
 
 	bool input_handled = false;
-	for (uint16 gamepad_index = 0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
 	{
 		if (input_has_gamepad(gamepad_index, nullptr))
 		{
-
 			s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(gamepad_index);
 
 			if (input_xinput_update_gamepad(gamepad_index, duration_ms, gamepad_state))
@@ -125,6 +124,14 @@ DIMOUSESTATE2* __cdecl input_get_mouse_state()
 	return &input_globals->suppressed_mouse_state;
 }
 
+uint16* __cdecl input_get_mouse_button_state()
+{
+	if (!input_globals->input_suppressed)
+		return input_globals->mouse_buttons;
+
+	return nullptr;
+}
+
 bool __cdecl input_get_key(s_key_state* keystate)
 {
 	return INVOKE(0x2E3CB, 0x0, input_get_key, keystate);
@@ -167,9 +174,9 @@ void __cdecl input_update_main_device_state()
 
 		uint32 device_flags = 0;
 		if (gamepad->m_device_just_left)
-			device_flags = 1;
+			device_flags |= 0x0001u;
 		if (gamepad->m_device_just_joined)
-			device_flags |= 0x2000;
+			device_flags |= 0x2000u;
 
 		input_abstraction_handle_device_change(device_flags);
 		device_index++;

@@ -57,7 +57,7 @@ enum e_handicap : int8
 
 enum e_player_flags : int
 {
-	// player_flag_player_active = 0, // not entirely sure about this one, but the code uses the flag bellow
+	// player_flag_player_active = 0, // not entirely sure about this one, but the code uses the flag below
 	_player_left_game_bit = 1,
 	player_flag_player_first_spawn = 3,
 };
