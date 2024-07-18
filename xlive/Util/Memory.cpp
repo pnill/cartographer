@@ -12,7 +12,7 @@ H2Type DetectProcessType()
 	H2Type h2TypeResult = H2Type::Invalid;
 
 	// update 5/3/2022:
-	// this now verifies game version as well, therefore the code bellow had to be commented out
+	// this now verifies game version as well, therefore the code below had to be commented out
 
 	// try and detect type based on module name.
 	/*if (GetModuleHandleW(L"halo2.exe"))
