@@ -402,6 +402,11 @@ protected:
 public:
 	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 	
+
+	const e_user_interface_screen_id get_id();
+	c_text_widget* get_screen_header_text();
+	c_text_widget* get_screen_button_key_text();
+	c_text_widget* try_find_screen_text(uint32 idx);
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
 	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
 	void* get_screen_definition();

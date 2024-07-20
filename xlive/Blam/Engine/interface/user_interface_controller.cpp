@@ -24,7 +24,7 @@ bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_inde
 	return INVOKE(0x206B50, 0x1F3F78, user_interface_controller_is_player_profile_valid, controller_index);
 }
 
-uint32 __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index)
+e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index)
 {
 	return INVOKE(0x206B13, 0x1F3F3A, user_interface_controller_get_next_valid_index, controller_index);
 }
@@ -268,7 +268,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 	user_interface_controller_update_network_properties(controller_index);
 }
 
-void user_inteface_controller_apply_patches()
+void user_interface_controller_apply_patches()
 {
 	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match

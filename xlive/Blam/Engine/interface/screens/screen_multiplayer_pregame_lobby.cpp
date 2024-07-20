@@ -480,7 +480,7 @@ void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
 		return;
 	}
 
-	c_text_widget* chat_box_text = try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(chat_box_receiver));
+	c_text_widget* chat_box_text = try_find_screen_text(chat_box_receiver);
 	if (chat_box_text && this->m_communications_allowed)
 	{
 		rectangle2d chat_text_bounds;
@@ -555,7 +555,7 @@ void c_screen_multiplayer_pregame_lobby::update_chat_icons()
 		up_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_up;
 		down_arrow_icon_id = _pregame_lobby_pane_0_bitmap_arrows_down;
 
-		c_text_widget* map_download_progress_text = try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_pregame_lobby_pane_0_text_map_download_progress));
+		c_text_widget* map_download_progress_text = try_find_screen_text(_pregame_lobby_pane_0_text_map_download_progress);
 		if (map_download_progress_text)
 		{
 			rectangle2d new_bounds;

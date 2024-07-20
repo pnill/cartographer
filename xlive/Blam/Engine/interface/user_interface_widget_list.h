@@ -18,12 +18,12 @@ struct s_item_text_mapping
 };
 ASSERT_STRUCT_SIZE(s_item_text_mapping, 8);
 
-struct s_dynamic_list_item
+struct s_list_item_datum
 {
 	uint16 unk;
 	int16 item_id;
 };
-ASSERT_STRUCT_SIZE(s_dynamic_list_item, 4);
+ASSERT_STRUCT_SIZE(s_list_item_datum, 4);
 
 
 /* classes */

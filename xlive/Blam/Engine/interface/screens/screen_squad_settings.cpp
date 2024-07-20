@@ -139,14 +139,14 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	c_list_widget(user_flags),
 	m_slot(this, &c_squad_settings_list::handle_item_pressed_event)
 {
-	m_list_data = ui_list_data_new(k_squad_setting_list_name, k_total_no_of_squad_list_items, sizeof(s_dynamic_list_item));
+	m_list_data = ui_list_data_new(k_squad_setting_list_name, k_total_no_of_squad_list_items, sizeof(s_list_item_datum));
 	data_make_valid(m_list_data);
 
 	m_party_mgmt_item_deleted = true;
 
 	// yes this sucks
 #define SQUAD_ITEM_GET_NEW() \
-		(static_cast<s_dynamic_list_item*>(datum_get(m_list_data, datum_new(m_list_data))))
+		(static_cast<s_list_item_datum*>(datum_get(m_list_data, datum_new(m_list_data))))
 
 	const e_session_protocol active_protocol = user_interface_squad_get_active_protocol();
 	switch (active_protocol)
@@ -219,7 +219,7 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 uint16 c_squad_settings_list::get_last_item_type()
 {
 	datum item_idx = this->get_old_data_index();
-	s_dynamic_list_item* item_datum = (s_dynamic_list_item*)datum_try_and_get(this->m_list_data, item_idx);
+	s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item_idx);
 	if (item_datum)
 		return item_datum->item_id;
 	return NONE;
@@ -291,7 +291,7 @@ bool c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 
 	if (!DATUM_IS_NONE(*pitem_index))
 	{
-		s_dynamic_list_item* item = (s_dynamic_list_item*)datum_try_and_get(m_list_data, *pitem_index);
+		s_list_item_datum* item = (s_list_item_datum*)datum_try_and_get(m_list_data, *pitem_index);
 		e_squad_list_items item_type = (e_squad_list_items)item->item_id;
 
 		switch (item_type)
@@ -442,9 +442,9 @@ void c_screen_squad_settings::update()
 	//INVOKE_TYPE(0x24F0EB, 0x0, void(__thiscall*)(c_screen_squad_settings*), this);
 
 	e_squad_list_items item_type = (e_squad_list_items)this->m_squad_settings_list.get_last_item_type();
-	c_text_widget* option_help_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_change_map_help));
-	c_text_widget* option_header_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_current_map));
-	c_text_widget* option_value_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_map));
+	c_text_widget* option_help_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_change_map_help);
+	c_text_widget* option_header_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_current_map);
+	c_text_widget* option_value_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_map);
 	c_bitmap_widget* option_bitmap = this->try_find_bitmap_widget(_squad_settings_dialog_pane_0_bitmap_xbox_live);
 
 	if (option_bitmap)

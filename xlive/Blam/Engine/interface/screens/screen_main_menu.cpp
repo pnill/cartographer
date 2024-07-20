@@ -11,7 +11,7 @@
 #include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
 #include "Networking/transport/transport.h"
-#include "Networking/panaroma/panorama_friends.h"
+#include "Networking/panorama/panorama_friends.h"
 #include "tag_files/global_string_ids.h"
 #include "shell/shell.h"
 
@@ -61,7 +61,7 @@ c_main_menu_list::c_main_menu_list(int16 user_flags) :
 	c_list_widget(user_flags),
 	m_slot(this, &c_main_menu_list::handle_item_pressed_event)
 {
-	//we dont need s_dynamic_list_item here as no of list items remain same
+	//we dont need s_list_item_datum here as no of list items remain same
 	m_list_data = ui_list_data_new(k_main_menu_list_name, k_total_no_of_main_menu_list_items, sizeof(datum));
 	data_make_valid(m_list_data);
 
@@ -220,7 +220,7 @@ bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 
 	bool success = true;
 
-	c_networking_panaroma_friends* friends = get_networking_panaroma_friends();
+	c_networking_panorama_friends* friends = get_networking_panorama_friends();
 	if (!friends->has_active_task())
 	{
 		friends->initialize_startup();

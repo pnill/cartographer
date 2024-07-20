@@ -45,6 +45,26 @@ c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_inte
 	this->field_A01 = false;
 }
 
+const e_user_interface_screen_id c_screen_widget::get_id()
+{
+	return m_screen_id;
+}
+
+c_text_widget* c_screen_widget::get_screen_header_text()
+{
+	return try_find_text_widget(K_HEADER_TEXT_BLOCK_INDEX);
+}
+
+c_text_widget* c_screen_widget::get_screen_button_key_text()
+{
+	return try_find_text_widget(K_BUTTON_KEY_TEXT_BLOCK_INDEX);
+}
+
+c_text_widget* c_screen_widget::try_find_screen_text(uint32 idx)
+{
+	return try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(idx));
+}
+
 void c_screen_widget::destroy()
 {
 	INVOKE_TYPE(0x20F6FF, 0x0, void(__thiscall*)(c_screen_widget*), this);

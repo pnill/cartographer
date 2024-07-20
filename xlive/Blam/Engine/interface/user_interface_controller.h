@@ -182,7 +182,7 @@ s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 void __cdecl user_interface_controller_initialize();
 void __cdecl user_interface_controller_update();
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index);
-uint32 __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index);
+e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_user_index(e_controller_index controller_index);
 void __cdecl user_interface_controller_set_user_index(e_controller_index controller_index, uint32 user_index);
 e_controller_index __cdecl user_interface_controller_get_controller_for_user(uint32 user_index);
@@ -212,4 +212,4 @@ bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller
 bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(e_controller_index master_controller_index);
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active);
-void user_inteface_controller_apply_patches();
+void user_interface_controller_apply_patches();
