@@ -131,9 +131,15 @@ enum e_xbox_live_menu_bitmap_type
 	k_number_of_xbox_live_menu_bitmap_types,
 };
 
+enum e_settings_variant_bitmap_type
+{
+	_settings_variant_bitmap_type_default = 0,
+	k_number_of_settings_variant_bitmap_types,
+};
 
 datum new_xbox_live_bitmap_datum = NONE;
 datum xbox_live_menu_bitmap_datum = NONE;
+datum variant_bitmap_datum = NONE;
 
 c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	c_list_widget(user_flags),
@@ -459,6 +465,7 @@ void c_screen_squad_settings::update()
 	uint32 bitm_index = 0;
 
 	s_game_variant* game_variant = user_interface_session_get_game_variant();
+	real_vector2d option_render_scale = { 1.0f,1.0f };//default value
 
 	switch (item_type)
 	{
@@ -559,6 +566,8 @@ void c_screen_squad_settings::update()
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_difficulty_options, _difficulty_option_legendary);
 				break;
 			}
+
+			option_render_scale = { 0.859375f,0.80859375f };
 		}
 
 
@@ -585,10 +594,12 @@ void c_screen_squad_settings::update()
 		header_string = _string_id_switch_to_arranged;
 		value_string = _string_id_empty_string;
 		//bitm_index = 6;
-		if (option_bitmap && !DATUM_IS_NONE(new_xbox_live_bitmap_datum))
+		if (option_bitmap && !DATUM_IS_NONE(variant_bitmap_datum))
 		{
-			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_arranged);
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(variant_bitmap_datum, _settings_variant_bitmap_type_default);
 			option_bitmap->assign_new_bitmap_block(bitmap_block);
+			//render_scale = { (real32)required_width/(real32)borked_width  ,(real32)required_height /(real32)borked_height };
+			option_render_scale = { 0.859375f,0.80859375f };
 		}
 		break;
 	case _item_switch_to_optimatch:
@@ -630,7 +641,10 @@ void c_screen_squad_settings::update()
 	if (option_value_text_block)
 		option_value_text_block->set_text_from_string_id(value_string);
 	if (option_bitmap)
+	{
 		option_bitmap->verify_and_update_bitmap_index(bitm_index);
+		option_bitmap->set_render_scale(&option_render_scale);
+	}
 
 	c_list_item_widget* item = this->m_squad_settings_list.try_find_item_widget(_item_party_management);
 	if (item && !this->m_squad_settings_list.party_management_exists() && user_interface_squad_get_player_count() < 2)
@@ -706,6 +720,7 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 	}
 
 	xbox_live_menu_bitmap_datum = tags::find_tag(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live_menu");
+	variant_bitmap_datum = tags::find_tag(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\variant_settings\\variant");
 
 	return;
 }

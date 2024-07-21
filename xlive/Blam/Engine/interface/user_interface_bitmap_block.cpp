@@ -2,6 +2,11 @@
 
 #include "user_interface_bitmap_block.h"
 
+const real_vector2d* c_bitmap_widget::get_render_scale()
+{
+	return &m_render_scale;
+}
+
 void c_bitmap_widget::verify_and_update_bitmap_index(int16 index)
 {
 	INVOKE_TYPE(0x21C300, 0x0, void(__thiscall*)(c_bitmap_widget*, int16), this, index);
@@ -14,6 +19,15 @@ void c_bitmap_widget::assign_new_bitmap_block(bitmap_data* block)
 void c_bitmap_widget::set_local_bitmap(int16 local_bitmap_block_index, int16 bitmap_block_index)
 {
 	INVOKE_TYPE(0x21CFED, 0x0, int(__thiscall*)(c_bitmap_widget*, int16, int16), this, local_bitmap_block_index, bitmap_block_index);
+}
+
+
+void c_bitmap_widget::set_render_scale(const real_vector2d* scale)
+{
+	if (scale)
+	{
+		this->m_render_scale = *scale;
+	}
 }
 
 
