@@ -97,7 +97,7 @@ int32 c_main_menu_list::get_list_items_count()
 void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_index)
 {
 	//return INVOKE_TYPE(0xA755, 0x0, void(__thiscall*)(c_list_widget*, c_list_widget*, int), this, item, skin_index);
-	
+
 
 	ASSERT(item);
 	uint8 skin_text_type = _main_menu_list_skin_text_main;
@@ -115,7 +115,7 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 	// this code responsible for checking to switch between main/greyed text
 	//bool is_valid = unlock_main_menu_items(item->get_last_data_index());
 	//item_text = item->try_find_text_widget(!is_valid);
-	
+
 	c_text_widget* item_text = item->try_find_text_widget(_main_menu_list_skin_text_main);
 	item->set_item_transitioning();
 
@@ -273,9 +273,9 @@ bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 		screen_error_ok_dialog_show(
 			_user_interface_channel_type_game_error,
 			_ui_error_beta_feature_disabled,
-			_window_4, 
-			FLAG((*pevent)->controller), 
-			nullptr, 
+			_window_4,
+			FLAG((*pevent)->controller),
+			nullptr,
 			nullptr);
 
 		return success;
@@ -303,7 +303,7 @@ bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 	params.m_screen_state.field_4 = 0xFFFFFFFF;
 	params.m_screen_state.field_8 = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
-	
+
 	params.m_load_function(&params);
 
 	return success;
@@ -339,7 +339,7 @@ bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 		return success;
 	}
 
-	if(transport_available())
+	if (transport_available())
 	{
 		s_screen_parameters params;
 		params.m_flags = 0;
@@ -394,9 +394,9 @@ void c_main_menu_list::apply_instance_patches()
 
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
-
+	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
-	
+
 	if (user_interface_controller_get_signed_in_controller_count() <= 0)
 	{
 		user_interface_enter_game_shell(0);
@@ -422,6 +422,7 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 
 bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_index controller_index)
 {
+	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
 
 	if (user_interface_controller_get_signed_in_controller_count() <= 0)
@@ -451,7 +452,18 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 {
 	if (!UserSignedOnline(_controller_index_0))
 		return true;
-	
+
+	if (!user_interface_controller_is_player_profile_valid(_controller_index_0))
+	{
+		// dont allow transitioning into live if _controller_index_0 is inactive
+		screen_error_ok_dialog_show(
+			_user_interface_channel_type_game_error,
+			_ui_error_xblive_user_not_authorized,
+			_window_4,
+			NONE,// allow all controllers
+			user_interface_controller_sign_out_all_controllers,
+			nullptr);
+	}
 
 	s_screen_parameters params;
 	params.m_flags = 0;
