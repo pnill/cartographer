@@ -213,7 +213,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 #if K_TAG_INJECTION_DEBUG
 	c_static_string260 str;
-	this->get_name_by_tag_datum(tag_info->type.group, this->m_table.get_entry_by_injected_index(injected_index)->cache_index, str.get_buffer());
+	this->get_name_by_tag_datum(tag_info->group_tag.group, this->m_table.get_entry_by_injected_index(injected_index)->cache_index, str.get_buffer());
 	LOG_DEBUG_GAME("[c_tag_injecting_mananger::load_raw] loading {} index {:x}", str.get_string(), injected_index);
 #endif
 

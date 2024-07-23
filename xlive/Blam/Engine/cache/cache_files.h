@@ -1,10 +1,17 @@
 #pragma once
 #include "main/game_preferences.h"
+#include "tag_files/string_id.h"
 #include "tag_files/tag_groups.h"
 
 #define CACHE_FILE_PAGE_SIZE 512
 #define FIRST_SHARED_TAG_INSTANCE_INDEX 10000
 #define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
+#define k_cache_file_max_string_ids 24576
+
+#define k_cache_file_debug_name_buffer_size 5120000
+#define k_cache_file_debug_name_offset_buffer_size 80384
+#define k_cache_file_debug_string_id_index_buffer_size (k_cache_file_max_string_ids * sizeof(string_id))
+#define k_cache_file_debug_string_id_storage_size 393216
 
 enum e_shared_resource_database_type : int32
 {
@@ -47,6 +54,8 @@ struct s_cache_header
 	int32 data_offset;
 	int32 data_size;
 	int32 tag_size;
+
+	// Offset mask is used for cache files that rely on a shared resource database
 	int32 tag_offset_mask;
 	int32 shared_tag_dependency_offset;
 	int32 shared_tag_dependency_count;
@@ -108,6 +117,14 @@ struct s_cache_file_memory_globals
 };
 ASSERT_STRUCT_SIZE(s_cache_file_memory_globals, 0x810);
 
+struct s_cache_file_debug_globals
+{
+	int8 debug_tag_name_buffer[k_cache_file_debug_name_buffer_size];
+	int8 debug_tag_name_offsets[k_cache_file_debug_name_offset_buffer_size];
+	int8 debug_string_id_storage[k_cache_file_debug_string_id_storage_size];
+	int8 debug_string_id_index[k_cache_file_debug_string_id_index_buffer_size];
+};
+
 struct tag_iterator
 {
 	int32 field_0;
@@ -139,7 +156,7 @@ void __cdecl cache_file_close();
 
 bool __cdecl cache_header_verify(s_cache_header* cache_header);
 
-uint32 __cdecl cache_file_round_up_read_size(uint32 size);
+uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size);
 
 bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, int8* out_buffer);
 
@@ -147,6 +164,6 @@ void __cdecl scenario_tags_load_internal_exit_panic();
 
 bool cache_validate_shared_tag_instances(int8* tag_header, uint32 offset_mask);
 
-bool __cdecl scenario_tags_load_internal(const char* scenario_path);
+bool __cdecl scenario_tags_load(const char* scenario_path);
 
 void cache_files_apply_patches();

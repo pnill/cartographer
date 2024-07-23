@@ -148,7 +148,7 @@ void main_game_apply_patches(void)
 
 void main_game_set_global_scenario_index(datum scenario_index)
 {
-    datum* global_scenario_index = Memory::GetAddress<datum*>(0x8BB94C);
+    datum* global_scenario_index = Memory::GetAddress<datum*>(0x4119A0);
     *global_scenario_index = scenario_index;
 }
 
