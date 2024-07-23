@@ -387,6 +387,8 @@
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_favorites.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_presence.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1038,6 +1040,8 @@
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_favorites.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

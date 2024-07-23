@@ -42,20 +42,6 @@ enum e_context_id : uint32
 	_context_id_game_mode = X_CONTEXT_GAME_MODE
 };
 
-enum e_context_presence : uint32
-{
-	_context_presence_mainmenu = 0,
-	_context_presence_settings = 1,
-	_context_presence_server_browser = 2,
-	_context_presence_singleplayer = 3,
-	_context_presence_lobby = 4,
-	_context_presence_results = 5,
-	_context_presence_live_in_game = 6,
-	_context_presence_public_game = 7,
-	_context_presence_invite_only_game = 8,
-	_context_presence_network_in_game = 9
-};
-
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 extern XSESSION_LOCAL_DETAILS sessionDetails;
 

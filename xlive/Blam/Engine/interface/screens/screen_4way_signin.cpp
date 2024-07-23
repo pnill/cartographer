@@ -333,8 +333,8 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	params.user_flags = FLAG(controller_index);
 	params.m_channel_type = _user_interface_channel_type_gameshell;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_press_start_introduction_load;
 
 	params.m_load_function(&params);
@@ -354,8 +354,8 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 		params.user_flags = FLAG(event->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		params.m_load_function = nullptr;
 
 		switch (this->m_call_context)
@@ -747,8 +747,8 @@ void user_interface_recover_4way_screen(e_session_protocol protocol)
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 	params.m_channel_type = _user_interface_channel_type_gameshell;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
 
 	if (session_protocol_has_coop(protocol))
@@ -831,8 +831,8 @@ void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
 	params.m_channel_type = _user_interface_channel_type_gameshell;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
 	params.m_load_function(&params);

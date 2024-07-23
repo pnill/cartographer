@@ -216,3 +216,31 @@ void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_sc
 {
 	return INVOKE_TYPE(0x20B8C3, 0x0, void(__cdecl*)(c_screen_widget*, s_screen_parameters*), new_screen, parameters);
 }
+
+
+
+c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, c_list_widget* list):
+	c_screen_widget(menu_id,channel_type,window_index,user_flags)
+{
+	this->m_child_list = list;
+}
+
+c_screen_with_menu::~c_screen_with_menu()
+{
+}
+
+bool c_screen_with_menu::handle_event(s_event_record* event)
+{
+	return INVOKE_TYPE(0x20EEBE, 0x0, bool(__thiscall*)(c_screen_with_menu*, s_event_record*), this, event);
+}
+
+c_user_interface_widget* c_screen_with_menu::sub_6121F6(rectangle2d* point)
+{
+	return INVOKE_TYPE(0x20EF08, 0x0, c_user_interface_widget * (__thiscall*)(c_screen_with_menu*, rectangle2d*), this, point);
+}
+
+void c_screen_with_menu::initialize(s_screen_parameters* parameters)
+{
+	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, s_screen_parameters*), this, parameters);
+}
+

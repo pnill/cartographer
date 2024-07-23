@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "screen_main_menu.h"
 #include "screen_4way_signin.h"
+#include "screen_settings.h"
 #include "game/preferences.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_controller.h"
@@ -237,8 +238,8 @@ bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 		params.user_flags = FLAG((*pevent)->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		//params.m_load_function = &c_screen_bungie_news::load; // replacing with 4way_screen
 		params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
 
@@ -300,8 +301,8 @@ bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_gameshell;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
 
 	params.m_load_function(&params);
@@ -348,8 +349,8 @@ bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 		params.user_flags = FLAG((*pevent)->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
 		params.m_load_function(&params);
@@ -370,7 +371,22 @@ bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 
 bool c_main_menu_list::handle_item_settings(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0xB32B, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	//return INVOKE_TYPE(0xB32B, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+
+	s_screen_parameters params;
+	params.m_flags = 0;
+	params.m_window_index = _window_4;
+	params.field_C = 0;
+	params.user_flags = FLAG((*pevent)->controller);
+	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_screen_state.field_0 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+	params.m_load_function = &c_screen_settings::load;
+
+	params.m_load_function(&params);
+
+	return true;
 }
 
 //bool c_main_menu_list::handle_item_guide(s_event_record** pevent)
@@ -382,15 +398,6 @@ bool c_main_menu_list::handle_item_quit(s_event_record** pevent)
 {
 	return INVOKE_TYPE(0xA307, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 }
-
-void c_main_menu_list::apply_instance_patches()
-{
-	if (Memory::IsDedicatedServer())
-		return;
-
-	PatchCall(Memory::GetAddress(0xB724), jmp_c_main_menu_list); //replace our c_main_menu_list inside c_screen_main_menu ctor
-}
-
 
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
@@ -410,8 +417,8 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 		params.m_channel_type = _user_interface_channel_type_gameshell;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
 
 		params.m_load_function(&params);
@@ -438,8 +445,8 @@ bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_ind
 		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 		params.m_channel_type = _user_interface_channel_type_gameshell;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
 		params.m_load_function(&params);
@@ -472,10 +479,19 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 	params.user_flags = NONE;// allow all
 	params.m_channel_type = _user_interface_channel_type_gameshell;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
 
 	params.m_load_function(&params);
 	return true;
+}
+
+
+void c_main_menu_list::apply_instance_patches()
+{
+	if (Memory::IsDedicatedServer())
+		return;
+
+	PatchCall(Memory::GetAddress(0xB724), jmp_c_main_menu_list); //replace our c_main_menu_list inside c_screen_main_menu ctor
 }

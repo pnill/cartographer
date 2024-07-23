@@ -368,6 +368,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
@@ -444,6 +445,7 @@
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_favorites.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_friends.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_presence.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
@@ -621,6 +623,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
@@ -1005,6 +1008,7 @@
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_favorites.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_friends.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />

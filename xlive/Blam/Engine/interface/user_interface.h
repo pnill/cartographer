@@ -326,8 +326,8 @@ enum e_user_interface_screen_id : uint32;
 struct s_screen_state
 {
 	int32 field_0;
-	int32 field_4;
-	int32 field_8;
+	int32 m_last_focused_item_order;
+	int32 m_last_focused_item_index;
 };
 
 struct s_screen_parameters

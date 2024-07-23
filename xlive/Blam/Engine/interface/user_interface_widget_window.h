@@ -445,5 +445,26 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_screen_widget, 0xA5C);
 
+
+class c_screen_with_menu : public c_screen_widget
+{
+protected:
+	c_list_widget* m_child_list;
+
+public:
+
+	c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags , c_list_widget* list);
+
+	// c_screen_with_menu virtual functions
+
+	virtual ~c_screen_with_menu();
+	virtual bool handle_event(s_event_record* event) override;
+	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
+	virtual void initialize(s_screen_parameters* parameters) override;
+
+};
+ASSERT_STRUCT_SIZE(c_screen_with_menu, 0xA60);
+
+
 // Todo : move to proper location
 void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters);

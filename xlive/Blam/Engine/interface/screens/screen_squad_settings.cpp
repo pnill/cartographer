@@ -355,8 +355,8 @@ bool c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_interface;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_single_player_level_select_load_lobby;
 	c_screen_single_player_level_select_load_lobby(&params);
 
@@ -371,8 +371,8 @@ bool c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_interface;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_single_player_difficulty_select_load_lobby;
 	c_screen_single_player_difficulty_select_load_lobby(&params);
 
