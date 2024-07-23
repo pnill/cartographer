@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "xbox.h"
 
-#include "resources/resource.h"
-
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
 // #5260: XShowSigninUI
@@ -99,135 +97,12 @@ DWORD WINAPI XShowCustomPlayerListUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR p
 	return ERROR_SUCCESS;
 }
 
-HWND hGameWnd = NULL;
-
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
-
-	DWORD wndPID;
-	GetWindowThreadProcessId(hwnd, &wndPID);
-	if (wndPID == *(DWORD*)&lParam)
-	{
-		hGameWnd = hwnd;
-		return FALSE;
-	}
-	return TRUE;
-}
-
-struct XShowKeyboardUI_DATA
-{
-	LPCWSTR wseDefaultText;
-	LPCWSTR wszTitleText;
-	LPCWSTR wszDescriptionText;
-	LPWSTR wszResultText;
-	DWORD cchResultText;
-	DWORD ret;
-};
-
-
-BOOL CALLBACK MyDlgProc_KeyboardUI(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	static XShowKeyboardUI_DATA* keydata = NULL;
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-	{
-		keydata = (XShowKeyboardUI_DATA*)lParam;
-		if (keydata)
-		{
-			RECT desktop;
-			RECT dialog;
-			const HWND hDesktop = GetDesktopWindow();
-			GetWindowRect(hDesktop, &desktop);
-			GetWindowRect(hDlg, &dialog);
-			SetWindowPos(hDlg, HWND_TOPMOST, (desktop.right / 2) - (dialog.right / 2), (desktop.bottom / 2) - (dialog.bottom / 2), NULL, NULL, SWP_NOSIZE);
-
-			SetWindowText(hDlg, keydata->wszTitleText);
-			SetDlgItemText(hDlg, IDC_EDIT1, keydata->wseDefaultText);
-			SetDlgItemText(hDlg, IDC_DSC1, keydata->wszDescriptionText);
-		}
-		return TRUE;
-	}
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDCANCEL)
-		{
-			keydata->ret = LOWORD(wParam);
-
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-		}
-
-
-		if (LOWORD(wParam) == IDOK)
-		{
-			keydata->ret = LOWORD(wParam);
-
-			if (keydata && keydata->wszResultText && keydata->cchResultText)
-				GetDlgItemText(hDlg, IDC_EDIT1, keydata->wszResultText, keydata->cchResultText);
-
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-
 // #5216: XShowKeyboardUI
 DWORD WINAPI XShowKeyboardUI(DWORD dwUserIndex, DWORD dwFlags, LPCWSTR wseDefaultText, LPCWSTR wszTitleText, LPCWSTR wszDescriptionText, LPWSTR wszResultText, DWORD cchResultText, PXOVERLAPPED pOverlapped)
 {
 	LOG_TRACE_XLIVE(L"XShowKeyboardUI  (dwUserIndex = {0}, dwFlags = {1:x}, wseDefaultText = {2}, wszTitleText = {3}, wszDescriptionText = {4}, wszResultText = {5:p}, cchResultText = {6:x}, pOverlapped = {7:p})",
 		dwUserIndex, dwFlags, wseDefaultText, wszTitleText, wszDescriptionText, (void*)wszResultText, cchResultText, (void*)pOverlapped);
-
-
-	DWORD dwPid = GetCurrentProcessId();
-	EnumWindows(EnumWindowsProc, (LPARAM)&dwPid);
-	//if(!IsWindow(hGameWnd))
-	hGameWnd = NULL;
-
-
-	XShowKeyboardUI_DATA keydata;
-
-
-	if (cchResultText && wszResultText)
-	{
-		keydata.cchResultText = cchResultText;
-		keydata.wseDefaultText = wseDefaultText;
-		keydata.wszDescriptionText = wszDescriptionText;
-		keydata.wszTitleText = wszTitleText;
-		keydata.wszResultText = wszResultText;
-	}
-
-
-	DialogBoxParam(hThis, MAKEINTRESOURCE(IDD_XSHOWKEYBOARDUI), hGameWnd, MyDlgProc_KeyboardUI, (LPARAM)&keydata);
-
-
-	if (keydata.ret == IDOK)
-		keydata.ret = ERROR_SUCCESS;
-
-	else
-		keydata.ret = ERROR_CANCELLED;
-
-
-	LOG_TRACE_XLIVE("- code = {:x}", keydata.ret);
-
-
-	if (pOverlapped)
-	{
-		pOverlapped->InternalLow = keydata.ret;
-		pOverlapped->dwExtendedError = keydata.ret;
-
-
-		Check_Overlapped(pOverlapped);
-
-
-		return ERROR_IO_PENDING;
-	}
-
-
-	return keydata.ret;
+	return ERROR_SUCCESS;
 }
 
 // #5252: XShowGamerCardUI
@@ -272,117 +147,11 @@ DWORD WINAPI XMarketplaceGetDownloadStatus(DWORD dwUserIndex, ULONGLONG qwOfferI
 	return 0;
 }
 
-struct XShowMessageBoxUI_DATA
-{
-	LPCWSTR wszTitleText;
-	LPCWSTR wszDescriptionText;
-	LPCWSTR *wszButtons;
-	DWORD dwButtons;
-	DWORD ret;
-};
-
-
-BOOL CALLBACK MyDlgProc_MessageBoxUI(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	static XShowMessageBoxUI_DATA* keydata = NULL;
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-	{
-		keydata = (XShowMessageBoxUI_DATA*)lParam;
-		if (keydata)
-		{
-			RECT desktop;
-			RECT dialog;
-			const HWND hDesktop = GetDesktopWindow();
-			GetWindowRect(hDesktop, &desktop);
-			GetWindowRect(hDlg, &dialog);
-			SetWindowPos(hDlg, HWND_TOPMOST, (desktop.right / 2) - (dialog.right / 2), (desktop.bottom / 2) - (dialog.bottom / 2), NULL, NULL, SWP_NOSIZE);
-
-
-			SetWindowText(hDlg, keydata->wszTitleText);
-			SetDlgItemText(hDlg, IDC_DSC1, keydata->wszDescriptionText);
-
-
-			if (keydata->dwButtons >= 1)
-				SetDlgItemText(hDlg, IDOK, keydata->wszButtons[0]);
-
-			if (keydata->dwButtons >= 2)
-				SetDlgItemText(hDlg, IDCANCEL, keydata->wszButtons[1]);
-		}
-		return TRUE;
-	}
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDCANCEL)
-		{
-			keydata->ret = 1;
-
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-		}
-
-
-		if (LOWORD(wParam) == IDOK)
-		{
-			keydata->ret = 0;
-
-			EndDialog(hDlg, LOWORD(wParam));
-			return TRUE;
-		}
-	}
-
-	return FALSE;
-}
-
-
 // #5266: XShowMessageBoxUI
 DWORD WINAPI XShowMessageBoxUI(DWORD dwUserIndex, LPCWSTR wszTitle, LPCWSTR wszText, DWORD cButtons, LPCWSTR *pwszButtons,
 	DWORD dwFocusButton, DWORD dwFlags, MESSAGEBOX_RESULT *pResult, XOVERLAPPED *pOverlapped)
 {
 	LOG_TRACE_XLIVE(L"XShowMessageBoxUI  ({0} = {1})", wszTitle, wszText);
-
-
-	// Checkme
-	//if( dwFlags & XMB_PASSCODEMODE )
-	//if( dwFlags & XMB_VERIFYPASSCODEMODE )
-
-
-	DWORD dwPid = GetCurrentProcessId();
-	EnumWindows(EnumWindowsProc, (LPARAM)&dwPid);
-	//if(!IsWindow(hGameWnd))
-	hGameWnd = NULL;
-
-
-	XShowMessageBoxUI_DATA keydata;
-
-	keydata.wszDescriptionText = wszText;
-	keydata.wszTitleText = wszTitle;
-	keydata.wszButtons = pwszButtons;
-	keydata.dwButtons = cButtons;
-
-
-	if (cButtons == 1)
-		DialogBoxParam(hThis, MAKEINTRESOURCE(IDD_XSHOWMESSAGEBOXUI_1), hGameWnd, MyDlgProc_MessageBoxUI, (LPARAM)&keydata);
-
-	else if (cButtons == 2)
-		DialogBoxParam(hThis, MAKEINTRESOURCE(IDD_XSHOWMESSAGEBOXUI_2), hGameWnd, MyDlgProc_MessageBoxUI, (LPARAM)&keydata);
-
-	if (pResult)
-		pResult->dwButtonPressed = keydata.ret;
-
-
-
-	if (pOverlapped)
-	{
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-		return ERROR_IO_PENDING;
-	}
-
-
 	return ERROR_SUCCESS;
 }
 
