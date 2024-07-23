@@ -1,6 +1,8 @@
 #pragma once
 #include "input_windows.h"
 
+/* classes */
+
 class xinput_device : public input_device
 {
 protected:
@@ -8,6 +10,8 @@ protected:
 	uint32 error_level;
 	XINPUT_STATE xinput_state;
 public:
+	// xinput_device virtual functions
+
 	virtual void XInputOpen(void) { return; };
 	virtual void XInputClose(void) { return; };
 	virtual void XUpdateState(void) override;

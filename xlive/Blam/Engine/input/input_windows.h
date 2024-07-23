@@ -3,9 +3,13 @@
 
 #define k_number_of_windows_input_virtual_codes 256
 
+/* classes */
+
 class input_device
 {
 public:
+	// input_device virtual functions
+
 	virtual void XInputOpen(void) = 0;
 	virtual void XInputClose(void) = 0;
 	virtual void XUpdateState(void) = 0;
@@ -27,7 +31,10 @@ protected:
 	uint32 field34;
 	uint32 field38;
 	uint32 field3C;
+
 public:
+	// dinput_device virtual functions
+
 	virtual void XInputOpen(void) override;
 	virtual void XInputClose(void) override;
 	virtual void XUpdateState(void) override;
@@ -38,6 +45,7 @@ public:
 ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 
+/* structures */
 
 struct s_key_state
 {
@@ -136,13 +144,11 @@ struct s_input_globals
 ASSERT_STRUCT_SIZE(s_input_globals, 0x7D8);
 
 
-
-
-
+/* global externs */
 extern s_input_globals* input_globals;
-
 extern XINPUT_VIBRATION g_vibration_state[k_number_of_controllers];
 
+/* public code */
 
 void __cdecl input_initialize();
 void __cdecl input_dispose();

@@ -39,7 +39,7 @@ enum e_settings_list_items : uint16
 enum e_default_list_skin_texts
 {
 	_default_list_skin_text_main = 0,
-	k_number_of__default_list_skin_texts,
+	k_number_of_default_list_skin_texts,
 };
 
 enum e_settings_screen_panes
@@ -284,9 +284,9 @@ bool c_settings_list::handle_item_guide(s_event_record** pevent)
 // 
 
 
-c_screen_settings::c_screen_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags):
-c_screen_with_menu(_screen_settings, channel_type, window_index,user_flags, &m_settings_list),
-m_settings_list(user_flags)
+c_screen_settings::c_screen_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+	c_screen_with_menu(_screen_settings, channel_type, window_index, user_flags, &m_settings_list),
+	m_settings_list(user_flags)
 {
 	user_interface_globals_commit_edit_profile_changes();
 	user_interface_squad_clear_match_playlist();
@@ -364,7 +364,7 @@ void c_screen_settings::apply_patches_on_map_load()
 	MetaExtender::add_tag_block3<s_window_pane_reference>((uint32)&main_widget_tag->panes, k_number_of_addition_panes_for_settings_screen);
 	//copy data from about_pane
 	csmemcpy(main_widget_tag->panes[_settings_pane_guide], main_widget_tag->panes[_settings_pane_about], sizeof(s_window_pane_reference));
-
+	//updating the new number of visible items in each pane
 	for (s_window_pane_reference& pane : main_widget_tag->panes)
 	{
 		pane.list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;

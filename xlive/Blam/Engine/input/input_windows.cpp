@@ -81,6 +81,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 			input.ki.wVk = 0;
 			input.ki.wScan = 0;
 			input.ki.dwFlags = KEYEVENTF_KEYUP;
+			input.ki.time= 0;
 			input.ki.dwExtraInfo = 0;
 			SendInput(1, &input, sizeof(input));
 		}

@@ -6,6 +6,12 @@
 
 /* macro defines */
 
+// note :
+// -h2x tag visible items : 2 , screen class items : 3
+// -h2v tag visible items : 6 , screen class items : 7
+// -both have an extra "unused" item which might be the incomplete ui\screens\game_shell\settings_screen\extras\extras_enabled_dialog.wgit
+// -it has the texts done and looks semi-okayish , should be worth restoring
+//
 #define k_no_of_visible_items_for_settings 7
 
 /* classes */
@@ -15,7 +21,7 @@ class c_settings_list : public c_list_widget
 protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_settings];
 	c_slot2<c_settings_list, s_event_record*, datum> m_slot;
-	bool field_464;
+	bool field_464; // probably for unlocking "unused" item
 	uint8 gap_465[3];
 
 	bool handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);

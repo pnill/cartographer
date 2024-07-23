@@ -983,7 +983,6 @@ void H2MOD::Initialize()
 	if (!Memory::IsDedicatedServer())
 	{
 		KeyboardInput::Initialize();
-		ControllerInput::Initialize();
 		
 		Initialise_tag_loader();
 		RenderHooks::Initialize();
