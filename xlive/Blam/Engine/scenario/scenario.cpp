@@ -6,6 +6,12 @@ scenario* get_global_scenario(void)
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);
 }
 
+void set_global_scenario(scenario* _scenario, datum scenario_index)
+{
+    *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430) = _scenario;
+    *Memory::GetAddress<datum*>(0x4119A0) = scenario_index;
+}
+
 collision_bsp* global_collision_bsp_get(void)
 {
     return *Memory::GetAddress<collision_bsp**>(0x479E64, 0x4A6420);

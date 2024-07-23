@@ -27,3 +27,9 @@ void data_make_valid(s_data_array* data_array)
 	// not entirely sure what this actually does
 	INVOKE(0x66B33, 0x3281F, data_make_valid, data_array);
 }
+
+
+uint32 __cdecl datum_header_allocate(uint32 total_size, uint32 alignment_bits)
+{
+	return INVOKE(0x37E69, 0, datum_header_allocate, total_size, alignment_bits);
+}

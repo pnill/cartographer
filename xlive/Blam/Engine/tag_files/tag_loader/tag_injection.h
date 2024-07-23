@@ -26,5 +26,7 @@ bool tag_injection_is_injected(datum injected_index);
 
 datum tag_injection_resolve_cache_datum(datum cache_datum);
 
+void tag_injection_scenario_load_setup(uint32 allocation_size);
+
 void tag_injection_apply_hooks();
 void tag_injection_initialize();

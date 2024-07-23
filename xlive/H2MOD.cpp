@@ -862,6 +862,7 @@ void H2MOD::ApplyHooks() {
 	simulation_apply_patches();
 	simulation_players_apply_patches();
 
+	cache_files_apply_patches();
 	network_configuration_apply_patches();
 
 	// server/client detours 
@@ -1000,7 +1001,7 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
-	TagFixes::Initalize();
+	//TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();

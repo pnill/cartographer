@@ -48,6 +48,11 @@ s_game_globals* scenario_get_game_globals(void)
 	return *Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C);
 }
 
+void scenario_set_game_globals(s_game_globals* globals)
+{
+	*Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C) = globals;
+}
+
 s_ui_levels_definition* game_globals_get_ui_levels(void)
 {
 	s_game_globals* globals = scenario_get_game_globals();

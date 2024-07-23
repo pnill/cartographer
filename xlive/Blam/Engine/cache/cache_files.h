@@ -2,8 +2,17 @@
 #include "main/game_preferences.h"
 #include "tag_files/tag_groups.h"
 
+#define CACHE_FILE_PAGE_SIZE 512
 #define FIRST_SHARED_TAG_INSTANCE_INDEX 10000
 #define MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL 20000
+
+enum e_shared_resource_database_type : int32
+{
+	_shared_resource_database_type_main_menu = 0,
+	_shared_resource_database_type_multi_player = 1,
+	_shared_resource_database_type_single_player = 2,
+	_shared_resource_database_type_none = -1
+};
 
 struct cache_file_tag_instance
 {
@@ -24,7 +33,7 @@ struct s_tags_header
 	datum globals_index;
 	int32 field_14;
 	int32 tag_count;
-	int32 type;
+	char type[4];
 };
 ASSERT_STRUCT_SIZE(s_tags_header, 32);
 
@@ -87,17 +96,17 @@ struct s_cache_header
 };
 ASSERT_STRUCT_SIZE(s_cache_header, 0x800);
 
-struct s_cache_file_globals
+struct s_cache_file_memory_globals
 {
 	bool tags_loaded;
 	bool custom_map;
 	int8 pad[2];
-	int32 tag_cache_base_address;
+	uint32 tag_cache_base_address;
 	s_cache_header header;
 	s_tags_header* tags_header;
 	void* field_80C;
 };
-ASSERT_STRUCT_SIZE(s_cache_file_globals, 0x810);
+ASSERT_STRUCT_SIZE(s_cache_file_memory_globals, 0x810);
 
 struct tag_iterator
 {
@@ -108,6 +117,8 @@ struct tag_iterator
 	tag_group tag_type;
 };
 ASSERT_STRUCT_SIZE(tag_iterator, 20);
+
+s_cache_file_memory_globals* cache_file_memory_globals_get();
 
 s_cache_header* cache_files_get_header(void);
 
@@ -123,3 +134,19 @@ void cache_file_map_clear_all_failures(void);
 
 // Get tag data from tag index
 void* __cdecl tag_get_fast(datum tag_index);
+
+void __cdecl cache_file_close();
+
+bool __cdecl cache_header_verify(s_cache_header* cache_header);
+
+uint32 __cdecl cache_file_round_up_read_size(uint32 size);
+
+bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, int8* out_buffer);
+
+void __cdecl scenario_tags_load_internal_exit_panic();
+
+bool cache_validate_shared_tag_instances(int8* tag_header, uint32 offset_mask);
+
+bool __cdecl scenario_tags_load_internal(const char* scenario_path);
+
+void cache_files_apply_patches();

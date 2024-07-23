@@ -4,6 +4,8 @@
 
 scenario* get_global_scenario(void);
 
+void set_global_scenario(scenario* _scenario, datum scenario_index);
+
 collision_bsp* global_collision_bsp_get(void);
 
 uint32 scenario_netgame_equipment_size(void);

@@ -756,6 +756,7 @@
     <ClCompile Include="Blam\Engine\simulation\simulation_queue_global_events.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_type_collection.cpp" />
     <ClCompile Include="Blam\Engine\simulation\simulation_world.cpp" />
+    <ClCompile Include="Blam\Engine\sound\sound_cache_file_definitions.cpp" />
     <ClCompile Include="Blam\Engine\sound\sound_manager.cpp" />
     <ClCompile Include="Blam\Engine\structures\cluster_partitions.cpp" />
     <ClCompile Include="Blam\Engine\structures\structures.cpp" />
@@ -1149,6 +1150,7 @@
     <ClInclude Include="Blam\Engine\simulation\simulation_view.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_watcher.h" />
     <ClInclude Include="Blam\Engine\simulation\simulation_world.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
     <ClInclude Include="Blam\Engine\sound\sound_clusters.h" />
     <ClInclude Include="Blam\Engine\sound\sound_manager.h" />
     <ClInclude Include="Blam\Engine\sound\sound_scenery.h" />

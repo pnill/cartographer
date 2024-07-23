@@ -146,3 +146,12 @@ void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 in
 {
 	return INVOKE(0x3C772, 0x32899, tag_block_get_element_with_size, block, index, block_size);
 }
+
+void set_tag_group_data_info(uint32 tag_data, uint32 tag_data_size)
+{
+	uint32* g_tag_group_data = Memory::GetAddress<uint32*>(0x482290, 0);
+	uint32* g_tag_group_data_size = Memory::GetAddress<uint32*>(0x482294, 0);
+
+	*g_tag_group_data = tag_data;
+	*g_tag_group_data_size = tag_data_size;
+}
