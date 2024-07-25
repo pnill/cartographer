@@ -152,7 +152,7 @@ bool scenario_tags_load_process_shared_tags()
 	return true;
 }
 
-bool __cdecl scenario_tags_load_debug()
+bool scenario_tags_load_debug(void)
 {
 	s_cache_header* cache_header = cache_files_get_header();
 
@@ -164,25 +164,25 @@ bool __cdecl scenario_tags_load_debug()
 
 	if(!cache_file_blocking_read(NONE, cache_header->tag_name_buffer_offset, aligned_tag_name_read_size, g_cache_file_debug_globals.debug_tag_name_buffer))
 	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag names from cache");
+		DISPLAY_ASSERT("%s: failed to load tag names from cache", __FUNCTION__);
 		return false;
 	}
 
 	if (!cache_file_blocking_read(NONE, cache_header->tag_name_offsets_offset, aligned_tag_name_offset_read_size, g_cache_file_debug_globals.debug_tag_name_offsets))
 	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag name offsets from cache");
+		DISPLAY_ASSERT("%s: failed to load tag name offsets from cache", __FUNCTION__);
 		return false;
 	}
 
 	if(!cache_file_blocking_read(NONE, cache_header->string_table_offset, aligned_string_id_table_read_size, g_cache_file_debug_globals.debug_string_id_storage))
 	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string table from cache");
+		DISPLAY_ASSERT("%s: failed to load string table from cache" __FUNCTION__);
 		return false;
 	}
 
 	if(!cache_file_blocking_read(NONE, cache_header->string_idx_offset, aligned_string_id_index_buffer_read_size, g_cache_file_debug_globals.debug_string_id_index))
 	{
-		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string index table from cache");
+		DISPLAY_ASSERT("%s: failed to load string index table from cache", __FUNCTION__);
 		return false;
 	}
 
@@ -227,7 +227,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("scenario_tags_load: failed to load tag header from cache");
+		DISPLAY_ASSERT("%s: failed to load tag header from cache" __FUNCTION__);
 		return false;
 	}
 
@@ -236,7 +236,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("scenario_tags_load: failed to load tag data from cache");
+		DISPLAY_ASSERT("%s: failed to load tag data from cache", __FUNCTION__);
 		return false;
 	}
 
@@ -293,12 +293,13 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	return true;
 }
 
-void cache_files_apply_patches()
+void cache_files_apply_patches(void)
 {
 	// Default Maps
 	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load);
 	// Custom Maps
 	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load);
+	return;
 }
 
 
