@@ -7,5 +7,5 @@
  */
 void __cdecl biped_definitions_fixup(datum biped_datum)
 {
-	INVOKE(0x1389B0, 0, biped_definitions_fixup, biped_datum);
+	INVOKE(0x1389B0, 0x134618, biped_definitions_fixup, biped_datum);
 }

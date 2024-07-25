@@ -6,7 +6,7 @@
 
 runtime_global_sound_gestalt* get_runtime_global_sound_gestalt()
 {
-	return Memory::GetAddress<runtime_global_sound_gestalt*>(0x482298, 0);
+	return Memory::GetAddress<runtime_global_sound_gestalt*>(0x482298, 0x4D2518);
 }
 
 void initialize_runtime_sound_gestalt_definition_shared(const s_sound_cache_file_gestalt_definition* shared_gestalt)
@@ -85,7 +85,7 @@ void initialize_runtime_sound_gestalt_definition_shared(const s_sound_cache_file
 
 bool __cdecl initialize_runtime_sound_gestalt_definition_custom(s_sound_cache_file_gestalt_definition* shared_gestalt, s_sound_cache_file_gestalt_definition* custom_gestalt)
 {
-	return INVOKE(0x3CAE5, 0, initialize_runtime_sound_gestalt_definition_custom, shared_gestalt, custom_gestalt);
+	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_custom, shared_gestalt, custom_gestalt);
 }
 void __cdecl initialize_runtime_sound_gestalt_definition()
 {

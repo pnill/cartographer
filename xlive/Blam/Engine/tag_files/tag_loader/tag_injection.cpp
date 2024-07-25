@@ -71,6 +71,8 @@ datum tag_injection_resolve_cache_datum(datum cache_datum)
 
 void tag_injection_scenario_load_setup(uint32 allocation_size)
 {
+	LOG_DEBUG_GAME("[tag_injection_scenario_load_setup]: Setting up for injection - Alloc Size: {:x}", allocation_size);
+
 	g_manager.set_base_map_tag_data_size(allocation_size + 0x20);
 
 	//Clear the table
@@ -85,7 +87,7 @@ void tag_injection_scenario_load_setup(uint32 allocation_size)
 	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
 	{
 		// Grab the current 
-		uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50);
+		uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50, 0x4A29B8);
 		memset((BYTE*)g_tag_table, 0, 0x3BA40);
 
 		if (*tag_table_start != NULL)
@@ -151,9 +153,17 @@ void tag_injection_apply_hooks()
 	//PatchCall(Memory::GetAddress(0x315ED), scenario_tags_load_internal);
 
 	//client side desync fix
-	///(noping out jump instructions)	
-	NopFill(Memory::GetAddress(0x316CE), 2);
-	NopFill(Memory::GetAddress(0x316DC), 2);
+	///(noping out jump instructions)
+	if (!Memory::IsDedicatedServer())
+	{
+		NopFill(Memory::GetAddress(0x316CE), 2);
+		NopFill(Memory::GetAddress(0x316DC), 2);
+	}
+	else
+	{
+		//NopFill(Memory::GetAddress(0x2557E), 2);
+		//NopFill(Memory::GetAddress(0x2558C), 2);
+	}
 }
 
 void tag_injection_initialize()

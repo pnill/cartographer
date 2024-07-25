@@ -8,5 +8,5 @@
  */
 void __cdecl physics_model_definitions_fixup(datum phsyics_model_datum, bool unk_havok_flag)
 {
-	INVOKE(0x7B844, 0, physics_model_definitions_fixup, phsyics_model_datum, unk_havok_flag);
+	INVOKE(0x7B844, 0x852A4, physics_model_definitions_fixup, phsyics_model_datum, unk_havok_flag);
 }

@@ -7,5 +7,5 @@
  */
 void __cdecl vehicle_definitions_fixup(datum vehicle_datum)
 {
-	INVOKE(0x13895A, 0, vehicle_definitions_fixup, vehicle_datum);
+	INVOKE(0x13895A, 0x1345C2, vehicle_definitions_fixup, vehicle_datum);
 }

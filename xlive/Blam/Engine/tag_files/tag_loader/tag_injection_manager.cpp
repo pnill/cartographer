@@ -187,11 +187,14 @@ tag_group c_tag_injecting_manager::get_tag_group_by_datum(datum cache_datum) con
 
 void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) const
 {
+	// resource caches are disabled on H2Server
+	if (Memory::IsDedicatedServer())
+		return;
+
 	// There is probably a struct here but can't identify anything
-	HANDLE* g_cache_handle = Memory::GetAddress<HANDLE*>(0x4AE8A8);
-	uint32* g_cache_handle_geometry_block_offset = Memory::GetAddress<DWORD*>(0x4AE8B0);
-	uint32* g_cache_handle_geometry_block_size = Memory::GetAddress<DWORD*>(0x4AE8B4);
-	
+	HANDLE* g_cache_handle = Memory::GetAddress<HANDLE*>(0x4AE8A8, 0x4CF128);
+	uint32* g_cache_handle_geometry_block_offset = Memory::GetAddress<DWORD*>(0x4AE8B0, 0x4CF130);
+	uint32* g_cache_handle_geometry_block_size = Memory::GetAddress<DWORD*>(0x4AE8B4, 0x4CF134);
 
 	// a little precaution to circumvent unexpected behaviour
 	const uint32 previous_geometry_block_offset = *g_cache_handle_geometry_block_offset;
@@ -245,7 +248,6 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 
 		case 'bitm':
 		{
-
 			int old_list_field = *Memory::GetAddress<DWORD*>(0xA49270 + 0x1FC);
 			bitmap_group* bitmap_definition = (bitmap_group*)tag_data;
 
@@ -318,6 +320,9 @@ void c_tag_injecting_manager::apply_definition_fixup(e_tag_group group, datum in
 
 void c_tag_injecting_manager::initialize_shader_template(datum injected_datum)
 {
+	if (Memory::IsDedicatedServer())
+		return;
+
 	typedef bool(__cdecl t_init_shader_template)(int a1);
 	auto p_init_shader_template = Memory::GetAddress<t_init_shader_template*>(0x2694E6);
 	tag_iterator* stem_iterator = Memory::GetAddress<tag_iterator*>(0xA4AF10);
@@ -542,9 +547,6 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 	tag_class[2] = group.string[1];
 	tag_class[3] = group.string[0];
 	tag_class[4] = '\0';
-
-	c_static_string260 name;
-	manager->get_name_by_tag_datum(group.group, cache_datum, name.get_buffer());
 
 	LOG_DEBUG_GAME("[c_tag_injection_manager::load_tag] loading dependency {} {}", name.get_string(), tag_class);
 #endif
