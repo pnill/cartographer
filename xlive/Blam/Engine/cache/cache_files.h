@@ -33,8 +33,8 @@ ASSERT_STRUCT_SIZE(cache_file_tag_instance, 16);
 // Stores information about currently loaded tags
 struct s_tags_header
 {
-	void* parent_info;
-	int32 tag_parent_info_count;
+	s_tag_group_link* tag_group_link_set;
+	int32 tag_group_link_set_count;
 	cache_file_tag_instance* tag_instances;
 	datum scenario_index;
 	datum globals_index;

@@ -66,7 +66,7 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 
 void c_xml_definition_loader::load_cache_info()
 {
-	uint32 instance_table_offset = this->m_cache_header->tag_offset + 0xC * this->m_tags_header->tag_parent_info_count + 0x20;
+	uint32 instance_table_offset = this->m_cache_header->tag_offset + 0xC * this->m_tags_header->tag_group_link_set_count + 0x20;
 	uint32 tag_data_start_offset = this->m_cache_header->tag_offset + this->m_cache_header->data_offset;
 
 	uint32 tag_instance_offset = instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);

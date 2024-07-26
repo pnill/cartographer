@@ -154,16 +154,16 @@ void tag_injection_apply_hooks()
 
 	//client side desync fix
 	///(noping out jump instructions)
-	if (!Memory::IsDedicatedServer())
-	{
-		NopFill(Memory::GetAddress(0x316CE), 2);
-		NopFill(Memory::GetAddress(0x316DC), 2);
-	}
-	else
-	{
-		//NopFill(Memory::GetAddress(0x2557E), 2);
-		//NopFill(Memory::GetAddress(0x2558C), 2);
-	}
+	//if (!Memory::IsDedicatedServer())
+	//{
+	//	NopFill(Memory::GetAddress(0x316CE), 2);
+	//	NopFill(Memory::GetAddress(0x316DC), 2);
+	//}
+	//else
+	//{
+	//	//NopFill(Memory::GetAddress(0x2557E), 2);
+	//	//NopFill(Memory::GetAddress(0x2558C), 2);
+	//}
 }
 
 void tag_injection_initialize()

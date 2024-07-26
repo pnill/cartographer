@@ -133,6 +133,14 @@ union tag_group
 	char string[4];
 };
 
+struct s_tag_group_link
+{
+	tag_group child;
+	tag_group parent_2;
+	tag_group parent;
+};
+
+
 struct s_tag_block
 {
 	int32 count;
@@ -144,6 +152,8 @@ constexpr tag_group tag_group_from_enum(e_tag_group type)
 	const tag_group temp{ type };
 	return temp;
 }
+
+s_tag_group_link* tag_group_get_link_set(tag_group group);
 
 tag_group tag_group_get_name(tag_group group);
 

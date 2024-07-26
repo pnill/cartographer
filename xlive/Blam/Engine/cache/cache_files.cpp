@@ -57,6 +57,34 @@ void* __cdecl tag_get_fast(datum tag_index)
 	return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
 }
 
+
+typedef void* (__cdecl* t_tag_get_safe)(tag_group group, datum tag_index);
+t_tag_get_safe p_tag_get_safe;
+
+void* tag_get_safe(tag_group group, datum tag_index)
+{
+	if(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index) > 0u)
+	{
+		s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
+		cache_file_tag_instance* tag_instance = &cache_file_memory->tags_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
+
+		if(tag_index == tag_instance->tag_index)
+		{
+			s_tag_group_link* group_link = tag_group_get_link_set(tag_instance->group_tag);
+
+			if(group_link)
+			{
+				if(group_link->child.group == group.group || group_link->parent_2.group == group.group || group_link->parent.group == group.group)
+				{
+					return (void*)((char*)cache_file_memory->tag_cache_base_address + tag_instance->data_offset);
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 void __cdecl cache_file_close()
 {
 	INVOKE(0x64C37, 0x4CC8E, cache_file_close);
@@ -130,8 +158,8 @@ bool scenario_tags_load_process_shared_tags()
 	if (!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, shared_header.data_offset + shared_header.tag_offset, adjusted_data_size, shared_data_start, false))
 		return false;
 
-	unmasked_tag_header->parent_info = &unmasked_tag_header[1];
-	unmasked_tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&unmasked_tag_header[1]) + 0xC * unmasked_tag_header->tag_parent_info_count);
+	unmasked_tag_header->tag_group_link_set = (s_tag_group_link*)&unmasked_tag_header[1];
+	unmasked_tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&unmasked_tag_header[1]) + 0xC * unmasked_tag_header->tag_group_link_set_count);
 
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX)
 	{
@@ -258,8 +286,8 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	}
 
 	// Change the pointers in the header to point to the new locations in memory
-	tag_header->parent_info = &tag_header[1];
-	tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&tag_header[1]) + 0xC * tag_header->tag_parent_info_count);
+	tag_header->tag_group_link_set = (s_tag_group_link*)&tag_header[1];
+	tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&tag_header[1]) + 0xC * tag_header->tag_group_link_set_count);
 
 	// TODO: Where do these go.
 	*Memory::GetAddress<cache_file_tag_instance**>(0x47cd50, 0x4A29B8) = tag_header->tag_instances;
@@ -299,6 +327,8 @@ void cache_files_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load);
 	// Custom Maps
 	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load);
+
+	DETOUR_ATTACH(p_tag_get_safe, Memory::GetAddress<t_tag_get_safe>(0x316C3, 0x25573), tag_get_safe);
 	return;
 }
 

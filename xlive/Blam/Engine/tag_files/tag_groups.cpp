@@ -1,6 +1,36 @@
 #include "stdafx.h"
 #include "tag_groups.h"
 
+#include "cache/cache_files.h"
+
+s_tag_group_link* tag_group_get_link_set(tag_group group)
+{
+	s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
+
+	if (!cache_file_memory->tags_header)
+		return nullptr;
+
+	s_tag_group_link t_link;
+	t_link.child = group;
+	t_link.parent_2 = tag_group_from_enum(_tag_group_none);
+	t_link.parent = tag_group_from_enum(_tag_group_none);
+
+	typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
+	auto p_subtract_function = Memory::GetAddress<subtract_function_t>(0x30D90, 0x24C40);
+
+	typedef int32(__cdecl *tag_group_get_link_set_index)(s_tag_group_link* link_set, s_tag_group_link* tag_link_set, uint32 tag_link_set_size, int32 element_size, subtract_function_t func, int32 unk);
+	auto p_tag_group_get_link_set_index = Memory::GetAddress<tag_group_get_link_set_index>(0x8CAC3, 0x7333C);
+
+	int32 link_index = p_tag_group_get_link_set_index(&t_link, cache_file_memory->tags_header->tag_group_link_set, cache_file_memory->tags_header->tag_group_link_set_count, 12, p_subtract_function, 0);;
+
+	if (link_index == NONE)
+		return nullptr;
+
+	s_tag_group_link* link = &cache_file_memory->tags_header->tag_group_link_set[link_index];
+
+	return link;
+}
+
 tag_group tag_group_get_name(tag_group group)
 {
 	// We need to reverse this since little endian reorders the character bytes

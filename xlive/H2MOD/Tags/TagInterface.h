@@ -101,8 +101,8 @@ namespace tags
 		return static_cast<tag_parent_info*>(
 			bsearch(
 				&search_for,
-				header->parent_info,
-				header->tag_parent_info_count,
+				header->tag_group_link_set,
+				header->tag_group_link_set_count,
 				sizeof(tag_parent_info),
 				compare_parent_info
 			));
