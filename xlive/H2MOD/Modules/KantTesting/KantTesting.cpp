@@ -5,6 +5,7 @@ namespace KantTesting
 {
 	void MapLoad()
 	{
+
 	}
 
 	void Initialize()

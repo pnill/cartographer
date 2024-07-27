@@ -168,6 +168,8 @@ void c_tag_injecting_manager::reset()
 
 	// todo: clear entry table
 	this->m_table.clear();
+
+	this->m_injectable_used_size = 0;
 }
 
 

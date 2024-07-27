@@ -1,3 +1,3 @@
 #pragma once
 
-#define K_TAG_INJECTION_DEBUG 0
+#define K_TAG_INJECTION_DEBUG 1

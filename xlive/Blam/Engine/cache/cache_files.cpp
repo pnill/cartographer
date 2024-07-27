@@ -163,17 +163,18 @@ bool scenario_tags_load_process_shared_tags()
 
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX)
 	{
+
 		// Update cache tag_header's instances referencing shared tags
 		datum current_shared_datum = FIRST_SHARED_TAG_INSTANCE_INDEX;
 		do
 		{
-			if(unmasked_tag_header->tag_instances[current_shared_datum].tag_index != NONE)
+			if(tag_header->tag_instances[current_shared_datum].tag_index != NONE)
 			{
 				tag_header->tag_instances[current_shared_datum].data_offset = unmasked_tag_header->tag_instances[current_shared_datum].data_offset;
 				tag_header->tag_instances[current_shared_datum].size = unmasked_tag_header->tag_instances[current_shared_datum].size;
-
-				current_shared_datum++;
 			}
+
+			current_shared_datum++;
 		} while (current_shared_datum < tag_header->tag_count);
 	}
 
