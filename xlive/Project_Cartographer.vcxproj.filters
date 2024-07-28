@@ -1062,6 +1062,7 @@
     <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
     <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
     <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "sound_cache_file_definitions.h"
 
+#include "sound_definitions.h"
 #include "cseries/cseries_system_memory.h"
 #include "game/game_globals.h"
 
@@ -9,7 +10,7 @@ runtime_global_sound_gestalt* get_runtime_global_sound_gestalt()
 	return Memory::GetAddress<runtime_global_sound_gestalt*>(0x482298, 0x4D2518);
 }
 
-void initialize_runtime_sound_gestalt_definition_shared(const s_sound_cache_file_gestalt_definition* shared_gestalt)
+void initialize_runtime_sound_gestalt_definition_cache_only(const s_sound_cache_file_gestalt_definition* shared_gestalt)
 {
 	runtime_global_sound_gestalt* global_sound_gestalt = get_runtime_global_sound_gestalt();
 
@@ -83,14 +84,34 @@ void initialize_runtime_sound_gestalt_definition_shared(const s_sound_cache_file
 	global_sound_gestalt->initialized = true;
 }
 
-bool __cdecl initialize_runtime_sound_gestalt_definition_custom(s_sound_cache_file_gestalt_definition* shared_gestalt, s_sound_cache_file_gestalt_definition* custom_gestalt)
+bool __cdecl initialize_runtime_sound_gestalt_definition_with_shared(s_sound_cache_file_gestalt_definition* cache_gestalt, s_sound_cache_file_gestalt_definition* shared_gestalt)
 {
-	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_custom, shared_gestalt, custom_gestalt);
+	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_with_shared, cache_gestalt, shared_gestalt);
 }
-void __cdecl initialize_runtime_sound_gestalt_definition()
-{
-	//INVOKE(0x3DC37, 0, initialize_runtime_sound_gestalt_definition);
 
+void initialize_runtime_sound_gestalt_panic()
+{
+	// Clear all sound tags gestalt parameters so they cannot play.
+
+	tag_iterator sound_iterator;
+	tag_iterator_new(&sound_iterator, tag_group_from_enum(_tag_group_sound));
+
+	while (tag_iterator_next(&sound_iterator))
+	{
+		sound_definition_v1* sound = (sound_definition_v1*)tag_get_fast(sound_iterator.current_tag_index);
+
+		sound->gestalt_custom_playback_index = NONE;
+		sound->gestalt_extra_info_index = NONE;
+		sound->gestalt_pitch_range_index = NONE;
+		sound->gestalt_playback_parameter_index = NONE;
+		sound->gestalt_promotion_index = NONE;
+		sound->gestalt_scale_index = NONE;
+		sound->gestalt_unknown_index = NONE;
+	}
+}
+
+void initialize_runtime_sound_gestalt_definition()
+{
 	runtime_global_sound_gestalt* global_sound_gestalt = get_runtime_global_sound_gestalt();
 	s_game_globals* game_globals = scenario_get_game_globals();
 	s_cache_header* cache_header = cache_files_get_header();
@@ -107,27 +128,29 @@ void __cdecl initialize_runtime_sound_gestalt_definition()
 	{
 		datum shared_gestalt_datum = game_globals->sound_globals[0]->sound_gesalt;
 
-		s_sound_cache_file_gestalt_definition* shared_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(shared_gestalt_datum);
-		s_sound_cache_file_gestalt_definition* custom_gestalt = nullptr;
+		s_sound_cache_file_gestalt_definition* cache_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(shared_gestalt_datum);
+		s_sound_cache_file_gestalt_definition* shared_gestalt = nullptr;
 
 		if(cache_header->secondary_ugh_tag_index != NONE)
-			custom_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(cache_header->secondary_ugh_tag_index);
+			shared_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(cache_header->secondary_ugh_tag_index);
 
-		if(!custom_gestalt)
+		if(!shared_gestalt)
 		{
-			initialize_runtime_sound_gestalt_definition_shared(shared_gestalt);
+			initialize_runtime_sound_gestalt_definition_cache_only(cache_gestalt);
 		}
 		else
 		{
-			if(!initialize_runtime_sound_gestalt_definition_custom(shared_gestalt, custom_gestalt))
+			if(!initialize_runtime_sound_gestalt_definition_with_shared(cache_gestalt, shared_gestalt))
 			{
-				auto a = 0;
-				// Panic, wipe all snd! tags!!!
+				// Gestalt initialization failed, clear all gestalt info for sounds.
+				DISPLAY_ASSERT("%s: failed to initialize sounds gestalt merging failed", __FUNCTION__);
+				initialize_runtime_sound_gestalt_panic();
 			}
 		}
 	}
 	else
 	{
-		// Panic!!!
+		DISPLAY_ASSERT("%s: failed to initialize sounds sound_globals could not be found", __FUNCTION__);
+		initialize_runtime_sound_gestalt_panic();
 	}
 }

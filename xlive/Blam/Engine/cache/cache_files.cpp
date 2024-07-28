@@ -118,9 +118,9 @@ void scenario_tags_load_internal_panic()
 	cache_file_close();
 }
 
-bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool unk_bool)
+bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool async)
 {
-	return INVOKE(0x64CC7, 0x4CD1E, read_shared_resource_database, database_type, unused_flags, offset, size, out_buffer, unk_bool);
+	return INVOKE(0x64CC7, 0x4CD1E, read_shared_resource_database, database_type, unused_flags, offset, size, out_buffer, async);
 }
 
 bool scenario_tags_load_process_shared_tags()
@@ -138,24 +138,24 @@ bool scenario_tags_load_process_shared_tags()
 	if(!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, 0, 2048, &shared_header, false))
 		return false;
 
-	const uint32 adjusted_tag_size = cache_file_align_read_size_to_cache_page(shared_header.tag_size);
-	const uint32 adjusted_data_offset = cache_file_align_read_size_to_cache_page(shared_header.data_offset);
-	const uint32 adjusted_data_size = cache_file_align_read_size_to_cache_page(shared_header.data_size);
+	const uint32 aligned_tag_size = cache_file_align_read_size_to_cache_page(shared_header.tag_size);
+	const uint32 aligned_data_offset = cache_file_align_read_size_to_cache_page(shared_header.data_offset);
+	const uint32 aligned_data_size = cache_file_align_read_size_to_cache_page(shared_header.data_size);
 
-	if (adjusted_tag_size > cache_header->tag_offset_mask)
+	if (aligned_tag_size > cache_header->tag_offset_mask)
 		return false;
 
 	// Read tags header
-	if (!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, shared_header.tag_offset, adjusted_data_offset, unmasked_tag_header, false))
+	if (!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, shared_header.tag_offset, aligned_data_offset, unmasked_tag_header, false))
 		return false;
 
 	if (unmasked_tag_header->tag_count < FIRST_SHARED_TAG_INSTANCE_INDEX)
 		return false;
 
-	int8* shared_data_start = (int8*)(cache_file_memory->tag_cache_base_address + adjusted_tag_size - shared_header.data_size);
+	int8* shared_data_start = (int8*)(cache_file_memory->tag_cache_base_address + aligned_tag_size - shared_header.data_size);
 
 	// Read tag data
-	if (!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, shared_header.data_offset + shared_header.tag_offset, adjusted_data_size, shared_data_start, false))
+	if (!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, shared_header.data_offset + shared_header.tag_offset, aligned_data_size, shared_data_start, false))
 		return false;
 
 	unmasked_tag_header->tag_group_link_set = (s_tag_group_link*)&unmasked_tag_header[1];
@@ -221,6 +221,13 @@ bool scenario_tags_load_debug(void)
 bool __cdecl scenario_tags_load(const char* scenario_path)
 {
 	s_cache_header* cache_header = cache_files_get_header();
+
+	// Todo: fully test Single Player, adding this a precaution for now
+	if(cache_header->type == scenario_type_singleplayer)
+	{
+		return INVOKE(0x31348, 0x251F8, scenario_tags_load, scenario_path);
+	}
+
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;

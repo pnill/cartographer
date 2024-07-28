@@ -474,4 +474,4 @@ ASSERT_STRUCT_SIZE(runtime_global_sound_gestalt, 96);
 
 runtime_global_sound_gestalt* get_runtime_global_sound_gestalt();
 
-void __cdecl initialize_runtime_sound_gestalt_definition();
+void initialize_runtime_sound_gestalt_definition();
