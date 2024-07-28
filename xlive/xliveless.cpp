@@ -24,8 +24,8 @@ HANDLE* g_dwEnumeratorHandleObjects[] =
 	&g_dwFakeFriendsEnumerator
 };
 
-extern void InitInstance();
-extern void ExitInstance();
+extern void initialize_instance();
+extern void exit_instance();
 
 char str[8192];
 WCHAR strw[8192];

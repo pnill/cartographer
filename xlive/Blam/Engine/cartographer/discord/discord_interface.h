@@ -1,5 +1,11 @@
 #pragma once
 
+/* macros */
+
+// #define TEST_DISCORD_INSTANCE
+
+/* enums */
+
 enum e_context_variant : uint32
 {
 	_context_variant_ctf = 0,
@@ -11,6 +17,8 @@ enum e_context_variant : uint32
 	_context_variant_assault = 6,
 	k_context_variant_count
 };
+
+/* prototypes */
 
 // Initialize discord interface
 void discord_game_status_create(HMODULE module);

@@ -10,7 +10,7 @@
 
 
 
-extern void InitInstance();
+extern void initialize_instance();
 extern LRESULT IMGUI_IMPL_API ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool displayXyz = false;
@@ -29,16 +29,6 @@ const char CompileTime[] = __TIME__;
 
 int verticalRes = 0;
 int horizontalRes = 0;
-
-extern HMODULE hThis;
-extern std::wstring ModulePathW(HMODULE);
-
-std::wstring GetDirectoryFile(wchar_t *filename)
-{
-	std::wstring dirFile(ModulePathW(hThis));
-	dirFile.append(filename);
-	return dirFile;
-}
 
 void XLiveRendering::InitializeD3D9(LPDIRECT3DDEVICE9 pD3D9Device, D3DPRESENT_PARAMETERS* presentParameters)
 {
@@ -61,7 +51,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 {
 	LOG_TRACE_XLIVE("XLiveInitializeEx()");
 
-	InitInstance();
+	initialize_instance();
 
 	if (pXii->pD3D) {
 		XLiveRendering::InitializeD3D9((LPDIRECT3DDEVICE9)pXii->pD3D, (D3DPRESENT_PARAMETERS*)pXii->pD3DPP);
@@ -134,15 +124,6 @@ HRESULT WINAPI XLiveOnDestroyDevice()
 	
 	//LOG_TRACE_XLIVE("XLiveOnDestroyDevice");
 	return S_OK;
-}
-
-void InitalizeFont(std::wstring strFontName, const std::wstring& strFontPath, int size, IDirect3DDevice9* pD3Ddev, bool OnOff)
-{
-}
-
-
-void InitFontsIfRequired()
-{
 }
 
 int achievement_height = 0;
