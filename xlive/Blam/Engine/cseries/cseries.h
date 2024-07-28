@@ -48,6 +48,7 @@ typedef long datum;
 static_assert(sizeof(datum) == 4);
 
 #define k_kilo 1024
+#define k_unsigned_short_max 0xffff
 
 #define SIZEOF_BITS(value) (8 * sizeof(value))
 #define CHAR_BITS SIZEOF_BITS(int8)
@@ -128,8 +129,7 @@ static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") e
 #define ASSERT_STRUCT_OFFSET(STRUCT,FIELD,OFFSET)\
 static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET ") for " #FIELD " is invalid");
 
-#if defined(_DEBUG)
-
+#ifdef ASSERTS_ENABLED
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
 display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
 if (!is_debugger_present() && g_catch_exceptions)               \

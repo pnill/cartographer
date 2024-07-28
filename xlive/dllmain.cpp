@@ -5,104 +5,33 @@
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
-HMODULE hThis = NULL;
+#ifdef TEST_DISCORD_INSTANCE
+#include "H2MOD/Modules/Shell/H2MODShell.h"
+#endif
 
+
+/* constants */
 
 #define k_discord_dll_filename L"discord_game_sdk.dll"
 
-std::string ModulePathA(HMODULE hModule = NULL)
-{
-	char strPath[MAX_PATH];
-	memset(strPath, 0, sizeof(strPath));
-	GetModuleFileNameA(hModule, strPath, MAX_PATH);
+/* globals */
 
-	for (int i = strlen(strPath) - 1; i >= 0; i--)
-	{ 
-		if (strPath[i] == '\\') {
-			strPath[i + 1] = '\0'; break;
-		}
-	}
-	return std::string(strPath);
-}
+HMODULE hThis = NULL;
 
-std::wstring ModulePathW(HMODULE hModule = NULL)
-{
-	wchar_t strPath[MAX_PATH];
-	memset(strPath, 0, sizeof(strPath));
-	GetModuleFileNameW(hModule, strPath, MAX_PATH);
-	for (int i = wcslen(strPath) - 1; i >= 0; i--)
-	{
-		if (strPath[i] == L'\\') {
-			strPath[i + 1] = L'\0'; break;
-		}
-	}
-	return std::wstring(strPath);
-}
-
-void HeapDebugInitialize()
-{
-#if CART_HEAP_DEBUG
-	int CurrentFlags;
-	CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;
-	CurrentFlags |= _CRTDBG_LEAK_CHECK_DF;
-	CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
-	_CrtSetDbgFlag(CurrentFlags);
-#endif
-}
-
-void discord_initialize()
-{
-	HMODULE module = LoadLibraryW(k_discord_dll_filename);
-	if (module && !Memory::IsDedicatedServer() && H2Config_discord_enable)
-	{
-		discord_game_status_create(module);
-	}
-
-	return;
-}
-
-void InitInstance()
-{
-	static bool init = false;
-
-	if (!init)
-	{
-		init = true;
-
-		HeapDebugInitialize();
-		H2DedicatedServerStartup();
-
-		discord_initialize();
-	}
-}
+/* externs */
 
 extern CRITICAL_SECTION log_section;
-void ExitInstance()
-{
-	if (!Memory::IsDedicatedServer() && H2Config_discord_enable)//&& _Shell::GetInstanceId() == 1)
-	{
-		discord_game_status_dispose();
-	}
 
-#ifndef NO_TRACE
-	EnterCriticalSection(&log_section);
-	delete xlive_log;
-	delete h2mod_log;
-	delete network_log;
-	delete console_log;
-	delete onscreendebug_log;
-#if COMPILE_WITH_VOICE
-	delete voice_log;
-#endif
-	LeaveCriticalSection(&log_section);
-	DeleteCriticalSection(&log_section);
-#endif
-	TerminateProcess(GetCurrentProcess(), 0);
-}
+/* prototypes */
 
-//=============================================================================
-// Entry Point
+void discord_initialize(void);
+void discord_dispose(void);
+void heap_debug_initialize(void);
+void initialize_instance(void);
+void exit_instance(void);
+
+/* entry point */
+
 BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
 	switch (ul_reason_for_call)
@@ -118,8 +47,90 @@ BOOL APIENTRY DllMain( HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpRese
 		break;
 
 	case DLL_PROCESS_DETACH:
-		ExitInstance();
+		exit_instance();
 		break;
 	}
 	return TRUE;
+}
+
+/* private code */
+
+void discord_initialize(void)
+{
+	HMODULE module = LoadLibraryW(k_discord_dll_filename);
+	if (module && !Memory::IsDedicatedServer()
+		&& H2Config_discord_enable
+#ifdef TEST_DISCORD_INSTANCE
+		&& _Shell::GetInstanceId() == 1
+#endif
+		)
+	{
+		discord_game_status_create(module);
+	}
+
+	return;
+}
+
+void discord_dispose(void)
+{
+	if (!Memory::IsDedicatedServer()
+		&& H2Config_discord_enable
+#ifdef TEST_DISCORD_INSTANCE
+		&& _Shell::GetInstanceId() == 1
+#endif
+		)
+	{
+		discord_game_status_dispose();
+	}
+	return;
+}
+
+void heap_debug_initialize(void)
+{
+#if CART_HEAP_DEBUG
+	int CurrentFlags;
+	CurrentFlags = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	CurrentFlags |= _CRTDBG_DELAY_FREE_MEM_DF;
+	CurrentFlags |= _CRTDBG_LEAK_CHECK_DF;
+	CurrentFlags |= _CRTDBG_CHECK_ALWAYS_DF;
+	_CrtSetDbgFlag(CurrentFlags);
+#endif
+	return;
+}
+
+void initialize_instance(void)
+{
+	static bool init = false;
+
+	if (!init)
+	{
+		init = true;
+
+		heap_debug_initialize();
+		H2DedicatedServerStartup();
+
+		discord_initialize();
+	}
+	return;
+}
+
+void exit_instance(void)
+{
+	discord_dispose();
+
+#ifndef NO_TRACE
+	EnterCriticalSection(&log_section);
+	delete xlive_log;
+	delete h2mod_log;
+	delete network_log;
+	delete console_log;
+	delete onscreendebug_log;
+#if COMPILE_WITH_VOICE
+	delete voice_log;
+#endif
+	LeaveCriticalSection(&log_section);
+	DeleteCriticalSection(&log_section);
+#endif
+	TerminateProcess(GetCurrentProcess(), 0);
+	return;
 }

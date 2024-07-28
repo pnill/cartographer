@@ -216,44 +216,5 @@ int WINAPI XUserSetContextEx(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 {
 	LOG_TRACE_XLIVE("XUserSetContextEx  (userIndex = {0}, contextId = {1}, contextValue = {2:x}, pOverlapped = {3:p})",
 		dwUserIndex, dwContextId, dwContextValue, (void*)pOverlapped);
-
-
-	//return 0;
-
-
-	if (dwContextId == X_CONTEXT_PRESENCE)
-	{
-		LOG_TRACE_XLIVE("- X_CONTEXT_PRESENCE = {:x}", dwContextValue);
-	}
-
-	else if (dwContextId == X_CONTEXT_GAME_TYPE)
-	{
-		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_TYPE = {:x}", dwContextValue);
-
-		sessionDetails.dwGameType = dwContextValue;
-	}
-
-	else if (dwContextId == X_CONTEXT_GAME_MODE)
-	{
-		LOG_TRACE_XLIVE("- X_CONTEXT_GAME_MODE = {:x}", dwContextValue);
-
-		sessionDetails.dwGameMode = dwContextValue;
-	}
-
-
-
-	if (pOverlapped == 0)
-		return ERROR_SUCCESS;
-
-	else
-	{
-		pOverlapped->InternalHigh = 0;
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = ERROR_SUCCESS;
-
-
-		Check_Overlapped(pOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
+	return ERROR_SUCCESS;
 }

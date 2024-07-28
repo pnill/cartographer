@@ -2,15 +2,7 @@
 // Microsoft Visual C++ generated include file.
 // Used by Resource.rc
 //
-#define IDD_XSHOWKEYBOARDUI             101
-#define IDD_XSHOWMESSAGEBOXUI_3         102
-#define IDD_XSHOWMESSAGEBOXUI_2         102
-#define IDD_XSHOWMESSAGEBOXUI_1         103
 #define IDB_CRASH_WINDOW_HEADER_BITMAP  200
-#define IDC_EDIT1                       1001
-#define IDC_STATIC1                     1002
-#define IDC_DSC                         1002
-#define IDC_DSC1                        1002
 
 // Next default values for new objects
 // 

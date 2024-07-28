@@ -10,7 +10,6 @@
 
 /* constants */
 
-//#define TEST_DISCORD_INSTANCE
 #define k_discord_client_id 379371722685808641
 #define k_thread_close_wait_time_ms 2000
 
