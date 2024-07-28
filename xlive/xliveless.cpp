@@ -27,9 +27,6 @@ HANDLE* g_dwEnumeratorHandleObjects[] =
 extern void initialize_instance();
 extern void exit_instance();
 
-char str[8192];
-WCHAR strw[8192];
-
 XMARKETPLACE_CONTENTOFFER_INFO marketplace[100];
 int marketplaceCount = 0;
 
@@ -37,99 +34,6 @@ XMARKETPLACE_CONTENTOFFER_INFO marketplaceDlc[100];
 int marketplaceDlcCount = 0;
 
 int marketplaceEnumerate = 0;
-
-
-/*
-VOID Local_Storage_W( int player, WCHAR *str )
-{
-	WCHAR temp2[512];
-
-
-
-	mbstowcs( temp2, g_profileDirectory, 512 );
-
-	wcscpy( str, temp2 );
-	wcscat( str, L"\\" );
-	CreateDirectoryW( str, NULL );
-
-
-
-	mbstowcs( temp2, g_szUserName[player], 256 );
-
-	wcscat( str, temp2 );
-	CreateDirectoryW( str, NULL );
-}
-
-
-
-VOID Local_Storage_A( int player, CHAR *strA )
-{
-	strcpy( strA, g_profileDirectory );
-	strcat( strA, "\\" );
-	CreateDirectoryA( strA, NULL );
-
-
-	strcat( strA, g_szUserName[player] );
-	CreateDirectoryA( strA, NULL );
-}
-*/
-
-
-VOID ReadLine( FILE *fp, char *str )
-{
-	int lcv;
-
-
-	lcv = 0;
-	while( !feof(fp) )
-	{
-		char buf[2];
-
-
-		// UTF-16LE
-		fread( &buf, 1, 2, fp );
-
-
-		str[lcv] = buf[0];
-
-
-		if( buf[0] == 0x0D )
-			str[lcv] = 0;
-
-		if( buf[0] == 0x0A )
-		{
-			str[lcv] = 0;
-			break;
-		}
-
-
-		lcv++;
-	}
-}
-
-
-BOOL SkipText( FILE *fp, const char *str )
-{
-	char line[1024];
-
-
-	// Header
-	while(1)
-	{
-		// UTF-16LE
-		ReadLine( fp, line );
-
-
-
-		//MessageBoxA(0,line,str,MB_OK );
-
-		if( strcmp( line, str ) == 0 )
-			return TRUE;
-
-		if( feof(fp) )
-			return FALSE;
-	}
-}
 
 void Check_Overlapped( PXOVERLAPPED pOverlapped )
 {
@@ -947,94 +851,16 @@ DWORD WINAPI XContentGetMarketplaceCounts( DWORD dwUserIndex, DWORD dwContentCat
 {
 	LOG_TRACE_XLIVE( "XContentGetMarketplaceCounts  (dwUserIndex = {0}, dwContentCategories = {1:x}, cbResults = {2:x}, pResults = {3:p}, pOverlapped = {4:p})",
 		dwUserIndex, dwContentCategories, cbResults, (void*)pResults, (void*)pOverlapped );
-
-
-	if( pResults )
-	{
-		pResults->dwNewOffers = 0;
-		pResults->dwTotalOffers = marketplaceDlcCount;
-	}
-
-
-	if( pOverlapped )
-	{
-		pOverlapped->InternalHigh = marketplaceDlcCount;
-
-		pOverlapped->InternalLow = ERROR_SUCCESS;
-		pOverlapped->dwExtendedError = 0;
-
-
-		Check_Overlapped( pOverlapped );
-
-		return ERROR_IO_PENDING;
-	}
-
-
 	return ERROR_SUCCESS;
 }
-
 
 // #5372: XMarketplaceCreateOfferEnumerator
-DWORD WINAPI XMarketplaceCreateOfferEnumerator( DWORD dwUserIndex, DWORD dwOfferType, DWORD dwContentCategories, DWORD cItem, PDWORD pcbBuffer, PHANDLE phEnum )
+DWORD WINAPI XMarketplaceCreateOfferEnumerator(DWORD dwUserIndex, DWORD dwOfferType, DWORD dwContentCategories, DWORD cItem, PDWORD pcbBuffer, PHANDLE phEnum)
 {
 	LOG_TRACE_XLIVE("XMarketplaceCreateOfferEnumerator  (dwUserIndex = {0}, dwOfferType = {1:x}, dwContentCategories = {2:x}, cItem = {3}, pchBuffer = {4:p}, phEnum = {5:p}",
-		dwUserIndex, dwOfferType, dwContentCategories, cItem, (void*)pcbBuffer, (void*)phEnum );
-
-
-	if( pcbBuffer ) *pcbBuffer = sizeof( XMARKETPLACE_CONTENTOFFER_INFO ) * cItem;
-	if( phEnum )
-	{
-		*phEnum = g_dwMarketplaceContent = CreateMutex(NULL,NULL,NULL);
-
-
-		LOG_TRACE_XLIVE("- Handle = {:p}", (void*)*phEnum);
-
-
-		marketplaceEnumerate = 0;
-
-		marketplaceCount = marketplaceDlcCount;
-		memcpy( &marketplace, &marketplaceDlc, sizeof(XMARKETPLACE_CONTENTOFFER_INFO) * marketplaceDlcCount );
-
-
-		for( int lcv = 0; lcv < marketplaceDlcCount; lcv++ )
-		{
-
-			marketplace[lcv].wszTitleName = 0;
-			marketplace[lcv].wszOfferName = 0;
-
-			marketplace[lcv].dwOfferNameLength = 0;
-			marketplace[lcv].dwSellTextLength = 0;
-			marketplace[lcv].dwPackageSize = 0;
-
-			marketplace[lcv].dwOfferType = XMARKETPLACE_OFFERING_TYPE_CONTENT;
-			marketplace[lcv].dwContentCategory = XCONTENTTYPE_MARKETPLACE;
-
-			marketplace[lcv].fIsUnrestrictedLicense = FALSE;
-			marketplace[lcv].fUserHasPurchased = TRUE;
-			marketplace[lcv].dwLicenseMask = 0xFFFFFFFF;
-
-
-
-			if( lcv == 0 )
-				LOG_TRACE_XLIVE( "- [{0}] TitleId = {1:x}", lcv, marketplace[lcv].dwTitleID );
-
-
-			LOG_TRACE_XLIVE( "- [{0}] OfferingId = {1:x}", lcv, marketplace[lcv].qwOfferID );
-
-
-			strw[0] = 0;
-			for( int lcv2 = 0; lcv2 < 20; lcv2++ )
-				_swprintf( strw, L"%s%02X", strw, marketplace[lcv].contentId[lcv2] );
-			strw[40] = 0;
-
-			LOG_TRACE_XLIVE(L"- [{0}] ContentId = {1}", lcv, strw );
-		}
-	}
-
-
+		dwUserIndex, dwOfferType, dwContentCategories, cItem, (void*)pcbBuffer, (void*)phEnum);
 	return ERROR_SUCCESS;
 }
-
 
 DWORD WINAPI XMarketplaceCreateOfferEnumeratorByOffering( DWORD dwUserIndex, DWORD cItem, const ULONGLONG *pqwNumOffersIds, WORD cOfferIDs, PDWORD pcbBuffer, PHANDLE phEnum )
 {
