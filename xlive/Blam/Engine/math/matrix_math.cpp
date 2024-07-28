@@ -46,7 +46,7 @@ real_quaternion* matrix3x3_rotation_to_quaternion(const real_matrix3x3* matrix, 
 	if (v1 <= 0.0f)
 	{
 		uint32 i = matrix->forward.i < matrix->left.j;
-		if (matrix->forward.v[i] < matrix->up.k)
+		if (matrix->v.n[4 * i] < matrix->up.k)
 		{
 			i = 2;
 		}
