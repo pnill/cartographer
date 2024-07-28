@@ -9,6 +9,7 @@
 #define K_HEADER_TEXT_BLOCK_INDEX 0
 #define K_BUTTON_KEY_TEXT_BLOCK_INDEX 1
 #define K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS 2
+#define K_MAXIMUM_NUMBER_OF_BUTTON_KEYS 4
 
 #define TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(block_idx) \
 			(block_idx + K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS)
@@ -342,7 +343,7 @@ enum e_special_widgets_type
 };
 
 /* forward declarations */
-
+enum e_user_interface_controller_component : uint32;
 class c_button_widget;
 class c_tab_view_widget;
 class c_player_widget_representation;
@@ -409,6 +410,7 @@ public:
 	c_text_widget* try_find_screen_text(uint32 idx);
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
 	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
+	void initialize_button_keys_text(bool add_new_child);
 	void* get_screen_definition();
 	
 	
@@ -424,13 +426,13 @@ public:
 	virtual void sub_60E884();
 	virtual void initialize(s_screen_parameters* parameters) = 0;
 	virtual void post_initialize();
-	virtual void setup_special_widgets();
+	virtual void post_initialize_button_keys();
 	virtual c_user_interface_widget* sub_6102C5();
 	virtual uint8 sub_6103D6();
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual int32 sub_60F151(int32 a2);
+	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual uint8 sub_40AD53();
 	virtual e_user_interface_channel_type  get_channel();
 	virtual e_user_interface_render_window  get_render_window();
@@ -440,7 +442,7 @@ public:
 	virtual void sub_60ECC9(s_screen_state* state);
 	virtual void* load_proc() = 0;
 	virtual bool overlay_effect_is_disabled();
-	virtual void sub_60F2A4(uint8 bitmap_index);
+	virtual void set_favourites_bitmap_visible(bool show_icon);
 
 };
 ASSERT_STRUCT_SIZE(c_screen_widget, 0xA5C);

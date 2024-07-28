@@ -40,6 +40,13 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 
 /* public code */
 
+
+uint32 xinput_device::get_port() const
+{
+	return dwUserIndex;
+}
+
+
 void input_xinput_clear_rumble_state(void)
 {
 	// Originally 20

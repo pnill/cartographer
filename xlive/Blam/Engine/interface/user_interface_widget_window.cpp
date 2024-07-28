@@ -83,6 +83,11 @@ void c_screen_widget::apply_new_representations_to_players(c_player_widget_repre
 {
 	INVOKE_TYPE(0x211CD0, 0x0, void(__thiscall*)(c_screen_widget*, c_player_widget_representation*, int32), this, representations, player_count);
 }
+void c_screen_widget::initialize_button_keys_text(bool add_new_child)
+{
+	return INVOKE_TYPE(0x20FF73, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, add_new_child);
+}
+
 void* c_screen_widget::get_screen_definition()
 {
 	return INVOKE_TYPE(0x20E8A6, 0x0, void*(__thiscall*)(c_screen_widget*), this);
@@ -127,7 +132,7 @@ void c_screen_widget::post_initialize()
 	INVOKE_TYPE(0x20F790, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
 
-void c_screen_widget::setup_special_widgets()
+void c_screen_widget::post_initialize_button_keys()
 {
 	INVOKE_TYPE(0x210B4E, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
@@ -157,9 +162,12 @@ int32 c_screen_widget::sub_60F081(s_event_record* a2)
 	return INVOKE_TYPE(0x20F081, 0x0, int32(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
 }
 
-int32 c_screen_widget::sub_60F151(int32 a2)
+e_user_interface_controller_component c_screen_widget::get_component_from_button_key(int32 special_widget_index)
 {
-	return INVOKE_TYPE(0x20F151, 0x0, int32(__thiscall*)(c_screen_widget*, int32), this, a2);
+	//converts private_use_characters to controller_component
+	// anything other than a,b,x,y defaults to a
+	//override this if you want to add support for say d-pad up or triggers
+	return INVOKE_TYPE(0x20F151, 0x0, e_user_interface_controller_component(__thiscall*)(c_screen_widget*, int32), this, special_widget_index);
 }
 
 uint8 c_screen_widget::sub_40AD53()
@@ -206,9 +214,9 @@ bool c_screen_widget::overlay_effect_is_disabled()
 	return this->m_disable_overlay_effect;
 }
 
-void c_screen_widget::sub_60F2A4(uint8 bitmap_index)
+void c_screen_widget::set_favourites_bitmap_visible(bool show_icon)
 {
-	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, uint8), this, bitmap_index);
+	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, show_icon);
 }
 
 

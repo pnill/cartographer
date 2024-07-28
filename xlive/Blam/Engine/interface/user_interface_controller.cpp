@@ -159,6 +159,15 @@ bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller
 	return false;
 }
 
+bool __cdecl user_interface_controller_has_gamepad_just_left(e_controller_index controller_index)
+{
+	if (VALID_INDEX(controller_index, k_number_of_controllers))
+	{
+		return input_gamepad_just_left(controller_index);
+	}
+	return false;
+}
+
 bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index)
 {
 	s_user_interface_controller_globals* g_user_interface_controller_globals = user_interface_controller_globals_get();
@@ -206,6 +215,11 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 
 }
 
+bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controller_index)
+{
+	return user_interface_controller_globals_get()->controllers[controller_index].m_flags.test(_controller_state_has_xbox_live_bit);
+}
+
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active)
 {
 	//INVOKE(0x208A01, 0x0, user_interface_controller_xbox_live_account_set_signed_in, controller_index, active);
@@ -237,7 +251,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		{
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
 			c_static_wchar_string32 format;
-			global_string_resolve_stringid_to_value(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
+			user_interface_global_string_get(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
 			usnzprintf(controller->player_name.get_buffer(),
 				controller->player_name.max_length(),
 				format.get_string(),

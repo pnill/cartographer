@@ -10,11 +10,23 @@
 #include "interface/user_interface_controller.h"
 
 extern input_device** g_xinput_devices;
+extern s_input_abstraction_globals* input_abstraction_globals;
 
+bool g_should_offset_gamepad_indices = false;
+bool g_notified_to_change_mapping = false;
+uint32 input_device_change_delay_timer = NULL;
 s_input_globals* input_globals;
 
 XINPUT_VIBRATION g_vibration_state[k_number_of_controllers]{};
 real32 g_rumble_factor = 1.0f;
+
+/* forward declarations*/
+int compare_device_compatibility(const void* p1, const void* p2);
+int compare_device_ports(const void* p1, const void* p2);
+void input_windows_update_device_mapping();
+void input_windows_restore_device_mapping();
+
+/* public code */
 
 void __cdecl input_initialize()
 {
@@ -86,6 +98,22 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 			SendInput(1, &input, sizeof(input));
 		}
 	}
+
+	// we want device changes to happen smoothly, not abrupt
+	input_device_change_delay_timer += duration_ms;
+	if (g_notified_to_change_mapping && input_device_change_delay_timer > 2500)
+	{
+		if (g_should_offset_gamepad_indices)
+		{
+			input_windows_update_device_mapping();
+		}
+		else
+		{
+			input_windows_restore_device_mapping();
+		}
+		g_notified_to_change_mapping = false;
+		input_device_change_delay_timer = 0;
+	}
 }
 
 void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms)
@@ -97,11 +125,35 @@ bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2)
 {
 	return INVOKE(0x2F3CD, 0x0, input_has_gamepad, gamepad_index, a2);
 }
+
 bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index)
 {
 	//return INVOKE_TYPE(0x2E186, 0x0, bool(__cdecl*)(uint16), gamepad_index);
 	return input_globals->gamepad_states[gamepad_index].connected;
 }
+
+bool __cdecl input_gamepad_just_left(uint16 gamepad_index)
+{
+	if (VALID_INDEX(gamepad_index, k_number_of_controllers))
+	{
+		return input_globals->gamepad_states[gamepad_index].m_device_just_left;
+	}
+	return false;
+}
+
+uint8 __cdecl input_get_connected_gamepads_count()
+{
+	uint8 count = 0;
+	for (e_controller_index controller = first_controller();
+		controller != k_no_controller;
+		controller = next_controller(controller))
+	{
+		if (input_has_gamepad_plugged(controller))
+			count++;
+	}
+	return count;
+}
+
 s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index)
 {
 	//s_gamepad_input_state* global = Memory::GetAddress<s_gamepad_input_state*>(0x47A5C8);
@@ -211,6 +263,115 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
+bool input_windows_processing_device_change()
+{
+	return g_notified_to_change_mapping;
+}
+
+bool input_windows_has_split_device_active()
+{
+	return g_should_offset_gamepad_indices;
+}
+
+void input_windows_notify_change_device_mapping()
+{
+	g_notified_to_change_mapping = true;
+	g_should_offset_gamepad_indices = !g_should_offset_gamepad_indices;
+}
+
+int compare_device_compatibility(const void* p1, const void* p2)
+{
+	input_device* device1 = *(input_device**)p1;
+	input_device* device2 = *(input_device**)p2;
+
+	XINPUT_STATE state_temp;
+	uint32 error_code1, error_code2;
+	error_code1 = device1->XGetState(&state_temp);
+	error_code2 = device2->XGetState(&state_temp);
+
+
+	if (error_code1 == ERROR_SEVERITY_SUCCESS && error_code2 == ERROR_DEVICE_NOT_CONNECTED)
+		return -1;
+	else if (error_code2 == ERROR_SEVERITY_SUCCESS && error_code1 == ERROR_DEVICE_NOT_CONNECTED)
+		return 1;
+
+	return 0;
+}
+
+int compare_device_ports(const void* p1, const void* p2)
+{
+	xinput_device* device1 = *(xinput_device**)p1;
+	xinput_device* device2 = *(xinput_device**)p2;
+
+	return device1->get_port() - device2->get_port();
+}
+
+void input_windows_update_device_mapping()
+{
+	input_device* g_new_xinput_order[k_number_of_controllers] = {};
+	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	{
+		g_new_xinput_order[gamepad_index] = g_xinput_devices[gamepad_index];
+	}
+
+	//sort based on connectivity, 
+	//most active /first connected gamepads will be first in the array
+	qsort(g_new_xinput_order, NUMBEROF(g_new_xinput_order), sizeof(input_device*), compare_device_compatibility);
+
+	// we also rotate the controller array 
+	// so that k_windows_device_controller_index does not have most active controller
+
+	if (g_should_offset_gamepad_indices)
+	{
+		g_xinput_devices[_controller_index_0] = g_new_xinput_order[_controller_index_3];
+		g_xinput_devices[_controller_index_1] = g_new_xinput_order[_controller_index_0];
+		g_xinput_devices[_controller_index_2] = g_new_xinput_order[_controller_index_1];
+		g_xinput_devices[_controller_index_3] = g_new_xinput_order[_controller_index_2];
+	}
+
+}
+
+void input_windows_restore_device_mapping()
+{
+	input_device* g_new_xinput_order[k_number_of_controllers] = {};
+	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	{
+		g_new_xinput_order[gamepad_index] = g_xinput_devices[gamepad_index];
+	}
+
+	//sort based on dwUserIndex (port)
+	//this is set upon input_initialize()
+	qsort(g_new_xinput_order, NUMBEROF(g_new_xinput_order), sizeof(input_device*), compare_device_ports);
+
+
+	for (uint16 gamepad_index = _controller_index_0; gamepad_index < k_number_of_controllers; gamepad_index++)
+	{
+		g_xinput_devices[gamepad_index] = g_new_xinput_order[gamepad_index];
+	}
+}
+
+bool input_has_gamepad_hook(int16 gamepad_index, bool* a1)
+{
+	if (g_should_offset_gamepad_indices && gamepad_index == k_windows_device_controller_index)
+	{
+		if (a1)
+		{
+			*a1 = true;
+		}
+		return true;
+	}
+
+	return input_has_gamepad(gamepad_index, a1);
+}
+
+void input_stop_removed_controller_handler_from_panicking()
+{
+	PatchCall(Memory::GetAddress(0x208D3C), input_has_gamepad_hook);
+	PatchCall(Memory::GetAddress(0x2084B3), input_has_gamepad_hook);
+	PatchCall(Memory::GetAddress(0x20844A), input_has_gamepad_hook);
+}
+
+
 void input_windows_apply_patches(void)
 {
 	input_globals = Memory::GetAddress<s_input_globals*>(0x479F50);
@@ -220,5 +381,7 @@ void input_windows_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x2FA62), input_update_main_device_state);		// Replace call in input_update
 	PatchCall(Memory::GetAddress(0x2FC2F), input_update_main_device_state);		// Replace call in input_update
 	PatchCall(Memory::GetAddress(0x2FBD2), input_update_gamepads);				// Replace call in input_update
+
+	input_stop_removed_controller_handler_from_panicking();
 	return;
 }

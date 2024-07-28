@@ -1,7 +1,19 @@
 #pragma once
 #include "controllers.h"
 
+/* macro defines */
+
 #define k_number_of_windows_input_virtual_codes 256
+#define k_number_of_windows_mouse_buttons 8
+#define k_number_of_buffered_keys 64
+
+
+// controller_index which the mouse/keyboard combo will use
+#define k_windows_device_controller_index _controller_index_0
+
+/* forward declarations */
+class c_input_dx9_mouse_cursor; //TODO
+
 
 /* classes */
 
@@ -106,7 +118,6 @@ struct s_keyboard_input_state
 };
 ASSERT_STRUCT_SIZE(s_keyboard_input_state, 0x400);
 
-class c_input_dx9_mouse_cursor; //TODO
 
 struct s_input_globals
 {
@@ -120,20 +131,20 @@ struct s_input_globals
 	s_keyboard_input_state keyboard;
 	int16 buffered_key_read_index;
 	int16 buffered_key_read_count;
-	s_key_state buffered_keys[64];
+	s_key_state buffered_keys[k_number_of_buffered_keys];
 	LPDIRECTINPUTDEVICE8A mouse_dinput_device;
 	bool mouse_show;
 	uint8 gap_619[3];
 	uint32 field_61C;
 	DIMOUSESTATE2 mouse_state;
-	uint16 mouse_buttons[8];
+	uint16 mouse_buttons[k_number_of_windows_mouse_buttons];
 	DIMOUSESTATE2 suppressed_mouse_state;
 	uint8 gap_658[24];
 	uint32 mouse_cursor_state;
-	void* mouse_cursor_dx9;
-	s_gamepad_input_state gamepad_states[4];
+	c_input_dx9_mouse_cursor* mouse_cursor_dx9;
+	s_gamepad_input_state gamepad_states[k_number_of_controllers];
 	s_gamepad_input_button_state suppressed_gamepad_state;
-	XINPUT_VIBRATION rumble_states[4];
+	XINPUT_VIBRATION rumble_states[k_number_of_controllers];
 	uint32 main_controller_index;
 	bool hardware_device_changed;
 	char gap[3];
@@ -157,6 +168,8 @@ void __cdecl input_update_gamepads(uint32 duration_ms);
 void __cdecl input_update_mouse(DIMOUSESTATE2* mouse_state, uint32 duration_ms);
 bool __cdecl input_has_gamepad(uint16 gamepad_index, bool* a2);
 bool __cdecl input_has_gamepad_plugged(uint16 gamepad_index);
+bool __cdecl input_gamepad_just_left(uint16 gamepad_index);
+uint8 __cdecl input_get_connected_gamepads_count();
 s_gamepad_input_state* __cdecl input_get_gamepad(uint16 gamepad_index);
 s_gamepad_input_button_state* __cdecl input_get_gamepad_state(uint16 gamepad_index);
 DIMOUSESTATE2* __cdecl input_get_mouse_state();
@@ -164,6 +177,9 @@ uint16* __cdecl input_get_mouse_button_state();
 bool __cdecl input_get_key(s_key_state* keystate);
 void __cdecl input_update_main_device_state();
 
+bool input_windows_processing_device_change();
+bool input_windows_has_split_device_active();
+void input_windows_notify_change_device_mapping();
 void input_windows_apply_patches(void);
 
 int32* hs_debug_simulate_gamepad_global_get(void);

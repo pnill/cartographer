@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "screen_4way_signin.h"
 #include "game/game.h"
@@ -85,6 +85,17 @@ enum e_controller_signin_bitmaps
 	k_number_of_controller_signin_bitmap_types
 };
 
+enum e_edit_profile_bitmaps
+{
+	_edit_profile_bitmap_controller = 0,
+	_edit_profile_bitmap_player,
+	_edit_profile_bitmap_keyboard,
+	_edit_profile_bitmap_voice,
+	_edit_profile_bitmap_xbox_live,
+	_edit_profile_bitmap_subtitles,
+	k_number_of_edit_profile_bitmap_types
+};
+
 /* structures */
 
 struct s_screen_4way_items
@@ -104,10 +115,14 @@ struct s_screen_4way_items
 /* globals */
 
 uint32 ui_recover_from_disconnection_return_address = NULL;
+bool g_show_split_inputs_option = false;
+datum edit_profile_bitmap_datum = NONE;
 
 /* forward declarations*/
 
 void initialize_elements(s_screen_4way_items& elements, e_controller_index controller);
+void add_button_key_split_input(c_text_widget* button_key_text);
+void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text);
 
 /* public code */
 
@@ -148,7 +163,7 @@ void c_screen_4way_signin::update()
 			c_player_widget_representation* current_player = &representations[controller];
 			current_player->set_appearance(&profile.profile);
 			current_player->set_player_name_from_configuration((s_player_properties*)profile.player_name.get_buffer()); //hacky
-			show_gamertag_text = online_connected_to_xbox_live();
+			show_gamertag_text = user_interface_controller_has_xbox_live(controller);
 		}
 
 		initialize_elements(items, controller);
@@ -227,10 +242,32 @@ void c_screen_4way_signin::update()
 				// we dont really have a way to determine controller_types between akebono and duke , using either is fine.
 				int16 bitmap_update_idx = gamepad_connected ? _controller_signin_bitmap_akebono : _controller_signin_bitmap_missing;
 				controller_signin_bitmap->verify_and_update_bitmap_index(bitmap_update_idx);
+
+
+				if (controller == k_windows_device_controller_index)
+				{
+					modify_controller_bitmap_for_split(controller_signin_bitmap, press_a_to_join_text);
+				}
 			}
 		}
-	}
 
+		if (controller != k_windows_device_controller_index
+			&& user_interface_controller_has_gamepad_just_left(controller)
+			&& user_interface_controller_is_player_profile_valid(controller))
+		{
+			// signout any leftover profile
+			// in h2x this is not needed as the error screen pops up and forces you to connect controller to proceed
+			// todo : fix the removed controller process, its annoying the way it is now
+			user_interface_controller_sign_out(controller);
+		}
+	}
+	g_show_split_inputs_option = false;
+	if (IN_RANGE(input_get_connected_gamepads_count(), 0, k_number_of_controllers)
+		&& user_interface_controller_is_player_profile_valid(k_windows_device_controller_index))
+	{
+		g_show_split_inputs_option = true;
+	}
+	this->update_button_key_texts();
 
 	this->apply_new_representations_to_players(representations, k_number_of_controllers);
 	c_user_interface_widget::update();
@@ -246,21 +283,27 @@ bool c_screen_4way_signin::handle_event(s_event_record* event)
 
 	if (event->type == _user_interface_event_type_gamepad_button_pressed)
 	{
+		result = this->handle_split_input_event(event);
+
 		if (!user_interface_controller_is_player_profile_valid(event->controller))
 		{
 			// if the event owner is not yet signed in
-			result = this->handle_default_events(event);
+			result = this->handle_invalid_controller_event(event);
 		}
 		else
 		{
 
-			result = this->handle_main_events(event);
+			result = this->handle_controller_button_pressed_event(event);
 
 		}
-
-		if (result)
-			return result;
 	}
+	if (event->type == _user_interface_event_type_automation)
+	{
+		result = this->handle_automation_event(event);
+	}
+
+	if (result)
+		return result;
 
 
 	return c_screen_widget::handle_event(event);
@@ -341,7 +384,7 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	return true;
 }
 
-bool c_screen_4way_signin::handle_main_events(s_event_record* event)
+bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record* event)
 {
 	char sucess = true;
 	if (event->component == _user_interface_controller_component_button_a ||
@@ -450,7 +493,7 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 	return sucess;
 }
 
-bool c_screen_4way_signin::handle_default_events(s_event_record* event)
+bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event)
 {
 	if (event->component == _user_interface_controller_component_button_a
 		|| event->component == _user_interface_controller_component_button_start)
@@ -474,6 +517,52 @@ bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 			_ui_confirm_decline_crossgame_invite);
 	}
 	return true;
+}
+
+bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
+{
+	bool result= false;
+	int16 automation_mode = (int16)event->value;
+
+	if (!IN_RANGE_INCLUSIVE(automation_mode, 2, 11))
+	{
+		error(0, "unhandled automation type %s ", automation_mode);
+	}
+	else
+	{
+		s_event_record new_event;
+		new_event.component = event->component;
+		new_event.value = event->value;
+		new_event.controller = event->controller;
+
+		new_event.type = _user_interface_event_type_gamepad_button_pressed;
+		result = this->handle_event(&new_event);
+	}
+	return result;
+}
+
+bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
+{
+	if (event->component == _user_interface_controller_component_button_x
+		&& !input_windows_processing_device_change())
+	{
+		input_windows_notify_change_device_mapping();
+		g_show_split_inputs_option = false;
+		return true;
+	}
+	return false;
+}
+
+void c_screen_4way_signin::update_button_key_texts()
+{
+	//initialize default button key text from tag
+	this->initialize_button_keys_text(false);
+
+	if (g_show_split_inputs_option)
+	{
+		add_button_key_split_input(this->get_screen_button_key_text());
+	}
+	this->post_initialize_button_keys();
 }
 
 void* c_screen_4way_signin::load(s_screen_parameters * parameters)
@@ -670,6 +759,8 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	{
 		base_hud_block->shader.index = shader_datum_index;
 	}
+
+	edit_profile_bitmap_datum = tags::find_tag(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
 }
 
 void initialize_elements(s_screen_4way_items& elements, e_controller_index controller)
@@ -735,6 +826,61 @@ void initialize_elements(s_screen_4way_items& elements, e_controller_index contr
 		elements.bitmap_controller_signin = _4way_signin_main_pane_0_bitmap_player_3_controller_signin;
 
 		break;
+	}
+}
+
+void add_button_key_split_input(c_text_widget* button_key_text)
+{
+	ASSERT(button_key_text);
+
+	c_static_wchar_string<512> temp, old;
+	old.set(button_key_text->get_interface()->get_raw_string());
+	if(!input_windows_has_split_device_active())
+	{
+		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c ADD SPLIT ", _private_use_character_x_button);
+	}
+	else
+	{
+		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c REMOVE SPLIT ", _private_use_character_x_button);
+	}
+	button_key_text->set_text(temp.get_string());
+	button_key_text->append_text(old.get_string());
+}
+
+void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)
+{
+	ASSERT(signin_bitmap);
+	ASSERT(join_text);
+
+	if (input_windows_has_split_device_active())
+	{
+		if (!DATUM_IS_NONE(edit_profile_bitmap_datum))
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(edit_profile_bitmap_datum, _edit_profile_bitmap_keyboard);
+			signin_bitmap->assign_new_bitmap_block(bitmap_block);
+
+			const real_vector2d new_scale = { 0.6796875f,0.5546875f }; //downscaled to match target , then upscaled to 2
+			signin_bitmap->set_render_scale(&new_scale);
+
+			rectangle2d bounds;
+			signin_bitmap->get_bounds(&bounds);
+
+			//shifting left to make it more centered
+			bounds.left -= 80;
+			bounds.right -= 80;
+			signin_bitmap->set_bounds(&bounds);
+
+			join_text->set_text_from_string_id(_string_id_press_a_to_join);
+		}
+	}
+	else
+	{
+		const real_vector2d default_scale = { 1.0f,1.0f };
+		signin_bitmap->set_render_scale(&default_scale);
+
+		// if we unasign current bitmap data and call get_current_bitmap_data() , it will return tag data
+		signin_bitmap->assign_new_bitmap_block(nullptr);
+		signin_bitmap->assign_new_bitmap_block(signin_bitmap->get_current_bitmap_data());
 	}
 }
 

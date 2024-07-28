@@ -27,6 +27,11 @@ void __cdecl user_interface_enter_game_shell(int32 context)
 	INVOKE(0x20CE70, 0x0, user_interface_enter_game_shell, context);
 }
 
+bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id)
+{
+	return INVOKE(0x20BAAA, 0x0, user_interface_in_screen, channel_type, window_index, screen_id);
+}
+
 
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d)
 {

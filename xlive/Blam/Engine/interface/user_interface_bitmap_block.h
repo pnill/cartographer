@@ -21,6 +21,7 @@ protected:
 
 public:
 	const real_vector2d* get_render_scale();
+	bitmap_data* get_current_bitmap_data();
 	void verify_and_update_bitmap_index(int16 index);
 	void assign_new_bitmap_block(bitmap_data* block);
 	void set_local_bitmap(int16 local_bitmap_block_index, int16 bitmap_block_index);

@@ -10,6 +10,8 @@ protected:
 	uint32 error_level;
 	XINPUT_STATE xinput_state;
 public:
+
+	uint32 get_port() const;
 	// xinput_device virtual functions
 
 	virtual void XInputOpen(void) { return; };
