@@ -22,7 +22,7 @@
 #define k_relative_maps_directory L"\\maps\\"
 #define k_relative_mods_directory L"\\mods\\"
 #define k_relative_mods_maps_directory k_relative_mods_directory L"maps\\"
-#define k_relative_mods_plugin_directory k_relative_mods_directory L"plugins\\"
+#define k_relative_mods_plugin_directory k_relative_mods_directory L"definitions\\"
 
 
 c_tag_injecting_manager::c_tag_injecting_manager():
