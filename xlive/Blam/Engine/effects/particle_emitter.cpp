@@ -120,8 +120,8 @@ void c_particle_emitter::calc_matrix(
 	real_vector3d translated_vector;
 	matrix3x3_transform_vector(&this->m_matrix, &definition->translational_offset, &translated_vector);
 
-	if (fabs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
-		fabs(definition->relative_direction.pitch) >= k_real_math_epsilon)
+	if (abs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
+		abs(definition->relative_direction.pitch) >= k_real_math_epsilon)
 	{
 		real_matrix3x3 rotations_matrix;
 		matrix3x3_from_angles(&rotations_matrix, definition->relative_direction.yaw, definition->relative_direction.pitch, 0.0f);
