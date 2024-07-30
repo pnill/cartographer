@@ -3,7 +3,7 @@
 
 #include "particle_system.h"
 
-real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_point3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
+void __cdecl particle_update_points_interpolate_hook(const real_point3d* previous_point, const real_point3d* target_point, real32 fractional_tick, real_point3d* out)
 {
 	// The engine would interpolate between the particle_emitters previous and current posisiton to find a rough estimate
 	// of where it should be in the world to be as close as possible to the object
@@ -16,7 +16,6 @@ real_vector3d* __cdecl particle_update_points_interpolate_hook(const real_point3
 		memcpy(out, target_point, sizeof(real_point3d));
 	else
 		memcpy(out, previous_point, sizeof(real_point3d));
-	return out;
 }
 
 void particle_update(real32 delta)

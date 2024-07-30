@@ -68,8 +68,8 @@ struct s_temporary_camera_impulse
 	real32 duration;
 	int8 fade_function; // e_transition_function_type
 	int8 pad;
-	real32 rotation;
-	real32 pushback;
+	real32 temporary_rotation;
+	real32 temporary_translation;
 	real_bounds jitter;
 };
 ASSERT_STRUCT_SIZE(s_temporary_camera_impulse, 24);
@@ -89,7 +89,7 @@ ASSERT_STRUCT_SIZE(s_player_effect_camera_shaking, 28);
 
 struct s_player_effect_user_globals
 {
-	real_vector3d vector_0;
+	real_vector3d jitter;
 	real_vector3d vector_C;
 	int16 field_18;
 	int16 pad_1A;

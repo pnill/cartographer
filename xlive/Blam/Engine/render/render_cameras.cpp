@@ -98,7 +98,7 @@ bool render_projection_point_to_screen(
 			out_view_position->i = v6 / divisor;
 			out_view_position->j = v1 / divisor;
 			out_view_position->k = v2 / divisor;
-			out_view_position->w = 1.f;
+			out_view_position->l = 1.f;
 
 			bounds->lower = matrix_scale_x / divisor;
 			bounds->upper = matrix_scale_y / divisor;

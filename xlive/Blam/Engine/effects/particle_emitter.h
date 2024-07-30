@@ -11,11 +11,11 @@ struct c_particle_emitter
 	datum particle_index;
 	datum m_next_emitter_index;
 	real32 particles_to_emit;
-	real_matrix3x3 matrix;
-	real_point3d position;
-	real_point3d previous_position;
+	real_matrix3x3 m_matrix;
+	real_point3d m_position;
+	real_point3d m_previous_position;
 
-	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_point) const;
+	void adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_vector3d* out_vector) const;
 
 	void __stdcall pulse(
 		c_particle_emitter* _this,

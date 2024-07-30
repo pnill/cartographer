@@ -6,7 +6,7 @@
 #include "main/interpolator.h"
 #include "math/random_math.h"
 
-void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 translation, real32 rotation);
+void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude);
 real32 player_effect_transition_function_evaluate(e_transition_function_type function_type, real32 scale, real32 elapsed_time, real32 duration);
 
 s_player_effect_globals* player_effect_globals_get(void)
@@ -91,13 +91,16 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
                 }
 
                 real_vector3d v1;
-                cross_product3d(&global_up3d, &user_effect->vector_0, &v1);
+                cross_product3d(&global_up3d, &user_effect->jitter, &v1);
 
-                real32 rotation = user_effect->camera_impulse.rotation * transition_result;
+                real32 rotation = user_effect->camera_impulse.temporary_rotation * transition_result;
                 matrix4x3_rotation_from_axis_and_angle(&effect_matrix, &v1, sin(rotation), cos(rotation));
 
-                real32 pushback_transition = user_effect->camera_impulse.pushback * transition_result;
-                scale_vector3d(&user_effect->vector_0, pushback_transition, &effect_matrix.position);
+                real32 translation = user_effect->camera_impulse.temporary_translation * transition_result;
+                effect_matrix.position.x = user_effect->jitter.i * translation;
+                effect_matrix.position.y = user_effect->jitter.j * translation;
+                effect_matrix.position.z = user_effect->jitter.k * translation;
+
                 point_from_line3d(&effect_matrix.position, &user_effect->vector_C, transition_result, &effect_matrix.position);
                 matrix4x3_multiply(matrix, &effect_matrix, matrix);
             }
@@ -145,7 +148,7 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 
                     rumble_player_continuous(user_index, user_effect->rumble_intensity_left, user_effect->rumble_intensity_right);
                 }
-                player_effect_apply_camera_effect_matrix_internal(&effect_matrix, v1, v2);
+                get_shake_matrix(&effect_matrix, v1, v2);
                 matrix4x3_multiply(matrix, &effect_matrix, matrix);
             }
         }
@@ -155,19 +158,21 @@ void player_effect_apply_camera_effect_matrix(int32 user_index, real_matrix4x3* 
 }
 
 
-void player_effect_apply_camera_effect_matrix_internal(real_matrix4x3* matrix, real32 translation, real32 rotation)
+void get_shake_matrix(real_matrix4x3* shake_matrix, real32 translation_magnitude, real32 rotation_magnitude)
 {
     real_vector3d vector;
 
-    if (rotation != 0.0f)
+    if (rotation_magnitude != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        matrix4x3_rotation_from_axis_and_angle(matrix, &vector, sin(rotation), cos(rotation));
+        matrix4x3_rotation_from_axis_and_angle(shake_matrix, &vector, sin(rotation_magnitude), cos(rotation_magnitude));
     }
-    if (translation != 0.0f)
+    if (translation_magnitude != 0.0f)
     {
         _random_direction3d(get_local_random_seed_address(), NULL, __FILE__, __LINE__, &vector);
-        scale_vector3d(&vector, translation, &matrix->position);
+        shake_matrix->position.x = vector.i * translation_magnitude;
+        shake_matrix->position.x = vector.j * translation_magnitude;
+        shake_matrix->position.x = vector.k * translation_magnitude;
     }
     return;
 }

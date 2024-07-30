@@ -145,7 +145,7 @@ unit_datum* s_player::get_player_unit_data(datum player_index)
     return (unit_datum*)object_get_fast_unsafe(unit_index);
 }
 
-real_vector3d* s_player::get_unit_coords(datum player_index)
+real_point3d* s_player::get_unit_coords(datum player_index)
 {
     unit_datum* player_unit = get_player_unit_data(player_index);
     if (player_unit != nullptr)

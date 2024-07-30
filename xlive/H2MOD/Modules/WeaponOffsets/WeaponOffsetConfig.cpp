@@ -18,7 +18,7 @@ void ReadWeaponOffsetConfig(s_weapon_custom_offset* weaponOffsets, int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
-			fscanf_s(file, "%f,%f,%f\n", &weaponOffsets[i].modifiedOffset.i, &weaponOffsets[i].modifiedOffset.j, &weaponOffsets[i].modifiedOffset.k);
+			fscanf_s(file, "%f,%f,%f\n", &weaponOffsets[i].modifiedOffset.x, &weaponOffsets[i].modifiedOffset.y, &weaponOffsets[i].modifiedOffset.z);
 		}
 		fclose(file);
 	}
@@ -35,8 +35,8 @@ void SaveWeaponOffsetConfig(const s_weapon_custom_offset* customOffsets, int cou
 	{
 		for (int i = 0; i < count; i++)
 		{
-			const real_vector3d& offset = defaultOffsets ? customOffsets[i].defaultOffset : customOffsets[i].modifiedOffset;
-			fprintf_s(file, "%.3f,%.3f,%.3f\n", offset.i, offset.j, offset.k);
+			const real_point3d* offset = defaultOffsets ? &customOffsets[i].defaultOffset : &customOffsets[i].modifiedOffset;
+			fprintf_s(file, "%.3f,%.3f,%.3f\n", offset->x, offset->y, offset->z);
 		}
 		fclose(file);
 	}

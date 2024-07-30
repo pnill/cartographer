@@ -511,7 +511,7 @@ struct _weapon_definition
     tag_reference deployed_vehicle; // vehi
     tag_reference age_effect;       // effe
     tag_reference aged_weapon;      // weap
-    real_vector3d first_person_weapon_offset;
+    real_point3d first_person_weapon_offset;
     real_vector2d first_person_scope_size;
 };
 ASSERT_STRUCT_SIZE(_weapon_definition, 796);

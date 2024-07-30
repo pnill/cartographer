@@ -88,11 +88,11 @@ namespace ImGuiHandler {
 				// Setup combo box menus for each weapon
 				ImGui::Combo(weapon_offsets_get_string(_weapon_offsets_string_combo_title), &selectedOption, weapons, ARRAYSIZE(weapons));
 				OffsetMenu(selectedOption, "##OffsetX", _weapon_offsets_string_weapon_offset_x,
-					weapOffsets[selectedOption].modifiedOffset.i, weapOffsets[selectedOption].defaultOffset.i);
+					weapOffsets[selectedOption].modifiedOffset.x, weapOffsets[selectedOption].defaultOffset.x);
 				OffsetMenu(selectedOption, "##OffsetY", _weapon_offsets_string_weapon_offset_y,
-					weapOffsets[selectedOption].modifiedOffset.j, weapOffsets[selectedOption].defaultOffset.j);
+					weapOffsets[selectedOption].modifiedOffset.y, weapOffsets[selectedOption].defaultOffset.y);
 				OffsetMenu(selectedOption, "##OffsetZ", _weapon_offsets_string_weapon_offset_z,
-					weapOffsets[selectedOption].modifiedOffset.k, weapOffsets[selectedOption].defaultOffset.k);
+					weapOffsets[selectedOption].modifiedOffset.z, weapOffsets[selectedOption].defaultOffset.z);
 			}
 		}
 

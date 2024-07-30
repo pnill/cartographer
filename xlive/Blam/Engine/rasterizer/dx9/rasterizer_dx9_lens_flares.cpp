@@ -51,7 +51,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
     const s_frame* global_window_parameters = global_window_parameters_get();
 
     real_vector3d direction;
-    vector_from_points3d(point, &global_window_parameters->camera.point, &direction);
+    vector_from_points3d(&global_window_parameters->camera.point, point, &direction);
     normalize3d(&direction);
     real32 length = dot_product3d(&global_window_parameters->camera.forward, &direction);
 
@@ -235,10 +235,10 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
                 real_rectangle2d sun_quad;
                 // create the required quad from the sun surface quad
-                sun_quad.x0 = sun_surface_quad.v[0] - square_half_size; // go left square_half_size
-                sun_quad.x1 = sun_surface_quad.v[1] + square_half_size; // go right square_half_size
-                sun_quad.y0 = sun_surface_quad.v[3] + square_half_size; // go up square_half_size
-                sun_quad.y1 = sun_surface_quad.v[2] - square_half_size; // go down square_half_size
+                sun_quad.x0 = sun_surface_quad.x0 - square_half_size; // go left square_half_size
+                sun_quad.x1 = sun_surface_quad.x1 + square_half_size; // go right square_half_size
+                sun_quad.y0 = sun_surface_quad.y1 + square_half_size; // go up square_half_size
+                sun_quad.y1 = sun_surface_quad.y0 - square_half_size; // go down square_half_size
 
                 real32 result_div = brightness / (real32)(pass + 1);
 
@@ -289,7 +289,7 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, rea
     s_frame* global_window_parameters = global_window_parameters_get();
 
     real_vector3d direction;
-    vector_from_points3d(point, &global_window_parameters->camera.point, &direction);
+    vector_from_points3d(&global_window_parameters->camera.point, point, &direction);
     normalize3d(&direction);
     real32 length = dot_product3d(&global_window_parameters->camera.forward, &direction);
     

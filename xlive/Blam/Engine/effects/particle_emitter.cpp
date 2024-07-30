@@ -13,24 +13,27 @@ s_data_array* get_particle_emitter_table()
 	return *Memory::GetAddress<s_data_array**>(0x4DD090, 0x5053B8);
 }
 
-void c_particle_emitter::adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_point3d* out_point) const
+void c_particle_emitter::adjust_matrix_and_vector_to_effect_camera(bool use_effect_camera, real_matrix3x3* out_matrix, real_vector3d* out_vector) const
 {
 	if (use_effect_camera)
 	{
 		s_camera* effect_camera = get_effect_camera();
 		real_matrix3x3 effect_camera_matrix;
 
-		*out_matrix = this->matrix;
-		*out_point = this->position;
+		*out_matrix = this->m_matrix;
+		*out_vector = { this->m_position.x, this->m_position.y, this->m_position.z };
 		matrix3x3_from_forward_and_up(&effect_camera_matrix, &effect_camera->forward, &effect_camera->up);
 		matrix3x3_multiply(&effect_camera_matrix, out_matrix, out_matrix);
-		matrix3x3_transform_vector(&effect_camera_matrix, out_point, out_point);
-		add_vectors3d(out_point, &effect_camera->point, out_point);
+		matrix3x3_transform_vector(&effect_camera_matrix, out_vector, out_vector);
+
+		out_vector->i += effect_camera->point.x;
+		out_vector->j += effect_camera->point.y;
+		out_vector->k += effect_camera->point.z;
 	}
 	else
 	{
-		*out_matrix = this->matrix;
-		*out_point = this->position;
+		*out_matrix = this->m_matrix;
+		*out_vector = { this->m_position.x, this->m_position.y, this->m_position.z };
 	}
 }
 
@@ -61,7 +64,7 @@ void c_particle_emitter::pulse(
 	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
 	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
-	_this->previous_position = _this->position;
+	_this->m_previous_position = _this->m_position;
 	if (matrix)
 	{
 		// Use sky scale if the particle is in the sky
@@ -111,22 +114,24 @@ void c_particle_emitter::calc_matrix(
 	const real_matrix4x3* matrix
 )
 {
-	this->matrix = matrix->vectors;
-	this->position = matrix->position;
-	scale_vector3d(&this->position, scale, &this->position);
+	this->m_matrix = matrix->vectors;
+	this->m_position = matrix->position;
 
 	real_vector3d translated_vector;
-	matrix3x3_transform_vector(&this->matrix, &definition->translational_offset, &translated_vector);
+	matrix3x3_transform_vector(&this->m_matrix, &definition->translational_offset, &translated_vector);
 
-	if (abs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
-		abs(definition->relative_direction.pitch) >= k_real_math_epsilon)
+	if (fabs(definition->relative_direction.yaw) >= k_real_math_epsilon ||
+		fabs(definition->relative_direction.pitch) >= k_real_math_epsilon)
 	{
 		real_matrix3x3 rotations_matrix;
 		matrix3x3_from_angles(&rotations_matrix, definition->relative_direction.yaw, definition->relative_direction.pitch, 0.0f);
-		matrix3x3_multiply(&this->matrix, &rotations_matrix, &this->matrix);
+		matrix3x3_multiply(&this->m_matrix, &rotations_matrix, &this->m_matrix);
 	}
 
-	add_vectors3d(&this->position, &translated_vector, &this->position);
+	this->m_position.x += translated_vector.i;
+	this->m_position.y += translated_vector.j;
+	this->m_position.z += translated_vector.k;
+	return;
 }
 
 // ### FIXME this approach will probably not work
@@ -147,7 +152,7 @@ void c_particle_emitter::adjust_initial_particle_position(
 	effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), particle_system->parent_effect_index);
 	object_datum* object = (object_datum*)object_get_fast_unsafe(effect->object_index);
 
-	this->previous_position = this->position;
+	this->m_previous_position = this->m_position;
 	if (matrix)
 	{
 		// Use sky scale if the particle is in the sky

@@ -746,7 +746,7 @@ int CommandCollection::Crash(const std::vector<std::string>& tokens, ConsoleComm
 
 void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_point3d* position, const real_vector3d* rotation, float randomMultiplier, bool sameTeam)
 {
-	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_point3d* orient);
+	typedef void(__cdecl* set_orientation_t)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
 	auto p_vector3d_from_euler_angles3d = Memory::GetAddress<set_orientation_t>(0x3347B);
 
 	for (int i = 0; i < count; i++)
