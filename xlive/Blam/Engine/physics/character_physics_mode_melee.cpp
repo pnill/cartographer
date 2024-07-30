@@ -196,9 +196,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				// scale_vector3d(&output->out_translational_velocity, time_globals::get_ticks_difference_real(), &output->out_translational_velocity);
 				//output->out_translational_velocity = output->out_translational_velocity * time_globals::get_ticks_difference_real();
 
-				real_vector3d decelerated_direction;
-				scale_vector3d(&direction, -deceleration, &decelerated_direction);
-				add_vectors3d(&decelerated_direction, &physics_output->translational_velocity, &physics_output->translational_velocity);
+				real_vector3d v;
+				scale_vector3d(&direction, -deceleration, &v);
+				add_vectors3d(&v, &physics_output->translational_velocity, &physics_output->translational_velocity);
 
 				// this shit apparently is not converted back to a vector that
 				// - defines the velocity in units per seconds instead of units per tick
@@ -235,9 +235,9 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 					deceleration = current_velocity_per_tick;
 				}
 				
-				real_vector3d decelerated_direction;
-				scale_vector3d(&direction, -deceleration, &decelerated_direction);
-				add_vectors3d(&decelerated_direction, &physics_output->translational_velocity, &physics_output->translational_velocity);
+				real_vector3d v;
+				scale_vector3d(&direction, -deceleration, &v);
+				add_vectors3d(&v, &physics_output->translational_velocity, &physics_output->translational_velocity);
 
 				//m_time_to_target_in_ticks = ((_FP5 * 0.5f) + v124);
 				//addDebugText("remaining target distance ticks: %f, %d", ((_FP5 * 0.5f) + v124), m_time_to_target_in_ticks);
@@ -498,13 +498,13 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 						// the best we can do is to reproduce the 30 tick behaviour
 						// on the physics velocity vector
-						real_vector3d decelerated_direction;
+						real_vector3d v;
 						scale_vector3d(
 							&direction_of_current_translational_velocity,
 							-deceleration * time_globals::get_ticks_difference_real(),
 							//-deceleration,
-							&decelerated_direction);
-						add_vectors3d(&decelerated_direction, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
+							&v);
+						add_vectors3d(&v, &current_translational_velocity_per_tick, &physics_output->translational_velocity);
 
 						// for some reason in the actual game the following line of code is missing from the actual game
 						// no idea why
