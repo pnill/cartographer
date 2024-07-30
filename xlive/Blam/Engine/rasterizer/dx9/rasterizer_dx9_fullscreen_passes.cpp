@@ -174,10 +174,10 @@ bool __cdecl rasterizer_fullscreen_effects_build_vertex_buffer_cb(
         // then it goes counter-clockwise until it forms a rectangle, so 0,0 -> 1,0 (right down) -> 1,1 (right top) -> 0,1 (left top) -> (end) 0,0 (left bottom)
         // if the location is 1, for each component we scale it with the bounds width/lenght and offset that with the verticies located on the left
         // if it is 0, then the vertex is either at the left of the screen, or at the bottom, depending on which component is 0
-        ((real_vector4d*)output)->x = (0.5f / bounds_width)  + ((location->x * bounds_width) / tex_width) + (bounds->x0 / tex_width);
-        ((real_vector4d*)output)->y = (0.5f / bounds_height) + ((location->y * bounds_height) / tex_height) + (bounds->y0 / tex_height);
-        ((real_vector4d*)output)->z = 0.f;
-        ((real_vector4d*)output)->w = 1.f;
+        ((real_rectangle2d*)output)->x0 = (0.5f / bounds_width)  + ((location->i * bounds_width) / tex_width) + (bounds->x0 / tex_width);
+        ((real_rectangle2d*)output)->x1 = (0.5f / bounds_height) + ((location->j * bounds_height) / tex_height) + (bounds->y0 / tex_height);
+        ((real_rectangle2d*)output)->y0 = 0.f;
+        ((real_rectangle2d*)output)->y1 = 1.f;
         break;
     case _vertex_output_type_color:
         *(pixel32*)output = global_white_pixel32;
@@ -235,9 +235,9 @@ void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location,
 
     real32 z = (z_far != 0.f ? rasterizer_dx9_fullscreen_effect_calculate_position_z(z_far, 1) : 1.f);
     
-    output->x = location->i * 2.f - 1.f;    // x
-    output->y = -(location->j * 2.f - 1.f); // y
-    output->z = z;                          // z
-    output->w = 1.f;                        // scale
+    output->i = location->i * 2.f - 1.f;    // x
+    output->j = -(location->j * 2.f - 1.f); // y
+    output->k = z;                          // z
+    output->l = 1.f;                        // scale
     return;
 }

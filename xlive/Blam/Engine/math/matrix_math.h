@@ -17,7 +17,7 @@ struct real_matrix4x3
 };
 ASSERT_STRUCT_SIZE(real_matrix4x3, 52);
 
-const real_matrix4x3 global_identity4x3 = { 1.0f, { global_forward3d, global_left3d, global_up3d }, global_zero_vector3d };
+const real_matrix4x3 global_identity4x3 = { 1.0f, { global_forward3d, global_left3d, global_up3d }, {0.f, 0.f, 0.f} };
 
 real_matrix3x3* matrix3x3_from_forward_and_up(real_matrix3x3* matrix, const real_vector3d* forward, const real_vector3d* up);
 
@@ -45,9 +45,9 @@ void matrix4x3_from_point_and_quaternion(real_matrix4x3* matrix, const real_poin
 
 void matrix4x3_to_point_and_vectors(real_matrix4x3* matrix, real_point3d* position, real_vector3d* forward, real_vector3d* up);
 
-real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real_point3d* in, real_point3d* out);
+real_point3d* matrix4x3_transform_point(const real_matrix4x3* matrix, const real_point3d* point, real_point3d* result);
 
-real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d* in, real_vector3d* out);
+real_vector3d* matrix4x3_transform_vector(const real_matrix4x3* matrix, const real_vector3d* vector, real_vector3d* result);
 
 real_matrix4x3* matrix4x3_rotation_from_angles(real_matrix4x3* matrix, real32 i, real32 j, real32 k);
 

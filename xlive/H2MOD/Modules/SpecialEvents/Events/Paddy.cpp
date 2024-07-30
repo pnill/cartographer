@@ -68,7 +68,7 @@ void paddy_event_map_load()
 			bomb_model->render_model.index = paddy_pot_model->render_model.index;
 			auto paddy_pot_render = tags::get_tag<_tag_group_render_model, render_model_definition>(paddy_pot_model->render_model.index, true);
 			auto pot_node = paddy_pot_render->nodes[0];
-			pot_node->default_rotation.k = -0.75f;
+			pot_node->default_rotation.v.k = -0.75f;
 			pot_node->default_translation.y = 0.07f;
 			pot_node->default_translation.z = -0.1f;
 

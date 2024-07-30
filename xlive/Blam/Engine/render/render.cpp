@@ -328,28 +328,28 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
 	vc[0].i = 2.0f / (real32)width; // x
 	vc[0].j = 0.0f;
 	vc[0].k = 0.0f;
-	vc[0].w = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
+	vc[0].l = -(1.0f / (real32)width + 1.0f) - ((real32)screen_bounds.left * 2.0f / width); // offset from x
 
 	vc[1].i = 0.0f;
 	vc[1].j = -(2.0f / (real32)height); // y
 	vc[1].k = 0.0f;
-	vc[1].w = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
+	vc[1].l = (1.0f / (real32)height + 1.0f) + ((real32)screen_bounds.top * 2.0f / height); // offset from y
 
 	vc[2].i = 0.0f;
 	vc[2].j = 0.0f;
 	vc[2].k = 0.0f; // z
-	vc[2].w = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
+	vc[2].l = 0.5f; // acts as an offset, facing (<=1.0f is towards the viewport, above 1.0f facing from the viewport)
 
 	vc[3].i = 0.0f;
 	vc[3].j = 0.0f;
 	vc[3].k = 0.0f;
-	vc[3].w = 1.0f; // w scaling component
+	vc[3].l = 1.0f; // w scaling component
 
 	// the c181 register seems unused?
 	vc[4].i = 0.0f;
 	vc[4].j = 0.0f;
 	vc[4].k = 0.0f;
-	vc[4].w = 0.0f;
+	vc[4].l = 0.0f;
 
 	// avoid unnecessary API calls by testing the user mode memory cache
 	if (rasterizer_get_main_vertex_shader_cache()->test_cache(177, vc, NUMBEROF(vc)))

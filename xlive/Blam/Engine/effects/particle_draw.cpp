@@ -9,8 +9,6 @@
 #include "particle_location.h"
 #include "render/render_sky.h"
 
-#include "Util/Hooks/Hook.h"
-
 typedef void(__cdecl* particle_draw_callback_t)(c_particle*, s_particle_state*, real_vector3d*, real_vector3d*, real32, real_argb_color*, c_particle_definition**);
 
 typedef void(__cdecl* particle_system_draw_t)(
@@ -25,10 +23,12 @@ void __cdecl particle_system_draw(
 	c_particle_system* particle_system,
 	c_particle_location* particle_location,
 	s_particle_state* particle_state,
-	particle_draw_callback_t draw_callback,
+	particle_draw_callback_t callback,
 	c_particle_definition** particle_definition)
 {
-	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
+	c_particle_system_definition* system_def = particle_system->get_definition();
+
+	ASSERT(callback);
 
 	particle_state->set_particle_system(particle_system);
 	particle_state->set_particle_location(particle_location);
@@ -37,16 +37,20 @@ void __cdecl particle_system_draw(
 	datum current_particle_emitter_index = particle_location->particle_emitter_index;
 	while (current_particle_emitter_index != NONE)
 	{
+		ASSERT(system_def);
+
 		c_particle_emitter* particle_emitter = (c_particle_emitter*)datum_get(get_particle_emitter_table(), DATUM_INDEX_TO_ABSOLUTE_INDEX(current_particle_emitter_index));
-		c_particle_emitter_definition* emitter_definition = particle_system_definition->emitters[emitter_index];
+		c_particle_emitter_definition* emitter_def = system_def->emitters[emitter_index];
 		datum current_particle_index = particle_emitter->particle_index;
+
+		ASSERT(emitter_def);
 
 		while (current_particle_index != NONE)
 		{
 			real32 particle_scale = 1.0f;
 			real32 sky_render_model_scale = 1.0f;
 			real_matrix3x3 relative_matrix;
-			real_point3d relative_position;
+			real_vector3d relative_position;
 			real_argb_color particle_color;
 
 			if (particle_system->flags.test(_particle_system_scale_with_sky_render_model_bit))
@@ -54,7 +58,7 @@ void __cdecl particle_system_draw(
 				sky_render_model_scale = get_current_sky_render_model_scale();
 			}
 
-			if (particle_system_definition->coordinate_system != _particle_coordinate_system_world) 
+			if (system_def->coordinate_system != _particle_coordinate_system_world) 
 			{
 				particle_emitter->adjust_matrix_and_vector_to_effect_camera(
 					particle_location->parent_effect_has_bit_15_set,
@@ -63,14 +67,14 @@ void __cdecl particle_system_draw(
 				);
 			}
 
-			c_flags<e_particle_state_flags, uint32, k_particle_state_flags> rt_flags2(emitter_definition->runtime_flags_2 & 0x107F0u);
+			c_flags<e_particle_state_flags, uint32, k_particle_state_flags> rt_flags2(emitter_def->runtime_flags_2 & 0x107F0u);
 			particle_state->state_update(rt_flags2);
 
-			emitter_definition->get_emitter_particle_color(particle_state, &particle_color);
+			emitter_def->get_emitter_particle_color(particle_state, &particle_color);
 
-			if (!TEST_BIT(emitter_definition->runtime_flags, 4))
+			if (!TEST_BIT(emitter_def->runtime_flags, 4))
 			{
-				particle_scale = emitter_definition->particle_size.get_result(particle_state) * sky_render_model_scale;
+				particle_scale = emitter_def->particle_size.get_result(particle_state) * sky_render_model_scale;
 			}
 
 			while (current_particle_index != NONE)
@@ -78,29 +82,29 @@ void __cdecl particle_system_draw(
 				c_particle* particle = (c_particle*)datum_get(get_particle_table(), DATUM_INDEX_TO_ABSOLUTE_INDEX(current_particle_index));
 				particle_state->set_particle(particle);
 
-				real_point3d particle_position;
+				real_vector3d particle_position;
 				real_vector3d particle_velocity;
-				particle_position = particle->m_position;
+				particle_position = { particle->m_position.x, particle->m_position.y, particle->m_position.z };
 				particle_velocity = particle->m_velocity;
 
-				rt_flags2 = emitter_definition->runtime_flags_2 & 0xF80Fu;
+				rt_flags2 = emitter_def->runtime_flags_2 & 0xF80Fu;
 				particle_state->state_update(rt_flags2);
 
-				emitter_definition->get_emitter_particle_inverse_color(particle_state, &particle_color);
+				emitter_def->get_emitter_particle_inverse_color(particle_state, &particle_color);
 
-				if (!TEST_BIT(emitter_definition->runtime_flags, 4))
+				if (!TEST_BIT(emitter_def->runtime_flags, 4))
 				{
-					particle_scale = emitter_definition->particle_size.get_result(particle_state) * sky_render_model_scale;
+					particle_scale = emitter_def->particle_size.get_result(particle_state) * sky_render_model_scale;
 				}
 
-				if (particle_system_definition->coordinate_system != _particle_coordinate_system_world)
+				if (system_def->coordinate_system != _particle_coordinate_system_world)
 				{
 					matrix3x3_transform_vector(&relative_matrix, &particle_position, &particle_position);
 					add_vectors3d(&particle_position, &relative_position, &particle_position);
 					matrix3x3_transform_vector(&relative_matrix, &particle_velocity, &particle_velocity);
 				}
 
-				draw_callback(
+				callback(
 					particle,
 					particle_state,
 					&particle_position,

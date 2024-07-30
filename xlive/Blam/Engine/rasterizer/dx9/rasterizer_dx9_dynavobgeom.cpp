@@ -76,12 +76,12 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 		vs_constants[0].i = width_ratio * 2.f;
 		vs_constants[0].j = 0.f;
 		vs_constants[0].k = 0.f;
-		vs_constants[0].w = v1 - (width_ratio + 1.f);
+		vs_constants[0].l = v1 - (width_ratio + 1.f);
 
 		vs_constants[1].i = 0.f;
 		vs_constants[1].j = height_ratio * -2.f;
 		vs_constants[1].k = 0.f;
-		vs_constants[1].w = (height_ratio + v2) + 1.f;
+		vs_constants[1].l = (height_ratio + v2) + 1.f;
 
 		vs_constants[2] = { 0.f, 0.f, 0.f, 0.5f };
 		vs_constants[3] = { 0.f, 0.f, 0.f, 1.f };
@@ -94,17 +94,17 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 		vs_constants_second[1].i = (parameters->field_8 ? 1.f : 0.f);
 		vs_constants_second[1].j = (parameters->field_8 ? 0.f : 1.f);
 		vs_constants_second[1].k = (parameters->field_9 ? 1.f : 0.f);
-		vs_constants_second[1].w = (parameters->field_9 ? 0.f : 1.f);
+		vs_constants_second[1].l = (parameters->field_9 ? 0.f : 1.f);
 
 		vs_constants_second[2].i = (parameters->field_10 ? 1.f : 0.f);
 		vs_constants_second[2].j = (parameters->field_10 ? 0.f : 1.f);
 		vs_constants_second[2].k = (parameters->field_1C ? parameters->field_1C->i : 0.f);
-		vs_constants_second[2].w = (parameters->field_1C ? parameters->field_1C->j : 0.f);
+		vs_constants_second[2].l = (parameters->field_1C ? parameters->field_1C->j : 0.f);
 
 		vs_constants_second[3].i = (parameters->field_20 ? parameters->field_20->i : 0.f);
 		vs_constants_second[3].j = (parameters->field_20 ? parameters->field_20->j : 0.f);
 		vs_constants_second[3].k = (parameters->field_24 ? parameters->field_24->i : 0.f);
-		vs_constants_second[3].w = (parameters->field_24 ? parameters->field_24->j : 0.f);
+		vs_constants_second[3].l = (parameters->field_24 ? parameters->field_24->j : 0.f);
 		
 		vs_constants_second[4] = parameters->vs_constants_second_4;
 		vs_constants_second[5] = { parameters->field_34.i, parameters->field_34.j, 0.f, 0.f };
@@ -162,7 +162,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 				memcpy(&ps_constants[i], (color != NULL ? color->color : global_real_rgb_white), sizeof(real_rgb_color));
 
 				const s_dynamic_geometry_map_alpha* alpha = parameters->map_alpha[i];
-				ps_constants[i].w = (alpha != NULL ? *alpha->alpha : 1.f);
+				ps_constants[i].l = (alpha != NULL ? *alpha->alpha : 1.f);
 			}
 
 			if (parameters->map[1])
@@ -170,7 +170,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 				ps_constants[3].i = (parameters->field_90 == 0);
 				ps_constants[3].j = (parameters->field_90 == 1);
 				ps_constants[3].k = (parameters->field_90 == 2);
-				ps_constants[3].w = (parameters->field_90 == 3);
+				ps_constants[3].l = (parameters->field_90 == 3);
 				ps_constants[4].i = (parameters->field_90 == 4);
 				ps_constants[4].j = (parameters->field_90 == 5);
 			}
@@ -178,7 +178,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 			if (parameters->map[2])
 			{
 				ps_constants[4].k = (parameters->field_92 == 0);
-				ps_constants[4].w = (parameters->field_92 == 1);
+				ps_constants[4].l = (parameters->field_92 == 1);
 				ps_constants[5].i = (parameters->field_92 == 2);
 				ps_constants[5].j = (parameters->field_92 == 3);
 				ps_constants[5].k = (parameters->field_92 == 4);
