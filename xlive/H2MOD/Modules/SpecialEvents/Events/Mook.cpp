@@ -11,8 +11,8 @@
 
 void mook_event_map_load()
 {
-	datum ball_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
-	datum bomb_weapon_datum = tags::find_tag(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
+	datum ball_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\ball\\ball");
+	datum bomb_weapon_datum = tag_loaded(_tag_group_weapon, "objects\\weapons\\multiplayer\\assault_bomb\\assault_bomb");
 
 	tag_injection_set_active_map(k_events_map);
 	if (!tag_injection_active_map_verified())
@@ -24,7 +24,7 @@ void mook_event_map_load()
 	{
 		tag_injection_inject();
 
-		auto mook_ball_weapon = tags::get_tag<_tag_group_weapon, _weapon_definition>(mook_ball_weapon_datum, true);
+		_weapon_definition* mook_ball_weapon = (_weapon_definition*)tag_get_fast(mook_ball_weapon_datum);
 
 		replace_fp_and_3p_models_from_weapon(ball_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);
 		replace_fp_and_3p_models_from_weapon(bomb_weapon_datum, mook_ball_weapon->item.object.model.index, mook_ball_weapon->item.object.model.index);

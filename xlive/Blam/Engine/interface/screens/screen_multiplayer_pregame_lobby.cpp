@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "H2MOD/Tags/TagInterface.h"
 #include "screen_multiplayer_pregame_lobby.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
@@ -630,7 +629,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 {
 	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
 
-	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 
 	if (main_widget_datum_index == NONE)
 	{
@@ -638,7 +637,7 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = tags::get_tag_fast<s_user_interface_screen_widget_definition>(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 
 	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
 	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];

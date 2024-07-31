@@ -8,11 +8,10 @@
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 #include "models/models.h"
+#include "objects/objects.h"
 #include "scenario/scenario_definitions.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/MetaExtender.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 datum lbitm_datum = NONE;
@@ -28,8 +27,8 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 	{
 		object_placement_data placement;
 
-		auto pump = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(pump_datum, true);
-		auto pump_hmlt = tags::get_tag<_tag_group_model, s_model_definition>(pump->objectTag.model.index, true);
+		s_scenery_group_definition* pump = (s_scenery_group_definition*)tag_get_fast(pump_datum);
+		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->objectTag.model.index);
 
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
@@ -109,17 +108,17 @@ void halloween_event_map_load()
 		tag_injection_inject();
 
 		// OG Halo 2 Coag lightmap
-		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
+		datum ltmp_datum = tag_loaded(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
 		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
 		{
-			s_scenario_structure_lightmap_group_definition* lightmap = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
-			lightmap->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
+			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
+			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 		}
 
-		scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
-		structure_bsp* bsp_definition = tags::get_tag_fast<structure_bsp>(scenario_definition->structure_bsps[0]->structure_bsp.index);
+		scenario* scenario_definition = (scenario*)tag_get_fast(cache_files_get_tags_header()->scenario_index);
+		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(scenario_definition->structure_bsps[0]->structure_bsp.index);
 
 		if (tag_injection_is_injected(sky_datum))
 		{
@@ -128,7 +127,7 @@ void halloween_event_map_load()
 
 		if (ltmp_datum != NONE && lbitm_datum != NONE)
 		{
-			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour

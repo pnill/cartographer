@@ -137,7 +137,7 @@ namespace ImGuiHandler {
 		{
 			for (int i = 0; i < ARRAYSIZE(weapOffsets); i++)
 			{
-				datum weap_datum = tags::find_tag(_tag_group_weapon, weapOffsets[i].weaponPath);
+				datum weap_datum = tag_loaded(_tag_group_weapon, weapOffsets[i].weaponPath);
 				if (weap_datum != NONE)
 				{
 					weapOffsets[i].tag = (_weapon_definition*)tag_get_fast(weap_datum);

@@ -9,7 +9,6 @@
 #define k_cache_file_max_string_ids 24576
 
 #define k_cache_file_debug_name_buffer_size 5120000
-#define k_cache_file_debug_name_offset_buffer_size 80384
 #define k_cache_file_debug_string_id_index_buffer_size (k_cache_file_max_string_ids * sizeof(string_id))
 #define k_cache_file_debug_string_id_storage_size 393216
 
@@ -119,8 +118,8 @@ ASSERT_STRUCT_SIZE(s_cache_file_memory_globals, 0x810);
 
 struct s_cache_file_debug_globals
 {
-	int8 debug_tag_name_buffer[k_cache_file_debug_name_buffer_size];
-	int8 debug_tag_name_offsets[k_cache_file_debug_name_offset_buffer_size];
+	char debug_tag_name_buffer[k_cache_file_debug_name_buffer_size];
+	int32 debug_tag_name_offsets[MAXIMUM_SIMULTANEOUS_TAG_INSTANCES_TOTAL + 96];
 	int8 debug_string_id_storage[k_cache_file_debug_string_id_storage_size];
 	int8 debug_string_id_index[k_cache_file_debug_string_id_index_buffer_size];
 };
@@ -135,7 +134,11 @@ struct tag_iterator
 };
 ASSERT_STRUCT_SIZE(tag_iterator, 20);
 
-s_cache_file_memory_globals* cache_file_memory_globals_get();
+/* prototypes */
+
+void cache_files_apply_patches(void);
+
+s_cache_file_memory_globals* cache_file_memory_globals_get(void);
 
 s_cache_header* cache_files_get_header(void);
 
@@ -143,7 +146,7 @@ s_tags_header* cache_files_get_tags_header(void);
 
 cache_file_tag_instance* global_tag_instances_get(void);
 
-tag_iterator* tag_iterator_new(tag_iterator* itr, tag_group type);
+tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type);
 
 datum __cdecl tag_iterator_next(tag_iterator* itr);
 
@@ -158,12 +161,10 @@ bool __cdecl cache_header_verify(s_cache_header* cache_header);
 
 uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size);
 
-bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, int8* out_buffer);
-
-void __cdecl scenario_tags_load_internal_exit_panic();
-
-bool cache_validate_shared_tag_instances(int8* tag_header, uint32 offset_mask);
+bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, void* out_buffer);
 
 bool __cdecl scenario_tags_load(const char* scenario_path);
 
-void cache_files_apply_patches();
+datum tag_loaded(uint32 group_tag, const char* name);
+
+const char* tag_get_name(datum tag_name_index);

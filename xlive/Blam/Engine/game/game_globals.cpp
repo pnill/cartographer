@@ -11,7 +11,6 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "tag_files/tag_loader/tag_injection.h"
 
 /**
@@ -189,7 +188,7 @@ void game_globals_add_lmao_representation(void)
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant
-		s_model_definition* mode_chief_mp = tags::get_tag<_tag_group_model, s_model_definition>(mode_chief_mp_datum);
+		s_model_definition* mode_chief_mp = (s_model_definition*)tag_get_fast(mode_chief_mp_datum);
 		auto base_variant = mode_chief_mp->variants[0];
 		auto new_variant = MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;

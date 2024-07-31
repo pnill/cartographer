@@ -12,8 +12,8 @@ s_tag_group_link* tag_group_get_link_set(tag_group group)
 
 	s_tag_group_link t_link;
 	t_link.child = group;
-	t_link.parent_2 = tag_group_from_enum(_tag_group_none);
-	t_link.parent = tag_group_from_enum(_tag_group_none);
+	t_link.parent_2 = { _tag_group_none };
+	t_link.parent = { _tag_group_none };
 
 	typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
 	auto p_subtract_function = Memory::GetAddress<subtract_function_t>(0x30D90, 0x24C40);

@@ -9,10 +9,37 @@
 #include "tag_files/tag_loader/tag_injection.h"
 #include "tag_files/tag_loader/tag_injection_manager.h"
 
+/* typedefs */
+
+typedef void* (__cdecl* t_tag_get_safe)(tag_group group, datum tag_index);
+
+/* globals */
+
 // H2V does not include these parameters inside the s_cache_file_memory_globals struct, so we have to create and store them elsewhere
 s_cache_file_debug_globals g_cache_file_debug_globals;
 
-s_cache_file_memory_globals* cache_file_memory_globals_get()
+t_tag_get_safe p_tag_get_safe;
+
+/* prototypes */
+
+bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool async);
+void* tag_get_safe(tag_group group, datum tag_index);
+
+/* public code */
+
+
+void cache_files_apply_patches(void)
+{
+	// Default Maps
+	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load);
+	// Custom Maps
+	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load);
+
+	DETOUR_ATTACH(p_tag_get_safe, Memory::GetAddress<t_tag_get_safe>(0x316C3, 0x25573), tag_get_safe);
+	return;
+}
+
+s_cache_file_memory_globals* cache_file_memory_globals_get(void)
 {
 	return Memory::GetAddress<s_cache_file_memory_globals*>(0x47CD60, 0x4A29C8);
 }
@@ -32,10 +59,10 @@ cache_file_tag_instance* global_tag_instances_get(void)
 	return *Memory::GetAddress<cache_file_tag_instance**>(0x47CD50, 0x4A29B8);
 }
 
-tag_iterator* tag_iterator_new(tag_iterator* itr, tag_group type)
+tag_iterator* tag_iterator_new(tag_iterator* itr, e_tag_group type)
 {
 	itr->next_tag_index = 0;
-	itr->tag_type.group = type.group;
+	itr->tag_type.group = type;
 	return itr;
 }
 
@@ -57,34 +84,6 @@ void* __cdecl tag_get_fast(datum tag_index)
 	return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
 }
 
-
-typedef void* (__cdecl* t_tag_get_safe)(tag_group group, datum tag_index);
-t_tag_get_safe p_tag_get_safe;
-
-void* tag_get_safe(tag_group group, datum tag_index)
-{
-	if(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index) > 0u)
-	{
-		s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
-		cache_file_tag_instance* tag_instance = &cache_file_memory->tags_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
-
-		if(tag_index == tag_instance->tag_index)
-		{
-			s_tag_group_link* group_link = tag_group_get_link_set(tag_instance->group_tag);
-
-			if(group_link)
-			{
-				if(group_link->child.group == group.group || group_link->parent_2.group == group.group || group_link->parent.group == group.group)
-				{
-					return (void*)((char*)cache_file_memory->tag_cache_base_address + tag_instance->data_offset);
-				}
-			}
-		}
-	}
-
-	return nullptr;
-}
-
 void __cdecl cache_file_close()
 {
 	INVOKE(0x64C37, 0x4CC8E, cache_file_close);
@@ -100,7 +99,7 @@ uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size)
 	return INVOKE(0x647DA, 0x4C831, cache_file_align_read_size_to_cache_page, size);
 }
 
-bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, int8* out_buffer)
+bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, void* out_buffer)
 {
 	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, unk, cache_offset, read_size, out_buffer);
 }
@@ -118,10 +117,6 @@ void scenario_tags_load_internal_panic()
 	cache_file_close();
 }
 
-bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool async)
-{
-	return INVOKE(0x64CC7, 0x4CD1E, read_shared_resource_database, database_type, unused_flags, offset, size, out_buffer, async);
-}
 
 bool scenario_tags_load_process_shared_tags()
 {
@@ -329,15 +324,78 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	return true;
 }
 
-void cache_files_apply_patches(void)
+datum tag_loaded(uint32 group_tag, const char* name)
 {
-	// Default Maps
-	PatchCall(Memory::GetAddress(0x3166B, 0x2551B), scenario_tags_load);
-	// Custom Maps
-	PatchCall(Memory::GetAddress(0x315ED, 0x2549D), scenario_tags_load);
+	const s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
+	datum result = NONE;
 
-	DETOUR_ATTACH(p_tag_get_safe, Memory::GetAddress<t_tag_get_safe>(0x316C3, 0x25573), tag_get_safe);
-	return;
+	if (g_cache_file_memory_globals->tags_loaded)
+	{
+		if (g_cache_file_memory_globals->tags_header->tag_count > 0)
+		{
+			cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
+
+			for (uint32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; i++)
+			{
+				cache_file_tag_instance* tag_instance = &global_tag_instances[i];
+				if (group_tag == tag_instance->group_tag.group)
+				{
+					const char* tag_name = tag_get_name(tag_instance->tag_index);
+					if (!stricmp(name, tag_name))
+					{
+						result = tag_instance->tag_index;
+						break;
+					}
+				}
+
+			}
+		}
+	}
+	return result;
 }
 
+const char* tag_get_name(datum tag_index)
+{
+	uint16 tag_name_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index);
 
+	s_cache_file_memory_globals* g_cache_file_memory_globals = cache_file_memory_globals_get();
+	ASSERT(g_cache_file_memory_globals->tags_loaded);
+	ASSERT(IN_RANGE(tag_name_index, 0, g_cache_file_memory_globals->header.debug_tag_name_count - 1));
+
+	int32 tag_name_offset = g_cache_file_debug_globals.debug_tag_name_offsets[tag_name_index];
+
+	ASSERT(IN_RANGE(tag_name_offset, 0, NUMBEROF(g_cache_file_debug_globals.debug_tag_name_buffer) - 1));
+
+	return &g_cache_file_debug_globals.debug_tag_name_buffer[tag_name_offset];
+}
+
+/* private code */
+
+bool __cdecl read_shared_resource_database(e_shared_resource_database_type database_type, int32 unused_flags, uint32 offset, uint32 size, void* out_buffer, bool async)
+{
+	return INVOKE(0x64CC7, 0x4CD1E, read_shared_resource_database, database_type, unused_flags, offset, size, out_buffer, async);
+}
+
+void* tag_get_safe(tag_group group, datum tag_index)
+{
+	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index) > 0u)
+	{
+		s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
+		cache_file_tag_instance* tag_instance = &cache_file_memory->tags_header->tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
+
+		if (tag_index == tag_instance->tag_index)
+		{
+			s_tag_group_link* group_link = tag_group_get_link_set(tag_instance->group_tag);
+
+			if (group_link)
+			{
+				if (group_link->child.group == group.group || group_link->parent_2.group == group.group || group_link->parent.group == group.group)
+				{
+					return (void*)((char*)cache_file_memory->tag_cache_base_address + tag_instance->data_offset);
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}

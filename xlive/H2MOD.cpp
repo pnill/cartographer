@@ -228,14 +228,13 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 
 void H2MOD::disable_score_announcer_sounds(int sound_flags)
 {
-	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)
 	{
-		datum multiplayerGlobalsTagIndex = tags::find_tag(_tag_group_multiplayer_globals, multiplayerGlobalsTag);
+		datum multiplayerGlobalsTagIndex = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
 
 		if (multiplayerGlobalsTagIndex != NONE)
 		{
-			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<_tag_group_multiplayer_globals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = (s_multiplayer_globals_group_definition*)tag_get_fast(multiplayerGlobalsTagIndex);
 
 			if (multiplayerGlobalsTag->runtime.count)
 			{

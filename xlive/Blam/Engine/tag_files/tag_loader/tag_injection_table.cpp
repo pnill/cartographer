@@ -58,7 +58,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 	s_tag_injecting_table_entry* result = &this->m_table[this->m_entry_count];
 	result->cache_index = cache_index;
 	result->injected_index = k_first_injected_datum + this->m_entry_count;
-	result->type = tag_group_from_enum(type);
+	result->type = { type };
 	result->is_initialized = true;
 	result->is_injected = false;
 	result->loaded_data = (c_xml_definition_loader*)calloc(1, sizeof(c_xml_definition_loader));

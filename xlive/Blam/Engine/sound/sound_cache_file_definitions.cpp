@@ -89,14 +89,14 @@ bool __cdecl initialize_runtime_sound_gestalt_definition_with_shared(s_sound_cac
 	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_with_shared, cache_gestalt, shared_gestalt);
 }
 
-void initialize_runtime_sound_gestalt_panic()
+void initialize_runtime_sound_gestalt_panic(void)
 {
 	// Clear all sound tags gestalt parameters so they cannot play.
 
 	tag_iterator sound_iterator;
-	tag_iterator_new(&sound_iterator, tag_group_from_enum(_tag_group_sound));
+	tag_iterator_new(&sound_iterator, _tag_group_sound);
 
-	while (tag_iterator_next(&sound_iterator))
+	while (tag_iterator_next(&sound_iterator) != NONE)
 	{
 		sound_definition_v1* sound = (sound_definition_v1*)tag_get_fast(sound_iterator.current_tag_index);
 
@@ -108,6 +108,7 @@ void initialize_runtime_sound_gestalt_panic()
 		sound->gestalt_scale_index = NONE;
 		sound->gestalt_unknown_index = NONE;
 	}
+	return;
 }
 
 void initialize_runtime_sound_gestalt_definition()
@@ -128,11 +129,13 @@ void initialize_runtime_sound_gestalt_definition()
 	{
 		datum shared_gestalt_datum = game_globals->sound_globals[0]->sound_gesalt;
 
-		s_sound_cache_file_gestalt_definition* cache_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(shared_gestalt_datum);
-		s_sound_cache_file_gestalt_definition* shared_gestalt = nullptr;
+		s_sound_cache_file_gestalt_definition* cache_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(shared_gestalt_datum);
+		s_sound_cache_file_gestalt_definition* shared_gestalt = NULL;
 
-		if(cache_header->secondary_ugh_tag_index != NONE)
-			shared_gestalt = tags::get_tag_fast<s_sound_cache_file_gestalt_definition>(cache_header->secondary_ugh_tag_index);
+		if (cache_header->secondary_ugh_tag_index != NONE)
+		{
+			shared_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(cache_header->secondary_ugh_tag_index);
+		}
 
 		if(!shared_gestalt)
 		{
