@@ -650,7 +650,7 @@ void c_tag_injecting_manager::inject_tags()
 
 		entry->loaded_data->copy_tag_data((int8*)(tags::get_tag_data() + injection_offset), injection_offset);
 
-		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model)
+		if(entry->type.group == _tag_group_bitmap || entry->type.group == _tag_group_render_model || entry->type.group == _tag_group_weather_system)
 			this->load_raw_data_from_cache(entry->injected_index);
 
 		this->apply_definition_fixup(entry->type.group, entry->injected_index);
