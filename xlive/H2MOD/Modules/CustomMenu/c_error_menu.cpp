@@ -3,129 +3,120 @@
 
 #include "CustomLanguage.h"
 
-#pragma region CM_Error_Inner
+void c_error_menu::get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text)
+{
+	wchar_t* error_menu_header_text		[k_language_count][k_cartographer_error_id_end] = {};
+	wchar_t* error_menu_subheader_text	[k_language_count][k_cartographer_error_id_end] = {};
 
-void* __cdecl CustomMenu_Error_Inner(s_new_ui_screen_parameters* parameters) {
-	return c_error_menu::open(parameters);
+	error_menu_header_text		[_language_english][_cartographer_error_id_generic_error] = L"Error!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_generic_error] =	L"Generic Error.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_no_custom_language_categorised_as_other] = L"None";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_no_custom_language_categorised_as_other] = L"There are no custom languages catergorised as Other.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_error_reading_custom_language_file] = L"Error";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_error_reading_custom_language_file] = L"An error occured when trying to read the custom language file.\r\nNo Changes have been made.\r\nReview the on screen debug log for more details.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_error_outdated_version] = L"Outdated Version!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_error_outdated_version] = L"You are using an outdated version of Project Cartographer! Please install the latest version.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_invalid_login_token] = L"Invalid Login Token!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_invalid_login_token] = L"Login Again.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_invalid_account_id] = L"Invalid Account ID!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_invalid_account_id] = L"The Username or Email Address you entered is not one of an existing account. Please check your spelling or create a new account if you don't have one already.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_incorrect_password] = L"Incorrect Password!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_incorrect_password] = L"The password you entered is incorrect!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_machine_banned] = L"BANNED!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_machine_banned] = L"The computer you are currently using is banned! If you think this is a mistake, post on the online forum pleading your innocence; if you have any you cheater!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_account_banned] = L"BANNED!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_account_banned] = L"Your account is banned! If you think this is a mistake, post on the online forum pleading your innocence; if you have any you cheater!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_account_disabled] = L"Account Disabled!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_account_disabled] = L"Your account is currently disabled, closed or deleted! Please contact an administrator if this was a mistake.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_unknown_unhandled_error] = L"Unknown Error!?";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_unknown_unhandled_error] = L"The error that has occured has not been handled. Please contact an admin including any log files you have and what you did.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_internal_error] = L"Something's Broken!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_internal_error] = L"An internal error has occured. We've probably noticed this already but contact an admin if this persists.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_account_already_in_use] = L"Accounts in Use";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_account_already_in_use] = L"Another instance of Halo 2 / H2Server is currently signing in, please try again after it finishes.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_login_insufficient_machine_identifiers] = L"Insufficient PC Identification!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_login_insufficient_machine_identifiers] = L"Your PC does not have sufficient unique identifiers available. Please contact an admin about linking this PC with another that you own that does have sufficient info. This is to ensure fair online play.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_invalid_email] = L"Invalid Email!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_invalid_email] = L"The Email address you have entered is invalid! Please double check your spelling.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_invalid_username] = L"Invalid Username!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_invalid_username] = L"The Username you have entered is invalid! Please ensure you have formed it correctly using only allowed symbols!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_invalid_password] = L"Invalid Password!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_invalid_password] = L"The Password you have entered is invalid! Please ensure you have formed it correctly using only allowed symbols!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_email_already_used] = L"Email Already in Use!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_email_already_used] = L"The Email Address you have entered is already in use! You cannot use an email for multiple accounts. Please use a different email, sign in to that account or reset its password if you have forgotton it.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_username_taken] = L"Username Taken!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_username_taken] = L"The Username you have entered is already in use!";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_blacklisted_email_provider] = L"BANNED Email Provider!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_blacklisted_email_provider] = L"The Email Address you have entered is using a domain name that has been banned! We do not allow disposable email addresses! If this is a mistake please contact an admin.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_success] = L"Account Successfully Created!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_success] = L"The account you just entered has been successfully created! You may now use those details to login.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_verification_email_sent] = L"Verification Email Sent!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_verification_email_sent] = L"An email has been sent to the email address submitted. Please follow the instuctions in the email to activate your account.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_create_processing_account_notice] = L"Creating Account...";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_create_processing_account_notice] = L"Processing your new account...\r\nPlease wait.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_login_please_wait_notice] = L"Logging in...";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_login_please_wait_notice] = L"Please wait while you are being logged in.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_account_login_connection_failed] = L"Connection Failed!";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_account_login_connection_failed] = L"Please visit:\r\nhttps://halo2pc.com/connection\r\nfor help with troubleshooting potential issues.";
+	error_menu_header_text		[_language_english][_cartographer_error_id_setting_requiring_game_restart] = L"Restart Required";
+	error_menu_subheader_text	[_language_english][_cartographer_error_id_setting_requiring_game_restart] = L"The setting you have just changed requires that you restart your game for it to take effect.";
+
+	*out_header_text = error_menu_header_text[_language_english][error_id];
+	*out_subheader_text = error_menu_subheader_text[_language_english][error_id];
 }
 
-void CustomMenuCall_Error_Inner() {
-	if (!Memory::IsDedicatedServer()) {
-		CallWgit(CustomMenu_Error_Inner, 1);
-	}
+void* c_error_menu::open_by_error_id(e_cartographer_error_id error_id) {
 
-	/*char* lblTitle = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFFFF0);
-	char* lblDesc = H2CustomLanguageGetLabel(CMLabelMenuId_Error, 0xFFFFFFF1);
-	if (!lblTitle || !lblDesc) {
-		if (lblTitle)
-			addDebugText(lblTitle);
-		if (lblDesc)
-			addDebugText(lblDesc);
-	}
-	else {
-		addDebugText("%s - %s", lblTitle, lblDesc);
-	}*/
+	c_error_menu* error_menu = (c_error_menu*)ui_custom_cartographer_load_menu(c_error_menu::open, 1);
+	error_menu->m_error_id = error_id;
+
+	return error_menu;
 }
 
-void CustomMenuCall_Error_Inner(char* title, char* description) {
-	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFFF0, title, true);
-	add_cartographer_label(CMLabelMenuId_Error, 0xFFFFFFF1, description, true);
-	CustomMenuCall_Error_Inner();
-}
-
-void CustomMenuCall_Error_Inner(int menuIdTitle, int title, int menuIdDesc, int description) {
-	char* lblTitle = H2CustomLanguageGetLabel(menuIdTitle, title);
-	char* lblDesc = H2CustomLanguageGetLabel(menuIdDesc, description);
-	CustomMenuCall_Error_Inner(lblTitle, lblDesc);
-}
-
-void CustomMenuCall_Error_Inner(int menuId, int title, int description) {
-	CustomMenuCall_Error_Inner(menuId, title, menuId, description);
-}
-
-#pragma endregion
-
-void* __cdecl c_error_menu::open(s_new_ui_screen_parameters* parameters)
+void* __cdecl c_error_menu::open(s_screen_parameters* parameters)
 {
 	c_error_menu* error_menu = nullptr;
 	BYTE* ui_buffer = ui_memory_pool_allocate(sizeof(c_error_menu), 0);
 	if (ui_buffer) {
-		error_menu = new (ui_buffer) c_error_menu(parameters->ui_channel, parameters->field_8, HIWORD(parameters->flags));
+		error_menu = new (ui_buffer) c_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+		error_menu->m_allocated	= true;
 	}
-	error_menu->field_6C = true;
 	user_interface_register_screen_to_channel(error_menu, parameters);
 	return error_menu;
 }
 
-void c_error_edit_list::button_handler(int* a2, int* a3)
+void c_error_edit_list::button_handler(s_event_record* a2, int32* a3)
 {
-	int button_id = *(int*)a3 & 0xFFFF;
+	int button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
-	int parent_screen_idx = this->get_top_most_parent_widget_index();
-	int parent_screen_ui_channel = this->get_top_most_parent_widget_ui_channel();
+	e_user_interface_render_window	parent_render_window = this->get_parent_render_window();
+	e_user_interface_channel_type	parent_screen_ui_channel = this->get_parent_channel();
 
-	bool close_parent_screen = false;
-
-	// ** you can open new screens if needed
-	// s_new_ui_screen_parameters new_ui_;
-	// new_ui_.data_new(0, 1 << *(int*)(*a2 + 4), parent_screen_ui_channel, 4, c_account_list_menu::open);
-
-	// here place the button 
-
-	if (close_parent_screen)
-		user_interface_back_out_from_channel(parent_screen_ui_channel, parent_screen_idx);
+	user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 	return;
 }
 
-c_error_edit_list::c_error_edit_list(int _flags) :
-	c_list_widget(_flags, true)
+c_error_edit_list::c_error_edit_list(uint32 _flags) :
+	c_list_widget(_flags),
+	m_field_2C0(0),
+	m_slot_2(this, &c_error_edit_list::button_handler)
 {
-	auto sub_2113C6 = Memory::GetAddress<int(__thiscall*)(void*)>(0x2113C6);
-	auto sub_2113D3 = Memory::GetAddress<void* (__thiscall*)(void*, void*)>(0x2113D3);
-	auto c_list_item_widget_ctor = Memory::GetAddress<void* (__thiscall*)(void*)>(0x21FFC9);
-	auto c_list_item_widget_dctor = Memory::GetAddress<void(__thiscall*)(void*)>(0xA551);
-	auto p_vector_constructor = Memory::GetAddress<void(__stdcall*)(void*, unsigned int, int, void* (__thiscall*)(void*), void(__thiscall*)(void*))>(0x28870B);
+	this->m_list_data = nullptr;
 
-	// this constructs the buttons list widgets drawn inside the window
-	// brightness menu can display 4 widget list buttons at once
-	p_vector_constructor(this->item_list, 132, 4, c_list_item_widget_ctor, c_list_item_widget_dctor);
-
-	this->field_2C0 = 0;
-	sub_2113C6(&this->slot_2_unk.field_8);
-
-	//this->slot_2_unk.c_slot_vtbl = &off_1229700;
-	// this->slot_2_unk.c_slot_vtbl = NULL;
-	// not sure why this exists, it just calls the function to the button handler
-	// TODO implement virtual interface for slot_1, slot_2
-	this->slot_2_unk.c_slot_vtbl = Memory::GetAddressRelative<void*>(0x7D9700);
-	this->slot_2_unk.ui_screen_edit_list = this;
-	this->slot_2_unk.button_handler_cb = &c_error_edit_list::button_handler;
-
-	// ** here place how many buttons you will have
-	int button_count = 0;
-	//s_data_array* account_list_data = allocate_list_data("brightness edit list", button_count, 4);
-	//this->list_data_array = account_list_data;
-	this->list_data_array = nullptr;
-
-	// s_data_array::data_make_valid(account_list_data);
-
-	/*for (unsigned int i = 0; i < this->list_data_array->datum_max_elements; i++) {
-		s_data_array::datum_new_in_range(this->list_data_array);
-	}*/
-
-	// no fucking clue what's this, maybe related to this->slot_2_unk.c_slot_vtbl data offset
-	// because this->slot_2_unk.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-708) {
-		sub_2113D3(&this->gap_70[56], nullptr);
+	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
+	// because this->m_slot_2.c_slot_vtbl is at offset 708
+	if ((void*)this == (void*)-offsetof(c_error_edit_list, m_slot_2)) {
+		linker_type2.link(nullptr);
 	}
 	else {
-		sub_2113D3(&this->gap_70[56], &this->slot_2_unk.field_8);
+		linker_type2.link(&this->m_slot_2);
 	}
 }
 
-c_error_menu::c_error_menu(int _ui_channel, int a4, int _flags) :
-	c_screen_with_menu(BRIGHTNESS_MENU_ID, _ui_channel, a4, _flags, &error_edit_list, true),
-	error_edit_list(_flags)
+c_error_menu::c_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
+	c_screen_with_menu(_screen_brightness_level, _ui_channel, _window_index, _flags, &m_error_edit_list),
+	m_error_edit_list(_flags)
 {
+	m_error_id = _cartpgrapher_error_id_none;
 }
 

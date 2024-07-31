@@ -131,15 +131,6 @@ static char current_location_id = 0;
 bool updater_has_files_to_download = false;
 bool updater_has_files_to_install = false;
 
-static void setButtonState(unsigned int btn_ID, char button_state) {
-	if (button_state == 0)
-		add_cartographer_label(CMLabelMenuId_Update, btn_ID, (char*)0, true);
-	else if (button_state == 1)
-		add_cartographer_label(CMLabelMenuId_Update, btn_ID, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFF0000 + btn_ID), true);
-	else if (button_state == 2)
-		add_cartographer_label(CMLabelMenuId_Update, btn_ID, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFF00 + btn_ID), true);
-}
-
 
 static int interpretUpdateEntry(char* fileLine, char* version, int lineNumber) {
 	bool read_it = false;
@@ -363,7 +354,7 @@ static void FetchUpdateDetails() {
 
 	//Download the following:
 	if (im_lazy.length() > 0)
-		im_lazy = H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF2) + im_lazy;
+		im_lazy = "Download the following:\n" + im_lazy;
 
 	std::string im_lazy1 = "";
 
@@ -377,11 +368,11 @@ static void FetchUpdateDetails() {
 
 	//Install the following:
 	if (im_lazy1.length() > 0)
-		im_lazy += H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF3) + im_lazy1;
+		im_lazy += "Install the following:\n" + im_lazy1;
 
 	//Up to date.
 	if (im_lazy.length() <= 0)
-		im_lazy = H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFFFF4);
+		im_lazy = "Up to date!";
 
 	extern char* autoUpdateText;
 	char* autoUpdateTextAlt = autoUpdateText;
@@ -431,36 +422,22 @@ static DWORD WINAPI DownloadThread(LPVOID lParam)
 {
 	int operation_id = (int)lParam;
 
-	setButtonState(1, 0);
-	setButtonState(2, 0);
-	setButtonState(3, 0);
-
 	if (operation_id == 0) {
-		setButtonState(1, 2);
 		FetchUpdateDetails();
 	}
-	else if (operation_id == 1) {
-		setButtonState(2, 2);
+	else if (operation_id == 1) 
+	{
 		if (DownloadUpdatedFiles())
+		{
 			FetchUpdateDetails();
+		}
 	}
-
-	setButtonState(1, 1);
-	if (updater_has_files_to_download)
-		setButtonState(2, 1);
-	else
-		setButtonState(2, 0);
-	if (updater_has_files_to_install)
-		setButtonState(3, 1);
-	else
-		setButtonState(3, 0);
 	
 	hThreadDownloader = 0;
 	return 0;
 }
 
 void GSDownloadInit() {
-	setButtonState(1, 1);
 }
 
 void GSDownloadCheck() {
@@ -474,8 +451,6 @@ void GSDownloadDL() {
 }
 
 void GSDownloadInstall() {
-
-	setButtonState(3, 2);
 
 	wchar_t* dir_temp = _wgetenv(L"TEMP");
 
@@ -530,7 +505,7 @@ void GSDownloadInstall() {
 		else {
 			addDebugText("Failed to fork updater!");
 			addDebugText(existingfilepathupdater);
-			add_cartographer_label(CMLabelMenuId_Update, 3, H2CustomLanguageGetLabel(CMLabelMenuId_Update, 0xFFFFF003), true);
+			// ### FIXME failed to fork updater
 		}
 		free(updater_params_flags);
 	}
@@ -548,6 +523,8 @@ void GSDownloadCancel() {
 	//else {
 		// the thread handle is not signaled - the thread is still alive
 	//}
+
+
 	if (hThreadDownloader) {
 		TerminateThread(hThreadDownloader, 1);
 		hThreadDownloader = 0;
@@ -562,10 +539,6 @@ void GSDownloadCancel() {
 
 	updater_has_files_to_download = false;
 	updater_has_files_to_install = false;
-
-	setButtonState(1, 0);
-	setButtonState(2, 0);
-	setButtonState(3, 0);
 }
 
 

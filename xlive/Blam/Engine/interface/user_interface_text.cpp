@@ -52,9 +52,14 @@ void c_user_interface_text::set_color(const real_rgb_color* color)
 }
 
 
-c_user_interface_text::~c_user_interface_text()
+c_user_interface_text* c_user_interface_text::destructor(uint32 flags)
 {
+	this->~c_user_interface_text();
+	if (TEST_BIT(flags, 0))
+	{
+	}
 
+	return this;
 }
 
 

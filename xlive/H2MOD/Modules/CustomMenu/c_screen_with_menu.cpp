@@ -6,7 +6,7 @@
 // derived from c_screen_with_menu, but doesn't really matter
 void __thiscall c_screen_with_menu::build_player_list(void* a1, int player_count)
 {
-	auto p_build_player_list = Memory::GetAddressRelative<void(__thiscall*)(void*, void*, int)>(0x611CD0);
+	auto p_build_player_list = Memory::GetAddress<void(__thiscall*)(void*, void*, int)>(0x211CD0);
 
 	// we only hook calls done to c_screen_with_menu::build_player_list in c_screen_network_squad_browser
 
@@ -24,7 +24,7 @@ __declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::b
 
 #pragma endregion
 
-void c_screen_with_menu::applyPatches()
+void c_screen_with_menu::apply_patches()
 {
 	if (Memory::IsDedicatedServer()) return;
 

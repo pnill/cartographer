@@ -3,8 +3,8 @@
 #include "user_interface_widget_list_item.h"
 #include "user_interface_widget_text.h"
 
-c_list_widget::c_list_widget(int16 user_flags)
-	:c_user_interface_widget(_widget_type_list, user_flags)
+c_list_widget::c_list_widget(uint16 user_flags)
+	: c_user_interface_widget(_widget_type_list, user_flags)
 {
 	// INVOKE_TYPE(0x213B1C, 0x0, c_list_widget(*__thiscall*)(c_list_widget*, __int16), this, user_flags);
 
@@ -18,10 +18,6 @@ c_list_widget::c_list_widget(int16 user_flags)
 	this->m_list_has_hidden_items = 0;
 	this->field_A6 = 0;
 	this->field_A7 = 1;
-
-	this->signal1 = nullptr;
-	this->signal2 = nullptr;
-
 }
 
 c_list_item_widget* c_list_widget::try_find_item_widget(uint32 idx)
@@ -76,9 +72,17 @@ void c_list_widget::remove_item_from_list(c_list_item_widget* item)
 // c_list_widget virtual functions
 
 
-c_list_widget::~c_list_widget()
+c_user_interface_widget* c_list_widget::destructor(uint32 flags)
 {
+	this->~c_list_widget();
+	if (TEST_BIT(flags, 0))
+	{
+
+	}
+
 	//return INVOKE_TYPE(0x213BBF, 0x0, void*(__thiscall*)(c_list_widget*, char), lpMem, a2);
+
+	return this;
 }
 
 int32 c_list_widget::setup_children()

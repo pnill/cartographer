@@ -53,11 +53,6 @@ static int InterpretMasterCreate(char* response_content) {
 					break;
 				}
 			}
-			if (strlen(tempstr1) > 0) {
-				addDebugText("Username Should be: %s", tempstr1);
-				char* username = H2CustomLanguageGetLabel(CMLabelMenuId_AccountCreate, 1);
-				strncpy_s(username, XUSER_NAME_SIZE, tempstr1, XUSER_MAX_NAME_LENGTH);
-			}
 		}
 
 		free(fileLine);
@@ -107,29 +102,29 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
 			//internal error
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF014, 0xFFFFF015);
+			c_error_menu::open_by_error_id(_cartographer_error_id_internal_error);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_EMAIL) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01A, 0xFFFFF01B);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_email);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_USERNAME) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01C, 0xFFFFF01D);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_username);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF01E, 0xFFFFF01F);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_password);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_EMAIL) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF020, 0xFFFFF021);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_email_already_used);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_USERNAME) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF022, 0xFFFFF023);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_username_taken);
 		}
 		else if (rtn_code == ERROR_CODE_BANNED_EMAIL_DOMAIN) {
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF024, 0xFFFFF025);
+			c_error_menu::open_by_error_id(_cartographer_error_id_account_create_blacklisted_email_provider);
 		}
 		else {
 			//unknown error!
-			CustomMenuCall_Error_Inner(CMLabelMenuId_Error, 0xFFFFF012, 0xFFFFF013);
+			c_error_menu::open_by_error_id(_cartographer_error_id_unknown_unhandled_error);
 		}
 	}
 	else {

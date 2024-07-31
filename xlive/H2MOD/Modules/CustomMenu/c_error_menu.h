@@ -2,80 +2,129 @@
 #include "c_brightness_menu.h"
 #include "CustomLanguage.h"
 
+#include "interface/user_interface_headers.h"
+
+#include "Accounts/screen_cartographer_account_manager.h"
+
+enum e_cartographer_error_id
+{
+	_cartpgrapher_error_id_none = NONE,
+	_cartographer_error_id_generic_error,
+	_cartographer_error_id_no_custom_language_categorised_as_other,
+	_cartographer_error_id_error_reading_custom_language_file,
+	_cartographer_error_id_error_outdated_version,
+	_cartographer_error_id_invalid_login_token,
+	_cartographer_error_id_login_invalid_account_id,
+	_cartographer_error_id_login_incorrect_password,
+	_cartographer_error_id_login_machine_banned,
+	_cartographer_error_id_login_account_banned,
+	_cartographer_error_id_login_account_disabled,
+	_cartographer_error_id_unknown_unhandled_error,
+	_cartographer_error_id_internal_error,
+	_cartographer_error_id_login_account_already_in_use,
+	_cartographer_error_id_login_insufficient_machine_identifiers,
+	_cartographer_error_id_account_create_invalid_email,
+	_cartographer_error_id_account_create_invalid_username,
+	_cartographer_error_id_account_create_invalid_password,
+	_cartographer_error_id_account_create_email_already_used,
+	_cartographer_error_id_account_create_username_taken,
+	_cartographer_error_id_account_create_blacklisted_email_provider,
+	_cartographer_error_id_account_create_success,
+	_cartographer_error_id_account_create_verification_email_sent,
+	_cartographer_error_id_account_create_processing_account_notice,
+	_cartographer_error_id_account_login_please_wait_notice,
+	_cartographer_error_id_account_login_connection_failed,
+	_cartographer_error_id_setting_requiring_game_restart,
+
+	k_cartographer_error_id_end
+};
+
 class c_error_edit_list : public c_list_widget
 {
 public:
-	char item_list[132 * 4];
-	int field_2C0;
-	c_slot2<c_error_edit_list> slot_2_unk;
-	// button handler callback
+	int m_field_2C0;
+	c_slot2<c_error_edit_list, s_event_record*, int32> m_slot_2;
 
-	c_error_edit_list(int _flags);
+	c_error_edit_list(uint32 _flags);
 
-	virtual char* get_item_list() override
+	virtual c_list_item_widget* get_list_items() override
 	{
-		return item_list; // returns pointer to edit list
+		return nullptr; // returns pointer to edit list
 	}
 
-	virtual int get_list_item_count() override
+	virtual int32 get_list_items_count() override
 	{
-		// returns edit list count
-		return 4;
+		return 0;
 	}
 
-	void get_label(int a1, int a2) override
+	void update_list_items(c_list_item_widget* item, int32 skin_index) override
 	{
-		auto p_sub_211909 = Memory::GetAddress<int(__thiscall*)(int, int, int, int)>(0x211909);
-		auto p_sub_21bf85 = Memory::GetAddress<void(__thiscall*)(int, int)>(0x21bf85);
-
-		// a1 = ptr to account_list_items[idx]
-		__int16 list_item_index = *(WORD*)(a1 + 112);
-		int v3 = p_sub_211909(a1, 6, 0, 0);
-		if (v3)
-		{
-			set_widget_label_from_string_id_reimpl(v3, list_item_index + 1, CMLabelMenuId_Error);
-		}
 	}
 
 	// button handler
-	void button_handler(int* a2, int* a3);
+	void button_handler(s_event_record* a2, int32* a3);
 };
-static_assert(offsetof(c_error_edit_list, slot_2_unk.field_8) == 712);
-static_assert(offsetof(c_error_edit_list, list_data_array) == 112);
-static_assert(offsetof(c_error_edit_list, gap_70[56]) == 172);
 
 class c_error_menu : protected c_screen_with_menu
 {
 public:
-	static void* __cdecl open(s_new_ui_screen_parameters* a1);
+	c_error_edit_list m_error_edit_list;
+	e_cartographer_error_id m_error_id;
 
+	static void* open_by_error_id(e_cartographer_error_id error_id);
+	static void* __cdecl open(s_screen_parameters* a1);
 
-	c_error_menu(int _ui_channel, int a4, int _flags);
+	static void get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text);
+
+	c_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
+
+	~c_error_menu()
+	{
+		switch (m_error_id)
+		{
+		case _cartographer_error_id_invalid_login_token:
+			if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::IsAccountingActiveHandle()) {
+				c_account_list_menu::open_account_add_context();
+				c_account_list_menu::accountingGoBackToList = true;
+			}
+			c_account_list_menu::UpdateAccountingActiveHandle(false);
+			break;
+		case _cartpgrapher_error_id_none:
+		default:
+			break;
+		}
+	}
 
 	// interface
-	virtual int custom_deconstructor(BYTE flags) override
+	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		return c_screen_with_menu::custom_deconstructor(flags);
+		return c_screen_with_menu::destructor(flags);
 	};
 
 	// c_screen_with_menu specific interface
-	virtual int IUnkFunc23(int a2) override
+	virtual void initialize(s_screen_parameters* screen_parameters) override
 	{
-		// int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
-		return sub_2111ab_CMLTD((int)this, a2, CMLabelMenuId_Error, 0xFFFFFFF0, 0xFFFFFFF1);
-		// return c_screen_with_menu::IUnkFunc23(a2);
+		c_screen_with_menu::initialize(screen_parameters);
+
+		wchar_t* header_text = L"<unknown-error>";
+		wchar_t* subheader_text = L"<unknown-error-subheader>";
+
+		if (m_error_id != _cartpgrapher_error_id_none)
+		{
+			get_error_label(m_error_id, &header_text, &subheader_text);
+		}
+
+		m_header_text.set_text(header_text);
+		c_text_widget* subheader_text_widget = (c_text_widget*)this->try_find_child(_widget_type_text, 2, false);
+		if (subheader_text_widget)
+		{
+			subheader_text_widget->set_text(subheader_text);
+		}
 	}
 
-	virtual void* get_open_menu_cb() override
+	virtual void* load_proc() override
 	{
 		return c_error_menu::open;
 	}
-
-	c_error_edit_list error_edit_list;
 private:
 };
-// static_assert(sizeof(c_account_create_menu) == 3396);
-
-void CustomMenuCall_Error_Inner(char* title, char* description);
-void CustomMenuCall_Error_Inner(int menuId, int title, int description);
-void CustomMenuCall_Error_Inner(int menuIdTitle, int title, int menuIdDesc, int description);

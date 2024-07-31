@@ -2,7 +2,7 @@
 
 #include "user_interface_widget_button.h"
 
-c_button_widget::c_button_widget(int16 button_index, int16 user_flags):
+c_button_widget::c_button_widget(int16 button_index, uint16 user_flags):
 	c_user_interface_widget(_widget_type_button,user_flags)
 {
 	m_flags = 0;
@@ -13,9 +13,14 @@ c_button_widget::c_button_widget(int16 button_index, int16 user_flags):
 
 // c_button_widget virtual functions
 
-c_button_widget::~c_button_widget()
+c_user_interface_widget* c_button_widget::destructor(uint32 flags)
 {
+	this->~c_button_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
 
+	return this;
 }
 
 void c_button_widget::update()
@@ -52,7 +57,7 @@ bool c_button_widget::can_interact()
 c_user_interface_text* c_button_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x23BC5B, 0x0, c_user_interface_text * (__thiscall*)(c_button_widget*), this);
-	return &this->text_interface;
+	return &this->m_text_interface;
 }
 
 void c_button_widget::setup_texts()

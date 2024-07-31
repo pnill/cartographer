@@ -156,8 +156,8 @@ void H2AccountBufferCheck() {
 			H2AccountArrayLoginToken = (char**)realloc(H2AccountArrayLoginToken, sizeof(char*) * H2AccountArrayLen);
 		}
 		for (int i = H2AccountArrayLen - arrayIncSize; i < H2AccountArrayLen; i++) { // dont look, this is G
-			H2AccountArrayUsername[i] = 0;
-			H2AccountArrayLoginToken[i] = 0;
+			H2AccountArrayUsername[i] = NULL;
+			H2AccountArrayLoginToken[i] = NULL;
 		}
 	}
 }

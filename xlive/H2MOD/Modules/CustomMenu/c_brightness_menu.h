@@ -1,398 +1,304 @@
 #pragma once
 #include "CustomMenuGlobals.h"
-#include "c_list_widget.h"
 
-#define BRIGHTNESS_MENU_ID 272
+#include "interface/user_interface_headers.h"
 
 class c_brightness_level_edit_list : public c_list_widget
 {
 public:
-	char edit_list[132 * 4];
-	char edit_list_info[28];
+	c_list_item_widget m_edit_list[4];
+	uint8 edit_list_info[28];
 
 	// todo maybe implement the actual constructor
 
-	c_brightness_level_edit_list(int a2) :
-		c_list_widget(a2, false)
+	c_brightness_level_edit_list(uint16 user_flags) :
+		c_list_widget(user_flags)
 	{
-		void* old_vtbl = *(void**)this;
-		// this will replace the vtable
-		auto p_initialize_button_list = Memory::GetAddressRelative<void(__thiscall*)(void*, int)>(0x650E22); // c_brightness_level_edit_list
-		p_initialize_button_list(this, a2);
-		*(void**)this = old_vtbl;
 	}
 
 	// overrides, only needed ones
-	virtual int custom_deconstructor(BYTE flags) override
+	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<int(class_type::**)(int)>(0);
-		return (this->* * pFn)(flags);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 0, c_user_interface_widget * (class_type::**)(uint32), flags);
 	}
 
-	virtual int IUnkFunc2() override
+	virtual int32 setup_children() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(1);
-		return (this->* * pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
 	}
 
-	virtual void IUnkFunc22() override
+	virtual int32 link_item_widgets() override
 	{
-		typedef void(class_type::** fnT)();
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(21);
-		return (this->* * pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 21, int32(class_type::**)());
 	}
 
-	virtual char* get_item_list() override
+	virtual c_list_item_widget* get_list_items() override
 	{
-		typedef char* (class_type::** fnT)();
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(22);
-		return (this->* * pFn)();
+		return m_edit_list;
 	}
 
-	virtual int get_list_item_count() override
+	virtual int32 get_list_items_count() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(23);
-		return (this->* * pFn)();
+		return NUMBEROF(m_edit_list);
 	}
 
-	virtual void get_label(int a1, int a2) override
+	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override
 	{
-		typedef void(class_type::** fnT)(int, int);
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(24);
-		return (this->* * pFn)(a1, a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 24, void(class_type::**)(c_list_item_widget*, int32), item, skin_index);
 	}
 
-	virtual bool IUnkFunc26(int a1) override
+	virtual bool verify_item_in_focus(c_list_item_widget* item) override
 	{
-		typedef bool(class_type::** fnT)(int);
-		auto pFn = c_brightness_level_edit_list_base_vtable_get_func_ptr<fnT>(25);
-		return (this->* * pFn)(a1);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 25, bool(class_type::**)(c_list_item_widget*), item);
 	}
 
 private:
 	typedef c_brightness_level_edit_list class_type;
 
 	template<typename T>
-	static T c_brightness_level_edit_list_base_vtable_get_func_ptr(DWORD idx)
+	static T _get_vfptr_table(DWORD idx)
 	{
-		return reinterpret_cast<T>(&Memory::GetAddressRelative<void**>(0x7D972C)[idx]);
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x4D972C)[idx]);
 	}
 };
 
-static_assert(offsetof(c_brightness_level_edit_list, edit_list) == 176);
+static_assert(offsetof(c_brightness_level_edit_list, m_edit_list) == 176);
 
 class c_brightness_menu : protected c_screen_with_menu
 {
 public:
-	c_brightness_menu(int _ui_channel, int a4, __int16 _flags);
+	c_brightness_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
 	~c_brightness_menu() = default;
 
 	typedef c_brightness_menu class_type;
 
 	// interface
-	virtual int custom_deconstructor(BYTE flags) override
+	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<int(class_type::**)(int)>(0);
-		return (this->**pFn)(flags);
+		this->~c_brightness_menu();
+		if (TEST_BIT(flags, 0))
+		{
+
+		}
+
+		return this;
 	};
 
-	virtual int IUnkFunc2() override
+	virtual int32 setup_children() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(1);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
 	}
 
-	virtual void IUnkFunc3() override
+	virtual void on_screen_leave() override
 	{
-		typedef void(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(2);
-		return (this->**pFn)();
+		INVOKE_VFPTR_FN(_get_vfptr_table, 2, void(class_type::**)());
 	}
 
-	virtual int IUnkFunc4() override
+	virtual void update() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(3);
-		return (this->**pFn)();
+		INVOKE_VFPTR_FN(_get_vfptr_table, 3, void(class_type::**)());
 	}
 
-	virtual void IUnkFunc5_used_by_virtual_kb(int a2) override
+	virtual void render_widget(rectangle2d* viewport_bounds) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(4);
-		(this->**pFn)(a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 4, void(class_type::**)(rectangle2d*), viewport_bounds);
 	}
 
-	virtual DWORD IUnkFunc6(DWORD* a2) override
+	virtual void* get_mouse_region(rectangle2d* mouse_region_out) override
 	{
-		typedef DWORD(class_type::** fnT)(DWORD*);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(5);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 5, void*(class_type::**)(rectangle2d*), mouse_region_out);
 	}
 
-	virtual int IUnkFunc7(int a2) override
+	virtual int32 initialize_child_animations(s_animation_transform* a2) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(6);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 6, int32(class_type::**)(s_animation_transform*), a2);
 	}
 
-	virtual int IUnkFunc8() override
+	virtual int32 get_intro_delay() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(7);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 7, int32(class_type::**)());
 	}
 
-	virtual DWORD* IUnkFunc9(DWORD* a2) override
+	virtual void* get_unprojected_bounds(rectangle2d* unprojected_bounds) override
 	{
-		typedef DWORD* (class_type::** fnT)(DWORD*);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(8);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 8, void*(class_type::**)(rectangle2d*), unprojected_bounds);
 	}
 
-	virtual void IUnkFunc10(int a1) override
+	virtual void sub_612A7C(c_user_interface_widget* a2) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(9);
-		return (this->**pFn)(a1);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 9, void(class_type::**)(c_user_interface_widget*), a2);
 	}
 
-	virtual int IUnkFunc11() override
+	virtual c_user_interface_widget* sub_612ABC() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(10);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 10, c_user_interface_widget*(class_type::**)());
 	}
 
-	virtual int IUnkFunc12() override
+	virtual c_user_interface_widget* sub_612BCA() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(11);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 11, c_user_interface_widget*(class_type::**)());
 	}
 
-	virtual int IUnkFunc13(int* a2) override
+	virtual bool handle_event(s_event_record* event) override
 	{
-		typedef int(class_type::** fnT)(int*);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(12);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 12, bool(class_type::**)(s_event_record*), event);
 	}
 
-	virtual int get_top_most_parent_widget_ui_channel() override
+	virtual e_user_interface_channel_type get_parent_channel() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(13);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 13, e_user_interface_channel_type(class_type::**)());
 	}
 
-	virtual int get_top_most_parent_widget_index() override
+	virtual e_user_interface_render_window get_parent_render_window() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(14);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 14, e_user_interface_render_window(class_type::**)());
 	}
 
-	virtual void IUnkFunc16_maybe_debug(int a1) override
+	virtual void construct_animation_on_region_enter(int32 a1) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(15);
-		return (this->**pFn)(a1);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 15, void(class_type::**)(int32), a1);
 	}
 
-	virtual void IUnkFunc17_maybe_debug(int a1) override
+	virtual void construct_animation_on_region_leave(int32 a1) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(16);
-		return (this->**pFn)(a1);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 16, void(class_type::**)(int32), a1);
 	}
 
-	virtual int IUnkFunc18(int a2) override
+	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(17);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 17, c_user_interface_widget*(class_type::**)(rectangle2d*), point);
 	}
 
-	virtual bool IUnkFunc19() override
+	virtual bool can_interact() override
 	{
-		typedef bool(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(18);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 18, bool(class_type::**)());
 	}
 
-	virtual int IUnkFunc20() override
+	virtual c_user_interface_text* get_interface() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(19);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 19, c_user_interface_text*(class_type::**)());
 	}
 
-	virtual bool IUnkFunc21() override
+	virtual bool sub_6114B9() override
 	{
-		typedef bool(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(20);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 20, bool(class_type::**)());
 	}
 
-	virtual void IUnkFunc22_maybe_debug() override
+	virtual void sub_60E884() override
 	{
-		typedef void(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(21);
-		return (this->**pFn)();
+		INVOKE_VFPTR_FN(_get_vfptr_table, 21, void(class_type::**)());
 	}
 
-	virtual int IUnkFunc23(int a2) override
+	virtual void initialize(s_screen_parameters* parameters) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(22);
-		return (this->**pFn)(a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(s_screen_parameters*), parameters);
 	}
 
-	virtual int IUnkFunc24() override
+	virtual void post_initialize() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(23);
-		return (this->**pFn)();
+		INVOKE_VFPTR_FN(_get_vfptr_table, 23, void(class_type::**)());
 	}
 
-	virtual BYTE* IUnkFunc25() override
+	virtual void setup_special_widgets() override
 	{
-		typedef BYTE* (class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(24);
-		return (this->**pFn)();
+		INVOKE_VFPTR_FN(_get_vfptr_table, 24, void(class_type::**)());
 	}
 
-	virtual int IUnkFunc26() override
+	virtual c_user_interface_widget* sub_6102C5() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(25);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 25, c_user_interface_widget*(class_type::**)());
 	}
 
-	virtual int IUnkFunc27() override
+	virtual uint8 sub_6103D6() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(26);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 26, uint8(class_type::**)());
 	}
 
-	virtual int IUnkFunc28(int a2) override
+	virtual int32 sub_60F1F4(s_event_record* a2) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(27);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 27, int32(class_type::**)(s_event_record*), a2);
 	}
 
-	virtual bool IUnkFunc29(int* a2) override
+	virtual uint8 sub_60EFC1(s_event_record* event) override
 	{
-		typedef bool(class_type::** fnT)(int*);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(28);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 28, uint8(class_type::**)(s_event_record*), event);
 	}
 
-	virtual bool IUnkFunc30(int a2) override
+	virtual int32 sub_60F081(s_event_record* a2) override
 	{
-		typedef bool(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(29);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 29, int32(class_type::**)(s_event_record*), a2);
 	}
 
-	virtual int IUnkFunc31(int a2) override
+	virtual int32 sub_60F151(int32 a2) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(30);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 30, int32(class_type::**)(int32), a2);
 	}
 
-	virtual bool IUnkFunc32(int a2) override
+	virtual bool sub_40AD53(int32 a2) override
 	{
-		typedef bool(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(31);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 31, bool(class_type::**)(int32), a2);
 	}
 
-	virtual int IUnkFunc33() override
+	virtual e_user_interface_channel_type get_channel() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(32);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 32, e_user_interface_channel_type(class_type::**)());
 	}
 
-	virtual int IUnkFunc34() override
+	virtual e_user_interface_render_window get_render_window() override
 	{
-		typedef int(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(33);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 33, e_user_interface_render_window(class_type::**)());
 	}
 
-	virtual unsigned int IUnkFunc35(int a2) override
+	virtual int32 sub_60EB92(int32 a2) override
 	{
-		typedef unsigned int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(34);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 34, int32(class_type::**)(int32), a2);
 	}
 
-	virtual void IUnkFunc36_maybe_debug(int a2) override
+	virtual void sub_60EBC2(int32 a2) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(35);
-		return (this->**pFn)(a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 35, void(class_type::**)(int32), a2);
 	}
 
-	virtual int IUnkFunc37(DWORD* a2) override
+	virtual void* sub_60EC5C(s_screen_state* state) override
 	{
-		typedef int(class_type::** fnT)(DWORD*);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(36);
-		return (this->**pFn)(a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 36, void*(class_type::**)(s_screen_state*), state);
 	}
 
-	virtual int IUnkFunc38(int a2) override
+	virtual void sub_60ECC9(s_screen_state* state) override
 	{
-		typedef int(class_type::** fnT)(int);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(37);
-		return (this->**pFn)(a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 37, void(class_type::**)(s_screen_state*), state);
 	}
 
-	virtual void* get_open_menu_cb() override
+	virtual void* load_proc() override
 	{
-		typedef void*(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(38);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 38, void*(class_type::**)());
 	}
 
-	virtual bool IUnkFunc40() override
+	virtual bool overlay_effect_is_disabled() override
 	{
-		typedef bool(class_type::** fnT)();
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(39);
-		return (this->**pFn)();
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 39, bool(class_type::**)());
 	}
 
-	virtual void IUnkFunc41(bool a2) override
+	virtual void sub_60F2A4(uint8 bitmap_index) override
 	{
-		typedef void(class_type::** fnT)(bool);
-		auto pFn = c_brightness_menu_base_vtable_get_func_ptr<fnT>(40);
-		(this->**pFn)(a2);
+		INVOKE_VFPTR_FN(_get_vfptr_table, 40, void(class_type::**)());
 	}
 
-	c_brightness_level_edit_list list_widgets;
-
+	c_brightness_level_edit_list m_list_widgets;
 	
-	static void* open_brightness_menu(s_new_ui_screen_parameters* a1);
+	static void* open_brightness_menu(s_screen_parameters* a1);
 
 private:
+	// reserved name
 	template<typename T>
-	static T c_brightness_menu_base_vtable_get_func_ptr(DWORD idx)
+	static T _get_vfptr_table(DWORD idx)
 	{
-		return reinterpret_cast<T>(&Memory::GetAddressRelative<void**>(0x7D7ABC)[idx]);
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x4D7ABC)[idx]);
 	}
 };
 
 static_assert(sizeof(c_brightness_menu) == 3388);
-static_assert(offsetof(c_brightness_menu, list_widgets) == 2656);
+static_assert(offsetof(c_brightness_menu, m_list_widgets) == 2656);
 
 void replace_brightness_menu();

@@ -20,7 +20,7 @@ struct s_main_game_globals
 	bool game_sounds_disabled;
 	short pad_1;
 	DWORD ticks_till_end;
-	DWORD game_ragdoll_count;
+	int32 game_ragdoll_count;
 	int unused_1;
 	byte cluster_pvs[64];
 	byte cluster_pvs_local[64];

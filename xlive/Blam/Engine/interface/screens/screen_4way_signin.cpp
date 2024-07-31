@@ -89,8 +89,14 @@ c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel
 	m_call_context = _4_way_signin_type_splitscreen;
 }
 
-c_screen_4way_signin::~c_screen_4way_signin()
+c_user_interface_widget* c_screen_4way_signin::destructor(uint32 flags)
 {
+	this->~c_screen_4way_signin();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 
 void c_screen_4way_signin::update()
@@ -368,9 +374,9 @@ bool __cdecl user_inteface_decline_invite_callback(e_controller_index controller
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = FLAG(controller_index);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.field_4 = 0xFFFFFFFF;
 	params.m_screen_state.field_8 = 0xFFFFFFFF;
@@ -389,9 +395,9 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 		s_screen_parameters params;
 		params.m_flags = 0;
 		params.m_window_index = _window_4;
-		params.field_C = 0;
+		params.m_context = 0;
 		params.user_flags = FLAG(event->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
 		params.m_screen_state.field_4 = 0xFFFFFFFF;
 		params.m_screen_state.field_8 = 0xFFFFFFFF;
@@ -428,7 +434,7 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 
 			//this needs further research
 
-			screen_error_ok_dialog_show(_user_interface_channel_type_interface, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
+			screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
 
 			break;
 		}
@@ -443,9 +449,9 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 		if (user_interface_controller_get_signed_in_controller_count() == 1)
 		{
 			// _screen_xbox_live_main_menu is replaced by _screen_bungie_news in h2v
-			//if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_xbox_live_main_menu)
-			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_bungie_news)
-				&& !user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_main_menu))
+			//if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_xbox_live_main_menu)
+			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_bungie_news)
+				&& !user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_main_menu))
 			{
 				user_interface_enter_game_shell(1);
 			}
@@ -457,7 +463,8 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 			{
 				if (this->m_call_context == _4_way_signin_type_crossgame_invite)
 				{
-					user_interface_error_display_ok_cancle_dialog_with_ok_callback(_user_interface_channel_type_interface,
+					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+						_user_interface_channel_type_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_interface_mainmenu_sign_out_controller_callback,
@@ -465,7 +472,8 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 				}
 				else
 				{
-					user_interface_error_display_ok_cancle_dialog_with_ok_callback(_user_interface_channel_type_interface,
+					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+						_user_interface_channel_type_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_inteface_sign_out_controller_default_callback,
@@ -474,7 +482,7 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 			}
 			else
 			{
-				screen_error_ok_dialog_show(_user_interface_channel_type_interface, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
+				screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
 
 			}
 			this->m_controllers_mask |= FLAG(event->controller);
@@ -505,8 +513,8 @@ bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 		|| event->component == _user_interface_controller_component_button_back)
 		&& !user_interface_controller_get_signed_in_controller_count())
 	{
-		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
-			_user_interface_channel_type_interface,
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_dialog,
 			_window_4,
 			FLAG(event->controller),
 			user_inteface_decline_invite_callback,
@@ -515,7 +523,7 @@ bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 	return true;
 }
 
-void* c_screen_4way_signin::load(s_screen_parameters * parameters)
+void* c_screen_4way_signin::load(s_screen_parameters* parameters)
 {
 	c_screen_4way_signin* screen;
 
@@ -717,9 +725,9 @@ void user_interface_recover_4way_screen(e_session_protocol protocol)
 	s_screen_parameters params;
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.field_4 = 0xFFFFFFFF;
 	params.m_screen_state.field_8 = 0xFFFFFFFF;
@@ -801,9 +809,9 @@ void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
 	s_screen_parameters params;
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.field_4 = 0xFFFFFFFF;
 	params.m_screen_state.field_8 = 0xFFFFFFFF;

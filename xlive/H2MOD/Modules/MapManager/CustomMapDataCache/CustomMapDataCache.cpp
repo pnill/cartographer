@@ -8,7 +8,7 @@
 #include "tag_files/files_windows.h"
 #include "text/unicode.h"
 
-#include "H2MOD/Modules/CustomMenu/c_list_widget.h"
+#include "interface/user_interface_headers.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 
 
@@ -877,24 +877,19 @@ public:
 
 		if (custom_map_available_count > 0)
 		{
-			*custom_map_menu_list = c_list_widget::allocate_list_data("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
+			*custom_map_menu_list = ui_list_data_new("custom game custom maps", custom_map_available_count, sizeof(s_custom_map_id));
 			data_make_valid(*custom_map_menu_list);
 			map_ids_buffer = new s_custom_map_id[custom_map_available_count];
 			get_custom_map_manager()->get_custom_map_list_ids(map_ids_buffer, custom_map_available_count);
-		}
 
-		if (custom_map_available_count > 0)
-		{
 			// ### FIXME ugly...
 			for (uint32 i = custom_map_available_count; i-- > 0; )
 			{
-				s_custom_map_id* list_entry 
+				s_custom_map_id* list_entry
 					= &((s_custom_map_id*)(*custom_map_menu_list)->data)[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_new(*custom_map_menu_list))];
 				memcpy(list_entry, &map_ids_buffer[i], sizeof(s_custom_map_id));
 			}
 		}
-
-		// addDebugText("c_custom_game_custom_map_list - custom map list count: %d", (*custom_map_menu_list)->total_elements_used);
 
 		if (map_ids_buffer != nullptr)
 			delete[] map_ids_buffer;

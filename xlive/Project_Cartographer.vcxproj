@@ -629,6 +629,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_group_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_guide.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_headers.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_hud_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_memory.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_model_block.h" />
@@ -778,12 +779,10 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MessageBox.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MOTD.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_account_manager.cpp" />
+    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_menus.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_error_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
@@ -845,7 +844,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
@@ -1187,12 +1185,10 @@
     <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
     <ClInclude Include="H2MOD\Modules\Config\WeaponOffsetConfig\WeaponOffsetConfig.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_account_manager.h" />
+    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_menus.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
     <ClInclude Include="H2MOD\Modules\GamePhysics\Patches\ProjectileFix.h" />
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
@@ -1264,7 +1260,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />

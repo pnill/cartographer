@@ -132,7 +132,7 @@ void user_interface_networking_join_game(XSESSION_INFO* session, int32 user_inde
     if (user_interface_controller_get_signed_in_controller_count() <= 0)
     {
         user_interface_networking_set_globals(true, session, user_index, from_game_invite);
-        screen_error_ok_dialog_show(1, _ui_error_invite_requires_signin, 4, 1 << user_index, user_interface_controller_pick_profile_offline, 0);
+        screen_error_ok_dialog_show(1, _ui_error_invite_requires_signin, 4, FLAG(user_index), user_interface_controller_pick_profile_offline, 0);
     }
     else
     {

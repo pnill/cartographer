@@ -284,7 +284,6 @@ errno_t c_static_wchar_string<T>::to_lower(void)
 	return _wcslwr_s(text, T);
 }
 
-
 size_t csstrnlen(const char* s, size_t size);
 
 char* csstrnzcpy(char* s1, const char* s2, size_t size);

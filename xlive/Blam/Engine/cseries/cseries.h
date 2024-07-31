@@ -64,12 +64,17 @@ static_assert(sizeof(datum) == 4);
 // ADDR_SERVER: file offset in h2server.exe
 // TYPE: function
 // __VA_ARGS__: arguments for the function we want to invoke
-#define INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) Memory::GetAddress<TYPE>(ADDR_CLIENT, ADDR_SERVER)(__VA_ARGS__)
-#define INVOKE(ADDR_CLIENT, ADDR_SERVER, FN_DECL, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, decltype(FN_DECL)*, __VA_ARGS__)
+#define INVOKE_BY_TYPE(_addr_client, _addr_server, _type, ...) Memory::GetAddress<_type>(_addr_client, _addr_server)(__VA_ARGS__)
+#define INVOKE(_addr_client, _addr_server, _fn_decl, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, decltype(_fn_decl)*, __VA_ARGS__)
 // ### TODO find better name
-#define INVOKE_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, ...) INVOKE_BY_TYPE(ADDR_CLIENT, ADDR_SERVER, TYPE, __VA_ARGS__)
+#define INVOKE_TYPE(_addr_client, _addr_server, _type, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, _type, __VA_ARGS__)
 
-#define NONE -1
+#define INVOKE_VFPTR_FN(_get_table_fn, _index, _type, ...) \
+    (this->**_get_table_fn<_type>(_index))(__VA_ARGS__)
+
+#define INVOKE_CLASS_FN(classobj, functionPtr)  ((classobj)->*(functionPtr))
+
+#define NONE (-1)
 #define DATUM_INDEX_NEW(_absolute_index, _salt) (datum)(((_salt) << 16) | (_absolute_index))
 #define DATUM_IS_NONE(_datum_index) ((_datum_index) == NONE)
 #define DATUM_INDEX_TO_ABSOLUTE_INDEX(_datum_index) ((uint16)((_datum_index) & 0xFFFF))

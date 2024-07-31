@@ -59,14 +59,15 @@ ASSERT_STRUCT_SIZE(s_animation_transform, 0x34);
 
 class c_user_interface_widget
 {
-protected:
+	// ### TODO FIXME need to access m_button_index inside virtual keyboard code
+public:
 	//void* __vtable;
 	e_user_interface_widget_type m_widget_type;
 	int16 m_controllers_mask;
 	int16 m_block_index;
 	int32 m_hierarchy_order;
 	c_user_interface_widget* parent_widget;
-	c_user_interface_widget* child_widget;
+	c_user_interface_widget* m_child_widget;
 	c_user_interface_widget* next_widget;
 	c_user_interface_widget* previous_widget;
 	rectangle2d m_bounds;
@@ -79,12 +80,13 @@ protected:
 	bool m_visible;
 	bool m_can_handle_events;
 
-
 	void destroy_recursive();
 	void initialize_animation(s_animation_transform* animation);
 
 public:
-	c_user_interface_widget(e_user_interface_widget_type widget_type, int16 user_flags);
+	c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags);
+
+	~c_user_interface_widget();
 
 	int16 get_animation_type();
 	e_user_interface_widget_type get_type();
@@ -112,7 +114,7 @@ public:
 	
 	// c_user_interface_widget virtual functions
 
-	virtual ~c_user_interface_widget();
+	virtual c_user_interface_widget* destructor(uint32 flags);
 	virtual int32 setup_children();
 	virtual void on_screen_leave();
 	virtual void update();

@@ -2,10 +2,8 @@
 
 #include "CustomMenuGlobals.h"
 #include "c_screen_with_menu.h"
-#include "c_user_interface_widget.h"
-#include "c_screen_widget.h"
 
-#define VIRTUAL_KEYBOARD_MENU_ID 167
+#include "interface/user_interface_headers.h"
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 
@@ -14,60 +12,246 @@
 
 #define VIRTUAL_KEYBOARD_BUTTON_COUNT 47
 
+void ui_globals_set_keyboard_input_state(bool state);
+
+class c_virtual_keyboard_button : public c_button_widget
+{
+protected:
+	// ### TODO cleanup this
+	bool handle_virtual_keyboard_event(s_event_record* a2);
+
+public:
+
+	typedef c_virtual_keyboard_button class_type;
+
+	c_virtual_keyboard_button() :
+		c_button_widget(NONE, 0)
+	{
+	}
+
+	virtual c_user_interface_widget* destructor(uint32 flags) override
+	{
+		this->~c_virtual_keyboard_button();
+		if (FLAG(flags, 0))
+		{
+		}
+
+		return this;
+	}
+
+	virtual int32 setup_children() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
+	}
+
+	virtual void on_screen_leave() override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 2, void(class_type::**)());
+	}
+
+	virtual void update() override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 3, void(class_type::**)());
+	}
+
+	virtual void render_widget(rectangle2d* viewport_bounds) override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 4, void(class_type::**)(rectangle2d*), viewport_bounds);
+	}
+
+	virtual void* get_mouse_region(rectangle2d* mouse_region_out) override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 5, void* (class_type::**)(rectangle2d*), mouse_region_out);
+	}
+
+	virtual int32 initialize_child_animations(s_animation_transform* a2) override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 6, int32(class_type::**)(s_animation_transform*), a2);
+	}
+
+	virtual int32 get_intro_delay() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 7, int32(class_type::**)());
+	}
+
+	virtual void* get_unprojected_bounds(rectangle2d* unprojected_bounds) override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 8, void* (class_type::**)(rectangle2d*), unprojected_bounds);
+	}
+
+	virtual void sub_612A7C(c_user_interface_widget* a2) override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 9, void(class_type::**)(c_user_interface_widget*), a2);
+	}
+
+	virtual c_user_interface_widget* sub_612ABC() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 10, c_user_interface_widget * (class_type::**)());
+	}
+
+	virtual c_user_interface_widget* sub_612BCA() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 11, c_user_interface_widget * (class_type::**)());
+	}
+
+	virtual bool handle_event(s_event_record* event) override
+	{
+		return this->handle_virtual_keyboard_event(event);
+
+		//return INVOKE_VFPTR_FN(_get_vfptr_table, 12, bool(class_type::**)(s_event_record*), event);
+	}
+
+	virtual e_user_interface_channel_type get_parent_channel() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 13, e_user_interface_channel_type(class_type::**)());
+	}
+
+	virtual e_user_interface_render_window get_parent_render_window() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 14, e_user_interface_render_window(class_type::**)());
+	}
+
+	virtual void construct_animation_on_region_enter(int32 a1) override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 15, void(class_type::**)(int32), a1);
+	}
+
+	virtual void construct_animation_on_region_leave(int32 a1) override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 16, void(class_type::**)(int32), a1);
+	}
+
+	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 17, c_user_interface_widget * (class_type::**)(rectangle2d*), point);
+	}
+
+	virtual bool can_interact() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 18, bool(class_type::**)());
+	}
+
+	virtual c_user_interface_text* get_interface() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 19, c_user_interface_text * (class_type::**)());
+	}
+
+	virtual bool sub_6114B9() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 20, bool(class_type::**)());
+	}
+
+	// c_button_widget additions
+
+	virtual void setup_texts() override
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 21, void(class_type::**)());
+	}
+
+	virtual int32 get_bitmap_active_index() override
+	{
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 22, int32(class_type::**)());
+	}
+
+private:
+
+	// reserved name
+	template<typename T>
+	static T _get_vfptr_table(DWORD idx)
+	{
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x3D30D4)[idx]);
+	}
+};
+
 class c_virtual_keyboard_menu : protected c_screen_widget
 {
+protected:
+	int field_A5C;
+	int field_A60;
+	uint8 field_A64[512];
+	int field_C64;
+	int field_C68;
+	int16 field_C6C;
+	int16 field_C6E;
+	int16 field_C70;
+	int16 field_C72;
+	char field_C74;
+	c_virtual_keyboard_button m_virtual_keyboard_buttons[VIRTUAL_KEYBOARD_BUTTON_COUNT];
+	int field_3B78;
+	char field_3B7C;
+	char field_3B7D;
+
 public:
-	static void* __cdecl open(s_new_ui_screen_parameters* parameters);
+	static void* __cdecl open(s_screen_parameters* parameters);
 
 	// TODO list initializer once the ctors are re-implemented
-	c_virtual_keyboard_menu(int _ui_channel, int a4, __int16 _flags) :
-		c_screen_widget(VIRTUAL_KEYBOARD_MENU_ID, _ui_channel, a4, _flags, false)
+	c_virtual_keyboard_menu(e_user_interface_channel_type _channel_type, e_user_interface_render_window _window_index, uint16 _user_flags) :
+		c_screen_widget(_screen_virtual_keyboard, _channel_type, _window_index, _user_flags)
 	{
-		typedef c_virtual_keyboard_menu* (__thiscall* c_virtual_keyboard_menu_ctor_t)(c_virtual_keyboard_menu*, int, int, __int16);
-		auto p_c_virtual_keyboard_menu_base_ctor = Memory::GetAddressRelative<c_virtual_keyboard_menu_ctor_t>(0x63BDF6);
+		field_A5C = NONE;
+		field_A60 = NONE;
+		csmemset(field_A64, 0, sizeof(field_A64));
+		field_C64 = 0;
+		field_C68 = 0;
+		field_C6C = 0;
+		field_C6E = 4;
+		field_C70 = 10;
+		field_C72 = 0;
+		field_C74 = 0;
 
-		void* old_vtbl = *(void**)this;
-		p_c_virtual_keyboard_menu_base_ctor(this, _ui_channel, a4, _flags);
-		*(void**)this = old_vtbl;
+		field_3B78 = NONE;
+		field_3B7C = 1;
+		field_3B7D = 0;
+
+		for (int32 i = 0; i < NUMBEROF(m_virtual_keyboard_buttons); i++)
+		{
+			m_virtual_keyboard_buttons[i].m_button_index = i;
+			m_virtual_keyboard_buttons[i].m_controllers_mask = _user_flags;
+		}
+
+		ui_globals_set_keyboard_input_state(true);
 	}
 
-	~c_virtual_keyboard_menu() = default;
-
-	virtual int custom_deconstructor(BYTE flags) override
+	~c_virtual_keyboard_menu()
 	{
-		auto pFn = c_virtual_keyboard_menu_vtable_get_func_ptr<int(class_type::**)(int)>(0);
-		return (this->** pFn)(flags);
+		ui_globals_set_keyboard_input_state(false);
 	}
 
-	virtual void IUnkFunc5_used_by_virtual_kb(int a2)
+	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		typedef void(class_type::** fnT)(int);
-		auto pFn = c_virtual_keyboard_menu_vtable_get_func_ptr<fnT>(4);
-		(this->* * pFn)(a2);
+		this->~c_virtual_keyboard_menu();
+		if (TEST_BIT(flags, 0))
+		{
+		}
+
+		return this;
 	}
 
-	virtual int IUnkFunc13(int* a2) override;
+	virtual void render_widget(rectangle2d* viewport_bounds)
+	{
+		INVOKE_VFPTR_FN(_get_vfptr_table, 4, void(class_type::**)(rectangle2d * viewport_bounds), viewport_bounds);
+	}
 
-	virtual int IUnkFunc23(int a2);
+	virtual bool handle_event(s_event_record* event) override;
 
-	virtual void* get_open_menu_cb() override
+	virtual void initialize(s_screen_parameters* parameters);
+
+	virtual void* load_proc() override
 	{
 		return c_virtual_keyboard_menu::open;
 	}
 
 	void __thiscall set_input_string_buffer(wchar_t* buffer, size_t buffer_size);
 
-	char virtual_keyboard_data[15232 - sizeof(c_screen_widget)];
-
 private:
 	typedef c_screen_widget class_type;
 
 	template<typename T>
-	static T c_virtual_keyboard_menu_vtable_get_func_ptr(DWORD idx)
+	static T _get_vfptr_table(DWORD idx)
 	{
-		return reinterpret_cast<T>(&Memory::GetAddressRelative<void**>(0x7D302C)[idx]);
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x3D302C)[idx]);
 	}
 };
-static_assert(sizeof(c_virtual_keyboard_menu) == 15232);
+ASSERT_STRUCT_SIZE(c_virtual_keyboard_menu, 15232);
 
-void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, int menuType, int menuIdTitle, int title, int menuIdDesc, int description);
+void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, int menuType);

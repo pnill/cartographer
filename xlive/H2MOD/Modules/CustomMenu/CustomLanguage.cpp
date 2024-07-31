@@ -455,30 +455,6 @@ char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	return get_custom_label(current_language, label_menu_id, label_id, label);
 }
 
-char* H2ServerGetLabel(int label_menu_id, int label_id) {
-	char* label = get_cartographer_label(label_menu_id, label_id, 0b10);
-	if (label)
-		return label;
-	return get_cartographer_label(label_menu_id, label_id, 0b01);
-}
-
-char* H2CustomLanguageGetLabel(int label_menu_id, int label_id) {
-	if (H2IsDediServer)
-		return H2ServerGetLabel(label_menu_id, label_id);
-	return H2GetLabel(0, label_id, label_menu_id, 0);
-}
-
-
-void combineCartographerLabels(int menuId, int lbl1, int lbl2, int lblCmb) {
-	char* label_1 = H2CustomLanguageGetLabel(menuId, lbl1);
-	char* label_2 = H2CustomLanguageGetLabel(menuId, lbl2);
-	int label_len = (label_1 ? strlen(label_1) : 0) + (label_2 ? strlen(label_2) : 0) + 1;
-	char* label_combined = (char*)malloc(label_len);
-	snprintf(label_combined, label_len, label_1 ? label_1 : "", label_2 ? label_2 : "");
-	add_cartographer_label(menuId, lblCmb, label_combined, true);
-	free(label_combined);
-}
-
 void setGameLanguage() {
 	bool* HasLoadedLanguage = (bool*)(H2BaseAddr + 0x481908);
 
@@ -626,7 +602,6 @@ void __stdcall string_id_to_wide_string_hook(int thisx, int string_id, wchar_t *
 		utf8_string_to_wchar_string(utf8_str, buffer, 512);
 		if (string_id == 0x110023FD) // check if the string id is training_swaphold
 		{
-			// if it's the case, 
 			const wchar_t reload_weapon_game_str[] = { 0xE448, 0 };
 			const wchar_t weapon_pickup_game_str[] = { 0xE45A, 0 };
 

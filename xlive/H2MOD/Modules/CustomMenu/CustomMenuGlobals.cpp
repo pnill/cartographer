@@ -6,37 +6,23 @@
 
 BYTE* ui_memory_pool_allocate(int size, int a2)
 {
-	/* unk is not used, but definitely pushed on the stack */
 	auto p_ui_memory_pool_allocate = Memory::GetAddress<BYTE*(__cdecl*)(int, int)>(0x20D2D8);
 	return p_ui_memory_pool_allocate(size, a2);
-}
-
-int __cdecl user_interface_register_screen_to_channel(void* ui_buffer, s_new_ui_screen_parameters* parameters)
-{
-	auto p_user_interface_register_screen_to_channel = Memory::GetAddressRelative<int(__cdecl*)(void*, s_new_ui_screen_parameters*)>(0x60B8C3);
-	return p_user_interface_register_screen_to_channel(ui_buffer, parameters);
-}
-
-int __cdecl user_interface_back_out_from_channel(int ui_channel, int window_idx)
-{
-	auto p_user_interface_back_out_from_channel = Memory::GetAddressRelative<int(__cdecl*)(int, int)>(0x6096DA);
-	return p_user_interface_back_out_from_channel(ui_channel, window_idx);
 }
 
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
 void* lastOuterMenuFuncPtr = 0;
 
-void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr) {
-	CallWgit(WgitScreenfunctionPtr, 1, 0);
+void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr) {
+	return ui_custom_cartographer_load_menu(WgitScreenfunctionPtr, 1, 0);
 }
 
-void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2) {
-	CallWgit(WgitScreenfunctionPtr, open_method2, 0);
+void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2) {
+	return ui_custom_cartographer_load_menu(WgitScreenfunctionPtr, open_method2, 0);
 }
 
 int prevOpenMethod = 3;
-//bool hacked21 = false;
-void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
+void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2, int menu_wgit_type) {
 	//int(__thiscall*WgitInitialize)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
 	//0x0020C258 is another one.
 	//void*(__thiscall*WgitFinalize)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
@@ -56,131 +42,26 @@ void CallWgit(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method2, 
 				long long timeDiff = difference.count();
 				if (timeDiff < 1500) {
 					open_method = 3;
-					//hacked21 = true;
 				}
 			}
-			//else if (hacked21) {
-			//	return;
-			//}
 		}
 	}
 	lastOuterMenuFuncPtr = WgitScreenfunctionPtr;
 	lastOuterMenuUse = std::chrono::high_resolution_clock::now();
 	prevOpenMethod = open_method;
 
-	//char* menu_setup = (char*)malloc(sizeof(char) * 0x20);
-	//WgitInitialize(menu_setup);
-
-	s_new_ui_screen_parameters new_screen_params;
+	s_screen_parameters new_screen_params;
 	switch (open_method) {
 	case 3:
-		new_screen_params.data_new(0, 1, _ui_channel_gameshell_dialog, 4, WgitScreenfunctionPtr);
+		new_screen_params.data_new(0, FLAG(0), _user_interface_channel_type_dialog, _window_4, WgitScreenfunctionPtr);
 		break;
 	case 0:
 	default:
-		new_screen_params.data_new(0, 1, _ui_channel_gameshell_screen, 4, WgitScreenfunctionPtr);
+		new_screen_params.data_new(0, FLAG(0), _user_interface_channel_type_gameshell_screen, _window_4, WgitScreenfunctionPtr);
+		break;
 	}
 
-	new_screen_params.ui_screen_load_proc_exec();
-}
-
-int __cdecl sub_250E22_CM(int thisptr, int a2, DWORD* menu_vftable_1, DWORD menu_button_handler, int number_of_buttons)
-{
-	void*(__thiscall* sub_213B1C)(int, int) = (void*(__thiscall*)(int, int))((char*)H2BaseAddr + 0x213B1C);
-	void*(__thiscall* sub_21FFC9)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x21FFC9);
-	void(__stdcall* sub_28870B)(int, int, int, void(__thiscall*)(DWORD), int) = (void(__stdcall*)(int, int, int, void(__thiscall*)(DWORD), int))((char*)H2BaseAddr + 0x28870B);
-	int(__thiscall* sub_2113C6)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x2113C6);
-	int(__cdecl* sub_20D1FD)(const char*, int numberOfButtons, int) = (int(__cdecl*)(const char*, int, int))((char*)H2BaseAddr + 0x20D1FD);
-	int(__cdecl* sub_66B33)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x66B33);
-	int(__cdecl* sub_667A0)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x667A0);
-	void*(__thiscall* sub_2113D3)(int, int) = (void*(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2113D3);
-
-	int v5; // eax@4
-	int v2 = thisptr;
-
-	sub_213B1C(thisptr, a2);
-
-	//cloned vftable
-	*(DWORD*)v2 = (DWORD)menu_vftable_1 + 0x30;
-
-	int(__thiscall* sub_E5A551)(void* thisptr) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0xA551);
-
-	sub_28870B((int)((char*)v2 + 176), 132, 4, (void(__thiscall*)(DWORD))sub_21FFC9, (int)sub_E5A551);
-
-	*((BYTE*)v2 + 704) = 0;
-
-	sub_2113C6((int)((char*)v2 + 712));
-
-	//*((DWORD*)v2 + 177) = &off_1229700;
-	*((DWORD*)v2 + 177) = 0;
-
-	*((DWORD*)v2 + 181) = (DWORD)v2;
-
-	*((DWORD*)v2 + 182) = (DWORD)menu_button_handler;
-	DWORD* safds = ((DWORD*)v2 + 182);
-
-	const char* editliststr = "brightness level settings edit list";
-
-	int v3 = sub_20D1FD(editliststr, number_of_buttons, 4);
-
-	*((DWORD*)v2 + 28) = v3;
-
-	sub_66B33(v3);
-
-	for (unsigned int i = 0; i < *(DWORD*)(*((DWORD*)v2 + 28) + 32); ++i) {
-		sub_667A0(*((DWORD*)v2 + 28));
-	}
-	if (v2 == -708) {
-		v5 = 0;
-	}
-	else {
-		v5 = v2 + 712;
-	}
-
-	sub_2113D3(v2 + 172, v5);
-
-	return (int)v2;
-}
-
-int __cdecl sub_248B17_CM(int thisptr, int a2, int a3, int a4, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type)
-{
-	void*(__thiscall* sub_211159)(void*, int wgit_id, int, int, int, int) = (void*(__thiscall*)(void*, int, int, int, int, int))((char*)H2BaseAddr + 0x211159);
-	//int(__thiscall* sub_250E22)(int, int) = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x250E22);
-
-	//The GUI type and the Labels on it are pre-written from that WgitID
-	//272, 259
-	sub_211159((void*)thisptr, menu_wgit_type, a2, a3, a4, thisptr + 2656);
-
-	*(DWORD*)thisptr = (DWORD)menu_vftable_2;
-
-	sub_250E22_CM(thisptr + 2656, a4, menu_vftable_1, menu_button_handler, number_of_buttons);
-
-	return thisptr;
-}
-
-int __cdecl CustomMenu_CallHead(s_new_ui_screen_parameters* a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type)
-{
-	auto sub_20B8C3 = (int(__cdecl*)(int, s_new_ui_screen_parameters*))((char*)H2BaseAddr + 0x20B8C3);
-
-	int menu_struct = (int)ui_memory_pool_allocate(3388, 0);
-	int menu_id = ((int*)menu_struct)[28];
-	if (menu_struct) {
-		menu_struct = sub_248B17_CM(menu_struct, a1->ui_channel, a1->field_8, HIWORD(a1->flags), menu_vftable_1, menu_vftable_2, menu_button_handler, number_of_buttons, menu_wgit_type);
-	}
-	*(BYTE *)(menu_struct + 0x6C) = 1;
-	//*(BYTE *)(menu_struct + 0xd20) = 1;
-	sub_20B8C3(menu_struct, a1);
-
-	return menu_struct;
-}
-
-int __stdcall sub_20F790_CM(int thisptr, __int16 selected_button_id)
-{
-	int(__thiscall* sub_213F50)(int, __int16) = (int(__thiscall*)(int, __int16))((char*)H2BaseAddr + 0x213F50);
-	int(__thiscall* sub_20F790)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20F790);
-
-	sub_213F50(thisptr + 2656, selected_button_id);
-	return sub_20F790(thisptr);
+	return new_screen_params.ui_screen_load_proc_exec();
 }
 
 char __stdcall sub_21bb0b_CMLTD(void* thisptr, __int16 a2, int* aa3, int label_menu_id, int label_id_description)
@@ -829,46 +710,6 @@ char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id,
 		}
 	}
 	return result;
-}
-
-int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
-{
-	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
-	int(__cdecl * sub_239623)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x239623);
-	int(__thiscall * sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
-
-	int v2 = thisptr;
-	int v3 = sub_20c701(*(DWORD*)(thisptr + 0x70));
-	int v4 = *(DWORD*)(v2 + 0xA5C);
-
-	int var68[0x50];
-	var68[0] = 0;
-	var68[1] = 1;
-	var68[2] = 0;
-	var68[3] = 0;
-	var68[4] = v4;
-	var68[5] = 0;
-
-	memset(&var68[6], 0, 0x50u);
-	sub_210a44_CMLTD(v2, v3, var68, label_menu_id, label_id_title, label_id_description);
-	int v6 = sub_20c701(*(DWORD*)(v2 + 0x70));
-
-	if (v6 != -1)
-	{
-		int v7 = sub_239623(v6);
-		if (v7)
-		{
-			if (!(*(BYTE*)v7 & 2))
-			{
-				int v8 = *(DWORD*)(v2 + 0xA5C);
-				if (v8) {
-					*(BYTE*)(v8 + 0xA2) = 1;
-				}
-			}
-		}
-	}
-	return sub_211e23(v2);
 }
 
 void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id)
