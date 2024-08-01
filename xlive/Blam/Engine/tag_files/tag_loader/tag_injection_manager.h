@@ -60,7 +60,7 @@ private:
 	bool m_active_map_verified;
 	c_static_wchar_string<MAX_PATH> m_active_map;
 	s_cache_header m_active_map_cache_header;
-	s_tags_header m_active_map_tags_header;
+	cache_file_tags_header m_active_map_tags_header;
 	uint32 m_active_map_scenario_instance_offset;
 	uint32 m_active_map_instance_table_offset;
 	FILE* m_active_map_file_handle;

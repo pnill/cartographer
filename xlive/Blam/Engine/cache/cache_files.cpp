@@ -49,9 +49,9 @@ s_cache_header* cache_files_get_header(void)
 	return Memory::GetAddress<s_cache_header*>(0x47CD68, 0x4A29D0);
 }
 
-s_tags_header* cache_files_get_tags_header(void)
+cache_file_tags_header* cache_files_get_tags_header(void)
 {
-	return tags::get_at_tag_data_offset<s_tags_header>(cache_files_get_header()->tag_offset_mask);
+	return tags::get_at_tag_data_offset<cache_file_tags_header>(cache_files_get_header()->tag_offset_mask);
 }
 
 cache_file_tag_instance* global_tag_instances_get(void)
@@ -110,7 +110,7 @@ void scenario_tags_load_internal_panic()
 
 	if(cache_file_memory_globals->tag_cache_base_address)
 	{
-		system_heap_free((int*)(cache_file_memory_globals->tag_cache_base_address - *(int*)(cache_file_memory_globals->tag_cache_base_address - 4)));
+		CSERIES_FREE((int*)(cache_file_memory_globals->tag_cache_base_address - *(int*)(cache_file_memory_globals->tag_cache_base_address - 4)));
 		cache_file_memory_globals = nullptr;
 	}
 
@@ -122,15 +122,15 @@ bool scenario_tags_load_process_shared_tags()
 {
 	s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
 
-	s_tags_header* tag_header = cache_file_memory->tags_header;
-	s_tags_header* unmasked_tag_header = (s_tags_header*)cache_file_memory->tag_cache_base_address;
+	cache_file_tags_header* tag_header = cache_file_memory->tags_header;
+	cache_file_tags_header* unmasked_tag_header = (cache_file_tags_header*)cache_file_memory->tag_cache_base_address;
 	s_cache_header* cache_header = cache_files_get_header();
 	s_cache_header shared_header;
 
 	csmemset(&shared_header, 0, sizeof(s_cache_header));
 
 	// Read cache header
-	if(!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, 0, 2048, &shared_header, false))
+	if(!read_shared_resource_database(_shared_resource_database_type_multi_player, NONE, 0, sizeof(s_cache_header), &shared_header, false))
 		return false;
 
 	const uint32 aligned_tag_size = cache_file_align_read_size_to_cache_page(shared_header.tag_size);
@@ -217,12 +217,6 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 {
 	s_cache_header* cache_header = cache_files_get_header();
 
-	// Todo: fully test Single Player, adding this a precaution for now
-	if(cache_header->type == scenario_type_singleplayer)
-	{
-		return INVOKE(0x31348, 0x251F8, scenario_tags_load, scenario_path);
-	}
-
 	s_cache_file_memory_globals* cache_file_memory_globals = cache_file_memory_globals_get();
 
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
@@ -279,9 +273,9 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 		return false;
 	}
 
-	s_tags_header* tag_header = (s_tags_header*)memory_tag_header_data_start;
+	cache_file_tags_header* tag_header = (cache_file_tags_header*)memory_tag_header_data_start;
 
-	if(!tag_header->tag_instances || tag_header->tag_count <= 0 || !csstricmp(tag_header->type, "tags"))
+	if(!tag_header->tag_instances || tag_header->tag_count <= 0 || tag_header->signature != 'tags')
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
@@ -290,9 +284,9 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 
 	// Change the pointers in the header to point to the new locations in memory
 	tag_header->tag_group_link_set = (s_tag_group_link*)&tag_header[1];
-	tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&tag_header[1]) + 0xC * tag_header->tag_group_link_set_count);
+	tag_header->tag_instances = (cache_file_tag_instance*)(((char*)&tag_header[1]) + sizeof(s_tag_group_link) * tag_header->tag_group_link_set_count);
 
-	// TODO: Where do these go.
+	// These are used for the inlined functions of tag data operations i.e tag_block_get
 	*Memory::GetAddress<cache_file_tag_instance**>(0x47cd50, 0x4A29B8) = tag_header->tag_instances;
 	*Memory::GetAddress<uint32*>(0x47cd54, 0x4A29BC) = cache_file_memory_globals->tag_cache_base_address;
 

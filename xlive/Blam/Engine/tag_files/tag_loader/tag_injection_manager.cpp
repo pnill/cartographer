@@ -134,9 +134,9 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	lazy_fread(this->m_active_map_file_handle, 0, &this->m_active_map_cache_header, sizeof(s_cache_header), 1);
 
 	// Read tags header from map file
-	lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, &this->m_active_map_tags_header, sizeof(s_tags_header), 1);
+	lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, &this->m_active_map_tags_header, sizeof(cache_file_tags_header), 1);
 
-	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + 0xC * this->m_active_map_tags_header.tag_group_link_set_count + 0x20;
+	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + sizeof(s_tag_group_link) * this->m_active_map_tags_header.tag_group_link_set_count + 0x20;
 
 	// Read the scenario instance from map file
 	cache_file_tag_instance temp_instance;
@@ -163,10 +163,9 @@ void c_tag_injecting_manager::reset()
 	// just for safety clear the stored data for active map
 	this->m_active_map.clear();
 	memset(&this->m_active_map_cache_header, 0, sizeof(s_cache_header));
-	memset(&this->m_active_map_tags_header, 0, sizeof(s_tags_header));
+	memset(&this->m_active_map_tags_header, 0, sizeof(cache_file_tags_header));
 	this->m_active_map_scenario_instance_offset = 0;
 
-	// todo: clear entry table
 	this->m_table.clear();
 
 	this->m_injectable_used_size = 0;

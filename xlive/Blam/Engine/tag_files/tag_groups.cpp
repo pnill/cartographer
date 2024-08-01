@@ -3,6 +3,18 @@
 
 #include "cache/cache_files.h"
 
+typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
+
+int32 __cdecl tag_group_get_link_set_sort(uint32 a1, uint32 a2, uint32 a3)
+{
+	return INVOKE(0x30D90, 0x24C40, tag_group_get_link_set_sort, a1, a2, a3);
+}
+
+int32 __cdecl tag_group_get_link_set_index(s_tag_group_link* link_set, s_tag_group_link* tag_link_set, uint32 tag_link_set_size, int32 element_size, subtract_function_t sort_function, int32 unk)
+{
+	return INVOKE(0x8CAC3, 0x7333C, tag_group_get_link_set_index, link_set, tag_link_set, tag_link_set_size, element_size, sort_function, unk);
+}
+
 s_tag_group_link* tag_group_get_link_set(tag_group group)
 {
 	s_cache_file_memory_globals* cache_file_memory = cache_file_memory_globals_get();
@@ -15,13 +27,7 @@ s_tag_group_link* tag_group_get_link_set(tag_group group)
 	t_link.parent_2 = { _tag_group_none };
 	t_link.parent = { _tag_group_none };
 
-	typedef int32(__cdecl* subtract_function_t)(uint32 a1, uint32 a2, uint32 a3);
-	auto p_subtract_function = Memory::GetAddress<subtract_function_t>(0x30D90, 0x24C40);
-
-	typedef int32(__cdecl *tag_group_get_link_set_index)(s_tag_group_link* link_set, s_tag_group_link* tag_link_set, uint32 tag_link_set_size, int32 element_size, subtract_function_t func, int32 unk);
-	auto p_tag_group_get_link_set_index = Memory::GetAddress<tag_group_get_link_set_index>(0x8CAC3, 0x7333C);
-
-	int32 link_index = p_tag_group_get_link_set_index(&t_link, cache_file_memory->tags_header->tag_group_link_set, cache_file_memory->tags_header->tag_group_link_set_count, 12, p_subtract_function, 0);;
+	int32 link_index = tag_group_get_link_set_index(&t_link, cache_file_memory->tags_header->tag_group_link_set, cache_file_memory->tags_header->tag_group_link_set_count, 12, tag_group_get_link_set_sort, 0);
 
 	if (link_index == NONE)
 		return nullptr;

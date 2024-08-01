@@ -19,10 +19,14 @@ c_tag_injection_table::~c_tag_injection_table()
 {
 	for(uint16 i = 0; i < this->m_entry_count; i++)
 	{
+		ASSERT(this->m_table[i].loaded_data);
 		this->m_table[i].loaded_data->clear();
-		free(this->m_table->loaded_data);
+		free(this->m_table[i].loaded_data);
 	}
+
+	ASSERT(this->m_table);
 	free(this->m_table);
+
 	return;
 }
 
@@ -30,10 +34,14 @@ void c_tag_injection_table::clear()
 {
 	for (uint16 i = 0; i < this->m_entry_count; i++)
 	{
+		ASSERT(this->m_table[i].loaded_data);
 		this->m_table[i].loaded_data->clear();
 		free(this->m_table[i].loaded_data);
 	}
+
+	ASSERT(this->m_table);
 	free(this->m_table);
+
 	this->m_entry_count = 0;
 	this->m_table_size = 0;
 	this->m_table = nullptr;

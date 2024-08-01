@@ -19,7 +19,7 @@
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
 
 void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* file_handle, 
-	s_cache_header* cache_header, s_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
+	s_cache_header* cache_header, cache_file_tags_header* tags_header, uint32 scenario_instance_offset, datum cache_index)
 {
 	this->m_tag_reference_offsets = nullptr;
 	this->m_classless_tag_reference_offsets = nullptr;
@@ -66,7 +66,7 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 
 void c_xml_definition_loader::load_cache_info()
 {
-	uint32 instance_table_offset = this->m_cache_header->tag_offset + 0xC * this->m_tags_header->tag_group_link_set_count + 0x20;
+	uint32 instance_table_offset = this->m_cache_header->tag_offset + sizeof(s_tag_group_link) * this->m_tags_header->tag_group_link_set_count + 0x20;
 	uint32 tag_data_start_offset = this->m_cache_header->tag_offset + this->m_cache_header->data_offset;
 
 	uint32 tag_instance_offset = instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_cache_index);
@@ -116,8 +116,8 @@ void c_xml_definition_loader::clear()
 	if (this->m_tag_reference_count)
 		free(this->m_tag_references);
 
-	if (this->m_data)
-		free(this->m_data);
+	ASSERT(this->m_data);
+	free(this->m_data);
 
 	this->reset_counts();
 	return;
@@ -192,10 +192,12 @@ void c_xml_definition_loader::initialize_arrays()
 	if(this->m_tag_block_offset_count)
 		this->m_tag_block_offsets = lazy_malloc_buffer(s_memory_link, this->m_tag_block_offset_count);
 
-	if(this->m_tag_reference_offset_count + this->m_classless_tag_reference_offset_count)
+	if(this->m_tag_reference_offset_count || this->m_classless_tag_reference_offset_count)
 		this->m_tag_references = lazy_malloc_buffer(datum, (this->m_tag_reference_offset_count + this->m_classless_tag_reference_offset_count));
 
 	this->m_data = (int8*)calloc(this->m_total_data_size, sizeof(int8));
+
+	ASSERT(this->m_data);
 }
 
 int8* c_xml_definition_loader::reserve_data(uint32 size)
@@ -204,8 +206,9 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 	{
 		DISPLAY_ASSERT("[c_xml_definition_loader::reserve_data]: RAN OUT OF SPACE");
 	}
-	if (!this->m_data)
-		return nullptr;
+
+	ASSERT(this->m_data);
+	
 	const uint32 old_size = this->m_used_data;
 	this->m_used_data += size;
 
@@ -218,7 +221,14 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 
 void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* loader, const c_xml_definition_block* definition, uint32 file_offset, int8* buffer, uint32 block_count)
 {
+	ASSERT(loader);
+	ASSERT(definition);
+	ASSERT(buffer);
+
 	int8* cache_data = (int8*)calloc(block_count,definition->get_size());
+
+	ASSERT(cache_data);
+
 	fseek(loader->m_file_handle, file_offset, SEEK_SET);
 	fread(cache_data, definition->get_size() * block_count, 1, loader->m_file_handle);
 	memcpy(buffer, cache_data, definition->get_size() * block_count);
@@ -275,6 +285,9 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 			{
 
 				int8* data_cache = (int8*)malloc(t_data_reference.size);
+
+				ASSERT(data_cache);
+
 				int8* data_buffer = loader->reserve_data(t_data_reference.size);
 				fseek(loader->m_file_handle, loader->resolve_cache_tag_data_offset(t_data_reference.data), SEEK_SET);
 				fread(data_cache, t_data_reference.size, 1, loader->m_file_handle);

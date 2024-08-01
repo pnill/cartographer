@@ -83,87 +83,18 @@ void tag_injection_scenario_load_setup(uint32 allocation_size)
 
 	g_manager.reset();
 
-	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
-	{
-		// Grab the current 
-		uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50, 0x4A29B8);
-		memset((BYTE*)g_tag_table, 0, 0x3BA40);
+	uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50, 0x4A29B8);
+	memset((BYTE*)g_tag_table, 0, 0x3BA40);
 
-		if (*tag_table_start != NULL)
-		{
-			memcpy(g_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
-			*tag_table_start = (uint32)g_tag_table;
-		}
+	if (*tag_table_start != NULL)
+	{
+		memcpy(g_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
+		*tag_table_start = (uint32)g_tag_table;
 	}
 }
 
-
-//Used to allocate some more space for tag tables and tags
-//uint32 __cdecl datum_header_allocate_hook(int32 allocation_size, int32 item_size)
-//{
-//	typedef unsigned int(_cdecl* Allocate_memory)(int size, char arg_4);
-//	Allocate_memory pAllocate_memory;
-//	pAllocate_memory = Memory::GetAddress<Allocate_memory>(0x37E69);
-//
-//	//i need to allocate more space
-//	int modified_allocation_size = allocation_size + k_injectable_allocation_size;
-//	g_manager.set_base_map_tag_data_size(allocation_size + 0x20);
-//	
-//	return INVOKE(0x37E69, 0, datum_header_allocate, modified_allocation_size, item_size);
-//}
-//
-//// function patching to load custom tags
-//bool _cdecl scenario_tags_load_internal(char* scenario_path)
-//{
-//	bool result = INVOKE(0x31348, 0, scenario_tags_load_internal, scenario_path);
-//
-//	//Clear the table
-//	for (uint16 i = k_first_injected_datum; i < g_manager.get_entry_count(); i++)
-//	{
-//		g_tag_table[i] = cache_file_tag_instance{ _tag_group_none, NONE, 0, 0 };
-//	}
-//
-//	g_manager.reset();
-//
-//	// extending tag_tables and loading tag for all mutiplayer maps and mainmenu map
-//	if (cache_files_get_header()->type != scenario_type_singleplayer_shared)
-//	{
-//		// Grab the current 
-//		uint32* tag_table_start = Memory::GetAddress<uint32*>(0x47CD50);
-//		memset((BYTE*)g_tag_table, 0, 0x3BA40);
-//
-//		if (*tag_table_start != NULL)
-//		{
-//			memcpy(g_tag_table, (BYTE*)*tag_table_start, 0x3BA40);
-//			*tag_table_start = (uint32)g_tag_table;
-//		}
-//	}
-//
-//	return result;
-//}
-
 void tag_injection_apply_hooks()
 {
-	// Hook the allocation function for the tag table to add more space for injected tags
-	//PatchCall(Memory::GetAddress(0x313B2), datum_header_allocate_hook);
-	// Default Maps
-	//PatchCall(Memory::GetAddress(0x3166B), scenario_tags_load_internal);
-	// Custom Maps
-	//PatchCall(Memory::GetAddress(0x315ED), scenario_tags_load_internal);
-
-	//client side desync fix
-	///(noping out jump instructions)
-	//if (!Memory::IsDedicatedServer())
-	//{
-	//	NopFill(Memory::GetAddress(0x316CE), 2);
-	//	NopFill(Memory::GetAddress(0x316DC), 2);
-	//}
-	//else
-	//{
-	//	//NopFill(Memory::GetAddress(0x2557E), 2);
-	//	//NopFill(Memory::GetAddress(0x2558C), 2);
-	//}
 }
 
 void tag_injection_initialize()

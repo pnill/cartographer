@@ -16,5 +16,5 @@ void __cdecl global_preferences_initialize(void)
 
 void __cdecl game_preferences_flag_dirty()
 {
-	INVOKE(0x323D2, 0, game_preferences_flag_dirty);
+	INVOKE(0x323D2, 0x25994, game_preferences_flag_dirty);
 }

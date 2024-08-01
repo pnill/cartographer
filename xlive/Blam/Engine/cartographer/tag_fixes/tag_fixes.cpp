@@ -1,13 +1,17 @@
 #include "stdafx.h"
 #include "tag_fixes.h"
 
+#include "scenario/scenario.h"
 #include "shaders/shader_definitions.h"
+#include "structures/structure_bsp_definitions.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 void tag_fixes_masterchief(void);
 void tag_fixes_grunt(void);
 void tag_fixes_brute(void);
 void tag_fixes_smg(void);
 void tag_fixes_environment(void);
+void tag_fixes_misty_rain();
 
 void main_tag_fixes(void)
 {
@@ -16,6 +20,7 @@ void main_tag_fixes(void)
 	tag_fixes_brute();
 	tag_fixes_smg();
 	tag_fixes_environment();
+	tag_fixes_misty_rain();
 	return;
 }
 
@@ -133,4 +138,36 @@ void tag_fixes_environment(void)
 	}
 
 	return;
+}
+
+void tag_fixes_misty_rain()
+{
+	const s_cache_header* cache_header = cache_files_get_header();
+
+	if (!strcmp(cache_header->name, "05a_deltaapproach"))
+	{
+		tag_injection_set_active_map(L"carto_shared");
+		if (tag_injection_active_map_verified())
+		{
+			datum misty_rain_datum = tag_injection_load(_tag_group_weather_system, "scenarios\\skies\\solo\\deltatemple\\weather\\misty_rain", true);
+
+			if (misty_rain_datum != NONE)
+			{
+				tag_injection_inject();
+
+				scenario* scenario_definition = get_global_scenario();
+				scenario_definition->weather_palette[0]->name.set("misty_cs");
+				scenario_definition->weather_palette[0]->weather_system.group.group = _tag_group_weather_system;
+				scenario_definition->weather_palette[0]->weather_system.index = misty_rain_datum;
+
+				for(int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
+				{
+					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[i]->structure_bsp.index);
+					bsp_definition->weather_palette[0]->name.set("misty_cs");
+					bsp_definition->weather_palette[0]->weather_system.group.group = _tag_group_weather_system;
+					bsp_definition->weather_palette[0]->weather_system.index = misty_rain_datum;
+				}
+			}
+		}
+	}
 }

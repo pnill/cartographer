@@ -696,6 +696,7 @@ void c_screen_squad_settings::apply_patches_on_map_load()
 	if (xbox_live_bitmap_datum != NONE)
 	{
 		tag_injection_inject();
+		new_xbox_live_bitmap_datum = xbox_live_bitmap_datum;
 		LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
 	}
 	else

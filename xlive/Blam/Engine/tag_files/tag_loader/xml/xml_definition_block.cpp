@@ -9,8 +9,8 @@ c_xml_definition_block::c_xml_definition_block(tinyxml2::XMLElement* base_elemen
 	// offset and size are default -1 and overwritten if the attribute exists
 	// for the given base_element if somehow they are being passed as -1 it will most
 	// likely indicate there is an issue in the plugin xml file.
-	//ASSERT(offset == UINT_MAX)
-	//ASSERT(size == UINT_MAX)
+	ASSERT(offset != UINT_MAX);
+	ASSERT(size != UINT_MAX);
 
 	this->m_element = base_element;
 	this->m_offset = offset;

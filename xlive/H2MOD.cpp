@@ -497,7 +497,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		resetAfterMatch = true;
 	}
-
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
 	return result;
