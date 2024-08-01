@@ -1,15 +1,8 @@
 #include "stdafx.h"
-
 #include "imgui_handler.h"
 
-#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 #include "input/input_windows.h"
-
-#include "H2MOD/Modules/Input/ControllerInput.h"
-#include "H2MOD/Modules/Input/KeyboardInput.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
-#include "XLive/xnet/IpManagement/XnIp.h"
 
 extern int notify_xlive_ui;
 

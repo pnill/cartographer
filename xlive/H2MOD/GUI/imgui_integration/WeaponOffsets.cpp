@@ -4,7 +4,6 @@
 
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
 

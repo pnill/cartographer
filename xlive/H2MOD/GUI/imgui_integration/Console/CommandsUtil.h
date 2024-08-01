@@ -1,7 +1,6 @@
 #pragma once
 
 #include "imgui.h"
-#include "CommandHandler.h"
 
 struct StringLineHeader;
 typedef int StringHeaderFlags;

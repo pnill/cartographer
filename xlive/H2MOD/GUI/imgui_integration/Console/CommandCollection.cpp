@@ -16,7 +16,6 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Utils/Utils.h"
 
 // for XNet connection logging
 #include "tag_files/tag_loader/tag_injection.h"
