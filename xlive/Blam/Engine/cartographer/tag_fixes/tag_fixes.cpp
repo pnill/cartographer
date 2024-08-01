@@ -11,7 +11,7 @@ void tag_fixes_grunt(void);
 void tag_fixes_brute(void);
 void tag_fixes_smg(void);
 void tag_fixes_environment(void);
-void tag_fixes_misty_rain();
+void tag_fixes_misty_rain(void);
 
 void main_tag_fixes(void)
 {
@@ -140,7 +140,7 @@ void tag_fixes_environment(void)
 	return;
 }
 
-void tag_fixes_misty_rain()
+void tag_fixes_misty_rain(void)
 {
 	const s_cache_header* cache_header = cache_files_get_header();
 
@@ -155,19 +155,24 @@ void tag_fixes_misty_rain()
 			{
 				tag_injection_inject();
 
+				// Set the field in the scenario
 				scenario* scenario_definition = get_global_scenario();
-				scenario_definition->weather_palette[0]->name.set("misty_cs");
-				scenario_definition->weather_palette[0]->weather_system.group.group = _tag_group_weather_system;
-				scenario_definition->weather_palette[0]->weather_system.index = misty_rain_datum;
+				structure_weather_palette_entry* palette = scenario_definition->weather_palette[0];
+				palette->name.set("misty_cs");
+				palette->weather_system.group.group = _tag_group_weather_system;
+				palette->weather_system.index = misty_rain_datum;
 
+				// Set the field in every single bsp in the scenario
 				for(int32 i = 0; i < scenario_definition->structure_bsps.count; ++i)
 				{
 					structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[i]->structure_bsp.index);
-					bsp_definition->weather_palette[0]->name.set("misty_cs");
-					bsp_definition->weather_palette[0]->weather_system.group.group = _tag_group_weather_system;
-					bsp_definition->weather_palette[0]->weather_system.index = misty_rain_datum;
+					structure_weather_palette_entry* palette = bsp_definition->weather_palette[0];
+					palette->name.set("misty_cs");
+					palette->weather_system.group.group = _tag_group_weather_system;
+					palette->weather_system.index = misty_rain_datum;
 				}
 			}
 		}
 	}
+	return;
 }

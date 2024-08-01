@@ -48,6 +48,10 @@ void c_xml_definition_agent::init(tag_group type, const wchar_t* plugin_path)
 #endif
 		}
 	}
+	else
+	{
+		this->m_type.group = _tag_group_none;
+	}
 
 	// Print out message that says we failed to load the plugin 
 	if (error_occured)
