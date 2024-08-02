@@ -342,41 +342,63 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	
 	cache_file_tag_instance temp_instance;
 
-	fseek(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset, SEEK_SET);
-	uint32 current_index = 0;
-	uint32 chars_read = 0;
-	uint16 buff_size = 0;
-	char buff[MAX_PATH];
+	int32 current_index = 0;
+	int32 current_offset = 0;
+	uint32 next_offset = 0;
+	uint32 current_size = 0;
+	char name_buffer[MAX_PATH] = {};
 
-	while(true)
+	while (true)
 	{
-		char c = (char)fgetc(this->m_active_map_file_handle);
-		chars_read++;
-		if (c == '\0')
+		if (current_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 		{
-			if (memcmp(tag_name, buff, strlen(tag_name)) == 0)
-			{
-				fpos_t position;
-				fgetpos(this->m_active_map_file_handle, &position);
+			// Get the offset of the current index
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, &current_offset, sizeof(uint32), 1);
 
+			// If the current offset is -1 it means we have reached the end of the index table
+			if (current_offset == NONE)
+				break;
+
+			// Get the offset of the next index
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (current_index + 1), &next_offset, sizeof(uint32), 1);
+
+			// Current size is calculated using the offsets of the two indexes
+			current_size = next_offset - current_offset;
+
+			// Read the current debug name
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
+
+			if(memcmp(tag_name, name_buffer, current_size - 1) == 0)
+			{
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
 				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
-
-				fseek(this->m_active_map_file_handle, position, SEEK_SET);
 			}
-			current_index++;
-			buff_size = 0;
 		}
 		else
 		{
-			buff[buff_size] = c;
-			buff[buff_size + 1] = '\0';
-			buff_size++;
+			// Get the offset of the current index
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, &current_offset, sizeof(uint32), 1);
+
+			// Current size is calculated using the total size of the buffer and the current offset;
+			current_size = (this->m_active_map_cache_header.tag_name_offsets_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
+
+			// Read the current debug name
+			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
+
+			if (memcmp(tag_name, name_buffer, current_size - 1) == 0)
+			{
+				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
+				if (temp_instance.group_tag.group == group)
+					return temp_instance.tag_index;
+			}
 		}
-		if (chars_read > this->m_active_map_cache_header.tag_name_buffer_size)
+
+
+		if (++current_index >= this->m_active_map_cache_header.debug_tag_name_count)
 			break;
 	}
+
 	return NONE;
 }
 
