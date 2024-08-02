@@ -368,7 +368,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 			// Read the current debug name
 			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
 
-			if(memcmp(tag_name, name_buffer, current_size - 1) == 0)
+			if(memcmp(tag_name, name_buffer, strlen(tag_name)) == 0)
 			{
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
 				if (temp_instance.group_tag.group == group)
@@ -386,7 +386,7 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 			// Read the current debug name
 			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
 
-			if (memcmp(tag_name, name_buffer, current_size - 1) == 0)
+			if (memcmp(tag_name, name_buffer, strlen(tag_name)) == 0)
 			{
 				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
 				if (temp_instance.group_tag.group == group)
@@ -398,7 +398,6 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		if (++current_index >= this->m_active_map_cache_header.debug_tag_name_count)
 			break;
 	}
-
 	return NONE;
 }
 
