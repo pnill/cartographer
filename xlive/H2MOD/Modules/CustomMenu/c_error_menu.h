@@ -98,7 +98,9 @@ public:
 	// interface
 	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		return c_screen_with_menu::destructor(flags);
+		this->~c_error_menu();
+
+		return this;
 	};
 
 	// c_screen_with_menu specific interface
