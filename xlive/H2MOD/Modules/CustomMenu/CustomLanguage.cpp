@@ -17,8 +17,6 @@
 
 std::vector<custom_language*> custom_languages;
 std::vector<custom_language*> custom_languages_tempclone;
-std::unordered_map<int, std::unordered_map<int, char*>> cartographer_label_map;
-std::unordered_map<int, std::unordered_map<int, char*>> cartographer_label_map_dyn;
 
 bool custom_labels_updated = false;
 bool current_language_isGarbage = false;
@@ -44,48 +42,6 @@ char* add_label(std::unordered_map<int, std::unordered_map<int, char*>>& label_m
 		free(label_map[label_menu_id][label_id]);
 	char* new_label = (char*)calloc(labelBufferLen, sizeof(char));
 	return label_map[label_menu_id][label_id] = new_label;
-}
-
-char* add_cartographer_label(int label_menu_id, int label_id, const char* label, bool is_dynamic) {
-	if (is_dynamic) {
-		return add_label(cartographer_label_map_dyn, label_menu_id, label_id, label);
-	}
-	if (!label)
-		return 0;
-	return add_label(cartographer_label_map, label_menu_id, label_id, label);
-}
-
-char* add_cartographer_label(int label_menu_id, int label_id, const char* label) {
-	return add_cartographer_label(label_menu_id, label_id, label, false);
-}
-
-char* add_cartographer_label(int label_menu_id, int label_id, int labelBufferLen, bool is_dynamic) {
-	if (is_dynamic) {
-		return add_label(cartographer_label_map_dyn, label_menu_id, label_id, labelBufferLen);
-	}
-	return add_label(cartographer_label_map, label_menu_id, label_id, labelBufferLen);
-}
-
-char* add_cartographer_label(int label_menu_id, int label_id, int labelBufferLen) {
-	return add_cartographer_label(label_menu_id, label_id, labelBufferLen, false);
-}
-
-char* get_cartographer_label(int label_menu_id, int label_id, __int8 is_dynamic) {
-	if (is_dynamic & 0b10) {
-		std::unordered_map<int, std::unordered_map<int, char*>> &label_map = cartographer_label_map_dyn;
-		if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
-			return label_map[label_menu_id][label_id];
-	}
-	if (is_dynamic & 0b01) {
-		std::unordered_map<int, std::unordered_map<int, char*>> &label_map = cartographer_label_map;
-		if (label_map.count(label_menu_id) && label_map[label_menu_id].count(label_id))
-			return label_map[label_menu_id][label_id];
-	}
-	return 0;
-}
-
-char* get_cartographer_label(int label_menu_id, int label_id) {
-	return get_cartographer_label(label_menu_id, label_id, 0b11);
 }
 
 char* add_custom_label(custom_language* language, int label_menu_id, int label_id, const char* label) {
@@ -437,16 +393,11 @@ H2GetLabel_t pH2GetLabel;
 char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 	//int label_menu_id = *(int*)(*(int*)a1 + 8 * a3 + 4);
 	int label_menu_id = a3;
-	char* label = get_cartographer_label(label_menu_id, label_id, 0b10);
+	char* label = get_custom_label(current_language, label_menu_id, label_id, 0);
 	if (label)
 		return label;
-	label = get_custom_label(current_language, label_menu_id, label_id, 0);
-	if (label)
-		return label;
-	label = get_cartographer_label(label_menu_id, label_id, 0b01);
-	if (!label && a1)
-		label = pH2GetLabel(a1, label_id, a3, a4);
-	//if (strcmp(label, "PROFILE NAME") == 0) {
+	label = pH2GetLabel(a1, label_id, a3, a4);
+	//if (strstr(label, "PROFILE NAME") == 0) {
 	//	return label;//in order to breakpoint and get label_id's.
 	//}
 	if (!H2Config_custom_labels_capture_missing) {

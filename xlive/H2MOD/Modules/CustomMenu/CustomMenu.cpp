@@ -29,10 +29,10 @@ bool g_force_cartographer_update = false;
 
 #pragma region CM_Language_Sub
 
-int CM_Language_Main = 0;
-int Language_Sub_Count = 0;
-std::map<int, int> cm_lang_variant_map;
-std::map<int, int> cm_lang_other_lang_map;
+//int CM_Language_Main = 0;
+//int Language_Sub_Count = 0;
+//std::map<int, int> cm_lang_variant_map;
+//std::map<int, int> cm_lang_other_lang_map;
 
 //static bool CMButtonHandler_Language_Sub(int button_id) {
 //	addDebugText("Button ID: %d", button_id);
@@ -154,17 +154,6 @@ void* ui_load_cartographer_invalid_login_token()
 }
 
 #pragma endregion
-
-#pragma region some tests
-
-#pragma endregion
-
-typedef char(__stdcall* tsub_23d060)(int, int*);
-tsub_23d060 psub_23d060;
-char __stdcall sub_23d060(int thisptr, int* a2) //__thiscall
-{
-	return psub_23d060(thisptr, a2);//keyboard keypress handler
-}
 
 void XUiShowSignInH2() {
 	if (!c_account_list_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
