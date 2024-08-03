@@ -1,10 +1,6 @@
 #pragma once
-#include "c_brightness_menu.h"
-#include "CustomLanguage.h"
 
 #include "interface/user_interface_headers.h"
-
-#include "Accounts/screen_cartographer_account_manager.h"
 
 enum e_cartographer_error_id
 {
@@ -39,13 +35,13 @@ enum e_cartographer_error_id
 	k_cartographer_error_id_end
 };
 
-class c_error_edit_list : public c_list_widget
+class c_cartographer_error_edit_list : public c_list_widget
 {
 public:
 	int m_field_2C0;
-	c_slot2<c_error_edit_list, s_event_record*, int32> m_slot_2;
+	c_slot2<c_cartographer_error_edit_list, s_event_record*, int32> m_slot_2;
 
-	c_error_edit_list(uint32 _flags);
+	c_cartographer_error_edit_list(uint32 _flags);
 
 	virtual c_list_item_widget* get_list_items() override
 	{
@@ -65,10 +61,10 @@ public:
 	void button_handler(s_event_record* a2, int32* a3);
 };
 
-class c_error_menu : protected c_screen_with_menu
+class c_cartographer_error_menu : protected c_screen_with_menu
 {
 public:
-	c_error_edit_list m_error_edit_list;
+	c_cartographer_error_edit_list m_error_edit_list;
 	e_cartographer_error_id m_error_id;
 
 	static void* open_by_error_id(e_cartographer_error_id error_id);
@@ -76,29 +72,14 @@ public:
 
 	static void get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text);
 
-	c_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
+	c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	~c_error_menu()
-	{
-		switch (m_error_id)
-		{
-		case _cartographer_error_id_invalid_login_token:
-			if (c_account_list_menu::accountingGoBackToList && c_account_list_menu::IsAccountingActiveHandle()) {
-				c_account_list_menu::open_account_add_context();
-				c_account_list_menu::accountingGoBackToList = true;
-			}
-			c_account_list_menu::UpdateAccountingActiveHandle(false);
-			break;
-		case _cartpgrapher_error_id_none:
-		default:
-			break;
-		}
-	}
+	~c_cartographer_error_menu();
 
 	// interface
 	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
-		this->~c_error_menu();
+		this->~c_cartographer_error_menu();
 
 		return this;
 	};
@@ -126,7 +107,7 @@ public:
 
 	virtual void* load_proc() override
 	{
-		return c_error_menu::open;
+		return c_cartographer_error_menu::open;
 	}
 private:
 };

@@ -4,12 +4,6 @@
 #include "game/game_globals.h"
 #include "H2MOD/Tags/TagInterface.h"
 
-BYTE* ui_memory_pool_allocate(int size, int a2)
-{
-	auto p_ui_memory_pool_allocate = Memory::GetAddress<BYTE*(__cdecl*)(int, int)>(0x20D2D8);
-	return p_ui_memory_pool_allocate(size, a2);
-}
-
 std::chrono::time_point<std::chrono::high_resolution_clock> lastOuterMenuUse;
 void* lastOuterMenuFuncPtr = 0;
 
@@ -155,7 +149,7 @@ void* __stdcall sub_20f8ae_CMLTD(void* thisptr, __int16 a2, int* a3, int label_m
 	v5 = 0;
 	if (*(BYTE*)a3 & 0x10)
 	{
-		v4 = (int)ui_memory_pool_allocate(252, 0);
+		v4 = (int)ui_pool_allocate_space(252, 0);
 		if (v4)
 		{
 			v5 = (int)sub_20F576((void*)v4, *((WORD*)v3 + 4));
@@ -163,7 +157,7 @@ void* __stdcall sub_20f8ae_CMLTD(void* thisptr, __int16 a2, int* a3, int label_m
 	}
 	else
 	{
-		v6 = (int)ui_memory_pool_allocate(1212, 0);
+		v6 = (int)ui_pool_allocate_space(1212, 0);
 		if (v6)
 		{
 			v5 = (int)sub_20F65D((void*)v6, *((WORD*)v3 + 4));

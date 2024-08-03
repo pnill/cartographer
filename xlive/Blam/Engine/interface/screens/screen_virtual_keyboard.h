@@ -1,9 +1,8 @@
 #pragma once
 
-#include "CustomMenuGlobals.h"
-#include "c_screen_with_menu.h"
-
 #include "interface/user_interface_headers.h"
+
+#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 

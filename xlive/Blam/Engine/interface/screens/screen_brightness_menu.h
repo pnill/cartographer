@@ -1,5 +1,6 @@
 #pragma once
-#include "CustomMenuGlobals.h"
+
+#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
 #include "interface/user_interface_headers.h"
 

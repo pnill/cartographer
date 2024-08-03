@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "CustomMenu.h"
-#include "CustomLanguage.h"
 
 #include "interface/screens/screen_xbox_live_task_progress_dialog.h"
 
@@ -9,16 +8,11 @@
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/Updater/Updater.h"
-#include "H2MOD/Utils/Utils.h"
 
-#include "c_error_menu.h"
-#include "c_brightness_menu.h"
-#include "c_screen_with_menu.h"
-#include "c_virtual_keyboard_menu.h"
-
-#include "Accounts/screen_cartographer_account_manager.h"
+#include "interface/user_interface_widget_screen_with_menu.h"
+#include "interface/screens/screen_virtual_keyboard.h"
+#include "interface/screens/screen_cartographer_errors.h"
+#include "interface/screens/screen_cartographer_account_manager.h"
 
 extern DWORD H2BaseAddr;
 extern bool H2IsDediServer;
@@ -47,7 +41,7 @@ bool g_force_cartographer_update = false;
 //		return true;
 //	}
 //	else {
-//		c_error_menu::open_by_error_id(_cartographer_error_id_no_custom_language_categorised_as_other);
+//		c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_no_custom_language_categorised_as_other);
 //	}
 //	return false;
 //}
@@ -73,7 +67,7 @@ bool g_force_cartographer_update = false;
 //	}
 //	else if (button_id == 2 + 8 + 0) {
 //		if (!reloadCustomLanguages()) {
-//			c_error_menu::open_by_error_id(_cartographer_error_id_error_reading_custom_language_file);
+//			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_error_reading_custom_language_file);
 //		}
 //		return false;
 //	}
@@ -148,20 +142,20 @@ void RefreshToggleIngameKeyboardControls() {
 
 void* ui_load_cartographer_invalid_login_token() 
 {
-	c_account_list_menu::accountingGoBackToList = true;
-	c_account_list_menu::UpdateAccountingActiveHandle(true);
-	return c_error_menu::open_by_error_id(_cartographer_error_id_invalid_login_token);
+	c_cartographer_account_manager_menu::accountingGoBackToList = true;
+	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+	return c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_invalid_login_token);
 }
 
 #pragma endregion
 
 void XUiShowSignInH2() {
-	if (!c_account_list_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
-		c_account_list_menu::open_account_list_context();
+	if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
+		c_cartographer_account_manager_menu::open_account_list_context();
 	}
 	else {
-		if (!c_account_list_menu::IsAccountingActiveHandle())
-			c_error_menu::open_by_error_id(_cartographer_error_id_login_account_already_in_use);
+		if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle())
+			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_account_already_in_use);
 	}
 }
 

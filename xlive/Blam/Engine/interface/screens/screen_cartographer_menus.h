@@ -2,7 +2,6 @@
 
 // miscellaneous cartographer menus
 
-#include "../c_screen_with_menu.h"
 #include "interface/user_interface_headers.h"
 
 #include "H2MOD/Modules/Updater/Updater.h"
@@ -316,9 +315,6 @@ static void get_update_label(int32 label_id, wchar_t** out_label)
 	label_table[_language_english][_cartographer_update_text_button_install_update] = L"Install Update";
 	label_table[_language_english][_cartographer_update_text_button_status_installing_update] = L"Installing Update...";
 	label_table[_language_english][_cartographer_update_text_button_status_failed_to_run_updater_app] = L"Failed to run updater app!";
-	label_table[_language_english][_cartographer_update_text_button_status_download_the_following] = L"Download the following:\n";
-	label_table[_language_english][_cartographer_update_text_button_status_install_the_following] = L"Install the following:\n";
-	label_table[_language_english][_cartographer_update_text_button_status_up_to_date] = L"Up to date!";
 	label_table[_language_english][_cartographer_update_text_button_status_cancel] = L"Cancel";
 
 	*out_label = label_table[_language_english][label_id];

@@ -1,9 +1,11 @@
 #include "stdafx.h"
-#include "c_error_menu.h"
 
-#include "CustomLanguage.h"
+#include "screen_cartographer_errors.h"
+#include "screen_cartographer_account_manager.h"
 
-void c_error_menu::get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text)
+#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
+
+void c_cartographer_error_menu::get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text)
 {
 	wchar_t* error_menu_header_text		[k_language_count][k_cartographer_error_id_end] = {};
 	wchar_t* error_menu_subheader_text	[k_language_count][k_cartographer_error_id_end] = {};
@@ -65,27 +67,27 @@ void c_error_menu::get_error_label(e_cartographer_error_id error_id, wchar_t** o
 	*out_subheader_text = error_menu_subheader_text[_language_english][error_id];
 }
 
-void* c_error_menu::open_by_error_id(e_cartographer_error_id error_id) {
+void* c_cartographer_error_menu::open_by_error_id(e_cartographer_error_id error_id) {
 
-	c_error_menu* error_menu = (c_error_menu*)ui_custom_cartographer_load_menu(c_error_menu::open, 1);
+	c_cartographer_error_menu* error_menu = (c_cartographer_error_menu*)ui_custom_cartographer_load_menu(c_cartographer_error_menu::open, 1);
 	error_menu->m_error_id = error_id;
 
 	return error_menu;
 }
 
-void* __cdecl c_error_menu::open(s_screen_parameters* parameters)
+void* __cdecl c_cartographer_error_menu::open(s_screen_parameters* parameters)
 {
-	c_error_menu* error_menu = nullptr;
-	BYTE* ui_buffer = ui_memory_pool_allocate(sizeof(c_error_menu), 0);
+	c_cartographer_error_menu* error_menu = nullptr;
+	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_cartographer_error_menu), 0);
 	if (ui_buffer) {
-		error_menu = new (ui_buffer) c_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
+		error_menu = new (ui_buffer) c_cartographer_error_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
 		error_menu->m_allocated	= true;
 	}
 	user_interface_register_screen_to_channel(error_menu, parameters);
 	return error_menu;
 }
 
-void c_error_edit_list::button_handler(s_event_record* a2, int32* a3)
+void c_cartographer_error_edit_list::button_handler(s_event_record* a2, int32* a3)
 {
 	int button_id = DATUM_INDEX_TO_ABSOLUTE_INDEX(*a3);
 
@@ -96,16 +98,16 @@ void c_error_edit_list::button_handler(s_event_record* a2, int32* a3)
 	return;
 }
 
-c_error_edit_list::c_error_edit_list(uint32 _flags) :
+c_cartographer_error_edit_list::c_cartographer_error_edit_list(uint32 _flags) :
 	c_list_widget(_flags),
 	m_field_2C0(0),
-	m_slot_2(this, &c_error_edit_list::button_handler)
+	m_slot_2(this, &c_cartographer_error_edit_list::button_handler)
 {
 	this->m_list_data = nullptr;
 
 	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
 	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-offsetof(c_error_edit_list, m_slot_2)) {
+	if ((void*)this == (void*)-offsetof(c_cartographer_error_edit_list, m_slot_2)) {
 		linker_type2.link(nullptr);
 	}
 	else {
@@ -113,10 +115,26 @@ c_error_edit_list::c_error_edit_list(uint32 _flags) :
 	}
 }
 
-c_error_menu::c_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
+c_cartographer_error_menu::c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
 	c_screen_with_menu(_screen_brightness_level, _ui_channel, _window_index, _flags, &m_error_edit_list),
 	m_error_edit_list(_flags)
 {
 	m_error_id = _cartpgrapher_error_id_none;
 }
 
+c_cartographer_error_menu::~c_cartographer_error_menu()
+{
+	switch (m_error_id)
+	{
+	case _cartographer_error_id_invalid_login_token:
+		if (c_cartographer_account_manager_menu::accountingGoBackToList && c_cartographer_account_manager_menu::IsAccountingActiveHandle()) {
+			c_cartographer_account_manager_menu::open_account_add_context();
+			c_cartographer_account_manager_menu::accountingGoBackToList = true;
+		}
+		c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(false);
+		break;
+	case _cartpgrapher_error_id_none:
+	default:
+		break;
+	}
+}

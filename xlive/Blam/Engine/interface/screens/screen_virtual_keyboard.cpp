@@ -1,9 +1,6 @@
 #include "stdafx.h"
 
-#include "c_virtual_keyboard_menu.h"
-#include "H2MOD/Utils/Utils.h"
-
-#include "CustomLanguage.h"
+#include "screen_virtual_keyboard.h"
 
 char __fastcall sub_23CC18_CM(int thisptr, int _EDX);
 
@@ -15,7 +12,7 @@ void ui_globals_set_keyboard_input_state(bool state)
 void* __cdecl c_virtual_keyboard_menu::open(s_screen_parameters* parameters) 
 {
 	c_virtual_keyboard_menu* virtual_keyboard_menu = nullptr;
-	BYTE* ui_buffer = ui_memory_pool_allocate(sizeof(c_virtual_keyboard_menu), 0);
+	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_virtual_keyboard_menu), 0);
 	if (ui_buffer) {
 		virtual_keyboard_menu = new (ui_buffer) c_virtual_keyboard_menu(parameters->m_channel_type, parameters->m_window_index, parameters->user_flags);
 		virtual_keyboard_menu->m_allocated = true;

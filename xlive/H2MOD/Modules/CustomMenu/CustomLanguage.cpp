@@ -456,13 +456,14 @@ void setGameLanguage() {
 	*HasLoadedLanguage = true;
 }
 
+void* pfn_c00031b97 = NULL;
+
 char* __cdecl cave_c00031b97(char* result, int buff_len)//Font Table Filename Override
 {
 	strcpy_s(result, buff_len, current_language->font_table_filename);
 	return result;
 }
 
-char*(__cdecl* pfn_c00031b97)(int, int) = 0;
 //__usercall - edi a1, stack a2
 __declspec(naked) char* nak_c00031b97()
 {

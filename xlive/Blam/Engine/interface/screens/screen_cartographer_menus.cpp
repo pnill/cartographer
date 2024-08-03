@@ -4,7 +4,7 @@
 
 #include "H2MOD/GUI/ImGui_Integration/imgui_handler.h"
 
-#include "../CustomMenuGlobals.h"
+#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
 #include "H2MOD/Modules/Updater/Updater.h"
 

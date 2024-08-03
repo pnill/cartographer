@@ -1,13 +1,9 @@
 #pragma once
 
-#include "c_screen_with_menu.h"
-
 #include "interface/user_interface_headers.h"
 
 extern DWORD H2BaseAddr;
 const int CreditsMenu_ID = 0xFF000006;
-
-BYTE* ui_memory_pool_allocate(int size, int a2);
 
 void __stdcall set_widget_label_from_string_id_reimpl(int thisptr, int label_id, int label_menu_id);
 
@@ -22,4 +18,3 @@ char __stdcall sub_210a44_CMLTD(int thisptr, int a2, int* a3, int label_menu_id,
 void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr);
 void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method);
 void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t WgitScreenfunctionPtr, int open_method, int menu_wgit_type);
-int __cdecl CustomMenu_CallHead(s_screen_parameters* a1, DWORD* menu_vftable_1, DWORD* menu_vftable_2, DWORD menu_button_handler, int number_of_buttons, int menu_wgit_type);

@@ -29,7 +29,7 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_widget_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
@@ -97,10 +97,7 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_account_manager.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_error_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
@@ -384,7 +381,10 @@
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\networking\panaroma\panorama_achievements.cpp" />
     <ClCompile Include="Blam\Engine\game\game_results.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_menus.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -513,7 +513,7 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_widget_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
@@ -610,10 +610,7 @@
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_account_manager.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
@@ -1034,7 +1031,10 @@
     <ClInclude Include="Blam\Engine\networking\panaroma\panorama_user_history.h" />
     <ClInclude Include="Blam\Engine\game\game_results.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_headers.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\screen_cartographer_menus.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
