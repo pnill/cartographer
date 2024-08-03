@@ -31,7 +31,7 @@ public:
 	virtual c_user_interface_widget* destructor(uint32 flags) override
 	{
 		this->~c_virtual_keyboard_button();
-		if (FLAG(flags, 0))
+		if (TEST_BIT(flags, 0))
 		{
 		}
 
