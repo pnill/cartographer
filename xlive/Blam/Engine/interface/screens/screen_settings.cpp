@@ -343,6 +343,7 @@ void c_screen_settings::post_initialize_button_keys()
 		c_text_widget* description = this->try_find_screen_text(_pane_guide_text_description);
 		c_text_widget* flavor_text1 = this->try_find_screen_text(_pane_guide_text_custom_flavor_text1);
 		c_text_widget* flavor_text2 = this->try_find_screen_text(_pane_guide_text_custom_flavor_text2);
+		c_bitmap_widget* main_bitmap = this->try_find_bitmap_widget(_pane_guide_bitmap_settings_screen_bitmap);
 		if (description)
 		{
 			description->set_text(L"Go to Cartographer settings");
@@ -358,8 +359,7 @@ void c_screen_settings::post_initialize_button_keys()
 			flavor_text2->set_text(L"Hop onto ONLINE and be ready to suffer from disappointment");
 		}
 
-		c_bitmap_widget* main_bitmap = this->try_find_bitmap_widget(_pane_guide_bitmap_settings_screen_bitmap);
-		if (!DATUM_IS_NONE(cartographer_bitmap_datum))
+		if (!DATUM_IS_NONE(cartographer_bitmap_datum) && main_bitmap)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(cartographer_bitmap_datum, _settings_cartographer_bitmap_type_default);
 			main_bitmap->assign_new_bitmap_block(bitmap_block);
@@ -444,23 +444,16 @@ void c_screen_settings::apply_patches_on_map_load()
 
 	s_window_pane_reference* guide_pane = main_widget_tag->panes[_settings_pane_guide];
 	//clone blocks into a seperate memory (so we dont end up affecting about_pane)
-	//MetaExtender::add_tag_block3<s_bitmap_block_reference>((uint32)&main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks, NULL);
 	MetaExtender::add_tag_block3<s_text_block_reference>((uint32)&main_widget_tag->panes[_settings_pane_guide]->text_blocks, k_number_of_addition_texts_for_guide_pane);
 	//copy data from existing blocks
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
 
-
-	//update new bitmaps_block to point to injected bitmap tag
-	//main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks[_pane_about_bitmap_settings_screen_bitmap]->bitmap_tag.index = cartographer_bitmap_datum;
-	//main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks[_pane_about_bitmap_settings_screen_bitmap]->initial_sprite_frame = _settings_cartographer_bitmap_type_default;
 	
 	//update new text_block to reposition callout texts
 	guide_pane->text_blocks[_pane_guide_text_flavor_text33]->text_bounds = { -5 ,-5,-115 ,75 };
 	guide_pane->text_blocks[_pane_guide_text_flavor_text34]->text_bounds = { 180 ,460,140 ,860 };
 	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1]->text_bounds = { 250 ,30,150 ,150 };
 	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2]->text_bounds = { -120 ,450,-220 ,530 };
-	//main_widget_tag->panes[_settings_pane_guide]->text_blocks[_pane_about_text_flavor_text33]->initial_sprite_frame = _settings_cartographer_bitmap_type_default;
-
 
 }
