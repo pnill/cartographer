@@ -113,7 +113,6 @@ enum e_xbox_live_bitmap_type
 	_xbox_live_bitmap_type_quick_options,
 	
 	//custom bitmaps additions
-	_xbox_live_bitmap_type_switch_to_arranged,
 	_xbox_live_bitmap_type_switch_to_coop,
 	k_number_of_xbox_live_bitmap_types,
 };
@@ -136,6 +135,8 @@ enum e_settings_variant_bitmap_type
 	_settings_variant_bitmap_type_default = 0,
 	k_number_of_settings_variant_bitmap_types,
 };
+
+/* globals */
 
 datum new_xbox_live_bitmap_datum = NONE;
 datum xbox_live_menu_bitmap_datum = NONE;

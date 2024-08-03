@@ -61,7 +61,7 @@ public:
 	// c_screen_settings virtual functions
 
 	virtual ~c_screen_settings();
-	virtual void update() override;
+	virtual void post_initialize_button_keys() override;
 	virtual void* load_proc() override;
 };
 ASSERT_STRUCT_SIZE(c_screen_settings, 0xEC8);

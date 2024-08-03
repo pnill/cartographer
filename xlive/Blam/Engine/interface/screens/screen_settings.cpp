@@ -4,12 +4,14 @@
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"
 #include "interface/user_interface_widget_text.h"
+#include "interface//user_interface_bitmap_block.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "networking/panorama/panorama_presence.h"
 #include "tag_files/global_string_ids.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Tags/MetaExtender.h"
+#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 /* macro defines */
 
@@ -59,15 +61,49 @@ enum e_settings_screen_panes
 	k_number_of_addition_panes_for_settings_screen = k_total_no_of_settings_pane- k_total_no_of_settings_pane_orignal
 };
 
-enum e_screen_pane_about_texts
+enum e_screen_pane_texts
 {
-	_pane_about_text_about_description,
+	_pane_about_text_description = 0,
 	_pane_about_text_flavor_text33,
 	_pane_about_text_flavor_text34,
-
 	k_screen_pane_about_texts_count,
+
+
+	_pane_guide_text_description = 0,
+	_pane_guide_text_flavor_text33,
+	_pane_guide_text_flavor_text34,
+
+	//custom addition
+	_pane_guide_text_custom_flavor_text1,
+	_pane_guide_text_custom_flavor_text2,
+	k_screen_pane_guide_texts_count,
+
+	k_total_no_of_guide_texts_orignal = 3,
+	k_number_of_addition_texts_for_guide_pane = k_screen_pane_guide_texts_count - k_total_no_of_guide_texts_orignal
 };
 
+enum e_screen_pane_bitmaps
+{
+	_pane_about_bitmap_settings_screen_bitmap = 0,
+	_pane_about_bitmap_ul_06,
+	_pane_about_bitmap_br_03,
+	k_screen_pane_about_bitmaps_count,
+
+	_pane_guide_bitmap_settings_screen_bitmap = 0,
+	_pane_guide_bitmap_ul_06,
+	_pane_guide_bitmap_br_03,
+	k_screen_pane_guide_bitmaps_count,
+};
+
+enum e_settings_cartographer_bitmap_type
+{
+	_settings_cartographer_bitmap_type_default = 0,
+	k_number_of_cartographer_variant_bitmap_types,
+};
+
+/* globals */
+
+datum cartographer_bitmap_datum = NONE;
 
 c_settings_list::c_settings_list(int16 user_flags):
 	c_list_widget(user_flags),
@@ -296,21 +332,43 @@ c_screen_settings::~c_screen_settings()
 {
 }
 
-void c_screen_settings::update()
+void c_screen_settings::post_initialize_button_keys()
 {
-	c_user_interface_widget::update();
-
-	// updating description here , as no other place to do when "Multiple Panes Are For List Flavor Items"
+	// this function is executed once upon every pane creation
+	// thus can be used as on_pane_switch hook
 
 	if (this->m_pane_index == _settings_pane_guide
 		|| DATUM_INDEX_TO_ABSOLUTE_INDEX(this->m_settings_list.get_old_data_index()) == _item_guide)
 	{
-		c_text_widget* description = this->try_find_screen_text(_pane_about_text_about_description);
+		c_text_widget* description = this->try_find_screen_text(_pane_guide_text_description);
+		c_text_widget* flavor_text1 = this->try_find_screen_text(_pane_guide_text_custom_flavor_text1);
+		c_text_widget* flavor_text2 = this->try_find_screen_text(_pane_guide_text_custom_flavor_text2);
 		if (description)
 		{
 			description->set_text(L"Go to Cartographer settings");
 		}
+
+		if (flavor_text1)
+		{
+			flavor_text1->set_text(L"Matchmaking is ready! and Coop works for real");
+		}
+
+		if (flavor_text2)
+		{
+			flavor_text2->set_text(L"Hop onto ONLINE and be ready to suffer from disappointment");
+		}
+
+		c_bitmap_widget* main_bitmap = this->try_find_bitmap_widget(_pane_guide_bitmap_settings_screen_bitmap);
+		if (!DATUM_IS_NONE(cartographer_bitmap_datum))
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(cartographer_bitmap_datum, _settings_cartographer_bitmap_type_default);
+			main_bitmap->assign_new_bitmap_block(bitmap_block);
+		}
+
 	}
+
+	// call orignal function now
+	c_screen_widget::post_initialize_button_keys();
 }
 
 
@@ -369,4 +427,40 @@ void c_screen_settings::apply_patches_on_map_load()
 	{
 		pane.list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;
 	}
+
+	datum cartographer_bitmap_org_datum = tag_loader::Get_tag_datum("ui\\screens\\game_shell\\settings_screen\\cartographer", _tag_group_bitmap, "mainmenu_bitmaps");
+
+	if (!DATUM_IS_NONE(cartographer_bitmap_org_datum))
+	{
+		tag_loader::Load_tag(cartographer_bitmap_org_datum, false, "mainmenu_bitmaps");
+		tag_loader::Push_Back();
+		cartographer_bitmap_datum = tag_loader::ResolveNewDatum(cartographer_bitmap_org_datum);
+		LOG_DEBUG_FUNC("cartographer bitmap datum : 0x{:08X} ,", cartographer_bitmap_datum);
+	}
+	else
+	{
+		cartographer_bitmap_datum = NONE;
+	}
+
+	s_window_pane_reference* guide_pane = main_widget_tag->panes[_settings_pane_guide];
+	//clone blocks into a seperate memory (so we dont end up affecting about_pane)
+	//MetaExtender::add_tag_block3<s_bitmap_block_reference>((uint32)&main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks, NULL);
+	MetaExtender::add_tag_block3<s_text_block_reference>((uint32)&main_widget_tag->panes[_settings_pane_guide]->text_blocks, k_number_of_addition_texts_for_guide_pane);
+	//copy data from existing blocks
+	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
+	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
+
+
+	//update new bitmaps_block to point to injected bitmap tag
+	//main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks[_pane_about_bitmap_settings_screen_bitmap]->bitmap_tag.index = cartographer_bitmap_datum;
+	//main_widget_tag->panes[_settings_pane_guide]->bitmap_blocks[_pane_about_bitmap_settings_screen_bitmap]->initial_sprite_frame = _settings_cartographer_bitmap_type_default;
+	
+	//update new text_block to reposition callout texts
+	guide_pane->text_blocks[_pane_guide_text_flavor_text33]->text_bounds = { -5 ,-5,-115 ,75 };
+	guide_pane->text_blocks[_pane_guide_text_flavor_text34]->text_bounds = { 180 ,460,140 ,860 };
+	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1]->text_bounds = { 250 ,30,150 ,150 };
+	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2]->text_bounds = { -120 ,450,-220 ,530 };
+	//main_widget_tag->panes[_settings_pane_guide]->text_blocks[_pane_about_text_flavor_text33]->initial_sprite_frame = _settings_cartographer_bitmap_type_default;
+
+
 }
