@@ -44,6 +44,26 @@ c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_inte
 	this->field_A01 = false;
 }
 
+const e_user_interface_screen_id c_screen_widget::get_id()
+{
+	return m_screen_id;
+}
+
+c_text_widget* c_screen_widget::get_screen_header_text()
+{
+	return try_find_text_widget(K_HEADER_TEXT_BLOCK_INDEX);
+}
+
+c_text_widget* c_screen_widget::get_screen_button_key_text()
+{
+	return try_find_text_widget(K_BUTTON_KEY_TEXT_BLOCK_INDEX);
+}
+
+c_text_widget* c_screen_widget::try_find_screen_text(uint32 idx)
+{
+	return try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(idx));
+}
+
 void c_screen_widget::destroy()
 {
 	INVOKE_TYPE(0x20F6FF, 0x0, void(__thiscall*)(c_screen_widget*), this);
@@ -62,6 +82,11 @@ void c_screen_widget::apply_new_representations_to_players(c_player_widget_repre
 {
 	INVOKE_TYPE(0x211CD0, 0x0, void(__thiscall*)(c_screen_widget*, c_player_widget_representation*, int32), this, representations, player_count);
 }
+void c_screen_widget::initialize_button_keys_text(bool add_new_child)
+{
+	return INVOKE_TYPE(0x20FF73, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, add_new_child);
+}
+
 void* c_screen_widget::get_screen_definition()
 {
 	return INVOKE_TYPE(0x20E8A6, 0x0, void*(__thiscall*)(c_screen_widget*), this);
@@ -107,7 +132,7 @@ void c_screen_widget::post_initialize()
 	INVOKE_TYPE(0x20F790, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
 
-void c_screen_widget::setup_special_widgets()
+void c_screen_widget::post_initialize_button_keys()
 {
 	INVOKE_TYPE(0x210B4E, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
@@ -137,9 +162,12 @@ int32 c_screen_widget::sub_60F081(s_event_record* a2)
 	return INVOKE_TYPE(0x20F081, 0x0, int32(__thiscall*)(c_screen_widget*, s_event_record*), this, a2);
 }
 
-int32 c_screen_widget::sub_60F151(int32 a2)
+e_user_interface_controller_component c_screen_widget::get_component_from_button_key(int32 special_widget_index)
 {
-	return INVOKE_TYPE(0x20F151, 0x0, int32(__thiscall*)(c_screen_widget*, int32), this, a2);
+	//converts private_use_characters to controller_component
+	// anything other than a,b,x,y defaults to a
+	//override this if you want to add support for say d-pad up or triggers
+	return INVOKE_TYPE(0x20F151, 0x0, e_user_interface_controller_component(__thiscall*)(c_screen_widget*, int32), this, special_widget_index);
 }
 
 bool c_screen_widget::sub_40AD53(int32 a2)
@@ -186,12 +214,71 @@ bool c_screen_widget::overlay_effect_is_disabled()
 	return this->m_disable_overlay_effect;
 }
 
-void c_screen_widget::sub_60F2A4(uint8 bitmap_index)
+void c_screen_widget::set_favourites_bitmap_visible(bool show_icon)
 {
-	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, uint8), this, bitmap_index);
+	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, show_icon);
 }
 
 void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters)
 {
 	return INVOKE_TYPE(0x20B8C3, 0x0, void(__cdecl*)(c_screen_widget*, s_screen_parameters*), new_screen, parameters);
+}
+
+
+
+c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags, c_list_widget* list):
+	c_screen_widget(menu_id,channel_type,window_index,user_flags)
+{
+	this->m_child_list = list;
+}
+
+c_user_interface_widget* c_screen_with_menu::destructor(uint32 flags)
+{
+	this->~c_screen_with_menu();
+
+	return this;
+}
+
+bool c_screen_with_menu::handle_event(s_event_record* event)
+{
+	return INVOKE_TYPE(0x20EEBE, 0x0, bool(__thiscall*)(c_screen_with_menu*, s_event_record*), this, event);
+}
+
+c_user_interface_widget* c_screen_with_menu::sub_6121F6(rectangle2d* point)
+{
+	return INVOKE_TYPE(0x20EF08, 0x0, c_user_interface_widget * (__thiscall*)(c_screen_with_menu*, rectangle2d*), this, point);
+}
+
+void c_screen_with_menu::initialize(s_screen_parameters* parameters)
+{
+	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, s_screen_parameters*), this, parameters);
+}
+
+#pragma region Live list fix for disappearing labels
+// derived from c_screen_with_menu, but doesn't really matter
+void __thiscall c_screen_with_menu::build_player_list(void* a1, int player_count)
+{
+	auto p_build_player_list = Memory::GetAddress<void(__thiscall*)(void*, void*, int)>(0x211CD0);
+
+	// we only hook calls done to c_screen_with_menu::build_player_list in c_screen_network_squad_browser
+
+	BYTE* thisx = (BYTE*)this;
+
+	bool network_squad_browser_live_browser = *(bool*)(thisx + 7936);
+
+	if (network_squad_browser_live_browser)
+		return; // don't load the player list from data, since we are in the live list, and we don't use the details pane located in the lower right part where players are listed
+
+	return p_build_player_list(this, a1, player_count);
+}
+
+__declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::build_player_list }
+
+#pragma endregion
+
+void c_screen_with_menu::apply_patches()
+{
+	if (Memory::IsDedicatedServer()) return;
+
+	PatchCall(Memory::GetAddressRelative(0x619650), jmp_build_player_list);
 }

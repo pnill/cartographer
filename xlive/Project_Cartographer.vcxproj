@@ -370,6 +370,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_bitmap_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_controller.cpp" />
@@ -443,10 +444,11 @@
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
-    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_achievements.cpp" />
-    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_favorites.cpp" />
-    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_friends.cpp" />
-    <ClCompile Include="Blam\Engine\networking\panaroma\panorama_user_history.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_favorites.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_friends.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_presence.cpp" />
+    <ClCompile Include="Blam\Engine\networking\panorama\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager.cpp" />
     <ClCompile Include="Blam\Engine\Networking\replication\replication_entity_manager_view.cpp" />
@@ -626,6 +628,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />
     <ClInclude Include="Blam\Engine\interface\signal_slot.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface.h" />
@@ -807,7 +810,6 @@
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_melee.cpp" />
     <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="H2MOD\Modules\GamePhysics\Patches\MeleeFix.cpp" />
-    <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\KantTesting\KantTesting.cpp" />
@@ -856,7 +858,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
-    <ClCompile Include="Blam\Engine\interface\user_interface_widget_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
@@ -1012,10 +1013,11 @@
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />
-    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_achievements.h" />
-    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_favorites.h" />
-    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_friends.h" />
-    <ClInclude Include="Blam\Engine\networking\panaroma\panorama_user_history.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_favorites.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_friends.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
+    <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_entity_manager_view.h" />
     <ClInclude Include="Blam\Engine\Networking\replication\replication_event_manager.h" />
@@ -1279,7 +1281,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_widget_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />

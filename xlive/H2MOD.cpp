@@ -925,7 +925,7 @@ void H2MOD::ApplyHooks() {
 		unit_apply_patches();
 
 		user_interface_text_apply_hooks();
-		user_inteface_controller_apply_patches();
+		user_interface_controller_apply_patches();
 		hud_messaging_apply_hooks();
 		font_group_apply_hooks();
 		screens_apply_patches();
@@ -981,7 +981,6 @@ void H2MOD::Initialize()
 	if (!Memory::IsDedicatedServer())
 	{
 		KeyboardInput::Initialize();
-		ControllerInput::Initialize();
 		
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();

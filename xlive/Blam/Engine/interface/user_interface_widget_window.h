@@ -10,6 +10,7 @@
 #define K_HEADER_TEXT_BLOCK_INDEX 0
 #define K_BUTTON_KEY_TEXT_BLOCK_INDEX 1
 #define K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS 2
+#define K_MAXIMUM_NUMBER_OF_BUTTON_KEYS 4
 
 #define TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(block_idx) \
 			(block_idx + K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS)
@@ -343,7 +344,7 @@ enum e_special_widgets_type
 };
 
 /* forward declarations */
-
+enum e_user_interface_controller_component : uint32;
 class c_button_widget;
 class c_tab_view_widget;
 class c_player_widget_representation;
@@ -395,15 +396,20 @@ protected:
 	c_user_interface_widget* m_special_widgets[k_maximum_number_of_special_widgets];
 	c_slot1<c_screen_widget, int32> m_screen_slot;
 
-
 	void destroy();
 	void switch_panes(int32* pane_index_ptr);
 
 public:
 	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 	
+
+	const e_user_interface_screen_id get_id();
+	c_text_widget* get_screen_header_text();
+	c_text_widget* get_screen_button_key_text();
+	c_text_widget* try_find_screen_text(uint32 idx);
 	void verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout);
 	void apply_new_representations_to_players(c_player_widget_representation* representations, int32 player_count);
+	void initialize_button_keys_text(bool add_new_child);
 	void* get_screen_definition();
 	
 	
@@ -419,13 +425,13 @@ public:
 	virtual void sub_60E884();
 	virtual void initialize(s_screen_parameters* parameters) = 0;
 	virtual void post_initialize();
-	virtual void setup_special_widgets();
+	virtual void post_initialize_button_keys();
 	virtual c_user_interface_widget* sub_6102C5();
 	virtual uint8 sub_6103D6();
 	virtual int32 sub_60F1F4(s_event_record* a2);
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
-	virtual int32 sub_60F151(int32 a2);
+	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
 	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type  get_channel();
 	virtual e_user_interface_render_window  get_render_window();
@@ -435,7 +441,7 @@ public:
 	virtual void sub_60ECC9(s_screen_state* state);
 	virtual void* load_proc() = 0;
 	virtual bool overlay_effect_is_disabled();
-	virtual void sub_60F2A4(uint8 bitmap_index);
+	virtual void set_favourites_bitmap_visible(bool show_icon);
 
 private:
 	template<typename T>
@@ -445,6 +451,42 @@ private:
 	}
 };
 ASSERT_STRUCT_SIZE(c_screen_widget, 0xA5C);
+
+
+class c_screen_with_menu : public c_screen_widget
+{
+protected:
+	c_list_widget* m_child_list;
+
+public:
+
+	c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags , c_list_widget* list);
+
+	// c_screen_with_menu virtual functions
+
+	// base interface overrides
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual bool handle_event(s_event_record* event) override;
+	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
+	virtual void initialize(s_screen_parameters* parameters) override;
+
+	// member functions
+	void __thiscall build_player_list(void* a1, int player_count);
+
+	// static member functions
+	static void apply_patches();
+
+private:
+	typedef c_screen_with_menu class_type;
+
+	template<typename T>
+	static T _get_vfptr_table(DWORD idx)
+	{
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x3CF3A4)[idx]);
+	}
+};
+ASSERT_STRUCT_SIZE(c_screen_with_menu, 0xA60);
+
 
 // Todo : move to proper location
 void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters);

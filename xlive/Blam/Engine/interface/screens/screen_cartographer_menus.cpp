@@ -135,8 +135,8 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 }
 
 c_cartographer_credits_menu::c_cartographer_credits_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
-	c_screen_with_menu(_screen_brightness_level, _ui_channel, _window_index, _flags, &credits_edit_list),
-	credits_edit_list(_flags)
+	c_screen_with_menu(_screen_brightness_level, _ui_channel, _window_index, _flags, &m_credits_edit_list),
+	m_credits_edit_list(_flags)
 {
 }
 

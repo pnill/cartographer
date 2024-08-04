@@ -328,8 +328,8 @@ enum e_user_interface_screen_id : uint32;
 struct s_screen_state
 {
 	int32 field_0;
-	int32 field_4;
-	int32 field_8;
+	int32 m_last_focused_item_order;
+	int32 m_last_focused_item_index;
 };
 
 typedef void* (__cdecl* proc_ui_screen_load_cb_t)(s_screen_parameters*);
@@ -351,8 +351,8 @@ struct s_screen_parameters
 		this->m_channel_type = channel_type;
 		this->m_window_index = window_index;
 		m_screen_state.field_0 = NONE;
-		m_screen_state.field_4 = NONE;
-		m_screen_state.field_8 = NONE;
+		m_screen_state.m_last_focused_item_order = NONE;
+		m_screen_state.m_last_focused_item_index = NONE;
 		this->m_load_function = load_cb;
 	}
 
@@ -375,3 +375,4 @@ void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_us
 void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index);
 bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
 void __cdecl user_interface_enter_game_shell(int32 context);
+bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);

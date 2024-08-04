@@ -122,7 +122,7 @@ struct s_event_record
 {
 	e_user_interface_event_type type;
 	e_controller_index controller;
-	e_user_interface_controller_component component;	
+	e_user_interface_controller_component component;
 	uint16 value; // // holds e_user_interface_automation_mode during _user_interface_event_type_automation
 };
 ASSERT_STRUCT_SIZE(s_event_record, 16);
@@ -179,7 +179,7 @@ s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 void __cdecl user_interface_controller_initialize();
 void __cdecl user_interface_controller_update();
 bool __cdecl user_interface_controller_is_player_profile_valid(e_controller_index controller_index);
-uint32 __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index);
+e_controller_index __cdecl user_interface_controller_get_next_valid_index(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_user_index(e_controller_index controller_index);
 void __cdecl user_interface_controller_set_user_index(e_controller_index controller_index, uint32 user_index);
 e_controller_index __cdecl user_interface_controller_get_controller_for_user(uint32 user_index);
@@ -206,7 +206,10 @@ void __cdecl user_interface_controller_update_network_properties(e_controller_in
 void __cdecl user_interface_controller_pick_profile_dialog(e_controller_index controller_index, bool online_user);
 bool __cdecl user_interface_controller_pick_profile_offline(e_controller_index controller_index);
 bool __cdecl user_interface_controller_has_gamepad(e_controller_index controller_index);
+bool __cdecl user_interface_controller_has_gamepad_just_left(e_controller_index controller_index);
 bool __cdecl user_interface_controller_is_guest(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(e_controller_index master_controller_index);
+bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controller_index);
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active);
-void user_inteface_controller_apply_patches();
+void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index);
+void user_interface_controller_apply_patches();

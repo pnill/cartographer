@@ -6,6 +6,11 @@
 
 #include "H2MOD/Modules/Updater/Updater.h"
 
+void* ui_load_cartographer_guide_menu();
+void* ui_load_cartographer_update_notice_menu();
+void* ui_load_cartographer_credits_menu();
+void* ui_load_cartographer_update_menu();
+
 enum e_cartographer_guide_string_table
 {
 	_cartographer_guide_text_none = NONE,
@@ -35,7 +40,7 @@ static void get_guide_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-class c_cartographer_guide_edit_list : c_list_widget
+class c_cartographer_guide_edit_list : public c_list_widget
 {
 public:
 	c_list_item_widget m_list_item_widgets[4];
@@ -187,7 +192,7 @@ static void get_credits_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-class c_cartographer_credits_edit_list : c_list_widget
+class c_cartographer_credits_edit_list : public c_list_widget
 {
 public:
 	c_list_item_widget m_list_item_widgets[4];
@@ -233,7 +238,7 @@ public:
 
 class c_cartographer_credits_menu : public c_screen_with_menu
 {
-	c_cartographer_credits_edit_list credits_edit_list;
+	c_cartographer_credits_edit_list m_credits_edit_list;
 public:
 	c_cartographer_credits_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
@@ -335,7 +340,7 @@ enum e_cartographer_update_status
 	k_cartographer_update_status_end,
 };
 
-class c_cartographer_update_edit_list : c_list_widget
+class c_cartographer_update_edit_list : public c_list_widget
 {
 public:
 	c_list_item_widget m_list_item_widgets[2];
@@ -498,7 +503,7 @@ static void get_update_notice_label(int32 label_id, wchar_t** out_label)
 	*out_label = label_table[_language_english][label_id];
 }
 
-class c_cartographer_update_notice_edit_list : c_list_widget
+class c_cartographer_update_notice_edit_list : public c_list_widget
 {
 public:
 	c_list_item_widget m_list_item_widgets[2];

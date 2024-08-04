@@ -112,7 +112,6 @@ enum e_xbox_live_bitmap_type
 	_xbox_live_bitmap_type_quick_options,
 	
 	//custom bitmaps additions
-	_xbox_live_bitmap_type_switch_to_arranged,
 	_xbox_live_bitmap_type_switch_to_coop,
 	k_number_of_xbox_live_bitmap_types,
 };
@@ -130,22 +129,30 @@ enum e_xbox_live_menu_bitmap_type
 	k_number_of_xbox_live_menu_bitmap_types,
 };
 
+enum e_settings_variant_bitmap_type
+{
+	_settings_variant_bitmap_type_default = 0,
+	k_number_of_settings_variant_bitmap_types,
+};
+
+/* globals */
 
 datum new_xbox_live_bitmap_datum = NONE;
 datum xbox_live_menu_bitmap_datum = NONE;
+datum variant_bitmap_datum = NONE;
 
 c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 	c_list_widget(user_flags),
 	m_slot(this, &c_squad_settings_list::handle_item_pressed_event)
 {
-	m_list_data = ui_list_data_new(k_squad_setting_list_name, k_total_no_of_squad_list_items, sizeof(s_dynamic_list_item));
+	m_list_data = ui_list_data_new(k_squad_setting_list_name, k_total_no_of_squad_list_items, sizeof(s_list_item_datum));
 	data_make_valid(m_list_data);
 
 	m_party_mgmt_item_deleted = true;
 
 	// yes this sucks
 #define SQUAD_ITEM_GET_NEW() \
-		(static_cast<s_dynamic_list_item*>(datum_get(m_list_data, datum_new(m_list_data))))
+		(static_cast<s_list_item_datum*>(datum_get(m_list_data, datum_new(m_list_data))))
 
 	const e_session_protocol active_protocol = user_interface_squad_get_active_protocol();
 	switch (active_protocol)
@@ -216,7 +223,7 @@ c_squad_settings_list::c_squad_settings_list(int16 user_flags) :
 uint16 c_squad_settings_list::get_last_item_type()
 {
 	datum item_idx = this->get_old_data_index();
-	s_dynamic_list_item* item_datum = (s_dynamic_list_item*)datum_try_and_get(this->m_list_data, item_idx);
+	s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item_idx);
 	if (item_datum)
 		return item_datum->item_id;
 	return NONE;
@@ -293,7 +300,7 @@ void c_squad_settings_list::handle_item_pressed_event(s_event_record** pevent, d
 
 	if (*pitem_index != NONE)
 	{
-		s_dynamic_list_item* item = (s_dynamic_list_item*)datum_try_and_get(m_list_data, *pitem_index);
+		s_list_item_datum* item = (s_list_item_datum*)datum_try_and_get(m_list_data, *pitem_index);
 		e_squad_list_items item_type = (e_squad_list_items)item->item_id;
 
 		switch (item_type)
@@ -350,8 +357,8 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_single_player_level_select_load_lobby;
 	c_screen_single_player_level_select_load_lobby(&params);
 }
@@ -364,8 +371,8 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.user_flags = FLAG((*pevent)->controller);
 	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_single_player_difficulty_select_load_lobby;
 	c_screen_single_player_difficulty_select_load_lobby(&params);
 }
@@ -440,9 +447,9 @@ void c_screen_squad_settings::update()
 	//INVOKE_TYPE(0x24F0EB, 0x0, void(__thiscall*)(c_screen_squad_settings*), this);
 
 	e_squad_list_items item_type = (e_squad_list_items)this->m_squad_settings_list.get_last_item_type();
-	c_text_widget* option_help_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_change_map_help));
-	c_text_widget* option_header_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_current_map));
-	c_text_widget* option_value_text_block = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(_squad_settings_dialog_pane_0_text_map));
+	c_text_widget* option_help_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_change_map_help);
+	c_text_widget* option_header_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_current_map);
+	c_text_widget* option_value_text_block = this->try_find_screen_text(_squad_settings_dialog_pane_0_text_map);
 	c_bitmap_widget* option_bitmap = this->try_find_bitmap_widget(_squad_settings_dialog_pane_0_bitmap_xbox_live);
 
 	if (option_bitmap)
@@ -457,6 +464,7 @@ void c_screen_squad_settings::update()
 	uint32 bitm_index = 0;
 
 	s_game_variant* game_variant = user_interface_session_get_game_variant();
+	real_vector2d option_render_scale = { 1.0f,1.0f };//default value
 
 	switch (item_type)
 	{
@@ -557,6 +565,8 @@ void c_screen_squad_settings::update()
 				option_bitmap->set_local_bitmap(_squad_settings_dialog_local_bitmap_difficulty_options, _difficulty_option_legendary);
 				break;
 			}
+
+			option_render_scale = { 0.859375f,0.80859375f };
 		}
 
 
@@ -583,10 +593,12 @@ void c_screen_squad_settings::update()
 		header_string = _string_id_switch_to_arranged;
 		value_string = _string_id_empty_string;
 		//bitm_index = 6;
-		if (option_bitmap && new_xbox_live_bitmap_datum != NONE)
+		if (option_bitmap && variant_bitmap_datum != NONE)
 		{
-			bitmap_data* bitmap_block = bitmap_group_get_bitmap(new_xbox_live_bitmap_datum, _xbox_live_bitmap_type_switch_to_arranged);
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(variant_bitmap_datum, _settings_variant_bitmap_type_default);
 			option_bitmap->assign_new_bitmap_block(bitmap_block);
+			//render_scale = { (real32)required_width/(real32)borked_width  ,(real32)required_height /(real32)borked_height };
+			option_render_scale = { 0.859375f,0.80859375f };
 		}
 		break;
 	case _item_switch_to_optimatch:
@@ -628,7 +640,10 @@ void c_screen_squad_settings::update()
 	if (option_value_text_block)
 		option_value_text_block->set_text_from_string_id(value_string);
 	if (option_bitmap)
+	{
 		option_bitmap->verify_and_update_bitmap_index(bitm_index);
+		option_bitmap->set_render_scale(&option_render_scale);
+	}
 
 	c_list_item_widget* item = this->m_squad_settings_list.try_find_item_widget(_item_party_management);
 	if (item && !this->m_squad_settings_list.party_management_exists() && user_interface_squad_get_player_count() < 2)
@@ -689,21 +704,24 @@ void c_screen_squad_settings::apply_instance_patches()
 void c_screen_squad_settings::apply_patches_on_map_load()
 {
 	tag_injection_set_active_map(L"mainmenu_bitmaps");
-
 	datum xbox_live_bitmap_datum = tag_injection_load(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live", true);
 
-	if (xbox_live_bitmap_datum != NONE)
+	if (tag_injection_active_map_verified())
 	{
-		tag_injection_inject();
-		new_xbox_live_bitmap_datum = xbox_live_bitmap_datum;
-		LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
-	}
-	else
-	{
-		new_xbox_live_bitmap_datum = NONE;
+		if (xbox_live_bitmap_datum != NONE)
+		{
+			tag_injection_inject();
+			new_xbox_live_bitmap_datum = xbox_live_bitmap_datum;
+			LOG_DEBUG_FUNC("New xbox live bitmap datum : 0x{:08X} ,", new_xbox_live_bitmap_datum);
+		}
+		else
+		{
+			new_xbox_live_bitmap_datum = NONE;
+		}
 	}
 
 	xbox_live_menu_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\xbox_live\\xbox_live_main_menu\\xbox_live_menu");
+	variant_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\variant_settings\\variant");
 
 	return;
 }

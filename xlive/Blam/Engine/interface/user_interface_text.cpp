@@ -51,6 +51,13 @@ void c_user_interface_text::set_color(const real_rgb_color* color)
 	this->m_text_color = *color;
 }
 
+bool c_user_interface_text::is_private_use_character(wchar_t character)
+{
+	if (IN_RANGE_INCLUSIVE(character, K_PRIVATE_USE_CHARACTER_SPACE_START, K_PRIVATE_USE_CHARACTER_SPACE_END))
+		return true;
+	return false;
+}
+
 
 c_user_interface_text* c_user_interface_text::destructor(uint32 flags)
 {
@@ -74,6 +81,11 @@ float get_ui_text_label_scale()
 void set_ui_text_label_scale(float scale)
 {
 	ui_text_label_scaling = scale;
+}
+
+bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, char a3)
+{
+	return INVOKE(0x22F712, 0x0, user_interface_parse_string, string, max_length, a3);
 }
 
 // this seems to compute the required space to display the text?

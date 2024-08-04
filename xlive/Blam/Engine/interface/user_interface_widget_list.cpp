@@ -40,7 +40,7 @@ void c_list_widget::update_list_items_from_mapping(c_list_item_widget* item, int
 	c_text_widget* item_text = item->try_find_text_widget(text_widget_idx);
 	if (item_text)
 	{
-		s_dynamic_list_item* item_datum = (s_dynamic_list_item*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
+		s_list_item_datum* item_datum = (s_list_item_datum*)datum_try_and_get(this->m_list_data, item->get_last_data_index());
 		if (item_datum && total_mappings > 0)
 		{
 			int16 mapping_idx = 0;

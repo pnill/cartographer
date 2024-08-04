@@ -4,6 +4,10 @@
 
 #include "game/game.h"
 #include "game/game_time.h"
+#include "networking/logic/life_cycle_manager.h"
+#include "H2MOD/Modules/Shell/Config.h"
+
+/* globals */
 
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
@@ -28,6 +32,19 @@ uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
 	XINPUT_GAMEPAD_X,
 	XINPUT_GAMEPAD_Y,
 }; // 0x39DEE0
+
+
+/* forward declaration */
+
+void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_buttons);
+
+/* public code */
+
+
+uint32 xinput_device::get_port() const
+{
+	return dwUserIndex;
+}
 
 
 void input_xinput_clear_rumble_state(void)
@@ -170,12 +187,15 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 		input_xinput_update_trigger(&max_trigger_msec_down, trigger_down, trigger_msec_down);
 	}
 
+	uint16 gamepad_buttons = 0;
+	input_xinput_update_get_gamepad_buttons(gamepad_index, &gamepad_buttons);
+
 	for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
 	{
 		uint8& frames_down = gamepad_state->button_frames_down[button_index];
 		uint16& msec_down = gamepad_state->button_msec_down[button_index];
-
-		bool button_down = TEST_FLAG(state.Gamepad.wButtons, XINPUT_BUTTON_FLAGS[button_index]);
+		
+		bool button_down = TEST_FLAG(gamepad_buttons, XINPUT_BUTTON_FLAGS[button_index]);
 		//if (button_down)
 		//	LOG_DEBUG_FUNC(" down {}", button_index);
 		if (button_down)
@@ -203,6 +223,34 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 		|| gamepad_state->thumb_right.x > 0
 		|| gamepad_state->thumb_right.y > 0
 		|| any_button_pressed;
+}
+
+void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_buttons)
+{
+	input_device* gamepad = g_xinput_devices[gamepad_index];
+	uint16 custom_button_flags[k_number_of_xinput_buttons];
+
+	XINPUT_STATE state;
+	H2Config_CustomLayout.ToArray(custom_button_flags);
+
+	ASSERT(out_buttons != nullptr);
+	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)
+	{
+		if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
+		{
+			for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
+			{
+				if (TEST_FLAG(state.Gamepad.wButtons, XINPUT_BUTTON_FLAGS[button_index]))
+				{
+					*out_buttons |= custom_button_flags[button_index];
+				}
+			}
+		}
+		else
+		{
+			*out_buttons = state.Gamepad.wButtons;
+		}
+	}
 }
 
 

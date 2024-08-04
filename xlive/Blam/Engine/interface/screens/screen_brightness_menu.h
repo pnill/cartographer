@@ -1,7 +1,5 @@
 #pragma once
 
-#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
-
 #include "interface/user_interface_headers.h"
 
 class c_brightness_level_edit_list : public c_list_widget
@@ -201,7 +199,7 @@ public:
 		INVOKE_VFPTR_FN(_get_vfptr_table, 23, void(class_type::**)());
 	}
 
-	virtual void setup_special_widgets() override
+	virtual void post_initialize_button_keys() override
 	{
 		INVOKE_VFPTR_FN(_get_vfptr_table, 24, void(class_type::**)());
 	}
@@ -231,9 +229,9 @@ public:
 		return INVOKE_VFPTR_FN(_get_vfptr_table, 29, int32(class_type::**)(s_event_record*), a2);
 	}
 
-	virtual int32 sub_60F151(int32 a2) override
+	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index) override
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 30, int32(class_type::**)(int32), a2);
+		return INVOKE_VFPTR_FN(_get_vfptr_table, 30, e_user_interface_controller_component(class_type::**)(int32), special_widget_index);
 	}
 
 	virtual bool sub_40AD53(int32 a2) override
@@ -281,7 +279,7 @@ public:
 		return INVOKE_VFPTR_FN(_get_vfptr_table, 39, bool(class_type::**)());
 	}
 
-	virtual void sub_60F2A4(uint8 bitmap_index) override
+	virtual void set_favourites_bitmap_visible(bool show_icon) override
 	{
 		INVOKE_VFPTR_FN(_get_vfptr_table, 40, void(class_type::**)());
 	}

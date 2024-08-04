@@ -26,6 +26,16 @@ void c_text_widget::set_text_from_string_id(string_id sid)
 	INVOKE_TYPE(0x21BF85, 0x0, void(__thiscall*)(c_text_widget*, string_id), this, sid);
 }
 
+void c_text_widget::append_text(wchar_t const* text)
+{
+	this->get_interface()->append_text(text);
+}
+
+void c_text_widget::append_text_from_string_id(string_id sid)
+{
+	INVOKE_TYPE(0x21BFF6, 0x0, void(__thiscall*)(c_text_widget*, string_id), this, sid);
+}
+
 void c_text_widget::set_text_properties(int32 flags, int16 animation_index, real_argb_color* text_color, int32 font, rectangle2d* bounds)
 {
 	INVOKE_TYPE(0x21BC81, 0x0, void(__thiscall*)(c_text_widget*, int32, int16, real_argb_color*, int32, rectangle2d*), this, flags, animation_index, text_color, font, bounds);

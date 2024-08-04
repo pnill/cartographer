@@ -556,6 +556,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 	s_tag_injecting_table_entry* new_entry = this->m_table.init_entry(cache_datum, group);
 
 	c_xml_definition_agent* agent = this->get_agent({group});
+	ASSERT(agent != nullptr);
 	new_entry->loaded_data->init(
 		agent->get_definition(),
 		this->m_active_map_file_handle,

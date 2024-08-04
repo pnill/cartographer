@@ -3,17 +3,17 @@
 /* structures */
 
 // todo : verify this struct
-struct s_panaroma_friends_block
+struct s_panorama_friends_block
 {
 	uint32 buffer_size;
 	uint8* buffer;
 	uint32 result;
 };
-ASSERT_STRUCT_SIZE(s_panaroma_friends_block, 12);
+ASSERT_STRUCT_SIZE(s_panorama_friends_block, 12);
 
 
 /* classes */
-class c_networking_panaroma_friends
+class c_networking_panorama_friends
 {
 protected:
 	void* m_current_task;
@@ -27,8 +27,8 @@ protected:
 	HANDLE m_enumerator;
 	uint32 field_24;
 	uint8 gap_28[24];
-	s_panaroma_friends_block* m_pending_friends_block;
-	s_panaroma_friends_block* field_44;
+	s_panorama_friends_block* m_pending_friends_block;
+	s_panorama_friends_block* field_44;
 	bool field_48;
 	bool m_op_pending;
 	uint8 gap_4A[6];
@@ -37,6 +37,6 @@ public:
 	bool has_active_task();
 	void initialize_startup();
 };
-ASSERT_STRUCT_SIZE(c_networking_panaroma_friends, 0x50);
+ASSERT_STRUCT_SIZE(c_networking_panorama_friends, 0x50);
 
-c_networking_panaroma_friends* get_networking_panaroma_friends(void);
+c_networking_panorama_friends* get_networking_panorama_friends(void);

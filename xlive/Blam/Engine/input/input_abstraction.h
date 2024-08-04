@@ -3,7 +3,11 @@
 #include "controllers.h"
 #include "input_windows.h"
 
+/* macro defines*/
+
 #define k_maximum_number_of_game_function_binds 8
+
+/* enums */
 
 enum e_input_preference_device_type :uint32
 {
@@ -11,13 +15,6 @@ enum e_input_preference_device_type :uint32
 	_input_preference_device_mouse = 0x0,
 	_input_preference_device_keyboard = 0x1,
 	_input_preference_device_gamepad = 0x2,
-};
-
-struct s_abstract_input_button_state
-{
-	real32	hold_time_real;
-	uint8	hold_time_byte;
-	uint16	hold_time_short;
 };
 
 enum e_button_functions
@@ -116,6 +113,8 @@ enum e_gamepad_buttons
 	NUMBER_OF_GAMEPAD_BUTTONS = 0x10,
 };
 
+/* structures */
+
 #pragma pack(push,1)
 struct s_game_function_bind
 {
@@ -160,11 +159,20 @@ struct s_gamepad_input_preferences
 };
 ASSERT_STRUCT_SIZE(s_gamepad_input_preferences, 0x1680);
 
-struct s_keyboard_input_preferences
+class s_abstract_button
 {
-	s_key_state keys[NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
+	real32 m_down_amount;
+	uint8 m_down_frames;
+	char gap;
+	uint16 m_down_msec;
 };
-ASSERT_STRUCT_SIZE(s_keyboard_input_preferences, 0x1C8);
+ASSERT_STRUCT_SIZE(s_abstract_button, 8);
+
+struct s_game_abstracted_input_state
+{
+	s_abstract_button buttons[NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
+};
+ASSERT_STRUCT_SIZE(s_game_abstracted_input_state, 0x1C8);
 
 // TODO : verify this struct and NUMBER_OF_ABSTRACT_BUTTONS
 struct s_game_input_state
@@ -189,7 +197,7 @@ ASSERT_STRUCT_SIZE(s_game_input_state, 0xB8);
 struct s_input_abstraction_globals
 {
 	s_gamepad_input_preferences preferences[k_number_of_controllers];
-	s_keyboard_input_preferences keyboard_preferences;
+	s_game_abstracted_input_state abstracted_inputs;
 	s_game_input_state input_states[k_number_of_controllers];
 	uint32 controller_detection_timer;
 	bool input_has_gamepad[k_number_of_controllers];

@@ -3,10 +3,19 @@
 #include "game/game_time.h"
 #include "H2MOD/Modules/Shell/Config.h"
 
+/* globals */
+
 s_input_abstraction_globals* input_abstraction_globals;
 extern uint16 radialDeadzone;
+//we need this because theres only a single abstracted_inputs inside input_abstraction_globals for h2v
+s_game_abstracted_input_state g_abstract_input_states[k_number_of_controllers];
+//buffers to store old windows input states
+DIMOUSESTATE2 old_mouse_state;
+uint16 old_mouse_buttons[8];
+s_keyboard_input_state old_keyboard_state;
+uint16 updating_gamepad_index = _controller_index_0;
 
-s_abstract_input_button_state g_abstract_input_button_hold_state[k_number_of_controllers][NUMBER_OF_EXTENDED_CONTROL_BUTTONS];
+/* public code */
 
 void __cdecl input_abstraction_initialize()
 {
@@ -319,158 +328,200 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 		input_abstraction_set_mouse_look_sensitivity(controller, H2Config_mouse_sens);
 	}
 }
+
+void input_abstraction_store_windows_inputs()
+{
+	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	if (mouse_state)
+	{
+		csmemcpy(&old_mouse_state, mouse_state, sizeof(*mouse_state));
+
+		uint16* mouse_buttons = input_get_mouse_button_state();
+
+		if (mouse_buttons)
+		{
+			csmemcpy(old_mouse_buttons, mouse_buttons, sizeof(old_mouse_buttons));
+		}
+	}
+	csmemcpy(&old_keyboard_state, &input_globals->keyboard, sizeof(input_globals->keyboard));
+}
+
+void input_abstraction_restore_windows_inputs()
+{
+	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	if (mouse_state)
+	{
+		csmemcpy(mouse_state, &old_mouse_state, sizeof(*mouse_state));
+
+		uint16* mouse_buttons = input_get_mouse_button_state();
+		if (mouse_buttons)
+		{
+			csmemcpy(mouse_buttons, old_mouse_buttons, sizeof(input_globals->mouse_buttons));
+		}
+	}
+	csmemcpy(&input_globals->keyboard, &old_keyboard_state, sizeof(input_globals->keyboard));
+
+}
+
+void input_abstraction_clear_windows_inputs()
+{
+	DIMOUSESTATE2* mouse_state = input_get_mouse_state();
+	if(mouse_state)
+	{
+		csmemset(mouse_state, 0, sizeof(*mouse_state));
+
+		uint16* mouse_buttons = input_get_mouse_button_state();
+		if(mouse_buttons)
+		{
+			csmemset(mouse_buttons, 0, sizeof(old_mouse_buttons));
+		}
+	}
+	csmemset(&input_globals->keyboard, 0, sizeof(input_globals->keyboard));
+}
+
+void input_abstraction_store_abstracted_inputs(e_controller_index controller)
+{
+	csmemcpy(
+		&g_abstract_input_states[controller],
+		&input_abstraction_globals->abstracted_inputs,
+		sizeof(s_game_abstracted_input_state));
+}
+
+void input_abstraction_restore_abstracted_inputs(e_controller_index controller)
+{
+	csmemcpy(
+		&input_abstraction_globals->abstracted_inputs,
+		&g_abstract_input_states[controller],
+		sizeof(s_game_abstracted_input_state));
+}
+
 void __cdecl input_abstraction_update()
 {
 	//INVOKE(0x628A8, 0x0, input_abstraction_update);
 
-	bool any_gamepad_connected = false;
 	real_euler_angles2d left_stick, right_stick;
+
+	input_abstraction_store_windows_inputs();
 
 	for (e_controller_index controller = first_controller();
 		controller != k_no_controller;
 		controller = next_controller(controller))
-	{
-		if (input_has_gamepad_plugged(controller))
-			any_gamepad_connected = true;
-	}
-
-	DIMOUSESTATE2 old_mouse_state;
-	uint16 old_mouse_buttons[8];
-	s_keyboard_input_state old_keyboard_state;
-
-	if (any_gamepad_connected)
-	{
-
-		for (e_controller_index controller = first_controller();
-			controller != k_no_controller;
-			controller = next_controller(controller))
-		{
-			left_stick.yaw = 0.0f;
-			left_stick.pitch = 0.0f;
-			right_stick.yaw = 0.0f;
-			right_stick.pitch = 0.0f;
-
-			if (controller > _controller_index_0 && controller == _controller_index_1)
-			{
-				DIMOUSESTATE2* mouse_state = input_get_mouse_state();
-
-				if (mouse_state)
-				{
-					csmemcpy(&old_mouse_state, mouse_state, sizeof(*mouse_state));
-					csmemset(mouse_state, 0, sizeof(*mouse_state));
-
-					uint16* mouse_buttons = input_get_mouse_button_state();
-
-					if (mouse_buttons)
-					{
-						csmemcpy(old_mouse_buttons, mouse_buttons, sizeof(old_mouse_buttons));
-						csmemset(mouse_buttons, 0, sizeof(old_mouse_buttons));
-					}
-				}
-
-				csmemcpy(&old_keyboard_state, &input_globals->keyboard, sizeof(input_globals->keyboard));
-				csmemset(&input_globals->keyboard, 0, sizeof(input_globals->keyboard));
-			}
-
-			s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
-			s_game_input_state* abstracted_input_state = &input_abstraction_globals->input_states[controller];
-			s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
-
-			if (!gamepad_state)
-			{
-				// this is never reached for _controller0 ???
-				input_abstraction_globals->input_has_gamepad[controller] = false;
-
-			}
-			else
-			{
-
-				if (!H2Config_controller_modern)
-				{
-					input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
-				}
-				else
-				{
-					input_abstraction_update_throttles_modern(gamepad_state, &left_stick, &right_stick);
-				}
-
-				if (!input_abstraction_globals->input_has_gamepad[controller])
-					input_abstraction_globals->input_has_gamepad[controller] = true;
-
-			}
-
-			if (input_has_gamepad_plugged(controller))
-			{
-				csmemcpy(
-					Memory::GetAddress<s_abstract_input_button_state*>(0x4AE3B0), 
-					g_abstract_input_button_hold_state[controller],
-					sizeof(g_abstract_input_button_hold_state[controller]));
-
-				input_abstraction_update_input_state(
-					controller,
-					preference,
-					gamepad_state,
-					&left_stick,
-					&right_stick,
-					abstracted_input_state);
-
-				csmemcpy(
-					g_abstract_input_button_hold_state[controller], 
-					Memory::GetAddress<s_abstract_input_button_state*>(0x4AE3B0), 
-					sizeof(g_abstract_input_button_hold_state[controller]));
-			}
-
-
-			if (controller == _controller_index_3)
-			{
-				DIMOUSESTATE2* mouse_state = input_get_mouse_state();
-				if (mouse_state)
-				{
-					csmemcpy(mouse_state, &old_mouse_state, sizeof(*mouse_state));
-
-					uint16* mouse_buttons = input_get_mouse_button_state();
-					if (mouse_buttons)
-					{
-						csmemcpy(mouse_buttons, old_mouse_buttons, sizeof(input_globals->mouse_buttons));
-					}
-				}
-				csmemcpy(&input_globals->keyboard, &old_keyboard_state, sizeof(input_globals->keyboard));
-			}
-		}
-	}
-	else
 	{
 		left_stick.yaw = 0.0f;
 		left_stick.pitch = 0.0f;
 		right_stick.yaw = 0.0f;
 		right_stick.pitch = 0.0f;
 
-		input_abstraction_globals->input_has_gamepad[_controller_index_0] = false;
 
-		input_abstraction_update_input_state(
-			_controller_index_0,
-			&input_abstraction_globals->preferences[_controller_index_0],
-			input_get_gamepad_state(_controller_index_0),
-			&left_stick,
-			&right_stick,
-			&input_abstraction_globals->input_states[_controller_index_0]);
+		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
+		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
+		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 
-		input_abstraction_apply_raw_mouse_update(_controller_index_0, &input_abstraction_globals->input_states[_controller_index_0]);
+		//restore last state from global array before processing
+		input_abstraction_restore_abstracted_inputs(controller);
+
+		if (!gamepad_state)
+		{
+			// controls players when gamepad is disconnected or no gamepad
+			input_abstraction_globals->input_has_gamepad[controller] = false;
+
+			if(controller != k_windows_device_controller_index)
+			{
+				// this needs to be done when a controller disconnects for active player, so it doesnt get controlled by m/k
+				input_abstraction_clear_windows_inputs();		
+				input_abstraction_update_input_state(
+					controller,
+					preference,
+					gamepad_state,
+					&left_stick,
+					&right_stick,
+					game_input_state);
+			}
+			else
+			{
+				input_abstraction_restore_windows_inputs();
+				input_abstraction_update_input_state(
+					k_windows_device_controller_index,
+					preference,
+					gamepad_state,
+					&left_stick,
+					&right_stick,
+					game_input_state);
+				input_abstraction_apply_raw_mouse_update(k_windows_device_controller_index, game_input_state);
+			}	
+
+		}
+		else
+		{
+
+			if (!H2Config_controller_modern)
+			{
+				input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
+			}
+			else
+			{
+				input_abstraction_update_throttles_modern(gamepad_state, &left_stick, &right_stick);
+			}
+
+			if (!input_abstraction_globals->input_has_gamepad[controller])
+				input_abstraction_globals->input_has_gamepad[controller] = true;
+
+
+
+			if (controller == k_windows_device_controller_index)
+			{
+				input_abstraction_restore_windows_inputs();
+				input_abstraction_update_input_state(
+					k_windows_device_controller_index,
+					preference,
+					gamepad_state,
+					&left_stick,
+					&right_stick,
+					game_input_state);
+
+				input_abstraction_apply_raw_mouse_update(k_windows_device_controller_index, game_input_state);
+
+			}
+			else
+			{
+				input_abstraction_clear_windows_inputs();
+				input_abstraction_update_input_state(
+					controller,
+					preference,
+					gamepad_state,
+					&left_stick,
+					&right_stick,
+					game_input_state);
+			}
+
+		}
+		//store to array after processing is done
+		input_abstraction_store_abstracted_inputs(controller);
 	}
+	//restore mouse and keyboard states if it was cleared at any point
+	input_abstraction_restore_windows_inputs();
 }
 
 void __cdecl input_abstraction_update_input_state(int controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state)
 {
+	updating_gamepad_index = controller_index;
+
 	INVOKE(0x61EA2, 0x0, input_abstraction_update_input_state, controller_index, preference, gamepad_state, left_stick_analog, right_stick_analog, input_state);
 	////https://github.com/pnill/cartographer/blob/development-patches/xlive/H2MOD/Modules/Splitscreen/InputFixes.cpp#L311
 }
 
+bool __cdecl input_abstraction_controller_plugged_hook(uint16 gamepad_index)
+{
+	//fixes a hardcode check to _controller_index_0 that prevents other controllers from working without _controller_index_0 being connected
+	return input_has_gamepad_plugged(updating_gamepad_index);
+}
 
 void input_abstraction_patches_apply()
 {
 	input_abstraction_globals = Memory::GetAddress<s_input_abstraction_globals*>(0x4A89B0);
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
+	PatchCall(Memory::GetAddress(0x61FBD), input_abstraction_controller_plugged_hook); //inside input_abstraction_update_input_state
 	input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 	input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
 	input_abstraction_set_controller_thumb_deadzone(_controller_index_0);

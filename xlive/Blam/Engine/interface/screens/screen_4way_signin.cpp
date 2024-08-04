@@ -14,6 +14,8 @@
 #include "Networking/online/online_account_xbox.h"
 #include "tag_files/global_string_ids.h"
 
+#include "tag_files/tag_loader/tag_injection.h"
+
 /* enums */
 
 enum e_4way_signin_main_text_blocks
@@ -75,9 +77,52 @@ enum e_4way_signin_main_model_blocks
 	_4way_signin_main_pane_0_model_ui_player4b,
 };
 
+enum e_controller_signin_bitmaps
+{
+	_controller_signin_bitmap_missing = 0,
+	_controller_signin_bitmap_akebono,
+	_controller_signin_bitmap_duke,
+	k_number_of_controller_signin_bitmap_types
+};
+
+enum e_edit_profile_bitmaps
+{
+	_edit_profile_bitmap_controller = 0,
+	_edit_profile_bitmap_player,
+	_edit_profile_bitmap_keyboard,
+	_edit_profile_bitmap_voice,
+	_edit_profile_bitmap_xbox_live,
+	_edit_profile_bitmap_subtitles,
+	k_number_of_edit_profile_bitmap_types
+};
+
+/* structures */
+
+struct s_screen_4way_items
+{
+	uint8 text_profile_name;
+	uint8 text_press_a_to_join;
+	uint8 text_insert_controller;
+	uint8 text_profile_name_heading;
+	uint8 text_gamertag_heading;
+	uint8 text_gamertag_text;
+	uint8 model_ui_player_a;
+	uint8 model_ui_player_b;
+	uint8 bitmap_unknown;
+	uint8 bitmap_controller_signin;
+};
+
 /* globals */
 
 uint32 ui_recover_from_disconnection_return_address = NULL;
+bool g_show_split_inputs_option = false;
+datum edit_profile_bitmap_datum = NONE;
+
+/* forward declarations*/
+
+void initialize_elements(s_screen_4way_items& elements, e_controller_index controller);
+void add_button_key_split_input(c_text_widget* button_key_text);
+void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text);
 
 /* public code */
 
@@ -105,10 +150,11 @@ void c_screen_4way_signin::update()
 
 	this->set_controller_mask(all_users_mask);
 	c_player_widget_representation representations[k_number_of_controllers];
+	s_screen_4way_items items;
 
 	for (e_controller_index controller = _controller_index_0;
-		controller != NONE;
-		controller = (e_controller_index)user_interface_controller_get_next_valid_index(controller))
+		controller != k_no_controller;
+		controller = user_interface_controller_get_next_valid_index(controller))
 	{
 		bool gamepad_connected = user_interface_controller_has_gamepad(controller);
 		bool controller_has_joined = has_live_privileges && user_interface_controller_is_player_profile_valid(controller);
@@ -123,82 +169,13 @@ void c_screen_4way_signin::update()
 			c_player_widget_representation* current_player = &representations[controller];
 			current_player->set_appearance(&profile.profile);
 			current_player->set_player_name_from_configuration((s_player_properties*)profile.player_name.get_buffer()); //hacky
-			show_gamertag_text = online_connected_to_xbox_live();
+			show_gamertag_text = user_interface_controller_has_xbox_live(controller);
 		}
 
+		initialize_elements(items, controller);
 
-		uint32 profile_name_text_id, press_a_to_join_text_id, insert_controller_text_id,
-			profile_name_heading_text_id, gamertag_heading_text_id, gamertag_text_id,
-			ui_player_model_id_a, ui_player_model_id_b,
-			unknown_bitmap_id, controller_signin_bitmap_id;
-
-		switch (controller)
-		{
-		case _controller_index_0:
-
-			profile_name_text_id = _4way_signin_main_pane_0_text_player0_profile_name;
-			press_a_to_join_text_id = _4way_signin_main_pane_0_text_player0_press_a_to_join;
-			insert_controller_text_id = _4way_signin_main_pane_0_text_player0_insert_controller;
-			profile_name_heading_text_id = _4way_signin_main_pane_0_text_player0_profile_name_heading;
-			gamertag_heading_text_id = _4way_signin_main_pane_0_text_player0_gamertag_heading;
-			gamertag_text_id = _4way_signin_main_pane_0_text_player0_gamertag;
-			ui_player_model_id_a = _4way_signin_main_pane_0_model_ui_player1;
-			ui_player_model_id_b = _4way_signin_main_pane_0_model_ui_player1b;
-			unknown_bitmap_id = _4way_signin_main_pane_0_bitmap_3;
-			controller_signin_bitmap_id = _4way_signin_main_pane_0_bitmap_player_0_controller_signin;
-
-			break;
-
-		case _controller_index_1:
-
-			profile_name_text_id = _4way_signin_main_pane_0_text_player1_profile_name;
-			press_a_to_join_text_id = _4way_signin_main_pane_0_text_player1_press_a_to_join;
-			insert_controller_text_id = _4way_signin_main_pane_0_text_player1_insert_controller;
-			profile_name_heading_text_id = _4way_signin_main_pane_0_text_player1_profile_name_heading;
-			gamertag_heading_text_id = _4way_signin_main_pane_0_text_player1_gamertag_heading;
-			gamertag_text_id = _4way_signin_main_pane_0_text_player1_gamertag;
-			ui_player_model_id_a = _4way_signin_main_pane_0_model_ui_player2;
-			ui_player_model_id_b = _4way_signin_main_pane_0_model_ui_player2b;
-			unknown_bitmap_id = _4way_signin_main_pane_0_bitmap_4;
-			controller_signin_bitmap_id = _4way_signin_main_pane_0_bitmap_player_1_controller_signin;
-
-			break;
-
-		case _controller_index_2:
-
-			profile_name_text_id = _4way_signin_main_pane_0_text_player2_profile_name;
-			press_a_to_join_text_id = _4way_signin_main_pane_0_text_player2_press_a_to_join;
-			insert_controller_text_id = _4way_signin_main_pane_0_text_player2_insert_controller;
-			profile_name_heading_text_id = _4way_signin_main_pane_0_text_player2_profile_name_heading;
-			gamertag_heading_text_id = _4way_signin_main_pane_0_text_player2_gamertag_heading;
-			gamertag_text_id = _4way_signin_main_pane_0_text_player2_gamertag;
-			ui_player_model_id_a = _4way_signin_main_pane_0_model_ui_player3;
-			ui_player_model_id_b = _4way_signin_main_pane_0_model_ui_player3b;
-			unknown_bitmap_id = _4way_signin_main_pane_0_bitmap_5;
-			controller_signin_bitmap_id = _4way_signin_main_pane_0_bitmap_player_2_controller_signin;
-
-			break;
-
-		case _controller_index_3:
-
-			profile_name_text_id = _4way_signin_main_pane_0_text_player3_profile_name;
-			press_a_to_join_text_id = _4way_signin_main_pane_0_text_player3_press_a_to_join;
-			insert_controller_text_id = _4way_signin_main_pane_0_text_player3_insert_controller;
-			profile_name_heading_text_id = _4way_signin_main_pane_0_text_player3_profile_name_heading;
-			gamertag_heading_text_id = _4way_signin_main_pane_0_text_player3_gamertag_heading;
-			gamertag_text_id = _4way_signin_main_pane_0_text_player3_gamertag;
-			ui_player_model_id_a = _4way_signin_main_pane_0_model_ui_player4;
-			ui_player_model_id_b = _4way_signin_main_pane_0_model_ui_player4b;
-			unknown_bitmap_id = _4way_signin_main_pane_0_bitmap_6;
-			controller_signin_bitmap_id = _4way_signin_main_pane_0_bitmap_player_3_controller_signin;
-
-			break;
-
-
-		}
-
-		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(profile_name_text_id), controller_has_joined);
-		c_text_widget* press_a_to_join_text = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(press_a_to_join_text_id));
+		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(items.text_profile_name), controller_has_joined);
+		c_text_widget* press_a_to_join_text = this->try_find_screen_text(items.text_press_a_to_join);
 		if (press_a_to_join_text)
 		{
 			press_a_to_join_text->set_visible(false);
@@ -219,7 +196,7 @@ void c_screen_4way_signin::update()
 			}
 		}
 
-		c_text_widget* insert_controller_text = this->try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(insert_controller_text_id));
+		c_text_widget* insert_controller_text = this->try_find_screen_text(items.text_insert_controller);
 		if (insert_controller_text)
 		{
 			if (controller_has_joined)
@@ -232,13 +209,13 @@ void c_screen_4way_signin::update()
 				insert_controller_text->set_visible(false);
 			}
 		}
-
-		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(gamertag_text_id), show_gamertag_text);
-		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(gamertag_heading_text_id), show_gamertag_text);
-		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(profile_name_heading_text_id), controller_has_joined);
+	
+		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(items.text_gamertag_text), show_gamertag_text);
+		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(items.text_gamertag_heading), show_gamertag_text);
+		this->set_child_visible(_widget_type_text, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(items.text_profile_name_heading), controller_has_joined);
 
 		//for some reason game saves player characters as masterchief and dervish in saved profiles
-		c_model_widget* ui_player_model_a = this->try_find_model_widget(ui_player_model_id_a);
+		c_model_widget* ui_player_model_a = this->try_find_model_widget(items.model_ui_player_a);
 		if (ui_player_model_a)
 		{
 			if (controller_has_joined)
@@ -246,7 +223,7 @@ void c_screen_4way_signin::update()
 			else
 				ui_player_model_a->set_visible(false);
 		}
-		c_model_widget* ui_player_model_b = this->try_find_model_widget(ui_player_model_id_b);
+		c_model_widget* ui_player_model_b = this->try_find_model_widget(items.model_ui_player_b);
 		if (ui_player_model_b)
 		{
 			if (controller_has_joined)
@@ -257,23 +234,46 @@ void c_screen_4way_signin::update()
 		}
 
 
-		c_bitmap_widget* unknown_bitmap = this->try_find_bitmap_widget(unknown_bitmap_id);
+		c_bitmap_widget* unknown_bitmap = this->try_find_bitmap_widget(items.bitmap_unknown);
 		if (unknown_bitmap)
 			unknown_bitmap->set_visible(controller_has_joined);
 
-		c_bitmap_widget* controller_signin_bitmap = this->try_find_bitmap_widget(controller_signin_bitmap_id);
+		c_bitmap_widget* controller_signin_bitmap = this->try_find_bitmap_widget(items.bitmap_controller_signin);
 		if (controller_signin_bitmap)
 		{
 			bool should_show_bitmap = controller_has_joined == false;
 			controller_signin_bitmap->set_visible(should_show_bitmap);
 			if (should_show_bitmap)
 			{
-				int16 bitmap_update_idx = gamepad_connected ? 1 : 0;
+				// we dont really have a way to determine controller_types between akebono and duke , using either is fine.
+				int16 bitmap_update_idx = gamepad_connected ? _controller_signin_bitmap_akebono : _controller_signin_bitmap_missing;
 				controller_signin_bitmap->verify_and_update_bitmap_index(bitmap_update_idx);
+
+
+				if (controller == k_windows_device_controller_index)
+				{
+					modify_controller_bitmap_for_split(controller_signin_bitmap, press_a_to_join_text);
+				}
 			}
 		}
-	}
 
+		if (controller != k_windows_device_controller_index
+			&& user_interface_controller_has_gamepad_just_left(controller)
+			&& user_interface_controller_is_player_profile_valid(controller))
+		{
+			// signout any leftover profile
+			// in h2x this is not needed as the error screen pops up and forces you to connect controller to proceed
+			// todo : fix the removed controller process, its annoying the way it is now
+			user_interface_controller_sign_out(controller);
+		}
+	}
+	g_show_split_inputs_option = false;
+	if (IN_RANGE(input_get_connected_gamepads_count(), 0, k_number_of_controllers)
+		&& user_interface_controller_is_player_profile_valid(k_windows_device_controller_index))
+	{
+		g_show_split_inputs_option = true;
+	}
+	this->update_button_key_texts();
 
 	this->apply_new_representations_to_players(representations, k_number_of_controllers);
 	c_user_interface_widget::update();
@@ -289,21 +289,27 @@ bool c_screen_4way_signin::handle_event(s_event_record* event)
 
 	if (event->type == _user_interface_event_type_gamepad_button_pressed)
 	{
+		result = this->handle_split_input_event(event);
+
 		if (!user_interface_controller_is_player_profile_valid(event->controller))
 		{
 			// if the event owner is not yet signed in
-			result = this->handle_default_events(event);
+			result = this->handle_invalid_controller_event(event);
 		}
 		else
 		{
 
-			result = this->handle_main_events(event);
+			result = this->handle_controller_button_pressed_event(event);
 
 		}
-
-		if (result)
-			return result;
 	}
+	if (event->type == _user_interface_event_type_automation)
+	{
+		result = this->handle_automation_event(event);
+	}
+
+	if (result)
+		return result;
 
 
 	return c_screen_widget::handle_event(event);
@@ -362,12 +368,12 @@ bool __cdecl user_interface_mainmenu_sign_out_controller_callback(e_controller_i
 	return true;
 
 }
-bool __cdecl user_inteface_sign_out_controller_default_callback(e_controller_index controller_index)
+bool __cdecl user_interface_sign_out_controller_default_callback(e_controller_index controller_index)
 {
 	user_interface_controller_sign_out(controller_index);
 	return true;
 }
-bool __cdecl user_inteface_decline_invite_callback(e_controller_index controller_index)
+bool __cdecl user_interface_decline_invite_callback(e_controller_index controller_index)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
@@ -376,15 +382,15 @@ bool __cdecl user_inteface_decline_invite_callback(e_controller_index controller
 	params.user_flags = FLAG(controller_index);
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_press_start_introduction_load;
 
 	params.m_load_function(&params);
 	return true;
 }
 
-bool c_screen_4way_signin::handle_main_events(s_event_record* event)
+bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record* event)
 {
 	char sucess = true;
 	if (event->component == _user_interface_controller_component_button_a ||
@@ -397,8 +403,8 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 		params.user_flags = FLAG(event->controller);
 		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.field_4 = 0xFFFFFFFF;
-		params.m_screen_state.field_8 = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 		params.m_load_function = nullptr;
 
 		switch (this->m_call_context)
@@ -474,7 +480,7 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 						_user_interface_channel_type_dialog,
 						_window_4,
 						FLAG(event->controller),
-						user_inteface_sign_out_controller_default_callback,
+						user_interface_sign_out_controller_default_callback,
 						_ui_error_confirm_controller_sign_out);
 				}
 			}
@@ -495,7 +501,7 @@ bool c_screen_4way_signin::handle_main_events(s_event_record* event)
 	return sucess;
 }
 
-bool c_screen_4way_signin::handle_default_events(s_event_record* event)
+bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event)
 {
 	if (event->component == _user_interface_controller_component_button_a
 		|| event->component == _user_interface_controller_component_button_start)
@@ -515,13 +521,59 @@ bool c_screen_4way_signin::handle_default_events(s_event_record* event)
 			_user_interface_channel_type_dialog,
 			_window_4,
 			FLAG(event->controller),
-			user_inteface_decline_invite_callback,
+			user_interface_decline_invite_callback,
 			_ui_confirm_decline_crossgame_invite);
 	}
 	return true;
 }
 
-void* c_screen_4way_signin::load(s_screen_parameters* parameters)
+bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
+{
+	bool result= false;
+	int16 automation_mode = (int16)event->value;
+
+	if (!IN_RANGE_INCLUSIVE(automation_mode, 2, 11))
+	{
+		error(0, "unhandled automation type %s ", automation_mode);
+	}
+	else
+	{
+		s_event_record new_event;
+		new_event.component = event->component;
+		new_event.value = event->value;
+		new_event.controller = event->controller;
+
+		new_event.type = _user_interface_event_type_gamepad_button_pressed;
+		result = this->handle_event(&new_event);
+	}
+	return result;
+}
+
+bool c_screen_4way_signin::handle_split_input_event(s_event_record* event)
+{
+	if (event->component == _user_interface_controller_component_button_x
+		&& !input_windows_processing_device_change())
+	{
+		input_windows_notify_change_device_mapping();
+		g_show_split_inputs_option = false;
+		return true;
+	}
+	return false;
+}
+
+void c_screen_4way_signin::update_button_key_texts()
+{
+	//initialize default button key text from tag
+	this->initialize_button_keys_text(false);
+
+	if (g_show_split_inputs_option)
+	{
+		add_button_key_split_input(this->get_screen_button_key_text());
+	}
+	this->post_initialize_button_keys();
+}
+
+void* c_screen_4way_signin::load(s_screen_parameters * parameters)
 {
 	c_screen_4way_signin* screen;
 
@@ -716,6 +768,128 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 		base_hud_block->shader.index = shader_datum_index;
 	}
 
+	edit_profile_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
+}
+
+void initialize_elements(s_screen_4way_items& elements, e_controller_index controller)
+{
+	switch (controller)
+	{
+	case _controller_index_0:
+
+		elements.text_profile_name = _4way_signin_main_pane_0_text_player0_profile_name;
+		elements.text_press_a_to_join = _4way_signin_main_pane_0_text_player0_press_a_to_join;
+		elements.text_insert_controller = _4way_signin_main_pane_0_text_player0_insert_controller;
+		elements.text_profile_name_heading = _4way_signin_main_pane_0_text_player0_profile_name_heading;
+		elements.text_gamertag_heading = _4way_signin_main_pane_0_text_player0_gamertag_heading;
+		elements.text_gamertag_text = _4way_signin_main_pane_0_text_player0_gamertag;
+		elements.model_ui_player_a = _4way_signin_main_pane_0_model_ui_player1;
+		elements.model_ui_player_b = _4way_signin_main_pane_0_model_ui_player1b;
+		elements.bitmap_unknown = _4way_signin_main_pane_0_bitmap_3;
+		elements.bitmap_controller_signin = _4way_signin_main_pane_0_bitmap_player_0_controller_signin;
+
+		break;
+
+	case _controller_index_1:
+
+		elements.text_profile_name = _4way_signin_main_pane_0_text_player1_profile_name;
+		elements.text_press_a_to_join = _4way_signin_main_pane_0_text_player1_press_a_to_join;
+		elements.text_insert_controller = _4way_signin_main_pane_0_text_player1_insert_controller;
+		elements.text_profile_name_heading = _4way_signin_main_pane_0_text_player1_profile_name_heading;
+		elements.text_gamertag_heading = _4way_signin_main_pane_0_text_player1_gamertag_heading;
+		elements.text_gamertag_text = _4way_signin_main_pane_0_text_player1_gamertag;
+		elements.model_ui_player_a = _4way_signin_main_pane_0_model_ui_player2;
+		elements.model_ui_player_b = _4way_signin_main_pane_0_model_ui_player2b;
+		elements.bitmap_unknown = _4way_signin_main_pane_0_bitmap_4;
+		elements.bitmap_controller_signin = _4way_signin_main_pane_0_bitmap_player_1_controller_signin;
+
+		break;
+
+	case _controller_index_2:
+
+		elements.text_profile_name = _4way_signin_main_pane_0_text_player2_profile_name;
+		elements.text_press_a_to_join = _4way_signin_main_pane_0_text_player2_press_a_to_join;
+		elements.text_insert_controller = _4way_signin_main_pane_0_text_player2_insert_controller;
+		elements.text_profile_name_heading = _4way_signin_main_pane_0_text_player2_profile_name_heading;
+		elements.text_gamertag_heading = _4way_signin_main_pane_0_text_player2_gamertag_heading;
+		elements.text_gamertag_text = _4way_signin_main_pane_0_text_player2_gamertag;
+		elements.model_ui_player_a = _4way_signin_main_pane_0_model_ui_player3;
+		elements.model_ui_player_b = _4way_signin_main_pane_0_model_ui_player3b;
+		elements.bitmap_unknown = _4way_signin_main_pane_0_bitmap_5;
+		elements.bitmap_controller_signin = _4way_signin_main_pane_0_bitmap_player_2_controller_signin;
+
+		break;
+
+	case _controller_index_3:
+
+		elements.text_profile_name = _4way_signin_main_pane_0_text_player3_profile_name;
+		elements.text_press_a_to_join = _4way_signin_main_pane_0_text_player3_press_a_to_join;
+		elements.text_insert_controller = _4way_signin_main_pane_0_text_player3_insert_controller;
+		elements.text_profile_name_heading = _4way_signin_main_pane_0_text_player3_profile_name_heading;
+		elements.text_gamertag_heading = _4way_signin_main_pane_0_text_player3_gamertag_heading;
+		elements.text_gamertag_text = _4way_signin_main_pane_0_text_player3_gamertag;
+		elements.model_ui_player_a = _4way_signin_main_pane_0_model_ui_player4;
+		elements.model_ui_player_b = _4way_signin_main_pane_0_model_ui_player4b;
+		elements.bitmap_unknown = _4way_signin_main_pane_0_bitmap_6;
+		elements.bitmap_controller_signin = _4way_signin_main_pane_0_bitmap_player_3_controller_signin;
+
+		break;
+	}
+}
+
+void add_button_key_split_input(c_text_widget* button_key_text)
+{
+	ASSERT(button_key_text);
+
+	c_static_wchar_string<512> temp, old;
+	old.set(button_key_text->get_interface()->get_raw_string());
+	if(!input_windows_has_split_device_active())
+	{
+		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c ADD SPLIT ", _private_use_character_x_button);
+	}
+	else
+	{
+		usnzprintf(temp.get_buffer(), temp.max_length(), L"%c REMOVE SPLIT ", _private_use_character_x_button);
+	}
+	button_key_text->set_text(temp.get_string());
+	button_key_text->append_text(old.get_string());
+}
+
+void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_widget* join_text)
+{
+	ASSERT(signin_bitmap);
+	ASSERT(join_text);
+
+	if (input_windows_has_split_device_active())
+	{
+		if (edit_profile_bitmap_datum != NONE)
+		{
+			bitmap_data* bitmap_block = bitmap_group_get_bitmap(edit_profile_bitmap_datum, _edit_profile_bitmap_keyboard);
+			signin_bitmap->assign_new_bitmap_block(bitmap_block);
+
+			const real_vector2d new_scale = { 0.6796875f,0.5546875f }; //downscaled to match target , then upscaled to 2
+			signin_bitmap->set_render_scale(&new_scale);
+
+			rectangle2d bounds;
+			signin_bitmap->get_bounds(&bounds);
+
+			//shifting left to make it more centered
+			bounds.left -= 80;
+			bounds.right -= 80;
+			signin_bitmap->set_bounds(&bounds);
+
+			join_text->set_text_from_string_id(_string_id_press_a_to_join);
+		}
+	}
+	else
+	{
+		const real_vector2d default_scale = { 1.0f,1.0f };
+		signin_bitmap->set_render_scale(&default_scale);
+
+		// if we unasign current bitmap data and call get_current_bitmap_data() , it will return tag data
+		signin_bitmap->assign_new_bitmap_block(nullptr);
+		signin_bitmap->assign_new_bitmap_block(signin_bitmap->get_current_bitmap_data());
+	}
 }
 
 void user_interface_recover_4way_screen(e_session_protocol protocol)
@@ -727,8 +901,8 @@ void user_interface_recover_4way_screen(e_session_protocol protocol)
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
 
 	if (session_protocol_has_coop(protocol))
@@ -811,8 +985,8 @@ void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
 	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.field_4 = 0xFFFFFFFF;
-	params.m_screen_state.field_8 = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
 	params.m_load_function(&params);
