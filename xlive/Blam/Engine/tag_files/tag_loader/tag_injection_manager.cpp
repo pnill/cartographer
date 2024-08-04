@@ -5,6 +5,7 @@
 #include "cache/pc_geometry_cache.h"
 #include "cache/pc_texture_cache.h"
 #include "creatures/creature_definitions.h"
+#include "filesys/pc_file_system.h"
 #include "geometry/geometry_block.h"
 #include "models/render_model_definitions.h"
 #include "physics/physics_model_definitions.h"
@@ -12,12 +13,6 @@
 #include "units/biped_definitions.h"
 #include "units/vehicle_definitions.h"
 #include "Util/filesys.h"
-
-#define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
-	{ \
-		fseek(FILE, OFFSET, SEEK_SET);\
-		fread(OUT, SIZE, COUNT, FILE); \
-	}
 
 /* constants */
 
@@ -133,16 +128,17 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	_wfopen_s(&this->m_active_map_file_handle, this->m_active_map.get_string(), L"rb");
 
 	// Read cache header from map file
-	lazy_fread(this->m_active_map_file_handle, 0, &this->m_active_map_cache_header, sizeof(s_cache_header), 1);
+	file_seek_and_read(this->m_active_map_file_handle, 0, sizeof(s_cache_header), 1, &this->m_active_map_cache_header);
 
 	// Read tags header from map file
-	lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, &this->m_active_map_tags_header, sizeof(cache_file_tags_header), 1);
+	file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_offset, sizeof(cache_file_tags_header), 1, &this->m_active_map_tags_header);
+
 
 	this->m_active_map_instance_table_offset = this->m_active_map_cache_header.tag_offset + sizeof(s_tag_group_link) * this->m_active_map_tags_header.tag_group_link_set_count + 0x20;
 
 	// Read the scenario instance from map file
 	cache_file_tag_instance temp_instance;
-	lazy_fread(this->m_active_map_file_handle, m_active_map_instance_table_offset, &temp_instance, sizeof(cache_file_tag_instance), 1);
+	file_seek_and_read(this->m_active_map_file_handle, m_active_map_instance_table_offset, sizeof(cache_file_tag_instance), 1, &temp_instance);
 
 	this->m_active_map_scenario_instance_offset = temp_instance.data_offset;
 
@@ -179,7 +175,7 @@ cache_file_tag_instance c_tag_injecting_manager::get_tag_instance_from_cache(dat
 {
 	cache_file_tag_instance temp_instance;
 	uint32 instance_offset = this->m_active_map_instance_table_offset + sizeof(cache_file_tag_instance) * DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
-	lazy_fread(this->m_active_map_file_handle, instance_offset, &temp_instance, sizeof(cache_file_tag_instance), 1);
+	file_seek_and_read(this->m_active_map_file_handle, instance_offset, sizeof(cache_file_tag_instance), 1, &temp_instance);
 	return temp_instance;
 }
 
@@ -344,35 +340,38 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	
 	cache_file_tag_instance temp_instance;
 
-	int32 current_index = 0;
 	int32 current_offset = 0;
 	uint32 next_offset = 0;
 	uint32 current_size = 0;
 	char name_buffer[MAX_PATH] = {};
 
-	while (true)
+	for(uint32 current_index = 0; current_index < this->m_active_map_cache_header.debug_tag_name_count; current_index++)
 	{
 		if (current_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 		{
 			// Get the offset of the current index
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, &current_offset, sizeof(uint32), 1);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
 
 			// If the current offset is -1 it means we have reached the end of the index table
 			if (current_offset == NONE)
 				break;
 
 			// Get the offset of the next index
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (current_index + 1), &next_offset, sizeof(uint32), 1);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (current_index + 1), sizeof(uint32), 1, &next_offset);
 
 			// Current size is calculated using the offsets of the two indexes
-			current_size = next_offset - current_offset;
+			// if next offset is none, the current offset is the end of the table and just read max path
+			if (next_offset == NONE)
+				current_size = MAX_PATH;
+			else
+				current_size = next_offset - current_offset;
 
 			// Read the current debug name
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
 
 			if(csstricmp(tag_name, name_buffer) == 0)
 			{
-				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
+				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), sizeof(tags::tag_instance), 1, &temp_instance);
 				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
 			}
@@ -380,25 +379,21 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 		else
 		{
 			// Get the offset of the current index
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, &current_offset, sizeof(uint32), 1);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * current_index, sizeof(uint32), 1, &current_offset);
 
 			// Current size is calculated using the total size of the buffer and the current offset;
 			current_size = (this->m_active_map_cache_header.tag_name_offsets_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
 
 			// Read the current debug name
-			lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, &name_buffer, current_size, 1);
+			file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, &name_buffer);
 
 			if (csstricmp(tag_name, name_buffer) == 0)
 			{
-				lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), &temp_instance, sizeof(tags::tag_instance), 1);
+				file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (current_index * sizeof(tags::tag_instance)), sizeof(tags::tag_instance), 1, &temp_instance);
 				if (temp_instance.group_tag.group == group)
 					return temp_instance.tag_index;
 			}
 		}
-
-
-		if (++current_index >= this->m_active_map_cache_header.debug_tag_name_count)
-			break;
 	}
 	return NONE;
 }
@@ -408,12 +403,14 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	if (!this->m_active_map_verified)
 	{
 		LOG_ERROR_GAME("[c_tag_injecting_mananger::get_name_by_tag_datum] active map has not be set for tag: {:x}", cache_datum);
+		out_name[0] = '\0';
+		return;
 	}
 
 	uint16 absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(cache_datum);
 
 	cache_file_tag_instance temp_instance;
-	lazy_fread(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (absolute_index * sizeof(cache_file_tag_instance)), &temp_instance, sizeof(cache_file_tag_instance), 1);
+	file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_instance_table_offset + (absolute_index * sizeof(cache_file_tag_instance)), sizeof(cache_file_tag_instance), 1, &temp_instance);
 
 	if(temp_instance.tag_index != cache_datum || temp_instance.group_tag.group != group)
 	{
@@ -428,7 +425,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 	if (absolute_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 	{
 		// Get the offset of the cache index
-		lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, &current_offset, sizeof(uint32), 1);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
 
 		// If the current offset is -1 it means we have reached the end of the index table
 		if (current_offset == NONE)
@@ -438,19 +435,23 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		}
 
 		// Get the offset of the next index
-		lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (absolute_index + 1), &next_offset, sizeof(uint32), 1);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * (absolute_index + 1), sizeof(uint32), 1, &next_offset);
 
 		// Current size is calculated using the offsets of the two indexes
-		current_size = next_offset - current_offset;
+		// if next offset is none, the current offset is the end of the table and just read max path
+		if (next_offset == NONE)
+			current_size = MAX_PATH;
+		else
+			current_size = next_offset - current_offset;
 
 		// Read the current debug name
-		lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, out_name, current_size, 1);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
 		return;
 	}
 	else
 	{
 		// Get the offset of the cache index
-		lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, &current_offset, sizeof(uint32), 1);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_offsets_offset + sizeof(uint32) * absolute_index, sizeof(uint32), 1, &current_offset);
 
 		// If the current offset is -1 it means we have reached the end of the index table
 		if (current_offset == NONE)
@@ -463,7 +464,7 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 		current_size = (this->m_active_map_cache_header.tag_name_offsets_offset + (this->m_active_map_cache_header.debug_tag_name_count * sizeof(uint32))) - current_offset;
 
 		// Read the current debug name
-		lazy_fread(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, out_name, current_size, 1);
+		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
 		return;
 	}
 
@@ -654,12 +655,6 @@ void c_tag_injecting_manager::inject_tags()
 
 		entry->is_injected = true;
 
-		if(entry->type.group == _tag_group_bitmap)
-		{
-			bitmap_group* test = (bitmap_group*)entry->loaded_data->get_data();
-			auto sdfsd = 213123;
-		}
-
 		uint32 injection_offset = this->m_base_tag_data_size + this->m_injectable_used_size;
 
 #if TAG_INJECTION_DEBUG
@@ -709,5 +704,3 @@ void c_tag_injecting_manager::inject_tags()
 	LOG_DEBUG_GAME("[c_tag_injecting_manager::inject_tags] Injection Complete");
 #endif
 }
-
-#undef lazy_fread

@@ -5,17 +5,12 @@
 
 #include "bitmaps/bitmap_group.h"
 #include "cache/cache_files.h"
+#include "filesys/pc_file_system.h"
 #include "tag_files/data_reference.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 #include "tag_files/tag_loader/tag_injection.h"
-
-#define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
-	{ \
-		fseek(FILE, OFFSET, SEEK_SET);\
-		fread(OUT, SIZE, COUNT, FILE); \
-	}
 
 #define lazy_malloc_buffer(TYPE, COUNT)\
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
@@ -135,37 +130,38 @@ void c_xml_definition_loader::initialize_arrays_internal(c_xml_definition_loader
 {
 	for (uint32 block_index = 0; block_index < block_count; block_index++)
 	{
+		uint32 base_offset = file_offset + definition->get_size() * block_index;
 		for (uint32 i = 0; i < definition->get_tag_references_count(); i++)
 		{
-			lazy_fread(loader->m_file_handle, file_offset + definition->get_tag_reference_offset(i) + definition->get_size() * block_index, &t_tag_reference, sizeof(tag_reference), 1);
+			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_tag_reference_offset(i), sizeof(tag_reference), 1, &t_tag_reference);
 			if (t_tag_reference.group.group != _tag_group_none && t_tag_reference.index != NONE)
 				loader->m_tag_reference_offset_count++;
 		}
 
 		for (uint32 i = 0; i < definition->get_classless_tag_references_count(); i++)
 		{
-			lazy_fread(loader->m_file_handle, file_offset + definition->get_classless_tag_reference_offset(i) + definition->get_size() * block_index, &t_classless_tag_reference, sizeof(datum), 1);
+			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_classless_tag_reference_offset(i), sizeof(datum), 1, &t_classless_tag_reference);
 			if (t_classless_tag_reference != NONE)
 				loader->m_classless_tag_reference_offset_count++;
 		}
 
 		for (uint32 i = 0; i < definition->get_data_references_count(); i++)
 		{
-			lazy_fread(loader->m_file_handle, file_offset + definition->get_data_reference_offset(i) + definition->get_size() * block_index, &t_data_reference, sizeof(data_reference), 1);
+			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_data_reference_offset(i), sizeof(data_reference), 1, &t_data_reference);
 			if (t_data_reference.size != 0)
 				loader->m_data_reference_offset_count++;
 		}
 
 		for (uint32 i = 0; i < definition->get_string_id_count(); i++)
 		{
-			lazy_fread(loader->m_file_handle, file_offset + definition->get_string_id_offset(i) + definition->get_size() * block_index, &t_string_id, sizeof(string_id), 1);
+			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_string_id_offset(i), sizeof(string_id), 1, &t_string_id);
 			if (t_string_id.is_valid())
 				loader->m_string_id_offset_count++;
 		}
 
 		for (uint32 i = 0; i < definition->get_tag_block_count(); i++)
 		{
-			lazy_fread(loader->m_file_handle, file_offset + definition->get_tag_block(i)->get_offset() + definition->get_size() * block_index, &t_tag_block, sizeof(tag_block<>), 1);
+			file_seek_and_read(loader->m_file_handle, base_offset + definition->get_tag_block(i)->get_offset(), sizeof(tag_block<>), 1, &t_tag_block);
 			if (t_tag_block.count > 0)
 			{
 				loader->m_tag_block_offset_count++;
@@ -238,7 +234,8 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 		for (uint32 i = 0; i < definition->get_tag_references_count(); i++)
 		{
 			uint32 calc_offset = definition->get_tag_reference_offset(i) + definition->get_size() * block_index;
-			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_tag_reference, sizeof(tag_reference), 1);
+
+			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(tag_reference), 1, &t_tag_reference);
 			if (t_tag_reference.group.group != _tag_group_none && t_tag_reference.index != NONE)
 			{
 				s_offset_link* link = &loader->m_tag_reference_offsets[loader->m_tag_reference_offset_count];
@@ -258,7 +255,8 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 		for (uint32 i = 0; i < definition->get_classless_tag_references_count(); i++)
 		{
 			uint32 calc_offset = definition->get_classless_tag_reference_offset(i) + definition->get_size() * block_index;
-			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_classless_tag_reference, sizeof(datum), 1);
+			
+			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(datum), 1, &t_classless_tag_reference);
 			if (t_classless_tag_reference != NONE)
 			{
 				s_offset_link* link = &loader->m_classless_tag_reference_offsets[loader->m_classless_tag_reference_offset_count];
@@ -279,7 +277,8 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 		for (uint32 i = 0; i < definition->get_data_references_count(); i++)
 		{
 			uint32 calc_offset = definition->get_data_reference_offset(i) + definition->get_size() * block_index;
-			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_data_reference, sizeof(data_reference), 1);
+
+			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(data_reference), 1, &t_data_reference);
 			if (t_data_reference.size != 0)
 			{
 				int8* data_cache = (int8*)malloc(t_data_reference.size);
@@ -311,7 +310,8 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 		for (uint32 i = 0; i < definition->get_string_id_count(); i++)
 		{
 			uint32 calc_offset = definition->get_string_id_offset(i) + definition->get_size() * block_index;
-			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_string_id, sizeof(string_id), 1);
+
+			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(string_id), 1, &t_string_id);
 			if (t_string_id.is_valid())
 			{
 				loader->m_string_id_offsets[loader->m_string_id_offset_count].cache_offset = file_offset + calc_offset;
@@ -324,7 +324,8 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 		{
 			const c_xml_definition_block* definition_block = definition->get_tag_block(i);
 			uint32 calc_offset = definition_block->get_offset() + definition->get_size() * block_index;
-			lazy_fread(loader->m_file_handle, file_offset + calc_offset, &t_tag_block, sizeof(tag_block<>), 1);
+
+			file_seek_and_read(loader->m_file_handle, file_offset + calc_offset, sizeof(tag_block<>), 1, &t_tag_block);
 			if (t_tag_block.count > 0)
 			{
 				int8* block_buffer = loader->reserve_data(definition_block->get_size() * t_tag_block.count);
@@ -367,10 +368,12 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 
 	for (uint32 block_index = 0; block_index < block_count; block_index++)
 	{
+		uint32 calc_offset = base_offset + block_index * definition->get_size();
 		for (uint32 i = 0; i < definition->get_data_references_count(); i++)
 		{
 			data_reference reference;
-			lazy_fread(this->m_file_handle, base_offset + definition->get_data_reference_offset(i) + block_index * definition->get_size(), &reference, sizeof(data_reference), 1);
+
+			file_seek_and_read(this->m_file_handle, calc_offset + definition->get_data_reference_offset(i), sizeof(data_reference), 1, &reference);
 			if (reference.size != 0)
 			{
 				this->m_total_data_size += reference.size;
@@ -387,7 +390,8 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 			tag_block<> block;
 
 			const c_xml_definition_block* definition_block = definition->get_tag_block(i);
-			lazy_fread(this->m_file_handle, base_offset + definition_block->get_offset() + block_index * definition->get_size(), &block, sizeof(tag_block<>), 1);
+
+			file_seek_and_read(this->m_file_handle, calc_offset + definition_block->get_offset(), sizeof(tag_block<>), 1, &block);
 			if (block.count != 0 && block.data != 0 && block.count != -1 && block.data != -1)
 			{
 				this->m_total_data_size += definition_block->get_size() * block.count;
@@ -513,7 +517,8 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 void c_xml_definition_loader::validate_data() const
 {
 	int8* cache_data = (int8*)malloc(this->m_definition->get_size());
-	lazy_fread(this->m_file_handle, this->m_file_offset, cache_data, this->m_definition->get_size(), 1);
+
+	file_seek_and_read(this->m_file_handle, this->m_file_offset, this->m_definition->get_size(), 1, cache_data);
 
 	int res = memcmp(cache_data, this->m_data, this->m_definition->get_size());
 
@@ -524,7 +529,8 @@ void c_xml_definition_loader::validate_data() const
 	for (uint32 i = 0; i < this->m_data_reference_offset_count; i++)
 	{
 		int8* data_data = (int8*)malloc(this->m_data_reference_offsets[i].size);
-		lazy_fread(this->m_file_handle, this->m_data_reference_offsets[i].cache_offset, data_data, this->m_data_reference_offsets[i].size, 1);
+
+		file_seek_and_read(this->m_file_handle, this->m_data_reference_offsets[i].cache_offset, this->m_data_reference_offsets[i].size, 1, data_data);
 		int res = memcmp(data_data, (uint8*)this->m_data_reference_offsets[i].memory_offset, 1);
 		if (res != 0)
 		{
@@ -535,7 +541,8 @@ void c_xml_definition_loader::validate_data() const
 	for (uint32 i = 0; i < this->m_tag_block_offset_count; i++)
 	{
 		int8* block_data = (int8*)malloc(this->m_tag_block_offsets[i].size);
-		lazy_fread(this->m_file_handle, this->m_tag_block_offsets[i].cache_offset, block_data, this->m_tag_block_offsets[i].size, 1);
+
+		file_seek_and_read(this->m_file_handle, this->m_tag_block_offsets[i].cache_offset, this->m_tag_block_offsets[i].size, 1, block_data);
 		int res = memcmp(block_data, (uint8*)this->m_tag_block_offsets[i].memory_offset, 1);
 		if (res != 0)
 		{
@@ -547,6 +554,4 @@ void c_xml_definition_loader::validate_data() const
 }
 #endif
 
-
-#undef lazy_fread
 #undef lazy_malloc_buffer
