@@ -58,7 +58,7 @@ s_tag_injecting_table_entry* c_tag_injection_table::init_entry(datum cache_index
 	//tag_group temp;
 	//temp.group = type;
 
-	if (this->m_entry_count + 1 == this->m_table_size)
+	if (this->m_entry_count >= this->m_table_size)
 	{
 		this->resize_table();
 	}
