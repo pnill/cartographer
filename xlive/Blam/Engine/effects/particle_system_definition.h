@@ -93,7 +93,7 @@ public:
     // Explaination("emission angle(degrees)", "")
     c_particle_property emission_angle;
 
-    real_point3d translational_offset;
+    real_vector3d translational_offset;
     // particle initial velocity direction relative to the location's forward
     real_euler_angles2d relative_direction;
 

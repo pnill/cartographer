@@ -69,7 +69,7 @@ private:
 };
 
 typedef c_static_string<32>  static_string32;
-typedef c_static_string<64>  static_string64;
+typedef c_static_string<64>  c_static_string64;
 typedef c_static_string<128> static_string128;
 typedef c_static_string<256> static_string256;
 typedef c_static_string<260> c_static_string260;
@@ -283,7 +283,6 @@ errno_t c_static_wchar_string<T>::to_lower(void)
 {
 	return _wcslwr_s(text, T);
 }
-
 
 size_t csstrnlen(const char* s, size_t size);
 

@@ -41,6 +41,10 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
     biped_datum* biped = (biped_datum*)object_get_fast_unsafe(object_index);
     _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
+    ASSERT(camera_position);
+    ASSERT(camera_forward);
+    ASSERT(camera_up);
+
     if (biped_def->camera_interpolation_end > biped_def->camera_interpolation_start)
     {
         real32 v1;
@@ -60,6 +64,8 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
         {
             v1 = M_PI_2;
         }
+
+        ASSERT(angle_range > 0.f);
 
         real32 function_value = (v1 - biped_def->camera_interpolation_start) / angle_range;
         real32 function_result;
@@ -96,11 +102,10 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
             }
 
             real_vector3d camera_diff;
-            vector_from_points3d(camera_position, &node_matrix->position, &camera_diff);
+            vector_from_points3d(&node_matrix->position, camera_position, &camera_diff);
 
-
-            real32 forward_product = dot_product2d(&forward_out, &camera_diff.vector2d);
-            real32 up_product = dot_product2d(&up_out, &camera_diff.vector2d);
+            real32 forward_product = dot_product2d((real_vector2d*)&camera_diff, &forward_out);
+            real32 up_product = dot_product2d((real_vector2d*)&camera_diff, &up_out);
 
             real_vector3d biped_vector = biped->vector_3E4;
 
@@ -126,93 +131,35 @@ void __cdecl biped_offset_first_person_camera(const real_vector3d* camera_forwar
     return;
 }
 
-real32 local_user_crouch_delta_accum[4]{ 0.f, 0.f, 0.f, 0.f };
-real32 local_user_crouch_last_frame_time[4]{ 0.f, 0.f, 0.f, 0.f };
-
 void __cdecl biped_get_sight_position(
     datum biped_index,
     e_unit_estimate_mode estimate_mode,
     real_point3d* estimated_body_position,
     real_vector3d* desired_facing_vector,
     real_vector3d* desired_gun_offset,
-    real_point3d* object_origin)
+    real_point3d* sight_position)
 {
     if (estimate_mode)
     {
-        *object_origin = *estimated_body_position;
+        *sight_position = *estimated_body_position;
         if (estimate_mode == _unit_estimate_gun_position)
         {
             const real_vector3d direction = { -desired_facing_vector->j, desired_facing_vector->i, 0.0f };
-            point_from_line3d(object_origin, desired_facing_vector, desired_gun_offset->i, object_origin);
-            point_from_line3d(object_origin, &direction, desired_gun_offset->j, object_origin);
-            object_origin->z += desired_gun_offset->k;
+            point_from_line3d(sight_position, desired_facing_vector, desired_gun_offset->i, sight_position);
+            point_from_line3d(sight_position, &direction, desired_gun_offset->j, sight_position);
+            sight_position->z += desired_gun_offset->k;
             return;
         }
     }
     else
     {
-        object_get_origin_interpolated(biped_index, object_origin);
+        object_get_origin_interpolated(biped_index, sight_position);
     }
 
     biped_datum* biped = (biped_datum*)object_get_fast_unsafe(biped_index);
     _biped_definition* biped_def = (_biped_definition*)tag_get_fast(biped->unit.object.tag_definition_index);
 
     real32 crouching = 0.0f;
-
-    //real32 crouch_time = biped_def->crouch_transition_time_seconds;
-
-    //if (estimate_mode != _unit_estimate_1)
-    //{
-    //    // New crouching implementation for interpolation
-    //    // Original functionality would take the biped_datum->crouching_progress float and use it to calculate the camera position->z
-    //    // Re-implemented to update on game frame if the unit is in a crouch position
-    //    // This is achieved by taking the current frame delta and accumulating it for each player and then dividing it by the biped definitions
-    //    // crouch_transition_time_in_seconds to get a progress result between 0 and 1
-
-    //	s_player* player = s_player::get_from_unit_index(biped_index);
-
-    //    // If the current biped_datum is linked to a player run the new crouching interpolation
-    //    if (player)
-    //    {
-    //        // Check if the crouching delta accumulator has already been updated in this current frame by comparing it to c_render::render_time
-    //        if (local_user_crouch_last_frame_time[player->user_index] != get_current_render_time())
-    //        {
-    //            // If the bit flag for crouching is set on the unit_datum add to the accumulator for the local_user else subtract from it
-    //            if (TEST_BIT(biped->unit.unit_flags, 23))
-    //            {
-    //                local_user_crouch_delta_accum[player->user_index] += g_current_game_frame_delta;
-    //                if (local_user_crouch_delta_accum[player->user_index] >= crouch_time)
-    //                    local_user_crouch_delta_accum[player->user_index] = crouch_time;
-    //            }
-    //            else
-    //            {
-    //                local_user_crouch_delta_accum[player->user_index] -= g_current_game_frame_delta;
-    //                if (local_user_crouch_delta_accum[player->user_index] <= 0)
-    //                    local_user_crouch_delta_accum[player->user_index] = 0;
-    //            }
-    //            // Update the last frame time for the local_user_index to prevent applying the delta more than once per frame
-    //            local_user_crouch_last_frame_time[player->user_index] = get_current_render_time();
-    //        }
-    //        // Check that the local_user_index accumulator is not greater than crouch time
-    //        real32 t_crouch = local_user_crouch_delta_accum[player->user_index] > crouch_time ? crouch_time : local_user_crouch_delta_accum[player->user_index];
-
-    //    	// calculate the final crouching progress
-    //        crouching = t_crouch / crouch_time;
-    //    }
-
-    //    // If the current biped_datum is not a player run the original crouching behavior
-    //    else
-    //    {
-    //        if (estimate_mode == _unit_estimate_2)
-    //        {
-    //            crouching = 1.0f;
-    //        }
-    //        if (!biped_is_running_invisible_crouched_uber_melee(biped_index))
-    //        {
-    //            crouching = biped->unit.crouching;
-    //        }
-    //    }
-    //}
 
     if (estimate_mode != _unit_estimate_1)
     {
@@ -230,15 +177,15 @@ void __cdecl biped_get_sight_position(
     // Camera height calculations
     real32 standing_camera_height = (1.0f - crouching) * biped_def->standing_camera_height;
     real32 crouching_camera_height = biped_def->crouching_camera_height * crouching;
-    object_origin->z += (standing_camera_height + crouching_camera_height) * biped->unit.object.scale;
+    sight_position->z += (standing_camera_height + crouching_camera_height) * biped->unit.object.scale;
 
-    real_point3d origin_copy = *object_origin;
+    real_point3d origin_copy = *sight_position;
     real_vector3d forward = biped->unit.aiming_vector;
     real_vector3d up;
     generate_up_vector3d(&forward, &up);
     biped_offset_first_person_camera(&forward, biped_index, &origin_copy, &up);
     real_vector3d origin_vector;
-    vector_from_points3d(&origin_copy, object_origin, &origin_vector);
+    vector_from_points3d(sight_position, &origin_copy, &origin_vector);
     if (normalize3d(&origin_vector) > 0.0f)
     {
         collision_result collision;
@@ -259,10 +206,10 @@ void __cdecl biped_get_sight_position(
             FLAG(_collision_test_instanced_geometry_bit) |
             FLAG(_collision_test_structure_bit));
 
-        if (collision_test_vector(flags, object_origin, &direction, NONE, NONE, &collision))
+        if (collision_test_vector(flags, sight_position, &direction, NONE, NONE, &collision))
         {
             real32 length = collision.t * 0.9f;
-            point_from_line3d(object_origin, &direction, length, &placement);
+            point_from_line3d(sight_position, &direction, length, &placement);
         }
         else
         {
@@ -277,18 +224,18 @@ void __cdecl biped_get_sight_position(
             // Secondary check that we only run if the collision_test_vector returns true
             (
                 // Populate values
-                vector_from_points3d(&collision.point, &placement, &collision_vector),
-                vector_from_points3d(&origin_copy, &placement, &position_vector),
+                vector_from_points3d(&placement, &collision.point, &collision_vector),
+                vector_from_points3d(&placement, &origin_copy, &position_vector),
 
                 // Actual check here
                 dot_product3d(&origin_vector, &position_vector) + 0.05f > dot_product3d(&collision_vector, &origin_vector)
             ))
         {
-            point_from_line3d(&collision.point, &origin_vector, -0.05f, object_origin);
+            point_from_line3d(&collision.point, &origin_vector, -0.05f, sight_position);
         }
         else
         {
-            *object_origin = origin_copy;
+            *sight_position = origin_copy;
         }
 
         datum player_index = player_index_from_unit_index(biped_index);
@@ -300,7 +247,7 @@ void __cdecl biped_get_sight_position(
                 real_point3d point;
                 if (halo_interpolator_interpolate_position_backwards(player->user_index, 0, &point))
                 {
-                    *object_origin = point;
+                    *sight_position = point;
                 }
             }
         }

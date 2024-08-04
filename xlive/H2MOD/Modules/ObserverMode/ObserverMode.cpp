@@ -146,7 +146,7 @@ namespace ObserverMode
 			currentPlayerIndex++;
 
 		datum newIndex = ((datum)pArray->data[0x204 * currentPlayerIndex + 0x28]);
-		if (DATUM_IS_NONE(newIndex))
+		if (newIndex == NONE)
 			NextPlayer();
 		else
 			observer_current_index = newIndex;

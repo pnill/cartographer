@@ -3,13 +3,8 @@
 void InitCustomMenu();
 void DeinitCustomMenu();
 
-void GSCustomMenuCall_Language();
-void GSCustomMenuCall_Update_Note();
-void GSCustomMenuCall_Guide();
-void GSCustomMenuCall_Esc();
-void GSCustomMenuCall_Invalid_Login_Token();
+void* ui_load_cartographer_invalid_login_token();
 
-extern bool CMForce_Update;
+extern bool g_force_cartographer_update;
 
-void GSCustomMenuCall_Obscure();
 void XUiShowSignInH2();

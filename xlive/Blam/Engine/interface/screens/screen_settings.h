@@ -20,19 +20,18 @@ class c_settings_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_settings];
-	c_slot2<c_settings_list, s_event_record*, datum> m_slot;
+	c_slot2<c_settings_list, s_event_record**, datum> m_slot;
 	bool field_464; // probably for unlocking "unused" item
-	uint8 gap_465[3];
 
-	bool handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
-	bool handle_item_player_profile(s_event_record** pevent);
-	bool handle_item_variant(s_event_record** pevent);
-	bool handle_item_video(s_event_record** pevent);
-	bool handle_item_audio(s_event_record** pevent);
-	bool handle_item_network(s_event_record** pevent);
-	bool handle_item_about(s_event_record** pevent);
+	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_player_profile(s_event_record** pevent);
+	void handle_item_variant(s_event_record** pevent);
+	void handle_item_video(s_event_record** pevent);
+	void handle_item_audio(s_event_record** pevent);
+	void handle_item_network(s_event_record** pevent);
+	void handle_item_about(s_event_record** pevent);
 	//custom addition
-	bool handle_item_guide(s_event_record** pevent);
+	void handle_item_guide(s_event_record** pevent);
 
 
 public:

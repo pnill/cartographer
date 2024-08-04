@@ -10,7 +10,7 @@ c_text_widget::c_text_widget(int16 user_flags) :
 }
 
 c_text_widget::c_text_widget(datum user_index) :
-	c_user_interface_widget(_widget_type_text, DATUM_IS_NONE(user_index) ? 0 : FLAG(user_index))
+	c_user_interface_widget(_widget_type_text, (user_index == NONE) ? 0 : FLAG(user_index))
 {
 	this->intro_animation_delay_ms = 0;
 	this->field_74 = 0;
@@ -18,7 +18,7 @@ c_text_widget::c_text_widget(datum user_index) :
 
 void c_text_widget::set_text(wchar_t const* text)
 {
-	INVOKE_TYPE(0x21BAA9, 0x0, void(__thiscall*)(c_text_widget*, wchar_t const*), this, text);
+	this->get_interface()->set_text(text);
 }
 
 void c_text_widget::set_text_from_string_id(string_id sid)
@@ -28,7 +28,7 @@ void c_text_widget::set_text_from_string_id(string_id sid)
 
 void c_text_widget::append_text(wchar_t const* text)
 {
-	this->get_interface()->update_raw_string(text);
+	this->get_interface()->append_text(text);
 }
 
 void c_text_widget::append_text_from_string_id(string_id sid)
@@ -46,10 +46,16 @@ void c_text_widget::set_field74()
 	field_74 = true;
 }
 
-c_text_widget::~c_text_widget()
+c_user_interface_widget* c_text_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x21B9E9, 0x0, c_user_interface_widget*(__thiscall*)(c_text_widget*, char), lpMem, a2);
+	this->~c_text_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
+
 void c_text_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x21BD11, 0x0, void(__thiscall*)(c_text_widget*, rectangle2d*), this, viewport_bounds);
@@ -71,11 +77,17 @@ c_small_text_widget::c_small_text_widget(datum user_index):
 	c_text_widget(user_index)
 {
 }
-
-c_small_text_widget::~c_small_text_widget()
+c_user_interface_widget* c_small_text_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x20F63F, 0x0, LPVOID(__thiscall*)(LPVOID, char), lpMem,a2);
+	this->~c_small_text_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
+
+
 c_user_interface_text* c_small_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x20F5E3, 0x0, c_user_interface_text*(__thiscall*)(c_small_text_widget*), this);
@@ -94,10 +106,16 @@ c_normal_text_widget::c_normal_text_widget(datum user_index):
 {
 }
 
-c_normal_text_widget::~c_normal_text_widget()
+c_user_interface_widget* c_normal_text_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x20F6CE, 0x0, c_normal_text_widget*(__thiscall*)(c_normal_text_widget*, char), lpMem,a2);
+	this->~c_normal_text_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
+
 c_user_interface_text* c_normal_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x20F6CA, 0x0, c_user_interface_text*(__thiscall*)(c_normal_text_widget*), this);
@@ -115,9 +133,14 @@ c_long_text_widget::c_long_text_widget(datum user_index):
 {
 }
 
-c_long_text_widget::~c_long_text_widget()
+c_user_interface_widget* c_long_text_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x243EF9, 0x0, LPVOID(__thiscall*)(LPVOID, char), lpMem,a2);
+	this->~c_long_text_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 c_user_interface_text* c_long_text_widget::get_interface()
 {

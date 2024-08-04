@@ -7,11 +7,12 @@
 #include "interface//user_interface_bitmap_block.h"
 #include "interface/user_interface_globals.h"
 #include "interface/user_interface_screen_widget_definition.h"
+#include "interface/screens/screen_cartographer_menus.h"
 #include "networking/panorama/panorama_presence.h"
 #include "tag_files/global_string_ids.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+
+#include "tag_files/tag_loader/tag_injection.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 /* macro defines */
 
@@ -121,7 +122,7 @@ c_settings_list::c_settings_list(int16 user_flags):
 		datum_new(m_list_data);
 	}
 
-	signal2->link_signal_to_slot((_slot*)&signal2, &m_slot);
+	linker_type2.link(&m_slot);
 }
 
 
@@ -176,9 +177,9 @@ void c_settings_list::update_list_items(c_list_item_widget* item, int32 skin_ind
 	}
 }
 
-bool c_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
 {
-	//return INVOKE_TYPE(0x21F70A, 0x0, bool(__thiscall*)(c_settings_list*, s_event_record**, long*), this, pevent, pitem_index);
+	//return INVOKE_TYPE(0x21F70A, 0x0, void(__thiscall*)(c_settings_list*, s_event_record**, long*), this, pevent, pitem_index);
 
 	int16 item_absolute_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(*pitem_index);
 
@@ -205,112 +206,102 @@ bool c_settings_list::handle_item_pressed_event(s_event_record** pevent, datum* 
 	case _item_guide:
 		handle_item_guide(pevent);
 		break;
-	
 	}
-
-	return true;
 }
 
-bool c_settings_list::handle_item_player_profile(s_event_record** pevent)
+void c_settings_list::handle_item_player_profile(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_single_player_profile_select_fancy_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_variant(s_event_record** pevent)
+void c_settings_list::handle_item_variant(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_game_engine_category_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_video(s_event_record** pevent)
+void c_settings_list::handle_item_video(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_video_settings_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_audio(s_event_record** pevent)
+void c_settings_list::handle_item_audio(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_audio_settings_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_network(s_event_record** pevent)
+void c_settings_list::handle_item_network(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_interface;
+	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_network_adapter_menu_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_about(s_event_record** pevent)
+void c_settings_list::handle_item_about(s_event_record** pevent)
 {
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_interface;
+	params.m_channel_type = _user_interface_channel_type_dialog;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = c_screen_about_dialog_menu_load;
 
 	params.m_load_function(&params);
-	return true;
 }
-bool c_settings_list::handle_item_guide(s_event_record** pevent)
+void c_settings_list::handle_item_guide(s_event_record** pevent)
 {
-	GSCustomMenuCall_Guide();
-	return true;
+	ui_load_cartographer_guide_menu();
 }
 
 
@@ -359,7 +350,7 @@ void c_screen_settings::post_initialize_button_keys()
 			flavor_text2->set_text(L"Hop onto ONLINE and be ready to suffer from disappointment");
 		}
 
-		if (!DATUM_IS_NONE(cartographer_bitmap_datum) && main_bitmap)
+		if (cartographer_bitmap_datum != NONE && main_bitmap)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(cartographer_bitmap_datum, _settings_cartographer_bitmap_type_default);
 			main_bitmap->assign_new_bitmap_block(bitmap_block);
@@ -408,17 +399,17 @@ void c_screen_settings::apply_patches_on_map_load()
 {
 	const char* main_widget_tag_path = "ui\\screens\\game_shell\\settings_screen\\settings";
 
-	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index))
+	if (main_widget_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = tags::get_tag_fast<s_user_interface_screen_widget_definition>(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 
-	//	add window_pane for guide option 
+	//    add window_pane for guide option 
 	MetaExtender::add_tag_block3<s_window_pane_reference>((uint32)&main_widget_tag->panes, k_number_of_addition_panes_for_settings_screen);
 	//copy data from about_pane
 	csmemcpy(main_widget_tag->panes[_settings_pane_guide], main_widget_tag->panes[_settings_pane_about], sizeof(s_window_pane_reference));
@@ -428,14 +419,21 @@ void c_screen_settings::apply_patches_on_map_load()
 		pane.list_block[0]->num_visible_items = k_no_of_visible_items_for_settings;
 	}
 
-	datum cartographer_bitmap_org_datum = tag_loader::Get_tag_datum("ui\\screens\\game_shell\\settings_screen\\cartographer", _tag_group_bitmap, "mainmenu_bitmaps");
-
-	if (!DATUM_IS_NONE(cartographer_bitmap_org_datum))
+	tag_injection_set_active_map(L"mainmenu_bitmaps");
+	if (tag_injection_active_map_verified())
 	{
-		tag_loader::Load_tag(cartographer_bitmap_org_datum, false, "mainmenu_bitmaps");
-		tag_loader::Push_Back();
-		cartographer_bitmap_datum = tag_loader::ResolveNewDatum(cartographer_bitmap_org_datum);
-		LOG_DEBUG_FUNC("cartographer bitmap datum : 0x{:08X} ,", cartographer_bitmap_datum);
+		datum cartographer_bitmap_org_datum = tag_injection_load(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\cartographer", true);
+
+		if (cartographer_bitmap_org_datum != NONE)
+		{
+			tag_injection_inject();
+			cartographer_bitmap_datum = cartographer_bitmap_org_datum;
+			LOG_DEBUG_FUNC("cartographer bitmap datum : 0x{:08X} ,", cartographer_bitmap_datum);
+		}
+		else
+		{
+			cartographer_bitmap_datum = NONE;
+		}
 	}
 	else
 	{
@@ -449,11 +447,9 @@ void c_screen_settings::apply_patches_on_map_load()
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
 	csmemcpy(guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2], guide_pane->text_blocks[_pane_guide_text_flavor_text33], sizeof(s_text_block_reference));
 
-	
 	//update new text_block to reposition callout texts
 	guide_pane->text_blocks[_pane_guide_text_flavor_text33]->text_bounds = { -5 ,-5,-115 ,75 };
 	guide_pane->text_blocks[_pane_guide_text_flavor_text34]->text_bounds = { 180 ,460,140 ,860 };
 	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text1]->text_bounds = { 250 ,30,150 ,150 };
 	guide_pane->text_blocks[_pane_guide_text_custom_flavor_text2]->text_bounds = { -120 ,450,-220 ,530 };
-
 }

@@ -297,14 +297,15 @@ enum e_ui_error_types : uint32
 
 enum e_user_interface_channel_type
 {
-	_user_interface_channel_type_hardware_error = 0x0,
-	_user_interface_channel_type_game_error = 0x1,
-	_user_interface_channel_type_keyboard = 0x2,
-	_user_interface_channel_type_interface = 0x3,
-	_user_interface_channel_type_dialog = 0x4,
-	_user_interface_channel_type_gameshell = 0x5,
-	_user_interface_channel_type_gameshell_background = 0x6,
-	k_number_of_user_interface_channels = 0x7
+	_user_interface_channel_type_hardware_error = 0,
+	_user_interface_channel_type_game_error,
+	_user_interface_channel_type_keyboard,
+	_user_interface_channel_type_dialog,
+	// this one is unknown
+	_user_interface_channel_type_interface,
+	_user_interface_channel_type_gameshell_screen,
+	_user_interface_channel_type_gameshell_background,
+	k_number_of_user_interface_channels
 };
 
 enum e_user_interface_render_window
@@ -319,6 +320,7 @@ enum e_user_interface_render_window
 
 /* forward declations*/
 
+struct s_screen_parameters;
 enum e_user_interface_screen_id : uint32;
 
 /* structures */
@@ -330,15 +332,34 @@ struct s_screen_state
 	int32 m_last_focused_item_index;
 };
 
+typedef void* (__cdecl* proc_ui_screen_load_cb_t)(s_screen_parameters*);
+
 struct s_screen_parameters
 {
-	int16 m_flags;
+	uint16 m_flags;
 	uint16 user_flags;
 	e_user_interface_channel_type m_channel_type;
 	e_user_interface_render_window m_window_index;
-	int32 field_C;
+	void* m_context;
 	s_screen_state m_screen_state;
-	void* (__cdecl* m_load_function)(s_screen_parameters*);
+	proc_ui_screen_load_cb_t m_load_function;
+
+	void data_new(uint16 flags, uint16 user_flags, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, proc_ui_screen_load_cb_t load_cb)
+	{
+		this->m_flags = flags;
+		this->user_flags = user_flags;
+		this->m_channel_type = channel_type;
+		this->m_window_index = window_index;
+		m_screen_state.field_0 = NONE;
+		m_screen_state.m_last_focused_item_order = NONE;
+		m_screen_state.m_last_focused_item_index = NONE;
+		this->m_load_function = load_cb;
+	}
+
+	void* ui_screen_load_proc_exec()
+	{
+		return m_load_function(this);
+	}
 };
 ASSERT_STRUCT_SIZE(s_screen_parameters, 0x20);
 
@@ -350,7 +371,8 @@ void render_menu_user_interface_to_usercall(int32 window_index, int32 controller
 
 void __cdecl screen_error_ok_dialog_show(int32 a1, e_ui_error_types ui_error_index, int32 a3, int16 a4, void* a5, void* a6);
 bool __cdecl user_interface_channel_is_busy(e_user_interface_channel_type channel_type);
-void __cdecl user_interface_error_display_ok_cancle_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
+void __cdecl user_interface_error_display_ok_cancel_dialog_with_ok_callback(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback_handle, e_ui_error_types error_type);
+void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index);
 bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
 void __cdecl user_interface_enter_game_shell(int32 context);
 bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);

@@ -4,7 +4,6 @@
 #include "game/game_time.h"
 #include "objects/objects.h"
 
-#include "H2MOD/Tags/TagInterface.h"
 #include "items/projectile_definition.h"
 
 
@@ -28,7 +27,7 @@ projectile_update_t p_projectile_update;
 float projectile_get_update_tick_length(datum projectile_datum_index, bool projectile_instant_update)
 {
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
-	char* proj_tag_data = tags::get_tag_fast<char>(*((datum*)object_data));
+	char* proj_tag_data = (char*)tag_get_fast(*((datum*)object_data));
 
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
 		&& (projectile_instant_update || *(int*)(object_data + 428) == time_globals::get_game_time())) // also check if the projectile is updated twice in the same tick
@@ -153,7 +152,7 @@ void ProjectileFix::ApplyProjectileVelocity()
 {
 	for (uint32 i = 0; i < ARRAYSIZE(tag_names); i++)
 	{
-		datum proj_index = tags::find_tag(_tag_group_projectile, tag_names[i]);
+		datum proj_index = tag_loaded(_tag_group_projectile, tag_names[i]);
 		if (proj_index != NONE)
 		{
 			_projectile_definition* projectile = (_projectile_definition*)tag_get_fast(proj_index);

@@ -62,7 +62,7 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 		nObject.translational_velocity = biped_unit->translational_velocity;
 
 		datum new_object_datum = object_new(&nObject);
-		if (!DATUM_IS_NONE(new_object_datum))
+		if (new_object_datum != NONE)
 			simulation_action_object_create(new_object_datum);
 	}
 }
@@ -70,7 +70,7 @@ void GraveRobber::SpawnSkull(datum unit_datum)
 
 void GraveRobber::PickupSkull(datum player_datum, datum skull_datum)
 {
-	if (DATUM_IS_NONE(skull_datum)) { return; }
+	if (skull_datum == NONE) { return; }
 
 	s_player* player = s_player::get(player_datum);
 	int player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_datum);

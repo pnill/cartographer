@@ -14,32 +14,31 @@ class c_squad_settings_list : public c_list_widget
 {
 protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_squad_settings];
-	c_slot2<c_squad_settings_list,s_event_record*,datum> m_slot;
+	c_slot2<c_squad_settings_list,s_event_record**,datum> m_slot;
 	bool m_party_mgmt_item_deleted;
-	uint8 gap_465[3];
 
-	bool handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
-	bool handle_item_change_map(s_event_record** pevent);
-	bool handle_item_change_variant(s_event_record** pevent);
-	bool handle_item_change_level(s_event_record** pevent);
-	bool handle_item_change_difficulty(s_event_record** pevent);
-	bool handle_item_quick_options(s_event_record** pevent);
-	bool handle_item_switch_to_coop(s_event_record** pevent);
-	bool handle_item_switch_to_arranged(s_event_record** pevent);
-	bool handle_item_switch_to_optimatch(s_event_record** pevent);
-	bool handle_item_change_hopper(s_event_record** pevent);
-	bool handle_item_party_management(s_event_record** pevent);
+	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
+	void handle_item_change_map(s_event_record** pevent);
+	void handle_item_change_variant(s_event_record** pevent);
+	void handle_item_change_level(s_event_record** pevent);
+	void handle_item_change_difficulty(s_event_record** pevent);
+	void handle_item_quick_options(s_event_record** pevent);
+	void handle_item_switch_to_coop(s_event_record** pevent);
+	void handle_item_switch_to_arranged(s_event_record** pevent);
+	void handle_item_switch_to_optimatch(s_event_record** pevent);
+	void handle_item_change_hopper(s_event_record** pevent);
+	void handle_item_party_management(s_event_record** pevent);
 
 
 public:
 	c_squad_settings_list(int16 user_flags);
 	uint16 get_last_item_type();
-	bool party_management_exists();
+	bool party_management_exists() const;
 	void party_management_delete_item();
 	
 	// c_squad_settings_list virtual functions
 	
-	virtual ~c_squad_settings_list();
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	bool handle_event(s_event_record* event) override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
@@ -61,7 +60,7 @@ public:
 
 	// c_screen_squad_settings virtual functions
 
-	virtual ~c_screen_squad_settings();
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	virtual void update() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;

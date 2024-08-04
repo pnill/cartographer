@@ -99,3 +99,5 @@ struct _biped_definition
     int16 pad1;
 };
 ASSERT_STRUCT_SIZE(_biped_definition, 788)
+
+void __cdecl biped_definitions_fixup(datum biped_datum);

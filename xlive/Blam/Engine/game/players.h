@@ -186,7 +186,7 @@ struct s_player
 	static const wchar_t* get_name(datum player_index);
 	static datum get_unit_index(datum player_index);
 	static unit_datum* get_player_unit_data(datum player_index);
-	static real_vector3d* get_unit_coords(datum player_index);
+	static real_point3d* get_unit_coords(datum player_index);
 	static uint64 get_id(datum player_index);
 };
 ASSERT_STRUCT_SIZE(s_player, 516);

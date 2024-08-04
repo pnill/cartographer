@@ -1,8 +1,6 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #include "screen_4way_signin.h"
-#include "game/game.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -15,6 +13,8 @@
 #include "interface/user_interface_utilities.h"
 #include "Networking/online/online_account_xbox.h"
 #include "tag_files/global_string_ids.h"
+
+#include "tag_files/tag_loader/tag_injection.h"
 
 /* enums */
 
@@ -132,8 +132,14 @@ c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel
 	m_call_context = _4_way_signin_type_splitscreen;
 }
 
-c_screen_4way_signin::~c_screen_4way_signin()
+c_user_interface_widget* c_screen_4way_signin::destructor(uint32 flags)
 {
+	this->~c_screen_4way_signin();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 
 void c_screen_4way_signin::update()
@@ -317,7 +323,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 
 
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
-	if (!DATUM_IS_NONE(widget_tag_datum))
+	if (widget_tag_datum != NONE)
 	{
 		this->verify_and_load_from_layout(NONE, &layout);
 	}
@@ -372,9 +378,9 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = FLAG(controller_index);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -393,9 +399,9 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 		s_screen_parameters params;
 		params.m_flags = 0;
 		params.m_window_index = _window_4;
-		params.field_C = 0;
+		params.m_context = 0;
 		params.user_flags = FLAG(event->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -432,7 +438,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 
 			//this needs further research
 
-			screen_error_ok_dialog_show(_user_interface_channel_type_interface, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
+			screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_join_gameinvite_without_signon, _window_4, FLAG(event->controller), 0, 0);
 
 			break;
 		}
@@ -447,9 +453,9 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 		if (user_interface_controller_get_signed_in_controller_count() == 1)
 		{
 			// _screen_xbox_live_main_menu is replaced by _screen_bungie_news in h2v
-			//if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_xbox_live_main_menu)
-			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_bungie_news)
-				&& !user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell, _window_4, _screen_main_menu))
+			//if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_xbox_live_main_menu)
+			if (!user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_bungie_news)
+				&& !user_interface_back_out_from_channel_by_id(_user_interface_channel_type_gameshell_screen, _window_4, _screen_main_menu))
 			{
 				user_interface_enter_game_shell(1);
 			}
@@ -461,7 +467,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			{
 				if (this->m_call_context == _4_way_signin_type_crossgame_invite)
 				{
-					user_interface_error_display_ok_cancle_dialog_with_ok_callback(_user_interface_channel_type_interface,
+					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+						_user_interface_channel_type_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_interface_mainmenu_sign_out_controller_callback,
@@ -469,7 +476,8 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 				}
 				else
 				{
-					user_interface_error_display_ok_cancle_dialog_with_ok_callback(_user_interface_channel_type_interface,
+					user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+						_user_interface_channel_type_dialog,
 						_window_4,
 						FLAG(event->controller),
 						user_interface_sign_out_controller_default_callback,
@@ -478,7 +486,7 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			}
 			else
 			{
-				screen_error_ok_dialog_show(_user_interface_channel_type_interface, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
+				screen_error_ok_dialog_show(_user_interface_channel_type_dialog, _ui_error_cant_sign_out_master_with_guests, _window_4, FLAG(event->controller), NULL, NULL);
 
 			}
 			this->m_controllers_mask |= FLAG(event->controller);
@@ -509,8 +517,8 @@ bool c_screen_4way_signin::handle_invalid_controller_event(s_event_record* event
 		|| event->component == _user_interface_controller_component_button_back)
 		&& !user_interface_controller_get_signed_in_controller_count())
 	{
-		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
-			_user_interface_channel_type_interface,
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_dialog,
 			_window_4,
 			FLAG(event->controller),
 			user_interface_decline_invite_callback,
@@ -635,16 +643,16 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	const char* player_skins_tag_path = "ui\\player_skins\\player_skin_signin";
 	const int16 scale_factor = 2;
 
-	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
-	datum player_skins_datum_index = tags::find_tag(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum player_skins_datum_index = tag_loaded(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index) || DATUM_IS_NONE(player_skins_datum_index))
+	if (main_widget_datum_index == NONE || player_skins_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = tags::get_tag_fast<s_user_interface_screen_widget_definition>(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
 
 	const point2d bitmap_positions[] = {
@@ -740,7 +748,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	}
 
 	//hacky wacky until skin tag definitions are added
-	void* player_skins_signin_tag = tags::get_tag_fast(player_skins_datum_index);
+	void* player_skins_signin_tag = tag_get_fast(player_skins_datum_index);
 	tag_block<s_hud_block_reference> hud_block = *reinterpret_cast<tag_block<s_hud_block_reference>*>((char*)(player_skins_signin_tag)+0x2C);
 
 
@@ -750,17 +758,17 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	base_hud_block->bounds = og_bounds;
 
 	const char* shader_tag_path = "ui\\hud\\shaders\\ui_small_emblem";
-	datum shader_datum_index = tags::find_tag(_tag_group_shader, shader_tag_path);
+	datum shader_datum_index = tag_loaded(_tag_group_shader, shader_tag_path);
 
 	// ui_medium_emblem is bugged for guest profiles so we use ui_small_emblem shader
 	// but the bitmap quality is lowered
 	// fixme
-	if (!DATUM_IS_NONE(shader_datum_index))
+	if (shader_datum_index != NONE)
 	{
 		base_hud_block->shader.index = shader_datum_index;
 	}
 
-	edit_profile_bitmap_datum = tags::find_tag(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
+	edit_profile_bitmap_datum = tag_loaded(_tag_group_bitmap, "ui\\screens\\game_shell\\settings_screen\\player_profile\\edit_profile");
 }
 
 void initialize_elements(s_screen_4way_items& elements, e_controller_index controller)
@@ -854,7 +862,7 @@ void modify_controller_bitmap_for_split(c_bitmap_widget* signin_bitmap, c_text_w
 
 	if (input_windows_has_split_device_active())
 	{
-		if (!DATUM_IS_NONE(edit_profile_bitmap_datum))
+		if (edit_profile_bitmap_datum != NONE)
 		{
 			bitmap_data* bitmap_block = bitmap_group_get_bitmap(edit_profile_bitmap_datum, _edit_profile_bitmap_keyboard);
 			signin_bitmap->assign_new_bitmap_block(bitmap_block);
@@ -889,9 +897,9 @@ void user_interface_recover_4way_screen(e_session_protocol protocol)
 	s_screen_parameters params;
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -973,9 +981,9 @@ void screen_network_squad_browser_backout_to_4way_screen(uint8 context)
 	s_screen_parameters params;
 	params.m_flags = 7; //retreating or recovering?
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = user_interface_controller_get_signed_in_controllers_mask(); // orignally h2x uses the flags
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;

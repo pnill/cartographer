@@ -7,15 +7,21 @@ c_small_user_interface_text::c_small_user_interface_text()
 	string.clear();
 }
 
-c_small_user_interface_text::~c_small_user_interface_text()
+c_user_interface_text* c_small_user_interface_text::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x20F4AB, 0x0, c_user_interface_text(*__thiscall*)(c_user_interface_text*, char), lpMem, a2);
+	this->~c_small_user_interface_text();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
-void  c_small_user_interface_text::initial_raw_string(const wchar_t* raw_text)
+
+void  c_small_user_interface_text::set_text(const wchar_t* raw_text)
 {
 	INVOKE_TYPE(0x20F425, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_small_user_interface_text::update_raw_string(const wchar_t* Source)
+void c_small_user_interface_text::append_text(const wchar_t* Source)
 {
 	INVOKE_TYPE(0x20F462, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, Source);
 }
@@ -32,15 +38,21 @@ c_normal_user_interface_text::c_normal_user_interface_text()
 	string.clear();
 }
 
-c_normal_user_interface_text::~c_normal_user_interface_text()
+c_user_interface_text* c_normal_user_interface_text::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x20F558, 0x0, c_user_interface_text(*__thiscall*)(c_normal_user_interface_text*, char), lpMem, a2);
+	this->~c_normal_user_interface_text();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
-void  c_normal_user_interface_text::initial_raw_string(const wchar_t* raw_text)
+
+void  c_normal_user_interface_text::set_text(const wchar_t* raw_text)
 {
 	INVOKE_TYPE(0x20F4C9, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_normal_user_interface_text::update_raw_string(const wchar_t* Source)
+void c_normal_user_interface_text::append_text(const wchar_t* Source)
 {
 	INVOKE_TYPE(0x20F509, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, Source);
 }
@@ -57,15 +69,21 @@ c_long_user_interface_text::c_long_user_interface_text()
 	string.clear();
 }
 
-c_long_user_interface_text::~c_long_user_interface_text()
+c_user_interface_text* c_long_user_interface_text::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x243E6A, 0x0, c_user_interface_text(*__thiscall*)(c_long_user_interface_text*, char), lpMem, a2);
+	this->~c_long_user_interface_text();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
-void c_long_user_interface_text::initial_raw_string(const wchar_t* raw_text)
+
+void c_long_user_interface_text::set_text(const wchar_t* raw_text)
 {
 	INVOKE_TYPE(0x243DDB, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_long_user_interface_text::update_raw_string(const wchar_t* Source)
+void c_long_user_interface_text::append_text(const wchar_t* Source)
 {
 	INVOKE_TYPE(0x243E1B, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, Source);
 }

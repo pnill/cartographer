@@ -434,18 +434,9 @@ bool HandleGuiLogin(char* ltoken, char* identifier, char* password, int* out_mas
 					break;
 				}
 			}
-
-			if (username) {
-				char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-				snprintf(login_identifier, strlen(username) + 1, username);
-			}
 		}
 	}
 	else {
-		if (!H2IsDediServer) {
-			char* login_identifier = H2CustomLanguageGetLabel(CMLabelMenuId_AccountEdit, 1);
-			SecureZeroMemory(login_identifier, strlen(login_identifier));
-		}
 		if (error_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) {
 			result = false;
 		}

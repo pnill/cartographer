@@ -18,8 +18,8 @@ int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 // #5215: XShowGuideUI
 int WINAPI XShowGuideUI(DWORD dwUserIndex)
 {
-	extern void GSCustomMenuCall_Guide(); // Custom menu Guide Popup from H2MOD
-	GSCustomMenuCall_Guide();
+	extern void* ui_load_cartographer_guide_menu(); // Custom menu Guide Popup from H2MOD
+	ui_load_cartographer_guide_menu();
 
 	return 0;
 }

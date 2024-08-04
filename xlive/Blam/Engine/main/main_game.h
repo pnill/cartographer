@@ -31,3 +31,5 @@ void main_game_launch_set_game_mode(int32 game_mode);
 void main_game_launch(const char* map_name);
 
 void main_game_apply_patches(void);
+
+void main_game_set_global_scenario_index(datum scenario_index);

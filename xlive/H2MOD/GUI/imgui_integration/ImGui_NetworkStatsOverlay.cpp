@@ -3,7 +3,6 @@
 #include "imgui.h"
 #include "ImGui_NetworkStatsOverlay.h"
 
-#include "effects/player_effects.h"
 #include "game/game_time.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/Session/NetworkSession.h"

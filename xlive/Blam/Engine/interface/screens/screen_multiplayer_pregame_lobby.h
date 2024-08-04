@@ -78,6 +78,7 @@ protected:
 	rectangle2d start_game_button_bounds;
 	rectangle2d game_details_button_bounds;
 
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 
 	void initialize_long_text_chat();
 	void update_protocol();

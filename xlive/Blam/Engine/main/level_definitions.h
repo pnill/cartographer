@@ -12,27 +12,10 @@ enum e_multiplayer_ui_level_definition_flags : uint8
     _multiplayer_ui_level_definition_flag_unlockable = FLAG(0)
 };
 
-
 struct s_ui_level_descriptions
 {
-    c_static_wchar_string32 english_name;
-    c_static_wchar_string32 japanese_name;
-    c_static_wchar_string32 german_name;
-    c_static_wchar_string32 french_name;
-    c_static_wchar_string32 spanish_name;
-    c_static_wchar_string32 italian_name;
-    c_static_wchar_string32 korean_name;
-    c_static_wchar_string32 chinese_name;
-    c_static_wchar_string32 portuguese_name;
-    c_static_wchar_string128 english_description;
-    c_static_wchar_string128 japanese_description;
-    c_static_wchar_string128 german_description;
-    c_static_wchar_string128 french_description;
-    c_static_wchar_string128 spanish_description;
-    c_static_wchar_string128 italian_description;
-    c_static_wchar_string128 korean_description;
-    c_static_wchar_string128 chinese_description;
-    c_static_wchar_string128 portuguese_description;
+    wchar_t name[k_language_count][32];
+    wchar_t description[k_language_count][128];
 };
 ASSERT_STRUCT_SIZE(s_ui_level_descriptions, 2880);
 
@@ -52,7 +35,7 @@ struct s_multiplayer_ui_level_definition
     int32 map_id;
     tag_reference bitmap;   // bitm
     s_ui_level_descriptions level_descriptions;
-    static_string256 path;
+    char path[256];
     int32 sort_order;
     e_multiplayer_ui_level_definition_flags flags;
     int8 pad[3];

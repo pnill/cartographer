@@ -218,8 +218,8 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 
                     render_model_node* node = weapon_model->nodes[node_index];
                     real_orientation* orientation = &fp_orientations->weapon_orientations[animation_graph_node_index];
-                    orientation->quaternion = node->default_rotation;
-                    orientation->position = node->default_translation;
+                    orientation->rotation = node->default_rotation;
+                    orientation->translation = node->default_translation;
                     orientation->scale = 1.0f;
                 }
             }
@@ -238,8 +238,8 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
 
                     render_model_node* node = hands_model->nodes[node_index];
                     real_orientation* orientation = &fp_orientations->weapon_orientations[animation_graph_node_index];
-                    orientation->quaternion = node->default_rotation;
-                    orientation->position = node->default_translation;
+                    orientation->rotation = node->default_rotation;
+                    orientation->translation = node->default_translation;
                     orientation->scale = 1.0f;
                 }
             }
@@ -541,9 +541,9 @@ void __cdecl first_person_weapons_update_nodes(int32 user_index, int32 weapon_sl
                 else
                 {
                     csmemcpy(&fp_data->adjustment_matrix, &weapon_data->nodes[adjustment_matrix_index], sizeof(fp_data->adjustment_matrix));
-                    fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_definition->first_person_weapon_offset.i;
-                    fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_definition->first_person_weapon_offset.j;
-                    fp_data->adjustment_matrix.position.z = fp_data->adjustment_matrix.position.z - weapon_definition->first_person_weapon_offset.k;
+                    fp_data->adjustment_matrix.position.x = fp_data->adjustment_matrix.position.x - weapon_definition->first_person_weapon_offset.x;
+                    fp_data->adjustment_matrix.position.y = fp_data->adjustment_matrix.position.y - weapon_definition->first_person_weapon_offset.y;
+                    fp_data->adjustment_matrix.position.z = fp_data->adjustment_matrix.position.z - weapon_definition->first_person_weapon_offset.z;
                     SET_FLAG(fp_data->flags, 2, true);
                     halo_interpolator_set_target_position_data(user_index, 1, &fp_data->adjustment_matrix);
                 }

@@ -627,7 +627,7 @@ void ReadH2Config() {
 
 	if (err) {
 		addDebugText("ERROR: No H2Configuration files could be found!");
-		CMForce_Update = true;
+		g_force_cartographer_update = true;
 		H2Config_isConfigFileAppDataLocal = true;
 	}
 	else {

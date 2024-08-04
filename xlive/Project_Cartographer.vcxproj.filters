@@ -11,9 +11,6 @@
     <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
@@ -29,8 +26,6 @@
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_list_widget.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
     <ClCompile Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.cpp" />
@@ -66,7 +61,6 @@
     <ClCompile Include="H2MOD\Modules\Input\PlayerControl.cpp" />
     <ClCompile Include="H2MOD\Modules\Input\KeyboardInput.cpp" />
     <ClCompile Include="H2MOD\Tags\MetaExtender.cpp" />
-    <ClCompile Include="H2MOD\Modules\Input\ControllerInput.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_Handler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\MOTD.cpp" />
@@ -98,13 +92,7 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
     <ClCompile Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_brightness_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_error_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_screen_widget.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_errors.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
@@ -387,8 +375,27 @@
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_favorites.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_user_history.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
-    <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_presence.cpp" />
+    <ClCompile Include="Blam\Engine\game\game_results.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
+    <ClCompile Include="Blam\Engine\sound\sound_cache_file_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\filesys\pc_file_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -495,9 +502,6 @@
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
@@ -517,8 +521,6 @@
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_list_widget.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_with_menu.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
     <ClInclude Include="H2MOD\Modules\MainLoopPatches\RunLoop\RunLoop.h" />
@@ -615,13 +617,7 @@
     <ClInclude Include="H2MOD\Modules\MapManager\CustomMapDataCache\CustomMapDataCache.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\ImGui_NetworkStatsOverlay.h" />
     <ClInclude Include="CartographerDllConf.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_brightness_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_user_interface_widget.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_list_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_error_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_screen_widget.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\c_virtual_keyboard_menu.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\Accounts\c_account_create_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_errors.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.h" />
     <ClInclude Include="H2MOD\GUI\ImGui_Integration\Console\CommandsUtil.h" />
@@ -1040,8 +1036,29 @@
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_favorites.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_user_history.h" />
-    <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_presence.h" />
+    <ClInclude Include="Blam\Engine\game\game_results.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_headers.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_account_manager.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_definitions.h" />
+    <ClInclude Include="Blam\Engine\filesys\pc_file_system.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

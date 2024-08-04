@@ -118,16 +118,13 @@ enum e_user_interface_automation_mode : uint16
 };
 
 // Credits :  https://github.com/twist84/ManagedDonkey/blob/main/game/source/interface/user_interface_controller.hpp
-#pragma pack(push , 1)
 struct s_event_record
 {
 	e_user_interface_event_type type;
 	e_controller_index controller;
 	e_user_interface_controller_component component;
 	uint16 value; // // holds e_user_interface_automation_mode during _user_interface_event_type_automation
-	PAD16;
 };
-#pragma pack(pop)
 ASSERT_STRUCT_SIZE(s_event_record, 16);
 
 enum e_controller_state_flags

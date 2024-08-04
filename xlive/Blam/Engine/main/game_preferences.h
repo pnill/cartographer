@@ -17,3 +17,5 @@ enum e_language : uint32
 e_language get_current_language(void);
 
 void __cdecl global_preferences_initialize(void);
+
+void __cdecl game_preferences_flag_dirty();

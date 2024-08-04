@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-#include "H2MOD/Tags/TagInterface.h"
 #include "screen_multiplayer_pregame_lobby.h"
 #include "interface/user_interface_screen_widget_definition.h"
 #include "interface/user_interface_widget_window.h"
@@ -462,6 +461,13 @@ void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
 }
 
+c_user_interface_widget* c_screen_multiplayer_pregame_lobby::destructor(uint32 flags)
+{
+	this->~c_screen_multiplayer_pregame_lobby();
+
+	return this;
+}
+
 void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
 {
 	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
@@ -630,15 +636,15 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 {
 	const char* main_widget_tag_path = "ui\\screens\\game_shell\\pregame_lobby\\pregame_lobby";
 
-	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index))
+	if (main_widget_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = tags::get_tag_fast<s_user_interface_screen_widget_definition>(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 
 	s_window_pane_reference* custom_games_pane = main_widget_tag->panes[0];
 	s_window_pane_reference* cooperative_pane = main_widget_tag->panes[1];

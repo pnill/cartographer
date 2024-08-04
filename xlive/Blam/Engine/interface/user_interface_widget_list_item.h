@@ -10,18 +10,19 @@ protected:
 	datum m_last_data_index;
 	int32 m_intro_delay_milliseconds;
 	bool field_78;
-	uint8 gap_79[3];
-	_slot1<>* signal1;
-	_slot2<>* signal2;
+	_slot_linker linker_type1;
+	_slot_linker linker_type2;
 
 public:
 	c_list_item_widget();
 	datum get_last_data_index();
 	void set_item_transitioning();
 
+	
+
 	// c_list_item_widget virtual functions
 
-	virtual ~c_list_item_widget();
+	virtual c_list_item_widget* destructor(uint32 flags) override;
 	virtual void update() override;
 	virtual int32 get_intro_delay() override;
 	virtual bool handle_event(s_event_record* event) override;

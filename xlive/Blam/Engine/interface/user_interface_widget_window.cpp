@@ -3,12 +3,11 @@
 #include "user_interface_widget_window.h"
 #include "rasterizer/rasterizer_globals.h"
 
-c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags) :
 	c_user_interface_widget(_widget_type_screen, user_flags),
 	m_header_text((int16)0),
 	m_screen_button_key_text((int16)0),
 	m_screen_slot(this, &c_screen_widget::switch_panes)
-
 {
 	//INVOKE_TYPE(0x2106A2, 0x0, void(__thiscall*)(c_screen_widget*, e_user_interface_screen_id, e_user_interface_channel_type, e_user_interface_render_window, int16),
 	//	this, menu_id, channel_type, window_index, user_flags);
@@ -70,9 +69,9 @@ void c_screen_widget::destroy()
 	INVOKE_TYPE(0x20F6FF, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
 
-bool c_screen_widget::switch_panes(int32* pane_index_ptr)
+void c_screen_widget::switch_panes(int32* pane_index_ptr)
 {
-	return INVOKE_TYPE(0x210227, 0x0, bool(__thiscall*)(c_screen_widget*, int32*), this, pane_index_ptr);
+	INVOKE_TYPE(0x210227, 0x0, bool(__thiscall*)(c_screen_widget*, int32*), this, pane_index_ptr);
 }
 
 void c_screen_widget::verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout)
@@ -96,10 +95,11 @@ void* c_screen_widget::get_screen_definition()
 
 // c_screen_widget virtual functions
 
-c_screen_widget::~c_screen_widget()
+c_user_interface_widget* c_screen_widget::destructor(uint32 flags)
 {
-	// todo : is this necessary?
-	this->destroy();
+	this->~c_screen_widget();
+
+	return this;
 }
 
 
@@ -170,9 +170,9 @@ e_user_interface_controller_component c_screen_widget::get_component_from_button
 	return INVOKE_TYPE(0x20F151, 0x0, e_user_interface_controller_component(__thiscall*)(c_screen_widget*, int32), this, special_widget_index);
 }
 
-uint8 c_screen_widget::sub_40AD53()
+bool c_screen_widget::sub_40AD53(int32 a2)
 {
-	return INVOKE_TYPE(0xAD53, 0x0, uint8(__thiscall*)(c_screen_widget*), this);
+	return INVOKE_TYPE(0xAD53, 0x0, bool(__thiscall*)(c_screen_widget*, int32), this, a2);
 }
 
 e_user_interface_channel_type c_screen_widget::get_channel()
@@ -219,7 +219,6 @@ void c_screen_widget::set_favourites_bitmap_visible(bool show_icon)
 	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, bool), this, show_icon);
 }
 
-
 void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters)
 {
 	return INVOKE_TYPE(0x20B8C3, 0x0, void(__cdecl*)(c_screen_widget*, s_screen_parameters*), new_screen, parameters);
@@ -233,8 +232,11 @@ c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_use
 	this->m_child_list = list;
 }
 
-c_screen_with_menu::~c_screen_with_menu()
+c_user_interface_widget* c_screen_with_menu::destructor(uint32 flags)
 {
+	this->~c_screen_with_menu();
+
+	return this;
 }
 
 bool c_screen_with_menu::handle_event(s_event_record* event)
@@ -252,3 +254,31 @@ void c_screen_with_menu::initialize(s_screen_parameters* parameters)
 	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, s_screen_parameters*), this, parameters);
 }
 
+#pragma region Live list fix for disappearing labels
+// derived from c_screen_with_menu, but doesn't really matter
+void __thiscall c_screen_with_menu::build_player_list(void* a1, int player_count)
+{
+	auto p_build_player_list = Memory::GetAddress<void(__thiscall*)(void*, void*, int)>(0x211CD0);
+
+	// we only hook calls done to c_screen_with_menu::build_player_list in c_screen_network_squad_browser
+
+	BYTE* thisx = (BYTE*)this;
+
+	bool network_squad_browser_live_browser = *(bool*)(thisx + 7936);
+
+	if (network_squad_browser_live_browser)
+		return; // don't load the player list from data, since we are in the live list, and we don't use the details pane located in the lower right part where players are listed
+
+	return p_build_player_list(this, a1, player_count);
+}
+
+__declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::build_player_list }
+
+#pragma endregion
+
+void c_screen_with_menu::apply_patches()
+{
+	if (Memory::IsDedicatedServer()) return;
+
+	PatchCall(Memory::GetAddressRelative(0x619650), jmp_build_player_list);
+}

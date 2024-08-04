@@ -1,4 +1,5 @@
 #pragma once
+#include "user_interface.h"
 #include "user_interface_widget.h"
 #include "user_interface_widget_text.h"
 #include "signal_slot.h"
@@ -392,16 +393,14 @@ protected:
 	bool field_9FF;
 	bool field_A00;
 	bool field_A01;
-	uint8 gap_A02[2];
 	c_user_interface_widget* m_special_widgets[k_maximum_number_of_special_widgets];
 	c_slot1<c_screen_widget, int32> m_screen_slot;
 
-
 	void destroy();
-	bool switch_panes(int32* pane_index_ptr);
+	void switch_panes(int32* pane_index_ptr);
 
 public:
-	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
+	c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags);
 	
 
 	const e_user_interface_screen_id get_id();
@@ -416,7 +415,7 @@ public:
 	
 	// c_screen_widget virtual functions
 
-	virtual ~c_screen_widget();
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 	virtual bool sub_6114B9() override;
@@ -433,7 +432,7 @@ public:
 	virtual uint8 sub_60EFC1(s_event_record* event);
 	virtual int32 sub_60F081(s_event_record* a2);
 	virtual e_user_interface_controller_component get_component_from_button_key(int32 special_widget_index);
-	virtual uint8 sub_40AD53();
+	virtual bool sub_40AD53(int32 a2);
 	virtual e_user_interface_channel_type  get_channel();
 	virtual e_user_interface_render_window  get_render_window();
 	virtual int32 sub_60EB92(int32 a2);
@@ -444,6 +443,12 @@ public:
 	virtual bool overlay_effect_is_disabled();
 	virtual void set_favourites_bitmap_visible(bool show_icon);
 
+private:
+	template<typename T>
+	static T c_screen_widget_base_vtable_get_func_ptr(DWORD idx)
+	{
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x3CF2F4)[idx]);
+	}
 };
 ASSERT_STRUCT_SIZE(c_screen_widget, 0xA5C);
 
@@ -459,11 +464,26 @@ public:
 
 	// c_screen_with_menu virtual functions
 
-	virtual ~c_screen_with_menu();
+	// base interface overrides
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
 	virtual void initialize(s_screen_parameters* parameters) override;
 
+	// member functions
+	void __thiscall build_player_list(void* a1, int player_count);
+
+	// static member functions
+	static void apply_patches();
+
+private:
+	typedef c_screen_with_menu class_type;
+
+	template<typename T>
+	static T _get_vfptr_table(DWORD idx)
+	{
+		return reinterpret_cast<T>(&Memory::GetAddress<void**>(0x3CF3A4)[idx]);
+	}
 };
 ASSERT_STRUCT_SIZE(c_screen_with_menu, 0xA60);
 

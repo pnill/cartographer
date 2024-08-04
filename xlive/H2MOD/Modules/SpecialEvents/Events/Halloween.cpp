@@ -8,29 +8,27 @@
 #include "Blam/Cache/TagGroups/scenery_definition.hpp"
 
 #include "models/models.h"
+#include "objects/objects.h"
 #include "scenario/scenario_definitions.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
-datum lbitm_datum;
-datum sky_datum;
-datum candle_datum;
-datum candle_fire_datum;
-datum large_candle_datum;
-datum pump_datum;
+datum lbitm_datum = NONE;
+datum sky_datum = NONE;
+datum candle_datum = NONE;
+datum candle_fire_datum = NONE;
+datum large_candle_datum = NONE;
+datum pump_datum = NONE;
 
 void halloween_game_life_cycle_update(e_game_life_cycle state)
 {
 	if (state == _life_cycle_in_game)
 	{
-		typedef void(__cdecl t_set_orientation)(real_vector3d* forward, real_vector3d* up, const real_vector3d* orient);
-		auto set_orientation = Memory::GetAddress<t_set_orientation*>(0x3347B);
-
 		object_placement_data placement;
 
-		auto pump = tags::get_tag<_tag_group_scenery, s_scenery_group_definition>(pump_datum, true);
-		auto pump_hmlt = tags::get_tag<_tag_group_model, s_model_definition>(pump->objectTag.model.index, true);
+		s_scenery_group_definition* pump = (s_scenery_group_definition*)tag_get_fast(pump_datum);
+		s_model_definition* pump_hmlt = (s_model_definition*)tag_get_fast(pump->objectTag.model.index);
 
 		const s_cache_header* cache_header = cache_files_get_header();
 		if (!strcmp(cache_header->name, "coagulation"))
@@ -55,7 +53,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
@@ -80,7 +78,7 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 				}
 				// Set location orientation and scale
 				placement.position = scen_place.position;
-				set_orientation(&placement.forward, &placement.up, &scen_place.rotation);
+				vectors3d_from_euler_angles3d(&placement.forward, &placement.up, &scen_place.rotation);
 				placement.scale = scen_place.scale;
 
 				// Create the new object
@@ -93,50 +91,43 @@ void halloween_game_life_cycle_update(e_game_life_cycle state)
 void halloween_event_map_load()
 {
 	// Load specific tags from shared and modify placements depending on the map being played
-	const s_cache_header* cache_header = cache_files_get_header();
-	scenario* scenario_definition = tags::get_tag_fast<scenario>(cache_files_get_tags_header()->scenario_index);
-	auto bsp_definition = tags::get_tag_fast<structure_bsp>(scenario_definition->structure_bsps[0]->structure_bsp.index);
-	if (!strcmp(cache_header->name, "coagulation"))
-	{
-		lbitm_datum = tag_loader::Get_tag_datum("scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", _tag_group_bitmap, "carto_shared");
-		sky_datum = tag_loader::Get_tag_datum("scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", _tag_group_sky, "carto_shared");
-		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", _tag_group_scenery, "carto_shared");
-		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", _tag_group_scenery, "carto_shared");
-		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
-		large_candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", _tag_group_scenery, "carto_shared");
 
-		tag_loader::Load_tag(pump_datum, true, "carto_shared");
-		tag_loader::Load_tag(candle_datum, true, "carto_shared");
-		tag_loader::Load_tag(lbitm_datum, true, "carto_shared");
-		tag_loader::Load_tag(sky_datum, true, "carto_shared");
-		tag_loader::Load_tag(large_candle_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+	const s_cache_header* cache_header = cache_files_get_header();
+
+	tag_injection_set_active_map(k_events_map);
+
+	if(!strcmp(cache_header->name, "coagulation"))
+	{
+		lbitm_datum = tag_injection_load(_tag_group_bitmap, "scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap_truecolor_bitmaps", true);
+		sky_datum = tag_injection_load(_tag_group_sky, "scenarios\\skies\\multi\\halo\\coagulation\\coagulation_night", true);
+		candle_fire_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", true);
+		candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", true);
+		pump_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", true);
+		large_candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", true);
+
+		tag_injection_inject();
 
 		// OG Halo 2 Coag lightmap
-		datum ltmp_datum = tags::find_tag(_tag_group_scenario_structure_lightmap,
+		datum ltmp_datum = tag_loaded(_tag_group_scenario_structure_lightmap,
 			"scenarios\\multi\\halo\\coagulation\\coagulation_coagulation_lightmap");
 
-		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-		large_candle_datum = tag_loader::ResolveNewDatum(large_candle_datum);
-		lbitm_datum = tag_loader::ResolveNewDatum(lbitm_datum);
-		sky_datum = tag_loader::ResolveNewDatum(sky_datum);
+		if(tag_injection_is_injected(lbitm_datum) && ltmp_datum != NONE)
+		{
+			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
+			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
+		}
 
-		LOG_INFO_GAME("{:x}", candle_datum);
-		LOG_INFO_GAME("{:x}", candle_fire_datum);
-		LOG_INFO_GAME("{:x}", pump_datum);
-		LOG_INFO_GAME("{:x}", lbitm_datum);
-		LOG_INFO_GAME("{:x}", sky_datum);
+		scenario* scenario_definition = (scenario*)tag_get_fast(cache_files_get_tags_header()->scenario_index);
+		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(scenario_definition->structure_bsps[0]->structure_bsp.index);
 
-		if (!DATUM_IS_NONE(sky_datum))
+		if (tag_injection_is_injected(sky_datum))
 		{
 			scenario_definition->skies[0]->index = sky_datum;
 		}
 
-		if (!DATUM_IS_NONE(ltmp_datum) && !DATUM_IS_NONE(lbitm_datum))
+		if (ltmp_datum != NONE && lbitm_datum != NONE)
 		{
-			auto ltmp = tags::get_tag_fast<s_scenario_structure_lightmap_group_definition>(ltmp_datum);
+			s_scenario_structure_lightmap_group_definition* ltmp = (s_scenario_structure_lightmap_group_definition*)tag_get_fast(ltmp_datum);
 			ltmp->lightmap_groups[0]->bitmap_group.index = lbitm_datum;
 
 			// Null out decorator block since the colour for them is separate from the lightmap colour
@@ -144,33 +135,23 @@ void halloween_event_map_load()
 			bsp_definition->decorator_placement.data = 0;
 		}
 
-		// Add items to scenario
-		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum) && !DATUM_IS_NONE(large_candle_datum))
+		if(tag_injection_is_injected(candle_datum) && tag_injection_is_injected(pump_datum) && tag_injection_is_injected(large_candle_datum))
 		{
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 			// We execute this after a bluescreen since our new objects arent recreated automatically
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::blue_screen, EventExecutionType::execute_after, true);
 		}
 	}
-	else if (!strcmp(cache_header->name, "lockout"))
+	if (!strcmp(cache_header->name, "lockout"))
 	{
-		candle_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", _tag_group_scenery, "carto_shared");
-		candle_fire_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", _tag_group_scenery, "carto_shared");
-		pump_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", _tag_group_scenery, "carto_shared");
+		candle_fire_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_fire", true);
+		candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle", true);
+		pump_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\jack_o_lantern", true);
+		large_candle_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\jack_o_lantern\\candle\\candle_big_light", true);
 
-		tag_loader::Load_tag(pump_datum, true, "carto_shared");
-		tag_loader::Load_tag(candle_datum, true, "carto_shared");
-		tag_loader::Push_Back();
+		tag_injection_inject();
 
-		candle_datum = tag_loader::ResolveNewDatum(candle_datum);
-		candle_fire_datum = tag_loader::ResolveNewDatum(candle_fire_datum);
-		pump_datum = tag_loader::ResolveNewDatum(pump_datum);
-
-		LOG_INFO_GAME("{:x}", candle_datum);
-		LOG_INFO_GAME("{:x}", candle_fire_datum);
-		LOG_INFO_GAME("{:x}", pump_datum);
-
-		if (!DATUM_IS_NONE(candle_datum) && !DATUM_IS_NONE(pump_datum))
+		if (candle_datum != NONE && pump_datum != NONE)
 		{
 			EventHandler::register_callback(halloween_game_life_cycle_update, EventType::gamelifecycle_change, EventExecutionType::execute_after, true);
 			// We execute this after a bluescreen since our new objects arent recreated automatically

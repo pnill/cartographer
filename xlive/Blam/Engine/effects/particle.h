@@ -29,8 +29,8 @@ enum e_particle_flags : uint16
 class c_particle
 {
 public:
-	int8 gap_0[2];
-	uint16 flags;
+	int16 m_identifier;
+	uint16 m_flags;
 	datum next_particle;
 	real32 time_accumulator;
 	real32 effect_delay_time;
@@ -40,7 +40,7 @@ public:
 	int8 gap_34[12];
 
 	void adjust_initial_position(
-		c_particle_emitter_definition* emitter_definition,
+		c_particle_emitter_definition* emitter_def,
 		c_particle_emitter* particle_emitter,
 		s_particle_state* state,
 		c_particle_system* particle_system,

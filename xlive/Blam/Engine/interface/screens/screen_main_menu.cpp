@@ -71,7 +71,7 @@ c_main_menu_list::c_main_menu_list(int16 user_flags) :
 		datum_new(m_list_data);
 	}
 
-	signal2->link_signal_to_slot((_slot*)&signal2, &m_slot);
+	linker_type2.link(&m_slot);
 }
 
 void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
@@ -81,8 +81,14 @@ void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
 
 __declspec(naked) void jmp_c_main_menu_list() { __asm { jmp c_main_menu_list::c_main_menu_list_ctor } }
 
-c_main_menu_list::~c_main_menu_list()
+c_user_interface_widget* c_main_menu_list::destructor(uint32 flags)
 {
+	this->~c_main_menu_list();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 
 c_list_item_widget* c_main_menu_list::get_list_items()
@@ -151,10 +157,7 @@ void c_main_menu_list::update_list_items(c_list_item_widget* item, int32 skin_in
 	}
 }
 
-
-
-
-bool c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
+void c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum* pitem_index)
 {
 	//return INVOKE_TYPE(0xB396, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**, long*), this, pevent, pitem_index);
 
@@ -198,17 +201,14 @@ bool c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum*
 		handle_item_quit(pevent);
 		break;
 	}
-
-
-	return true;
 }
 
-bool c_main_menu_list::handle_item_campaign(s_event_record** pevent)
+void c_main_menu_list::handle_item_campaign(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0xB198, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	INVOKE_TYPE(0xB198, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 }
 
-bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
+void c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 {
 	//return INVOKE_TYPE(0xB257, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
@@ -218,8 +218,6 @@ bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 	if (!game_activated)
 		return true;
 	*/
-
-	bool success = true;
 
 	c_networking_panorama_friends* friends = get_networking_panorama_friends();
 	if (!friends->has_active_task())
@@ -234,9 +232,9 @@ bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 		s_screen_parameters params;
 		params.m_flags = 0;
 		params.m_window_index = _window_4;
-		params.field_C = 0;
+		params.m_context = 0;
 		params.user_flags = FLAG((*pevent)->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -244,31 +242,28 @@ bool c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 		params.m_load_function = &c_screen_4way_signin::load_for_xbox_live;
 
 		params.m_load_function(&params);
-
-		return success;
-	}
-
-	if (transport_available())
-	{
-		user_interface_guide_state_manager_get()->add_user_signin_task(true, screen_show_screen_4way_signin_xbox_live_callback);
 	}
 	else
 	{
-		screen_error_ok_dialog_show(
-			_user_interface_channel_type_game_error,
-			_ui_error_xblive_cannot_access_service,
-			_window_4,
-			FLAG((*pevent)->controller),
-			nullptr,
-			nullptr);
+		if (transport_available())
+		{
+			user_interface_guide_state_manager_get()->add_user_signin_task(true, screen_show_screen_4way_signin_xbox_live_callback);
+		}
+		else
+		{
+			screen_error_ok_dialog_show(
+				_user_interface_channel_type_game_error,
+				_ui_error_xblive_cannot_access_service,
+				_window_4,
+				FLAG((*pevent)->controller),
+				nullptr,
+				nullptr);
+		}
 	}
-
-	return success;
 }
 
-bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
+void c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 {
-	bool success = true;
 	if (user_interface_globals_is_beta_build())
 	{
 		screen_error_ok_dialog_show(
@@ -278,43 +273,26 @@ bool c_main_menu_list::handle_item_splitscreen(s_event_record** pevent)
 			FLAG((*pevent)->controller),
 			nullptr,
 			nullptr);
-
-		return success;
 	}
-
-	if (online_connected_to_xbox_live())
+	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
-			_user_interface_channel_type_interface,
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
 			screen_show_screen_4way_signin_splitscreen_offline,
 			_ui_error_confirm_xbox_live_sign_out);
-
-		return success;
 	}
-
-	s_screen_parameters params;
-	params.m_flags = 0;
-	params.m_window_index = _window_4;
-	params.field_C = 0;
-	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
-	params.m_screen_state.field_0 = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = &c_screen_4way_signin::load_for_splitscreen;
-
-	params.m_load_function(&params);
-
-	return success;
+	else
+	{
+		screen_show_screen_4way_signin_splitscreen_offline((*pevent)->controller);
+	}
 }
 
-bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
+void c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 {
 	//return INVOKE_TYPE(0xA978, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
-	bool success = true;
 	if (user_interface_globals_is_beta_build())
 	{
 		screen_error_ok_dialog_show(
@@ -324,86 +302,55 @@ bool c_main_menu_list::handle_item_system_link(s_event_record** pevent)
 			FLAG((*pevent)->controller),
 			nullptr,
 			nullptr);
-
-		return success;
 	}
-
-	if (online_connected_to_xbox_live())
+	else if (online_connected_to_xbox_live())
 	{
-		user_interface_error_display_ok_cancle_dialog_with_ok_callback(
-			_user_interface_channel_type_interface,
+		user_interface_error_display_ok_cancel_dialog_with_ok_callback(
+			_user_interface_channel_type_dialog,
 			_window_4,
 			FLAG((*pevent)->controller),
 			screen_show_screen_4way_signin_system_link_offline,
 			_ui_error_confirm_xbox_live_sign_out);
-
-		return success;
-	}
-
-	if (transport_available())
-	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.field_C = 0;
-		params.user_flags = FLAG((*pevent)->controller);
-		params.m_channel_type = _user_interface_channel_type_gameshell;
-		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
-
-		params.m_load_function(&params);
 	}
 	else
 	{
-		screen_error_ok_dialog_show(
-			_user_interface_channel_type_game_error,
-			_ui_error_network_link_required,
-			_window_4,
-			user_interface_controller_get_signed_in_controllers_mask(),
-			nullptr,
-			nullptr);
+		screen_show_screen_4way_signin_system_link_offline((*pevent)->controller);
 	}
-
-	return success;
 }
 
-bool c_main_menu_list::handle_item_settings(s_event_record** pevent)
+void c_main_menu_list::handle_item_settings(s_event_record** pevent)
 {
 	//return INVOKE_TYPE(0xB32B, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = NULL;
 	params.user_flags = FLAG((*pevent)->controller);
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
 	params.m_load_function = &c_screen_settings::load;
 
 	params.m_load_function(&params);
-
-	return true;
 }
 
-//bool c_main_menu_list::handle_item_guide(s_event_record** pevent)
+//void c_main_menu_list::handle_item_guide(s_event_record** pevent)
 //{
-//	return INVOKE_TYPE(0xB513, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+//	return INVOKE_TYPE(0xB513, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 //}
 
-bool c_main_menu_list::handle_item_quit(s_event_record** pevent)
+void c_main_menu_list::handle_item_quit(s_event_record** pevent)
 {
-	return INVOKE_TYPE(0xA307, 0x0, bool(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
+	return INVOKE_TYPE(0xA307, 0x0, void(__thiscall*)(c_main_menu_list*, s_event_record**), this, pevent);
 }
 
 bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_index controller_index)
 {
 	online_account_transition_to_offline();
 	user_interface_transition_to_offline();
-
+	
 	if (user_interface_controller_get_signed_in_controller_count() <= 0)
 	{
 		user_interface_enter_game_shell(0);
@@ -413,9 +360,9 @@ bool __cdecl screen_show_screen_4way_signin_splitscreen_offline(e_controller_ind
 		s_screen_parameters params;
 		params.m_flags = 0;
 		params.m_window_index = _window_4;
-		params.field_C = 0;
+		params.m_context = 0;
 		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
-		params.m_channel_type = _user_interface_channel_type_gameshell;
+		params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 		params.m_screen_state.field_0 = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
@@ -438,18 +385,31 @@ bool __cdecl screen_show_screen_4way_signin_system_link_offline(e_controller_ind
 	}
 	else
 	{
-		s_screen_parameters params;
-		params.m_flags = 0;
-		params.m_window_index = _window_4;
-		params.field_C = 0;
-		params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
-		params.m_channel_type = _user_interface_channel_type_gameshell;
-		params.m_screen_state.field_0 = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
-		params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-		params.m_load_function = &c_screen_4way_signin::load_for_system_link;
+		if (transport_available())
+		{
+			s_screen_parameters params;
+			params.m_flags = 0;
+			params.m_window_index = _window_4;
+			params.m_context = 0;
+			params.user_flags = user_interface_controller_get_signed_in_controllers_mask();
+			params.m_channel_type = _user_interface_channel_type_gameshell_screen;
+			params.m_screen_state.field_0 = 0xFFFFFFFF;
+			params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
+			params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
+			params.m_load_function = &c_screen_4way_signin::load_for_system_link;
 
-		params.m_load_function(&params);
+			params.m_load_function(&params);
+		}
+		else
+		{
+			screen_error_ok_dialog_show(
+				_user_interface_channel_type_game_error,
+				_ui_error_network_link_required,
+				_window_4,
+				user_interface_controller_get_signed_in_controllers_mask(),
+				nullptr,
+				nullptr);
+		}
 	}
 
 	return true;
@@ -475,9 +435,9 @@ bool __cdecl screen_show_screen_4way_signin_xbox_live_callback()
 	s_screen_parameters params;
 	params.m_flags = 0;
 	params.m_window_index = _window_4;
-	params.field_C = 0;
+	params.m_context = 0;
 	params.user_flags = NONE;// allow all
-	params.m_channel_type = _user_interface_channel_type_gameshell;
+	params.m_channel_type = _user_interface_channel_type_gameshell_screen;
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
