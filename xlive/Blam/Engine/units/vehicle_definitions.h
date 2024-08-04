@@ -333,3 +333,5 @@ struct _vehicle_definition
 	s_havok_vehicle_physics_definition havok_vehicle_physics;
 };
 ASSERT_STRUCT_SIZE(_vehicle_definition, 768);
+
+void __cdecl vehicle_definitions_fixup(datum vehicle_datum);

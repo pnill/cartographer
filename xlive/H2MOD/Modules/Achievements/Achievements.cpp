@@ -1,9 +1,10 @@
 #include "stdafx.h"
+#include "Achievements.h"
 
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "rapidjson/document.h"
-#include "rapidjson/prettywriter.h"
+#include "rapidjson/writer.h"
 
 using namespace rapidjson;
 std::map<DWORD, bool> achievementList;

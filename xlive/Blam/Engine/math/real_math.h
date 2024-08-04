@@ -354,3 +354,5 @@ real32 scale_interpolate(real32 previous_scale, real32 current_scale, real32 fra
 real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* out);
 
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);
+
+void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles);

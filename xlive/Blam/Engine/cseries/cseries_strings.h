@@ -69,7 +69,7 @@ private:
 };
 
 typedef c_static_string<32>  static_string32;
-typedef c_static_string<64>  static_string64;
+typedef c_static_string<64>  c_static_string64;
 typedef c_static_string<128> static_string128;
 typedef c_static_string<256> static_string256;
 typedef c_static_string<260> c_static_string260;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "objects/objects.h"
 
 #define player_identifier_size_bits (sizeof(unsigned long long) * CHAR_BIT)

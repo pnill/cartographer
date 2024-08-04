@@ -15,7 +15,6 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "H2MOD/Tags/TagInterface.h"
 
 std::vector<uint64> Infection::zombieIdentifiers;
 
@@ -238,17 +237,19 @@ void Infection::onGameTick()
 
 void Infection::removeUnwantedItems()
 {
-	const datum shotgun_ammo_equip_datum = tags::find_tag(_tag_group_equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
+	const datum shotgun_ammo_equip_datum = tag_loaded(_tag_group_equipment, "objects\\powerups\\shotgun_ammo\\shotgun_ammo");
 
-	auto itemcollections = tags::find_tags(_tag_group_item_collection);
-	for (auto it = itemcollections.begin(); it != itemcollections.end(); it++)
+	tag_iterator iterator;
+	tag_iterator_new(&iterator, _tag_group_item_collection);
+
+	while (tag_iterator_next(&iterator) != NONE)
 	{
-		std::string item_name = tags::get_tag_name(it->first);
-		if (item_name.find("multiplayer\\powerups") != std::string::npos ||
-			item_name == "multiplayer\\single_weapons\\frag_grenades" ||
-			item_name == "multiplayer\\single_weapons\\plasma_grenades")
+		const char* tag_name = tag_get_name(iterator.current_tag_index);
+		if (strstr(tag_name, "multiplayer\\powerups") ||
+			strncmp(tag_name, "multiplayer\\single_weapons\\frag_grenades", 256) ||
+			strncmp(tag_name, "multiplayer\\single_weapons\\plasma_grenades", 256))
 		{
-			auto itmc = tags::get_tag_fast<s_item_collection_group_definition>(it->first);
+			s_item_collection_group_definition* itmc = (s_item_collection_group_definition*)tag_get_fast(iterator.current_tag_index);
 
 			for (int i = 0; i < itmc->item_permutations.count; i++)
 			{

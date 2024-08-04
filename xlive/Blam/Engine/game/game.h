@@ -84,7 +84,7 @@ bool game_is_authoritative(void);
 s_game_cluster_bit_vectors* game_get_cluster_activation(void);
 
 // Setup default player data in the game options structure
-void game_options_setup_default_players(int player_count, s_game_options* game_options);
+void __cdecl game_options_setup_default_players(int32 player_count, s_game_options* game_options);
 
 void game_time_get_date_and_time(s_date_and_time* date_and_time);
 

@@ -16,9 +16,9 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 
 // for XNet connection logging
+#include "tag_files/tag_loader/tag_injection.h"
 #include "XLive/xnet/IpManagement/XnIp.h"
 
 std::mutex commandInsertMtx;
@@ -713,7 +713,7 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	}
 
 	std::string tagName = tokens[1];
-	std::string mapName = tokens[3];
+	std::wstring mapName(tokens[3].begin(), tokens[3].end());
 
 	const char* p_string = tokens[2].c_str();
 	tag_group tag_type;
@@ -722,12 +722,13 @@ int CommandCollection::InjectTagCmd(const std::vector<std::string>& tokens, Cons
 	tag_type.string[1] = p_string[2];
 	tag_type.string[0] = p_string[3];
 
-	auto tagDatum = tag_loader::Get_tag_datum(tagName, tag_type.group, mapName);
-	tag_loader::Load_tag(tagDatum, true, mapName);
-	tag_loader::Push_Back();
-	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_loader::ResolveNewDatum(tagDatum));
+	tag_injection_set_active_map(mapName.c_str());
+	auto tag_datum = tag_injection_load(tag_type.group, tagName.c_str(), true);
+	tag_injection_inject();
 
-	LOG_INFO_GAME("{} - {} {} {}", tagName, tag_type.string, mapName);
+	outputCb(StringFlag_None, "# loaded tag datum: %#X", tag_datum);
+
+	LOG_INFO_GAME("{} - {} {}", tagName, tag_type.string);
 	return 0;
 }
 
@@ -757,7 +758,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 			datum localPlayerIdx = player_index_from_user_index(0);
 			real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
 
-			if (!DATUM_IS_NONE(object_idx))
+			if (object_idx != NONE)
 			{
 				object_placement_data_new(&new_object_placement, object_idx, -1, 0);
 
@@ -812,7 +813,7 @@ void CommandCollection::ReadObjectDatumIdx() {
 
 void CommandCollection::DeleteObject(datum objectDatumIdx)
 {
-	if (!DATUM_IS_NONE(objectDatumIdx))
+	if (objectDatumIdx != NONE)
 	{
 		object_delete(objectDatumIdx);
 	}

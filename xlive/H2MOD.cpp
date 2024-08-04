@@ -56,6 +56,7 @@
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
 #include "widgets/cloth.h"
@@ -87,7 +88,6 @@
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 
@@ -118,8 +118,7 @@ void __cdecl projectile_collision_object_cause_damage(s_damage_data* damage_data
 {
 	// Hook on call to prevent guardian glitching on Infection gametype
 	if (CustomVariantHandler::VariantEnabled(_id_infection)) {
-		if (!DATUM_IS_NONE(damage_data->creator_datum) 
-			&& damage_data->field_10 != -1)
+		if (damage_data->creator_datum != NONE && damage_data->field_10 != NONE)
 		{
 			LOG_TRACE_GAME(
 				"{} {} {:X} {:X} {:X} {:X} {:X} {:X} {:X} {:X}",
@@ -176,7 +175,7 @@ void call_give_player_weapon(int playerIndex, datum weaponId, bool resetLoadout)
 	//LOG_TRACE_GAME("GivePlayerWeapon(PlayerIndex: %08X, WeaponId: %08X)", PlayerIndex, WeaponId);
 
 	datum unit_datum = s_player::get_unit_index(playerIndex);
-	if (!DATUM_IS_NONE(unit_datum))
+	if (unit_datum != NONE)
 	{
 		object_placement_data nObject;
 
@@ -230,14 +229,13 @@ void H2MOD::set_unit_speed_patch(bool hackit) {
 
 void H2MOD::disable_score_announcer_sounds(int sound_flags)
 {
-	static const std::string multiplayerGlobalsTag("multiplayer\\multiplayer_globals");
 	if (sound_flags)
 	{
-		datum multiplayerGlobalsTagIndex = tags::find_tag(_tag_group_multiplayer_globals, multiplayerGlobalsTag);
+		datum multiplayerGlobalsTagIndex = tag_loaded(_tag_group_multiplayer_globals, "multiplayer\\multiplayer_globals");
 
-		if (!DATUM_IS_NONE(multiplayerGlobalsTagIndex))
+		if (multiplayerGlobalsTagIndex != NONE)
 		{
-			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = tags::get_tag<_tag_group_multiplayer_globals, s_multiplayer_globals_group_definition>(multiplayerGlobalsTagIndex);
+			s_multiplayer_globals_group_definition* multiplayerGlobalsTag = (s_multiplayer_globals_group_definition*)tag_get_fast(multiplayerGlobalsTagIndex);
 
 			if (multiplayerGlobalsTag->runtime.count)
 			{
@@ -499,7 +497,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		resetAfterMatch = true;
 	}
-
 	EventHandler::MapLoadEventExecute(EventExecutionType::execute_after, options->game_mode);
 	CustomVariantHandler::OnMapLoad(ExecTime::_postEventExec, options);
 	return result;
@@ -584,14 +581,14 @@ bool FlashlightIsEngineSPCheck() {
 
 void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
 {
-	if (!DATUM_IS_NONE(unit_datum))
+	if (unit_datum != NONE)
 	{
 		object_placement_data object_placement;
 
 		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, 0);
 
 		datum object_idx = object_new(&object_placement);
-		if (!DATUM_IS_NONE(object_idx))
+		if (object_idx != NONE)
 		{
 			unit_delete_all_weapons(unit_datum);
 			unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
@@ -864,6 +861,7 @@ void H2MOD::ApplyHooks() {
 	simulation_apply_patches();
 	simulation_players_apply_patches();
 
+	cache_files_apply_patches();
 	network_configuration_apply_patches();
 
 	// server/client detours 
@@ -985,7 +983,6 @@ void H2MOD::Initialize()
 		KeyboardInput::Initialize();
 		ControllerInput::Initialize();
 		
-		Initialise_tag_loader();
 		RenderHooks::Initialize();
 		DirectorHooks::Initialize();
 		ImGuiHandler::WeaponOffsets::Initialize();
@@ -998,6 +995,8 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
+
+	tag_injection_initialize();
 	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();

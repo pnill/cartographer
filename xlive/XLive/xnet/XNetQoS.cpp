@@ -1,8 +1,8 @@
 #include "stdafx.h"
+#include "XLive/xnet/XNetQoS.h"
 
 #include <MSWSock.h>
 #include <WS2tcpip.h>
-#include "XLive/xnet/XNetQoS.h"
 #include "IpManagement/XnIp.h"
 #include "H2MOD/Modules/Shell/Config.h"
 

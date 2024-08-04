@@ -34,7 +34,7 @@ protected:
 public:
 	c_squad_settings_list(int16 user_flags);
 	uint16 get_last_item_type();
-	bool party_management_exists();
+	bool party_management_exists() const;
 	void party_management_delete_item();
 	
 	// c_squad_settings_list virtual functions

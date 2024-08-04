@@ -1,6 +1,8 @@
 #pragma once
 
-enum e_tag_group : uint32
+#define k_tag_group_count 120
+
+enum e_tag_group : int32
 {
 	_tag_group_cache_file_sound = '$#!+',
 	_tag_group_scenario_scenery_resource = '*cen',
@@ -121,7 +123,8 @@ enum e_tag_group : uint32
 	_tag_group_cellular_automata2d = 'whip',
 	_tag_group_user_interface_shared_globals_definition = 'wigl',
 	_tag_group_wind = 'wind',
-	_tag_group_weapon_hud_interface = 'wphi'
+	_tag_group_weapon_hud_interface = 'wphi',
+	_tag_group_none = NONE
 };
 
 union tag_group 
@@ -130,12 +133,26 @@ union tag_group
 	char string[4];
 };
 
+struct s_tag_group_link
+{
+	tag_group child;
+	tag_group parent_2;
+	tag_group parent;
+};
+
+
 struct s_tag_block
 {
 	int32 count;
 	int32 data;
 };
 
+s_tag_group_link* tag_group_get_link_set(tag_group group);
+
 tag_group tag_group_get_name(tag_group group);
 
+uint32 tag_group_get_as_index(tag_group group);
+
 void* __cdecl tag_block_get_element_with_size(const s_tag_block* block, int32 index, int32 block_size);
+
+void __cdecl set_tag_group_data_info(uint32 tag_data, uint32 tag_data_size);

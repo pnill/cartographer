@@ -122,8 +122,8 @@ public:
 		m_itemQueryMutex.unlock();
 	}
 
-	int GetItemLeftCount();
-	int GetValidItemsFoundCount();
+	int GetItemLeftCount() const;
+	int GetValidItemsFoundCount() const;
 
 	void CancelOperation() {
 		// before canceling the operation 
@@ -133,7 +133,7 @@ public:
 	}
 
 	void EnumerateFromHttp();
-	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer);
+	bool SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const;
 
 	void SetNewPageBuffer(DWORD cbBuffer, CHAR* pvBuffer)
 	{
@@ -172,7 +172,7 @@ public:
 	std::mutex m_ioWriteMutex;
 
 private:
-	bool ShouldCancelOperation() 
+	bool ShouldCancelOperation() const
 	{
 		return m_cancelOperation;
 	}

@@ -12,14 +12,12 @@
 
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Tags/TagInterface.h"
 
 /* globals */
 
 bool g_should_draw_hud_override = true;
 std::vector<datum> crosshair_bitmap_datums;				// Store all the crosshair bitmap datums
 std::vector<point2d> crosshair_original_bitmap_sizes;	// We use point2d struct to store the original resolutions (x as width and y as height)
-
 
 /* prototypes */
 
@@ -95,7 +93,7 @@ void set_crosshair_scale(real32 scale)
 	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
 		// Grab the bitmap definition
-		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
+		bitmap_group* bitm_definition = (bitmap_group*)tag_get_fast(crosshair_bitmap_datums[i]);
 
 		// Loop through every bitmap inside the bitmap tag
 		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
@@ -181,7 +179,7 @@ void initialize_crosshair_bitmap_data(void)
 {
 	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
 	{
-		bitmap_group* bitm_definition = tags::get_tag_fast<bitmap_group>(crosshair_bitmap_datums[i]);
+		bitmap_group* bitm_definition = (bitmap_group*)tag_get_fast(crosshair_bitmap_datums[i]);
 		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
 		{
 			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
@@ -206,11 +204,12 @@ bool crosshair_bitmap_vector_contains_datum(datum tag_index)
 
 void get_crosshair_bitmap_datums(void)
 {
-	// Get all nhdt tags
-	std::map<datum, std::string> new_hud_definition_tags = tags::find_tags(_tag_group_new_hud_definition);
-	for (auto it = new_hud_definition_tags.begin(); it != new_hud_definition_tags.end(); it++)
+	tag_iterator iterator;
+	tag_iterator_new(&iterator, _tag_group_new_hud_definition);
+
+	while (tag_iterator_next(&iterator) != NONE)
 	{
-		s_new_hud_definition* nhdt_definition = tags::get_tag_fast<s_new_hud_definition>(it->first);
+		s_new_hud_definition* nhdt_definition = (s_new_hud_definition*)tag_get_fast(iterator.current_tag_index);
 
 		// Loop through every bitmap widget in the nhdt definition
 		for (byte i = 0; i < nhdt_definition->bitmap_widgets.count; ++i)
