@@ -4,7 +4,7 @@
 #include "game/game_globals.h"
 #include "main/level_definitions.h"
 
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
+#include "tag_files/tag_loader/tag_injection.h"
 #include "Util/filesys.h"
 
 
@@ -19,23 +19,22 @@
 
 namespace MapSlots
 {
-	std::vector<std::string> AddedMaps;
+	std::vector<std::wstring> AddedMaps;
 	std::vector<s_multiplayer_ui_level_definition> MapData;
-	std::map<datum, std::string> BitmapsToLoad;
+	std::map<datum, std::wstring> BitmapsToLoad;
 
 	void CacheMapData(void)
 	{
 		//lots copied over from Tag Loader, using this function to grab the Level data in the scenario tag
 		//And using that to construct a new s_multiplayer_levels_block and grab the bitmap datum for tag loading
-		std::string game_dir(GetExeDirectoryNarrow());
-		std::string def_maps_loc = game_dir + "\\maps";
+		std::wstring def_maps_loc = GetExeDirectoryWide() + L"\\maps";
 		LOG_TRACE_GAME("[Map Slots]: Startup - Caching map data");
 		for (const auto& map : AddedMaps)
 		{
-			std::string map_location = def_maps_loc + "\\" + map;
+			std::wstring map_location = def_maps_loc + L"\\" + map + L".map";
 			if (std::filesystem::exists(map_location))
 			{
-				LOG_TRACE_GAME("[Map Slots]: Startup - Caching {}", map);
+				LOG_TRACE_GAME(L"[Map Slots]: Startup - Caching {}", map);
 				std::ifstream fin(map_location.c_str(), std::ios::binary);
 				if (fin.is_open())
 				{
@@ -77,11 +76,9 @@ namespace MapSlots
 					fin.read((char*)&newBlock, sizeof(s_multiplayer_ui_level_definition));
 
 					//Fix incase the maps level data is incorrectly setup
-					if (strlen(newBlock.path.get_string()) == 0) {
+					if (strlen(newBlock.path) == 0) {
 						fin.seekg(0x1C8);
-						char* buffer = new char[128];
-						fin.read(buffer, 128);
-						newBlock.path.set(buffer);
+						fin.read(newBlock.path, NUMBEROF(s_multiplayer_ui_level_definition::path));
 					}
 
 					MapData.emplace_back(newBlock);
@@ -93,7 +90,7 @@ namespace MapSlots
 			}
 			else
 			{
-				LOG_TRACE_GAME("[Map Slots]: Startup - Map File Missing {}", map);
+				LOG_TRACE_GAME(L"[Map Slots]: Startup - Map File Missing {}", map);
 			}
 		}
 
@@ -111,13 +108,13 @@ namespace MapSlots
 			{
 				if (added_maps + k_multiplayer_first_unused_slot < k_max_map_slots)
 				{
-					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.english_name.get_string());
+					LOG_TRACE_FUNCW(L"Adding {}", newSlot.level_descriptions.name[_language_english]);
 					s_multiplayer_ui_level_definition* slot = ui_levels->multiplayer_levels[added_maps + k_multiplayer_first_unused_slot];
 
 					//Write the data loaded from the maps into the unused slot
 					memcpy(slot, &newSlot, sizeof(newSlot));
 					//Resolve the loaded bitmap datum
-					slot->bitmap.index = tag_loader::ResolveNewDatum(newSlot.bitmap.index);
+					slot->bitmap.index = tag_injection_resolve_cache_datum(newSlot.bitmap.index);
 
 					//Change the map id and sort ID so that the maps are 
 					//placed in order at the end of the list
@@ -146,7 +143,7 @@ namespace MapSlots
 			if (k_multiplayer_first_unused_slot + added_map_count < k_max_map_slots)
 			{
 				s_multiplayer_ui_level_definition* slot = &multiplayer_levels[k_multiplayer_first_unused_slot + added_map_count];
-				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.english_name.get_string());
+				LOG_TRACE_FUNCW("Adding {}", newSlot.level_descriptions.name[_language_english]);
 				DWORD dwBack[2];
 				VirtualProtect(slot, sizeof(s_multiplayer_ui_level_definition), PAGE_EXECUTE_READWRITE, &dwBack[0]);
 
@@ -200,13 +197,15 @@ namespace MapSlots
 	{
 		if (!AddedMaps.empty())
 		{
-			//Load all the added maps bitmaps
+			////Load all the added maps bitmaps
 			LOG_TRACE_GAME("[Map Slots]: OnMapLoad - Tag Loading Bitmaps");
 			for (const auto& item : BitmapsToLoad)
 			{
-				tag_loader::Load_tag(item.first, false, item.second);
+				tag_injection_set_active_map(item.second.c_str());
+				tag_injection_load(_tag_group_bitmap, item.first, false);
+				tag_injection_inject();
 			}
-			tag_loader::Push_Back();
+
 			add_new_multiplayer_map_slots_game();
 		}
 
@@ -215,8 +214,8 @@ namespace MapSlots
 
 	void Initialize(void)
 	{
-		AddedMaps.emplace_back("highplains.map");
-		AddedMaps.emplace_back("derelict.map");
+		AddedMaps.emplace_back(L"highplains");
+		AddedMaps.emplace_back(L"derelict");
 		CacheMapData();
 
 		if (Memory::IsDedicatedServer())

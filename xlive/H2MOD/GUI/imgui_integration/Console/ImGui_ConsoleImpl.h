@@ -1,11 +1,8 @@
 #pragma once
 
 #include "imgui.h"
-#include "../ImGui_Handler.h"
 #include "ComVar.h"
 #include "CommandHandler.h"
-#include "CommandCollection.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 
 class CartographerConsole;
 typedef CartographerConsole CartConsole;

@@ -24,6 +24,7 @@ xliveless.v12.suo
 **/.vscode
 /Directx SDK/include
 /Halo2
+/Halo2Server
 /xlive/Debug
 /xlive/Release
 *.opensdf

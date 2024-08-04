@@ -38,6 +38,7 @@ enum e_seat_mapping_bitfield : int
 	seat_mapping_bitfield_seat_31 = FLAG(31)
 };
 
+// max: k_maximum_hs_unit_seat_mappings
 struct s_hs_unit_seat_mapping
 {
 	datum unit_tag_datum_index;

@@ -582,6 +582,8 @@ ASSERT_STRUCT_SIZE(s_game_globals, 644);
 /* public code */
 
 s_game_globals* scenario_get_game_globals(void);
+void scenario_set_game_globals(s_game_globals* globals);
+
 s_ui_levels_definition* game_globals_get_ui_levels(void);
 s_game_globals_player_representation* game_globals_get_representation(e_character_type type);
 

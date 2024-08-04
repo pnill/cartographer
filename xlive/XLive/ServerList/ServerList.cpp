@@ -134,17 +134,17 @@ DWORD ComputeXLocatorServerEnumeratorBufferSize(DWORD cItems, DWORD cRequiredPro
 	return result;
 }
 
-int CServerList::GetItemLeftCount()
+int CServerList::GetItemLeftCount() const
 {
 	return m_itemsLeftInDoc;
 }
 
-int CServerList::GetValidItemsFoundCount()
+int CServerList::GetValidItemsFoundCount() const
 {
 	return m_pageItemsFoundCount;
 }
 
-bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer)
+bool CServerList::SearchResultParseAndWrite(const std::string& serverResultData, XUID xuid, XLOCATOR_SEARCHRESULT* pOutSearchResult, XUSER_PROPERTY** propertiesBuffer, WCHAR** stringBuffer) const
 {
 	XLOCATOR_SEARCHRESULT searchResult;
 	ZeroMemory(&searchResult, sizeof(XLOCATOR_SEARCHRESULT));

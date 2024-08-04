@@ -5,11 +5,10 @@ namespace KantTesting
 {
 	void MapLoad()
 	{
+
 	}
 
 	void Initialize()
 	{
-		if (ENABLEKANTTEST) {
-		}
 	}
 }

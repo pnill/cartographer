@@ -10,7 +10,7 @@ c_text_widget::c_text_widget(int16 user_flags) :
 }
 
 c_text_widget::c_text_widget(datum user_index) :
-	c_user_interface_widget(_widget_type_text, DATUM_IS_NONE(user_index) ? 0 : FLAG(user_index))
+	c_user_interface_widget(_widget_type_text, (user_index == NONE) ? 0 : FLAG(user_index))
 {
 	this->intro_animation_delay_ms = 0;
 	this->field_74 = 0;

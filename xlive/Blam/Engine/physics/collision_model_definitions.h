@@ -108,3 +108,6 @@ struct collision_model_definition
 	tag_block<collision_model_pathfinding_sphere> pathfinding_spheres;
 	tag_block<collision_model_node> nodes;
 };
+
+
+void __cdecl collision_model_definitions_fixup(datum collision_model_datum);

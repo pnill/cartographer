@@ -3,9 +3,9 @@
 
 struct s_weapon_custom_offset 
 {
-	const real_vector3d defaultOffset;
+	const real_point3d defaultOffset;
 	const char weaponPath[128];
-	real_vector3d modifiedOffset;
+	real_point3d modifiedOffset;
 	_weapon_definition* tag;
 };
 

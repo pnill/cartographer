@@ -182,7 +182,7 @@ struct object_datum
 	real_point3d position;
 	real_vector3d forward;
 	real_vector3d up;
-	real_point3d translational_velocity;
+	real_vector3d translational_velocity;
 	real_vector3d angular_velocity;
 	real32 scale;
 	c_object_identifier object_identifier;

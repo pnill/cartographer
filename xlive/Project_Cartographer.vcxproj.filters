@@ -11,9 +11,6 @@
     <ClCompile Include="Blam\Engine\networking\transport\network_observer.cpp" />
     <ClCompile Include="Blam\Engine\Networking\Session\NetworkSession.cpp" />
     <ClCompile Include="H2MOD\Tags\TagInterface.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\cache_loader.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\meta_struct.cpp" />
-    <ClCompile Include="H2MOD\Tags\MetaLoader\tag_loader.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\ServerConsole.cpp" />
     <ClCompile Include="Util\log.cpp" />
     <ClCompile Include="XLive\Cryptography\Rc4.cpp" />
@@ -385,6 +382,21 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_cartographer_menus.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_brightness_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_virtual_keyboard.cpp" />
+    <ClCompile Include="H2MOD\Tags\MetaLoader\xml_loader.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.cpp" />
+    <ClCompile Include="Blam\Engine\tag_files\tag_loader\tag_injection.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
+    <ClCompile Include="Blam\Engine\units\vehicle_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\units\biped_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\creatures\creature_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\cseries_system_memory.cpp" />
+    <ClCompile Include="Blam\Engine\sound\sound_cache_file_definitions.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -491,9 +503,6 @@
     <ClInclude Include="Blam\Engine\Networking\Session\NetworkSession.h" />
     <ClInclude Include="H2MOD\Modules\Shell\ServerConsole.h" />
     <ClInclude Include="H2MOD\Tags\TagInterface.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\cache_loader.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\meta_struct.h" />
-    <ClInclude Include="H2MOD\Tags\MetaLoader\tag_loader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\SimpleIni.h" />
     <ClInclude Include="XLive\Cryptography\Rc4.h" />
@@ -1035,6 +1044,22 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_cartographer_menus.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_brightness_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_virtual_keyboard.h" />
+    <ClInclude Include="H2MOD\Tags\MetaLoader\xml_loader.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_agent.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_block.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\xml\xml_definition_loader.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_manager.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_table.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection.h" />
+    <ClInclude Include="Blam\Engine\tag_files\tag_loader\tag_injection_define.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
+    <ClInclude Include="Blam\Engine\creatures\creature_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
+    <ClInclude Include="Blam\Engine\ai\character_definitions.h" />
+    <ClInclude Include="Blam\Engine\cseries\cseries_system_memory.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_cache_file_definitions.h" />
+    <ClInclude Include="H2MOD\GUI\imgui_integration\WeaponOffsetsStringTable.h" />
+    <ClInclude Include="Blam\Engine\sound\sound_definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

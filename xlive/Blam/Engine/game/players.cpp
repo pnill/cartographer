@@ -139,13 +139,13 @@ void s_player::set_player_unit_grenade_count(datum player_index, e_unit_grenade_
 unit_datum* s_player::get_player_unit_data(datum player_index)
 {
     datum unit_index = s_player::get_unit_index(player_index);
-    if (DATUM_IS_NONE(unit_index))
+    if (unit_index == NONE)
         return nullptr;
 
     return (unit_datum*)object_get_fast_unsafe(unit_index);
 }
 
-real_vector3d* s_player::get_unit_coords(datum player_index)
+real_point3d* s_player::get_unit_coords(datum player_index)
 {
     unit_datum* player_unit = get_player_unit_data(player_index);
     if (player_unit != nullptr)

@@ -11,8 +11,7 @@
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Tags/MetaExtender.h"
-#include "H2MOD/Tags/MetaLoader/tag_loader.h"
-#include "H2MOD/Tags/TagInterface.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 /**
 	 * \brief Adds a new player representation to the globals tag block
@@ -46,6 +45,11 @@ void game_globals_add_new_player_representations(void);
 s_game_globals* scenario_get_game_globals(void)
 {
 	return *Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C);
+}
+
+void scenario_set_game_globals(s_game_globals* globals)
+{
+	*Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C) = globals;
 }
 
 s_ui_levels_definition* game_globals_get_ui_levels(void)
@@ -132,20 +136,19 @@ void game_globals_remove_singleplayer_representation(void)
 void game_globals_add_skeleton_representation(scenario* scenario_definition)
 {
 	// Add skeleton
-	datum skele_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\masterchief_skeleton", _tag_group_biped, "carto_shared");
-	datum skele_fp_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp\\fp", _tag_group_render_model, "carto_shared");
-	datum skele_body_datum = tag_loader::Get_tag_datum("objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
+
+	tag_injection_set_active_map(k_carto_shared_map);
+	datum skele_datum = tag_injection_load(_tag_group_biped, "objects\\characters\\masterchief_skeleton\\masterchief_skeleton", true);
+	datum skele_fp_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp\\fp", true);
+	datum skele_body_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\masterchief_skeleton\\fp_body\\fp_body", true);
 
 	if (skele_datum != NONE && skele_fp_datum != NONE && skele_body_datum != NONE && get_current_special_event() == _special_event_halloween && !H2Config_no_events)
 	{
-		tag_loader::Load_tag(skele_fp_datum, true, "carto_shared");
-		tag_loader::Load_tag(skele_body_datum, true, "carto_shared");
-		tag_loader::Load_tag(skele_datum, true, "carto_shared");
-		tag_loader::Push_Back();
-		datum skele_new_datum = tag_loader::ResolveNewDatum(skele_datum);
-		add_representation(tag_loader::ResolveNewDatum(skele_fp_datum), tag_loader::ResolveNewDatum(skele_body_datum), skele_new_datum);
+		tag_injection_inject();
+
+		add_representation(skele_fp_datum, skele_body_datum, skele_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
-		new_def->tag_datum = skele_new_datum;
+		new_def->tag_datum = skele_datum;
 	}
 	else
 	{
@@ -156,19 +159,19 @@ void game_globals_add_skeleton_representation(scenario* scenario_definition)
 
 void game_globals_add_flood_representation(scenario* scenario_definition)
 {
-	datum flood_datum = tag_loader::Get_tag_datum("objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", _tag_group_biped, "carto_shared");
-	datum flood_arms_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_arms\\fp_arms", _tag_group_render_model, "carto_shared");
-	datum flood_body_datum = tag_loader::Get_tag_datum("objects\\characters\\flood_mp\\fp_body\\fp_body", _tag_group_render_model, "carto_shared");
+	tag_injection_set_active_map(k_carto_shared_map);
+
+	datum flood_datum = tag_injection_load(_tag_group_biped, "objects\\characters\\floodcombat_elite\\floodcombat_elite_mp", true);
+	datum flood_arms_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\flood_mp\\fp_arms\\fp_arms", true);
+	datum flood_body_datum = tag_injection_load(_tag_group_render_model, "objects\\characters\\flood_mp\\fp_body\\fp_body", true);
+
 	if (flood_datum != NONE && flood_arms_datum != NONE && flood_body_datum != NONE)
 	{
-		tag_loader::Load_tag(flood_datum, true, "carto_shared");
-		tag_loader::Load_tag(flood_arms_datum, true, "carto_shared");
-		tag_loader::Load_tag(flood_body_datum, true, "carto_shared");
-		tag_loader::Push_Back();
-		datum new_flood_index = tag_loader::ResolveNewDatum(flood_datum);
-		add_representation(tag_loader::ResolveNewDatum(flood_arms_datum), tag_loader::ResolveNewDatum(flood_body_datum), new_flood_index);
+		tag_injection_inject();
+
+		add_representation( flood_arms_datum, flood_body_datum, flood_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
-		new_def->tag_datum = new_flood_index;
+		new_def->tag_datum = flood_datum;
 	}
 	else
 	{
@@ -185,7 +188,7 @@ void game_globals_add_lmao_representation(void)
 	if (mode_chief_mp_datum != NONE)
 	{
 		// Copy the variant
-		s_model_definition* mode_chief_mp = tags::get_tag<_tag_group_model, s_model_definition>(mode_chief_mp_datum);
+		s_model_definition* mode_chief_mp = (s_model_definition*)tag_get_fast(mode_chief_mp_datum);
 		auto base_variant = mode_chief_mp->variants[0];
 		auto new_variant = MetaExtender::add_tag_block2<s_model_variant>((unsigned long)std::addressof(mode_chief_mp->variants));
 		new_variant->name = 0xABABABA;
@@ -214,14 +217,13 @@ void game_globals_add_lmao_representation(void)
 			}
 		}
 
+		tag_injection_set_active_map(k_carto_shared_map);
 		// Add lmao head as an attachment on the new variant
-		datum lmao_datum = tag_loader::Get_tag_datum("scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", _tag_group_scenery, "carto_shared");
+		datum lmao_datum = tag_injection_load(_tag_group_scenery, "scenarios\\objects\\multi\\carto_shared\\emoji_head\\emoji_head", true);
 		if (lmao_datum != NONE)
 		{
-			tag_loader::Load_tag(lmao_datum, true, "carto_shared");
-			tag_loader::Push_Back();
+			tag_injection_inject();
 
-			lmao_datum = tag_loader::ResolveNewDatum(lmao_datum);
 			if (lmao_datum != NONE)
 			{
 				auto new_object = MetaExtender::add_tag_block2<s_model_variant_object>((unsigned long)std::addressof(new_variant->objects));

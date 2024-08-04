@@ -1,8 +1,6 @@
 #include "stdafx.h"
 
 #include "screen_4way_signin.h"
-#include "game/game.h"
-#include "H2MOD/Tags/TagInterface.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -319,7 +317,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 
 
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
-	if (!DATUM_IS_NONE(widget_tag_datum))
+	if (widget_tag_datum != NONE)
 	{
 		this->verify_and_load_from_layout(NONE, &layout);
 	}
@@ -593,16 +591,16 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	const char* player_skins_tag_path = "ui\\player_skins\\player_skin_signin";
 	const int16 scale_factor = 2;
 
-	datum main_widget_datum_index = tags::find_tag(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
-	datum player_skins_datum_index = tags::find_tag(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
+	datum main_widget_datum_index = tag_loaded(_tag_group_user_interface_screen_widget_definition, main_widget_tag_path);
+	datum player_skins_datum_index = tag_loaded(_tag_group_user_interface_list_skin_definition, player_skins_tag_path);
 
-	if (DATUM_IS_NONE(main_widget_datum_index) || DATUM_IS_NONE(player_skins_datum_index))
+	if (main_widget_datum_index == NONE || player_skins_datum_index == NONE)
 	{
 		LOG_ERROR_FUNC("bad datum found");
 		return;
 	}
 
-	s_user_interface_screen_widget_definition* main_widget_tag = tags::get_tag_fast<s_user_interface_screen_widget_definition>(main_widget_datum_index);
+	s_user_interface_screen_widget_definition* main_widget_tag = (s_user_interface_screen_widget_definition*)tag_get_fast(main_widget_datum_index);
 	s_window_pane_reference* base_pane = main_widget_tag->panes[0];
 
 	const point2d bitmap_positions[] = {
@@ -698,7 +696,7 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	}
 
 	//hacky wacky until skin tag definitions are added
-	void* player_skins_signin_tag = tags::get_tag_fast(player_skins_datum_index);
+	void* player_skins_signin_tag = tag_get_fast(player_skins_datum_index);
 	tag_block<s_hud_block_reference> hud_block = *reinterpret_cast<tag_block<s_hud_block_reference>*>((char*)(player_skins_signin_tag)+0x2C);
 
 
@@ -708,12 +706,12 @@ void c_screen_4way_signin::apply_patches_on_map_load()
 	base_hud_block->bounds = og_bounds;
 
 	const char* shader_tag_path = "ui\\hud\\shaders\\ui_small_emblem";
-	datum shader_datum_index = tags::find_tag(_tag_group_shader, shader_tag_path);
+	datum shader_datum_index = tag_loaded(_tag_group_shader, shader_tag_path);
 
 	// ui_medium_emblem is bugged for guest profiles so we use ui_small_emblem shader
 	// but the bitmap quality is lowered
 	// fixme
-	if (!DATUM_IS_NONE(shader_datum_index))
+	if (shader_datum_index != NONE)
 	{
 		base_hud_block->shader.index = shader_datum_index;
 	}

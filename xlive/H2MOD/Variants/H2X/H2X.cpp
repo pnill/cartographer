@@ -5,8 +5,6 @@
 #include "game/game_time.h"
 #include "math/math.h"
 
-#include "H2MOD/Tags/TagInterface.h"
-
 
 const H2X::h2x_mod_info weapons[] =
 {
@@ -43,10 +41,10 @@ void H2X::ApplyMapLoadPatches(bool enable)
 	for (auto& weapon : weapons)
 	{
 		float rof = (enable ? weapon.h2x_rate_of_fire : weapon.original_rate_of_fire);
-		datum weapon_datum = tags::find_tag(_tag_group_weapon, weapon.tag_string);
+		datum weapon_datum = tag_loaded(_tag_group_weapon, weapon.tag_string);
 		if (weapon_datum != NONE)
 		{
-			_weapon_definition* weapon_tag = tags::get_tag_fast<_weapon_definition>(weapon_datum);
+			_weapon_definition* weapon_tag = (_weapon_definition*)tag_get_fast(weapon_datum);
 			weapon.rounds_per_second_based ?
 				weapon_tag->barrels[weapon.barrel_data_block_index]->rounds_per_second.upper = rof : 
 				weapon_tag->barrels[weapon.barrel_data_block_index]->fire_recovery_time_seconds = rof;

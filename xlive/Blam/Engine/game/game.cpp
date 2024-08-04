@@ -113,11 +113,9 @@ s_game_cluster_bit_vectors* game_get_cluster_activation(void)
 	return get_main_game_globals()->cluster_activation;
 }
 
-void game_options_setup_default_players(int player_count, s_game_options* game_options)
+void __cdecl game_options_setup_default_players(int32 player_count, s_game_options* game_options)
 {
-	typedef void(__cdecl* cache_file_map_clear_all_failures_t)(int, s_game_options*);
-	auto p_game_options_setup_default_players = Memory::GetAddress<cache_file_map_clear_all_failures_t>(0x49650, 0x428ED);
-	p_game_options_setup_default_players(player_count, game_options);
+    INVOKE(0x49650, 0x428ED, game_options_setup_default_players, player_count, game_options);
 	return;
 }
 
@@ -148,7 +146,7 @@ void game_direct_connect_to_session(XNKID kid, XNKEY key, const XNADDR* addr, in
     else
     {
         c_game_life_cycle_handler_joining::check_joining_capability();
-        wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE];
+        wchar_t local_usernames[k_number_of_users][XUSER_NAME_SIZE] = {};
         s_player_identifier local_identifiers[k_number_of_users];
         int valid_local_player_count = 0;
         for (auto i = 0; i < 4; i++)

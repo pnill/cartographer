@@ -1,9 +1,9 @@
 #pragma once
 #define ENABLEKANTTEST 0
-#include "networking/Transport/transport_qos.h"
 
 namespace KantTesting
 {
+	/*
 	struct __declspec(align(8)) s_session_informations_live
 	{
 		DWORD dwServerExists;
@@ -18,8 +18,8 @@ namespace KantTesting
 		int8 session_info[0xA1C];
 		char gapp[24];
 	};
-
 	ASSERT_STRUCT_SIZE(s_session_informations_live, 0xAA8);
+	*/
 
 	void Initialize();
 }

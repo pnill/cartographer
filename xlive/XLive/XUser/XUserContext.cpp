@@ -140,7 +140,7 @@ DWORD WINAPI XUserSetContext(DWORD dwUserIndex, DWORD dwContextId, DWORD dwConte
 	}
 	case _context_id_presence:
 	{
-		switch ((e_context_variant)dwContextValue)
+		switch ((e_context_presence)dwContextValue)
 		{
 		case _context_presence_singleplayer:
 		{

@@ -14,7 +14,6 @@
 #include "rasterizer/rasterizer_globals.h"
 
 #include "H2MOD/Modules/CustomMenu/CustomLanguage.h"
-#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
@@ -23,6 +22,7 @@
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
+#include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Utils/Utils.h"
 #endif
 

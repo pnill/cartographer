@@ -19,16 +19,19 @@ namespace TagFixes
 	{
 		void fix_shader_template_nvidia(const char *template_name, const char* bitmap_name, int32 bitmap_idx)
 		{
-			datum bitmap_to_fix = tags::find_tag(_tag_group_bitmap, bitmap_name);
-			datum borked_template = tags::find_tag(_tag_group_shader_template, template_name);
+			datum bitmap_to_fix = tag_loaded(_tag_group_bitmap, bitmap_name);
+			datum borked_template = tag_loaded(_tag_group_shader_template, template_name);
 			LOG_DEBUG_FUNC("bitmap {0}, borked_template {1}", bitmap_to_fix, borked_template);
-			if (DATUM_IS_NONE(bitmap_to_fix) || DATUM_IS_NONE(borked_template))
+			if (bitmap_to_fix == NONE || borked_template == NONE)
 				return;
 			LOG_DEBUG_FUNC("Fixing: template {}, bitmap {}", template_name, bitmap_name);
-			auto shaders = tags::find_tags(_tag_group_shader);
-			for(auto &shader_item : shaders)
+
+			tag_iterator iterator;
+			tag_iterator_new(&iterator, _tag_group_shader);
+
+			while (tag_iterator_next(&iterator) != NONE)
 			{
-				auto shader = tags::get_tag<_tag_group_shader, byte>(shader_item.first);
+				char* shader = (char*)tag_get_fast(iterator.current_tag_index);
 				if(shader != nullptr)
 				{
 					tag_reference* shader_template = reinterpret_cast<tag_reference*>(shader);
@@ -70,9 +73,9 @@ namespace TagFixes
 			// TODO FIXME: this breaks other shadows
 			return;
 
-			auto cinematic_shadow_datum = tags::find_tag(_tag_group_vertex_shader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
-			auto shadow_datum = tags::find_tag(_tag_group_shader_pass, "shaders\\shader_passes\\shadow\\shadow_generate");
-			byte* shadow_tag = tags::get_tag<_tag_group_shader_pass, BYTE>(shadow_datum);
+			datum cinematic_shadow_datum = tag_loaded(_tag_group_vertex_shader, "rasterizer\\vertex_shaders_dx9\\shadow_buffer_generation_cinematic");
+			datum shadow_datum = tag_loaded(_tag_group_shader_pass, "shaders\\shader_passes\\shadow\\shadow_generate");
+			char* shadow_tag = (char*)tag_get_fast(shadow_datum);
 			if(shadow_tag != nullptr)
 			{
 				tag_block<int> *shadow_pp = reinterpret_cast<tag_block<int>*>(shadow_tag + 0x1C);
@@ -104,20 +107,24 @@ namespace TagFixes
 
 		void shader_lod_max()
 		{
-			auto shaders = tags::find_tags(_tag_group_shader);
-			for (auto& shader_item : shaders)
+			tag_iterator iterator;
+			tag_iterator_new(&iterator, _tag_group_shader);
+
+			while (tag_iterator_next(&iterator) != NONE)
 			{
-				auto shader = tags::get_tag<_tag_group_shader, s_shader_definition>(shader_item.first);
+				s_shader_definition* shader = (s_shader_definition*)tag_get_fast(iterator.current_tag_index);
 				shader->shader_lod_bias = _shader_lod_bias_never;
 			}
 		}
 
 		void light_framerate_killer()
 		{
-			auto lights = tags::find_tags(_tag_group_light);
-			for (auto& light_item : lights)
+			tag_iterator iterator;
+			tag_iterator_new(&iterator, _tag_group_light);
+
+			while (tag_iterator_next(&iterator) != NONE)
 			{
-				auto light = tags::get_tag_fast<light_definition>(light_item.first);
+				light_definition* light = (light_definition*)tag_get_fast(iterator.current_tag_index);
 				// Disabled since it caused issues where certain lights wouldnt render randomly
 				// TODO figure out why it does this at some other point in time
 				// light->flags.set(_light_definition_light_framerate_killer, true);
@@ -128,10 +135,12 @@ namespace TagFixes
 
 		void fall_damage_fix()
 		{
-			auto bipeds = tags::find_tags(_tag_group_biped);
-			for (auto& biped_item : bipeds)
+			tag_iterator iterator;
+			tag_iterator_new(&iterator, _tag_group_biped);
+
+			while (tag_iterator_next(&iterator) != NONE)
 			{
-				auto biped = tags::get_tag<_tag_group_biped, _biped_definition>(biped_item.first);
+				_biped_definition* biped = (_biped_definition*)tag_get_fast(iterator.current_tag_index);
 				biped->unit.object.abs_acceleration.lower *= 2.0f;
 				biped->unit.object.abs_acceleration.upper *= 2.0f;
 			}
@@ -140,10 +149,10 @@ namespace TagFixes
 		void sound_classes_fix()
 		{
 			// Change sound_classes data to equivalents in original halo 2
-			datum sound_classes_datum = tags::find_tag(_tag_group_sound_classes, "sound\\sound_classes");
+			datum sound_classes_datum = tag_loaded(_tag_group_sound_classes, "sound\\sound_classes");
 			if (sound_classes_datum != NONE)
 			{
-				s_sound_classes_block* sound_classes = tags::get_tag_fast<s_sound_classes_block>(sound_classes_datum);
+				s_sound_classes_block* sound_classes = (s_sound_classes_block*)tag_get_fast(sound_classes_datum);
 
 				sound_classes->soundClasses[0]->gainBoundsDB = { -0.0f, -4.0f };
 				sound_classes->soundClasses[1]->gainBoundsDB = { -0.0f, -4.0f };

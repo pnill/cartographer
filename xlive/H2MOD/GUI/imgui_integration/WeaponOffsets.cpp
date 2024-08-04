@@ -4,7 +4,6 @@
 
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
-#include "H2MOD/Modules/Input/PlayerControl.h"
 #include "H2MOD/GUI/ImGui_Integration/ImGui_Handler.h"
 #include "H2MOD/Modules/WeaponOffsets/WeaponOffsetConfig.h"
 
@@ -88,11 +87,11 @@ namespace ImGuiHandler {
 				// Setup combo box menus for each weapon
 				ImGui::Combo(weapon_offsets_get_string(_weapon_offsets_string_combo_title), &selectedOption, weapons, ARRAYSIZE(weapons));
 				OffsetMenu(selectedOption, "##OffsetX", _weapon_offsets_string_weapon_offset_x,
-					weapOffsets[selectedOption].modifiedOffset.i, weapOffsets[selectedOption].defaultOffset.i);
+					weapOffsets[selectedOption].modifiedOffset.x, weapOffsets[selectedOption].defaultOffset.x);
 				OffsetMenu(selectedOption, "##OffsetY", _weapon_offsets_string_weapon_offset_y,
-					weapOffsets[selectedOption].modifiedOffset.j, weapOffsets[selectedOption].defaultOffset.j);
+					weapOffsets[selectedOption].modifiedOffset.y, weapOffsets[selectedOption].defaultOffset.y);
 				OffsetMenu(selectedOption, "##OffsetZ", _weapon_offsets_string_weapon_offset_z,
-					weapOffsets[selectedOption].modifiedOffset.k, weapOffsets[selectedOption].defaultOffset.k);
+					weapOffsets[selectedOption].modifiedOffset.z, weapOffsets[selectedOption].defaultOffset.z);
 			}
 		}
 
@@ -137,8 +136,8 @@ namespace ImGuiHandler {
 		{
 			for (int i = 0; i < ARRAYSIZE(weapOffsets); i++)
 			{
-				datum weap_datum = tags::find_tag(_tag_group_weapon, weapOffsets[i].weaponPath);
-				if (!DATUM_IS_NONE(weap_datum))
+				datum weap_datum = tag_loaded(_tag_group_weapon, weapOffsets[i].weaponPath);
+				if (weap_datum != NONE)
 				{
 					weapOffsets[i].tag = (_weapon_definition*)tag_get_fast(weap_datum);
 					ApplyOffset(i);

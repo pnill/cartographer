@@ -15,7 +15,7 @@ s_data_array* get_effects_location_table()
     return *Memory::GetAddress<s_data_array**>(0x4CE880, 0x4F506C);
 }
 
-real_point3d* effect_get_velocity(datum effect_index)
+real_vector3d* effect_get_velocity(datum effect_index)
 {
     effect_datum* effect = (effect_datum*)datum_get(get_effects_table(), effect_index);
     return &effect->velocity;
