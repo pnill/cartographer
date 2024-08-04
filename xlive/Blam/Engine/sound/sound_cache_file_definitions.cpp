@@ -10,7 +10,7 @@ runtime_global_sound_gestalt* get_runtime_global_sound_gestalt()
 	return Memory::GetAddress<runtime_global_sound_gestalt*>(0x482298, 0x4D2518);
 }
 
-void initialize_runtime_sound_gestalt_definition_cache_only(const s_sound_cache_file_gestalt_definition* shared_gestalt)
+void initialize_runtime_sound_gestalt_definition_primary_only(const s_sound_cache_file_gestalt_definition* shared_gestalt)
 {
 	runtime_global_sound_gestalt* global_sound_gestalt = get_runtime_global_sound_gestalt();
 
@@ -84,9 +84,9 @@ void initialize_runtime_sound_gestalt_definition_cache_only(const s_sound_cache_
 	global_sound_gestalt->initialized = true;
 }
 
-bool __cdecl initialize_runtime_sound_gestalt_definition_with_shared(s_sound_cache_file_gestalt_definition* cache_gestalt, s_sound_cache_file_gestalt_definition* shared_gestalt)
+bool __cdecl initialize_runtime_sound_gestalt_definition_with_secondary(s_sound_cache_file_gestalt_definition* primary_gestalt, s_sound_cache_file_gestalt_definition* secondary_gestalt)
 {
-	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_with_shared, cache_gestalt, shared_gestalt);
+	return INVOKE(0x3CAE5, 0x4F0DA, initialize_runtime_sound_gestalt_definition_with_secondary, primary_gestalt, secondary_gestalt);
 }
 
 void initialize_runtime_sound_gestalt_panic(void)
@@ -129,21 +129,24 @@ void initialize_runtime_sound_gestalt_definition()
 	{
 		datum shared_gestalt_datum = game_globals->sound_globals[0]->sound_gesalt;
 
-		s_sound_cache_file_gestalt_definition* cache_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(shared_gestalt_datum);
-		s_sound_cache_file_gestalt_definition* shared_gestalt = NULL;
+
+		// if the cache file uses a shared resource database the primary gestalt will be the datum of that shared database and the cache gestalt will be the secondary
+		// if the cache file does not use a shared resource database the cache gestalt will be the primary.
+		s_sound_cache_file_gestalt_definition* primary_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(shared_gestalt_datum);
+		s_sound_cache_file_gestalt_definition* secondary_gestalt = NULL;
 
 		if (cache_header->secondary_ugh_tag_index != NONE)
 		{
-			shared_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(cache_header->secondary_ugh_tag_index);
+			secondary_gestalt = (s_sound_cache_file_gestalt_definition*)tag_get_fast(cache_header->secondary_ugh_tag_index);
 		}
 
-		if(!shared_gestalt)
+		if(!secondary_gestalt)
 		{
-			initialize_runtime_sound_gestalt_definition_cache_only(cache_gestalt);
+			initialize_runtime_sound_gestalt_definition_primary_only(primary_gestalt);
 		}
 		else
 		{
-			if(!initialize_runtime_sound_gestalt_definition_with_shared(cache_gestalt, shared_gestalt))
+			if(!initialize_runtime_sound_gestalt_definition_with_secondary(primary_gestalt, secondary_gestalt))
 			{
 				// Gestalt initialization failed, clear all gestalt info for sounds.
 				DISPLAY_ASSERT("%s: failed to initialize sounds gestalt merging failed", __FUNCTION__);
