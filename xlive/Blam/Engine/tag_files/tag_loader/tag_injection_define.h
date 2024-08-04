@@ -1,3 +1,3 @@
 #pragma once
 
-#define TAG_INJECTION_DEBUG 1
+#define TAG_INJECTION_DEBUG 0
