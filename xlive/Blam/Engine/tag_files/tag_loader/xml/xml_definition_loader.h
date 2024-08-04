@@ -8,7 +8,7 @@ struct s_offset_link
 {
 	uint32 cache_offset;
 	uint32 memory_offset;
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	char name[64];
 #endif
 };
@@ -41,7 +41,7 @@ public:
 	datum get_tag_reference(uint32 index) const;
 	void copy_tag_data(int8* out_buffer, uint32 base_offset);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	void validate_data() const;
 #endif
 private:

@@ -27,7 +27,7 @@ class c_xml_definition_block
 	uint32 m_tag_block_count;
 	c_xml_definition_block* m_tag_blocks;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	c_static_string64* m_tag_reference_names;
 	c_static_string64* m_classless_tag_reference_names;
 	c_static_string64* m_data_reference_names;
@@ -65,7 +65,7 @@ public:
 	uint32 get_tag_block_count() const;
 	c_xml_definition_block* get_tag_block(uint32 index) const;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	c_static_string64* get_tag_reference_name(uint32 index) const;
 	c_static_string64* get_classless_tag_reference_name(uint32 index) const;
 	c_static_string64* get_data_reference_name(uint32 index) const;

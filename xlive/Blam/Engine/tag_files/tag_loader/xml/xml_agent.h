@@ -16,7 +16,7 @@ public:
 
 	static void log(const char* function_name, const char* format, ...);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	static void print_definition_internal(c_xml_definition_block* definition, uint32 depth);
 	void print_definition();
 #endif

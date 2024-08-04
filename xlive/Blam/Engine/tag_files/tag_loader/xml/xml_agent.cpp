@@ -43,7 +43,7 @@ void c_xml_definition_agent::init(tag_group type, const wchar_t* plugin_path)
 
 			this->m_definition = c_xml_definition_block(root, 0, root_size);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 			this->print_definition();
 #endif
 		}
@@ -81,7 +81,7 @@ void c_xml_definition_agent::log(const char* function_name, const char* format, 
 	return;
 }
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 
 void c_xml_definition_agent::print_definition_internal(c_xml_definition_block* definition, uint32 depth)
 {

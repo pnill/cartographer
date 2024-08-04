@@ -12,8 +12,10 @@
 #include "tag_files/tag_loader/tag_injection.h"
 
 #define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
-	fseek(FILE, OFFSET, SEEK_SET);\
-	fread(OUT, SIZE, COUNT, FILE)
+	{ \
+		fseek(FILE, OFFSET, SEEK_SET);\
+		fread(OUT, SIZE, COUNT, FILE); \
+	}
 
 #define lazy_malloc_buffer(TYPE, COUNT)\
 	(TYPE*)malloc(sizeof(TYPE) * (COUNT))
@@ -50,7 +52,7 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 	// seen some tags that have an instance size greater than the computed size? failsafe?
 	if (this->m_instance.size > this->m_total_data_size)
 	{
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_xml_definition_loader::init] computed size: {} instance size: {}", this->m_total_data_size, this->m_instance.size);
 #endif
 		this->m_total_data_size = this->m_instance.size;
@@ -59,7 +61,7 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 	this->initialize_arrays();
 	this->load_tag_data();
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	LOG_INFO_GAME("[c_xml_definition_loader::init] {:x} - {:x}", this->m_instance.data_offset, this->m_instance.data_offset + this->m_instance.size);
 #endif
 }
@@ -209,7 +211,7 @@ int8* c_xml_definition_loader::reserve_data(uint32 size)
 	const uint32 old_size = this->m_used_data;
 	this->m_used_data += size;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	LOG_DEBUG_GAME("[c_xml_definition_loader::reserve_data] data: {:x} requested: {:x} used: {:x} total: {:x}", (uint32)this->m_data, size, this->m_used_data, this->m_total_data_size);
 #endif
 
@@ -243,7 +245,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 				link->cache_offset = file_offset + calc_offset;
 				link->memory_offset = (uint32)buffer + calc_offset;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				csstrnzcpy(link->name, definition->get_tag_reference_name(i)->get_string(), sizeof(s_offset_link::name));
 #endif
 
@@ -264,7 +266,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 				link->cache_offset = file_offset + calc_offset;
 				link->memory_offset = (uint32)buffer + calc_offset;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				csstrnzcpy(link->name, definition->get_classless_tag_reference_name(i)->get_string(), sizeof(s_offset_link::name));
 #endif
 
@@ -297,7 +299,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 				link->data = data_buffer;
 				link->size = t_data_reference.size;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				LOG_DEBUG_GAME("[c_xml_definition_lodaer::load_tag_internal] data reference: {}-{:x} size: {:x} data: {:x}", i, file_offset + definition->get_data_reference_offset(i), t_data_reference.size, t_data_reference.data);
 				csstrnzcpy(link->name, definition->get_data_reference_name(i)->get_string(), sizeof(s_offset_link::name));
 #endif
@@ -334,7 +336,7 @@ void c_xml_definition_loader::load_tag_data_internal(c_xml_definition_loader* lo
 				link->size = definition_block->get_size() * t_tag_block.count;
 				link->data = block_buffer;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				LOG_DEBUG_GAME("[c_xml_definition_loader::load_tag_internal] tag_block: {} name: {} count: {}, size: {:x}", i, definition->get_tag_block_name(i)->get_string(), t_tag_block.count, definition_block->get_size());
 				csstrnzcpy(link->name, definition->get_tag_block_name(i)->get_string(), sizeof(s_offset_link::name));
 #endif
@@ -355,7 +357,7 @@ void c_xml_definition_loader::load_tag_data()
 
 	this->load_tag_data_internal(this, this->m_definition, this->m_file_offset, buffer, 1);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 	this->validate_data();
 #endif
 }
@@ -372,7 +374,7 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 			if (reference.size != 0)
 			{
 				this->m_total_data_size += reference.size;
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				bool in_bounds = (this->m_instance.data_offset < reference.data && this->m_instance.data_offset + this->m_instance.size > reference.data);
 				LOG_DEBUG_GAME("[c_xml_definition_loader::calc_data_size] {:x} data_reference  {} {} {:x} {}", base_offset, definition->get_data_reference_offset(i), reference.size, reference.data, in_bounds);
 #endif
@@ -390,7 +392,7 @@ void c_xml_definition_loader::calculate_total_data_size(const c_xml_definition_b
 			{
 				this->m_total_data_size += definition_block->get_size() * block.count;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 				bool in_bounds = (this->m_instance.data_offset < block.data && this->m_instance.data_offset + this->m_instance.size > block.data);
 				LOG_DEBUG_GAME(
 					"[c_xml_definition_loader::calc_data_size] {:x} {} {} {} {:x} {}",
@@ -441,7 +443,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 		tag_reference* reference = (tag_reference*)(out_buffer + link->memory_offset - this->m_data);
 		datum resolved_index = tag_injection_resolve_cache_datum(reference->index);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_xml_definition_loader::copy_tag_data]: updating tag reference: {} from: {:X} to {:X}", link->name, reference->index, resolved_index);
 #endif
 
@@ -455,7 +457,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 		datum* reference = (datum*)(out_buffer + link->memory_offset - this->m_data);
 		datum resolved_index = tag_injection_resolve_cache_datum(*reference);
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 		LOG_DEBUG_GAME("[c_xml_definition_loader::copy_tag_data]: updating classless tag reference: {} from: {:x} to {:x} addr: {:x}",
 			link->name,
 			*reference,
@@ -474,7 +476,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 		uint32 resolved_offset = ((uint32)link->data - (uint32)this->m_data);
 		reference->data = (uint32)base_offset + resolved_offset;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 		bool in_bounds = (resolved_offset + link->size <= this->m_total_data_size);
 		LOG_DEBUG_GAME("[c_xml_definition_loader::copy_tag_data]: rebase tag_block: {} base_offset: {:x} block_offset {:x} block_size: {:x} total size: {:x} in bounds: {}",
 			link->name,
@@ -494,7 +496,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 		uint32 resolved_offset = ((uint32)link->data - (uint32)this->m_data);
 		reference->data = (uint32)base_offset + resolved_offset;
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 		bool in_bounds = (resolved_offset + link->size <= this->m_total_data_size);
 		LOG_DEBUG_GAME("[c_xml_definition_loader::copy_tag_data]: rebase tag_block: {} base_offset: {:x} block_offset {:x} block_size: {:x} total size: {:x} in bounds: {}",
 			link->name,
@@ -507,7 +509,7 @@ void c_xml_definition_loader::copy_tag_data(int8* out_buffer, uint32 base_offset
 	}
 }
 
-#if K_TAG_INJECTION_DEBUG
+#if TAG_INJECTION_DEBUG
 void c_xml_definition_loader::validate_data() const
 {
 	int8* cache_data = (int8*)malloc(this->m_definition->get_size());
