@@ -14,8 +14,10 @@
 #include "Util/filesys.h"
 
 #define lazy_fread(FILE, OFFSET, OUT, SIZE, COUNT)\
-	fseek(FILE, OFFSET, SEEK_SET);\
-	fread(OUT, SIZE, COUNT, FILE)
+	{ \
+		fseek(FILE, OFFSET, SEEK_SET);\
+		fread(OUT, SIZE, COUNT, FILE); \
+	}
 
 /* constants */
 
