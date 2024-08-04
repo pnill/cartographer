@@ -33,12 +33,12 @@ void c_xbox_live_task_progress_menu::apply_patches()
 	// Fix the placement of the 4 UI bitmaps
 	if (pane_definition->bitmap_blocks.count == 4)
 	{
-		point2d fixed_bitmaps_placemets[4] = { {-288, 218}, {148, -66}, {-278, 208}, {-234, 306} };
+		point2d fixed_bitmaps_placements[4] = { {-288, 218}, {148, -66}, {-278, 208}, {-234, 306} };
 
 		for (int i = 0; i < 4; ++i)
 		{
 			// fix the ui bitmap elements position
-			pane_definition->bitmap_blocks[i]->topleft = fixed_bitmaps_placemets[i];
+			pane_definition->bitmap_blocks[i]->topleft = fixed_bitmaps_placements[i];
 		}
 	}
 

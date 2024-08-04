@@ -1018,7 +1018,7 @@ namespace ImGuiHandler {
 					{
 						if (ImGui::Button("Custom Languages"))
 						{
-							GSCustomMenuCall_Language();
+							//GSCustomMenuCall_Language();
 						}
 					}
 				}

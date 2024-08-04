@@ -9,9 +9,14 @@ c_tab_view_widget::c_tab_view_widget(int16 user_flags):
 	this->field_70 = nullptr;
 }
 
-c_tab_view_widget::~c_tab_view_widget()
+c_user_interface_widget* c_tab_view_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x220B33, 0x0, c_tab_view_widget(*__thiscall*)(c_tab_view_widget*, char), lpMem,a2);
+	this->~c_tab_view_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 
 int32 c_tab_view_widget::setup_children()

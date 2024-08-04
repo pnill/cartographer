@@ -53,11 +53,12 @@ protected:
 	bool m_list_has_hidden_items;
 	bool field_A6;
 	bool field_A7;
-	_slot1<>* signal1;
-	_slot2<>* signal2;
+	_slot_linker linker_type1;
+	_slot_linker linker_type2;
 
 public:
-	c_list_widget(int16 user_flags);
+	c_list_widget(uint16 user_flags);
+
 	c_list_item_widget* try_find_item_widget(uint32 idx);
 	datum get_old_data_index();
 	void update_list_items_from_mapping(c_list_item_widget* item, int32 skin_index, int32 text_widget_idx, s_item_text_mapping* mapping, int32 total_mappings);
@@ -68,7 +69,7 @@ public:
 
 	// c_list_widget virtual functions
 
-	virtual ~c_list_widget();
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	virtual int32 setup_children() override;
 	virtual void on_screen_leave() override;
 	virtual void update() override;
@@ -85,5 +86,12 @@ public:
 	virtual int32 get_list_items_count() = 0;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) = 0;
 	virtual bool verify_item_in_focus(c_list_item_widget* item);
+
+private:
+	template<typename T>
+	static T get_base_vtable_fn_ptr(DWORD idx)
+	{
+		return reinterpret_cast<T>(&Memory::GetAddressRelative<void**>(0x3CF5FC)[idx]);
+	}
 };
 ASSERT_STRUCT_SIZE(c_list_widget, 0xB0);

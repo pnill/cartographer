@@ -3,12 +3,11 @@
 #include "user_interface_widget_window.h"
 #include "rasterizer/rasterizer_globals.h"
 
-c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
+c_screen_widget::c_screen_widget(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, uint16 user_flags) :
 	c_user_interface_widget(_widget_type_screen, user_flags),
 	m_header_text((int16)0),
 	m_screen_button_key_text((int16)0),
 	m_screen_slot(this, &c_screen_widget::switch_panes)
-
 {
 	//INVOKE_TYPE(0x2106A2, 0x0, void(__thiscall*)(c_screen_widget*, e_user_interface_screen_id, e_user_interface_channel_type, e_user_interface_render_window, int16),
 	//	this, menu_id, channel_type, window_index, user_flags);
@@ -50,9 +49,9 @@ void c_screen_widget::destroy()
 	INVOKE_TYPE(0x20F6FF, 0x0, void(__thiscall*)(c_screen_widget*), this);
 }
 
-bool c_screen_widget::switch_panes(int32* pane_index_ptr)
+void c_screen_widget::switch_panes(int32* pane_index_ptr)
 {
-	return INVOKE_TYPE(0x210227, 0x0, bool(__thiscall*)(c_screen_widget*, int32*), this, pane_index_ptr);
+	INVOKE_TYPE(0x210227, 0x0, bool(__thiscall*)(c_screen_widget*, int32*), this, pane_index_ptr);
 }
 
 void c_screen_widget::verify_and_load_from_layout(datum widget_tag, s_interface_expected_screen_layout* expected_layout)
@@ -71,10 +70,11 @@ void* c_screen_widget::get_screen_definition()
 
 // c_screen_widget virtual functions
 
-c_screen_widget::~c_screen_widget()
+c_user_interface_widget* c_screen_widget::destructor(uint32 flags)
 {
-	// todo : is this necessary?
-	this->destroy();
+	this->~c_screen_widget();
+
+	return this;
 }
 
 
@@ -142,9 +142,9 @@ int32 c_screen_widget::sub_60F151(int32 a2)
 	return INVOKE_TYPE(0x20F151, 0x0, int32(__thiscall*)(c_screen_widget*, int32), this, a2);
 }
 
-uint8 c_screen_widget::sub_40AD53()
+bool c_screen_widget::sub_40AD53(int32 a2)
 {
-	return INVOKE_TYPE(0xAD53, 0x0, uint8(__thiscall*)(c_screen_widget*), this);
+	return INVOKE_TYPE(0xAD53, 0x0, bool(__thiscall*)(c_screen_widget*, int32), this, a2);
 }
 
 e_user_interface_channel_type c_screen_widget::get_channel()
@@ -190,7 +190,6 @@ void c_screen_widget::sub_60F2A4(uint8 bitmap_index)
 {
 	return INVOKE_TYPE(0x20F2A4, 0x0, void(__thiscall*)(c_screen_widget*, uint8), this, bitmap_index);
 }
-
 
 void user_interface_register_screen_to_channel(c_screen_widget* new_screen, s_screen_parameters* parameters)
 {

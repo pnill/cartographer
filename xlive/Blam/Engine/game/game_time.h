@@ -4,7 +4,7 @@ struct time_globals
 {
 	bool initialized;
 	bool paused;
-	short ticks_per_second;
+	int16 ticks_per_second;
 	real32 tick_length;
 	DWORD tick_count;
 	real32 game_speed;

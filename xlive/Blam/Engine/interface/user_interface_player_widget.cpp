@@ -4,10 +4,16 @@
 
 // c_player_widget virtual functions
 
-c_player_widget::~c_player_widget()
+c_user_interface_widget* c_player_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x220475, 0x0, c_user_interface_widget*(__thiscall*)(c_player_widget*, char), lpMem,a2);
+	this->~c_player_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
+
 int32 c_player_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220441, 0x0, int32(__thiscall*)(c_player_widget*), this);
@@ -15,8 +21,6 @@ int32 c_player_widget::setup_children()
 	this->m_visible = false;
 	return result;
 }
-
-
 
 
 c_player_widget_representation::c_player_widget_representation()

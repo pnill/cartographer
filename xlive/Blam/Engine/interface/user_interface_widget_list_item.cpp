@@ -9,10 +9,6 @@ c_list_item_widget::c_list_item_widget() :
 	this->m_last_data_index = NONE;
 	this->m_intro_delay_milliseconds = 0;
 	this->field_78 = 1;
-	//signal_slot_ptr_reset((_slot*)&this->signal1);
-	//signal_slot_ptr_reset((_slot*)&this->signal2);
-	this->signal1 = nullptr;
-	this->signal2 = nullptr;
 	this->m_widget_type = _widget_type_list_item;
 	this->field_6D = 1;
 
@@ -33,9 +29,15 @@ void c_list_item_widget::set_item_transitioning()
 
 // c_list_item_widget virtual functions
 
-c_list_item_widget::~c_list_item_widget()
+c_list_item_widget* c_list_item_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x220057, 0x0, void*(__thiscall*)(c_list_item_widget*, char), lpMem,a2);
+	this->~c_list_item_widget();
+	if (TEST_BIT(flags, 0))
+	{
+		// free mem
+	}
+
+	return this;
 }
 
 void c_list_item_widget::update()

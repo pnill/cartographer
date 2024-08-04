@@ -6,9 +6,14 @@
 
 // c_hud_widget virtual functions
 
-c_hud_widget::~c_hud_widget()
+c_user_interface_widget* c_hud_widget::destructor(uint32 flags)
 {
-	//return INVOKE_TYPE(0x240FF8, 0x0, c_user_interface_widget*(__thiscall*)(c_model_widget*, char), lpMem, a2);
+	this->~c_hud_widget();
+	if (TEST_BIT(flags, 0))
+	{
+	}
+
+	return this;
 }
 
 void c_hud_widget::update()

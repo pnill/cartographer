@@ -1,8 +1,9 @@
 #include "stdafx.h"
 
+#include "interface/user_interface_headers.h"
 #include "user_interface_widget.h"
 
-c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type widget_type, int16 user_flags)
+c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags)
 {
 	//INVOKE_TYPE(0x211D81, 0x0, void(__thiscall*)(c_user_interface_widget*, e_user_interface_widget_type, __int16), this, widget_type, user_flags);
 
@@ -13,7 +14,7 @@ c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type wi
 	this->m_block_index = NONE;
 	this->m_hierarchy_order = NONE;
 	this->parent_widget = nullptr;
-	this->child_widget = nullptr;
+	this->m_child_widget = nullptr;
 	this->next_widget = nullptr;
 	this->previous_widget = nullptr;
 	this->m_animation_index = NONE;
@@ -39,10 +40,6 @@ c_user_interface_widget::c_user_interface_widget(e_user_interface_widget_type wi
 }
 
 
-void c_user_interface_widget::destroy_recursive()
-{
-	INVOKE_TYPE(0x211E65, 0x0, void(__thiscall*)(c_user_interface_widget*), this);
-}
 void c_user_interface_widget::initialize_animation(s_animation_transform* animation)
 {
 	INVOKE_TYPE(0x2115FE, 0x0, void(__thiscall*)(c_user_interface_widget*, s_animation_transform*), this, animation);
@@ -78,12 +75,12 @@ c_user_interface_widget* c_user_interface_widget::get_parent()
 
 c_user_interface_widget* c_user_interface_widget::get_children()
 {
-	return this->child_widget;
+	return this->m_child_widget;
 }
 
-c_user_interface_widget* c_user_interface_widget::try_find_child(e_user_interface_widget_type type, uint32 idx, bool recursive_search)
+c_user_interface_widget* c_user_interface_widget::try_find_child(e_user_interface_widget_type type, uint32 begin_index, bool recursive_search)
 {
-	return INVOKE_TYPE(0x211909, 0x0, c_user_interface_widget * (__thiscall*)(c_user_interface_widget*, e_user_interface_widget_type, uint32, bool), this, type, idx, recursive_search);
+	return INVOKE_TYPE(0x211909, 0x0, c_user_interface_widget * (__thiscall*)(c_user_interface_widget*, e_user_interface_widget_type, uint32, bool), this, type, begin_index, recursive_search);
 }
 
 c_text_widget* c_user_interface_widget::try_find_text_widget(uint32 idx)
@@ -172,12 +169,42 @@ void c_user_interface_widget::start_widget_animation(int32 type)
 
 // c_user_interface_widget virtual functions
 
-c_user_interface_widget::~c_user_interface_widget()
+c_user_interface_widget* c_user_interface_widget::destructor(uint32 flags)
 {
 	//return INVOKE_TYPE(0x212734, 0x0, c_user_interface_widget*(__thiscall*)(c_user_interface_widget*, char), lpMem, a2);
-	this->destroy_recursive();
+	
+	this->~c_user_interface_widget();
+	if (TEST_BIT(flags, 0))
+	{
+		// ### TODO FIXME figure out this flag and the way this gets free'd
+	}
+
+	return this;
 }
 
+void c_user_interface_widget::destroy_recursive()
+{
+	c_user_interface_widget* child_widget = m_child_widget;
+	m_child_widget = nullptr;
+	while (child_widget != nullptr)
+	{
+		c_user_interface_widget* next_child = child_widget->m_child_widget;
+		child_widget->~c_user_interface_widget();
+
+		if (child_widget->m_allocated)
+		{
+			child_widget->destructor(0);
+			ui_pool_dellocate((uint8*)child_widget);
+		}
+
+		child_widget = next_child;
+	}
+}
+
+c_user_interface_widget::~c_user_interface_widget()
+{
+	this->destroy_recursive();
+}
 
 int32 c_user_interface_widget::setup_children()
 {

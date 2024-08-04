@@ -461,6 +461,13 @@ void fix_server_party_leader_texts(e_pregame_pane_type pane_type)
 	WriteValue<uint8>(Memory::GetAddress(0x245275) + 1, TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(server_party_leader_text_id));
 }
 
+c_user_interface_widget* c_screen_multiplayer_pregame_lobby::destructor(uint32 flags)
+{
+	this->~c_screen_multiplayer_pregame_lobby();
+
+	return this;
+}
+
 void c_screen_multiplayer_pregame_lobby::initialize_long_text_chat()
 {
 	e_pregame_lobby_text_blocks chat_box_receiver = _pregame_lobby_pane_0_text_chat_body;
