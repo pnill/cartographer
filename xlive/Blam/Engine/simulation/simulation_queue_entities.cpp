@@ -37,7 +37,7 @@ bool simulation_queue_entity_decode_header(c_bitstream* stream, e_simulation_ent
 	*type = (e_simulation_entity_type)stream->read_integer("entity-type", 5);
 	*gamestate_index = NONE;
 	//simulation_gamestate_index_decode(stream, gamestate_index);
-	bool successfully_decoded = IN_RANGE_INCLUSIVE(*type, _simulation_entity_type_slayer_engine_globals, k_simulation_entity_count - 1);
+	bool successfully_decoded = IN_RANGE(*type, _simulation_entity_type_slayer_engine_globals, k_simulation_entity_count - 1);
 	return successfully_decoded;
 }
 

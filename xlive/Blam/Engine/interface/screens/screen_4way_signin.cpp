@@ -581,7 +581,7 @@ bool c_screen_4way_signin::handle_automation_event(s_event_record* event)
 	bool result= false;
 	int16 automation_mode = (int16)event->value;
 
-	if (!IN_RANGE_INCLUSIVE(automation_mode, 2, 11))
+	if (!IN_RANGE(automation_mode, 2, 11))
 	{
 		error(0, "unhandled automation type %s ", automation_mode);
 	}

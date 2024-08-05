@@ -34,11 +34,11 @@ e_special_event_type get_current_special_event()
 	{
 	// January
 	case 1:
-		event = (IN_RANGE_INCLUSIVE(date.day, 1, 7) ? _special_event_christmas : event);
+		event = (IN_RANGE(date.day, 1, 7) ? _special_event_christmas : event);
 		break;
 	// March
 	case 3:
-		event = (IN_RANGE_INCLUSIVE(date.day, 17, 24) ? _special_event_st_paddys : event);
+		event = (IN_RANGE(date.day, 17, 24) ? _special_event_st_paddys : event);
 		break;
 	// April
 	/* One time event
@@ -48,19 +48,19 @@ e_special_event_type get_current_special_event()
 	*/
 	// May
 	case 5:
-		event = (IN_RANGE_INCLUSIVE(date.day, 30, 31) ? _special_event_birthday : event);
+		event = (IN_RANGE(date.day, 30, 31) ? _special_event_birthday : event);
 		break;
 	// October
 	case 10:
-		event = (IN_RANGE_INCLUSIVE(date.day, 17, 31) ? _special_event_halloween : event);
+		event = (IN_RANGE(date.day, 17, 31) ? _special_event_halloween : event);
 		break;
 	// November
 	case 11:
-		event = (IN_RANGE_INCLUSIVE(date.day, 8, 10) ? _special_event_birthday : event);
+		event = (IN_RANGE(date.day, 8, 10) ? _special_event_birthday : event);
 		break;
 	// December
 	case 12:
-		event = (IN_RANGE_INCLUSIVE(date.day, 20, 31) ? _special_event_christmas : event);
+		event = (IN_RANGE(date.day, 20, 31) ? _special_event_christmas : event);
 		break;
 	}
 
