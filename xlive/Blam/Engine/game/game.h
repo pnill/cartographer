@@ -4,7 +4,7 @@
 #include "structures/cluster_partitions.h"
 
 #define k_game_maximum_ragdolls 3
-#define k_game_maximum_ragdolls_new 12
+#define k_game_maximum_ragdolls_new 6
 
 #define k_game_maximum_players_to_allow_ragdolls 8
 #define k_game_maximum_players_to_allow_ragdolls_new 16
