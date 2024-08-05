@@ -37,9 +37,6 @@ void c_xml_definition_loader::init(c_xml_definition_block* definition, FILE* fil
 
 	this->load_cache_info();
 
-	if (this->m_instance.group_tag.group == _tag_group_render_model)
-		auto sdf = 0;
-
 	this->reset_counts();
 	// set the initial size of the data_loader
 	this->calculate_total_data_size(this->m_definition, this->m_file_offset, 1);
