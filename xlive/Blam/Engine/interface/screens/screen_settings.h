@@ -59,7 +59,7 @@ public:
 
 	// c_screen_settings virtual functions
 
-	virtual ~c_screen_settings();
+	virtual c_user_interface_widget* destructor(uint32 flags) override;
 	virtual void post_initialize_button_keys() override;
 	virtual void* load_proc() override;
 };
