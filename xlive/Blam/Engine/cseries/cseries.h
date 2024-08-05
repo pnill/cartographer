@@ -80,8 +80,7 @@ static_assert(sizeof(datum) == 4);
 #define DATUM_INDEX_TO_IDENTIFIER(_datum_index) ((uint16)(((_datum_index) >> 16) & 0xFFFF))
 
 #define NUMBEROF(_array) (sizeof(_array) / sizeof(*_array))
-#define IN_RANGE(val, min, max) ((val) > (min) && (val) < (max))
-#define IN_RANGE_INCLUSIVE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
+#define IN_RANGE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))
 #define VALID_COUNT(index, count) ((index) >= 0 && (index) <= (count))
 

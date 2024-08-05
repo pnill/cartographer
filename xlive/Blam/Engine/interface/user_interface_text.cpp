@@ -53,7 +53,7 @@ void c_user_interface_text::set_color(const real_rgb_color* color)
 
 bool c_user_interface_text::is_private_use_character(wchar_t character)
 {
-	if (IN_RANGE_INCLUSIVE(character, K_PRIVATE_USE_CHARACTER_SPACE_START, K_PRIVATE_USE_CHARACTER_SPACE_END))
+	if (IN_RANGE(character, K_PRIVATE_USE_CHARACTER_SPACE_START, K_PRIVATE_USE_CHARACTER_SPACE_END))
 		return true;
 	return false;
 }

@@ -49,7 +49,7 @@ void main_game_launch_set_difficulty(int16 difficulty)
 
 void main_game_launch_set_coop_player_count(int32 player_count)
 {
-    if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
+    if (!IN_RANGE(player_count, 1, k_number_of_users))
     {
         error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
     }
@@ -64,7 +64,7 @@ void main_game_launch_set_coop_player_count(int32 player_count)
 
 void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 {
-    if (!IN_RANGE_INCLUSIVE(player_count, 1, k_number_of_users))
+    if (!IN_RANGE(player_count, 1, k_number_of_users))
     {
         error(2, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
     }
@@ -118,7 +118,7 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 void main_game_launch_set_game_mode(int32 game_mode)
 {
-    if (!IN_RANGE_INCLUSIVE(game_mode, 1, (int)k_game_mode_count - 1))
+    if (!IN_RANGE(game_mode, 1, (int)k_game_mode_count - 1))
     {
         error(2, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
     }
@@ -185,7 +185,7 @@ void main_game_launch_set_campaign_details(void)
     // Ensure difficulty is between 0 and 3
     g_main_game_launch_options.difficulty = PIN(g_main_game_launch_options.difficulty, 0, k_campaign_difficulty_levels_count - 1);
 
-    if (!IN_RANGE_INCLUSIVE(g_main_game_launch_user_count, 1, k_number_of_users))
+    if (!IN_RANGE(g_main_game_launch_user_count, 1, k_number_of_users))
     {
         g_main_game_launch_user_count = 1;
     }

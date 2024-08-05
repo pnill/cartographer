@@ -657,7 +657,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
             if (first_person_data->unit_index == unit_index && first_person_data->unit_index != NONE)
             {
                 s_game_globals* globals = scenario_get_game_globals();
-                if (IN_RANGE_INCLUSIVE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
+                if (IN_RANGE(first_person_data->character_type, _character_type_masterchief, globals->player_representation.count - 1))
                 {
                     s_game_globals_player_representation* player_rep = globals->player_representation[first_person_data->character_type];
                     datum fp_hands_index = player_rep->first_person_hands.index;
@@ -838,7 +838,7 @@ void first_person_weapon_apply_ik(int32 user_index, s_first_person_model_data* f
                     {
                         if (iterator.attach_to_marker != NONE 
                             && iterator.attach_to_marker.get_packed() 
-                            && IN_RANGE_INCLUSIVE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
+                            && IN_RANGE(fp_data->character_type, _character_type_masterchief, globals->player_representation.count - 1) )
                         {
                             const s_game_globals_player_representation* player_rep = globals->player_representation[fp_data->character_type];
                             datum fp_hands_model_index = player_rep->first_person_hands.index;

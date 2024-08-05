@@ -114,7 +114,7 @@ void set_display_type(e_display_type display_type)
 void render_splitscreen_line(void)
 {
 	const int32 player_window_count = get_player_window_count();
-	ASSERT(IN_RANGE_INCLUSIVE(player_window_count, 1, 4));
+	ASSERT(IN_RANGE(player_window_count, 1, 4));
 
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 	const int32 resolution_x = rasterizer_globals->resolution_x;
