@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "screen_virtual_keyboard.h"
+
+#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
 char __fastcall sub_23CC18_CM(int thisptr, int _EDX);
 
