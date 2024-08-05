@@ -323,6 +323,10 @@ void game_apply_pre_winmain_patches(void)
     PatchCall(Memory::GetAddress(0x9802, 0x1FAED), game_initialize_for_new_map);
     PatchCall(Memory::GetAddress(0x39D2A, 0xC0C0), game_update);
     PatchCall(Memory::GetAddress(0x39E42, 0xBA4F), game_initialize);
+
+    // inscrease the max player count to allow ragdolls and the ragdoll count
+    WriteValue<int8>(Memory::GetAddress(0x49CCC, 0x42F4A) + 2, k_game_maximum_players_to_allow_ragdolls_new);
+    WriteValue<int8>(Memory::GetAddress(0x49CDC, 0x42F5A) + 2, k_game_maximum_ragdolls_new);
     
     // Get original game_frame function
     if (!Memory::IsDedicatedServer())
