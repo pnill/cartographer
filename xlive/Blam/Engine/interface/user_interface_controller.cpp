@@ -90,7 +90,7 @@ uint32 __cdecl user_interface_controller_get_signed_in_controller_count()
 	return INVOKE(0x2073AE, 0, user_interface_controller_get_signed_in_controller_count);
 }
 
-uint32 __cdecl user_interface_controller_get_signed_in_controllers_mask()
+uint16 __cdecl user_interface_controller_get_signed_in_controllers_mask(void)
 {
 	return INVOKE(0x20758D, 0, user_interface_controller_get_signed_in_controllers_mask);
 }
@@ -273,7 +273,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{
-		controller->player_name.set(controller->player_profile.player_name.get_string());
+		controller->player_name.set(controller->player_profile.player_name);
 	}
 	else
 	{

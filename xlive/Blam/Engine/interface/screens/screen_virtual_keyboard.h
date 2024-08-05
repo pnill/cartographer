@@ -1,8 +1,6 @@
 #pragma once
-
 #include "interface/user_interface_headers.h"
 
-#include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 
@@ -202,7 +200,7 @@ public:
 		field_3B7C = 1;
 		field_3B7D = 0;
 
-		for (int32 i = 0; i < NUMBEROF(m_virtual_keyboard_buttons); i++)
+		for (int16 i = 0; i < NUMBEROF(m_virtual_keyboard_buttons); i++)
 		{
 			m_virtual_keyboard_buttons[i].m_button_index = i;
 			m_virtual_keyboard_buttons[i].m_controllers_mask = _user_flags;

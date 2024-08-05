@@ -18,7 +18,7 @@ protected:
 	e_4_way_signin_type m_call_context;
 
 	bool handle_controller_button_pressed_event(s_event_record* event);
-	bool handle_invalid_controller_event(s_event_record* event);
+	bool handle_invalid_controller_event(s_event_record* event) const;
 	bool handle_automation_event(s_event_record* event);
 	bool handle_split_input_event(s_event_record* event);
 	void update_button_key_texts();
