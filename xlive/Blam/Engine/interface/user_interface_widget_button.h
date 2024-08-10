@@ -8,14 +8,13 @@
 // ### TODO FIXME need to access m_button_index inside virtual keyboard code
 class c_button_widget : public c_user_interface_widget
 {
-public:
 	// ### TODO FIXME need to access m_button_index inside virtual keyboard code
 //protected:
+public:
 	c_small_user_interface_text m_text_interface;
 	int32 m_flags;
 	int16 m_button_index;
-	uint8 gap_FA[2];
-	_slot2<> *signal;
+	_slot_linker linker_type1;
 
 public:
 	c_button_widget(int16 button_index, uint16 user_flags);

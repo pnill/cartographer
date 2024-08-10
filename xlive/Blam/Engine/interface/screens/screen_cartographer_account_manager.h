@@ -189,7 +189,7 @@ public:
 	{
 		datum list_item_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
 
-		c_text_widget* text_widget = (c_text_widget*)item->try_find_child(_widget_type_text, 0, false);
+		c_text_widget* text_widget = (c_text_widget*)item->try_find_text_widget(0);
 		if (text_widget)
 		{
 			int32 button_count_allocated = m_list_data->datum_max_elements;
@@ -400,7 +400,7 @@ public:
 		ASSERT(header_text != NULL && subheader_text != NULL);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)this->try_find_child(_widget_type_text, 2, false);
+		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);

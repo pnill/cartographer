@@ -18,7 +18,6 @@ struct s_main_game_globals
 	s_game_options options;
 	bool game_in_progress;
 	bool game_is_lost;
-	short pad_0;
 	int ticks_to_reset_game;
 	bool game_is_finished;
 	bool game_sounds_disabled;

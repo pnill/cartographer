@@ -4,7 +4,7 @@
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 
-// we just re-use the first seventeen keyboard id's in default code for now
+// we just re-use the first 17 keyboard id's in default code for now
 #define VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW (VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX * 2)
 
 #define VIRTUAL_KEYBOARD_BUTTON_COUNT 47
@@ -162,30 +162,29 @@ private:
 
 class c_virtual_keyboard_menu : protected c_screen_widget
 {
-protected:
-	int field_A5C;
-	int field_A60;
+public:
+	int32 m_keyboard_type;
+	int32 field_A60;
 	uint8 field_A64[512];
-	int field_C64;
-	int field_C68;
+	int32 field_C64;
+	int32 field_C68;
 	int16 field_C6C;
 	int16 field_C6E;
 	int16 field_C70;
 	int16 field_C72;
-	char field_C74;
+	uint8 field_C74;
 	c_virtual_keyboard_button m_virtual_keyboard_buttons[VIRTUAL_KEYBOARD_BUTTON_COUNT];
-	int field_3B78;
-	char field_3B7C;
-	char field_3B7D;
+	int32 field_3B78;
+	uint8 field_3B7C;
+	uint8 field_3B7D;
 
-public:
 	static void* __cdecl open(s_screen_parameters* parameters);
 
 	// TODO list initializer once the ctors are re-implemented
 	c_virtual_keyboard_menu(e_user_interface_channel_type _channel_type, e_user_interface_render_window _window_index, uint16 _user_flags) :
 		c_screen_widget(_screen_virtual_keyboard, _channel_type, _window_index, _user_flags)
 	{
-		field_A5C = NONE;
+		m_keyboard_type = NONE;
 		field_A60 = NONE;
 		csmemset(field_A64, 0, sizeof(field_A64));
 		field_C64 = 0;
@@ -231,14 +230,14 @@ public:
 
 	virtual bool handle_event(s_event_record* event) override;
 
-	virtual void initialize(s_screen_parameters* parameters);
+	virtual void initialize(s_screen_parameters* parameters) override;
 
 	virtual void* load_proc() override
 	{
 		return c_virtual_keyboard_menu::open;
 	}
 
-	void __thiscall set_input_string_buffer(wchar_t* buffer, size_t buffer_size);
+	void __thiscall set_input_string_buffer(wchar_t* buffer, uint32 buffer_size);
 
 private:
 	typedef c_screen_widget class_type;
@@ -251,4 +250,4 @@ private:
 };
 ASSERT_STRUCT_SIZE(c_virtual_keyboard_menu, 15232);
 
-void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, int menuType);
+void ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type);

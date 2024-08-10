@@ -332,11 +332,11 @@ void c_cartographer_account_manager_edit_list::cartographer_type_add_button_hand
 
 	if (button_id == 0) 
 	{
-		CustomMenuCall_VKeyboard_Inner(m_account_add.email_or_username, ARRAYSIZE(m_account_add.email_or_username), 16);
+		ui_load_virtual_keyboard(m_account_add.email_or_username, ARRAYSIZE(m_account_add.email_or_username), 16);
 	}
 	else if (button_id == 1) 
 	{
-		CustomMenuCall_VKeyboard_Inner(m_account_add.password, ARRAYSIZE(m_account_add.password), 16);
+		ui_load_virtual_keyboard(m_account_add.password, ARRAYSIZE(m_account_add.password), 16);
 	}
 	else if (button_id == 2) 
 	{
@@ -464,15 +464,15 @@ void c_cartographer_account_manager_edit_list::cartographer_type_create_account(
 
 	if (button_id == 0) 
 	{
-		CustomMenuCall_VKeyboard_Inner(m_account_create.user_name, ARRAYSIZE(m_account_create.user_name) /* Wide string buffer size */, 0);
+		ui_load_virtual_keyboard(m_account_create.user_name, ARRAYSIZE(m_account_create.user_name) /* Wide string buffer size */, 0);
 	}
 	else if (button_id == 1) 
 	{
-		CustomMenuCall_VKeyboard_Inner(m_account_create.email, ARRAYSIZE(m_account_create.email), 16);
+		ui_load_virtual_keyboard(m_account_create.email, ARRAYSIZE(m_account_create.email), 16);
 	}
 	else if (button_id == 2) 
 	{
-		CustomMenuCall_VKeyboard_Inner(m_account_create.password, ARRAYSIZE(m_account_create.password), 16);
+		ui_load_virtual_keyboard(m_account_create.password, ARRAYSIZE(m_account_create.password), 16);
 	}
 	else if (button_id == 3) 
 	{
