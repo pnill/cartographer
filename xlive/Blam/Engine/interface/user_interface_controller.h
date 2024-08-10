@@ -147,7 +147,7 @@ struct s_user_interface_controller
 	uint32 user_index;
 	s_player_identifier controller_user_identifier;
 	PAD32;
-	s_saved_game_file_player_profile player_profile;
+	s_saved_game_player_profile player_profile;
 	uint32 profile_index;
 	e_game_team player_team;
 	PAD16;
@@ -198,7 +198,7 @@ uint32 __cdecl user_interface_controller_get_last_level_played(e_controller_inde
 uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in_controllers();
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index);
 void __cdecl user_interface_controller_sign_out_all_controllers();
-void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index);
+void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index);
 void __cdecl user_interface_controller_get_user_properties(e_controller_index controller_index, s_player_identifier* controller_user_identifier, s_player_properties* properties);
 void __cdecl user_interface_controller_event_submit(s_event_record* event);
 

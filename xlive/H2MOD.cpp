@@ -91,6 +91,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "saved_games/saved_game_files_async_windows.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -940,6 +941,8 @@ void H2MOD::ApplyHooks() {
 		input_abstraction_patches_apply();
 		render_apply_patches();
 		apply_interface_hooks();
+
+		saved_games_async_helpers_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

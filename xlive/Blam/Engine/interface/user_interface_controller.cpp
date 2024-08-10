@@ -115,7 +115,7 @@ void __cdecl user_interface_controller_sign_out_all_controllers()
 	INVOKE(0x208A28, 0x1F4E9F, user_interface_controller_sign_out_all_controllers);
 }
 
-void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index)
+void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index)
 {
 	INVOKE(0x206890, 0x0, user_interface_controller_get_profile_data, controller_index, profile, profile_index);
 }
@@ -273,7 +273,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{
-		controller->player_name.set(controller->player_profile.player_name);
+		controller->player_name.set(controller->player_profile.name);
 	}
 	else
 	{

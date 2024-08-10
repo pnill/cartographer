@@ -4,6 +4,10 @@
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 #define VIRTUAL_KEYBOARD_BUTTON_COUNT 47
 
+#define k_number_of_virtual_keyboard_columns 11
+
+#define k_number_of_virtual_keyboard_rows 4
+
 void ui_globals_set_keyboard_input_state(bool state);
 
 class c_virtual_keyboard_button : public c_button_widget

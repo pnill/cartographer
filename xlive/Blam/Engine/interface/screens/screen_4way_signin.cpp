@@ -209,7 +209,7 @@ void c_screen_4way_signin::update(void)
 		bool controller_has_joined = has_live_privileges && user_interface_controller_is_player_profile_valid(controller);
 		bool show_gamertag_text = false;
 
-		s_saved_game_file_player_profile profile;
+		s_saved_game_player_profile profile;
 		if (controller_has_joined)
 		{
 			uint32 profile_index;
@@ -217,7 +217,7 @@ void c_screen_4way_signin::update(void)
 
 			c_player_widget_representation* current_player = &representations[controller];
 			current_player->set_appearance(&profile.profile);
-			current_player->set_player_name_from_configuration((s_player_properties*)profile.player_name); //hacky
+			current_player->set_player_name_from_configuration((s_player_properties*)profile.name); //hacky
 			show_gamertag_text = user_interface_controller_has_xbox_live(controller);
 		}
 
