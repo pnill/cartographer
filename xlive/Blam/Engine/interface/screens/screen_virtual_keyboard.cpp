@@ -3,7 +3,7 @@
 
 #include "H2MOD/Modules/CustomMenu/CustomMenuGlobals.h"
 
-char __fastcall sub_23CC18_CM(int thisptr, int _EDX);
+void sub_23CC18_CM(c_user_interface_widget* thisptr);
 
 void ui_globals_set_keyboard_input_state(bool state)
 {
@@ -23,15 +23,12 @@ void* __cdecl c_virtual_keyboard_menu::open(s_screen_parameters* parameters)
 	return virtual_keyboard_menu;
 }
 
-void __thiscall c_virtual_keyboard_menu::set_input_string_buffer(wchar_t* buffer, size_t buffer_size)
+void __thiscall c_virtual_keyboard_menu::set_input_string_buffer(wchar_t* buffer, uint32 buffer_size)
 {
-	typedef void(__thiscall* set_input_string_buffer_t)(void*, wchar_t*, int);
-	auto p_set_input_string_buffer = Memory::GetAddress<set_input_string_buffer_t>(0x23B118);
-
-	p_set_input_string_buffer(this, buffer, buffer_size);
+	INVOKE_TYPE(0x23B118, 0x0, void(__thiscall*)(c_virtual_keyboard_menu*, wchar_t*, int), this, buffer, buffer_size);
 }
 
-void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, int menuType) {
+void ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type) {
 	// VirtualKeyboardTypes - original
 	// -1 allows all symbols and does not check the output string if valid for any purpose as below options do
 
@@ -44,42 +41,21 @@ void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, 
 	// 13 - rename squad
 	// 16 - search for games by its description
 
-	// from 17 to 33 we got the same as above, but new to match our new code
-	// 17 - 21 = 0 to 4 and so on, but diferent indices so we determine what our code will execute
-
-	int VKbMenuTypeDefault = menuType;//enter message text
-
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
 	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_keyboard, _window_4, c_virtual_keyboard_menu::open);
 	c_virtual_keyboard_menu* virtual_keyboard = (c_virtual_keyboard_menu*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
-	*(DWORD*)((BYTE*)virtual_keyboard + 2652) = VKbMenuTypeDefault;
-
-	virtual_keyboard->set_input_string_buffer(textBuffer, textBufferLen);
-
-	//*(DWORD*)(v4 + 2656) = a3;
+	virtual_keyboard->m_keyboard_type = keyboard_type;
+	virtual_keyboard->set_input_string_buffer(out_keyboard_text, out_keyboard_text_lenght);
 }
 
 // TODO **CLEANUP**
 #pragma region Virtual Keyboard button handlers
 
-char __fastcall sub_23CC18_CM(int thisptr, int _EDX)//__thiscall
+void sub_23CC18_CM(c_user_interface_widget* thisptr)//__thiscall
 {
-	int(__thiscall * sub_212604)(int, int) = (int(__thiscall*)(int, int))((char*)H2BaseAddr + 0x212604);
-
-	BYTE& byte_978DFE = *((BYTE*)H2BaseAddr + 0x978DFE);
-
-	int v1; // esi
-	char result; // al
-	//char v3[1024]; // [esp+4h] [ebp-804h]
-
-	v1 = thisptr;
-	int VKbMenuTypeDefault = *(DWORD*)(thisptr + 2652);
-
-	result = sub_212604(v1, 3);
-
-	return result;
+	thisptr->start_widget_animation(3);
 }
 
 void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
@@ -246,7 +222,7 @@ void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
 				// success. however it will open other menus like customise new variant
 				// we replace the original function that would call the default menus
 			success:
-				sub_23CC18_CM((int)thisptr, 0);
+				sub_23CC18_CM((c_user_interface_widget*)thisptr);
 			}
 			break;
 		case 41://shift button
@@ -539,7 +515,7 @@ bool c_virtual_keyboard_menu::handle_event(s_event_record* event)
 
 void c_virtual_keyboard_menu::initialize(s_screen_parameters* parameters)
 {
-	INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(s_screen_parameters * parameters), parameters);
+	INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(s_screen_parameters *), parameters);
 
 	// set the default header and description text
 
