@@ -4,7 +4,7 @@
 
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
 
-// we just re-use the first seventeen keyboard id's in default code for now
+// we just re-use the first 17 keyboard id's in default code for now
 #define VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW (VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX * 2)
 
 #define VIRTUAL_KEYBOARD_BUTTON_COUNT 47
@@ -231,7 +231,7 @@ public:
 
 	virtual bool handle_event(s_event_record* event) override;
 
-	virtual void initialize(s_screen_parameters* parameters);
+	virtual void initialize(s_screen_parameters* parameters) override;
 
 	virtual void* load_proc() override
 	{

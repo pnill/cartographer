@@ -48,17 +48,10 @@ void CustomMenuCall_VKeyboard_Inner(wchar_t* textBuffer, __int16 textBufferLen, 
 	// 17 - 21 = 0 to 4 and so on, but diferent indices so we determine what our code will execute
 
 	int VKbMenuTypeDefault = menuType;//enter message text
-	int VKbMenuTypeNew = menuType + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;//enter message text
-
-	if (VKbMenuTypeDefault == -1)
-		VKbMenuTypeNew = -1;
-
-	int a1 = 0;
-	int a3 = 0;
 
 	s_screen_parameters virtual_keyboard_params;
 	virtual_keyboard_params.m_context = nullptr;
-	virtual_keyboard_params.data_new(0, FLAG(a1), _user_interface_channel_type_keyboard, _window_4, c_virtual_keyboard_menu::open);
+	virtual_keyboard_params.data_new(0, FLAG(0), _user_interface_channel_type_keyboard, _window_4, c_virtual_keyboard_menu::open);
 	c_virtual_keyboard_menu* virtual_keyboard = (c_virtual_keyboard_menu*)virtual_keyboard_params.ui_screen_load_proc_exec();
 
 	*(DWORD*)((BYTE*)virtual_keyboard + 2652) = VKbMenuTypeDefault;
@@ -83,15 +76,6 @@ char __fastcall sub_23CC18_CM(int thisptr, int _EDX)//__thiscall
 
 	v1 = thisptr;
 	int VKbMenuTypeDefault = *(DWORD*)(thisptr + 2652);
-	int VKbMenuTypeNew = *(DWORD*)(thisptr + 2652) + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
-	if (VKbMenuTypeDefault == -1)
-		VKbMenuTypeNew = -1;
-
-	/*if (VKbMenuTypeDefault != 15)//type: enter message text. hmm something interesting is happening here
-	{
-		sub_4BEB3((int)v3, 1024, *(DWORD*)(thisptr + 3172), *(signed __int16*)(thisptr + 3180));
-		sub_287567(*(__int16**)(v1 + 3172), *(signed __int16*)(v1 + 3180), (__int16*)v3);
-	}*/
 
 	result = sub_212604(v1, 3);
 
@@ -132,9 +116,6 @@ void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
 	signed int v15; // eax
 
 	int VKbMenuTypeDefault = *((DWORD*)thisptr + 663);
-	int VKbMenuTypeNew = *((DWORD*)thisptr + 663) + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
-	if (VKbMenuTypeDefault == -1)
-		VKbMenuTypeNew = -1;
 
 	if (VKbMenuTypeDefault != 12 || *((DWORD*)thisptr + 3806) == -1)
 	{
@@ -230,30 +211,18 @@ void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
 				case 2:
 				case 3:
 				case 4:
-					switch (VKbMenuTypeNew)
+					if (v15 == 1)
 					{
-					case 17:
-					case 18:
-					case 19:
-					case 20:
-					case 21:
-						if (v15 == 1)
-						{
-							error_message_id = 88;
-						}
-						else if (v15 == 2)
-						{
-							// error_message_id = 70;
+						error_message_id = 88;
+					}
+					else if (v15 == 2)
+					{
+						// error_message_id = 70;
 
-							// replace already exist error message with success
-							goto success;
-						}
-
-					default:
-						break;
+						// replace already exist error message with success
+						goto success;
 					}
 					break;
-
 				case 5:
 				case 6:
 				case 7:
@@ -265,6 +234,7 @@ void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
 					{
 						error_message_id = 71;
 					}
+					break;
 				default:
 					break;
 				}
@@ -566,76 +536,15 @@ bool c_virtual_keyboard_menu::handle_event(s_event_record* event)
 	return result;
 }
 
-int __stdcall sub_23bf3e_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
-{
-	int(__cdecl * sub_20c701)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x20c701);
-	//int(__thiscall* sub_210a44)(int, int, int*) = (int(__thiscall*)(int, int, int*))((char*)H2BaseAddr + 0x210a44);
-	int(__thiscall * sub_211e23)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211e23);
-
-	void(__thiscall * sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)H2BaseAddr + 0x23BBBE);
-	//int(__thiscall* sub_23AE3C)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23AE3C);
-
-	void* dword_3D2E38 = (void*)(H2BaseAddr + 0x3D2E38);
-	void* dword_3D2A78 = (void*)(H2BaseAddr + 0x3D2A78);
-	void* dword_3D2CB8 = (void*)(H2BaseAddr + 0x3D2CB8);
-	void* dword_3D2B38 = (void*)(H2BaseAddr + 0x3D2B38);
-	BYTE* byte_3D2F30 = (BYTE*)((char*)H2BaseAddr + 0x3D2F30);
-
-	int* v2; // esi
-	int v3; // edi
-	unsigned int v4; // eax
-	int v5; // ecx
-	int result; // eax
-	int v7[80];
-	int v14[47]; // [esp+74h] [ebp-BCh]
-
-	v2 = (int*)thisptr;
-	v3 = sub_20c701(((int*)thisptr)[28]);
-	if (v3 != -1)
-	{
-		v7[0] = 0;
-		v7[1] = 1;
-		v7[2] = 47;
-		v7[3] = (int)v14;
-		v7[4] = 0;
-		v7[5] = 0;
-		memset(&v7[6], 0, 80);
-		v4 = 0;
-		v5 = (int)(v2 + 798);
-		do
-		{
-			v14[v4++] = v5;
-			v5 += 256;
-		} while (v4 < 47u);
-		sub_210a44_CMLTD((int)v2, v3, v7, label_menu_id, label_id_title, label_id_description);
-	}
-	sub_211e23((int)v2);
-	sub_23BBBE(v2, dword_3D2E38, 47);
-	sub_23BBBE(v2, dword_3D2A78, 47);
-	sub_23BBBE(v2, dword_3D2CB8, 47);
-	sub_23BBBE(v2, dword_3D2B38, 47);
-	result = sub_23ae3c_CMLTD(v2, label_menu_id, label_id_title, label_id_description);
-	int VKbMenuTypeDefault = v2[663];
-	int VKbMenuTypeNew = v2[663] + VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX;
-	//"SYMBOLS" AND "ACCENTS" buttons are greyed out by default
-	if (byte_3D2F30[8 * VKbMenuTypeDefault] & 0xA)
-	{
-		*((BYTE*)v2 + 14566) = 0;//disables "SYMBOLS" button from being highlightable
-		*((BYTE*)v2 + 14310) = 0;//disables "ACCENTS" button from being highlightable
-	}
-	else
-	{
-		*((BYTE*)v2 + 15078) = 0;//enable "SYMBOLS" button style
-		*((BYTE*)v2 + 14822) = 0;//enable "ACCENTS" button style
-	}
-	return result;
-}
-
 
 void c_virtual_keyboard_menu::initialize(s_screen_parameters* parameters)
 {
-	// ### FIXME remove
-	sub_23bf3e_CMLTD((int)this, (int)parameters, 0xFF00000B, 0xFFFFFFF0, 0xFFFFFFF1);
+	INVOKE_VFPTR_FN(_get_vfptr_table, 22, void(class_type::**)(s_screen_parameters * parameters), parameters);
+
+	// set the default header and description text
+
+	m_header_text.set_text(L"");
+	try_find_text_widget(3)->set_text(L"");
 }
 
 #pragma endregion
