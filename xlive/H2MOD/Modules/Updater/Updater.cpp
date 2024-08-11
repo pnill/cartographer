@@ -499,7 +499,7 @@ void GSDownloadInstall() {
 		swprintf(updater_params_flags, updater_params_buflen, L"-p %d -t 5000 %s", GetCurrentProcessId(), std::wstring(updater_params.begin(), updater_params.end()).c_str());
 		if (fork_cmd_elevate(existingfilepathupdater, updater_params_flags)) {
 			addDebugText("Shutting down to update!");
-			BYTE& Quit_Exit_Game = *(BYTE*)((char*)H2BaseAddr + (H2IsDediServer ? 0x4a7083 : 0x48220b));
+			BYTE& Quit_Exit_Game = *(BYTE*)((char*)Memory::GetAddress() + (Memory::IsDedicatedServer() ? 0x4a7083 : 0x48220b));
 			Quit_Exit_Game = 1;
 		}
 		else {

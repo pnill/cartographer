@@ -85,7 +85,7 @@ namespace MeleeFix
 			push a2
 			mov eax, a1
 			mov edx, [0x167948]
-			add edx, [H2BaseAddr]
+			add edx, [Memory::baseAddress]
 			call edx
 			add esp, 12
 			mov result, eax

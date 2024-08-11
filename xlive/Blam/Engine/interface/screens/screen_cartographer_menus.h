@@ -70,7 +70,7 @@ public:
 	{
 		datum list_item_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
 
-		c_text_widget* text_widget = (c_text_widget*)item->try_find_child(_widget_type_text, 0, false);
+		c_text_widget* text_widget = item->try_find_text_widget(0);
 		if (text_widget)
 		{
 			wchar_t* button_label = nullptr;
@@ -122,7 +122,7 @@ public:
 		ASSERT(header_text != nullptr && subheader_text != nullptr);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
+		c_text_widget* subheader_text_widget = try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			extern int H2Config_hotkeyIdGuide;
@@ -274,7 +274,7 @@ public:
 		ASSERT(header_text != nullptr && subheader_text != nullptr);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
+		c_text_widget* subheader_text_widget = try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);
@@ -463,7 +463,7 @@ public:
 		ASSERT(header_text != nullptr && subheader_text != nullptr);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
+		c_text_widget* subheader_text_widget = try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);
@@ -585,7 +585,7 @@ public:
 		ASSERT(header_text != nullptr && subheader_text != nullptr);
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
+		c_text_widget* subheader_text_widget = try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);

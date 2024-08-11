@@ -108,7 +108,7 @@ bool H2Config_isConfigFileAppDataLocal = false;
 void SaveH2Config() {
 	addDebugText("Saving H2Configuration File...");
 
-	if (!H2IsDediServer) {
+	if (!Memory::IsDedicatedServer()) {
 		extern int current_language_main;
 		extern int current_language_sub;
 		H2Config_language.code_main = current_language_main;
@@ -120,10 +120,10 @@ void SaveH2Config() {
 		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), FlagFilePathConfig);
 	}
 	else if (H2Portable || !H2Config_isConfigFileAppDataLocal) {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2ProcessFilePath, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], H2ProcessFilePath, _Shell::GetInstanceId());
 	}
 	else {
-		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], H2AppDataLocal, _Shell::GetInstanceId());
+		swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], H2AppDataLocal, _Shell::GetInstanceId());
 	}
 
 	addDebugText(L"Saving config: \"%ws\"", fileConfigPath);
@@ -160,7 +160,7 @@ void SaveH2Config() {
 			"\n\n"
 			;
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 			iniStringBuffer <<
 				"# language_code Options (Client):"
 				"\n# <main>x<variant> - Sets the main/custom language for the game."
@@ -275,7 +275,7 @@ void SaveH2Config() {
 			"\n\n";
 
 		/*
-		if (H2IsDediServer) {
+		if (Memory::IsDedicatedServer()) {
 			iniStringBuffer <<
 				"# mp_explosion_physics Options (Server):"
 				"\n# 0 - Explosions do not push players or vehicles they drive."
@@ -336,7 +336,7 @@ void SaveH2Config() {
 			"\n# 1 - Enables console window logging, will display all output from all loggers."
 			"\n\n";
 
-		if (H2IsDediServer) {
+		if (Memory::IsDedicatedServer()) {
 			iniStringBuffer <<
 				"# server_name Options (Server):"
 				"\n# Sets the name of the server up to 15 characters long."
@@ -395,7 +395,7 @@ void SaveH2Config() {
       
 		}
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 			iniStringBuffer <<
 				"# hotkey_... Options (Client):"
 				"\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form."
@@ -420,12 +420,12 @@ void SaveH2Config() {
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "upnp", H2Config_upnp_enable);
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 			std::string lang_str(std::to_string(H2Config_language.code_main) + "x" + std::to_string(H2Config_language.code_variant));
 			ini.SetValue(H2ConfigVersionSection.c_str(), "language_code", lang_str.c_str());
 		}
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
@@ -513,7 +513,7 @@ void SaveH2Config() {
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
 
 		/*
-		if (H2IsDediServer) {
+		if (Memory::IsDedicatedServer()) {
 			fputs("\nmp_explosion_physics = ", fileConfig); fputs(AdvLobbySettings_mp_explosion_physics ? "1" : "0", fileConfig);
 
 			fputs("\nmp_sputnik = ", fileConfig); fputs(AdvLobbySettings_mp_sputnik ? "1" : "0", fileConfig);
@@ -536,7 +536,7 @@ void SaveH2Config() {
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log_console", H2Config_debug_log_console);
 
-		if (H2IsDediServer) {
+		if (Memory::IsDedicatedServer()) {
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "server_playlist", H2Config_dedi_server_playlist);
@@ -566,7 +566,7 @@ void SaveH2Config() {
 				"\n");
 		}
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_help", H2Config_hotkeyIdHelp, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdHelp)).c_str());
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "hotkey_align_window", H2Config_hotkeyIdAlignWindow, std::string("# " + GetVKeyCodeString(H2Config_hotkeyIdAlignWindow)).c_str());
@@ -610,7 +610,7 @@ void ReadH2Config() {
 			if (H2Config_isConfigFileAppDataLocal) {
 				checkFilePath = local;
 			}
-			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[H2IsDediServer], checkFilePath, readInstanceIdFile);
+			swprintf(fileConfigPath, ARRAYSIZE(fileConfigPath), H2ConfigFilenames[Memory::IsDedicatedServer()], checkFilePath, readInstanceIdFile);
 			addDebugText(L"Reading config: \"%ws\"", fileConfigPath);
 			err = _wfopen_s(&fileConfig, fileConfigPath, L"rb");
 
@@ -633,7 +633,7 @@ void ReadH2Config() {
 	else {
 		ownsConfigFile = (readInstanceIdFile == _Shell::GetInstanceId());
 
-		if (!H2IsDediServer) {
+		if (!Memory::IsDedicatedServer()) {
 			extern int current_language_main;
 			extern int current_language_sub;
 			H2Config_language.code_main = current_language_main;
@@ -679,7 +679,7 @@ void ReadH2Config() {
 			}
 
 			// client only
-			if (!H2IsDediServer)
+			if (!Memory::IsDedicatedServer())
 			{
 				std::string language_code(ini.GetValue(H2ConfigVersionSection.c_str(), "language_code", "-1x0"));
 				if (!language_code.empty())
@@ -828,7 +828,7 @@ void ReadH2Config() {
 			}
 
 			// dedicated server only
-			if (H2IsDediServer)
+			if (Memory::IsDedicatedServer())
 			{
 				const char* server_name = ini.GetValue(H2ConfigVersionSection.c_str(), "server_name", H2Config_dedi_server_name);
 				if (server_name) {

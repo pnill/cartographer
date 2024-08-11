@@ -250,4 +250,4 @@ private:
 };
 ASSERT_STRUCT_SIZE(c_virtual_keyboard_menu, 15232);
 
-void ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type);
+void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type);

@@ -17,16 +17,16 @@ void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t p_ui_screen_proc
 
 int prevOpenMethod = 3;
 void* ui_custom_cartographer_load_menu(proc_ui_screen_load_cb_t p_ui_screen_proc_cb, int open_method2, int menu_wgit_type) {
-	//int(__thiscall*WgitInitialize)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B0BC);
+	//int(__thiscall*WgitInitialize)(void*) = (int(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x20B0BC);
 	//0x0020C258 is another one.
-	//void*(__thiscall*WgitFinalize)(void*) = (void*(__thiscall*)(void*))((char*)H2BaseAddr + 0x20B11E);
+	//void*(__thiscall*WgitFinalize)(void*) = (void*(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x20B11E);
 
 	int open_method = open_method2;
 	if (open_method == 1) {
 		open_method = prevOpenMethod;
 	}
 	else if (open_method == 2) {
-		int CurrentWgitID = *(int*)((BYTE*)H2BaseAddr + 0x9758D8);
+		int CurrentWgitID = *(int*)((BYTE*)Memory::GetAddress() + 0x9758D8);
 		if (menu_wgit_type == 0) {
 			open_method = 3;
 		}
