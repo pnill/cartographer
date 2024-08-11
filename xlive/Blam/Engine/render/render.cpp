@@ -23,17 +23,24 @@
 #include "structures/structures.h"
 
 /* type definitions */
-typedef bool (__cdecl* t_draw_ingame_user_interface_element)(
+typedef bool (__cdecl* t_render_ingame_user_interface_hud_element)(
     real32 left,
     real32 top,
     int16 x,
     int16 y,
     real32 scale,
     real32 rotation_rad,
-    int32 bitmap_tag_index,
-    int32 bitmap,
+    datum bitmap_tag_index,
+    datum bitmap,
     real32* a9,
-    int32 shader_tag_index);
+    datum shader_tag_index);
+
+typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook)(
+    int32* a1, 
+    datum tag_index, 
+    datum bitmap_index, 
+    int32* a4, 
+    datum shader_index);
 
 /* prototypes */
 
@@ -51,17 +58,24 @@ s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
 void __cdecl rasterizer_render_scene(bool is_texture_camera);
 
-bool __cdecl draw_ingame_user_interface_element_hook(
+bool __cdecl render_ingame_user_interface_hud_element_hook(
     real32 left,
     real32 top,
     int16 x,
     int16 y,
     real32 scale,
     real32 rotation_rad,
-    int32 bitmap_tag_index,
-    int32 bitmap,
+    datum bitmap_tag_index,
+    datum bitmap,
     real32* a9,
-    int32 shader_tag_index);
+    datum shader_tag_index);
+
+bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(
+    int32* a1,
+    datum tag_index,
+    datum bitmap_index,
+    int32* a4,
+    datum shader_index);
 
 void render_view(
     real_rectangle2d* frustum_bounds,
@@ -86,14 +100,16 @@ void render_view(
 
 /* public code */
 
-t_draw_ingame_user_interface_element p_draw_ingame_user_interface_element;
+t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
+t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
 
 void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
     PatchCall(Memory::GetAddress(0x19DA7C), render_window);
 
-    DETOUR_ATTACH(p_draw_ingame_user_interface_element, Memory::GetAddress<t_draw_ingame_user_interface_element>(0x221E3B), draw_ingame_user_interface_element_hook);
+    DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element_hook);
+    DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
 
     // ### FIXME re-enable text/user interface text
     // *Memory::GetAddress<bool*>(0x46818E) = false;
@@ -359,20 +375,28 @@ void rasterizer_setup_2d_vertex_shader_user_interface_constants()
     return;
 }
 
-bool __cdecl draw_ingame_user_interface_element_hook(
+// hud fixes 
+
+bool __cdecl render_ingame_user_interface_hud_element_hook(
     real32 left,
     real32 top,
     int16 x,
     int16 y,
     real32 scale,
     real32 rotation_rad,
-    int32 bitmap_tag_index,
-    int32 bitmap,
+    datum bitmap_tag_index,
+    datum bitmap,
     real32* a9,
-    int32 shader_tag_index)
+    datum shader_tag_index)
 {
     rasterizer_setup_2d_vertex_shader_user_interface_constants();
-    return p_draw_ingame_user_interface_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, a9, shader_tag_index);
+    return p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, a9, shader_tag_index);
+}
+
+bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index)
+{
+    rasterizer_setup_2d_vertex_shader_user_interface_constants();
+    return p_render_ingame_user_interface_hud_indicators_element(a1, tag_index, bitmap_index, a4, shader_index);
 }
 
 void render_view(
