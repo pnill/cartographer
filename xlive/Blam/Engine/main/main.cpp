@@ -17,3 +17,9 @@ void main_reset_map(void)
 	*Memory::GetAddress<bool*>(0x48224E, 0x4A70C6) = true;
 	return;
 }
+
+void main_quit()
+{
+	*Memory::GetAddress<bool*>(0x48220b, 0x4a7083) = true;
+	return;
+}
