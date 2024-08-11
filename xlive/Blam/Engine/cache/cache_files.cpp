@@ -335,7 +335,7 @@ datum tag_loaded(uint32 group_tag, const char* name)
 				if (group_tag == tag_instance->group_tag.group)
 				{
 					const char* tag_name = tag_get_name(tag_instance->tag_index);
-					if (!stricmp(name, tag_name))
+					if (!_stricmp(name, tag_name))
 					{
 						result = tag_instance->tag_index;
 						break;
