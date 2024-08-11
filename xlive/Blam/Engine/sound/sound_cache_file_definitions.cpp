@@ -149,14 +149,14 @@ void initialize_runtime_sound_gestalt_definition()
 			if(!initialize_runtime_sound_gestalt_definition_with_secondary(primary_gestalt, secondary_gestalt))
 			{
 				// Gestalt initialization failed, clear all gestalt info for sounds.
-				DISPLAY_ASSERT("%s: failed to initialize sounds gestalt merging failed", __FUNCTION__);
+				DISPLAY_ASSERT("initialize_runtime_sound_gestalt_definition: failed to initialize sounds gestalt merging failed");
 				initialize_runtime_sound_gestalt_panic();
 			}
 		}
 	}
 	else
 	{
-		DISPLAY_ASSERT("%s: failed to initialize sounds sound_globals could not be found", __FUNCTION__);
+		DISPLAY_ASSERT("initialize_runtime_sound_gestalt_definition: failed to initialize sounds sound_globals could not be found");
 		initialize_runtime_sound_gestalt_panic();
 	}
 }

@@ -26,7 +26,7 @@ H2Config_Experimental_Rendering_Mode g_experimental_rendering_mode = _rendering_
 
 void CartographerMainLoop() {
 	static bool halo2WindowExists = false;
-	if (!H2IsDediServer && !halo2WindowExists && H2hWnd != NULL) {
+	if (!Memory::IsDedicatedServer() && !halo2WindowExists && H2hWnd != NULL) {
 		halo2WindowExists = true;
 		DWORD Display_Mode = 1;
 		HKEY hKeyVideoSettings = NULL;
@@ -46,17 +46,17 @@ void CartographerMainLoop() {
 			SetWindowText(H2hWnd, titleMod);
 		}
 	}
-	if(H2IsDediServer)
+	if(Memory::IsDedicatedServer())
 	{
 		//StatsHandler::playerRanksUpdateTick();
 	}
 	//EventHandler::executeGameLoopCallbacks();
 	/*
 	static bool halo2ServerOnce1 = false;
-	if (H2IsDediServer && !halo2ServerOnce1) {
+	if (Memory::IsDedicatedServer() && !halo2ServerOnce1) {
 		halo2ServerOnce1 = true;
 		pushHostLobby();
-		wchar_t* LanServerName = (wchar_t*)((BYTE*)H2BaseAddr + 0x52042A);
+		wchar_t* LanServerName = (wchar_t*)((BYTE*)Memory::GetAddress() + 0x52042A);
 		if (strlen(H2Config_dedi_server_name) > 0) {
 			swprintf(LanServerName, 32, L"%hs", H2Config_dedi_server_name);
 		}
@@ -64,11 +64,11 @@ void CartographerMainLoop() {
 
 	static int prevPartyPrivacy = 0;
 	int partyPrivacy;
-	if (H2IsDediServer) {
-		partyPrivacy = *(int*)(H2BaseAddr + 0x534850);
+	if (Memory::IsDedicatedServer()) {
+		partyPrivacy = *(int*)(Memory::GetAddress() + 0x534850);
 	}
 	else {
-		partyPrivacy = *(int*)(H2BaseAddr + 0x50A398);
+		partyPrivacy = *(int*)(Memory::GetAddress() + 0x50A398);
 	}
 	if (prevPartyPrivacy > 0 && partyPrivacy == 0) {
 		pushHostLobby();
@@ -135,7 +135,7 @@ void InitRunLoop() {
 	p_main_loop_body = Memory::GetAddress<main_loop_body_t>(0x399CC, 0xBFDE);
 	PatchCall(Memory::GetAddress(0x39E64, 0xC684), main_loop_body);
 
-	if (H2IsDediServer) {
+	if (Memory::IsDedicatedServer()) {
 		addDebugText("Hooking loop & shutdown Function");
 	}
 	else {

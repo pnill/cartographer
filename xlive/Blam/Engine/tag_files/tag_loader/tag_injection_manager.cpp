@@ -624,7 +624,7 @@ void c_tag_injecting_manager::load_dependencies(c_tag_injecting_manager* manager
 		tag_group t_group = manager->get_tag_group_by_datum(tag_index);
 		if (t_group.group != _tag_group_sound)
 		{
-			load_tag_internal(manager, t_group, tag_index, load_dependencies);
+			load_tag_internal(manager, t_group, tag_index, true);
 		}
 	}
 	return;

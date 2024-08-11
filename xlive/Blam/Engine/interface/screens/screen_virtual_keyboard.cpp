@@ -28,7 +28,7 @@ void __thiscall c_virtual_keyboard_menu::set_input_string_buffer(wchar_t* buffer
 	INVOKE_TYPE(0x23B118, 0x0, void(__thiscall*)(c_virtual_keyboard_menu*, wchar_t*, int), this, buffer, buffer_size);
 }
 
-void ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type) {
+void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_lenght, int32 keyboard_type) {
 	// VirtualKeyboardTypes - original
 	// -1 allows all symbols and does not check the output string if valid for any purpose as below options do
 
@@ -48,6 +48,8 @@ void ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_te
 
 	virtual_keyboard->m_keyboard_type = keyboard_type;
 	virtual_keyboard->set_input_string_buffer(out_keyboard_text, out_keyboard_text_lenght);
+
+	return virtual_keyboard;
 }
 
 // TODO **CLEANUP**
@@ -63,20 +65,20 @@ void __fastcall sub_23CD58_CM(void* thisptr, int _EDX, __int16 a2)//__thiscall
 	//virtual key press handler
 	//return psub_23CD58(thisptr, a2);
 
-	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x23CD58);
+	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)Memory::GetAddress() + 0x23CD58);
 	//return sub_23CD58(thisptr, a2);
 
-	char(__cdecl * sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)H2BaseAddr + 0x4C6E0);
-	char(__thiscall * sub_23C4C9)(int, __int16) = (char(__thiscall*)(int, __int16))((char*)H2BaseAddr + 0x23C4C9);
-	int(__thiscall * sub_23B9DE)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x23B9DE);
-	int(__cdecl * sub_21DD04)(signed int) = (int(__cdecl*)(signed int))((char*)H2BaseAddr + 0x21DD04);
-	signed int(__thiscall * sub_23B8F1)(void*) = (signed int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23B8F1);
-	int(__cdecl * sub_20E1D8)(int, int, int, int, int, int) = (int(__cdecl*)(int, int, int, int, int, int))((char*)H2BaseAddr + 0x20E1D8);
-	//char(__thiscall*sub_23CC18)(int) = (char(__thiscall*)(int))((char*)H2BaseAddr + 0x23CC18);
-	int(__thiscall * sub_23BADA)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23BADA);
-	void(__thiscall * sub_23BB13)(void*) = (void(__thiscall*)(void*))((char*)H2BaseAddr + 0x23BB13);
-	void(__thiscall * sub_23BB4C)(void*) = (void(__thiscall*)(void*))((char*)H2BaseAddr + 0x23BB4C);
-	void(__thiscall * sub_23BB85)(void*) = (void(__thiscall*)(void*))((char*)H2BaseAddr + 0x23BB85);
+	char(__cdecl * sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)Memory::GetAddress() + 0x4C6E0);
+	char(__thiscall * sub_23C4C9)(int, __int16) = (char(__thiscall*)(int, __int16))((char*)Memory::GetAddress() + 0x23C4C9);
+	int(__thiscall * sub_23B9DE)(int) = (int(__thiscall*)(int))((char*)Memory::GetAddress() + 0x23B9DE);
+	int(__cdecl * sub_21DD04)(signed int) = (int(__cdecl*)(signed int))((char*)Memory::GetAddress() + 0x21DD04);
+	signed int(__thiscall * sub_23B8F1)(void*) = (signed int(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23B8F1);
+	int(__cdecl * sub_20E1D8)(int, int, int, int, int, int) = (int(__cdecl*)(int, int, int, int, int, int))((char*)Memory::GetAddress() + 0x20E1D8);
+	//char(__thiscall*sub_23CC18)(int) = (char(__thiscall*)(int))((char*)Memory::GetAddress() + 0x23CC18);
+	int(__thiscall * sub_23BADA)(void*) = (int(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23BADA);
+	void(__thiscall * sub_23BB13)(void*) = (void(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23BB13);
+	void(__thiscall * sub_23BB4C)(void*) = (void(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23BB4C);
+	void(__thiscall * sub_23BB85)(void*) = (void(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23BB85);
 
 	int v4; // eax
 	__int16* v5; // eax
@@ -249,17 +251,17 @@ bool c_virtual_keyboard_button::handle_virtual_keyboard_event(s_event_record* ev
 {
 	//return psub_23CF88(thisptr, a2);
 
-	//char(__thiscall* sub_23CF88)(int, int*) = (char(__thiscall*)(int, int*))((char*)H2BaseAddr + 0x23CF88);
+	//char(__thiscall* sub_23CF88)(int, int*) = (char(__thiscall*)(int, int*))((char*)Memory::GetAddress() + 0x23CF88);
 	//return sub_23CF88(thisptr, a2);
 
-	int(__thiscall * sub_211BA1)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x211BA1);
-	int(__cdecl *sub_209A8C)() = (int(*)())((char*)H2BaseAddr + 0x209A8C);
-	void(__cdecl * sub_43233)(signed int) = (void(__cdecl*)(signed int))((char*)H2BaseAddr + 0x43233);
-	char(__thiscall * sub_212152)(int, int) = (char(__thiscall*)(int, int))((char*)H2BaseAddr + 0x212152);
-	int(__thiscall * sub_20E807)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x20E807);
-	char(__thiscall * sub_212660)(int, int, char) = (char(__thiscall*)(int, int, char))((char*)H2BaseAddr + 0x212660);
-	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x23CD58);
-	char(__thiscall * sub_2118F0)(int, int) = (char(__thiscall*)(int, int))((char*)H2BaseAddr + 0x2118F0);
+	int(__thiscall * sub_211BA1)(int) = (int(__thiscall*)(int))((char*)Memory::GetAddress() + 0x211BA1);
+	int(__cdecl *sub_209A8C)() = (int(*)())((char*)Memory::GetAddress() + 0x209A8C);
+	void(__cdecl * sub_43233)(signed int) = (void(__cdecl*)(signed int))((char*)Memory::GetAddress() + 0x43233);
+	char(__thiscall * sub_212152)(int, int) = (char(__thiscall*)(int, int))((char*)Memory::GetAddress() + 0x212152);
+	int(__thiscall * sub_20E807)(int) = (int(__thiscall*)(int))((char*)Memory::GetAddress() + 0x20E807);
+	char(__thiscall * sub_212660)(int, int, char) = (char(__thiscall*)(int, int, char))((char*)Memory::GetAddress() + 0x212660);
+	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)Memory::GetAddress() + 0x23CD58);
+	char(__thiscall * sub_2118F0)(int, int) = (char(__thiscall*)(int, int))((char*)Memory::GetAddress() + 0x2118F0);
 
 	int thisptr = (int)this;
 	int* a2 = (int*)event;
@@ -335,25 +337,25 @@ bool c_virtual_keyboard_menu::handle_event(s_event_record* event)
 
 	void* thisptr = (void*)this;
 
-	char(__thiscall * sub_23AF4E)(void*, int) = (char(__thiscall*)(void*, int))((char*)H2BaseAddr + 0x23AF4E);
-	void(__thiscall * sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)H2BaseAddr + 0x23BBBE);
-	int(__thiscall * sub_23B080)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23B080);
-	int(__cdecl * sub_21DD04)(signed int) = (int(__cdecl*)(signed int))((char*)H2BaseAddr + 0x21DD04);
-	int(__thiscall * sub_23B9DE)(int) = (int(__thiscall*)(int))((char*)H2BaseAddr + 0x23B9DE);
-	int(__thiscall * sub_23BADA)(void*) = (int(__thiscall*)(void*))((char*)H2BaseAddr + 0x23BADA);
-	char(__thiscall * sub_23C4C9)(int, __int16) = (char(__thiscall*)(int, __int16))((char*)H2BaseAddr + 0x23C4C9);
-	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)H2BaseAddr + 0x23CD58);
-	char(__thiscall * sub_20EB2B)(void*, s_event_record*) = (char(__thiscall*)(void*, s_event_record*))((char*)H2BaseAddr + 0x20EB2B);
-	void(__thiscall * sub_23B5C1)(void*) = (void(__thiscall*)(void*))((char*)H2BaseAddr + 0x23B5C1);
-	int(__cdecl * sub_4BD54)(int) = (int(__cdecl*)(int))((char*)H2BaseAddr + 0x4BD54);
-	char(__cdecl * sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)H2BaseAddr + 0x4C6E0);
+	char(__thiscall * sub_23AF4E)(void*, int) = (char(__thiscall*)(void*, int))((char*)Memory::GetAddress() + 0x23AF4E);
+	void(__thiscall * sub_23BBBE)(void*, void*, int) = (void(__thiscall*)(void*, void*, int))((char*)Memory::GetAddress() + 0x23BBBE);
+	int(__thiscall * sub_23B080)(void*) = (int(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23B080);
+	int(__cdecl * sub_21DD04)(signed int) = (int(__cdecl*)(signed int))((char*)Memory::GetAddress() + 0x21DD04);
+	int(__thiscall * sub_23B9DE)(int) = (int(__thiscall*)(int))((char*)Memory::GetAddress() + 0x23B9DE);
+	int(__thiscall * sub_23BADA)(void*) = (int(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23BADA);
+	char(__thiscall * sub_23C4C9)(int, __int16) = (char(__thiscall*)(int, __int16))((char*)Memory::GetAddress() + 0x23C4C9);
+	//void(__thiscall* sub_23CD58)(void*, __int16) = (void(__thiscall*)(void*, __int16))((char*)Memory::GetAddress() + 0x23CD58);
+	char(__thiscall * sub_20EB2B)(void*, s_event_record*) = (char(__thiscall*)(void*, s_event_record*))((char*)Memory::GetAddress() + 0x20EB2B);
+	void(__thiscall * sub_23B5C1)(void*) = (void(__thiscall*)(void*))((char*)Memory::GetAddress() + 0x23B5C1);
+	int(__cdecl * sub_4BD54)(int) = (int(__cdecl*)(int))((char*)Memory::GetAddress() + 0x4BD54);
+	char(__cdecl * sub_4C6E0)(__int16) = (char(__cdecl*)(__int16))((char*)Memory::GetAddress() + 0x4C6E0);
 
-	void* dword_3D2D78 = (void*)(H2BaseAddr + 0x3D2D78);
-	void* dword_3D2A78 = (void*)(H2BaseAddr + 0x3D2A78);
-	void* dword_3D2B38 = (void*)(H2BaseAddr + 0x3D2B38);
-	void* dword_3D2CB8 = (void*)(H2BaseAddr + 0x3D2CB8);
-	void* dword_3D2E38 = (void*)(H2BaseAddr + 0x3D2E38);
-	BYTE* byte_3D2F30 = (BYTE*)((char*)H2BaseAddr + 0x3D2F30);
+	void* dword_3D2D78 = (void*)(Memory::GetAddress() + 0x3D2D78);
+	void* dword_3D2A78 = (void*)(Memory::GetAddress() + 0x3D2A78);
+	void* dword_3D2B38 = (void*)(Memory::GetAddress() + 0x3D2B38);
+	void* dword_3D2CB8 = (void*)(Memory::GetAddress() + 0x3D2CB8);
+	void* dword_3D2E38 = (void*)(Memory::GetAddress() + 0x3D2E38);
+	BYTE* byte_3D2F30 = (BYTE*)((char*)Memory::GetAddress() + 0x3D2F30);
 
 	unsigned int v6; // eax
 	bool v7; // cf

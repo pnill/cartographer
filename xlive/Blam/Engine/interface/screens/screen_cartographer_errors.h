@@ -98,7 +98,7 @@ public:
 		}
 
 		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = (c_text_widget*)try_find_text_widget(2);
+		c_text_widget* subheader_text_widget = try_find_text_widget(2);
 		if (subheader_text_widget)
 		{
 			subheader_text_widget->set_text(subheader_text);

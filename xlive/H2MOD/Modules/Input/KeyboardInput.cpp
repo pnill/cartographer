@@ -20,27 +20,27 @@ void KeyboardInput::ToggleKeyboardInput()
 	if (H2Config_disable_ingame_keyboard) {
 		//Allows to repeat last movement when lose focus in mp, unlocks METHOD E from point after intro vid
 		BYTE getFocusB[] = { 0x00 };
-		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		WriteBytes(Memory::GetAddress() + 0x2E3C5, getFocusB, 1);
 
 		//Allows input when not in focus.
 		BYTE getFocusE[] = { 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 };
-		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
-		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
-		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2F9EA, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2F9FC, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2FA09, getFocusE, 6);
 	}
 	else {
 		//Reset them all back.
 		BYTE getFocusB[] = { 0x01 };
-		WriteBytes(H2BaseAddr + 0x2E3C5, getFocusB, 1);
+		WriteBytes(Memory::GetAddress() + 0x2E3C5, getFocusB, 1);
 
 		//dont allow input when not in focus.
 		BYTE getFocusE[] = { 0x0F, 0x85, 0x02, 0x02, 0x00, 0x00 };
-		WriteBytes(H2BaseAddr + 0x2F9EA, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2F9EA, getFocusE, 6);
 		getFocusE[2] = 0xF0;
 		getFocusE[3] = 0x01;
-		WriteBytes(H2BaseAddr + 0x2F9FC, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2F9FC, getFocusE, 6);
 		getFocusE[2] = 0xE3;
-		WriteBytes(H2BaseAddr + 0x2FA09, getFocusE, 6);
+		WriteBytes(Memory::GetAddress() + 0x2FA09, getFocusE, 6);
 	}
 }
 std::map<int*, std::function<void()>> hotKeyMap;
@@ -102,7 +102,7 @@ void setWindowed(int originX, int originY, int width, int height) {
 }
 //TODO: REFACTOR Content
 void hotkeyFuncAlignWindow() {
-	if (H2IsDediServer) {
+	if (Memory::IsDedicatedServer()) {
 		return;
 	}
 	if (!g_pD3DDevice9 || !H2hWnd) {
@@ -133,7 +133,7 @@ void hotkeyFuncAlignWindow() {
 }
 //TODO: REFACTOR Content
 void hotkeyFuncWindowMode() {
-	if (H2IsDediServer) {
+	if (Memory::IsDedicatedServer()) {
 		return;
 	}
 	if (!g_pD3DDevice9 || !H2hWnd) {
@@ -205,7 +205,7 @@ void KeyboardInput::Initialize()
 {
 	if (!enableKeyboard3[0]) {
 		for (int i = 0; i < 6; i++) {
-			enableKeyboard3[i] = *((BYTE*)H2BaseAddr + 0x2FA67 + i);
+			enableKeyboard3[i] = *((BYTE*)Memory::GetAddress() + 0x2FA67 + i);
 		}
 	}
 	ToggleKeyboardInput();

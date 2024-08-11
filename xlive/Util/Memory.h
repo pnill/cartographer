@@ -30,6 +30,8 @@ public:
 
 	static DWORD GetAddress(DWORD client, DWORD server = 0)
 	{
+		ASSERT( Memory::IsDedicatedServer() || client != 0);
+		ASSERT(!Memory::IsDedicatedServer() || server != 0);
 		return GetBaseAddress() + (IsDedicatedServer() ? server : client);
 	}
 

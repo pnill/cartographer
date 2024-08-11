@@ -158,7 +158,7 @@ bool read_custom_labels() {
 		char* fileLine;
 		bool keepReading = true;
 		int lineNumber = 0;
-		int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
+		int language_id = *(int*)((char*)Memory::GetAddress() + 0x412818);
 		custom_language* curr_lang = get_custom_language(language_id, 0);
 		while (keepReading && GetFileLine(labelsFile, &fileLine)) {
 			lineNumber++;
@@ -407,9 +407,9 @@ char* __stdcall H2GetLabel(int a1, int label_id, int a3, int a4) { //sub_3defd
 }
 
 void setGameLanguage() {
-	bool* HasLoadedLanguage = (bool*)(H2BaseAddr + 0x481908);
+	bool* HasLoadedLanguage = (bool*)(Memory::GetAddress() + 0x481908);
 
-	int& language_id = *(int*)(H2BaseAddr + 0x412818);
+	int& language_id = *(int*)(Memory::GetAddress() + 0x412818);
 	if (current_language_main >= 0) {
 		language_id = current_language_main;
 	}
@@ -508,16 +508,16 @@ void setCustomLanguage(int main, int variant) {
 	
 	setGameLanguage();
 
-	int GameGlobals = (int)*(int*)((char*)H2BaseAddr + 0x482D3C);
+	int GameGlobals = (int)*(int*)((char*)Memory::GetAddress() + 0x482D3C);
 	if (GameGlobals) {
 		BYTE& EngineMode = *(BYTE*)(GameGlobals + 0x8);
 		EngineMode = 1;
-		BYTE& QuitLevel = *(BYTE*)((char*)H2BaseAddr + 0x482251);
+		BYTE& QuitLevel = *(BYTE*)((char*)Memory::GetAddress() + 0x482251);
 		QuitLevel = 1;
 	}
 
 	custom_language* old_language = current_language;
-	int language_id = *(int*)((char*)H2BaseAddr + 0x412818);
+	int language_id = *(int*)((char*)Memory::GetAddress() + 0x412818);
 	if ((current_language = get_custom_language(language_id, variant)) == 0)
 		current_language = get_custom_language(language_id, 0);
 	current_language_sub = current_language->lang_variant;
@@ -525,9 +525,9 @@ void setCustomLanguage(int main, int variant) {
 	addDebugText("language_code = %dx%d", current_language_main, current_language_sub);
 
 	if (GameGlobals) {
-		BYTE* LoadedFonts = (BYTE*)((char*)H2BaseAddr + 0x47e7c0);
+		BYTE* LoadedFonts = (BYTE*)((char*)Memory::GetAddress() + 0x47e7c0);
 		*LoadedFonts = 0;
-		void*(*sub_31dff)() = (void*(*)())((char*)H2BaseAddr + 0x31dff);
+		void*(*sub_31dff)() = (void*(*)())((char*)Memory::GetAddress() + 0x31dff);
 		sub_31dff();
 	}
 	if (current_language_isGarbage) {
@@ -609,20 +609,20 @@ static void overrideCoreH2Labels() {
 } 
 
 void InitCustomLanguage() {
-	if (!H2IsDediServer) {
+	if (!Memory::IsDedicatedServer()) {
 		setGameLanguage();
 
 		initialise_core_languages();
 		overrideCoreH2Labels();
 		read_custom_labels();
 
-		p_string_id_to_wide_string = (string_id_to_wide_string_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
+		p_string_id_to_wide_string = (string_id_to_wide_string_t)DetourClassFunc((BYTE*)Memory::GetAddress() + 0x3E332, (BYTE*)string_id_to_wide_string_hook, 11);
 
-		pH2GetLabel = (H2GetLabel_t)DetourClassFunc((BYTE*)H2BaseAddr + 0x3defd, (BYTE*)H2GetLabel, 8);
+		pH2GetLabel = (H2GetLabel_t)DetourClassFunc((BYTE*)Memory::GetAddress() + 0x3defd, (BYTE*)H2GetLabel, 8);
 
 		//Hook the function that sets the font table filename.
-		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)H2BaseAddr + 0x00031b97);
-		PatchCall(H2BaseAddr + 0x00031e89, nak_c00031b97);
+		pfn_c00031b97 = (char*(__cdecl*)(int, int))((BYTE*)Memory::GetAddress() + 0x00031b97);
+		PatchCall(Memory::GetAddress() + 0x00031e89, nak_c00031b97);
 
 		bool redoCapture = H2Config_custom_labels_capture_missing;
 		setCustomLanguage(H2Config_language.code_main, H2Config_language.code_variant);
@@ -631,7 +631,7 @@ void InitCustomLanguage() {
 }
 
 void DeinitCustomLanguage() {
-	if (!H2IsDediServer) {
+	if (!Memory::IsDedicatedServer()) {
 		write_custom_labels();
 	}
 }

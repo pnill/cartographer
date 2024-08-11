@@ -9,10 +9,10 @@
 
 bool g_main_game_time_frame_limiter_enabled = false;
 
-float get_ticks_leftover_time()
+real32 main_time_get_max_frame_time()
 {
 	time_globals* time_globals = time_globals::get();
-	float result = time_globals->tick_length - (float)(time_globals->game_ticks_leftover / (float)time_globals->ticks_per_second);
+	real32 result = time_globals->tick_length - (real32)(time_globals->game_ticks_leftover / (real32)time_globals->ticks_per_second);
 	return MAX(result, 0.0f);
 }
 
@@ -86,7 +86,7 @@ real32 __cdecl main_time_update_hook(bool fixed_time_step, real32 fixed_time_del
 				// if there's game tick leftover time (i.e the actual game tick update executed faster than the actual engine's fixed time step)
 				// FIXED by interpolation: 
 				// limit the framerate to get back in sync with the renderer to prevent ghosting and jagged movement
-				real32 frame_time = get_ticks_leftover_time();
+				real32 frame_time = main_time_get_max_frame_time();
 				while (frame_time > dt_sec)
 				{
 					uint32 yield_time_msec = 0;

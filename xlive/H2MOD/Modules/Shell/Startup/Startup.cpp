@@ -42,9 +42,6 @@ h2log *console_log = nullptr;
 // Voice chat logger
 h2log* voice_log = nullptr;
 
-DWORD H2BaseAddr = NULL;
-bool H2IsDediServer = false;
-
 wchar_t* H2ProcessFilePath = 0;
 wchar_t* H2AppDataLocal = 0;
 wchar_t* FlagFilePathConfig = 0;
@@ -74,7 +71,7 @@ bool configureXinput() {
 			swprintf(xinput_path, ARRAYSIZE(xinput_path), L"xinput/p%02d/xinput9_1_0.dll", _Shell::GetInstanceId());
 			LOG_TRACE_FUNCW(L"Changing xinput path to '{0}' : '{1}'", xinput_path, xinput_path);
 
-			WritePointer(H2BaseAddr + 0x8AD28, xinput_path);
+			WritePointer(Memory::GetAddress() + 0x8AD28, xinput_path);
 
 			char xinputName[_MAX_PATH];
 			char xinputdir[_MAX_PATH];
@@ -281,9 +278,6 @@ void InitH2Startup() {
 
 	cseries_debug_initialize();
 	Memory::Initialize();
-
-	H2BaseAddr = Memory::GetAddress();
-	H2IsDediServer = Memory::IsDedicatedServer();
 
 	shell_windows_initialize();
 	// ### TODO remove entirely

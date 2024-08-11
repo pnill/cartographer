@@ -247,7 +247,7 @@ namespace playlist_loader
 	//		mov ecx, playlist_entry
 	//		mov ebx, a2
 	//		mov eax, [0x12D14]
-	//		add eax, [H2BaseAddr]
+	//		add eax, [Memory::baseAddress]
 	//		call eax
 	//	}
 	//}

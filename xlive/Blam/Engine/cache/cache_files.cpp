@@ -188,25 +188,25 @@ bool scenario_tags_load_debug(void)
 
 	if(!cache_file_blocking_read(NONE, cache_header->tag_name_buffer_offset, aligned_tag_name_read_size, g_cache_file_debug_globals.debug_tag_name_buffer))
 	{
-		DISPLAY_ASSERT("%s: failed to load tag names from cache", __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag names from cache");
 		return false;
 	}
 
 	if (!cache_file_blocking_read(NONE, cache_header->tag_name_offsets_offset, aligned_tag_name_offset_read_size, g_cache_file_debug_globals.debug_tag_name_offsets))
 	{
-		DISPLAY_ASSERT("%s: failed to load tag name offsets from cache", __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load tag name offsets from cache");
 		return false;
 	}
 
 	if(!cache_file_blocking_read(NONE, cache_header->string_table_offset, aligned_string_id_table_read_size, g_cache_file_debug_globals.debug_string_id_storage))
 	{
-		DISPLAY_ASSERT("%s: failed to load string table from cache" __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string table from cache");
 		return false;
 	}
 
 	if(!cache_file_blocking_read(NONE, cache_header->string_idx_offset, aligned_string_id_index_buffer_read_size, g_cache_file_debug_globals.debug_string_id_index))
 	{
-		DISPLAY_ASSERT("%s: failed to load string index table from cache", __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load_debug: failed to load string index table from cache");
 		return false;
 	}
 
@@ -252,7 +252,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("%s: failed to load tag header from cache" __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load: failed to load tag header from cache");
 		return false;
 	}
 
@@ -261,7 +261,7 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 	{
 		game_preferences_flag_dirty();
 		scenario_tags_load_internal_panic();
-		DISPLAY_ASSERT("%s: failed to load tag data from cache", __FUNCTION__);
+		DISPLAY_ASSERT("scenario_tags_load: failed to load tag data from cache");
 		return false;
 	}
 
@@ -335,7 +335,7 @@ datum tag_loaded(uint32 group_tag, const char* name)
 				if (group_tag == tag_instance->group_tag.group)
 				{
 					const char* tag_name = tag_get_name(tag_instance->tag_index);
-					if (!stricmp(name, tag_name))
+					if (!_stricmp(name, tag_name))
 					{
 						result = tag_instance->tag_index;
 						break;

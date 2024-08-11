@@ -4,6 +4,7 @@
 #include "CommandsUtil.h"
 #include "ComVar.h"
 
+#include "main/main.h"
 #include "game/game.h"
 #include "main/main_game.h"
 #include "main/main_game_time.h"
@@ -86,6 +87,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode));
 	InsertCommand(new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite));
 	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
+	InsertCommand(new ConsoleCommand("quit", "quits the game to desktop", 0, 0, CommandCollection::quit));
 
 	atexit([]() -> void {
 		for (auto command : commandTable)
@@ -912,5 +914,11 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 
 	game_direct_connect_to_session(session.sessionID, session.keyExchangeKey, &session.hostAddress, EXECUTABLE_TYPE, EXECUTABLE_VERSION, COMPATIBLE_VERSION);
 
+	return 0;
+}
+
+int CommandCollection::quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	main_quit();
 	return 0;
 }
