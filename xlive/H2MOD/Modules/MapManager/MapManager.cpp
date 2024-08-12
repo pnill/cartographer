@@ -53,10 +53,10 @@ network_life_cycle_session_get_global_map_precache_status_t p_network_life_cycle
 // TODO: simplify and cleanup
 int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *out_smallest_load_percentage, unsigned int *out_host_map_status) {
 	// this just gets the current network_session, but has some extra misc checks
-	typedef bool(__cdecl* get_network_session_with_misc_checks_t)(s_network_session**);
+	typedef bool(__cdecl* get_network_session_with_misc_checks_t)(c_network_session**);
 	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks_t>(0x1AD782, 0x1A66FF);
 
-	s_network_session* session = nullptr;
+	c_network_session* session = nullptr;
 	uint32 result_map_status, result_precache_percentage;
 	result_map_status = result_precache_percentage = 0;
 	bool someone_downloading_map = false;
@@ -181,7 +181,7 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 }
 
 // this is actually thiscall, but the parameter is unused
-bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, s_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
+bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, c_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
 {
 	s_session_membership* membership = &session->membership[0];
 
@@ -363,7 +363,7 @@ void MapManager::ReloadAllMaps() {
 
 bool MapManager::GetMapFilename(std::wstring& buffer) {
 	wchar_t map_file_location[256];
-	s_network_session* session = nullptr;
+	c_network_session* session = nullptr;
 
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::GetActiveNetworkSession(&session)) {

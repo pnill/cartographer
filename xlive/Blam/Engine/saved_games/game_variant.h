@@ -290,7 +290,7 @@ struct s_game_variant
 	e_game_engine_starting_weapon starting_equipment_primary;
 	e_game_engine_starting_weapon starting_equipment_secondary;
 
-	bool is_team_play()
+	bool is_team_play() const
 	{
 		return TEST_BIT(this->game_engine_flags, _game_engine_teams_bit);
 	}

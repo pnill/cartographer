@@ -33,8 +33,8 @@ public:
 	c_game_life_cycle_handler_functions* functions;
 	e_game_life_cycle life_cycle;
 	void* life_cycle_manager;
-	bool unk_bool;
-	void initialize(void* life_cycle_manager, e_game_life_cycle life_cycle, bool unk_bool);
+	bool field_C;
+	void initialize(void* life_cycle_manager, e_game_life_cycle life_cycle, bool a3);
 };
 
 struct c_game_life_cycle_handler_none : c_game_life_cycle_handler
@@ -121,7 +121,7 @@ public:
 	e_game_life_cycle life_cycle_state;
 	c_game_life_cycle_handler* life_cycle_handlers[e_game_life_cycle::k_life_cycle_count];
 	void* network_session_manager;
-	s_network_session* network_session;
+	c_network_session* network_session;
 	void* text_chat_manager_maybe;
 	void* network_message_gateway;
 	void* network_observer;
@@ -135,7 +135,7 @@ public:
 		void* network_message_gateway, 
 		void* network_observer, 
 		void* network_session_manager, 
-		s_network_session* network_session,
+		c_network_session* network_session,
 		void* text_chat_manager_maybe)
 	{
 		this->life_cycle_state = _life_cycle_none;

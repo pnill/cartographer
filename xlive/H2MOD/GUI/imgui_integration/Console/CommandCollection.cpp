@@ -87,6 +87,7 @@ void CommandCollection::InitializeCommands()
 	InsertCommand(new ConsoleCommand("game_mode", "sets the game mode for the next map, 1 parameter(s): <int>", 1, 1, CommandCollection::game_mode));
 	InsertCommand(new ConsoleCommand("invite", "creates a invite code that you can send to people for direct connecting", 0, 0, CommandCollection::invite));
 	InsertCommand(new ConsoleCommand("connect", "lets you directly connect to a session with an invite code", 1, 1, CommandCollection::connect));
+	InsertCommand(new ConsoleCommand("sv_change_player_team", "changes the player team to the specivied team", 2, 2, CommandCollection::change_player_team));
 	InsertCommand(new ConsoleCommand("quit", "quits the game to desktop", 0, 0, CommandCollection::quit));
 
 	atexit([]() -> void {
@@ -289,7 +290,7 @@ int CommandCollection::IsSessionHostCmd(const std::vector<std::string>& tokens, 
 {
 	TextOutputCb* outputCb = ctx.outputCb;
 
-	s_network_session* session;
+	c_network_session* session;
 	if (!NetworkSession::GetActiveNetworkSession(&session))
 	{
 		outputCb(StringFlag_None, "# not in a network session");
@@ -458,7 +459,7 @@ int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens, Conso
 	TextOutputCb* outputCb = ctx.outputCb;
 	const ConsoleCommand* command_data = ctx.consoleCommand;
 
-	s_network_session* session;
+	c_network_session* session;
 
 	if (!NetworkSession::GetActiveNetworkSession(&session))
 	{
@@ -876,7 +877,7 @@ int CommandCollection::game_mode(const std::vector<std::string>& tokens, Console
 int CommandCollection::invite(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {
 	TextOutputCb* outputCb = ctx.outputCb;
-	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* network_session = NetworkSession::GetActiveNetworkSession();
 	bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
 
 	XSESSION_INFO session;
@@ -916,6 +917,22 @@ int CommandCollection::connect(const std::vector<std::string>& tokens, ConsoleCo
 
 	return 0;
 }
+
+int CommandCollection::change_player_team(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
+{
+	int32 player_index = NONE;
+	int32 new_team_index = NONE;
+
+	if (ComVar(&player_index).SetFromStr(tokens[1])
+		&& ComVar(&new_team_index).SetFromStr(tokens[2]))
+	{
+		c_network_session* session = NetworkSession::GetActiveNetworkSession();
+		session->player_switch_teams(player_index, new_team_index);
+	}
+
+	return 0;
+}
+
 
 int CommandCollection::quit(const std::vector<std::string>& tokens, ConsoleCommandCtxData ctx)
 {

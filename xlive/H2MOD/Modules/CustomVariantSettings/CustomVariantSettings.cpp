@@ -52,7 +52,7 @@ namespace CustomVariantSettings
 
 	void SendCustomVariantSettings(int peerIndex)
 	{
-		s_network_session* session = NetworkSession::GetActiveNetworkSession();
+		c_network_session* session = NetworkSession::GetActiveNetworkSession();
 		if (NetworkSession::LocalPeerIsSessionHost())
 		{
 			//TODO: Find and map out struct with current variant information.
