@@ -147,9 +147,9 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 		{
 			LOG_TRACE_NETWORK("  - network address: {:x}", ntohl(addr.address.ipv4));
 
-			int peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
-			s_network_session* session = NetworkSession::GetActiveNetworkSession();
-			if (peer_index != -1 && !NetworkSession::IsPeerIndexLocal(peer_index))
+			int32 peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
+			c_network_session* session = NetworkSession::GetActiveNetworkSession();
+			if (peer_index != NONE && !NetworkSession::IsPeerIndexLocal(peer_index))
 			{
 				s_custom_map_filename data;
 				ZeroMemory(&data, sizeof(s_custom_map_filename));
@@ -283,20 +283,29 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 	if (!MessageIsCustom(message_type))
 		p_handle_channel_message(thisx, network_channel_index, message_type, dynamic_data_size, packet);
 
-	if (message_type == _player_add) {
+	switch (message_type)
+	{
+	case _membership_update:
+		network_session_membership_update_local_players_teams();
+		break;
+	case _player_add:
 		if (peer_network_channel->is_channel_state_5()
 			&& peer_network_channel->get_network_address(&addr))
 		{
-			auto peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
+			int32 peer_index = NetworkSession::GetPeerIndexFromNetworkAddress(&addr);
 			EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, peer_index, EventHandler::NetworkPlayerEventType::add);
 			NetworkMessage::SendAntiCheat(peer_index);
 		}
+		break;
+	case k_network_message_type_collection_count:
+	default:
+		break;
 	}
 }
 
 void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 {
-	s_network_session* session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* session = NetworkSession::GetActiveNetworkSession();
 
 	if (session->local_session_state == _network_session_state_peer_established)
 	{
@@ -322,7 +331,7 @@ void NetworkMessage::SendRequestMapFilename(int mapDownloadId)
 
 void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
 {
-	s_network_session* session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* session = NetworkSession::GetActiveNetworkSession();
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		s_team_change data;
@@ -331,7 +340,7 @@ void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
 		c_network_observer* observer = session->p_network_observer;
 		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIdx);
 
-		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx))
+		if (peerIdx != NONE && !NetworkSession::IsPeerIndexLocal(peerIdx))
 		{
 			if (observer_channel->field_1) {
 				observer->send_message(session->session_index, observer_channel->observer_index, false, _team_change, sizeof(s_team_change), &data);
@@ -342,7 +351,7 @@ void NetworkMessage::SendTeamChange(int peerIdx, e_game_team team)
 
 void NetworkMessage::SendRankChange(int peerIdx, BYTE rank)
 {
-	s_network_session* session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* session = NetworkSession::GetActiveNetworkSession();
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
 		s_rank_change data;
@@ -351,7 +360,7 @@ void NetworkMessage::SendRankChange(int peerIdx, BYTE rank)
 		c_network_observer* observer = session->p_network_observer;
 		s_session_observer_channel* observer_channel = NetworkSession::GetPeerObserverChannel(peerIdx);
 
-		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx))
+		if (peerIdx != NONE && !NetworkSession::IsPeerIndexLocal(peerIdx))
 		{
 			if (observer_channel->field_1) {
 				observer->send_message(session->session_index, observer_channel->observer_index, false, _rank_change, sizeof(s_rank_change), &data);
@@ -361,7 +370,7 @@ void NetworkMessage::SendRankChange(int peerIdx, BYTE rank)
 }
 void NetworkMessage::SendAntiCheat(int peerIdx)
 {
-	s_network_session* session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* session = NetworkSession::GetActiveNetworkSession();
 
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
@@ -370,7 +379,7 @@ void NetworkMessage::SendAntiCheat(int peerIdx)
 
 		s_anti_cheat data;
 		data.enabled = g_twizzler_status;
-		if (peerIdx != -1 && !NetworkSession::IsPeerIndexLocal(peerIdx)) {
+		if (peerIdx != NONE && !NetworkSession::IsPeerIndexLocal(peerIdx)) {
 			if (observer_channel->field_1) {
 				observer->send_message(session->session_index, observer_channel->observer_index, false, _anti_cheat, sizeof(s_anti_cheat), &data);
 			}

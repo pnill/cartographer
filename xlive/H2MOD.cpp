@@ -529,7 +529,7 @@ change_team_t p_change_local_team;
 
 void __cdecl changeTeam(int localPlayerIndex, int teamIndex)
 {
-	s_network_session* session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* session = NetworkSession::GetActiveNetworkSession();
 
 	// prevent team switch in the pregame lobby, when the game already started
 	if (session) {
@@ -610,15 +610,15 @@ void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
 		p_game_mode_engine_draw_team_indicators(local_user_render_idx);
 }
 
-typedef int16(__cdecl* get_enabled_teams_flags_t)(s_network_session*);
+typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
 get_enabled_teams_flags_t p_get_enabled_teams_flags;
 
-int16 __cdecl get_enabled_team_flags(s_network_session* session)
+uint16 __cdecl get_enabled_team_flags(c_network_session* session)
 {
-	int16 default_teams_enabled_flags = p_get_enabled_teams_flags(session);
-	int16 new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
-	const int16 red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
-	const int16 infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
+	uint16 default_teams_enabled_flags = p_get_enabled_teams_flags(session);
+	uint16 new_teams_enabled_flags = (default_teams_enabled_flags & H2Config_team_bit_flags);
+	const uint16 red_versus_blue_teams = FLAG(_game_team_red) | FLAG(_game_team_blue);
+	const uint16 infection_teams = FLAG(_game_team_red) | FLAG(_game_team_green);
 
 	std::wstring selected_map_file_name;
 
@@ -669,7 +669,7 @@ int __cdecl get_next_hill_index(int previousHill)
 	return previousHill + 1;
 }
 
-int32 get_active_count_from_bitflags(int16 teams_bit_flags)
+int32 get_active_count_from_bitflags(uint16 teams_bit_flags)
 {
 	int32 count = 0;
 	for (int32 i = 0; i < _game_team_neutral; i++)
@@ -713,7 +713,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 	{
 		std::mt19937 mt_rand(rd());
 		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
-		int16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
+		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
 		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)_game_team_neutral);
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
@@ -854,6 +854,7 @@ void H2MOD::ApplyHooks() {
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
 	network_transport_apply_patches();
+	network_session_apply_patches();
 	bitstream_serialization_apply_patches();
 
 	network_memory_apply_patches();

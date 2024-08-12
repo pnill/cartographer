@@ -8,11 +8,11 @@ e_game_life_cycle __cdecl get_game_life_cycle()
 	return INVOKE(0x1AD660, 0x1A65DD, get_game_life_cycle);
 }
 
-void c_game_life_cycle_handler::initialize(void* life_cycle_manager, e_game_life_cycle life_cycle, bool unk_bool)
+void c_game_life_cycle_handler::initialize(void* life_cycle_manager, e_game_life_cycle life_cycle, bool a3)
 {
 	this->life_cycle_manager = life_cycle_manager;
 	this->life_cycle = life_cycle;
-	this->unk_bool = unk_bool;
+	this->field_C = a3;
 	static_cast<c_game_life_cycle_manager*>(this->life_cycle_manager)->life_cycle_handlers[this->life_cycle] = this;
 }
 

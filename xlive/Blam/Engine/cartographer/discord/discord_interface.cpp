@@ -232,7 +232,7 @@ void discord_interface_zero_player_count(void)
 
 void discord_interface_set_player_counts(void)
 {
-	s_network_session* session = nullptr;
+	c_network_session* session = nullptr;
 	if (NetworkSession::GetActiveNetworkSession(&session))
 	{
 		g_discord_globals.activity.party.size.current_size = session->membership[0].player_count;
@@ -325,7 +325,7 @@ void discord_rich_presence_update(s_discord_data* discord)
 	g_discord_globals.activity.application_id = k_discord_client_id;
 	g_discord_globals.activity.supported_platforms = DiscordActivitySupportedPlatformFlags_Desktop;
 
-	s_network_session* network_session = NetworkSession::GetActiveNetworkSession();
+	c_network_session* network_session = NetworkSession::GetActiveNetworkSession();
 	if (network_session && (network_session->session_host_peer_index != NONE && network_session->local_session_state != _network_session_state_peer_leaving))
 	{
 		bool not_session_host = !NetworkSession::LocalPeerIsSessionHost();
