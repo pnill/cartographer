@@ -297,7 +297,6 @@ void __stdcall handle_channel_message_hook(void* thisx, int network_channel_inde
 			NetworkMessage::SendAntiCheat(peer_index);
 		}
 		break;
-	case k_network_message_type_collection_count:
 	default:
 		break;
 	}
