@@ -59,7 +59,7 @@ c_cartographer_guide_edit_list::c_cartographer_guide_edit_list(uint16 _flags) :
 
 	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
 	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
+	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
 		linker_type2.link(nullptr);
 	}
 	else {
@@ -126,7 +126,7 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 
 	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
 	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
+	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
 		linker_type2.link(nullptr);
 	}
 	else {
@@ -176,7 +176,7 @@ c_cartographer_update_edit_list::c_cartographer_update_edit_list(uint16 _flags) 
 
 	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
 	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
+	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
 		linker_type2.link(nullptr);
 	}
 	else {
@@ -282,7 +282,7 @@ c_cartographer_update_notice_edit_list::c_cartographer_update_notice_edit_list(u
 
 	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
 	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
+	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
 		linker_type2.link(nullptr);
 	}
 	else {
