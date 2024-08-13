@@ -217,3 +217,41 @@ public:
 	}
 	~c_static_flags(void) = default;
 };
+
+template<typename t_type, size_t k_maximum_count>
+class c_static_array
+{
+public:
+	void clear()
+	{
+		csmemset((int8*)m_data, 0, sizeof(t_type) * k_maximum_count);
+	}
+	bool empty()
+	{
+		return m_count == 0;
+	}
+	bool full()
+	{
+		return m_count == k_maximum_count;
+	}
+	uint32 get_total_size()
+	{
+		return k_maximum_count * sizeof(t_type);
+	}
+	uint32 get_type_size()
+	{
+		return sizeof(t_type);
+	}
+	uint32 get_count()
+	{
+		return m_count;
+	}
+	t_type* operator[](uint32 index)
+	{
+		ASSERT(index < k_maximum_count);
+		return &this->m_data[index];
+	}
+protected:
+	uint32 m_count = 0;
+	t_type m_data[k_maximum_count];
+};

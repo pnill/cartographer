@@ -60,3 +60,16 @@ struct s_saved_game_player_profile
 };
 
 ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
+
+struct s_cartographer_player_profile_settings
+{
+	bool yaba;
+	bool daba;
+	bool dooo;
+};
+
+struct s_cartographer_player_profile
+{
+	s_saved_game_player_profile profile;
+	s_cartographer_player_profile_settings cartographer_settings;
+};

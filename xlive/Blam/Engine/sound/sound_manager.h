@@ -98,3 +98,5 @@ struct s_sound_manager_globals
 ASSERT_STRUCT_SIZE(s_sound_manager_globals, 492);
 
 void __cdecl sound_initialize(void);
+
+void __cdecl sound_idle();
