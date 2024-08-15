@@ -79,8 +79,9 @@ int16 sub_59CC02_to_usercall(
         push a3
         push a2
         push object_index
-        mov esi, dword ptr[render_info]
+        mov esi, render_info
         call sub_59CC02
+        add esp, 4 * 6
         mov result, ax
     }
 
@@ -110,6 +111,7 @@ bool sub_59D024_to_usercall(
         mov ecx, desired_lod
         mov edx, region_count
         call sub_59D024
+        add esp, 4 * 4
         mov result, al
     }
 
