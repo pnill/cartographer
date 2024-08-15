@@ -26,4 +26,4 @@ struct machine_datum
 	int16 field_1DE;
 	int16 pad1;
 };
-CHECK_STRUCT_SIZE(machine_datum, 480);
+ASSERT_STRUCT_SIZE(machine_datum, 480);

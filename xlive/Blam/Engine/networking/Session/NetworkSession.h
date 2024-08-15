@@ -84,7 +84,7 @@ namespace NetworkSession
 
 	int32 GetPlayerCount();
 	const wchar_t* GetPlayerName(datum player_index);
-	unsigned long long GetPlayerId(datum player_index);
+	uint64 GetPlayerId(datum player_index);
 
 	int8 GetPlayerTeam(datum player_index);
 	int32 GetPeerIndexFromId(uint64 xuid);
@@ -120,7 +120,7 @@ struct s_session_virtual_couch
 	XSESSION_INFO xsession_info;
 	char pad[3];
 	uint32 xuid_count;
-	unsigned long long player_ids[k_maximum_players];
+	uint64 player_ids[k_maximum_players];
 };
 ASSERT_STRUCT_SIZE(s_session_virtual_couch, 200);
 
@@ -200,7 +200,7 @@ ASSERT_STRUCT_SIZE(s_membership_peer, 268);
 
 struct s_membership_player
 {
-	unsigned long long identifier; // -0xA
+	uint64 identifier; // -0xA
 	int32 peer_index; // -0x8
 	int32 peer_user_index; // -0x4
 	WORD player_flags; // 0x0
@@ -218,7 +218,7 @@ struct s_session_membership
 {
 	uint32 update_number; // 0x70
 	int32 session_leader_peer_index; // 0x74
-	unsigned long long dedicated_server_xuid; // 0x78
+	uint64 dedicated_server_xuid; // 0x78
 	int32 xbox_session_leader_peer_index; // 0x80
 	int32 peer_count; // 0x84
 	s_membership_peer peers[k_network_maximum_machines_per_session]; // 0x88

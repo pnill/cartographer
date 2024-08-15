@@ -56,6 +56,7 @@
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
+#include "render/render_lod_new.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
@@ -940,6 +941,8 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
 		rasterizer_dx9_water_apply_patches();
+
+		render_lod_new_apply_patches();
 
 		cinematics_apply_patches();
 		game_time_apply_patches();

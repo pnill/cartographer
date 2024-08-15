@@ -1,14 +1,15 @@
 #include "stdafx.h"
 #include "TagInterface.h"
 
-tags::tag_instance* tags::get_tag_instances()
+tags::tag_instance* tags::get_tag_instance(datum tag_index)
 {
-	return *Memory::GetAddress<tag_instance**>(0x47CD50, 0x4A29B8);
+	tags::tag_instance* tag_instances = *Memory::GetAddress<tag_instance**>(0x47CD50, 0x4A29B8);
+	return &tag_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_index)];
 }
 
-char* tags::get_tag_data()
+uint8* tags::get_tag_data()
 {
-	return *Memory::GetAddress<char**>(0x47CD54, 0x4A29BC);
+	return *Memory::GetAddress<uint8**>(0x47CD54, 0x4A29BC);
 }
 
 HANDLE tags::get_cache_handle()

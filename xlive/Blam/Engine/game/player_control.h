@@ -35,9 +35,9 @@ struct player_action
 	real32 secondary_trigger;
 	uint32 action_flags;
 	uint16 weapon_set_identifier;
+	int16 zoom_level;
 	s_player_action_weapons weapon_indexes;
 	uint16 grenade_index;
-	uint16 zoom_level;
 	int32 interaction_type;
 	int32 interaction_object;
 	int32 melee_target_unit;
@@ -59,7 +59,7 @@ struct s_player_control
 	uint32 action_context;
 	int8 gap_80[25];
 	bool zoom_input_held;
-	int8 gap_9A[2];
+	int16 field_9A;
 	int16 zoom_input_updates_held_count;
 	int8 gap_9E;
 	int8 field_9F;
@@ -85,6 +85,7 @@ void player_control_disable_local_camera(bool state);
 
 s_player_control_globals* player_control_globals_get(void);
 s_player_control* player_control_get(int32 user_index);
+int16 player_control_get_zoom_level(int32 user_index);
 
 void player_control_update_dt(real32 dt);
 void player_control_apply_patches();

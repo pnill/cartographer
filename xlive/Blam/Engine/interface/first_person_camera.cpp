@@ -69,7 +69,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 			fov = unit->camera_field_of_view;
 		}
 
-		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.weapon_indexes);
+		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.zoom_level);
 	}
 	return result;
 }

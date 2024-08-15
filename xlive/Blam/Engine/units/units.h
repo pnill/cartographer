@@ -198,7 +198,7 @@ ASSERT_STRUCT_SIZE(unit_datum, 864);
 void __cdecl unit_delete_all_weapons(datum unit_datum_index);
 datum __cdecl unit_inventory_next_weapon(datum unit_datum_index);
 bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_datum_index, e_weapon_addition_method weapon_addition_method);
-float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, s_player_action_weapons weapon_indexes);
+float __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, int16 zoom_level);
 bool unit_is_dual_wielding(datum unit_index);
 datum __cdecl unit_inventory_get_weapon(datum unit_index, int16 weapon_slot);
 

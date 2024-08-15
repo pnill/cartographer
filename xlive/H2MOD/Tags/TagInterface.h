@@ -11,6 +11,7 @@ namespace tags
 		size_t data_offset;
 		size_t size;
 	};
+	ASSERT_STRUCT_SIZE(tag_instance, 16);
 	
 	struct tag_parent_info
 	{
@@ -33,7 +34,7 @@ namespace tags
 	void on_map_load(void (*callback)());
 
 	/* tag data in currently loaded map (merged cache and shared cache data afaik) */
-	char* get_tag_data();
+	uint8* get_tag_data();
 
 	/* Returns a handle to the map file currently loaded */
 	HANDLE get_cache_handle();
@@ -49,24 +50,24 @@ namespace tags
 	}
 
 	/* Returns a pointer to the tag instance array */
-	tag_instance* get_tag_instances();
+	tag_instance* get_tag_instance(datum tag_index);
 
 	/* Returns the number of tags, pretty self explanatory */
-	inline long get_tag_count()
+	inline int32 get_tag_count()
 	{
 		return cache_files_get_tags_header()->tag_count;
 	}
 
 	/* Convert a tag index to a tag datum */
-	inline datum index_to_datum(signed short idx)
+	inline datum index_to_datum(int16 idx)
 	{
 		if (idx >= get_tag_count())
 		{
 			LOG_ERROR_FUNC("Index out of bounds");
 			return NONE;
 		}
-		auto instance = get_tag_instances()[idx];
-		datum tag_datum = instance.datum_index;
+		tag_instance* instance = get_tag_instance(idx);
+		datum tag_datum = instance->datum_index;
 		LOG_CHECK(DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_datum) == idx); // should always be true
 		return tag_datum;
 	}

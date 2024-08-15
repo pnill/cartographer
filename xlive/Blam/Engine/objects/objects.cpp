@@ -828,6 +828,11 @@ real_matrix4x3* object_get_node_matrices(datum object_datum, int32* out_node_cou
 	return (real_matrix4x3*)object_header_block_get_with_count(object_datum, &object_get_fast_unsafe(object_datum)->nodes_block, sizeof(real_matrix4x3), out_node_count);
 }
 
+int32 __cdecl object_get_skinning_matrices(datum object_index, int32 skinning_matrix_count, real_matrix4x3* object_skinning_matrices, real_matrix4x3* out_object_skinning_matrices)
+{
+	return INVOKE(0x1963C7, 0x0, object_get_skinning_matrices, object_index, skinning_matrix_count, object_skinning_matrices, out_object_skinning_matrices);
+}
+
 datum object_get_damage_owner(datum object_index)
 {
 	object_datum* object = (object_datum*)object_try_and_get_and_verify_type(object_index, NONE);

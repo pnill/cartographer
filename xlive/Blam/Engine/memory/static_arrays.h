@@ -1,5 +1,30 @@
 #pragma once
 
+template<typename t_storage_type, size_t k_count>
+class c_static_array
+{
+public:
+	t_storage_type* operator[](int32 index)
+	{
+		ASSERT(valid(index));
+		return &m_storage[index];
+	}
+
+	/*t_storage_type* operator &()
+	{
+		return m_storage;
+	}*/
+
+	// Checks if current value set for the bitflag is valud
+	bool valid(int32 index) const
+	{
+		return index < k_count;
+	}
+
+protected:
+	t_storage_type m_storage[k_count];
+};
+
 template<typename t_type, typename t_storage_type, size_t k_count>
 class c_flags_no_init 
 {
