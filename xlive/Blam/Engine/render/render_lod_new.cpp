@@ -314,7 +314,7 @@ void __cdecl object_build_render_cache_and_info(
             }
             else
             {
-				if (render_info->render_state_cache[render_model_storage_index]
+				if (*render_info->render_state_cache[render_model_storage_index]
 					&& *render_info->rasterizer_pool_offsets[render_model_storage_index] != NONE
 					&& !render_info->first_person
 					&& !using_old_permutation
@@ -378,7 +378,7 @@ void __cdecl object_build_render_cache_and_info(
 				
                 render_object_cache_unk2(*render_info->object_indices[render_model_storage_index], false);
 
-				if (render_info->render_state_cache[render_model_storage_index] != NULL)
+				if (*render_info->render_state_cache[render_model_storage_index] != NULL)
 				{
 					s_render_cache_storage* render_cache_storage = *render_info->render_state_cache[render_model_storage_index];
 
