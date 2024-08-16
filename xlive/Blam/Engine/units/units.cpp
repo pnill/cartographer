@@ -26,9 +26,9 @@ bool __cdecl unit_add_weapon_to_inventory(datum unit_datum_index, datum weapon_d
 	return INVOKE(0x1442AA, 0x1330FA, unit_add_weapon_to_inventory, unit_datum_index, weapon_datum_index, weapon_addition_method);
 }
 
-real32 __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, s_player_action_weapons weapon_index)
+real32 __cdecl unit_get_field_of_view(datum unit_datum_index, real32 unit_camera_field_of_view, int16 zoom_level)
 {
-	return INVOKE(0x1414AC, 0x1302FB, unit_get_field_of_view, unit_datum_index, unit_camera_field_of_view, weapon_index);
+	return INVOKE(0x1414AC, 0x1302FB, unit_get_field_of_view, unit_datum_index, unit_camera_field_of_view, zoom_level);
 }
 
 bool unit_is_dual_wielding(datum unit_index)

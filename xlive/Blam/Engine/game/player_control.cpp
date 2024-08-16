@@ -33,6 +33,11 @@ s_player_control* player_control_get(int32 user_index)
 	return &player_control_globals_get()->local_players[user_index];
 }
 
+int16 player_control_get_zoom_level(int32 user_index)
+{
+	return player_control_get(user_index)->actions.zoom_level;
+}
+
 void player_control_disable_local_camera(bool state)
 {
 	player_control_globals_get()->disable_camera = state;
@@ -61,8 +66,7 @@ void __cdecl update_player_control_check_held_time(s_player* player, s_player_co
 	{
 		if (player_control->zoom_input_held && local_player_held_zoom_delta_time[player->user_index] >= 1.0f)
 		{
-			player_control->actions.weapon_indexes.primary_weapon_index = player_control->gap_9A[0];
-			player_control->actions.weapon_indexes.secondary_weapon_index = player_control->gap_9A[1];
+			player_control->actions.zoom_level = player_control->field_9A;
 		}
 	}
 }

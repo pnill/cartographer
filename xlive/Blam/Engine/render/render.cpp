@@ -44,10 +44,9 @@ typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook
 
 /* prototypes */
 
-int32* get_global_window_bound_index(void);
 int32* get_global_window_out_cluster_index(int32 index);
 int32* get_global_window_out_leaf_index(int32 index);
-uint32* global_frame_num_get(void);
+uint32* global_view_frame_num_get(void);
 int32* curent_window_bound_index_get(void);
 int32* global_cluster_index_get(void);
 int32* global_leaf_index_get(void);
@@ -117,6 +116,11 @@ void render_apply_patches(void)
     return;
 }
 
+int32* get_global_window_bound_index(void)
+{
+    return Memory::GetAddress<int32*>(0x4E6978, 0x50EC48);
+}
+
 s_frame* global_window_parameters_get(void)
 {
     return Memory::GetAddress<s_frame*>(0xA3DF70);
@@ -160,6 +164,11 @@ int32* global_user_render_index_get(void)
 uint32* global_effect_flag_get(void)
 {
     return Memory::GetAddress<uint32*>(0xA3DA34);
+}
+
+uint32* global_frame_num_get(void)
+{
+    return Memory::GetAddress<uint32*>(0x4E695C);
 }
 
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
@@ -266,11 +275,6 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
 
 /* private code */
 
-int32* get_global_window_bound_index(void)
-{
-    return Memory::GetAddress<int32*>(0x4E6978, 0x50EC48);
-}
-
 int32* get_global_window_out_cluster_index(int32 index)
 {
     return &Memory::GetAddress<int32*>(0x4E697C, 0x50EC4C)[index];
@@ -281,7 +285,7 @@ int32* get_global_window_out_leaf_index(int32 index)
     return &Memory::GetAddress<int32*>(0x4E698C, 0x50EC5C)[index];
 }
 
-uint32* global_frame_num_get(void)
+uint32* global_view_frame_num_get(void)
 {
     return Memory::GetAddress<uint32*>(0x4E6960);
 }
@@ -423,7 +427,7 @@ void render_view(
     ASSERT(render_camera);
     s_camera* camera = (rasterizer_camera ? rasterizer_camera : render_camera);
 
-    ++*global_frame_num_get();
+    ++*global_view_frame_num_get();
 
     ASSERT(fog);
     

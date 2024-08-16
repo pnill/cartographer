@@ -56,6 +56,7 @@
 #include "simulation/game_interface/simulation_game_units.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
+#include "render/render_lod_new.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
@@ -546,24 +547,26 @@ void __cdecl print_to_console(const char* output)
 	addDebugText(finalOutput.c_str());
 }
 
-DWORD calculate_model_lod;
-DWORD calculate_model_lod_detour_end;
+void* calculate_model_lod;
 __declspec(naked) void calculate_model_lod_detour()
 {
 	__asm
 	{
-		// replaced code
-		// todo check if this is needed when using a static LOD, might save on some processor time
+		// ### TODO check if this is needed when using a static LOD, might save on some processor time
+		// other usercall registers are setup, push the single stack variable
+		mov eax, dword ptr[esp + 4]
+		push eax
 		call calculate_model_lod
+		add esp, 4
 
 		cmp H2Config_static_lod_state, 0
 		jz END_DETOUR
 
-		mov eax, H2Config_static_lod_state
-		sub eax, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
+		mov al, H2Config_static_lod_state
+		sub al, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
 
 		END_DETOUR:
-		jmp calculate_model_lod_detour_end
+		ret
 	}
 }
 
@@ -903,9 +906,8 @@ void H2MOD::ApplyHooks() {
 		// hook the print command to redirect the output to our console
 		PatchCall(Memory::GetAddress(0xE9E50), print_to_console);
 
-		calculate_model_lod = Memory::GetAddress(0x19CA3E);
-		calculate_model_lod_detour_end = Memory::GetAddress(0x19CDA3 + 5);
-		WriteJmpTo(Memory::GetAddress(0x19CDA3), calculate_model_lod_detour);
+		calculate_model_lod = Memory::GetAddress<void*>(0x19CA3E);
+		PatchCall(Memory::GetAddress<void*>(0x19CDA3), calculate_model_lod_detour);
 
 		// set max model quality to L6
 		WriteValue(Memory::GetAddress(0x190B38 + 1), 5);
@@ -940,6 +942,8 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
 		rasterizer_dx9_water_apply_patches();
+
+		render_lod_new_apply_patches();
 
 		cinematics_apply_patches();
 		game_time_apply_patches();

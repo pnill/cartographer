@@ -11,6 +11,7 @@
 #define MAXIMUM_NODES_PER_RENDER_MODEL_SECTION 40
 #define MAXIMUM_MARKER_GROUPS_PER_RENDER_MODEL 4096
 #define MAXIMUM_MARKERS_PER_RENDER_MODEL_MARKER_GROUP 256
+#define MAXIMUM_RENDER_MODELS_PER_OBJECT 4
 
 int32 __cdecl render_model_find_marker_group_by_name(datum render_model_index, string_id name);
 

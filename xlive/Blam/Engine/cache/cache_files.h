@@ -161,7 +161,7 @@ bool __cdecl cache_header_verify(s_cache_header* cache_header);
 
 uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size);
 
-bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, void* out_buffer);
+bool __cdecl cache_file_blocking_read(uint32 a1, uint32 cache_offset, uint32 read_size, void* out_buffer);
 
 bool __cdecl scenario_tags_load(const char* scenario_path);
 

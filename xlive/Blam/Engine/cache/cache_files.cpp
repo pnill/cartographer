@@ -73,15 +73,14 @@ datum __cdecl tag_iterator_next(tag_iterator* itr)
 
 void cache_file_map_clear_all_failures(void)
 {
-	typedef void(__cdecl *cache_file_map_clear_all_failures_t)(void);
-	auto p_cache_file_map_clear_all_failures = Memory::GetAddress<cache_file_map_clear_all_failures_t>(0x64551, 0x4C5A8);
-	p_cache_file_map_clear_all_failures();
+	INVOKE(0x64551, 0x4C5A8, cache_file_map_clear_all_failures);
 	return;
 }
 
 void* __cdecl tag_get_fast(datum tag_index)
 {
-	return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
+	//return INVOKE(0x239623, 0x217295, tag_get_fast, tag_index);
+	return tags::get_tag_data() + tags::get_tag_instance(tag_index)->data_offset;
 }
 
 void __cdecl cache_file_close()
@@ -99,9 +98,9 @@ uint32 __cdecl cache_file_align_read_size_to_cache_page(uint32 size)
 	return INVOKE(0x647DA, 0x4C831, cache_file_align_read_size_to_cache_page, size);
 }
 
-bool __cdecl cache_file_blocking_read(uint32 unk, uint32 cache_offset, uint32 read_size, void* out_buffer)
+bool __cdecl cache_file_blocking_read(uint32 a1, uint32 cache_offset, uint32 read_size, void* out_buffer)
 {
-	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, unk, cache_offset, read_size, out_buffer);
+	return INVOKE(0x64D01, 0x4CD58, cache_file_blocking_read, a1, cache_offset, read_size, out_buffer);
 }
 
 void scenario_tags_load_internal_panic()
@@ -158,19 +157,16 @@ bool scenario_tags_load_process_shared_tags()
 
 	if(tag_header->tag_count >= FIRST_SHARED_TAG_INSTANCE_INDEX)
 	{
-
 		// Update cache tag_header's instances referencing shared tags
 		datum current_shared_datum = FIRST_SHARED_TAG_INSTANCE_INDEX;
-		do
+		for (; current_shared_datum < tag_header->tag_count; current_shared_datum++)
 		{
 			if(tag_header->tag_instances[current_shared_datum].tag_index != NONE)
 			{
 				tag_header->tag_instances[current_shared_datum].data_offset = unmasked_tag_header->tag_instances[current_shared_datum].data_offset;
 				tag_header->tag_instances[current_shared_datum].size = unmasked_tag_header->tag_instances[current_shared_datum].size;
 			}
-
-			current_shared_datum++;
-		} while (current_shared_datum < tag_header->tag_count);
+		}
 	}
 
 	return true;

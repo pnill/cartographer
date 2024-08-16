@@ -290,9 +290,14 @@ namespace ImGuiHandler {
 					ImGui::Text(advanced_settings_get_string(_advanced_string_lod));
 					const char* items[] = { advanced_settings_get_string(_advanced_string_default), advanced_settings_get_string(_advanced_string_lod_1), advanced_settings_get_string(_advanced_string_lod_2), advanced_settings_get_string(_advanced_string_lod_3), advanced_settings_get_string(_advanced_string_lod_4), advanced_settings_get_string(_advanced_string_lod_5), advanced_settings_get_string(_advanced_string_lod_6) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
+
+					int static_lod_state = H2Config_static_lod_state;
+
+					ImGui::Combo("##LOD", &static_lod_state, items, 7);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_lod_tooltip));
+
+					H2Config_static_lod_state = static_lod_state;
 
 					ImGui::NextColumn();
 					ImGui::Text(advanced_settings_get_string(_advanced_string_shadow_title));

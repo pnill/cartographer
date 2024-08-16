@@ -205,7 +205,7 @@ void c_tag_injecting_manager::load_raw_data_from_cache(datum injected_index) con
 	*g_cache_handle_geometry_block_size = 0x0;
 
 	cache_file_tag_instance* tag_info = &this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)];
-	char* tag_data = tags::get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
+	uint8* tag_data = tags::get_tag_data() + this->m_instances[DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index)].data_offset;
 
 	//fail safe
 	if (DATUM_INDEX_TO_ABSOLUTE_INDEX(tag_info->tag_index) != DATUM_INDEX_TO_ABSOLUTE_INDEX(injected_index))

@@ -35,6 +35,14 @@ public:
 		return std::stoi(str, nullptr, _Base);
 	}
 
+	// cool, signed char is apparently considered different from char
+	// at least for MSVC, requiring implementing both specializations
+	template<>
+	static signed char ToIntegral<signed char>(const std::string& str, int _Base)
+	{
+		return ToIntegral<int>(str, _Base);
+	}
+
 	template<>
 	static unsigned int ToIntegral<unsigned int>(const std::string& str, int _Base)
 	{
@@ -100,7 +108,7 @@ public:
 	virtual ~ComVar() = default;
 
 	template<typename Type = T>
-	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, Type> 
+	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, bool> 
 		SetFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
