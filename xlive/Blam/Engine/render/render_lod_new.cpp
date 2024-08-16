@@ -46,7 +46,7 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
 
     if (storage != NULL
         && storage->rasterizer_cpu_render_cache_offset != NULL
-        && storage->id == render_object_cache_create_index())
+        && storage->render_frame_allocated == render_object_cache_create_index())
     {
         result = true;
     }
@@ -166,44 +166,46 @@ void* __cdecl sub_597370(datum object_index, float a2)
     return INVOKE(0x197370, 0x0, sub_597370, object_index, a2);
 }
 
-typedef void(__cdecl* t_sub_59D165)(
+typedef void(__cdecl* t_object_build_render_cache_and_info)(
     datum object_index,
     int32 a2,
     real32 a3,
     real32 a4,
-    s_render_object_info* render_info,
+    s_render_object_info* info,
     int32 a6,
     bool force_no_fp_object,
     bool skinning_matrices);
 
-t_sub_59D165 p_sub_59D165;
+t_object_build_render_cache_and_info p_object_build_render_cache_and_info;
 
 void __cdecl object_build_render_cache_and_info(
     datum object_index,
     int32 a2,
     real32 a3,
     real32 a4,
-    s_render_object_info* render_info,
+    s_render_object_info* info,
     int32 a6,
     bool force_no_fp_object,
     bool use_skinning_matrices)
 {
     int8 desired_object_lod = NONE;
     int32 skipped_object_count = 0;
-    render_info->object_count = 0;
+    info->object_count = 0;
 
     int16 render_model_count = sub_59CC02_to_usercall(
         object_index,
         a3,
         a2,
-        &render_info->first_person,
+        &info->first_person,
         force_no_fp_object,
         &desired_object_lod,
-        render_info);
+        info);
 
-    render_info->level_of_detail = desired_object_lod;
+    info->level_of_detail = desired_object_lod;
 
-    if (render_info->first_person 
+    ASSERT(render_model_count <= MAXIMUM_RENDER_MODELS_PER_OBJECT);
+
+    if (info->first_person 
         && *global_user_render_index_get() != NONE 
         && player_control_get_zoom_level(*global_user_render_index_get()) != NONE)
     {
@@ -215,11 +217,11 @@ void __cdecl object_build_render_cache_and_info(
     if (object->object_type == _object_type_scenery)
     {
         uint8* object_data = (uint8*)object_try_and_get_and_verify_type(object_index, FLAG(_object_type_scenery));
-        render_info->field_16A = *(int16*)(object_data + 308);
+        info->field_16A = *(int16*)(object_data + 308);
     }
     else
     {
-        render_info->field_16A = NONE;
+        info->field_16A = NONE;
     }
 
     for (int32 i = 0; i < render_model_count; i++)
@@ -237,43 +239,46 @@ void __cdecl object_build_render_cache_and_info(
 
         object_get_model_node_data(
             object_index,
-            render_info->first_person,
+            info->first_person,
             render_model_storage_index,
             &flags,
-            render_info->object_indices[render_model_storage_index],
-            render_info->render_model_tag_defs[render_model_storage_index],
+            &info->object_index[render_model_storage_index],
+            &info->render_model_tag_defs[render_model_storage_index],
             &object_node_matrices,
             &object_node_count
             );
 
-        int8 cached_lod = render_object_cache_get_level_of_detail(*render_info->object_indices[render_model_storage_index]);
+        int8 cached_lod = render_object_cache_get_level_of_detail(info->object_index[render_model_storage_index]);
 
         // this just gets called
-        render_object_cache_get_unk1(*render_info->object_indices[render_model_storage_index]);
+        render_object_cache_get_unk1(info->object_index[render_model_storage_index]);
 
-        *render_info->render_state_cache[render_model_storage_index] = render_object_cache_get_render_state(*render_info->object_indices[render_model_storage_index]);
-        *render_info->field_70[render_model_storage_index] = TEST_BIT(flags, 0);
+        info->render_info[render_model_storage_index] = render_object_cache_get_render_state(info->object_index[render_model_storage_index]);
+        info->field_70[render_model_storage_index] = TEST_BIT(flags, 0);
+
+        ASSERT(!info->render_info[render_model_storage_index] 
+            || info->render_info[render_model_storage_index]->context == info->object_index[render_model_storage_index]);
 
         // partial missing code from Halo 2 Vista
-        object_is_cached = render_object_cache_storage_is_object_cached(*render_info->render_state_cache[render_model_storage_index]) && cached_lod != NONE;
+        object_is_cached = render_object_cache_storage_is_object_cached(info->render_info[render_model_storage_index]) && cached_lod != NONE;
         if (object_is_cached)
         {
-            render_info->level_of_detail = cached_lod;
+            info->level_of_detail = cached_lod;
         }
 
         bool using_old_permutation;
         bool result_boolean1 = sub_59D024_to_usercall(
-            render_info->field_18[render_model_storage_index],
-            &render_info->level_of_detail,
-            &render_info->field_75[16 * render_model_storage_index],
-            *render_info->render_model_tag_defs[render_model_storage_index],
+            &info->field_18[render_model_storage_index],
+            &info->level_of_detail,
+            &info->field_75[16 * render_model_storage_index],
+            info->render_model_tag_defs[render_model_storage_index],
             object_index,
-            render_info->first_person,
+            info->first_person,
             cached_lod,
             &using_old_permutation
         );
 
-        bool lod_mismatch = render_info->level_of_detail != desired_object_lod;
+        bool lod_mismatch = info->level_of_detail != desired_object_lod;
         object_is_cached = object_is_cached && !using_old_permutation;
 
         if (object_is_cached && lod_mismatch)
@@ -288,25 +293,25 @@ void __cdecl object_build_render_cache_and_info(
         }
 
         int32 unk_count1 = sub_77DCF6_get_unk_count(
-            *render_info->render_model_tag_defs[render_model_storage_index],
-            render_info->level_of_detail,
-            &render_info->field_75[16 * render_model_storage_index]
+            info->render_model_tag_defs[render_model_storage_index],
+            info->level_of_detail,
+            &info->field_75[16 * render_model_storage_index]
             );
 
-        *render_info->field_2C[render_model_storage_index] = unk_count1;
-        *render_info->rasterizer_pool_offsets[render_model_storage_index] = NONE;
+        info->field_2C[render_model_storage_index] = unk_count1;
+        info->rasterizer_pool_offsets[render_model_storage_index] = NONE;
 
-        if (!object_is_cached || render_info->first_person)
+        if (!object_is_cached || info->first_person)
         {
             // allocate and initialize the cache, because object is not cached
 
             uint32 allocated_pool_offset = rasterizer_pool_allocate(
                 0,
                 1,
-                render_object_cache_get_pool_size(*render_info->field_2C[render_model_storage_index])
+                render_object_cache_get_pool_size(info->field_2C[render_model_storage_index])
             );
 
-            *render_info->rasterizer_pool_offsets[render_model_storage_index] = allocated_pool_offset;
+            info->rasterizer_pool_offsets[render_model_storage_index] = allocated_pool_offset;
 
             if (allocated_pool_offset == NONE)
             {
@@ -314,17 +319,17 @@ void __cdecl object_build_render_cache_and_info(
             }
             else
             {
-				if (*render_info->render_state_cache[render_model_storage_index]
-					&& *render_info->rasterizer_pool_offsets[render_model_storage_index] != NONE
-					&& !render_info->first_person
+				if (info->render_info[render_model_storage_index]
+					&& info->rasterizer_pool_offsets[render_model_storage_index] != NONE
+					&& !info->first_person
 					&& !using_old_permutation
 					&& !lod_mismatch)
 				{
 					// set the cache up
-                    s_render_cache_storage* render_cache_storage = *render_info->render_state_cache[render_model_storage_index];
+                    s_render_cache_storage* render_cache_storage = info->render_info[render_model_storage_index];
 
-                    render_cache_storage->id = render_object_cache_create_index();
-                    render_cache_storage->rasterizer_cpu_render_cache_offset = *render_info->rasterizer_pool_offsets[render_model_storage_index];
+                    render_cache_storage->render_frame_allocated = render_object_cache_create_index();
+                    render_cache_storage->rasterizer_cpu_render_cache_offset = info->rasterizer_pool_offsets[render_model_storage_index];
 				}
 
                 if (use_skinning_matrices)
@@ -335,13 +340,13 @@ void __cdecl object_build_render_cache_and_info(
 
                 sub_77DEBD(
                     object_index,
-                    *render_info->render_model_tag_defs[render_model_storage_index],
+                    info->render_model_tag_defs[render_model_storage_index],
                     object_node_matrices,
-                    &render_info->field_75[16 * render_model_storage_index],
-                    render_info->level_of_detail,
-                    render_info->first_person,
+                    &info->field_75[16 * render_model_storage_index],
+                    info->level_of_detail,
+                    info->first_person,
                     unk_count1,
-                    rasterizer_pool_get_from_offset(*render_info->rasterizer_pool_offsets[render_model_storage_index])
+                    rasterizer_pool_get_from_offset(info->rasterizer_pool_offsets[render_model_storage_index])
                 );
 			}
         }
@@ -351,38 +356,41 @@ void __cdecl object_build_render_cache_and_info(
             if (object_is_cached)
             {
                 // more of missing code...
-                if (!render_info->first_person && *get_global_window_bound_index() != NONE)
+                if (!info->first_person && *get_global_window_bound_index() != NONE)
                 {
-                    s_render_cache_storage* render_cache_storage = *render_info->render_state_cache[render_model_storage_index];
-                    *render_info->rasterizer_pool_offsets[render_model_storage_index] = render_cache_storage->rasterizer_cpu_render_cache_offset;
+                    s_render_cache_storage* render_cache_storage = info->render_info[render_model_storage_index];
+
+                    ASSERT(*get_global_window_bound_index() == (int32)(info->render_info[render_model_storage_index]->render_frame_allocated >> 30));
+
+                    info->rasterizer_pool_offsets[render_model_storage_index] = render_cache_storage->rasterizer_cpu_render_cache_offset;
                 }
             }
             else
             {
-                if (TEST_BIT(render_info->field_170, 6))
+                if (TEST_BIT(info->field_170, 6))
                 {
-                    render_model_definition* render_model = (render_model_definition*)tag_get_fast(*render_info->render_model_tag_defs[render_model_storage_index]);
+                    render_model_definition* render_model = (render_model_definition*)tag_get_fast(info->render_model_tag_defs[render_model_storage_index]);
                     prt_info* prt = render_model->prt_info[0];
 
                     object_render_valid = sub_59EB0C(
                         a6,
                         prt,
-                        render_info->level_of_detail,
-                        *render_info->object_indices[render_model_storage_index],
-                        rasterizer_pool_get_from_offset(*render_info->rasterizer_pool_offsets[render_model_storage_index]),
-                        *render_info->field_18[render_model_storage_index],
-                        &render_info->field_75[16 * render_model_storage_index],
-                        *render_info->render_model_tag_defs[render_model_storage_index]
+                        info->level_of_detail,
+                        info->object_index[render_model_storage_index],
+                        rasterizer_pool_get_from_offset(info->rasterizer_pool_offsets[render_model_storage_index]),
+                        info->field_18[render_model_storage_index],
+                        &info->field_75[16 * render_model_storage_index],
+                        info->render_model_tag_defs[render_model_storage_index]
                     );
                 }
 				
-                render_object_cache_unk2(*render_info->object_indices[render_model_storage_index], false);
+                render_object_cache_unk2(info->object_index[render_model_storage_index], false);
 
-				if (*render_info->render_state_cache[render_model_storage_index] != NULL)
+				if (info->render_info[render_model_storage_index] != NULL)
 				{
-					s_render_cache_storage* render_cache_storage = *render_info->render_state_cache[render_model_storage_index];
+					s_render_cache_storage* render_cache_storage = info->render_info[render_model_storage_index];
 
-					void* render_object_cpu_cache_data = sub_597370(*render_info->object_indices[render_model_storage_index], a4);
+					void* render_object_cpu_cache_data = sub_597370(info->object_index[render_model_storage_index], a4);
 					csmemcpy(render_cache_storage->field_A, render_object_cpu_cache_data, sizeof(render_cache_storage->field_A));
 				}
             }
@@ -390,13 +398,13 @@ void __cdecl object_build_render_cache_and_info(
 
         if (object_render_valid)
         {
-            render_info->object_count++;
-            object_datum* object = object_get_fast_unsafe(*render_info->object_indices[render_model_storage_index]);
+            info->object_count++;
+            object_datum* object = object_get_fast_unsafe(info->object_index[render_model_storage_index]);
             if (object->cached_object_render_state_index != NONE)
             {
                 uint8* cached_object_render_state = (uint8*)datum_get(get_cached_object_render_states_array(), object->cached_object_render_state_index);
 
-                if (*(datum*)(cached_object_render_state + 4) == *render_info->object_indices[render_model_storage_index])
+                if (*(datum*)(cached_object_render_state + 4) == info->object_index[render_model_storage_index])
                 {
                     *(uint32*)(cached_object_render_state + 12) = *global_frame_num_get();
                 }
@@ -411,5 +419,5 @@ void __cdecl object_build_render_cache_and_info(
 
 void render_lod_new_apply_patches()
 {
-    DETOUR_ATTACH(p_sub_59D165, Memory::GetAddress<t_sub_59D165>(0x19D165, 0x0), object_build_render_cache_and_info);
+    DETOUR_ATTACH(p_object_build_render_cache_and_info, Memory::GetAddress<t_object_build_render_cache_and_info>(0x19D165, 0x0), object_build_render_cache_and_info);
 }

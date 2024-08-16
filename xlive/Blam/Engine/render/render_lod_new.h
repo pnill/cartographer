@@ -15,10 +15,11 @@ enum e_render_lod : int8
 
 struct s_render_cache_storage
 {
-	uint8 gap_0[8];
+    datum context;
+	uint8 gap_4[4];
 	uint32 rasterizer_cpu_render_cache_offset;
 	// kinda sucks this gets reset each frame
-	uint32 id;
+	uint32 render_frame_allocated;
 	uint8 field_A[84];
 };
 ASSERT_STRUCT_SIZE(s_render_cache_storage, 100);
@@ -28,8 +29,8 @@ struct s_render_object_info
     c_static_array<uint32, 5> rasterizer_pool_offsets;
     c_static_array<int32, 5> field_18;
     c_static_array<uint8, 5> field_2C;
-    c_static_array<datum, 5> object_indices;
-    c_static_array<s_render_cache_storage*, 5> render_state_cache;
+    c_static_array<datum, 5> object_index;
+    c_static_array<s_render_cache_storage*, 5> render_info;
     c_static_array<datum, 5> render_model_tag_defs;
     c_static_array<uint8, 5> field_70;
     uint8 field_75[80];
