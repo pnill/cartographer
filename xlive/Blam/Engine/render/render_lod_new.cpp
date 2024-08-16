@@ -178,7 +178,7 @@ typedef void(__cdecl* t_sub_59D165)(
 
 t_sub_59D165 p_sub_59D165;
 
-void __cdecl sub_59D165(
+void __cdecl object_build_render_cache_and_info(
     datum object_index,
     int32 a2,
     real32 a3,
@@ -300,15 +300,15 @@ void __cdecl sub_59D165(
         {
             // allocate and initialize the cache, because object is not cached
 
-            uint32 allocated_pool = rasterizer_pool_allocate(
+            uint32 allocated_pool_offset = rasterizer_pool_allocate(
                 0,
                 1,
                 render_object_cache_get_pool_size(*render_info->field_2C[render_model_storage_index])
             );
 
-            *render_info->rasterizer_pool_offsets[render_model_storage_index] = allocated_pool;
+            *render_info->rasterizer_pool_offsets[render_model_storage_index] = allocated_pool_offset;
 
-            if (allocated_pool == NONE)
+            if (allocated_pool_offset == NONE)
             {
                 object_render_valid = false;
             }
@@ -411,5 +411,5 @@ void __cdecl sub_59D165(
 
 void render_lod_new_apply_patches()
 {
-    DETOUR_ATTACH(p_sub_59D165, Memory::GetAddress<t_sub_59D165>(0x19D165, 0x0), sub_59D165);
+    DETOUR_ATTACH(p_sub_59D165, Memory::GetAddress<t_sub_59D165>(0x19D165, 0x0), object_build_render_cache_and_info);
 }
