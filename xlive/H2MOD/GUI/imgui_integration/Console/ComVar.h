@@ -100,7 +100,7 @@ public:
 	virtual ~ComVar() = default;
 
 	template<typename Type = T>
-	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, Type> 
+	std::enable_if_t<!std::is_same_v<Type, bool> && std::is_integral_v<Type>, bool> 
 		SetFromStr(const std::string& str, int _Base = 0, std::string& potentialException = empty)
 	{
 		bool success = true;
