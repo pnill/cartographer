@@ -4,6 +4,9 @@
 #include "cartographer/twizzler/twizzler.h"
 #include "render/render_lod_new.h"
 
+#include "H2MOD/GUI/imgui_integration/Console/ComVar.h"
+#include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
+
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
@@ -39,7 +42,7 @@ bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
-int H2Config_static_lod_state = _render_lod_disabled;
+int8 H2Config_static_lod_state = _render_lod_disabled;
 int H2Config_field_of_view = 78;
 int H2Config_vehicle_field_of_view = 78;
 bool H2Config_static_first_person = false;
@@ -77,7 +80,30 @@ bool H2Config_even_shuffle_teams = false;
 bool H2Config_koth_random = true;
 H2Config_Experimental_Rendering_Mode H2Config_experimental_fps = _rendering_mode_none;
 
+// ### TODO FIXME remove CSimpleIniA garbage
+// for now improve the code by simplifying it
+template<typename T>
+static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
+	get_conf_value(CSimpleIniA* simple_ini, const char* section_key, const char* config_name, const char* default_setting, T* out_value)
+{
+	bool result = false;
+	std::string exception;
+	std::string str_value = simple_ini->GetValue(section_key, config_name, default_setting);
+	if (ComVar(out_value).SetFromStr(str_value, 0, exception))
+	{
+		//CartographerConsole::LogToTab(_console_tab_logs, "config: success setting \"%s\"", config_name);
+		result = true;
+	}
+	else
+	{
+		CartographerConsole::LogToTab(_console_tab_logs, "config: %s, default: %s - threw exception: [%s]", config_name, default_setting, exception.c_str());
+	}
 
+	return result;
+}
+
+#define GET_CONF(_simple_ini, _config_name, _default_setting, _out_value) \
+	get_conf_value(_simple_ini, H2ConfigVersionSection.c_str(), _config_name, _default_setting, _out_value)
 
 float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
@@ -700,7 +726,8 @@ void ReadH2Config() {
 				H2Config_raw_input = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
 				H2Config_discord_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
 				H2Config_fps_limit = ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
-				H2Config_static_lod_state = ini.GetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
+
+				GET_CONF(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
 
 				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
 				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
