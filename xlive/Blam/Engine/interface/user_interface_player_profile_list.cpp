@@ -147,7 +147,7 @@ wchar_t* c_player_profile_list::unknown_function_3(int32 a1)
 
 
 
-void c_player_profile_list::apply_patches()
+void user_interface_player_profile_list_apply_patches()
 {
 	// c_player_profile_list vtable
 	WritePointer(Memory::GetAddress(0x3D284C), jmp_c_player_profile_list__update_displayed_profiles);
