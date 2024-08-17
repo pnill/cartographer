@@ -9,6 +9,8 @@
 
 #include "rasterizer/rasterizer_memory.h"
 
+#include "H2MOD/Modules/Shell/Config.h"
+
 uint32 render_object_cache_create_index()
 {
 	uint32 result = (*get_global_window_bound_index() << 30) | (*global_frame_num_get() & 0x3FFFFFFF);
@@ -417,7 +419,33 @@ void __cdecl object_build_render_cache_and_info(
     }
 }
 
+void* object_render_calculate_lod_usercall = NULL;
+__declspec(naked) void object_render_calculate_lod_nak_to_usercall()
+{
+    __asm
+    {
+        // ### TODO check if this is needed when using a static LOD, might save on some processor time
+        // other usercall registers are setup, push the single stack variable
+        mov eax, dword ptr[esp + 4]
+        push eax
+        call object_render_calculate_lod_usercall
+        add esp, 4
+
+        cmp H2Config_static_lod_state, 0
+        jz END_DETOUR
+
+        mov al, H2Config_static_lod_state
+        sub al, 1 // convert setting to in-game model LOD value (0 - 5, L1 - L6)
+
+        END_DETOUR:
+        ret
+    }
+}
+
 void render_lod_new_apply_patches()
 {
     DETOUR_ATTACH(p_object_build_render_cache_and_info, Memory::GetAddress<t_object_build_render_cache_and_info>(0x19D165, 0x0), object_build_render_cache_and_info);
+
+    object_render_calculate_lod_usercall = Memory::GetAddress<void*>(0x19CA3E);
+    PatchCall(Memory::GetAddress<void*>(0x19CDA3), object_render_calculate_lod_nak_to_usercall);
 }
