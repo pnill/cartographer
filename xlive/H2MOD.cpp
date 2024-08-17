@@ -82,6 +82,7 @@
 #ifndef NDEBUG
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #endif
+#include "filesys/pc_file_system.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -91,6 +92,8 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "interface/user_interface_player_profile_list.h"
+#include "saved_games/saved_game_files.h"
 #include "saved_games/saved_game_files_async_windows.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
@@ -942,7 +945,10 @@ void H2MOD::ApplyHooks() {
 		render_apply_patches();
 		apply_interface_hooks();
 
-		saved_games_async_helpers_apply_hooks();
+		user_interface_player_profile_list_apply_patches();
+		//pc_file_system_apply_hooks();
+		//saved_game_files_apply_hooks();
+		//saved_games_async_helpers_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

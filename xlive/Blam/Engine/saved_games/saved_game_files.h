@@ -70,8 +70,12 @@ struct s_saved_game_files_globals
 	int32 unk_5;
 	int32 unk_6;
 	c_static_array<s_saved_game_files_globals_cached_game_save, k_maximum_enumerated_cached_save_game_files> cached_save_files;
+	bool meta_data_lock_done;
+	int32 unk_7;
+	int32 locked_thread_id;
+	int32 unk_8;
 };
-ASSERT_STRUCT_SIZE(s_saved_game_files_globals, 2296);
+ASSERT_STRUCT_SIZE(s_saved_game_files_globals, 2312);
 
 s_saved_game_main_menu_globals* saved_game_main_menu_globals_get();
 
@@ -82,3 +86,7 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_type);
 
 bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path);
+
+void saved_games_get_default_player_profile_name(uint32 enumerated_index, wchar_t* display_name);
+
+void saved_game_files_apply_hooks();

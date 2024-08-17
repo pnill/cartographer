@@ -78,6 +78,11 @@ uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a
 	return INVOKE_TYPE(0x5E501, 0x0, uint32(__thiscall*)(s_input_abstraction_globals*, e_button_functions, void*), input_abstraction_globals, button, a3);
 }
 
+bool input_abstraction_preferences_new(s_gamepad_input_preferences* preferences, int16 a2, bool a3, bool a4)
+{
+	return INVOKE(0x5EE72, 0, input_abstraction_preferences_new, preferences, a2, a3, a4);
+}
+
 uint32 input_abstraction_get_stick_type_for_function(e_button_functions function)
 {
 	// Todo : define enum

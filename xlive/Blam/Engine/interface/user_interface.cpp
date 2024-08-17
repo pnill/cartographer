@@ -37,6 +37,16 @@ bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type
 	return INVOKE(0x20BAAA, 0x0, user_interface_in_screen, channel_type, window_index, screen_id);
 }
 
+uint32 user_interface_globals_get_edit_player_profile_index()
+{
+	return INVOKE(0x209BA3, 0, user_interface_globals_get_edit_player_profile_index);
+}
+
+s_saved_game_player_profile* user_interface_globals_get_edit_player_profile()
+{
+	return INVOKE(0x209B9D, 0, user_interface_globals_get_edit_player_profile);
+}
+
 
 void render_menu_user_interface_to_usercall(int32 window_index, int32 controller_index, int32 player_count, rectangle2d* rect2d)
 {

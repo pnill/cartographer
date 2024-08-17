@@ -403,6 +403,8 @@
     <ClCompile Include="Blam\Engine\cseries\async_helpers.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_games_file_async_windows.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
+    <ClCompile Include="Blam\Engine\cache\phyical_memory_map.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_player_profile_list.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1071,6 +1073,8 @@
     <ClInclude Include="Blam\Engine\filesys\pc_saved_game.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files_async_windows.h" />
     <ClInclude Include="Blam\Engine\cseries\async_helpers.h" />
+    <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_player_profile_list.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

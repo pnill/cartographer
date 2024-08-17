@@ -224,6 +224,7 @@ class c_static_array
 public:
 	void clear()
 	{
+		m_count = 0;
 		csmemset((int8*)m_data, 0, sizeof(t_type) * k_maximum_count);
 	}
 	bool empty()

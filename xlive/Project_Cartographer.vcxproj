@@ -318,6 +318,7 @@
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_texture_cache.cpp" />
+    <ClCompile Include="Blam\Engine\cache\phyical_memory_map.cpp" />
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
@@ -382,6 +383,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_hud_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_memory.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_model_block.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_player_profile_list.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_player_widget.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_utilities.cpp" />
@@ -549,6 +551,7 @@
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
+    <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
     <ClInclude Include="Blam\Engine\cache\predicted_resources.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
@@ -647,6 +650,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_memory.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_model_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_player_profile_list.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
     <ClInclude Include="Blam\Engine\interface\new_hud_definitions.h" />

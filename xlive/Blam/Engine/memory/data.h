@@ -119,3 +119,4 @@ void __cdecl data_make_valid(s_data_array* data_array);
 void __cdecl datum_delete(s_data_array* data_array, datum datum_index);
 
 uint32 datum_header_allocate(uint32 total_size, uint32 alignment_bits);
+bool __cdecl datum_header_deallocate(void* object);

@@ -15,7 +15,8 @@ enum e_pc_file_system_type : uint32
 
 struct s_pc_file_type_save_path_info
 {
-	int8* unk;
+	// KNOWNFOLDERID Reference: https://learn.microsoft.com/en-us/windows/win32/shell/knownfolderid#constants
+	KNOWNFOLDERID* known_folder_id;
 	// CSIDL Reference: https://github.com/tpn/winsdk-10/blob/master/Include/10.0.10240.0/um/ShlObj.h#L1113
 	uint32 cs_idl;
 	wchar_t* path;
@@ -24,3 +25,5 @@ struct s_pc_file_type_save_path_info
 s_pc_file_type_save_path_info* pc_file_system_get_save_path_info(e_pc_file_system_type type);
 
 void file_seek_and_read(FILE* file_handle, uint32 file_offset, uint32 read_size, uint32 read_count, void* out_buffer);
+
+void pc_file_system_apply_hooks();

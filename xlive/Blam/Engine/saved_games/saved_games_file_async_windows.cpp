@@ -72,9 +72,7 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 					if(saved_games_append_file_type_to_path(file_info.file_path, file_info.type, file_path))
 					{
 						WideCharToMultiByte(0xFDE9u, 0, file_path, -1, flattened_file_path, 256, 0, 0);
-						bool result =  saved_games_async_helper_async_read_create_task(flattened_file_path, &loading_profile, sizeof(s_cartographer_player_profile), 0, in_out_completion);
-
-						//csmemcpy(buffer, profile_buffer, buffer_size);
+						bool result =  saved_games_async_helper_async_read_create_task(flattened_file_path, buffer, buffer_size, 0, in_out_completion);
 
 						return result;
 					}
@@ -175,11 +173,6 @@ bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, u
 		return false;
 	async_yield_until_done(in_out_completion, true);
 
-	if (buffer_size == sizeof(s_saved_game_player_profile) && loading_profile.profile.valid_maybe == 1)
-	{
-		csmemcpy(buffer, &loading_profile, buffer_size);
-	}
-
 	bool result = in_out_completion[0];
 	if (!result)
 		saved_game_globals->unk_4 = *(int32*)&in_out_completion[4];
@@ -188,8 +181,8 @@ bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, u
 
 void saved_games_async_helpers_apply_hooks()
 {
-	DETOUR_ATTACH(p_saved_games_async_helper_write_file, Memory::GetAddress<t_saved_games_async_helper_write_file>(0x42CA6), saved_games_async_helper_write_file);
+	//DETOUR_ATTACH(p_saved_games_async_helper_write_file, Memory::GetAddress<t_saved_games_async_helper_write_file>(0x42CA6), saved_games_async_helper_write_file);
 	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_internal, Memory::GetAddress<t_saved_games_async_helper_read_file_internal>(0x4259E), saved_games_async_helper_read_file_internal);
-	DETOUR_ATTACH(p_saved_games_async_helper_read_file_callback, Memory::GetAddress<t_saved_games_async_helper_read_file_callback>(0x9B0D0), saved_games_async_helper_read_file_callback);
-	DETOUR_ATTACH(p_saved_games_async_helper_read_file, Memory::GetAddress<t_saved_games_async_helper_read_file>(0x46450), saved_games_async_helper_read_file);
+	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_callback, Memory::GetAddress<t_saved_games_async_helper_read_file_callback>(0x9B0D0), saved_games_async_helper_read_file_callback);
+	//DETOUR_ATTACH(p_saved_games_async_helper_read_file, Memory::GetAddress<t_saved_games_async_helper_read_file>(0x46450), saved_games_async_helper_read_file);
 }
