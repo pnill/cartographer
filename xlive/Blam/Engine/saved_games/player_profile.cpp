@@ -94,23 +94,3 @@ bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_p
 		return saved_game_player_profile_read_file(enumerated_file_index, profile);
 	}
 }
-
-void saved_games_cartographer_player_profile_v1_new(s_saved_game_cartographer_player_profile_v1* settings)
-{
-	settings->version = _saved_game_cartographer_player_profile_version_1;
-	settings->field_of_view = 78;
-	settings->vehicle_field_of_view = 78;
-	settings->static_first_person = false;
-	settings->mouse_sensitivity = 0;
-	settings->raw_mouse_sensitivity = 25.f;
-	settings->mouse_uniform = false;
-	settings->raw_mouse_input = false;
-	settings->controller_sensitivity = 0;
-	settings->controller_modern = false;
-	settings->controller_deadzone_type = 0;
-	settings->deadzone_axial_x = 26.f;
-	settings->deadzone_axial_y = 26.f;
-	settings->deadzone_radial = 1.f;
-	settings->crosshair_offset = NAN;
-	settings->crosshair_scale = 1.f;
-}

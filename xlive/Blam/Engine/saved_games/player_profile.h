@@ -8,12 +8,6 @@
 
 #define k_default_profiles_count 1
 
-enum e_saved_game_cartographer_player_profile_version : uint32
-{
-	_saved_game_cartographer_player_profile_version_1 = 0x1,
-	_saved_game_cartographer_player_profile_version_2 = 0x2,
-};
-
 struct s_saved_game_profile_variant_info
 {
 	int8 data[192];
@@ -68,26 +62,6 @@ struct s_saved_game_player_profile
 };
 ASSERT_STRUCT_SIZE(s_saved_game_player_profile, 4616);
 
-struct s_saved_game_cartographer_player_profile_v1
-{
-	e_saved_game_cartographer_player_profile_version version;
-	uint32 field_of_view;
-	uint32 vehicle_field_of_view;
-	bool static_first_person;
-	real32 mouse_sensitivity;
-	real32 raw_mouse_sensitivity;
-	bool mouse_uniform;
-	bool raw_mouse_input;
-	real32 controller_sensitivity;
-	bool controller_modern;
-	int8 controller_deadzone_type;
-	ControllerInput::CustomControllerLayout custom_layout;
-	real32 deadzone_axial_x;
-	real32 deadzone_axial_y;
-	real32 deadzone_radial;
-	real32 crosshair_offset;
-	real32 crosshair_scale;
-};
 
 void __cdecl saved_game_player_profile_set_default_variant(void* saved_game_variant);
 void __cdecl saved_game_player_profile_set_input_preferences(s_gamepad_input_preferences* input_preferences, s_saved_game_profile_input_preferences* profile_input_preferences);
@@ -96,5 +70,3 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 bool saved_game_player_profile_read_file(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
 bool __cdecl saved_game_player_profile_read_post_verify_profile_traits(s_player_profile_traits* profile);
 bool saved_game_player_profile_load(uint32 enumerated_file_index, s_saved_game_player_profile* profile);
-
-void saved_games_cartographer_player_profile_v1_new(s_saved_game_cartographer_player_profile_v1* settings);

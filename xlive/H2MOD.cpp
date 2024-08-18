@@ -93,6 +93,7 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "interface/user_interface_player_profile_list.h"
+#include "saved_games/cartographer_player_profile.h"
 #include "saved_games/saved_game_files.h"
 #include "saved_games/saved_game_files_async_windows.h"
 
@@ -946,9 +947,6 @@ void H2MOD::ApplyHooks() {
 		apply_interface_hooks();
 
 		user_interface_player_profile_list_apply_patches();
-		//pc_file_system_apply_hooks();
-		saved_game_files_apply_hooks();
-		//saved_games_async_helpers_apply_hooks();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
@@ -981,7 +979,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
-
+	cartographer_player_profile_initialize();
 	tag_injection_initialize();
 	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();

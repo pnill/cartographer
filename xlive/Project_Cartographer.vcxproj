@@ -740,6 +740,7 @@
     <ClCompile Include="Blam\Engine\render\render_section_visibility.cpp" />
     <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
     <ClCompile Include="Blam\Engine\render\render_visibility_collection.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state_procs.cpp" />
     <ClCompile Include="Blam\Engine\render\render_sky.cpp" />
@@ -1108,6 +1109,7 @@
     <ClInclude Include="Blam\Engine\render\render_visibility_collection.h" />
     <ClInclude Include="Blam\Engine\render\render_water.h" />
     <ClInclude Include="Blam\Engine\render\weather_definitions.h" />
+    <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile.h" />
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files_async_windows.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state.h" />
     <ClInclude Include="Blam\Engine\saved_games\game_state_procs.h" />

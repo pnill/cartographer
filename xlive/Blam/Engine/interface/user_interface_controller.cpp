@@ -2,12 +2,12 @@
 #include "user_interface_controller.h"
 #include "user_interface_guide.h"
 #include "networking/online/online_account_xbox.h"
+#include "saved_games/cartographer_player_profile.h"
 #include "saved_games/saved_game_files_async_windows.h"
 #include "tag_files/global_string_ids.h"
 
 
-// Temporary location?
-s_saved_game_cartographer_player_profile_v1 g_cartographer_profile_settings[4]{};
+
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 {
@@ -84,7 +84,6 @@ void __cdecl user_interface_controller_set_griefer(e_controller_index controller
 	INVOKE(0x206949, 0, user_interface_controller_set_griefer, controller_index, griefing);
 }
 
-
 wchar_t* __cdecl user_interface_controller_get_player_profile_name(e_controller_index controller_index)
 {
 	return INVOKE(0x206B67, 0, user_interface_controller_get_player_profile_name, controller_index);
@@ -117,9 +116,8 @@ bool __cdecl user_interface_controller_sign_in(e_controller_index controller_ind
 {
 	bool result = p_user_interface_controller_sign_in(controller_index, profile, enumerated_file_index);
 	if(result)
-	{
-		saved_games_async_helper_read_cartographer_bin(enumerated_file_index, &g_cartographer_profile_settings[controller_index]);
-	}
+		cartographer_player_profile_load(controller_index, enumerated_file_index);
+
 	return result;
 }
 

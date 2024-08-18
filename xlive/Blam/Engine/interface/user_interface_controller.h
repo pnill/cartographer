@@ -213,4 +213,5 @@ uint32 __cdecl user_interface_controller_get_guest_controllers_count_for_master(
 bool __cdecl user_interface_controller_has_xbox_live(e_controller_index controller_index);
 void __cdecl user_interface_controller_xbox_live_account_set_signed_in(e_controller_index controller_index, bool active);
 void __cdecl user_interface_controller_update_player_name(e_controller_index controller_index);
+
 void user_interface_controller_apply_patches();
