@@ -745,7 +745,7 @@
     <ClCompile Include="Blam\Engine\render\render_sky.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_variant.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\player_profile.cpp" />
-    <ClCompile Include="Blam\Engine\saved_games\saved_games_file_async_windows.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\saved_game_files_async_windows.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario.cpp" />
     <ClCompile Include="Blam\Engine\scenario\scenario_fog.cpp" />

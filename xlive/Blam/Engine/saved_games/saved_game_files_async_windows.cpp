@@ -1,14 +1,11 @@
 #include "stdafx.h"
 
+#include "saved_game_files_async_windows.h"
 #include "player_profile.h"
 #include "saved_game_files.h"
-#include "saved_game_files_async_windows.h"
 #include "cseries/async.h"
-#include "cseries/async_helpers.h"
 #include "tag_files/files_windows.h"
 
-// storage for the profile that is being loaded that exists on a global scope awaiting the async file loading to complete;
-s_cartographer_player_profile loading_profile{};
 
 typedef bool(__cdecl* t_saved_games_async_helper_write_file)(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, int8* completion);
 t_saved_games_async_helper_write_file p_saved_games_async_helper_write_file;
@@ -17,8 +14,7 @@ bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t
 {
 	if (buffer_size == sizeof(s_saved_game_player_profile))
 	{
-		csmemcpy(&loading_profile, buffer, buffer_size);
-		return p_saved_games_async_helper_write_file(enumerated_index, new_display_name, &loading_profile, sizeof(s_cartographer_player_profile), completion);
+		return p_saved_games_async_helper_write_file(enumerated_index, new_display_name, buffer, buffer_size, completion);
 	}
 
 	return p_saved_games_async_helper_write_file(enumerated_index, new_display_name, buffer, buffer_size, completion);
@@ -37,7 +33,6 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 {
 	if (buffer_size == sizeof(s_saved_game_player_profile))
 	{
-		csmemset(&loading_profile, 0, sizeof(s_cartographer_player_profile));
 		s_saved_game_main_menu_globals* saved_game_globals = saved_game_main_menu_globals_get();
 
 		auto abs_index = (enumerated_index >> 8) & 0x1FFF;
@@ -177,6 +172,83 @@ bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, u
 	if (!result)
 		saved_game_globals->unk_4 = *(int32*)&in_out_completion[4];
 	return result;
+}
+
+bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, int8* completion)
+{
+	return INVOKE(0x9AE4C, 0, saved_games_async_helper_create_task_write_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
+}
+
+bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, int8* completion)
+{
+	return INVOKE(0x9B67D, 0, saved_games_async_helper_create_task_read_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
+}
+
+void saved_games_async_helper_get_cartographer_bin_path(uint32 enumerated_file_index, wchar_t* out_path)
+{
+	s_saved_game_main_menu_globals_save_file_info file_info{};
+	saved_games_get_file_info(&file_info, enumerated_file_index);
+
+	wcsncpy(out_path, file_info.file_path, 256);
+	wcscat(out_path, L"cartographer.bin");
+}
+
+bool saved_games_async_helper_check_cartographer_bin(uint32 enumerated_file_index)
+{
+	wchar_t bin_path[MAX_PATH]{};
+
+	saved_games_async_helper_get_cartographer_bin_path(enumerated_file_index, bin_path);
+
+	utf8 utf8_path[MAX_PATH];
+	wchar_string_to_utf8_string(bin_path, utf8_path, MAX_PATH);
+
+	s_file_reference file_reference;
+	if (file_reference_create_from_path(&file_reference, utf8_path, false))
+	{
+		e_file_open_error t_error;
+		if (file_open(&file_reference, _permission_read_bit, &t_error))
+		{
+			file_close(&file_reference);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool saved_games_async_helper_write_cartographer_bin(uint32 enumerated_file_index, s_saved_game_cartographer_player_profile_v1* settings)
+{
+	int8 in_out_completion[2060];
+
+	wchar_t bin_path[MAX_PATH]{};
+
+	saved_games_async_helper_get_cartographer_bin_path(enumerated_file_index, bin_path);
+
+	bool result = saved_games_async_helper_create_task_write_bin_file(bin_path, (int8*)settings, 0, (int8*)settings, sizeof(s_saved_game_cartographer_player_profile_v1), 0, in_out_completion);
+
+	async_yield_until_done(in_out_completion, true);
+
+	return result;
+}
+
+void saved_games_async_helper_read_cartographer_bin(uint32 enumerated_file_index, s_saved_game_cartographer_player_profile_v1* settings)
+{
+	if (saved_games_async_helper_check_cartographer_bin(enumerated_file_index))
+	{
+		int8 in_out_completion[2060];
+
+		wchar_t bin_path[MAX_PATH]{};
+
+		saved_games_async_helper_get_cartographer_bin_path(enumerated_file_index, bin_path);
+
+		bool result = saved_games_async_helper_create_task_read_bin_file(bin_path, (int8*)settings, 0, (int8*)settings, sizeof(s_saved_game_cartographer_player_profile_v1), 0, in_out_completion);
+
+		async_yield_until_done(in_out_completion, true);
+	}
+	else
+	{
+		saved_games_cartographer_player_profile_v1_new(settings);
+		saved_games_async_helper_write_cartographer_bin(enumerated_file_index, settings);
+	}
 }
 
 void saved_games_async_helpers_apply_hooks()

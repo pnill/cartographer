@@ -947,7 +947,7 @@ void H2MOD::ApplyHooks() {
 
 		user_interface_player_profile_list_apply_patches();
 		//pc_file_system_apply_hooks();
-		//saved_game_files_apply_hooks();
+		saved_game_files_apply_hooks();
 		//saved_games_async_helpers_apply_hooks();
 	}
 	else {

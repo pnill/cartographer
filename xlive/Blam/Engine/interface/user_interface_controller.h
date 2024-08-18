@@ -196,6 +196,7 @@ uint32 __cdecl user_interface_controller_get_signed_in_controller_count();
 uint16 __cdecl user_interface_controller_get_signed_in_controllers_mask(void);
 uint32 __cdecl user_interface_controller_get_last_level_played(e_controller_index controller_index);
 uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in_controllers();
+bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index);
 void __cdecl user_interface_controller_sign_out_all_controllers();
 void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index);

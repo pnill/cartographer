@@ -22,6 +22,14 @@ enum e_saved_game_file_type
 	k_number_of_saved_game_file_types = 0xA,
 };
 
+struct s_saved_game_file_loading_information
+{
+	int8 data[591];
+	wchar_t file_path[MAX_PATH];
+	wchar_t meta_information[128];
+};
+ASSERT_STRUCT_SIZE(s_saved_game_file_loading_information, 1368);
+
 struct s_saved_game_main_menu_globals_default_save_file
 {
 	e_saved_game_file_type type;

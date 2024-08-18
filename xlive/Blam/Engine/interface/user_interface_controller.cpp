@@ -2,7 +2,12 @@
 #include "user_interface_controller.h"
 #include "user_interface_guide.h"
 #include "networking/online/online_account_xbox.h"
+#include "saved_games/saved_game_files_async_windows.h"
 #include "tag_files/global_string_ids.h"
+
+
+// Temporary location?
+s_saved_game_cartographer_player_profile_v1 g_cartographer_profile_settings[4]{};
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 {
@@ -103,6 +108,19 @@ uint32 __cdecl user_interface_controller_get_last_level_played(e_controller_inde
 uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in_controllers()
 {
 	return INVOKE(0x2076F7, 0, user_interface_controller_get_highest_campaign_level_in_signed_in_controllers);
+}
+
+typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
+t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
+
+bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index)
+{
+	bool result = p_user_interface_controller_sign_in(controller_index, profile, enumerated_file_index);
+	if(result)
+	{
+		saved_games_async_helper_read_cartographer_bin(enumerated_file_index, &g_cartographer_profile_settings[controller_index]);
+	}
+	return result;
 }
 
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index)
@@ -287,6 +305,7 @@ void user_interface_controller_apply_patches()
 	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match
 	WriteValue<uint8>(Memory::GetAddress(0x20CEB5 + 6), 0); // disable _ui_error_demo_version_no_more_for_you
+	DETOUR_ATTACH(p_user_interface_controller_sign_in, Memory::GetAddress<t_user_interface_controller_sign_in>(0x2087BF), user_interface_controller_sign_in);
 }
 
 

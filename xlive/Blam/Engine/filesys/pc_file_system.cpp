@@ -29,6 +29,11 @@ int __cdecl pc_file_system_create_directory_hierarchy(e_pc_file_system_type type
 	return result;
 }
 
+bool __cdecl pc_file_system_get_drive_letter_for_type(e_pc_file_system_type type, wchar_t* buffer)
+{
+	return INVOKE(0x8F1FE, 0, pc_file_system_get_drive_letter_for_type, type, buffer);
+}
+
 void pc_file_system_apply_hooks()
 {
 	DETOUR_ATTACH(p_pc_file_system_create_directory_hierarchy, Memory::GetAddress<t_pc_file_system_create_directory_hierarchy>(0x8EF9E), pc_file_system_create_directory_hierarchy);

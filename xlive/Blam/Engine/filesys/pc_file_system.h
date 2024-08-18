@@ -25,5 +25,6 @@ struct s_pc_file_type_save_path_info
 s_pc_file_type_save_path_info* pc_file_system_get_save_path_info(e_pc_file_system_type type);
 
 void file_seek_and_read(FILE* file_handle, uint32 file_offset, uint32 read_size, uint32 read_count, void* out_buffer);
+bool __cdecl pc_file_system_get_drive_letter_for_type(e_pc_file_system_type type, wchar_t* buffer);
 
 void pc_file_system_apply_hooks();

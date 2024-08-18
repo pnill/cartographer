@@ -188,3 +188,4 @@ bool* input_suppress_global_get(void);
 
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 
+bool __cdecl input_windows_drive_letter_test(int32 drive, bool* out_result);

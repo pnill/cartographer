@@ -263,6 +263,11 @@ void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, u
 	return;
 }
 
+bool __cdecl input_windows_drive_letter_test(int32 drive, bool* out_result)
+{
+	return INVOKE(0x2E463, 0, input_windows_drive_letter_test, drive, out_result);
+}
+
 bool input_windows_processing_device_change()
 {
 	return g_notified_to_change_mapping;
