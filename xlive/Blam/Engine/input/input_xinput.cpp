@@ -8,6 +8,10 @@
 #include "H2MOD/Modules/Shell/Config.h"
 
 /* globals */
+typedef DWORD(WINAPI* XInputGetStateEx_t)(DWORD dwUserIndex, XINPUT_STATE* pState);
+XInputGetStateEx_t XInputGetStateEx;
+
+HMODULE g_xinput1_4_module;
 
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
@@ -233,9 +237,25 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 	XINPUT_STATE state;
 	H2Config_CustomLayout.ToArray(custom_button_flags);
 
+	// TODO: figure out how to map this to the player that is using the home button and open advanced settings in their context.
+	if (XInputGetStateEx)
+	{
+		uint32 dwUserIndex = ((xinput_device*)gamepad)->get_port();
+		XINPUT_STATE t_state;
+		ZeroMemory(&t_state, sizeof(XINPUT_STATE));
+		if(XInputGetStateEx(dwUserIndex, &t_state) == ERROR_SUCCESS)
+		{
+			if(TEST_FLAG(t_state.Gamepad.wButtons, 0x400))
+			{
+				LOG_INFO_GAME("Home button pressed");
+			}
+		}
+	}
+
 	ASSERT(out_buttons != nullptr);
 	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)
 	{
+		
 		if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 		{
 			for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
@@ -253,6 +273,17 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 	}
 }
 
+bool __cdecl xinput_load()
+{
+	g_xinput1_4_module = LoadLibraryW(L"xinput1_4.dll");
+
+	if (g_xinput1_4_module)
+	{
+		XInputGetStateEx = (XInputGetStateEx_t)GetProcAddress(g_xinput1_4_module, (LPCSTR)100);
+	}
+
+	return INVOKE(0x8AD1B, 0, xinput_load);
+}
 
 void xinput_apply_patches(void)
 {
@@ -261,5 +292,6 @@ void xinput_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x2FBDA), input_xinput_update_rumble_state);
 	PatchCall(Memory::GetAddress(0x2FC34), input_xinput_clear_rumble_state);
+	PatchCall(Memory::GetAddress(0x2FD7E), xinput_load);
 	return;
 }
