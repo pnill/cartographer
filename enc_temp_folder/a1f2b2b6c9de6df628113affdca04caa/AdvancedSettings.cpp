@@ -108,7 +108,7 @@ namespace ImGuiHandler {
 					if (abs(state->thumb_right.y) <= ((float)MAXSHORT * (current_cartographer_profile->deadzone_axial_y / 100)))
 						axial_invalid++;
 					bool radial_invalid = false;
-					unsigned int ar = pow((short)((float)MAXSHORT * (current_cartographer_profile->deadzone_radial / 100)), 2);
+					unsigned int ar = pow((short)((float)MAXSHORT * (H2Config_Deadzone_Radial / 100)), 2);
 					unsigned int arx = pow(state->thumb_right.x, 2);
 					unsigned int ary = pow(state->thumb_right.y, 2);
 					unsigned int rh = arx + ary;
@@ -293,14 +293,9 @@ namespace ImGuiHandler {
 					ImGui::Text(advanced_settings_get_string(_advanced_string_lod));
 					const char* items[] = { advanced_settings_get_string(_advanced_string_default), advanced_settings_get_string(_advanced_string_lod_1), advanced_settings_get_string(_advanced_string_lod_2), advanced_settings_get_string(_advanced_string_lod_3), advanced_settings_get_string(_advanced_string_lod_4), advanced_settings_get_string(_advanced_string_lod_5), advanced_settings_get_string(_advanced_string_lod_6) };
 					ImGui::PushItemWidth(WidthPercentage(100));
-
-					int static_lod_state = H2Config_static_lod_state;
-
-					ImGui::Combo("##LOD", &static_lod_state, items, 7);
+					ImGui::Combo("##LOD", &H2Config_static_lod_state, items, 7);
 					if (ImGui::IsItemHovered())
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_lod_tooltip));
-
-					H2Config_static_lod_state = static_lod_state;
 
 					ImGui::NextColumn();
 					ImGui::Text(advanced_settings_get_string(_advanced_string_shadow_title));
@@ -519,7 +514,7 @@ namespace ImGuiHandler {
 						}
 						ImGui::SameLine();
 						ImGui::PushItemWidth(WidthPercentage(13));
-						ImGui::InputFloat("##C_Deadzone_A_X_2", &current_cartographer_profile->deadzone_axial_x, 0, 3);
+						ImGui::InputFloat("##C_Deadzone_A_X_2", &H2Config_Deadzone_A_X, 0, 3);
 						if (ImGui::IsItemEdited())
 						{
 							if (current_cartographer_profile->deadzone_axial_x < 0)

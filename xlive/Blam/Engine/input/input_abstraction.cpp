@@ -2,11 +2,12 @@
 #include "input_abstraction.h"
 #include "game/game_time.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "saved_games/cartographer_player_profile.h"
 
 /* globals */
 
 s_input_abstraction_globals* input_abstraction_globals;
-extern uint16 radialDeadzone;
+extern uint16 radialDeadzone[k_number_of_controllers];
 //we need this because theres only a single abstracted_inputs inside input_abstraction_globals for h2v
 s_game_abstracted_input_state g_abstract_input_states[k_number_of_controllers];
 //buffers to store old windows input states
@@ -256,10 +257,11 @@ void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gam
 void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
 {
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller);
 
-	if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_X / 100));
-		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_Y / 100));
+	if (profile_settings->controller_deadzone_type == Axial || profile_settings->controller_deadzone_type == Both) {
+		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_x / 100));
+		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_y / 100));
 
 	}
 	else
@@ -267,13 +269,13 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 		preference->gamepad_axial_deadzone_right_x = 0;
 		preference->gamepad_axial_deadzone_right_y = 0;
 	}
-	if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+	if (profile_settings->controller_deadzone_type == Radial || profile_settings->controller_deadzone_type == Both)
 	{
-		radialDeadzone = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_Radial / 100));
+		radialDeadzone[controller] = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_radial / 100));
 	}
 	else
 	{
-		radialDeadzone = 0;
+		radialDeadzone[controller] = 0;
 	}
 }
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value)
@@ -421,6 +423,7 @@ void __cdecl input_abstraction_update()
 		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
 		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+		s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller);
 
 		//restore last state from global array before processing
 		input_abstraction_restore_abstracted_inputs(controller);
@@ -459,7 +462,7 @@ void __cdecl input_abstraction_update()
 		else
 		{
 
-			if (!H2Config_controller_modern)
+			if (!profile_settings->controller_modern)
 			{
 				input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
 			}

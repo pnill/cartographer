@@ -11,8 +11,8 @@ enum e_saved_game_cartographer_player_profile_version : uint32
 struct s_saved_game_cartographer_player_profile_v1
 {
 	e_saved_game_cartographer_player_profile_version version;
-	uint32 field_of_view;
-	uint32 vehicle_field_of_view;
+	int32 field_of_view;
+	int32 vehicle_field_of_view;
 	bool static_first_person;
 	real32 mouse_sensitivity;
 	real32 raw_mouse_sensitivity;
@@ -34,5 +34,7 @@ void cartographer_player_profile_v1_new(s_saved_game_cartographer_player_profile
 s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get(e_controller_index controller_index);
 
 void cartographer_player_profile_load(e_controller_index controller_index, uint32 enumerated_file_index);
+
+void cartographer_player_profile_save(e_controller_index controller_index);
 
 void cartographer_player_profile_initialize();
