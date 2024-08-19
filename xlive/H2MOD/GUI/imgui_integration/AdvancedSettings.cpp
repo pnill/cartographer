@@ -152,104 +152,106 @@ namespace ImGuiHandler {
 					}
 					ImGui::PopItemWidth();
 
-
-					//Vehicle FOV
-					ImGui::Text(advanced_settings_get_string(_advanced_string_vehicle_field_of_view));
-					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
-					if (ImGui::IsItemEdited())
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
-
-					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
-					if (ImGui::IsItemEdited()) {
-						if (H2Config_vehicle_field_of_view > 110)
-							H2Config_vehicle_field_of_view = 110;
-						if (H2Config_vehicle_field_of_view < 45)
-							H2Config_vehicle_field_of_view = 45;
-
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
-					}
-					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
+					if (current_controller_index == _controller_index_0)
 					{
-						H2Config_vehicle_field_of_view = 78;
-						observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
-					}
-					ImGui::PopItemWidth();
+						//Vehicle FOV
+						ImGui::Text(advanced_settings_get_string(_advanced_string_vehicle_field_of_view));
+						ImGui::PushItemWidth(WidthPercentage(80));
+						ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
+						if (ImGui::IsItemEdited())
+							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 
-					//Crosshair Offset
-					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_offset));
-					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
-					if (ImGui::IsItemEdited())
-						set_crosshair_offset(H2Config_crosshair_offset);
-					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
-					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_offset > 0.5)
-							H2Config_crosshair_offset = 0.5;
-						if (H2Config_crosshair_offset < 0)
-							H2Config_crosshair_offset = 0;
+						ImGui::PushItemWidth(WidthPercentage(10));
+						ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						if (ImGui::IsItemEdited()) {
+							if (H2Config_vehicle_field_of_view > 110)
+								H2Config_vehicle_field_of_view = 110;
+							if (H2Config_vehicle_field_of_view < 45)
+								H2Config_vehicle_field_of_view = 45;
 
-						set_crosshair_offset(H2Config_crosshair_offset);
-					}
-					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))
-					{
-						H2Config_crosshair_offset = 0.138f;
-						set_crosshair_offset(H2Config_crosshair_offset);
-					}
-					ImGui::PopItemWidth();
+							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						}
+						ImGui::PushItemWidth(WidthPercentage(10));
+						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
+						{
+							H2Config_vehicle_field_of_view = 78;
+							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						}
+						ImGui::PopItemWidth();
 
-					//Crosshair Size
-					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_size));
-					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
-					if (ImGui::IsItemEdited())
-						set_crosshair_scale(H2Config_crosshair_scale);
-					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
-					if (ImGui::IsItemEdited()) {
-						if (H2Config_crosshair_scale > 2)
-							H2Config_crosshair_scale = 2;
-						if (H2Config_crosshair_scale < 0)
-							H2Config_crosshair_scale = 0;
-						set_crosshair_scale(H2Config_crosshair_scale);
-					}
-					ImGui::PushItemWidth(WidthPercentage(10));
-					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "CrosshairSize3"), b2_size))
-					{
-						H2Config_crosshair_scale = 1;
-						set_crosshair_scale(H2Config_crosshair_scale);
-					}
-					ImGui::PopItemWidth();
+						//Crosshair Offset
+						ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_offset));
+						ImGui::PushItemWidth(WidthPercentage(80));
+						ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
+						if (ImGui::IsItemEdited())
+							set_crosshair_offset(H2Config_crosshair_offset);
+						ImGui::PushItemWidth(WidthPercentage(10));
+						ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
+						if (ImGui::IsItemEdited()) {
+							if (H2Config_crosshair_offset > 0.5)
+								H2Config_crosshair_offset = 0.5;
+							if (H2Config_crosshair_offset < 0)
+								H2Config_crosshair_offset = 0;
 
-					ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
-					ImGui::NewLine();
-					//Ingame Change Display
-					if (ImGui::Button(advanced_settings_get_string(_advanced_string_weaponoffsets, "WeaponOffsets"), b3_size))
-					{
-						ImGuiHandler::ToggleWindow("Weapon Offsets");
+							set_crosshair_offset(H2Config_crosshair_offset);
+						}
+						ImGui::PushItemWidth(WidthPercentage(10));
+						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))
+						{
+							H2Config_crosshair_offset = 0.138f;
+							set_crosshair_offset(H2Config_crosshair_offset);
+						}
+						ImGui::PopItemWidth();
+
+						//Crosshair Size
+						ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_size));
+						ImGui::PushItemWidth(WidthPercentage(80));
+						ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
+						if (ImGui::IsItemEdited())
+							set_crosshair_scale(H2Config_crosshair_scale);
+						ImGui::PushItemWidth(WidthPercentage(10));
+						ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
+						if (ImGui::IsItemEdited()) {
+							if (H2Config_crosshair_scale > 2)
+								H2Config_crosshair_scale = 2;
+							if (H2Config_crosshair_scale < 0)
+								H2Config_crosshair_scale = 0;
+							set_crosshair_scale(H2Config_crosshair_scale);
+						}
+						ImGui::PushItemWidth(WidthPercentage(10));
+						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "CrosshairSize3"), b2_size))
+						{
+							H2Config_crosshair_scale = 1;
+							set_crosshair_scale(H2Config_crosshair_scale);
+						}
+						ImGui::PopItemWidth();
+
+						ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
+						ImGui::NewLine();
+						//Ingame Change Display
+						if (ImGui::Button(advanced_settings_get_string(_advanced_string_weaponoffsets, "WeaponOffsets"), b3_size))
+						{
+							ImGuiHandler::ToggleWindow("Weapon Offsets");
+						}
+
+						ImGui::Columns(2, NULL, false);
+
+						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_hide_ingame_chat), &H2Config_hide_ingame_chat);
+						ImGui::NextColumn();
+						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_static_fp), &H2Config_static_first_person);
+						if (ImGui::IsItemHovered())
+							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_static_fp_tooltip));
+						ImGui::NextColumn();
+						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_hud), &should_show_hud);
+						if (ImGui::IsItemEdited())
+							should_draw_hud_override_set(should_show_hud);
+						ImGui::NextColumn();
+						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_first_person), &g_showFP);
+						if (ImGui::IsItemEdited())
+							toggle_first_person(g_showFP);
+						ImGui::Columns(1);
+						ImGui::NewLine();
 					}
-
-					ImGui::Columns(2, NULL, false);
-
-					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_hide_ingame_chat), &H2Config_hide_ingame_chat);
-					ImGui::NextColumn();
-					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_static_fp), &H2Config_static_first_person);
-					if (ImGui::IsItemHovered())
-						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_static_fp_tooltip));
-					ImGui::NextColumn();
-					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_hud), &should_show_hud);
-					if (ImGui::IsItemEdited())
-						should_draw_hud_override_set(should_show_hud);
-					ImGui::NextColumn();
-					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_first_person), &g_showFP);
-					if (ImGui::IsItemEdited())
-						toggle_first_person(g_showFP);
-					ImGui::Columns(1);
-					ImGui::NewLine();
 				}
 			}
 			void VideoSettings()
@@ -920,113 +922,121 @@ namespace ImGuiHandler {
 			if (ImGui::Begin(advanced_settings_get_string(_advanced_string_title), &open, window_flags))
 			{
 				HudSettings();
-				VideoSettings();
-				MouseKeyboardSettings();
+				if (current_controller_index == _controller_index_0)
+				{
+					VideoSettings();
+					MouseKeyboardSettings();
+				}
 				ControllerSettings();
-				HostSettings();
-				GameSettings();
-
+				if (current_controller_index == _controller_index_0)
+				{
+					HostSettings();
+					GameSettings();
+				}
 
 #ifndef NDEBUG
-				if (ImGui::CollapsingHeader("Dev Testing"))
+				if (current_controller_index == _controller_index_0)
 				{
-					s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-					
-					ImGui::Indent();
-					if (ImGui::CollapsingHeader("Director Mode"))
+					if (ImGui::CollapsingHeader("Dev Testing"))
 					{
-						if (ImGui::Button("Set Observer Team"))
+						s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+						ImGui::Indent();
+						if (ImGui::CollapsingHeader("Director Mode"))
 						{
-							WriteValue(Memory::GetAddress(0x51A6B4), 255);
-						}
-						if (ImGui::Button("Game"))
-						{
-							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
-							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
-						}
-						if (ImGui::Button("Editor"))
-						{
-							ObserverMode::SwitchObserverMode(ObserverMode::observer_freecam);
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("Editor Follow"))
-						{
-							ObserverMode::NextPlayer();
-							ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
-						}
-						ImGui::SameLine();
-						if (ImGui::Button("Editor First Person"))
-						{
-							ObserverMode::NextPlayer();
-							ObserverMode::SwitchObserverMode(ObserverMode::observer_firstperson);
-						}
-						if (ImGui::Button("Player"))
-						{
-							DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
-							ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
-						}
-						if (ImGui::Button("N"))
-						{
-							ObserverMode::NextPlayer();
-						}
-					}
-					if (ImGui::CollapsingHeader("Raster Layers")) {
-						ImGui::Columns(4, NULL, false);
-						for (auto i = 0; i < 25; i++)
-						{
-							if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
+							if (ImGui::Button("Set Observer Team"))
 							{
-								rasterizer_globals->reset_screen = true;
+								WriteValue(Memory::GetAddress(0x51A6B4), 255);
 							}
-							ImGui::NextColumn();
+							if (ImGui::Button("Game"))
+							{
+								DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+								ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
+							}
+							if (ImGui::Button("Editor"))
+							{
+								ObserverMode::SwitchObserverMode(ObserverMode::observer_freecam);
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Editor Follow"))
+							{
+								ObserverMode::NextPlayer();
+								ObserverMode::SwitchObserverMode(ObserverMode::observer_followcam);
+							}
+							ImGui::SameLine();
+							if (ImGui::Button("Editor First Person"))
+							{
+								ObserverMode::NextPlayer();
+								ObserverMode::SwitchObserverMode(ObserverMode::observer_firstperson);
+							}
+							if (ImGui::Button("Player"))
+							{
+								DirectorHooks::SetDirectorMode(DirectorHooks::e_game);
+								ObserverMode::SwitchObserverMode(ObserverMode::observer_none);
+							}
+							if (ImGui::Button("N"))
+							{
+								ObserverMode::NextPlayer();
+							}
 						}
-						ImGui::Columns(1);
-					}
-					if (ImGui::CollapsingHeader("Render Geometries"))
-					{
-						ImGui::Columns(4, NULL, false);
-						for (auto i = 0; i < 24; i++)
-						{
-							ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
-							ImGui::NextColumn();
+						if (ImGui::CollapsingHeader("Raster Layers")) {
+							ImGui::Columns(4, NULL, false);
+							for (auto i = 0; i < 25; i++)
+							{
+								if (ImGui::Checkbox(IntToString<int>(i).c_str(), &ras_layer_overrides[i]))
+								{
+									rasterizer_globals->reset_screen = true;
+								}
+								ImGui::NextColumn();
+							}
+							ImGui::Columns(1);
 						}
-						ImGui::Columns(1);
-					}
-					static int event_type = H2Config_forced_event;
-					if (ImGui::CollapsingHeader("Events"))
-					{
-						if (ImGui::RadioButton("None", &event_type, _special_event_none))
+						if (ImGui::CollapsingHeader("Render Geometries"))
 						{
-							H2Config_forced_event = _special_event_none;
-						} ImGui::SameLine();
-						if (ImGui::RadioButton("Christmas", &event_type, _special_event_christmas))
-						{
-							H2Config_forced_event = _special_event_christmas;
-						} ImGui::SameLine();
-						if (ImGui::RadioButton("St Paddys", &event_type, _special_event_st_paddys))
-						{
-							H2Config_forced_event = _special_event_st_paddys;
-						} ImGui::SameLine();
-						if (ImGui::RadioButton("Mook Madness", &event_type, _special_event_mook_maddness))
-						{
-							H2Config_forced_event = _special_event_mook_maddness;
+							ImGui::Columns(4, NULL, false);
+							for (auto i = 0; i < 24; i++)
+							{
+								ImGui::Checkbox(IntToString<int>(i).c_str(), &geo_render_overrides[i]);
+								ImGui::NextColumn();
+							}
+							ImGui::Columns(1);
 						}
+						static int event_type = H2Config_forced_event;
+						if (ImGui::CollapsingHeader("Events"))
+						{
+							if (ImGui::RadioButton("None", &event_type, _special_event_none))
+							{
+								H2Config_forced_event = _special_event_none;
+							} ImGui::SameLine();
+							if (ImGui::RadioButton("Christmas", &event_type, _special_event_christmas))
+							{
+								H2Config_forced_event = _special_event_christmas;
+							} ImGui::SameLine();
+							if (ImGui::RadioButton("St Paddys", &event_type, _special_event_st_paddys))
+							{
+								H2Config_forced_event = _special_event_st_paddys;
+							} ImGui::SameLine();
+							if (ImGui::RadioButton("Mook Madness", &event_type, _special_event_mook_maddness))
+							{
+								H2Config_forced_event = _special_event_mook_maddness;
+							}
 
-						if (ImGui::RadioButton("Halloween", &event_type, _special_event_halloween))
-						{
-							H2Config_forced_event = _special_event_halloween;
-						}ImGui::SameLine();
-						if (ImGui::RadioButton("Birthday", &event_type, _special_event_birthday))
-						{
-							H2Config_forced_event = _special_event_birthday;
-						}
+							if (ImGui::RadioButton("Halloween", &event_type, _special_event_halloween))
+							{
+								H2Config_forced_event = _special_event_halloween;
+							}ImGui::SameLine();
+							if (ImGui::RadioButton("Birthday", &event_type, _special_event_birthday))
+							{
+								H2Config_forced_event = _special_event_birthday;
+							}
 
-					}
-					if (ImGui::CollapsingHeader("WGIT Testing"))
-					{
-						if (ImGui::Button("Custom Languages"))
+						}
+						if (ImGui::CollapsingHeader("WGIT Testing"))
 						{
-							//GSCustomMenuCall_Language();
+							if (ImGui::Button("Custom Languages"))
+							{
+								//GSCustomMenuCall_Language();
+							}
 						}
 					}
 				}

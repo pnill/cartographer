@@ -4,6 +4,7 @@
 
 #include "game/game.h"
 #include "game/game_time.h"
+#include "H2MOD/GUI/imgui_integration/ImGui_Handler.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "saved_games/cartographer_player_profile.h"
@@ -19,6 +20,8 @@ XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
 uint16 radialDeadzone[k_number_of_controllers] = {0,0,0,0};
+
+bool g_controller_home_button_state[k_number_of_controllers] = { false, false, false, false };
 
 uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
 {
@@ -247,10 +250,17 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 		ZeroMemory(&t_state, sizeof(XINPUT_STATE));
 		if(XInputGetStateEx(dwUserIndex, &t_state) == ERROR_SUCCESS)
 		{
-			if(TEST_FLAG(t_state.Gamepad.wButtons, 0x400))
+			if (TEST_FLAG(t_state.Gamepad.wButtons, 0x400))
 			{
-				LOG_INFO_GAME("Home button pressed");
+				if (!g_controller_home_button_state[gamepad_index])
+				{
+					ImGuiHandler::ImAdvancedSettings::set_controller_index((e_controller_index)gamepad_index);
+					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+				}
+				g_controller_home_button_state[gamepad_index] = true;
 			}
+			else
+				g_controller_home_button_state[gamepad_index] = false;
 		}
 	}
 
