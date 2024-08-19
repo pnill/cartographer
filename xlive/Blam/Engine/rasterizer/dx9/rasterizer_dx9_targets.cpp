@@ -77,6 +77,9 @@ void rasterizer_dx9_targets_apply_patches(void)
     // discard unnecessary set render target call(s)
     NopFill(Memory::GetAddress(0x26C81A), 5);
 
+    // motion sensor
+    PatchCall(Memory::GetAddress(0x284BF3), rasterizer_set_render_target_internal_hook_set_viewport);
+
     return;
 }
 
