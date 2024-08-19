@@ -130,6 +130,36 @@ void radar_patch()
 	WritePointer(Memory::GetAddress(0x2849EA) + 2, &motion_sensor_sweep_shader);
 }
 
+//void motion_sensor_render_update(int32 local_player_index, int32 a2, point2d* offset_point)
+//{
+//	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
+//
+//	s_camera* global_camera = get_global_camera();
+//
+//	// hack fix
+//	// pulse might not be perfectly aligned
+//	offset_point->x = safe_area;
+//	// from bottom point
+//	offset_point->y = rectangle2d_height(&global_camera->window_bounds) + 8 - safe_area;
+//
+//	INVOKE(0x22C86F, 0x0, motion_sensor_render_update, local_player_index, a2, offset_point);
+//}
+
+void motion_sensor_render_update(real_point2d* position, real32 pulse)
+{
+	s_camera* global_camera = get_global_camera();
+
+	position->x -= global_camera->viewport_bounds.left;
+	position->x -= global_camera->window_bounds.left;
+	position->x += abs(global_camera->viewport_bounds.left - global_camera->window_bounds.left);
+
+	position->y -= global_camera->viewport_bounds.top;
+	position->y -= global_camera->window_bounds.bottom;
+	position->y += (global_camera->window_bounds.bottom - global_camera->viewport_bounds.top);
+
+	INVOKE(0x284810, 0x0, motion_sensor_render_update, position, pulse);
+}
+
 void motion_sensor_apply_patches()
 {
 	radar_patch();
@@ -137,6 +167,12 @@ void motion_sensor_apply_patches()
 
 	// Remove hud motion sensor update from game tick
 	NopFill(Memory::GetAddress(0x220c8f), 5);
+
+	// splitscreen motion sensor fix
+	PatchCall(Memory::GetAddress(0x22C4C4), motion_sensor_render_update);
+	//PatchCall(Memory::GetAddress(0x2266F9), motion_sensor_render_update);
+	//NopFill(Memory::GetAddress(0x22C379), 2);
+	//NopFill(Memory::GetAddress(0x22C38D), 2);
 }
 
 void motion_sensor_fix_size()
