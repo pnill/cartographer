@@ -43,7 +43,7 @@ void c_shader_submission_interface_new::stage_texture(
     int16 stage,
     e_shader_pass_texture_source_extern bitmap_extern_index,
     uint32* res_x,
-    uint32* res_y)
+    uint32* res_y) const
 {
     ASSERT(res_x && res_y);
 
