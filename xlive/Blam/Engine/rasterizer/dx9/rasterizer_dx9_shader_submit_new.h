@@ -25,7 +25,7 @@ ASSERT_STRUCT_SIZE(s_shader_submission_bitmap_info, 64)
 class c_shader_submission_interface_new
 {
 public:
-	void stage_texture(int16 stage, e_shader_pass_texture_source_extern bitmap_extern_index, uint32* res_x, uint32* res_y);
+	void stage_texture(int16 stage, e_shader_pass_texture_source_extern bitmap_extern_index, uint32* res_x, uint32* res_y) const;
 private:
 	int32 field_0;
 	int32 field_4;
