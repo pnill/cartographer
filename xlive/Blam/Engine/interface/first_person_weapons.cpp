@@ -611,7 +611,7 @@ int32 __cdecl first_person_weapon_build_models(int32 user_index, datum unit_inde
                     if (object_def->model.index != NONE)
                     {
                         s_model_definition* model = (s_model_definition*)tag_get_fast(object_def->model.index);
-                        if (model->animation.index != NONE)
+                        if (model->animation_graph.index != NONE)
                         {
                             unit_model_index = model->render_model.index;
                             if (!halo_interpolator_interpolate_object_node_matrices(unit_index, &node_matrices, &node_count))

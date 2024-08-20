@@ -507,7 +507,7 @@ struct s_model_definition
 
     tag_reference render_model;     // mode
     tag_reference collision_model;  // coll
-    tag_reference animation;        // jmad
+    tag_reference animation_graph;  // jmad
     tag_reference physics;          // phys
     tag_reference physics_model;    // phmo
 
