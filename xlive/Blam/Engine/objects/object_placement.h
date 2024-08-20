@@ -42,7 +42,7 @@ struct object_placement_data
 	datum tag_index;
 	c_object_identifier object_identifier;
 	string_id variant_name;
-	DWORD placement_index;
+	uint32 scenario_datum_index;
 	e_bsp_policy placement_policy;
 	BYTE unk_15;
 	WORD unk_16;

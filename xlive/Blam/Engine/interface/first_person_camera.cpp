@@ -46,15 +46,15 @@ void player_control_set_field_of_view(float fov)
 	overridden_fov_radians = DEGREES_TO_RADIANS(fov);
 }
 
-float __cdecl player_control_get_field_of_view(int controller_index)
+real32 __cdecl player_control_get_field_of_view(e_controller_index controller_index)
 {
 	const s_player_control* player_control_info = player_control_get(controller_index);
 
-	float result = observer_suggested_field_of_view();
+	real32 result = observer_suggested_field_of_view();
 	if (player_control_info->unit_datum_index != NONE)
 	{
-		float fov;
-		
+		real32 fov;
+
 		if (currentVariantSettings.forced_fov != 0)
 		{
 			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
@@ -74,7 +74,7 @@ float __cdecl player_control_get_field_of_view(int controller_index)
 	return result;
 }
 
-void first_person_camera_apply_patches()
+void first_person_camera_apply_patches(void)
 {
 	// Set the custom FOV's from our config beforehand
 	player_control_set_field_of_view(H2Config_field_of_view);
@@ -82,4 +82,5 @@ void first_person_camera_apply_patches()
 
 	// Patch this call for our custom fov implementation
 	PatchCall(Memory::GetAddress(0xCD880, 0xB8BF9), player_control_get_field_of_view);
+	return;
 }

@@ -291,7 +291,7 @@ void halo_interpolator_object_populate_interpolation_data(
         if (abs_object_index < k_maximum_objects_per_map)
         {
             object_datum* object = object_get_fast_unsafe(object_index);
-            if (object->object_flags.test(_object_hidden_bit))
+            if (object->flags.test(_object_hidden_bit))
             {
                 g_target_interpolation_frame_data->object_data[abs_object_index].object_index = NONE;
                 // discard previous as well

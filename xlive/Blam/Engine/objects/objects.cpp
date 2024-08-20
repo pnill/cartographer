@@ -21,7 +21,7 @@
 #include "scenario/scenario.h"
 #include "simulation/simulation.h"
 #include "structures/cluster_partitions.h"
-
+#include "tag_files/tag_files.h"
 
 
 s_data_array* object_header_data_get(void)
@@ -171,8 +171,10 @@ void __cdecl object_cleanup_havok(datum object_index)
 void object_reset_interpolation(datum object_index)
 {
 	const object_datum* object = object_get_fast_unsafe(object_index);
-	c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 
+	ASSERT(object);
+
+	c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 	animation_manager->interpolator_controls[1].disable();
 	object_wake(object_index);
 	return;
@@ -190,7 +192,7 @@ bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vecto
 	s_object_header* object_header = (s_object_header*)datum_get(object_header_data_get(), object_index);
 	const object_datum* object = (object_datum*)object_header->object;
 
-	if (object->object_flags.test(_object_always_active_bit))
+	if (object->flags.test(_object_always_active_bit))
 	{
 		return true;
 	}
@@ -230,10 +232,12 @@ void get_object_payload(datum object_index, s_object_payload* payload)
 {
 	const object_datum* object = object_get_fast_unsafe(object_index);
 	uint16 object_collision_cull_flags = 0;
-	if (object->object_flags.test(_object_uses_collidable_list_bit))
+	if (object->flags.test(_object_uses_collidable_list_bit))
 	{
 		object_collision_cull_flags = collision_compute_object_cull_flags(object_index);
 	}
+
+	ASSERT(payload);
 
 	payload->object_type = object->object_identifier.get_type();
 	payload->object_collision_cull_flags = object_collision_cull_flags;
@@ -247,8 +251,16 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 {
 	s_object_header* object_header = (s_object_header *)datum_get(object_header_data_get(), object_index);
 	object_datum* object = (object_datum *)object_header->object;
-
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
+
+	ASSERT(DATUM_INDEX_TO_IDENTIFIER(object_index));
+	ASSERT(object->parent_object_index == NONE);
+	ASSERT(!object_header->flags.test(_object_header_connected_to_map_bit));
+	ASSERT(!object_header->flags.test(_object_header_child_bit));
+	ASSERT(!object->flags.test(_object_connected_to_map_bit));
+	ASSERT(!object->flags.test(_object_in_limbo_bit));
+	ASSERT(objects_can_connect_to_map());
+
 	s_location* p_location = location;
 	s_location scnr_location;
 
@@ -264,7 +276,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 
 	if (p_location->cluster_index == NONE)
 	{
-		object->object_flags.set(_object_outside_of_map_bit, true);
+		object->flags.set(_object_outside_of_map_bit, true);
 	}
 	else
 	{
@@ -272,12 +284,12 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		object->location.cluster_index = p_location->cluster_index;
 		object->location.bsp_index = p_location->bsp_index;
 		object_header->cluster_index = p_location->cluster_index;
-		object->object_flags.set(_object_outside_of_map_bit, false);
+		object->flags.set(_object_outside_of_map_bit, false);
 	}
 	s_game_cluster_bit_vectors cluster_bitvector[16];
 	s_game_cluster_bit_vectors* p_cluster_bitvector = NULL;
 	bool cluster_overflow = false;
-	if (object->object_flags.test(_object_cinematic_visibility_bit))
+	if (object->flags.test(_object_cinematic_visibility_bit))
 	{
 		csmemset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 31) / 32));
 		p_cluster_bitvector = cluster_bitvector;
@@ -287,7 +299,7 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 	get_object_payload(object_index, &payload);
 
 	cluster_partition* partition = collideable_object_cluster_partition_get();
-	if (!object->object_flags.test(_object_uses_collidable_list_bit))
+	if (!object->flags.test(_object_uses_collidable_list_bit))
 	{
 		partition = noncollideable_object_cluster_partition_get();
 	}
@@ -303,15 +315,22 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		&payload,
 		&cluster_overflow);
 
-	object->object_flags.set(_object_connected_to_map_bit, true);
+	object->flags.set(_object_connected_to_map_bit, true);
 	object_header->flags.set(_object_header_connected_to_map_bit, true);
+
+	if (cluster_overflow)
+	{
+		const char* name = tag_get_name(object->tag_definition_index);
+		error(8, 2, "### WARNING object %s touched too many clusters", name);
+	}
+
 	object_connect_lights_recursive(object_index, false, true, false, false);
 
 	if (object_can_activate_in_cluster(object_index, game_get_cluster_activation()))
 	{
 		object_activate(object_index);
 	}
-	else if (!object->object_flags.test(_object_deleted_when_deactivated_bit) || simulation_query_object_is_predicted(object_index))
+	else if (!object->flags.test(_object_deleted_when_deactivated_bit) || simulation_query_object_is_predicted(object_index))
 	{
 		object_deactivate(object_index);
 	}
@@ -335,7 +354,7 @@ void object_postprocess_node_matrices(datum object_index)
 	if (object_tag->model.index != NONE)
 	{
 		const s_model_definition* model_tag = (s_model_definition*)tag_get_fast(object_tag->model.index);
-		if (model_tag->render_model.index != NONE && model_tag->animation.index != NONE)
+		if (model_tag->render_model.index != NONE && model_tag->animation_graph.index != NONE)
 		{
 			int32 node_count;
 			real_matrix4x3* node_matricies = object_get_node_matrices(object_index, &node_count);
@@ -459,11 +478,11 @@ datum object_allocate_header(datum tag_definition_index)
 	return object_index;
 }
 
-datum object_new_internal(datum object_index, object_placement_data* placement)
+datum object_new_internal(datum object_index, object_placement_data* data)
 {
 	bool process_is_game_client = !Memory::IsDedicatedServer();
 
-	const object_definition* object_def = (object_definition*)tag_get_fast(placement->tag_index);
+	const object_definition* object_def = (object_definition*)tag_get_fast(data->tag_index);
 	const object_type_definition* object_type_definition = object_type_definition_get(object_def->object_type);
 	const s_model_definition* model_definition = NULL;
 
@@ -478,9 +497,9 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 
 	object_header->flags.set(_object_header_post_update_bit, true);
 	object_header->object_type = object_def->object_type;
-	object->tag_definition_index = placement->tag_index;
+	object->tag_definition_index = data->tag_index;
 
-	if (placement->object_identifier.get_source() == NONE)
+	if (data->object_identifier.get_source() == NONE)
 	{
 		object->object_identifier.create_dynamic(object_def->object_type);
 		object->placement_index = NONE;
@@ -488,47 +507,49 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 	}
 	else
 	{
-		object->object_identifier = placement->object_identifier;
-		object->placement_index = placement->placement_index;
-		object->structure_bsp_index = placement->object_identifier.get_origin_bsp();
+		ASSERT(data->scenario_datum_index != NONE);
+		ASSERT(data->object_identifier.get_type() == object_def->object_type);
+		object->object_identifier = data->object_identifier;
+		object->placement_index = data->scenario_datum_index;
+		object->structure_bsp_index = data->object_identifier.get_origin_bsp();
 	}
 
-	object->position = placement->position;
-	object->forward = placement->forward;
-	object->up = placement->up;
-	object->translational_velocity = placement->translational_velocity;
-	object->angular_velocity = placement->angular_velocity;
-	object->scale = placement->scale;
+	object->position = data->position;
+	object->forward = data->forward;
+	object->up = data->up;
+	object->translational_velocity = data->translational_velocity;
+	object->angular_velocity = data->angular_velocity;
+	object->scale = data->scale;
 
-	bool enable = placement->flags.test(_scenario_object_placement_bit_0);
-	object->object_flags.set(_object_mirrored_bit, enable);
+	bool enable = data->flags.test(_scenario_object_placement_bit_0);
+	object->flags.set(_object_mirrored_bit, enable);
 	enable = model_definition && model_definition->collision_model.index != NONE;
-	object->object_flags.set(_object_uses_collidable_list_bit, enable);
+	object->flags.set(_object_uses_collidable_list_bit, enable);
 
 	datum mode_index;
 	datum coll_index;
 	enable = object_is_prt_and_lightmapped(object_index, &mode_index, &coll_index);
-	object->object_flags.set(_object_has_prt_or_lighting_info_bit, enable);
+	object->flags.set(_object_has_prt_or_lighting_info_bit, enable);
 
 	object_header->cluster_index = NONE;
 	location_invalidate(&object->location);
 	object->first_cluster_reference = NONE;
-	object->parent_index = NONE;
+	object->parent_object_index = NONE;
 	object->next_index = NONE;
 	object->current_weapon_datum = NONE;
 	object->name_list_index = NONE;
 	object->netgame_equipment_index = NONE;
 	object->byte_108 = NONE;
 	object->byte_109 = NONE;
-	object->placement_policy = placement->placement_policy;
+	object->placement_policy = data->placement_policy;
 	if (TEST_FLAG(object_def->flags, _object_definition_does_not_cast_shadow))
 	{
-		object->object_flags.set(_object_shadowless_bit, true);
+		object->flags.set(_object_shadowless_bit, true);
 	}
 
-	if (object->object_flags.test(_object_hidden_bit))
+	if (object->flags.test(_object_hidden_bit))
 	{
-		object->object_flags.set(_object_hidden_bit, false);
+		object->flags.set(_object_hidden_bit, false);
 		if (object_is_connected_to_map(object_index))
 		{
 			object_connect_lights_recursive(object_index, false, true, false, false);
@@ -536,19 +557,19 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 		object_update_collision_culling(object_index);
 	}
 
-	object->damage_owner_target_model_abs_index = placement->damage_owner.target_model_abs_index;
-	object->damage_owner_owner_index = placement->damage_owner.owner_index;
-	object->damage_owner_object_index = placement->damage_owner.entity_index;
+	object->damage_owner_target_model_abs_index = data->damage_owner.target_model_abs_index;
+	object->damage_owner_owner_index = data->damage_owner.owner_index;
+	object->damage_owner_object_index = data->damage_owner.entity_index;
 	object->model_variant_id = NONE;
 	object->cached_object_render_state_index = NONE;
 	object->field_D0 = NONE;
 	object->physics_flags.set_unsafe(0);
-	object->physics_flags.set(_object_physics_bit_8, placement->flags.test(_scenario_object_placement_bit_3));
+	object->physics_flags.set(_object_physics_bit_8, data->flags.test(_scenario_object_placement_bit_3));
 	object->havok_datum = NONE;
 	object->simulation_entity_index = NONE;
 	object->attached_to_simulation = 0;
-	object->destroyed_constraints_flag = placement->destroyed_constraints_flag;
-	object->loosened_constraints_flag = placement->loosened_constraints_flag;
+	object->destroyed_constraints_flag = data->destroyed_constraints_flag;
+	object->loosened_constraints_flag = data->loosened_constraints_flag;
 
 	uint32 node_count = 1;
 	uint32 collision_regions_count = 1;
@@ -563,9 +584,23 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 		{
 			node_count = model_definition->nodes.count;
 		}
+		else
+		{
+			const char* model_name = tag_get_name(object_def->model.index);
+			const char* object_name = tag_get_name(data->tag_index);
+			error(8, 2, "object '%s' model '%s' has invalid node count %d!", object_name, model_name, model_definition->nodes.count);
+		}
+
+
 		if (model_definition->collision_regions.count >= 1)
 		{
 			collision_regions_count = model_definition->collision_regions.count;
+		}
+		else
+		{
+			const char* model_name = tag_get_name(object_def->model.index);
+			const char* object_name = tag_get_name(data->tag_index);
+			error(8, 2, "object '%s' model '%s' has invalid region count %d!", object_name, model_name, model_definition->collision_regions.count);
 		}
 
 		if (model_definition->new_damage_info.count > 0 && model_definition->new_damage_info.data != NONE)
@@ -573,10 +608,10 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 			damage_info_damage_sections_size = model_definition->new_damage_info[0]->damage_sections.count;
 		}
 
-		if (model_definition->animation.index != NONE)
+		if (model_definition->animation_graph.index != NONE)
 		{
 			c_animation_manager animation_manager;
-			if (animation_manager.reset_graph(model_definition->animation.index, object_def->model.index, true))
+			if (animation_manager.reset_graph(model_definition->animation_graph.index, object_def->model.index, true))
 			{
 				valid_animation_manager = true;
 				allow_interpolation = !TEST_FLAG(FLAG(object_def->object_type), (
@@ -591,17 +626,28 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 				// allow interpolation if object is device and device flags include interpolation
 				if (TEST_FLAG(FLAG(object_def->object_type), (FLAG(_object_type_light_fixture) | FLAG(_object_type_control) | FLAG(_object_type_machine))))
 				{
-					_device_definition* device_def = (_device_definition*)tag_get_fast(placement->tag_index);
+					_device_definition* device_def = (_device_definition*)tag_get_fast(data->tag_index);
 					if (TEST_FLAG(device_def->flags, _device_definition_allow_interpolation))
 					{
 						allow_interpolation = true;
 					}
 				}
 			}
+			else
+			{
+				const char* model_path = tag_get_name(object_def->model.index);
+				const char* model_name = tag_name_strip_path(model_path);
+				const char* graph_path = tag_get_name(model_definition->animation_graph.index);
+				const char* graph_name = tag_name_strip_path(graph_path);
+				error(3, 2, "graph '%s' is not compatible with model '%s'", graph_name, model_name);
+			}
 		}
 	}
 
+
 	int16 orientation_size = (!allow_interpolation ? 0 : 32 * node_count);
+
+	// TODO: header asserts here
 
 	// Allocate object header blocks
 	bool can_create_object =
@@ -613,7 +659,7 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, original_orientation_block), orientation_size, 4)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, node_orientation_block), orientation_size, 4)
 		&& object_header_block_allocate(object_index, offsetof(object_datum, animation_manager_block), (valid_animation_manager ? 144 : 0), 0)
-		&& havok_can_allocate_space_for_instance_of_object_definition(placement->tag_index);
+		&& havok_can_allocate_space_for_instance_of_object_definition(data->tag_index);
 
 	// If one of the object headers cannot be allocated then something has gone horribly wrong and we can't create our object
 	bool out_of_objects = !can_create_object;
@@ -621,15 +667,23 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 	{
 		if (valid_animation_manager)
 		{
+			ASSERT(model_definition);
+			ASSERT(model_definition->animation_graph.index != NONE);
+			ASSERT(object);
+
 			c_animation_manager* animation_manager = (c_animation_manager*)object_header_block_get(object_index, &object->animation_manager_block);
 			animation_manager->initialize();
-			bool graph_reset = animation_manager->reset_graph(model_definition->animation.index, object_def->model.index, true);
-			object->object_flags.set(_object_data_bit_11, graph_reset);
+			
+			bool graph_reset = animation_manager->reset_graph(model_definition->animation_graph.index, object_def->model.index, true);
+			ASSERT(graph_reset);
+
+			object->flags.set(_object_data_bit_11, graph_reset);
 		}
 
 		// Null attachment block
 		if (object_def->attachments.count > 0)
 		{
+			ASSERT(object);
 			int32 attachments_count;
 			object_attachment* object_attachments_block = (object_attachment*)object_header_block_get_with_count(object_index,
 				&object->object_attachments_block,
@@ -639,20 +693,20 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 			csmemset(object_attachments_block, NONE, sizeof(object_attachment) * attachments_count);
 		}
 
-		if (object_type_new(object_index, placement, &out_of_objects))
+		if (object_type_new(object_index, data, &out_of_objects))
 		{
-			bool object_flag_check = object->object_flags.test(_object_deleted_when_deactivated_bit);
-			if (placement->flags.test(_scenario_object_placement_bit_1) || placement->flags.test(_scenario_object_placement_bit_2))
+			bool object_flag_check = object->flags.test(_object_deleted_when_deactivated_bit);
+			if (data->flags.test(_scenario_object_placement_bit_1) || data->flags.test(_scenario_object_placement_bit_2))
 			{
-				object->object_flags.set(_object_deleted_when_deactivated_bit, false);
+				object->flags.set(_object_deleted_when_deactivated_bit, false);
 			}
 
-			update_object_variant_index(object_index, placement->variant_name);
-			update_object_region_information(object_index, placement->region_index);
-			object_set_initial_change_colors(object_index, placement->active_change_colors_mask, placement->change_colors);
+			update_object_variant_index(object_index, data->variant_name);
+			update_object_region_information(object_index, data->region_index);
+			object_set_initial_change_colors(object_index, data->active_change_colors_mask, data->change_colors);
 			object_initialize_vitality(object_index, NULL, NULL);
 			object_compute_change_colors(object_index);
-			object->emblem_info = placement->emblem_info;
+			object->emblem_info = data->emblem_info;
 
 			if (object->animation_manager_block.offset != NONE)
 			{
@@ -664,11 +718,11 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 			// If the object (can) connect to the map we make sure it gets connected
 			if (objects_can_connect_to_map())
 			{
-				placement->object_is_inside_cluster = set_object_position_if_in_cluster(&placement->location, object_index);
+				data->object_is_inside_cluster = set_object_position_if_in_cluster(&data->location, object_index);
 
 				// If the object is inside a cluster set the location to the one passed in the placement data
 				// If not then pass null
-				s_location* p_location = (placement->object_is_inside_cluster ? &placement->location : NULL);
+				s_location* p_location = (data->object_is_inside_cluster ? &data->location : NULL);
 				object_reconnect_to_map(p_location, object_index);
 			}
 
@@ -677,7 +731,7 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 
 			object_wake(object_index);
 
-			object->physics_flags.set(_object_physics_bit_2, placement->flags.test(_scenario_object_placement_bit_5));
+			object->physics_flags.set(_object_physics_bit_2, data->flags.test(_scenario_object_placement_bit_5));
 
 			object_reconnect_to_physics(object_index);
 			object_initialize_effects(object_index);
@@ -685,7 +739,7 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 
 			if (object_def->creation_effect.index != NONE)
 			{
-				effect_new_from_object(object_def->creation_effect.index, &placement->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
+				effect_new_from_object(object_def->creation_effect.index, &data->damage_owner, object_index, 0.0f, 0.0f, NULL, NULL);
 			}
 
 			// Not 100% sure what this function does but it has to do with occlusion
@@ -695,14 +749,14 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 				object_occlusion_data_initialize(object_index);
 			}
 
-			object->object_flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
+			object->flags.set(_object_deleted_when_deactivated_bit, object_flag_check);
 			object_early_mover_new(object_index);
 
-			if (object->object_flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
+			if (object->flags.test(_object_deleted_when_deactivated_bit) && !object_header->flags.test(_object_header_active_bit))
 			{
 				if (objects_can_connect_to_map())
 				{
-					if (!placement->flags.test(_scenario_object_placement_bit_1) && (!placement->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
+					if (!data->flags.test(_scenario_object_placement_bit_1) && (!data->flags.test(_scenario_object_placement_bit_2) || object->location.cluster_index != NONE))
 					{
 						object_delete(object_index);
 					}
@@ -721,6 +775,18 @@ datum object_new_internal(datum object_index, object_placement_data* placement)
 		free_object_memory(object_index);
 		object_index = NONE;
 	}
+
+#ifdef _DEBUG
+	if (object_index == NONE && data->tag_index != NONE)
+	{
+		const char* message = out_of_objects ? "OUT OF OBJECTS" : "OBJECT CREATION FAILED";
+		const char* object_path = tag_get_name(data->tag_index);
+		const char* object_name = tag_name_strip_path(object_path);
+		error(8, 3, "%s: cannot create %s", message, object_name);
+
+		// TODO: error globals here 
+	}
+#endif
 
 	return object_index;
 }
@@ -787,7 +853,7 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 		interpolated_object_position = object->position;
 	}
 
-	if (object->parent_index == NONE)
+	if (object->parent_object_index == NONE)
 	{
 		*point_out = point;
 	}
@@ -795,9 +861,9 @@ void __cdecl object_get_origin(datum object_index, real_point3d* point_out, bool
 	{
 		real_matrix4x3 interpolated_matrix;
 		real_matrix4x3* transform_matrix = &interpolated_matrix;
-		if (!interpolated || !halo_interpolator_interpolate_object_node_matrix(object->parent_index, object->matrix_index, &interpolated_matrix))
+		if (!interpolated || !halo_interpolator_interpolate_object_node_matrix(object->parent_object_index, object->matrix_index, &interpolated_matrix))
 		{
-			transform_matrix = object_get_node_matrix(object->parent_index, object->matrix_index);
+			transform_matrix = object_get_node_matrix(object->parent_object_index, object->matrix_index);
 		}
 		matrix4x3_transform_point(transform_matrix, &interpolated_object_position, point_out);
 	}
@@ -940,7 +1006,7 @@ void __cdecl objects_post_update()
 			&& object_header->flags.test(_object_header_awake_bit)
 			&& !object_header->flags.test(_object_header_being_deleted_bit))
 		{
-			if (object->object_flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
+			if (object->flags.test(_object_hidden_bit) && !Memory::IsDedicatedServer())
 			{
 				// reset the interpolator for this object, if hidden
 				// ### FIXME maybe hook object_hide and reset it there?
@@ -989,7 +1055,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 				NULL, 
 				node_count, 
 				node_matrices, 
-				object->object_flags.test(_object_mirrored_bit), 
+				object->flags.test(_object_mirrored_bit), 
 				marker_object,
 				count);
 
@@ -1010,7 +1076,7 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 	}
 		
 	marker_object->field_6C = 0;
-	if (object->object_flags.test(_object_mirrored_bit))
+	if (object->flags.test(_object_mirrored_bit))
 	{
 		scale_vector3d(&marker_object->matrix1.vectors.left, -1.0f, &marker_object->matrix1.vectors.left);
 	}
