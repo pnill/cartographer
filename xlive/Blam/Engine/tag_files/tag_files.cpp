@@ -10,6 +10,6 @@ const char* tag_name_strip_path(const char* name)
 {
     ASSERT(name);
 
-    const char* result = strrchr(name, 92);
+    const char* result = strrchr(name, '\\');
     return result ? result + 1 : name;
 }
