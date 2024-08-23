@@ -81,7 +81,7 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_use
 
 	s_players_globals* player_globals = get_players_globals();
 
-	if (user_index < player_globals->player_user_count)
+	if (user_index < player_globals->local_player_count)
 	{
 		datum user_datum = player_globals->player_user_mapping[user_index];
 		for (uint32 index = 0; index < k_number_of_controllers; index++)

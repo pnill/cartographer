@@ -433,6 +433,11 @@ void __cdecl players_update_activation(void)
     return;
 }
 
+int16 local_player_count(void)
+{
+    return get_players_globals()->local_player_count;
+}
+
 void players_apply_patches(void)
 {
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
