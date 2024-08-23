@@ -47,7 +47,7 @@ bool render_object_cache_storage_is_object_cached(s_render_cache_storage* storag
     bool result = false;
 
     if (storage != NULL
-        && storage->rasterizer_cpu_render_cache_offset != NULL
+        && storage->rasterizer_cpu_render_cache_offset != NONE
         && storage->render_frame_allocated == render_object_cache_create_index())
     {
         result = true;
