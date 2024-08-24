@@ -180,116 +180,39 @@ void tag_fixes_misty_rain(void)
 	return;
 }
 
-void tag_fixes_split_screen_hud()
+void tag_fixes_split_screen_hud(void)
 {
-	datum master_chief_hud_index = tag_loaded(_tag_group_new_hud_definition, "ui\\hud\\masterchief");
-	datum dervish_hud_index = tag_loaded(_tag_group_new_hud_definition, "ui\\hud\\dervish");
-	if(master_chief_hud_index && dervish_hud_index)
-	{
-		s_new_hud_definition* master_chief_hud = (s_new_hud_definition*)tag_get_fast(master_chief_hud_index);
-		s_new_hud_definition* dervish_hud = (s_new_hud_definition*)tag_get_fast(dervish_hud_index);
-		if(master_chief_hud && dervish_hud)
-		{
-			// shield meter widget
-			master_chief_hud->bitmap_widgets[3]->halfscreen_offset.y = -155;
-			master_chief_hud->bitmap_widgets[3]->quarterscreen_offset.y = -155;
-			dervish_hud->bitmap_widgets[3]->halfscreen_offset.y = -155;
-			dervish_hud->bitmap_widgets[3]->quarterscreen_offset.y = -155;
-
-			// shield meter mask widget
-			master_chief_hud->bitmap_widgets[4]->halfscreen_offset.y = -155;
-			master_chief_hud->bitmap_widgets[4]->quarterscreen_offset.y = -155;
-			dervish_hud->bitmap_widgets[4]->halfscreen_offset.y = -155;
-			dervish_hud->bitmap_widgets[4]->quarterscreen_offset.y = -155;
-
-			// motion tracker background widget
-			master_chief_hud->bitmap_widgets[5]->halfscreen_offset.y = -130;
-			master_chief_hud->bitmap_widgets[5]->quarterscreen_offset.y = -130;
-			dervish_hud->bitmap_widgets[5]->halfscreen_offset.y = -130;
-			dervish_hud->bitmap_widgets[5]->quarterscreen_offset.y = -130;
-
-			// second? motion tracker background widget
-			master_chief_hud->bitmap_widgets[7]->halfscreen_offset.y = -130;
-			master_chief_hud->bitmap_widgets[7]->quarterscreen_offset.y = -130;
-			dervish_hud->bitmap_widgets[7]->halfscreen_offset.y = -130;
-			dervish_hud->bitmap_widgets[7]->quarterscreen_offset.y = -130;
-		}
-	}
-
-	datum scoreboard_hud_datum = tag_loaded(_tag_group_new_hud_definition, "ui\\hud\\scoreboard");
-	if(scoreboard_hud_datum)
-	{
-		s_new_hud_definition* scoreboard_hud = (s_new_hud_definition*)tag_get_fast(scoreboard_hud_datum);
-		if(scoreboard_hud)
-		{
-			// player score
-			scoreboard_hud->bitmap_widgets[0]->halfscreen_offset = scoreboard_hud->bitmap_widgets[0]->fullscreen_offset;
-
-			// other player score
-			scoreboard_hud->bitmap_widgets[1]->halfscreen_offset = scoreboard_hud->bitmap_widgets[1]->fullscreen_offset;
-
-			// player emblem
-			scoreboard_hud->bitmap_widgets[2]->quarterscreen_offset.x = -35;
-			scoreboard_hud->bitmap_widgets[2]->quarterscreen_offset.y = -68;
-			scoreboard_hud->bitmap_widgets[2]->halfscreen_offset = scoreboard_hud->bitmap_widgets[2]->fullscreen_offset;
-
-			// player arrow
-			scoreboard_hud->bitmap_widgets[3]->quarterscreen_offset = scoreboard_hud->bitmap_widgets[3]->fullscreen_offset;
-			scoreboard_hud->bitmap_widgets[3]->halfscreen_offset = scoreboard_hud->bitmap_widgets[3]->fullscreen_offset;
-
-			// player emblem teams
-			scoreboard_hud->bitmap_widgets[4]->quarterscreen_offset.x = -35;
-			scoreboard_hud->bitmap_widgets[4]->quarterscreen_offset.y = -32;
-			scoreboard_hud->bitmap_widgets[4]->halfscreen_offset = scoreboard_hud->bitmap_widgets[4]->fullscreen_offset;
-
-			// other player emblem
-			scoreboard_hud->bitmap_widgets[5]->quarterscreen_offset.x = -35;
-			scoreboard_hud->bitmap_widgets[5]->quarterscreen_offset.y = -68;
-			scoreboard_hud->bitmap_widgets[5]->halfscreen_offset = scoreboard_hud->bitmap_widgets[5]->fullscreen_offset;
-
-			// other player emblem teams
-			scoreboard_hud->bitmap_widgets[6]->quarterscreen_offset.x = -35;
-			scoreboard_hud->bitmap_widgets[6]->quarterscreen_offset.y = -68;
-			scoreboard_hud->bitmap_widgets[6]->halfscreen_offset = scoreboard_hud->bitmap_widgets[6]->fullscreen_offset;
-
-			//bomb_defusal
-			scoreboard_hud->bitmap_widgets[7]->quarterscreen_offset.y = 50;
-			scoreboard_hud->bitmap_widgets[7]->halfscreen_offset.y = 50;
-
-
-		}
-	}
-
 	tag_iterator hud_iterator;
 	tag_iterator_new(&hud_iterator, _tag_group_new_hud_definition);
-
 	while(tag_iterator_next(&hud_iterator) != NONE)
 	{
-		const char* tag_name = tag_get_name(hud_iterator.current_tag_index);
 		s_new_hud_definition* hud = (s_new_hud_definition*)tag_get_fast(hud_iterator.current_tag_index);
-
-		if (hud->bitmap_widgets.count && hud->bitmap_widgets.data != NONE)
+		for (uint32 i = 0; i < hud->bitmap_widgets.count; ++i)
 		{
-			for (uint32 index = 0; index < hud->bitmap_widgets.count; index++)
-			{
-				s_hud_bitmap_widget_definition* bitmap_widget = hud->bitmap_widgets[index];
-				// these elements on the top of the screen can just copy their fullscreen_offsets
+			s_hud_bitmap_widget_definition* widget = hud->bitmap_widgets[i];
+			widget->halfscreen_offset.x *= 2;
+			widget->halfscreen_offset.y *= 2;
+			widget->quarterscreen_offset.x *= 2;
+			widget->quarterscreen_offset.y *= 2;
+		}
 
-				// weapon_background_right, weapon_background_single, backpack, weapon_background_out, heat_meter_right, heat_background_right
-				// heat_background_left, heat_meter_left
-				if (bitmap_widget->name == (string_id)0x17001E0D || 
-					bitmap_widget->name == (string_id)0x18001F6C || 
-					bitmap_widget->name == (string_id)0x8001E11  ||
-					bitmap_widget->name == (string_id)0x15001F74 ||
-					bitmap_widget->name == (string_id)0x10001F29 ||
-					bitmap_widget->name == (string_id)0x15001F27 ||
-					bitmap_widget->name == (string_id)0x14001F28 ||
-					bitmap_widget->name == (string_id)0xF001F2A)
-				{
-					bitmap_widget->halfscreen_offset = bitmap_widget->fullscreen_offset;
-					bitmap_widget->quarterscreen_offset = bitmap_widget->fullscreen_offset;
-				}
-			}
+		for (uint32 i = 0; i < hud->text_widgets.count; ++i)
+		{
+			s_hud_text_widget_definition* widget = hud->text_widgets[i];
+			widget->halfscreen_offset.x *= 2;
+			widget->halfscreen_offset.y *= 2;
+			widget->quarterscreen_offset.x *= 2;
+			widget->quarterscreen_offset.y *= 2;
+		}
+
+		for (uint32 i = 0; i < hud->screen_effect_widgets.count; ++i)
+		{
+			s_hud_screen_effect_widget_definition* widget = hud->screen_effect_widgets[i];
+			widget->halfscreen_offset.x *= 2;
+			widget->halfscreen_offset.y *= 2;
+			widget->quarterscreen_offset.x *= 2;
+			widget->quarterscreen_offset.y *= 2;
 		}
 	}
+	return;
 }
