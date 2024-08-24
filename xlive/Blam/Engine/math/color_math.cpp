@@ -11,3 +11,8 @@ pixel32 real_argb_color_to_pixel32(const real_argb_color* color)
     ) };
     return result;
 }
+
+void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
+{
+    INVOKE(0x75FE2, 0, pixel32_to_real_rgb_color, pixel_color, out_color);
+}

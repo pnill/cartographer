@@ -2,10 +2,10 @@
 
 struct s_draw_hud_bitmap_widget_input_results
 {
-	int32 result_1;
-	int32 result_2;
-	int32 result_3;
-	int32 result_4;
+	real32 result_1;
+	real32 result_2;
+	real32 result_3;
+	real32 result_4;
 };
 
 

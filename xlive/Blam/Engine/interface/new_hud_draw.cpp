@@ -23,11 +23,11 @@ real_rgb_color* global_hud_draw_widget_special_hud_type_color_primary_get()
 }
 real_rgb_color* global_hud_draw_widget_special_hud_type_secondary_color_get()
 {
-	return Memory::GetAddress<real_rgb_color*>(0x976694);
+	return Memory::GetAddress<real_rgb_color*>(0x97669C);
 }
 real_rgb_color* global_hud_draw_widget_special_hud_type_tertiary_color_get()
 {
-	return Memory::GetAddress<real_rgb_color*>(0x976698);
+	return Memory::GetAddress<real_rgb_color*>(0x9766A8);
 }
 
 void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widget_definition* bitmap_widget, real_rectangle2d* location, uint32* out_bitmap_index, uint32* out_width_pixels, uint32* out_height_pixels)
@@ -162,6 +162,19 @@ void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_po
 	INVOKE(0x223969, 0, hud_widget_anchor_calculate_point, anchor, out_point);
 }
 
+static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
+{
+	{0},
+	{0xFF0000},
+	{0xFF00},
+	{0xFFFF00},
+	{0x007F00},
+	{0x45059A},
+	{0x9C46C1},
+	{0x55AA},
+	{0x78F0}
+};
+
 void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, int32* widget_function_results)
 {
 	if (bitmap_widget->bitmap.index == NONE || bitmap_widget->shader.index == NONE)
@@ -252,6 +265,8 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	bool special_draw_case = false;
 
 	s_new_hud_globals_player_info* player_info;
+	int32 shield_layer_level = 0;
+
 	switch(bitmap_widget->special_hud_type)
 	{
 	case special_hud_type_sb_player_emblem:
@@ -273,6 +288,86 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	case special_hud_type_unit_shield_meter:
 		special_draw_case = true;
 		player_info = new_hud_engine_globals_get_player_data(local_render_user_index);
+
+		while(true)
+		{
+			real32 shield_vitality = user_state->unit_current_shield_vitality - (float)shield_layer_level;
+
+			if (shield_vitality >= 0.f)
+				shield_vitality = shield_vitality <= 1.f ? shield_vitality : 1.f;
+			else
+				shield_vitality = 0;
+
+			real32 player_unk_0 = player_info->unk_0 - (float)shield_layer_level;
+
+			if (shield_vitality >= 0.f)
+				player_unk_0 = player_unk_0 <= 1.f ? player_unk_0 : 1.f;
+			else
+				player_unk_0 = 0.f;
+
+			bool unk_bool = false;
+			real32 color_scale_something = player_info->unk_4;
+
+			if(player_unk_0 <= shield_vitality)
+			{
+				unk_bool = false;
+				color_scale_something = 0.f;
+			}
+			else
+			{
+				unk_bool = true;
+				if (color_scale_something >= 0.f)
+					color_scale_something = color_scale_something <= 1.f ? color_scale_something : 1.f;
+				else
+					color_scale_something = 0.f;
+			}
+
+			real_rgb_color shield_color;
+			shield_color.red = 1.f * color_scale_something;
+			shield_color.green = 1.f * color_scale_something;
+			shield_color.blue = 1.f * color_scale_something;
+
+			if (!unk_bool)
+				player_unk_0 = shield_vitality;
+
+			if (player_unk_0 <= 0 && shield_vitality <= 0)
+				break;
+
+			global_hud_draw_widget_function_results_get()->result_1 = player_unk_0;
+			global_hud_draw_widget_function_results_get()->result_2 = shield_vitality;
+			*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_color;
+
+			if(shield_layer_level)
+			{
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+			}
+			else if(player_unk_84_from_user_index(local_render_user_index))
+			{
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+			}
+			else
+			{
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[7], global_hud_draw_widget_special_hud_type_secondary_color_get());
+				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+			}
+
+			draw_ingame_user_interface_element_hook(
+				final_location.x,
+				final_location.y,
+				bitmap_width,
+				bitmap_height,
+				hud_scale,
+				theta_result,
+				bitmap_widget->bitmap.index,
+				bitmap_index,
+				&bitmap_bounds,
+				bitmap_widget->shader.index);
+
+			if (++shield_layer_level > 4)
+				break;
+		}
 		break;
 	case special_hud_type_territory_meter:
 		special_draw_case = true;
