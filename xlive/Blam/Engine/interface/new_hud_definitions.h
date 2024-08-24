@@ -282,19 +282,20 @@ enum e_widget_state_extra_flags : short
     widget_state_extra_flag_autoaiminvincible = FLAG(4)
 };
 
-enum e_widget_state_weapon_flags : short
+enum e_widget_state_weapon_flags : uint16
 {
-    widget_state_weapon_flag_primary_weapon = FLAG(0),
-    widget_state_weapon_flag_secondary_weapon = FLAG(1),
-    widget_state_weapon_flag_backpack_weapon = FLAG(2),
-    widget_state_weapon_flag_age_below_cutoff = FLAG(3),
-    widget_state_weapon_flag_clip_below_cutoff = FLAG(4),
-    widget_state_weapon_flag_total_below_cutoff = FLAG(5),
-    widget_state_weapon_flag_overheated = FLAG(6),
-    widget_state_weapon_flag_out_of_ammo = FLAG(7),
-    widget_state_weapon_flag_lock_target_available = FLAG(8),
-    widget_state_weapon_flag_locking = FLAG(9),
-    widget_state_weapon_flag_locked = FLAG(10)
+    widget_state_weapon_flag_primary_weapon = 0,
+    widget_state_weapon_flag_secondary_weapon = 1,
+    widget_state_weapon_flag_backpack_weapon = 2,
+    widget_state_weapon_flag_age_below_cutoff = 3,
+    widget_state_weapon_flag_clip_below_cutoff = 4,
+    widget_state_weapon_flag_total_below_cutoff = 5,
+    widget_state_weapon_flag_overheated = 6,
+    widget_state_weapon_flag_out_of_ammo = 7,
+    widget_state_weapon_flag_lock_target_available = 8,
+    widget_state_weapon_flag_locking = 9,
+    widget_state_weapon_flag_locked = 10,
+    k_widget_state_weapon_flag_count
 };
 
 enum e_widget_state_game_engine_state_flags : short
@@ -321,7 +322,7 @@ struct s_hud_widget_state_definition
 
     e_widget_state_unit_flags yes_unit_flags;
     e_widget_state_extra_flags yes_extra_flags;
-    e_widget_state_weapon_flags yes_weapon_flags;
+    c_flags_no_init<e_widget_state_weapon_flags, uint16, k_widget_state_weapon_flag_count> yes_weapon_flags;
     e_widget_state_game_engine_state_flags yes_game_engine_state_flags;
 
     e_widget_state_unit_flags no_unit_flags;

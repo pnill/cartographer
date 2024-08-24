@@ -1,4 +1,5 @@
 #pragma once
+#include "game/game_engine_territories.h"
 #include "game/players.h"
 #include "networking/Session/NetworkSession.h"
 
@@ -89,7 +90,11 @@ struct s_new_hud_temporary_user_state
 	int8 gap_198[60];
 	datum other_player_datum;
 	real_rgb_color other_player_color;
-	int8 gap_1E4[152];
+	int8 gap_1E4[72];
+	uint32 territories_count;
+	pixel32 territory_pixel_color[k_maximum_territories_flags];
+	real32 territory_control_progress[k_maximum_territories_flags];
+	int8 gap_260[10];
 };
 ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 

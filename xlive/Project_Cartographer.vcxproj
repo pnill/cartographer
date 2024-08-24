@@ -605,6 +605,7 @@
     <ClInclude Include="Blam\Engine\game\game.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
+    <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_util.h" />
     <ClInclude Include="Blam\Engine\game\game_portals.h" />
     <ClInclude Include="Blam\Engine\game\game_results.h" />
