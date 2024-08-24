@@ -74,10 +74,10 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 		*out_height_pixels = bitmap_data->height_pixels;
 		*out_bitmap_index = 0;
 
-		location->bottom = 1.f;
-		location->right = 1.f;
-		location->top = 0;
-		location->left = 0;
+		location->y1 = 1.f;
+		location->x1 = 1.f;
+		location->y0 = 0.f;
+		location->x0 = 0.f;
 
 		return;
 	}
@@ -96,11 +96,11 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 		*out_width_pixels = bitmap->bitmaps[bitmap_index]->width_pixels;
 		*out_height_pixels = bitmap->bitmaps[bitmap_index]->height_pixels;
 		*out_bitmap_index = bitmap_index;
-		location->bottom = 1.f;
-		location->right = 1.f;
-		location->top = 0;
-		location->left = 0;
 
+		location->y1 = 1.f;
+		location->x1 = 1.f;
+		location->y0 = 0.f;
+		location->x0 = 0.f;
 		return;
 	}
 
@@ -114,10 +114,10 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	*out_width_pixels = bitmap_data->width_pixels;
 	*out_height_pixels = bitmap_data->height_pixels;
 	*out_bitmap_index = bitmap_sprite->bitmapIndex;
-	location->top = bitmap_sprite->location.top;
-	location->bottom = bitmap_sprite->location.bottom;
-	location->left = bitmap_sprite->location.left;
-	location->right = bitmap_sprite->location.right;
+	location->y0 = bitmap_sprite->location.y0;
+	location->y1 = bitmap_sprite->location.y1;
+	location->x0 = bitmap_sprite->location.x0;
+	location->x1 = bitmap_sprite->location.x1;
 }
 
 real32 __cdecl hud_draw_widget_effect_get_value(uint32 unused, string_id input_name)
@@ -236,30 +236,30 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		break;
 	}
 
-	real32 calc_registration_x = ((bitmap_bounds.right - bitmap_bounds.left) * registration_point.x) * (float)bitmap_width;
+	real32 calc_registration_x = ((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * (float)bitmap_width;
 	real32 calc_offset_x = screen_offset.x + offset_result.x;
 
-	real32 calc_registration_y = ((bitmap_bounds.bottom - bitmap_bounds.top) * registration_point.y) * (float)bitmap_height;
+	real32 calc_registration_y = ((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * (float)bitmap_height;
 	real32 calc_offset_y = screen_offset.y + offset_result.y;
 
-	real32 final_point_x = (((calc_offset_x - calc_registration_x) + bitmap_bounds.left) * hud_scale) + anchor_point.x;
-	real32 final_point_y = (((calc_offset_y - calc_registration_y) + bitmap_bounds.top) * hud_scale) + anchor_point.y;
+	real32 final_point_x = (((calc_offset_x - calc_registration_x) + bitmap_bounds.x0) * hud_scale) + anchor_point.x;
+	real32 final_point_y = (((calc_offset_y - calc_registration_y) + bitmap_bounds.y0) * hud_scale) + anchor_point.y;
 
 	real_point2d final_location{ final_point_x, final_point_y };
 	real32 bitmap_size[2]{ (float)bitmap_width, (float)bitmap_height };
 
 	if(bitmap_widget->flags.test(bitmap_widget_flag_flip_horizontally))
 	{
-		real32 bounds_left = bitmap_bounds.left;
-		bitmap_bounds.left = bitmap_bounds.right;
-		bitmap_bounds.right = bounds_left;
+		real32 bounds_left = bitmap_bounds.x0;
+		bitmap_bounds.x0 = bitmap_bounds.x1;
+		bitmap_bounds.x1 = bounds_left;
 	}
 
 	if(bitmap_widget->flags.test(bitmap_widget_flag_flip_vertically))
 	{
-		real32 bounds_top = bitmap_bounds.top;
-		bitmap_bounds.top = bitmap_bounds.bottom;
-		bitmap_bounds.bottom = bounds_top;
+		real32 bounds_top = bitmap_bounds.y0;
+		bitmap_bounds.y0 = bitmap_bounds.y1;
+		bitmap_bounds.y1 = bounds_top;
 	}
 
 	bool special_draw_case = false;
@@ -399,10 +399,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			final_location.y = final_location.y - ((bitmap_size[1] * hud_scale) * 9.f);
 
 			real_rectangle2d stretched_bounds;
-			bitmap_bounds.top = bitmap_bounds.top - ((bitmap_bounds.bottom - bitmap_bounds.top) * 9.f);
-			bitmap_bounds.left = bitmap_bounds.left - ((bitmap_bounds.right - bitmap_bounds.left) * 9.f);
-			stretched_bounds.bottom = bitmap_bounds.bottom;
-			stretched_bounds.right = bitmap_bounds.right;
+			bitmap_bounds.y0 = bitmap_bounds.y0 - ((bitmap_bounds.y1 - bitmap_bounds.y0) * 9.f);
+			bitmap_bounds.x0 = bitmap_bounds.x0 - ((bitmap_bounds.x1 - bitmap_bounds.x0) * 9.f);
+			stretched_bounds.y1 = bitmap_bounds.y1;
+			stretched_bounds.x1 = bitmap_bounds.x1;
 
 			hud_scale = hud_scale * 10;
 
@@ -421,10 +421,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		if (bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_horizontally))
 		{
 			real_rectangle2d flipped_bounds{};
-			flipped_bounds.top = bitmap_bounds.top;
-			flipped_bounds.bottom = bitmap_bounds.bottom;
-			flipped_bounds.left = bitmap_bounds.right;
-			flipped_bounds.right = bitmap_bounds.left;
+			flipped_bounds.y0 = bitmap_bounds.y0;
+			flipped_bounds.y1 = bitmap_bounds.y1;
+			flipped_bounds.x0 = bitmap_bounds.x1;
+			flipped_bounds.x1 = bitmap_bounds.x0;
 
 			draw_ingame_user_interface_element_hook(
 				bitmap_size[0] * hud_scale + final_location.x,
@@ -442,10 +442,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		{
 			real_rectangle2d flipped_bounds{};
 
-			flipped_bounds.top = bitmap_bounds.bottom;
-			flipped_bounds.bottom = bitmap_bounds.top;
-			flipped_bounds.left = bitmap_bounds.left;
-			flipped_bounds.right = bitmap_bounds.right;
+			flipped_bounds.y0 = bitmap_bounds.y1;
+			flipped_bounds.y1 = bitmap_bounds.y0;
+			flipped_bounds.x0 = bitmap_bounds.x0;
+			flipped_bounds.x1 = bitmap_bounds.x1;
 
 
 			draw_ingame_user_interface_element_hook(
@@ -464,10 +464,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			bitmap_widget->flags.test(bitmap_widget_flag_scope_mirror_vertically))
 		{
 			real_rectangle2d flipped_bounds{};
-			flipped_bounds.top = bitmap_bounds.bottom;
-			flipped_bounds.bottom = bitmap_bounds.top;
-			flipped_bounds.left = bitmap_bounds.right;
-			flipped_bounds.right = bitmap_bounds.left;
+			flipped_bounds.y0 = bitmap_bounds.y1;
+			flipped_bounds.y1 = bitmap_bounds.y0;
+			flipped_bounds.x0 = bitmap_bounds.x1;
+			flipped_bounds.x1 = bitmap_bounds.x0;
 			draw_ingame_user_interface_element_hook(
 				bitmap_size[0] * hud_scale + final_location.x,
 				bitmap_size[1] * hud_scale + final_location.y,

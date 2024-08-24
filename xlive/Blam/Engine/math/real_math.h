@@ -90,7 +90,6 @@ union real_rectangle2d
 {
 	real32 n[4];
 	struct { real32 x0, x1, y0, y1; };
-	struct { real32 left, right, top, bottom; };
 };
 ASSERT_STRUCT_SIZE(real_rectangle2d, sizeof(real32) * 4);
 
