@@ -180,6 +180,10 @@ void tag_fixes_misty_rain(void)
 	return;
 }
 
+// Explanation:
+// Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
+// However, these numbers were only doubled for fullscreen offsets and not the offsets used when in splitscreen
+// We double these to fix the hud in splitscreen
 void tag_fixes_split_screen_hud(void)
 {
 	tag_iterator hud_iterator;
