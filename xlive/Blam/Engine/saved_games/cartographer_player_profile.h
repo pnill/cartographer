@@ -29,11 +29,24 @@ struct s_saved_game_cartographer_player_profile_v1
 	real32 crosshair_scale;
 };
 
+struct s_cartographer_profile_run_time
+{
+	s_saved_game_cartographer_player_profile_v1 profile;
+	uint32 enumerated_file_index;
+	e_controller_index controller_index;
+	uint32 user_index;
+	uint32 gamepad_index;
+};
+
 void cartographer_player_profile_v1_new(s_saved_game_cartographer_player_profile_v1* settings);
 
-s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get(e_controller_index controller_index);
+s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_controller_index(e_controller_index controller_index);
+
+s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_user_index(uint32 user_index);
 
 void cartographer_player_profile_load(e_controller_index controller_index, uint32 enumerated_file_index);
+
+void cartographer_player_profile_set_user_index(e_controller_index controller_index, uint32 user_index);
 
 void cartographer_player_profile_save(e_controller_index controller_index);
 

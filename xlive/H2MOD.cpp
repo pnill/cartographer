@@ -92,6 +92,7 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "interface/new_hud_draw.h"
 #include "interface/user_interface_player_profile_list.h"
 #include "saved_games/cartographer_player_profile.h"
 #include "saved_games/saved_game_files.h"
@@ -448,7 +449,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
 
 			hud_patches_on_map_load();
-			new_hud_patches_on_map_load(game_mode_ui_shell);
 			main_tag_fixes();
 		}
 
@@ -947,6 +947,7 @@ void H2MOD::ApplyHooks() {
 		apply_interface_hooks();
 
 		user_interface_player_profile_list_apply_patches();
+		new_hud_draw_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);

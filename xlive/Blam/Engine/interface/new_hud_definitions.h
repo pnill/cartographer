@@ -2,6 +2,8 @@
 #include "math/function_definitions.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_reference.h"
+#include "memory/static_arrays.h"
+#include "text/text.h"
 
 enum e_new_hud_dashlight_flags : short
 {
@@ -132,13 +134,14 @@ enum e_hud_anchor : int16
     _hud_anchor_lockon_target = 5
 };
 
-enum e_bitmap_widget_flags : short
+enum e_bitmap_widget_flags : uint16
 {
-    bitmap_widget_flag_flip_horizontally = FLAG(0),
-    bitmap_widget_flag_flip_vertically = FLAG(1),
-    bitmap_widget_flag_scope_mirror_horizontally = FLAG(2),
-    bitmap_widget_flag_scope_mirror_vertically = FLAG(3),
-    bitmap_widget_flag_scope_stretch = FLAG(4)
+    bitmap_widget_flag_flip_horizontally = 0,
+    bitmap_widget_flag_flip_vertically = 1,
+    bitmap_widget_flag_scope_mirror_horizontally = 2,
+    bitmap_widget_flag_scope_mirror_vertically = 3,
+    bitmap_widget_flag_scope_stretch = 4,
+    k_bitmap_widget_flag_count
 };
 
 enum e_special_hud_type : short
@@ -333,11 +336,12 @@ struct s_hud_widget_state_definition
 };
 ASSERT_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
 
-enum e_hud_widget_effect_flags : short
+enum e_hud_widget_effect_flags : uint16
 {
-    hud_widget_effect_flag_apply_scale = FLAG(0),
-    hud_widget_effect_flag_apply_theta = FLAG(1),
-    hud_widget_effect_flag_apply_offset = FLAG(2)
+    hud_widget_effect_flag_apply_scale = 0,
+    hud_widget_effect_flag_apply_theta = 1,
+    hud_widget_effect_flag_apply_offset = 2,
+    k_hud_widget_effect_flag_count
 };
 
 struct s_hud_widget_effect_function
@@ -354,7 +358,7 @@ struct s_hud_widget_effect_definition
 {
     // Explaination("WIDGET EFFECTS", "allow the scaling, rotation, and offsetting of widgets")
 
-    e_hud_widget_effect_flags flags;
+    c_flags_no_init<e_hud_widget_effect_flags, uint16, k_hud_widget_effect_flag_count> flags;
     short pad;
 
     // Your mom below (according to bungie)
@@ -380,7 +384,7 @@ struct s_hud_bitmap_widget_definition
     s_hud_widget_state_definition widget_state;
 
     e_hud_anchor anchor;
-    e_bitmap_widget_flags flags;
+    c_flags_no_init<e_bitmap_widget_flags, uint16, k_bitmap_widget_flag_count> flags;
 
     tag_reference bitmap;    // bitm
     tag_reference shader;    // shad
@@ -410,19 +414,6 @@ enum e_text_widget_flags : short
     text_widget_flag_force_2digit_number = FLAG(1),
     text_widget_flag_force_3digit_number = FLAG(2),
     text_widget_flag_talking_player_hack = FLAG(3)
-};
-
-enum e_text_justification : short
-{
-    text_justification_left = 0,
-    text_justification_center = 1,
-    text_justification_right = 2,
-};
-
-enum e_font_index : byte
-{
-    font_index_defualt = 0,
-    font_index_number_font = 1,
 };
 
 #define k_maximum_hud_text_widgets_per_tag 256

@@ -2,6 +2,18 @@
 #include "game/players.h"
 #include "networking/Session/NetworkSession.h"
 
+/* enums */
+
+enum e_model_group_targets_flags : __int32
+{
+	e_model_group_targets_flags_locked_by_human_tracking = 0x1,
+	e_model_group_targets_flags_locked_by_plasma_tracking = 0x2,
+	e_model_group_targets_flags_headshot = 0x4,
+	e_model_group_targets_flags_vulnerable = 0x8,
+	e_model_group_targets_flags_alwas_locked_by_plasma_tracking = 0x10,
+};
+
+
 /* structures */
 
 struct s_hud_scripted_globals
@@ -67,7 +79,17 @@ struct s_new_hud_temporary_user_state
 	bool current_weapon_has_zoom;
 	int8 gap_3F[17];
 	bool dead_unit_index_exists;
-	int8 gap_51[567];
+	int8 gap_51[7];
+	e_model_group_targets_flags crosshair_flags;
+	int8 gap_5C[225];
+	bool game_is_coop;
+	int8 gap_13E[86];
+	datum local_player_datum;
+	real_rgb_color local_player_color;
+	int8 gap_198[60];
+	datum other_player_datum;
+	real_rgb_color other_player_color;
+	int8 gap_1E4[152];
 };
 ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 
@@ -75,16 +97,12 @@ ASSERT_STRUCT_SIZE(s_new_hud_temporary_user_state, 0x288);
 
 void new_hud_apply_patches(void);
 
-void new_hud_patches_on_map_load(bool game_mode_ui_shell);
-
 void should_draw_hud_override_set(bool flag);
 s_new_hud_engine_globals* get_new_hud_engine_globals(void);
+s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(uint32 local_player_index);
+void new_hud_engine_globals_set_drawing_player_index(datum player_datum);
 s_hud_scripted_globals* get_hud_scripted_globals(void);
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);
-
-// We scale crosshairs by adjusting the bitmap data size in the bitmap tag
-// It doesn't seem to actually downscale the bitmap since the data loaded still remains the same
-void set_crosshair_scale(real32 scale);
 
 // Checks if we shouldn't draw the hud
 bool new_hud_dont_draw(void);

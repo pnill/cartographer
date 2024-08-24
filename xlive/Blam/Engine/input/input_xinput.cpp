@@ -237,32 +237,10 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 {
 	input_device* gamepad = g_xinput_devices[gamepad_index];
 	uint16 custom_button_flags[k_number_of_xinput_buttons];
-	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get((e_controller_index)gamepad_index);
+	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(((e_controller_index)gamepad_index));
 
 	XINPUT_STATE state;
 	profile_settings->custom_layout.ToArray(custom_button_flags);
-
-	// TODO: figure out how to map this to the player that is using the home button and open advanced settings in their context.
-	if (XInputGetStateEx)
-	{
-		uint32 dwUserIndex = ((xinput_device*)gamepad)->get_port();
-		XINPUT_STATE t_state;
-		ZeroMemory(&t_state, sizeof(XINPUT_STATE));
-		if(XInputGetStateEx(dwUserIndex, &t_state) == ERROR_SUCCESS)
-		{
-			if (TEST_FLAG(t_state.Gamepad.wButtons, 0x400))
-			{
-				if (!g_controller_home_button_state[gamepad_index])
-				{
-					ImGuiHandler::ImAdvancedSettings::set_controller_index((e_controller_index)gamepad_index);
-					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
-				}
-				g_controller_home_button_state[gamepad_index] = true;
-			}
-			else
-				g_controller_home_button_state[gamepad_index] = false;
-		}
-	}
 
 	ASSERT(out_buttons != nullptr);
 	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)

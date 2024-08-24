@@ -58,12 +58,6 @@ void new_hud_apply_patches(void)
 	return;
 }
 
-void new_hud_patches_on_map_load(bool game_mode_ui_shell)
-{
-	initialize_crosshair_scale(game_mode_ui_shell);
-	return;
-}
-
 void should_draw_hud_override_set(bool flag)
 {
 	g_should_draw_hud_override = flag;
@@ -75,6 +69,16 @@ s_new_hud_engine_globals* get_new_hud_engine_globals(void)
 	return *Memory::GetAddress<s_new_hud_engine_globals**>(0x9770F4, 0x99E93C);
 }
 
+s_new_hud_globals_player_info* new_hud_engine_globals_get_player_data(uint32 local_player_index)
+{
+	return INVOKE(0x2237ED, 0, new_hud_engine_globals_get_player_data, local_player_index);
+}
+
+void new_hud_engine_globals_set_drawing_player_index(datum player_datum)
+{
+	INVOKE(0x224B53, 0, new_hud_engine_globals_set_drawing_player_index, player_datum);
+}
+
 s_hud_scripted_globals* get_hud_scripted_globals(void)
 {
 	return *Memory::GetAddress<s_hud_scripted_globals**>(0x9765CC, 0x99FBB4);
@@ -83,33 +87,6 @@ s_hud_scripted_globals* get_hud_scripted_globals(void)
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index)
 {
 	return &Memory::GetAddress<s_new_hud_temporary_user_state*>(0x9766D0, 0)[local_user_index];
-}
-
-void set_crosshair_scale(real32 scale)
-{
-	size_t bitmap_size_vector_index = 0;
-
-	// Loops through every bitmap datum in the vector that's considered a crosshair
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
-	{
-		// Grab the bitmap definition
-		bitmap_group* bitm_definition = (bitmap_group*)tag_get_fast(crosshair_bitmap_datums[i]);
-
-		// Loop through every bitmap inside the bitmap tag
-		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
-		{
-			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
-			point2d original_bitmap_size = crosshair_original_bitmap_sizes[bitmap_size_vector_index];
-
-			// Multiply bitmap size by scale and then by the upscale size
-			// We do (1 /k_secondary_upscale_size) in the calculations since we need to scale down the bitmap depending on the resolution increase
-			// Example: the bitmap provided is supposed to be 4 times larger in size compared to the original so we need to scale it down by (1/4) so 0.25
-			bitmap_data_block->width_pixels = original_bitmap_size.x * scale * (1 / k_crosshair_upscale_size);
-			bitmap_data_block->height_pixels = original_bitmap_size.y * scale * (1 / k_crosshair_upscale_size);
-
-			++bitmap_size_vector_index;
-		}
-	}
 }
 
 bool new_hud_dont_draw(void)
@@ -173,72 +150,4 @@ real_point2d* __cdecl ui_get_hud_element_position_hook(e_hud_anchor anchor, real
 		break;
 	}
 	return point;
-}
-
-void initialize_crosshair_bitmap_data(void)
-{
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
-	{
-		bitmap_group* bitm_definition = (bitmap_group*)tag_get_fast(crosshair_bitmap_datums[i]);
-		for (int32 j = 0; j < bitm_definition->bitmaps.count; ++j)
-		{
-			bitmap_data* bitmap_data_block = bitm_definition->bitmaps[j];
-			point2d bitmap_size = { bitmap_data_block->width_pixels, bitmap_data_block->height_pixels };
-			crosshair_original_bitmap_sizes.push_back(bitmap_size);
-		}
-	}
-}
-
-bool crosshair_bitmap_vector_contains_datum(datum tag_index)
-{
-	for (size_t i = 0; i < crosshair_bitmap_datums.size(); ++i)
-	{
-		if (crosshair_bitmap_datums[i] == tag_index)
-		{
-			return true;
-		}
-	}
-	
-	return false;
-}
-
-void get_crosshair_bitmap_datums(void)
-{
-	tag_iterator iterator;
-	tag_iterator_new(&iterator, _tag_group_new_hud_definition);
-
-	while (tag_iterator_next(&iterator) != NONE)
-	{
-		s_new_hud_definition* nhdt_definition = (s_new_hud_definition*)tag_get_fast(iterator.current_tag_index);
-
-		// Loop through every bitmap widget in the nhdt definition
-		for (byte i = 0; i < nhdt_definition->bitmap_widgets.count; ++i)
-		{
-			s_hud_bitmap_widget_definition* bitmap_widget_definition = nhdt_definition->bitmap_widgets[i];
-
-			if (bitmap_widget_definition->widget_inputs.input_1 == hud_input_type_unit_autoaimed && 
-				bitmap_widget_definition->anchor == _hud_anchor_crosshair && 
-				!crosshair_bitmap_vector_contains_datum(bitmap_widget_definition->bitmap.index))
-			{
-				crosshair_bitmap_datums.push_back(bitmap_widget_definition->bitmap.index);
-			}
-		}
-	}
-
-}
-
-void initialize_crosshair_scale(bool game_mode_ui_shell)
-{
-	// Clear data from previous map file
-	crosshair_bitmap_datums.clear();
-	crosshair_original_bitmap_sizes.clear();
-
-	if (!game_mode_ui_shell) 
-	{
-		get_crosshair_bitmap_datums();
-		initialize_crosshair_bitmap_data();
-		set_crosshair_scale(H2Config_crosshair_scale);
-	}
-
-	return;
 }

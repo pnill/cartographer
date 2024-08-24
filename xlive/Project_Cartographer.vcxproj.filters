@@ -1077,6 +1077,7 @@
     <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_profile_list.h" />
     <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile.h" />
+    <ClInclude Include="Blam\Engine\text\text.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

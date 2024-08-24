@@ -102,6 +102,9 @@ void render_view(
 t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
 t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
 
+e_controller_index g_render_current_controller_index = _controller_index_0;
+uint32 g_render_current_user_index = 0;
+
 void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
@@ -114,6 +117,26 @@ void render_apply_patches(void)
     // *Memory::GetAddress<bool*>(0x46818E) = false;
 
     return;
+}
+
+int32 get_global_render_window_count()
+{
+    return *Memory::GetAddress<int32*>(0x4E6974);
+}
+
+bool get_global_render_split_horizontally()
+{
+    return (*Memory::GetAddress<int32*>(0x4E6970) == 1);
+}
+
+e_controller_index global_render_current_controller_index()
+{
+    return g_render_current_controller_index;
+}
+
+uint32 global_render_current_user_index()
+{
+    return g_render_current_user_index;
 }
 
 int32* get_global_window_bound_index(void)
@@ -174,6 +197,23 @@ uint32* global_frame_num_get(void)
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
 {
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
+}
+
+e_screen_split_type get_screen_split_type(uint32 render_user_index)
+{
+    switch(get_global_render_window_count())
+    {
+	    case 2:
+	        return _screen_split_type_half;
+	    case 3:
+	        if (render_user_index == 0)
+	            return _screen_split_type_half;
+	        return _screen_split_type_quarter;
+	    case 4:
+	        return _screen_split_type_quarter;
+	    default:
+	        return _screen_split_type_full;
+    }
 }
 
 bool frame_parameters_type_is_above_or_equal_to_7(void)
@@ -244,6 +284,9 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     rasterizer_globals_get()->rasterizer_draw_on_main_back_buffer = false;
     if (window->render_camera.vertical_field_of_view > k_real_math_epsilon)
     {
+        g_render_current_controller_index = controller_index;
+        g_render_current_user_index = window->user_index;
+
         render_view(
             &frustum_bounds,
             &window->rasterizer_camera,

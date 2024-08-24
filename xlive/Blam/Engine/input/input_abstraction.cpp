@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "input_abstraction.h"
 #include "game/game_time.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "saved_games/cartographer_player_profile.h"
 
@@ -257,7 +258,7 @@ void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gam
 void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
 {
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
-	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller);
+	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
 	if (profile_settings->controller_deadzone_type == Axial || profile_settings->controller_deadzone_type == Both) {
 		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_x / 100));
@@ -402,6 +403,8 @@ void input_abstraction_restore_abstracted_inputs(e_controller_index controller)
 		sizeof(s_game_abstracted_input_state));
 }
 
+bool g_controller_advanced_settings_toggle[4] {false, false, false, false};
+
 void __cdecl input_abstraction_update()
 {
 	//INVOKE(0x628A8, 0x0, input_abstraction_update);
@@ -423,10 +426,12 @@ void __cdecl input_abstraction_update()
 		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
 		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
-		s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get(controller);
+		s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
 		//restore last state from global array before processing
 		input_abstraction_restore_abstracted_inputs(controller);
+
+
 
 		if (!gamepad_state)
 		{
@@ -473,8 +478,7 @@ void __cdecl input_abstraction_update()
 
 			if (!input_abstraction_globals->input_has_gamepad[controller])
 				input_abstraction_globals->input_has_gamepad[controller] = true;
-
-
+					
 
 			if (controller == k_windows_device_controller_index)
 			{
@@ -502,7 +506,22 @@ void __cdecl input_abstraction_update()
 					game_input_state);
 			}
 
+			// crappy but it works
+			if (gamepad_state->button_frames_down[_xinput_gamepad_dpad_down] > 10 && gamepad_state->button_msec_down[_xinput_gamepad_dpad_up] > 10)
+			{
+				if (!g_controller_advanced_settings_toggle[controller])
+				{
+					ImGuiHandler::ImAdvancedSettings::set_controller_index(controller);
+					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+					g_controller_advanced_settings_toggle[controller] = true;
+				}
+			}
+			else
+			{
+				g_controller_advanced_settings_toggle[controller] = false;
+			}
 		}
+
 		//store to array after processing is done
 		input_abstraction_store_abstracted_inputs(controller);
 	}

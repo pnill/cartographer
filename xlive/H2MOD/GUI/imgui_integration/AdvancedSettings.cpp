@@ -65,8 +65,6 @@ namespace ImGuiHandler {
 			int g_water = 0;
 			bool g_init = false;
 
-
-
 			void DrawDeadzones()
 			{
 				ImDrawList* draw_list = ImGui::GetForegroundDrawList();
@@ -202,30 +200,31 @@ namespace ImGuiHandler {
 							set_crosshair_offset(H2Config_crosshair_offset);
 						}
 						ImGui::PopItemWidth();
+					}
 
-						//Crosshair Size
-						ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_size));
-						ImGui::PushItemWidth(WidthPercentage(80));
-						ImGui::SliderFloat("##CrosshairSize1", &H2Config_crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
-						if (ImGui::IsItemEdited())
-							set_crosshair_scale(H2Config_crosshair_scale);
-						ImGui::PushItemWidth(WidthPercentage(10));
-						ImGui::InputFloat("##CrosshairSize2", &H2Config_crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
-						if (ImGui::IsItemEdited()) {
-							if (H2Config_crosshair_scale > 2)
-								H2Config_crosshair_scale = 2;
-							if (H2Config_crosshair_scale < 0)
-								H2Config_crosshair_scale = 0;
-							set_crosshair_scale(H2Config_crosshair_scale);
-						}
-						ImGui::PushItemWidth(WidthPercentage(10));
-						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "CrosshairSize3"), b2_size))
-						{
-							H2Config_crosshair_scale = 1;
-							set_crosshair_scale(H2Config_crosshair_scale);
-						}
-						ImGui::PopItemWidth();
+					//Crosshair Size
+					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_size));
+					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::SliderFloat("##CrosshairSize1", &current_cartographer_profile->crosshair_scale, 0.0f, 2.0f, "");  ImGui::SameLine();
 
+					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::InputFloat("##CrosshairSize2", &current_cartographer_profile->crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
+					if (ImGui::IsItemEdited()) {
+						if (current_cartographer_profile->crosshair_scale > 2)
+							current_cartographer_profile->crosshair_scale = 2;
+						if (current_cartographer_profile->crosshair_scale < 0)
+							current_cartographer_profile->crosshair_scale = 0;
+					}
+					ImGui::PushItemWidth(WidthPercentage(10));
+					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "CrosshairSize3"), b2_size))
+					{
+						current_cartographer_profile->crosshair_scale = 1;
+					}
+					ImGui::PopItemWidth();
+
+
+					if (current_controller_index == _controller_index_0)
+					{
 						ImVec2 b3_size = ImVec2(WidthPercentage(33.3333333333f), item_size.y);
 						ImGui::NewLine();
 						//Ingame Change Display
@@ -238,14 +237,20 @@ namespace ImGuiHandler {
 
 						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_hide_ingame_chat), &H2Config_hide_ingame_chat);
 						ImGui::NextColumn();
-						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_static_fp), &H2Config_static_first_person);
-						if (ImGui::IsItemHovered())
-							ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_static_fp_tooltip));
-						ImGui::NextColumn();
+					}
+
+					ImGui::Checkbox(advanced_settings_get_string(_advanced_string_static_fp), &current_cartographer_profile->static_first_person);
+					if (ImGui::IsItemHovered())
+						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_static_fp_tooltip));
+					ImGui::NextColumn();
+
+					if (current_controller_index == _controller_index_0)
+					{
 						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_hud), &should_show_hud);
 						if (ImGui::IsItemEdited())
 							should_draw_hud_override_set(should_show_hud);
 						ImGui::NextColumn();
+
 						ImGui::Checkbox(advanced_settings_get_string(_advanced_string_show_first_person), &g_showFP);
 						if (ImGui::IsItemEdited())
 							toggle_first_person(g_showFP);
@@ -1055,7 +1060,7 @@ namespace ImGuiHandler {
 		void set_controller_index(e_controller_index controller_index)
 		{
 			current_controller_index = controller_index;
-			current_cartographer_profile = cartographer_player_profile_get(controller_index);
+			current_cartographer_profile = cartographer_player_profile_get_by_controller_index(controller_index);
 		}
 
 		void Open()

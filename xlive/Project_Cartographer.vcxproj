@@ -1199,6 +1199,7 @@
     <ClInclude Include="Blam\Engine\text\draw_string.h" />
     <ClInclude Include="Blam\Engine\text\font_cache.h" />
     <ClInclude Include="Blam\Engine\text\font_group.h" />
+    <ClInclude Include="Blam\Engine\text\text.h" />
     <ClInclude Include="Blam\Engine\text\text_group.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\text\unicode.h" />

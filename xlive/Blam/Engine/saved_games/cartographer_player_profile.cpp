@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "cartographer_player_profile.h"
 #include "saved_game_files_async_windows.h"
+#include "game/players.h"
 #include "input/input_abstraction.h"
 
 s_saved_game_cartographer_player_profile_v1 g_cartographer_profile_settings[k_number_of_controllers]{};
 uint32 g_cartographer_profile_file_index_map[k_number_of_controllers]{};
+
+s_cartographer_profile_run_time g_cartographer_profiles[k_number_of_controllers]{};
 
 constexpr const wchar_t* cartographer_bin = L"cartographer_profile";
 
@@ -28,16 +31,33 @@ void saved_games_cartographer_player_profile_v1_new(s_saved_game_cartographer_pl
 	settings->crosshair_scale = 1.f;
 }
 
-s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get(e_controller_index controller_index)
+s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_controller_index(e_controller_index controller_index)
 {
-	return &g_cartographer_profile_settings[controller_index];
+	return &g_cartographer_profiles[controller_index].profile;
+}
+
+s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_user_index(uint32 user_index)
+{
+	s_players_globals* player_globals = get_players_globals();
+
+	if (user_index < player_globals->player_user_count)
+	{
+		datum user_datum = player_globals->player_user_mapping[user_index];
+		for(uint32 index = 0; index < k_number_of_controllers; index++)
+		{
+			if (player_globals->player_controller_mapping[index] == user_datum)
+				return &g_cartographer_profiles[index].profile;
+		}
+	}
+	return nullptr;
 }
 
 void cartographer_player_profile_load(e_controller_index controller_index, uint32 enumerated_file_index)
 {
-	g_cartographer_profile_file_index_map[controller_index] = enumerated_file_index;
+	s_saved_game_cartographer_player_profile_v1* current_profile = &g_cartographer_profiles[controller_index].profile;
 
-	s_saved_game_cartographer_player_profile_v1* current_profile = &g_cartographer_profile_settings[controller_index];
+	g_cartographer_profiles[controller_index].enumerated_file_index = enumerated_file_index;
+	g_cartographer_profiles[controller_index].controller_index = controller_index;
 
 	if(!saved_games_async_helper_read_saved_game_bin(cartographer_bin, 
 		enumerated_file_index, 
@@ -55,12 +75,17 @@ void cartographer_player_profile_load(e_controller_index controller_index, uint3
 	input_abstraction_set_controller_thumb_deadzone(controller_index);
 }
 
+void cartographer_player_profile_set_user_index(e_controller_index controller_index, uint32 user_index)
+{
+	g_cartographer_profiles[controller_index].user_index = user_index;
+}
+
 void cartographer_player_profile_save(e_controller_index controller_index)
 {
-	if (g_cartographer_profile_file_index_map[controller_index] != NONE)
+	if (g_cartographer_profiles[controller_index].controller_index != NONE)
 		saved_games_async_helper_write_saved_game_bin(cartographer_bin,
-			g_cartographer_profile_file_index_map[controller_index],
-			(int8*)&g_cartographer_profile_settings[controller_index],
+			g_cartographer_profiles[controller_index].enumerated_file_index,
+			(int8*)&g_cartographer_profiles[controller_index].profile,
 			sizeof(s_saved_game_cartographer_player_profile_v1));
 }
 
@@ -68,8 +93,10 @@ void cartographer_player_profile_initialize()
 {
 	for (uint32 index = 0; index < k_number_of_controllers; ++index)
 	{
-		saved_games_cartographer_player_profile_v1_new(&g_cartographer_profile_settings[index]);
-		g_cartographer_profile_file_index_map[index] = -1;
+		saved_games_cartographer_player_profile_v1_new(&g_cartographer_profiles[index].profile);
+		g_cartographer_profiles[index].enumerated_file_index = NONE;
+		g_cartographer_profiles[index].controller_index = k_no_controller;
+		g_cartographer_profiles[index].user_index = NONE;
 	}
 }
 
