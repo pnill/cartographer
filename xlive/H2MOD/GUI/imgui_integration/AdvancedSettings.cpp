@@ -8,7 +8,6 @@
 #include "input/input_abstraction.h"
 #include "interface/hud.h"
 #include "interface/new_hud.h"
-#include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
 #include "networking/NetworkMessageTypeCollection.h"
 #include "rasterizer/rasterizer_globals.h"
@@ -28,6 +27,7 @@
 
 #include "imgui.h"
 #include "imgui_handler.h"
+#include "camera/observer.h"
 #include "saved_games/cartographer_player_profile.h"
 
 /* constants */
@@ -176,31 +176,27 @@ namespace ImGuiHandler {
 							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 						}
 						ImGui::PopItemWidth();
-
-						//Crosshair Offset
-						ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_offset));
-						ImGui::PushItemWidth(WidthPercentage(80));
-						ImGui::SliderFloat("##Crosshair1", &H2Config_crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
-						if (ImGui::IsItemEdited())
-							set_crosshair_offset(H2Config_crosshair_offset);
-						ImGui::PushItemWidth(WidthPercentage(10));
-						ImGui::InputFloat("##Crosshair2", &H2Config_crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
-						if (ImGui::IsItemEdited()) {
-							if (H2Config_crosshair_offset > 0.5)
-								H2Config_crosshair_offset = 0.5;
-							if (H2Config_crosshair_offset < 0)
-								H2Config_crosshair_offset = 0;
-
-							set_crosshair_offset(H2Config_crosshair_offset);
-						}
-						ImGui::PushItemWidth(WidthPercentage(10));
-						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))
-						{
-							H2Config_crosshair_offset = 0.138f;
-							set_crosshair_offset(H2Config_crosshair_offset);
-						}
-						ImGui::PopItemWidth();
 					}
+					//Crosshair Offset
+					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_offset));
+					ImGui::PushItemWidth(WidthPercentage(80));
+					ImGui::SliderFloat("##Crosshair1", &current_cartographer_profile->crosshair_offset, 0.0f, 0.5f, ""); ImGui::SameLine();
+
+					ImGui::PushItemWidth(WidthPercentage(10));
+					ImGui::InputFloat("##Crosshair2", &current_cartographer_profile->crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
+					if (ImGui::IsItemEdited()) {
+						if (current_cartographer_profile->crosshair_offset > 0.5)
+							current_cartographer_profile->crosshair_offset = 0.5;
+						if (current_cartographer_profile->crosshair_offset < 0)
+							current_cartographer_profile->crosshair_offset = 0;
+					}
+					ImGui::PushItemWidth(WidthPercentage(10));
+					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))
+					{
+						current_cartographer_profile->crosshair_offset = 0.138f;
+					}
+					ImGui::PopItemWidth();
+					
 
 					//Crosshair Size
 					ImGui::Text(advanced_settings_get_string(_advanced_string_crosshair_size));

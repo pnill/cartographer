@@ -88,4 +88,11 @@ s_player_control* player_control_get(int32 user_index);
 int16 player_control_get_zoom_level(int32 user_index);
 
 void player_control_update_dt(real32 dt);
+
+// Gets the FOV from the unit tag of the player with the passed controller index
+// We modified it so it overriddes the FOV depending on if the user has a custom FOV set or the forced FOV value is set for custom variants
+real32 __cdecl player_control_get_field_of_view(uint32 user_index);
+
+void __cdecl player_control_get_facing_direction(uint32 player_index, real_vector3d* out_facing);
+
 void player_control_apply_patches();

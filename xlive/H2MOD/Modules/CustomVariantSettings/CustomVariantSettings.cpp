@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CustomVariantSettings.h"
 
-#include "interface/first_person_camera.h"
+#include "camera/observer.h"
 #include "memory/bitstream.h"
 #include "game/game.h"
 #include "game/game_time.h"

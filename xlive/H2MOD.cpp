@@ -23,7 +23,6 @@
 #include "interface/hud_messaging.h"
 #include "interface/interface.h"
 #include "interface/motion_sensor.h"
-#include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/user_interface_text.h"
@@ -82,6 +81,7 @@
 #ifndef NDEBUG
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #endif
+#include "camera/first_person_camera.h"
 #include "filesys/pc_file_system.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"

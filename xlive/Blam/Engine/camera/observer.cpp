@@ -6,6 +6,7 @@
 #include "cutscene/cinematics.h"
 #include "effects/player_effects.h"
 #include "game/game_time.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "interface/first_person_weapons.h"
 #include "networking/Session/NetworkSession.h"
 #include "physics/collisions.h"
@@ -44,8 +45,6 @@ void observer_apply_patches(void)
 	observer_apply_interpolation_patches();
 	return;
 }
-
-
 
 s_observer* observer_user_globals_get(void)
 {
@@ -191,4 +190,26 @@ void observer_update_internal(int32 user_index)
 	observer->result.forward = forward;
 	observer->result.up = up;
 	return;
+}
+
+float observer_suggested_field_of_view()
+{
+	return *Memory::GetAddress<float*>(0x413780, 0x3B5300);
+}
+
+void observer_set_suggested_field_of_view(float fov)
+{
+	// Don't change the fov if it's 0 or greater than 110
+	if (fov <= 0 || fov > 110) return;
+
+	float final_fov_rad;
+	if (currentVariantSettings.forced_fov == 0)
+	{
+		final_fov_rad = DEGREES_TO_RADIANS(fov);
+	}
+	else
+	{
+		final_fov_rad = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+	}
+	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 }

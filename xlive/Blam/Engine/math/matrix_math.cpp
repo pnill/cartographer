@@ -174,6 +174,11 @@ void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output)
 	return;
 }
 
+void matrix4x3_inverse_transform_normal(real_matrix4x3* input, real_vector3d* input_vector, real_vector3d* out_vector)
+{
+	INVOKE(0x77D35, 0, matrix4x3_inverse_transform_normal, input, input_vector, out_vector);
+}
+
 void __fastcall matrix4x3_multiply(const real_matrix4x3* matrix1, const real_matrix4x3* matrix2, real_matrix4x3* out)
 {
 	INVOKE(0x78209, 0x75DFF, matrix4x3_multiply, matrix1, matrix2, out);

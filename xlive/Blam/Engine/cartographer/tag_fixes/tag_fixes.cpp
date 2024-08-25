@@ -243,6 +243,7 @@ void tag_fixes_split_screen_hud(void)
 		{
 			for (uint32 i = 0; i < hud->screen_effect_widgets.count; ++i)
 			{
+				LOG_DEBUG_GAME("{}", tag_get_name(hud_iterator.current_tag_index));
 				s_hud_screen_effect_widget_definition* effect_widget = hud->screen_effect_widgets[i];
 				effect_widget->halfscreen_offset.x *= 2;
 				effect_widget->halfscreen_offset.y *= 2;
