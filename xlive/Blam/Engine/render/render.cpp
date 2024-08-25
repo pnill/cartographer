@@ -32,7 +32,7 @@ typedef bool (__cdecl* t_render_ingame_user_interface_hud_element)(
     real32 rotation_rad,
     datum bitmap_tag_index,
     datum bitmap,
-    real32* a9,
+    real_rectangle2d* bounds,
     datum shader_tag_index);
 
 typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook)(
@@ -56,18 +56,6 @@ int32* global_sky_index_get(void);
 s_scenario_fog_result* global_fog_result_get(void);
 bool* global_byte_4E6938_get(void);
 void __cdecl rasterizer_render_scene(bool is_texture_camera);
-
-bool __cdecl render_ingame_user_interface_hud_element_hook(
-    real32 left,
-    real32 top,
-    int16 x,
-    int16 y,
-    real32 scale,
-    real32 rotation_rad,
-    datum bitmap_tag_index,
-    datum bitmap,
-    real32* a9,
-    datum shader_tag_index);
 
 bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(
     int32* a1,
@@ -433,11 +421,11 @@ bool __cdecl render_ingame_user_interface_hud_element_hook(
     real32 rotation_rad,
     datum bitmap_tag_index,
     datum bitmap,
-    real32* a9,
+    real_rectangle2d* bounds,
     datum shader_tag_index)
 {
     rasterizer_setup_2d_vertex_shader_user_interface_constants();
-    return p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, a9, shader_tag_index);
+    return p_draw_ingame_user_interface_hud_element(left, top, x, y, scale, rotation_rad, bitmap_tag_index, bitmap, bounds, shader_tag_index);
 }
 
 bool __cdecl render_ingame_user_interface_hud_indicators_element_hook(int32* a1, datum tag_index, datum bitmap_index, int32* a4, datum shader_index)

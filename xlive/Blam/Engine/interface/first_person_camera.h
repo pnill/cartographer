@@ -12,6 +12,6 @@ void player_control_set_field_of_view(float fov);
 
 // Gets the FOV from the unit tag of the player with the passed controller index
 // We modified it so it overriddes the FOV depending on if the user has a custom FOV set or the forced FOV value is set for custom variants
-real32 __cdecl player_control_get_field_of_view(e_controller_index controller_index);
+real32 __cdecl player_control_get_field_of_view(uint32 user_index);
 
 void first_person_camera_apply_patches(void);

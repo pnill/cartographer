@@ -60,8 +60,8 @@ struct s_saved_game_files_globals_cached_game_save
 
 struct s_saved_game_main_menu_globals
 {
-	c_static_array<s_saved_game_main_menu_globals_default_save_file, k_maximum_enumerated_default_save_game_files> default_save_files;
-	c_static_array<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit> save_files;
+	c_static_array_tracked<s_saved_game_main_menu_globals_default_save_file, k_maximum_enumerated_default_save_game_files> default_save_files;
+	c_static_array_tracked<s_saved_game_main_menu_globals_save_file_info, k_maximum_enumerated_saved_game_files_any_type_per_memory_unit> save_files;
 	datum saved_game_file_index_salt;
 	int8 gap2[131072];
 };
@@ -77,7 +77,7 @@ struct s_saved_game_files_globals
 	int32 unk_4;
 	int32 unk_5;
 	int32 unk_6;
-	c_static_array<s_saved_game_files_globals_cached_game_save, k_maximum_enumerated_cached_save_game_files> cached_save_files;
+	c_static_array_tracked<s_saved_game_files_globals_cached_game_save, k_maximum_enumerated_cached_save_game_files> cached_save_files;
 	bool meta_data_lock_done;
 	int32 unk_7;
 	int32 locked_thread_id;

@@ -72,17 +72,17 @@ ASSERT_STRUCT_SIZE(window_bound, 280);
 
 /* public code */
 
-bool __cdecl draw_ingame_user_interface_element_hook(
+bool __cdecl render_ingame_user_interface_hud_element_hook(
 	real32 left,
 	real32 top,
 	int16 x,
 	int16 y,
 	real32 scale,
 	real32 rotation_rad,
-	int32 bitmap_tag_index,
-	int32 bitmap,
-	real_rectangle2d* a9,
-	int32 shader_tag_index);
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index);
 
 void render_apply_patches(void);
 

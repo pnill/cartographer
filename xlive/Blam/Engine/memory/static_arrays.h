@@ -219,7 +219,7 @@ public:
 };
 
 template<typename t_type, size_t k_maximum_count>
-class c_static_array
+class c_static_array_tracked
 {
 public:
 	void clear()

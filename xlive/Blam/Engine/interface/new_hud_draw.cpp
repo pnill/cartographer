@@ -367,7 +367,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
 				}
 
-				draw_ingame_user_interface_element_hook(
+				render_ingame_user_interface_hud_element_hook(
 					final_location.x,
 					final_location.y,
 					bitmap_width,
@@ -406,7 +406,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 				real32 adjusted_location_x = base_location + distance_per_territory * index;
 
-				draw_ingame_user_interface_element_hook(
+				render_ingame_user_interface_hud_element_hook(
 					adjusted_location_x,
 					final_location.y,
 					bitmap_width,
@@ -427,7 +427,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	if (!special_draw_case)
 	{
 		if (!bitmap_widget->flags.test(bitmap_widget_flag_scope_stretch)) {
-			draw_ingame_user_interface_element_hook(
+			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
 				final_location.y,
 				bitmap_width,
@@ -453,7 +453,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 			hud_scale = hud_scale * 10;
 
-			draw_ingame_user_interface_element_hook(
+			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
 				final_location.y,
 				bitmap_width,
@@ -473,7 +473,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
 
-			draw_ingame_user_interface_element_hook(
+			render_ingame_user_interface_hud_element_hook(
 				bitmap_size[0] * hud_scale + final_location.x,
 				final_location.y,
 				bitmap_width,
@@ -495,7 +495,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x1 = bitmap_bounds.x1;
 
 
-			draw_ingame_user_interface_element_hook(
+			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
 				bitmap_size[1] * hud_scale + final_location.y,
 				bitmap_width,
@@ -515,7 +515,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.y1 = bitmap_bounds.y0;
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
-			draw_ingame_user_interface_element_hook(
+			render_ingame_user_interface_hud_element_hook(
 				bitmap_size[0] * hud_scale + final_location.x,
 				bitmap_size[1] * hud_scale + final_location.y,
 				bitmap_width,

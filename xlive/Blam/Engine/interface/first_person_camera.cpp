@@ -48,7 +48,7 @@ void player_control_set_field_of_view(float fov)
 	overridden_fov_radians = DEGREES_TO_RADIANS(fov);
 }
 
-real32 __cdecl player_control_get_field_of_view(e_controller_index controller_index)
+real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 {
 	const s_player_control* player_control_info = player_control_get(user_index);
 
