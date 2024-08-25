@@ -507,7 +507,7 @@ void __cdecl input_abstraction_update()
 			}
 
 			// crappy but it works
-			if (gamepad_state->button_frames_down[_xinput_gamepad_dpad_down] > 10 && gamepad_state->button_msec_down[_xinput_gamepad_dpad_up] > 10)
+			if (gamepad_state->button_frames_down[_xinput_gamepad_back] > 10 && gamepad_state->button_msec_down[_xinput_gamepad_dpad_up] > 10)
 			{
 				if (!g_controller_advanced_settings_toggle[controller])
 				{

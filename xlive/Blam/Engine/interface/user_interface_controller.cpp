@@ -116,14 +116,18 @@ bool __cdecl user_interface_controller_sign_in(e_controller_index controller_ind
 {
 	bool result = p_user_interface_controller_sign_in(controller_index, profile, enumerated_file_index);
 	if(result)
-		cartographer_player_profile_load(controller_index, enumerated_file_index);
+		cartographer_player_profile_sign_in(controller_index, enumerated_file_index);
 
 	return result;
 }
 
+typedef void(__cdecl* t_user_interface_controller_sign_out)(e_controller_index controller_index);
+t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
+
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index)
 {
-	INVOKE(0x208257, 0x1F491B, user_interface_controller_sign_out, controller_index);
+	p_user_interface_controller_sign_out(controller_index);
+	cartographer_player_profile_sign_out(controller_index);
 }
 
 void __cdecl user_interface_controller_sign_out_all_controllers()
@@ -304,6 +308,7 @@ void user_interface_controller_apply_patches()
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match
 	WriteValue<uint8>(Memory::GetAddress(0x20CEB5 + 6), 0); // disable _ui_error_demo_version_no_more_for_you
 	DETOUR_ATTACH(p_user_interface_controller_sign_in, Memory::GetAddress<t_user_interface_controller_sign_in>(0x2087BF), user_interface_controller_sign_in);
+	DETOUR_ATTACH(p_user_interface_controller_sign_out, Memory::GetAddress<t_user_interface_controller_sign_out>(0x208257, 0x1F491B), user_interface_controller_sign_out);
 }
 
 

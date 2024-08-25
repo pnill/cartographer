@@ -561,7 +561,7 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 
 	if(text_widget->flags.test(text_widget_flag_string_is_a_number))
 	{
-		real32 value = draw_hud_widget_get_value(-1, text_widget->string);
+		int32 value = (int32)draw_hud_widget_get_value(-1, text_widget->string);
 		if (text_widget->flags.test(text_widget_flag_force_2digit_number))
 		{
 			if (value < 0)

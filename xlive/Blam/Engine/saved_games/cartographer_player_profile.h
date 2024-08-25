@@ -44,7 +44,9 @@ s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_
 
 s_saved_game_cartographer_player_profile_v1* cartographer_player_profile_get_by_user_index(uint32 user_index);
 
-void cartographer_player_profile_load(e_controller_index controller_index, uint32 enumerated_file_index);
+void cartographer_player_profile_sign_in(e_controller_index controller_index, uint32 enumerated_file_index);
+
+void cartographer_player_profile_sign_out(e_controller_index controller_index);
 
 void cartographer_player_profile_set_user_index(e_controller_index controller_index, uint32 user_index);
 
