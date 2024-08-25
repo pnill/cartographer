@@ -73,6 +73,7 @@ namespace NetworkSession
 
 	// peer-player functions
 	int32 GetPeerIndex(datum player_index);
+	bool IsPlayerLocal(datum player_index);
 
 	// player functions
 	
@@ -450,11 +451,24 @@ struct c_network_session
 		this->local_membership_update_number++;
 	}
 
-	void player_switch_teams(datum player_index, int8 team_index)
+	void switch_player_team(datum player_index, e_game_team team_index)
 	{
 		if (local_state_session_host())
 		{
 			get_player_membership(player_index)->properties[0].team_index = team_index;
+			request_membership_update();
+		}
+	}
+
+	// switch multiple players with a single membership update
+	void switch_players_to_teams(datum* player_indexes, int32 player_count, e_game_team* team_indexes)
+	{
+		if (local_state_session_host())
+		{
+			for (int32 i = 0; i < player_count; i++)
+			{
+				get_player_membership(player_indexes[i])->properties[0].team_index = team_indexes[i];
+			}
 			request_membership_update();
 		}
 	}

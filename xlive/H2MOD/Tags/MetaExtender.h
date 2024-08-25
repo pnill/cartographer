@@ -33,7 +33,7 @@ namespace MetaExtender
 				(void*)(((unsigned long)new_memory) + (sizeof(T) * src_index)),
 				sizeof(T));
 			*block_count = *block_count + 1;
-			*block_offset = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54)));
+			*block_offset = (int)((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 			LOG_INFO_GAME(IntToString<int>(*block_offset, std::hex));
 			return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - 1)));
 		}
@@ -42,7 +42,7 @@ namespace MetaExtender
 			memcpy((void*)(((unsigned long)new_memory) + (sizeof(T) * dst_index)),
 				(void*)(((unsigned long)new_memory) + (sizeof(T) * src_index)),
 				sizeof(T));
-			*block_offset = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54)));
+			*block_offset = (int)((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 			LOG_INFO_GAME(IntToString<int>(*block_offset, std::hex));
 			return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * dst_index));
 		}
@@ -60,7 +60,7 @@ namespace MetaExtender
 		memcpy(new_memory, &tags::get_tag_data()[*block_offset], block_size);
 
 		*block_count = *block_count + 1;
-		*block_offset = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54, 0x4A29BC)));
+		*block_offset = (int)((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - 1)));
 	}
@@ -77,7 +77,7 @@ namespace MetaExtender
 		memcpy(new_memory, &tags::get_tag_data()[*block_offset], block_size);
 
 		*block_count = *block_count + count;
-		*block_offset = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54)));
+		*block_offset = (int)((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - count)));
 	}

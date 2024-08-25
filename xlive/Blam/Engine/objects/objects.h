@@ -25,6 +25,8 @@ enum e_game_team : int16
 	_game_team_pink = 7,
 	_game_team_neutral = 8,
 
+	k_game_multiplayer_team_count = 8,
+
 	// SP
 	_game_team_default = 0,
 	_game_team_player = 1,
@@ -46,7 +48,7 @@ enum e_game_team : int16
 	_game_team_unused15 = 15,
 
 	// Shared
-	_game_team_none = -1
+	_game_team_none = NONE
 };
 
 enum e_object_data_flags : int32

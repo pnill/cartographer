@@ -49,7 +49,7 @@ namespace MetaExtender {
 		memcpy(new_tag_block, &tags::get_tag_data()[*reinterpret_cast<int*>(tag_block_ptr + 4)], currentSize);
 
 		*reinterpret_cast<int*>(tag_block_ptr) = tag_block_item_count + newCount;
-		*reinterpret_cast<int*>(tag_block_ptr + 4) = (unsigned long)new_tag_block - int(*Memory::GetAddress<int**>(0x47CD54));
+		*reinterpret_cast<int*>(tag_block_ptr + 4) = (unsigned long)new_tag_block - (unsigned long)tags::get_tag_data();
 	}
 
 
@@ -65,7 +65,7 @@ namespace MetaExtender {
 	//	memcpy(new_memory, &tags::get_tag_data()[*block_offset], block_size);
 
 	//	*block_count = *block_count + 1;
-	//	*block_offset = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54)));
+	//	*block_offset = (int)((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 
 	//	return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (*block_count - 1)));
 	//}
@@ -79,7 +79,7 @@ namespace MetaExtender {
 		memcpy(new_memory, &tags::get_tag_data()[block->data], block_size);
 
 		block->size = block->size + 1;
-		block->data = (int)((unsigned long)new_memory - int(*Memory::GetAddress<int**>(0x47CD54)));
+		block->data = ((unsigned long)new_memory - (unsigned long)tags::get_tag_data());
 
 		return reinterpret_cast<T*>(((unsigned long)new_memory) + (sizeof(T) * (block->size - 1)));
 	}

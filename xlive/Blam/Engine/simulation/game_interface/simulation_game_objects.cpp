@@ -37,14 +37,14 @@ bool simulation_object_variant_should_sync(s_simulation_object_creation_data* cr
     {
         s_model_definition* model_definition = (s_model_definition*)tag_get_fast(model_tag_index);
 
-        // Confirm that the "defualt" variant is not the one we are trying to sync
+        // Confirm that the "default" variant is not the one we are trying to sync
         sync_variant = model_definition->variants[creation_data->model_variant_index]->name != object_def->default_model_variant;
     }
 
     return sync_variant;
 }
 
-typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode_t)(void* thisptr, void* creation_data, c_bitstream* stream);
+typedef void(__stdcall* c_simulation_unit_entity_definition_creation_encode_t)(void*, s_simulation_object_creation_data*, c_bitstream*);
 c_simulation_unit_entity_definition_creation_encode_t p_c_simulation_unit_entity_definition_encode;
 void __stdcall c_simulation_object_entity_definition__object_creation_encode(void* _this, s_simulation_object_creation_data* creation_data, c_bitstream* packet)
 {
@@ -144,7 +144,8 @@ int32 __stdcall c_simulation_object_entity_definition__object_creation_required_
     return simulation_definition_table_index_bits() + 92 + (6 + 1);
 }
 
-datum __fastcall c_simulation_object_entity_definition__object_create_object(void* _this,
+datum __stdcall c_simulation_object_entity_definition__object_create_object(
+    void* _this,
     s_simulation_object_creation_data* object_creation,
     s_simulation_object_state_data* state_data,
     uint32* flags,

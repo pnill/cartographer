@@ -47,7 +47,7 @@ e_game_team s_player::get_team(datum player_index)
 {
 	if (!is_index_valid(player_index))
 	{
-		return (e_game_team)NONE;
+		return _game_team_none;
 	}
 	return (e_game_team)get(player_index)->properties[0].team_index;
 }
@@ -81,8 +81,16 @@ void s_player::set_unit_character_type(datum player_index, e_character_type char
 		return;
 	}
     s_player* player = get(player_index);
+
+    // ### FIXME flood biped prevents client players from spawning
+    if (character_type == _character_type_flood)
+    {
+        character_type = _character_type_elite;
+    }
+
+    // shouldn't be needed
     player->properties[0].profile_traits.profile.player_character_type = character_type;
-    player->properties[1].profile_traits.profile.player_character_type = character_type;
+    //player->properties[1].profile_traits.profile.player_character_type = character_type;
     return;
 }
 
@@ -167,6 +175,7 @@ uint64 s_player::get_id(datum player_index)
 player_iterator::player_iterator() :
     m_data_iterator(s_player::get_data())
 {
+    m_current_player = NULL;
 }
 
 bool player_iterator::get_next_active_player()
@@ -184,22 +193,27 @@ bool player_iterator::get_next_active_player()
 	return m_current_player != nullptr;
 }
 
-s_player* player_iterator::get_current_player_data()
+s_player* player_iterator::get_current_player_data() const
 {
 	return m_current_player;
 }
 
-int player_iterator::get_current_player_index()
+int32 player_iterator::get_current_player_index() const
 {
 	return m_data_iterator.get_current_absolute_index();
 }
 
-wchar_t* player_iterator::get_current_player_name()
+datum player_iterator::get_current_player_datum_index() const
+{
+	return m_data_iterator.get_current_datum_index();
+}
+
+wchar_t* player_iterator::get_current_player_name() const
 {
 	return m_current_player->properties[0].player_name;
 }
 
-unsigned long long player_iterator::get_current_player_id()
+uint64 player_iterator::get_current_player_id() const
 {
 	return s_player::get_id(this->get_current_player_index());
 }
@@ -299,6 +313,7 @@ void __cdecl player_configuration_validate_character_type(s_player_properties* c
                 for (uint32 i = 0; i < k_number_of_users; i++)
                 {
                     network_session_interface_set_local_user_character_type(i, _character_type_skeleton);
+                    //user_interface_controller_update_network_properties((e_controller_index)i);
                 }
             }
         }
@@ -360,9 +375,9 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
     {
         if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
         {
-            if (configuration_data->team_index != NONE && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
+            if (configuration_data->team_index != _game_team_none && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
             {
-                configuration_data->team_index = NONE;
+                configuration_data->team_index = _game_team_none;
             }
         }
     }
@@ -378,9 +393,9 @@ void __cdecl players_update_activation(void)
         while (player_it.get_next_datum())
         {
             s_player* player = player_it.get_current_datum();
-            if (!TEST_BIT(player->flags, 1))
+            if (!TEST_BIT(player->flags, _player_left_game_bit))
             {
-                bool machine_active_in_game = TEST_BIT(player->flags, 0);
+                bool machine_active_in_game = TEST_BIT(player->flags, _player_active_in_game_bit);
                 bool insert_event = false;
                 if (game_is_distributed())
                 {
@@ -395,7 +410,7 @@ void __cdecl players_update_activation(void)
                     machine_active_in_game = true;
                 }
 
-                if (TEST_BIT(player->flags, 0) != machine_active_in_game)
+                if (TEST_BIT(player->flags, _player_active_in_game_bit) != machine_active_in_game)
                 {
                     datum player_index = player_it.get_current_datum_index();
                     if (insert_event)
@@ -405,7 +420,7 @@ void __cdecl players_update_activation(void)
                     }
                     else
                     {
-                        SET_FLAG(player->flags, 0, machine_active_in_game);
+                        SET_FLAG(player->flags, _player_active_in_game_bit, machine_active_in_game);
 
                         if (machine_active_in_game)
                         {
@@ -422,7 +437,7 @@ void __cdecl players_update_activation(void)
 void players_apply_patches(void)
 {
     // Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
-    WriteValue<BYTE>(Memory::GetAddress(0x54fb3, 0x5D4AB), k_player_character_type_count);
+    WriteValue<BYTE>(Memory::GetAddress(0x54fb2, 0x5D4AA) + 1, k_player_character_type_count);
 
     // Replace the player profile validation function with our own
     PatchCall(Memory::GetAddress(0x5509E, 0x5D596), player_validate_configuration);

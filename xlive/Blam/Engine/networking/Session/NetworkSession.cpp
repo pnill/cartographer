@@ -116,6 +116,11 @@ bool NetworkSession::IsPeerIndexLocal(int32 peer_index)
 	return GetLocalPeerIndex() == peer_index;
 }
 
+bool NetworkSession::IsPlayerLocal(datum player_index)
+{
+	return IsPeerIndexLocal(GetPeerIndex(player_index));
+}
+
 IN_ADDR NetworkSession::GetLocalNetworkAddress()
 {
 	return GetActiveNetworkSession()->membership[0].peers[GetLocalPeerIndex()].secure_address.inaOnline;

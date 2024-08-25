@@ -688,14 +688,14 @@ bool __cdecl should_start_pregame_countdown_hook()
 	if (!minimumPlayersConditionMet)
 		return false;
 
-	if (H2Config_even_shuffle_teams
+	/*if (H2Config_even_shuffle_teams
 		&& NetworkSession::IsVariantTeamPlay())
 	{
 		std::mt19937 mt_rand(rd());
 		std::vector<int32> activePlayersIndices = NetworkSession::GetActivePlayerIndicesList();
 		uint16 activeTeamsFlags = get_enabled_team_flags(NetworkSession::GetActiveNetworkSession());
 
-		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)_game_team_neutral);
+		int32 max_teams = PIN(get_active_count_from_bitflags(activeTeamsFlags), 2, (int32)k_game_multiplayer_team_count);
 		LOG_INFO_GAME("{} - balancing teams", __FUNCTION__);
 
 		ServerConsole::SendMsg(L"Balancing Teams | Equilibrar equipos", true);
@@ -703,7 +703,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 		int32 maxPlayersPerTeam = MAX(1, NetworkSession::GetPlayerCount() / max_teams);
 		LOG_DEBUG_GAME("Players Per Team: {}", maxPlayersPerTeam);
 
-		for (int32 i = 0; i < _game_team_neutral; i++)
+		for (int32 i = 0; i < k_game_multiplayer_team_count; i++)
 		{
 			int32 currentTeamPlayers = 0;
 
@@ -727,8 +727,7 @@ bool __cdecl should_start_pregame_countdown_hook()
 				NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndexSelected), (e_game_team)i);
 			}
 		}
-
-	}
+	}*/
 
 	EventHandler::CountdownStartEventExecute(EventExecutionType::execute_after);
 	return true;
