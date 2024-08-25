@@ -90,7 +90,12 @@ struct s_new_hud_temporary_user_state
 	int8 gap_198[60];
 	datum other_player_datum;
 	real_rgb_color other_player_color;
-	int8 gap_1E4[72];
+	int8 gap_1E4[62];
+	bool player_talking;
+	int8 gap_22F;
+	int8 gap_230;
+	int8 gap_231;
+	datum player_index;
 	uint32 territories_count;
 	pixel32 territory_pixel_color[k_maximum_territories_flags];
 	real32 territory_control_progress[k_maximum_territories_flags];

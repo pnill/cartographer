@@ -1,6 +1,6 @@
 #pragma once
 
-struct s_draw_hud_bitmap_widget_input_results
+struct s_draw_hud_widget_input_results
 {
 	real32 result_1;
 	real32 result_2;

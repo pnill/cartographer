@@ -409,12 +409,13 @@ struct s_hud_bitmap_widget_definition
 };
 ASSERT_STRUCT_SIZE(s_hud_bitmap_widget_definition, 100);
 
-enum e_text_widget_flags : short
+enum e_text_widget_flags : uint16
 {
-    text_widget_flag_string_is_a_number = FLAG(0),
-    text_widget_flag_force_2digit_number = FLAG(1),
-    text_widget_flag_force_3digit_number = FLAG(2),
-    text_widget_flag_talking_player_hack = FLAG(3)
+    text_widget_flag_string_is_a_number = 0,
+    text_widget_flag_force_2digit_number = 1,
+    text_widget_flag_force_3digit_number = 2,
+    text_widget_flag_talking_player_hack = 3,
+    k_text_widget_flag_count
 };
 
 #define k_maximum_hud_text_widgets_per_tag 256
@@ -429,7 +430,7 @@ struct s_hud_text_widget_definition
     /*Explaination("FLAGS", "string is a number: treats the inputted string id as a function name, not a string name
     force 2 - digit number : when used in combination with above, forces output to be a 2 - digit numberwith leading zeros if necessary
     force 3 - digit number : same as above, but with 3 digits instead of 2")*/
-    e_text_widget_flags flags;
+    c_flags_no_init<e_text_widget_flags, uint16, k_text_widget_flag_count> flags;
 
     tag_reference shader;   // shad
     string_id string;

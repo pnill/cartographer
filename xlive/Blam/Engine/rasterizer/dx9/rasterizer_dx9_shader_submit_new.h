@@ -77,3 +77,12 @@ void rasterizer_dx9_shader_submit_new_apply_patches(void);
 int32* convolution_targets_get(void);
 
 void __cdecl rasterizer_shader_level_of_detail_bias_update(void);
+
+void __cdecl rasterizer_shader_submit(datum shader_index, int32 a2, int32 a3, int32 a4, int32 a5, int32 a6);
+
+// these functions modify some flags but cannot ascertain what they do.
+void __cdecl rasterizer_flags_unknown_function_1();
+void __cdecl rasterizer_flags_unknown_function_2(int32* a1);
+
+// referenced before submitting a shader
+int32* rasterizer_unknown_shader_submit_unknown_value_get();

@@ -11,6 +11,7 @@ enum e_font_index : int8
 {
     font_index_defualt = 0,
     font_index_number_font = 1,
+    font_index_invalid = -1
 };
 
 enum e_text_font : uint16
