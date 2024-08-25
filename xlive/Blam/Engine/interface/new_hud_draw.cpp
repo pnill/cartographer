@@ -128,23 +128,23 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	bounds->x1 = bitmap_sprite->bounds.x1;
 }
 
-real32 __cdecl hud_draw_widget_get_value(uint32 unused, string_id input_name)
+real32 __cdecl draw_hud_widget_get_value(uint32 unused, string_id input_name)
 {
-	return INVOKE(0x22211A, 0, hud_draw_widget_get_value, unused, input_name);
+	return INVOKE(0x22211A, 0, draw_hud_widget_get_value, unused, input_name);
 }
 
 void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_widget_effect_definition* widget_effect, real_point2d* out_offset, real_point2d* out_scale, real32* out_theta)
 {
 	if (out_theta && widget_effect->flags.test(hud_widget_effect_flag_apply_theta))
 	{
-		const real32 theta_value = hud_draw_widget_get_value(NONE, widget_effect->theta.input_name);
+		const real32 theta_value = draw_hud_widget_get_value(NONE, widget_effect->theta.input_name);
 		const real32 theta_result = widget_effect->theta.function.evaluate(theta_value, 1.f);
 		*out_theta += widget_effect->theta.function.unknown_post_evaluate_function(theta_result);
 	}
 	if (out_offset && widget_effect->flags.test(hud_widget_effect_flag_apply_offset))
 	{
-		const real32 horizontal_value = hud_draw_widget_get_value(NONE, widget_effect->horizontal_offset.input_name);
-		const real32 vertical_value = hud_draw_widget_get_value(NONE, widget_effect->vertical_offset.input_name);
+		const real32 horizontal_value = draw_hud_widget_get_value(NONE, widget_effect->horizontal_offset.input_name);
+		const real32 vertical_value = draw_hud_widget_get_value(NONE, widget_effect->vertical_offset.input_name);
 
 		const real32 horizontal_result = widget_effect->horizontal_offset.function.evaluate(horizontal_value, 1.f);
 		const real32 vertical_result = widget_effect->vertical_offset.function.evaluate(vertical_value, 1.f);
@@ -154,8 +154,8 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 	}
 	if (out_scale && widget_effect->flags.test(hud_widget_effect_flag_apply_scale))
 	{
-		const real32 horizontal_value = hud_draw_widget_get_value(NONE, widget_effect->horizontal_scale.input_name);
-		const real32 vertical_value = hud_draw_widget_get_value(NONE, widget_effect->vertical_scale.input_name);
+		const real32 horizontal_value = draw_hud_widget_get_value(NONE, widget_effect->horizontal_scale.input_name);
+		const real32 vertical_value = draw_hud_widget_get_value(NONE, widget_effect->vertical_scale.input_name);
 
 		const real32 horizontal_result = widget_effect->horizontal_scale.function.evaluate(horizontal_value, 1.f);
 		const real32 vertical_result = widget_effect->vertical_scale.function.evaluate(vertical_value, 1.f);
@@ -297,132 +297,130 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		*global_hud_draw_widget_special_hud_type_secondary_color_get() = user_state->other_player_color;
 		break;
 	case special_hud_type_unit_shield_meter:
-	{
-		special_draw_case = true;
-
-		s_new_hud_globals_player_info* player_info = new_hud_engine_globals_get_player_data(local_render_user_index);
-		int32 shield_layer_level = 0;
-
-		while (true)
 		{
-			real32 shield_vitality = user_state->unit_current_shield_vitality - (float)shield_layer_level;
+			special_draw_case = true;
 
-			if (shield_vitality >= 0.f)
-				shield_vitality = shield_vitality <= 1.f ? shield_vitality : 1.f;
-			else
-				shield_vitality = 0;
+			s_new_hud_globals_player_info* player_info = new_hud_engine_globals_get_player_data(local_render_user_index);
+			int32 shield_layer_level = 0;
 
-			real32 player_unk_0 = player_info->unk_0 - (float)shield_layer_level;
-
-			if (shield_vitality >= 0.f)
-				player_unk_0 = player_unk_0 <= 1.f ? player_unk_0 : 1.f;
-			else
-				player_unk_0 = 0.f;
-
-			bool unk_bool = false;
-			real32 color_scale_something = player_info->unk_4;
-
-			if (player_unk_0 <= shield_vitality)
+			while (true)
 			{
-				unk_bool = false;
-				color_scale_something = 0.f;
-			}
-			else
-			{
-				unk_bool = true;
-				if (color_scale_something >= 0.f)
-					color_scale_something = color_scale_something <= 1.f ? color_scale_something : 1.f;
+				real32 shield_vitality = user_state->unit_current_shield_vitality - (float)shield_layer_level;
+
+				if (shield_vitality >= 0.f)
+					shield_vitality = shield_vitality <= 1.f ? shield_vitality : 1.f;
 				else
+					shield_vitality = 0;
+
+				real32 player_unk_0 = player_info->unk_0 - (float)shield_layer_level;
+
+				if (shield_vitality >= 0.f)
+					player_unk_0 = player_unk_0 <= 1.f ? player_unk_0 : 1.f;
+				else
+					player_unk_0 = 0.f;
+
+				bool unk_bool = false;
+				real32 color_scale_something = player_info->unk_4;
+
+				if (player_unk_0 <= shield_vitality)
+				{
+					unk_bool = false;
 					color_scale_something = 0.f;
+				}
+				else
+				{
+					unk_bool = true;
+					if (color_scale_something >= 0.f)
+						color_scale_something = color_scale_something <= 1.f ? color_scale_something : 1.f;
+					else
+						color_scale_something = 0.f;
+				}
+
+				real_rgb_color shield_color;
+				shield_color.red = 1.f * color_scale_something;
+				shield_color.green = 1.f * color_scale_something;
+				shield_color.blue = 1.f * color_scale_something;
+
+				if (!unk_bool)
+					player_unk_0 = shield_vitality;
+
+				if (player_unk_0 <= 0 && shield_vitality <= 0)
+					break;
+
+				global_hud_draw_widget_function_results_get()->result_1 = player_unk_0;
+				global_hud_draw_widget_function_results_get()->result_2 = shield_vitality;
+				*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_color;
+
+				if (shield_layer_level)
+				{
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+				}
+				else if (player_unk_84_from_user_index(local_render_user_index))
+				{
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+				}
+				else
+				{
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[7], global_hud_draw_widget_special_hud_type_secondary_color_get());
+					pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
+				}
+
+				draw_ingame_user_interface_element_hook(
+					final_location.x,
+					final_location.y,
+					bitmap_width,
+					bitmap_height,
+					hud_scale,
+					theta_result,
+					bitmap_widget->bitmap.index,
+					bitmap_index,
+					&bitmap_bounds,
+					bitmap_widget->shader.index);
+
+				if (++shield_layer_level > 4)
+					break;
 			}
-
-			real_rgb_color shield_color;
-			shield_color.red = 1.f * color_scale_something;
-			shield_color.green = 1.f * color_scale_something;
-			shield_color.blue = 1.f * color_scale_something;
-
-			if (!unk_bool)
-				player_unk_0 = shield_vitality;
-
-			if (player_unk_0 <= 0 && shield_vitality <= 0)
-				break;
-
-			global_hud_draw_widget_function_results_get()->result_1 = player_unk_0;
-			global_hud_draw_widget_function_results_get()->result_2 = shield_vitality;
-			*global_hud_draw_widget_special_hud_type_color_primary_get() = shield_color;
-
-			if (shield_layer_level)
-			{
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_secondary_color_get());
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[shield_layer_level], global_hud_draw_widget_special_hud_type_tertiary_color_get());
-			}
-			else if (player_unk_84_from_user_index(local_render_user_index))
-			{
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[5], global_hud_draw_widget_special_hud_type_secondary_color_get());
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[6], global_hud_draw_widget_special_hud_type_tertiary_color_get());
-			}
-			else
-			{
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[7], global_hud_draw_widget_special_hud_type_secondary_color_get());
-				pixel32_to_real_rgb_color(g_draw_hud_bitmap_widget_shield_pixel_colors[8], global_hud_draw_widget_special_hud_type_tertiary_color_get());
-			}
-
-			draw_ingame_user_interface_element_hook(
-				final_location.x,
-				final_location.y,
-				bitmap_width,
-				bitmap_height,
-				hud_scale,
-				theta_result,
-				bitmap_widget->bitmap.index,
-				bitmap_index,
-				&bitmap_bounds,
-				bitmap_widget->shader.index);
-
-			if (++shield_layer_level > 4)
-				break;
+			break;
 		}
-		break;
-	}
 	case special_hud_type_territory_meter:
-	{
-		special_draw_case = true;
-
-		if (user_state->territories_count == 0)
-			return;
-
-		*global_hud_draw_widget_special_hud_type_secondary_color_get() = *global_real_rgb_white;
-
-		real32 distance_per_territory = ((float)bitmap_width + 1) * hud_scale;
-		real32 base_location = final_location.x - ((user_state->territories_count - 1) * (distance_per_territory * 0.5f));
-
-		for (int32 index = 0; index < user_state->territories_count; ++index)
 		{
-			pixel32 territory_color = user_state->territory_pixel_color[index];
-			pixel32_to_real_rgb_color(territory_color, global_hud_draw_widget_special_hud_type_color_primary_get());
+			special_draw_case = true;
 
-			real32 territory_progress = user_state->territory_control_progress[index];
-			global_hud_draw_widget_function_results_get()->result_1 = territory_progress;
+			if (user_state->territories_count == 0)
+				return;
 
-			real32 adjusted_location_x = base_location + distance_per_territory * index;
+			*global_hud_draw_widget_special_hud_type_secondary_color_get() = *global_real_rgb_white;
 
-			draw_ingame_user_interface_element_hook(
-				adjusted_location_x,
-				final_location.y,
-				bitmap_width,
-				bitmap_height,
-				hud_scale,
-				theta_result,
-				bitmap_widget->bitmap.index,
-				bitmap_index,
-				&bitmap_bounds,
-				bitmap_widget->shader.index);
+			real32 distance_per_territory = ((float)bitmap_width + 1) * hud_scale;
+			real32 base_location = final_location.x - ((user_state->territories_count - 1) * (distance_per_territory * 0.5f));
+
+			for (int32 index = 0; index < user_state->territories_count; ++index)
+			{
+				pixel32 territory_color = user_state->territory_pixel_color[index];
+				pixel32_to_real_rgb_color(territory_color, global_hud_draw_widget_special_hud_type_color_primary_get());
+
+				real32 territory_progress = user_state->territory_control_progress[index];
+				global_hud_draw_widget_function_results_get()->result_1 = territory_progress;
+
+				real32 adjusted_location_x = base_location + distance_per_territory * index;
+
+				draw_ingame_user_interface_element_hook(
+					adjusted_location_x,
+					final_location.y,
+					bitmap_width,
+					bitmap_height,
+					hud_scale,
+					theta_result,
+					bitmap_widget->bitmap.index,
+					bitmap_index,
+					&bitmap_bounds,
+					bitmap_widget->shader.index);
+			}
+
+			break;
 		}
-
-		break;
-	}
-	default:
-		break;
 	}
 
 
@@ -563,7 +561,7 @@ void draw_hud_text_get_string(s_draw_hud_widget_input_results* widget_function_r
 
 	if(text_widget->flags.test(text_widget_flag_string_is_a_number))
 	{
-		real32 value = hud_draw_widget_get_value(-1, text_widget->string);
+		real32 value = draw_hud_widget_get_value(-1, text_widget->string);
 		if (text_widget->flags.test(text_widget_flag_force_2digit_number))
 		{
 			if (value < 0)
@@ -651,7 +649,7 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 	int32 draw_string_font_index = NONE;
 
 	draw_hud_text_get_string(widget_function_results, text_widget, user_state, widget_string, &draw_string_font_index);
-
+	draw_string_set_draw_mode(draw_string_font_index, NONE, 0,0, global_real_argb_white, global_real_argb_black, false);
 	if(draw_string_set_string(widget_string))
 	{
 		rasterizer_flags_unknown_function_1();
@@ -692,19 +690,19 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 
 		real_point2d final_location{ final_location_x, final_location_y };
 
-		rectangle2d text_bounds{ 0, 1000, 0, 1000 };
-		int32 draw_string_unk_1[2];
+		rectangle2d text_bounds{ 0, 0, 1000, 1000 };
+		rectangle2d draw_string_bounds;
 		int32 draw_string_unk_2;
-		draw_string_calculate_bounds(&text_bounds, widget_string, draw_string_unk_1, &draw_string_unk_2, 1.f);
+		draw_string_calculate_bounds(&text_bounds, widget_string, &draw_string_bounds, &draw_string_unk_2, 1.f);
 
-		int32 draw_string_unk3 = draw_string_unknown_function_1(&draw_string_unk_1[0]);
-		real32 calc_draw_string_unk3 = (draw_string_unk3 * *get_primary_hud_scale()) * scale_result.x;
+		int32 text_width = rectangle2d_width(&draw_string_bounds);
+		real32 calc_text_width = (text_width * *get_primary_hud_scale()) * scale_result.x;
 
-		int32 draw_string_unk4 = draw_string_unknown_function_2(&draw_string_unk_1[0]);
-		real32 calc_draw_string_unk4 = (draw_string_unk4 * *get_primary_hud_scale()) * scale_result.y;
+		int32 text_height = rectangle2d_height(&draw_string_bounds);
+		real32 calc_text_height = (text_height * *get_primary_hud_scale()) * scale_result.y;
 
-		int32 ceil_offset_x = 1000;//ceilf(calc_draw_string_unk3);
-		int32 ceil_offset_y = 1000;//ceilf(calc_draw_string_unk4);
+		int32 ceil_text_width = ceilf(calc_text_width);
+		int32 ceil_text_height = ceilf(calc_text_height);
 
 		draw_string_set_unknown_color(global_real_argb_white);
 		draw_string_set_shadow_color(global_real_argb_black);
@@ -712,22 +710,22 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		switch(text_widget->justification)
 		{
 		case text_justification_center:
-			text_bounds.left = (final_location.x - (real32)(ceil_offset_x >> 1));
+			text_bounds.left = (final_location.x - (real32)(ceil_text_width >> 1));
 			text_bounds.top = final_location.y;
-			text_bounds.right = (final_location.x + (real32)(ceil_offset_x - (ceil_offset_x >> 1)));
-			text_bounds.bottom = ceil_offset_y + final_location.y;
+			text_bounds.right = (final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
+			text_bounds.bottom = ceil_text_height + final_location.y;
 			break;
 		case text_justification_right:
-			text_bounds.left = (final_location.x - ceil_offset_x);
+			text_bounds.left = (final_location.x - ceil_text_width);
 			text_bounds.top = final_location.y;
 			text_bounds.right = final_location.x;
-			text_bounds.bottom = (final_location_y + ceil_offset_y);
+			text_bounds.bottom = (final_location_y + ceil_text_height);
 			break;
 		default:
 			text_bounds.left = final_location.x;
 			text_bounds.top = final_location.y;
-			text_bounds.right = ceil_offset_x + final_location.x;
-			text_bounds.bottom = ceil_offset_y + final_location.y;
+			text_bounds.right = ceil_text_width + final_location.x;
+			text_bounds.bottom = ceil_text_height + final_location.y;
 			break;
 		}
 

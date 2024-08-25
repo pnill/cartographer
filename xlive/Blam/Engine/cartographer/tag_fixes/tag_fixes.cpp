@@ -179,6 +179,20 @@ void tag_fixes_misty_rain(void)
 	}
 	return;
 }
+// Explanation:
+// Hud tags are packaged using the data saver option which will cause h2tool to reuse tag blocks
+// this will cause the offset fix to apply multiple times to individual blocks here we are just keeping
+// a temporary map of all the blocks that have already been adjusted.
+int32* already_adjusted_blocks;
+int32 adjusted_blocks_count = 0;
+bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
+{
+	for(uint32 index = 0; index < adjusted_blocks_count; index++)
+		if (already_adjusted_blocks[index] == block_offset)
+			return true;
+
+	return false;
+}
 
 // Explanation:
 // Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
@@ -186,37 +200,60 @@ void tag_fixes_misty_rain(void)
 // We double these to fix the hud in splitscreen
 void tag_fixes_split_screen_hud(void)
 {
+	already_adjusted_blocks = (int32*)malloc(sizeof(int32) * 255);
+	adjusted_blocks_count = 0;
+
+	ASSERT(already_adjusted_blocks);
+
 	tag_iterator hud_iterator;
 	tag_iterator_new(&hud_iterator, _tag_group_new_hud_definition);
-	while(tag_iterator_next(&hud_iterator) != NONE)
+	while (tag_iterator_next(&hud_iterator) != NONE)
 	{
 		s_new_hud_definition* hud = (s_new_hud_definition*)tag_get_fast(hud_iterator.current_tag_index);
-		for (uint32 i = 0; i < hud->bitmap_widgets.count; ++i)
+
+		if (!tag_fixes_split_screen_block_adjusted(hud->bitmap_widgets.data))
 		{
-			s_hud_bitmap_widget_definition* widget = hud->bitmap_widgets[i];
-			widget->halfscreen_offset.x *= 2;
-			widget->halfscreen_offset.y *= 2;
-			widget->quarterscreen_offset.x *= 2;
-			widget->quarterscreen_offset.y *= 2;
+			for (uint32 i = 0; i < hud->bitmap_widgets.count; ++i)
+			{
+				s_hud_bitmap_widget_definition* bitmap_widget = hud->bitmap_widgets[i];
+				bitmap_widget->halfscreen_offset.x *= 2;
+				bitmap_widget->halfscreen_offset.y *= 2;
+				bitmap_widget->quarterscreen_offset.x *= 2;
+				bitmap_widget->quarterscreen_offset.y *= 2;
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->bitmap_widgets.data;
 		}
 
-		for (uint32 i = 0; i < hud->text_widgets.count; ++i)
+		if (!tag_fixes_split_screen_block_adjusted(hud->text_widgets.data))
 		{
-			s_hud_text_widget_definition* widget = hud->text_widgets[i];
-			widget->halfscreen_offset.x *= 2;
-			widget->halfscreen_offset.y *= 2;
-			widget->quarterscreen_offset.x *= 2;
-			widget->quarterscreen_offset.y *= 2;
+			for (uint32 i = 0; i < hud->text_widgets.count; ++i)
+			{
+				s_hud_text_widget_definition* text_widget = hud->text_widgets[i];
+				text_widget->halfscreen_offset.x *= 2;
+				text_widget->halfscreen_offset.y *= 2;
+				text_widget->quarterscreen_offset.x *= 2;
+				text_widget->quarterscreen_offset.y *= 2;
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->text_widgets.data;
 		}
 
-		for (uint32 i = 0; i < hud->screen_effect_widgets.count; ++i)
+		if (!tag_fixes_split_screen_block_adjusted(hud->screen_effect_widgets.data))
 		{
-			s_hud_screen_effect_widget_definition* widget = hud->screen_effect_widgets[i];
-			widget->halfscreen_offset.x *= 2;
-			widget->halfscreen_offset.y *= 2;
-			widget->quarterscreen_offset.x *= 2;
-			widget->quarterscreen_offset.y *= 2;
+			for (uint32 i = 0; i < hud->screen_effect_widgets.count; ++i)
+			{
+				s_hud_screen_effect_widget_definition* effect_widget = hud->screen_effect_widgets[i];
+				effect_widget->halfscreen_offset.x *= 2;
+				effect_widget->halfscreen_offset.y *= 2;
+				effect_widget->quarterscreen_offset.x *= 2;
+				effect_widget->quarterscreen_offset.y *= 2;
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->screen_effect_widgets.data;
 		}
 	}
+
+	free(already_adjusted_blocks);
 	return;
 }

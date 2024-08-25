@@ -46,20 +46,10 @@ void __cdecl draw_string_set_position(int16 x, int16 y)
 	INVOKE(0x98833, 0, draw_string_set_position, x, y);
 }
 
-void __cdecl draw_string_calculate_bounds(rectangle2d* bounds, wchar_t* string, int32* out_unk, int32* out_unk_2,
+void __cdecl draw_string_calculate_bounds(rectangle2d* bounds, wchar_t* string, rectangle2d* out_draw_string_bounds, int32* out_unk_2,
 	real32 scale)
 {
-	INVOKE(0x99D97, 0, draw_string_calculate_bounds, bounds, string, out_unk, out_unk_2, scale);
-}
-
-int32 __cdecl draw_string_unknown_function_1(int32* a1)
-{
-	return INVOKE(0x77071, 0, draw_string_unknown_function_1, a1);
-}
-
-int32 __cdecl draw_string_unknown_function_2(int32* a1)
-{
-	return INVOKE(0x77080, 0, draw_string_unknown_function_2, a1);
+	INVOKE(0x99D97, 0, draw_string_calculate_bounds, bounds, string, out_draw_string_bounds, out_unk_2, scale);
 }
 
 void draw_string_draw(rectangle2d* bounds, wchar_t* string, real32 scale)
