@@ -927,7 +927,7 @@ int CommandCollection::change_player_team(const std::vector<std::string>& tokens
 		&& ComVar(&new_team_index).SetFromStr(tokens[2]))
 	{
 		c_network_session* session = NetworkSession::GetActiveNetworkSession();
-		session->player_switch_teams(player_index, new_team_index);
+		session->switch_player_team(player_index, (e_game_team)new_team_index);
 	}
 
 	return 0;

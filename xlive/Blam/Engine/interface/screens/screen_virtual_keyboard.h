@@ -1,12 +1,7 @@
 #pragma once
 #include "interface/user_interface_headers.h"
 
-
 #define VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX 17
-
-// we just re-use the first 17 keyboard id's in default code for now
-#define VIRTUAL_KEYBOARD_MENU_TYPE_MAX_NEW (VIRTUAL_KEYBOARD_MENU_TYPE_DEFAULT_MAX * 2)
-
 #define VIRTUAL_KEYBOARD_BUTTON_COUNT 47
 
 void ui_globals_set_keyboard_input_state(bool state);

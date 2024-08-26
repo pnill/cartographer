@@ -20,7 +20,7 @@ datum __stdcall c_simulation_unit_entity_definition__create_object(void* _this,
     real_rgb_color change_colors[4];
     
     object_placement_data placement_data;
-    object_placement_data_new(&placement_data, creation_data->object.object_definition_index, -1, 0);
+    object_placement_data_new(&placement_data, creation_data->object.object_definition_index, NONE, 0);
 
     // Hacky hack for player variants
     // TODO Remove this once we get tag injection working on servers

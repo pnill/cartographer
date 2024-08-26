@@ -85,8 +85,8 @@ public:
 	XNADDR joining_xnaddr;
 	int32 field_54;
 	int32 joining_user_count;
-	s_player_identifier player_identifiers[4];
-	wchar_t player_names[4][16];
+	s_player_identifier player_identifiers[k_number_of_users];
+	wchar_t player_names[k_number_of_users][16];
 	int8 gapFC[128];
 	int32 field_17C;
 	bool field_180;

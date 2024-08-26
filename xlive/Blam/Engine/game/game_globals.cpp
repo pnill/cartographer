@@ -169,7 +169,7 @@ void game_globals_add_flood_representation(scenario* scenario_definition)
 	{
 		tag_injection_inject();
 
-		add_representation( flood_arms_datum, flood_body_datum, flood_datum);
+		add_representation(flood_arms_datum, flood_body_datum, flood_datum);
 		s_scenario_simulation_definition_table_element* new_def = MetaExtender::add_tag_block2<s_scenario_simulation_definition_table_element>((unsigned long)std::addressof(scenario_definition->simulation_definition_table));
 		new_def->tag_datum = flood_datum;
 	}

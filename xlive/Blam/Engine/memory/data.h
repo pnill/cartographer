@@ -67,7 +67,7 @@ public:
 		return result;
 	}
 	
-	int get_next_absolute_datum_index(int index) const
+	int32 get_next_absolute_datum_index(int index) const
 	{
 		if (index < 0)
 			return -1;
@@ -83,7 +83,7 @@ public:
 		return index;
 	}
 
-	int get_current_absolute_index() const
+	int32 get_current_absolute_index() const
 	{
 		return m_current_absolute_index;
 	}
@@ -93,7 +93,7 @@ public:
 		return m_last_datum_index;
 	}
 
-	int get_data_count() const
+	int32 get_data_count() const
 	{
 		return m_data_array->total_elements_used;
 	}
@@ -106,7 +106,7 @@ public:
 private:
 	s_data_array* m_data_array;
 	datum m_last_datum_index;
-	int m_current_absolute_index;
+	int32 m_current_absolute_index;
 };
 
 

@@ -23,8 +23,8 @@ std::vector<uint64> Infection::zombieIdentifiers;
 
 bool initialSpawn;
 bool infectedPlayed;
-int zombiePlayerIndex = NONE;
-int last_time_at_game_should_not_end = 0;
+int32 zombiePlayerIndex = NONE;
+int32 last_time_at_game_should_not_end = 0;
 const wchar_t* infectionSoundTable[k_language_count][e_infection_sounds::_infection_end]
 {
 	{SND_INFECTION_EN, SND_INFECTED_EN, SND_NEW_ZOMBIE_EN },
@@ -49,7 +49,7 @@ int Infection::calculateZombiePlayerIndex()
 		if (activePlayersIndices.empty())
 			return NONE;
 
-		int infectedPlayerIndex = activePlayersIndices[dist(mt_rand)];
+		int32 infectedPlayerIndex = activePlayersIndices[dist(mt_rand)];
 		LOG_TRACE_GAME(L"[h2mod-infection] random infection player index: {}, with name: {}", infectedPlayerIndex, NetworkSession::GetPlayerName(infectedPlayerIndex));
 
 		return infectedPlayerIndex;
@@ -62,24 +62,48 @@ void Infection::sendTeamChange()
 {
 	if (NetworkSession::LocalPeerIsSessionHost())
 	{
-		if (NetworkSession::GetPlayerCount() > 0)
+		int32 player_count = NetworkSession::GetPlayerCount();
+
+		if (player_count > 0)
 		{
-			for (int playerIndex = 0; playerIndex < k_maximum_players; playerIndex++)
-		{
-			if (NetworkSession::PlayerIsActive(playerIndex))
+			int32 player_array_index = 0;
+			datum player_indexes[k_maximum_players] = {};
+			e_game_team player_teams[k_maximum_players] = {};
+
+			for (int32 i = 0; i < k_maximum_players; i++)
 			{
-				if (!NetworkSession::IsPeerIndexLocal(NetworkSession::GetPeerIndex(playerIndex))) {
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(playerIndex), zombiePlayerIndex == playerIndex ? k_zombie_team : k_humans_team);
-					LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", playerIndex, NetworkSession::GetPlayerName(playerIndex), zombiePlayerIndex == playerIndex ? true : false);
-				}
-				else if (!Memory::IsDedicatedServer()) {
-					bool is_player_zombie = playerIndex == zombiePlayerIndex;
-					user_interface_controller_set_desired_team_index(_controller_index_0, is_player_zombie ? k_zombie_team : k_humans_team);
-					user_interface_controller_update_network_properties(_controller_index_0);
-					LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_player_zombie);
+				if (NetworkSession::PlayerIsActive(i))
+				{
+					e_game_team team = zombiePlayerIndex == i ? k_zombie_team : k_humans_team;
+					bool is_current_player_zombie = zombiePlayerIndex == i;
+
+					if (!NetworkSession::IsPlayerLocal(i))
+					{
+						player_indexes[player_array_index] = i;
+						player_teams[player_array_index++] = team;
+
+						// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!! !!!! 
+						NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(i), team);
+
+						LOG_TRACE_GAME(L"[h2mod-infection] sent team change packet to player index: {}, with name: {}, infected?: {}", 
+							i, 
+							NetworkSession::GetPlayerName(i), 
+							is_current_player_zombie
+						);
+					}
+					else 
+					{
+						if (!Memory::IsDedicatedServer())
+						{
+							user_interface_controller_set_desired_team_index(_controller_index_0, team);
+							user_interface_controller_update_network_properties(_controller_index_0);
+							LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_current_player_zombie);
+						}
+					}
 				}
 			}
-			}
+
+			NetworkSession::GetActiveNetworkSession()->switch_players_to_teams(player_indexes, NetworkSession::GetPlayerCount(), player_teams);
 		}
 	}
 }
@@ -167,7 +191,7 @@ void Infection::preSpawnServerSetup() {
 	player_iterator player_it;
 	while (player_it.get_next_active_player())
 	{
-		int currentPlayerIndex = player_it.get_current_player_index();
+		int32 currentPlayerIndex = player_it.get_current_player_index();
 		uint64 playerIdentifier = player_it.get_current_player_id();
 		bool isZombie = std::find(Infection::zombieIdentifiers.begin(), Infection::zombieIdentifiers.end(), playerIdentifier) != Infection::zombieIdentifiers.end();
 
@@ -179,14 +203,23 @@ void Infection::preSpawnServerSetup() {
 		}
 
 		LOG_TRACE_GAME(L"[h2mod-infection] Zombie pre spawn index={}, isZombie={}, playerIdentifier={}, playerName:{}", currentPlayerIndex, isZombie, playerIdentifier, s_player::get_name(currentPlayerIndex));
-		if (isZombie) {
+		if (isZombie) 
+		{
 			s_player::set_unit_character_type(currentPlayerIndex, _character_type_flood);
-			if (s_player::get_team(currentPlayerIndex) != k_zombie_team) {
+			if (s_player::get_team(currentPlayerIndex) != k_zombie_team) 
+			{
 				if (NetworkSession::LocalPeerIsSessionHost())
-					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), k_zombie_team); // prevent *toxic* kids from switching to humans in the pre-game lobby after joining
+				{
+					// prevent the fucks from switching to humans in the pre-game lobby after joining
+
+					// ### TODO FIXME remove SendTeamChange() and team change packet before release !!!! !!!! !!!!
+					NetworkMessage::SendTeamChange(NetworkSession::GetPeerIndex(currentPlayerIndex), k_zombie_team); 
+					NetworkSession::GetActiveNetworkSession()->switch_player_team(player_it.get_current_player_datum_index(), k_zombie_team);
+				}
 			}
 		}
-		else {
+		else 
+		{
 			if (get_current_special_event() == _special_event_halloween && H2Config_spooky_boy)
 				s_player::set_unit_character_type(currentPlayerIndex, _character_type_skeleton);
 			else
@@ -353,7 +386,7 @@ void Infection::OnMapLoad(ExecTime execTime, s_game_options* options)
 
 void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
-	int absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
+	int32 absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 	datum playerUnitDatum = s_player::get_unit_index(player_index);
 
 	switch (execTime)
@@ -422,7 +455,10 @@ void Infection::OnPlayerSpawn(ExecTime execTime, datum playerIdx)
 		if (!Memory::IsDedicatedServer())
 		{
 			uint64 playerIdentifier = s_player::get_id(playerIdx);
-			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", absPlayerIdx, playerIdentifier, s_player::get_name(player_index_from_user_index(0)));
+			LOG_TRACE_GAME(L"[h2mod-infection] Client pre spawn, playerIndex={}, playerIdentifier={}, localPlayerName={}", 
+				absPlayerIdx, 
+				playerIdentifier, 
+				s_player::get_name(player_index_from_user_index(0)));
 			//If player being spawned is LocalUser/Player
 			if (playerIdentifier == s_player::get_id(player_index_from_user_index(0)))
 			{

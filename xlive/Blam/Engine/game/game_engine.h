@@ -155,7 +155,7 @@ struct s_multiplayer_event_response_definition
     string_id primary_string;
     int32 primary_string_duration_seconds;
 
-	string_id pluralDisplayString;
+	string_id display_string_plural;
 	int32 pad3[7];
     real32 sound_delay_announcer_only;
 
