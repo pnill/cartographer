@@ -25,7 +25,7 @@ void cartographer_player_profile_v1_new(s_saved_game_cartographer_player_profile
 	settings->deadzone_axial_x = 26.f;
 	settings->deadzone_axial_y = 26.f;
 	settings->deadzone_radial = 1.f;
-	settings->crosshair_offset = NAN;
+	settings->crosshair_offset = 0.138f;
 	settings->crosshair_scale = 1.f;
 }
 

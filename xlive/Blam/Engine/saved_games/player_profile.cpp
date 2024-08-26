@@ -22,10 +22,10 @@ void saved_game_player_profile_default_new(s_saved_game_player_profile* profile,
 	csmemset(profile, 0, sizeof(s_saved_game_player_profile));
 	profile->valid_maybe = true;
 	wcsncpy(profile->name, L"Guest", 16);
-	profile->profile_traits.profile.primary_color = player_color_colbat;
-	profile->profile_traits.profile.secondary_color = player_color_white;
-	profile->profile_traits.profile.tertiary_color = player_color_white;
-	profile->profile_traits.profile.quaternary_color = player_color_white;
+	profile->profile_traits.profile.primary_color = _player_color_colbat;
+	profile->profile_traits.profile.secondary_color = _player_color_white;
+	profile->profile_traits.profile.tertiary_color = _player_color_white;
+	profile->profile_traits.profile.quaternary_color = _player_color_white;
 	profile->profile_traits.profile.emblem_info.foreground_emblem = _emblem_foreground_seventh_column;
 	profile->profile_traits.profile.emblem_info.background_emblem = _emblem_background_solid;
 	profile->unk |= 1;

@@ -73,7 +73,7 @@ void __cdecl first_person_camera_update(int8* camera, s_director_update* directo
 
 	datum player_unit_index = NONE;
 	if (players_user_is_active(director_update->user_index))
-		player_unit_index = s_player::get_unit_index(director_update->user_index);
+		player_unit_index = s_player::get_unit_index(player_index_from_user_index(director_update->user_index));
 
 	real_vector3d unit_facing{};
 
