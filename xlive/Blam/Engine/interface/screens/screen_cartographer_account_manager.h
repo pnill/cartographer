@@ -187,7 +187,12 @@ public:
 
 	void update_list_items(c_list_item_widget* item, int32 skin_index) override
 	{
-		datum list_item_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
+		int32 list_item_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(item->get_last_data_index());
+
+		if (item->get_last_data_index() == NONE)
+		{
+			return;
+		}
 
 		c_text_widget* text_widget = item->try_find_text_widget(0);
 		if (text_widget)
