@@ -1,6 +1,5 @@
 #pragma once
-#include <miniupnpc/miniupnpc.h>
-#include <string>
+#include <miniupnpc/upnpdev.h>
 
 namespace Utils
 {

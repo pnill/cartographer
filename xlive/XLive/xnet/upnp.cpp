@@ -1,6 +1,7 @@
 #include "stdafx.h"
-
 #include "upnp.h"
+
+#include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
 
 #include "H2MOD/Modules/Shell/Config.h"

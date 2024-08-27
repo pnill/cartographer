@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 
 /*
 	Returns the directory of the main executable
