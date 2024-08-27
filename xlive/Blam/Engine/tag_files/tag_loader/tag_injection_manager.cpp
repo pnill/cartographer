@@ -125,7 +125,7 @@ void c_tag_injecting_manager::set_active_map(const wchar_t* map_name)
 	this->m_active_map_verified = true;
 	
 	// TODO: write out error
-	_wfopen_s(&this->m_active_map_file_handle, this->m_active_map.get_string(), L"rb");
+	this->m_active_map_file_handle = _wfsopen(this->m_active_map.get_string(), L"rb", SH_DENYNO);
 
 	// Read cache header from map file
 	file_seek_and_read(this->m_active_map_file_handle, 0, sizeof(s_cache_header), 1, &this->m_active_map_cache_header);
