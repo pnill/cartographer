@@ -82,12 +82,6 @@ void s_player::set_unit_character_type(datum player_index, e_character_type char
 	}
     s_player* player = get(player_index);
 
-    // ### FIXME flood biped prevents client players from spawning
-    if (character_type == _character_type_flood)
-    {
-        character_type = _character_type_elite;
-    }
-
     // shouldn't be needed
     player->properties[0].profile_traits.profile.player_character_type = character_type;
     //player->properties[1].profile_traits.profile.player_character_type = character_type;

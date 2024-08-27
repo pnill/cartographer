@@ -53,7 +53,7 @@ namespace CustomVariantSettings
 	void SendCustomVariantSettings(int peerIndex)
 	{
 		c_network_session* session = NetworkSession::GetActiveNetworkSession();
-		if (NetworkSession::LocalPeerIsSessionHost())
+		if (NetworkSession::LocalPeerIsSessionHost() && Memory::IsDedicatedServer())
 		{
 			//TODO: Find and map out struct with current variant information.
 			auto VariantName = std::wstring(Memory::GetAddress<wchar_t*>(0, 0x534A18));
