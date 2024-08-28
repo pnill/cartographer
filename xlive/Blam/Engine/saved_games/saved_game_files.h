@@ -95,6 +95,6 @@ const wchar_t* saved_games_get_file_type_as_string(e_saved_game_file_type file_t
 
 bool saved_games_append_file_type_to_path(wchar_t* in_path, e_saved_game_file_type file_type, wchar_t* out_path);
 
-void saved_games_get_default_player_profile_name(uint32 enumerated_index, wchar_t* display_name);
+void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name);
 
 void saved_game_files_apply_hooks();

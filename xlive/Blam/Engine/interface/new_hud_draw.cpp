@@ -12,6 +12,20 @@
 #include "saved_games/cartographer_player_profile.h"
 #include "text/draw_string.h"
 
+/* globals */
+
+static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
+{
+	{0},
+	{0xFF0000},
+	{0xFF00},
+	{0xFFFF00},
+	{0x007F00},
+	{0x45059A},
+	{0x9C46C1},
+	{0x55AA},
+	{0x78F0}
+};
 
 /* private code */
 
@@ -169,19 +183,6 @@ void hud_widget_anchor_calculate_point(e_hud_anchor anchor, real_point2d* out_po
 {
 	INVOKE(0x223969, 0, hud_widget_anchor_calculate_point, anchor, out_point);
 }
-
-static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
-{
-	{0},
-	{0xFF0000},
-	{0xFF00},
-	{0xFFFF00},
-	{0x007F00},
-	{0x45059A},
-	{0x9C46C1},
-	{0x55AA},
-	{0x78F0}
-};
 
 void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* bitmap_widget, real32* widget_function_results)
 {
@@ -749,11 +750,6 @@ void __cdecl draw_hud_layer(void)
 	INVOKE(0x22657B, 0x0, draw_hud_layer);
 	return;
 }
-
-//void __cdecl draw_hud_bitmap_widget(int player_render_state, s_new_hud_temporary_user_state* user_state, s_hud_bitmap_widget_definition* definition, int* a4)
-//{
-//	INVOKE(0x222E9B, 0, draw_hud_bitmap_widget, player_render_state, user_state, definition, a4);
-//}
 
 void new_hud_draw_apply_patches()
 {

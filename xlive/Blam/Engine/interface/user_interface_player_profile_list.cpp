@@ -129,7 +129,7 @@ void c_player_profile_list::update_displayed_profiles()
 						if (!result)
 						{
 							csmemset(&stored_profile->profile, 0, sizeof(s_saved_game_player_profile));
-							saved_games_get_default_player_profile_name(enumerated_file_index, stored_profile->profile.name);
+							saved_games_get_display_name(enumerated_file_index, stored_profile->profile.name);
 						}
 					}
 				}
@@ -144,8 +144,6 @@ wchar_t* c_player_profile_list::unknown_function_3(int32 a1)
 {
 	return INVOKE_TYPE(0x2372D6, 0x0, wchar_t*(__thiscall*)(c_player_profile_list*, int32 a1), this, a1);
 }
-
-
 
 void user_interface_player_profile_list_apply_patches()
 {
