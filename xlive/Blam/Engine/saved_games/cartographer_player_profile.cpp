@@ -136,8 +136,7 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_use
 		datum user_datum = player_globals->player_user_mapping[user_index];
 		for(uint32 index = 0; index < k_number_of_controllers; index++)
 		{
-			if (player_globals->player_controller_mapping[index] == user_datum)
-				if(g_cartographer_profiles[index].enumerated_file_index != NONE)
+			if (player_globals->player_controller_mapping[index] == user_datum && g_cartographer_profiles[index].enumerated_file_index != NONE)
 					return &g_cartographer_profiles[index].profile;
 		}
 	}
