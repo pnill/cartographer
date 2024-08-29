@@ -181,6 +181,6 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 
 void saved_game_files_apply_hooks()
 {
-	WritePointer(Memory::GetAddress(0x39BD90), saved_game_files_memory_initialize);
+	//WritePointer(Memory::GetAddress(0x39BD90), saved_game_files_memory_initialize);
 	//DETOUR_ATTACH(p_saved_games_load_save_file_information_from_disk, Memory::GetAddress<t_saved_games_load_save_file_information_from_disk>(0x46596), saved_games_load_save_file_information_from_disk);
 }

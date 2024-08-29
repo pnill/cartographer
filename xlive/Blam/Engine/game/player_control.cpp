@@ -26,7 +26,7 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 	if (player_control_info->unit_datum_index != NONE)
 	{
 		float fov;
-		const s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
+		const s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
 
 		if (currentVariantSettings.forced_fov != 0)
 		{

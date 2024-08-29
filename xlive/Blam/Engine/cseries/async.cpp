@@ -9,15 +9,12 @@ void __cdecl async_initialize(void)
 	return;
 }
 
-void __cdecl async_yield_until_done(int8* completion, bool play_sound)
+void __cdecl async_yield_until_done(s_async_completion* completion, bool play_sound)
 {
-	if (!completion[0])
+	while(!completion->completed)
 	{
-		do
-		{
-			SwitchToThread();
-			if (play_sound)
-				sound_idle();
-		} while (!completion[0]);
+		SwitchToThread();
+		if (play_sound)
+			sound_idle();
 	}
 }

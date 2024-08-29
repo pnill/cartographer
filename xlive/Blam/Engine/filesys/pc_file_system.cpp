@@ -1,7 +1,12 @@
 #include "stdafx.h"
 #include "pc_file_system.h"
 
-s_pc_file_type_save_path_info* g_pc_file_system_save_path_info;
+/* typedefs */
+
+typedef int(__cdecl* t_pc_file_system_create_directory_hierarchy)(e_pc_file_system_type type, wchar_t* buffer, wchar_t* buffer_2, bool return_folder_path);
+t_pc_file_system_create_directory_hierarchy p_pc_file_system_create_directory_hierarchy;
+
+/* public code */
 
 s_pc_file_type_save_path_info* pc_file_system_get_save_path_info(e_pc_file_system_type type)
 {
@@ -16,9 +21,6 @@ void file_seek_and_read(FILE* file_handle, uint32 file_offset, uint32 read_size,
 	bool read_result = fread(out_buffer, read_size, read_count, file_handle);
 	ASSERT(read_result);
 }
-
-typedef int(__cdecl* t_pc_file_system_create_directory_hierarchy)(e_pc_file_system_type type, wchar_t* buffer, wchar_t* buffer_2, bool return_folder_path);
-t_pc_file_system_create_directory_hierarchy p_pc_file_system_create_directory_hierarchy;
 
 int __cdecl pc_file_system_create_directory_hierarchy(e_pc_file_system_type type, wchar_t* buffer, wchar_t* buffer_2, bool is_folder)
 {
@@ -36,5 +38,5 @@ bool __cdecl pc_file_system_get_drive_letter_for_type(e_pc_file_system_type type
 
 void pc_file_system_apply_hooks()
 {
-	DETOUR_ATTACH(p_pc_file_system_create_directory_hierarchy, Memory::GetAddress<t_pc_file_system_create_directory_hierarchy>(0x8EF9E), pc_file_system_create_directory_hierarchy);
+	//DETOUR_ATTACH(p_pc_file_system_create_directory_hierarchy, Memory::GetAddress<t_pc_file_system_create_directory_hierarchy>(0x8EF9E), pc_file_system_create_directory_hierarchy);
 }

@@ -8,10 +8,10 @@
 
 /* typedef */
 
-typedef bool(__cdecl* t_saved_games_async_helper_write_file)(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, int8* completion);
+typedef bool(__cdecl* t_saved_games_async_helper_write_file)(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
 t_saved_games_async_helper_write_file p_saved_games_async_helper_write_file;
 
-typedef bool(__cdecl* t_saved_games_async_helper_read_file_internal)(int enumerated_index, void* buffer, unsigned int buffer_size, int8* in_out_completion);
+typedef bool(__cdecl* t_saved_games_async_helper_read_file_internal)(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
 t_saved_games_async_helper_read_file_internal p_saved_games_async_helper_read_file_internal;
 
 typedef void(__cdecl* t_saved_games_async_helper_read_file_callback)(int32 a1, int8* context, int32 data_size);
@@ -22,17 +22,17 @@ t_saved_games_async_helper_read_file p_saved_games_async_helper_read_file;
 
 /* private code */
 
-bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, int8* completion)
+bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion)
 {
 	return p_saved_games_async_helper_write_file(enumerated_index, new_display_name, buffer, buffer_size, completion);
 }
 
-bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* buffer, uint32 buffer_size, bool unk_flag, int8* in_out_completion)
+bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* buffer, uint32 buffer_size, bool unk_flag, s_async_completion* in_out_completion)
 {
 	return INVOKE(0x9b149, 0, saved_games_async_helper_async_read_create_task, unk, buffer, buffer_size, unk_flag, in_out_completion);
 }
 
-bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, int8* in_out_completion)
+bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion)
 {
 		s_saved_game_main_menu_globals* saved_game_globals = saved_game_main_menu_globals_get();
 
@@ -49,10 +49,10 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 			{
 				auto test = saved_game_globals->default_save_files[abs_index];
 				csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
-				in_out_completion[2] = 1;
-				*(in_out_completion + 1) = 0;
-				*in_out_completion = 1;
-				*(in_out_completion + 514) = 0x3F800000;
+				in_out_completion->unk_2 = true;
+				in_out_completion->unk_4 = 0;
+				in_out_completion->completed = true;
+				in_out_completion->unk_808 = 1.f;
 				return true;
 			}
 		}
@@ -79,6 +79,7 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 
 void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file_reference, int8* buffer, uint32 buffer_size)
 {
+	// todo: figure out structure of context for async callbacks
 	int32* unk_1 = ((int32*)a1 + 1);
 	int8* unk_2 = &a1[1];
 
@@ -153,24 +154,24 @@ bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, u
 	s_saved_game_files_globals* saved_game_globals = saved_game_files_globals_get();
 
 	// todo: figure out structure of the completetion object for async work
-	int8 in_out_completion[2060];
+	s_async_completion in_out_completion{};
 
-	if (!saved_games_async_helper_read_file_internal(enumerated_index, buffer, buffer_size, in_out_completion))
+	if (!saved_games_async_helper_read_file_internal(enumerated_index, buffer, buffer_size, &in_out_completion))
 		return false;
-	async_yield_until_done(in_out_completion, true);
+	async_yield_until_done(&in_out_completion, true);
 
-	bool result = in_out_completion[0];
+	bool result = in_out_completion.completed;
 	if (!result)
-		saved_game_globals->unk_4 = *(int32*)&in_out_completion[4];
+		saved_game_globals->unk_4 = in_out_completion.unk_4;
 	return result;
 }
 
-bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, int8* completion)
+bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion)
 {
 	return INVOKE(0x9AE4C, 0, saved_games_async_helper_create_task_write_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
 }
 
-bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, int8* completion)
+bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion)
 {
 	return INVOKE(0x9B67D, 0, saved_games_async_helper_create_task_read_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
 }
@@ -211,15 +212,15 @@ bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, u
 
 bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
 {
-	int8 in_out_completion[2060];
+	s_async_completion in_out_completion{};
 
 	wchar_t bin_path[MAX_PATH]{};
 
 	saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
 
-	bool result = saved_games_async_helper_create_task_write_bin_file(bin_path, (int8*)buffer, 0, (int8*)buffer, buffer_size, 0, in_out_completion);
+	bool result = saved_games_async_helper_create_task_write_bin_file(bin_path, (int8*)buffer, 0, (int8*)buffer, buffer_size, false, &in_out_completion);
 
-	async_yield_until_done(in_out_completion, true);
+	async_yield_until_done(&in_out_completion, true);
 
 	return result;
 }
@@ -228,15 +229,15 @@ bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, ui
 {
 	if (saved_games_async_helper_check_saved_game_bin(binary_name, enumerated_file_index))
 	{
-		int8 in_out_completion[2060];
+		s_async_completion in_out_completion{};
 
 		wchar_t bin_path[MAX_PATH]{};
 
 		saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
 
-		bool result = saved_games_async_helper_create_task_read_bin_file(bin_path, buffer, 0, buffer, buffer_size, 0, in_out_completion);
+		bool result = saved_games_async_helper_create_task_read_bin_file(bin_path, buffer, 0, buffer, buffer_size, false, &in_out_completion);
 
-		async_yield_until_done(in_out_completion, true);
+		async_yield_until_done(&in_out_completion, true);
 
 		return result;
 	}

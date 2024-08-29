@@ -194,10 +194,7 @@ void hotkeyFuncGuide() {
 	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
 	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 }
-void hotkeyFuncGuide2() {
-	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_1);
-	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
-}
+
 void hotkeyFuncDebug() {
 	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);
 }
@@ -205,7 +202,6 @@ void hotkeyFuncConsole() {
 	ImGuiHandler::ToggleWindow(CartographerConsole::windowName);
 }
 
-int pause = VK_PAUSE;
 void KeyboardInput::Initialize()
 {
 	if (!enableKeyboard3[0]) {
@@ -219,7 +215,6 @@ void KeyboardInput::Initialize()
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdAlignWindow, hotkeyFuncAlignWindow);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdWindowMode, hotkeyFuncWindowMode);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdGuide, hotkeyFuncGuide);
-	KeyboardInput::RegisterHotkey(&pause, hotkeyFuncGuide2);
 	KeyboardInput::RegisterHotkey(&H2Config_hotkeyIdConsole, hotkeyFuncConsole);
 	// KeyboardInput::RegisterHotkey(&pause, hotkeyFuncDebug);
 }

@@ -237,7 +237,7 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 {
 	input_device* gamepad = g_xinput_devices[gamepad_index];
 	uint16 custom_button_flags[k_number_of_xinput_buttons];
-	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(((e_controller_index)gamepad_index));
+	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(((e_controller_index)gamepad_index));
 
 	XINPUT_STATE state;
 	profile_settings->custom_layout.ToArray(custom_button_flags);

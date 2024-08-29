@@ -34,7 +34,7 @@ void __cdecl render_camera_build_projection(s_camera* camera,
 void __cdecl render_camera_build_projection_static(s_camera* camera, real_rectangle2d* frustum_bounds, render_projection* out_projection)
 {
 	real32 old_camera_field_of_view = camera->vertical_field_of_view;
-	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_user_index(global_render_current_user_index());
+	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(global_render_current_user_index());
 
 	if (profile_settings)
 	{

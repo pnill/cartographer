@@ -258,7 +258,7 @@ void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gam
 void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
 {
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
-	s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
+	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
 	if (profile_settings->controller_deadzone_type == Axial || profile_settings->controller_deadzone_type == Both) {
 		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_x / 100));
@@ -426,7 +426,7 @@ void __cdecl input_abstraction_update()
 		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
 		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
-		s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
+		s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
 		//restore last state from global array before processing
 		input_abstraction_restore_abstracted_inputs(controller);

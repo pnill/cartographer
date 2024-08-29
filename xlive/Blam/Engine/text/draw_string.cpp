@@ -16,9 +16,9 @@ void __cdecl draw_string_set_shadow_color(real_argb_color const* color)
 	INVOKE(0x98A38, 0, draw_string_set_shadow_color, color);
 }
 
-void draw_string_set_unknown_color(real_argb_color const* color)
+void draw_string_set_player_color(real_argb_color const* color)
 {
-	INVOKE(0x9884B, 0, draw_string_set_unknown_color, color);
+	INVOKE(0x9884B, 0, draw_string_set_player_color, color);
 }
 
 void __cdecl draw_string_set_font(int32 font_index)

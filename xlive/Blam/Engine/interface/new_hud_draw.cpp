@@ -16,15 +16,15 @@
 
 static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 {
-	{0},
-	{0xFF0000},
-	{0xFF00},
-	{0xFFFF00},
-	{0x007F00},
-	{0x45059A},
-	{0x9C46C1},
-	{0x55AA},
-	{0x78F0}
+	D3DCOLOR_XRGB(0,0,0),
+	D3DCOLOR_XRGB(255, 0, 0),
+	D3DCOLOR_XRGB(0, 255, 0),
+	D3DCOLOR_XRGB(255, 255, 0),
+	D3DCOLOR_XRGB(0, 127, 0),
+	D3DCOLOR_XRGB(69, 5, 154),
+	D3DCOLOR_XRGB(156, 70, 193),
+	D3DCOLOR_XRGB(00, 85, 170),
+	D3DCOLOR_XRGB(0,120,240),
 };
 
 /* private code */
@@ -220,7 +220,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		if (bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_primary_weapon) ||
 			bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_secondary_weapon))
 		{
-			s_saved_game_cartographer_player_profile_v1* profile_settings = cartographer_player_profile_get_by_user_index(local_render_user_index);
+			s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(local_render_user_index);
 			hud_scale = *get_secondary_hud_scale() * profile_settings->crosshair_scale;
 		}
 		else
@@ -705,7 +705,7 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		int32 ceil_text_width = ceilf(calc_text_width);
 		int32 ceil_text_height = ceilf(calc_text_height);
 
-		draw_string_set_unknown_color(global_real_argb_white);
+		draw_string_set_player_color(global_real_argb_white);
 		draw_string_set_shadow_color(global_real_argb_black);
 
 		switch(text_widget->justification)

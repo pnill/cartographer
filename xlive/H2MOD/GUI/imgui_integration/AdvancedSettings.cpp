@@ -49,7 +49,7 @@ c_static_string<256> g_advanced_settings_temp_string;
 int g_button_placeholders[14];
 
 e_controller_index current_controller_index = _controller_index_0;
-s_saved_game_cartographer_player_profile_v1* current_cartographer_profile;
+s_saved_game_cartographer_player_profile* current_cartographer_profile;
 
 namespace ImGuiHandler {
 	namespace ImAdvancedSettings {

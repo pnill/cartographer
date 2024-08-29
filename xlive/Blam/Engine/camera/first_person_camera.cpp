@@ -11,6 +11,8 @@
 #include "units/unit_definitions.h"
 #include "units/vehicle_definitions.h"
 
+/* private code */
+
 void __cdecl first_person_camera_build_observer_command(datum player_unit_index, real_vector3d* unit_facing, s_observer_command* observer_command)
 {
 	ASSERT(unit_facing);
@@ -21,7 +23,7 @@ void __cdecl first_person_camera_build_observer_command(datum player_unit_index,
 	observer_command->position.orientation = global_zero_vector3d;
 	observer_command->focus_distance = 0.f;
 	observer_command->forward = *unit_facing;
-	observer_command->field_of_view = 1.2217305f;
+	observer_command->field_of_view = DEGREES_TO_RADIANS(70.f);
 	generate_up_vector3d(&observer_command->forward, &observer_command->up);
 	if(player_unit_index != NONE)
 	{
@@ -81,12 +83,12 @@ void __cdecl first_person_camera_update(int8* camera, s_director_update* directo
 	first_person_camera_build_observer_command(player_unit_index, &unit_facing, observer_command);
 
 	s_game_globals* globals = scenario_get_game_globals();
-	s_saved_game_cartographer_player_profile_v1* player_profile = cartographer_player_profile_get_by_user_index(director_update->user_index);
+	s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(director_update->user_index);
 	observer_command->crosshair_position.x = 0.f;
 	observer_command->crosshair_position.y = player_profile->crosshair_offset;
 	real32 field_of_view = player_control_get_field_of_view(director_update->user_index) * 1.f;
 
-	field_of_view = PIN(field_of_view, 0.017453292f, 1.9198622f);
+	field_of_view = PIN(field_of_view, DEGREES_TO_RADIANS(1.f), DEGREES_TO_RADIANS(110.f));
 
 	observer_command->field_of_view = field_of_view;
 
@@ -98,13 +100,14 @@ void __cdecl first_person_camera_update(int8* camera, s_director_update* directo
 	}
 }
 
+/* public code */
+
 void first_person_camera_apply_patches(void)
 {
 	// Set the custom FOV's from our config beforehand
 	observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
 
 	// Patch this call for our custom fov implementation
-	//PatchCall(Memory::GetAddress(0xCD880, 0xB8BF9), player_control_get_field_of_view);
 	DETOUR_ATTACH(p_first_person_camera_update, Memory::GetAddress<t_first_person_camera_update>(0xCD7E1), first_person_camera_update);
 	return;
 }

@@ -50,33 +50,32 @@ void c_player_profile_list::update_displayed_profiles()
 	c_list_item_widget* current_child = (c_list_item_widget*)this->m_child_widget;
 
 	memset(profile_indices, NONE, sizeof(uint32) * 16);
-	while(current_child && current_child_widget_index < 16)
+	for (int current_child_widget_index = 0; current_child_widget_index < 16; ++current_child_widget_index)
 	{
-		if (current_child_widget_index >= 16)
-			break;
-
-		if(current_child->get_last_data_index() != NONE)
+		if (current_child->get_last_data_index() != NONE)
 		{
 			void* item = datum_get(this->m_list_data, current_child->get_last_data_index());
 			if (item)
 				profile_indices[current_child_widget_index] = *((int32*)item + 1);
 		}
 		current_child = (c_list_item_widget*)current_child->next_widget;
-		++current_child_widget_index;
+
+		if (!current_child)
+			break;
 	}
 
-	if(profile_storage_size > 0)
+	if (profile_storage_size > 0)
 	{
 		uint32 current_profile_storage_index = 0;
-		
-		do
+
+		for (int32 current_profile_storage_index = 0; current_profile_storage_index < profile_storage_size; ++current_profile_storage_index)
 		{
 			enumerated_file_index = profile_storage[current_profile_storage_index].enumerated_file_index;
 
 			int32 current_player_profile_indices_index = 0;
-			while(true)
+			for (; current_player_profile_indices_index < 16; ++current_player_profile_indices_index)
 			{
-				if(enumerated_file_index == profile_indices[current_player_profile_indices_index])
+				if (enumerated_file_index == profile_indices[current_player_profile_indices_index])
 				{
 					if (enumerated_file_index != user_interface_globals_get_edit_player_profile_index())
 					{
@@ -84,18 +83,14 @@ void c_player_profile_list::update_displayed_profiles()
 						break;
 					}
 				}
-
-				if (++current_player_profile_indices_index >= 16)
-					break;
 			}
-			if(current_player_profile_indices_index != 16)
+
+			if (current_player_profile_indices_index != 16)
 				profile_indices[current_player_profile_indices_index] = NONE;
 
 			if (current_player_profile_indices_index == 16 && enumerated_file_index != NONE)
 				profile_storage[current_profile_storage_index].enumerated_file_index = NONE;
-
-			++current_profile_storage_index;
-		} while (current_profile_storage_index < profile_storage_size);
+		}
 	}
 
 	for(int32 index = 0; index < 16; ++index)
@@ -106,13 +101,11 @@ void c_player_profile_list::update_displayed_profiles()
 			if(profile_storage_size > 0)
 			{
 				uint32 current_profile_storage_index = 0;
-				do
+				for (; current_profile_storage_index < profile_storage_size; ++current_profile_storage_index)
 				{
 					if (profile_storage[current_profile_storage_index].enumerated_file_index == NONE)
 						break;
-
-					++current_profile_storage_index;
-				} while (current_profile_storage_index < profile_storage_size);
+				}
 
 				if(current_profile_storage_index >= 0 && current_profile_storage_index < profile_storage_size)
 				{
