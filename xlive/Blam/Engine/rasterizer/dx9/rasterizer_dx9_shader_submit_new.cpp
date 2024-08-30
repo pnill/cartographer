@@ -246,10 +246,10 @@ void c_shader_submission_interface_new::stage_texture(
             break;
         case _shader_pass_texture_source_extern_global_convolution1:
         case _shader_pass_texture_source_extern_global_convolution2:
-            convolution_target_index = bitmap_extern_index - 24;
+            convolution_target_index = bitmap_extern_index - _shader_pass_texture_source_extern_global_convolution1;
             ASSERT(IN_RANGE(convolution_target_index, 0, 1));
 
-            target = (e_rasterizer_target)convolution_targets_get()[convolution_target_index];
+            target = (e_rasterizer_target)convolution_targets_get()[bitmap_extern_index];
 
             if (target == _rasterizer_target_convolution_scratch1 ||
                 target == _rasterizer_target_convolution_scratch2 ||
