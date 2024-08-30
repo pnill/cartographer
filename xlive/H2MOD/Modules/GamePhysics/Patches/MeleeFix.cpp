@@ -7,7 +7,6 @@
 #include "physics/character_physics_mode_melee.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
-#include "H2MOD/Modules/Shell/Startup/Startup.h"
 
 FLOATING_POINT_ENV_ACCESS();
 

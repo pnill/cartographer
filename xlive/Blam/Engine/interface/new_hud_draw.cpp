@@ -157,6 +157,8 @@ void hud_widget_effect_evaluate(uint32 local_render_user_index, s_new_hud_tempor
 	}
 	if (out_offset && widget_effect->flags.test(hud_widget_effect_flag_apply_offset))
 	{
+		ASSERT(out_scale);
+
 		const real32 horizontal_value = draw_hud_widget_get_value(NONE, widget_effect->horizontal_offset.input_name);
 		const real32 vertical_value = draw_hud_widget_get_value(NONE, widget_effect->vertical_offset.input_name);
 
@@ -397,7 +399,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			real32 distance_per_territory = ((float)bitmap_width + 1) * hud_scale;
 			real32 base_location = final_location.x - ((user_state->territories_count - 1) * (distance_per_territory * 0.5f));
 
-			for (int32 index = 0; index < user_state->territories_count; ++index)
+			for (uint32 index = 0; index < user_state->territories_count; ++index)
 			{
 				pixel32 territory_color = user_state->territory_pixel_color[index];
 				pixel32_to_real_rgb_color(territory_color, global_hud_draw_widget_special_hud_type_color_primary_get());

@@ -104,9 +104,6 @@ void __cdecl first_person_camera_update(int8* camera, s_director_update* directo
 
 void first_person_camera_apply_patches(void)
 {
-	// Set the custom FOV's from our config beforehand
-	observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
-
 	// Patch this call for our custom fov implementation
 	DETOUR_ATTACH(p_first_person_camera_update, Memory::GetAddress<t_first_person_camera_update>(0xCD7E1), first_person_camera_update);
 	return;

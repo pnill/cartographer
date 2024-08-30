@@ -15,7 +15,6 @@
 #include "main/main_screenshot.h"
 #include "render/render.h"
 
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
 
 /* constants */
@@ -43,7 +42,6 @@ void hud_render_player_indicators(datum player_index);
 
 void hud_patches_on_map_load(void)
 {
-	set_crosshair_offset(H2Config_crosshair_offset);
 	set_primary_hud_scale(1.f);
 	set_secondary_hud_scale(1.f);
 	return;

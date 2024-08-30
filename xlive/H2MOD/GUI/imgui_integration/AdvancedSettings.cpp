@@ -6,7 +6,6 @@
 #include "game/cheats.h"
 #include "game/game.h"
 #include "input/input_abstraction.h"
-#include "interface/hud.h"
 #include "interface/new_hud.h"
 #include "interface/first_person_weapons.h"
 #include "networking/NetworkMessageTypeCollection.h"
@@ -136,27 +135,27 @@ namespace ImGuiHandler {
 					//Player FOV
 					ImGui::Text(advanced_settings_get_string(_advanced_string_player_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					int g_field_of_view = (int)current_cartographer_profile->field_of_view;
-					ImGui::SliderInt("##PlayerFOV1", &g_field_of_view, 45, 110, ""); ImGui::SameLine();
+					int val = current_cartographer_profile->field_of_view;
+					ImGui::SliderInt("##PlayerFOV1", &val, 45, 110, "");
+					ImGui::SameLine();
 					if(ImGui::IsItemEdited())
 					{
-						if (g_field_of_view > 110)
-							current_cartographer_profile->field_of_view = 110.f;
-						else if (g_field_of_view < 45)
-							current_cartographer_profile->field_of_view = 45.f;
-						else
-							current_cartographer_profile->field_of_view = g_field_of_view;
+						current_cartographer_profile->field_of_view = PIN(val, 45, 110);
 					}
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputFloat("##PlayerFOV2", &current_cartographer_profile->field_of_view, 0, 110, "%.1f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
-					if (ImGui::IsItemEdited()) {
-						current_cartographer_profile->field_of_view = PIN(current_cartographer_profile->field_of_view, 45, 110);
+
+					val = current_cartographer_profile->field_of_view;
+					ImGui::InputInt("##PlayerFOV2", &val, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll);
+					ImGui::SameLine();
+					if (ImGui::IsItemEdited()) 
+					{
+						current_cartographer_profile->field_of_view = PIN(val, 45, 110);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "PlayerFov3"), b2_size))
 					{
-						current_cartographer_profile->field_of_view = 78.f;
+						current_cartographer_profile->field_of_view = 78;
 					}
 					ImGui::PopItemWidth();
 
@@ -165,25 +164,28 @@ namespace ImGuiHandler {
 						//Vehicle FOV
 						ImGui::Text(advanced_settings_get_string(_advanced_string_vehicle_field_of_view));
 						ImGui::PushItemWidth(WidthPercentage(80));
-						ImGui::SliderInt("##VehicleFOV1", &H2Config_vehicle_field_of_view, 45, 110, ""); ImGui::SameLine();
+
+						val = current_cartographer_profile->vehicle_field_of_view;
+						ImGui::SliderInt("##VehicleFOV1", &val, 45, 110, ""); ImGui::SameLine();
 						if (ImGui::IsItemEdited())
-							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						{
+							current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
+							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
+						}
 
 						ImGui::PushItemWidth(WidthPercentage(10));
-						ImGui::InputInt("##VehicleFOV2", &H2Config_vehicle_field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
-						if (ImGui::IsItemEdited()) {
-							if (H2Config_vehicle_field_of_view > 110)
-								H2Config_vehicle_field_of_view = 110;
-							if (H2Config_vehicle_field_of_view < 45)
-								H2Config_vehicle_field_of_view = 45;
 
-							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+						val = current_cartographer_profile->vehicle_field_of_view;
+						ImGui::InputInt("##VehicleFOV2", &val, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						if (ImGui::IsItemEdited()) {
+							current_cartographer_profile->vehicle_field_of_view = PIN(val, 45, 110);
+							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "VehicleFOV3"), b2_size))
 						{
-							H2Config_vehicle_field_of_view = 78;
-							observer_set_suggested_field_of_view(H2Config_vehicle_field_of_view);
+							current_cartographer_profile->vehicle_field_of_view = 78;
+							observer_set_suggested_field_of_view(current_cartographer_profile->vehicle_field_of_view);
 						}
 						ImGui::PopItemWidth();
 					}
@@ -195,10 +197,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##Crosshair2", &current_cartographer_profile->crosshair_offset, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (current_cartographer_profile->crosshair_offset > 0.5)
-							current_cartographer_profile->crosshair_offset = 0.5;
-						if (current_cartographer_profile->crosshair_offset < 0)
-							current_cartographer_profile->crosshair_offset = 0;
+						current_cartographer_profile->crosshair_offset = PIN(current_cartographer_profile->crosshair_offset, 0, 0.5);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Crosshair3"), b2_size))
@@ -216,10 +215,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(10));
 					ImGui::InputFloat("##CrosshairSize2", &current_cartographer_profile->crosshair_scale, 0, 110, "%.3f"); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (current_cartographer_profile->crosshair_scale > 2)
-							current_cartographer_profile->crosshair_scale = 2;
-						if (current_cartographer_profile->crosshair_scale < 0)
-							current_cartographer_profile->crosshair_scale = 0;
+						current_cartographer_profile->crosshair_scale = PIN(current_cartographer_profile->crosshair_scale, 0, 2);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "CrosshairSize3"), b2_size))
@@ -375,10 +371,10 @@ namespace ImGuiHandler {
 					ImGui::NextColumn();
 					TextVerticalPad(advanced_settings_get_string(_advanced_string_uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##MK_Sep", &H2Config_mouse_uniform);
+					ImGui::Checkbox("##MK_Sep", &current_cartographer_profile->mouse_uniform);
 					if (ImGui::IsItemEdited())
 					{
-						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -397,16 +393,11 @@ namespace ImGuiHandler {
 						ImGui::PushItemWidth(WidthPercentage(15));
 						ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
-							if (g_raw_scale > 100)
-								g_raw_scale = 100;
-							if (g_raw_scale < 1)
-								g_raw_scale = 1;
-							g_raw_scale = (int)H2Config_raw_mouse_scale;
+							H2Config_raw_mouse_scale = PIN(H2Config_raw_mouse_scale, 1, 100);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "RawMouseScale2"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
-							g_raw_scale = 25;
 							H2Config_raw_mouse_scale = 25.0f;
 						}
 					}
@@ -414,29 +405,26 @@ namespace ImGuiHandler {
 					{
 						ImGui::Text(advanced_settings_get_string(_advanced_string_mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						int g_mouse_sens = (int)H2Config_mouse_sens;
+						int g_mouse_sens = (int)current_cartographer_profile->mouse_sensitivity;
 						ImGui::SliderInt("##Mousesens1", &g_mouse_sens, 1, 100, ""); ImGui::SameLine();
 						if (ImGui::IsItemEdited())
 						{
-							H2Config_mouse_sens = (float)g_mouse_sens;
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+							current_cartographer_profile->mouse_sensitivity = (real32)g_mouse_sens;
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##Mousesens2", &H2Config_mouse_sens, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+
+						ImGui::InputFloat("##Mousesens2", &current_cartographer_profile->mouse_sensitivity, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
-							if (g_mouse_sens > 100)
-								g_mouse_sens = 100;
-							if (g_mouse_sens < 1)
-								g_mouse_sens = 1;
-							g_mouse_sens = (int)H2Config_mouse_sens;
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+
+							current_cartographer_profile->mouse_sensitivity = PIN(current_cartographer_profile->mouse_sensitivity, 1, 100);
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "Mousesens3"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
-							g_mouse_sens = 3;
-							H2Config_mouse_sens = 3.0f;
-							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+							current_cartographer_profile->mouse_sensitivity = 3.0f;
+							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 						}
 					}
 				}
@@ -451,10 +439,10 @@ namespace ImGuiHandler {
 					//Uniform Sensitivity
 					TextVerticalPad(advanced_settings_get_string(_advanced_string_uniform_sensitivity));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##C_Sep", &H2Config_mouse_uniform);
+					ImGui::Checkbox("##C_Sep", &current_cartographer_profile->mouse_uniform);
 					if (ImGui::IsItemEdited())
 					{
-						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
+						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 					}
 					if (ImGui::IsItemHovered())
 					{
@@ -475,11 +463,7 @@ namespace ImGuiHandler {
 					ImGui::PushItemWidth(WidthPercentage(15));
 					ImGui::InputFloat("##Controllersens2", &current_cartographer_profile->controller_sensitivity, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
-						if (g_controller_sens > 100)
-							g_controller_sens = 100;
-						if (g_controller_sens < 1)
-							g_controller_sens = 1;
-						g_controller_sens = (int)current_cartographer_profile->controller_sensitivity;
+						current_cartographer_profile->controller_sensitivity = PIN(current_cartographer_profile->controller_sensitivity, 1, 100);
 						input_abstraction_set_controller_look_sensitivity(current_controller_index, current_cartographer_profile->controller_sensitivity);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));

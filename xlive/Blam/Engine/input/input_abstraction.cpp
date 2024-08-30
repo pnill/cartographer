@@ -305,8 +305,8 @@ void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller,
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 
 	preference->mouse_yaw_rate = (80.0f + 20.0f * value) - 30.0f;
-
-	if (H2Config_mouse_uniform)
+	
+	if (cartographer_player_profile_get_by_user_index(0)->mouse_uniform)
 		preference->mouse_pitch_rate = preference->mouse_yaw_rate;
 	else
 		preference->mouse_pitch_rate = (40.0f + 10.0f * value) - 15.0f;
@@ -333,7 +333,7 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 	}
 	else
 	{
-		input_abstraction_set_mouse_look_sensitivity(controller, H2Config_mouse_sens);
+		input_abstraction_set_mouse_look_sensitivity(controller, cartographer_player_profile_get_by_user_index(0)->mouse_sensitivity);
 	}
 }
 
@@ -549,7 +549,5 @@ void input_abstraction_patches_apply()
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
 	PatchCall(Memory::GetAddress(0x61FBD), input_abstraction_controller_plugged_hook); //inside input_abstraction_update_input_state
-	input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
-	input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
 	input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
 }

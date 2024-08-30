@@ -92,8 +92,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_vertex_shader_permutation(10);
 
-            real32 viewport_middle_x = viewport_width / 2;
-            real32 viewport_middle_y = viewport_height / 2;
+            real32 viewport_middle_x = (real32)(viewport_width / 2);
+            real32 viewport_middle_y = (real32)(viewport_height / 2);
 
             RECT rect;
             rect.left = viewport_left + (viewport_width * sun_surface_quad.x0 / 2.0f + viewport_middle_x);

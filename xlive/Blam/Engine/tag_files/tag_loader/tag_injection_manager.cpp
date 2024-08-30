@@ -439,14 +439,10 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 
 		// Current size is calculated using the offsets of the two indexes
 		// if next offset is none, the current offset is the end of the table and just read max path
-		if (next_offset == NONE)
-			current_size = MAX_PATH;
-		else
-			current_size = next_offset - current_offset;
+		current_size = (next_offset == NONE ? MAX_PATH : next_offset - current_offset);
 
 		// Read the current debug name
 		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
-		return;
 	}
 	else
 	{
@@ -465,10 +461,9 @@ void c_tag_injecting_manager::get_name_by_tag_datum(e_tag_group group, datum cac
 
 		// Read the current debug name
 		file_seek_and_read(this->m_active_map_file_handle, this->m_active_map_cache_header.tag_name_buffer_offset + current_offset, current_size, 1, out_name);
-		return;
 	}
 
-	out_name[0] = '\0';
+	return;
 }
 
 bool c_tag_injecting_manager::initialize_agent(tag_group group)
@@ -556,7 +551,7 @@ datum c_tag_injecting_manager::load_tag(e_tag_group group, datum cache_datum, bo
 	s_tag_injecting_table_entry* new_entry = this->m_table.init_entry(cache_datum, group);
 
 	c_xml_definition_agent* agent = this->get_agent({group});
-	ASSERT(agent != nullptr);
+	ASSERT(agent);
 	new_entry->loaded_data->init(
 		agent->get_definition(),
 		this->m_active_map_file_handle,
@@ -602,6 +597,7 @@ void c_tag_injecting_manager::load_tag_internal(c_tag_injecting_manager* manager
 
 	s_tag_injecting_table_entry* new_entry = manager->m_table.init_entry(cache_datum, group.group);
 	c_xml_definition_agent* agent = manager->get_agent(group);
+	ASSERT(agent);
 	new_entry->loaded_data->init(
 		agent->get_definition(),
 		manager->m_active_map_file_handle,

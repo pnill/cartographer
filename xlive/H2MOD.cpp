@@ -35,7 +35,6 @@
 #include "main/main_render.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
-#include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Transport/transport.h"
 #include "objects/damage.h"
 #include "units/bipeds.h"
@@ -72,7 +71,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
@@ -82,7 +80,6 @@
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #endif
 #include "camera/first_person_camera.h"
-#include "filesys/pc_file_system.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -95,8 +92,6 @@
 #include "interface/new_hud_draw.h"
 #include "interface/user_interface_player_profile_list.h"
 #include "saved_games/cartographer_player_profile.h"
-#include "saved_games/saved_game_files.h"
-#include "saved_games/saved_game_files_async_windows.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -444,10 +439,6 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		if (!Memory::IsDedicatedServer())
 		{
-			input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
-			input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
-			input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
-
 			hud_patches_on_map_load();
 			main_tag_fixes();
 		}

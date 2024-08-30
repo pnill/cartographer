@@ -1,13 +1,16 @@
 #pragma once
+#include "player_profile.h"
+#include "memory/static_arrays.h"
+
+/* constants */
 
 #define k_maximum_enumerated_saved_game_files_any_type_per_memory_unit 4096
 #define k_maximum_enumerated_default_save_game_files 101
 #define k_maximum_enumerated_cached_save_game_files 4
 
-#include "player_profile.h"
-#include "memory/static_arrays.h"
+/* enums */
 
-enum e_saved_game_file_type
+enum e_saved_game_file_type : uint32
 {
 	_saved_game_file_type_profile = 0,
 	_saved_game_file_type_game_variant_slayer = 0x1,
@@ -21,6 +24,8 @@ enum e_saved_game_file_type
 	_saved_game_file_type_game_variant_territories = 0x9,
 	k_number_of_saved_game_file_types = 0xA,
 };
+
+/* structures */
 
 struct s_saved_game_file_loading_information
 {
@@ -84,6 +89,8 @@ struct s_saved_game_files_globals
 	int32 unk_8;
 };
 ASSERT_STRUCT_SIZE(s_saved_game_files_globals, 2312);
+
+/* prototypes */
 
 s_saved_game_main_menu_globals* saved_game_main_menu_globals_get();
 

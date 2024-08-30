@@ -4,9 +4,8 @@
 
 #include "game/game.h"
 #include "game/game_time.h"
-#include "H2MOD/GUI/imgui_integration/ImGui_Handler.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "saved_games/cartographer_player_profile.h"
 
 /* globals */

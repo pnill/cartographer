@@ -1,12 +1,12 @@
 #include "stdafx.h"
-
 #include "saved_game_files_async_windows.h"
 
 #include "saved_game_files.h"
+
 #include "cseries/async.h"
 #include "tag_files/files_windows.h"
 
-/* typedef */
+/* typedefs */
 
 typedef bool(__cdecl* t_saved_games_async_helper_write_file)(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
 t_saved_games_async_helper_write_file p_saved_games_async_helper_write_file;
@@ -19,6 +19,94 @@ t_saved_games_async_helper_read_file_callback p_saved_games_async_helper_read_fi
 
 typedef void(__cdecl* t_saved_games_async_helper_read_file)(uint32 enumerated_index, int8* buffer, uint32 buffer_size);
 t_saved_games_async_helper_read_file p_saved_games_async_helper_read_file;
+
+/* prototypes */
+
+bool __cdecl saved_games_async_helper_write_file(int32 enumerated_index, wchar_t* new_display_name, void* buffer, uint32 buffer_size, s_async_completion* completion);
+bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* buffer, uint32 buffer_size, bool unk_flag, s_async_completion* in_out_completion);
+bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion);
+void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file_reference, int8* buffer, uint32 buffer_size);
+void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context, int32 data_size);
+bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, uint32 buffer_size);
+bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
+bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion);
+
+/* public code */
+
+void saved_games_async_helpers_apply_patches(void)
+{
+	//DETOUR_ATTACH(p_saved_games_async_helper_write_file, Memory::GetAddress<t_saved_games_async_helper_write_file>(0x42CA6), saved_games_async_helper_write_file);
+	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_internal, Memory::GetAddress<t_saved_games_async_helper_read_file_internal>(0x4259E), saved_games_async_helper_read_file_internal);
+	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_callback, Memory::GetAddress<t_saved_games_async_helper_read_file_callback>(0x9B0D0), saved_games_async_helper_read_file_callback);
+	//DETOUR_ATTACH(p_saved_games_async_helper_read_file, Memory::GetAddress<t_saved_games_async_helper_read_file>(0x46450), saved_games_async_helper_read_file);
+	return;
+}
+
+void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_index, const wchar_t* binary_name, wchar_t* out_path)
+{
+	s_saved_game_main_menu_globals_save_file_info file_info{};
+	saved_games_get_file_info(&file_info, enumerated_file_index);
+
+	wcsncpy(out_path, file_info.file_path, 256);
+	wcscat(out_path, binary_name);
+	wcscat(out_path, L".bin");
+	return;
+}
+
+bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index)
+{
+	bool result = false;
+
+	wchar_t bin_path[MAX_PATH]{};
+
+	saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
+
+	utf8 utf8_path[MAX_PATH];
+	wchar_string_to_utf8_string(bin_path, utf8_path, MAX_PATH);
+
+	s_file_reference file_reference;
+	if (file_reference_create_from_path(&file_reference, utf8_path, false))
+	{
+		e_file_open_error t_error;
+		if (file_open(&file_reference, _permission_read_bit, &t_error))
+		{
+			file_close(&file_reference);
+			result = true;
+		}
+	}
+	return result;
+}
+
+bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
+{
+	s_async_completion in_out_completion{};
+	wchar_t bin_path[MAX_PATH]{};
+
+	saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
+
+	bool result = saved_games_async_helper_create_task_write_bin_file(bin_path, (int8*)buffer, 0, (int8*)buffer, buffer_size, false, &in_out_completion);
+
+	async_yield_until_done(&in_out_completion, true);
+
+	return result;
+}
+
+bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
+{
+	bool result = false;
+	if (saved_games_async_helper_check_saved_game_bin(binary_name, enumerated_file_index))
+	{
+		s_async_completion in_out_completion{};
+		wchar_t bin_path[MAX_PATH]{};
+
+		saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
+
+		result = saved_games_async_helper_create_task_read_bin_file(bin_path, buffer, 0, buffer, buffer_size, false, &in_out_completion);
+
+		async_yield_until_done(&in_out_completion, true);
+	}
+	return result;
+}
 
 /* private code */
 
@@ -34,47 +122,46 @@ bool __cdecl saved_games_async_helper_async_read_create_task(void* unk, void* bu
 
 bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, void* buffer, unsigned int buffer_size, s_async_completion* in_out_completion)
 {
-		s_saved_game_main_menu_globals* saved_game_globals = saved_game_main_menu_globals_get();
+	bool result = false;
 
-		auto abs_index = (enumerated_index >> 8) & 0x1FFF;
-		auto last_index = saved_game_globals->default_save_files.get_count() - 1;
+	s_saved_game_main_menu_globals* saved_game_globals = saved_game_main_menu_globals_get();
 
-		// 0x200000 in the index flags that the index is a default file
-		if ((enumerated_index & 0x200000) != 0 && saved_game_globals)
+	// 0x200000 in the index flags that the index is a default file
+	if ((enumerated_index & 0x200000) != 0 && saved_game_globals)
+	{
+		uint32 abs_index = (enumerated_index >> 8) & 0x1FFF;
+		uint32 last_index = saved_game_globals->default_save_files.get_count() - 1;
+
+		// Removed check of buffer_size so it can read the entry from the globals
+		// potentially unsafe will have to come up with a way to verify if this was actually needed or not.
+		if ((abs_index <= last_index || abs_index == last_index))
 		{
-
-			// Removed check of buffer_size so it can read the entry from the globals
-			// potentially unsafe will have to come up with a way to verify if this was actually needed or not.
-			if ((abs_index <= last_index || abs_index == last_index))
-			{
-				auto test = saved_game_globals->default_save_files[abs_index];
-				csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
-				in_out_completion->unk_2 = true;
-				in_out_completion->unk_4 = 0;
-				in_out_completion->completed = true;
-				in_out_completion->unk_808 = 1.f;
-				return true;
-			}
+			csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
+			in_out_completion->unk_2 = true;
+			in_out_completion->unk_4 = 0;
+			in_out_completion->completed = true;
+			in_out_completion->unk_808 = 1.f;
+			result = true;
 		}
-		else
+	}
+	else
+	{
+		s_saved_game_main_menu_globals_save_file_info file_info {};
+		wchar_t file_path[256];
+		char flattened_file_path[256];
+		if(saved_games_get_file_info(&file_info, enumerated_index))
 		{
-			s_saved_game_main_menu_globals_save_file_info file_info {};
-			wchar_t file_path[256];
-			char flattened_file_path[256];
-			if(saved_games_get_file_info(&file_info, enumerated_index))
+			if(file_info.unk_5 != NONE)
 			{
-				if(file_info.unk_5 != NONE)
+				if(saved_games_append_file_type_to_path(file_info.file_path, file_info.type, file_path))
 				{
-					if(saved_games_append_file_type_to_path(file_info.file_path, file_info.type, file_path))
-					{
-						WideCharToMultiByte(0xFDE9u, 0, file_path, -1, flattened_file_path, 256, 0, 0);
-						bool result =  saved_games_async_helper_async_read_create_task(flattened_file_path, buffer, buffer_size, 0, in_out_completion);
-
-						return result;
-					}
+					WideCharToMultiByte(65001, 0, file_path, -1, flattened_file_path, NUMBEROF(flattened_file_path), 0, 0);
+					result = saved_games_async_helper_async_read_create_task(flattened_file_path, buffer, buffer_size, 0, in_out_completion);
 				}
 			}
 		}
+	}
+	return result;
 }
 
 void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file_reference, int8* buffer, uint32 buffer_size)
@@ -134,6 +221,7 @@ void saved_games_async_helper_read_file_success(int8* a1, s_file_reference* file
 		}
 		file_close(file_reference);
 	}
+	return;
 }
 
 void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context, int32 data_size)
@@ -147,6 +235,7 @@ void __cdecl saved_games_async_helper_read_file_callback(int32 a1, int8* context
 	{
 		saved_games_async_helper_read_file_success(*((int8**)context + 3), &file_reference, *(int8**)context, *((uint32*)context + 1));
 	}
+	return;
 }
 
 bool saved_games_async_helper_read_file(uint32 enumerated_index, int8* buffer, uint32 buffer_size)
@@ -174,80 +263,4 @@ bool __cdecl saved_games_async_helper_create_task_write_bin_file(wchar_t* full_p
 bool __cdecl saved_games_async_helper_create_task_read_bin_file(wchar_t* full_path, int8* buffer, uint32 header_size, int8* data, uint32 data_size, bool unk, s_async_completion* completion)
 {
 	return INVOKE(0x9B67D, 0, saved_games_async_helper_create_task_read_bin_file, full_path, buffer, header_size, data, data_size, unk, completion);
-}
-
-/* public code */
-
-void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_index, const wchar_t* binary_name, wchar_t* out_path)
-{
-	s_saved_game_main_menu_globals_save_file_info file_info{};
-	saved_games_get_file_info(&file_info, enumerated_file_index);
-
-	wcsncpy(out_path, file_info.file_path, 256);
-	wcscat(out_path, binary_name);
-	wcscat(out_path, L".bin");
-}
-
-bool saved_games_async_helper_check_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index)
-{
-	wchar_t bin_path[MAX_PATH]{};
-
-	saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
-
-	utf8 utf8_path[MAX_PATH];
-	wchar_string_to_utf8_string(bin_path, utf8_path, MAX_PATH);
-
-	s_file_reference file_reference;
-	if (file_reference_create_from_path(&file_reference, utf8_path, false))
-	{
-		e_file_open_error t_error;
-		if (file_open(&file_reference, _permission_read_bit, &t_error))
-		{
-			file_close(&file_reference);
-			return true;
-		}
-	}
-	return false;
-}
-
-bool saved_games_async_helper_write_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
-{
-	s_async_completion in_out_completion{};
-
-	wchar_t bin_path[MAX_PATH]{};
-
-	saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
-
-	bool result = saved_games_async_helper_create_task_write_bin_file(bin_path, (int8*)buffer, 0, (int8*)buffer, buffer_size, false, &in_out_completion);
-
-	async_yield_until_done(&in_out_completion, true);
-
-	return result;
-}
-
-bool saved_games_async_helper_read_saved_game_bin(const wchar_t* binary_name, uint32 enumerated_file_index, int8* buffer, uint32 buffer_size)
-{
-	if (saved_games_async_helper_check_saved_game_bin(binary_name, enumerated_file_index))
-	{
-		s_async_completion in_out_completion{};
-
-		wchar_t bin_path[MAX_PATH]{};
-
-		saved_games_async_helper_get_saved_game_bin_path(enumerated_file_index, binary_name, bin_path);
-
-		bool result = saved_games_async_helper_create_task_read_bin_file(bin_path, buffer, 0, buffer, buffer_size, false, &in_out_completion);
-
-		async_yield_until_done(&in_out_completion, true);
-
-		return result;
-	}
-	return false;
-}
-
-void saved_games_async_helpers_apply_hooks()
-{
-	//DETOUR_ATTACH(p_saved_games_async_helper_write_file, Memory::GetAddress<t_saved_games_async_helper_write_file>(0x42CA6), saved_games_async_helper_write_file);
-	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_internal, Memory::GetAddress<t_saved_games_async_helper_read_file_internal>(0x4259E), saved_games_async_helper_read_file_internal);
-	//DETOUR_ATTACH(p_saved_games_async_helper_read_file_callback, Memory::GetAddress<t_saved_games_async_helper_read_file_callback>(0x9B0D0), saved_games_async_helper_read_file_callback);
-	//DETOUR_ATTACH(p_saved_games_async_helper_read_file, Memory::GetAddress<t_saved_games_async_helper_read_file>(0x46450), saved_games_async_helper_read_file);
 }
