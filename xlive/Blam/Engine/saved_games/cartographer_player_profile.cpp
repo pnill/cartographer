@@ -130,6 +130,14 @@ bool cartographer_player_profile_verify(s_saved_game_cartographer_player_profile
 
 /* public code */
 
+bool cartographer_player_profile_is_signed_in(e_controller_index controller_index)
+{
+	if (controller_index == k_no_controller)
+		return false;
+
+	return g_cartographer_profiles[controller_index].controller_index != NONE;
+}
+
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_controller_index(e_controller_index controller_index)
 {
 	return &g_cartographer_profiles[controller_index].profile;

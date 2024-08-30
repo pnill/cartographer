@@ -48,7 +48,7 @@ c_static_string<256> g_advanced_settings_temp_string;
 
 int g_button_placeholders[14];
 
-e_controller_index current_controller_index = _controller_index_0;
+e_controller_index current_controller_index = k_no_controller;
 s_saved_game_cartographer_player_profile* current_cartographer_profile;
 
 namespace ImGuiHandler {
@@ -1065,12 +1065,26 @@ namespace ImGuiHandler {
 
 		void set_controller_index(e_controller_index controller_index)
 		{
-			current_controller_index = controller_index;
-			current_cartographer_profile = cartographer_player_profile_get_by_controller_index(controller_index);
+			if (cartographer_player_profile_is_signed_in(controller_index))
+			{
+				current_controller_index = controller_index;
+				current_cartographer_profile = cartographer_player_profile_get_by_controller_index(controller_index);
+			}
+			else
+			{
+				current_controller_index = k_no_controller;
+				current_cartographer_profile = nullptr;
+			}
 		}
 
 		void Open()
 		{
+			if (current_controller_index == k_no_controller)
+			{
+				ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+				return;
+			}
+
 			uint16 Buttons[14];
 			current_cartographer_profile->custom_layout.ToArray(Buttons);
 			for (auto i = 0; i < 14; i++)
@@ -1085,8 +1099,13 @@ namespace ImGuiHandler {
 		void Close()
 		{
 			g_init = false;
-			cartographer_player_profile_save(current_controller_index);
-			SaveH2Config();
+			if (cartographer_player_profile_is_signed_in(current_controller_index))
+			{
+				cartographer_player_profile_save(current_controller_index);
+
+				if(current_controller_index == _controller_index_0)
+					SaveH2Config();
+			}
 		}
 	}
 }

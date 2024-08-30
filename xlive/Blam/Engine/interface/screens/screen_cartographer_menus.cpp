@@ -79,6 +79,7 @@ void c_cartographer_guide_edit_list::button_handler(s_event_record* event_record
 
 	if (button_id == 0) 
 	{
+		ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
 		ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 	}
 	else if (button_id == 1) 

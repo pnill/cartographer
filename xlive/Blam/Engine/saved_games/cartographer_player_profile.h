@@ -54,6 +54,8 @@ struct s_cartographer_profile_run_time
 	uint32 gamepad_index;
 };
 
+bool cartographer_player_profile_is_signed_in(e_controller_index controller_index);
+
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_controller_index(e_controller_index controller_index);
 
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_user_index(uint32 user_index);
