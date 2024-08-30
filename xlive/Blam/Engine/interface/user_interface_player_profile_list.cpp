@@ -43,14 +43,13 @@ void c_player_profile_list::update_displayed_profiles()
 	s_user_interface_player_profile_storage* profile_storage = this->get_displayed_player_profile_storage(&profile_storage_size);
 
 	uint32 profile_indices[16];
-	int32 current_child_widget_index = 0;
 
 	int32 enumerated_file_index = NONE;
 
 	c_list_item_widget* current_child = (c_list_item_widget*)this->m_child_widget;
 
 	memset(profile_indices, NONE, sizeof(uint32) * 16);
-	for (int current_child_widget_index = 0; current_child_widget_index < 16; ++current_child_widget_index)
+	for (int32 current_child_widget_index = 0; current_child_widget_index < 16; ++current_child_widget_index)
 	{
 		if (current_child->get_last_data_index() != NONE)
 		{
@@ -66,8 +65,6 @@ void c_player_profile_list::update_displayed_profiles()
 
 	if (profile_storage_size > 0)
 	{
-		uint32 current_profile_storage_index = 0;
-
 		for (int32 current_profile_storage_index = 0; current_profile_storage_index < profile_storage_size; ++current_profile_storage_index)
 		{
 			enumerated_file_index = profile_storage[current_profile_storage_index].enumerated_file_index;
