@@ -7,6 +7,7 @@ enum e_saved_game_cartographer_player_profile_version : uint32
 	_saved_game_cartographer_player_profile_version_1 = 0x1,
 	_saved_game_cartographer_player_profile_version_2 = 0x2,
 
+	k_saved_game_cartographer_player_profile_version_count,
 	k_saved_game_cartographer_player_profile_version_invalid = -1
 };
 
@@ -20,7 +21,7 @@ struct s_saved_game_cartographer_player_profile_v2
 {
 	e_saved_game_cartographer_player_profile_version version;
 	uint32 signature;
-	uint32 field_of_view;
+	real32 field_of_view;
 	uint32 vehicle_field_of_view;
 	bool static_first_person;
 	real32 mouse_sensitivity;

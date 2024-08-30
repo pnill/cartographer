@@ -41,7 +41,7 @@ void cartographer_player_profile_new<s_saved_game_cartographer_player_profile_v2
 {
 	settings->version = _saved_game_cartographer_player_profile_version_2;
 	settings->signature = cartographer_signature;
-	settings->field_of_view = 78;
+	settings->field_of_view = 78.f;
 	settings->vehicle_field_of_view = 78;
 	settings->static_first_person = false;
 	settings->mouse_sensitivity = 0;
@@ -84,6 +84,8 @@ void cartographer_player_profile_upgrade_to_v2(s_saved_game_cartographer_player_
 
 bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_player_profile* settings, bool* out_upgrade_performed)
 {
+	uint32 upgrade_iterations = 0;
+
 	while(settings->version != g_cartographer_profile_version)
 	{
 		// when creating a newer version of the cartographer profile create a new case to call the new upgrade to function
@@ -97,6 +99,12 @@ bool cartographer_player_profile_upgrade_check(s_saved_game_cartographer_player_
 			break;
 		default:
 			DISPLAY_ASSERT("A cartographer profile version that was un-expected was reached during upgrading!!!");
+			return false;
+		}
+
+		if(++upgrade_iterations == k_saved_game_cartographer_player_profile_version_count)
+		{
+			DISPLAY_ASSERT("Maximum iterations of possible cartographer profile upgrades was reached without success, assuming profile is corrupt.");
 			return false;
 		}
 	}
@@ -159,10 +167,7 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 	{
 		// profile does not exist or is corrupted
 		cartographer_player_profile_new(current_profile);
-		saved_games_async_helper_write_saved_game_bin(cartographer_bin,
-			enumerated_file_index,
-			(int8*)current_profile,
-			sizeof(s_saved_game_cartographer_player_profile));
+		cartographer_player_profile_save(controller_index);
 	}
 	else
 	{
@@ -175,10 +180,7 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 			if (version == k_saved_game_cartographer_player_profile_version_invalid)
 			{
 				cartographer_player_profile_new(current_profile);
-				saved_games_async_helper_write_saved_game_bin(cartographer_bin,
-					enumerated_file_index,
-					(int8*)current_profile,
-					sizeof(s_saved_game_cartographer_player_profile));
+				cartographer_player_profile_save(controller_index);
 			}
 			else
 			{
@@ -196,10 +198,7 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 				{
 					// upgrade check failed over-write original.
 					cartographer_player_profile_new(current_profile);
-					saved_games_async_helper_write_saved_game_bin(cartographer_bin,
-						enumerated_file_index,
-						(int8*)current_profile,
-						sizeof(s_saved_game_cartographer_player_profile));
+					cartographer_player_profile_save(controller_index);
 				}
 			}
 		}

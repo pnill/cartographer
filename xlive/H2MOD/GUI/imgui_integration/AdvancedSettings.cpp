@@ -136,17 +136,27 @@ namespace ImGuiHandler {
 					//Player FOV
 					ImGui::Text(advanced_settings_get_string(_advanced_string_player_field_of_view));
 					ImGui::PushItemWidth(WidthPercentage(80));
-					ImGui::SliderInt("##PlayerFOV1", (int*)&current_cartographer_profile->field_of_view, 45, 110, ""); ImGui::SameLine();
+					int g_field_of_view = (int)current_cartographer_profile->field_of_view;
+					ImGui::SliderInt("##PlayerFOV1", &g_field_of_view, 45, 110, ""); ImGui::SameLine();
+					if(ImGui::IsItemEdited())
+					{
+						if (g_field_of_view > 110)
+							current_cartographer_profile->field_of_view = 110.f;
+						else if (g_field_of_view < 45)
+							current_cartographer_profile->field_of_view = 45.f;
+						else
+							current_cartographer_profile->field_of_view = g_field_of_view;
+					}
 
 					ImGui::PushItemWidth(WidthPercentage(10));
-					ImGui::InputInt("##PlayerFOV2", (int*)&current_cartographer_profile->field_of_view, 0, 110, ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputFloat("##PlayerFOV2", &current_cartographer_profile->field_of_view, 0, 110, "%.1f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						current_cartographer_profile->field_of_view = PIN(current_cartographer_profile->field_of_view, 45, 110);
 					}
 					ImGui::PushItemWidth(WidthPercentage(10));
 					if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "PlayerFov3"), b2_size))
 					{
-						current_cartographer_profile->field_of_view = 78;
+						current_cartographer_profile->field_of_view = 78.f;
 					}
 					ImGui::PopItemWidth();
 
