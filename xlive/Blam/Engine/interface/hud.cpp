@@ -164,7 +164,7 @@ void hud_render_player_indicators(datum player_index)
 				is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
 			*/
 
-			bool is_enemy = player->properties[0].team_index != player->properties[0].team_index;
+			bool is_enemy = game_engine_team_is_enemy((e_game_team)current_player->properties[0].team_index, (e_game_team)player->properties[0].team_index);
 			datum current_index = player_iterator.get_current_datum_index();
 
 			if (current_index != player_index && !is_enemy && current_player->unit_index != NONE)
