@@ -192,7 +192,7 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		return;
 
 	real_rectangle2d bitmap_bounds{};
-	uint32 bitmap_index = -1;
+	uint32 bitmap_index = NONE;
 	uint32 bitmap_width = 0;
 	uint32 bitmap_height = 0;
 
@@ -444,7 +444,6 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		}
 		else
 		{
-			real_point2d stretched_location;
 			final_location.x = final_location.x - ((bitmap_size[0] * hud_scale) * 9.f);
 			final_location.y = final_location.y - ((bitmap_size[1] * hud_scale) * 9.f);
 
