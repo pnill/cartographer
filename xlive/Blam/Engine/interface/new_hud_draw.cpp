@@ -219,8 +219,9 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 	if (bitmap_widget->anchor == _hud_anchor_crosshair)
 	{
-		if (bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_primary_weapon) ||
-			bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_secondary_weapon))
+		if ((bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_primary_weapon) ||
+			bitmap_widget->widget_state.yes_weapon_flags.test(widget_state_weapon_flag_secondary_weapon)) 
+			&& user_state->current_zoom_level == -1)
 		{
 			s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(local_render_user_index);
 			hud_scale = *get_secondary_hud_scale() * profile_settings->crosshair_scale;
@@ -254,16 +255,16 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	}
 
 	real32 calc_registration_x = ((bitmap_bounds.x1 - bitmap_bounds.x0) * registration_point.x) * (float)bitmap_width;
-	real32 calc_offset_x = screen_offset.x + offset_result.x;
+	real32 calc_offset_x = (real32)screen_offset.x + offset_result.x;
 
 	real32 calc_registration_y = ((bitmap_bounds.y1 - bitmap_bounds.y0) * registration_point.y) * (float)bitmap_height;
-	real32 calc_offset_y = screen_offset.y + offset_result.y;
+	real32 calc_offset_y = (real32)screen_offset.y + offset_result.y;
 
 	real32 final_point_x = (((calc_offset_x - calc_registration_x) + bitmap_bounds.x0) * hud_scale) + anchor_point.x;
 	real32 final_point_y = (((calc_offset_y - calc_registration_y) + bitmap_bounds.y0) * hud_scale) + anchor_point.y;
 
 	real_point2d final_location{ final_point_x, final_point_y };
-	real32 bitmap_size[2]{ (float)bitmap_width, (float)bitmap_height };
+	real_vector2d bitmap_size{ (float)bitmap_width, (float)bitmap_height };
 
 	if (bitmap_widget->flags.test(bitmap_widget_flag_flip_horizontally))
 	{
@@ -444,22 +445,19 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 		}
 		else
 		{
-			final_location.x = final_location.x - ((bitmap_size[0] * hud_scale) * 9.f);
-			final_location.y = final_location.y - ((bitmap_size[1] * hud_scale) * 9.f);
+			final_location.x = final_location.x - ((bitmap_size.i * hud_scale) * 9.f);
+			final_location.y = final_location.y - ((bitmap_size.j * hud_scale) * 9.f);
 
-			real_rectangle2d stretched_bounds;
 			bitmap_bounds.y0 = bitmap_bounds.y0 - ((bitmap_bounds.y1 - bitmap_bounds.y0) * 9.f);
 			bitmap_bounds.x0 = bitmap_bounds.x0 - ((bitmap_bounds.x1 - bitmap_bounds.x0) * 9.f);
-			stretched_bounds.y1 = bitmap_bounds.y1;
-			stretched_bounds.x1 = bitmap_bounds.x1;
 
 			hud_scale = hud_scale * 10;
 
 			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
 				final_location.y,
-				bitmap_width,
-				bitmap_height,
+				bitmap_size.i,
+				bitmap_size.j,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -476,10 +474,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x1 = bitmap_bounds.x0;
 
 			render_ingame_user_interface_hud_element_hook(
-				bitmap_size[0] * hud_scale + final_location.x,
+				(bitmap_size.i * hud_scale) + final_location.x,
 				final_location.y,
-				bitmap_width,
-				bitmap_height,
+				bitmap_size.i,
+				bitmap_size.j,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -499,9 +497,9 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 
 			render_ingame_user_interface_hud_element_hook(
 				final_location.x,
-				bitmap_size[1] * hud_scale + final_location.y,
-				bitmap_width,
-				bitmap_height,
+				bitmap_size.j * hud_scale + final_location.y,
+				bitmap_size.i,
+				bitmap_size.j,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
@@ -518,10 +516,10 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 			flipped_bounds.x0 = bitmap_bounds.x1;
 			flipped_bounds.x1 = bitmap_bounds.x0;
 			render_ingame_user_interface_hud_element_hook(
-				bitmap_size[0] * hud_scale + final_location.x,
-				bitmap_size[1] * hud_scale + final_location.y,
-				bitmap_width,
-				bitmap_height,
+				(bitmap_size.i * hud_scale) + final_location.x,
+				bitmap_size.j * hud_scale + final_location.y,
+				bitmap_size.i,
+				bitmap_size.j,
 				hud_scale,
 				theta_result,
 				bitmap_widget->bitmap.index,
