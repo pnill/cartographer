@@ -5,15 +5,22 @@
 #include "game/game.h"
 #include "game/game_time.h"
 #include "networking/logic/life_cycle_manager.h"
-#include "H2MOD/Modules/Shell/Config.h"
+#include "H2MOD/Modules/Input/ControllerInput.h"
+#include "saved_games/cartographer_player_profile.h"
 
 /* globals */
+typedef DWORD(WINAPI* XInputGetStateEx_t)(DWORD dwUserIndex, XINPUT_STATE* pState);
+XInputGetStateEx_t XInputGetStateEx;
+
+HMODULE g_xinput1_4_module;
 
 bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
-uint16 radialDeadzone = 0;
+uint16 radialDeadzone[k_number_of_controllers] = {0,0,0,0};
+
+bool g_controller_home_button_state[k_number_of_controllers] = { false, false, false, false };
 
 uint32 XINPUT_BUTTON_FLAGS[k_number_of_xinput_buttons] =
 {
@@ -134,7 +141,7 @@ int16 input_xinput_adjust_thumb_axis_deadzone(int16 thumb_axis, int16 thumb_dead
 
 // Radial deadzone is being calculated using the Pythagorean Theorem, if the point is outside of the given Radius 
 // it is accepted as valid input otherwise it is rejected.
-void input_xinput_adjust_thumb_radial_deadzones(s_gamepad_input_button_state* gamepad_state)
+void input_xinput_adjust_thumb_radial_deadzones(uint32 gamepad_index, s_gamepad_input_button_state* gamepad_state)
 {
 	int16 lx = gamepad_state->thumb_left.x;
 	int16 ly = gamepad_state->thumb_left.y;
@@ -146,7 +153,7 @@ void input_xinput_adjust_thumb_radial_deadzones(s_gamepad_input_button_state* ga
 	uint32 rh = (rx * rx) + (ry * ry);
 
 	// If the radius of the stick moved is less than the deadzone radius set the stick positions to zero
-	uint32 radius = radialDeadzone * radialDeadzone;
+	uint32 radius = radialDeadzone[gamepad_index] * radialDeadzone[gamepad_index];
 	if (lh <= radius)
 	{
 		gamepad_state->thumb_left.x = 0;
@@ -213,9 +220,9 @@ bool input_xinput_update_gamepad(uint32 gamepad_index, uint32 duration_ms, s_gam
 	gamepad_state->thumb_right.x = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRX, preference.gamepad_axial_deadzone_right_x);
 	gamepad_state->thumb_right.y = input_xinput_adjust_thumb_axis_deadzone(state.Gamepad.sThumbRY, preference.gamepad_axial_deadzone_right_y);
 
-	if (radialDeadzone)
+	if (radialDeadzone[gamepad_index])
 	{
-		input_xinput_adjust_thumb_radial_deadzones(gamepad_state);
+		input_xinput_adjust_thumb_radial_deadzones(gamepad_index, gamepad_state);
 	}
 
 	return gamepad_state->thumb_left.x > 0
@@ -229,13 +236,15 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 {
 	input_device* gamepad = g_xinput_devices[gamepad_index];
 	uint16 custom_button_flags[k_number_of_xinput_buttons];
+	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(((e_controller_index)gamepad_index));
 
 	XINPUT_STATE state;
-	H2Config_CustomLayout.ToArray(custom_button_flags);
+	profile_settings->custom_layout.ToArray(custom_button_flags);
 
 	ASSERT(out_buttons != nullptr);
 	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)
 	{
+		
 		if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 		{
 			for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
@@ -253,6 +262,17 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 	}
 }
 
+bool __cdecl xinput_load()
+{
+	g_xinput1_4_module = LoadLibraryW(L"xinput1_4.dll");
+
+	if (g_xinput1_4_module)
+	{
+		XInputGetStateEx = (XInputGetStateEx_t)GetProcAddress(g_xinput1_4_module, (LPCSTR)100);
+	}
+
+	return INVOKE(0x8AD1B, 0, xinput_load);
+}
 
 void xinput_apply_patches(void)
 {
@@ -261,5 +281,6 @@ void xinput_apply_patches(void)
 
 	PatchCall(Memory::GetAddress(0x2FBDA), input_xinput_update_rumble_state);
 	PatchCall(Memory::GetAddress(0x2FC34), input_xinput_clear_rumble_state);
+	PatchCall(Memory::GetAddress(0x2FD7E), xinput_load);
 	return;
 }

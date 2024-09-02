@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "input_abstraction.h"
 #include "game/game_time.h"
+#include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
+#include "saved_games/cartographer_player_profile.h"
 
 /* globals */
 
 s_input_abstraction_globals* input_abstraction_globals;
-extern uint16 radialDeadzone;
+extern uint16 radialDeadzone[k_number_of_controllers];
 //we need this because theres only a single abstracted_inputs inside input_abstraction_globals for h2v
 s_game_abstracted_input_state g_abstract_input_states[k_number_of_controllers];
 //buffers to store old windows input states
@@ -76,6 +78,11 @@ bool __cdecl input_abstraction_get_key_state(int16 key)
 uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a3)
 {
 	return INVOKE_TYPE(0x5E501, 0x0, uint32(__thiscall*)(s_input_abstraction_globals*, e_button_functions, void*), input_abstraction_globals, button, a3);
+}
+
+bool input_abstraction_preferences_new(s_gamepad_input_preferences* preferences, int16 a2, bool a3, bool a4)
+{
+	return INVOKE(0x5EE72, 0, input_abstraction_preferences_new, preferences, a2, a3, a4);
 }
 
 uint32 input_abstraction_get_stick_type_for_function(e_button_functions function)
@@ -251,10 +258,11 @@ void input_abstraction_update_throttles_modern(s_gamepad_input_button_state* gam
 void input_abstraction_set_controller_thumb_deadzone(e_controller_index controller)
 {
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+	s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
-	if (H2Config_Controller_Deadzone == Axial || H2Config_Controller_Deadzone == Both) {
-		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_X / 100));
-		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_A_Y / 100));
+	if (profile_settings->controller_deadzone_type == Axial || profile_settings->controller_deadzone_type == Both) {
+		preference->gamepad_axial_deadzone_right_x = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_x / 100));
+		preference->gamepad_axial_deadzone_right_y = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_axial_y / 100));
 
 	}
 	else
@@ -262,13 +270,13 @@ void input_abstraction_set_controller_thumb_deadzone(e_controller_index controll
 		preference->gamepad_axial_deadzone_right_x = 0;
 		preference->gamepad_axial_deadzone_right_y = 0;
 	}
-	if (H2Config_Controller_Deadzone == Radial || H2Config_Controller_Deadzone == Both)
+	if (profile_settings->controller_deadzone_type == Radial || profile_settings->controller_deadzone_type == Both)
 	{
-		radialDeadzone = (uint16)((real32)INT16_MAX * (H2Config_Deadzone_Radial / 100));
+		radialDeadzone[controller] = (uint16)((real32)INT16_MAX * (profile_settings->deadzone_radial / 100));
 	}
 	else
 	{
-		radialDeadzone = 0;
+		radialDeadzone[controller] = 0;
 	}
 }
 void input_abstraction_set_controller_look_sensitivity(e_controller_index controller, real32 value)
@@ -297,8 +305,8 @@ void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller,
 	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
 
 	preference->mouse_yaw_rate = (80.0f + 20.0f * value) - 30.0f;
-
-	if (H2Config_mouse_uniform)
+	
+	if (cartographer_player_profile_get_by_user_index(0)->mouse_uniform)
 		preference->mouse_pitch_rate = preference->mouse_yaw_rate;
 	else
 		preference->mouse_pitch_rate = (40.0f + 10.0f * value) - 15.0f;
@@ -325,7 +333,7 @@ void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_g
 	}
 	else
 	{
-		input_abstraction_set_mouse_look_sensitivity(controller, H2Config_mouse_sens);
+		input_abstraction_set_mouse_look_sensitivity(controller, cartographer_player_profile_get_by_user_index(0)->mouse_sensitivity);
 	}
 }
 
@@ -395,6 +403,8 @@ void input_abstraction_restore_abstracted_inputs(e_controller_index controller)
 		sizeof(s_game_abstracted_input_state));
 }
 
+bool g_controller_advanced_settings_toggle[4] {false, false, false, false};
+
 void __cdecl input_abstraction_update()
 {
 	//INVOKE(0x628A8, 0x0, input_abstraction_update);
@@ -416,9 +426,12 @@ void __cdecl input_abstraction_update()
 		s_gamepad_input_button_state* gamepad_state = input_get_gamepad_state(controller);
 		s_game_input_state* game_input_state = &input_abstraction_globals->input_states[controller];
 		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+		s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_controller_index(controller);
 
 		//restore last state from global array before processing
 		input_abstraction_restore_abstracted_inputs(controller);
+
+
 
 		if (!gamepad_state)
 		{
@@ -454,7 +467,7 @@ void __cdecl input_abstraction_update()
 		else
 		{
 
-			if (!H2Config_controller_modern)
+			if (!profile_settings->controller_modern)
 			{
 				input_abstraction_update_throttles_legacy(gamepad_state, &left_stick, &right_stick);
 			}
@@ -465,8 +478,7 @@ void __cdecl input_abstraction_update()
 
 			if (!input_abstraction_globals->input_has_gamepad[controller])
 				input_abstraction_globals->input_has_gamepad[controller] = true;
-
-
+					
 
 			if (controller == k_windows_device_controller_index)
 			{
@@ -494,7 +506,22 @@ void __cdecl input_abstraction_update()
 					game_input_state);
 			}
 
+			// crappy but it works
+			if (gamepad_state->button_frames_down[_xinput_gamepad_back] > 10 && gamepad_state->button_msec_down[_xinput_gamepad_dpad_up] > 10)
+			{
+				if (!g_controller_advanced_settings_toggle[controller])
+				{
+					ImGuiHandler::ImAdvancedSettings::set_controller_index(controller);
+					ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
+					g_controller_advanced_settings_toggle[controller] = true;
+				}
+			}
+			else
+			{
+				g_controller_advanced_settings_toggle[controller] = false;
+			}
 		}
+
 		//store to array after processing is done
 		input_abstraction_store_abstracted_inputs(controller);
 	}
@@ -522,7 +549,5 @@ void input_abstraction_patches_apply()
 
 	PatchCall(Memory::GetAddress(0x39B82), input_abstraction_update);
 	PatchCall(Memory::GetAddress(0x61FBD), input_abstraction_controller_plugged_hook); //inside input_abstraction_update_input_state
-	input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
-	input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
 	input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
 }

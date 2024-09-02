@@ -8,6 +8,15 @@
 #include "effects/player_effects.h"
 #include "scenario/scenario_fog.h"
 
+/* enums */
+
+enum e_screen_split_type : int8
+{
+	_screen_split_type_full = 0,
+	_screen_split_type_half = 1,
+	_screen_split_type_quarter = 2,
+};
+
 /* structures */
 
 struct s_bloom_window_data
@@ -63,7 +72,28 @@ ASSERT_STRUCT_SIZE(window_bound, 280);
 
 /* public code */
 
+bool __cdecl render_ingame_user_interface_hud_element_hook(
+	real32 left,
+	real32 top,
+	int16 x,
+	int16 y,
+	real32 scale,
+	real32 rotation_rad,
+	datum bitmap_tag_index,
+	datum bitmap,
+	real_rectangle2d* bounds,
+	datum shader_tag_index);
+
 void render_apply_patches(void);
+
+
+int32 get_global_render_window_count();
+
+bool get_global_render_split_horizontally();
+
+e_controller_index global_render_current_controller_index();
+
+uint32 global_render_current_user_index();
 
 s_frame* global_window_parameters_get(void);
 
@@ -96,6 +126,8 @@ void draw_render_layer(e_collection_type collection_type, e_render_layer render_
 // Get cluster index and leaf index from render position provided
 // Return true if out_cluster_index and out_leaf_index are valid
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index);
+
+e_screen_split_type get_screen_split_type(uint32 render_user_index);
 
 // Render window
 void __cdecl render_window(window_bound* window, bool is_texture_camera);

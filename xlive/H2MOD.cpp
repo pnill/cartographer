@@ -23,7 +23,6 @@
 #include "interface/hud_messaging.h"
 #include "interface/interface.h"
 #include "interface/motion_sensor.h"
-#include "interface/first_person_camera.h"
 #include "interface/first_person_weapons.h"
 #include "interface/new_hud.h"
 #include "interface/user_interface_text.h"
@@ -36,7 +35,6 @@
 #include "main/main_render.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
-#include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Transport/transport.h"
 #include "objects/damage.h"
 #include "units/bipeds.h"
@@ -73,7 +71,6 @@
 #include "H2MOD/Modules/GamePhysics/Patches/MeleeFix.h"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
 #include "H2MOD/Modules/HaloScript/HaloScript.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "H2MOD/Modules/Input/KeyboardInput.h"
 #include "H2MOD/Modules/KantTesting/KantTesting.h"
 #include "H2MOD/Modules/MainMenu/MapSlots.h"
@@ -82,6 +79,7 @@
 #ifndef NDEBUG
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #endif
+#include "camera/first_person_camera.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -91,6 +89,9 @@
 #include "H2MOD/Tags/MetaExtender.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "interface/new_hud_draw.h"
+#include "interface/user_interface_player_profile_list.h"
+#include "saved_games/cartographer_player_profile.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
 
@@ -438,12 +439,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 		if (!Memory::IsDedicatedServer())
 		{
-			input_abstraction_set_controller_thumb_deadzone(_controller_index_0);
-			input_abstraction_set_controller_look_sensitivity(_controller_index_0, H2Config_controller_sens);
-			input_abstraction_set_mouse_look_sensitivity(_controller_index_0, H2Config_mouse_sens);
-
 			hud_patches_on_map_load();
-			new_hud_patches_on_map_load(game_mode_ui_shell);
 			main_tag_fixes();
 		}
 
@@ -940,6 +936,9 @@ void H2MOD::ApplyHooks() {
 		input_abstraction_patches_apply();
 		render_apply_patches();
 		apply_interface_hooks();
+
+		user_interface_player_profile_list_apply_patches();
+		new_hud_draw_apply_patches();
 	}
 	else {
 		LOG_INFO_GAME("{} - applying dedicated server hooks", __FUNCTION__);
@@ -972,7 +971,7 @@ void H2MOD::Initialize()
 	{
 		playlist_loader::initialize();
 	}
-
+	cartographer_player_profile_initialize();
 	tag_injection_initialize();
 	CommandCollection::InitializeCommands();
 	CustomVariantHandler::RegisterCustomVariants();

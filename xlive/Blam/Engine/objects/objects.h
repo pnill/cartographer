@@ -304,6 +304,8 @@ datum __cdecl object_get_parent_recursive(datum parent_index);
 
 int16 __cdecl object_get_markers_by_string_id(datum object_index, string_id marker, object_marker* marker_object, int16 count);
 
-void objects_apply_patches(void);
-
 void __cdecl objects_purge_deleted_objects(void);
+
+void __cdecl object_get_velocities(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity);
+
+void objects_apply_patches(void);

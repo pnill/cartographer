@@ -8,7 +8,7 @@
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Utils/Utils.h"
-
+#include "input/controllers.h"
 
 
 static BYTE enableKeyboard3[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
@@ -191,8 +191,10 @@ void hotkeyFuncToggleHideIngameChat() {
 	}
 }
 void hotkeyFuncGuide() {
+	ImGuiHandler::ImAdvancedSettings::set_controller_index(_controller_index_0);
 	ImGuiHandler::ToggleWindow(k_advanced_settings_window_name);
 }
+
 void hotkeyFuncDebug() {
 	ImGuiHandler::ToggleWindow(ImGuiHandler::ImDebugOverlay::windowName);
 }
@@ -200,7 +202,6 @@ void hotkeyFuncConsole() {
 	ImGuiHandler::ToggleWindow(CartographerConsole::windowName);
 }
 
-int pause = VK_PRIOR;
 void KeyboardInput::Initialize()
 {
 	if (!enableKeyboard3[0]) {

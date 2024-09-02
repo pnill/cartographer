@@ -35,6 +35,8 @@ void matrix4x3_from_point_and_vectors(real_matrix4x3* matrix, const real_point3d
 
 void matrix4x3_inverse(const real_matrix4x3* input, real_matrix4x3* output);
 
+void __cdecl matrix4x3_inverse_transform_normal(real_matrix4x3* input, real_vector3d* input_vector, real_vector3d* out_vector);
+
 void __fastcall matrix4x3_multiply(const real_matrix4x3* matrix1, const real_matrix4x3* matrix2, real_matrix4x3* out);
 
 void matrix4x3_translation(real_matrix4x3* matrix, const real_point3d* position);

@@ -43,18 +43,6 @@ bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
 int8 H2Config_static_lod_state = _render_lod_disabled;
-int H2Config_field_of_view = 78;
-int H2Config_vehicle_field_of_view = 78;
-bool H2Config_static_first_person = false;
-float H2Config_mouse_sens = 0;
-bool H2Config_mouse_uniform = false;
-float H2Config_controller_sens = 0;
-bool H2Config_controller_modern = false;
-H2Config_Deadzone_Type H2Config_Controller_Deadzone = H2Config_Deadzone_Type::Axial;
-float H2Config_Deadzone_A_X = 26.0f;
-float H2Config_Deadzone_A_Y = 26.0f;
-float H2Config_Deadzone_Radial = 1.0f;
-float H2Config_crosshair_offset = NAN;
 bool H2Config_disable_ingame_keyboard = false;
 bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
@@ -105,7 +93,6 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 #define GET_CONF(_simple_ini, _config_name, _default_setting, _out_value) \
 	get_conf_value(_simple_ini, H2ConfigVersionSection.c_str(), _config_name, _default_setting, _out_value)
 
-float H2Config_crosshair_scale = 1.0f;
 float H2Config_raw_mouse_scale = 25.0f;
 
 e_override_texture_resolution H2Config_Override_Shadows;
@@ -225,13 +212,6 @@ void SaveH2Config() {
 				"\n# 1 - Enables Discord Rich Presence."
 				"\n\n"
 
-				/*
-				"# controller_aim_assist Options (Client):"
-				"\n# 0 - Disables aim assist for controllers."
-				"\n# 1 - Enables aim assist for controllers."
-				"\n\n"
-				*/
-
 				"# fps_limit Options (Client):"
 				"\n# <uint> - 0 disables the built in frame limiter. >0 is the fps limit of the game."
 				"\n\n"
@@ -247,16 +227,8 @@ void SaveH2Config() {
 				"\n# 6 - L6 - Cinematic"
 				"\n\n"
 
-				"# field_of_view Options (Client):"
-				"\n# <uint 0 to 110> - 0 disables the built in FoV adjustment. >0 is the FoV set value."
-				"\n\n"
-
 				"# refresh_rates Options (Client):"
 				"\n# <uint 0 to 240> - 0 disables the built in refresh rate adjustment. >0 is the refresh rate set value."
-				"\n\n"
-
-				"# mouse_sens Options (Client):"
-				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
 				"\n\n"
 
 				"# Force Max Shader LOD Options (Client):"
@@ -279,10 +251,6 @@ void SaveH2Config() {
 				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
 				"\n\n"
 
-				"# crosshair_offset Options (Client):"
-				"\n# <0 to 0.53> - NaN disables the built in Crosshair adjustment."
-				"\n\n"
-
 				"# disable_ingame_keyboard Options (Client):"
 				"\n# 0 - Normal Game Controls."
 				"\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus."
@@ -299,48 +267,6 @@ void SaveH2Config() {
 			"\n# 0 - Non-host players cannot delay the game start countdown timer."
 			"\n# 1 - Non-host players can delay the game start countdown timer (native default)."
 			"\n\n";
-
-		/*
-		if (Memory::IsDedicatedServer()) {
-			iniStringBuffer <<
-				"# mp_explosion_physics Options (Server):"
-				"\n# 0 - Explosions do not push players or vehicles they drive."
-				"\n# 1 - Enables explosion physics for players in the game."
-				"\n\n"
-
-				"# mp_sputnik Options (Server):"
-				"\n# 0 - Sputnik skull is off."
-				"\n# 1 - Sputnik skull is on for all players."
-				"\n\n"
-
-				"# mp_grunt_bday_party Options (Server):"
-				"\n# 0 - Grunt Birthday Party skull is off."
-				"\n# 1 - Grunt Birthday Party skull is on for all players."
-				"\n\n"
-
-				"# grenade_chain_react Options (Server):"
-				"\n# 0 - Grenades do not chain react in multiplayer."
-				"\n# 1 - Grenades chain react in multiplayer."
-				"\n\n"
-
-				"# banshee_bomb Options (Server):"
-				"\n# 0 - Players cannot use the Banshee Bomb in multiplayer."
-				"\n# 1 - Players can use the Banshee Bomb in multiplayer."
-				"\n\n",
-
-				"# mp_blind Options (Server):"
-				"\n# 0 - Players do not have missing HUD or First Person elements."
-				"\n# 1 - Players cannot see their HUD."
-				"\n# 2 - Players cannot see their First Person Model."
-				"\n# 3 - Players cannot see their HUD or First Person Model."
-				"\n\n"
-
-				"# banshee_bomb Options (Server):"
-				"\n# 0 - Players cannot use their Flashlight in multiplayer."
-				"\n# 1 - Players can use their Flashlight in multiplayer."
-				"\n\n";
-		}
-		*/
 
 		iniStringBuffer <<
 			"# debug_log Options:"
@@ -427,13 +353,6 @@ void SaveH2Config() {
 				"\n# The number used is the keyboard Virtual-Key (VK) Code in base-10 integer form."
 				"\n# The codes in hexadecimal (base-16) form can be found here:"
 				"\n# https://msdn.microsoft.com/en-us/library/windows/desktop/dd375731(v=vs.85).aspx"
-				"\n\n"
-
-				"# crosshair_... size Options (Client):"
-				"\n# 0 - Disables the crosshair width/height from being displayed."
-				"\n# 1 - Default width/height size "
-				"\n# Anything above 1 will change the width/height to the indicated size"
-				"\n# The size can range from a minimum of 0 to a maximum of 65535"
 				"\n\n";
 		}
 
@@ -460,21 +379,9 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
 
-			//ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_aim_assist", H2Config_controller_aim_assist);
-
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "static_lod_state", H2Config_static_lod_state);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
-
-			ini.SetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", H2Config_static_first_person);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_sens", std::to_string(H2Config_mouse_sens).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 
@@ -482,32 +389,6 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_sens", std::to_string(H2Config_controller_sens).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
-
-			if (FloatIsNaN(H2Config_crosshair_offset)) {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN");
-			}
-			else {
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", std::to_string(H2Config_crosshair_offset).c_str());
-			}
-			if(FloatIsNaN(H2Config_crosshair_scale))
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN");
-			}
-			else
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", std::to_string(H2Config_crosshair_scale).c_str());
-			}
 			if(FloatIsNaN(H2Config_raw_mouse_scale))
 			{
 				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25");
@@ -526,8 +407,6 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 
-			ini.SetValue(H2ConfigVersionSection.c_str(), "controller_layout", H2Config_CustomLayout.ToString().c_str());
-
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
@@ -537,24 +416,6 @@ void SaveH2Config() {
 		}
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "enable_xdelay", H2Config_xDelay);
-
-		/*
-		if (Memory::IsDedicatedServer()) {
-			fputs("\nmp_explosion_physics = ", fileConfig); fputs(AdvLobbySettings_mp_explosion_physics ? "1" : "0", fileConfig);
-
-			fputs("\nmp_sputnik = ", fileConfig); fputs(AdvLobbySettings_mp_sputnik ? "1" : "0", fileConfig);
-
-			fputs("\nmp_grunt_bday_party = ", fileConfig); fputs(AdvLobbySettings_mp_grunt_bday_party ? "1" : "0", fileConfig);
-
-			fputs("\ngrenade_chain_react = ", fileConfig); fputs(AdvLobbySettings_grenade_chain_react ? "1" : "0", fileConfig);
-
-			fputs("\nbanshee_bomb = ", fileConfig); fputs(AdvLobbySettings_banshee_bomb ? "1" : "0", fileConfig);
-
-			char tmpChar[2] = { '0' + AdvLobbySettings_mp_blind, 0 };
-			fputs("\nmp_blind = ", fileConfig); fputs(tmpChar, fileConfig);
-
-			fputs("\nflashlight = ", fileConfig); fputs(AdvLobbySettings_flashlight ? "1" : "0", fileConfig);
-		}*/
 
 		ini.SetBoolValue(H2ConfigVersionSection.c_str(), "debug_log", H2Config_debug_log);
 
@@ -710,7 +571,7 @@ void ReadH2Config() {
 				std::string language_code(ini.GetValue(H2ConfigVersionSection.c_str(), "language_code", "-1x0"));
 				if (!language_code.empty())
 				{
-					size_t delimiter_offset = language_code.find("x");
+					size_t delimiter_offset = language_code.find('x');
 					if (delimiter_offset != std::string::npos)
 					{
 						std::string code_main_substr = language_code.substr(0, delimiter_offset);
@@ -729,10 +590,6 @@ void ReadH2Config() {
 
 				GET_CONF(&ini, "static_lod_state", "0", &H2Config_static_lod_state);
 
-				H2Config_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "field_of_view", H2Config_field_of_view);
-				H2Config_vehicle_field_of_view = ini.GetLongValue(H2ConfigVersionSection.c_str(), "vehicle_field_of_view", H2Config_vehicle_field_of_view);
-				H2Config_static_first_person = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "static_fp_fov", false);
-
 				switch(1)
 				{
 					case 0:
@@ -747,56 +604,8 @@ void ReadH2Config() {
 						break;
 				}
 				
-				std::string crosshair_offset_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_offset", "NaN"));
-				if (crosshair_offset_str != "NaN")
-					H2Config_crosshair_offset = std::stof(crosshair_offset_str);
-				else
-					H2Config_crosshair_offset = 0.138f;
-
-				std::string crosshair_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "crosshair_scale", "NaN"));
-				if (crosshair_scale_str != "NaN")
-					H2Config_crosshair_scale = std::stof(crosshair_scale_str);
-				else
-					H2Config_crosshair_scale = 1.0f;
 				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
 				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
-
-				H2Config_mouse_uniform = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "mouse_uniform_sens", H2Config_mouse_uniform);
-				std::string mouse_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_sens", "0"));
-				H2Config_mouse_sens = std::stof(mouse_sens_str);
-				std::string controller_sens_str(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_sens", "0"));
-				H2Config_controller_sens = std::stof(controller_sens_str);
-				H2Config_controller_modern = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "controller_modern", H2Config_controller_modern);
-				/*
-				 * ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_type", std::to_string(H2Config_Controller_Deadzone).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", std::to_string(H2Config_Deadzone_A_X).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", std::to_string(H2Config_Deadzone_A_Y).c_str());
-
-			ini.SetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", std::to_string(H2Config_Deadzone_Radial).c_str());
-				 */
-
-				switch (std::stoi(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_type", "0")))
-				{
-					default:
-					case 0:
-						H2Config_Controller_Deadzone = Axial;
-						break;
-					case 1:
-						H2Config_Controller_Deadzone = Radial;
-						break;
-					case 2:
-						H2Config_Controller_Deadzone = Both;
-						break;
-				}
-				std::string deadzone_axial_x(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_x", "26.518"));
-				H2Config_Deadzone_A_X = std::stof(deadzone_axial_x);
-				std::string deadzone_axial_y(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_axial_y", "26.518"));
-				H2Config_Deadzone_A_Y = std::stof(deadzone_axial_y);
-				std::string deadzone_radial(ini.GetValue(H2ConfigVersionSection.c_str(), "deadzone_radial", "26.518"));
-				H2Config_Deadzone_Radial = std::stof(deadzone_radial);
-
 
 				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
@@ -844,9 +653,6 @@ void ReadH2Config() {
 						break;
 				}
 				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
-
-				H2Config_CustomLayout.FromString(std::string(ini.GetValue(H2ConfigVersionSection.c_str(), "controller_layout", "1-2-4-8-16-32-64-128-256-512-4096-8192-16384-32768")));
-				
 				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 				H2Config_spooky_boy = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 #ifndef NDEBUG

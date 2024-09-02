@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum e_game_engine_index
 {
 	_game_engine_campaign = 0,

@@ -53,8 +53,7 @@ struct s_observer_command
 	uint8 flags;
 	int8 pad[3];
 	s_observer_command_displacement position;
-	real32 field_1C;
-	real32 field_20;
+	real_point2d crosshair_position;
 	real32 focus_distance;
 	real32 field_of_view;
 	real_vector3d forward;
@@ -96,5 +95,13 @@ struct s_observer
 ASSERT_STRUCT_SIZE(s_observer, 856);
 
 s_observer* observer_get_from_user(int32 user_index);
+
+void __cdecl observer_validate_camera_command(s_observer_command* observer_command);
+
+// Gets the FOV value for the observer camera
+float observer_suggested_field_of_view();
+
+// Sets the FOV value for the observer camera
+void observer_set_suggested_field_of_view(float fov);
 
 void observer_apply_patches(void);

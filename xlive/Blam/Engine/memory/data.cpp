@@ -33,3 +33,9 @@ uint32 __cdecl datum_header_allocate(uint32 total_size, uint32 alignment_bits)
 {
 	return INVOKE(0x37E69, 0x2B4E6, datum_header_allocate, total_size, alignment_bits);
 }
+
+bool __cdecl datum_header_deallocate(void* object)
+{
+	// todo: server offset
+	return INVOKE(0x37EC3, 0, datum_header_deallocate, object);
+}

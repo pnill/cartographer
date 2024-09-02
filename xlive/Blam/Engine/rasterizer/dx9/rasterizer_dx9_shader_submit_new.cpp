@@ -312,6 +312,26 @@ void __cdecl rasterizer_shader_level_of_detail_bias_update(void)
 	return;
 }
 
+void __cdecl rasterizer_shader_submit(datum shader_index, int32 a2, int32 a3, int32 a4, int32 a5, int32 a6)
+{
+    INVOKE(0x269E9A, 0, rasterizer_shader_submit, shader_index, a2, a3, a4, a5, a6);
+}
+
+void rasterizer_flags_unknown_function_1()
+{
+    INVOKE(0x2664EA, 0, rasterizer_flags_unknown_function_1);
+}
+
+void rasterizer_flags_unknown_function_2(int32* a1)
+{
+    INVOKE(0x266415, 0, rasterizer_flags_unknown_function_2, a1);
+}
+
+int32* rasterizer_unknown_shader_submit_unknown_value_get()
+{
+    return Memory::GetAddress<int32*>(0x9765D8);
+}
+
 /* private code */
 
 void __fastcall c_shader_submission_interface_new__stage_texture(

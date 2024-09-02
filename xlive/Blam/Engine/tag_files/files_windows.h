@@ -21,7 +21,7 @@ enum FILE_REFERENCE_PATH_FLAGS : __int16
 	FILE_EXTENSION = FLAG(3), // base
 };
 
-enum e_file_open_flags : DWORD
+enum e_file_open_flags : uint16
 {
 	_permission_read_bit = FLAG(0),
 	_permission_write_bit = FLAG(1),

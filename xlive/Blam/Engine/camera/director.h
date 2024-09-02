@@ -11,4 +11,18 @@ enum e_director_mode : int32
 	k_director_game_modes_count 
 };
 
+struct s_director_update
+{
+	int32 user_index;
+	bool unk_1;
+	bool unk_2;
+	bool unk_3;
+	bool unk_4;
+	real32 delta;
+	real_euler_angles2d facing;
+	int8 gap14[16];
+	real32 turn_scale;
+	int8 gap24[4];
+};
+
 int32 __cdecl director_get_perspective(int32 user_index);

@@ -29,6 +29,7 @@
 #include "structures/structure_audibility.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "text/text.h"
 
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16
@@ -887,30 +888,6 @@ struct scenario_cutscene_camera_point
     real_vector3d orientation;
 };
 ASSERT_STRUCT_SIZE(scenario_cutscene_camera_point, 64);
-
-enum e_text_justification : short
-{
-    text_justification_left = 0,
-    text_justification_right = 1,
-    text_justification_center = 2,
-    text_justification_custom_text_entry = 3
-};
-
-enum e_text_font : short
-{
-    text_font_terminal_font = 0,
-    text_font_body_text_font = 1,
-    text_font_title_font = 2,
-    text_font_super_large_font = 3,
-    text_font_large_body_text_font = 4,
-    text_font_split_screen_hud_message_font = 5,
-    text_font_full_screen_hud_message_font = 6,
-    text_font_english_body_text_font = 7,
-    text_font_hud_number_font = 8,
-    text_font_subtitle_font = 9,
-    text_font_main_menu_font = 10,
-    text_font_text_chat_font = 11
-};
 
 // max count: k_maximum_scenario_cutscene_titles 128
 struct s_scenario_cutscene_title

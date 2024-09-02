@@ -2,7 +2,12 @@
 #include "user_interface_controller.h"
 #include "user_interface_guide.h"
 #include "networking/online/online_account_xbox.h"
+#include "saved_games/cartographer_player_profile.h"
+#include "saved_games/saved_game_files_async_windows.h"
 #include "tag_files/global_string_ids.h"
+
+
+
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
 {
@@ -79,7 +84,6 @@ void __cdecl user_interface_controller_set_griefer(e_controller_index controller
 	INVOKE(0x206949, 0, user_interface_controller_set_griefer, controller_index, griefing);
 }
 
-
 wchar_t* __cdecl user_interface_controller_get_player_profile_name(e_controller_index controller_index)
 {
 	return INVOKE(0x206B67, 0, user_interface_controller_get_player_profile_name, controller_index);
@@ -105,9 +109,25 @@ uint32 __cdecl user_interface_controller_get_highest_campaign_level_in_signed_in
 	return INVOKE(0x2076F7, 0, user_interface_controller_get_highest_campaign_level_in_signed_in_controllers);
 }
 
+typedef bool(__cdecl* t_user_interface_controller_sign_in)(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index);
+t_user_interface_controller_sign_in p_user_interface_controller_sign_in;
+
+bool __cdecl user_interface_controller_sign_in(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32 enumerated_file_index)
+{
+	bool result = p_user_interface_controller_sign_in(controller_index, profile, enumerated_file_index);
+	if(result)
+		cartographer_player_profile_sign_in(controller_index, enumerated_file_index);
+
+	return result;
+}
+
+typedef void(__cdecl* t_user_interface_controller_sign_out)(e_controller_index controller_index);
+t_user_interface_controller_sign_out p_user_interface_controller_sign_out;
+
 void __cdecl user_interface_controller_sign_out(e_controller_index controller_index)
 {
-	INVOKE(0x208257, 0x1F491B, user_interface_controller_sign_out, controller_index);
+	p_user_interface_controller_sign_out(controller_index);
+	cartographer_player_profile_sign_out(controller_index);
 }
 
 void __cdecl user_interface_controller_sign_out_all_controllers()
@@ -115,7 +135,7 @@ void __cdecl user_interface_controller_sign_out_all_controllers()
 	INVOKE(0x208A28, 0x1F4E9F, user_interface_controller_sign_out_all_controllers);
 }
 
-void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_file_player_profile* profile, uint32* profile_index)
+void __cdecl user_interface_controller_get_profile_data(e_controller_index controller_index, s_saved_game_player_profile* profile, uint32* profile_index)
 {
 	INVOKE(0x206890, 0x0, user_interface_controller_get_profile_data, controller_index, profile, profile_index);
 }
@@ -273,7 +293,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{
-		controller->player_name.set(controller->player_profile.player_name);
+		controller->player_name.set(controller->player_profile.name);
 	}
 	else
 	{
@@ -287,6 +307,8 @@ void user_interface_controller_apply_patches()
 	PatchCall(Memory::GetAddress(0x20887A), user_interface_controller_update_player_name); // fixes guest-signin names in ONLINE mode
 	NopFill(Memory::GetAddress(0x20CF20), 6); // fixes auto guest-signout when leaving a match
 	WriteValue<uint8>(Memory::GetAddress(0x20CEB5 + 6), 0); // disable _ui_error_demo_version_no_more_for_you
+	DETOUR_ATTACH(p_user_interface_controller_sign_in, Memory::GetAddress<t_user_interface_controller_sign_in>(0x2087BF), user_interface_controller_sign_in);
+	DETOUR_ATTACH(p_user_interface_controller_sign_out, Memory::GetAddress<t_user_interface_controller_sign_out>(0x208257, 0x1F491B), user_interface_controller_sign_out);
 }
 
 

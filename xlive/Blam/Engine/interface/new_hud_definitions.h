@@ -2,6 +2,8 @@
 #include "math/function_definitions.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_reference.h"
+#include "memory/static_arrays.h"
+#include "text/text.h"
 
 enum e_new_hud_dashlight_flags : short
 {
@@ -132,13 +134,14 @@ enum e_hud_anchor : int16
     _hud_anchor_lockon_target = 5
 };
 
-enum e_bitmap_widget_flags : short
+enum e_bitmap_widget_flags : uint16
 {
-    bitmap_widget_flag_flip_horizontally = FLAG(0),
-    bitmap_widget_flag_flip_vertically = FLAG(1),
-    bitmap_widget_flag_scope_mirror_horizontally = FLAG(2),
-    bitmap_widget_flag_scope_mirror_vertically = FLAG(3),
-    bitmap_widget_flag_scope_stretch = FLAG(4)
+    bitmap_widget_flag_flip_horizontally = 0,
+    bitmap_widget_flag_flip_vertically = 1,
+    bitmap_widget_flag_scope_mirror_horizontally = 2,
+    bitmap_widget_flag_scope_mirror_vertically = 3,
+    bitmap_widget_flag_scope_stretch = 4,
+    k_bitmap_widget_flag_count
 };
 
 enum e_special_hud_type : short
@@ -279,19 +282,20 @@ enum e_widget_state_extra_flags : short
     widget_state_extra_flag_autoaiminvincible = FLAG(4)
 };
 
-enum e_widget_state_weapon_flags : short
+enum e_widget_state_weapon_flags : uint16
 {
-    widget_state_weapon_flag_primary_weapon = FLAG(0),
-    widget_state_weapon_flag_secondary_weapon = FLAG(1),
-    widget_state_weapon_flag_backpack_weapon = FLAG(2),
-    widget_state_weapon_flag_age_below_cutoff = FLAG(3),
-    widget_state_weapon_flag_clip_below_cutoff = FLAG(4),
-    widget_state_weapon_flag_total_below_cutoff = FLAG(5),
-    widget_state_weapon_flag_overheated = FLAG(6),
-    widget_state_weapon_flag_out_of_ammo = FLAG(7),
-    widget_state_weapon_flag_lock_target_available = FLAG(8),
-    widget_state_weapon_flag_locking = FLAG(9),
-    widget_state_weapon_flag_locked = FLAG(10)
+    widget_state_weapon_flag_primary_weapon = 0,
+    widget_state_weapon_flag_secondary_weapon = 1,
+    widget_state_weapon_flag_backpack_weapon = 2,
+    widget_state_weapon_flag_age_below_cutoff = 3,
+    widget_state_weapon_flag_clip_below_cutoff = 4,
+    widget_state_weapon_flag_total_below_cutoff = 5,
+    widget_state_weapon_flag_overheated = 6,
+    widget_state_weapon_flag_out_of_ammo = 7,
+    widget_state_weapon_flag_lock_target_available = 8,
+    widget_state_weapon_flag_locking = 9,
+    widget_state_weapon_flag_locked = 10,
+    k_widget_state_weapon_flag_count
 };
 
 enum e_widget_state_game_engine_state_flags : short
@@ -318,7 +322,7 @@ struct s_hud_widget_state_definition
 
     e_widget_state_unit_flags yes_unit_flags;
     e_widget_state_extra_flags yes_extra_flags;
-    e_widget_state_weapon_flags yes_weapon_flags;
+    c_flags_no_init<e_widget_state_weapon_flags, uint16, k_widget_state_weapon_flag_count> yes_weapon_flags;
     e_widget_state_game_engine_state_flags yes_game_engine_state_flags;
 
     e_widget_state_unit_flags no_unit_flags;
@@ -333,11 +337,12 @@ struct s_hud_widget_state_definition
 };
 ASSERT_STRUCT_SIZE(s_hud_widget_inputs_definition, 4);
 
-enum e_hud_widget_effect_flags : short
+enum e_hud_widget_effect_flags : uint16
 {
-    hud_widget_effect_flag_apply_scale = FLAG(0),
-    hud_widget_effect_flag_apply_theta = FLAG(1),
-    hud_widget_effect_flag_apply_offset = FLAG(2)
+    hud_widget_effect_flag_apply_scale = 0,
+    hud_widget_effect_flag_apply_theta = 1,
+    hud_widget_effect_flag_apply_offset = 2,
+    k_hud_widget_effect_flag_count
 };
 
 struct s_hud_widget_effect_function
@@ -354,7 +359,7 @@ struct s_hud_widget_effect_definition
 {
     // Explaination("WIDGET EFFECTS", "allow the scaling, rotation, and offsetting of widgets")
 
-    e_hud_widget_effect_flags flags;
+    c_flags_no_init<e_hud_widget_effect_flags, uint16, k_hud_widget_effect_flag_count> flags;
     short pad;
 
     // Your mom below (according to bungie)
@@ -380,7 +385,7 @@ struct s_hud_bitmap_widget_definition
     s_hud_widget_state_definition widget_state;
 
     e_hud_anchor anchor;
-    e_bitmap_widget_flags flags;
+    c_flags_no_init<e_bitmap_widget_flags, uint16, k_bitmap_widget_flag_count> flags;
 
     tag_reference bitmap;    // bitm
     tag_reference shader;    // shad
@@ -404,25 +409,13 @@ struct s_hud_bitmap_widget_definition
 };
 ASSERT_STRUCT_SIZE(s_hud_bitmap_widget_definition, 100);
 
-enum e_text_widget_flags : short
+enum e_text_widget_flags : uint16
 {
-    text_widget_flag_string_is_a_number = FLAG(0),
-    text_widget_flag_force_2digit_number = FLAG(1),
-    text_widget_flag_force_3digit_number = FLAG(2),
-    text_widget_flag_talking_player_hack = FLAG(3)
-};
-
-enum e_text_justification : short
-{
-    text_justification_left = 0,
-    text_justification_center = 1,
-    text_justification_right = 2,
-};
-
-enum e_font_index : byte
-{
-    font_index_defualt = 0,
-    font_index_number_font = 1,
+    text_widget_flag_string_is_a_number = 0,
+    text_widget_flag_force_2digit_number = 1,
+    text_widget_flag_force_3digit_number = 2,
+    text_widget_flag_talking_player_hack = 3,
+    k_text_widget_flag_count
 };
 
 #define k_maximum_hud_text_widgets_per_tag 256
@@ -437,7 +430,7 @@ struct s_hud_text_widget_definition
     /*Explaination("FLAGS", "string is a number: treats the inputted string id as a function name, not a string name
     force 2 - digit number : when used in combination with above, forces output to be a 2 - digit numberwith leading zeros if necessary
     force 3 - digit number : same as above, but with 3 digits instead of 2")*/
-    e_text_widget_flags flags;
+    c_flags_no_init<e_text_widget_flags, uint16, k_text_widget_flag_count> flags;
 
     tag_reference shader;   // shad
     string_id string;

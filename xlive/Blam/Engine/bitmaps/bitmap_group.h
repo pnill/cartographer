@@ -95,10 +95,7 @@ struct bitmap_group_sprite
     short bitmapIndex;
     short pad0;
     DWORD pad1;
-    float left;
-    float right;
-    float top;
-    float bottom;
+    real_rectangle2d bounds;
     real_point2d registrationPoint;
 };
 ASSERT_STRUCT_SIZE(bitmap_group_sprite, 32);

@@ -44,26 +44,27 @@ enum e_unit_definition_flags : int32
 
 enum e_unit_seat_definition_flags : uint32
 {
-    _unit_seat_definition_invisible = FLAG(0),
-    _unit_seat_definition_locked = FLAG(1),
-    _unit_seat_definition_driver = FLAG(2),
-    _unit_seat_definition_gunner = FLAG(3),
-    _unit_seat_definition_third_person_camera = FLAG(4),
-    _unit_seat_definition_allows_weapons = FLAG(5),
-    _unit_seat_definition_third_person_on_enter = FLAG(6),
-    _unit_seat_definition_first_person_camera_slaved_to_gun = FLAG(7),
-    _unit_seat_definition_allow_vehicle_communication_animations = FLAG(8),
-    _unit_seat_definition_not_valid_without_driver = FLAG(9),
-    _unit_seat_definition_allow_ai_noncombatants = FLAG(10),
-    _unit_seat_definition_boarding_seat = FLAG(11),
-    _unit_seat_definition_ai_firing_disabled_by_max_acceleration = FLAG(12),
-    _unit_seat_definition_boarding_enters_seat = FLAG(13),
-    _unit_seat_definition_boarding_need_any_passenger = FLAG(14),
-    _unit_seat_definition_controls_open_and_close = FLAG(15),
-    _unit_seat_definition_invalid_for_player = FLAG(16),
-    _unit_seat_definition_invalid_for_nonplayer = FLAG(17),
-    _unit_seat_definition_gunnerplayer_only = FLAG(18),
-    _unit_seat_definition_invisible_under_major_damage = FLAG(19)
+    _unit_seat_definition_invisible = 0,
+    _unit_seat_definition_locked = 1,
+    _unit_seat_definition_driver = 2,
+    _unit_seat_definition_gunner = 3,
+    _unit_seat_definition_third_person_camera = 4,
+    _unit_seat_definition_allows_weapons = 5,
+    _unit_seat_definition_third_person_on_enter = 6,
+    _unit_seat_definition_first_person_camera_slaved_to_gun = 7,
+    _unit_seat_definition_allow_vehicle_communication_animations = 8,
+    _unit_seat_definition_not_valid_without_driver = 9,
+    _unit_seat_definition_allow_ai_noncombatants = 10,
+    _unit_seat_definition_boarding_seat = 11,
+    _unit_seat_definition_ai_firing_disabled_by_max_acceleration = 12,
+    _unit_seat_definition_boarding_enters_seat = 13,
+    _unit_seat_definition_boarding_need_any_passenger = 14,
+    _unit_seat_definition_controls_open_and_close = 15,
+    _unit_seat_definition_invalid_for_player = 16,
+    _unit_seat_definition_invalid_for_nonplayer = 17,
+    _unit_seat_definition_gunnerplayer_only = 18,
+    _unit_seat_definition_invisible_under_major_damage = 19,
+    k_unit_seat_definition_flag_count
 };
 
 // max count: MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2
@@ -132,7 +133,7 @@ ASSERT_STRUCT_SIZE(unit_initial_weapon, 8);
 // max count: MAXIMUM_SEATS_PER_UNIT_DEFINITION 32
 struct unit_seat
 {
-    e_unit_seat_definition_flags flags;
+    c_flags_no_init<e_unit_seat_definition_flags, uint32, k_unit_seat_definition_flag_count> flags;
     string_id label;
     string_id marker_name;
     string_id entry_markers_name;

@@ -151,7 +151,6 @@ public:
 	{
 		switch (m_cartographer_screen_type)
 		{
-			break;
 		case _cartographer_account_manager_screen_type_list:
 		case _cartographer_account_manager_screen_type_list_remove_account:
 			break;

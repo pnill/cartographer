@@ -70,6 +70,11 @@ e_game_team unit_get_team_index(datum unit_index)
 	return (unit ? unit->unit_team : _game_team_none);
 }
 
+bool __cdecl unit_desires_tight_camera_track(datum unit_index)
+{
+	return INVOKE(0x13F63B, 0, unit_desires_tight_camera_track, unit_index);
+}
+
 // Replace calls to use interpolated functions
 void unit_get_camera_position_patch_mass_functions(void)
 {

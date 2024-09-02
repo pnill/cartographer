@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "tag_fixes.h"
 
+#include "interface/new_hud_definitions.h"
 #include "scenario/scenario.h"
 #include "shaders/shader_definitions.h"
 #include "structures/structure_bsp_definitions.h"
@@ -12,6 +13,7 @@ void tag_fixes_brute(void);
 void tag_fixes_smg(void);
 void tag_fixes_environment(void);
 void tag_fixes_misty_rain(void);
+void tag_fixes_split_screen_hud();
 
 void main_tag_fixes(void)
 {
@@ -21,6 +23,7 @@ void main_tag_fixes(void)
 	tag_fixes_smg();
 	tag_fixes_environment();
 	tag_fixes_misty_rain();
+	tag_fixes_split_screen_hud();
 	return;
 }
 
@@ -174,5 +177,95 @@ void tag_fixes_misty_rain(void)
 			}
 		}
 	}
+	return;
+}
+// Explanation:
+// Hud tags are packaged using the data saver option which will cause h2tool to reuse tag blocks
+// this will cause the offset fix to apply multiple times to individual blocks here we are just keeping
+// a temporary map of all the blocks that have already been adjusted.
+int32* already_adjusted_blocks;
+int32 adjusted_blocks_count = 0;
+bool tag_fixes_split_screen_block_adjusted(int32 block_offset)
+{
+	for(uint32 index = 0; index < adjusted_blocks_count; index++)
+		if (already_adjusted_blocks[index] == block_offset)
+			return true;
+
+	return false;
+}
+
+// Explanation:
+// Hud offsets were doubled as a hack by hired gun when they upscaled the hud for H2V by 2
+// However, these numbers were only doubled for fullscreen offsets and not the offsets used when in splitscreen
+// We double these to fix the hud in splitscreen
+void tag_fixes_split_screen_hud(void)
+{
+	already_adjusted_blocks = (int32*)malloc(sizeof(int32) * 255);
+	adjusted_blocks_count = 0;
+
+	ASSERT(already_adjusted_blocks);
+
+	tag_iterator hud_iterator;
+	tag_iterator_new(&hud_iterator, _tag_group_new_hud_definition);
+	while (tag_iterator_next(&hud_iterator) != NONE)
+	{
+		s_new_hud_definition* hud = (s_new_hud_definition*)tag_get_fast(hud_iterator.current_tag_index);
+
+		if (!tag_fixes_split_screen_block_adjusted(hud->bitmap_widgets.data))
+		{
+			for (uint32 i = 0; i < hud->bitmap_widgets.count; ++i)
+			{
+				s_hud_bitmap_widget_definition* bitmap_widget = hud->bitmap_widgets[i];
+
+				// this is commented out because ammo clip bitmaps were broken in the port, the bitmaps need to be changed to properly fix them
+				// if the bitmaps aren't redone uncomment out the if statement and they'll be generally fixed.
+				//if (bitmap_widget->widget_inputs.input_1 != hud_input_type_weapon_clip_ammo)
+				//{
+					bitmap_widget->halfscreen_offset.x *= 2;
+					bitmap_widget->halfscreen_offset.y *= 2;
+					bitmap_widget->quarterscreen_offset.x *= 2;
+					bitmap_widget->quarterscreen_offset.y *= 2;
+				//}
+				//else
+				//{
+				//	bitmap_widget->halfscreen_offset = bitmap_widget->fullscreen_offset;
+				//	bitmap_widget->quarterscreen_offset = bitmap_widget->fullscreen_offset;
+				//}
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->bitmap_widgets.data;
+		}
+
+		if (!tag_fixes_split_screen_block_adjusted(hud->text_widgets.data))
+		{
+			for (uint32 i = 0; i < hud->text_widgets.count; ++i)
+			{
+				s_hud_text_widget_definition* text_widget = hud->text_widgets[i];
+				text_widget->halfscreen_offset.x *= 2;
+				text_widget->halfscreen_offset.y *= 2;
+				text_widget->quarterscreen_offset.x *= 2;
+				text_widget->quarterscreen_offset.y *= 2;
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->text_widgets.data;
+		}
+
+		if (!tag_fixes_split_screen_block_adjusted(hud->screen_effect_widgets.data))
+		{
+			for (uint32 i = 0; i < hud->screen_effect_widgets.count; ++i)
+			{
+				LOG_DEBUG_GAME("{}", tag_get_name(hud_iterator.current_tag_index));
+				s_hud_screen_effect_widget_definition* effect_widget = hud->screen_effect_widgets[i];
+				effect_widget->halfscreen_offset.x *= 2;
+				effect_widget->halfscreen_offset.y *= 2;
+				effect_widget->quarterscreen_offset.x *= 2;
+				effect_widget->quarterscreen_offset.y *= 2;
+			}
+
+			already_adjusted_blocks[adjusted_blocks_count++] = hud->screen_effect_widgets.data;
+		}
+	}
+
+	free(already_adjusted_blocks);
 	return;
 }

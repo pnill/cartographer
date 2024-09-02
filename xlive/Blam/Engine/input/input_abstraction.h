@@ -228,5 +228,6 @@ bool __cdecl input_abstraction_get_key_state(int16 key);
 void __cdecl input_abstraction_update();
 void __cdecl input_abstraction_update_input_state(int controller_index, s_gamepad_input_preferences* preference, s_gamepad_input_button_state* gamepad_state, real_euler_angles2d* left_stick_analog, real_euler_angles2d* right_stick_analog, s_game_input_state* input_state);
 uint32 s_input_abstraction_globals_sub_45E501(e_button_functions button, void* a3);
+bool __cdecl input_abstraction_preferences_new(s_gamepad_input_preferences* preferences, int16 a2, bool a3, bool a4);
 
 void input_abstraction_patches_apply();

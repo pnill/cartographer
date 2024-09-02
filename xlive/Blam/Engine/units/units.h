@@ -60,6 +60,14 @@ enum e_unit_flags : uint32
 	_unit_is_crouching_bit = 23
 };
 
+enum e_unit_control_flags : uint32
+{
+	_unit_control_bit_1 = 1,
+	_unit_control_bit_2 = 2,
+
+	k_unit_control_flags_count
+};
+
 struct s_unit_304
 {
 	int8 gap_0[16];
@@ -102,7 +110,7 @@ struct unit_datum
 	datum controlling_player_index;
 	datum player_datum;
 	int8 gap_148[8];
-	uint32 control_flags;
+	c_flags_no_init<e_unit_control_flags, uint32, k_unit_control_flags_count> control_flags;
 	uint32 control_flags_2;
 	string_id animation_state;
 	real_vector3d desired_facing;
@@ -211,5 +219,7 @@ void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point)
 void __cdecl unit_control(datum unit_index, unit_control_data* control_data);
 
 e_game_team unit_get_team_index(datum unit_index);
+
+bool __cdecl unit_desires_tight_camera_track(datum unit_index);
 
 void unit_apply_patches(void);

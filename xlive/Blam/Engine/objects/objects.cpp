@@ -976,6 +976,11 @@ void __cdecl objects_purge_deleted_objects(void)
 	}
 }
 
+void object_get_velocities(datum object_index, real_vector3d* translational_velocity, real_vector3d* angular_velocity)
+{
+	INVOKE(0x132BDE, 0, object_get_velocities, object_index, translational_velocity, angular_velocity);
+}
+
 void __cdecl objects_post_update()
 {
 	object_globals_get()->objects_updating = true;

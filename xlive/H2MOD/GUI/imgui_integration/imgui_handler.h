@@ -1,5 +1,6 @@
 #pragma once
 #include "imgui.h"
+#include "input/controllers.h"
 
 /* constants */
 
@@ -79,6 +80,7 @@ namespace ImGuiHandler
 	namespace ImAdvancedSettings
 	{
 		void Render(bool* p_open);
+		void set_controller_index(e_controller_index controller_index);
 		void Open();
 		void Close();
 	}

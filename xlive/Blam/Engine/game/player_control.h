@@ -81,6 +81,16 @@ struct s_player_control_globals
 };
 ASSERT_STRUCT_SIZE(s_player_control_globals, 728);
 
+struct s_player_control_camera_info
+{
+	datum slave_object;
+	int16 parent_seat_index;
+	int16 pad;
+	int8* unit_camera;
+	real_point3d location;
+};
+ASSERT_STRUCT_SIZE(s_player_control_camera_info, 24);
+
 void player_control_disable_local_camera(bool state);
 
 s_player_control_globals* player_control_globals_get(void);
@@ -88,4 +98,15 @@ s_player_control* player_control_get(int32 user_index);
 int16 player_control_get_zoom_level(int32 user_index);
 
 void player_control_update_dt(real32 dt);
+
+// Gets the FOV from the unit tag of the player with the passed controller index
+// We modified it so it overriddes the FOV depending on if the user has a custom FOV set or the forced FOV value is set for custom variants
+real32 __cdecl player_control_get_field_of_view(uint32 user_index);
+
+void __cdecl player_control_get_facing_direction(uint32 player_index, real_vector3d* out_facing);
+
+real_euler_angles2d* __cdecl player_control_get_facing(uint32 player_index);
+
+void __cdecl player_control_get_camera_info(uint32 player_index, s_player_control_camera_info* camera_info);
+
 void player_control_apply_patches();

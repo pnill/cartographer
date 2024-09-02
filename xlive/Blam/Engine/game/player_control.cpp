@@ -2,15 +2,64 @@
 #include "player_control.h"
 
 #include "players.h"
+#include "camera/observer.h"
 
 #include "game/game_time.h"
+#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "main/interpolator.h"
+#include "saved_games/cartographer_player_profile.h"
+#include "units/unit_definitions.h"
 
 real32 g_player_control_dt = 0.0f;
 
 void player_control_update_dt(real32 dt)
 {
 	g_player_control_dt = dt;
+}
+
+real32 __cdecl player_control_get_field_of_view(uint32 user_index)
+{
+	const s_player_control* player_control_info = player_control_get(user_index);
+
+	float result = observer_suggested_field_of_view();
+
+	if (player_control_info->unit_datum_index != NONE)
+	{
+		float fov;
+		const s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
+
+		if (currentVariantSettings.forced_fov != 0)
+		{
+			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+		}
+		else if (profile_settings)
+		{
+			fov = DEGREES_TO_RADIANS(profile_settings->field_of_view);
+		}
+		else
+		{
+			_unit_definition* unit = (_unit_definition*)tag_get_fast(object_get_fast_unsafe(player_control_info->unit_datum_index)->tag_definition_index);
+			fov = unit->camera_field_of_view;
+		}
+
+		result = unit_get_field_of_view(player_control_info->unit_datum_index, fov, player_control_info->actions.zoom_level);
+	}
+	return result;
+}
+
+void __cdecl player_control_get_facing_direction(uint32 player_index, real_vector3d* out_facing)
+{
+	INVOKE(0x9076E, 0, player_control_get_facing_direction, player_index, out_facing);
+}
+
+real_euler_angles2d* player_control_get_facing(uint32 player_index)
+{
+	return INVOKE(0x90759, 0, player_control_get_facing, player_index);
+}
+
+void player_control_get_camera_info(uint32 player_index, s_player_control_camera_info* camera_info)
+{
+	INVOKE(0x90BAF, 0, player_control_get_camera_info, player_index, camera_info);
 }
 
 real32 __cdecl player_control_get_autocenter_delta()

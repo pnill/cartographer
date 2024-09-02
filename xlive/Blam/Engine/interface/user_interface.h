@@ -1,4 +1,5 @@
 #pragma once
+#include "saved_games/player_profile.h"
 
 /* enums */
 
@@ -377,3 +378,6 @@ void __cdecl user_interface_back_out_from_channel(e_user_interface_channel_type 
 bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id id);
 void __cdecl user_interface_enter_game_shell(int32 context);
 bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
+
+uint32 __cdecl user_interface_globals_get_edit_player_profile_index();
+s_saved_game_player_profile* user_interface_globals_get_edit_player_profile();
