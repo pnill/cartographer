@@ -216,10 +216,21 @@ void tag_fixes_split_screen_hud(void)
 			for (uint32 i = 0; i < hud->bitmap_widgets.count; ++i)
 			{
 				s_hud_bitmap_widget_definition* bitmap_widget = hud->bitmap_widgets[i];
-				bitmap_widget->halfscreen_offset.x *= 2;
-				bitmap_widget->halfscreen_offset.y *= 2;
-				bitmap_widget->quarterscreen_offset.x *= 2;
-				bitmap_widget->quarterscreen_offset.y *= 2;
+
+				// this is commented out because ammo clip bitmaps were broken in the port, the bitmaps need to be changed to properly fix them
+				// if the bitmaps aren't redone uncomment out the if statement and they'll be generally fixed.
+				//if (bitmap_widget->widget_inputs.input_1 != hud_input_type_weapon_clip_ammo)
+				//{
+					bitmap_widget->halfscreen_offset.x *= 2;
+					bitmap_widget->halfscreen_offset.y *= 2;
+					bitmap_widget->quarterscreen_offset.x *= 2;
+					bitmap_widget->quarterscreen_offset.y *= 2;
+				//}
+				//else
+				//{
+				//	bitmap_widget->halfscreen_offset = bitmap_widget->fullscreen_offset;
+				//	bitmap_widget->quarterscreen_offset = bitmap_widget->fullscreen_offset;
+				//}
 			}
 
 			already_adjusted_blocks[adjusted_blocks_count++] = hud->bitmap_widgets.data;
