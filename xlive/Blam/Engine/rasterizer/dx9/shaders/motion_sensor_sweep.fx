@@ -1,5 +1,3 @@
-// fxc /T ps_2_0 /Fo ../compiled/motion_sensor_sweep.pso ../motion_sensor_sweep.hlsl
-
 struct PS_INPUT
 {
     float2 TexCoord0 : TEXCOORD0;

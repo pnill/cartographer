@@ -51,14 +51,6 @@ void rasterizer_dx9_screen_effect_apply_patches(void)
 void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_flare_occlusion_test, bool render_layer_selfibloomination)
 {
 	rasterizer_dx9_perf_event_begin("postprocess_scene", NULL);
-
-	// Cleanup before starting
-	// Removes textures staged from previously drawing the first person geometry
-	for (uint8 i = 0; i < 8; i++)
-	{
-		rasterizer_dx9_device_set_texture(i, NULL);
-	}
-
 	rasterizer_dx9_reset_depth_buffer();
 
 	const s_frame* global_window_parameters = global_window_parameters_get();
@@ -153,8 +145,8 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 
 		if (global_scenario->screen_effect_references.count > 0)
 		{
-			int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-			int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+			const int16 width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+			const int16 height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
 
 			real32 x = -0.5f / width;
 			real32 y = -0.5f / height;
@@ -180,7 +172,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 			mesh_data[14] = 1.f;
 			mesh_data[15] = 1.f;
 
-			for (int32 i = 0; i < global_scenario->screen_effect_references.count; i++)
+			for (int32 i = 0; i < global_scenario->screen_effect_references.count; ++i)
 			{
 				s_scenario_screen_effect_reference* screen_effect_reference = global_scenario->screen_effect_references[i];
 				if (screen_effect_reference->screen_effect.index != NONE)

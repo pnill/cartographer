@@ -8,8 +8,16 @@
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_loading.h"
 
+/* typedefs */
+
+typedef void(__cdecl* rasterizer_dx9_set_texture_stage_t)(int16, datum, int16, real32);
+
 /* globals */
-datum last_bitmap_tag_index = 0;
+
+rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
+
+bool g_dx9_sm3_supported = false;
+datum g_last_bitmap_tag_index = 0;
 
 
 D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
@@ -60,12 +68,6 @@ D3DBLEND g_src_blend[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-
-/* typedefs */
-
-typedef void(__cdecl* rasterizer_dx9_set_texture_stage_t)(int16, datum, int16, real32);
-rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
-
 /* prototypes */
 
 void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
@@ -73,6 +75,12 @@ void __cdecl rasterizer_set_stream_source(void);
 void __cdecl debug_frame_usage_draw(void);
 void __cdecl rasterizer_present_backbuffer(void);
 void __cdecl rasterizer_cache_bitmaps(void);
+bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count);
+bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+    D3DPRIMITIVETYPE PrimitiveType,
+    UINT PrimitiveCount,
+    const void* pVertexStreamZeroData,
+    UINT VertexStreamZeroStride);
 
 /* public code */
 
@@ -88,7 +96,7 @@ IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void)
 
 datum last_bitmap_tag_index_get(void)
 {
-    return last_bitmap_tag_index;
+    return g_last_bitmap_tag_index;
 }
 
 IDirect3DPixelShader9** local_pixel_shaders_get(void)
@@ -99,10 +107,14 @@ IDirect3DPixelShader9** local_pixel_shaders_get(void)
 void rasterizer_dx9_main_apply_patches(void)
 {
     // debugging, get vertex decls currently set
-    //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
-    //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
+    PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
+    PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
 
     DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_direct);
+
+    // Patch initialize code with our own to detect sm3 support
+    PatchCall(Memory::GetAddress(0x263526), rasterizer_dx9_initialize_device);
+    PatchCall(Memory::GetAddress(0x26375D), rasterizer_dx9_initialize_device);
     return;
 }
 
@@ -187,39 +199,8 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
 {
-    last_bitmap_tag_index = bitmap_tag_index;
+    g_last_bitmap_tag_index = bitmap_tag_index;
     p_rasterizer_dx9_set_texture_stage(stage, bitmap_tag_index, bitmap_data_index, a4);
-    return;
-}
-
-void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
-{
-    INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_target, flags, color, z, stencil);
-    return;
-}
-
-void __cdecl rasterizer_set_stream_source(void)
-{
-    INVOKE(0x26F4D3, 0x0, rasterizer_set_stream_source);
-    return;
-}
-
-// Draws 
-void __cdecl debug_frame_usage_draw(void)
-{
-    INVOKE(0x25ECAA, 0x0, debug_frame_usage_draw);
-    return;
-}
-
-void __cdecl rasterizer_present_backbuffer(void)
-{
-    INVOKE(0x25F277, 0x0, rasterizer_present_backbuffer);
-    return;
-}
-
-void __cdecl rasterizer_cache_bitmaps(void)
-{
-    INVOKE(0x261720, 0x0, rasterizer_cache_bitmaps);
     return;
 }
 
@@ -311,21 +292,59 @@ void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32
     return;
 }
 
+bool __cdecl rasterizer_dx9_initialize_device(real_vector3d* v, bool display_blackness)
+{
+    bool result = INVOKE(0x25E798, 0x0, rasterizer_dx9_initialize_device, v, display_blackness);
 
-//struct s_vs_shader_decl_draw_screen
-//{
-//    D3DXVECTOR4 pos;
-//    D3DXVECTOR3 texCoord;
-//    D3DCOLOR color;
-//};
-//
-//struct s_vs_shader_decl_36
-//{
-//    D3DXVECTOR4 position;
-//    D3DXVECTOR2 texcoord;
-//    D3DCOLOR color;
-//};
+    D3DCAPS9 caps{};
+    rasterizer_dx9_device_get_interface()->GetDeviceCaps(&caps);
 
+    // Check if shader model 3 is supported
+    g_dx9_sm3_supported = caps.MaxVertexShader30InstructionSlots >= 512 && caps.MaxPixelShader30InstructionSlots >= 512;
+    return result;
+}
+
+void __cdecl rasterizer_dx9_initialize_camera_projection(
+    bool is_texture_camera,
+    const s_camera* camera,
+    const render_projection* projection,
+    e_rasterizer_target rasterizer_target)
+{
+    INVOKE(0x261B53, 0x0, rasterizer_dx9_initialize_camera_projection, is_texture_camera, camera, projection, rasterizer_target);
+    return;
+}
+
+/* private code */
+
+void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+{
+    INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_target, flags, color, z, stencil);
+    return;
+}
+
+void __cdecl rasterizer_set_stream_source(void)
+{
+    INVOKE(0x26F4D3, 0x0, rasterizer_set_stream_source);
+    return;
+}
+
+void __cdecl debug_frame_usage_draw(void)
+{
+    INVOKE(0x25ECAA, 0x0, debug_frame_usage_draw);
+    return;
+}
+
+void __cdecl rasterizer_present_backbuffer(void)
+{
+    INVOKE(0x25F277, 0x0, rasterizer_present_backbuffer);
+    return;
+}
+
+void __cdecl rasterizer_cache_bitmaps(void)
+{
+    INVOKE(0x261720, 0x0, rasterizer_cache_bitmaps);
+    return;
+}
 
 bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
 {

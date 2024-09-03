@@ -38,3 +38,10 @@ void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color)
     INVOKE(0x75FE2, 0, pixel32_to_real_rgb_color, pixel_color, out_color);
     return;
 }
+
+pixel32 real_alpha_to_pixel32(real32 alpha)
+{
+    ASSERT(alpha >= 0.f && alpha <= 1.f);
+    pixel32 color = { (int32)(alpha * 255.f) << 24 };
+    return color;
+}

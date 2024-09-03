@@ -72,6 +72,9 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <unordered_map>
 #include <filesystem>
 
+#ifdef _DEBUG
+#define D3D_DEBUG_INFO
+#endif
 #include <d3d9.h>
 #include <d3dx9.h>
 

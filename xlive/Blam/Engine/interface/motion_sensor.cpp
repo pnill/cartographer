@@ -120,7 +120,8 @@ void __cdecl rasterizer_dx9_create_motion_sensor_shader()
 {
 	INVOKE(0x28458C, 0x0, rasterizer_dx9_create_motion_sensor_shader);
 
-	rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)motion_sensor_sweep_pixel_shader_bytecode, &motion_sensor_sweep_shader);
+	const unsigned char* ps = g_dx9_sm3_supported ? k_motion_sensor_sweep_ps_3_0 : k_motion_sensor_sweep_ps_2_0;
+	rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &motion_sensor_sweep_shader);
 	return;
 }
 

@@ -1,7 +1,308 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_fog.h"
 
+#include "rasterizer_dx9.h"
+#include "rasterizer_dx9_fullscreen_passes.h"
+#include "rasterizer_dx9_main.h"
+#include "rasterizer_dx9_submit.h"
+#include "rasterizer_dx9_shader_submit.h"
+
+#include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/dx9/shaders/compiled/fog_atmospheric_apply.h"
+
+/* constants */
+
 static real32 fog_wind_x_axis_velocity_factor1 = 30.0f;
+
+/* typedefs */
+
+typedef bool(__cdecl* rasterizer_dx9_create_fog_shaders_t)(void);
+
+/* globals */
+
+rasterizer_dx9_create_fog_shaders_t p_rasterizer_dx9_create_fog_shaders;
+
+/* prototypes */
+
+real32* patchy_fog_apply_scale_get(void);
+bool __cdecl rasterizer_dx9_set_fog_pixel_shader(uint32 index);
+void rasterizer_fog_constant_velocity_update();
+void rasterizer_fog_speed_apply_patch(void);
+bool __cdecl rasterizer_dx9_create_fog_shaders(void);
+void rasterizer_dx9_atmospheric_fog_patch(void);
+
+/* public code */
+
+void rasterizer_dx9_fog_apply_patches(void)
+{
+	rasterizer_fog_speed_apply_patch();
+
+	// splitscreen patchy fog fix, take just the viewport portion of the main render target
+	// that is used as a texture in the patchy fog draw code shader
+	WritePointer(Memory::GetAddress(0x2774AE) + 1, rasterizer_dx9_patchy_fog_apply_build_vertex_buffer);
+	WritePointer(Memory::GetAddress(0x2774CF) + 1, rasterizer_dx9_patchy_fog_apply_from_stencil_build_vertex_buffer);
+
+
+	rasterizer_dx9_atmospheric_fog_patch();
+	return;
+}
+
+bool __cdecl rasterizer_dx9_draw_atmospheric_fog(int32 a1)
+{
+	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+	rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_backbuffer);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPFILTER, 0);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
+	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
+	rasterizer_dx9_set_texture_direct(2, rasterizer_globals_get_data()->gradients.index, 0, 0.f);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXANISOTROPY, 1);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MIPMAPLODBIAS, 0);
+	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXMIPLEVEL, 0);
+	rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, 1);
+	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
+	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32.color);
+	rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+	rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
+	rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
+	if (!*rasterizer_dx9_disable_stencil_get())
+	{
+		rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, 0);
+	}
+	rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 0);
+	rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, 0);
+	rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
+	rasterizer_dx9_set_render_state(D3DRS_SLOPESCALEDEPTHBIAS, 0);
+
+	const s_frame* global_window_parameters = global_window_parameters_get();
+	real_vector4d ps_constants[3];
+
+	real_rgb_color color;
+	color.red = global_window_parameters->fog_result.atmospheric_color.red * global_window_parameters->fog_result.atmospheric_max_density;
+	color.green = global_window_parameters->fog_result.atmospheric_color.green * global_window_parameters->fog_result.atmospheric_max_density;
+	color.blue = global_window_parameters->fog_result.atmospheric_color.blue * global_window_parameters->fog_result.atmospheric_max_density;
+
+	ps_constants[0].i = PIN(color.red, 0.f, 1.f);
+	ps_constants[0].j = PIN(color.green, 0.f, 1.f);
+	ps_constants[0].k = PIN(color.blue, 0.f, 1.f);
+	ps_constants[0].l = PIN(global_window_parameters->fog_result.atmospheric_max_density, 0.f, 1.f);
+
+
+	color.red = global_window_parameters->fog_result.secondary_color.red * global_window_parameters->fog_result.secondary_max_density;
+	color.green = global_window_parameters->fog_result.secondary_color.green * global_window_parameters->fog_result.secondary_max_density;
+	color.blue = global_window_parameters->fog_result.secondary_color.blue * global_window_parameters->fog_result.secondary_max_density;
+
+	ps_constants[1].i = PIN(color.red, 0.f, 1.f);
+	ps_constants[1].j = PIN(color.green, 0.f, 1.f);
+	ps_constants[1].k = PIN(color.blue, 0.f, 1.f);
+	ps_constants[1].l = PIN(global_window_parameters->fog_result.secondary_max_density, 0.f, 1.f);
+
+
+	ps_constants[2].i = PIN(global_window_parameters->fog_result.sky_fog_color.red, 0.f, 1.f);
+	ps_constants[2].j = PIN(global_window_parameters->fog_result.sky_fog_color.green, 0.f, 1.f);
+	ps_constants[2].k = PIN(global_window_parameters->fog_result.sky_fog_color.blue, 0.f, 1.f);
+	ps_constants[2].l = PIN(global_window_parameters->fog_result.sky_fog_alpha, 0.f, 1.f);
+
+	if (rasterizer_get_main_pixel_shader_cache()->test_cache(0, ps_constants, NUMBEROF(ps_constants)))
+	{
+		rasterizer_dx9_device_get_interface()->SetPixelShaderConstantF(0, (const float*)ps_constants, NUMBEROF(ps_constants));
+	}
+	rasterizer_dx9_set_fog_pixel_shader(0);
+	rasterizer_dx9_submit_resolve();
+	return true;
+}
+
+bool __cdecl rasterizer_dx9_draw_fog_sky_only(int32 a1)
+{
+	return INVOKE(0x276912, 0x0, rasterizer_dx9_draw_fog_sky_only, a1);
+}
+
+bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
+	int32 output_type,
+	real_rectangle2d* bounds,
+	real_vector4d* location,
+	void* output,
+	void* ctx)
+{
+	s_frame* global_window_parameters;
+	real32 atmospheric_distance;
+	real32 val;
+
+	bool result = true;
+
+	switch (output_type)
+	{
+	case 0:
+		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
+		break;
+	case 1:
+		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		break;
+	case 2:
+		global_window_parameters = global_window_parameters_get();
+		atmospheric_distance = global_window_parameters->fog_result.atmospheric_max_distance - global_window_parameters->fog_result.atmospheric_min_distance;
+
+		val = atmospheric_distance >= k_real_math_epsilon ? atmospheric_distance : k_real_math_epsilon;
+		val = (1.f / val);
+		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
+		((real_vector4d*)output)->j = 0.f;
+		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.atmospheric_min_distance * val);
+		((real_vector4d*)output)->l = 0.f;
+		break;
+	case 3:
+		global_window_parameters = global_window_parameters_get();
+		atmospheric_distance = global_window_parameters->fog_result.secondary_max_distance - global_window_parameters->fog_result.secondary_min_distance;
+
+		val = atmospheric_distance >= k_real_math_epsilon ? atmospheric_distance : k_real_math_epsilon;
+		val = (1.f / val);
+		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
+		((real_vector4d*)output)->j = 0.f;
+		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.secondary_min_distance * val);
+		((real_vector4d*)output)->l = 0.f;
+		break;
+	case 4:
+		rasterizer_dx9_fullscreen_calculate_screen_coordinates(bounds, (real_point2d*)location, (real_point2d*)output);
+		break;
+	case 5:
+		*(pixel32*)output = global_white_pixel32;
+		break;
+	default:
+		DISPLAY_ASSERT("unreachable");
+		result = false;
+	}
+
+	return result;
+}
+
+bool __cdecl rasterizer_dx9_patchy_fog_apply_build_vertex_buffer(
+	int32 output_type,
+	real_rectangle2d* bounds,
+	real_vector4d* location,
+	void* output,
+	void* ctx)
+{
+	s_frame* global_window_parameters;
+	real32 patchy_distance;
+	real32 val;
+
+	bool result = true;
+
+	switch (output_type)
+	{
+	case 0:
+		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
+		break;
+	case 1:
+		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		break;
+	case 2:
+		global_window_parameters = global_window_parameters_get();
+		patchy_distance = global_window_parameters->fog_result.patchy_max_distance - global_window_parameters->fog_result.patchy_min_distance;
+
+		val = patchy_distance >= k_real_math_epsilon ? patchy_distance : k_real_math_epsilon;
+		val = (1.f / val);
+		((real_vector4d*)output)->i = global_window_parameters->camera.z_far * val;
+		((real_vector4d*)output)->j = 0.f;
+		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.patchy_min_distance * val);
+		((real_vector4d*)output)->l = 0.f;
+		break;
+	case 3:
+		rasterizer_dx9_fullscreen_calculate_screen_coordinates(bounds, (real_point2d*)location, (real_point2d*)output);
+		((real_point2d*)(output))->u *= *patchy_fog_apply_scale_get();
+		((real_point2d*)(output))->v *= *patchy_fog_apply_scale_get();
+		break;
+	case 4:
+		*(pixel32*)output = global_white_pixel32;
+		break;
+	default:
+		result = 0;
+		break;
+	}
+	return result;
+}
+
+bool __cdecl rasterizer_dx9_patchy_fog_apply_from_stencil_build_vertex_buffer(
+	int32 output_type,
+	real_rectangle2d* bounds,
+	real_vector4d* location,
+	void* output,
+	void* ctx)
+{
+	bool result = true;
+	ASSERT(output);
+
+	switch (output_type)
+	{
+	case _vertex_output_type_position:
+		// position normalized device coordinates
+		// make sure to set the viewport, otherwise it'll represent the entire surface
+		// which is not good during split-screen
+		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
+		break;
+	case _vertex_output_type_texcoord:
+		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
+		break;
+	case _vertex_output_type_color:
+		*(pixel32*)output = global_white_pixel32;
+		break;
+	default:
+		DISPLAY_ASSERT("unreachable");
+		result = false;
+	}
+
+	return result;
+}
+
+bool __cdecl rasterizer_dx9_sky_only_fog_build_vertex_buffer(
+	int32 output_type,
+	real_rectangle2d* bounds,
+	real_vector4d* location,
+	void* output,
+	void* ctx)
+{
+	bool result = true;
+
+	switch (output_type)
+	{
+	case 0:
+		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
+		break;
+	case 1:
+		*(pixel32*)output = global_white_pixel32;
+		break;
+	default:
+		DISPLAY_ASSERT("unreachable");
+		result = false;
+	}
+
+	return result;
+}
+
+/* private code */
+
+real32* patchy_fog_apply_scale_get(void)
+{
+	return Memory::GetAddress<real32*>(0xA56B50);
+}
+
+bool __cdecl rasterizer_dx9_set_fog_pixel_shader(uint32 index)
+{
+	return INVOKE(0x276018, 0x0, rasterizer_dx9_set_fog_pixel_shader, index);
+}
 
 void __declspec(naked) rasterizer_fog_constant_velocity_update()
 {
@@ -46,7 +347,7 @@ void __declspec(naked) rasterizer_fog_constant_velocity_update()
 #undef k_delta_time_stack_location
 }
 
-void rasterizer_fog_apply_patches()
+void rasterizer_fog_speed_apply_patch(void)
 {
 	Codecave(Memory::GetAddress(0x2773B5), rasterizer_fog_constant_velocity_update, 42);
 	// xorps xmm0, xmm0, 2 nops
@@ -54,6 +355,19 @@ void rasterizer_fog_apply_patches()
 	WriteBytes(Memory::GetAddress(0x2776D4), xmm0_clear, sizeof(xmm0_clear));
 	WriteBytes(Memory::GetAddress(0x2776E8), xmm0_clear, sizeof(xmm0_clear));
 	WriteBytes(Memory::GetAddress(0x277700), xmm0_clear, sizeof(xmm0_clear));
+	return;
+}
 
+bool __cdecl rasterizer_dx9_create_fog_shaders(void)
+{
+	const unsigned char* ps = g_dx9_sm3_supported ? k_fog_atmospheric_apply_ps_3_0 : k_fog_atmospheric_apply_ps_2_0;
+	WritePointer(Memory::GetAddress(0x468768), ps);
+	return p_rasterizer_dx9_create_fog_shaders();
+}
+
+void rasterizer_dx9_atmospheric_fog_patch(void)
+{
+	DETOUR_ATTACH(p_rasterizer_dx9_create_fog_shaders, Memory::GetAddress<rasterizer_dx9_create_fog_shaders_t>(0x275F94), rasterizer_dx9_create_fog_shaders);
+	WriteValue(Memory::GetAddress(0x277443 + 1), rasterizer_dx9_draw_atmospheric_fog);
 	return;
 }
