@@ -111,11 +111,16 @@ struct s_rasterizer_globals
 };
 ASSERT_STRUCT_SIZE(s_rasterizer_globals, 4336);
 
-/* public code */
+/* prototypes */
 
 s_rasterizer_globals* rasterizer_globals_get(void);
 
 s_game_globals_rasterizer_data* rasterizer_globals_get_data(void);
 
+uint32 rasterizer_get_width(void);
+
+uint32 rasterizer_get_height(void);
+
 void __cdecl rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
+
 void __cdecl rasterizer_get_frame_bounds(rectangle2d* frame_bounds);

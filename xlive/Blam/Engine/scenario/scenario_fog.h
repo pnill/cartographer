@@ -54,7 +54,8 @@ struct s_scenario_fog_result
     datum patchy_fog_tag_index;
     int8 gap_6C[24];
     real_bounds field_88;
-    int8 gap_90[8];
+    real32 patchy_min_distance;
+    real32 patchy_max_distance;
     bool field_96;
     bool field_97;
     bool sort_behind_transparents;
@@ -130,7 +131,7 @@ struct s_scenario_atmospheric_fog_palette_entry
     int pad3[11];
 
     // Explaination("PATCHY FOG", "EMPTY STRING")
-    real_rgb_color patchyColor;
+    real_rgb_color patchy_color;
     int pad4[3];
     real_vector2d patchy_density;
     real_vector2d patchy_distance_world_units;
