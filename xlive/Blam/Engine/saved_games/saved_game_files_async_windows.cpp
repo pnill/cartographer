@@ -127,7 +127,7 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 	s_saved_game_main_menu_globals* saved_game_globals = saved_game_main_menu_globals_get();
 
 	// 0x200000 in the index flags that the index is a default file
-	if ((enumerated_index & 0x200000) != 0 && saved_game_globals)
+	if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index) && saved_game_globals)
 	{
 		uint32 abs_index = (enumerated_index >> 8) & 0x1FFF;
 		uint32 last_index = saved_game_globals->default_save_files.get_count() - 1;

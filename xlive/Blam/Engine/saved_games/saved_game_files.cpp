@@ -59,7 +59,7 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 	if (saved_game_main_menu_globals)
 	{
 		// file is not a default save
-		if ((enumerated_index & 0x200000) == 0)
+		if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 		{
 			auto abs_index = (enumerated_index >> 8) & 0x1FFF;
 			auto last_index = saved_game_main_menu_globals->save_files.get_count() - 1;
@@ -109,7 +109,7 @@ void saved_games_get_display_name(uint32 enumerated_index, wchar_t* display_name
 	display_name[0] = '\0';
 	s_saved_game_main_menu_globals* saved_game_main_menu_globals = saved_game_main_menu_globals_get();
 
-	if (saved_game_main_menu_globals && (enumerated_index & 0x200000) != 0)
+	if (saved_game_main_menu_globals && ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_index))
 	{
 		uint32 absolute_index = (enumerated_index >> 8) & 0x1FFF;
 		uint32 last_index = saved_game_main_menu_globals->default_save_files.get_count() - 1;
