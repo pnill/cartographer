@@ -47,7 +47,7 @@ void rasterizer_dx9_fog_apply_patches(void)
 	return;
 }
 
-bool __cdecl rasterizer_dx9_draw_atmospheric_fog(int32 a1)
+bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(int32 a1)
 {
 	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
 	rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_backbuffer);
@@ -146,13 +146,13 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 
 	switch (output_type)
 	{
-	case 0:
+	case _rasterizer_dx9_atmospheric_fog_output_type_position:
 		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
 		break;
-	case 1:
+	case _rasterizer_dx9_atmospheric_fog_output_type_texcoord:
 		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
 		break;
-	case 2:
+	case _rasterizer_dx9_atmospheric_fog_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
 		atmospheric_distance = global_window_parameters->fog_result.atmospheric_max_distance - global_window_parameters->fog_result.atmospheric_min_distance;
 
@@ -163,7 +163,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.atmospheric_min_distance * val);
 		((real_vector4d*)output)->l = 0.f;
 		break;
-	case 3:
+	case _rasterizer_dx9_atmospheric_fog_output_type_secondary_plane_position:
 		global_window_parameters = global_window_parameters_get();
 		atmospheric_distance = global_window_parameters->fog_result.secondary_max_distance - global_window_parameters->fog_result.secondary_min_distance;
 
@@ -174,10 +174,10 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_build_vertex_buffer(
 		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.secondary_min_distance * val);
 		((real_vector4d*)output)->l = 0.f;
 		break;
-	case 4:
+	case _rasterizer_dx9_atmospheric_fog_output_type_screen_coordinates:
 		rasterizer_dx9_fullscreen_calculate_screen_coordinates(bounds, (real_point2d*)location, (real_point2d*)output);
 		break;
-	case 5:
+	case _rasterizer_dx9_atmospheric_fog_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
@@ -203,13 +203,13 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_build_vertex_buffer(
 
 	switch (output_type)
 	{
-	case 0:
+	case _rasterizer_dx9_patchy_fog_output_type_position:
 		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
 		break;
-	case 1:
+	case _rasterizer_dx9_patchy_fog_output_type_texcoord:
 		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
 		break;
-	case 2:
+	case _rasterizer_dx9_patchy_fog_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
 		patchy_distance = global_window_parameters->fog_result.patchy_max_distance - global_window_parameters->fog_result.patchy_min_distance;
 
@@ -220,12 +220,12 @@ bool __cdecl rasterizer_dx9_patchy_fog_apply_build_vertex_buffer(
 		((real_vector4d*)output)->k = -(global_window_parameters->fog_result.patchy_min_distance * val);
 		((real_vector4d*)output)->l = 0.f;
 		break;
-	case 3:
+	case _rasterizer_dx9_patchy_fog_output_type_screen_coordinates:
 		rasterizer_dx9_fullscreen_calculate_screen_coordinates(bounds, (real_point2d*)location, (real_point2d*)output);
 		((real_point2d*)(output))->u *= *patchy_fog_apply_scale_get();
 		((real_point2d*)(output))->v *= *patchy_fog_apply_scale_get();
 		break;
-	case 4:
+	case _rasterizer_dx9_patchy_fog_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
@@ -278,10 +278,10 @@ bool __cdecl rasterizer_dx9_sky_only_fog_build_vertex_buffer(
 
 	switch (output_type)
 	{
-	case 0:
+	case _rasterizer_dx9_fog_sky_only_output_type_position:
 		rasterizer_dx9_fullscreen_calculate_position(location, 1.f, (real_vector4d*)output);
 		break;
-	case 1:
+	case _rasterizer_dx9_fog_sky_only_output_type_color:
 		*(pixel32*)output = global_white_pixel32;
 		break;
 	default:
@@ -368,6 +368,5 @@ bool __cdecl rasterizer_dx9_create_fog_shaders(void)
 void rasterizer_dx9_atmospheric_fog_patch(void)
 {
 	DETOUR_ATTACH(p_rasterizer_dx9_create_fog_shaders, Memory::GetAddress<rasterizer_dx9_create_fog_shaders_t>(0x275F94), rasterizer_dx9_create_fog_shaders);
-	WriteValue(Memory::GetAddress(0x277443 + 1), rasterizer_dx9_draw_atmospheric_fog);
 	return;
 }

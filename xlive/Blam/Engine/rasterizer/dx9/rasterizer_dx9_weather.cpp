@@ -140,7 +140,7 @@ bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 	case _rasterizer_dx9_weather_plate_output_type_screen_texcoord:
 		rasterizer_dx9_fullscreen_calculate_texcoords(bounds, (real_point2d*)location, (real_point2d*)output);
 		break;
-	case _rasterizer_dx9_weather_plate_output_type_plane_texcoord:
+	case _rasterizer_dx9_weather_plate_output_type_plane_position:
 		global_window_parameters = global_window_parameters_get();
 
 		val = MAX(k_real_math_epsilon, ctx->depth_blend_z_bounds.upper - ctx->depth_blend_z_bounds.lower);

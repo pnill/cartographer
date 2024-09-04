@@ -1,10 +1,37 @@
 #pragma once
 
+/* enums */
+
+enum e_rasterizer_dx9_atmospheric_fog_output_type : int32
+{
+	_rasterizer_dx9_atmospheric_fog_output_type_position,
+	_rasterizer_dx9_atmospheric_fog_output_type_texcoord,
+	_rasterizer_dx9_atmospheric_fog_output_type_plane_position,
+	_rasterizer_dx9_atmospheric_fog_output_type_secondary_plane_position,
+	_rasterizer_dx9_atmospheric_fog_output_type_screen_coordinates,
+	_rasterizer_dx9_atmospheric_fog_output_type_color
+};
+
+enum e_rasterizer_dx9_patchy_fog_output_type : int32
+{
+	_rasterizer_dx9_patchy_fog_output_type_position,
+	_rasterizer_dx9_patchy_fog_output_type_texcoord,
+	_rasterizer_dx9_patchy_fog_output_type_plane_position,
+	_rasterizer_dx9_patchy_fog_output_type_screen_coordinates,
+	_rasterizer_dx9_patchy_fog_output_type_color
+};
+
+enum e_rasterizer_dx9_fog_sky_only_output_type : int32
+{
+	_rasterizer_dx9_fog_sky_only_output_type_position,
+	_rasterizer_dx9_fog_sky_only_output_type_color
+};
+
 /* prototypes */
 
 void rasterizer_dx9_fog_apply_patches(void);
 
-bool __cdecl rasterizer_dx9_draw_atmospheric_fog(int32 a1);
+bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(int32 a1);
 
 bool __cdecl rasterizer_dx9_draw_fog_sky_only(int32 a1);
 

@@ -32,7 +32,7 @@ void __cdecl render_atmospheric_fog(void)
 		{
 			rasterizer_dx9_render_fullscreen_overlay_geometry(
 				0,
-				rasterizer_dx9_draw_atmospheric_fog,
+				rasterizer_dx9_atmospheric_fog_pipeline_setup,
 				rasterizer_dx9_atmospheric_fog_build_vertex_buffer,
 				0,
 				0,

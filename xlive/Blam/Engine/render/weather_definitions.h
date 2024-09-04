@@ -3,7 +3,7 @@
 #include "render/render_weather.h"
 #include "tag_files/tag_reference.h"
 
-#define MAX_WIND_PRIMITIVES = 128
+#define MAX_WIND_PRIMITIVES 128
 #define k_animated_background_plate_textures 3
 
 enum  e_wind_primitive_type : uint16
