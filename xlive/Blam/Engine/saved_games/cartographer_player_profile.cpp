@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "cartographer_player_profile.h"
 
+#include "saved_game_files.h"
 #include "saved_game_files_async_windows.h"
 
 #include "game/players.h"
@@ -56,19 +57,28 @@ void cartographer_player_profile_initialize(void)
 
 bool cartographer_player_profile_is_signed_in(e_controller_index controller_index)
 {
+
 	if (controller_index == k_no_controller)
 		return false;
 
-	return g_cartographer_profiles[controller_index].controller_index != NONE;
+	if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[controller_index].enumerated_file_index) &&
+		g_cartographer_profiles[controller_index].enumerated_file_index != NONE)
+		return true;
+
+	return g_cartographer_profiles[controller_index].controller_index != k_no_controller;
 }
 
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_controller_index(e_controller_index controller_index)
 {
+	if (ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[controller_index].enumerated_file_index))
+		return &g_default_cartographer_profile;
+
 	return &g_cartographer_profiles[controller_index].profile;
 }
 
 s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_user_index(uint32 user_index)
 {
+
 	s_players_globals* player_globals = get_players_globals();
 
 	if (user_index < player_globals->player_user_count)
@@ -76,8 +86,12 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_use
 		datum user_datum = player_globals->player_user_mapping[user_index];
 		for (uint32 index = 0; index < k_number_of_controllers; index++)
 		{
-			if (player_globals->player_controller_mapping[index] == user_datum && g_cartographer_profiles[index].enumerated_file_index != NONE)
-				return &g_cartographer_profiles[index].profile;
+			if (player_globals->player_controller_mapping[index] == user_datum &&
+				g_cartographer_profiles[index].enumerated_file_index != NONE &&
+				!ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[index].enumerated_file_index))
+			{
+					return &g_cartographer_profiles[index].profile;
+			}
 		}
 	}
 
@@ -91,45 +105,48 @@ void cartographer_player_profile_sign_in(e_controller_index controller_index, ui
 	g_cartographer_profiles[controller_index].enumerated_file_index = enumerated_file_index;
 	g_cartographer_profiles[controller_index].controller_index = controller_index;
 
-	// try to load the profile
-	if (!saved_games_async_helper_read_saved_game_bin(k_cartographer_bin_name,
-		enumerated_file_index,
-		(int8*)current_profile,
-		sizeof(s_saved_game_cartographer_player_profile)))
+	if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index))
 	{
-		// profile does not exist or is corrupted
-		cartographer_player_profile_new(current_profile);
-		cartographer_player_profile_save(controller_index);
-	}
-	else
-	{
-		// check the profile is valid
-		e_saved_game_cartographer_player_profile_version version;
-		if (!cartographer_player_profile_verify(current_profile, &version))
+		// try to load the profile
+		if (!saved_games_async_helper_read_saved_game_bin(k_cartographer_bin_name,
+			enumerated_file_index,
+			(int8*)current_profile,
+			sizeof(s_saved_game_cartographer_player_profile)))
 		{
-			// if the loaded profile is deemed invalid over-write it.
-			if (version == k_saved_game_cartographer_player_profile_version_invalid)
+			// profile does not exist or is corrupted
+			cartographer_player_profile_new(current_profile);
+			cartographer_player_profile_save(controller_index);
+		}
+		else
+		{
+			// check the profile is valid
+			e_saved_game_cartographer_player_profile_version version;
+			if (!cartographer_player_profile_verify(current_profile, &version))
 			{
-				cartographer_player_profile_new(current_profile);
-				cartographer_player_profile_save(controller_index);
-			}
-			else
-			{
-				bool upgraded_check = false;
-				// check if profile needs to be upgraded
-				if (cartographer_player_profile_upgrade_check(current_profile, &upgraded_check))
+				// if the loaded profile is deemed invalid over-write it.
+				if (version == k_saved_game_cartographer_player_profile_version_invalid)
 				{
-					// if profile was upgraded re-save it.
-					if (upgraded_check)
-					{
-						cartographer_player_profile_save(controller_index);
-					}
+					cartographer_player_profile_new(current_profile);
+					cartographer_player_profile_save(controller_index);
 				}
 				else
 				{
-					// upgrade check failed over-write original.
-					cartographer_player_profile_new(current_profile);
-					cartographer_player_profile_save(controller_index);
+					bool upgraded_check = false;
+					// check if profile needs to be upgraded
+					if (cartographer_player_profile_upgrade_check(current_profile, &upgraded_check))
+					{
+						// if profile was upgraded re-save it.
+						if (upgraded_check)
+						{
+							cartographer_player_profile_save(controller_index);
+						}
+					}
+					else
+					{
+						// upgrade check failed over-write original.
+						cartographer_player_profile_new(current_profile);
+						cartographer_player_profile_save(controller_index);
+					}
 				}
 			}
 		}
@@ -151,11 +168,14 @@ void cartographer_player_profile_sign_out(e_controller_index controller_index)
 
 void cartographer_player_profile_save(e_controller_index controller_index)
 {
-	if (g_cartographer_profiles[controller_index].controller_index != NONE)
+	if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[controller_index].enumerated_file_index) &&
+		g_cartographer_profiles[controller_index].controller_index != NONE)
+	{
 		saved_games_async_helper_write_saved_game_bin(k_cartographer_bin_name,
 			g_cartographer_profiles[controller_index].enumerated_file_index,
 			(int8*)&g_cartographer_profiles[controller_index].profile,
 			sizeof(s_saved_game_cartographer_player_profile));
+	}
 	return;
 }
 

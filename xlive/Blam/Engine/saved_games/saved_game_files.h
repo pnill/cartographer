@@ -8,6 +8,9 @@
 #define k_maximum_enumerated_default_save_game_files 101
 #define k_maximum_enumerated_cached_save_game_files 4
 
+#define ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index) \
+	(((enumerated_file_index) & 0x200000) != 0)
+
 /* enums */
 
 enum e_saved_game_file_type : uint32
