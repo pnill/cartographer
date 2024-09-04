@@ -87,9 +87,9 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_use
 		for (uint32 index = 0; index < k_number_of_controllers; index++)
 		{
 			if (player_globals->player_controller_mapping[index] == user_datum &&
-				g_cartographer_profiles[index].enumerated_file_index != NONE)
+				g_cartographer_profiles[index].enumerated_file_index != NONE &&
+				!ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[index].enumerated_file_index))
 			{
-				if (!ENUMERATED_INDEX_IS_DEFAULT_SAVE(g_cartographer_profiles[index].enumerated_file_index))
 					return &g_cartographer_profiles[index].profile;
 			}
 		}
