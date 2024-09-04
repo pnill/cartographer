@@ -27,27 +27,7 @@ ASSERT_STRUCT_SIZE(real_rgb_color, sizeof(real32) * 3);
 const pixel32 global_white_pixel32 = { D3DCOLOR_ARGB(255, 255, 255, 255) };
 const pixel32 global_yellow_pixel32 = { D3DCOLOR_ARGB(255, 255, 255, 0) };
 
-// h1/reach puts these in cseries.obj because it is the first file that includes them? or defines them?
-const real_argb_color global_real_argb_color_table[] =
-{
-	{ {  1.f,	1.f,	1.f,	1.f } },
-	{ {  1.f,	.5f,	.5f,	.5f } },
-	{ {  1.f,	.0f,	.0f,	.0f } },
-	{ {  1.f,	1.f,	.0f,	.0f } },
-	{ {  1.f,	.0f,	1.f,	.0f } },
-	{ {  1.f,	.0f,	.0f,	1.f } },
-	{ {  1.f,	.0f,	1.f,	1.f } },
-	{ {  1.f,	1.f,	1.f,	.0f } },
-	{ {  1.f,	1.f,	.0f,	1.f } },
-	{ {  1.f,	1.f,	.41f,	.7f } },
-	{ {  1.f,	.39f,	.58f,	.93f } },
-	{ {  1.f,	1.f,	.5f,	.0f } },
-	{ {  1.f,	.44f,	.05f,	.43f } },
-	{ {  1.f,	.5f,	1.f,	.83f } },
-	{ {  1.f,	.0f,	.39f,	.0f } },
-	{ {  1.f,	1.f,	.63f,	.48f } },
-	{ {  1.f,	.81f,	.13f,	.56f } }
-};
+extern const real_argb_color global_real_argb_color_table[];
 
 const real_argb_color* const global_real_argb_white = &global_real_argb_color_table[0];
 const real_argb_color* const global_real_argb_grey = &global_real_argb_color_table[1];
