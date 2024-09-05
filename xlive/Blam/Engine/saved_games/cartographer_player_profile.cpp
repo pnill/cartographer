@@ -100,6 +100,11 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_use
 
 void cartographer_player_profile_sign_in(e_controller_index controller_index, uint32 enumerated_file_index)
 {
+	// The game will re-sign in the profiles when switching between maps no need to
+	// re-read the profile binary unless the player has actually signed out
+	if (enumerated_file_index == g_cartographer_profiles[controller_index].enumerated_file_index)
+		return;
+
 	s_saved_game_cartographer_player_profile* current_profile = &g_cartographer_profiles[controller_index].profile;
 
 	g_cartographer_profiles[controller_index].enumerated_file_index = enumerated_file_index;
