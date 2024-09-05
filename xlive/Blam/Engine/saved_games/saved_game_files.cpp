@@ -78,7 +78,7 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 			{
 				if (enumerated_index == saved_game_files_globals->cached_save_files[i]->enumerated_index)
 				{
-					csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i]->file_info, saved_game_files_globals->cached_save_files.get_type_size());
+					csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i]->file_info, sizeof(s_saved_game_main_menu_globals_save_file_info));
 					return true;
 				}
 			}

@@ -47,9 +47,9 @@ void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_ind
 	s_saved_game_main_menu_globals_save_file_info file_info{};
 	saved_games_get_file_info(&file_info, enumerated_file_index);
 
-	wcsncpy(out_path, file_info.file_path, 256);
-	wcscat(out_path, binary_name);
-	wcscat(out_path, L".bin");
+	ustrnzcpy(out_path, file_info.file_path, NUMBEROF(file_info.file_path));
+	ustrnzcat(out_path, binary_name, ustrnlen(binary_name, NUMBEROF(file_info.file_path)));
+	ustrnzcat(out_path, L".bin", 4);
 	return;
 }
 
@@ -132,9 +132,9 @@ bool __cdecl saved_games_async_helper_read_file_internal(int enumerated_index, v
 		uint32 abs_index = (enumerated_index >> 8) & 0x1FFF;
 		uint32 last_index = saved_game_globals->default_save_files.get_count() - 1;
 
-		// Removed check of buffer_size so it can read the entry from the globals
-		// potentially unsafe will have to come up with a way to verify if this was actually needed or not.
-		if ((abs_index <= last_index || abs_index == last_index))
+		// checking the size of the buffer is not specifically for player_profile it is whatever the
+		// largest structure that can be stored in the default save files static_array is.
+		if (abs_index <= last_index && buffer_size <= sizeof(s_saved_game_player_profile))
 		{
 			csmemcpy(buffer, saved_game_globals->default_save_files[abs_index]->buffer, buffer_size);
 			in_out_completion->unk_2 = true;
