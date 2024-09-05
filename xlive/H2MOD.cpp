@@ -38,6 +38,7 @@
 #include "networking/Transport/transport.h"
 #include "objects/damage.h"
 #include "units/bipeds.h"
+#include "rasterizer/rasterizer_fog.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
@@ -46,15 +47,17 @@
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
+#include "rasterizer/dx9/rasterizer_dx9_weather.h"
 #include "render/render.h"
+#include "render/render_cameras.h"
+#include "render/render_submit.h"
+#include "render/render_lod_new.h"
+#include "render/render_weather.h"
 #include "saved_games/game_state_procs.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_players.h"
 #include "simulation/game_interface/simulation_game_objects.h"
 #include "simulation/game_interface/simulation_game_units.h"
-#include "render/render_cameras.h"
-#include "render/render_submit.h"
-#include "render/render_lod_new.h"
 #include "tag_files/tag_loader/tag_injection.h"
 #include "text/font_cache.h"
 #include "units/units.h"
@@ -904,6 +907,7 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		
+		rasterizer_dx9_fog_apply_patches();
 		rasterizer_dx9_fullscreen_passes_apply_patches();
 		rasterizer_dx9_lens_flares_apply_patches();
 		rasterizer_dx9_main_apply_patches();
@@ -911,8 +915,12 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_shader_submit_new_apply_patches();
 		rasterizer_dx9_targets_apply_patches();
 		rasterizer_dx9_water_apply_patches();
+		rasterizer_dx9_weather_apply_patches();
+
+		rasterizer_fog_apply_patches();
 
 		render_lod_new_apply_patches();
+		render_weather_apply_patches();
 
 		cinematics_apply_patches();
 		game_time_apply_patches();
@@ -927,7 +935,6 @@ void H2MOD::ApplyHooks() {
 		cloth_apply_patches();
 		camera_apply_patches();
 		player_control_apply_patches();
-		rasterizer_fog_apply_patches();
 		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();

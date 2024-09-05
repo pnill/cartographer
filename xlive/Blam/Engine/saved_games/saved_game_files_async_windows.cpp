@@ -44,6 +44,9 @@ void saved_games_async_helpers_apply_patches(void)
 
 void saved_games_async_helper_get_saved_game_bin_path(uint32 enumerated_file_index, const wchar_t* binary_name, wchar_t* out_path)
 {
+	ASSERT(out_path);
+	ASSERT(binary_name);
+
 	s_saved_game_main_menu_globals_save_file_info file_info{};
 	saved_games_get_file_info(&file_info, enumerated_file_index);
 

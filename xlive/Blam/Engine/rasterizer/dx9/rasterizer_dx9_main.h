@@ -61,7 +61,11 @@ struct s_rasterizer_dx9_main_globals
     IDirect3DDevice9Ex* global_d3d_device;
 };
 
-/* public code */
+/* globals */
+
+extern bool g_dx9_sm3_supported;
+
+/* prototypes */
 
 s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
@@ -108,3 +112,11 @@ void rasterizer_dx9_texture_stage_dimensions(uint8 stage, uint32 width, uint32 h
 bool __cdecl rasterizer_dx9_device_set_texture(uint32 stage, IDirect3DTexture9* texture);
 
 void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32 usage, datum tag_index, int16 bitmap_index, real32 a6);
+
+bool __cdecl rasterizer_dx9_initialize_device(real_vector3d* v, bool display_blackness);
+
+void __cdecl rasterizer_dx9_initialize_camera_projection(
+    bool is_texture_camera,
+    const s_camera* camera,
+    const render_projection* projection,
+    e_rasterizer_target rasterizer_target);

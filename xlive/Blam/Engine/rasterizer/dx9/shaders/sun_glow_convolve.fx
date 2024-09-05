@@ -1,5 +1,3 @@
-// fxc /T ps_2_0 /Fo ../compiled/sun_glow_convolve.pso ../sun_glow_convolve.hlsl
-
 struct PS_INPUT
 {
     float4 color : COLOR;

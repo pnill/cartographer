@@ -303,4 +303,4 @@ ASSERT_STRUCT_SIZE(s_game_variant, 0x130);
 
 s_game_variant* get_game_variant(void);
 
-void game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);
+void __cdecl game_variant_build_default(s_game_variant* variant, e_game_variant_description_index game_variant_type);

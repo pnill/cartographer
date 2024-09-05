@@ -11,8 +11,6 @@ Project_Cartographer.vcxproj.user
 *.log
 *.idb
 *.java
-!xlive/libprotobuf.lib
-!xlive/libMinHook.x86.lib
 *.suo
 *.opendb
 *.db
@@ -30,6 +28,7 @@ xliveless.v12.suo
 *.opensdf
 *.user
 *.ipch
+*.pso
 version_git.h
 
 JSON/

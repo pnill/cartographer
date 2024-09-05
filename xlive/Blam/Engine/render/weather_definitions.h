@@ -1,10 +1,10 @@
 #pragma once
-#include "geometry/geometry_block.h"
 #include "math/color_math.h"
+#include "render/render_weather.h"
 #include "tag_files/tag_reference.h"
 
-#define MAX_PARTICLES_LITE = 4096
-#define MAX_WIND_PRIMITIVES = 128
+#define MAX_WIND_PRIMITIVES 128
+#define k_animated_background_plate_textures 3
 
 enum  e_wind_primitive_type : uint16
 {
@@ -19,18 +19,6 @@ enum e_animated_background_plate_flags : int32
 	_animated_background_plate_forward_motion = FLAG(0),
 	_animated_background_plate_auto_position_planes = FLAG(1),
 	_animated_background_plate_auto_scale_planes_auto_update_speed = FLAG(2)
-};
-
-enum e_particle_system_lite_type : uint16
-{
-	_particle_system_lite_type_generic = 0,
-	_particle_system_lite_type_snow = 1,
-	_particle_system_lite_type_rain = 2,
-	_particle_system_lite_type_rain_splash = 3,
-	_particle_system_lite_type_bugs = 4,
-	_particle_system_lite_type_sand_storm = 5,
-	_particle_system_lite_type_debris = 6,
-	_particle_system_lite_type_bubbles = 7
 };
 
 // max: MAX_WIND_PRIMITIVES
@@ -67,98 +55,63 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_wind_model, 156);
 
+struct s_animated_background_plate_window_color_data
+{
+	real32 alpha[k_animated_background_plate_textures];
+	real32 field_C[k_animated_background_plate_textures];
+	real32 field_18[k_animated_background_plate_textures];
+};
+ASSERT_STRUCT_SIZE(s_animated_background_plate_window_color_data, 36);
+
+struct s_animated_background_plate_window_bound_data
+{
+	s_animated_background_plate_window_color_data field_0[2];
+	real32 field_34[3];
+	real_point2d texture_positions[k_animated_background_plate_textures];
+	real32 field_6C[k_animated_background_plate_textures];
+	real32 field_78;
+	real32 field_7C;
+	real32 field_80;
+	real32 field_84;
+	real32 field_88;
+	real32 field_8C[11];
+};
+ASSERT_STRUCT_SIZE(s_animated_background_plate_window_bound_data, 184);
+
 // max: 1
 class c_animated_background_plate
 {
 public:
-	tag_reference textures[3]; // bitm
+	tag_reference textures[k_animated_background_plate_textures]; // bitm
 
 	real_point3d plate_position;
 
-	real_vector3d texture_move_speed[3];
-
-	real32 texture_scale[3];
-
-	real_vector3d texture_jitter[3];
+	real_vector3d texture_move_speed[k_animated_background_plate_textures];
+	real32 texture_scale[k_animated_background_plate_textures];
+	real_vector3d texture_jitter[k_animated_background_plate_textures];
 
 	real_bounds plate_z_bounds;
 	real_bounds depth_blend_z_bounds;
 
-	real32 texture_opacity[3];
+	real32 texture_opacity[k_animated_background_plate_textures];
 
 	e_animated_background_plate_flags flags;
 
-	real_rgb_color texture_tint_color[3];
-	real32 texture_mass[3];
+	real_rgb_color texture_tint_color[k_animated_background_plate_textures];
+	real32 texture_mass[k_animated_background_plate_textures];
 
-	int8 pad[736];
+	s_animated_background_plate_window_bound_data window[4];
 };
 ASSERT_STRUCT_SIZE(c_animated_background_plate, 936);
 
 // TODO: Figure out where this actually goes.
-// max: MAX_PARTICLES_LITE
-class c_particle_lite_render 
-{
-public:
-	real_vector3d m_position;
-	real32 m_size;
-	pixel32 m_color;
-};
-ASSERT_STRUCT_SIZE(c_particle_lite_render, 20);
-
-// TODO: Figure out where this actually goes.
-// max: MAX_PARTICLES_LITE
-class c_particle_lite_data 
-{
-public:
-	real_vector3d m_velocity;
-	int32 m_pad[3];
-	real32 m_mass;
-	real32 m_creation_time_stamp;
-};
-ASSERT_STRUCT_SIZE(c_particle_lite_data, 32);
-
-// TODO: Figure out where this actually goes.
 // max: 1
-struct particle_system_data
-{
-	tag_block<c_particle_lite_render> render_data;
-	tag_block<c_particle_lite_data> update_data;
-	int8 pad[32];
-};
-ASSERT_STRUCT_SIZE(particle_system_data, 48);
-
-// TODO: Figure out where this actually goes.
-// max: 1
-class c_particle_system_lite
-{
-public:
-	tag_reference m_sprites; // bitm
-	real_bounds m_view_box; // width, height
-	real32 m_view_box_depth;
-	real32 m_exclusion_radius;
-	real32 m_max_velocity;
-	real_bounds m_mass;
-	real_bounds m_size;
-	int32 m_maximum_particle_count;
-	real_vector3d m_initial_velocity;
-	real32 m_bitmap_animation_speed;
-	geometry_block_info m_geometry;
-	tag_block<particle_system_data> m_particle_system_data;
-	e_particle_system_lite_type m_type;
-	int8 m_pad_1[2];
-	real_bounds m_opacity;
-	real32 m_rain_streak_scale;
-	real32 m_rain_line_width;
-	int32 m_pad_2[3];
-};
-ASSERT_STRUCT_SIZE(c_particle_system_lite, 140);
 
 class c_weather_system
 {
 public:
 	tag_block<c_particle_system_lite> m_particle_system;
-	tag_block< c_animated_background_plate> m_background_plates;
+	tag_block<c_animated_background_plate> m_background_plates;
 	c_wind_model m_wind_model;
 	real32 m_fade_radius;
 };

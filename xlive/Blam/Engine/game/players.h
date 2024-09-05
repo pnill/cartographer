@@ -242,7 +242,7 @@ struct s_players_globals
 	bool any_players_dead;
 	bool input_disabled;
 	bool disable_movement;
-	int16 player_user_count;
+	int16 local_player_count;
 	int16 player_controller_count;
 	datum player_user_mapping[4];
 	datum player_controller_mapping[4];
@@ -281,5 +281,7 @@ uint32 player_appearance_required_bits(void);
 
 // Validate player configuration
 void __cdecl player_validate_configuration(datum player_index, s_player_properties* configuration_data);
+
+int16 local_player_count(void);
 
 void players_apply_patches(void);

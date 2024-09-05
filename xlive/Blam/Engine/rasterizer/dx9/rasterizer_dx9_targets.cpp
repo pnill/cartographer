@@ -259,8 +259,8 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
     case _rasterizer_target_resolved:
         d3d_texture = dx9_globals->global_d3d_texture_render_resolved;
         break;
-    case _rasterizer_target_1:
-        d3d_texture = rasterizer_dx9_get_target_texture(_rasterizer_target_1);
+    case _rasterizer_target_texaccum:
+        d3d_texture = rasterizer_dx9_get_target_texture(_rasterizer_target_texaccum);
         break;
     case _rasterizer_target_backbuffer:
         d3d_texture = dx9_globals->global_d3d_backbuffer_texture;
@@ -346,7 +346,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     bool valid_target = true;
     bool depth_provided = false;
 
-    e_rasterizer_target target = (*global_rasterizer_stage_get() != _rasterizer_target_1 ? rasterizer_target : _rasterizer_target_backbuffer);
+    e_rasterizer_target target = (*global_rasterizer_stage_get() != _rasterizer_target_texaccum ? rasterizer_target : _rasterizer_target_backbuffer);
     switch (target)
     {
     case _rasterizer_target_render_primary:
@@ -371,7 +371,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         }
         break;
-    case _rasterizer_target_1:
+    case _rasterizer_target_texaccum:
     case _rasterizer_target_bloom_primary:
     case _rasterizer_target_bloom_secondary:
     case _rasterizer_target_gamma_remap_lut:
@@ -497,8 +497,9 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             target == _rasterizer_target_render_primary ||
             target == _rasterizer_target_resolved ||
             target == _rasterizer_target_2 ||
-            target == _rasterizer_target_1 ||
+            target == _rasterizer_target_texaccum ||
             target == _rasterizer_target_cinematic ||
+            target == _rasterizer_target_backbuffer ||
             target == rasterizer_dx9_get_overlay_destination_target())
         {
             const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);

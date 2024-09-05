@@ -6,7 +6,7 @@ enum e_rasterizer_target : int16
 {
 	_rasterizer_target_none = NONE,
 	_rasterizer_target_render_primary = 0,
-	_rasterizer_target_1 = 1,
+	_rasterizer_target_texaccum = 1,
 	_rasterizer_target_2 = 2,
 	_rasterizer_target_backbuffer = 3,
 	_rasterizer_target_frontbuffer = 4,

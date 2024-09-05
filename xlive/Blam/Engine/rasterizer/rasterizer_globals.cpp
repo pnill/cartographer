@@ -13,6 +13,17 @@ s_game_globals_rasterizer_data* rasterizer_globals_get_data(void)
 	return *Memory::GetAddress<s_game_globals_rasterizer_data**>(0xA3DA3C);
 }
 
+uint32 rasterizer_get_width(void)
+{
+	return rasterizer_globals_get()->resolution_x;
+}
+
+uint32 rasterizer_get_height(void)
+{
+	return rasterizer_globals_get()->resolution_y;
+}
+
+
 void __cdecl rasterizer_get_screen_bounds(rectangle2d* screen_bounds)
 {
 	*screen_bounds = rasterizer_globals_get()->screen_bounds;

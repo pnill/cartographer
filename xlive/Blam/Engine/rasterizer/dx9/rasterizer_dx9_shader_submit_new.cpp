@@ -71,12 +71,12 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_unused_2:
-            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_texaccum);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_texaccum:
-            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
-            rasterizer_target_get_resolution(_rasterizer_target_1, res_x, res_y);
+            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_texaccum);
+            rasterizer_target_get_resolution(_rasterizer_target_texaccum, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_utility_buffer:
@@ -260,7 +260,7 @@ void c_shader_submission_interface_new::stage_texture(
             }
             else
             {
-                rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_1);
+                rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_texaccum);
             }
             continue_staging = false;
             break;

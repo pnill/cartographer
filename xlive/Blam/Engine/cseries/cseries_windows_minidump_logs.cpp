@@ -384,7 +384,7 @@ void setup_game_global_text(const wchar_t* reports_path)
 
         fwprintf(file, L"Ticks Till End: %u\n", game_globals->ticks_till_end);
 
-        fwprintf(file, L"Game Ragdoll Count: %u\n", game_globals->game_ragdoll_count);
+        fwprintf(file, L"Game Ragdoll Count: %d\n", game_globals->game_ragdoll_count);
 
         fwprintf(file, L"Cluster PVS: ");
         print_array_to_file(file, game_globals->cluster_pvs, sizeof(game_globals->cluster_pvs));

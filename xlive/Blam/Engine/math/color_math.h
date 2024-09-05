@@ -70,3 +70,5 @@ const real_rgb_color* const global_real_rgb_violet = (const real_rgb_color* cons
 pixel32 real_argb_color_to_pixel32(const real_argb_color* color);
 
 void pixel32_to_real_rgb_color(pixel32 pixel_color, real_rgb_color* out_color);
+
+pixel32 real_alpha_to_pixel32(real32 alpha);
