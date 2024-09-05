@@ -52,7 +52,7 @@ void rasterizer_dx9_fullscreen_calculate_screen_coordinates(const real_rectangle
     return;
 }
 
-void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bounds, const real_point2d* location, real_point2d* output)
+void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bounds, const real_point2d* location, real_point2d* output, int32 texture_stage)
 {
     ASSERT(bounds);
     ASSERT(location);
@@ -77,7 +77,7 @@ void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bound
 
     uint32 tex_width;
     uint32 tex_height;
-    rasterizer_dx9_staged_texture_surface_size(0, &tex_width, &tex_height);
+    rasterizer_dx9_staged_texture_surface_size(texture_stage, &tex_width, &tex_height);
 
     // explanation: locations are per vertex, this draw call will take 4 vertices
     // this function will get called 4 times, for each single vertex

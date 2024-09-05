@@ -18,7 +18,7 @@ void rasterizer_dx9_fullscreen_calculate_position(const real_vector4d* location,
 
 void rasterizer_dx9_fullscreen_calculate_screen_coordinates(const real_rectangle2d* bounds, const real_point2d* location, real_point2d* output);
 
-void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bounds, const real_point2d* location, real_point2d* output);
+void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bounds, const real_point2d* location, real_point2d* output, int32 texture_stage = 0);
 
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     real_rectangle2d* a1,

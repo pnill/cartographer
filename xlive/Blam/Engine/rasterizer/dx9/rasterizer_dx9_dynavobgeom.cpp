@@ -167,21 +167,21 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 
 			if (parameters->map[1])
 			{
-				ps_constants[3].i = (parameters->field_90 == 0);
-				ps_constants[3].j = (parameters->field_90 == 1);
-				ps_constants[3].k = (parameters->field_90 == 2);
-				ps_constants[3].l = (parameters->field_90 == 3);
-				ps_constants[4].i = (parameters->field_90 == 4);
-				ps_constants[4].j = (parameters->field_90 == 5);
+				ps_constants[3].i = (real32)(parameters->field_90 == 0);
+				ps_constants[3].j = (real32)(parameters->field_90 == 1);
+				ps_constants[3].k = (real32)(parameters->field_90 == 2);
+				ps_constants[3].l = (real32)(parameters->field_90 == 3);
+				ps_constants[4].i = (real32)(parameters->field_90 == 4);
+				ps_constants[4].j = (real32)(parameters->field_90 == 5);
 			}
 
 			if (parameters->map[2])
 			{
-				ps_constants[4].k = (parameters->field_92 == 0);
-				ps_constants[4].l = (parameters->field_92 == 1);
-				ps_constants[5].i = (parameters->field_92 == 2);
-				ps_constants[5].j = (parameters->field_92 == 3);
-				ps_constants[5].k = (parameters->field_92 == 4);
+				ps_constants[4].k = (real32)(parameters->field_92 == 0);
+				ps_constants[4].l = (real32)(parameters->field_92 == 1);
+				ps_constants[5].i = (real32)(parameters->field_92 == 2);
+				ps_constants[5].j = (real32)(parameters->field_92 == 3);
+				ps_constants[5].k = (real32)(parameters->field_92 == 4);
 			}
 
 			draw_geometry = SUCCEEDED(global_d3d_device->SetPixelShader(dynavobgeom_pixel_shaders_get()[0]));
