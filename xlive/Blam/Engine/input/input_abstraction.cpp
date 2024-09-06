@@ -295,9 +295,11 @@ void input_abstraction_set_controller_look_sensitivity(e_controller_index contro
 
 void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller, real32 value)
 {
+	s_saved_game_cartographer_player_profile* cartographer_player_profile = cartographer_player_profile_get_by_user_index(0);
+
 	if (value == 0.0f)
 		return;
-	if (H2Config_raw_input)
+	if (cartographer_player_profile->raw_mouse_input)
 		value = 1.0f;
 
 	value = MAX(value - 1.0f, 0.0f);
@@ -306,7 +308,7 @@ void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller,
 
 	preference->mouse_yaw_rate = (80.0f + 20.0f * value) - 30.0f;
 	
-	if (cartographer_player_profile_get_by_user_index(0)->mouse_uniform)
+	if (cartographer_player_profile->mouse_uniform)
 		preference->mouse_pitch_rate = preference->mouse_yaw_rate;
 	else
 		preference->mouse_pitch_rate = (40.0f + 10.0f * value) - 15.0f;
@@ -314,22 +316,30 @@ void input_abstraction_set_mouse_look_sensitivity(e_controller_index controller,
 
 void input_abstraction_apply_raw_mouse_update(e_controller_index controller, s_game_input_state* input_state)
 {
+	s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+	s_saved_game_cartographer_player_profile* cartographer_player_profile = cartographer_player_profile_get_by_user_index(0);
 
-	if (H2Config_raw_input)
+	if (cartographer_player_profile->raw_mouse_input)
 	{
 		DIMOUSESTATE2* mouse_state = input_get_mouse_state();
-		time_globals* time = time_globals::get();
+
+		// ### FIXME this is fucking shit
+		real32 raw_mouse_sensitivity = (cartographer_player_profile->raw_mouse_sensitivity / 100.f);
 
 		input_abstraction_set_mouse_look_sensitivity(controller, 1.0f);
-		input_state->mouse.yaw = time->tick_length * (real32)mouse_state->lX * -(H2Config_raw_mouse_scale / 100);
-		input_state->mouse.pitch = time->tick_length * (real32)mouse_state->lY * -(H2Config_raw_mouse_scale / 100);
+		input_state->mouse.yaw = (real32)-mouse_state->lX;
+		input_state->mouse.pitch = (real32)-mouse_state->lY;
 
-		s_gamepad_input_preferences* preference = &input_abstraction_globals->preferences[controller];
+		// multiply by 0.016 milliseconds, while this is likely wrong
+		// emulate current behaviour at all tickrates, instead of scaling with tick length lol
+		// which is a higher value at 30 tick, resulting in higher mouse sensitivity
+		input_state->mouse.yaw *= raw_mouse_sensitivity * (1.f / 60.f);
+		input_state->mouse.pitch *= raw_mouse_sensitivity * (1.f / 60.f);
+
 		if (preference->mouse_invert_look)
 		{
 			input_state->mouse.pitch = -0.0f - input_state->mouse.pitch;
 		}
-
 	}
 	else
 	{
@@ -430,8 +440,6 @@ void __cdecl input_abstraction_update()
 
 		//restore last state from global array before processing
 		input_abstraction_restore_abstracted_inputs(controller);
-
-
 
 		if (!gamepad_state)
 		{

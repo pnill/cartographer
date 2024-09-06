@@ -369,13 +369,7 @@ public:
 	// c_screen_with_menu specific interface
 	virtual void initialize(s_screen_parameters* screen_parameters) override
 	{
-		// int __stdcall sub_2111ab_CMLTD(int thisptr, int a2, int label_menu_id, int label_id_title, int label_id_description)
-		//return sub_2111ab_CMLTD((int)this, screen_parameters, CMLabelMenuId_AccountList, 0xFFFFFFF0, 0xFFFFFFF1);
 		c_screen_with_menu::initialize(screen_parameters);
-
-		//m_header_text.set_text(L"test 1");
-
-		//m_screen_button_key_text.get_interface()->set_text(L"test 3");
 
 		wchar_t* header_text = nullptr;
 		wchar_t* subheader_text = nullptr;

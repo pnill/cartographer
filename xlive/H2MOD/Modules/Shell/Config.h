@@ -56,7 +56,6 @@ extern unsigned long H2Config_ip_lan;
 extern _H2Config_language H2Config_language;
 extern bool H2Config_custom_labels_capture_missing;
 extern bool H2Config_skip_intro;
-extern bool H2Config_raw_input;
 extern bool H2Config_discord_enable;
 extern bool H2Config_controller_aim_assist;
 extern int H2Config_fps_limit;
@@ -92,14 +91,10 @@ extern int H2Config_hotkeyIdGuide;
 extern int H2Config_hotkeyIdConsole;
 extern int H2Config_minimum_player_start;
 
-extern float H2Config_raw_mouse_scale;
-extern ControllerInput::CustomControllerLayout H2Config_CustomLayout;
-
 extern e_override_texture_resolution H2Config_Override_Shadows;
 extern e_override_texture_resolution H2Config_Override_Water;
 
 extern bool H2Config_upnp_enable;
-extern bool H2Config_melee_fix;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;
 

@@ -38,7 +38,6 @@ unsigned long H2Config_ip_lan = 0;
 _H2Config_language H2Config_language = { -1, 0 };
 bool H2Config_custom_labels_capture_missing = false;
 bool H2Config_skip_intro = false;
-bool H2Config_raw_input = false;
 bool H2Config_discord_enable = true;
 //bool H2Config_controller_aim_assist = true;
 int H2Config_fps_limit = 60;
@@ -93,15 +92,10 @@ static std::enable_if_t<!std::is_same_v<T, bool> && std::is_integral_v<T>, bool>
 #define GET_CONF(_simple_ini, _config_name, _default_setting, _out_value) \
 	get_conf_value(_simple_ini, H2ConfigVersionSection.c_str(), _config_name, _default_setting, _out_value)
 
-float H2Config_raw_mouse_scale = 25.0f;
-
 e_override_texture_resolution H2Config_Override_Shadows;
 e_override_texture_resolution H2Config_Override_Water;
 
-ControllerInput::CustomControllerLayout H2Config_CustomLayout;
-
 bool H2Config_upnp_enable = true;
-bool H2Config_melee_fix = true;
 bool H2Config_no_events = false;
 bool H2Config_spooky_boy = true;
 #ifndef NDEBUG
@@ -202,11 +196,6 @@ void SaveH2Config() {
 				"\n# 1 - No Intro."
 				"\n\n"
 
-				"# raw_mouse_input Options (Client):"
-				"\n# 0 - Default mouse input handling (includes mouse acceleration)."
-				"\n# 1 - Mouse input does not have input acceleration."
-				"\n\n"
-
 				"# discord_enable Options (Client):"
 				"\n# 0 - Disables Discord Rich Presence."
 				"\n# 1 - Enables Discord Rich Presence."
@@ -227,10 +216,6 @@ void SaveH2Config() {
 				"\n# 6 - L6 - Cinematic"
 				"\n\n"
 
-				"# refresh_rates Options (Client):"
-				"\n# <uint 0 to 240> - 0 disables the built in refresh rate adjustment. >0 is the refresh rate set value."
-				"\n\n"
-
 				"# Force Max Shader LOD Options (Client):"
 				"\n# 0 - Disable shader_lod_max patch. game uses default shader lod settings"
 				"\n# 1 - Enable shader_lod_max patch. game uses highest quality shaders at all times"
@@ -245,10 +230,6 @@ void SaveH2Config() {
 				"\n# 0 - NOTE: If your game crashes on startup, consider disabling this. If it's not enabled, seek for help."
 				"\n# 0 - Disable D3D9Ex version of D3D9."
 				"\n# 1 - Enable D3D9Ex version of D3D9."
-				"\n\n"
-
-				"# controller_sens Options (Client):"
-				"\n# <uint 0 to inf> - 0 uses the default sensitivity."
 				"\n\n"
 
 				"# disable_ingame_keyboard Options (Client):"
@@ -375,8 +356,6 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
 
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
-
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
 
 			ini.SetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
@@ -389,23 +368,12 @@ void SaveH2Config() {
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 
-			if(FloatIsNaN(H2Config_raw_mouse_scale))
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25");
-			}
-			else
-			{
-				ini.SetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", std::to_string(H2Config_raw_mouse_scale).c_str());
-			}
-
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
 
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_shadows", std::to_string(H2Config_Override_Shadows).c_str());
 			ini.SetValue(H2ConfigVersionSection.c_str(), "override_water", std::to_string(H2Config_Override_Water).c_str());
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 
@@ -584,7 +552,6 @@ void ReadH2Config() {
 
 				H2Config_custom_labels_capture_missing = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "language_label_capture", H2Config_custom_labels_capture_missing);
 				H2Config_skip_intro = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skip_intro", H2Config_skip_intro);
-				H2Config_raw_input = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "raw_mouse_input", H2Config_raw_input);
 				H2Config_discord_enable = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "discord_enable", H2Config_discord_enable);
 				H2Config_fps_limit = ini.GetLongValue(H2ConfigVersionSection.c_str(), "fps_limit", H2Config_fps_limit);
 
@@ -605,7 +572,6 @@ void ReadH2Config() {
 				}
 				
 				std::string raw_mouse_scale_str(ini.GetValue(H2ConfigVersionSection.c_str(), "mouse_raw_scale", "25"));
-				H2Config_raw_mouse_scale = std::stof(raw_mouse_scale_str);
 
 				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
@@ -652,7 +618,6 @@ void ReadH2Config() {
 						H2Config_Override_Water = e_override_texture_resolution::tex_ultra;
 						break;
 				}
-				H2Config_melee_fix = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "melee_fix", H2Config_melee_fix);
 				H2Config_no_events = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "no_events", H2Config_no_events);
 				H2Config_spooky_boy = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "skeleton_biped", H2Config_spooky_boy);
 #ifndef NDEBUG
