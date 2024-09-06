@@ -1,6 +1,7 @@
 #pragma once
 #include "math/color_math.h"
 
+/* structures */
 
 // max: 1
 struct render_lighting
@@ -18,6 +19,7 @@ struct render_lighting
 };
 ASSERT_STRUCT_SIZE(render_lighting, 84);
 
+/* prototypes */
 
 void __cdecl render_lights(void);
 

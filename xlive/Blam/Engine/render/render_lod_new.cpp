@@ -1,13 +1,12 @@
 #include "stdafx.h"
-
 #include "render_lod_new.h"
 
 #include "render.h"
-#include "render/render_objects.h"
 
+#include "game/player_control.h"
 #include "models/render_models.h"
-
 #include "rasterizer/rasterizer_memory.h"
+#include "render/render_objects.h"
 
 #include "H2MOD/Modules/Shell/Config.h"
 

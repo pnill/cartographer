@@ -5,6 +5,7 @@
 
 #include "cseries/async.h"
 #include "tag_files/files_windows.h"
+#include "text/unicode.h"
 
 /* typedefs */
 

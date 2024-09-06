@@ -1,4 +1,5 @@
 #pragma once
+#include "memory/static_arrays.h"
 #include "math/function_definitions.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"

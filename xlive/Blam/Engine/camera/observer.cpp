@@ -8,7 +8,6 @@
 #include "game/game_time.h"
 #include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "interface/first_person_weapons.h"
-#include "networking/Session/NetworkSession.h"
 #include "physics/collisions.h"
 #include "render/render_visibility_collection.h"
 #include "scenario/scenario.h"

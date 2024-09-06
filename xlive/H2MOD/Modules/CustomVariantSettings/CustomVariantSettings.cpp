@@ -9,6 +9,7 @@
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Session/NetworkSession.h"
 #include "physics/physics_constants.h"
+#include "units/units.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 

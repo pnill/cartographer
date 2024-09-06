@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "render_lights.h"
 
+/* public code */
+
 void __cdecl render_lights(void)
 {
 	INVOKE(0x14CB17, 0x0, render_lights);

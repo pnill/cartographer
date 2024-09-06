@@ -116,7 +116,8 @@ datum s_player::get_unit_index(datum player_index)
 	return get(player_index)->unit_index;
 }
 
-void s_player::set_player_unit_grenade_count(datum player_index, e_unit_grenade_type type, int8 count, bool reset_equipment)
+// TODO: remove this
+void s_player::set_player_unit_grenade_count(datum player_index, int16 type, int8 count, bool reset_equipment)
 {
     int32 abs_player_index = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
     datum unit_datum_index = s_player::get_unit_index(player_index);
@@ -136,24 +137,6 @@ void s_player::set_player_unit_grenade_count(datum player_index, e_unit_grenade_
 
         LOG_TRACE_GAME("set_player_unit_grenade_count() - sending grenade simulation update, playerIndex={0}, peerIndex={1}", abs_player_index, NetworkSession::GetPeerIndex(abs_player_index));
     }
-}
-
-unit_datum* s_player::get_player_unit_data(datum player_index)
-{
-    datum unit_index = s_player::get_unit_index(player_index);
-    if (unit_index == NONE)
-        return nullptr;
-
-    return (unit_datum*)object_get_fast_unsafe(unit_index);
-}
-
-real_point3d* s_player::get_unit_coords(datum player_index)
-{
-    unit_datum* player_unit = get_player_unit_data(player_index);
-    if (player_unit != nullptr)
-        return &player_unit->object.position;
-
-    return nullptr;
 }
 
 uint64 s_player::get_id(datum player_index)

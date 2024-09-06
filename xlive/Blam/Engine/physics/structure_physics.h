@@ -2,6 +2,8 @@
 #include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
 
+/* structures */
+
 // max: (8*1024) 8192
 struct s_structure_physics_breakable_surface_key_value
 {

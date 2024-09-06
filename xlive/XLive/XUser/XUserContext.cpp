@@ -2,8 +2,11 @@
 #include "XUserContext.h"
 
 #include "cartographer/discord/discord_interface.h"
+#include "cseries/cseries_strings.h"
 #include "game/game.h"
 #include "networking/Session/NetworkSession.h"
+#include "text/unicode.h"
+
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "XLive/xbox/xbox.h"
@@ -59,9 +62,9 @@ void context_update_map_info_multiplayer(void)
 	wchar_string_to_utf8_string(wide_map_name, map_name, sizeof(map_name));
 
 	// Get scenario name and convert to utf8
-	c_static_wchar_string260* scenario_path = &game_options_get()->scenario_path;
-	int32 index = scenario_path->last_index_of(L"\\");
-	const wchar_t* scenario_name_wide = &scenario_path->get_string()[index + 1];
+	c_static_wchar_string<260> scenario_path(game_options_get()->scenario_path);
+	int32 index = scenario_path.last_index_of(L"\\");
+	const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
 	utf8 scenario_name[MAX_PATH];
 	wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
 

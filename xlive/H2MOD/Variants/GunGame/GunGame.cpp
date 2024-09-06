@@ -3,6 +3,7 @@
 
 #include "game/game.h"
 #include "networking/Session/NetworkSession.h"
+#include "units/units.h"
 #include "H2MOD.h"
 
 using namespace NetworkSession;

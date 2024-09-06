@@ -1,6 +1,10 @@
 #pragma once
 
+/* constants */
+
 #define MAXIMUM_DECALS_PER_STRUCTURE 6144
+
+/* structures */
 
 // max: MAXIMUM_DECALS_PER_STRUCTURE
 struct structure_runtime_decal

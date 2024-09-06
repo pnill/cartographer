@@ -3,6 +3,7 @@
 
 #include "simulation_gamestate_entities.h"
 
+#include "cseries/cseries_strings.h"
 #include "game/game.h"
 #include "simulation/simulation.h"
 #include "simulation/simulation_entity_database.h"

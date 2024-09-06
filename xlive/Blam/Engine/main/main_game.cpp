@@ -4,9 +4,7 @@
 #include "cache/cache_files.h"
 #include "cseries/cseries_strings.h"
 #include "game/game.h"
-#include "networking/Session/NetworkSession.h"
 #include "saved_games/game_variant.h"
-
 
 
 s_game_options g_main_game_launch_options = {};
@@ -29,7 +27,7 @@ void main_game_initialize(void)
 
 void main_game_launch_set_map_name(const char* map_name)
 {
-    MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path.get_buffer(), 260);
+    MultiByteToWideChar(CP_UTF8, 0, map_name, -1, g_main_game_launch_options.scenario_path, 260);
     return;
 }
 

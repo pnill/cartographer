@@ -2,6 +2,7 @@
 
 #include "ServerConsole.h"
 
+#include "cseries/cseries_strings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
 

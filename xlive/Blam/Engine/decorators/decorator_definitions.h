@@ -6,10 +6,26 @@
 #include "geometry/geometry_block.h"
 #include "math/color_math.h"
 
+/* constants */
 
 #define k_maximum_cache_block_count 4096
 #define k_maximum_group_count = 131072
 #define k_maximum_cell_collection_count 65535
+
+/* enums */
+
+enum e_decorator_type : int8
+{
+    _decorator_type_model = 0,
+    _decorator_type_floating_decal = 1,
+    _decorator_type_projected_decal = 2,
+    _decorator_type_screen_facing_quad = 3,
+    _decorator_type_axis_rotating_quad = 4,
+    _decorator_type_cross_quad = 5,
+    k_decorator_type_count
+};
+
+/* structures */
 
 // max count: 32*k_kilo 32768
 struct s_decorator_placement
@@ -63,16 +79,6 @@ public:
 };
 ASSERT_STRUCT_SIZE(c_decorator_cache_block, 52);
 
-enum e_decorator_type : char
-{
-    decorator_type_model = 0,
-    decorator_type_floating_decal = 1,
-    decorator_type_projected_decal = 2,
-    decorator_type_screen_facing_quad = 3,
-    decorator_type_axis_rotating_quad = 4,
-    decorator_type_cross_quad = 5
-};
-
 // max count: k_maximum_group_count 131072
 struct s_decorator_group
 {
@@ -91,6 +97,8 @@ struct s_decorator_group
     int compressed_bounding_center;
 };
 ASSERT_STRUCT_SIZE(s_decorator_group, 24);
+
+/* classes */
 
 // max count: k_maximum_cell_collection_count 65535
 class c_decorator_cell_collection

@@ -82,7 +82,8 @@ void christmas_event_map_load(void)
 		// Change/Add weather system to bsp
 		structure_bsp* bsp_definition = (structure_bsp*)tag_get_fast(get_global_scenario()->structure_bsps[0]->structure_bsp.index);
 		structure_weather_palette_entry* weat_block = MetaExtender::add_tag_block2<structure_weather_palette_entry>((unsigned long)std::addressof(bsp_definition->weather_palette));
-		weat_block->name.set("snow_cs");
+		const char new_name[] = "snow_cs";
+		csstrnzcpy(weat_block->name, new_name, NUMBEROF(new_name));
 		weat_block->weather_system.group.group = _tag_group_weather_system;
 		weat_block->weather_system.index = snow_datum;
 

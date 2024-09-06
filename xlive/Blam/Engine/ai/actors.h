@@ -3,8 +3,8 @@
 #include "actor_moving.h"
 #include "pathfinding_utilities.h"
 
+#include "game/game_allegiance.h"
 #include "memory/data.h"
-#include "objects/objects.h"
 #include "objects/object_placement.h"
 
 

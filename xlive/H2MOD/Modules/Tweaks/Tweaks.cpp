@@ -13,7 +13,7 @@
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Utils/Utils.h"
-#include "H2MOD/Variants/VariantMPGameEngine.h"
+//#include "H2MOD/Variants/VariantMPGameEngine.h"
 
 #pragma region Done_Tweaks
 
@@ -102,6 +102,7 @@ bool __cdecl is_remote_desktop()
 	return false;
 }
 
+/*
 class c_test_engine : public c_game_engine_base
 {
 	bool is_team_enemy(int team_a, int team_b)
@@ -120,6 +121,7 @@ class c_test_engine : public c_game_engine_base
 
 };
 c_test_engine g_test_engine;
+*/
 
 void __stdcall biped_ground_mode_update_hook(int thisx,
 	void* physics_output,

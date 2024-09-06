@@ -4,10 +4,10 @@
 #include "sector_geometry.h"
 #include "sector_environment_objects.h"
 
-
-#include "tag_files/tag_block.h"
 #include "physics/collision_bsp.h"
+#include "structures/instanced_geometry_definitions.h"
 #include "structures/structures.h"
+#include "tag_files/tag_block.h"
 
 enum e_pathfinding_hint_type : short
 {

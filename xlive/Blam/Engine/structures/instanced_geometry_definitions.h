@@ -1,11 +1,11 @@
 #pragma once
-
 #include "leaf_map.h"
 #include "structures.h"
+
 #include "geometry/geometry_block.h"
 #include "geometry/geometry_definitions_new.h"
-#include "physics/collision_model_definitions.h"
 #include "math/matrix_math.h"
+#include "physics/collision_model_definitions.h"
 
 #define k_maximum_instance_geometry_instances_per_structure_bsp 1024
 #define k_maximum_instance_geometry_definitions_per_structure_bsp 512

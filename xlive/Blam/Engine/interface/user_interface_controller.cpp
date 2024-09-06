@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "user_interface_controller.h"
+
 #include "user_interface_guide.h"
+
 #include "networking/online/online_account_xbox.h"
 #include "saved_games/cartographer_player_profile.h"
-#include "saved_games/saved_game_files_async_windows.h"
 #include "tag_files/global_string_ids.h"
-
-
+#include "tag_files/string_id.h"
+#include "text/unicode.h"
 
 
 s_user_interface_controller_globals* user_interface_controller_globals_get(void)
@@ -270,19 +271,19 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		if (online_xuid_is_guest_account(*controller_xuid))
 		{
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
-			c_static_wchar_string32 format;
-			user_interface_global_string_get(_string_id_guest_of_ascii_gamertag_unicode_format_string, format.get_buffer());// %d %hs
-			usnzprintf(controller->player_name.get_buffer(),
-				controller->player_name.max_length(),
-				format.get_string(),
+			wchar_t format[32];
+			user_interface_global_string_get(_string_id_guest_of_ascii_gamertag_unicode_format_string, format);// %d %hs
+			usnzprintf(controller->player_name,
+				NUMBEROF(controller->player_name),
+				format,
 				guest_no,
 				guide->m_gamertag);
 
 		}
 		else
 		{
-			usnzprintf(controller->player_name.get_buffer(),
-				controller->player_name.max_length(),
+			usnzprintf(controller->player_name,
+				NUMBEROF(controller->player_name),
 				L"%hs",
 				guide->m_gamertag);
 
@@ -293,11 +294,11 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 	}
 	else if (user_interface_controller_is_player_profile_valid(controller_index))
 	{
-		controller->player_name.set(controller->player_profile.name);
+		ustrncpy(controller->player_name, controller->player_profile.name, NUMBEROF(controller->player_profile.name));
 	}
 	else
 	{
-		controller->player_name.clear();
+		controller->player_name[0] = '\0';
 	}
 	user_interface_controller_update_network_properties(controller_index);
 }

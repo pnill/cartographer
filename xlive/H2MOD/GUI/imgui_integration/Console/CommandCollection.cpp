@@ -10,8 +10,9 @@
 #include "main/main_game_time.h"
 #include "networking/Session/NetworkSession.h"
 #include "networking/NetworkMessageTypeCollection.h"
-
+#include "objects/objects.h"
 #include "simulation/game_interface/simulation_game_action.h"
+#include "text/unicode.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -635,13 +636,10 @@ int CommandCollection::SpawnCmd(const std::vector<std::string>& tokens, ConsoleC
 
 	if (nearPlayerSpawn)
 	{
-		real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
-		if (localPlayerPos != nullptr)
-		{
-			position.x = localPlayerPos->x + 0.5f;
-			position.y = localPlayerPos->y + 0.5f;
-			position.z = localPlayerPos->z + 0.5f;
-		}
+		real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
+		position.x = localPlayerPos->x + 0.5f;
+		position.y = localPlayerPos->y + 0.5f;
+		position.z = localPlayerPos->z + 0.5f;
 	}
 	else
 	{
@@ -759,7 +757,7 @@ void CommandCollection::ObjectSpawn(datum object_idx, int count, const real_poin
 		{
 			object_placement_data new_object_placement;
 			datum localPlayerIdx = player_index_from_user_index(0);
-			real_point3d* localPlayerPos = s_player::get_unit_coords(localPlayerIdx);
+			real_point3d* localPlayerPos = &object_get_fast_unsafe(s_player::get(localPlayerIdx)->unit_index)->position;
 
 			if (object_idx != NONE)
 			{

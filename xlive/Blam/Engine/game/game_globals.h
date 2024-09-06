@@ -15,7 +15,6 @@
 
 
 #define NUMBER_OF_GLOBAL_SOUNDS 2
-#define k_unit_grenade_types_count 2
 #define k_global_vertex_shader_count 32
 #define k_maximum_material_types 256
 #define k_game_globals_maximum_multiplayer_colors 32

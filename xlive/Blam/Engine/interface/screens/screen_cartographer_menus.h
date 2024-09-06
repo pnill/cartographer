@@ -4,6 +4,7 @@
 
 #include "interface/user_interface_headers.h"
 
+#include "main/game_preferences.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 
 void* ui_load_cartographer_guide_menu();

@@ -15,7 +15,7 @@ const wchar_t* k_report_text_file_names[k_report_text_file_type_count] = { L"exc
 
 // globals
 
-c_static_wchar_string260 g_report_text_file_paths[k_report_text_file_type_count];
+static c_static_wchar_string<MAX_PATH> g_report_text_file_paths[k_report_text_file_type_count];
 
 // forward declarations
 
@@ -279,7 +279,7 @@ void setup_game_options_text(const wchar_t* reports_path)
         fwprintf(file, L"Is Custom Map: ");
         print_bool_to_file(file, game_options->is_custom_map);
 
-        fwprintf(file, L"Custom Map Name: %ls\n", game_options->custom_map_name.get_string());
+        fwprintf(file, L"Custom Map Name: %ls\n", game_options->custom_map_name);
 
         fwprintf(file, L"Campaign ID: ");
         fwprintf(file, L"%d\n", game_options->campaign_id);
@@ -287,7 +287,7 @@ void setup_game_options_text(const wchar_t* reports_path)
         fwprintf(file, L"Map ID: ");
         fwprintf(file, L"%d\n", game_options->map_id);
 
-        fwprintf(file, L"Scenario Path: %ls\n", game_options->scenario_path.get_string());
+        fwprintf(file, L"Scenario Path: %ls\n", game_options->scenario_path);
 
         fwprintf(file, L"Map ID: ");
         fwprintf(file, L"%d\n", game_options->map_id);

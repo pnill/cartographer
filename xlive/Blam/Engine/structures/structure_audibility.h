@@ -1,7 +1,5 @@
 #pragma once
-
 #include "tag_files/tag_reference.h"
-#include "cseries/cseries_strings.h"
 
 #define k_maximum_cluster_sound_palette_entries_per_structure 64
 #define k_maximum_machine_door_portal_associations 128
@@ -17,7 +15,7 @@ enum e_background_sound_scale_flags : int
 // max count: k_maximum_cluster_sound_palette_entries_per_structure 64
 struct structure_background_sound_palette_entry
 {
-    static_string32 name;
+    char name[32];
     tag_reference background_sound;         // lsnd
 
     // Play only when player is inside cluster.
@@ -38,7 +36,7 @@ ASSERT_STRUCT_SIZE(structure_background_sound_palette_entry, 100);
 // max count: k_maximum_cluster_sound_palette_entries_per_structure 64
 struct structure_sound_environment_palette_entry
 {
-    static_string32 name;
+    char name[32];
     tag_reference sound_environment;    // snde
     float cutoff_distance;
     float interpolation_speed;          // 1 sec

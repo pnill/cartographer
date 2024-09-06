@@ -1,7 +1,7 @@
 #pragma once
+#include "objects/object_identifier.h"
 #include "render/render_lights.h"
 #include "tag_files/tag_reference.h"
-#include "objects/object_identifier.h"
 
 #define MAXIMUM_LIGHTS_PER_MAP 350
 #define MAXIMUM_LIGHTMAP_GROUPS_PER_STRUCTURE 128

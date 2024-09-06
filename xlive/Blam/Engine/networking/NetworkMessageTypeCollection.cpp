@@ -2,6 +2,7 @@
 #include "NetworkMessageTypeCollection.h"
 
 #include "cartographer/twizzler/twizzler.h"
+#include "game/game_allegiance.h"
 #include "interface/user_interface_controller.h"
 #include "memory/bitstream.h"
 #include "networking/transport/network_channel.h"

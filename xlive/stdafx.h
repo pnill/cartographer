@@ -37,7 +37,6 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 #include <wincrypt.h>
 #include <mmsystem.h>
 #include <windef.h>
-#include <codecvt>
 #include <DbgHelp.h>
 #include <ShlObj.h>
 #include <psapi.h>

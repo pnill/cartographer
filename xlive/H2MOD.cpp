@@ -36,7 +36,6 @@
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/Transport/transport.h"
-#include "objects/damage.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_fog.h"
 #include "rasterizer/rasterizer_lens_flares.h"
@@ -483,10 +482,11 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			//if anyone wants to run code on map load single player
 			addDebugText("Engine type: Singleplayer");
 			toggle_xbox_tickrate(options, true);
-			if ( H2Config_discord_enable)
+			if (H2Config_discord_enable)
 			{
-				int32 index = options->scenario_path.last_index_of(L"\\");
-				const wchar_t* scenario_name_wide = &options->scenario_path.get_string()[index + 1];
+				c_static_wchar_string<260> scenario_path(game_options_get()->scenario_path);
+				int32 index = scenario_path.last_index_of(L"\\");
+				const wchar_t* scenario_name_wide = &scenario_path.get_string()[index + 1];
 				utf8 scenario_name[MAX_PATH];
 				wchar_string_to_utf8_string(scenario_name_wide, scenario_name, sizeof(scenario_name));
 
@@ -556,23 +556,6 @@ bool BansheeBombIsEngineMPCheck() {
 
 bool FlashlightIsEngineSPCheck() {
 	return game_is_campaign();
-}
-
-void GivePlayerWeaponDatum(datum unit_datum, datum weapon_tag_index)
-{
-	if (unit_datum != NONE)
-	{
-		object_placement_data object_placement;
-
-		object_placement_data_new(&object_placement, weapon_tag_index, unit_datum, 0);
-
-		datum object_idx = object_new(&object_placement);
-		if (object_idx != NONE)
-		{
-			unit_delete_all_weapons(unit_datum);
-			unit_add_weapon_to_inventory(unit_datum, object_idx, _weapon_addition_method_one);
-		}
-	}
 }
 
 void H2MOD::team_player_indicator_visibility(bool toggle)

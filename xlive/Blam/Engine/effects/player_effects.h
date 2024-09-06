@@ -1,8 +1,8 @@
 #pragma once
 #include "camera/observer.h"
+#include "game/players.h"
 #include "math/matrix_math.h"
 #include "math/periodic_functions.h"
-#include "networking/Session/NetworkSession.h"
 
 enum e_player_effect_user_global_flags : uint8
 {

@@ -10,9 +10,10 @@
 #include "models/models.h"
 #include "objects/objects.h"
 #include "scenario/scenario_definitions.h"
+#include "structures/structure_bsp_definitions.h"
+#include "tag_files/tag_loader/tag_injection.h"
 
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
-#include "tag_files/tag_loader/tag_injection.h"
 
 datum lbitm_datum = NONE;
 datum sky_datum = NONE;

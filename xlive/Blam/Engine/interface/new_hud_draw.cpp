@@ -11,6 +11,7 @@
 #include "render/render.h"
 #include "saved_games/cartographer_player_profile.h"
 #include "text/draw_string.h"
+#include "text/unicode.h"
 
 /* globals */
 
