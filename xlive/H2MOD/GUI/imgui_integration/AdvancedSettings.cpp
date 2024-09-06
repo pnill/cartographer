@@ -362,7 +362,7 @@ namespace ImGuiHandler {
 					//Raw Input
 					TextVerticalPad(advanced_settings_get_string(_advanced_string_raw_mouse));
 					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##RawMouse", &H2Config_raw_input);
+					ImGui::Checkbox("##RawMouse", &current_cartographer_profile->raw_mouse_input);
 					if (ImGui::IsItemHovered())
 					{
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_raw_mouse_tooltip));
@@ -381,24 +381,24 @@ namespace ImGuiHandler {
 						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_uniform_sensitivity_tooltip));
 					}
 					ImGui::Columns(1);
-					if (H2Config_raw_input) {
+					if (current_cartographer_profile->raw_mouse_input) {
 						ImGui::Text(advanced_settings_get_string(_advanced_string_raw_mouse_sensitivity));
 						ImGui::PushItemWidth(WidthPercentage(75));
-						int g_raw_scale = (int)H2Config_raw_mouse_scale;
+						int g_raw_scale = (int)current_cartographer_profile->raw_mouse_sensitivity;
 						ImGui::SliderInt("##RawMouseScale1", &g_raw_scale, 1, 100, ""); ImGui::SameLine();
 						if (ImGui::IsItemEdited())
 						{
-							H2Config_raw_mouse_scale = (float)g_raw_scale;
+							current_cartographer_profile->raw_mouse_sensitivity = (float)g_raw_scale;
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
-						ImGui::InputFloat("##RawMouseScale2", &H2Config_raw_mouse_scale, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##RawMouseScale2", &current_cartographer_profile->raw_mouse_sensitivity, 0, 110, "%.1f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
-							H2Config_raw_mouse_scale = PIN(H2Config_raw_mouse_scale, 1, 100);
+							current_cartographer_profile->raw_mouse_sensitivity = PIN(current_cartographer_profile->raw_mouse_sensitivity, 1.f, 100.f);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
 						if (ImGui::Button(advanced_settings_get_string(_advanced_string_reset, "RawMouseScale2"), ImVec2(WidthPercentage(10), item_size.y)))
 						{
-							H2Config_raw_mouse_scale = 25.0f;
+							current_cartographer_profile->raw_mouse_sensitivity = 25.f;
 						}
 					}
 					else
@@ -414,10 +414,10 @@ namespace ImGuiHandler {
 						}
 						ImGui::PushItemWidth(WidthPercentage(15));
 
-						ImGui::InputFloat("##Mousesens2", &current_cartographer_profile->mouse_sensitivity, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+						ImGui::InputFloat("##Mousesens2", &current_cartographer_profile->mouse_sensitivity, 0.f, 110.f, "%.1f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 						if (ImGui::IsItemEdited()) {
 
-							current_cartographer_profile->mouse_sensitivity = PIN(current_cartographer_profile->mouse_sensitivity, 1, 100);
+							current_cartographer_profile->mouse_sensitivity = PIN(current_cartographer_profile->mouse_sensitivity, 1.f, 100.f);
 							input_abstraction_set_mouse_look_sensitivity(_controller_index_0, current_cartographer_profile->mouse_sensitivity);
 						}
 						ImGui::PushItemWidth(WidthPercentage(10));
@@ -461,7 +461,7 @@ namespace ImGuiHandler {
 						input_abstraction_set_controller_look_sensitivity(current_controller_index, current_cartographer_profile->controller_sensitivity);
 					}
 					ImGui::PushItemWidth(WidthPercentage(15));
-					ImGui::InputFloat("##Controllersens2", &current_cartographer_profile->controller_sensitivity, 0, 110, "%.5f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
+					ImGui::InputFloat("##Controllersens2", &current_cartographer_profile->controller_sensitivity, 0.f, 110.f, "%.1f", ImGuiInputTextFlags_::ImGuiInputTextFlags_AutoSelectAll); ImGui::SameLine();
 					if (ImGui::IsItemEdited()) {
 						current_cartographer_profile->controller_sensitivity = PIN(current_cartographer_profile->controller_sensitivity, 1, 100);
 						input_abstraction_set_controller_look_sensitivity(current_controller_index, current_cartographer_profile->controller_sensitivity);

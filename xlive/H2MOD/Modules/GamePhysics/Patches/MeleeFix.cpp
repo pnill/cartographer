@@ -12,26 +12,6 @@ FLOATING_POINT_ENV_ACCESS();
 
 namespace MeleeFix
 {
-	void MeleeCollisionPatch()
-	{
-		if (!Memory::IsDedicatedServer()) {
-			/*
-				.text:007C3027 148 E8 C1 73 F8 FF       call    collision_test_vector ; Call Procedure
-				.text:007C302C 148 83 C4 18             add     esp, 18h        ; Add
-				.text:007C302F 130 84 C0                test    al, al          ; Logical Compare
-				.text:007C3031 130 0F 84 4B 01 00 00    jz      loc_7C3182      <=== Remove this jump
-			 */
-			if (H2Config_melee_fix)
-			{
-				// NopFill(Memory::GetAddress(0x143031, 0), 6);
-			}
-			else
-			{
-				BYTE original_melee_collision_instruction[] = { 0x0F, 0x84, 0x4B, 0x01, 0x00, 0x00 };
-				WriteBytes(Memory::GetAddress(0x143031, 0), original_melee_collision_instruction, sizeof(original_melee_collision_instruction));
-			}
-		}
-	}
 	//////////////////////////////////////////////////////
 	////////////////////Experimental//////////////////////
 	//////////////////////////////////////////////////////
@@ -185,8 +165,6 @@ namespace MeleeFix
 		// to note this in H3 is handled by adding .5, which does the same thing
 		// BYTE cvtss2si[] = { 0xF3, 0x0F, 0x2D };
 		// WriteBytes(Memory::GetAddressRelative(0x50B419, 0x4FDA49), cvtss2si, sizeof(cvtss2si));
-
-		// MeleeCollisionPatch();
 
 		// hooks and re-implements melee lunge function
 		// ApplyHooks();
