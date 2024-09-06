@@ -1,10 +1,9 @@
 #pragma once
-
 #include "game_variant.h"
-#include "cseries/cseries.h"
+
 #include "game/players.h"
-#include "H2MOD/Modules/Input/ControllerInput.h"
 #include "input/input_abstraction.h"
+#include "memory/static_arrays.h"
 
 #define k_default_profiles_count 1
 

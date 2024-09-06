@@ -606,6 +606,7 @@
     <ClInclude Include="Blam\Engine\game\aim_assist.h" />
     <ClInclude Include="Blam\Engine\game\cheats.h" />
     <ClInclude Include="Blam\Engine\game\game.h" />
+    <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_simulation.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_spawning.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />
@@ -890,7 +891,6 @@
     <ClCompile Include="H2MOD\Variants\GunGame\GunGame.cpp" />
     <ClCompile Include="H2MOD\Variants\H2X\H2X.cpp" />
     <ClCompile Include="H2MOD\Variants\Infection\Infection.cpp" />
-    <ClCompile Include="H2MOD\Variants\VariantMPGameEngine.cpp" />
     <ClCompile Include="H2MOD\Variants\VariantSystem.cpp" />
     <ClCompile Include="util\filesys.cpp" />
     <ClCompile Include="Util\hash.cpp" />
@@ -1325,7 +1325,6 @@
     <ClInclude Include="H2MOD\Variants\GunGame\GunGame.h" />
     <ClInclude Include="H2MOD\Variants\H2X\H2X.h" />
     <ClInclude Include="H2MOD\Variants\Infection\Infection.h" />
-    <ClInclude Include="H2MOD\Variants\VariantMPGameEngine.h" />
     <ClInclude Include="H2MOD\Variants\VariantSystem.h" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="util\filesys.h" />

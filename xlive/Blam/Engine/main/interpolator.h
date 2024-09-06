@@ -1,6 +1,6 @@
 #pragma once
+#include "game/players.h"
 #include "models/render_models.h"
-#include "networking/Session/NetworkSession.h"
 
 #define k_interpolation_first_person_weapon_slot_count 4
 #define k_interpolation_positions_count 2

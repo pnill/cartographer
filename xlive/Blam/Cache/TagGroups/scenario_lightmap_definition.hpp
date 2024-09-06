@@ -1,8 +1,8 @@
 #pragma once
 #include "math/color_math.h"
+#include "tag_files/data_reference.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
-
 
 
 /*********************************************************************
@@ -642,7 +642,7 @@ struct s_scenario_structure_lightmap_group_definition
 	PAD(0xC);//0x88
 	struct s_errors_block
 	{
-		static_string256 name;//0x0
+		char name[256];//0x0
 		enum class e_report_type : __int16
 		{
 			silent = 0,
@@ -681,7 +681,7 @@ struct s_scenario_structure_lightmap_group_definition
 			};
 			e_flags flags;//0x2
 			data_reference text;//0x4
-			static_string32 source_filename;//0xC
+			char source_filename[32];//0xC
 			__int32 source_line_number;//0x2C
 			struct s_vertices_block
 			{

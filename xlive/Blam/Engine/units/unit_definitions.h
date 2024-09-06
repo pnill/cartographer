@@ -5,9 +5,9 @@
 
 #include "ai/ai.h"
 
+#include "game/game_allegiance.h"
 #include "interface/motion_sensor.h"
 #include "objects/object_definition.h"
-#include "objects/objects.h"
 
 enum e_unit_definition_flags : int32
 {

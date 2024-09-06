@@ -1,5 +1,4 @@
 #pragma once
-#include "objects/damage.h"
 #include "objects/object_placement.h"
 #include "math/color_math.h"
 #include "math/matrix_math.h"

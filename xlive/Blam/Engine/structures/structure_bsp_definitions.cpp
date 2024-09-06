@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "structure_bsp_definitions.h"
-#include "Util/Memory.h"
 
 int16 get_global_structure_bsp_index(void)
 {

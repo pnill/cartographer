@@ -1,6 +1,6 @@
 #pragma once
 #include "memory/data.h"
-#include "models/render_model_definitions.h"
+#include "geometry/geometry_block.h"
 
 struct pc_geometry_cache_geometry_block
 {

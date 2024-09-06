@@ -1,9 +1,13 @@
 #pragma once
 #include "tag_files/tag_block.h"
 
+/* constants */
+
 #define MAXIMUM_CLUSTERS_PER_STRUCTURE 512
 #define MAXIMUM_FOG_PLANES_PER_STRUCTURE 127
 #define MAXIMUM_FOG_ZONES_PER_STRUCTURE 127
+
+/* enums */
 
 enum e_structure_debug_info_render_line_type : uint16
 {
@@ -28,6 +32,8 @@ enum e_structure_cluster_debug_errors : uint16
 	_structure_cluster_debug_error_fog_zone_collision = FLAG(1),
 	_structure_cluster_debug_error_fog_zone_immersion = FLAG(2)
 };
+
+/* structures */
 
 // max: SHORT_MAX
 struct s_structure_debug_info_render_line

@@ -5,6 +5,8 @@
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
 
+/* structures */
+
 // max: 1
 struct s_water_definition
 {

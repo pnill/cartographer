@@ -1,13 +1,12 @@
 #pragma once
-
+#include "game/game_allegiance.h"
 #include "input/controllers.h"
 #include "memory/data.h"
 #include "objects/damage_reporting.h"
 #include "objects/emblems.h"
-#include "objects/objects.h"
 #include "simulation/machine_id.h"
-#include "units/units.h"
 
+#define k_number_of_users 4
 #define k_maximum_players 16
 #define k_player_index_bit_count 4	// 4 because 4 bits can store 16 players in k_maximum_players
 
@@ -184,12 +183,10 @@ struct s_player
 	static s_player* get_from_unit_index(datum unit_index);
 	static void set_team(datum player_index, e_game_team team);
 	static void set_unit_character_type(datum player_index, e_character_type character_type);
-	static void set_player_unit_grenade_count(datum player_index, e_unit_grenade_type type, int8 count, bool reset_equipment);
+	static void set_player_unit_grenade_count(datum player_index, int16 type, int8 count, bool reset_equipment);
 	static void set_unit_speed(datum player_index, float speed);
 	static const wchar_t* get_name(datum player_index);
 	static datum get_unit_index(datum player_index);
-	static unit_datum* get_player_unit_data(datum player_index);
-	static real_point3d* get_unit_coords(datum player_index);
 	static uint64 get_id(datum player_index);
 };
 ASSERT_STRUCT_SIZE(s_player, 516);

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "game/game_allegiance.h"
 #include "input/controllers.h"
 #include "saved_games/player_profile.h"
 
@@ -160,7 +160,7 @@ struct s_user_interface_controller
 	int8 achievement_flags;
 	PAD24;
 	s_player_identifier field_1234;
-	c_static_wchar_string32 player_name;
+	wchar_t player_name[32];
 };
 ASSERT_STRUCT_SIZE(s_user_interface_controller, 4732);
 

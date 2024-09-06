@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "scenario.h"
 
+#include "structures/structure_bsp_definitions.h"
+
 scenario* get_global_scenario(void) 
 {
 	return *Memory::GetAddress<scenario**>(0x479E74, 0x4A6430);

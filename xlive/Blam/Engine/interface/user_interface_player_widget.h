@@ -1,8 +1,7 @@
 #pragma once
 #include "user_interface_group_widget.h"
 #include "user_interface_screen_widget_definition.h"
-#include "game/players.h"
-
+#include "game/game_allegiance.h"
 
 /* classes */
 

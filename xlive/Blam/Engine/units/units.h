@@ -1,5 +1,6 @@
 #pragma once
-#include "game/player_control.h"
+#include "game/aim_assist.h"
+#include "game/game_allegiance.h"
 #include "objects/objects.h"
 
 #define MAXIMUM_NUMBER_OF_UNIT_CAMERA_TRACKS 2

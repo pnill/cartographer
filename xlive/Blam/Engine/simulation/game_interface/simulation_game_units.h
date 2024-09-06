@@ -1,8 +1,7 @@
 #pragma once
-#include "simulation_game_entities.h"
 #include "simulation_game_objects.h"
 #include "game/players.h"
-
+#include "units/units.h"
 
 struct s_simulation_unit_state_data
 {

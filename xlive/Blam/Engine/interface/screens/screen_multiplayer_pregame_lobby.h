@@ -1,11 +1,10 @@
 #pragma once
-
+#include "game/game_allegiance.h"
 #include "interface/user_interface_widget_window.h"
 #include "interface/user_interface_widget_text.h"
 #include "interface/user_interface_widget_button.h"
 #include "interface/user_interface_widget_text_entry.h"
 #include "interface/signal_slot.h"
-#include "game/players.h"
 
 /* macro defines */
 

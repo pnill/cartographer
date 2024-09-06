@@ -5,8 +5,6 @@
 #include "memory/data.h"
 #include "objects/objects.h"
 
-
-
 void __cdecl sub_58F279(datum cloth_index)
 {
 	INVOKE(0x18F279, 0, sub_58F279, cloth_index);

@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "object_types.h"
 
-#include "object_placement.h"
-
+#include "objects.h"
 
 object_type_definition** get_object_type_definitions(void)
 {

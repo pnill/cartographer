@@ -3,7 +3,6 @@
 #include "scenario_interpolators.h"
 #include "scenario_kill_trigger_volumes.h"
 
-
 #include "ai/ai_flocks.h"
 #include "ai/ai_mission_dialogue.h"
 #include "ai/ai_orders.h"
@@ -12,7 +11,6 @@
 #include "ai/path.h"
 #include "ai/zone.h"
 #include "cache/predicted_resources.h"
-#include "cseries/cseries_strings.h"
 #include "decorators/decorator_definitions.h"
 #include "editor/editor_flags.h"
 #include "game/game_engine_spawning.h"
@@ -27,10 +25,10 @@
 #include "sound/sound_scenery.h"
 #include "structures/cluster_partitions.h"
 #include "structures/structure_audibility.h"
+#include "structures/structure_bsp_definitions.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "text/text.h"
-
 
 #define MAXIMUM_CHILD_SCENARIOS_PER_SCENARIO 16
 #define MAXIMUM_FUNCTIONS_PER_SCENARIO 32
@@ -123,7 +121,7 @@ enum e_bounds_mode : short
 struct scenario_function
 {
     e_scenario_function_flags flags;
-    static_string32 name;
+    char name[32];
     float period_seconds;               // Period for above function (lower values make function oscillate quickly; higher values make it oscillate slowly).
     
     // Multiply this function by above period
@@ -177,7 +175,7 @@ ASSERT_STRUCT_SIZE(scenario_environment_object, 64);
 // max count: MAXIMUM_OBJECT_NAMES_PER_SCENARIO 640
 struct scenario_object_name
 {
-    static_string32 name;
+    char name[32];
     e_object_type type;
     int8 pad;
     short placement_index;
@@ -421,7 +419,7 @@ enum e_device_group_flags : int
 // max count: MAXIMUM_DEVICE_GROUPS_PER_SCENARIO 128
 struct scenario_device_group
 {
-    static_string32 name;
+    char name[32];
     float initial_value;
     e_device_group_flags flags;
 };
@@ -578,7 +576,7 @@ ASSERT_STRUCT_SIZE(s_scenario_light, 108);
 // max count: MAXIMUM_SCENARIO_PLAYERS_PER_BLOCK 256
 struct scenario_starting_profile
 {
-    static_string32 name;
+    char name[32];
     float starting_health_damage;
     float starting_shield_damage;
     tag_reference primary_weapon;    // weap
@@ -670,7 +668,7 @@ ASSERT_STRUCT_SIZE(scenario_trigger_volume, 68);
 // max count: MAXIMUM_RECORDED_ANIMATIONS_PER_MAP 1024
 struct recorded_animation_definition
 {
-    static_string32 name;
+    char name[32];
     byte version;
     byte raw_animation_data;
     byte unit_control_data_version;
@@ -845,7 +843,7 @@ ASSERT_STRUCT_SIZE(character_palette_entry, 8);
 // max count: k_maximum_hs_scripts_per_scenario 1024
 struct hs_script
 {
-    static_string32 name;
+    char name[32];
     e_hs_script_type script_type;
     e_hs_type return_type;
     datum root_expression_index;
@@ -855,8 +853,8 @@ ASSERT_STRUCT_SIZE(hs_script, 40);
 // max count: MAXIMUM_CUTSCENE_FLAGS_PER_SCENARIO 512
 struct scenario_cutscene_flag
 {
-    int pad;
-    static_string32 name;
+    int32 pad;
+    char name[32];
     real_point3d position;
     real_euler_angles2d facing;
 };
@@ -880,7 +878,7 @@ struct scenario_cutscene_camera_point
 {
     e_cutscene_camera_point_flags flags;
     e_cutscene_camera_point_type type;
-    static_string32 name;
+    char name[32];
     
     /* cmed */
     int pad;
@@ -1052,7 +1050,7 @@ ASSERT_STRUCT_SIZE(s_scenario_structure_bsp_spherical_harmonic_lighting, 16);
 struct s_scenario_editor_folder
 {
     int parent_folder;                              // Block index: scenario_editor_folder
-    static_string256 name;
+    char name[256];
 };
 ASSERT_STRUCT_SIZE(s_scenario_editor_folder, 260);
 

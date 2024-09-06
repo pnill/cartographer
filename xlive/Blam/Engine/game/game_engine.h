@@ -1,6 +1,10 @@
 #pragma once
+#include "game/game_allegiance.h"
 #include "game_statborg.h"
-#include "networking/Session/NetworkSession.h"
+#include "math/color_math.h"
+#include "tag_files/string_id.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 
 /* constants */
 

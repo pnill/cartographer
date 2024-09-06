@@ -1,7 +1,5 @@
 #pragma once
 
-#include "objects/objects.h"
-
 enum e_game_engine_types
 {
 	invalid = -1,

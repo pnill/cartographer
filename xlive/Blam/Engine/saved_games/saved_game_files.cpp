@@ -2,6 +2,7 @@
 #include "saved_game_files.h"
 
 #include "cache/physical_memory_map.h"
+#include "text/unicode.h"
 
 /* globals */
 

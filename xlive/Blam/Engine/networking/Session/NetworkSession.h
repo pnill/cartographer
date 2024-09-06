@@ -1,5 +1,4 @@
 #pragma once
-
 #include "game/players.h"
 #include "input/controllers.h"
 #include "networking/Transport/transport.h"
@@ -44,8 +43,7 @@ struct s_membership_player;
 struct s_membership_peer;
 struct s_session_observer_channel;
 
-#define k_network_maximum_machines_per_session (16 + 1)
-#define k_number_of_users 4
+#define k_network_maximum_machines_per_session (k_maximum_players + 1)
 
 namespace NetworkSession
 {

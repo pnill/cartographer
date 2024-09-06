@@ -10,10 +10,9 @@
 #include "main/interpolator.h"
 #include "models/models.h"
 #include "models/render_model_definitions.h"
-#include "objects/object_definition.h"
-#include "objects/objects.h"
-#include "tag_files/global_string_ids.h"
 #include "render/render_objects.h"
+#include "tag_files/global_string_ids.h"
+#include "units/units.h"
 
 bool show_first_person = true;
 

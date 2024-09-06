@@ -6,7 +6,6 @@
 
 #include "game/game_time.h"
 #include "game/players.h"
-#include "networking/Session/NetworkSession.h"
 
 
 #define k_radar_size_multiplier 1.f
