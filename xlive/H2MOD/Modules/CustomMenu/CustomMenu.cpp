@@ -1,10 +1,6 @@
 #include "stdafx.h"
-
 #include "CustomMenu.h"
 
-#include "interface/screens/screen_xbox_live_task_progress_dialog.h"
-
-#include "H2MOD/GUI/ImGui_Integration/imgui_handler.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
 #include "H2MOD/Modules/Accounts/Accounts.h"
 #include "H2MOD/Modules/Shell/Config.h"
@@ -14,73 +10,6 @@
 #include "interface/screens/screen_cartographer_account_manager.h"
 
 bool g_force_cartographer_update = false;
-
-#pragma region CM_Language
-
-#pragma region CM_Language_Sub
-
-//int CM_Language_Main = 0;
-//int Language_Sub_Count = 0;
-//std::map<int, int> cm_lang_variant_map;
-//std::map<int, int> cm_lang_other_lang_map;
-
-//static bool CMButtonHandler_Language_Sub(int button_id) {
-//	addDebugText("Button ID: %d", button_id);
-//	setCustomLanguage(CM_Language_Main == -1 ? cm_lang_other_lang_map[button_id] : CM_Language_Main, cm_lang_variant_map[button_id]);
-//	return false;
-//}
-
-//bool GSCustomMenuCall_Language_Sub() {
-//	CM_Language_Sub_Setup_Buttons();
-//	if (Language_Sub_Count > 0) {
-//		ui_custom_cartographer_load_menu(CustomMenu_Language_Sub);
-//		return true;
-//	}
-//	else {
-//		c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_no_custom_language_categorised_as_other);
-//	}
-//	return false;
-//}
-
-
-#pragma endregion
-
-#pragma region CM_Language_Main
-
-//void toggleLanguageCapture() {
-//	H2Config_custom_labels_capture_missing = !H2Config_custom_labels_capture_missing;
-//}
-
-//static bool CMButtonHandler_Language(int button_id) {
-//	if (button_id == 0) {
-//		setCustomLanguage(-1);
-//		return true;
-//	}
-//	else if (button_id > 0 && button_id < 2 + 8) {
-//		CM_Language_Main = button_id - 2;
-//		GSCustomMenuCall_Language_Sub();
-//		return false;
-//	}
-//	else if (button_id == 2 + 8 + 0) {
-//		if (!reloadCustomLanguages()) {
-//			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_error_reading_custom_language_file);
-//		}
-//		return false;
-//	}
-//	else if (button_id == 2 + 8 + 1) {
-//		saveCustomLanguages();
-//		return true;
-//	}
-//	else if (button_id == 2 + 8 + 2) {
-//		toggleLanguageCapture();
-//		return false;
-//	}
-//	return false;
-//}
-
-#pragma endregion
-
-#pragma endregion
 
 #pragma region Setting_Modifications
 
