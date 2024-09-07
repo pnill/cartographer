@@ -189,8 +189,6 @@ void InitCustomMenu() {
 
 	RefreshToggleIngameKeyboardControls();
 
-	c_screen_with_menu::apply_patches();
-
 	// replace brightness menu for testing
 	// replace_brightness_menu();
 }

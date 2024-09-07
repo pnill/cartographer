@@ -25,4 +25,5 @@ void screens_apply_patches()
 	c_main_menu_list::apply_instance_patches();
 	c_screen_multiplayer_pregame_lobby::apply_instance_patches();
 	c_screen_squad_settings::apply_instance_patches();
+	c_screen_with_menu::apply_patches();
 }
