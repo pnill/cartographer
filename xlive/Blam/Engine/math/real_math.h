@@ -1,5 +1,7 @@
 #pragma once
 
+// apparently _valid_real_epsilon is primarily used in unit physics
+#define _valid_real_epsilon	0.001f
 #define k_real_math_epsilon 0.0001f
 
 #define DEGREES_TO_RADIANS(angle) ((real32)((angle) * M_PI / 180.0))

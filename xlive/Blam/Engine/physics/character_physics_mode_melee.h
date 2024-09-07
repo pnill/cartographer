@@ -1,6 +1,5 @@
 #pragma once
 
-#define k_valid_real_epsilon 0.001f
 // in practice the actual acceleration takes place in just 3 ticks, but it is defined as 5 for some reason
 #define k_acceleration_ticks_real 5.0f
 #define k_acceleration_ticks ((int)k_acceleration_ticks_real)

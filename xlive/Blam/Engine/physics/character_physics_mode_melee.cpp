@@ -38,10 +38,10 @@ real32 __cdecl melee_lunge_get_max_speed_per_tick(real32 tick_length, real32 tar
 		max_velocity = 12.0f;
 
 	real32 t1 = target_distance * 0.375f;
-	if (t1 >= k_valid_real_epsilon)
+	if (t1 >= _valid_real_epsilon)
 		return MIN(tick_length * max_velocity, t1);
 	else
-		return k_valid_real_epsilon;
+		return _valid_real_epsilon;
 }
 
 // check if this is what this actually does
@@ -52,7 +52,7 @@ real32 melee_lunge_get_tick_count(real32 distance, real32 max_speed_per_tick)
 
 	f1 = MAX(f1, 0.0f);
 
-	if (max_speed_per_tick > k_valid_real_epsilon)
+	if (max_speed_per_tick > _valid_real_epsilon)
 		return 6.0f + (f1 / max_speed_per_tick);
 	else
 		return 6.0f;
@@ -156,7 +156,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 		//const real32 melee_max_cosine = cos(degreesToRadians(85.f));
 		const real32 melee_max_cosine = 0.087155744f;
 
-		if (max_speed_per_tick <= k_valid_real_epsilon)
+		if (max_speed_per_tick <= _valid_real_epsilon)
 		{
 			FINISH_DECELERATION(FLAG(_melee_flag_deceleration_unk));
 			return;
@@ -206,7 +206,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 				// and output them like that
 				// output->out_translational_velocity = output->out_translational_velocity * (real32)time_globals::get()->ticks_per_second;
 
-				if (maybe_minimum_velocity <= ((current_velocity_per_tick - unk4) + k_valid_real_epsilon))
+				if (maybe_minimum_velocity <= ((current_velocity_per_tick - unk4) + _valid_real_epsilon))
 				{
 					return;
 				}
@@ -217,7 +217,7 @@ void c_character_physics_mode_melee_datum::melee_deceleration_fixup
 			}
 			else
 			{
-				if (current_velocity_per_tick <= k_valid_real_epsilon)
+				if (current_velocity_per_tick <= _valid_real_epsilon)
 				{
 					FINISH_DECELERATION(FLAG(_melee_flag_deceleration_unk));
 					return;
@@ -335,7 +335,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 
 		if (a3)
 		{
-			if (!m_has_target && distance_between_havok_components > k_valid_real_epsilon)
+			if (!m_has_target && distance_between_havok_components > _valid_real_epsilon)
 			{
 				real32 distance;
 				if (m_maximum_distance == 0.0f)
@@ -356,7 +356,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				real32 unk1 = MIN(MAX(m_field_28 * 1.5f, 0.0f), 2.5f);
 
 				real32 distance_to_target = magnitude3d(&vector_to_target);
-				if (distance_to_target > k_valid_real_epsilon)
+				if (distance_to_target > _valid_real_epsilon)
 				{
 					scale_vector3d(&vector_to_target, (distance_between_havok_components / distance_to_target), &vector_to_target);
 				}
@@ -386,7 +386,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 				m_maximum_counter = blam_ticks_real_to_integer((real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2);
 				// m_maximum_counter = (real32)(m_weapon_is_sword ? 7 : 1) + lunge_tick_count_2;
 
-				if (unk_distance1 > k_valid_real_epsilon)
+				if (unk_distance1 > _valid_real_epsilon)
 				{
 					point_from_line3d(player_origin, &unk_vector1, m_distance / unk_distance1, &m_target_point);
 				}
@@ -444,7 +444,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 			scale_vector3d(&current_translational_velocity_per_tick, game_tick_length(), &current_translational_velocity_per_tick);
 
 			// check if we should start decelerating
-			if (maximum_speed_per_tick > k_valid_real_epsilon)
+			if (maximum_speed_per_tick > _valid_real_epsilon)
 			{
 				if (m_started_decelerating
 					|| unk2 > distance_to_target_point
@@ -474,7 +474,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						m_started_decelerating = true;
 						m_deceleration_ticks = 0;
 						m_velocity_to_decelerate = MAX(min_velocity_after_deceleration_per_tick, temp_current_velocity_per_tick - min_velocity_after_deceleration_per_tick);
-						m_distance_to_target_point_before_deceleration = MAX(distance_to_target_point, k_valid_real_epsilon);
+						m_distance_to_target_point_before_deceleration = MAX(distance_to_target_point, _valid_real_epsilon);
 					}
 
 					bool melee_allow_deceleration = false;
@@ -512,7 +512,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 						// to reproduce the same behaviour 30 tick has, scale the vector with the difference between the tickrates
 						// scale_vector3d(&physics_output->translational_velocity, time_globals::get_ticks_difference_real(), &physics_output->translational_velocity);
 
-						if (min_velocity_after_deceleration_per_tick > ((temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f)) + k_valid_real_epsilon))
+						if (min_velocity_after_deceleration_per_tick > ((temp_current_velocity_per_tick - ((m_velocity_to_decelerate + min_velocity_after_deceleration_per_tick) / 3.0f)) + _valid_real_epsilon))
 						{
 							force_leave_melee_lunge_physics = true;
 							set_time_to_target(0.0f);
@@ -520,7 +520,7 @@ void __thiscall c_character_physics_mode_melee_datum::update_internal
 					}
 					else if (melee_allow_deceleration)
 					{
-						if (temp_current_velocity_per_tick > k_valid_real_epsilon)
+						if (temp_current_velocity_per_tick > _valid_real_epsilon)
 						{
 							real32 deceleration = MIN(m_velocity_to_decelerate / k_deceleration_ticks_real, temp_current_velocity_per_tick);
 							
