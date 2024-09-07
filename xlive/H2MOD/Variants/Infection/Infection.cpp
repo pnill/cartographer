@@ -96,9 +96,6 @@ void Infection::sendTeamChange()
 					{
 						if (!Memory::IsDedicatedServer())
 						{
-							player_indexes[player_array_index] = i;
-							player_teams[player_array_index++] = team;
-
 							s_player* local_player = s_player::get(i);
 
 							user_interface_controller_set_desired_team_index(local_player->controller_index, team);
@@ -401,7 +398,7 @@ void Infection::OnPlayerDeath(ExecTime execTime, datum player_index)
 {
 	int32 absPlayerIdx = DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index);
 	datum playerUnitDatum = s_player::get_unit_index(player_index);
-	// 0xec710001
+
 	switch (execTime)
 	{
 	case ExecTime::_preEventExec:
