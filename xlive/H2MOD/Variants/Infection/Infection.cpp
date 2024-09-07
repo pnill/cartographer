@@ -95,14 +95,18 @@ void Infection::sendTeamChange()
 					{
 						if (!Memory::IsDedicatedServer())
 						{
-							user_interface_controller_set_desired_team_index(_controller_index_0, team);
-							user_interface_controller_update_network_properties(_controller_index_0);
+							player_indexes[player_array_index] = i;
+							player_teams[player_array_index++] = team;
+
+							s_player* local_player = s_player::get(i);
+
+							user_interface_controller_set_desired_team_index(local_player->controller_index, team);
+							user_interface_controller_update_network_properties(local_player->controller_index);
 							LOG_TRACE_GAME(L"[h2mod-infection] setting local player team index, infected?: {}", is_current_player_zombie);
 						}
 					}
 				}
 			}
-
 			NetworkSession::GetActiveNetworkSession()->switch_players_to_teams(player_indexes, NetworkSession::GetPlayerCount(), player_teams);
 		}
 	}
