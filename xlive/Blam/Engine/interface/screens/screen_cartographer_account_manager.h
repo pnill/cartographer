@@ -417,3 +417,5 @@ public:
 	}
 };
 // ASSERT_STRUCT_SIZE(c_cartographer_account_manager_menu, 3396);
+
+void cartographer_account_manager_open_list();

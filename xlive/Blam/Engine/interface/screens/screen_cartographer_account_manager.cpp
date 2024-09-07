@@ -201,7 +201,14 @@ int g_account_manager_master_login_code;
 HANDLE g_account_manager_login_thread_handle = INVALID_HANDLE_VALUE;
 
 extern void* ui_load_cartographer_update_notice_menu();
-extern void* ui_load_cartographer_invalid_login_token();
+
+void* ui_load_cartographer_invalid_login_token()
+{
+	c_cartographer_account_manager_menu::accountingGoBackToList = true;
+	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
+	return c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_invalid_login_token);
+}
+
 extern bool g_force_cartographer_update;
 
 void xbox_live_task_progress_callback(DWORD a1)
@@ -519,5 +526,14 @@ void c_cartographer_account_manager_edit_list::button_handler(s_event_record* ev
 	return;
 }
 
+void cartographer_account_manager_open_list() {
+	if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle() && ReadH2Accounts()) {
+		c_cartographer_account_manager_menu::open_account_list_context();
+	}
+	else {
+		if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle())
+			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_account_already_in_use);
+	}
+}
 
 

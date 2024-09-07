@@ -8,13 +8,14 @@
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
 #include "H2MOD/Modules/Shell/H2MODShell.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/SimpleIni.h"
 
 #pragma region Config IO
+bool g_force_cartographer_update = false;
+
 const wchar_t* H2ConfigFilenames[] = { L"%wshalo2config%d.ini", L"%wsh2serverconfig%d.ini" };
 
 std::string H2ConfigVersionNumber("1");

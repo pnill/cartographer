@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "xbox.h"
+#include "interface/screens/screen_cartographer_account_manager.h"
 
 extern void Check_Overlapped(PXOVERLAPPED pOverlapped);
 
@@ -8,8 +9,7 @@ int WINAPI XShowSigninUI(DWORD cPanes, DWORD dwFlags)
 {
 	if (!UserSignedIn(0))
 	{
-		extern void XUiShowSignInH2();
-		XUiShowSignInH2();
+		cartographer_account_manager_open_list();
 	}
 
 	return ERROR_SUCCESS;

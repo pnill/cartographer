@@ -17,7 +17,6 @@
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 
 #ifndef NDEBUG
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
