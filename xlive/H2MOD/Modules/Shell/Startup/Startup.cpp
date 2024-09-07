@@ -364,8 +364,6 @@ void InitH2Startup() {
 
 	extern void InitCustomLanguage();
 	InitCustomLanguage();
-	extern void InitCustomMenu();
-	InitCustomMenu();
 	extern void InitRunLoop();
 	InitRunLoop();
 	H2MOD::Initialize();
@@ -394,8 +392,6 @@ void H2DedicatedServerStartup() {
 void DeinitH2Startup() {
 	extern void DeinitRunLoop();
 	DeinitRunLoop();
-	extern void DeinitCustomMenu();
-	DeinitCustomMenu();
 	extern void DeinitCustomLanguage();
 	DeinitCustomLanguage();
 	H2Tweaks::DisposePatches();

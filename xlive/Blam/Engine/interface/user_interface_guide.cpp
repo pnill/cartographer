@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "user_interface_guide.h"
-#include "H2MOD/Modules/CustomMenu/CustomMenu.h"
+#include "screens/screen_cartographer_account_manager.h"
 
 
 c_user_interface_guide_state_manager* user_interface_guide_state_manager_get(void)
@@ -12,5 +12,5 @@ void c_user_interface_guide_state_manager::add_user_signin_task(bool sign_to_liv
 {
 	//INVOKE_TYPE(0xDD7550, 0x0, int(__thiscall*)(c_user_interface_guide_state_manager*, bool, void*), this, sign_to_live, signin_callback);
 	this->m_callback_task = signin_callback;
-	XUiShowSignInH2();
+	cartographer_account_manager_open_list();
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "H2MOD/Modules/Input/ControllerInput.h"
+extern bool g_force_cartographer_update;
 
 void InitH2Config();
 void DeinitH2Config();
@@ -101,3 +102,4 @@ extern bool H2Config_spooky_boy;
 #ifndef NDEBUG
 extern int H2Config_forced_event;
 #endif
+
