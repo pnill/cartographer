@@ -6,6 +6,7 @@
 #include "new_hud.h"
 #include "new_hud_definitions.h"
 #include "bitmaps/bitmap_group.h"
+#include "game/game_engine_util.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "render/render.h"
@@ -27,6 +28,8 @@ static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 	D3DCOLOR_XRGB(00, 85, 170),
 	D3DCOLOR_XRGB(0,120,240),
 };
+
+c_static_flags_no_init<k_number_of_users> g_draw_hud_user_draw_player_indicators;
 
 /* private code */
 
@@ -733,6 +736,15 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		draw_string_draw(&text_bounds, widget_string, *get_primary_hud_scale());
 	}
 }
+
+void __cdecl draw_hud_player_indicators(uint32 local_render_user_index)
+{
+	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
+	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
+
+	if (g_draw_hud_user_draw_player_indicators.test(local_render_user_index))
+		p_game_mode_engine_draw_team_indicators(local_render_user_index);
+}
 /* public code */
 
 datum hud_bitmap_tag_index_get(void)
@@ -745,6 +757,19 @@ int32 hud_bitmap_data_index_get(void)
 	return *Memory::GetAddress<int32*>(0x97667C);
 }
 
+void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
+{
+	g_draw_hud_user_draw_player_indicators.set(user_index, enabled);
+}
+
+void hud_player_indicators_draw_reset()
+{
+	g_draw_hud_user_draw_player_indicators.set(0, true);
+	g_draw_hud_user_draw_player_indicators.set(1, true);
+	g_draw_hud_user_draw_player_indicators.set(2, true);
+	g_draw_hud_user_draw_player_indicators.set(3, true);
+}
+
 void __cdecl draw_hud_layer(void)
 {
 	INVOKE(0x22657B, 0x0, draw_hud_layer);
@@ -753,8 +778,9 @@ void __cdecl draw_hud_layer(void)
 
 void new_hud_draw_apply_patches()
 {
-	//PatchCall(Memory::GetAddress(0x222EE2), draw_hud_get_bitmap_data_usercall_to_rewritten);
+	hud_player_indicators_draw_reset();
+
+	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
 	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
 	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
-	//PatchCall(Memory::GetAddress(0x222E7E), draw_string_draw);
 }

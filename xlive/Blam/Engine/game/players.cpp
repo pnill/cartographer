@@ -205,6 +205,29 @@ datum __cdecl player_index_from_user_index(int32 user_index)
 	return INVOKE(0x5141D, 0x5992B, player_index_from_user_index, user_index);
 }
 
+e_controller_index players_get_controller_index_from_user_index(int32 user_index)
+{
+    e_controller_index result = k_no_controller;
+
+    s_players_globals* player_globals = get_players_globals();
+
+    if (user_index < player_globals->local_player_count)
+    {
+        datum user_datum = player_globals->player_user_mapping[user_index];
+
+        if (user_datum != NONE)
+        {
+            for (uint32 index = 0; index < k_number_of_controllers; index++)
+            {
+                if (player_globals->player_controller_mapping[index] == user_datum)
+                    result = (e_controller_index)index;
+            }
+        }
+    }
+
+    return result;
+}
+
 int8 __cdecl player_unk_84_from_user_index(int32 user_index)
 {
     return INVOKE(0x2220DC, 0, player_unk_84_from_user_index, user_index);

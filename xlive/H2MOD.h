@@ -22,7 +22,6 @@ public:
 	static void ApplyHooks();
 	static void RegisterEvents();
 
-	void team_player_indicator_visibility(bool toggle);
 	int get_player_index_from_unit_datum_index(datum unit_datum_index);
 	void set_unit_speed_patch(bool hackit);
 	void disable_score_announcer_sounds(int sound);

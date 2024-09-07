@@ -327,6 +327,8 @@ void __cdecl OnObjectDamage(datum unit_datum_index, int a2, bool a3, bool a4)
 }
 
 // Client Sided Patch
+// TODO: refactor this and rewrite the player_examine_nearby_weapons function
+// to check if the player_index is a local user and do a comparison to a flags check if they are able to pickup weapons
 void H2MOD::disable_weapon_pickup(bool enable)
 {
 	static BYTE oldBytes[5];
@@ -556,20 +558,6 @@ bool BansheeBombIsEngineMPCheck() {
 
 bool FlashlightIsEngineSPCheck() {
 	return game_is_campaign();
-}
-
-void H2MOD::team_player_indicator_visibility(bool toggle)
-{
-	this->drawTeamIndicators = toggle;
-}
-
-void __cdecl game_mode_engine_draw_team_indicators(int local_user_render_idx)
-{
-	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
-	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
-
-	if (h2mod->drawTeamIndicators)
-		p_game_mode_engine_draw_team_indicators(local_user_render_idx);
 }
 
 typedef uint16(__cdecl* get_enabled_teams_flags_t)(c_network_session*);
@@ -871,7 +859,7 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddress(0x92C05), BansheeBombIsEngineMPCheck);
 		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
-		PatchCall(Memory::GetAddress(0x226702), game_mode_engine_draw_team_indicators);
+
 
 		levels_apply_patches();
 		new_hud_apply_patches();
