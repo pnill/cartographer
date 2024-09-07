@@ -1,13 +1,12 @@
 #pragma once
 
-#include "interface/user_interface_headers.h"
+#include "interface/signal_slot.h"
+#include "interface/user_interface_widget_list.h"
+#include "interface/user_interface_widget_window.h"
 
 enum e_cartographer_error_id
 {
-	_cartpgrapher_error_id_none = NONE,
 	_cartographer_error_id_generic_error,
-	_cartographer_error_id_no_custom_language_categorised_as_other,
-	_cartographer_error_id_error_reading_custom_language_file,
 	_cartographer_error_id_error_outdated_version,
 	_cartographer_error_id_invalid_login_token,
 	_cartographer_error_id_login_invalid_account_id,
@@ -32,8 +31,19 @@ enum e_cartographer_error_id
 	_cartographer_error_id_account_login_connection_failed,
 	_cartographer_error_id_setting_requiring_game_restart,
 
-	k_cartographer_error_id_end
+	k_cartographer_error_id_count,
+	_cartpgrapher_error_id_none = NONE,
 };
+
+/* structures */
+
+struct s_cartographer_error_globals
+{
+	wchar_t* header_text;
+	wchar_t* subheader_text;
+};
+
+/* classes */
 
 class c_cartographer_error_edit_list : public c_list_widget
 {
