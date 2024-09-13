@@ -1,15 +1,18 @@
 #include "stdafx.h"
 #include "motion_sensor.h"
 
-#include "rasterizer/dx9/rasterizer_dx9_main.h"
-#include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
-
 #include "game/game_time.h"
 #include "game/players.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
+#include "rasterizer/dx9/shaders/compiled/motion_sensor_sweep.h"
+#include "rasterizer/rasterizer_globals.h"
 
+/* constants */
 
 #define k_radar_size_multiplier 1.f
 #define k_radar_distance_multiplier 1.5f
+
+/* globals */
 
 real32 g_motion_sensor_observation_accumulator = 0.f;
 real32 g_motion_sensor_sample_accumulator = 0.f;
@@ -119,7 +122,7 @@ void __cdecl rasterizer_dx9_create_motion_sensor_shader()
 {
 	INVOKE(0x28458C, 0x0, rasterizer_dx9_create_motion_sensor_shader);
 
-	const unsigned char* ps = g_dx9_sm3_supported ? k_motion_sensor_sweep_ps_3_0 : k_motion_sensor_sweep_ps_2_0;
+	const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_motion_sensor_sweep_ps_3_0 : k_motion_sensor_sweep_ps_2_0;
 	rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &motion_sensor_sweep_shader);
 	return;
 }

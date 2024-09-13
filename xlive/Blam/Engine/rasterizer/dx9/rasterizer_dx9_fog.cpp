@@ -360,7 +360,7 @@ void rasterizer_fog_speed_apply_patch(void)
 
 bool __cdecl rasterizer_dx9_create_fog_shaders(void)
 {
-	const unsigned char* ps = g_dx9_sm3_supported ? k_fog_atmospheric_apply_ps_3_0 : k_fog_atmospheric_apply_ps_2_0;
+	const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_fog_atmospheric_apply_ps_3_0 : k_fog_atmospheric_apply_ps_2_0;
 	WritePointer(Memory::GetAddress(0x468768), ps);
 	return p_rasterizer_dx9_create_fog_shaders();
 }

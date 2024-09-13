@@ -132,10 +132,10 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
     if (*global_rasterizer_stage_get() == 2)
     {
         const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-        if (target == dx9_globals->global_d3d_surface_render_primary && *last_z_stencil != dx9_globals->global_d3d_surface_render_z_as_target_z)
+        if (target == dx9_globals->global_d3d_surface_render_primary && *last_z_target != dx9_globals->global_d3d_surface_render_z_as_target_z)
         {
             *last_z_target = dx9_globals->global_d3d_surface_render_z_as_target_z;
-            HRESULT hr = global_d3d_device->SetRenderTarget(1, *last_z_stencil);
+            HRESULT hr = global_d3d_device->SetRenderTarget(1, dx9_globals->global_d3d_surface_render_z_as_target_z);
             valid = valid && SUCCEEDED(hr);
             target_set = true;
         }
@@ -670,9 +670,12 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
                 NULL));
     }
 
-    const char whiteSource[] = "float4 main() : COLOR { return float4(1.0f, 1.0f, 0.0f, 1.0f); }        ";
+    const char white_source[] = "float4 main() : COLOR { return float4(1.0f, 1.0f, 0.0f, 1.0f); }";
+    const char* shader_version = rasterizer_globals->d3d9_sm3_supported ? "ps_3_0" : "ps_2_0";
+
+
     LPD3DXBUFFER pBuffer;
-    const HRESULT hr = D3DXCompileShader(whiteSource, strlen(whiteSource), NULL, NULL, "main", "ps_2_0", 0, &pBuffer, NULL, NULL);
+    const HRESULT hr = D3DXCompileShader(white_source, strlen(white_source), NULL, NULL, "main", shader_version, 0, &pBuffer, NULL, NULL);
 
     bool result = false;
     if (pBuffer)
@@ -750,14 +753,13 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
     {
         if (dx9_globals->global_d3d_backbuffer_texture->GetSurfaceLevel(0, &dx9_globals->global_d3d_backbuffer_surface) >= 0)
         {
-            const bool render_depth = rasterizer_globals->render_depth_backbuffer;
+            const bool sm3_supported = rasterizer_globals->d3d9_sm3_supported;
 
-            const D3DFORMAT format = (render_depth ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
-            const D3DMULTISAMPLE_TYPE type = (render_depth ? dx9_globals->global_d3d_primary_multisampletype : D3DMULTISAMPLE_NONE);
-            const uint32 quality = (render_depth ? dx9_globals->global_d3d_primary_multisamplequality : 0);
+            const D3DFORMAT format = (sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
+            const D3DMULTISAMPLE_TYPE type = (sm3_supported ? dx9_globals->global_d3d_primary_multisampletype : D3DMULTISAMPLE_NONE);
+            const uint32 quality = (sm3_supported ? dx9_globals->global_d3d_primary_multisamplequality : 0);
 
-            ;
-            if (render_depth)
+            if (sm3_supported)
             {
                 hr = global_d3d_device->CreateRenderTarget(screen_bounds_width,
                     screen_bounds_height,

@@ -16,7 +16,6 @@ typedef void(__cdecl* rasterizer_dx9_set_texture_stage_t)(int16, datum, int16, r
 
 rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
 
-bool g_dx9_sm3_supported = false;
 datum g_last_bitmap_tag_index = 0;
 
 
@@ -299,8 +298,8 @@ bool __cdecl rasterizer_dx9_initialize_device(real_vector3d* v, bool display_bla
     D3DCAPS9 caps{};
     rasterizer_dx9_device_get_interface()->GetDeviceCaps(&caps);
 
-    // Check if shader model 3 is supported
-    g_dx9_sm3_supported = caps.MaxVertexShader30InstructionSlots >= 512 && caps.MaxPixelShader30InstructionSlots >= 512;
+    // Tells the game to make use of MRT and shader model 3 if the gpu supports it
+    rasterizer_globals_get()->d3d9_sm3_supported = caps.MaxVertexShader30InstructionSlots >= 512 && caps.MaxPixelShader30InstructionSlots >= 512;;
     return result;
 }
 

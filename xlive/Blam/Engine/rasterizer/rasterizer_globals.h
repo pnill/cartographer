@@ -100,7 +100,7 @@ struct s_rasterizer_globals
 	real32 sun_width_scale;
 	int32 rasterizer_blur_type;
 	bool field_E0;
-	bool render_depth_backbuffer;
+	bool d3d9_sm3_supported;
 	int16 pad_4;
 	bitmap_data* bitmap_data_array[1024];
 	uint32 next_bitmap_index;

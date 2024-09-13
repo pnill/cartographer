@@ -15,6 +15,7 @@ enum e_screen_split_type : int8
 	_screen_split_type_full = 0,
 	_screen_split_type_half = 1,
 	_screen_split_type_quarter = 2,
+	k_split_screen_type_count
 };
 
 /* structures */

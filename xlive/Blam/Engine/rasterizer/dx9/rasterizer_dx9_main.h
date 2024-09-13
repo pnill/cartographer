@@ -63,7 +63,6 @@ struct s_rasterizer_dx9_main_globals
 
 /* globals */
 
-extern bool g_dx9_sm3_supported;
 
 /* prototypes */
 

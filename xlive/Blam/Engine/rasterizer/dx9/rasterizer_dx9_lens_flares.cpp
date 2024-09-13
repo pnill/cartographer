@@ -270,7 +270,7 @@ void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
 {
     INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
 
-    const unsigned char* ps = g_dx9_sm3_supported ? k_sun_glow_convolve_ps_3_0 : k_sun_glow_convolve_ps_2_0;
+    const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_sun_glow_convolve_ps_3_0 : k_sun_glow_convolve_ps_2_0;
     rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &sun_glow_convolve_shader);
     return;
 }
