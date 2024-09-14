@@ -26,7 +26,7 @@ enum e_framebuffer_blend_function : int16
 
 struct s_rasterizer_dx9_main_globals
 {
-    IDirect3D9* global_d3d_interface;
+    IDirect3D9Ex* global_d3d_interface;
     D3DMULTISAMPLE_TYPE global_d3d_primary_multisampletype;
     uint32 global_d3d_primary_multisamplequality;
     IDirect3DSurface9* global_d3d_surface_render_primary;
@@ -76,6 +76,8 @@ void rasterizer_dx9_main_apply_patches(void);
 
 bool __cdecl rasterizer_initialize(void);
 
+bool __cdecl rasterizer_dx9_reset(bool create_window);
+
 void __cdecl rasterizer_dx9_reset_depth_buffer(void);
 
 void __cdecl rasterizer_present(bitmap_data* screenshot_bitmap);
@@ -119,3 +121,7 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
     const s_camera* camera,
     const render_projection* projection,
     e_rasterizer_target rasterizer_target);
+
+bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters);
+
+bool __cdecl rasterizer_dx9_render_scene_end(void);

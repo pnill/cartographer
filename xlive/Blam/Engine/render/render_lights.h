@@ -21,6 +21,12 @@ ASSERT_STRUCT_SIZE(render_lighting, 84);
 
 /* prototypes */
 
+/* prototypes */
+
 void __cdecl render_lights(void);
 
 void __cdecl render_light_clear_data(void);
+
+void __cdecl render_cinematic_lightmap_shadows(int32 effect_flag);
+
+void __cdecl render_lights_new(void);

@@ -79,3 +79,9 @@ bool __fastcall c_particle_system_lite::draw(c_particle_system_lite* _this)
 {
 	return rasterizer_dx9_draw_weather_particles(_this);
 }
+
+void __cdecl weather_render(void)
+{
+	INVOKE(0x199BA9, 0x0, weather_render);
+	return;
+}

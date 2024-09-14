@@ -28,3 +28,9 @@ bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b)
 {
 	return INVOKE(0x6ADA3, 0x6A5DE, game_engine_team_is_enemy, a, b);
 }
+
+void __cdecl game_engine_render(void)
+{
+	INVOKE(0x6A60F, 0x0, game_engine_render);
+	return;
+}

@@ -34,6 +34,8 @@ rasterizer_dx9_dispose_t p_rasterizer_dx9_primary_targets_dispose;
 rasterizer_dx9_dispose_t p_rasterizer_dx9_secondary_targets_dispose;
 rasterizer_dx9_get_render_target_surface_t p_rasterizer_dx9_get_render_target_surface;
 
+IDirect3DTexture9* g_d3d_texture_render_z_as_target_z = NULL;
+
 real32 g_sun_size = 0.2f;
 
 bool global_d3d_target_use_depth = false;
@@ -129,7 +131,7 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
     }
 
     bool target_set = false;
-    if (*global_rasterizer_stage_get() == 2)
+    if (*global_rasterizer_pixel_shader_index_get() == 2)
     {
         const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
         if (target == dx9_globals->global_d3d_surface_render_primary && *last_z_target != dx9_globals->global_d3d_surface_render_z_as_target_z)
@@ -306,6 +308,9 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
     case _rasterizer_target_particle_distortion:
         d3d_texture = rasterizer_dx9_get_target_texture(_rasterizer_target_particle_distortion);
         break;
+    case _rasterizer_target_z_a8b8g8r8:
+        d3d_texture = g_d3d_texture_render_z_as_target_z;
+        break;
     case _rasterizer_target_motion_sensor:
         d3d_texture = dx9_globals->global_d3d_texture_motion_sensor;
         break;
@@ -346,8 +351,9 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     bool valid_target = true;
     bool depth_provided = false;
 
-    e_rasterizer_target target = (*global_rasterizer_stage_get() != _rasterizer_target_texaccum ? rasterizer_target : _rasterizer_target_backbuffer);
-    switch (target)
+    int32 g_ps_index = *global_rasterizer_pixel_shader_index_get();
+    rasterizer_target = (g_ps_index == 1 ? _rasterizer_target_backbuffer : rasterizer_target);
+    switch (rasterizer_target)
     {
     case _rasterizer_target_render_primary:
         depth_provided = true;
@@ -376,7 +382,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     case _rasterizer_target_bloom_secondary:
     case _rasterizer_target_gamma_remap_lut:
     case _rasterizer_target_scratch:
-        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(target);
+        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(rasterizer_target);
         d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         break;
     case _rasterizer_target_frontbuffer:
@@ -397,7 +403,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     case _rasterizer_target_shadow_scratch2:
     case _rasterizer_target_convolution_scratch1:
     case _rasterizer_target_convolution_scratch2:
-        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(target);
+        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(rasterizer_target);
         break;
     case _rasterizer_target_shadow_alias_swizzled:
         d3d_surface = rasterizer_dx9_get_target_mip_surface(_rasterizer_target_shadow_alias_swizzled, mipmap_index);
@@ -494,17 +500,17 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             viewport.Height = g_cubemap_resolution;
         }
         else if (
-            target == _rasterizer_target_render_primary ||
-            target == _rasterizer_target_resolved ||
-            target == _rasterizer_target_2 ||
-            target == _rasterizer_target_texaccum ||
-            target == _rasterizer_target_cinematic ||
-            target == _rasterizer_target_backbuffer ||
-            target == rasterizer_dx9_get_overlay_destination_target())
+            rasterizer_target == _rasterizer_target_render_primary ||
+            rasterizer_target == _rasterizer_target_resolved ||
+            rasterizer_target == _rasterizer_target_2 ||
+            rasterizer_target == _rasterizer_target_texaccum ||
+            rasterizer_target == _rasterizer_target_cinematic ||
+            rasterizer_target == _rasterizer_target_backbuffer ||
+            rasterizer_target == rasterizer_dx9_get_overlay_destination_target())
         {
             const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
             const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-            if (target == rasterizer_dx9_get_overlay_destination_target())
+            if (rasterizer_target == rasterizer_dx9_get_overlay_destination_target())
             {
                 if (global_window_parameters->is_texture_camera)
                 {
@@ -759,20 +765,50 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
             const D3DMULTISAMPLE_TYPE type = (sm3_supported ? dx9_globals->global_d3d_primary_multisampletype : D3DMULTISAMPLE_NONE);
             const uint32 quality = (sm3_supported ? dx9_globals->global_d3d_primary_multisamplequality : 0);
 
+            // If shader model 3 is supported we create the z target as a render target
+            // Rather than a depth stencil surface
+            // We do this as the game will render out the z target at the same time as the lightmap indirect stage when shader model 3 is in use
             if (sm3_supported)
             {
-                hr = global_d3d_device->CreateRenderTarget(screen_bounds_width,
-                    screen_bounds_height,
-                    format,
-                    type,
-                    quality,
-                    false,
-                    &dx9_globals->global_d3d_surface_render_z_as_target_z,
-                    NULL);
+                succeeded =
+                    SUCCEEDED(global_d3d_device->CreateRenderTarget(
+                        screen_bounds_width,
+                        screen_bounds_height,
+                        format,
+                        type,
+                        quality,
+                        false,
+                        &dx9_globals->global_d3d_surface_render_z_as_target_z,
+                        NULL));
+
+                // If we created the render target and d3d9ex is supported
+                // Create and associate a texture to the render target
+                // This allows us to avoid using stretch rects to copy the result of the render target into the backbuffer when staging render targets as textures
+                if (succeeded && rasterizer_globals->use_d3d9_ex)
+                {
+                    // Create the texture associated to the render target
+                    succeeded = SUCCEEDED(global_d3d_device->CreateTexture(
+                        screen_bounds_width,
+                        screen_bounds_height,
+                        1,
+                        1,                                    // RENDERTARGET
+                        format,
+                        D3DPOOL_DEFAULT,
+                        &g_d3d_texture_render_z_as_target_z,
+                        NULL)) &&
+
+                    // Get texture of the render target from the render target surface
+                    SUCCEEDED(g_d3d_texture_render_z_as_target_z->GetSurfaceLevel(
+                        0,
+                        &dx9_globals->global_d3d_surface_render_z_as_target_z));
+                }
+
+                    
             }
             else
             {
-                hr = global_d3d_device->CreateDepthStencilSurface(screen_bounds_width,
+                hr = global_d3d_device->CreateDepthStencilSurface(
+                    screen_bounds_width,
                     screen_bounds_height,
                     format,
                     type,
@@ -780,8 +816,8 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
                     false,
                     &dx9_globals->global_d3d_surface_render_z_as_target_z,
                     NULL);
+                succeeded = SUCCEEDED(hr);
             }
-            succeeded = SUCCEEDED(hr);
         }
         else
         {
@@ -900,6 +936,12 @@ void __cdecl rasterizer_dx9_secondary_targets_dispose(void)
     {
         dx9_globals->global_d3d_surface_render_z_as_target_z->Release();
         dx9_globals->global_d3d_surface_render_z_as_target_z = NULL;
+    }
+
+    if (g_d3d_texture_render_z_as_target_z)
+    {
+        g_d3d_texture_render_z_as_target_z->Release();
+        g_d3d_texture_render_z_as_target_z = NULL;
     }
     return;
 }

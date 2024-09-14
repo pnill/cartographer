@@ -1,21 +1,27 @@
 #pragma once
 
+/* constants */
+
 #define k_max_display_option_count 64
 
 #define k_max_default_display_refresh_rate_count 8
 #define k_new_max_display_refresh_rate_count 24
 
-enum e_display_aspect_ratio : int
+/* enums */
+
+enum e_display_aspect_ratio : int32
 {
 	_aspect_ratio_4x3 = 0,
 	_aspect_ratio_16x9 = 1,
 	_aspect_ratio_16x10 = 2
 };
 
+/* structures */
+
 struct s_aspect_ratio
 {
-	byte x;
-	byte y;
+	uint8 x;
+	uint8 y;
 };
 
 struct s_display_option
@@ -30,11 +36,11 @@ struct s_video_mode
 	int32 width;
 	int32 height;
 	uint32 refresh_rate_count;
-	int32 refresh_rate[8];
+	int32 refresh_rate[k_max_default_display_refresh_rate_count];
 };
-ASSERT_STRUCT_SIZE(s_video_mode, 12 + 8 * 4);
+ASSERT_STRUCT_SIZE(s_video_mode, 44);
 
-struct s_video_settings
+struct s_rasterizer_settings
 {
 	int32 display_mode;
 	int32 aspect_ratio;
@@ -49,8 +55,14 @@ struct s_video_settings
 	int32 safe_area;
 	int32 level_of_detail;
 };
-static_assert(sizeof(s_video_settings) == 48, "s_video_settings total bytes wrong");
+ASSERT_STRUCT_SIZE(s_rasterizer_settings, 48);
+
+/* prototypes */
+
+void rasterizer_settings_apply_hooks(void);
 
 bool* get_render_fog_enabled(void);
 
-void rasterizer_settings_apply_hooks();
+s_rasterizer_settings* rasterizer_settings_get(void);
+
+void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality);

@@ -898,7 +898,7 @@ void H2MOD::ApplyHooks() {
 		apply_particle_update_patches();
 		apply_dead_camera_patches();
 		loading_apply_patches();
-		lens_flare_fix();
+		rasterizer_lens_flares_apply_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();
 		render_submit_apply_patches();

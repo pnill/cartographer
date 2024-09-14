@@ -26,7 +26,6 @@ IDirect3DPixelShader9* sun_glow_convolve_shader = NULL;
 IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void);
 void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void);
 bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* rect);
-e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target);
 void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target);
 e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_target primary_target, e_rasterizer_target secondary_target, int16 pass_count);
 
@@ -35,8 +34,12 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
 void rasterizer_dx9_lens_flares_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x2729B8), rasterizer_dx9_lens_flares_create_pixel_shaders);
+    return;
+}
 
-    PatchCall(Memory::GetAddress(0x26CF58), rasterizer_dx9_sun_glow_occlude);
+void __cdecl lens_flares_submit_occlusions(void)
+{
+    INVOKE(0x26DBF8, 0x0, lens_flares_submit_occlusions);
     return;
 }
 
@@ -259,31 +262,8 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
     return rasterizer_target;
 }
 
-/* private code */
-
-IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void)
-{
-    return Memory::GetAddress<IDirect3DPixelShader9**>(0xA4B008);
-}
-
-void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
-{
-    INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
-
-    const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_sun_glow_convolve_ps_3_0 : k_sun_glow_convolve_ps_2_0;
-    rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &sun_glow_convolve_shader);
-    return;
-}
-
-// Is the sun outside of our viewport
-// TODO: change the bounds depending on viewport bounds on the screen
-bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* sun_center)
-{
-    return sun_center->x0 < 1.f && sun_center->y0 < 1.f && sun_center->x1 > -1.f && sun_center->y1 > -1.f;
-}
-
 e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
-{    
+{
     const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
     ASSERT(definition);
 
@@ -293,16 +273,16 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, rea
     vector_from_points3d(&global_window_parameters->camera.point, point, &direction);
     normalize3d(&direction);
     real32 length = dot_product3d(&global_window_parameters->camera.forward, &direction);
-    
+
     length = global_window_parameters->camera.z_far / length;
 
     real_point3d sun_position;
     point_from_line3d(&global_window_parameters->camera.point, &direction, length, &sun_position);
-    
+
     real_bounds bounds;
     real_vector4d center;
     if (render_projection_point_to_screen(&sun_position, definition->occlusion_radius, &center, &bounds))
-    {        
+    {
         real_rectangle2d sun_occlusion_rect;
         sun_occlusion_rect.x0 = center.i - bounds.lower;
         sun_occlusion_rect.x1 = center.i + bounds.lower;
@@ -324,6 +304,29 @@ e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, rea
         }
     }
     return rasterizer_target;
+}
+
+/* private code */
+
+IDirect3DPixelShader9** lens_flare_pixel_shaders_get(void)
+{
+    return Memory::GetAddress<IDirect3DPixelShader9**>(0xA4B008);
+}
+
+void __cdecl rasterizer_dx9_lens_flares_create_pixel_shaders(void)
+{
+    INVOKE(0x26CEC9, 0x0, rasterizer_dx9_lens_flares_create_pixel_shaders);
+
+    const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_sun_glow_convolve_ps_3_0 : k_sun_glow_convolve_ps_2_0;
+    rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &sun_glow_convolve_shader);
+    return;
+}
+
+// Is the sun outside of our viewport
+// TODO: change the bounds depending on viewport bounds on the screen
+bool rasterizer_dx9_sun_is_in_bounds(const real_rectangle2d* sun_center)
+{
+    return sun_center->x0 < 1.f && sun_center->y0 < 1.f && sun_center->x1 > -1.f && sun_center->y1 > -1.f;
 }
 
 void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target target)

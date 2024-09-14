@@ -1,36 +1,176 @@
 #include "stdafx.h"
 #include "rasterizer_settings.h"
 
+#include "rasterizer_globals.h"
+
+#include "interface/user_interface_text.h"
 #include "math/math.h"
 #include "shell/shell.h"
-#include "dx9/rasterizer_dx9_main.h"
-#include "interface/user_interface_text.h"
+#include "rasterizer/dx9/rasterizer_dx9_main.h"
 
+/* typedefs */
 
-void __cdecl rasterizer_discard_refresh_rate();
+typedef void(__cdecl* t_update_screen_settings)(int32, int32, int16, int16, int16, int16, real32, real32);
+typedef int32(__cdecl* t_rasterizer_get_video_mode_refresh_rate)(uint32, uint32);
+typedef void(__cdecl* t_video_settings_get_available_monitor_display_modes)(void);
+
+/* globals */
+
+t_update_screen_settings p_update_screen_settings;
+t_rasterizer_get_video_mode_refresh_rate p_rasterizer_get_video_mode_refresh_rate;
+t_video_settings_get_available_monitor_display_modes p_video_settings_get_available_monitor_display_modes;
 
 s_display_option g_display_options[k_max_display_option_count] = {};
+uint32** g_video_mode_refresh_rates = NULL;
 
+/* prototypes */
+
+void __cdecl update_screen_settings(
+	int32 width,
+	int32 height,
+	int16 left,
+	int16 top,
+	int16 a5,
+	int16 a6,
+	real32 ui_scale,
+	real32 window_scale);
+
+void __cdecl rasterizer_discard_refresh_rate(void);
+
+int compare_display_options(void* context, const void* a1, const void* a2);
+
+// Calculates the greatest common denominator of the 2 numbers
+uint32 calculate_gcd(uint32 n, uint32 m);
+
+s_aspect_ratio calculate_aspect_ratio(uint32 width, uint32 height);
+
+// Create new resolution array to replace the hardcoded one in-game
+// Includes all supported video modes by the current monitor
+void create_new_display_setting_array(void);
+
+s_video_mode* rasterizer_get_video_modes(void);
+
+s_video_mode* rasterizer_get_video_mode(int32 video_mode);
+
+uint32 rasterizer_get_video_mode_count(void);
+
+int32 rasterizer_get_default_display_monitor(void);
+
+int __cdecl d3d_display_mode_compare(void* context, void const* a, void const* b);
+
+bool rasterizer_display_refresh_rate_exists(D3DDISPLAYMODE* d3d_display_modes, int32 display_mode_count, UINT width, UINT height, UINT refresh_rate);
+
+void __cdecl video_settings_get_available_monitor_display_modes_hook(void);
+
+uint32 rasterizer_get_video_mode_refresh_rate_count(uint32 video_mode_index);
+
+void __cdecl rasterizer_discard_refresh_rate(void);
+
+int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_index, uint32 refresh_rate_index);
+
+/* public code */
+
+void rasterizer_settings_apply_hooks(void)
+{
+	DETOUR_ATTACH(p_update_screen_settings, Memory::GetAddress<t_update_screen_settings>(0x264979), update_screen_settings);
+	create_new_display_setting_array();
+
+	DETOUR_ATTACH(p_video_settings_get_available_monitor_display_modes, Memory::GetAddress<t_video_settings_get_available_monitor_display_modes>(0x2638BB), video_settings_get_available_monitor_display_modes_hook);
+
+	//DETOUR_ATTACH(p_rasterizer_get_video_mode_refresh_rate, Memory::GetAddress<t_rasterizer_get_video_mode_refresh_rate>(0x263CA8), rasterizer_get_video_mode_refresh_rate_hook);
+
+	atexit(rasterizer_discard_refresh_rate);
+
+	// fix (or workaround) the refresh rate being unset
+	// by some hacky looking code in the game
+	NopFill(Memory::GetAddress(0x26475D), 26);
+
+	// Fix antialiasing when using shader model 3
+	PatchCall(Memory::GetAddress(0x250939), rasterizer_settings_set_antialiasing);
+	WriteValue(Memory::GetAddress(0x46803C), rasterizer_settings_set_antialiasing);
+	return;
+}
 
 bool* get_render_fog_enabled(void)
 {
 	return Memory::GetAddress<bool*>(0x41F6AA, 0x3C2B7E);
 }
 
-typedef void(__cdecl* update_screen_settings_t)(int, int, short, short, short, short, float, float);
-update_screen_settings_t p_update_screen_settings;
+s_rasterizer_settings* rasterizer_settings_get(void)
+{
+	return Memory::GetAddress<s_rasterizer_settings*>(0xA3D9F8);
+}
 
-uint32** g_video_mode_refresh_rates = NULL;
+void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
+{
+	D3DMULTISAMPLE_TYPE multisample_type;
+	switch (*out_quality)
+	{
+	case 1:
+		multisample_type = D3DMULTISAMPLE_2_SAMPLES;
+		break;
+	case 2:
+		multisample_type = D3DMULTISAMPLE_4_SAMPLES;
+		break;
+	case 0:
+	default:
+		multisample_type = D3DMULTISAMPLE_NONE;
+	}
+	
+	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+	const D3DFORMAT depth_format = rasterizer_globals->d3d9_sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format;
+
+	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+	IDirect3D9Ex* d3d9_interface = dx9_globals->global_d3d_interface;
+	
+	uint32 backbuffer_quality = 0;
+	uint32 depth_quality = 0;
+	if (multisample_type && 
+		SUCCEEDED(d3d9_interface->CheckDeviceMultiSampleType(
+			D3DADAPTER_DEFAULT,
+			D3DDEVTYPE_HAL,
+			rasterizer_globals->display_parameters.backbuffer_format,
+			D3DFORMAT(rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen),
+			multisample_type,
+			&backbuffer_quality)) &&
+		SUCCEEDED(d3d9_interface->CheckDeviceMultiSampleType(
+			D3DADAPTER_DEFAULT,
+			D3DDEVTYPE_HAL,
+			depth_format,
+			rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen,
+			multisample_type,
+			&depth_quality)))
+	{		
+		dx9_globals->global_d3d_primary_multisampletype = multisample_type;
+		dx9_globals->global_d3d_primary_multisamplequality = MIN(backbuffer_quality - 1, depth_quality - 1);
+	}
+	else
+	{
+		dx9_globals->global_d3d_primary_multisampletype = D3DMULTISAMPLE_NONE;
+		dx9_globals->global_d3d_primary_multisamplequality = 0;
+	}
+
+	if (rasterizer_dx9_device_get_interface())
+	{
+		rasterizer_globals->reset_screen = true;
+		rasterizer_dx9_reset(false);
+	}
+
+	rasterizer_settings_get()->anti_aliasing = *out_quality;
+	return;
+}
+
+/* private code */
 
 void __cdecl update_screen_settings(
-	int width, 
-	int height, 
-	short left,
-	short top,
-	short a5, 
-	short a6,
-	float ui_scale,
-	float window_scale)
+	int32 width, 
+	int32 height,
+	int16 left,
+	int16 top,
+	int16 a5,
+	int16 a6,
+	real32 ui_scale,
+	real32 window_scale)
 {
 	p_update_screen_settings(width, height, left, top, a5, a6, ui_scale, window_scale);
 
@@ -40,6 +180,8 @@ void __cdecl update_screen_settings(
 		set_ui_text_label_scale(1.f / ui_scale);
 	else
 		set_ui_text_label_scale(ui_scale);
+
+	return;
 }
 
 
@@ -83,7 +225,7 @@ s_aspect_ratio calculate_aspect_ratio(uint32 width, uint32 height)
 
 // Create new resolution array to replace the hardcoded one in-game
 // Includes all supported video modes by the current monitor
-void create_new_display_setting_array()
+void create_new_display_setting_array(void)
 {
 	size_t count = 0;
 	DEVMODE screen;
@@ -182,9 +324,10 @@ void create_new_display_setting_array()
 		// Maybe rewrite the functions for this in the future to fix this?
 		qsort_s(g_display_options, count, sizeof(s_display_option), compare_display_options, NULL);
 	}
+	return;
 }
 
-s_video_mode* rasterizer_get_video_modes()
+s_video_mode* rasterizer_get_video_modes(void)
 {
 	return *Memory::GetAddress<s_video_mode**>(0xA3D9F0);
 }
@@ -194,12 +337,12 @@ s_video_mode* rasterizer_get_video_mode(int32 video_mode)
 	return &rasterizer_get_video_modes()[video_mode];
 }
 
-uint32 rasterizer_get_video_mode_count()
+uint32 rasterizer_get_video_mode_count(void)
 {
 	return *Memory::GetAddress<uint32*>(0xA3D9F4);
 }
 
-int32 rasterizer_get_default_display_monitor()
+int32 rasterizer_get_default_display_monitor(void)
 {
 	int32 monitor_index = 0;
 
@@ -245,10 +388,7 @@ bool rasterizer_display_refresh_rate_exists(D3DDISPLAYMODE* d3d_display_modes, i
 	return false;
 }
 
-typedef void(__cdecl* t_video_settings_get_available_monitor_display_modes)();
-t_video_settings_get_available_monitor_display_modes p_video_settings_get_available_monitor_display_modes;
-
-void __cdecl video_settings_get_available_monitor_display_modes_hook()
+void __cdecl video_settings_get_available_monitor_display_modes_hook(void)
 {
 	p_video_settings_get_available_monitor_display_modes();
 
@@ -404,7 +544,7 @@ uint32 rasterizer_get_video_mode_refresh_rate_count(uint32 video_mode_index)
 	return 0;
 }
 
-void __cdecl rasterizer_discard_refresh_rate()
+void __cdecl rasterizer_discard_refresh_rate(void)
 {
 	// atexit
 
@@ -422,8 +562,6 @@ void __cdecl rasterizer_discard_refresh_rate()
 	return;
 }
 
-typedef int32(__cdecl* t_rasterizer_get_video_mode_refresh_rate)(uint32, uint32);
-t_rasterizer_get_video_mode_refresh_rate p_rasterizer_get_video_mode_refresh_rate;
 
 int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_index, uint32 refresh_rate_index)
 {
@@ -434,20 +572,4 @@ int32 __cdecl rasterizer_get_video_mode_refresh_rate_hook(uint32 video_mode_inde
 	}
 
 	return g_video_mode_refresh_rates[0][0];
-}
-
-void rasterizer_settings_apply_hooks()
-{
-	DETOUR_ATTACH(p_update_screen_settings, Memory::GetAddress<update_screen_settings_t>(0x264979), update_screen_settings);
-	create_new_display_setting_array();
-
-	DETOUR_ATTACH(p_video_settings_get_available_monitor_display_modes, Memory::GetAddress<t_video_settings_get_available_monitor_display_modes>(0x2638BB), video_settings_get_available_monitor_display_modes_hook);
-
-	//DETOUR_ATTACH(p_rasterizer_get_video_mode_refresh_rate, Memory::GetAddress<t_rasterizer_get_video_mode_refresh_rate>(0x263CA8), rasterizer_get_video_mode_refresh_rate_hook);
-
-	atexit(rasterizer_discard_refresh_rate);
-
-	// fix (or workaround) the refresh rate being unset
-	// by some hacky looking code in the game
-	NopFill(Memory::GetAddress(0x26475D), 26);
 }

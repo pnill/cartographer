@@ -49,8 +49,10 @@ void rasterizer_dx9_fog_apply_patches(void)
 
 bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(int32 a1)
 {
+	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
 	rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
-	rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_backbuffer);
+	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals->d3d9_sm3_supported && rasterizer_globals->use_d3d9_ex ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);

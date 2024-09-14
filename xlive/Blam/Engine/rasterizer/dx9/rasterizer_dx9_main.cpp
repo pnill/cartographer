@@ -18,8 +18,9 @@ rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
 
 datum g_last_bitmap_tag_index = 0;
 
+/* constants */
 
-D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
+const D3DBLEND k_blend_operation[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_ZERO,
   D3DBLEND_ZERO,
@@ -35,7 +36,7 @@ D3DBLEND g_blend_operation[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-D3DBLEND g_dst_blend[k_shader_framebuffer_blend_function_count] =
+const D3DBLEND k_dst_blend[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_INVSRCALPHA,
   D3DBLEND_ZERO,
@@ -51,7 +52,7 @@ D3DBLEND g_dst_blend[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
-D3DBLEND g_src_blend[k_shader_framebuffer_blend_function_count] =
+const D3DBLEND k_src_blend[k_shader_framebuffer_blend_function_count] =
 {
   D3DBLEND_SRCALPHA,
   D3DBLEND_DESTCOLOR,
@@ -120,6 +121,11 @@ void rasterizer_dx9_main_apply_patches(void)
 bool __cdecl rasterizer_initialize(void)
 {
     return INVOKE(0x0263359, 0x0, rasterizer_initialize);
+}
+
+bool __cdecl rasterizer_dx9_reset(bool create_window)
+{
+    return INVOKE(0x26370F, 0x0, rasterizer_dx9_reset, create_window);
 }
 
 void __cdecl rasterizer_dx9_reset_depth_buffer(void)
@@ -229,9 +235,9 @@ void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuf
     rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, alpha_blend_enabled);
     if (alpha_blend_enabled)
     {
-        rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, g_src_blend[framebuffer_blend_function]);
-        rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, g_dst_blend[framebuffer_blend_function]);
-        rasterizer_dx9_set_render_state(D3DRS_BLENDOP, g_blend_operation[framebuffer_blend_function]);
+        rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, k_src_blend[framebuffer_blend_function]);
+        rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, k_dst_blend[framebuffer_blend_function]);
+        rasterizer_dx9_set_render_state(D3DRS_BLENDOP, k_blend_operation[framebuffer_blend_function]);
     }
     return;
 }
@@ -374,4 +380,14 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     }
 
     return SUCCEEDED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
+}
+
+bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters) 
+{
+    return INVOKE(0x262105, 0x0, rasterizer_dx9_render_scene_start, parameters);
+}
+
+bool __cdecl rasterizer_dx9_render_scene_end(void)
+{
+    return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
 }

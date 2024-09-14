@@ -71,6 +71,18 @@ struct window_bound
 };
 ASSERT_STRUCT_SIZE(window_bound, 280);
 
+struct s_render_scene_parameters
+{
+	uint32 scene_rendered_count;
+	uint32 effect_flags;
+	real32 depth_range;
+};
+ASSERT_STRUCT_SIZE(s_render_scene_parameters, 12);
+
+/* globals */
+
+extern bool render_lens_flares_enabled;
+
 /* public code */
 
 bool __cdecl render_ingame_user_interface_hud_element_hook(
@@ -104,9 +116,11 @@ int32* get_global_window_bound_index(void);
 
 s_frame_parameters* global_frame_parameters_get(void);
 
-int32* global_rasterizer_stage_get(void);
+int32* global_rasterizer_pixel_shader_index_get(void);
 
 real64 get_current_render_time(void);
+
+int32 get_player_window_count(void);
 
 real32* hs_texture_camera_scale_get(void);
 
@@ -132,3 +146,12 @@ e_screen_split_type get_screen_split_type(uint32 render_user_index);
 
 // Render window
 void __cdecl render_window(window_bound* window, bool is_texture_camera);
+
+void __cdecl render_scene(
+	int32 render_layer_debug_view,
+	bool render_transparent_geo,
+	bool lens_flare_occlusion_test,
+	bool render_layer_selfibloomination,
+	int32 hologram_flag,
+	int32 effect_flag,
+	real32 depth_range);

@@ -100,3 +100,5 @@ extern IDirect3DPixelShader9* g_d3d9_weather_shaders[k_dx9_weather_shader_type_c
 void render_weather_apply_patches(void);
 
 real32* weather_dt_global_get(void);
+
+void __cdecl weather_render(void);

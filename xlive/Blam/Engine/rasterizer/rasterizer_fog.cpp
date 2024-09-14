@@ -55,3 +55,9 @@ void __cdecl render_atmospheric_fog(void)
 	}
 	return;
 }
+
+void __cdecl render_patchy_fog(bool a1, bool a2)
+{
+	INVOKE(0x277453, 0x0, render_patchy_fog, a1, a2);
+	return;
+}

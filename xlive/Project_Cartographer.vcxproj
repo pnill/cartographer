@@ -473,6 +473,7 @@
     <ClCompile Include="Blam\Engine\networking\transport\transport.cpp" />
     <ClCompile Include="Blam\Engine\networking\transport\transport_qos.cpp" />
     <ClCompile Include="Blam\Engine\objects\damage_effects.cpp" />
+    <ClCompile Include="Blam\Engine\objects\lights.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_early_movers.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_globals.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
@@ -594,6 +595,7 @@
     <ClInclude Include="Blam\Engine\cutscene\cinematics.h" />
     <ClInclude Include="Blam\Engine\effects\beam.h" />
     <ClInclude Include="Blam\Engine\effects\contrails.h" />
+    <ClInclude Include="Blam\Engine\effects\decals.h" />
     <ClInclude Include="Blam\Engine\effects\effects.h" />
     <ClInclude Include="Blam\Engine\effects\effects_creation.h" />
     <ClInclude Include="Blam\Engine\effects\effects_definitions.h" />
@@ -732,6 +734,7 @@
     <ClCompile Include="Blam\Engine\physics\havok_memory.cpp" />
     <ClCompile Include="Blam\Engine\physics\physics_model_definitions.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_decals.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.cpp" />
@@ -753,12 +756,15 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lights.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_memory.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_occlusion.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_screen_effects.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_settings.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_text.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_transparent_geometry.cpp" />
     <ClCompile Include="Blam\Engine\render\render.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cameras.cpp" />
     <ClCompile Include="Blam\Engine\render\render_cartographer_ingame_ui.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_contrails.cpp" />
     <ClCompile Include="Blam\Engine\render\render_first_person.cpp" />
     <ClCompile Include="Blam\Engine\render\render_layers.cpp" />
     <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
@@ -767,9 +773,12 @@
     <ClCompile Include="Blam\Engine\render\render_primitive.cpp" />
     <ClCompile Include="Blam\Engine\render\render_section_visibility.cpp" />
     <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_visibility.cpp" />
     <ClCompile Include="Blam\Engine\render\render_visibility_collection.cpp" />
-    <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_visible_geometry.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_water.cpp" />
     <ClCompile Include="Blam\Engine\render\render_weather.cpp" />
+    <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\game_state_procs.cpp" />
     <ClCompile Include="Blam\Engine\render\render_sky.cpp" />
@@ -1071,6 +1080,7 @@
     <ClInclude Include="Blam\Engine\game\game_globals.h" />
     <ClInclude Include="Blam\Engine\objects\damage_effects.h" />
     <ClInclude Include="Blam\Engine\objects\emblems.h" />
+    <ClInclude Include="Blam\Engine\objects\lights.h" />
     <ClInclude Include="Blam\Engine\objects\light_definitions.h" />
     <ClInclude Include="Blam\Engine\objects\object_definition.h" />
     <ClInclude Include="Blam\Engine\objects\object_early_movers.h" />
@@ -1094,6 +1104,7 @@
     <ClInclude Include="Blam\Engine\physics\physics_model_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\structure_physics.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_decals.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dof.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynamic_geometry.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_dynavobgeom.h" />
@@ -1122,12 +1133,15 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lights.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_memory.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_occlusion.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_screen_effects.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_settings.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_text.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_transparent_geometry.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_buffers.h" />
     <ClInclude Include="Blam\Engine\render\render.h" />
     <ClInclude Include="Blam\Engine\render\render_cartographer_ingame_ui.h" />
+    <ClInclude Include="Blam\Engine\render\render_contrails.h" />
     <ClInclude Include="Blam\Engine\render\render_debug_structure.h" />
     <ClInclude Include="Blam\Engine\render\render_first_person.h" />
     <ClInclude Include="Blam\Engine\render\render_layers.h" />
@@ -1140,7 +1154,9 @@
     <ClInclude Include="Blam\Engine\render\render_sky.h" />
     <ClInclude Include="Blam\Engine\render\render_sky_definitions.h" />
     <ClInclude Include="Blam\Engine\render\render_submit.h" />
+    <ClInclude Include="Blam\Engine\render\render_visibility.h" />
     <ClInclude Include="Blam\Engine\render\render_visibility_collection.h" />
+    <ClInclude Include="Blam\Engine\render\render_visible_geometry.h" />
     <ClInclude Include="Blam\Engine\render\render_water.h" />
     <ClInclude Include="Blam\Engine\render\render_weather.h" />
     <ClInclude Include="Blam\Engine\render\weather_definitions.h" />

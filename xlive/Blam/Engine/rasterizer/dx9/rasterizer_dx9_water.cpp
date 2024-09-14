@@ -8,31 +8,29 @@
 #include "camera/camera.h"
 #include "structures/structure_bsp_definitions.h"
 
+/* globals */
+
+bool g_water_refraction_surface_updated = false;
+
 /* prototypes */
 
-bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface(void);
+bool __cdecl rasterizer_dx9_update_water_refraction_surface(void);
 
 /* public code */
 
-bool* rasterizer_water_refraction_surface_updated_get(void)
-{
-    return Memory::GetAddress<bool*>(0x4F5048);
-}
-
 void rasterizer_dx9_water_apply_patches(void)
 {
-    PatchCall(Memory::GetAddress(0x1A07B5, 0x0), rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface);
-    PatchCall(Memory::GetAddress(0x28158F, 0x0), rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface);
+    PatchCall(Memory::GetAddress(0x1A07B5, 0x0), rasterizer_dx9_update_water_refraction_surface);
+    PatchCall(Memory::GetAddress(0x28158F, 0x0), rasterizer_dx9_update_water_refraction_surface);
     return;
 }
 
 /* private code */
 
-bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_rendered_surface(void)
+bool __cdecl rasterizer_dx9_update_water_refraction_surface(void)
 {
-    bool* rasterizer_water_refraction_surface_updated = rasterizer_water_refraction_surface_updated_get();
 
-    if (!*rasterizer_water_refraction_surface_updated)
+    if (!g_water_refraction_surface_updated)
     {
         rasterizer_dx9_perf_event_begin("water refraction", NULL);
         rasterizer_dx9_reset_depth_buffer();
@@ -47,7 +45,7 @@ bool __cdecl rasterizer_dx9_water_update_refraction_render_surface_with_main_ren
             rectangle2d_to_rect(&global_window_parameters_get()->camera.viewport_bounds, &rect);
             rasterizer_dx9_device_get_interface()->StretchRect(render_surface, &rect, surface, NULL, D3DTEXF_LINEAR);
         }
-        *rasterizer_water_refraction_surface_updated = true;
+        g_water_refraction_surface_updated = true;
         rasterizer_dx9_reset_depth_buffer();
 
         rasterizer_dx9_perf_event_end("water refraction");

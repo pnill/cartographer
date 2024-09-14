@@ -12,7 +12,7 @@ enum e_collection_type : uint32
 	k_number_collection_types
 };
 
-/* public code */
+/* prototypes */
 
 void __cdecl render_visibility_predict_resources_for_pvs(int32 cluster_index);
 
