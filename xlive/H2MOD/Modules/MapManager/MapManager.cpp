@@ -9,64 +9,42 @@
 #include "networking/NetworkMessageTypeCollection.h"
 #include "networking/Session/NetworkSession.h"
 
+#include "networking/logic/life_cycle_manager.h"
+#include "main/game_preferences.h"
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 
-/* String constants below for client/server messages */
-const char* DOWNLOADING_MAP = "Downloading Map";
-const char* DOWNLOAD_MAP_PERCENTAGE_PREFIX = "Downloaded ";
-const char* WAITING_FOR_MAP_DOWNLOAD_URL = "Waiting for map url from server";
-const char* FOUND_MAP_DOWNLOAD_URL = "Found map download url";
-const char* DOWNLOADING_COMPLETE = "Downloading complete";
-const char* RELOADING_MAPS = "Reloading maps in memory";
-const char* UNZIPPING_MAP_DOWNLOAD = "Unzipping map download";
-const char* FAILED_TO_OPEN_ZIP_FILE = "Failed to open the zip file";
-const char* STILL_SEARCHING_FOR_MAP = "Could not find maps from server, still searching";
-const char* COULD_NOT_FIND_MAPS = "Couldn't find the map";
-const char* UNABLE_TO_CONNECT_TO_SERVER = "Unable to connect to server";
-const char* BAD_FILE_SIZE = "Got bad file size, rejoin";
-const char* VALID_FILE_SIZE = "Got filesize from host";
-const char* CONNECTION_TO_HOST_CLOSED = "Connection to host closed";
-const char* VALID_FILE_NAME = "Got filename from host";
-const char* MAP_WRITTEN_TO_DISK = "Wrote downloaded map to disk";
-const char* CONNECTING_TO_HOST = "Connecting to host";
-const char* ERROR_CONNECTING_TO_HOST = "Socket error connecting to host";
-const char* CHECKING_IF_MAP_EXISTS = "Checking if the following map exists, %s";
-const char* MAP_DOESNT_EXIST_IN_REPO = "Download failed, map doesn't exist in repo";
+const wchar_t* k_download_map_receiving_text[k_language_count] = 
+{
+	L"You are receiving the map from %s. \r\nPlease wait...%i%%",
+};
 
-std::string validDigits("0123456789");
-std::string mapExt(".map");
-std::wstring mapExtUnicode(L".map");
-std::string fileReadMode("wb");
-std::string traceTemplate("%s");
-std::string fileSizeDelim("$");
-
-std::wstring CUSTOM_MAP = L"Custom Map";
-wchar_t EMPTY_UNICODE_STR = '\0';
+const wchar_t* k_map_download_source_text[k_language_count] = 
+{
+	L"repository",
+};
 
 #pragma region allow host to start game, without all players loading the map
 
-typedef int(__cdecl* network_life_cycle_session_get_global_map_precache_status_t)(int*, unsigned int*);
+typedef int32(__cdecl* network_life_cycle_session_get_global_map_precache_status_t)(int32*, e_network_session_map_status*);
 network_life_cycle_session_get_global_map_precache_status_t p_network_life_cycle_session_get_global_map_precache_status;
 
 // allow hosts to start the game while other peers didn't load the map
 // TODO: simplify and cleanup
-int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *out_smallest_load_percentage, unsigned int *out_host_map_status) {
+int32 __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int32 *out_lowest_load_percentage, e_network_session_map_status *out_host_map_status) {
 	// this just gets the current network_session, but has some extra misc checks
-	typedef bool(__cdecl* get_network_session_with_misc_checks_t)(c_network_session**);
-	auto p_get_network_session_with_misc_checks = Memory::GetAddress<get_network_session_with_misc_checks_t>(0x1AD782, 0x1A66FF);
 
 	c_network_session* session = nullptr;
-	uint32 result_map_status, result_precache_percentage;
-	result_map_status = result_precache_percentage = 0;
+	e_network_session_map_status result_map_status = _network_session_map_status_none;
+	uint32 result_precache_percentage = 0;
 	bool someone_downloading_map = false;
-	e_map_status local_peer_map_status, host_peer_map_status; 
+	e_network_session_map_status local_peer_map_status, host_peer_map_status; 
 	local_peer_map_status = host_peer_map_status = _network_session_map_status_none;
-	int peer_count_with_map_status_precached = 0;
-	int peer_count_with_map_status_downloading = 0;
-	int peer_count_with_map_status_unable_to_precache = 0;
+	int32 peer_count_with_map_status_precached = 0;
+	int32 peer_count_with_map_status_downloading = 0;
+	int32 peer_count_with_map_status_unable_to_precache = 0;
 
-	if (p_get_network_session_with_misc_checks(&session)) {
+	if (c_game_life_cycle_manager::get_active_session(&session)) {
 		switch (session->local_session_state)
 		{
 		case _network_session_state_none:
@@ -90,7 +68,7 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 			result_map_status = _network_session_map_status_loaded;
 			result_precache_percentage = 100; // i don't think this is used anymore, it has been replaced by the loading screen in H2v from Xbox
 			
-			for (int i = 0; i < membership->peer_count; i++) {
+			for (int32 i = 0; i < membership->peer_count; i++) {
 				
 				// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
 				// *************
@@ -130,8 +108,8 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 			}
 
 			// checks if local/host map status is fine
-			// if not just tell the game we cannot load the map
-			auto test_map_status = [&](e_map_status status) -> bool
+			// if not just let the game know map cannot be loaded
+			auto test_map_status = [&](e_network_session_map_status status) -> bool
 			{
 				switch (status)
 				{
@@ -174,25 +152,25 @@ int __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int *
 		}
 	}
 
-	if (out_smallest_load_percentage)
-		*out_smallest_load_percentage = result_precache_percentage;
+	if (out_lowest_load_percentage)
+		*out_lowest_load_percentage = result_precache_percentage;
 
 	return result_map_status;
 }
 
 // this is actually thiscall, but the parameter is unused
-bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, c_network_session *session, DWORD *out_peers_that_cant_load_map_flags)
+bool __stdcall get_map_load_status_for_all_peers_hook_2(int32 a1, c_network_session *session, uint32 *out_peers_unable_to_load_map_mask)
 {
 	s_session_membership* membership = &session->membership[0];
 
-	int result_bitflags = 0;
+	uint32 peers_map_not_loaded_mask = 0;
 	if (membership->peer_count > 0)
-		result_bitflags = (FLAG(membership->peer_count - 1) - 1) | FLAG(membership->peer_count - 1); // set all flags
+		peers_map_not_loaded_mask = FLAG(membership->peer_count) - 1; // set all flags
 
-	int peers_that_can_load_map = 0;
+	int32 peers_that_can_load_map = 0;
 	bool local_or_host_peer_cannot_load_map = false;
 
-	for (int i = 0; i < membership->peer_count; i++) {
+	for (int32 i = 0; i < membership->peer_count; i++) {
 		// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
 		// *************
 
@@ -211,7 +189,7 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, c_network_sessio
 				break;
 			case _network_session_map_status_precached:
 			case _network_session_map_status_loaded:
-				result_bitflags &= ~FLAG(i);
+				peers_map_not_loaded_mask &= ~FLAG(i);
 				peers_that_can_load_map++;
 				break;
 			default:
@@ -220,10 +198,10 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int a1, c_network_sessio
 		}
 	}
 
-	if (out_peers_that_cant_load_map_flags)
-		*out_peers_that_cant_load_map_flags = result_bitflags;
+	if (out_peers_unable_to_load_map_mask)
+		*out_peers_unable_to_load_map_mask = peers_map_not_loaded_mask;
 
-	// subtract from peers_that_can_load_map 1 to remove the host/local
+	// subtract 1 from peers_that_can_load_map to remove the host/local peer
 	return !local_or_host_peer_cannot_load_map && peers_that_can_load_map - (session->parameters[0].dedicated_server ? 1 : 0) > 0;
 }
 
@@ -255,27 +233,24 @@ char __cdecl handle_map_download_callback() {
 	return 1;
 }
 
-typedef char(__cdecl* leave_game_callback_def)();
-leave_game_callback_def p_original_leave_game_callback;
+typedef bool(__cdecl* map_download_leave_session_cb_t)();
+map_download_leave_session_cb_t p_map_download_leave_session_cb;
 
-char leavegame_callback()
+bool map_download_dialog_callback()
 {
-	return p_original_leave_game_callback();
+	return p_map_download_leave_session_cb();
 }
 
 /**
 * Menu constructor hook
 */
-void __cdecl display_map_downloading_menu(int a1, int a2, int a3, __int16 a4, DWORD map_download_callback, DWORD leave_game_callback, int a7, int a8, int a9, int a10)
+void __cdecl ui_open_map_download_confirm_dialog(int32 a1, int32 a2, int32 a3, int16 a4, void* map_download_callback, void* leave_game_callback, int32 a7, int32 a8, int32 a9, int32 a10)
 {
-	typedef void(__cdecl map_downloading_menu_constructor)(int a1, int a2, int a3, __int16 a4, int a5, int a6, int a7, int a8, int a9, int a10);
-	auto p_map_downloading_menu_constructor = Memory::GetAddress<map_downloading_menu_constructor*>(0x20E2E0);
-
-	p_original_leave_game_callback = (leave_game_callback_def)leave_game_callback;
-	p_map_downloading_menu_constructor(a1, a2, a3, a4, (DWORD)handle_map_download_callback, (DWORD)leavegame_callback, a7, a8, a9, a10);
+	p_map_download_leave_session_cb = (map_download_leave_session_cb_t)leave_game_callback;
+	INVOKE(0x20E2E0, 0x0, ui_open_map_download_confirm_dialog, a1, a2, a3, a4, handle_map_download_callback, map_download_dialog_callback, a7, a8, a9, a10);
 }
 
-int __cdecl get_total_map_downloading_percentage()
+int32 __cdecl get_total_map_downloading_percentage()
 {
 	if (!mapManager->m_mapDownloadQueryList.empty())
 		return mapManager->m_mapDownloadQueryList.front()->GetDownloadPercentage();
@@ -283,27 +258,24 @@ int __cdecl get_total_map_downloading_percentage()
 		return 0;
 }
 
-const wchar_t* receiving_map_string[] = {
-	L"You are receiving the map from %s. \r\nPlease wait...%i%%"
-};
-
 const wchar_t* get_receiving_map_string()
 { 
-	int(__cdecl* get_default_game_language)() = (int(__cdecl*)())((char*)Memory::GetAddress(0x381fd));
-	wchar_t** receiving_map_message = Memory::GetAddress<wchar_t**>(0x46575C);
+	e_language current_language = get_current_language();
+	wchar_t** map_receiving_default_text = Memory::GetAddress<wchar_t**>(0x46575C);
 
-	if (get_default_game_language() == 0) // check if english
-		return receiving_map_string[0];
+	if (current_language == _language_english) // check if english
+		return k_download_map_receiving_text[0];
 
-	return receiving_map_message[get_default_game_language()];
+	return map_receiving_default_text[current_language];
 }
 
-const wchar_t* repo_string[] = { L"repository" };
-void get_map_download_source(int a1, wchar_t* out_string)
+
+void map_download_get_download_source_text(int32 a1, wchar_t* out_text)
 {	
-	if (out_string != NULL)
-		wcsncpy_s(out_string, 512, repo_string[0], _TRUNCATE);
+	if (out_text != NULL)
+		wcsncpy_s(out_text, 512, k_map_download_source_text[0], _TRUNCATE);
 }
+
 /*
 	Seems to be a function responsible for loading data about maps when displaying them.
 	This is hooked to fix/re-add removed custom map images.
@@ -329,12 +301,12 @@ void MapManager::ApplyPatches() {
 
 		WriteBytes(Memory::GetAddress(0x215A9E), jmp, sizeof(jmp)); /* Allow map download in network */
 		WriteBytes(Memory::GetAddress(0x215AC9), jmp, sizeof(jmp)); /* Disable "Match has begun" bullshit */
-		PatchCall(Memory::GetAddress(0x244A4A), display_map_downloading_menu); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
+		PatchCall(Memory::GetAddress(0x244A4A), ui_open_map_download_confirm_dialog); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
 
 		// code below is for percentage display
 		PatchCall(Memory::GetAddress(0x244B77), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
 		PatchCall(Memory::GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
-		PatchCall(Memory::GetAddress(0x244B8F), get_map_download_source);
+		PatchCall(Memory::GetAddress(0x244B8F), map_download_get_download_source_text);
 		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
 
 		//Hooked to fix custom map images.
@@ -411,19 +383,18 @@ void MapDownloadQuery::StopDownload() {
 	m_forceStopDownload = true;
 };
 
-MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId)
-{
+MapDownloadQuery::MapDownloadQuery(const std::wstring& _mapToDownload, unsigned int _downloadId) {
 	id = _downloadId;
 	SetMapNameToDownload(_mapToDownload);
 }
 
-size_t write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+size_t map_download_curl_write_data_cb(void *ptr, size_t size, size_t nmemb, FILE *stream) {
 	return fwrite(ptr, size, nmemb, stream);
 }
 
-static int xferinfo(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
+static int32 map_download_curl_xferinfo_cb(void *p, curl_off_t dltotal, curl_off_t dlnow, curl_off_t ultotal, curl_off_t ulnow) {
 	MapDownloadQuery* mapDownloadQuery = (MapDownloadQuery*)p;
-	mapDownloadQuery->SetDownloadPercentage(((double)dlnow / (double)dltotal) * 100);
+	mapDownloadQuery->SetDownloadPercentage(((float)dlnow / (float)dltotal) * 100.f);
 	return mapDownloadQuery->ShouldStopDownload();
 }
 
@@ -454,9 +425,9 @@ bool MapDownloadQuery::DownloadFromRepo() {
 		//fail if 404 or any other type of http error
 		curl_easy_setopt(curl, CURLOPT_FAILONERROR, true);
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_data);
-		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, xferinfo);
-		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, this);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, map_download_curl_write_data_cb);
+		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, map_download_curl_xferinfo_cb);
+		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, (void*)this);
 		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 		res = curl_easy_perform(curl);
@@ -491,10 +462,10 @@ bool MapDownloadQuery::DownloadFromRepo() {
 
 void MapDownloadQuery::StartMapDownload()
 {
-	CHRONO_DEFINE_TIME_AND_CLOCK();
+	STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time, _clock);
 
 	auto mapDownloadThread = [this]() {
-		DWORD* mapDownloadStatus = Memory::GetAddress<DWORD*>(0x422570);
+		int32* mapDownloadStatus = Memory::GetAddress<int32*>(0x422570);
 
 		auto timeAtStart = _clock::now();
 
@@ -502,7 +473,7 @@ void MapDownloadQuery::StartMapDownload()
 			Sleep(50);
 
 		// set the game to downloading map state
-		*mapDownloadStatus = -1;
+		*mapDownloadStatus = NONE;
 
 		if (m_readyToDownload) {
 			LOG_TRACE_GAME("[h2mod-mapmanager] map file to download: {}", m_clientMapFilename);

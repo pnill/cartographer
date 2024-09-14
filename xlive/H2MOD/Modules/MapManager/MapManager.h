@@ -6,7 +6,7 @@
 */
 class MapDownloadQuery {
 public:
-	MapDownloadQuery(const std::wstring& _mapToDownload, int _downloadId);
+	MapDownloadQuery(const std::wstring& _mapToDownload, unsigned int _downloadId);
 	~MapDownloadQuery() = default;
 
 	void SetMapNameToDownload(const std::wstring& mapNameToDownload);
@@ -26,7 +26,7 @@ public:
 	std::atomic<bool> m_downloadFinished = false;
 	std::atomic<bool> m_readyToDownload = false;
 
-	int id;
+	unsigned int id;
 
 private:
 	std::atomic<bool> m_forceStopDownload = false;

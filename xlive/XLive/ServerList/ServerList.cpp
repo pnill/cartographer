@@ -484,7 +484,7 @@ void CServerList::EnumerateFromHttp()
 	{
 		// wait for the game to signal again, for the next thread
 
-		CHRONO_DEFINE_TIME_AND_CLOCK();
+		STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time, _clock);
 
 		m_pageItemsFoundCount = 0;
 
@@ -596,8 +596,8 @@ void CServerList::EnumerateFromHttp()
 					{
 						m_pageItemsFoundCount++;
 
-					// this holds all servers found count
-					// not just per page
+						// this holds all servers found count
+						// not just per page
 						validItemsFound++;
 
 						searchResultIdx++;
