@@ -118,6 +118,7 @@ ASSERT_STRUCT_SIZE(c_game_life_cycle_handler_match_making, 0x18);
 class c_game_life_cycle_manager
 {
 public:
+	bool initialized;
 	e_game_life_cycle life_cycle_state;
 	c_game_life_cycle_handler* life_cycle_handlers[e_game_life_cycle::k_life_cycle_count];
 	void* network_session_manager;
@@ -154,9 +155,11 @@ public:
 
 	static bool game_life_cycle_initialized();
 	static c_game_life_cycle_manager* get();
+	static bool get_active_session(c_network_session** out_session);
+
 	e_game_life_cycle get_life_cycle() const;
 	bool state_is_joining() const;
 	bool state_is_in_game() const;
-	void request_state_change(e_game_life_cycle requested_state, int unk_int, void* unk_ptr);
+	void request_state_change(e_game_life_cycle requested_state, int a3, void* a4);
 };
-ASSERT_STRUCT_SIZE(c_game_life_cycle_manager, 0x44);
+ASSERT_STRUCT_SIZE(c_game_life_cycle_manager, 0x48);

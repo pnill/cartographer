@@ -123,9 +123,9 @@ extern std::random_device rd;
 #endif
 
 // use this macro to define _time and _clock namespaces
-#define CHRONO_DEFINE_TIME_AND_CLOCK() \
-	namespace _time = std::chrono; \
-	using _clock = std::chrono::steady_clock; \
+#define STD_CHRONO_DEFINE_TIME_AND_CLOCK(_time_name, _clock_name) \
+	namespace _time_name = std::chrono; \
+	using _clock_name = std::chrono::steady_clock; \
 	using namespace std::chrono_literals;
 
 #undef small

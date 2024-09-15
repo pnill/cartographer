@@ -7,7 +7,7 @@
 
 // ### TODO Cleanup
 
-enum e_map_status : int32
+enum e_network_session_map_status : int32
 {
 	_network_session_map_status_none,
 	_network_session_map_status_unable_to_precache,
@@ -178,7 +178,7 @@ struct s_membership_peer
 	uint8 gap_24[4];
 	wchar_t name[16];
 	wchar_t peer_session_name[32];
-	e_map_status map_status;
+	e_network_session_map_status map_status;
 	uint32 map_progress_percentage;
 	char field_70;
 	uint8 gap_71[3];
