@@ -14,11 +14,6 @@
 
 std::unique_ptr<MapManager> mapManager(std::make_unique<MapManager>());
 
-const wchar_t* k_download_map_receiving_text[k_language_count] = 
-{
-	L"You are receiving the map from %s. \r\nPlease wait...%i%%",
-};
-
 const wchar_t* k_map_download_source_text[k_language_count] = 
 {
 	L"repository",
@@ -158,8 +153,7 @@ int32 __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int
 	return result_map_status;
 }
 
-// this is actually thiscall, but the parameter is unused
-bool __stdcall get_map_load_status_for_all_peers_hook_2(int32 a1, c_network_session *session, uint32 *out_peers_unable_to_load_map_mask)
+bool __stdcall game_life_cycle_get_map_load_status(void* thisx, c_network_session *session, uint32 *out_peers_unable_to_load_map_mask)
 {
 	s_session_membership* membership = &session->membership[0];
 
@@ -205,14 +199,6 @@ bool __stdcall get_map_load_status_for_all_peers_hook_2(int32 a1, c_network_sess
 	return !local_or_host_peer_cannot_load_map && peers_that_can_load_map - (session->parameters[0].dedicated_server ? 1 : 0) > 0;
 }
 
-__declspec(naked) void get_map_load_status_for_all_peers_hook_2_to_stdcall() {
-	__asm {
-		pop eax
-		push ecx
-		push eax
-		jmp get_map_load_status_for_all_peers_hook_2
-	}
-}
 #pragma endregion
 
 /**
@@ -250,25 +236,13 @@ void __cdecl ui_open_map_download_confirm_dialog(int32 a1, int32 a2, int32 a3, i
 	INVOKE(0x20E2E0, 0x0, ui_open_map_download_confirm_dialog, a1, a2, a3, a4, handle_map_download_callback, map_download_dialog_callback, a7, a8, a9, a10);
 }
 
-int32 __cdecl get_total_map_downloading_percentage()
+int32 __cdecl map_download_get_progress_percentage()
 {
 	if (!mapManager->m_mapDownloadQueryList.empty())
 		return mapManager->m_mapDownloadQueryList.front()->GetDownloadPercentage();
 	else
 		return 0;
 }
-
-const wchar_t* get_receiving_map_string()
-{ 
-	e_language current_language = get_current_language();
-	wchar_t** map_receiving_default_text = Memory::GetAddress<wchar_t**>(0x46575C);
-
-	if (current_language == _language_english) // check if english
-		return k_download_map_receiving_text[0];
-
-	return map_receiving_default_text[current_language];
-}
-
 
 void map_download_get_download_source_text(int32 a1, wchar_t* out_text)
 {	
@@ -303,11 +277,10 @@ void MapManager::ApplyPatches() {
 		WriteBytes(Memory::GetAddress(0x215AC9), jmp, sizeof(jmp)); /* Disable "Match has begun" bullshit */
 		PatchCall(Memory::GetAddress(0x244A4A), ui_open_map_download_confirm_dialog); /* Redirect the menu constructor to our code to replace the game's map downloading code callback */
 
-		// code below is for percentage display
-		PatchCall(Memory::GetAddress(0x244B77), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
-		PatchCall(Memory::GetAddress(0x22EE41), get_total_map_downloading_percentage); /* Redirects map downloading percentage to our custom downloader */
+		/* Redirects map downloading percentage to our custom downloader */
+		PatchCall(Memory::GetAddress(0x244B77), map_download_get_progress_percentage); 
+		PatchCall(Memory::GetAddress(0x22EE41), map_download_get_progress_percentage);
 		PatchCall(Memory::GetAddress(0x244B8F), map_download_get_download_source_text);
-		PatchCall(Memory::GetAddress(0x244B9D), get_receiving_map_string);
 
 		//Hooked to fix custom map images.
 		PatchCall(Memory::GetAddress(0x593F0), load_map_data_for_display_nak);
@@ -316,9 +289,10 @@ void MapManager::ApplyPatches() {
 	
 	// allow host to start the game, even if there are peers that didn't load the map
 	p_network_life_cycle_session_get_global_map_precache_status = (network_life_cycle_session_get_global_map_precache_status_t)DetourFunc(Memory::GetAddress<BYTE*>(0x1B1929, 0x197879), (BYTE*)network_life_cycle_session_get_global_map_precache_status_hook, 8);
-	WriteJmpTo(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), get_map_load_status_for_all_peers_hook_2_to_stdcall);
+	
+	DetourClassFunc(Memory::GetAddress<BYTE*>(0x1D76C5, 0x1BCD32), (BYTE*)game_life_cycle_get_map_load_status, 8);
 
-	// disables game's map downloading implementation
+	// disable the game's downloading implementation
 	NopFill(Memory::GetAddress(0x1B5421, 0x1A917F), 5);
 
 	// custom map cache patches/hooks
@@ -340,7 +314,7 @@ bool MapManager::GetMapFilename(std::wstring& buffer) {
 	// we want this to work in-game too
 	if (/*p_get_lobby_state() == game_lobby_states::in_lobby && */ NetworkSession::GetActiveNetworkSession(&session)) {
 		ZeroMemory(map_file_location, sizeof(map_file_location));
-		NetworkSession::GetMapFileLocation(map_file_location, sizeof(map_file_location));
+		NetworkSession::GetMapFileLocation(map_file_location, ARRAYSIZE(map_file_location));
 
 		std::wstring unicodeMapFileLocation(map_file_location);
 		std::size_t mapNameOffset = unicodeMapFileLocation.find_last_of(L'\\');
