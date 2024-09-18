@@ -53,7 +53,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 	const s_frame* global_window_parameters = global_window_parameters_get();
 	if (!global_window_parameters->render_type)
 	{
-		rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DBLEND_ZERO);
+		rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
 		rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);

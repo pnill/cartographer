@@ -34,12 +34,12 @@ void rasterizer_dx9_weather_apply_patches(void)
 {
 	// Needed to fix splitscreen
 	// TODO figure out how to fix weather plates for all users in splitscreen (random which viewport it will work for)
-	WriteValue(Memory::GetAddress(0x199708 + 1), rasterizer_dx9_weather_plate_build_vertex_buffer);
-	WriteValue(Memory::GetAddress(0x19970D + 1), rasterizer_dx9_draw_weather_plate);
+	WritePointer(Memory::GetAddress(0x199708) + 1, rasterizer_dx9_weather_plate_build_vertex_buffer);
+	WritePointer(Memory::GetAddress(0x19970D) + 1, rasterizer_dx9_weather_plate_setup_pipeline);
 	return;
 }
 
-bool __cdecl rasterizer_dx9_draw_weather_plate(const c_animated_background_plate* plate)
+bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_background_plate* plate)
 {
 	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, 1);
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
@@ -90,10 +90,9 @@ bool __cdecl rasterizer_dx9_draw_weather_plate(const c_animated_background_plate
 	//rasterizer_dx9_submit_resolve();
 
 	const int16 window_bound_index = global_window_parameters_get()->window_bound_index;
-	// FIXME: figure out why field_88 is negative to fix weather palette rendering breaking randomly
-	const real32 alpha = abs(plate->window[window_bound_index].field_84 * plate->window[window_bound_index].field_88);
+	const real32 alpha = plate->window[window_bound_index].field_80 * plate->window[window_bound_index].field_84;
 
-	real_vector4d ps_constants[6];
+	real_vector4d ps_constants[k_animated_background_plate_textures * 2];
 	for (uint8 background_plate_num = 0; background_plate_num < k_animated_background_plate_textures; ++background_plate_num)
 	{
 		// Tint colors
@@ -104,9 +103,12 @@ bool __cdecl rasterizer_dx9_draw_weather_plate(const c_animated_background_plate
 		
 		// Dot factors
 		ps_constants[3+background_plate_num].i = 0.f;
-		ps_constants[3+background_plate_num].j = PIN(alpha * plate->window[window_bound_index].field_0[1].alpha[background_plate_num], 0.f, 1.f);
+		ps_constants[3+background_plate_num].j = 0.f;
 		ps_constants[3+background_plate_num].k = 0.f;
-		ps_constants[3+background_plate_num].l = 0.f;
+		// doesn't really matter where this is set
+		// because it always returns the scalar/dot product in the shader, and the rest of the vector is 0
+		// but keep it in the last component for consistency with the original code
+		ps_constants[3+background_plate_num].l = PIN(alpha * plate->window[window_bound_index].field_0[1].alpha[background_plate_num], 0.f, 1.f);
 	}
 
 	if (rasterizer_get_main_pixel_shader_cache()->test_cache(0, ps_constants, NUMBEROF(ps_constants)))

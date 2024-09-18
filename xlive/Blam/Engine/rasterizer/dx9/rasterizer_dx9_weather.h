@@ -18,7 +18,7 @@ enum e_rasterizer_dx9_weather_plate_output_type : int32
 
 void rasterizer_dx9_weather_apply_patches(void);
 
-bool __cdecl rasterizer_dx9_draw_weather_plate(const c_animated_background_plate* plate);
+bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_background_plate* plate);
 
 bool __cdecl rasterizer_dx9_weather_plate_build_vertex_buffer(
 	int32 output_type,
