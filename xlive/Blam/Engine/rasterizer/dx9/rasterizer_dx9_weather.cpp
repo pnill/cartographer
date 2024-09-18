@@ -33,7 +33,6 @@ s_dx9_weather_particle_primitive g_weather_particle_primitives[MAX_PARTICLES_LIT
 void rasterizer_dx9_weather_apply_patches(void)
 {
 	// Needed to fix splitscreen
-	// TODO figure out how to fix weather plates for all users in splitscreen (random which viewport it will work for)
 	WritePointer(Memory::GetAddress(0x199708) + 1, rasterizer_dx9_weather_plate_build_vertex_buffer);
 	WritePointer(Memory::GetAddress(0x19970D) + 1, rasterizer_dx9_weather_plate_setup_pipeline);
 	return;
