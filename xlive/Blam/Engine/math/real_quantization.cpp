@@ -44,18 +44,18 @@ int32 quantize_unit_vector(const real_vector3d* u)
 	real32 f1, f2;
 	real_vector3d v = { abs(u->i), abs(u->j), abs(u->k) };
 
-	if (v.j >= v.i
-		&& v.j > v.k)
-	{
-		type = u->j > 0.0f ? 1 : 4;
-		f1 = u->i / v.j;
-		f2 = u->k / v.j;
-	}
-	else if (v.i > v.k)
+	if (v.i > v.j
+		&& v.i > v.k)
 	{
 		type = u->i > 0.0f ? 0 : 3;
 		f1 = u->j / v.i;
 		f2 = u->k / v.i;
+	}
+	else if (v.j > v.k)
+	{
+		type = u->j > 0.0f ? 1 : 4;
+		f1 = u->i / v.j;
+		f2 = u->k / v.j;
 	}
 	else
 	{
@@ -70,7 +70,7 @@ int32 quantize_unit_vector(const real_vector3d* u)
 
 void dequantize_unit_vector(int32 quantized_unit_vector, real_vector3d* out_unit_vector)
 {
-	real32 dequantized_f1 = dequantize_real((uint8)(quantized_unit_vector >> 3), -1.0f, 1.0f, 8, true);
+	real32 dequantized_f1 = dequantize_real((uint8)(quantized_unit_vector >>  3), -1.0f, 1.0f, 8, true);
 	real32 dequantized_f2 = dequantize_real((uint8)(quantized_unit_vector >> 11), -1.0f, 1.0f, 8, true);
 
 	int32 type = quantized_unit_vector & ((1 << 3) - 1);
@@ -80,7 +80,7 @@ void dequantize_unit_vector(int32 quantized_unit_vector, real_vector3d* out_unit
 		*out_unit_vector = { 1.0f, dequantized_f1, dequantized_f2 };
 		break;
 	case 1:
-		*out_unit_vector = { dequantized_f1, 1.0f, dequantized_f2, };
+		*out_unit_vector = { dequantized_f1, 1.0f, dequantized_f2 };
 		break;
 	case 2:
 		*out_unit_vector = { dequantized_f1, dequantized_f2, 1.0f };
