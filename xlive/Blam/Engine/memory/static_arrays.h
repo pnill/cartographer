@@ -38,7 +38,7 @@ class c_flags_no_init
 	static_assert(std::is_unsigned_v<t_storage_type>, "error: t_storage_type is not an unsigned integral type");
 
 public:
-	const t_type get_unsafe(void) const
+	const t_storage_type get_unsafe(void) const
 	{
 		return m_storage;
 	}

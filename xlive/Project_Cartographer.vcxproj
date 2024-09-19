@@ -51,7 +51,7 @@
     <IntDir>.\Release\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib;3rdparty/libcurl/lib/release;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/release;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -60,7 +60,7 @@
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;.\libs;..\protobuf-2.6.1\vsprojects\Debug;$(LibraryPath)</LibraryPath>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;.\;..\protobuf-2.6.1;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib;3rdparty/libcurl/lib/debug/;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(DXSDK_DIR)Lib\x86;3rdparty/directx/lib;3rdparty/discord/lib;3rdparty/libcurl/lib/nghttp2/;3rdparty/libcurl/lib/wolfssl/;3rdparty/libcurl/lib/curl/debug/;3rdparty/miniupnpc/lib;3rdparty/detours/lib.X86;$(LibraryPath)</LibraryPath>
     <IncludePath>$(IncludePath)</IncludePath>
     <ExternalIncludePath>$(ExternalIncludePath);$(DXSDK_DIR)Include</ExternalIncludePath>
   </PropertyGroup>
@@ -79,7 +79,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>WIN32;NDEBUG;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;xliveless_EXPORTS;MINIUPNP_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;NDEBUG;_CRT_SECURE_NO_WARNINGS;_WINDOWS;_USRDLL;xliveless_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -112,7 +112,7 @@
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;libcurl.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <SuppressStartupBanner>false</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
@@ -155,7 +155,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;MINIUPNP_STATICLIB;ASSERTS_ENABLED;EVENTS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;MINIUPNP_STATICLIB;NGHTTP2_STATICLIB;CURL_STATICLIB;_CRT_SECURE_NO_WARNINGS;_DEBUG;_WINDOWS;_USRDLL;xliveless_EXPORTS;ASSERTS_ENABLED;EVENTS_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -179,13 +179,14 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>/DPSAPI_VERSION=1 %(AdditionalOptions)</AdditionalOptions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <Culture>0x0409</Culture>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;libcurl-d.lib;wolfssl.lib;nghttp2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>iphlpapi.lib;version.lib;Crypt32.lib;Shlwapi.lib;Dbghelp.lib;ws2_32.lib;odbc32.lib;odbccp32.lib;Winmm.lib;d3d9.lib;d3dx9.lib;psapi.lib;detours.lib;libminiupnpc.lib;wolfssl.lib;nghttp2.lib;libcurl-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <ModuleDefinitionFile>.\xlive.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

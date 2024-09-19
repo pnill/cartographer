@@ -24,7 +24,6 @@
     <ClCompile Include="H2MOD\Modules\Achievements\Achievements.cpp" />
     <ClCompile Include="H2MOD\Modules\Shell\Config.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomLanguage.cpp" />
-    <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenu.cpp" />
     <ClCompile Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\Ranks.cpp" />
     <ClCompile Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.cpp" />
@@ -408,6 +407,7 @@
     <ClCompile Include="Blam\Engine\render\render_weather.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_fog.cpp" />
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -530,7 +530,6 @@
     <ClInclude Include="H2MOD\Modules\Achievements\Achievements.h" />
     <ClInclude Include="H2MOD\Modules\Shell\Config.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomLanguage.h" />
-    <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenu.h" />
     <ClInclude Include="H2MOD\Modules\CustomMenu\CustomMenuGlobals.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\Ranks.h" />
     <ClInclude Include="H2MOD\Modules\OnScreenDebug\OnscreenDebug.h" />
@@ -1090,6 +1089,7 @@
     <ClInclude Include="Blam\Engine\camera\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
