@@ -7,8 +7,8 @@
 #include "H2MOD/GUI/imgui_integration/Console/ComVar.h"
 #include "H2MOD/GUI/imgui_integration/Console/ImGui_ConsoleImpl.h"
 
-#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
+#include "H2MOD/Modules/Shell/H2MODShell.h"
 #include "H2MOD/Modules/Shell/Startup/Startup.h"
 #include "H2MOD/Utils/Utils.h"
 #include "Util/SimpleIni.h"

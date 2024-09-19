@@ -1,6 +1,5 @@
 #pragma once
 
-#include "H2MOD/Modules/Input/ControllerInput.h"
 extern bool g_force_cartographer_update;
 
 void InitH2Config();
