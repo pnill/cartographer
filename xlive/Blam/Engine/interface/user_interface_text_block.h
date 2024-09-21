@@ -15,7 +15,9 @@ public:
 
 	// c_small_user_interface_text virtual functions
 
-	virtual c_user_interface_text* destructor(uint32 flags);
+	virtual ~c_small_user_interface_text()
+	{
+	}
 	virtual void  set_text(const wchar_t* text) override;
 	virtual void  append_text(const wchar_t* text) override;
 	virtual const wchar_t* get_raw_string() override;
@@ -32,7 +34,9 @@ public:
 
 	// c_normal_user_interface_text virtual functions
 
-	virtual c_user_interface_text* destructor(uint32 flags);
+	virtual ~c_normal_user_interface_text()
+	{
+	}
 	virtual void  set_text(const wchar_t* raw_text) override;
 	virtual void  append_text(const wchar_t* Source) override;
 	virtual const wchar_t* get_raw_string() override;
@@ -49,7 +53,9 @@ public:
 
 	// c_normal_user_interface_text virtual functions
 
-	virtual c_user_interface_text* destructor(uint32 flags) override;
+	virtual ~c_long_user_interface_text() 
+	{
+	}
 	virtual void  set_text(const wchar_t* raw_text) override;
 	virtual void  append_text(const wchar_t* Source) override;
 	virtual const wchar_t* get_raw_string() override;

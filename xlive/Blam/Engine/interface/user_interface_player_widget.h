@@ -14,7 +14,9 @@ protected:
 public:
 	// c_player_widget virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_player_widget()
+	{
+	}
 	virtual int32 setup_children() override;
 };
 ASSERT_STRUCT_SIZE(c_player_widget, 0x78);

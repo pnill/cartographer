@@ -38,7 +38,9 @@ public:
 	
 	// c_squad_settings_list virtual functions
 	
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_squad_settings_list() 
+	{
+	}
 	bool handle_event(s_event_record* event) override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
@@ -60,7 +62,9 @@ public:
 
 	// c_screen_squad_settings virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_screen_squad_settings()
+	{
+	}
 	virtual void update() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;

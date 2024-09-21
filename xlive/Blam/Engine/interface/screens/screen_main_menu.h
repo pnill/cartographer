@@ -15,7 +15,6 @@ protected:
 	c_list_item_widget m_list_items[k_no_of_visible_items_for_main_menu];
 	c_slot2<c_main_menu_list, s_event_record**, datum> m_slot;
 
-
 	void handle_item_pressed_event(s_event_record** pevent, datum* pitem_index);
 	void handle_item_campaign(s_event_record** pevent);
 	void handle_item_xbox_live(s_event_record** pevent);
@@ -33,7 +32,9 @@ public:
 
 	// c_main_menu_list virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_main_menu_list()
+	{
+	}
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;

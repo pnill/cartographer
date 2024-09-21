@@ -415,7 +415,9 @@ public:
 	
 	// c_screen_widget virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_screen_widget()
+	{
+	}
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 	virtual bool sub_6114B9() override;
@@ -465,7 +467,9 @@ public:
 	// c_screen_with_menu virtual functions
 
 	// base interface overrides
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_screen_with_menu()
+	{
+	}
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
 	virtual void initialize(s_screen_parameters* parameters) override;

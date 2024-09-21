@@ -17,7 +17,9 @@ protected:
 public:
 	// c_hud_widget virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_hud_widget()
+	{
+	}
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;

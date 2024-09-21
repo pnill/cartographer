@@ -164,24 +164,6 @@ void c_user_interface_widget::start_widget_animation(int32 type)
 	INVOKE_TYPE(0x212604, 0x0, void(__thiscall*)(c_user_interface_widget*, int32), this, type);
 }
 
-
-
-
-// c_user_interface_widget virtual functions
-
-c_user_interface_widget* c_user_interface_widget::destructor(uint32 flags)
-{
-	//return INVOKE_TYPE(0x212734, 0x0, c_user_interface_widget*(__thiscall*)(c_user_interface_widget*, char), lpMem, a2);
-	
-	this->~c_user_interface_widget();
-	if (TEST_BIT(flags, 0))
-	{
-		// ### TODO FIXME figure out this flag and the way this gets free'd
-	}
-
-	return this;
-}
-
 void c_user_interface_widget::destroy_recursive()
 {
 	c_user_interface_widget* child_widget = m_child_widget;
@@ -193,7 +175,7 @@ void c_user_interface_widget::destroy_recursive()
 
 		if (child_widget->m_allocated)
 		{
-			child_widget->destructor(0);
+			child_widget->~c_user_interface_widget();
 			ui_pool_dellocate((uint8*)child_widget);
 		}
 
@@ -201,9 +183,10 @@ void c_user_interface_widget::destroy_recursive()
 	}
 }
 
+// c_user_interface_widget virtual functions
 c_user_interface_widget::~c_user_interface_widget()
 {
-	this->destroy_recursive();
+	destroy_recursive();
 }
 
 int32 c_user_interface_widget::setup_children()

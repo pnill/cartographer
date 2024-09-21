@@ -37,8 +37,9 @@ public:
 	c_screen_4way_signin(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags);
 
 	// c_screen_4way_signin virtual functions
-
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_screen_4way_signin()
+	{
+	}
 	virtual void update() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;

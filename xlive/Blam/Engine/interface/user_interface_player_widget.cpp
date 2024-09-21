@@ -4,16 +4,6 @@
 
 // c_player_widget virtual functions
 
-c_user_interface_widget* c_player_widget::destructor(uint32 flags)
-{
-	this->~c_player_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 int32 c_player_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220441, 0x0, int32(__thiscall*)(c_player_widget*), this);

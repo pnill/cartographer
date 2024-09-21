@@ -95,14 +95,6 @@ void* c_screen_widget::get_screen_definition()
 
 // c_screen_widget virtual functions
 
-c_user_interface_widget* c_screen_widget::destructor(uint32 flags)
-{
-	this->~c_screen_widget();
-
-	return this;
-}
-
-
 bool c_screen_widget::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x20EB2B, 0x0, bool(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
@@ -230,13 +222,6 @@ c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_use
 	c_screen_widget(menu_id,channel_type,window_index,user_flags)
 {
 	this->m_child_list = list;
-}
-
-c_user_interface_widget* c_screen_with_menu::destructor(uint32 flags)
-{
-	this->~c_screen_with_menu();
-
-	return this;
 }
 
 bool c_screen_with_menu::handle_event(s_event_record* event)

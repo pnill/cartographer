@@ -46,16 +46,6 @@ void c_text_widget::set_field74()
 	field_74 = true;
 }
 
-c_user_interface_widget* c_text_widget::destructor(uint32 flags)
-{
-	this->~c_text_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 void c_text_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x21BD11, 0x0, void(__thiscall*)(c_text_widget*, rectangle2d*), this, viewport_bounds);
@@ -77,16 +67,6 @@ c_small_text_widget::c_small_text_widget(datum user_index):
 	c_text_widget(user_index)
 {
 }
-c_user_interface_widget* c_small_text_widget::destructor(uint32 flags)
-{
-	this->~c_small_text_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 
 c_user_interface_text* c_small_text_widget::get_interface()
 {
@@ -106,16 +86,6 @@ c_normal_text_widget::c_normal_text_widget(datum user_index):
 {
 }
 
-c_user_interface_widget* c_normal_text_widget::destructor(uint32 flags)
-{
-	this->~c_normal_text_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 c_user_interface_text* c_normal_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x20F6CA, 0x0, c_user_interface_text*(__thiscall*)(c_normal_text_widget*), this);
@@ -133,15 +103,6 @@ c_long_text_widget::c_long_text_widget(datum user_index):
 {
 }
 
-c_user_interface_widget* c_long_text_widget::destructor(uint32 flags)
-{
-	this->~c_long_text_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
 c_user_interface_text* c_long_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x243EF5, 0x0, c_user_interface_text*(__thiscall*)(c_normal_text_widget*), this);

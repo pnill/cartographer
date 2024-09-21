@@ -22,7 +22,9 @@ public:
 
 	// c_list_item_widget virtual functions
 
-	virtual c_list_item_widget* destructor(uint32 flags) override;
+	virtual ~c_list_item_widget()
+	{
+	}
 	virtual void update() override;
 	virtual int32 get_intro_delay() override;
 	virtual bool handle_event(s_event_record* event) override;

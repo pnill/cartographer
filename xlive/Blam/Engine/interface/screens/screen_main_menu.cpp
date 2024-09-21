@@ -81,16 +81,6 @@ void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
 
 __declspec(naked) void jmp_c_main_menu_list() { __asm { jmp c_main_menu_list::c_main_menu_list_ctor } }
 
-c_user_interface_widget* c_main_menu_list::destructor(uint32 flags)
-{
-	this->~c_main_menu_list();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 c_list_item_widget* c_main_menu_list::get_list_items()
 {
 	return m_list_items;

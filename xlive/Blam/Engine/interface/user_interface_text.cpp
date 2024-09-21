@@ -58,18 +58,6 @@ bool c_user_interface_text::is_private_use_character(wchar_t character)
 	return false;
 }
 
-
-c_user_interface_text* c_user_interface_text::destructor(uint32 flags)
-{
-	this->~c_user_interface_text();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
-
 // Seperated scale for the text labels (carto addition)
 float ui_text_label_scaling = 0.0f;
 

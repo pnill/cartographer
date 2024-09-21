@@ -25,14 +25,8 @@ public:
 	{
 	}
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_virtual_keyboard_button()
 	{
-		this->~c_virtual_keyboard_button();
-		if (TEST_BIT(flags, 0))
-		{
-		}
-
-		return this;
 	}
 
 	virtual int32 setup_children() override
@@ -207,19 +201,9 @@ public:
 		ui_globals_set_keyboard_input_state(true);
 	}
 
-	~c_virtual_keyboard_menu()
+	virtual ~c_virtual_keyboard_menu()
 	{
 		ui_globals_set_keyboard_input_state(false);
-	}
-
-	virtual c_user_interface_widget* destructor(uint32 flags) override
-	{
-		this->~c_virtual_keyboard_menu();
-		if (TEST_BIT(flags, 0))
-		{
-		}
-
-		return this;
 	}
 
 	virtual void render_widget(rectangle2d* viewport_bounds)

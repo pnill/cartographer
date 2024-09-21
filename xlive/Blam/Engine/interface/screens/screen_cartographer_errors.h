@@ -84,15 +84,7 @@ public:
 
 	c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	~c_cartographer_error_menu();
-
-	// interface
-	virtual c_user_interface_widget* destructor(uint32 flags) override
-	{
-		this->~c_cartographer_error_menu();
-
-		return this;
-	};
+	virtual ~c_cartographer_error_menu();
 
 	// c_screen_with_menu specific interface
 	virtual void initialize(s_screen_parameters* screen_parameters) override

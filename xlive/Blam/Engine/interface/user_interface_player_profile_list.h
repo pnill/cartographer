@@ -15,7 +15,9 @@ class c_player_profile_list : public c_list_widget
 {
 public:
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override;
+	virtual ~c_player_profile_list()
+	{
+	}
 	virtual int32 setup_children() override;
 	virtual void on_screen_leave() override;
 	virtual void update() override;

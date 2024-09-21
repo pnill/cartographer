@@ -7,16 +7,6 @@ c_text_entry_widget::c_text_entry_widget(int16 button_index, int16 user_flags) :
 	field_544 = 0;
 }
 
-c_user_interface_widget* c_text_entry_widget::destructor(uint32 flags)
-{
-	this->~c_text_entry_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 void c_text_entry_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x230EB7, 0x0, void(__thiscall*)(c_text_entry_widget*, rectangle2d*), this, viewport_bounds);

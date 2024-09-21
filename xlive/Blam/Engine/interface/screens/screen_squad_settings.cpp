@@ -245,16 +245,6 @@ void c_squad_settings_list::party_management_delete_item()
 	this->m_party_mgmt_item_deleted = true;
 }
 
-c_user_interface_widget* c_squad_settings_list::destructor(uint32 flags)
-{
-	this->~c_squad_settings_list();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 bool c_squad_settings_list::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x24F979, 0x0, bool(__thiscall*)(c_squad_settings_list*, s_event_record*), this, event);
@@ -430,16 +420,6 @@ c_screen_squad_settings::c_screen_squad_settings(e_user_interface_channel_type c
 	c_screen_widget(_screen_squad_settings, channel_type, window_index, user_flags),
 	m_squad_settings_list(user_flags)
 {
-}
-
-c_user_interface_widget* c_screen_squad_settings::destructor(uint32 flags)
-{
-	this->~c_screen_squad_settings();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
 }
 
 void c_screen_squad_settings::update()
