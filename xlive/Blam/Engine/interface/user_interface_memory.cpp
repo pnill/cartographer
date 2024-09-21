@@ -13,7 +13,7 @@ uint8* ui_pool_allocate_space(uint32 pool_size, int32 a2)
 	return INVOKE(0x20D2D8, 0x0, ui_pool_allocate_space, pool_size, a2);
 }
 
-void ui_pool_dellocate(uint8* object)
+void ui_pool_deallocate(uint8* object)
 {
-	return INVOKE(0x20D2EA, 0x0, ui_pool_dellocate, object);
+	return INVOKE(0x20D2EA, 0x0, ui_pool_deallocate, object);
 }

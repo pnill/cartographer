@@ -176,7 +176,7 @@ void c_user_interface_widget::destroy_recursive()
 		if (child_widget->m_allocated)
 		{
 			child_widget->~c_user_interface_widget();
-			ui_pool_dellocate((uint8*)child_widget);
+			ui_pool_deallocate((uint8*)child_widget);
 		}
 
 		child_widget = next_child;
