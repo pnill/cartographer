@@ -57,14 +57,7 @@ c_cartographer_guide_edit_list::c_cartographer_guide_edit_list(uint16 _flags) :
 		datum_new(this->m_list_data);
 	}
 
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 }
 
 c_cartographer_guide_menu::c_cartographer_guide_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
@@ -125,14 +118,7 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 		datum_new(this->m_list_data);
 	}
 
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 }
 
 c_cartographer_credits_menu::c_cartographer_credits_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
@@ -175,14 +161,7 @@ c_cartographer_update_edit_list::c_cartographer_update_edit_list(uint16 _flags) 
 		datum_new(this->m_list_data);
 	}
 
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 
 	// ### TODO FIXME this is pretty hacked up, cleanup the system at some point
 	m_keep_screen_open = true;
@@ -281,14 +260,7 @@ c_cartographer_update_notice_edit_list::c_cartographer_update_notice_edit_list(u
 		datum_new(this->m_list_data);
 	}
 
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_guide_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 }
 
 c_cartographer_update_notice_menu::c_cartographer_update_notice_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :

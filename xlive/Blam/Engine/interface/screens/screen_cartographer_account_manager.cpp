@@ -154,14 +154,7 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 		datum_new(this->m_list_data);
 	}
 
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_account_manager_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 
 	switch (m_cartographer_screen_type)
 	{

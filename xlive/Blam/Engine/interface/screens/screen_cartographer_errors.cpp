@@ -156,15 +156,7 @@ c_cartographer_error_edit_list::c_cartographer_error_edit_list(uint32 _flags) :
 	m_slot_2(this, &c_cartographer_error_edit_list::button_handler)
 {
 	this->m_list_data = nullptr;
-
-	// no fucking clue what's this, maybe related to this->m_slot_2.c_slot_vtbl data offset
-	// because this->m_slot_2.c_slot_vtbl is at offset 708
-	if ((void*)this == (void*)-(int32)offsetof(c_cartographer_error_edit_list, m_slot_2)) {
-		linker_type2.link(nullptr);
-	}
-	else {
-		linker_type2.link(&this->m_slot_2);
-	}
+	linker_type2.link(&this->m_slot_2);
 }
 
 c_cartographer_error_menu::c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
