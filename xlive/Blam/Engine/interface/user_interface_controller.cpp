@@ -271,7 +271,7 @@ void __cdecl user_interface_controller_update_player_name(e_controller_index con
 		if (online_xuid_is_guest_account(*controller_xuid))
 		{
 			uint8 guest_no = online_xuid_get_guest_account_number(*controller_xuid);
-			wchar_t format[32];
+			wchar_t format[512];
 			user_interface_global_string_get(_string_id_guest_of_ascii_gamertag_unicode_format_string, format);// %d %hs
 			usnzprintf(controller->player_name,
 				NUMBEROF(controller->player_name),
