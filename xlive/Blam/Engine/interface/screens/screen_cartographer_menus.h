@@ -50,11 +50,8 @@ public:
 
 	c_cartographer_guide_edit_list(uint16 _flags);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_guide_edit_list()
 	{
-		this->~c_cartographer_guide_edit_list();
-
-		return this;
 	}
 
 	virtual c_list_item_widget* get_list_items() override
@@ -93,10 +90,8 @@ public:
 
 	static void* open(s_screen_parameters* parameters);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_guide_menu()
 	{
-		this->~c_cartographer_guide_menu();
-		return this;
 	}
 
 	virtual void post_initialize() override
@@ -202,11 +197,8 @@ public:
 
 	c_cartographer_credits_edit_list(uint16 _flags);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_credits_edit_list()
 	{
-		this->~c_cartographer_credits_edit_list();
-
-		return this;
 	}
 
 	virtual c_list_item_widget* get_list_items() override
@@ -245,11 +237,8 @@ public:
 
 	static void* open(s_screen_parameters* parameters);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_credits_menu()
 	{
-		this->~c_cartographer_credits_menu();
-
-		return this;
 	}
 
 	virtual void post_initialize() override
@@ -351,19 +340,13 @@ public:
 	bool m_keep_screen_open;
 
 	c_cartographer_update_edit_list(uint16 _flags);
-	~c_cartographer_update_edit_list()
+
+	virtual ~c_cartographer_update_edit_list()
 	{
 		if (m_keep_screen_open)
 		{
 			ui_load_cartographer_update_menu();
 		}
-	}
-
-	virtual c_user_interface_widget* destructor(uint32 flags) override
-	{
-		this->~c_cartographer_update_edit_list();
-
-		return this;
 	}
 
 	virtual c_list_item_widget* get_list_items() override
@@ -426,11 +409,8 @@ class c_cartographer_update_menu : public c_screen_with_menu
 public:
 	c_cartographer_update_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_update_menu()
 	{
-		this->~c_cartographer_update_menu();
-
-		return this;
 	}
 
 	static void* open(s_screen_parameters* parameters);
@@ -513,11 +493,8 @@ public:
 
 	c_cartographer_update_notice_edit_list(uint16 _flags);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_update_notice_edit_list()
 	{
-		this->~c_cartographer_update_notice_edit_list();
-
-		return this;
 	}
 
 	virtual c_list_item_widget* get_list_items() override
@@ -554,11 +531,8 @@ class c_cartographer_update_notice_menu : public c_screen_with_menu
 public:
 	c_cartographer_update_notice_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_cartographer_update_notice_menu()
 	{
-		this->~c_cartographer_update_notice_menu();
-
-		return this;
 	}
 
 	static void* open(s_screen_parameters* parameters);

@@ -29,17 +29,6 @@ void c_list_item_widget::set_item_transitioning()
 
 // c_list_item_widget virtual functions
 
-c_list_item_widget* c_list_item_widget::destructor(uint32 flags)
-{
-	this->~c_list_item_widget();
-	if (TEST_BIT(flags, 0))
-	{
-		// free mem
-	}
-
-	return this;
-}
-
 void c_list_item_widget::update()
 {
 	INVOKE_TYPE(0x220075, 0x0, void(__thiscall*)(c_list_item_widget*), this);

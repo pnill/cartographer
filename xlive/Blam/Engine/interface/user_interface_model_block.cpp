@@ -10,16 +10,6 @@ void c_model_widget::apply_appearance_and_character(s_player_profile_traits* app
 
 // c_model_widget virtual functions
 
-c_user_interface_widget* c_model_widget::destructor(uint32 flags)
-{
-	this->~c_model_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 int32 c_model_widget::setup_children()
 {
 	return INVOKE_TYPE(0x2407A7, 0x0, int32(__thiscall*)(c_model_widget*), this);

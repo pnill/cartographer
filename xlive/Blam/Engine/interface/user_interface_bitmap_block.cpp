@@ -38,16 +38,6 @@ void c_bitmap_widget::set_render_scale(const real_vector2d* scale)
 
 // c_bitmap_widget virtual functions
 
-c_user_interface_widget* c_bitmap_widget::destructor(uint32 flags)
-{
-	this->~c_bitmap_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 void c_bitmap_widget::update()
 {
 	return INVOKE_TYPE(0x21C9AC, 0x0, void(__thiscall*)(c_bitmap_widget*), this);

@@ -86,8 +86,6 @@ public:
 public:
 	c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags);
 
-	~c_user_interface_widget();
-
 	int16 get_animation_type();
 	e_user_interface_widget_type get_type();
 	c_user_interface_widget* get_next();
@@ -114,7 +112,7 @@ public:
 	
 	// c_user_interface_widget virtual functions
 
-	virtual c_user_interface_widget* destructor(uint32 flags);
+	virtual ~c_user_interface_widget();
 	virtual int32 setup_children();
 	virtual void on_screen_leave();
 	virtual void update();

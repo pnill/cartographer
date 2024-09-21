@@ -71,20 +71,6 @@ void c_list_widget::remove_item_from_list(c_list_item_widget* item)
 
 // c_list_widget virtual functions
 
-
-c_user_interface_widget* c_list_widget::destructor(uint32 flags)
-{
-	this->~c_list_widget();
-	if (TEST_BIT(flags, 0))
-	{
-
-	}
-
-	//return INVOKE_TYPE(0x213BBF, 0x0, void*(__thiscall*)(c_list_widget*, char), lpMem, a2);
-
-	return this;
-}
-
 int32 c_list_widget::setup_children()
 {
 	return INVOKE_TYPE(0x213FE5, 0x0, int32(__thiscall*)(c_list_widget*), this);

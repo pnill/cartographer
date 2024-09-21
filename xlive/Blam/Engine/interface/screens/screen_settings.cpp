@@ -319,13 +319,6 @@ c_screen_settings::c_screen_settings(e_user_interface_channel_type channel_type,
 	user_interface_squad_clear_match_playlist();
 }
 
-c_user_interface_widget* c_screen_settings::destructor(uint32 flags)
-{
-	this->~c_screen_settings();
-
-	return this;
-}
-
 void c_screen_settings::post_initialize_button_keys()
 {
 	// this function is executed once upon every pane creation

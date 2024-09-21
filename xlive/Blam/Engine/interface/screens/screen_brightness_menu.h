@@ -16,9 +16,8 @@ public:
 	}
 
 	// overrides, only needed ones
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_brightness_level_edit_list()
 	{
-		return INVOKE_VFPTR_FN(_get_vfptr_table, 0, c_user_interface_widget * (class_type::**)(uint32), flags);
 	}
 
 	virtual int32 setup_children() override
@@ -68,21 +67,12 @@ class c_brightness_menu : protected c_screen_with_menu
 public:
 	c_brightness_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	~c_brightness_menu() = default;
-
 	typedef c_brightness_menu class_type;
 
 	// interface
-	virtual c_user_interface_widget* destructor(uint32 flags) override
+	virtual ~c_brightness_menu()
 	{
-		this->~c_brightness_menu();
-		if (TEST_BIT(flags, 0))
-		{
-
-		}
-
-		return this;
-	};
+	}
 
 	virtual int32 setup_children() override
 	{

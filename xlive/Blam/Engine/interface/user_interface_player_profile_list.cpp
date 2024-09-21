@@ -4,12 +4,6 @@
 #include "user_interface_widget_list_item.h"
 #include "saved_games/saved_game_files.h"
 
-
-c_user_interface_widget* c_player_profile_list::destructor(uint32 flags)
-{
-	return INVOKE_TYPE(0x208B4B, 0x0, c_user_interface_widget*(__thiscall*)(c_player_profile_list*, uint32), this, flags);
-}
-
 int32 c_player_profile_list::setup_children()
 {
 	return INVOKE_TYPE(0x237583, 0x0, int32(__thiscall*)(c_player_profile_list*), this);

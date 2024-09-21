@@ -12,16 +12,6 @@ c_button_widget::c_button_widget(int16 button_index, uint16 user_flags):
 
 // c_button_widget virtual functions
 
-c_user_interface_widget* c_button_widget::destructor(uint32 flags)
-{
-	this->~c_button_widget();
-	if (TEST_BIT(flags, 0))
-	{
-	}
-
-	return this;
-}
-
 void c_button_widget::update()
 {
 	INVOKE_TYPE(0x2400E9, 0x0, void(__thiscall*)(c_button_widget*), this);

@@ -118,8 +118,6 @@ void* __cdecl c_cartographer_account_manager_menu::open(s_screen_parameters* par
 		break;
 	}
 
-	//button_count += 1;
-
 	if (ui_buffer) {
 		account_list_menu = new (ui_buffer) c_cartographer_account_manager_menu(
 			parameters->m_channel_type, parameters->m_window_index, parameters->user_flags, g_open_cartographer_account_manager_context, button_count, selected_button_index);

@@ -233,7 +233,9 @@ public:
 
 	// c_user_interface_text virtual functions
 
-	virtual c_user_interface_text* destructor(uint32 flags);
+	virtual ~c_user_interface_text()
+	{
+	}
 	virtual void  set_text(const wchar_t* raw_text) = 0;
 	virtual void  append_text(const wchar_t* Source) = 0;
 	virtual const wchar_t* get_raw_string() = 0;

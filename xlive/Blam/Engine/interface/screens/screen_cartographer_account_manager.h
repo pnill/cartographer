@@ -147,7 +147,8 @@ public:
 	// button handler callback
 
 	c_cartographer_account_manager_edit_list(uint16 _flags, int32 _button_count, int32 _default_selected_button, e_cartographer_account_manager_screen_type _screen_type);
-	~c_cartographer_account_manager_edit_list()
+	
+	virtual ~c_cartographer_account_manager_edit_list()
 	{
 		switch (m_cartographer_screen_type)
 		{
@@ -165,13 +166,6 @@ public:
 		default:
 			break;
 		}
-	}
-
-	virtual c_user_interface_widget* destructor(uint16 flags)
-	{
-		this->~c_cartographer_account_manager_edit_list();
-
-		return this;
 	}
 
 	virtual c_list_item_widget* get_list_items() override
@@ -329,7 +323,7 @@ public:
 
 	c_cartographer_account_manager_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags, e_cartographer_account_manager_screen_type _screen_type, int32 _button_count, int32 _selected_button);
 
-	~c_cartographer_account_manager_menu()
+	virtual ~c_cartographer_account_manager_menu()
 	{
 		switch (m_cartographer_screen_type)
 		{
@@ -358,13 +352,6 @@ public:
 		}
 		UpdateAccountingActiveHandle(false);
 	}
-
-	// interface
-	virtual c_user_interface_widget* destructor(uint32 flags) override
-	{
-		this->~c_cartographer_account_manager_menu();
-		return this;
-	};
 
 	// c_screen_with_menu specific interface
 	virtual void initialize(s_screen_parameters* screen_parameters) override
