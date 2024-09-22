@@ -86,6 +86,7 @@ public:
 public:
 	c_user_interface_widget(e_user_interface_widget_type widget_type, uint16 user_flags);
 
+	e_controller_index get_any_responding_controller();
 	int16 get_animation_type();
 	e_user_interface_widget_type get_type();
 	c_user_interface_widget* get_next();

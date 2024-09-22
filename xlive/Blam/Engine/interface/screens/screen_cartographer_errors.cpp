@@ -130,7 +130,7 @@ void* c_cartographer_error_menu::load_by_error_id(e_cartographer_error_id error_
 	return error_menu;
 }
 
-void* __cdecl c_cartographer_error_menu::load(s_screen_parameters* parameters)
+void* c_cartographer_error_menu::load(s_screen_parameters* parameters)
 {
 	c_cartographer_error_menu* error_menu = nullptr;
 	BYTE* ui_buffer = ui_pool_allocate_space(sizeof(c_cartographer_error_menu), 0);

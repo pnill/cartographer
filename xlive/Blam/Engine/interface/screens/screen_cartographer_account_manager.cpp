@@ -100,7 +100,7 @@ extern void* ui_load_cartographer_update_notice_menu();
 /* forward declarations */
 
 void* ui_load_cartographer_invalid_login_token();
-void xbox_live_task_progress_callback(DWORD a1);
+void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog);
 DWORD WINAPI thread_account_login_proc_cb(LPVOID lParam);
 static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam);
 
@@ -421,7 +421,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_add
 			snprintf(g_account_add_login_data.password, ARRAYSIZE(g_account_add_login_data.password), "%S", m_account_add.password);
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
 
-			c_xbox_live_task_progress_menu::open(xbox_live_task_progress_callback);
+			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -476,7 +476,7 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 			c_cartographer_account_manager_menu::accountingGoBackToList = false;
 			c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)button_id, 0, NULL);
-			c_xbox_live_task_progress_menu::open(xbox_live_task_progress_callback);
+			c_screen_xbox_live_task_progress_dialog::add_task(xbox_live_task_progress_callback);
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		}
 	}
@@ -739,13 +739,14 @@ void* ui_load_cartographer_invalid_login_token()
 }
 
 
-void xbox_live_task_progress_callback(DWORD a1)
+void xbox_live_task_progress_callback(c_screen_xbox_live_task_progress_dialog* dialog)
 {
+	dialog->set_display_text_raw(L"Signing into Project Cartographer, please wait...");
+
 	// if the g_account_manager_login_thread_handle handle is INVALID_HANDLE_VALUE, it means that the login thread has ended
 	if (g_account_manager_login_thread_handle == INVALID_HANDLE_VALUE)
 	{
-		// this is the ptr of the callback, if it gets set to null, it will close the menu
-		*(DWORD*)(a1 + 2652) = NULL;
+		dialog->close_task();
 
 		if (g_account_manager_master_login_code < 0)
 		{

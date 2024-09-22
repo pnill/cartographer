@@ -48,6 +48,20 @@ void c_user_interface_widget::initialize_animation(s_animation_transform* animat
 
 /* public methods */
 
+e_controller_index c_user_interface_widget::get_any_responding_controller()
+{
+	if (TEST_FLAG(m_controllers_mask, _controller_index_0))
+		return _controller_index_0;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_1))
+		return _controller_index_1;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_2))
+		return _controller_index_2;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_3))
+		return _controller_index_3;
+
+	return k_no_controller;
+}
+
 int16 c_user_interface_widget::get_animation_type()
 {
 	return this->m_animation_index;

@@ -460,6 +460,7 @@
     <ClCompile Include="Blam\Engine\Networking\memory\networking_memory.cpp" />
     <ClCompile Include="Blam\Engine\Networking\network_configuration.cpp" />
     <ClCompile Include="Blam\Engine\Networking\online\online_account_xbox.cpp" />
+    <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_achievements.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_favorites.cpp" />
     <ClCompile Include="Blam\Engine\networking\panorama\panorama_friends.cpp" />
@@ -1054,6 +1055,7 @@
     <ClInclude Include="Blam\Engine\cache\cache_files.h" />
     <ClInclude Include="Blam\Engine\Networking\network_configuration.h" />
     <ClInclude Include="Blam\Engine\Networking\online\online_account_xbox.h" />
+    <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_achievements.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_favorites.h" />
     <ClInclude Include="Blam\Engine\networking\panorama\panorama_friends.h" />
