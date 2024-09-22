@@ -17,6 +17,11 @@ void c_screen_network_squad_browser::build_players_list_fix(c_player_widget_repr
 __declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_network_squad_browser::build_players_list_fix }
 #pragma endregion
 
+void* c_screen_network_squad_browser::load(s_screen_parameters* parameters)
+{
+	return INVOKE(0x21A238, 0x0, c_screen_network_squad_browser::load, parameters);
+}
+
 void c_screen_network_squad_browser::apply_patches()
 {
 	if (Memory::IsDedicatedServer()) return;

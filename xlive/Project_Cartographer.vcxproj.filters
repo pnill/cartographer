@@ -401,7 +401,7 @@
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files_async_windows.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\saved_game_files.cpp" />
     <ClCompile Include="Blam\Engine\cache\phyical_memory_map.cpp" />
-    <ClCompile Include="Blam\Engine\interface\user_interface_player_profile_list.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_profile_select.cpp" />
     <ClCompile Include="Blam\Engine\saved_games\cartographer_player_profile.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_weather.cpp" />
     <ClCompile Include="Blam\Engine\render\render_weather.cpp" />
@@ -409,6 +409,14 @@
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_level_select.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_bungie_news.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_about_dialog.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_audio_settings.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1074,7 +1082,7 @@
     <ClInclude Include="Blam\Engine\saved_games\saved_game_files_async_windows.h" />
     <ClInclude Include="Blam\Engine\cseries\async_helpers.h" />
     <ClInclude Include="Blam\Engine\cache\physical_memory_map.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_player_profile_list.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_profile_select.h" />
     <ClInclude Include="Blam\Engine\saved_games\cartographer_player_profile.h" />
     <ClInclude Include="Blam\Engine\text\text.h" />
     <ClInclude Include="Blam\Engine\game\game_engine_territories.h" />
@@ -1092,6 +1100,14 @@
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_difficulty_select.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_level_select.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_bungie_news.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_variant_game_engine_type.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_about_dialog.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_audio_settings.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_video_settings.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

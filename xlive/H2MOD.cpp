@@ -92,7 +92,6 @@
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
 #include "interface/new_hud_draw.h"
-#include "interface/user_interface_player_profile_list.h"
 #include "saved_games/cartographer_player_profile.h"
 
 std::unique_ptr<H2MOD> h2mod(std::make_unique<H2MOD>());
@@ -915,7 +914,6 @@ void H2MOD::ApplyHooks() {
 		render_apply_patches();
 		apply_interface_hooks();
 
-		user_interface_player_profile_list_apply_patches();
 		new_hud_draw_apply_patches();
 	}
 	else {

@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "screen_4way_signin.h"
+#include "screen_network_squad_browser.h"
+#include "screen_bungie_news.h"
+#include "screen_press_start_introduction.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -427,7 +430,7 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
 	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_screen_press_start_introduction_load;
+	params.m_load_function = c_screen_press_start_introduction::load;
 
 	params.m_load_function(&params);
 	return true;
@@ -472,10 +475,10 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			}
 			break;
 		case _4_way_signin_type_system_link:
-			params.m_load_function = c_screen_network_squad_browser_load;
+			params.m_load_function = c_screen_network_squad_browser::load;
 			break;
 		case _4_way_signin_type_xbox_live:
-			params.m_load_function = c_screen_bungie_news_load;
+			params.m_load_function = c_screen_bungie_news::load;
 			break;
 		case _4_way_signin_type_crossgame_invite:
 
