@@ -197,7 +197,7 @@ void* ui_load_cartographer_invalid_login_token()
 {
 	c_cartographer_account_manager_menu::accountingGoBackToList = true;
 	c_cartographer_account_manager_menu::UpdateAccountingActiveHandle(true);
-	return c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_invalid_login_token);
+	return c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_invalid_login_token);
 }
 
 extern bool g_force_cartographer_update;
@@ -218,11 +218,11 @@ void xbox_live_task_progress_callback(DWORD a1)
 			case ERROR_CODE_CURL_SOCKET_FAILED:
 			case ERROR_CODE_ACCOUNT_DATA:
 			case ERROR_CODE_INVALID_PARAM:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_internal_error);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_internal_error);
 				return;
 
 			case ERROR_CODE_CURL_EASY_PERF:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_login_connection_failed);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_login_connection_failed);
 				return;
 
 			case ERROR_CODE_INVALID_VERSION:
@@ -234,39 +234,39 @@ void xbox_live_task_progress_callback(DWORD a1)
 				return;
 
 			case ERROR_CODE_INVALID_LOGIN_ID:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_invalid_account_id);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_invalid_account_id);
 				return;
 
 			case ERROR_CODE_INVALID_PASSWORD:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_incorrect_password);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_incorrect_password);
 				return;
 
 			case ERROR_CODE_MACHINE_BANNED:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_machine_banned);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_machine_banned);
 				return;
 
 			case ERROR_CODE_ACCOUNT_BANNED:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_account_banned);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_account_banned);
 				return;
 
 			case ERROR_CODE_ACCOUNT_DISABLED:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_account_disabled);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_account_disabled);
 				return;
 
 			case ERROR_CODE_MACHINE_SERIAL_INSUFFICIENT:
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_insufficient_machine_identifiers);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_insufficient_machine_identifiers);
 				return;
 
 			default:
 				//unknown error!
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_unknown_unhandled_error);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_unknown_unhandled_error);
 				return;
 			}
 		}
 		else {
 			if (g_account_manager_master_login_code == SUCCESS_CODE_MACHINE_SERIAL_INSUFFICIENT) 
 			{
-				c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_insufficient_machine_identifiers);
+				c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_insufficient_machine_identifiers);
 				return;
 			}
 			else 
@@ -440,7 +440,7 @@ static DWORD WINAPI thread_account_create_proc_cb(LPVOID lParam)
 	//submit account creation.
 	if (HandleGuiAccountCreate(g_account_create_data.user_name, g_account_create_data.email, g_account_create_data.password))
 	{
-		c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_verification_email_sent);
+		c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_verification_email_sent);
 
 		SecureZeroMemory(g_account_create_data.user_name, sizeof(g_account_create_data.user_name));
 		SecureZeroMemory(g_account_create_data.email, sizeof(g_account_create_data.email));
@@ -486,7 +486,7 @@ void c_cartographer_account_manager_edit_list::cartographer_type_create_account(
 			g_account_manager_login_thread_handle = CreateThread(NULL, 0, thread_account_login_proc_cb, (LPVOID)NONE, 0, NULL);
 
 			user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_processing_account_notice);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_processing_account_notice);
 			g_account_manager_thread_handle = CreateThread(NULL, 0, thread_account_create_proc_cb, (LPVOID)0, 0, NULL);
 		}
 	}
@@ -523,7 +523,7 @@ void cartographer_account_manager_open_list() {
 	}
 	else {
 		if (!c_cartographer_account_manager_menu::IsAccountingActiveHandle())
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_login_account_already_in_use);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_login_account_already_in_use);
 	}
 }
 

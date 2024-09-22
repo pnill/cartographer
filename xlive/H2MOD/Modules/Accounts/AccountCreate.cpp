@@ -102,29 +102,29 @@ bool HandleGuiAccountCreate(char* username, char* email, char* password) {
 		if (rtn_code == 0 || rtn_code == ERROR_CODE_CURL_SOCKET_FAILED || rtn_code == ERROR_CODE_CURL_HANDLE || rtn_code == ERROR_CODE_CURL_EASY_PERF
 			|| rtn_code == ERROR_CODE_INVALID_PARAM) {
 			//internal error
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_internal_error);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_internal_error);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_EMAIL) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_email);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_email);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_USERNAME) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_username);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_username);
 		}
 		else if (rtn_code == ERROR_CODE_INVALID_PASSWORD) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_invalid_password);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_invalid_password);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_EMAIL) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_email_already_used);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_email_already_used);
 		}
 		else if (rtn_code == ERROR_CODE_TAKEN_USERNAME) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_username_taken);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_username_taken);
 		}
 		else if (rtn_code == ERROR_CODE_BANNED_EMAIL_DOMAIN) {
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_account_create_blacklisted_email_provider);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_account_create_blacklisted_email_provider);
 		}
 		else {
 			//unknown error!
-			c_cartographer_error_menu::open_by_error_id(_cartographer_error_id_unknown_unhandled_error);
+			c_cartographer_error_menu::load_by_error_id(_cartographer_error_id_unknown_unhandled_error);
 		}
 	}
 	else {

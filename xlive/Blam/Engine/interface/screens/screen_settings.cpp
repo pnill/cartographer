@@ -45,12 +45,6 @@ enum e_settings_list_items : uint16
 	k_total_no_of_settings_list_items
 };
 
-enum e_default_list_skin_texts
-{
-	_default_list_skin_text_main = 0,
-	k_number_of_default_list_skin_texts,
-};
-
 enum e_settings_screen_panes
 {
 	_settings_pane_player_profile,

@@ -371,7 +371,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
 	if (widget_tag_datum != NONE)
 	{
-		this->verify_and_load_from_layout(NONE, &layout);
+		this->verify_and_load_from_layout(widget_tag_datum, &layout);
 	}
 	this->setup_children();
 	user_interface_squad_clear_match_playlist();

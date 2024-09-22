@@ -114,7 +114,7 @@ public:
 
 	virtual ~c_user_interface_widget();
 	virtual int32 setup_children();
-	virtual void on_screen_leave();
+	virtual void pre_destroy();
 	virtual void update();
 	virtual void render_widget(rectangle2d* viewport_bounds);
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out);

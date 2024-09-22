@@ -231,7 +231,8 @@ c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_use
 	this->m_child_list = list;
 }
 
-//c_screen_with_menus generally have header,buttonkeys and subheader indices fixed
+// c_screen_with_menus generally have header,buttonkeys and subheader indices fixed
+// verify before using this , not all widgets have a subheader
 c_text_widget* c_screen_with_menu::get_screen_subheader_text()
 {
 	return try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
