@@ -16,9 +16,7 @@ public:
 
 	// c_text_entry_widget virtual functions
 
-	virtual ~c_text_entry_widget()
-	{
-	}
+	virtual ~c_text_entry_widget();
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;

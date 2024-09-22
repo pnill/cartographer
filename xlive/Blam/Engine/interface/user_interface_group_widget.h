@@ -10,9 +10,7 @@ public:
 
 	// c_group_widget virtual functions
 
-	virtual ~c_group_widget()
-	{
-	}
+	virtual ~c_group_widget();
 	virtual c_user_interface_text* get_interface() override;
 
 };

@@ -28,6 +28,9 @@ void c_list_item_widget::set_item_transitioning()
 
 
 // c_list_item_widget virtual functions
+c_list_item_widget::~c_list_item_widget()
+{
+}
 
 void c_list_item_widget::update()
 {

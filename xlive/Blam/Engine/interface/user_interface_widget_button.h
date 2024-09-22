@@ -21,9 +21,7 @@ public:
 
 	// c_button_widget virtual functions
 
-	virtual ~c_button_widget()
-	{
-	}
+	virtual ~c_button_widget();
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out) override;

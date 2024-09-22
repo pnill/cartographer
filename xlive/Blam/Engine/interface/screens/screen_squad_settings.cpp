@@ -245,6 +245,10 @@ void c_squad_settings_list::party_management_delete_item()
 	this->m_party_mgmt_item_deleted = true;
 }
 
+c_squad_settings_list::~c_squad_settings_list()
+{
+}
+
 bool c_squad_settings_list::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x24F979, 0x0, bool(__thiscall*)(c_squad_settings_list*, s_event_record*), this, event);
@@ -419,6 +423,10 @@ void c_squad_settings_list::handle_item_party_management(s_event_record** pevent
 c_screen_squad_settings::c_screen_squad_settings(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags) :
 	c_screen_widget(_screen_squad_settings, channel_type, window_index, user_flags),
 	m_squad_settings_list(user_flags)
+{
+}
+
+c_screen_squad_settings::~c_screen_squad_settings()
 {
 }
 

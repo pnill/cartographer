@@ -9,6 +9,7 @@
 #include "screen_press_start_introduction.h"
 #include "screen_squad_settings.h"
 #include "screen_settings.h"
+#include "screen_network_squad_browser.h"
 
 void screens_apply_patches_on_map_load()
 {
@@ -28,5 +29,5 @@ void screens_apply_patches()
 	c_main_menu_list::apply_instance_patches();
 	c_screen_multiplayer_pregame_lobby::apply_instance_patches();
 	c_screen_squad_settings::apply_instance_patches();
-	c_screen_with_menu::apply_patches();
+	c_screen_network_squad_browser::apply_patches();
 }

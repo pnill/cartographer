@@ -69,9 +69,7 @@ public:
 
 	// c_list_widget virtual functions
 
-	virtual ~c_list_widget()
-	{
-	}
+	virtual ~c_list_widget();
 	virtual int32 setup_children() override;
 	virtual void on_screen_leave() override;
 	virtual void update() override;

@@ -46,6 +46,10 @@ void c_text_widget::set_field74()
 	field_74 = true;
 }
 
+c_text_widget::~c_text_widget()
+{
+}
+
 void c_text_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x21BD11, 0x0, void(__thiscall*)(c_text_widget*, rectangle2d*), this, viewport_bounds);
@@ -68,6 +72,10 @@ c_small_text_widget::c_small_text_widget(datum user_index):
 {
 }
 
+c_small_text_widget::~c_small_text_widget()
+{
+}
+
 c_user_interface_text* c_small_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x20F5E3, 0x0, c_user_interface_text*(__thiscall*)(c_small_text_widget*), this);
@@ -86,6 +94,10 @@ c_normal_text_widget::c_normal_text_widget(datum user_index):
 {
 }
 
+c_normal_text_widget::~c_normal_text_widget()
+{
+}
+
 c_user_interface_text* c_normal_text_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x20F6CA, 0x0, c_user_interface_text*(__thiscall*)(c_normal_text_widget*), this);
@@ -100,6 +112,10 @@ c_long_text_widget::c_long_text_widget(int16 user_flags):
 
 c_long_text_widget::c_long_text_widget(datum user_index):
 	c_text_widget(user_index)
+{
+}
+
+c_long_text_widget::~c_long_text_widget()
 {
 }
 

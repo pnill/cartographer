@@ -376,6 +376,7 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_main_menu.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_squad_settings.cpp" />
@@ -642,6 +643,7 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_esrb_warning.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_main_menu.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_multiplayer_pregame_lobby.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_squad_settings.h" />

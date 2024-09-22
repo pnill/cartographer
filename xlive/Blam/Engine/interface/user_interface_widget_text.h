@@ -25,9 +25,7 @@ public:
 
 	// c_text_widget virtual functions
 
-	virtual ~c_text_widget()
-	{
-	}
+	virtual ~c_text_widget();
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;
 
@@ -46,9 +44,7 @@ public:
 
 	// c_small_text_widget virtual functions
 
-	virtual ~c_small_text_widget()
-	{
-	}
+	virtual ~c_small_text_widget();
 	virtual c_user_interface_text* get_interface() override;
 
 };
@@ -66,9 +62,7 @@ public:
 
 	// c_normal_text_widget virtual functions
 
-	virtual ~c_normal_text_widget()
-	{
-	}
+	virtual ~c_normal_text_widget();
 	virtual c_user_interface_text* get_interface() override;
 
 };
@@ -85,9 +79,7 @@ public:
 
 
 	// c_long_text_widget virtual functions
-	virtual ~c_long_text_widget()
-	{
-	}
+	virtual ~c_long_text_widget();
 	virtual c_user_interface_text* get_interface() override;
 
 };

@@ -302,8 +302,7 @@ enum e_user_interface_channel_type
 	_user_interface_channel_type_game_error,
 	_user_interface_channel_type_keyboard,
 	_user_interface_channel_type_dialog,
-	// this one is unknown
-	_user_interface_channel_type_interface,
+	_user_interface_channel_type_online_menu,
 	_user_interface_channel_type_gameshell_screen,
 	_user_interface_channel_type_gameshell_background,
 	k_number_of_user_interface_channels

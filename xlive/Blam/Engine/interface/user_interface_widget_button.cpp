@@ -11,6 +11,9 @@ c_button_widget::c_button_widget(int16 button_index, uint16 user_flags):
 
 
 // c_button_widget virtual functions
+c_button_widget::~c_button_widget()
+{
+}
 
 void c_button_widget::update()
 {

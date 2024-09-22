@@ -51,6 +51,10 @@ void c_user_interface_text::set_color(const real_rgb_color* color)
 	this->m_text_color = *color;
 }
 
+c_user_interface_text::~c_user_interface_text()
+{
+}
+
 bool c_user_interface_text::is_private_use_character(wchar_t character)
 {
 	if (IN_RANGE(character, K_PRIVATE_USE_CHARACTER_SPACE_START, K_PRIVATE_USE_CHARACTER_SPACE_END))

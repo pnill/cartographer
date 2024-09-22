@@ -6,14 +6,17 @@ c_small_user_interface_text::c_small_user_interface_text()
 {
 	string.clear();
 }
-
-void  c_small_user_interface_text::set_text(const wchar_t* raw_text)
+c_small_user_interface_text::~c_small_user_interface_text()
 {
-	INVOKE_TYPE(0x20F425, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_small_user_interface_text::append_text(const wchar_t* Source)
+
+void  c_small_user_interface_text::set_text(const wchar_t* initial_text)
 {
-	INVOKE_TYPE(0x20F462, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, Source);
+	INVOKE_TYPE(0x20F425, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, initial_text);
+}
+void c_small_user_interface_text::append_text(const wchar_t* update_text)
+{
+	INVOKE_TYPE(0x20F462, 0x0, void(__thiscall*)(c_small_user_interface_text*, const wchar_t*), this, update_text);
 }
 const wchar_t* c_small_user_interface_text::get_raw_string()
 {
@@ -25,14 +28,17 @@ c_normal_user_interface_text::c_normal_user_interface_text()
 {
 	string.clear();
 }
-
-void  c_normal_user_interface_text::set_text(const wchar_t* raw_text)
+c_normal_user_interface_text::~c_normal_user_interface_text()
 {
-	INVOKE_TYPE(0x20F4C9, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_normal_user_interface_text::append_text(const wchar_t* Source)
+
+void  c_normal_user_interface_text::set_text(const wchar_t* initial_text)
 {
-	INVOKE_TYPE(0x20F509, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, Source);
+	INVOKE_TYPE(0x20F4C9, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, initial_text);
+}
+void c_normal_user_interface_text::append_text(const wchar_t* update_text)
+{
+	INVOKE_TYPE(0x20F509, 0x0, void(__thiscall*)(c_normal_user_interface_text*, const wchar_t*), this, update_text);
 }
 const wchar_t* c_normal_user_interface_text::get_raw_string()
 {
@@ -44,14 +50,17 @@ c_long_user_interface_text::c_long_user_interface_text()
 {
 	string.clear();
 }
-
-void c_long_user_interface_text::set_text(const wchar_t* raw_text)
+c_long_user_interface_text::~c_long_user_interface_text()
 {
-	INVOKE_TYPE(0x243DDB, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, raw_text);
 }
-void c_long_user_interface_text::append_text(const wchar_t* Source)
+
+void c_long_user_interface_text::set_text(const wchar_t* initial_text)
 {
-	INVOKE_TYPE(0x243E1B, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, Source);
+	INVOKE_TYPE(0x243DDB, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, initial_text);
+}
+void c_long_user_interface_text::append_text(const wchar_t* update_text)
+{
+	INVOKE_TYPE(0x243E1B, 0x0, void(__thiscall*)(c_long_user_interface_text*, const wchar_t*), this, update_text);
 }
 const wchar_t* c_long_user_interface_text::get_raw_string()
 {

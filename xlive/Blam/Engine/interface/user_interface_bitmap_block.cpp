@@ -38,6 +38,10 @@ void c_bitmap_widget::set_render_scale(const real_vector2d* scale)
 
 // c_bitmap_widget virtual functions
 
+c_bitmap_widget::~c_bitmap_widget()
+{
+}
+
 void c_bitmap_widget::update()
 {
 	return INVOKE_TYPE(0x21C9AC, 0x0, void(__thiscall*)(c_bitmap_widget*), this);

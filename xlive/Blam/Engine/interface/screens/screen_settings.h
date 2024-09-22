@@ -59,9 +59,7 @@ public:
 
 	// c_screen_settings virtual functions
 
-	virtual ~c_screen_settings()
-	{
-	}
+	virtual ~c_screen_settings();
 	virtual void post_initialize_button_keys() override;
 	virtual void* load_proc() override;
 };

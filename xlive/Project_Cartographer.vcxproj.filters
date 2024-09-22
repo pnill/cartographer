@@ -408,6 +408,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_fog.cpp" />
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_press_start_introduction.cpp" />
+    <ClCompile Include="Blam\Engine\interface\screens\screen_network_squad_browser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1090,6 +1091,7 @@
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\game\game_allegiance.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_press_start_introduction.h" />
+    <ClInclude Include="Blam\Engine\interface\screens\screen_network_squad_browser.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

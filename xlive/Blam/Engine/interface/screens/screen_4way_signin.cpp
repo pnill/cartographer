@@ -183,6 +183,10 @@ c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel
 	m_call_context = _4_way_signin_type_splitscreen;
 }
 
+c_screen_4way_signin::~c_screen_4way_signin()
+{
+}
+
 void c_screen_4way_signin::update(void)
 {
 	const uint32 all_users_mask = NONE;
