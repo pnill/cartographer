@@ -45,3 +45,4 @@ public:
 	virtual void initialize(s_screen_parameters* parameters) override;
 	virtual void* load_proc() override;
 };
+ASSERT_STRUCT_SIZE(c_screen_xbox_live_task_progress_dialog, 0xA70);

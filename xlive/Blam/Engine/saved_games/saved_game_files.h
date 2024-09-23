@@ -15,6 +15,7 @@
 
 enum e_saved_game_file_type : uint32
 {
+	_saved_game_file_type_invalid = NONE,
 	_saved_game_file_type_profile = 0,
 	_saved_game_file_type_game_variant_slayer = 0x1,
 	_saved_game_file_type_game_variant_koth = 0x2,
