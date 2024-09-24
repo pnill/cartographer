@@ -16,10 +16,6 @@ c_screen_press_start_introduction::c_screen_press_start_introduction(e_user_inte
 	this->m_has_input_saved = false;
 }
 
-c_screen_press_start_introduction::~c_screen_press_start_introduction()
-{
-}
-
 void c_screen_press_start_introduction::update()
 {
 	INVOKE_TYPE(0x23F2FD, 0x0, void(__thiscall*)(c_screen_press_start_introduction*), this);

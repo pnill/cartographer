@@ -6,9 +6,6 @@ c_small_user_interface_text::c_small_user_interface_text()
 {
 	string.clear();
 }
-c_small_user_interface_text::~c_small_user_interface_text()
-{
-}
 
 void  c_small_user_interface_text::set_text(const wchar_t* initial_text)
 {
@@ -28,9 +25,6 @@ c_normal_user_interface_text::c_normal_user_interface_text()
 {
 	string.clear();
 }
-c_normal_user_interface_text::~c_normal_user_interface_text()
-{
-}
 
 void  c_normal_user_interface_text::set_text(const wchar_t* initial_text)
 {
@@ -49,9 +43,6 @@ const wchar_t* c_normal_user_interface_text::get_raw_string()
 c_long_user_interface_text::c_long_user_interface_text()
 {
 	string.clear();
-}
-c_long_user_interface_text::~c_long_user_interface_text()
-{
 }
 
 void c_long_user_interface_text::set_text(const wchar_t* initial_text)

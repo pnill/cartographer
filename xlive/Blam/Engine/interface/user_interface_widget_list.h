@@ -77,7 +77,7 @@ public:
 
 	// c_list_widget virtual functions
 
-	virtual ~c_list_widget();
+	virtual ~c_list_widget() = default;
 	virtual int32 setup_children() override;
 	virtual void pre_destroy() override;
 	virtual void update() override;

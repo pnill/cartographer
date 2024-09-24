@@ -81,9 +81,6 @@ void c_main_menu_list::c_main_menu_list_ctor(int16 user_flags)
 
 __declspec(naked) void jmp_c_main_menu_list() { __asm { jmp c_main_menu_list::c_main_menu_list_ctor } }
 
-c_main_menu_list::~c_main_menu_list() 
-{
-}
 
 c_list_item_widget* c_main_menu_list::get_list_items()
 {

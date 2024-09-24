@@ -19,7 +19,7 @@ public:
 
 	// c_player_profile_list virtual functions
 
-	virtual ~c_player_profile_list();
+	virtual ~c_player_profile_list() = default;
 	virtual int32 setup_children() override;
 	virtual void pre_destroy() override;
 	virtual void update() override;

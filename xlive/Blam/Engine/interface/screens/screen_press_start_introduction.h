@@ -24,7 +24,7 @@ public:
 
 	// c_screen_press_start_introduction virtual functions
 
-	virtual ~c_screen_press_start_introduction();
+	virtual ~c_screen_press_start_introduction() = default;
 	virtual void update() override;
 	bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* parameters) override;

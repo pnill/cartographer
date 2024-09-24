@@ -4,9 +4,6 @@
 
 // c_player_widget virtual functions
 
-c_player_widget::~c_player_widget()
-{
-}
 
 int32 c_player_widget::setup_children()
 {

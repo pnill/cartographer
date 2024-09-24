@@ -211,10 +211,6 @@ c_cartographer_guide_edit_list::c_cartographer_guide_edit_list(uint16 _flags) :
 	linker_type2.link(&this->m_slot_2);
 }
 
-c_cartographer_guide_edit_list::~c_cartographer_guide_edit_list()
-{
-}
-
 c_list_item_widget* c_cartographer_guide_edit_list::get_list_items()
 {
 	return m_list_item_widgets;
@@ -285,10 +281,6 @@ void* c_cartographer_guide_menu::load(s_screen_parameters* parameters)
 	return guide_menu;
 }
 
-c_cartographer_guide_menu::~c_cartographer_guide_menu()
-{
-}
-
 void c_cartographer_guide_menu::initialize(s_screen_parameters* screen_parameters)
 {
 	c_screen_with_menu::initialize(screen_parameters);
@@ -340,10 +332,6 @@ c_cartographer_credits_edit_list::c_cartographer_credits_edit_list(uint16 _flags
 	linker_type2.link(&this->m_slot_2);
 }
 
-c_cartographer_credits_edit_list::~c_cartographer_credits_edit_list()
-{
-}
-
 c_list_item_widget* c_cartographer_credits_edit_list::get_list_items()
 {
 	return m_list_item_widgets;
@@ -393,10 +381,6 @@ void* c_cartographer_credits_menu::load(s_screen_parameters* parameters)
 
 	user_interface_register_screen_to_channel(credits_menu, parameters);
 	return credits_menu;
-}
-
-c_cartographer_credits_menu::~c_cartographer_credits_menu()
-{
 }
 
 void* c_cartographer_credits_menu::load_proc()
@@ -455,10 +439,6 @@ c_cartographer_update_edit_list::c_cartographer_update_edit_list(uint16 _flags) 
 	{
 		m_update_status = _cartographer_update_status_pending_install_update;
 	}
-}
-
-c_cartographer_update_edit_list::~c_cartographer_update_edit_list()
-{
 }
 
 void c_cartographer_update_edit_list::pre_destroy()
@@ -578,10 +558,6 @@ c_cartographer_update_menu::c_cartographer_update_menu(e_user_interface_channel_
 	GSDownloadInit();
 }
 
-c_cartographer_update_menu::~c_cartographer_update_menu()
-{
-}
-
 void c_cartographer_update_menu::update()
 {
 	m_update_edit_list.update_updater_status();
@@ -652,10 +628,6 @@ c_cartographer_update_notice_edit_list::c_cartographer_update_notice_edit_list(u
 	linker_type2.link(&this->m_slot_2);
 }
 
-c_cartographer_update_notice_edit_list::~c_cartographer_update_notice_edit_list()
-{
-}
-
 c_list_item_widget* c_cartographer_update_notice_edit_list::get_list_items()
 {
 	return m_list_item_widgets;
@@ -704,10 +676,6 @@ void c_cartographer_update_notice_edit_list::handle_item_pressed_event(s_event_r
 c_cartographer_update_notice_menu::c_cartographer_update_notice_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags) :
 	c_screen_with_menu(_screen_brightness_level, _ui_channel, _window_index, _flags, &m_update_notice_edit_list),
 	m_update_notice_edit_list(_flags)
-{
-}
-
-c_cartographer_update_notice_menu::~c_cartographer_update_notice_menu()
 {
 }
 

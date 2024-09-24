@@ -77,7 +77,7 @@ enum e_vkbd_context_type : int32
 	_vkbd_context_playlist_name2 = 0x9,
 	_vkbd_context_saved_film_name = 0xA,
 	_vkbd_context_saved_film_name2 = 0xB,
-	_vkbd_context_gamertag_entry = 0xC,
+	_vkbd_context_message_entry = 0xC,
 	_vkbd_context_squad_name_entry = 0xD,
 	_vkbd_context_type_14 = 0xE,
 	_vkbd_context_message_entry2 = 0xF,
@@ -105,7 +105,7 @@ public:
 
 	// c_virtual_keyboard_button virtual functions
 
-	virtual ~c_virtual_keyboard_button();	
+	virtual ~c_virtual_keyboard_button() = default;	
 	virtual bool handle_event(s_event_record* event) override;
 	virtual int32 get_bitmap_active_index() override;
 };

@@ -32,7 +32,7 @@ public:
 
 	// c_main_menu_list virtual functions
 
-	virtual ~c_main_menu_list();
+	virtual ~c_main_menu_list() = default;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;

@@ -98,10 +98,6 @@ void* c_screen_widget::get_screen_definition()
 
 // c_screen_widget virtual functions
 
-c_screen_widget::~c_screen_widget()
-{
-}
-
 bool c_screen_widget::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x20EB2B, 0x0, bool(__thiscall*)(c_screen_widget*, s_event_record*), this, event);
@@ -238,10 +234,6 @@ c_text_widget* c_screen_with_menu::get_screen_subheader_text()
 	return try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
 }
 
-
-c_screen_with_menu::~c_screen_with_menu()
-{
-}
 
 bool c_screen_with_menu::handle_event(s_event_record* event)
 {

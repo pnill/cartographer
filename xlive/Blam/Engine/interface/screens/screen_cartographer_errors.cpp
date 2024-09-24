@@ -149,10 +149,6 @@ c_cartographer_error_menu::c_cartographer_error_menu(e_user_interface_channel_ty
 	m_error_id = _cartpgrapher_error_id_none;
 }
 
-c_cartographer_error_menu::~c_cartographer_error_menu()
-{
-}
-
 void c_cartographer_error_menu::pre_destroy()
 {
 	switch (m_error_id)

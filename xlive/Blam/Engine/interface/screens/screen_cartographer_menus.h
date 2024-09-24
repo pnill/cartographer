@@ -43,7 +43,7 @@ public:
 
 	// c_cartographer_guide_edit_list virtual functions
 
-	virtual ~c_cartographer_guide_edit_list();
+	virtual ~c_cartographer_guide_edit_list() = default;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
@@ -59,7 +59,7 @@ public:
 	
 	// c_cartographer_guide_menu virtual functions
 
-	virtual ~c_cartographer_guide_menu();
+	virtual ~c_cartographer_guide_menu() = default;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 	virtual void* load_proc() override;
 };
@@ -80,7 +80,7 @@ public:
 
 	// c_cartographer_credits_edit_list virtual functions
 
-	virtual ~c_cartographer_credits_edit_list();
+	virtual ~c_cartographer_credits_edit_list() = default;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
@@ -95,7 +95,7 @@ public:
 
 	// c_cartographer_credits_menu virtual functions
 
-	virtual ~c_cartographer_credits_menu();
+	virtual ~c_cartographer_credits_menu() = default;
 	virtual void* load_proc() override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 };
@@ -120,7 +120,7 @@ public:
 
 	// c_cartographer_update_edit_list virtual functions
 	
-	virtual ~c_cartographer_update_edit_list();
+	virtual ~c_cartographer_update_edit_list() = default;
 	virtual void pre_destroy() override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
@@ -139,7 +139,7 @@ public:
 
 	// c_cartographer_update_menu virtual functions
 
-	virtual ~c_cartographer_update_menu();
+	virtual ~c_cartographer_update_menu() = default;
 	virtual void update() override;
 	virtual void* load_proc() override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
@@ -161,7 +161,7 @@ public:
 
 	// c_cartographer_update_notice_edit_list virtual functions.
 
-	virtual ~c_cartographer_update_notice_edit_list();
+	virtual ~c_cartographer_update_notice_edit_list() = default;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
@@ -177,7 +177,7 @@ public:
 
 	// c_cartographer_update_notice_menu virtual functions.
 
-	virtual ~c_cartographer_update_notice_menu();
+	virtual ~c_cartographer_update_notice_menu() = default;
 	virtual void* load_proc() override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 };

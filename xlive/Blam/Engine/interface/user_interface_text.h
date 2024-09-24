@@ -233,7 +233,7 @@ public:
 
 	// c_user_interface_text virtual functions
 
-	virtual ~c_user_interface_text();
+	virtual ~c_user_interface_text() = default;
 	virtual void  set_text(const wchar_t* initial_text) = 0;
 	virtual void  append_text(const wchar_t* update_text) = 0;
 	virtual const wchar_t* get_raw_string() = 0;

@@ -39,7 +39,7 @@ public:
 
 	// c_settings_list virtual functions
 
-	virtual ~c_settings_list();
+	virtual ~c_settings_list() = default;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
@@ -59,7 +59,7 @@ public:
 
 	// c_screen_settings virtual functions
 
-	virtual ~c_screen_settings();
+	virtual ~c_screen_settings() = default;
 	virtual void post_initialize_button_keys() override;
 	virtual void* load_proc() override;
 };

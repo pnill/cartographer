@@ -73,7 +73,7 @@ public:
 
 	// c_cartographer_account_manager_edit_list virtual functions
 
-	virtual ~c_cartographer_account_manager_edit_list();
+	virtual ~c_cartographer_account_manager_edit_list() = default;
 	virtual void pre_destroy() override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
@@ -110,7 +110,7 @@ public:
 
 	// c_cartographer_account_manager_menu virtual functions
 
-	virtual ~c_cartographer_account_manager_menu();
+	virtual ~c_cartographer_account_manager_menu() = default;
 	virtual void pre_destroy() override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;
 	virtual void post_initialize() override;

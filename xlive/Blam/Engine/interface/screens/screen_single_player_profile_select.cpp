@@ -5,10 +5,6 @@
 #include "saved_games/saved_game_files.h"
 #include "interface/user_interface_globals.h"
 
-c_player_profile_list::~c_player_profile_list()
-{
-}
-
 int32 c_player_profile_list::setup_children()
 {
 	return INVOKE_TYPE(0x237583, 0x0, int32(__thiscall*)(c_player_profile_list*), this);
@@ -56,7 +52,7 @@ void c_player_profile_list::update_displayed_profiles()
 			if (item)
 				profile_indices[current_child_widget_index] = *((int32*)item + 1);
 		}
-		current_child = (c_list_item_widget*)current_child->next_widget;
+		current_child = (c_list_item_widget*)current_child->get_next();
 
 		if (!current_child)
 			break;

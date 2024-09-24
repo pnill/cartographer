@@ -16,9 +16,7 @@ public:
 	}
 
 	// overrides, only needed ones
-	virtual ~c_brightness_level_edit_list()
-	{
-	}
+	virtual ~c_brightness_level_edit_list() = default;
 
 	virtual int32 setup_children() override
 	{

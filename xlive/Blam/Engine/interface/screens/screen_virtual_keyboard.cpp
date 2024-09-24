@@ -53,10 +53,6 @@ c_virtual_keyboard_button::c_virtual_keyboard_button():
 {
 }
 
-c_virtual_keyboard_button::~c_virtual_keyboard_button()
-{
-}
-
 bool c_virtual_keyboard_button::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x23CF88, 0x0, bool(__thiscall*)(c_virtual_keyboard_button*, s_event_record*), this, event);
@@ -73,23 +69,24 @@ c_screen_virtual_keyboard::c_screen_virtual_keyboard(e_user_interface_channel_ty
 {
 	m_context = _vkbd_context_invalid;
 	m_saved_game_file_type = _saved_game_file_type_invalid;
-	m_buffer.clear();
+
+	csmemset(m_buffer.get_buffer(), L'\0', m_buffer.max_length());
 	m_textbox_output = 0;
 	m_textbox_message = 0;
 	m_buffer_length = 0;
 	m_row = k_number_of_virtual_keyboard_rows;
 	m_column = k_number_of_virtual_keyboard_columns;
 	m_vkbd_flags = 0;
-	field_C74 = 0;
+	field_C74 = false;
 
 	field_3B78 = NONE;
-	field_3B7C = 1;
-	field_3B7D = 0;
+	field_3B7C = true;
+	field_3B7D = false;
 
 	for (int16 i = 0; i < NUMBEROF(m_buttons); i++)
 	{
-		m_buttons[i].m_button_index = i;
-		m_buttons[i].m_controllers_mask = _user_flags;
+		m_buttons[i].set_button_index(i);
+		m_buttons[i].set_controller_mask(_user_flags);
 	}
 
 	ui_set_virtual_keyboard_in_use(true);

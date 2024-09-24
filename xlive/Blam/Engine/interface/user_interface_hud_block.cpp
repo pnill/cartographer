@@ -5,9 +5,6 @@
 
 
 // c_hud_widget virtual functions
-c_hud_widget::~c_hud_widget()
-{
-}
 
 void c_hud_widget::update()
 {

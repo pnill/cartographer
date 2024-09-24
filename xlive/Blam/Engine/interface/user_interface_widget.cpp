@@ -170,7 +170,18 @@ void c_user_interface_widget::set_bounds(rectangle2d* bounds)
 
 void c_user_interface_widget::set_controller_mask(uint32 user_mask)
 {
-	INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
+	this->m_controllers_mask = user_mask;
+}
+
+void c_user_interface_widget::set_controller_mask_recursive(uint32 user_mask)
+{
+	//INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
+
+	c_user_interface_widget* child = get_children();
+	for (set_controller_mask(user_mask); child; child = child->get_next())
+	{
+		child->set_controller_mask_recursive(user_mask);
+	}
 }
 
 void c_user_interface_widget::start_widget_animation(int32 type)

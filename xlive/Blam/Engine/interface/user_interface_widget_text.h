@@ -25,7 +25,7 @@ public:
 
 	// c_text_widget virtual functions
 
-	virtual ~c_text_widget();
+	virtual ~c_text_widget() = default;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;
 

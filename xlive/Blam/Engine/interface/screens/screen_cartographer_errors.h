@@ -62,7 +62,7 @@ public:
 
 	// c_cartographer_error_menu virtual functions
 
-	virtual ~c_cartographer_error_menu();
+	virtual ~c_cartographer_error_menu() = default;
 	virtual void pre_destroy() override;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual void initialize(s_screen_parameters* screen_parameters) override;

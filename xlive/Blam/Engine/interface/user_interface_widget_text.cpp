@@ -46,10 +46,6 @@ void c_text_widget::set_field74()
 	field_74 = true;
 }
 
-c_text_widget::~c_text_widget()
-{
-}
-
 void c_text_widget::render_widget(rectangle2d* viewport_bounds)
 {
 	INVOKE_TYPE(0x21BD11, 0x0, void(__thiscall*)(c_text_widget*, rectangle2d*), this, viewport_bounds);

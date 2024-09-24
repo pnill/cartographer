@@ -59,8 +59,7 @@ ASSERT_STRUCT_SIZE(s_animation_transform, 0x34);
 
 class c_user_interface_widget
 {
-	// ### TODO FIXME need to access m_button_index inside virtual keyboard code
-public:
+protected:
 	//void* __vtable;
 	e_user_interface_widget_type m_widget_type;
 	int16 m_controllers_mask;
@@ -108,6 +107,7 @@ public:
 	void get_bounds(rectangle2d* bounds);
 	void set_bounds(rectangle2d* bounds);
 	void set_controller_mask(uint32 user_mask);
+	void set_controller_mask_recursive(uint32 user_mask);
 	void start_widget_animation(int32 type);
 
 	

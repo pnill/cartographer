@@ -11,10 +11,6 @@ c_group_widget::c_group_widget(e_user_interface_widget_type widget_type, int16 u
 
 // c_group_widget virtual functions
 
-c_group_widget::~c_group_widget()
-{
-}
-
 c_user_interface_text* c_group_widget::get_interface()
 {
 	//return INVOKE_TYPE(0x220050, 0x0, c_user_interface_text*(__thiscall*)(c_small_text_widget*), this);

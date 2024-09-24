@@ -9,9 +9,6 @@ void c_model_widget::apply_appearance_and_character(s_player_profile_traits* app
 
 
 // c_model_widget virtual functions
-c_model_widget::~c_model_widget()
-{
-}
 
 int32 c_model_widget::setup_children()
 {

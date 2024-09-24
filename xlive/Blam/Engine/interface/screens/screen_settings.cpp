@@ -126,10 +126,6 @@ c_settings_list::c_settings_list(int16 user_flags):
 }
 
 
-c_settings_list::~c_settings_list()
-{
-}
-
 c_list_item_widget* c_settings_list::get_list_items()
 {
 	return m_list_items;
@@ -319,9 +315,6 @@ c_screen_settings::c_screen_settings(e_user_interface_channel_type channel_type,
 	user_interface_squad_clear_match_playlist();
 }
 
-c_screen_settings::~c_screen_settings()
-{
-}
 
 void c_screen_settings::post_initialize_button_keys()
 {

@@ -16,7 +16,7 @@ public:
 
 	// c_model_widget virtual functions
 
-	virtual ~c_model_widget();
+	virtual ~c_model_widget() = default;
 	virtual int32 setup_children() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;

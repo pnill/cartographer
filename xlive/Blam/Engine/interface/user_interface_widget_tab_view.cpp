@@ -9,10 +9,6 @@ c_tab_view_widget::c_tab_view_widget(int16 user_flags):
 	this->field_70 = nullptr;
 }
 
-c_tab_view_widget::~c_tab_view_widget()
-{
-}
-
 int32 c_tab_view_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220A5F, 0x0, int32(__thiscall*)(c_tab_view_widget*), this);

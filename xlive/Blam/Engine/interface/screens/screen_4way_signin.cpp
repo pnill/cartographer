@@ -186,16 +186,12 @@ c_screen_4way_signin::c_screen_4way_signin(e_user_interface_channel_type channel
 	m_call_context = _4_way_signin_type_splitscreen;
 }
 
-c_screen_4way_signin::~c_screen_4way_signin()
-{
-}
-
 void c_screen_4way_signin::update(void)
 {
 	const uint32 all_users_mask = NONE;
 	const bool has_live_privileges = true;
 
-	this->set_controller_mask(all_users_mask);
+	this->set_controller_mask_recursive(all_users_mask);
 	c_player_widget_representation representations[k_number_of_controllers];
 
 	for (e_controller_index controller = _controller_index_0;

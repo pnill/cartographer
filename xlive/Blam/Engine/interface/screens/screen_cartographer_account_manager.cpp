@@ -228,10 +228,6 @@ c_cartographer_account_manager_edit_list::c_cartographer_account_manager_edit_li
 	}
 }
 
-c_cartographer_account_manager_edit_list::~c_cartographer_account_manager_edit_list()
-{
-}
-
 void c_cartographer_account_manager_edit_list::pre_destroy()
 {
 	switch (m_cartographer_screen_type)
@@ -547,10 +543,6 @@ c_cartographer_account_manager_menu::c_cartographer_account_manager_menu(e_user_
 	m_account_edit_list(_flags, _button_count, _selected_button, _screen_type)
 {
 	m_cartographer_screen_type = _screen_type;
-}
-
-c_cartographer_account_manager_menu::~c_cartographer_account_manager_menu()
-{
 }
 
 void c_cartographer_account_manager_menu::pre_destroy()
