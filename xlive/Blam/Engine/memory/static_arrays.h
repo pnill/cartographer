@@ -202,7 +202,7 @@ public:
 	}
 
 protected:
-	int32 m_flags[k_maximum_bit_count / LONG_BITS];
+	uint32 m_flags[k_maximum_bit_count / LONG_BITS];
 };
 
 template<size_t k_maximum_bit_count>
