@@ -451,11 +451,6 @@ void c_cartographer_account_manager_edit_list::handle_item_pressed_event_for_lis
 		user_interface_back_out_from_channel(parent_screen_ui_channel, parent_render_window);
 		g_account_manager_remove_mode ? c_cartographer_account_manager_menu::load_for_account_remove_from_list_context() : c_cartographer_account_manager_menu::load_for_account_list_context();
 	}
-	/*else if (button_id == H2AccountCount + 4)
-	{
-		extern void* ui_load_cartographer_guide_menu();
-		ui_load_cartographer_guide_menu();
-	}*/
 	else if (H2AccountCount > 0 && button_id >= 0 && button_id < H2AccountCount) // account selection (either for deletion or login)
 	{
 		if (this->account_removal_mode())

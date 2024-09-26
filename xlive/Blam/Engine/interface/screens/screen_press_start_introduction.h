@@ -31,5 +31,4 @@ public:
 	virtual void sub_60EBC2(int32 a1) override;
 	virtual void* load_proc() override;
 };
-#pragma pack(pop)
 ASSERT_STRUCT_SIZE(c_screen_press_start_introduction, 0xB8C);
