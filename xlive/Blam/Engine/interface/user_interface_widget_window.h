@@ -9,6 +9,7 @@
 
 #define K_HEADER_TEXT_BLOCK_INDEX 0
 #define K_BUTTON_KEY_TEXT_BLOCK_INDEX 1
+#define K_SUB_HEADER_TEXT_BLOCK_INDEX 2
 #define K_MINIMUM_NUMBER_OF_DEFAULT_SCREEN_TEXTS 2
 #define K_MAXIMUM_NUMBER_OF_BUTTON_KEYS 4
 
@@ -415,9 +416,7 @@ public:
 	
 	// c_screen_widget virtual functions
 
-	virtual ~c_screen_widget()
-	{
-	}
+	virtual ~c_screen_widget() = default;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_text* get_interface() override;
 	virtual bool sub_6114B9() override;
@@ -463,22 +462,16 @@ protected:
 public:
 
 	c_screen_with_menu(e_user_interface_screen_id menu_id, e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, int16 user_flags , c_list_widget* list);
+	c_text_widget* get_screen_subheader_text();
+
 
 	// c_screen_with_menu virtual functions
 
 	// base interface overrides
-	virtual ~c_screen_with_menu()
-	{
-	}
+	virtual ~c_screen_with_menu() = default;
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_user_interface_widget* sub_6121F6(rectangle2d* point) override;
 	virtual void initialize(s_screen_parameters* parameters) override;
-
-	// member functions
-	void __thiscall build_player_list(void* a1, int player_count);
-
-	// static member functions
-	static void apply_patches();
 
 private:
 	typedef c_screen_with_menu class_type;

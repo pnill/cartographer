@@ -5,12 +5,9 @@
 
 /* classes */
 
-// ### TODO FIXME need to access m_button_index inside virtual keyboard code
 class c_button_widget : public c_user_interface_widget
 {
-	// ### TODO FIXME need to access m_button_index inside virtual keyboard code
-//protected:
-public:
+protected:
 	c_small_user_interface_text m_text_interface;
 	int32 m_flags;
 	int16 m_button_index;
@@ -19,11 +16,11 @@ public:
 public:
 	c_button_widget(int16 button_index, uint16 user_flags);
 
+	void set_button_index(int16 button_index);
+
 	// c_button_widget virtual functions
 
-	virtual ~c_button_widget()
-	{
-	}
+	virtual ~c_button_widget() = default;
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual void* get_mouse_region(rectangle2d* mouse_region_out) override;

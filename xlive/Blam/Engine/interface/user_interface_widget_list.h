@@ -8,6 +8,14 @@
 
 class c_list_item_widget;
 
+/* enums */
+
+enum e_default_list_skin_texts
+{
+	_default_list_skin_text_main = 0,
+	k_number_of_default_list_skin_texts,
+};
+
 
 /* structures */
 
@@ -69,11 +77,9 @@ public:
 
 	// c_list_widget virtual functions
 
-	virtual ~c_list_widget()
-	{
-	}
+	virtual ~c_list_widget() = default;
 	virtual int32 setup_children() override;
-	virtual void on_screen_leave() override;
+	virtual void pre_destroy() override;
 	virtual void update() override;
 	virtual void render_widget(rectangle2d* viewport_bounds) override;
 	virtual int32 get_intro_delay() override;

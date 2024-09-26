@@ -4,6 +4,7 @@
 
 // c_player_widget virtual functions
 
+
 int32 c_player_widget::setup_children()
 {
 	//return INVOKE_TYPE(0x220441, 0x0, int32(__thiscall*)(c_player_widget*), this);

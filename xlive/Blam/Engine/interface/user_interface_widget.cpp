@@ -48,6 +48,20 @@ void c_user_interface_widget::initialize_animation(s_animation_transform* animat
 
 /* public methods */
 
+e_controller_index c_user_interface_widget::get_any_responding_controller()
+{
+	if (TEST_FLAG(m_controllers_mask, _controller_index_0))
+		return _controller_index_0;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_1))
+		return _controller_index_1;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_2))
+		return _controller_index_2;
+	if (TEST_FLAG(m_controllers_mask, _controller_index_3))
+		return _controller_index_3;
+
+	return k_no_controller;
+}
+
 int16 c_user_interface_widget::get_animation_type()
 {
 	return this->m_animation_index;
@@ -156,7 +170,18 @@ void c_user_interface_widget::set_bounds(rectangle2d* bounds)
 
 void c_user_interface_widget::set_controller_mask(uint32 user_mask)
 {
-	INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
+	this->m_controllers_mask = user_mask;
+}
+
+void c_user_interface_widget::set_controller_mask_recursive(uint32 user_mask)
+{
+	//INVOKE_TYPE(0x211B37, 0x0, void(__thiscall*)(c_user_interface_widget*, uint32), this, user_mask);
+
+	c_user_interface_widget* child = get_children();
+	for (set_controller_mask(user_mask); child; child = child->get_next())
+	{
+		child->set_controller_mask_recursive(user_mask);
+	}
 }
 
 void c_user_interface_widget::start_widget_animation(int32 type)
@@ -194,7 +219,7 @@ int32 c_user_interface_widget::setup_children()
 	return INVOKE_TYPE(0x211E23, 0x0, int32(__thiscall*)(c_user_interface_widget*), this);
 }
 
-void c_user_interface_widget::on_screen_leave()
+void c_user_interface_widget::pre_destroy()
 {
 	INVOKE_TYPE(0x211488, 0x0, void(__thiscall*)(c_user_interface_widget*), this);
 }

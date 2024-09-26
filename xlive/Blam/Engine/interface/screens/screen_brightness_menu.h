@@ -16,9 +16,7 @@ public:
 	}
 
 	// overrides, only needed ones
-	virtual ~c_brightness_level_edit_list()
-	{
-	}
+	virtual ~c_brightness_level_edit_list() = default;
 
 	virtual int32 setup_children() override
 	{
@@ -79,7 +77,7 @@ public:
 		return INVOKE_VFPTR_FN(_get_vfptr_table, 1, int32(class_type::**)());
 	}
 
-	virtual void on_screen_leave() override
+	virtual void pre_destroy() override
 	{
 		INVOKE_VFPTR_FN(_get_vfptr_table, 2, void(class_type::**)());
 	}

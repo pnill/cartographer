@@ -4,6 +4,8 @@
 #include "interface/user_interface_widget_list.h"
 #include "interface/user_interface_widget_window.h"
 
+/* enums */
+
 enum e_cartographer_error_id
 {
 	_cartographer_error_id_generic_error,
@@ -45,71 +47,26 @@ struct s_cartographer_error_globals
 
 /* classes */
 
-class c_cartographer_error_edit_list : public c_list_widget
+class c_cartographer_error_menu : protected c_screen_widget
 {
-public:
-	int m_field_2C0;
-	c_slot2<c_cartographer_error_edit_list, s_event_record*, int32> m_slot_2;
-
-	c_cartographer_error_edit_list(uint32 _flags);
-
-	virtual c_list_item_widget* get_list_items() override
-	{
-		return nullptr; // returns pointer to edit list
-	}
-
-	virtual int32 get_list_items_count() override
-	{
-		return 0;
-	}
-
-	void update_list_items(c_list_item_widget* item, int32 skin_index) override
-	{
-	}
-
-	// button handler
-	void button_handler(s_event_record* a2, int32* a3);
-};
-
-class c_cartographer_error_menu : protected c_screen_with_menu
-{
-public:
-	c_cartographer_error_edit_list m_error_edit_list;
+protected:
 	e_cartographer_error_id m_error_id;
-
-	static void* open_by_error_id(e_cartographer_error_id error_id);
-	static void* __cdecl open(s_screen_parameters* a1);
-
 	static void get_error_label(e_cartographer_error_id error_id, wchar_t** out_header_text, wchar_t** out_subheader_text);
+
+public:
+	static void* load_by_error_id(e_cartographer_error_id error_id);
+	static void* load(s_screen_parameters* a1);
 
 	c_cartographer_error_menu(e_user_interface_channel_type _ui_channel, e_user_interface_render_window _window_index, uint16 _flags);
 
-	virtual ~c_cartographer_error_menu();
 
-	// c_screen_with_menu specific interface
-	virtual void initialize(s_screen_parameters* screen_parameters) override
-	{
-		c_screen_with_menu::initialize(screen_parameters);
+	// c_cartographer_error_menu virtual functions
 
-		wchar_t* header_text = L"<unknown-error>";
-		wchar_t* subheader_text = L"<unknown-error-subheader>";
+	virtual ~c_cartographer_error_menu() = default;
+	virtual void pre_destroy() override;
+	virtual bool handle_event(s_event_record* event) override;
+	virtual void initialize(s_screen_parameters* screen_parameters) override;
+	virtual void* load_proc() override;
 
-		if (m_error_id != _cartpgrapher_error_id_none)
-		{
-			get_error_label(m_error_id, &header_text, &subheader_text);
-		}
-
-		m_header_text.set_text(header_text);
-		c_text_widget* subheader_text_widget = try_find_text_widget(2);
-		if (subheader_text_widget)
-		{
-			subheader_text_widget->set_text(subheader_text);
-		}
-	}
-
-	virtual void* load_proc() override
-	{
-		return c_cartographer_error_menu::open;
-	}
 private:
 };

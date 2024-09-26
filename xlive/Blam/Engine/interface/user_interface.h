@@ -302,8 +302,7 @@ enum e_user_interface_channel_type
 	_user_interface_channel_type_game_error,
 	_user_interface_channel_type_keyboard,
 	_user_interface_channel_type_dialog,
-	// this one is unknown
-	_user_interface_channel_type_interface,
+	_user_interface_channel_type_online_menu,
 	_user_interface_channel_type_gameshell_screen,
 	_user_interface_channel_type_gameshell_background,
 	k_number_of_user_interface_channels
@@ -379,5 +378,3 @@ bool __cdecl user_interface_back_out_from_channel_by_id(e_user_interface_channel
 void __cdecl user_interface_enter_game_shell(int32 context);
 bool __cdecl user_interface_in_screen(e_user_interface_channel_type channel_type, e_user_interface_render_window window_index, e_user_interface_screen_id screen_id);
 
-uint32 __cdecl user_interface_globals_get_edit_player_profile_index();
-s_saved_game_player_profile* user_interface_globals_get_edit_player_profile();

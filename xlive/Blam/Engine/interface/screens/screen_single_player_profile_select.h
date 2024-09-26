@@ -1,5 +1,5 @@
 #pragma once
-#include "user_interface_widget_list.h"
+#include "interface/user_interface_widget_list.h"
 #include "saved_games/player_profile.h"
 
 
@@ -14,12 +14,14 @@ struct s_user_interface_player_profile_storage
 class c_player_profile_list : public c_list_widget
 {
 public:
+	static void apply_instance_patches();
 
-	virtual ~c_player_profile_list()
-	{
-	}
+
+	// c_player_profile_list virtual functions
+
+	virtual ~c_player_profile_list() = default;
 	virtual int32 setup_children() override;
-	virtual void on_screen_leave() override;
+	virtual void pre_destroy() override;
 	virtual void update() override;
 	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 
@@ -38,4 +40,9 @@ private:
 	}
 };
 
-void user_interface_player_profile_list_apply_patches();
+class c_screen_single_player_profile_select_fancy
+{
+public:
+	static void* load(s_screen_parameters* parameters);
+};
+

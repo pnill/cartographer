@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "screen_4way_signin.h"
+#include "screen_network_squad_browser.h"
+#include "screen_bungie_news.h"
+#include "screen_press_start_introduction.h"
 #include "interface/user_interface.h"
 #include "interface/user_interface_bitmap_block.h"
 #include "interface/user_interface_controller.h"
@@ -188,7 +191,7 @@ void c_screen_4way_signin::update(void)
 	const uint32 all_users_mask = NONE;
 	const bool has_live_privileges = true;
 
-	this->set_controller_mask(all_users_mask);
+	this->set_controller_mask_recursive(all_users_mask);
 	c_player_widget_representation representations[k_number_of_controllers];
 
 	for (e_controller_index controller = _controller_index_0;
@@ -364,7 +367,7 @@ void c_screen_4way_signin::initialize(s_screen_parameters* parameters)
 	datum widget_tag_datum = user_interface_get_widget_tag_index_from_screen_id(this->m_screen_id);
 	if (widget_tag_datum != NONE)
 	{
-		this->verify_and_load_from_layout(NONE, &layout);
+		this->verify_and_load_from_layout(widget_tag_datum, &layout);
 	}
 	this->setup_children();
 	user_interface_squad_clear_match_playlist();
@@ -423,7 +426,7 @@ bool __cdecl user_interface_decline_invite_callback(e_controller_index controlle
 	params.m_screen_state.field_0 = NONE;
 	params.m_screen_state.m_last_focused_item_order = NONE;
 	params.m_screen_state.m_last_focused_item_index = NONE;
-	params.m_load_function = c_screen_press_start_introduction_load;
+	params.m_load_function = c_screen_press_start_introduction::load;
 
 	params.m_load_function(&params);
 	return true;
@@ -468,10 +471,10 @@ bool c_screen_4way_signin::handle_controller_button_pressed_event(s_event_record
 			}
 			break;
 		case _4_way_signin_type_system_link:
-			params.m_load_function = c_screen_network_squad_browser_load;
+			params.m_load_function = c_screen_network_squad_browser::load;
 			break;
 		case _4_way_signin_type_xbox_live:
-			params.m_load_function = c_screen_bungie_news_load;
+			params.m_load_function = c_screen_bungie_news::load;
 			break;
 		case _4_way_signin_type_crossgame_invite:
 

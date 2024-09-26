@@ -1,5 +1,11 @@
 #include "stdafx.h"
 #include "screen_settings.h"
+#include "screen_audio_settings.h"
+#include "screen_video_settings.h"
+#include "screen_about_dialog.h"
+#include "screen_network_adapter.h"
+#include "screen_variant_game_engine_type.h"
+#include "screen_single_player_profile_select.h"
 #include "interface/user_interface_controller.h"
 #include "interface/user_interface_memory.h"
 #include "interface/user_interface_networking.h"
@@ -37,12 +43,6 @@ enum e_settings_list_items : uint16
 	//custom addition
 	_item_guide,
 	k_total_no_of_settings_list_items
-};
-
-enum e_default_list_skin_texts
-{
-	_default_list_skin_text_main = 0,
-	k_number_of_default_list_skin_texts,
 };
 
 enum e_settings_screen_panes
@@ -125,10 +125,6 @@ c_settings_list::c_settings_list(int16 user_flags):
 	linker_type2.link(&m_slot);
 }
 
-
-c_settings_list::~c_settings_list()
-{
-}
 
 c_list_item_widget* c_settings_list::get_list_items()
 {
@@ -220,7 +216,7 @@ void c_settings_list::handle_item_player_profile(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_single_player_profile_select_fancy_load;
+	params.m_load_function = c_screen_single_player_profile_select_fancy::load;
 
 	params.m_load_function(&params);
 }
@@ -235,7 +231,7 @@ void c_settings_list::handle_item_variant(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_game_engine_category_load;
+	params.m_load_function = c_screen_game_engine_category::load_for_settings;
 
 	params.m_load_function(&params);
 }
@@ -250,7 +246,7 @@ void c_settings_list::handle_item_video(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_video_settings_load;
+	params.m_load_function = c_screen_video_settings::load;
 
 	params.m_load_function(&params);
 }
@@ -265,7 +261,7 @@ void c_settings_list::handle_item_audio(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_audio_settings_load;
+	params.m_load_function = c_screen_audio_settings::load;
 
 	params.m_load_function(&params);
 }
@@ -280,7 +276,7 @@ void c_settings_list::handle_item_network(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_network_adapter_menu_load;
+	params.m_load_function = c_screen_network_adapter_menu::load;
 
 	params.m_load_function(&params);
 }
@@ -295,7 +291,7 @@ void c_settings_list::handle_item_about(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_about_dialog_menu_load;
+	params.m_load_function = c_screen_about_dialog_menu::load;
 
 	params.m_load_function(&params);
 }
@@ -318,6 +314,7 @@ c_screen_settings::c_screen_settings(e_user_interface_channel_type channel_type,
 	user_interface_globals_commit_edit_profile_changes();
 	user_interface_squad_clear_match_playlist();
 }
+
 
 void c_screen_settings::post_initialize_button_keys()
 {

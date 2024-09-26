@@ -59,6 +59,9 @@ c_text_widget* c_screen_widget::get_screen_button_key_text()
 	return try_find_text_widget(K_BUTTON_KEY_TEXT_BLOCK_INDEX);
 }
 
+// only use this when you are sure the screen texts start from 2
+// that means 0 and 1 are filled up by screen_header and button_key
+// dont use this when there is a subheader / or in c_screen_with_menus
 c_text_widget* c_screen_widget::try_find_screen_text(uint32 idx)
 {
 	return try_find_text_widget(TEXT_BLOCK_INDEX_TO_WIDGET_INDEX(idx));
@@ -224,6 +227,14 @@ c_screen_with_menu::c_screen_with_menu(e_user_interface_screen_id menu_id, e_use
 	this->m_child_list = list;
 }
 
+// c_screen_with_menus generally have header,buttonkeys and subheader indices fixed
+// verify before using this , not all widgets have a subheader
+c_text_widget* c_screen_with_menu::get_screen_subheader_text()
+{
+	return try_find_text_widget(K_SUB_HEADER_TEXT_BLOCK_INDEX);
+}
+
+
 bool c_screen_with_menu::handle_event(s_event_record* event)
 {
 	return INVOKE_TYPE(0x20EEBE, 0x0, bool(__thiscall*)(c_screen_with_menu*, s_event_record*), this, event);
@@ -237,33 +248,4 @@ c_user_interface_widget* c_screen_with_menu::sub_6121F6(rectangle2d* point)
 void c_screen_with_menu::initialize(s_screen_parameters* parameters)
 {
 	INVOKE_TYPE(0x2111AB, 0x0, int(__thiscall*)(c_screen_with_menu*, s_screen_parameters*), this, parameters);
-}
-
-#pragma region Live list fix for disappearing labels
-// derived from c_screen_with_menu, but doesn't really matter
-void __thiscall c_screen_with_menu::build_player_list(void* a1, int player_count)
-{
-	auto p_build_player_list = Memory::GetAddress<void(__thiscall*)(void*, void*, int)>(0x211CD0);
-
-	// we only hook calls done to c_screen_with_menu::build_player_list in c_screen_network_squad_browser
-
-	BYTE* thisx = (BYTE*)this;
-
-	bool network_squad_browser_live_browser = *(bool*)(thisx + 7936);
-
-	if (network_squad_browser_live_browser)
-		return; // don't load the player list from data, since we are in the live list, and we don't use the details pane located in the lower right part where players are listed
-
-	return p_build_player_list(this, a1, player_count);
-}
-
-__declspec(naked) void jmp_build_player_list() { __asm jmp c_screen_with_menu::build_player_list }
-
-#pragma endregion
-
-void c_screen_with_menu::apply_patches()
-{
-	if (Memory::IsDedicatedServer()) return;
-
-	PatchCall(Memory::GetAddressRelative(0x619650), jmp_build_player_list);
 }

@@ -1,15 +1,16 @@
 #include "stdafx.h"
-#include  "user_interface_player_profile_list.h"
+#include  "screen_single_player_profile_select.h"
 
-#include "user_interface_widget_list_item.h"
+#include "interface/user_interface_widget_list_item.h"
 #include "saved_games/saved_game_files.h"
+#include "interface/user_interface_globals.h"
 
 int32 c_player_profile_list::setup_children()
 {
 	return INVOKE_TYPE(0x237583, 0x0, int32(__thiscall*)(c_player_profile_list*), this);
 }
 
-void c_player_profile_list::on_screen_leave()
+void c_player_profile_list::pre_destroy()
 {
 	INVOKE_TYPE(0x23685F, 0x0, void(__thiscall*)(c_player_profile_list*), this);
 }
@@ -51,7 +52,7 @@ void c_player_profile_list::update_displayed_profiles()
 			if (item)
 				profile_indices[current_child_widget_index] = *((int32*)item + 1);
 		}
-		current_child = (c_list_item_widget*)current_child->next_widget;
+		current_child = (c_list_item_widget*)current_child->get_next();
 
 		if (!current_child)
 			break;
@@ -129,7 +130,7 @@ wchar_t* c_player_profile_list::unknown_function_3(int32 a1)
 	return INVOKE_TYPE(0x2372D6, 0x0, wchar_t*(__thiscall*)(c_player_profile_list*, int32 a1), this, a1);
 }
 
-void user_interface_player_profile_list_apply_patches()
+void c_player_profile_list::apply_instance_patches()
 {
 	// c_player_profile_list vtable
 	WritePointer(Memory::GetAddress(0x3D284C), jmp_c_player_profile_list__update_displayed_profiles);
@@ -137,4 +138,9 @@ void user_interface_player_profile_list_apply_patches()
 	WritePointer(Memory::GetAddress(0x3D01DC), jmp_c_player_profile_list__update_displayed_profiles);
 	// c_player_profile_list_basic vtanle
 	WritePointer(Memory::GetAddress(0x3CB834), jmp_c_player_profile_list__update_displayed_profiles);
+}
+
+void* c_screen_single_player_profile_select_fancy::load(s_screen_parameters* parameters)
+{
+	return INVOKE(0x21EF9C, 0x0, c_screen_single_player_profile_select_fancy::load, parameters);
 }

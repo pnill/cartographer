@@ -76,7 +76,7 @@ int32 c_list_widget::setup_children()
 	return INVOKE_TYPE(0x213FE5, 0x0, int32(__thiscall*)(c_list_widget*), this);
 }
 
-void c_list_widget::on_screen_leave()
+void c_list_widget::pre_destroy()
 {
 	INVOKE_TYPE(0x2136A3, 0x0, void(__thiscall*)(c_list_widget*), this);
 }

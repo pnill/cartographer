@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "screen_squad_settings.h"
+#include "screen_single_player_difficulty_select.h"
+#include "screen_single_player_level_select.h"
 
 #include "bitmaps/bitmap_group.h"
 #include "interface/user_interface_controller.h"
@@ -349,8 +351,8 @@ void c_squad_settings_list::handle_item_change_level(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_single_player_level_select_load_lobby;
-	c_screen_single_player_level_select_load_lobby(&params);
+	params.m_load_function = c_screen_single_player_level_select::load_lobby;
+	params.m_load_function(&params);
 }
 void c_squad_settings_list::handle_item_change_difficulty(s_event_record** pevent)
 {
@@ -363,8 +365,8 @@ void c_squad_settings_list::handle_item_change_difficulty(s_event_record** peven
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_single_player_difficulty_select_load_lobby;
-	c_screen_single_player_difficulty_select_load_lobby(&params);
+	params.m_load_function = c_screen_single_player_difficulty_select::load_lobby;
+	params.m_load_function(&params);
 }
 void c_squad_settings_list::handle_item_quick_options(s_event_record** pevent)
 {

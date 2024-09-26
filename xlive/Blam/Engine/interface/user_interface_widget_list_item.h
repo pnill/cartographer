@@ -22,9 +22,7 @@ public:
 
 	// c_list_item_widget virtual functions
 
-	virtual ~c_list_item_widget()
-	{
-	}
+	virtual ~c_list_item_widget() = default;
 	virtual void update() override;
 	virtual int32 get_intro_delay() override;
 	virtual bool handle_event(s_event_record* event) override;
