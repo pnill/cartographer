@@ -118,7 +118,17 @@ void c_screen_virtual_keyboard::initialize(s_screen_parameters* parameters)
 	if (IN_RANGE(this->m_context, k_virtual_keyboard_custom_context_start, k_virtual_keyboard_custom_context_end))
 	{
 		// do not exceed this before calling the initializer
-		m_context = _vkbd_context_search_description;
+		switch (old_context)
+		{
+		case _vkbd_custom_context_username:
+			m_context = _vkbd_context_player_profile_name;
+			break;
+		case _vkbd_custom_context_email_or_username:
+		case _vkbd_custom_context_email:
+		case _vkbd_custom_context_password:
+			m_context = _vkbd_context_search_description;
+			break;
+		}
 	}
 
 	// call the orignal screen initializer
