@@ -141,6 +141,9 @@ public:
 	void set_input_string_buffer(wchar_t* buffer, uint32 buffer_size);
 	void set_context(e_vkbd_context_type context);
 
+	static void apply_patches();
+	bool __thiscall load_player_profile_edit();
+
 	static void* load(s_screen_parameters* parameters);
 
 	// c_screen_virtual_keyboard virtual functions

@@ -38,6 +38,10 @@ const s_keyboard_custom_labels k_keyboard_custom_label_globals[k_language_count]
 	}
 };
 
+/* global variables */
+
+bool g_vkbd_create_open_profile_config = true;
+
 // header & subheader
 static void get_keyboard_labels(e_vkbd_context_type context, wchar_t** out_header_text, wchar_t** out_subheader_text)
 {
@@ -94,6 +98,7 @@ c_screen_virtual_keyboard::c_screen_virtual_keyboard(e_user_interface_channel_ty
 
 c_screen_virtual_keyboard::~c_screen_virtual_keyboard()
 {
+	g_vkbd_create_open_profile_config = true;
 	ui_set_virtual_keyboard_in_use(false);
 }
 
@@ -122,6 +127,7 @@ void c_screen_virtual_keyboard::initialize(s_screen_parameters* parameters)
 		{
 		case _vkbd_custom_context_username:
 			m_context = _vkbd_context_player_profile_name;
+			g_vkbd_create_open_profile_config = false;
 			break;
 		case _vkbd_custom_context_email_or_username:
 		case _vkbd_custom_context_email:
@@ -195,6 +201,28 @@ void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_t
 	virtual_keyboard->set_input_string_buffer(out_keyboard_text, out_keyboard_text_lenght);
 
 	return virtual_keyboard;
+}
+
+typedef bool(__thiscall* t_load_player_profile_edit)(c_screen_virtual_keyboard*);
+t_load_player_profile_edit p_load_player_profile_edit;
+
+bool __thiscall c_screen_virtual_keyboard::load_player_profile_edit()
+{
+	bool result = true;
+
+	if (g_vkbd_create_open_profile_config)
+	{
+		result = p_load_player_profile_edit(this);
+	}
+
+	return result;
+}
+
+void __declspec(naked) jmp_c_screen_virtual_keyboard__load_player_profile_edit() { __asm jmp c_screen_virtual_keyboard::load_player_profile_edit }
+
+void c_screen_virtual_keyboard::apply_patches()
+{
+	DETOUR_ATTACH(p_load_player_profile_edit, Memory::GetAddress<t_load_player_profile_edit>(0x23C7B2, 0x0), jmp_c_screen_virtual_keyboard__load_player_profile_edit);
 }
 
 void ui_set_virtual_keyboard_in_use(bool state)

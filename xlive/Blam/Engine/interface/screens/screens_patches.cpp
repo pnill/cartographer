@@ -11,6 +11,7 @@
 #include "screen_settings.h"
 #include "screen_network_squad_browser.h"
 #include "screen_single_player_profile_select.h"
+#include "screen_virtual_keyboard.h"
 
 void screens_apply_patches_on_map_load()
 {
@@ -31,4 +32,5 @@ void screens_apply_patches()
 	c_screen_network_squad_browser::apply_patches();
 	c_screen_press_start_introduction::apply_instance_patches();
 	c_player_profile_list::apply_instance_patches();
+	c_screen_virtual_keyboard::apply_patches();
 }
