@@ -45,19 +45,15 @@ int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
 	return result;
 }
 
-void wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int buffer_count)
+void __cdecl wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int32 buffer_count)
 {
-	typedef void (__cdecl* wchar_string_to_utf8_string_t)(const wchar_t*, utf8*, int);
-	auto p_wchar_string_to_utf8_string = Memory::GetAddress<wchar_string_to_utf8_string_t>(0x4C9F7, 0x31DD7);
-	p_wchar_string_to_utf8_string(src, dst, buffer_count);
+	INVOKE(0x4C9F7, 0x31DD7, wchar_string_to_utf8_string, src, dst, buffer_count);
 	return;
 }
 
-void utf8_string_to_wchar_string(const utf8* src, wchar_t* dst, int buffer_count)
+void __cdecl utf8_string_to_wchar_string(const utf8* src, wchar_t* dst, int32 buffer_count)
 {
-	typedef void(__cdecl* utf8_string_to_wchar_string_t)(const utf8*, wchar_t*, int);
-	auto p_utf8_string_to_wchar_string = Memory::GetAddress<utf8_string_to_wchar_string_t>(0x4C801, 0x31BE1);
-	p_utf8_string_to_wchar_string(src, dst, buffer_count);
+	INVOKE(0x4C801, 0x31BE1, utf8_string_to_wchar_string, src, dst, buffer_count);
 	return;
 }
 
