@@ -432,6 +432,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			MapSlots::OnMapLoad();
 			UIRankPatch();
 			screens_apply_patches_on_map_load();
+			main_tag_fixes();
 		}
 
 	}

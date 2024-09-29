@@ -8,6 +8,11 @@ void display_assert(char const* condition, char const* file, int32 line, bool as
 	return;
 }
 
+void* csmemmove(void* dst, void* src, size_t size)
+{
+	return memmove(dst, src, size);
+}
+
 void* csmemset(void* dst, int32 val, size_t size)
 {
 	return memset(dst, val, size);

@@ -49,3 +49,6 @@ namespace XLiveRendering
 extern HWND H2hWnd;
 extern LPDIRECT3DDEVICE9 g_pD3DDevice9;
 
+HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii);
+
+int WINAPI XLiveOnResetDevice(D3DPRESENT_PARAMETERS* pD3DPP);

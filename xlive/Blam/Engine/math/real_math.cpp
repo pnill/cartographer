@@ -49,7 +49,7 @@ real_quaternion* quaternion_normalize(real_quaternion* q)
 real_quaternion* fast_quaternion_interpolate_and_normalize(const real_quaternion* previous, const real_quaternion* current, real32 fractional_ticks, real_quaternion* quaternion)
 {	
 	real32 dot_product = dot_product4d_quaternion(current, previous);
-	real32 v1 = (dot_product >= 0.0f ? fractional_ticks : -fractional_ticks);
+	real32 v1 = (dot_product >= 0.f ? fractional_ticks : -fractional_ticks);
 	real32 v2 = 1.0f - fractional_ticks;
 
 	quaternion->v.i = (previous->v.i * v2) + (v1 * current->v.i);

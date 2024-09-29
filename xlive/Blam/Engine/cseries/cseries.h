@@ -165,6 +165,9 @@ extern bool g_catch_exceptions;
 void display_assert(char const* condition, char const* file, int32 line, bool assertion_failed);
 
 // TODO reimplement this properly
+void* csmemmove(void* dst, void* src, size_t size);
+
+// TODO reimplement this properly
 void* csmemset(void* dst, int32 val, size_t size);
 
 // TODO reimplement this properly
