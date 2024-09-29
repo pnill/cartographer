@@ -38,7 +38,8 @@ IDirect3DTexture9* g_d3d_texture_render_z_as_target_z = NULL;
 
 real32 g_sun_size = 0.2f;
 
-bool global_d3d_target_use_depth = false;
+bool g_d3d_target_use_depth = false;
+bool g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
 
 /* prototypes */
 
@@ -49,12 +50,6 @@ uint32* motion_sensor_texture_size_get(void);
 IDirect3DTexture9* rasterizer_dx9_get_target_texture(e_rasterizer_target rasterizer_target);
 IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_target target, int16 mip);
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
-
-bool __cdecl rasterizer_dx9_primary_targets_initialize(void);
-void __cdecl rasterizer_dx9_primary_targets_dispose(void);
-bool __cdecl rasterizer_dx9_secondary_targets_initialize(void);
-void __cdecl rasterizer_dx9_secondary_targets_dispose(void);
-
 
 /* public code */
 
@@ -130,28 +125,30 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
         *last_target = target;
     }
 
-    bool target_set = false;
+    bool z_target_set = false;
     if (*global_rasterizer_pixel_shader_index_get() == 2)
     {
         const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-        if (target == dx9_globals->global_d3d_surface_render_primary && *last_z_target != dx9_globals->global_d3d_surface_render_z_as_target_z)
+        if (target == dx9_globals->global_d3d_surface_render_primary)
         {
-            *last_z_target = dx9_globals->global_d3d_surface_render_z_as_target_z;
-            HRESULT hr = global_d3d_device->SetRenderTarget(1, dx9_globals->global_d3d_surface_render_z_as_target_z);
+            // Set the target to scratch if we don't want to draw to the depth target for specific render layers
+            *last_z_target = g_dx9_dont_draw_to_depth_target_if_mrt_is_used ? NULL : dx9_globals->global_d3d_surface_render_z_as_target_z;
+
+            const HRESULT hr = global_d3d_device->SetRenderTarget(1, *last_z_target);
             valid = valid && SUCCEEDED(hr);
-            target_set = true;
+            z_target_set = true;
         }
     }
 
-    if (!target_set && *last_z_target != NULL)
+    if (!z_target_set && *last_z_target != NULL)
     {
         *last_z_target = NULL;
         HRESULT hr = global_d3d_device->SetRenderTarget(1, NULL);
-        valid = valid && SUCCEEDED(hr);
+        valid &= SUCCEEDED(hr);
     }
 
     bool result;
-    global_d3d_target_use_depth = use_depth;
+    g_d3d_target_use_depth = use_depth;
     if (z_stencil == (IDirect3DSurface9*)NONE || *last_z_stencil == z_stencil)
     {
         result = valid;
@@ -160,7 +157,6 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
     {
         HRESULT hr = global_d3d_device->SetDepthStencilSurface(z_stencil);
         *last_z_stencil = z_stencil;
-
         result = valid && SUCCEEDED(hr); 
     }
 
@@ -578,57 +574,6 @@ IDirect3DSurface9** rasterizer_dx9_last_z_stencil_get(void)
     return Memory::GetAddress<IDirect3DSurface9**>(0xA4B194);
 }
 
-/* private code */
-
-IDirect3DPixelShader9** global_d3d_shader_white_source_get(void)
-{
-    return Memory::GetAddress<IDirect3DPixelShader9**>(0x9DAAB0);
-}
-
-uint32* cubemap_target_size_get(void)
-{
-    return Memory::GetAddress<uint32*>(0x41F674);
-}
-
-uint32* motion_sensor_texture_size_get(void)
-{
-    return Memory::GetAddress<uint32*>(0x41F694);
-}
-
-IDirect3DTexture9* rasterizer_dx9_get_target_texture(e_rasterizer_target rasterizer_target)
-{
-    IDirect3DTexture9* result = NULL;
-    if (rasterizer_target != _rasterizer_target_none)
-    {
-        const s_rasterizer_target* target = rasterizer_dx9_texture_target_get(rasterizer_target);
-
-        // If the bool is false return the texture storage
-        // Otherwise, return NULL
-        result = (!target->unk_bool_20 ? target->d3d_texture_storage : result);             
-    }
-
-    return result;
-}
-
-IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_target rasterizer_target, int16 mipmap_index)
-{
-    IDirect3DSurface9* result = NULL;
-    const s_rasterizer_target* target = rasterizer_dx9_texture_target_get(rasterizer_target);
-    if (target->d3d_texture_storage && !target->unk_bool_20 && VALID_INDEX(mipmap_index, target->mip_count))
-    {
-        ASSERT(mipmap_index < NUMBEROF(target->d3d_surface_storage));
-        result = target->d3d_surface_storage[mipmap_index];
-    }
-
-    return result;
-}
-
-void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
-{
-    rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
-    return;
-}
-
 bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
 {
     s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
@@ -651,12 +596,12 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
         &dx9_globals->global_d3d_texture_render_resolved,
         NULL)))
     {
-        const D3DMULTISAMPLE_TYPE type = dx9_globals->global_d3d_primary_multisampletype;
-        const uint32 quality = dx9_globals->global_d3d_primary_multisamplequality;
+        const D3DMULTISAMPLE_TYPE type = rasterizer_globals->d3d9_sm3_supported ? D3DMULTISAMPLE_NONE : dx9_globals->global_d3d_primary_multisampletype;
+        const uint32 quality = rasterizer_globals->d3d9_sm3_supported ? 0 : dx9_globals->global_d3d_primary_multisamplequality;
 
         const D3DFORMAT depthstencil_fmt = rasterizer_globals->display_parameters.depthstencil_format;
-        
-        success = 
+
+        success =
             SUCCEEDED(dx9_globals->global_d3d_texture_render_resolved->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_render_resolved)) &&
             SUCCEEDED(global_d3d_device->CreateRenderTarget(screen_bounds_width,
                 screen_bounds_height,
@@ -721,7 +666,7 @@ void __cdecl rasterizer_dx9_primary_targets_dispose(void)
         dx9_globals->global_d3d_surface_render_resolved->Release();
         dx9_globals->global_d3d_surface_render_resolved = NULL;
     }
-    
+
     if (dx9_globals->global_d3d_surface_render_primary)
     {
         dx9_globals->global_d3d_surface_render_primary->Release();
@@ -745,14 +690,14 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
     const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
 
     bool succeeded = SUCCEEDED(global_d3d_device->CreateTexture(
-            screen_bounds_width,
-            screen_bounds_height,
-            1,
-            1,
-            D3DFMT_A8R8G8B8,
-            D3DPOOL_DEFAULT,
-            &dx9_globals->global_d3d_backbuffer_texture,
-            NULL));
+        screen_bounds_width,
+        screen_bounds_height,
+        1,
+        1,
+        D3DFMT_A8R8G8B8,
+        D3DPOOL_DEFAULT,
+        &dx9_globals->global_d3d_backbuffer_texture,
+        NULL));
 
     HRESULT hr;
     if (succeeded)
@@ -762,8 +707,8 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
             const bool sm3_supported = rasterizer_globals->d3d9_sm3_supported;
 
             const D3DFORMAT format = (sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
-            const D3DMULTISAMPLE_TYPE type = (sm3_supported ? dx9_globals->global_d3d_primary_multisampletype : D3DMULTISAMPLE_NONE);
-            const uint32 quality = (sm3_supported ? dx9_globals->global_d3d_primary_multisamplequality : 0);
+            const D3DMULTISAMPLE_TYPE type  = D3DMULTISAMPLE_NONE;
+            const uint32 quality = 0;
 
             // If shader model 3 is supported we create the z target as a render target
             // Rather than a depth stencil surface
@@ -797,13 +742,11 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
                         &g_d3d_texture_render_z_as_target_z,
                         NULL)) &&
 
-                    // Get texture of the render target from the render target surface
-                    SUCCEEDED(g_d3d_texture_render_z_as_target_z->GetSurfaceLevel(
-                        0,
-                        &dx9_globals->global_d3d_surface_render_z_as_target_z));
+                        // Get texture of the render target from the render target surface
+                        SUCCEEDED(g_d3d_texture_render_z_as_target_z->GetSurfaceLevel(
+                            0,
+                            &dx9_globals->global_d3d_surface_render_z_as_target_z));
                 }
-
-                    
             }
             else
             {
@@ -910,6 +853,7 @@ void __cdecl rasterizer_dx9_secondary_targets_dispose(void)
         dx9_globals->global_d3d_surface_sun_glow_secondary->Release();
         dx9_globals->global_d3d_surface_sun_glow_secondary = NULL;
     }
+
     if (dx9_globals->global_d3d_texture_sun_glow_primary)
     {
         dx9_globals->global_d3d_texture_sun_glow_primary->Release();
@@ -943,5 +887,63 @@ void __cdecl rasterizer_dx9_secondary_targets_dispose(void)
         g_d3d_texture_render_z_as_target_z->Release();
         g_d3d_texture_render_z_as_target_z = NULL;
     }
+
     return;
 }
+
+bool __cdecl rasterizer_dx9_targets_initialize(void)
+{
+    return INVOKE(0x2804FF, 0x0, rasterizer_dx9_targets_initialize);
+}
+
+/* private code */
+
+IDirect3DPixelShader9** global_d3d_shader_white_source_get(void)
+{
+    return Memory::GetAddress<IDirect3DPixelShader9**>(0x9DAAB0);
+}
+
+uint32* cubemap_target_size_get(void)
+{
+    return Memory::GetAddress<uint32*>(0x41F674);
+}
+
+uint32* motion_sensor_texture_size_get(void)
+{
+    return Memory::GetAddress<uint32*>(0x41F694);
+}
+
+IDirect3DTexture9* rasterizer_dx9_get_target_texture(e_rasterizer_target rasterizer_target)
+{
+    IDirect3DTexture9* result = NULL;
+    if (rasterizer_target != _rasterizer_target_none)
+    {
+        const s_rasterizer_target* target = rasterizer_dx9_texture_target_get(rasterizer_target);
+
+        // If the bool is false return the texture storage
+        // Otherwise, return NULL
+        result = (!target->unk_bool_20 ? target->d3d_texture_storage : result);             
+    }
+
+    return result;
+}
+
+IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_target rasterizer_target, int16 mipmap_index)
+{
+    IDirect3DSurface9* result = NULL;
+    const s_rasterizer_target* target = rasterizer_dx9_texture_target_get(rasterizer_target);
+    if (target->d3d_texture_storage && !target->unk_bool_20 && VALID_INDEX(mipmap_index, target->mip_count))
+    {
+        ASSERT(mipmap_index < NUMBEROF(target->d3d_surface_storage));
+        result = target->d3d_surface_storage[mipmap_index];
+    }
+
+    return result;
+}
+
+void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3)
+{
+    rasterizer_dx9_set_target(*rasterizer_dx9_main_render_target_get(), 0, true);
+    return;
+}
+

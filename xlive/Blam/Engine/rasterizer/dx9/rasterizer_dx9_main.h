@@ -1,8 +1,9 @@
 #pragma once
+#include "rasterizer_dx9_targets.h"
+
 #include "bitmaps/bitmap_group.h"
 #include "render/render.h"
-
-#include "rasterizer_dx9_targets.h"
+#include "rasterizer/rasterizer_globals.h"
 
 /* enums */
 
@@ -66,13 +67,19 @@ struct s_rasterizer_dx9_main_globals
 
 /* prototypes */
 
+void rasterizer_dx9_main_apply_patches(void);
+
 s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void);
 
 IDirect3DDevice9Ex* rasterizer_dx9_device_get_interface(void);
 
 datum last_bitmap_tag_index_get(void);
 
-void rasterizer_dx9_main_apply_patches(void);
+D3DCAPS9* rasterizer_dx9_caps_get(void);
+
+int32* hardware_vertex_processing_get(void);
+
+int32* allow_vsync_get(void);
 
 bool __cdecl rasterizer_initialize(void);
 
@@ -94,8 +101,6 @@ void __cdecl rasterizer_dx9_set_render_state(D3DRENDERSTATETYPE state, DWORD val
 
 void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuffer_blend_function);
 
-void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader);
-
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright);
 
 bool __cdecl rasterizer_set_texture_bitmap_data(int16 stage, bitmap_data* texture);
@@ -114,13 +119,15 @@ bool __cdecl rasterizer_dx9_device_set_texture(uint32 stage, IDirect3DTexture9* 
 
 void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32 usage, datum tag_index, int16 bitmap_index, real32 a6);
 
-bool __cdecl rasterizer_dx9_initialize_device(real_vector3d* v, bool display_blackness);
+bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameters, bool display_blackness);
 
 void __cdecl rasterizer_dx9_initialize_camera_projection(
     bool is_texture_camera,
     const s_camera* camera,
     const render_projection* projection,
     e_rasterizer_target rasterizer_target);
+
+bool __cdecl rasterizer_dx9_initialize(void);
 
 bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters);
 

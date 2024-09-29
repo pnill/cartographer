@@ -36,19 +36,8 @@
 #include "structures/structures.h"
 #include "widgets/liquid.h"
 
-/* globals */
-
-bool g_render_layer_view_4 = false;
-bool g_render_layer_view_5 = false;
-
-bool g_submit_occlusion_tests = true;
-
-bool render_decals_enabled = true;
-bool render_lens_flares_enabled = true;
-bool render_patchy_fog_enabled = true;
-bool render_water_enabled = true;
-
 /* type definitions */
+
 typedef bool(__cdecl* t_render_ingame_user_interface_hud_element)(
     real32 left,
     real32 top,
@@ -67,6 +56,24 @@ typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook
     datum bitmap_index,
     int32* a4,
     datum shader_index);
+
+/* globals */
+
+bool g_render_layer_view_4 = false;
+bool g_render_layer_view_5 = false;
+
+bool g_submit_occlusion_tests = true;
+
+bool render_decals_enabled = true;
+bool render_lens_flares_enabled = true;
+bool render_patchy_fog_enabled = true;
+bool render_water_enabled = true;
+
+t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
+t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
+
+e_controller_index g_render_current_controller_index = _controller_index_0;
+uint32 g_render_current_user_index = 0;
 
 /* prototypes */
 
@@ -124,12 +131,6 @@ void __cdecl render_camera(
 
 /* public code */
 
-t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
-t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
-
-e_controller_index g_render_current_controller_index = _controller_index_0;
-uint32 g_render_current_user_index = 0;
-
 void render_apply_patches(void)
 {
     PatchCall(Memory::GetAddress(0x19224A), render_window);
@@ -137,10 +138,6 @@ void render_apply_patches(void)
 
     DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element_hook);
     DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
-
-    // ### FIXME re-enable text/user interface text
-    // *Memory::GetAddress<bool*>(0x46818E) = false;
-
     return;
 }
 
@@ -222,6 +219,11 @@ uint32* global_effect_flag_get(void)
 uint32* global_frame_num_get(void)
 {
     return Memory::GetAddress<uint32*>(0x4E695C);
+}
+
+int32* load_low_detail_textures_get(void)
+{
+    return Memory::GetAddress<int32*>(0x4E6A60);
 }
 
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
@@ -366,11 +368,6 @@ void __cdecl render_scene(
 
     // Sky rendering
     const s_frame* global_window_parameters = global_window_parameters_get();
-    if (global_window_parameters->fog_result.draw_sky && effect_flag != 2 && render_layer_debug_view != 2)
-    {
-        rasterizer_dx9_set_stencil_mode(0);
-        render_sky();
-    }
 
     create_visible_render_primitives(hologram_flag);
 
@@ -390,7 +387,16 @@ void __cdecl render_scene(
             if (rasterizer_globals->d3d9_sm3_supported)
             {
                 *global_rasterizer_pixel_shader_index_get() = 2;
+                g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
             }
+
+            rasterizer_dx9_perf_event_begin("texaccum", NULL);
+            if (prepare_render_layer(_render_layer_texture_accumulate))
+            {
+                draw_render_layer();
+                reset_after_render_layer_draw();
+            }
+            rasterizer_dx9_perf_event_end("texaccum");
 
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
             if (prepare_render_layer(_render_layer_lightmap_indirect))
@@ -408,7 +414,8 @@ void __cdecl render_scene(
             }
             rasterizer_dx9_perf_event_end("sh_prt");
 
-            *global_rasterizer_pixel_shader_index_get() = 0;
+            g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+
             rasterizer_dx9_perf_event_begin("environment_map", NULL);
             if (prepare_render_layer(_render_layer_enviroment_map))
             {
@@ -496,6 +503,14 @@ void __cdecl render_scene(
         // RENDER LAYER 0, 3 - 5
         else
         {
+            rasterizer_dx9_perf_event_begin("texaccum", NULL);
+            if (prepare_render_layer(_render_layer_texture_accumulate))
+            {
+                draw_render_layer();
+                reset_after_render_layer_draw();
+            }
+            rasterizer_dx9_perf_event_end("texaccum");
+
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
             if (prepare_render_layer(_render_layer_lightmap_indirect))
             {
@@ -621,71 +636,83 @@ render_postprocess:
             goto render_postprocess;
         }
 
-        if (get_render_fog_enabled() && effect_flag != 2)
+        if (effect_flag != 2)
         {
-            if (prepare_render_layer(_render_layer_fog))
+            if (global_window_parameters->fog_result.draw_sky)
             {
-                draw_render_layer();
-                reset_after_render_layer_draw();
+                rasterizer_dx9_perf_event_begin("render_sky", NULL);
+                rasterizer_dx9_set_stencil_mode(2);
+                render_sky();
+                rasterizer_dx9_set_stencil_mode(0);
+                rasterizer_dx9_perf_event_end("render_sky");
             }
 
-            const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-            const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-            // If we're not using shader model 3 draw the depth on the backbuffer in a seperate pass
-            // In shader model 3 these are already drawn during the lightmap_indirect stage
-            if (rasterizer_globals->d3d9_sm3_supported)
+            if (get_render_fog_enabled())
             {
-                // We need to copy the result of the z target to the backbuffer if we're not in d3d9ex
-                // In EX we can associate a texture to the render target and stage that later on
-                // However, we cannot do this in stock d3d9 as the device reset will fail if you try and associate a texture to the render target
-                if (!rasterizer_globals->use_d3d9_ex)
+                const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+                const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+                // If we're not using shader model 3 draw the depth on the backbuffer in a seperate pass
+                // In shader model 3 these are already drawn during the lightmap_indirect stage
+                if (rasterizer_globals->d3d9_sm3_supported)
                 {
-                    RECT rect;
-                    rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
-                    global_d3d_device->StretchRect(
-                        dx9_globals->global_d3d_surface_render_z_as_target_z,
-                        &rect,
-                        dx9_globals->global_d3d_backbuffer_surface,
-                        &rect,
-                        D3DTEXF_LINEAR);
+                    // We need to copy the result of the z target to the backbuffer if we're not in d3d9ex
+                    // In EX we can associate a texture to the render target and stage that later on
+                    // However, we cannot do this in stock d3d9 as the device reset will fail if you try and associate a texture to the render target
+                    if (!rasterizer_globals->use_d3d9_ex)
+                    {
+                        RECT rect;
+                        rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
+                        global_d3d_device->StretchRect(
+                            dx9_globals->global_d3d_surface_render_z_as_target_z,
+                            &rect,
+                            dx9_globals->global_d3d_backbuffer_surface,
+                            &rect,
+                            D3DTEXF_LINEAR);
+                    }
                 }
-            }
-            else
-            {
-                const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
-                const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };
-                rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
-                global_d3d_device->Clear(
-                    0,
-                    NULL,
-                    D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
-                    global_white_pixel32.color,
-                    1.f,
-                    0);
-                *global_rasterizer_pixel_shader_index_get() = 1;
-                if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
+                else
                 {
-                    global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
+                    const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
+                    const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };
+                    rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
+                    global_d3d_device->Clear(
+                        0,
+                        NULL,
+                        D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+                        global_white_pixel32.color,
+                        1.f,
+                        0);
+
+                    *global_rasterizer_pixel_shader_index_get() = 1;
+
+                    if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
+                    {
+                        global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
+                    }
+
+                    if (prepare_render_layer(_render_layer_lightmap_indirect))
+                    {
+                        draw_render_layer();
+                        reset_after_render_layer_draw();
+                    }
+                    if (prepare_render_layer(_render_layer_spherical_harmonics_prt))
+                    {
+                        draw_render_layer();
+                        reset_after_render_layer_draw();
+                    }
                 }
-                
-                if (prepare_render_layer(_render_layer_lightmap_indirect))
-                {
-                    draw_render_layer();
-                    reset_after_render_layer_draw();
-                }
-                if (prepare_render_layer(_render_layer_spherical_harmonics_prt))
+
+                render_atmospheric_fog();
+
+                if (prepare_render_layer(_render_layer_fog))
                 {
                     draw_render_layer();
                     reset_after_render_layer_draw();
                 }
             }
         }
-        *global_rasterizer_pixel_shader_index_get() = 0;
 
-        if (get_render_fog_enabled() && effect_flag != 2)
-        {
-            render_atmospheric_fog();
-        }
+        g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
 
         if (render_water_enabled)
         {
@@ -714,12 +741,17 @@ render_postprocess:
             if (effect_flag == 2)
             {
 render_widgets:
+                rasterizer_dx9_perf_event_begin("liquids", NULL);
                 liquid_render();
+                rasterizer_dx9_perf_event_end("liquids");
+                rasterizer_dx9_perf_event_begin("weather", NULL);
                 weather_render();
+                rasterizer_dx9_perf_event_end("weather");
                 goto LABEL_77;
             }
 
             const s_scenario_fog_result* g_fog_result = global_fog_result_get();
+            rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
             if (g_fog_result->field_96)
             {
                 render_patchy_fog(1, 1);
@@ -728,6 +760,7 @@ render_widgets:
             {
                 render_patchy_fog(1, 0);
             }
+            rasterizer_dx9_perf_event_end("patchy_fog");
         }
 
         if (effect_flag != 2)

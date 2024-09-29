@@ -5,6 +5,7 @@
 #include "rasterizer_dx9_dof.h"
 #include "rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer_dx9_main.h"
+#include "rasterizer_dx9_screen_effect.h"
 #include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_submit.h"
 

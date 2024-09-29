@@ -1,7 +1,27 @@
 #pragma once
 #include "rasterizer_dx9_targets.h"
 
-/* public code */
+/* structures */
+
+struct s_rasterizer_bloom_globals
+{
+	bool enable_cinematic_bloom;
+	int8 pad[3];
+	real_bounds time_bounds;
+	real_bounds brightness_bounds;
+	real_bounds overbright_bounds;
+	real_bounds cinematic_time_bounds;
+	real_bounds cinematic_brightness_bounds;
+	real_bounds cinematic_overbright_bounds;
+};
+
+/* prototypes */
+
+s_rasterizer_bloom_globals** rasterizer_bloom_globals_get(void);
+
+void __cdecl rasterizer_dx9_create_blur_pixel_shaders(void);
+
+void __cdecl rasterizer_bloom_globals_initialize(void);
 
 void __cdecl rasterizer_dx9_dof_render_bloom(real32 blur_amount, real32 threshold, real32 brightness, real32 box_factor, real32 max_factor, bool a6, bool a7);
 

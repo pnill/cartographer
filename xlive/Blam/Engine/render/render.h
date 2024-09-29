@@ -112,6 +112,8 @@ s_frame* global_window_parameters_get(void);
 
 uint32* global_frame_num_get(void);
 
+int32* load_low_detail_textures_get(void);
+
 int32* get_global_window_bound_index(void);
 
 s_frame_parameters* global_frame_parameters_get(void);

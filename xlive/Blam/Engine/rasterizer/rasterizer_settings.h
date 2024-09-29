@@ -1,4 +1,5 @@
 #pragma once
+#include "rasterizer_globals.h"
 
 /* constants */
 
@@ -66,3 +67,13 @@ bool* get_render_fog_enabled(void);
 s_rasterizer_settings* rasterizer_settings_get(void);
 
 void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality);
+
+void __cdecl rasterizer_settings_update_window_position(void);
+
+void rasterizer_settings_set_default_settings(void);
+
+void __cdecl rasterizer_settings_create_registry_keys(bool is_game);
+
+void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode);
+
+void __cdecl rasterizer_settings_apply_settings(int32 setting);

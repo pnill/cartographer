@@ -41,9 +41,17 @@ struct s_rasterizer_globals_display_parameters
 };
 ASSERT_STRUCT_SIZE(s_rasterizer_globals_display_parameters, 56);
 
+struct s_rasterizer_parameters
+{
+	int16 field_0;
+	int32 field_4;
+	int32 field_8;
+};
+ASSERT_STRUCT_SIZE(s_rasterizer_parameters, 12);
+
 struct s_rasterizer_globals_clipping_parameters
 {
-	uint32 field_0[3];
+	s_rasterizer_parameters parameters;
 	real32 z_near;
 	real32 z_far;
 	real32 depth_near;

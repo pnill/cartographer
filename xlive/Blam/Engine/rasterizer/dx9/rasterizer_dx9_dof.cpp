@@ -22,6 +22,23 @@ e_rasterizer_target __cdecl sub_87E570(real32 unused1, real32 a1, real32 unused2
 
 /* public code */
 
+s_rasterizer_bloom_globals** rasterizer_bloom_globals_get(void)
+{
+    return Memory::GetAddress<s_rasterizer_bloom_globals**>(0xA3C63C);
+}
+
+void __cdecl rasterizer_dx9_create_blur_pixel_shaders(void)
+{
+    INVOKE(0x26BB08, 0x0, rasterizer_dx9_create_blur_pixel_shaders);
+    return;
+}
+
+void __cdecl rasterizer_bloom_globals_initialize(void)
+{
+    INVOKE(0x26BBDF, 0x0, rasterizer_bloom_globals_initialize);
+    return;
+}
+
 // TODO: Rewrite to fix bloom in splitscreen
 void __cdecl rasterizer_dx9_dof_render_bloom(real32 blur_amount, real32 threshold, real32 brightness, real32 box_factor, real32 max_factor, bool a6, bool a7)
 {

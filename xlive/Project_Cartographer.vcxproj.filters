@@ -427,6 +427,21 @@
     <ClCompile Include="Blam\Engine\render\render_weather.cpp" />
     <ClCompile Include="Blam\Engine\objects\lights.cpp" />
     <ClCompile Include="Blam\Engine\render\render_visible_geometry.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_errors.cpp" />
+    <ClCompile Include="Blam\Engine\cseries\debug_memory.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_profile.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_dynamic_reflect.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_stipple.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_widgets.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_motion_sensor.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_9on12.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_vertex_shader_definitions.cpp" />
+    <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1128,6 +1143,21 @@
     <ClInclude Include="Blam\Engine\render\render_weather.h" />
     <ClInclude Include="Blam\Engine\objects\lights.h" />
     <ClInclude Include="Blam\Engine\render\render_visible_geometry.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_errors.h" />
+    <ClInclude Include="Blam\Engine\cseries\debug_memory.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_profile.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_dynamic_reflect.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_debug.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_buffers.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_bitmaps.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_vertex_shaders.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_stipple.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_text.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_widgets.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_motion_sensor.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_9on12.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_shader_definitions.h" />
+    <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

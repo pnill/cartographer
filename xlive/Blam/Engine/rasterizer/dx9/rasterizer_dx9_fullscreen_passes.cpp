@@ -3,6 +3,7 @@
 
 #include "rasterizer_dx9.h"
 #include "rasterizer_dx9_main.h"
+#include "rasterizer_dx9_screen_effect.h"
 #include "rasterizer_dx9_shader_submit.h"
 
 #include "rasterizer/rasterizer_globals.h"

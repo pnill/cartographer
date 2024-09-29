@@ -2,6 +2,11 @@
 
 /* public code */
 
+bool __cdecl rasterizer_transparent_geometry_initialize(void)
+{
+	return INVOKE(0x278271, 0x0, rasterizer_transparent_geometry_initialize);
+}
+
 void __cdecl rasterizer_transparent_geometry_reset_counts(void)
 {
 	INVOKE(0x27818C, 0x0, rasterizer_transparent_geometry_reset_counts);

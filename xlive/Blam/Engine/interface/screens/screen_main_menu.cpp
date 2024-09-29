@@ -162,7 +162,7 @@ void c_main_menu_list::handle_item_pressed_event(s_event_record** pevent, datum*
 	if (item_absolute_index != _item_quit)
 		global_preferences_set_last_main_menu_item(item_absolute_index);
 
-	if (shell_startup_flag_is_set(_startup_flag_ui_fast_test) || shell_startup_flag_is_set(_startup_flag_ui_fast_test_no_start))
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_ui_fast_test) || shell_command_line_flag_is_set(_shell_command_line_flag_ui_fast_test_no_start))
 	{
 		item_absolute_index = _item_system_link;
 		//byte_811031 = 0;
@@ -218,7 +218,7 @@ void c_main_menu_list::handle_item_xbox_live(s_event_record** pevent)
 
 	//xbox checks if there are any live-controllers signed in
 	//h2v on the other hand checks for live-connection-status and the flag
-	if (online_connected_to_xbox_live() || shell_startup_flag_is_set(_startup_flag_unlock_xbox_live_menus))
+	if (online_connected_to_xbox_live() || shell_command_line_flag_is_set(_shell_command_line_flag_unlock_xbox_live_menus))
 	{
 		s_screen_parameters params;
 		params.m_flags = 0;

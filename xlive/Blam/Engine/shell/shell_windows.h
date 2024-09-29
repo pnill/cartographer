@@ -11,6 +11,10 @@
 
 /* public code */
 
+HWND* shell_windows_get_hwnd(void);
+bool* should_initilize_xlive_get(void);
+bool* xlive_initilized_get(void);
+
 uint32 __cdecl system_milliseconds();
 
 void shell_windows_initialize();
@@ -26,3 +30,4 @@ bool __cdecl game_is_minimized(void);
 
 bool __cdecl gfwl_gamestore_initialize(void);
 
+int32* fatal_error_id_get(void);

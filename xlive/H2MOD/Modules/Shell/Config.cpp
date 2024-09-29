@@ -48,7 +48,6 @@ bool H2Config_hide_ingame_chat = false;
 bool H2Config_xDelay = true;
 bool H2Config_shader_lod_max = false;
 bool H2Config_light_suppressor = false;
-bool H2Config_d3d9ex = false;
 bool H2Config_voice_chat = false;
 char H2Config_dedi_server_name[XUSER_NAME_SIZE] = { "" };
 char H2Config_dedi_server_playlist[256] = { "" };
@@ -227,12 +226,6 @@ void SaveH2Config() {
 				"\n# 1 - Enable light_suppressor patch. game dosen't suppress lights when multiple of them are onscreen"
 				"\n\n"
 
-				"# d3dex Options (Client):"
-				"\n# 0 - NOTE: If your game crashes on startup, consider disabling this. If it's not enabled, seek for help."
-				"\n# 0 - Disable D3D9Ex version of D3D9."
-				"\n# 1 - Enable D3D9Ex version of D3D9."
-				"\n\n"
-
 				"# disable_ingame_keyboard Options (Client):"
 				"\n# 0 - Normal Game Controls."
 				"\n# 1 - Disables ONLY Keyboard when in-game & allows controllers when game is not in focus."
@@ -366,8 +359,6 @@ void SaveH2Config() {
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
-
-			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 
 			ini.SetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 
@@ -576,7 +567,6 @@ void ReadH2Config() {
 
 				H2Config_shader_lod_max = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "shader_lod_max", H2Config_shader_lod_max);
 				H2Config_light_suppressor = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "light_suppressor", H2Config_light_suppressor);
-				H2Config_d3d9ex = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "d3dex", H2Config_d3d9ex);
 				H2Config_disable_ingame_keyboard = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "disable_ingame_keyboard", H2Config_disable_ingame_keyboard);
 				H2Config_hide_ingame_chat = ini.GetBoolValue(H2ConfigVersionSection.c_str(), "hide_ingame_chat", H2Config_hide_ingame_chat);
 			

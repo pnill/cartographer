@@ -88,6 +88,9 @@ void rasterizer_settings_apply_hooks(void)
 	// Fix antialiasing when using shader model 3
 	PatchCall(Memory::GetAddress(0x250939), rasterizer_settings_set_antialiasing);
 	WriteValue(Memory::GetAddress(0x46803C), rasterizer_settings_set_antialiasing);
+
+	PatchCall(Memory::GetAddress(0x25E207), rasterizer_settings_apply_settings);
+	WriteJmpTo(Memory::GetAddress(0x2640AE), rasterizer_settings_apply_settings);
 	return;
 }
 
@@ -118,7 +121,6 @@ void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 	}
 	
 	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-	const D3DFORMAT depth_format = rasterizer_globals->d3d9_sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format;
 
 	s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
 	IDirect3D9Ex* d3d9_interface = dx9_globals->global_d3d_interface;
@@ -136,7 +138,7 @@ void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 		SUCCEEDED(d3d9_interface->CheckDeviceMultiSampleType(
 			D3DADAPTER_DEFAULT,
 			D3DDEVTYPE_HAL,
-			depth_format,
+			rasterizer_globals->display_parameters.depthstencil_format,
 			rasterizer_globals->display_parameters.window_mode != _rasterizer_window_mode_real_fullscreen,
 			multisample_type,
 			&depth_quality)))
@@ -157,6 +159,68 @@ void __cdecl rasterizer_settings_set_antialiasing(uint32* out_quality)
 	}
 
 	rasterizer_settings_get()->anti_aliasing = *out_quality;
+	return;
+}
+
+void __cdecl rasterizer_settings_update_window_position(void)
+{
+	INVOKE(0x2640B3, 0x0, rasterizer_settings_update_window_position);
+	return;
+}
+
+void rasterizer_settings_set_default_settings(void)
+{
+	s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+	rasterizer_globals->clipping_parameters.z_near = *Memory::GetAddress<real32*>(0x468150);
+	rasterizer_globals->clipping_parameters.z_far = *Memory::GetAddress<real32*>(0x468154);
+	rasterizer_globals->display_parameters.frame_presented_count = 1;
+	rasterizer_globals->display_parameters.unused_window_mode = 1;
+	rasterizer_globals->display_parameters.font_width = 800;
+	rasterizer_globals->display_parameters.font_height = 600;
+	rasterizer_globals->resolution_x = 800;
+	rasterizer_globals->resolution_y = 600;
+	rasterizer_globals->screen_bounds.right = 800;
+	rasterizer_globals->screen_bounds.bottom = 600;
+	rasterizer_globals->screen_bounds.left = 0;
+	rasterizer_globals->screen_bounds.top = 0;
+	rasterizer_globals->fullscreen_parameters.brightness = 0.f;
+	rasterizer_globals->display_parameters.refresh_rate = 60;
+	rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
+	rasterizer_globals->display_parameters.depthstencil_format = D3DFMT_D24S8;
+	rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_funky_fullscreen;
+	rasterizer_globals->display_parameters.display_type = _display_type_widescreen;
+	rasterizer_globals->sun_width_scale = 1.f;
+	rasterizer_globals->frame_bounds = rasterizer_globals->screen_bounds;
+	rasterizer_globals->fullscreen_parameters.gamma = 1.f;
+	rasterizer_globals->fullscreen_parameters.field_8 = 0.05f;
+	rasterizer_globals->fullscreen_parameters.field_C = 1.f;
+	rasterizer_globals->reset_screen = false;
+	rasterizer_globals->rasterizer_draw_on_main_back_buffer = false;
+	rasterizer_globals->field_E0 = false;
+	return;
+}
+
+void __cdecl rasterizer_settings_create_registry_keys(bool is_game)
+{
+	INVOKE(0x264636, 0x0, rasterizer_settings_create_registry_keys, is_game);
+	return;
+}
+
+void __cdecl rasterizer_settings_set_display_mode(const e_rasterizer_window_mode* display_mode)
+{
+	INVOKE(0x2643CA, 0x0, rasterizer_settings_set_display_mode, display_mode);
+	return;
+}
+
+void __cdecl rasterizer_settings_apply_settings(int32 setting)
+{
+	INVOKE(0x190B26, 0x0, rasterizer_settings_apply_settings, setting);
+	
+	// Don't change the formats for low settings on d3d9ex
+	if (rasterizer_globals_get()->use_d3d9_ex)
+	{
+		*load_low_detail_textures_get() = false;
+	}
 	return;
 }
 
@@ -346,11 +410,11 @@ int32 rasterizer_get_default_display_monitor(void)
 {
 	int32 monitor_index = 0;
 
-	if (shell_startup_flag_is_set(_startup_flag_monitor_count))
+	if (shell_command_line_flag_is_set(_shell_command_line_flag_monitor_count))
 	{
-		if ((uint32)shell_startup_flag_get(_startup_flag_monitor_count) < rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
+		if ((uint32)shell_command_line_flag_get(_shell_command_line_flag_monitor_count) < rasterizer_dx9_main_globals_get()->global_d3d_interface->GetAdapterCount())
 		{
-			monitor_index = shell_startup_flag_get(_startup_flag_monitor_count);
+			monitor_index = shell_command_line_flag_get(_shell_command_line_flag_monitor_count);
 		}
 	}
 

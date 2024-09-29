@@ -1,22 +1,57 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_main.h"
 
+#include "rasterizer_dx9_9on12.h"
+
+#include "rasterizer_dx9_bitmaps.h"
+#include "rasterizer_dx9_debug.h"
+#include "rasterizer_dx9_dof.h"
+#include "rasterizer_dx9_dynavobgeom.h"
+#include "rasterizer_dx9_errors.h"
+#include "rasterizer_dx9_motion_sensor.h"
+#include "rasterizer_dx9_screen_effect.h"
+#include "rasterizer_dx9_submit.h"
+#include "rasterizer_dx9_shader_submit.h"
 #include "rasterizer_dx9_targets.h"
+#include "rasterizer_dx9_text.h"
+#include "rasterizer_dx9_vertex_buffers.h"
+#include "rasterizer_dx9_vertex_shaders.h"
+#include "rasterizer_dx9_widgets.h"
 
 #include "bitmaps/bitmaps.h"
 #include "bink/wmv_playback.h"
+#include "cache/pc_geometry_cache.h"
+#include "cache/pc_texture_cache.h"
+#include "cseries/debug_memory.h"
+#include "game/game.h"
+#include "main/main.h"
+#include "networking/network_configuration.h"
+#include "rasterizer/rasterizer_cinematics.h"
+#include "rasterizer/rasterizer_dynamic_reflect.h"
 #include "rasterizer/rasterizer_globals.h"
 #include "rasterizer/rasterizer_loading.h"
+#include "rasterizer/rasterizer_memory.h"
+#include "rasterizer/rasterizer_occlusion.h"
+#ifdef RASTERIZER_PROFILE_ENABLED
+#include "rasterizer/rasterizer_profile.h"
+#endif
+#include "rasterizer/rasterizer_settings.h"
+#include "rasterizer/rasterizer_stipple.h"
+#include "rasterizer/rasterizer_text.h"
+#include "rasterizer/rasterizer_transparent_geometry.h"
+#include "render/render_weather.h"
+#include "saved_games/game_state.h"
+#include "shell/shell.h"
+#include "shell/shell_windows.h"
+
+#include "H2MOD/GUI/XLiveRendering.h"
+
+#include <dwmapi.h>
 
 /* typedefs */
 
 typedef void(__cdecl* rasterizer_dx9_set_texture_stage_t)(int16, datum, int16, real32);
-
-/* globals */
-
-rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
-
-datum g_last_bitmap_tag_index = 0;
+typedef bool(__cdecl* rasterizer_dx9_initialize_t)(void);
 
 /* constants */
 
@@ -68,7 +103,87 @@ const D3DBLEND k_src_blend[k_shader_framebuffer_blend_function_count] =
   (D3DBLEND)NONE
 };
 
+const uint32 k_rasterizer_dx9_texture_usage[] =
+{
+    0,
+    D3DUSAGE_RENDERTARGET,
+    D3DUSAGE_DEPTHSTENCIL,
+    0
+};
+
+const D3DPOOL k_rasterizer_dx9_texture_pool[] =
+{
+    D3DPOOL_MANAGED,
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT,
+    D3DPOOL_MANAGED
+};
+
+const uint32 k_rasterizer_dx9_vertex_usage[] =
+{
+    D3DUSAGE_WRITEONLY,
+    D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
+    D3DUSAGE_WRITEONLY
+};
+
+const D3DPOOL k_rasterizer_dx9_vertex_pool[] =
+{
+    D3DPOOL_MANAGED,
+    D3DPOOL_MANAGED,
+    D3DPOOL_MANAGED
+};
+
+const uint32 k_rasterizer_dx9ex_texture_usage[] =
+{
+    0,
+    D3DUSAGE_RENDERTARGET,
+    D3DUSAGE_DEPTHSTENCIL,
+    0
+};
+
+const D3DPOOL k_rasterizer_dx9ex_texture_pool[] =
+{
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT
+};
+
+const uint32 k_rasterizer_dx9ex_vertex_usage[] =
+{
+    D3DUSAGE_WRITEONLY,
+    D3DUSAGE_DYNAMIC | D3DUSAGE_WRITEONLY,
+    D3DUSAGE_WRITEONLY
+};
+
+const D3DPOOL k_rasterizer_dx9ex_vertex_pool[] =
+{
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT,
+    D3DPOOL_DEFAULT
+};
+
+/* globals */
+
+rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
+rasterizer_dx9_initialize_t p_rasterizer_dx9_initialize;
+
+datum g_last_bitmap_tag_index = 0;
+
+const D3DVERTEXELEMENT9 global_d3d_vd_source = { 0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 };
+s_rasterizer_parameters g_rasterizer_parameters = {};
+
 /* prototypes */
+
+PALETTEENTRY* g_d3d_palettes_get(void);
+
+IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void);
+IDirect3DVertexShader9** global_d3d_vs_prime_get(void);
+
+const uint32** g_d3d9_texture_usage_get(void);
+const D3DPOOL** g_d3d9_texture_pool_get(void);
+const uint32** g_d3d9_vertex_usage_get(void);
+const D3DPOOL** g_d3d9_vertex_pool_get(void);
 
 void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
 void __cdecl rasterizer_set_stream_source(void);
@@ -81,8 +196,28 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     UINT PrimitiveCount,
     const void* pVertexStreamZeroData,
     UINT VertexStreamZeroStride);
+void __cdecl display_blackness_window(void);
+HWND __cdecl rasterizer_dx9_create_main_window(void);
+void __cdecl rasterizer_dx9_prime_shader_initialize(void);
 
 /* public code */
+
+void rasterizer_dx9_main_apply_patches(void)
+{
+    // debugging, get vertex decls currently set
+    //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
+    //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
+
+    DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_direct);
+
+    // Patch initialize code with our own to detect sm3 support
+    PatchCall(Memory::GetAddress(0x263526), rasterizer_dx9_device_initialize);
+    PatchCall(Memory::GetAddress(0x26375D), rasterizer_dx9_device_initialize);
+
+    // Redirect dx9 initialization function so we can use d3d9on12 and do other cool stuff
+    DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_dx9_initialize);
+    return;
+}
 
 s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals_get(void)
 {
@@ -99,23 +234,19 @@ datum last_bitmap_tag_index_get(void)
     return g_last_bitmap_tag_index;
 }
 
-IDirect3DPixelShader9** local_pixel_shaders_get(void)
+D3DCAPS9* rasterizer_dx9_caps_get(void)
 {
-    return Memory::GetAddress<IDirect3DPixelShader9**>(0xA56C0C);
+    return Memory::GetAddress<D3DCAPS9*>(0x9DA900);
 }
 
-void rasterizer_dx9_main_apply_patches(void)
+int32* hardware_vertex_processing_get(void)
 {
-    // debugging, get vertex decls currently set
-    //PatchCall(Memory::GetAddress(0x2220CA), DrawPrimitiveUP_hook_get_vertex_decl);
-    //PatchCall(Memory::GetAddress(0x27D746), DrawPrimitiveUP_hook_get_vertex_decl);
+    return Memory::GetAddress<int32*>(0x9DA8B0);
+}
 
-    DETOUR_ATTACH(p_rasterizer_dx9_set_texture_stage, Memory::GetAddress<rasterizer_dx9_set_texture_stage_t>(0x25F600, 0x0), rasterizer_dx9_set_texture_direct);
-
-    // Patch initialize code with our own to detect sm3 support
-    PatchCall(Memory::GetAddress(0x263526), rasterizer_dx9_initialize_device);
-    PatchCall(Memory::GetAddress(0x26375D), rasterizer_dx9_initialize_device);
-    return;
+int32* allow_vsync_get(void)
+{
+    return Memory::GetAddress<int32*>(0x9DA8C8);
 }
 
 bool __cdecl rasterizer_initialize(void)
@@ -242,12 +373,6 @@ void rasterizer_dx9_set_blend_render_state(e_framebuffer_blend_function framebuf
     return;
 }
 
-void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
-{
-    rasterizer_dx9_device_get_interface()->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
-    return;
-}
-
 void __cdecl rasterizer_get_bloom_brightness(real32* brightness, real32* overbright)
 {
     INVOKE(0x25F17D, 0x0, rasterizer_get_bloom_brightness, brightness, overbright);
@@ -297,16 +422,219 @@ void __cdecl rasterizer_dx9_set_texture(uint16 stage, e_bitmap_type type, uint32
     return;
 }
 
-bool __cdecl rasterizer_dx9_initialize_device(real_vector3d* v, bool display_blackness)
-{
-    bool result = INVOKE(0x25E798, 0x0, rasterizer_dx9_initialize_device, v, display_blackness);
+bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameters, bool display_blackness)
+{    
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals = rasterizer_dx9_main_globals_get();
 
-    D3DCAPS9 caps{};
-    rasterizer_dx9_device_get_interface()->GetDeviceCaps(&caps);
+    uint32 monitor_count = 0;
+    if (shell_command_line_flag_is_set(_shell_command_line_flag_monitor_count))
+    {
+        const uint32 flag_value = (uint32)shell_command_line_flag_get(_shell_command_line_flag_monitor_count);
+        monitor_count = flag_value < rasterizer_dx9_main_globals->global_d3d_interface->GetAdapterCount() ? flag_value : monitor_count;
+    }
 
-    // Tells the game to make use of MRT and shader model 3 if the gpu supports it
-    rasterizer_globals_get()->d3d9_sm3_supported = caps.MaxVertexShader30InstructionSlots >= 512 && caps.MaxPixelShader30InstructionSlots >= 512;;
-    return result;
+    ASSERT(parameters);
+
+    csmemmove(&rasterizer_globals->clipping_parameters.parameters, parameters, sizeof(s_rasterizer_parameters));
+
+    const bool is_fullscreen = rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_real_fullscreen;
+
+    D3DPRESENT_PARAMETERS d3d_present_parameters = {};
+    d3d_present_parameters.hDeviceWindow = *shell_windows_get_hwnd();
+    rasterizer_globals->display_parameters.backbuffer_format = D3DFMT_A8R8G8B8;
+    d3d_present_parameters.BackBufferFormat = D3DFMT_A8R8G8B8;
+    d3d_present_parameters.Windowed = !is_fullscreen;
+    d3d_present_parameters.AutoDepthStencilFormat = rasterizer_globals->display_parameters.depthstencil_format;
+    d3d_present_parameters.BackBufferWidth = rectangle2d_width(&rasterizer_globals->screen_bounds);
+    d3d_present_parameters.Flags = 0;
+    d3d_present_parameters.EnableAutoDepthStencil = false;
+    d3d_present_parameters.BackBufferHeight = rectangle2d_height(&rasterizer_globals->screen_bounds);
+    d3d_present_parameters.MultiSampleType = D3DMULTISAMPLE_NONE;
+    d3d_present_parameters.MultiSampleQuality = 0;
+    d3d_present_parameters.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    d3d_present_parameters.FullScreen_RefreshRateInHz = is_fullscreen ? rasterizer_globals->display_parameters.refresh_rate : d3d_present_parameters.FullScreen_RefreshRateInHz;
+
+    if (shell_command_line_flag_is_set(_shell_command_line_flag_novsync) 
+        /* || *load_low_detail_textures_get() */ ) // low detail textures checked for vsync???? 
+    {
+        d3d_present_parameters.PresentationInterval = 1;
+        if (!*allow_vsync_get())
+        {
+            d3d_present_parameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+        }
+    }
+
+    bool succeeded = true;
+    HRESULT device_create_hr;
+    D3DDISPLAYMODEEX fs_disp_mode;
+    if (rasterizer_dx9_main_globals->global_d3d_device)
+    {
+        HRESULT hr = XLiveOnResetDevice(&d3d_present_parameters);
+        succeeded = SUCCEEDED(hr);
+        if (!succeeded)
+        {
+            rasterizer_dx9_errors_log(hr, "XLiveOnResetDevice(&d3d_present_parameters)");
+        }
+
+        if (rasterizer_globals->use_d3d9_ex)
+        {
+            if (!is_fullscreen)
+            {
+                hr = rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, NULL);
+                succeeded &= SUCCEEDED(hr);
+                if (!succeeded)
+                {
+                    rasterizer_dx9_errors_log(hr, "global_d3d_device->ResetEx(&d3d_present_parameters, NULL)");
+                }
+            }
+            else
+            {
+                fs_disp_mode.Size = 24;
+                fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
+                fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
+                fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
+                fs_disp_mode.Format = rasterizer_globals->display_parameters.backbuffer_format;
+                fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+                hr = rasterizer_dx9_main_globals->global_d3d_device->ResetEx(&d3d_present_parameters, &fs_disp_mode);
+                succeeded &= SUCCEEDED(hr);
+                if (!succeeded)
+                {
+                    rasterizer_dx9_errors_log(hr, "global_d3d_device->ResetEx(&d3d_present_parameters, &fs_disp_mode)");
+                }
+            }
+        }
+        else
+        {
+            if (display_blackness)
+            {
+                display_blackness_window();
+            }
+            HRESULT hr = rasterizer_dx9_main_globals->global_d3d_device->Reset(&d3d_present_parameters);
+            succeeded &= SUCCEEDED(hr);
+            if (!succeeded)
+            {
+                rasterizer_dx9_errors_log(hr, "global_d3d_device->Reset(&d3d_present_parameters)");
+            }
+
+            if (!d3d_present_parameters.SwapEffect)
+            {
+                DwmEnableComposition(0);
+            }
+        }
+    }
+    else
+    {
+        const DWORD behavior_flags = 
+            (*hardware_vertex_processing_get() != 0 ? D3DCREATE_HARDWARE_VERTEXPROCESSING : D3DCREATE_SOFTWARE_VERTEXPROCESSING) |
+            D3DCREATE_FPU_PRESERVE |
+            D3DCREATE_MULTITHREADED |
+            D3DCREATE_DISABLE_DRIVER_MANAGEMENT;
+
+        if (rasterizer_globals->use_d3d9_ex)
+        {
+            fs_disp_mode.Size = 24;
+            fs_disp_mode.Width = d3d_present_parameters.BackBufferWidth;
+            fs_disp_mode.Height = d3d_present_parameters.BackBufferHeight;
+            fs_disp_mode.RefreshRate = d3d_present_parameters.FullScreen_RefreshRateInHz;
+            fs_disp_mode.Format = rasterizer_globals->display_parameters.backbuffer_format;
+            fs_disp_mode.ScanLineOrdering = D3DSCANLINEORDERING_PROGRESSIVE;
+            D3DDISPLAYMODEEX* p_fs_disp_mode = is_fullscreen ? &fs_disp_mode : NULL;
+            
+            device_create_hr = rasterizer_dx9_main_globals->global_d3d_interface->CreateDeviceEx(
+                monitor_count,
+                D3DDEVTYPE_HAL,
+                d3d_present_parameters.hDeviceWindow,
+                behavior_flags,
+                &d3d_present_parameters,
+                p_fs_disp_mode,
+                &rasterizer_dx9_main_globals->global_d3d_device);
+
+            succeeded &= SUCCEEDED(device_create_hr);
+            if (!succeeded)
+            {
+                rasterizer_dx9_errors_log(device_create_hr, "CreateDeviceEx");
+            }
+        }
+        else
+        {
+            IDirect3DDevice9* device = NULL;
+            device_create_hr = rasterizer_dx9_main_globals->global_d3d_interface->CreateDevice(
+                monitor_count,
+                D3DDEVTYPE_HAL,
+                d3d_present_parameters.hDeviceWindow,
+                behavior_flags,
+                &d3d_present_parameters,
+                (IDirect3DDevice9**)&rasterizer_dx9_main_globals->global_d3d_device);
+
+            succeeded &= SUCCEEDED(device_create_hr);
+            if (!succeeded)
+            {
+                rasterizer_dx9_errors_log(device_create_hr, "CreateDevice");
+            }
+        }
+    }
+
+    // TODO: implement
+    //debug_end_tracking_nonheap_allocation()
+
+    if (rasterizer_dx9_main_globals->global_d3d_device)
+    {
+        if (*should_initilize_xlive_get() && !*xlive_initilized_get())
+        {
+            const int32 network_adapter_index = network_adapter_index_get();
+            XLIVE_INITIALIZE_INFO xlive_init_info;
+            xlive_init_info.cbSize = 28;
+            xlive_init_info.pD3D = rasterizer_dx9_main_globals->global_d3d_device;
+            xlive_init_info.pD3DPP = &d3d_present_parameters;
+            memset(&xlive_init_info.langID, 0, 12);
+            xlive_init_info.dwFlags = 0;
+            if (network_adapter_index != NONE)
+            {
+                xlive_init_info.dwFlags = 1;
+                xlive_init_info.pszAdapterName = (PCHAR)network_adapter_name_get(network_adapter_index);
+            }
+
+            const HRESULT hr = XLiveInitialize(&xlive_init_info);
+            succeeded &= SUCCEEDED(hr);
+            if (succeeded)
+            {
+                *xlive_initilized_get() = true;
+                if (d3d_present_parameters.hDeviceWindow && is_fullscreen)
+                {
+                    rasterizer_settings_update_window_position();
+                }
+            }
+            else
+            {
+                *fatal_error_id_get() = hr == 0x80040317 ? 1018 : 105;
+                rasterizer_dx9_errors_log(hr, "XLiveInitialize");
+            }
+        }
+    }
+
+    SYSTEM_DEBUG_MEMORY("after CreateDevice/ResetDevice");
+
+    if (succeeded)
+    {
+        D3DCAPS9* caps = rasterizer_dx9_caps_get();
+        HRESULT hr = rasterizer_dx9_device_get_interface()->GetDeviceCaps(caps);
+        if (SUCCEEDED(hr))
+        {
+            // Tells the game to make use of MRT and shader model 3 if the gpu supports it
+            rasterizer_globals_get()->d3d9_sm3_supported = caps->MaxVertexShader30InstructionSlots >= 512 && caps->MaxPixelShader30InstructionSlots >= 512 && caps->NumSimultaneousRTs >= 2;
+        }
+        else
+        {
+            rasterizer_dx9_errors_log(hr, "global_d3d_device->GetDeviceCaps(&global_d3d_caps)");
+        }
+    }
+    else
+    {
+        error(3, "### ERROR %s() failed", __FUNCTION__);
+    }
+
+    return succeeded;
 }
 
 void __cdecl rasterizer_dx9_initialize_camera_projection(
@@ -319,7 +647,298 @@ void __cdecl rasterizer_dx9_initialize_camera_projection(
     return;
 }
 
+bool __cdecl rasterizer_dx9_initialize(void)
+{
+    bool result = true;
+
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    s_rasterizer_dx9_main_globals* rasterizer_dx9_main_globals = rasterizer_dx9_main_globals_get();
+
+    if (!rasterizer_globals->rasterizer_initialized && shell_tool_type() != _shell_tool_type_editing_tools)
+    {
+        // OSVERSIONINFOW in H2Sapien while OSVERSIONINFOA in the base game
+        // Possibly because it was changed as a part of the H2TOOLSET macro when PI studios was upgrading the Halo 2 Editing Kit
+        OSVERSIONINFOW version_information;
+        version_information.dwOSVersionInfoSize = sizeof(version_information);
+        if (GetVersionEx(&version_information))
+        {
+            if (version_information.dwMajorVersion < 6)
+            {
+                error(2, "### ERROR this machine isn't vista!");
+                main_quit();
+                result = false;
+            }
+            else
+            {
+                rasterizer_globals->use_d3d9_ex = true;
+            }
+        }
+        
+        if (result)
+        {
+            const HMODULE module = LoadLibrary(L"d3d9");
+            if (module)
+            {
+                rasterizer_globals->d3d9_create_ex_proc = (decltype(Direct3DCreate9Ex)*)GetProcAddress(module, "Direct3DCreate9Ex");
+                if (!rasterizer_globals->d3d9_create_ex_proc)
+                {
+                    error(2, "### ERROR failed to obtain Direct3DCreate9Ex function pointer");
+                    main_quit();
+                    result = false;
+                }
+            }
+            else
+            {
+                error(2, "### ERROR failed to dynamically load d3d9.dll");
+                main_quit();
+                result = false;
+            }
+        }
+
+        /*
+        if (!shell_command_line_flag_is_set(_shell_command_line_flag_d3d9ex_enabled))
+        {
+            rasterizer_globals->use_d3d9_ex = false;
+        }
+        */
+
+        if (result)
+        {
+            if (rasterizer_globals->use_d3d9_ex)
+            {
+#ifdef D3D9_ON_12_ENABLED
+                const HRESULT hr = rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface);
+#else
+                const HRESULT hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &rasterizer_dx9_main_globals->global_d3d_interface);
+#endif
+                if (FAILED(hr))
+                {
+                    error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
+                    main_quit();
+                    result = false;
+                }
+            }
+            else
+            {
+#ifdef D3D9_ON_12_ENABLED
+                rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface);
+#else
+                rasterizer_dx9_main_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
+#endif
+            }
+
+            if (!rasterizer_dx9_main_globals->global_d3d_interface)
+            {
+                error(3, "### ERROR failed to create D3D object");
+                result = false;
+            }
+        }
+
+        if (result)
+        {
+            *g_d3d9_texture_usage_get() = rasterizer_globals->use_d3d9_ex ? k_rasterizer_dx9ex_texture_usage : k_rasterizer_dx9_texture_usage;
+            *g_d3d9_texture_pool_get() = rasterizer_globals->use_d3d9_ex ? k_rasterizer_dx9ex_texture_pool : k_rasterizer_dx9_texture_pool;
+            *g_d3d9_vertex_usage_get() = rasterizer_globals->use_d3d9_ex ? k_rasterizer_dx9ex_vertex_usage : k_rasterizer_dx9_vertex_usage;
+            *g_d3d9_vertex_pool_get() = rasterizer_globals->use_d3d9_ex ? k_rasterizer_dx9ex_vertex_pool : k_rasterizer_dx9_vertex_pool;
+
+            if (shell_command_line_flag_is_set(_shell_command_line_flag_disable_hardware_vertex_processing))
+            {
+                *hardware_vertex_processing_get() = false;
+            }
+        }
+
+        if (result)
+        {
+            rasterizer_settings_set_default_settings();
+            rasterizer_settings_create_registry_keys(true);
+
+            // Force windowed if we're in the editor
+            if (game_in_editor())
+            {
+                rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
+            }
+
+            if (shell_command_line_flag_is_set(_shell_command_line_flag_windowed))
+            {
+                rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_windowed;
+                const e_rasterizer_window_mode mode = _rasterizer_window_mode_windowed;
+                rasterizer_settings_set_display_mode(&mode);
+            }
+
+            if (rasterizer_globals->display_parameters.window_mode == _rasterizer_window_mode_real_fullscreen)
+            {
+                rasterizer_globals->display_parameters.window_mode = _rasterizer_window_mode_funky_fullscreen;
+            }
+
+            HWND hwnd = rasterizer_dx9_create_main_window();
+            result = hwnd != 0;
+        }
+
+        result &= rasterizer_dx9_device_initialize(&g_rasterizer_parameters, false);
+
+        if (result)
+        {
+            rasterizer_dx9_initialize_state_cache();
+            rasterizer_dx9_reset_depth_buffer();
+            rasterizer_stipple_initialize();
+            rasterizer_dx9_gpu_frontend_initialize();
+            rasterizer_dx9_create_dynavobgeom_pixel_shaders();
+            rasterizer_dx9_create_screen_effect_pixel_shaders();
+            rasterizer_dx9_create_text_pixel_shaders();
+            rasterizer_dx9_create_widget_pixel_shaders();
+            rasterizer_dx9_create_blur_pixel_shaders();
+            rasterizer_dx9_create_motion_sensor_shaders();
+            c_particle_system_lite::initialize();
+            
+            csmemset(g_d3d_palettes_get(), 0, sizeof(int32) * 32);
+
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 1u);
+            rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, 1u);
+            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, 4u);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHAFUNC, 5u);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHAREF, 0);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
+            rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ZERO);
+            rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+            rasterizer_dx9_set_render_state(D3DRS_FOGENABLE, TRUE);
+            rasterizer_dx9_set_render_state(D3DRS_LIGHTING, 0);
+            rasterizer_dx9_set_render_state(D3DRS_SPECULARENABLE, 1u);
+        }
+
+        if (result)
+        {
+            rasterizer_memory_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_memory_initialize());
+
+            result &= rasterizer_dx9_primary_targets_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_primary_targets_initialize());
+
+
+            result &= rasterizer_dx9_vertex_buffer_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_vertex_buffer_initialize());
+        
+
+            result &= rasterizer_dx9_secondary_targets_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_secondary_targets_initialize());
+        
+
+            result &= rasterizer_dx9_targets_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_targets_initialize());
+        
+
+            result &= rasterizer_dx9_default_bitmaps_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_default_bitmaps_initialize());
+
+
+            result &= rasterizer_transparent_geometry_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_transparent_geometry_initialize());
+
+        
+            result &= rasterizer_dx9_vertex_shaders_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_vertex_shaders_initialize());
+
+
+            result &= rasterizer_dx9_debug_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dx9_debug_initialize());
+
+
+            result &= rasterizer_text_cache_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_text_cache_initialize());
+
+
+    #ifdef RASTERIZER_PROFILE_ENABLED
+
+            result &= rasterizer_profile_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_profile_initialize());
+    #endif
+
+            result &= rasterizer_dynamic_reflect_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_dynamic_reflect_initialize());
+        }
+
+        if (result)
+        {
+            rasterizer_dx9_prime_shader_initialize();
+
+            rasterizer_cinematics_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_cinematics_initialize());
+
+            geometry_cache_new();
+            SYSTEM_DEBUG_MEMORY(geometry_cache_new());
+
+            texture_cache_new();
+            SYSTEM_DEBUG_MEMORY(texture_cache_new());
+
+            rasterizer_occlusion_initialize();
+            SYSTEM_DEBUG_MEMORY(rasterizer_occlusion_initialize);
+
+            *rasterizer_bloom_globals_get() = (s_rasterizer_bloom_globals*)game_state_malloc("rasterizer bloom globals", 0, sizeof(s_rasterizer_bloom_globals));
+            rasterizer_bloom_globals_initialize();
+        }
+
+        rasterizer_globals->next_bitmap_index = 0;
+        rasterizer_globals->bitmap_data_count = 0;
+        rasterizer_globals->rasterizer_initialized = result;
+
+        if (!result)
+        {
+            error(3, "### ERROR failed to initialize rasterizer");
+        }
+    }
+
+    return result;
+}
+
+
+bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters) 
+{
+    return INVOKE(0x262105, 0x0, rasterizer_dx9_render_scene_start, parameters);
+}
+
+bool __cdecl rasterizer_dx9_render_scene_end(void)
+{
+    return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
+}
+
 /* private code */
+
+PALETTEENTRY* g_d3d_palettes_get(void)
+{
+    return Memory::GetAddress<PALETTEENTRY*>(0x9DAA30);
+}
+
+IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void)
+{
+    return Memory::GetAddress<IDirect3DVertexDeclaration9**>(0xA3C78C);
+}
+
+IDirect3DVertexShader9** global_d3d_vs_prime_get(void)
+{
+    return Memory::GetAddress<IDirect3DVertexShader9**>(0xA3C790);
+}
+
+const uint32** g_d3d9_texture_usage_get(void)
+{
+    return Memory::GetAddress<const uint32**>(0xA3C628);
+}
+
+const D3DPOOL** g_d3d9_texture_pool_get(void)
+{
+    return Memory::GetAddress<const D3DPOOL**>(0xA3C62C);
+}
+
+const uint32** g_d3d9_vertex_usage_get(void)
+{
+    return Memory::GetAddress<const uint32**>(0xA3C630);
+}
+
+const D3DPOOL** g_d3d9_vertex_pool_get(void)
+{
+    return Memory::GetAddress<const D3DPOOL**>(0xA3C634);
+}
 
 void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
 {
@@ -382,12 +1001,67 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     return SUCCEEDED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
 }
 
-bool __cdecl rasterizer_dx9_render_scene_start(const s_render_scene_parameters* parameters) 
+void __cdecl display_blackness_window(void)
 {
-    return INVOKE(0x262105, 0x0, rasterizer_dx9_render_scene_start, parameters);
+    INVOKE(0x25E5A8, 0x0, display_blackness_window);
+    return;
 }
 
-bool __cdecl rasterizer_dx9_render_scene_end(void)
+HWND __cdecl rasterizer_dx9_create_main_window(void)
 {
-    return INVOKE(0x262215, 0x0, rasterizer_dx9_render_scene_end);
+    return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
+}
+
+void __cdecl rasterizer_dx9_prime_shader_initialize(void)
+{
+    INVOKE(0x25EDA0, 0x0, rasterizer_dx9_prime_shader_initialize);
+    return;
+
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    HRESULT hr = global_d3d_device->CreateVertexDeclaration(&global_d3d_vd_source, global_d3d_vd_prime_get());
+    
+    bool succeeded = SUCCEEDED(hr);
+    if (!succeeded)
+    {
+        rasterizer_dx9_errors_log(hr, "global_d3d_device->CreateVertexDeclaration(global_d3d_vd_source, &global_d3d_vd_prime)");
+    }
+
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    const char global_d3d_vs_prime_source[] = "float4 main(float4 pos : POSITION) : POSITION { return pos; }";
+    const char* shader_version = rasterizer_globals->d3d9_sm3_supported ? "vs_3_0" : "vs_2_0";
+
+    LPD3DXBUFFER pShader;
+    hr = D3DXCompileShader(
+        global_d3d_vs_prime_source,
+        strlen(global_d3d_vs_prime_source),
+        NULL,
+        NULL,
+        "main",
+        shader_version,
+        0,
+        &pShader,
+        NULL,
+        NULL
+    );
+
+    succeeded &= SUCCEEDED(hr);
+
+    if (!succeeded)
+    {
+        rasterizer_dx9_errors_log(hr, "D3DXCompileShader(global_d3d_vs_prime_source, strlen(global_d3d_vs_prime_source), NULL, NULL, \"main\", shader_version, 0, &pShader, NULL, NULL)");
+    }
+
+    hr = global_d3d_device->CreateVertexShader((DWORD*)pShader->GetBufferPointer(), global_d3d_vs_prime_get());
+    succeeded &= SUCCEEDED(hr);
+    if (!succeeded)
+    {
+        rasterizer_dx9_errors_log(hr, "global_d3d_device->CreateVertexShader((DWORD*)pShader->GetBufferPointer(), &global_d3d_vs_prime)");
+    }
+
+    if (pShader)
+    {
+        pShader->Release();
+    }
+
+    return;
 }

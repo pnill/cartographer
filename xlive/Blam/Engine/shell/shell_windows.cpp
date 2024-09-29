@@ -95,6 +95,22 @@ unsigned long long shell_time_now_msec()
 	return shell_time_now(k_shell_time_msec_denominator);
 }
 
+HWND* shell_windows_get_hwnd(void)
+{
+	return Memory::GetAddress<HWND*>(0x46D9C4);
+}
+
+// mess around with xlive (not calling XLiveInitialize etc)
+bool* should_initilize_xlive_get(void)
+{
+	return Memory::GetAddress<bool*>(0x4FAD98);
+}
+
+bool* xlive_initilized_get(void)
+{
+	return Memory::GetAddress<bool*>(0x4FAD99);
+}
+
 uint32 __cdecl system_milliseconds()
 {
 	return INVOKE(0x37E51, 0x2B4CE, system_milliseconds);
@@ -218,9 +234,9 @@ void shell_windows_throttle_framerate(int desired_framerate)
 	last_counter = shell_time_counter_now(NULL);
 }
 
-int32 fatal_error_id_get(void)
+int32* fatal_error_id_get(void)
 {
-	return *Memory::GetAddress<int*>(0x46DAD4);
+	return Memory::GetAddress<int32*>(0x46DAD4);
 }
 
 int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -253,8 +269,7 @@ int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	HCURSOR cursor = LOG_CHECK(LoadCursor(NULL, MAKEINTRESOURCE(0x7F00)));
 	WriteValue(Memory::GetAddress(0x46D9B8), cursor); // g_hCursor
 
-	// mess around with xlive (not calling XLiveInitialize etc)
-	WriteValue<BYTE>(Memory::GetAddress(0x4FAD98), 1);
+	*should_initilize_xlive_get() = true;
 
 
 	// intialize some basic game subsystems
@@ -263,14 +278,14 @@ int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		main_loop();		// actually run game
 		shell_dispose();	// cleanup
 	}
-	else if (int32 g_fatal_error_id = fatal_error_id_get(); g_fatal_error_id)
+	else if (int32 g_fatal_error_id = *fatal_error_id_get(); g_fatal_error_id)
 	{
 		error(2, "shell_initialize failed!");
 		show_fatal_error(g_fatal_error_id);
 	}
 
 	int result;
-	int32 g_fatal_error_id = fatal_error_id_get();
+	int32 g_fatal_error_id = *fatal_error_id_get();
 	if (g_fatal_error_id)	// check if the game exited cleanly
 	{
 		destroy_windows();
@@ -287,7 +302,7 @@ int WINAPI H2WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 void destroy_windows(void)
 {
-	HWND hWnd = *Memory::GetAddress<HWND*>(0x46D9C4);
+	HWND hWnd = *shell_windows_get_hwnd();
 	HWND d3d_window = *Memory::GetAddress<HWND*>(0x46D9C8); // not sure what this window is actual for, used in IDirect3DDevice9::Present
 	if (hWnd)
 	{

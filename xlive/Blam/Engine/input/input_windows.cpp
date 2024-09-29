@@ -69,7 +69,7 @@ void __cdecl input_update_gamepads(uint32 duration_ms)
 
 	TEST_N_DEF(PC1);
 
-	HWND g_window_handle = *Memory::GetAddress<HWND*>(0x46D9C4);
+	HWND g_window_handle = *shell_windows_get_hwnd();
 
 	if (input_handled
 		&& g_window_handle == GetFocus()

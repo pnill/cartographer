@@ -28,7 +28,7 @@ void rasterizer_lens_flares_apply_patches(void)
 {
 	//rasterizer_near_clip_distance <real>
 	//Changed from game default of 0.06 to 0.0601
-	real32* rasterizer_near_clip_distance = Memory::GetAddress<real32*>(0x468150, 0x0);
+	real32* rasterizer_near_clip_distance = Memory::GetAddress<real32*>(0x468150);
 	*rasterizer_near_clip_distance = 0.0601f;
 
     PatchCall(Memory::GetAddress(0x1913AD), rasterizer_suns_glow_occlude);

@@ -7,6 +7,12 @@
 
 /* public code */
 
+void rasterizer_occlusion_initialize(void)
+{
+	INVOKE(0x27E1E4, 0x0, rasterizer_occlusion_initialize);
+	return;
+}
+
 void submit_occlusion_tests(bool lens_flare_occlusion_test)
 {
 	rasterizer_dx9_perf_event_begin("occlusion tests", NULL);
@@ -21,4 +27,5 @@ void submit_occlusion_tests(bool lens_flare_occlusion_test)
 void __cdecl rasterizer_occlusion_submit(void)
 {
 	INVOKE(0x27E29A, 0x0, rasterizer_occlusion_submit);
+	return;
 }
