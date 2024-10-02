@@ -37,8 +37,8 @@ struct s_rasterizer_dx9_main_globals
     IDirect3DSurface9* global_d3d_surface_render_resolved;
     IDirect3DSurface9* global_d3d_surface_screenshot;
     IDirect3DTexture9* global_d3d_texture_render_primary;
-    IDirect3DTexture9* global_d3d_backbuffer_texture;
-    IDirect3DSurface9* global_d3d_backbuffer_surface;
+    IDirect3DTexture9* global_d3d_texture_backbuffer;
+    IDirect3DSurface9* global_d3d_surface_backbuffer;
     uint32 global_d3d_sun_height;
     uint32 global_d3d_sun_width;
     IDirect3DTexture9* global_d3d_texture_sun_glow_primary;

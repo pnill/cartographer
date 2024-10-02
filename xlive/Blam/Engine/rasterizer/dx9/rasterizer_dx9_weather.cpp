@@ -62,7 +62,7 @@ bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_backgr
 	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
 
 	rasterizer_dx9_set_target(_rasterizer_target_render_primary, 0, false);
-	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals->d3d9_sm3_supported && rasterizer_globals->use_d3d9_ex ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);
+	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);

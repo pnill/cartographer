@@ -163,6 +163,8 @@ const D3DPOOL k_rasterizer_dx9ex_vertex_pool[] =
     D3DPOOL_DEFAULT
 };
 
+const char* global_d3d_vs_prime_source = "float4 main(float4 pos : POSITION) : POSITION { return pos; }";
+
 /* globals */
 
 rasterizer_dx9_set_texture_stage_t p_rasterizer_dx9_set_texture_stage;
@@ -170,7 +172,11 @@ rasterizer_dx9_initialize_t p_rasterizer_dx9_initialize;
 
 datum g_last_bitmap_tag_index = 0;
 
-const D3DVERTEXELEMENT9 global_d3d_vd_source = { 0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 };
+const D3DVERTEXELEMENT9 global_d3d_vd_source[] = 
+{
+    { 0, 0, D3DDECLTYPE_SHORT4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+    D3DDECL_END()
+};
 s_rasterizer_parameters g_rasterizer_parameters = {};
 
 /* prototypes */
@@ -198,7 +204,7 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     UINT VertexStreamZeroStride);
 void __cdecl display_blackness_window(void);
 HWND __cdecl rasterizer_dx9_create_main_window(void);
-void __cdecl rasterizer_dx9_prime_shader_initialize(void);
+void rasterizer_dx9_prime_shader_initialize(void);
 
 /* public code */
 
@@ -1012,13 +1018,10 @@ HWND __cdecl rasterizer_dx9_create_main_window(void)
     return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
 }
 
-void __cdecl rasterizer_dx9_prime_shader_initialize(void)
+void rasterizer_dx9_prime_shader_initialize(void)
 {
-    INVOKE(0x25EDA0, 0x0, rasterizer_dx9_prime_shader_initialize);
-    return;
-
     IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-    HRESULT hr = global_d3d_device->CreateVertexDeclaration(&global_d3d_vd_source, global_d3d_vd_prime_get());
+    HRESULT hr = global_d3d_device->CreateVertexDeclaration(global_d3d_vd_source, global_d3d_vd_prime_get());
     
     bool succeeded = SUCCEEDED(hr);
     if (!succeeded)
@@ -1027,7 +1030,6 @@ void __cdecl rasterizer_dx9_prime_shader_initialize(void)
     }
 
     s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-    const char global_d3d_vs_prime_source[] = "float4 main(float4 pos : POSITION) : POSITION { return pos; }";
     const char* shader_version = rasterizer_globals->d3d9_sm3_supported ? "vs_3_0" : "vs_2_0";
 
     LPD3DXBUFFER pShader;

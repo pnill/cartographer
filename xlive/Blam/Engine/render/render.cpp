@@ -651,26 +651,10 @@ render_postprocess:
             {
                 const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
                 const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
                 // If we're not using shader model 3 draw the depth on the backbuffer in a seperate pass
                 // In shader model 3 these are already drawn during the lightmap_indirect stage
-                if (rasterizer_globals->d3d9_sm3_supported)
-                {
-                    // We need to copy the result of the z target to the backbuffer if we're not in d3d9ex
-                    // In EX we can associate a texture to the render target and stage that later on
-                    // However, we cannot do this in stock d3d9 as the device reset will fail if you try and associate a texture to the render target
-                    if (!rasterizer_globals->use_d3d9_ex)
-                    {
-                        RECT rect;
-                        rectangle2d_to_rect(&global_window_parameters->camera.viewport_bounds, &rect);
-                        global_d3d_device->StretchRect(
-                            dx9_globals->global_d3d_surface_render_z_as_target_z,
-                            &rect,
-                            dx9_globals->global_d3d_backbuffer_surface,
-                            &rect,
-                            D3DTEXF_LINEAR);
-                    }
-                }
-                else
+                if (!rasterizer_globals->d3d9_sm3_supported)
                 {
                     const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
                     const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };

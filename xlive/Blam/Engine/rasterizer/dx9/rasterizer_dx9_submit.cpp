@@ -38,4 +38,8 @@ void __cdecl rasterizer_dx9_submit_resolve(void)
 	return;
 }
 
-
+void __cdecl rasterizer_dx9_clear_staged_texture_cache(void)
+{
+	INVOKE(0x26F49E, 0x0, rasterizer_dx9_clear_staged_texture_cache);
+	return;
+}

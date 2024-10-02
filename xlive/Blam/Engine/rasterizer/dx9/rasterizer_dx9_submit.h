@@ -1,5 +1,4 @@
 #pragma once
-
 #include "math/color_math.h"
 #include "memory/hashtable.h"
 
@@ -38,7 +37,7 @@ struct c_gpu_frontend
 	IDirect3DVertexDeclaration9* m_d3d_vertex_declaration;
 	int8 field_104[8];
 	int8 field_109[16];
-	void* m_hash_table;
+	s_hash_table* m_hash_table;
 	int32 field_11C;
 };
 
@@ -56,3 +55,5 @@ void __cdecl rasterizer_dx9_draw_rect(real_rectangle2d* quad, real32 depth, pixe
 bool __cdecl rasterizer_dx9_submit_vertex_declaration(uint32 vertex_declaration_index);
 
 void __cdecl rasterizer_dx9_submit_resolve(void);
+
+void __cdecl rasterizer_dx9_clear_staged_texture_cache(void);
