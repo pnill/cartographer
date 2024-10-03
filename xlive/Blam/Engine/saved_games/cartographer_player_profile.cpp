@@ -76,15 +76,14 @@ s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_con
 	return &g_cartographer_profiles[controller_index].profile;
 }
 
-s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_user_index(uint32 user_index)
+s_saved_game_cartographer_player_profile* cartographer_player_profile_get_by_user_index(int32 user_index)
 {
+	const s_players_globals* player_globals = get_players_globals();
 
-	s_players_globals* player_globals = get_players_globals();
-
-	if (user_index < player_globals->local_player_count)
+	if ((int16)user_index < player_globals->local_player_count)
 	{
 		datum user_datum = player_globals->player_user_mapping[user_index];
-		for (uint32 index = 0; index < k_number_of_controllers; index++)
+		for (uint32 index = 0; index < k_number_of_controllers; ++index)
 		{
 			if (player_globals->player_controller_mapping[index] == user_datum &&
 				g_cartographer_profiles[index].enumerated_file_index != NONE &&
@@ -207,7 +206,7 @@ void cartographer_player_profile_new(s_saved_game_cartographer_player_profile_v2
 	settings->raw_mouse_input = false;
 	settings->controller_sensitivity = 0.f;
 	settings->controller_modern = false;
-	settings->controller_deadzone_type = 0.f;
+	settings->controller_deadzone_type = 0;
 	settings->deadzone_axial_x = 26.f;
 	settings->deadzone_axial_y = 26.f;
 	settings->deadzone_radial = 1.f;

@@ -6,7 +6,6 @@
 #include "new_hud.h"
 #include "new_hud_definitions.h"
 #include "bitmaps/bitmap_group.h"
-#include "game/game_engine_util.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "render/render.h"
@@ -216,8 +215,8 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	if (bitmap_widget->effect.count > 0)
 		hud_widget_effect_evaluate(local_render_user_index, user_state, bitmap_widget->effect[0], &offset_result, &scale_result, &theta_result);
 
-	bitmap_width = (bitmap_width * scale_result.x);
-	bitmap_height = (bitmap_height * scale_result.y);
+	bitmap_width = (uint32)(bitmap_width * scale_result.x);
+	bitmap_height = (uint32)(bitmap_height * scale_result.y);
 
 	real32 hud_scale = *get_primary_hud_scale();
 
@@ -705,8 +704,8 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		int32 text_height = rectangle2d_height(&draw_string_bounds);
 		real32 calc_text_height = (text_height * *get_primary_hud_scale()) * scale_result.y;
 
-		int32 ceil_text_width = ceilf(calc_text_width);
-		int32 ceil_text_height = ceilf(calc_text_height);
+		int32 ceil_text_width = ceil(calc_text_width);
+		int32 ceil_text_height = ceil(calc_text_height);
 
 		draw_string_set_player_color(global_real_argb_white);
 		draw_string_set_shadow_color(global_real_argb_black);
@@ -714,22 +713,22 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		switch(text_widget->justification)
 		{
 		case text_justification_center:
-			text_bounds.left = (final_location.x - (real32)(ceil_text_width >> 1));
-			text_bounds.top = final_location.y;
-			text_bounds.right = (final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
-			text_bounds.bottom = ceil_text_height + final_location.y;
+			text_bounds.left = (int16)(final_location.x - (real32)(ceil_text_width >> 1));
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)(final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
+			text_bounds.bottom = (int16)ceil_text_height + final_location.y;
 			break;
 		case text_justification_right:
-			text_bounds.left = (final_location.x - ceil_text_width);
-			text_bounds.top = final_location.y;
-			text_bounds.right = final_location.x;
-			text_bounds.bottom = (final_location_y + ceil_text_height);
+			text_bounds.left = (int16)(final_location.x - ceil_text_width);
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)final_location.x;
+			text_bounds.bottom = (int16)(final_location_y + ceil_text_height);
 			break;
 		default:
-			text_bounds.left = final_location.x;
-			text_bounds.top = final_location.y;
-			text_bounds.right = ceil_text_width + final_location.x;
-			text_bounds.bottom = ceil_text_height + final_location.y;
+			text_bounds.left = (int16)final_location.x;
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)(ceil_text_width + final_location.x);
+			text_bounds.bottom = (int16)(ceil_text_height + final_location.y);
 			break;
 		}
 

@@ -957,7 +957,7 @@ void render_view(
 
     frame.render_type = render_type;
     frame.field_6 = zero_1;
-    frame.window_bound_index = window_bound_index;
+    frame.window_bound_index = (int16)window_bound_index;
     frame.is_texture_camera = is_texture_camera;
     frame.field_4 = neg_one;
     frame.render_fog = true;

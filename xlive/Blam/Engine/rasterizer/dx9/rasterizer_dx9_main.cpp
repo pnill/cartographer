@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_main.h"
 
+// Included for D3D9_ON_12_ENABLED macro
 #include "rasterizer_dx9_9on12.h"
 
 #include "rasterizer_dx9_bitmaps.h"
