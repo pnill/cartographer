@@ -82,7 +82,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 		real32 overbrightness;
 		rasterizer_get_bloom_brightness(&brightness, &overbrightness);
 		
-		real32 bloom_threshold = 0.89999998f;
+		real32 bloom_threshold = 0.9f;
 		if (global_window_parameters->bloom_data)
 		{
 			bloom_threshold *= (1.f - (1.f - global_window_parameters->bloom_data->field_10) * 1.f);
@@ -139,10 +139,12 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 				{
 					if (rasterizer_cinematic_globals->field_3C && rasterizer_cinematic_globals->field_40 > 0.f)
 					{
+						rasterizer_dx9_perf_event_begin("depth of field", NULL);
 						rasterizer_dx9_render_depth_of_field(
 							rasterizer_cinematic_globals->field_44.lower,
 							rasterizer_cinematic_globals->field_44.upper,
 							rasterizer_cinematic_globals->field_40);
+						rasterizer_dx9_perf_event_end("depth of field");
 					}
 
 					if (rasterizer_cinematic_globals->field_AC.lower > 0.f)

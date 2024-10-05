@@ -3,7 +3,7 @@
 
 /* public code */
 
-bool __cdecl render_water(bool a1, bool a2)
+bool __cdecl render_water(bool water_enabled, bool clear_target)
 {
-	return INVOKE(0x1A0673, 0x0, render_water, a1, a2);
+	return INVOKE(0x1A0673, 0x0, render_water, water_enabled, clear_target);
 }

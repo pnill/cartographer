@@ -799,20 +799,20 @@ bool __cdecl rasterizer_dx9_initialize(void)
             
             csmemset(g_d3d_palettes_get(), 0, sizeof(int32) * 32);
 
-            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 1u);
-            rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, 1u);
-            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, 4u);
+            rasterizer_dx9_set_render_state(D3DRS_ZENABLE, TRUE);
+            rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, TRUE);
+            rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
             rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHAFUNC, 5u);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
             rasterizer_dx9_set_render_state(D3DRS_ALPHAREF, 0);
             rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
             rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ZERO);
             rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
             rasterizer_dx9_set_render_state(D3DRS_FOGENABLE, TRUE);
-            rasterizer_dx9_set_render_state(D3DRS_LIGHTING, 0);
-            rasterizer_dx9_set_render_state(D3DRS_SPECULARENABLE, 1u);
+            rasterizer_dx9_set_render_state(D3DRS_LIGHTING, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_SPECULARENABLE, TRUE);
         }
 
         if (result)

@@ -42,4 +42,4 @@ ASSERT_STRUCT_SIZE(s_water_definition, 172);
 
 /* prototypes */
 
-bool __cdecl render_water(bool a1, bool a2);
+bool __cdecl render_water(bool water_enabled, bool clear_target);

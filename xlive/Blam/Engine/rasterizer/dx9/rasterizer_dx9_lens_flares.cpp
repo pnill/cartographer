@@ -127,11 +127,11 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             rasterizer_dx9_perf_event_begin("clear_alpha", NULL);
 
             rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVDESTALPHA);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, (DWORD)0);
-            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
+            rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
-            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, (DWORD)0);
+            rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[1]);
 
             viewport_middle_x = 10.f / viewport_width;
@@ -163,7 +163,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
 
             rasterizer_dx9_set_stencil_mode(8);
             global_d3d_device->SetPixelShader(lens_flare_pixel_shaders[2]);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
             rasterizer_dx9_draw_rect(&sun_surface_quad, 1.f, global_yellow_pixel32);
 
             rasterizer_dx9_perf_event_end("write_alpha");
@@ -215,7 +215,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
             rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
             rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
             rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_ONE);
             rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ONE);
@@ -349,7 +349,7 @@ void rasterizer_dx9_sun_glow_copy_source(const RECT* rect, e_rasterizer_target t
         rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_render_primary);
 
         D3DBLEND render_state = rasterizer_dx9_get_render_state(D3DRS_COLORWRITEENABLE);
-        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
         rasterizer_dx9_set_screen_effect_pixel_shader(1);
         rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
         rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -388,8 +388,8 @@ e_rasterizer_target rasterizer_dx9_convolve_surfaces_original(e_rasterizer_targe
     if (pass_count > 0)
     {
         rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
-        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
-        rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
+        rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
+        rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
         rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_DESTALPHA);
         rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_ZERO);
         rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);

@@ -29,7 +29,6 @@ void rasterizer_dx9_water_apply_patches(void)
 
 bool __cdecl rasterizer_dx9_update_water_refraction_surface(void)
 {
-
     if (!g_water_refraction_surface_updated)
     {
         rasterizer_dx9_perf_event_begin("water refraction", NULL);

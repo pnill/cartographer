@@ -17,6 +17,8 @@ struct s_rasterizer_bloom_globals
 
 /* prototypes */
 
+void rasterizer_dx9_dof_apply_patches(void);
+
 s_rasterizer_bloom_globals** rasterizer_bloom_globals_get(void);
 
 void __cdecl rasterizer_dx9_create_blur_pixel_shaders(void);

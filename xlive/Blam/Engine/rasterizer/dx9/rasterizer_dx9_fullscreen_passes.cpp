@@ -180,7 +180,7 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
             rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
             rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);

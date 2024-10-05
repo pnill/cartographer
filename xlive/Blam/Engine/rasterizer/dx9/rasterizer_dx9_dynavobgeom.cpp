@@ -60,7 +60,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 	if (!global_window_parameters->render_type)
 	{
 		rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
-		rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
+		rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 		rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);

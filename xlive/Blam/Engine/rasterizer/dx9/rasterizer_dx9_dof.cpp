@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_dof.h"
 
+#include "rasterizer_dx9.h"
 #include "rasterizer_dx9_main.h"
 #include "rasterizer_dx9_submit.h"
+#include "rasterizer_dx9_shader_submit.h"
 
 /* structures */
 
@@ -16,11 +18,29 @@ struct s_convolution_d3d_vertex
     D3DCOLOR color;
 };
 
+struct s_rasterizer_dx9_dof_overlay_data
+{
+    real_vector4d constants[4];
+    e_rasterizer_target target;
+    int16 pad;
+};
+
 /* prototypes */
+
+IDirect3DPixelShader9** get_local_pixel_shaders(void);
 
 e_rasterizer_target __cdecl sub_87E570(real32 unused1, real32 a1, real32 unused2, e_rasterizer_target a2, e_rasterizer_target a3, bool a4);
 
+bool __cdecl rasterizer_dx9_depth_of_field_pipeline_setup(s_rasterizer_dx9_dof_overlay_data* dof_data);
+
 /* public code */
+
+void rasterizer_dx9_dof_apply_patches(void)
+{
+    // Fix DOF rendering when using SM3
+    WriteValue(Memory::GetAddress(0x26CCA2 + 1), rasterizer_dx9_depth_of_field_pipeline_setup);
+    return;
+}
 
 s_rasterizer_bloom_globals** rasterizer_bloom_globals_get(void)
 {
@@ -142,7 +162,79 @@ void rasterizer_dx9_draw_overlay_rect(uint32 screen_resolution_x, uint32 screen_
 
 /* private code */
 
+IDirect3DPixelShader9** get_local_pixel_shaders(void)
+{
+    return Memory::GetAddress<IDirect3DPixelShader9**>(0xA4AFF0);
+}
+
+
 e_rasterizer_target __cdecl sub_87E570(real32 unused1, real32 a1, real32 unused2, e_rasterizer_target a2, e_rasterizer_target a3, bool a4)
 {
     return INVOKE(0x26BFBD, 0x0, sub_87E570, unused1, a1, unused2, a2, a3, a4);
+}
+
+
+bool __cdecl rasterizer_dx9_depth_of_field_pipeline_setup(s_rasterizer_dx9_dof_overlay_data* dof_data)
+{
+    const s_rasterizer_dx9_main_globals* rasterizer_dx9_globals = rasterizer_dx9_main_globals_get();
+
+    rasterizer_dx9_set_render_target_internal(rasterizer_dx9_globals->global_d3d_surface_render_resolved, (IDirect3DSurface9*)NONE, true);
+    rasterizer_dx9_set_target_as_texture(0, dof_data->target);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
+    rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
+
+    const e_rasterizer_target target = rasterizer_globals_get()->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer;
+    rasterizer_dx9_set_target_as_texture(1, target);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MAXANISOTROPY, 1);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MIPMAPLODBIAS, 0);
+    rasterizer_dx9_set_sampler_state(1, D3DSAMP_MAXMIPLEVEL, 0);
+
+    rasterizer_dx9_set_texture_direct(2, rasterizer_globals_get_data()->gradients.index, 0, 0.f);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXANISOTROPY, 1);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MIPMAPLODBIAS, 0);
+    rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXMIPLEVEL, 0);
+
+    rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
+    rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
+    rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+    rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+    rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+    rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
+    rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
+    rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
+    rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, FALSE);
+    rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+    rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
+    rasterizer_dx9_set_render_state(D3DRS_SLOPESCALEDEPTHBIAS, 0);
+    if (!*rasterizer_dx9_disable_stencil_get())
+    {
+        rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, FALSE);
+    }
+    rasterizer_dx9_submit_resolve();
+
+    if (rasterizer_get_main_pixel_shader_cache()->test_cache(0, dof_data->constants, NUMBEROF(dof_data->constants)))
+    {
+        rasterizer_dx9_globals->global_d3d_device->SetPixelShaderConstantF(0, (const float*)&dof_data->constants, NUMBEROF(dof_data->constants));
+    }
+    rasterizer_dx9_globals->global_d3d_device->SetPixelShader(get_local_pixel_shaders()[5]);
+    return true;
 }

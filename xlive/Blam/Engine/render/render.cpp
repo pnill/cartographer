@@ -703,21 +703,22 @@ render_postprocess:
             g_water_refraction_surface_updated = false;
 
             const s_scenario_fog_result* g_fog_result = global_fog_result_get();
-            if (g_fog_result->camera_immersion_flags.test(_camera_immersion_disable_water_bit))
+
+            const bool water_enabled = !g_fog_result->camera_immersion_flags.test(_camera_immersion_disable_water_bit);
+            bool clear_target = false;
+
+            if (water_enabled)
             {
-                render_water(false, false);
-            }
-            else
-            {
-                c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
-                bool layer_different = list_type->is_layer_different(_render_layer_water_alpha_masks);
+                const c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
+                clear_target = list_type->is_layer_different(_render_layer_water_alpha_masks);
                 if (prepare_render_layer(_render_layer_water_alpha_masks))
                 {
                     draw_render_layer();
                     reset_after_render_layer_draw();
                 }
-                render_water(true, layer_different);
             }
+
+            render_water(water_enabled, clear_target);
         }
 
         if (get_render_fog_enabled() && render_patchy_fog_enabled)
