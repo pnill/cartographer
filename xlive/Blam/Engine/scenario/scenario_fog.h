@@ -54,7 +54,8 @@ struct s_scenario_fog_result
     real_rgb_color sky_fog_color;
     real32 sky_fog_alpha;
     datum patchy_fog_tag_index;
-    int8 gap_6C[24];
+    real_vector4d patchy_fog_color;
+    int8 gap_6C[8];
     real_bounds field_88;
     real32 patchy_min_distance;
     real32 patchy_max_distance;

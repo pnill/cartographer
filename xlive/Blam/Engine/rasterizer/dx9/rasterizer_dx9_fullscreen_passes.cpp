@@ -95,7 +95,7 @@ void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bound
 
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     real_rectangle2d* a1,
-    bool(__cdecl* a2)(int32),
+    bool(__cdecl* a2)(void*),
     bool(__cdecl* a3)(
         int32 output_type,
         real_rectangle2d* bounds,

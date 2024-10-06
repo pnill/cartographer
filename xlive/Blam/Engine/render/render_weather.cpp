@@ -66,12 +66,16 @@ void __cdecl c_particle_system_lite::initialize(void)
 
 void __cdecl c_particle_system_lite::dispose(void)
 {
-	IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+	const IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
-	for (uint8 i = 0; i < NUMBEROF(g_d3d9_weather_shaders); ++i)
+	if (global_d3d_device)
 	{
-		g_d3d9_weather_shaders[i]->Release();
+		for (uint8 i = 0; i < NUMBEROF(g_d3d9_weather_shaders); ++i)
+		{
+			g_d3d9_weather_shaders[i]->Release();
+		}
 	}
+	
 	return;
 }
 

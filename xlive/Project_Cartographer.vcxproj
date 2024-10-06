@@ -785,6 +785,7 @@
     <ClCompile Include="Blam\Engine\render\render_lights.cpp" />
     <ClCompile Include="Blam\Engine\render\render_lod_new.cpp" />
     <ClCompile Include="Blam\Engine\render\render_objects.cpp" />
+    <ClCompile Include="Blam\Engine\render\render_patchy_fog.cpp" />
     <ClCompile Include="Blam\Engine\render\render_primitive.cpp" />
     <ClCompile Include="Blam\Engine\render\render_section_visibility.cpp" />
     <ClCompile Include="Blam\Engine\render\render_submit.cpp" />
@@ -1176,6 +1177,7 @@
     <ClInclude Include="Blam\Engine\render\render_lights.h" />
     <ClInclude Include="Blam\Engine\render\render_lod_new.h" />
     <ClInclude Include="Blam\Engine\render\render_objects.h" />
+    <ClInclude Include="Blam\Engine\render\render_patchy_fog.h" />
     <ClInclude Include="Blam\Engine\render\render_primitive.h" />
     <ClInclude Include="Blam\Engine\render\render_prt.h" />
     <ClInclude Include="Blam\Engine\render\render_section_visibility.h" />
