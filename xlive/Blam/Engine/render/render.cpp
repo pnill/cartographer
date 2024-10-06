@@ -253,7 +253,7 @@ bool frame_parameters_type_is_above_or_equal_to_7(void)
     return global_frame_parameters_get()->frame_type - 5 <= 2;
 }
 
-void draw_render_layer(e_collection_type collection_type, e_render_layer render_layer)
+void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer)
 {
     ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
     ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
@@ -391,45 +391,25 @@ void __cdecl render_scene(
             }
 
             rasterizer_dx9_perf_event_begin("texaccum", NULL);
-            if (prepare_render_layer(_render_layer_texture_accumulate))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
             rasterizer_dx9_perf_event_end("texaccum");
 
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-            if (prepare_render_layer(_render_layer_lightmap_indirect))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
             rasterizer_dx9_perf_event_end("lightmap_indirect");
 
             rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-            if (prepare_render_layer(_render_layer_spherical_harmonics_prt))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
             rasterizer_dx9_perf_event_end("sh_prt");
 
             g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
 
             rasterizer_dx9_perf_event_begin("environment_map", NULL);
-            if (prepare_render_layer(_render_layer_enviroment_map))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_enviroment_map);
             rasterizer_dx9_perf_event_end("environment_map");
 
             rasterizer_dx9_perf_event_begin("decal", NULL);
-            if (prepare_render_layer(_render_layer_decal))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_decal);
             rasterizer_dx9_perf_event_end("decal");
 
 
@@ -447,11 +427,7 @@ void __cdecl render_scene(
             rasterizer_dx9_perf_event_end("render_cinematic_lightmap_shadows");
 
             rasterizer_dx9_perf_event_begin("selfillumination", NULL);
-            if (prepare_render_layer(_render_layer_selfillumination))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_selfillumination);
             rasterizer_dx9_perf_event_end("selfillumination");
 
             rasterizer_dx9_perf_event_begin("render_lights_new", NULL);
@@ -468,11 +444,7 @@ void __cdecl render_scene(
             rasterizer_dx9_perf_event_end("decals_alpha_blend");
 
             rasterizer_dx9_perf_event_begin("overlay", NULL);
-            if (prepare_render_layer(_render_layer_overlay))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_overlay);
             rasterizer_dx9_perf_event_end("overlay");
 
             rasterizer_dx9_perf_event_begin("decals", NULL);
@@ -504,47 +476,27 @@ void __cdecl render_scene(
         else
         {
             rasterizer_dx9_perf_event_begin("texaccum", NULL);
-            if (prepare_render_layer(_render_layer_texture_accumulate))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
             rasterizer_dx9_perf_event_end("texaccum");
 
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
-            if (prepare_render_layer(_render_layer_lightmap_indirect))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
             rasterizer_dx9_perf_event_end("lightmap_indirect");
 
             rasterizer_dx9_perf_event_begin("sh_prt", NULL);
-            if (prepare_render_layer(_render_layer_spherical_harmonics_prt))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
             rasterizer_dx9_perf_event_end("sh_prt");
 
             rasterizer_dx9_perf_event_begin("overlay", NULL);
-            if (prepare_render_layer(_render_layer_overlay))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+            DRAW_RENDER_LAYER(_render_layer_overlay);
             rasterizer_dx9_perf_event_end("overlay");
         }
 
         // RENDER LAYER 2
         if (render_layer_debug_view == 2)
         {
-LABEL_77:
-            if (prepare_render_layer(_render_layer_transparent))
-            {
-                draw_render_layer();
-                reset_after_render_layer_draw();
-            }
+render_layer_2:
+            DRAW_RENDER_LAYER(_render_layer_transparent);
             
             if (render_layer_debug_view != 2)
             {
@@ -622,11 +574,7 @@ render_postprocess:
                     goto render_scene_end;
                 }
 
-                if (prepare_render_layer(_render_layer_selfibloomination))
-                {
-                    draw_render_layer();
-                    reset_after_render_layer_draw();
-                }
+                DRAW_RENDER_LAYER(_render_layer_selfibloomination);
             }
 
             if (effect_flag != 2)
@@ -674,25 +622,13 @@ render_postprocess:
                         global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
                     }
 
-                    if (prepare_render_layer(_render_layer_lightmap_indirect))
-                    {
-                        draw_render_layer();
-                        reset_after_render_layer_draw();
-                    }
-                    if (prepare_render_layer(_render_layer_spherical_harmonics_prt))
-                    {
-                        draw_render_layer();
-                        reset_after_render_layer_draw();
-                    }
+                    DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+                    DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
                 }
 
                 render_atmospheric_fog();
 
-                if (prepare_render_layer(_render_layer_fog))
-                {
-                    draw_render_layer();
-                    reset_after_render_layer_draw();
-                }
+                DRAW_RENDER_LAYER(_render_layer_fog);
             }
         }
 
@@ -711,11 +647,7 @@ render_postprocess:
             {
                 const c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
                 clear_target = list_type->is_layer_different(_render_layer_water_alpha_masks);
-                if (prepare_render_layer(_render_layer_water_alpha_masks))
-                {
-                    draw_render_layer();
-                    reset_after_render_layer_draw();
-                }
+                DRAW_RENDER_LAYER(_render_layer_water_alpha_masks);
             }
 
             render_water(water_enabled, clear_target);
@@ -732,7 +664,7 @@ render_widgets:
                 rasterizer_dx9_perf_event_begin("weather", NULL);
                 weather_render();
                 rasterizer_dx9_perf_event_end("weather");
-                goto LABEL_77;
+                goto render_layer_2;
             }
 
             const s_scenario_fog_result* g_fog_result = global_fog_result_get();

@@ -7,16 +7,12 @@
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
 
+/* globals */
+
 
 /* public code */
 
-void rasterizer_fog_apply_patches(void)
-{
-	PatchCall(Memory::GetAddress(0x1919AA), render_atmospheric_fog);
-	return;
-}
-
-void __cdecl render_atmospheric_fog(void)
+void render_atmospheric_fog(void)
 {
 	if (!render_layer_globals_get()->transparent_submit_in_progress)
 	{

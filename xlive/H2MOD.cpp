@@ -37,7 +37,6 @@
 #include "networking/network_configuration.h"
 #include "networking/Transport/transport.h"
 #include "units/bipeds.h"
-#include "rasterizer/rasterizer_fog.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_bitmaps.h"
 #include "rasterizer/dx9/rasterizer_dx9_dof.h"
@@ -892,7 +891,6 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_water_apply_patches();
 		rasterizer_dx9_weather_apply_patches();
 
-		rasterizer_fog_apply_patches();
 
 		render_lod_new_apply_patches();
 		render_weather_apply_patches();

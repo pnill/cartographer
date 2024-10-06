@@ -52,3 +52,14 @@ bool __cdecl prepare_render_layer(e_render_layer layer);
 void __cdecl draw_render_layer(void);
 
 void __cdecl reset_after_render_layer_draw(void);
+
+
+/* macros */
+
+#define DRAW_RENDER_LAYER(layer)		\
+if (prepare_render_layer((layer)))		\
+{										\
+	draw_render_layer();				\
+	reset_after_render_layer_draw();	\
+}										\
+(void)0 // This forces the use of a semicolon after the macro is used

@@ -502,7 +502,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             rasterizer_target == _rasterizer_target_2 ||
             rasterizer_target == _rasterizer_target_texaccum ||
             rasterizer_target == _rasterizer_target_cinematic ||
-            rasterizer_target == _rasterizer_target_backbuffer ||
+            rasterizer_target == _rasterizer_target_backbuffer ||   // For when the depth is rendered to the backbuffer
             rasterizer_target == rasterizer_dx9_get_overlay_destination_target())
         {
             const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
@@ -604,7 +604,8 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
 
         success =
             SUCCEEDED(dx9_globals->global_d3d_texture_render_resolved->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_render_resolved)) &&
-            SUCCEEDED(global_d3d_device->CreateRenderTarget(screen_bounds_width,
+            SUCCEEDED(global_d3d_device->CreateRenderTarget(
+                screen_bounds_width,
                 screen_bounds_height,
                 backbuffer_fmt,
                 type,
@@ -612,7 +613,8 @@ bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
                 false,
                 &dx9_globals->global_d3d_surface_render_primary,
                 NULL)) &&
-            SUCCEEDED(global_d3d_device->CreateDepthStencilSurface(screen_bounds_width,
+            SUCCEEDED(global_d3d_device->CreateDepthStencilSurface(
+                screen_bounds_width,
                 screen_bounds_height,
                 depthstencil_fmt,
                 type,

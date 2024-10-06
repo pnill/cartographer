@@ -137,7 +137,7 @@ uint32* global_effect_flag_get(void);
 // ### TODO: better function name
 bool frame_parameters_type_is_above_or_equal_to_7(void);
 
-void draw_render_layer(e_collection_type collection_type, e_render_layer render_layer);
+void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer);
 
 // CLIENT ONLY
 // Get cluster index and leaf index from render position provided
