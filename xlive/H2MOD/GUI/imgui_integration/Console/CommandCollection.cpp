@@ -15,7 +15,6 @@
 #include "text/unicode.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 

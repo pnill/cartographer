@@ -97,6 +97,9 @@ extern bool H2Config_upnp_enable;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;
 
+extern bool H2Config_force_off_d3d9ex;
+extern bool H2Config_force_off_sm3;
+
 #ifndef NDEBUG
 extern int H2Config_forced_event;
 #endif

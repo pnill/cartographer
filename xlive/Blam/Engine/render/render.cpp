@@ -379,11 +379,11 @@ void __cdecl render_scene(
         global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
     }
 
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
     if (render_layer_debug_view != 5)
     {
         if (render_layer_debug_view == 1 || render_layer_debug_view == 2)
         {
-            s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
             if (rasterizer_globals->d3d9_sm3_supported)
             {
                 *global_rasterizer_pixel_shader_index_get() = 2;
@@ -632,7 +632,14 @@ render_postprocess:
             }
         }
 
-        g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+        if (rasterizer_globals->d3d9_sm3_supported)
+        {
+            g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+        }
+        else
+        {
+            *global_rasterizer_pixel_shader_index_get() = 0;
+        }
 
         if (render_water_enabled)
         {

@@ -46,7 +46,7 @@
 #include "shell/shell_windows.h"
 
 #include "H2MOD/GUI/XLiveRendering.h"
-
+#include "H2MOD/Modules/Shell/Config.h"
 #include <dwmapi.h>
 
 /* typedefs */
@@ -629,7 +629,11 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
         if (SUCCEEDED(hr))
         {
             // Tells the game to make use of MRT and shader model 3 if the gpu supports it
-            rasterizer_globals_get()->d3d9_sm3_supported = caps->MaxVertexShader30InstructionSlots >= 512 && caps->MaxPixelShader30InstructionSlots >= 512 && caps->NumSimultaneousRTs >= 2;
+            rasterizer_globals_get()->d3d9_sm3_supported = 
+                caps->MaxVertexShader30InstructionSlots >= 512 && 
+                caps->MaxPixelShader30InstructionSlots >= 512 &&
+                caps->NumSimultaneousRTs >= 2 && 
+                !H2Config_force_off_sm3;            // Force disable sm3 if setting is set in H2Config
         }
         else
         {
@@ -677,7 +681,8 @@ bool __cdecl rasterizer_dx9_initialize(void)
             }
             else
             {
-                rasterizer_globals->use_d3d9_ex = true;
+                // Enable d3d9ex if we don't force it off in H2Config
+                rasterizer_globals->use_d3d9_ex = !H2Config_force_off_d3d9ex;
             }
         }
         
@@ -701,13 +706,6 @@ bool __cdecl rasterizer_dx9_initialize(void)
                 result = false;
             }
         }
-
-        /*
-        if (!shell_command_line_flag_is_set(_shell_command_line_flag_d3d9ex_enabled))
-        {
-            rasterizer_globals->use_d3d9_ex = false;
-        }
-        */
 
         if (result)
         {
