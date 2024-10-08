@@ -366,9 +366,7 @@ void __cdecl render_scene(
     
     rasterizer_dx9_render_scene_start(&parameters);
 
-    // Sky rendering
     const s_frame* global_window_parameters = global_window_parameters_get();
-
     create_visible_render_primitives(hologram_flag);
 
     const real32 dr = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
@@ -390,9 +388,14 @@ void __cdecl render_scene(
                 g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
             }
 
+            /*
+            * TODO:
+            * DO NOT ENABLE THIS (for now)
+            * Causes graphical issues on the start of outskirts with black geo being rendered
             rasterizer_dx9_perf_event_begin("texaccum", NULL);
             DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
             rasterizer_dx9_perf_event_end("texaccum");
+            */
 
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
             DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
@@ -475,9 +478,14 @@ void __cdecl render_scene(
         // RENDER LAYER 0, 3 - 5
         else
         {
+            /*
+            * TODO:
+            * DO NOT ENABLE THIS (for now)
+            * Causes graphical issues on the start of outskirts with black geo being rendered
             rasterizer_dx9_perf_event_begin("texaccum", NULL);
             DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
             rasterizer_dx9_perf_event_end("texaccum");
+            */
 
             rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
             DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
@@ -604,6 +612,8 @@ render_postprocess:
                 // In shader model 3 these are already drawn during the lightmap_indirect stage
                 if (!rasterizer_globals->d3d9_sm3_supported)
                 {
+                    rasterizer_dx9_perf_event_begin("render depth to backbuffer", NULL);
+
                     const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
                     const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };
                     rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
@@ -615,30 +625,31 @@ render_postprocess:
                         1.f,
                         0);
 
-                    *global_rasterizer_pixel_shader_index_get() = 1;
-
                     if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
                     {
                         global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
                     }
 
+                    *global_rasterizer_pixel_shader_index_get() = 1;
+
                     DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
                     DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+
+                    rasterizer_dx9_perf_event_end("render depth to backbuffer");
+                }
+
+                if (rasterizer_globals->d3d9_sm3_supported)
+                {
+                    g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+                }
+                else
+                {
+                    *global_rasterizer_pixel_shader_index_get() = 0;
                 }
 
                 render_atmospheric_fog();
-
                 DRAW_RENDER_LAYER(_render_layer_fog);
             }
-        }
-
-        if (rasterizer_globals->d3d9_sm3_supported)
-        {
-            g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
-        }
-        else
-        {
-            *global_rasterizer_pixel_shader_index_get() = 0;
         }
 
         if (render_water_enabled)

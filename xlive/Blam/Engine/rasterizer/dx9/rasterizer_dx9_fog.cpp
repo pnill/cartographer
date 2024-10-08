@@ -56,6 +56,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(void* data)
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
+
 	rasterizer_dx9_set_texture_direct(2, rasterizer_globals_get_data()->gradients.index, 0, 0.f);
 	rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
@@ -66,6 +67,7 @@ bool __cdecl rasterizer_dx9_atmospheric_fog_pipeline_setup(void* data)
 	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXANISOTROPY, 1);
 	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MIPMAPLODBIAS, 0);
 	rasterizer_dx9_set_sampler_state(2, D3DSAMP_MAXMIPLEVEL, 0);
+
 	rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);

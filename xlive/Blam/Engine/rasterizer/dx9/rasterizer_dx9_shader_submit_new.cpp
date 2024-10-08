@@ -57,7 +57,6 @@ void c_shader_submission_interface_new::stage_texture(
     int16 bitmap_index;
     RECT rect;
 
-
     bool continue_staging = true;
     while (continue_staging)
     {
@@ -90,8 +89,9 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_z:
-            rasterizer_dx9_set_target_as_texture(stage, _rasterizer_target_backbuffer);
-            rasterizer_target_get_resolution(_rasterizer_target_backbuffer, res_x, res_y);
+            target = rasterizer_globals_get()->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer;
+            rasterizer_dx9_set_target_as_texture(stage, target);
+            rasterizer_target_get_resolution(target, res_x, res_y);
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_global_target_shadow:

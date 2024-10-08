@@ -32,7 +32,8 @@ void simulation_queue_entity_creation_insert(s_simulation_queue_element* simulat
 void simulation_queue_entity_encode_header(c_bitstream* bitstream, e_simulation_entity_type type, datum gamestate_index)
 {
 	ASSERT(bitstream);
-	ASSERT(gamestate_index != NONE);
+	// TODO, gamestate index
+	// ASSERT(gamestate_index != NONE);
 
 	bitstream->write_integer("entity-type", type, 5);
 	//simulation_gamestate_index_encode(stream, gamestate_index);
@@ -60,7 +61,8 @@ bool encode_simulation_queue_creation_to_buffer(
 	int32* out_encoded_size
 )
 {
-	ASSERT(gamestate_index != NONE);
+	// TODO, gamestate index
+	// ASSERT(gamestate_index != NONE);
 
 	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
@@ -300,8 +302,9 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 		{
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_creation_data.entity_type);
 			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_get(decoded_creation_data.entity_index);
-
-			ASSERT(decoded_creation_data.gamestate_index != NONE);
+			
+			// TODO, gamestate index
+			// ASSERT(decoded_creation_data.gamestate_index != NONE);
 
 			if (game_is_playback())
 			{
