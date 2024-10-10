@@ -52,14 +52,14 @@ void __cdecl player_control_get_facing_direction(uint32 player_index, real_vecto
 	INVOKE(0x9076E, 0, player_control_get_facing_direction, player_index, out_facing);
 }
 
-real_euler_angles2d* player_control_get_facing(uint32 player_index)
+real_euler_angles2d* player_control_get_facing(uint32 user_index)
 {
-	return INVOKE(0x90759, 0, player_control_get_facing, player_index);
+	return INVOKE(0x90759, 0, player_control_get_facing, user_index);
 }
 
-void player_control_get_camera_info(uint32 player_index, s_player_control_camera_info* camera_info)
+void player_control_get_camera_info(uint32 user_index, s_player_control_camera_info* camera_info)
 {
-	INVOKE(0x90BAF, 0, player_control_get_camera_info, player_index, camera_info);
+	INVOKE(0x90BAF, 0, player_control_get_camera_info, user_index, camera_info);
 }
 
 real32 __cdecl player_control_get_autocenter_delta()

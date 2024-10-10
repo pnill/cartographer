@@ -417,6 +417,9 @@
     <ClCompile Include="Blam\Engine\interface\screens\screen_audio_settings.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_network_adapter.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_video_settings.cpp" />
+    <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
+    <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\editor_camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1108,6 +1111,8 @@
     <ClInclude Include="Blam\Engine\interface\screens\screen_audio_settings.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_network_adapter.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_video_settings.h" />
+    <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
+    <ClInclude Include="Blam\Engine\camera\editor_camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

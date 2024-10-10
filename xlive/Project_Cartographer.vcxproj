@@ -323,7 +323,9 @@
     <ClCompile Include="Blam\Engine\camera\camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\dead_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\director.cpp" />
+    <ClCompile Include="Blam\Engine\camera\editor_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\first_person_camera.cpp" />
+    <ClCompile Include="Blam\Engine\camera\following_camera.cpp" />
     <ClCompile Include="Blam\Engine\camera\observer.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\tag_fixes\tag_fixes.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\twizzler\twizzler.cpp" />
@@ -568,6 +570,7 @@
     <ClInclude Include="Blam\Engine\camera\camera_track_definition.h" />
     <ClInclude Include="Blam\Engine\camera\dead_camera.h" />
     <ClInclude Include="Blam\Engine\camera\director.h" />
+    <ClInclude Include="Blam\Engine\camera\editor_camera.h" />
     <ClInclude Include="Blam\Engine\camera\first_person_camera.h" />
     <ClInclude Include="Blam\Engine\camera\following_camera.h" />
     <ClInclude Include="Blam\Engine\camera\observer.h" />

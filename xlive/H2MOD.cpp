@@ -81,7 +81,9 @@
 #ifndef NDEBUG
 #include "H2MOD/Modules/ObserverMode/ObserverMode.h"
 #endif
+#include "camera/editor_camera.h"
 #include "camera/first_person_camera.h"
+#include "camera/following_camera.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
 #include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
@@ -866,6 +868,8 @@ void H2MOD::ApplyHooks() {
 		render_cameras_apply_patches();
 		first_person_camera_apply_patches();
 		first_person_weapons_apply_patches();
+		following_camera_apply_patches();
+		editor_camera_apply_patches();
 		bipeds_apply_patches();
 		unit_apply_patches();
 
