@@ -77,6 +77,10 @@ static_assert(EXECUTABLE_TYPE <= 7 && EXECUTABLE_TYPE >= 0, "EXECUTABLE_TYPE VAL
 
 #include <d3d9.h>
 #include <d3dx9.h>
+#include <d3d12.h>
+
+#include <dxgi1_4.h>
+#include <wrl/client.h>
 
 // Cartographer includes
 #include "cseries/cseries.h"

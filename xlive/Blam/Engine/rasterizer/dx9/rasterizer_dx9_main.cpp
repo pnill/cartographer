@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_main.h"
 
-// Included for D3D9_ON_12_ENABLED macro
 #include "rasterizer_dx9_9on12.h"
 
 #include "rasterizer_dx9_bitmaps.h"
@@ -180,11 +179,6 @@ const D3DVERTEXELEMENT9 global_d3d_vd_source[] =
 };
 s_rasterizer_parameters g_rasterizer_parameters = {};
 
-#ifdef D3D9_ON_12_ENABLED
-IDirect3DDevice9On12* g_d3d9on12_device = NULL;
-ID3D12Device* g_d3d12_device = NULL;
-#endif
-
 /* prototypes */
 
 PALETTEENTRY* g_d3d_palettes_get(void);
@@ -211,6 +205,10 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
 void __cdecl display_blackness_window(void);
 HWND __cdecl rasterizer_dx9_create_main_window(void);
 void rasterizer_dx9_prime_shader_initialize(void);
+
+bool rasterizer_dx9_should_use_d3d9ex(void);
+bool rasterizer_dx9_get_create_ex_proc(void);
+bool rasterizer_dx9_create_device_interface(void);
 
 /* public code */
 
@@ -585,13 +583,15 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
             }
         }
 
-#ifdef D3D9_ON_12_ENABLED
-        HRESULT d3d9on12_query_interface_hr = rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(IID_PPV_ARGS(&g_d3d9on12_device));
-        if (FAILED(d3d9on12_query_interface_hr))
+        if (g_rasterizer_dx9on12_enabled)
         {
-            rasterizer_dx9_errors_log(d3d9on12_query_interface_hr, "QueryInterface IDirect3DDevice9On12");
+            HRESULT d3d9on12_query_interface_hr = rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(IID_PPV_ARGS(&g_d3d9on12_device));
+            if (FAILED(d3d9on12_query_interface_hr))
+            {
+                rasterizer_dx9_errors_log(d3d9on12_query_interface_hr, "QueryInterface IDirect3DDevice9On12");
+            }
         }
-#endif
+        
     }
 
     // TODO: implement
@@ -679,76 +679,16 @@ bool __cdecl rasterizer_dx9_initialize(void)
 
     if (!rasterizer_globals->rasterizer_initialized && shell_tool_type() != _shell_tool_type_editing_tools)
     {
-        // OSVERSIONINFOW in H2Sapien while OSVERSIONINFOA in the base game
-        // Possibly because it was changed as a part of the H2TOOLSET macro when PI studios was upgrading the Halo 2 Editing Kit
-        OSVERSIONINFOW version_information;
-        version_information.dwOSVersionInfoSize = sizeof(version_information);
-        if (GetVersionEx(&version_information))
-        {
-            if (version_information.dwMajorVersion < 6)
-            {
-                error(2, "### ERROR this machine isn't vista!");
-                main_quit();
-                result = false;
-            }
-            else
-            {
-                // Enable d3d9ex if we don't force it off in H2Config
-                rasterizer_globals->use_d3d9_ex = !H2Config_force_off_d3d9ex;
-            }
-        }
+        rasterizer_globals->use_d3d9_ex = rasterizer_dx9_should_use_d3d9ex();
         
         if (result)
         {
-            const HMODULE module = LoadLibrary(L"d3d9");
-            if (module)
-            {
-                rasterizer_globals->d3d9_create_ex_proc = (decltype(Direct3DCreate9Ex)*)GetProcAddress(module, "Direct3DCreate9Ex");
-                if (!rasterizer_globals->d3d9_create_ex_proc)
-                {
-                    error(2, "### ERROR failed to obtain Direct3DCreate9Ex function pointer");
-                    main_quit();
-                    result = false;
-                }
-            }
-            else
-            {
-                error(2, "### ERROR failed to dynamically load d3d9.dll");
-                main_quit();
-                result = false;
-            }
+            result = rasterizer_dx9_get_create_ex_proc();
         }
 
         if (result)
         {
-            if (rasterizer_globals->use_d3d9_ex)
-            {
-#ifdef D3D9_ON_12_ENABLED
-                const HRESULT hr = rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface, &g_d3d12_device, false /*use_warp*/);
-#else
-                const HRESULT hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &rasterizer_dx9_main_globals->global_d3d_interface);
-#endif
-                if (FAILED(hr))
-                {
-                    error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
-                    main_quit();
-                    result = false;
-                }
-            }
-            else
-            {
-#ifdef D3D9_ON_12_ENABLED
-                rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface, &g_d3d12_device, false /*use_warp*/);
-#else
-                rasterizer_dx9_main_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
-#endif
-            }
-
-            if (!rasterizer_dx9_main_globals->global_d3d_interface)
-            {
-                error(3, "### ERROR failed to create D3D object");
-                result = false;
-            }
+            result = rasterizer_dx9_create_device_interface();
         }
 
         if (result)
@@ -1077,4 +1017,135 @@ void rasterizer_dx9_prime_shader_initialize(void)
     }
 
     return;
+}
+
+bool rasterizer_dx9_should_use_d3d9ex(void)
+{
+    bool result = false;
+    
+    // OSVERSIONINFOW in H2Sapien while OSVERSIONINFOA in the base game
+    // Possibly because it was changed as a part of the H2TOOLSET macro when PI studios was upgrading the Halo 2 Editing Kit
+    OSVERSIONINFOW version_information;
+    version_information.dwOSVersionInfoSize = sizeof(version_information);
+    if (GetVersionEx(&version_information))
+    {
+        if (version_information.dwMajorVersion < 6)
+        {
+            error(2, "### ERROR this machine isn't vista!");
+            
+            // By default it quits but let's ignore this for now...
+            /*
+            main_quit();
+            result = false;
+            */
+        }
+        else
+        {
+            // Enable d3d9ex if we don't force it off in H2Config and if dx9on12 is not enabled
+            // Using d3d9ex while dx9on12 is enabled crashes the game on Nvidia cards
+            result = !H2Config_force_off_d3d9ex && !g_rasterizer_dx9on12_enabled;
+        }
+    }
+
+    return result;
+}
+
+bool rasterizer_dx9_get_create_ex_proc(void)
+{
+    bool result = true;
+
+    const HMODULE module = LoadLibrary(L"d3d9");
+    if (module)
+    {
+        s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+        rasterizer_globals->d3d9_create_ex_proc = (decltype(Direct3DCreate9Ex)*)GetProcAddress(module, "Direct3DCreate9Ex");
+        if (!rasterizer_globals->d3d9_create_ex_proc)
+        {
+            error(2, "### ERROR failed to obtain Direct3DCreate9Ex function pointer");
+            /*
+            main_quit();
+            result = false;
+            */
+        }
+    }
+    else
+    {
+        error(2, "### ERROR failed to dynamically load d3d9.dll");
+        main_quit();
+        result = false;
+    }
+    return result;
+}
+
+bool rasterizer_dx9_create_device_interface(void)
+{
+    bool result = true;
+
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+
+    if (rasterizer_globals->use_d3d9_ex)
+    {
+        HRESULT hr;
+        if (g_rasterizer_dx9on12_enabled)
+        {
+            hr = rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
+        }
+        else
+        {
+            hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
+        }
+        if (FAILED(hr))
+        {
+            error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
+            main_quit();
+            result = false;
+        }
+    }
+    else
+    {
+        if (g_rasterizer_dx9on12_enabled)
+        {
+            rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
+        }
+        else
+        {
+            dx9_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
+        }
+    }
+
+    HRESULT hr;
+    if (g_rasterizer_dx9on12_enabled)
+    {
+        hr = rasterizer_dx9_create_through_d3d9on12(&dx9_globals->global_d3d_interface, false /*use_warp*/);
+        if (FAILED(hr))
+        {
+            error(2, "### ERROR failed to create D3D object through d3d9on12");
+            main_quit();
+            result = false;
+        }
+    }
+    else if (rasterizer_globals->use_d3d9_ex)
+    {
+        hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &dx9_globals->global_d3d_interface);
+        if (FAILED(hr))
+        {
+            error(2, "### ERROR failed to create D3D object with the Ex version of D3D");
+            main_quit();
+            result = false;
+        }
+    }
+    else
+    {
+        dx9_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
+    }
+
+
+    if (!dx9_globals->global_d3d_interface)
+    {
+        error(3, "### ERROR failed to create D3D object");
+        result = false;
+    }
+
+    return result;
 }

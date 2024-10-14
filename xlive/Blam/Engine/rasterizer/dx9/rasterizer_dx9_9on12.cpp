@@ -1,18 +1,18 @@
 #include "stdafx.h"
 #include "rasterizer_dx9_9on12.h"
 
-#ifdef D3D9_ON_12_ENABLED
-
-#include "rasterizer/rasterizer_globals.h"
-
-#include <d3d9on12.h>
-#include <d3d12.h>
-#include <dxgi1_4.h>
-#include <wrl/client.h>
+#include "rasterizer/dx12/rasterizer_dx12_main.h"
 
 using Microsoft::WRL::ComPtr;
 
-HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, ID3D12Device** d3d12, bool use_warp)
+/* globals */
+
+bool g_rasterizer_dx9on12_enabled = false;
+IDirect3DDevice9On12* g_d3d9on12_device = NULL;
+
+/* public code */
+
+HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, bool use_warp)
 {
     // Create the WARP adapter
     ComPtr<IDXGIFactory4> dxgiFactory;
@@ -54,20 +54,13 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, ID3D12Device*
         return E_FAIL;
     }
 
-    LOG_CRITICAL_GAME("D3D12 device created successfully using WARP!");
+    LOG_INFO_GAME("D3D12 device created successfully using WARP!");
 
     // Create D3D9On12
     D3D9ON12_ARGS Args = {};
     Args.Enable9On12 = TRUE;
     Args.pD3D12Device = d3d12_device.Get();
-    if (rasterizer_globals_get()->use_d3d9_ex)
-    {
-        hr = Direct3DCreate9On12Ex(D3D_SDK_VERSION, &Args, 1, d3d);
-    }
-    else
-    {
-        *d3d = (IDirect3D9Ex*)Direct3DCreate9On12(D3D_SDK_VERSION, &Args, 1);
-    }
+    *d3d = (IDirect3D9Ex*)Direct3DCreate9On12(D3D_SDK_VERSION, &Args, 1);
 
     if (FAILED(hr))
     {
@@ -76,11 +69,9 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, ID3D12Device*
     }
 
     d3d12_device->AddRef();
-    *d3d12 = d3d12_device.Get();
+    g_d3d12_device = d3d12_device.Get();
 
-    LOG_CRITICAL_GAME("D3D9On12 initialized successfully!");
+    LOG_INFO_GAME("D3D9On12 initialized successfully!");
 
     return 0;
 }
-
-#endif
