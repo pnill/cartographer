@@ -180,6 +180,11 @@ const D3DVERTEXELEMENT9 global_d3d_vd_source[] =
 };
 s_rasterizer_parameters g_rasterizer_parameters = {};
 
+#ifdef D3D9_ON_12_ENABLED
+IDirect3DDevice9On12* g_d3d9on12_device = NULL;
+ID3D12Device* g_d3d12_device = NULL;
+#endif
+
 /* prototypes */
 
 PALETTEENTRY* g_d3d_palettes_get(void);
@@ -565,7 +570,6 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
         }
         else
         {
-            IDirect3DDevice9* device = NULL;
             device_create_hr = rasterizer_dx9_main_globals->global_d3d_interface->CreateDevice(
                 monitor_count,
                 D3DDEVTYPE_HAL,
@@ -580,6 +584,14 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
                 rasterizer_dx9_errors_log(device_create_hr, "CreateDevice");
             }
         }
+
+#ifdef D3D9_ON_12_ENABLED
+        HRESULT d3d9on12_query_interface_hr = rasterizer_dx9_main_globals->global_d3d_device->QueryInterface(IID_PPV_ARGS(&g_d3d9on12_device));
+        if (FAILED(d3d9on12_query_interface_hr))
+        {
+            rasterizer_dx9_errors_log(d3d9on12_query_interface_hr, "QueryInterface IDirect3DDevice9On12");
+        }
+#endif
     }
 
     // TODO: implement
@@ -712,7 +724,7 @@ bool __cdecl rasterizer_dx9_initialize(void)
             if (rasterizer_globals->use_d3d9_ex)
             {
 #ifdef D3D9_ON_12_ENABLED
-                const HRESULT hr = rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface);
+                const HRESULT hr = rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface, &g_d3d12_device, false /*use_warp*/);
 #else
                 const HRESULT hr = rasterizer_globals->d3d9_create_ex_proc(D3D_SDK_VERSION, &rasterizer_dx9_main_globals->global_d3d_interface);
 #endif
@@ -726,7 +738,7 @@ bool __cdecl rasterizer_dx9_initialize(void)
             else
             {
 #ifdef D3D9_ON_12_ENABLED
-                rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface);
+                rasterizer_dx9_create_through_d3d9on12(&rasterizer_dx9_main_globals->global_d3d_interface, &g_d3d12_device, false /*use_warp*/);
 #else
                 rasterizer_dx9_main_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
 #endif

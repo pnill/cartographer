@@ -10,42 +10,46 @@
 #include <dxgi1_4.h>
 #include <wrl/client.h>
 
-#pragma comment(lib, "dxguid.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "d3d12.lib")
-#pragma comment(lib, "d3d9.lib")
+using Microsoft::WRL::ComPtr;
 
-HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d)
+HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d, ID3D12Device** d3d12, bool use_warp)
 {
-    // Initialize COM library
-    HRESULT hr = CoInitialize(NULL);
-    if (FAILED(hr)) {
-        return E_FAIL;
-    }
-
     // Create the WARP adapter
-    Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
-    hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
-    if (FAILED(hr)) {
+    ComPtr<IDXGIFactory4> dxgiFactory;
+    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgiFactory));
+    if (FAILED(hr))
+    {
         LOG_CRITICAL_GAME("Failed to create DXGIFactory.");
         return E_FAIL;
     }
 
-    Microsoft::WRL::ComPtr<IDXGIAdapter> warpAdapter;
-    hr = dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&warpAdapter));
-    if (FAILED(hr)) {
-        LOG_CRITICAL_GAME("Failed to get WARP adapter.");
-        return E_FAIL;
+    ComPtr<IDXGIAdapter> dxgi_adapter;
+    if (use_warp)
+    {
+        if (FAILED(hr = dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgi_adapter))))
+        {
+            LOG_CRITICAL_GAME("Failed to get WARP adapter.");
+            return E_FAIL;
+        }
+    }
+    else
+    {
+        if (FAILED(hr = dxgiFactory->EnumAdapters(0, &dxgi_adapter)))
+        {
+            LOG_CRITICAL_GAME("Failed to get adapter.");
+            return E_FAIL;
+        }
     }
 
     // Create D3D12 device using WARP
-    Microsoft::WRL::ComPtr<ID3D12Device> d3d12Device;
+    ComPtr<ID3D12Device> d3d12_device;
     hr = D3D12CreateDevice(
-        warpAdapter.Get(),                // Adapter
-        D3D_FEATURE_LEVEL_11_0,           // Minimum feature level
-        IID_PPV_ARGS(&d3d12Device));      // D3D12 device
+        dxgi_adapter.Get(),           // Adapter
+        D3D_FEATURE_LEVEL_11_0,      // Minimum feature level
+        IID_PPV_ARGS(&d3d12_device)); // D3D12 device
 
-    if (FAILED(hr)) {
+    if (FAILED(hr))
+    {
         LOG_CRITICAL_GAME("Failed to create D3D12 device.");
         return E_FAIL;
     }
@@ -53,24 +57,28 @@ HRESULT rasterizer_dx9_create_through_d3d9on12(IDirect3D9Ex** d3d)
     LOG_CRITICAL_GAME("D3D12 device created successfully using WARP!");
 
     // Create D3D9On12
+    D3D9ON12_ARGS Args = {};
+    Args.Enable9On12 = TRUE;
+    Args.pD3D12Device = d3d12_device.Get();
     if (rasterizer_globals_get()->use_d3d9_ex)
     {
-        hr = Direct3DCreate9On12Ex(D3D_SDK_VERSION, NULL, 0, d3d);
+        hr = Direct3DCreate9On12Ex(D3D_SDK_VERSION, &Args, 1, d3d);
     }
     else
     {
-        *d3d = (IDirect3D9Ex*)Direct3DCreate9On12(D3D_SDK_VERSION, NULL, 0);
+        *d3d = (IDirect3D9Ex*)Direct3DCreate9On12(D3D_SDK_VERSION, &Args, 1);
     }
 
-    if (FAILED(hr)) {
+    if (FAILED(hr))
+    {
         LOG_CRITICAL_GAME("Failed to initialize D3D9On12.");
         return E_FAIL;
     }
 
-    LOG_CRITICAL_GAME("D3D9On12 initialized successfully!");
+    d3d12_device->AddRef();
+    *d3d12 = d3d12_device.Get();
 
-    // Clean up
-    CoUninitialize();
+    LOG_CRITICAL_GAME("D3D9On12 initialized successfully!");
 
     return 0;
 }
