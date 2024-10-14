@@ -3,6 +3,7 @@
 
 #include "rasterizer_dx9_9on12.h"
 
+#include "rasterizer_dx9.h"
 #include "rasterizer_dx9_bitmaps.h"
 #include "rasterizer_dx9_debug.h"
 #include "rasterizer_dx9_dof.h"
@@ -181,34 +182,50 @@ s_rasterizer_parameters g_rasterizer_parameters = {};
 
 /* prototypes */
 
-PALETTEENTRY* g_d3d_palettes_get(void);
+static PALETTEENTRY* g_d3d_palettes_get(void);
 
-IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void);
-IDirect3DVertexShader9** global_d3d_vs_prime_get(void);
+static IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void);
+static IDirect3DVertexShader9** global_d3d_vs_prime_get(void);
 
-const uint32** g_d3d9_texture_usage_get(void);
-const D3DPOOL** g_d3d9_texture_pool_get(void);
-const uint32** g_d3d9_vertex_usage_get(void);
-const D3DPOOL** g_d3d9_vertex_pool_get(void);
+static const uint32** g_d3d9_texture_usage_get(void);
+static const D3DPOOL** g_d3d9_texture_pool_get(void);
+static const uint32** g_d3d9_vertex_usage_get(void);
+static const D3DPOOL** g_d3d9_vertex_pool_get(void);
 
-void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
-void __cdecl rasterizer_set_stream_source(void);
-void __cdecl debug_frame_usage_draw(void);
-void __cdecl rasterizer_present_backbuffer(void);
-void __cdecl rasterizer_cache_bitmaps(void);
-bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count);
-bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+static void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil);
+static void __cdecl rasterizer_set_stream_source(void);
+static void __cdecl debug_frame_usage_draw(void);
+static void __cdecl rasterizer_present_backbuffer(void);
+static void __cdecl rasterizer_cache_bitmaps(void);
+
+// Used for debugging the vertex declaration
+static bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count);
+
+// Used for debugging the vertex declaration
+static bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     D3DPRIMITIVETYPE PrimitiveType,
     UINT PrimitiveCount,
     const void* pVertexStreamZeroData,
     UINT VertexStreamZeroStride);
-void __cdecl display_blackness_window(void);
-HWND __cdecl rasterizer_dx9_create_main_window(void);
-void rasterizer_dx9_prime_shader_initialize(void);
 
-bool rasterizer_dx9_should_use_d3d9ex(void);
-bool rasterizer_dx9_get_create_ex_proc(void);
-bool rasterizer_dx9_create_device_interface(void);
+static void __cdecl display_blackness_window(void);
+
+static HWND __cdecl rasterizer_dx9_create_main_window(void);
+
+// Initializes the prime vertex shader
+static void rasterizer_dx9_prime_shader_initialize(void);
+
+// Returns true if we can use d3d9ex
+static bool rasterizer_dx9_should_use_d3d9ex(void);
+
+// Returns true if we retrieved the d3d9ex proc
+static bool rasterizer_dx9_get_create_ex_proc(void);
+
+// Returns true if we've successfully created the device interface
+static bool rasterizer_dx9_create_device_interface(void);
+
+// Returns true if we're using an amd or ati gpu
+static bool rasterizer_dx9_is_amd_or_ati_card(void);
 
 /* public code */
 
@@ -274,7 +291,7 @@ void __cdecl rasterizer_dx9_reset_depth_buffer(void)
     return INVOKE(0x269835, 0x0, rasterizer_dx9_reset_depth_buffer);
 }
 
-void rasterizer_present(bitmap_data* screenshot_bitmap)
+void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
 {
     bool result = true;
     if (!media_foundation_player_running())
@@ -342,6 +359,11 @@ void rasterizer_present(bitmap_data* screenshot_bitmap)
     }
 }
 
+void rasterizer_present_frame_wrapper(bitmap_data* pointer_to_bitmap)
+{
+    rasterizer_dx9_present(pointer_to_bitmap);
+    return;
+}
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
 {
@@ -640,12 +662,18 @@ bool __cdecl rasterizer_dx9_device_initialize(s_rasterizer_parameters* parameter
         HRESULT hr = rasterizer_dx9_device_get_interface()->GetDeviceCaps(caps);
         if (SUCCEEDED(hr))
         {
+            if (!g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches)
+            {
+                g_rasterizer_dx9_driver_globals.using_amd_or_ati_gpu = rasterizer_dx9_is_amd_or_ati_card();
+            }
+
             // Tells the game to make use of MRT and shader model 3 if the gpu supports it
-            rasterizer_globals_get()->d3d9_sm3_supported = 
-                caps->MaxVertexShader30InstructionSlots >= 512 && 
+            rasterizer_globals_get()->d3d9_sm3_supported =
+                caps->MaxVertexShader30InstructionSlots >= 512 &&
                 caps->MaxPixelShader30InstructionSlots >= 512 &&
-                caps->NumSimultaneousRTs >= 2 && 
-                !H2Config_force_off_sm3;            // Force disable sm3 if setting is set in H2Config
+                caps->NumSimultaneousRTs >= 2 &&
+                !H2Config_force_off_sm3 &&                          // Force disable sm3 if setting is set in H2Config
+                !g_rasterizer_dx9_driver_globals.using_amd_or_ati_gpu;
         }
         else
         {
@@ -862,72 +890,72 @@ bool __cdecl rasterizer_dx9_render_scene_end(void)
 
 /* private code */
 
-PALETTEENTRY* g_d3d_palettes_get(void)
+static PALETTEENTRY* g_d3d_palettes_get(void)
 {
     return Memory::GetAddress<PALETTEENTRY*>(0x9DAA30);
 }
 
-IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void)
+static IDirect3DVertexDeclaration9** global_d3d_vd_prime_get(void)
 {
     return Memory::GetAddress<IDirect3DVertexDeclaration9**>(0xA3C78C);
 }
 
-IDirect3DVertexShader9** global_d3d_vs_prime_get(void)
+static IDirect3DVertexShader9** global_d3d_vs_prime_get(void)
 {
     return Memory::GetAddress<IDirect3DVertexShader9**>(0xA3C790);
 }
 
-const uint32** g_d3d9_texture_usage_get(void)
+static const uint32** g_d3d9_texture_usage_get(void)
 {
     return Memory::GetAddress<const uint32**>(0xA3C628);
 }
 
-const D3DPOOL** g_d3d9_texture_pool_get(void)
+static const D3DPOOL** g_d3d9_texture_pool_get(void)
 {
     return Memory::GetAddress<const D3DPOOL**>(0xA3C62C);
 }
 
-const uint32** g_d3d9_vertex_usage_get(void)
+static const uint32** g_d3d9_vertex_usage_get(void)
 {
     return Memory::GetAddress<const uint32**>(0xA3C630);
 }
 
-const D3DPOOL** g_d3d9_vertex_pool_get(void)
+static const D3DPOOL** g_d3d9_vertex_pool_get(void)
 {
     return Memory::GetAddress<const D3DPOOL**>(0xA3C634);
 }
 
-void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
+static void __cdecl rasterizer_dx9_clear_target(uint32 flags, D3DCOLOR color, real32 z, bool stencil)
 {
     INVOKE(0x25FC2A, 0x0, rasterizer_dx9_clear_target, flags, color, z, stencil);
     return;
 }
 
-void __cdecl rasterizer_set_stream_source(void)
+static void __cdecl rasterizer_set_stream_source(void)
 {
     INVOKE(0x26F4D3, 0x0, rasterizer_set_stream_source);
     return;
 }
 
-void __cdecl debug_frame_usage_draw(void)
+static void __cdecl debug_frame_usage_draw(void)
 {
     INVOKE(0x25ECAA, 0x0, debug_frame_usage_draw);
     return;
 }
 
-void __cdecl rasterizer_present_backbuffer(void)
+static void __cdecl rasterizer_present_backbuffer(void)
 {
     INVOKE(0x25F277, 0x0, rasterizer_present_backbuffer);
     return;
 }
 
-void __cdecl rasterizer_cache_bitmaps(void)
+static void __cdecl rasterizer_cache_bitmaps(void)
 {
     INVOKE(0x261720, 0x0, rasterizer_cache_bitmaps);
     return;
 }
 
-bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
+static bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elements, UINT* vertex_element_count)
 {
     IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
 
@@ -940,7 +968,7 @@ bool rasterizer_dx9_get_vertex_declaration_format(D3DVERTEXELEMENT9* vertex_elem
     return res;
 }
 
-bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
+static bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     D3DPRIMITIVETYPE PrimitiveType,
     UINT PrimitiveCount,
     const void* pVertexStreamZeroData,
@@ -958,18 +986,18 @@ bool __cdecl DrawPrimitiveUP_hook_get_vertex_decl(
     return SUCCEEDED(global_d3d_device->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride));
 }
 
-void __cdecl display_blackness_window(void)
+static void __cdecl display_blackness_window(void)
 {
     INVOKE(0x25E5A8, 0x0, display_blackness_window);
     return;
 }
 
-HWND __cdecl rasterizer_dx9_create_main_window(void)
+static HWND __cdecl rasterizer_dx9_create_main_window(void)
 {
     return INVOKE(0x26101B, 0x0, rasterizer_dx9_create_main_window);
 }
 
-void rasterizer_dx9_prime_shader_initialize(void)
+static void rasterizer_dx9_prime_shader_initialize(void)
 {
     IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
     HRESULT hr = global_d3d_device->CreateVertexDeclaration(global_d3d_vd_source, global_d3d_vd_prime_get());
@@ -1019,7 +1047,7 @@ void rasterizer_dx9_prime_shader_initialize(void)
     return;
 }
 
-bool rasterizer_dx9_should_use_d3d9ex(void)
+static bool rasterizer_dx9_should_use_d3d9ex(void)
 {
     bool result = false;
     
@@ -1050,7 +1078,7 @@ bool rasterizer_dx9_should_use_d3d9ex(void)
     return result;
 }
 
-bool rasterizer_dx9_get_create_ex_proc(void)
+static bool rasterizer_dx9_get_create_ex_proc(void)
 {
     bool result = true;
 
@@ -1077,7 +1105,7 @@ bool rasterizer_dx9_get_create_ex_proc(void)
     return result;
 }
 
-bool rasterizer_dx9_create_device_interface(void)
+static bool rasterizer_dx9_create_device_interface(void)
 {
     bool result = true;
 
@@ -1140,11 +1168,28 @@ bool rasterizer_dx9_create_device_interface(void)
         dx9_globals->global_d3d_interface = (IDirect3D9Ex*)Direct3DCreate9(D3D_SDK_VERSION);
     }
 
-
     if (!dx9_globals->global_d3d_interface)
     {
         error(3, "### ERROR failed to create D3D object");
         result = false;
+    }
+
+    return result;
+}
+
+static bool rasterizer_dx9_is_amd_or_ati_card(void)
+{
+    bool result = false;
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+
+    D3DADAPTER_IDENTIFIER9 identifier;
+    dx9_globals->global_d3d_interface->GetAdapterIdentifier(D3DADAPTER_DEFAULT, 0, &identifier);
+    
+    if ( StrStrIA(identifier.Description, "amd") != NULL || 
+        StrStrIA(identifier.Description, "ati") != NULL)
+    {
+        LOG_INFO_GAME("AMD or ATI card in use.");
+        result = true;
     }
 
     return result;

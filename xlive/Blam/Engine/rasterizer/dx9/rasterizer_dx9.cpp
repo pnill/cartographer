@@ -15,6 +15,8 @@
 
 /* globals */
 
+s_rasterizer_dx9_driver_globals g_rasterizer_dx9_driver_globals = {};
+
 // bool g_rasterizer_d3d_perf = true;
 
 /* public code */

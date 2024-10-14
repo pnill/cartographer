@@ -3,6 +3,7 @@
 
 #include "cartographer/twizzler/twizzler.h"
 #include "render/render_lod_new.h"
+#include "rasterizer/dx9/rasterizer_dx9.h"
 #include "rasterizer/dx9/rasterizer_dx9_9on12.h"
 
 #include "H2MOD/GUI/imgui_integration/Console/ComVar.h"
@@ -381,6 +382,7 @@ void SaveH2Config() {
 			ini.SetBoolValue(k_h2config_version_section, "force_off_d3d9ex", H2Config_force_off_d3d9ex);
 			ini.SetBoolValue(k_h2config_version_section, "force_off_sm3", H2Config_force_off_sm3);
 			ini.SetBoolValue(k_h2config_version_section, "use_d3d9on12", g_rasterizer_dx9on12_enabled);
+			ini.SetBoolValue(k_h2config_version_section, "disable_amd_or_ati_patches", g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
 		}
 
 		ini.SetBoolValue(k_h2config_version_section, "enable_xdelay", H2Config_xDelay);
@@ -625,6 +627,11 @@ void ReadH2Config() {
 				H2Config_force_off_d3d9ex = ini.GetBoolValue(k_h2config_version_section, "force_off_d3d9ex", H2Config_force_off_d3d9ex);
 				H2Config_force_off_sm3 = ini.GetBoolValue(k_h2config_version_section, "force_off_sm3", H2Config_force_off_sm3);
 				g_rasterizer_dx9on12_enabled = ini.GetBoolValue(k_h2config_version_section, "use_d3d9on12", g_rasterizer_dx9on12_enabled);
+				g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches = ini.GetBoolValue(
+					k_h2config_version_section,
+					"disable_amd_or_ati_patches",
+					g_rasterizer_dx9_driver_globals.disable_amd_or_ati_patches);
+
 			}
 
 			// dedicated server only
