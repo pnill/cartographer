@@ -3,5 +3,4 @@
 namespace TagFixes
 {
 	void OnMapLoad();
-	void Initalize();
 }

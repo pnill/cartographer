@@ -401,7 +401,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 
 	MetaExtender::free_tag_blocks();
-	tags::run_callbacks();
+	TagFixes::OnMapLoad();
 	
 	game_globals_apply_tag_patches(options);
 	ImGuiHandler::WeaponOffsets::MapLoad();
@@ -956,7 +956,6 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
-	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();

@@ -255,8 +255,6 @@ DWORD WINAPI XUserCheckPrivilege(DWORD dwUserIndex, XPRIVILEGE_TYPE privilegeTyp
 // #5279: XUserReadAchievementPicture
 int WINAPI XUserReadAchievementPicture(DWORD dwUserIndex, DWORD dwTitleId, DWORD dwPictureId, BYTE* pbTextureBuffer, DWORD dwPitch, DWORD dwHeight, PXOVERLAPPED pOverlapped)
 {
-	LOG_TRACE_XLIVE("XUserReadAchievementPicture");
-
 	return ERROR_INVALID_PARAMETER;
 }
 
@@ -298,60 +296,12 @@ DWORD WINAPI XUserResetStatsViewAllUsers(DWORD dwViewId, PXOVERLAPPED pOverlappe
 // #5281: XUserReadStats
 DWORD WINAPI XUserReadStats(DWORD dwTitleId, DWORD dwNumXuids, CONST XUID *pXuids, DWORD dwNumStatsSpecs, DWORD *pSpecs, DWORD *pcbResults, DWORD *pResults, PXOVERLAPPED pOverlapped)
 {
-	if (pcbResults)
-	{
-		// return size
-		if (*pcbResults == 0)
-		{
-			*pcbResults = 4;
-
-			if (pOverlapped)
-			{
-				pOverlapped->InternalLow = ERROR_INSUFFICIENT_BUFFER;
-				pOverlapped->dwExtendedError = ERROR_INSUFFICIENT_BUFFER;
-
-
-				Check_Overlapped(pOverlapped);
-
-				return ERROR_IO_PENDING;
-			}
-
-			else
-				return ERROR_INSUFFICIENT_BUFFER;
-		}
-	}
-
-
-	if (pResults)
-		*pResults = 0;
-
-
-	if (pOverlapped)
-	{
-		pOverlapped->InternalLow = -1;
-		pOverlapped->dwExtendedError = -1;
-
-
-		Check_Overlapped(pOverlapped);
-
-		return ERROR_IO_PENDING;
-	}
-
-
 	return ERROR_SUCCESS;
 }
 
 // #5284: XUserCreateStatsEnumeratorByRank
 DWORD WINAPI XUserCreateStatsEnumeratorByRank(DWORD dwTitleId, DWORD dwRankStart, DWORD dwNumRows, DWORD dwNuStatSpec, CONST XUSER_STATS_SPEC* pSpecs, DWORD * pcbBuffer, PHANDLE ph)
 {
-	LOG_TRACE_XLIVE("XUserCreateStatsEnumeratorByRank");
-
-	if (pcbBuffer)
-		*pcbBuffer = 0;
-
-	if (ph)
-		*ph = 0;
-
 	return 1;
 }
 
@@ -360,25 +310,12 @@ DWORD WINAPI XUserCreateStatsEnumeratorByRank(DWORD dwTitleId, DWORD dwRankStart
 DWORD WINAPI XUserCreateStatsEnumeratorByXuid(DWORD dwTitleId, XUID XuidPivot, DWORD dwNumRows, DWORD dwNumStatsSpecs, CONST XUSER_STATS_SPEC* pSpecs, PDWORD pcbBuffer, PHANDLE ph)
 {
 	LOG_TRACE_XLIVE("XUserCreateStatsEnumeratorByXuid");
-
-	if (pcbBuffer)
-		*pcbBuffer = 0;
-
-	if (ph)
-		*ph = 0;
-
 	return 1;
 }
 
 // #5285: XUserCreateStatsEnumeratorByRating
 DWORD WINAPI XUserCreateStatsEnumeratorByRating(DWORD dwTitleId, LONGLONG i64Rating, DWORD dwNumRows, DWORD dwNumStatsSpecs, CONST XUSER_STATS_SPEC* pSpecs, PDWORD *pcbBuffer, PHANDLE ph)
 {
-	if (pcbBuffer)
-		*pcbBuffer = 0;
-
-	if (ph)
-		*ph = 0;
-
 	return 1;
 }
 
@@ -614,11 +551,6 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 	PXOVERLAPPED pOverlapped
 )
 {
-	LOG_TRACE_XLIVE("XUserReadProfileSettingsByXuid");
-
-
-	Check_Overlapped(pOverlapped);
-
 	return ERROR_NOT_FOUND;
 }
 
@@ -626,7 +558,5 @@ DWORD WINAPI XUserReadProfileSettingsByXuid(
 // #5337: XUserWriteProfileSettings
 DWORD WINAPI XUserWriteProfileSettings(DWORD dwUserIndex, DWORD dwNumSettings, const PXUSER_PROFILE_SETTING pSettings, PXOVERLAPPED pOverlapped)
 {
-	LOG_TRACE_XLIVE("XUserWriteProfileSettings  (dwUserIndex = {0}, dwNumSettings = {1}, pSettings = {2:p}, pOverlapped = {3:p})",
-		dwUserIndex, dwNumSettings, (void*)pSettings, (void*)pOverlapped);
 	return ERROR_SUCCESS;
 }

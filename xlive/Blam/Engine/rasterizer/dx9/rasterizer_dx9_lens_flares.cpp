@@ -263,7 +263,7 @@ e_rasterizer_target rasterizer_dx9_sun_glow_draw(datum tag_index, real_point3d* 
     return rasterizer_target;
 }
 
-e_rasterizer_target __cdecl rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
+e_rasterizer_target rasterizer_dx9_sun_glow_occlude(datum tag_index, real_point3d* point, e_rasterizer_target rasterizer_target)
 {
     const s_lens_flare_definition* definition = (s_lens_flare_definition*)tag_get_fast(tag_index);
     ASSERT(definition);

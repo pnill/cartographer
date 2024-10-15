@@ -443,10 +443,10 @@ void c_screen_squad_settings::update()
 	string_id help_string = _string_id_empty_string;
 	string_id header_string = _string_id_empty_string;
 	string_id value_string = _string_id_empty_string;
-	uint32 bitm_index = 0;
+	int16 bitm_index = 0;
 
 	s_game_variant* game_variant = user_interface_session_get_game_variant();
-	real_vector2d option_render_scale = { 1.0f,1.0f };//default value
+	real_vector2d option_render_scale = { 1.f, 1.f };	// default value
 
 	switch (item_type)
 	{

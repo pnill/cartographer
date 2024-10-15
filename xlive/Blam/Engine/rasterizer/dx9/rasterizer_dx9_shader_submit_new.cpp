@@ -176,7 +176,7 @@ void c_shader_submission_interface_new::stage_texture(
             continue_staging = false;
             break;
         case _shader_pass_texture_source_extern_hud_bitmap:
-            rasterizer_dx9_set_texture_direct(stage, hud_bitmap_tag_index_get(), hud_bitmap_data_index_get(), 0.0);
+            rasterizer_dx9_set_texture_direct(stage, hud_bitmap_tag_index_get(), hud_bitmap_data_index_get(), 0.f);
             
             if (hud_bitmap_tag_index_get() != NONE)
             {

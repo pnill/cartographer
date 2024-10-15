@@ -27,12 +27,6 @@ namespace tags
 		If you want to run code just after a map load register a callback using tags::on_map_load
 	*/
 
-	/* Run callbacks after the cache file has been loaded */
-	void run_callbacks();
-
-	/* Register callback on map data load */
-	void on_map_load(void (*callback)());
-
 	/* tag data in currently loaded map (merged cache and shared cache data afaik) */
 	uint8* get_tag_data();
 

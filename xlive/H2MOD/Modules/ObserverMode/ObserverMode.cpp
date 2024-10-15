@@ -24,16 +24,6 @@ namespace ObserverMode
 	h_editor_camera_update p_editor_camera_update;
 
 
-
-	float DegToRad(float degree)
-	{
-		return degree * (M_PI / 180.0f);
-		
-	}
-	float RadToDeg(float rad)
-	{
-		return rad * (180.0f / M_PI);
-	}
 	float GetDistance(float x1, float y1, float x2, float y2)
 	{
 		//Distance between two points 
@@ -51,12 +41,12 @@ namespace ObserverMode
 		float oppositeDistance = y2 - y1;
 		float adjacentDistance = GetDistance(x1, y1, x2, y2);
 		float d = oppositeDistance / adjacentDistance;
-		float n2 = (float)(-asin(d) * RadToDeg(1));
+		float n2 = (float)(-asin(d) * RADIANS_TO_DEGREES(1.f));
 
 		if (y2 > y1)
-			n2 = (float)(360.0f - asin(d) * RadToDeg(1));
+			n2 = (float)(360.0f - asin(d) * RADIANS_TO_DEGREES(1.f));
 		if (x1 > x2)
-			n2 = (float)(180.0f + asin(d) * RadToDeg(1));
+			n2 = (float)(180.0f + asin(d) * RADIANS_TO_DEGREES(1.f));
 		
 		return n2;
 	}

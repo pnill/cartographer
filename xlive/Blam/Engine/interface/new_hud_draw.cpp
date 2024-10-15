@@ -28,7 +28,8 @@ static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 	D3DCOLOR_XRGB(0,120,240),
 };
 
-c_static_flags_no_init<k_number_of_users> g_draw_hud_user_draw_player_indicators;
+// k_number_of_users, we have 4 bits left to spare in this value
+uint8 g_draw_hud_user_draw_player_indicators_mask;
 
 /* private code */
 
@@ -741,7 +742,7 @@ void __cdecl draw_hud_player_indicators(uint32 local_render_user_index)
 	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
 	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
 
-	if (g_draw_hud_user_draw_player_indicators.test(local_render_user_index))
+	if (TEST_BIT(g_draw_hud_user_draw_player_indicators_mask, local_render_user_index))
 		p_game_mode_engine_draw_team_indicators(local_render_user_index);
 }
 /* public code */
@@ -758,15 +759,14 @@ int32 hud_bitmap_data_index_get(void)
 
 void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
 {
-	g_draw_hud_user_draw_player_indicators.set(user_index, enabled);
+	SET_FLAG(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
+	return;
 }
 
-void hud_player_indicators_draw_reset()
+void hud_player_indicators_draw_reset(void)
 {
-	g_draw_hud_user_draw_player_indicators.set(0, true);
-	g_draw_hud_user_draw_player_indicators.set(1, true);
-	g_draw_hud_user_draw_player_indicators.set(2, true);
-	g_draw_hud_user_draw_player_indicators.set(3, true);
+	g_draw_hud_user_draw_player_indicators_mask = 0xFF;	// Set all bits to 1
+	return;
 }
 
 void __cdecl draw_hud_layer(void)
@@ -775,11 +775,12 @@ void __cdecl draw_hud_layer(void)
 	return;
 }
 
-void new_hud_draw_apply_patches()
+void new_hud_draw_apply_patches(void)
 {
 	hud_player_indicators_draw_reset();
 
 	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
 	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
 	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
+	return;
 }

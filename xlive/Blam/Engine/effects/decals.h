@@ -2,7 +2,7 @@
 
 enum e_decal_layer : int16
 {
-	_decal_layer_lit_alphablend_prelight = 0,
+    _decal_layer_lit_alphablend_prelight = 0,
     _decal_layer_lit_alphablend = 1,
     _decal_layer_double_multiply = 2,
     _decal_layer_multiply = 3,

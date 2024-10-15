@@ -73,15 +73,12 @@ bool saved_games_get_file_info(s_saved_game_main_menu_globals_save_file_info* ou
 	}
 	else if (saved_game_files_globals->cache_files_exist)
 	{
-		if (saved_game_files_globals->cached_save_files.get_count() > 0)
+		for (uint32 i = 0; i < saved_game_files_globals->cached_save_files.get_count(); ++i)
 		{
-			for (int32 i = 0; i < saved_game_files_globals->cached_save_files.get_count(); i++)
+			if (enumerated_index == saved_game_files_globals->cached_save_files[i]->enumerated_index)
 			{
-				if (enumerated_index == saved_game_files_globals->cached_save_files[i]->enumerated_index)
-				{
-					csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i]->file_info, sizeof(s_saved_game_main_menu_globals_save_file_info));
-					return true;
-				}
+				csmemcpy(out_info, &saved_game_files_globals->cached_save_files[i]->file_info, sizeof(s_saved_game_main_menu_globals_save_file_info));
+				return true;
 			}
 		}
 	}

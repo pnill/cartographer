@@ -721,6 +721,7 @@
     <ClInclude Include="Blam\Engine\math\random_direction_table.h" />
     <ClInclude Include="Blam\Engine\math\random_math.h" />
     <ClInclude Include="Blam\Engine\math\real_quantization.h" />
+    <ClInclude Include="Blam\Engine\memory\hashtable.h" />
     <ClInclude Include="Blam\Engine\memory\lruv_cache.h" />
     <ClInclude Include="Blam\Engine\memory\memory_pool.h" />
     <ClInclude Include="Blam\Engine\memory\rockall_heap_manager.h" />
@@ -860,6 +861,7 @@
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\AdvancedSettings.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandCollection.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\CommandHandler.cpp" />
+    <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ComVar.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\Console\ImGui_ConsoleImpl.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\DebugOverlay.cpp" />
     <ClCompile Include="H2MOD\GUI\ImGui_Integration\ImGui_CartographerStyle.cpp" />
