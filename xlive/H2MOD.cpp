@@ -37,8 +37,9 @@
 #include "networking/network_configuration.h"
 #include "networking/Transport/transport.h"
 #include "units/bipeds.h"
-#include "rasterizer/rasterizer_fog.h"
 #include "rasterizer/rasterizer_lens_flares.h"
+#include "rasterizer/dx9/rasterizer_dx9_bitmaps.h"
+#include "rasterizer/dx9/rasterizer_dx9_dof.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
 #include "rasterizer/dx9/rasterizer_dx9_fullscreen_passes.h"
 #include "rasterizer/dx9/rasterizer_dx9_lens_flares.h"
@@ -400,7 +401,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 
 
 	MetaExtender::free_tag_blocks();
-	tags::run_callbacks();
+	TagFixes::OnMapLoad();
 	
 	game_globals_apply_tag_patches(options);
 	ImGuiHandler::WeaponOffsets::MapLoad();
@@ -432,6 +433,7 @@ bool __cdecl OnMapLoad(s_game_options* options)
 			MapSlots::OnMapLoad();
 			UIRankPatch();
 			screens_apply_patches_on_map_load();
+			main_tag_fixes();
 		}
 
 	}
@@ -877,6 +879,8 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		
+		rasterizer_dx9_bitmaps_apply_patches();
+		rasterizer_dx9_dof_apply_patches();
 		rasterizer_dx9_fog_apply_patches();
 		rasterizer_dx9_fullscreen_passes_apply_patches();
 		rasterizer_dx9_lens_flares_apply_patches();
@@ -887,7 +891,6 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_water_apply_patches();
 		rasterizer_dx9_weather_apply_patches();
 
-		rasterizer_fog_apply_patches();
 
 		render_lod_new_apply_patches();
 		render_weather_apply_patches();
@@ -898,7 +901,7 @@ void H2MOD::ApplyHooks() {
 		apply_particle_update_patches();
 		apply_dead_camera_patches();
 		loading_apply_patches();
-		lens_flare_fix();
+		rasterizer_lens_flares_apply_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();
 		render_submit_apply_patches();
@@ -953,7 +956,6 @@ void H2MOD::Initialize()
 	CustomVariantHandler::RegisterCustomVariants();
 	CustomVariantSettings::Initialize();
 	MeleeFix::Initialize();
-	TagFixes::Initalize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	KantTesting::Initialize();

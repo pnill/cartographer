@@ -1,9 +1,15 @@
 #include "stdafx.h"
 #include "render.h"
 
+#include "render_contrails.h"
 #include "render_first_person.h"
 #include "render_lights.h"
+#include "render_primitive.h"
 #include "render_sky.h"
+#include "render_visibility.h"
+#include "render_visible_geometry.h"
+#include "render_water.h"
+#include "render_weather.h"
 
 #include "bink/wmv_playback.h"
 #include "cache/pc_geometry_cache.h"
@@ -13,17 +19,26 @@
 #include "interface/hud.h"
 #include "interface/user_interface.h"
 #include "math/color_math.h"
+#include "objects/lights.h"
 #include "rasterizer/dx9/rasterizer_dx9.h"
+#include "rasterizer/dx9/rasterizer_dx9_decals.h"
 #include "rasterizer/dx9/rasterizer_dx9_main.h"
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
+#include "rasterizer/dx9/rasterizer_dx9_water.h"
+#include "rasterizer/rasterizer_fog.h"
 #include "rasterizer/rasterizer_globals.h"
+#include "rasterizer/rasterizer_lens_flares.h"
+#include "rasterizer/rasterizer_occlusion.h"
 #include "rasterizer/rasterizer_settings.h"
+#include "rasterizer/rasterizer_transparent_geometry.h"
 #include "scenario/scenario_fog.h"
 #include "structures/structures.h"
+#include "widgets/liquid.h"
 
 /* type definitions */
-typedef bool (__cdecl* t_render_ingame_user_interface_hud_element)(
+
+typedef bool(__cdecl* t_render_ingame_user_interface_hud_element)(
     real32 left,
     real32 top,
     int16 x,
@@ -36,17 +51,36 @@ typedef bool (__cdecl* t_render_ingame_user_interface_hud_element)(
     datum shader_tag_index);
 
 typedef bool(__cdecl* t_render_ingame_user_interface_hud_indicators_element_hook)(
-    int32* a1, 
-    datum tag_index, 
-    datum bitmap_index, 
-    int32* a4, 
+    int32* a1,
+    datum tag_index,
+    datum bitmap_index,
+    int32* a4,
     datum shader_index);
+
+/* globals */
+
+bool g_render_layer_view_4 = false;
+bool g_render_layer_view_5 = false;
+
+bool g_submit_occlusion_tests = true;
+
+bool render_decals_enabled = true;
+bool render_lens_flares_enabled = true;
+bool render_patchy_fog_enabled = true;
+bool render_water_enabled = true;
+
+t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
+t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
+
+e_controller_index g_render_current_controller_index = _controller_index_0;
+uint32 g_render_current_user_index = 0;
 
 /* prototypes */
 
 int32* get_global_window_out_cluster_index(int32 index);
 int32* get_global_window_out_leaf_index(int32 index);
-uint32* global_view_frame_num_get(void);
+uint32* global_frame_num_get(void);
+uint32* global_scene_rendered_count_get(void);
 int32* curent_window_bound_index_get(void);
 int32* global_cluster_index_get(void);
 int32* global_leaf_index_get(void);
@@ -85,13 +119,17 @@ void render_view(
     int8 zero_2,
     s_screen_flash* screen_flash);
 
+void __cdecl render_scene_bitflags_set(void);
+void render_scene_wrapper(bool is_texture_camera);
+void __cdecl render_camera(
+    int32 render_layer_debug_view,
+    bool render_transparent_geo,
+    bool lens_flare_occlusion_test,
+    bool render_layer_selfibloomination,
+    int32 hologram_flag,
+    int32 effect_flag);
+
 /* public code */
-
-t_render_ingame_user_interface_hud_element p_draw_ingame_user_interface_hud_element;
-t_render_ingame_user_interface_hud_indicators_element_hook p_render_ingame_user_interface_hud_indicators_element;
-
-e_controller_index g_render_current_controller_index = _controller_index_0;
-uint32 g_render_current_user_index = 0;
 
 void render_apply_patches(void)
 {
@@ -100,10 +138,6 @@ void render_apply_patches(void)
 
     DETOUR_ATTACH(p_draw_ingame_user_interface_hud_element, Memory::GetAddress<t_render_ingame_user_interface_hud_element>(0x221E3B), render_ingame_user_interface_hud_element_hook);
     DETOUR_ATTACH(p_render_ingame_user_interface_hud_indicators_element, Memory::GetAddress<t_render_ingame_user_interface_hud_indicators_element_hook>(0x221C77), render_ingame_user_interface_hud_indicators_element_hook);
-
-    // ### FIXME re-enable text/user interface text
-    // *Memory::GetAddress<bool*>(0x46818E) = false;
-
     return;
 }
 
@@ -142,7 +176,7 @@ s_frame_parameters* global_frame_parameters_get(void)
     return Memory::GetAddress<s_frame_parameters*>(0xA3E208);
 }
 
-int32* global_rasterizer_stage_get(void)
+int32* global_rasterizer_pixel_shader_index_get(void)
 {
     return Memory::GetAddress<int32*>(0xA49494);
 }
@@ -150,6 +184,11 @@ int32* global_rasterizer_stage_get(void)
 real64 get_current_render_time(void)
 {
     return *Memory::GetAddress<real64*>(0x4E6968);
+}
+
+int32 get_player_window_count(void)
+{
+    return *Memory::GetAddress<int32*>(0x4E6974);
 }
 
 real32* hs_texture_camera_scale_get(void)
@@ -182,6 +221,11 @@ uint32* global_frame_num_get(void)
     return Memory::GetAddress<uint32*>(0x4E695C);
 }
 
+int32* load_low_detail_textures_get(void)
+{
+    return Memory::GetAddress<int32*>(0x4E6A60);
+}
+
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index)
 {
     return INVOKE(0x191032, 0x0, structure_get_cluster_and_leaf_from_render_point, point, out_cluster_index, out_leaf_index);
@@ -209,7 +253,7 @@ bool frame_parameters_type_is_above_or_equal_to_7(void)
     return global_frame_parameters_get()->frame_type - 5 <= 2;
 }
 
-void draw_render_layer(e_collection_type collection_type, e_render_layer render_layer)
+void render_scene_geometry(e_collection_type collection_type, e_render_layer render_layer)
 {
     ASSERT(VALID_INDEX(collection_type, k_number_collection_types));
     ASSERT(VALID_INDEX(render_layer, k_number_of_render_layers));
@@ -304,6 +348,378 @@ void __cdecl render_window(window_bound* window, bool is_texture_camera)
     return;
 }
 
+void __cdecl render_scene(
+    int32 render_layer_debug_view,
+    bool render_transparent_geo,
+    bool lens_flare_occlusion_test,
+    bool render_layer_selfibloomination,
+    int32 hologram_flag,
+    int32 effect_flag,
+    real32 depth_range)
+{
+    s_render_scene_parameters parameters;
+    uint32* g_scene_rendered_count = global_scene_rendered_count_get();
+    parameters.scene_rendered_count = ++*g_scene_rendered_count;
+    parameters.effect_flags = effect_flag;
+    parameters.depth_range = depth_range;
+
+    
+    rasterizer_dx9_render_scene_start(&parameters);
+
+    const s_frame* global_window_parameters = global_window_parameters_get();
+    create_visible_render_primitives(hologram_flag);
+
+    const real32 dr = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
+    const real_vector4d constants { 0.f, 1.f, dr, 1.f };
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+    if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
+    {
+        global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
+    }
+
+    s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    if (render_layer_debug_view != 5)
+    {
+        if (render_layer_debug_view == 1 || render_layer_debug_view == 2)
+        {
+            if (rasterizer_globals->d3d9_sm3_supported)
+            {
+                *global_rasterizer_pixel_shader_index_get() = 2;
+                g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
+            }
+
+            /*
+            * TODO:
+            * DO NOT ENABLE THIS (for now)
+            * Causes graphical issues on the start of outskirts with black geo being rendered
+            rasterizer_dx9_perf_event_begin("texaccum", NULL);
+            DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
+            rasterizer_dx9_perf_event_end("texaccum");
+            */
+
+            rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
+            DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+            rasterizer_dx9_perf_event_end("lightmap_indirect");
+
+            rasterizer_dx9_perf_event_begin("sh_prt", NULL);
+            DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+            rasterizer_dx9_perf_event_end("sh_prt");
+
+            g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+
+            rasterizer_dx9_perf_event_begin("environment_map", NULL);
+            DRAW_RENDER_LAYER(_render_layer_enviroment_map);
+            rasterizer_dx9_perf_event_end("environment_map");
+
+            rasterizer_dx9_perf_event_begin("decal", NULL);
+            DRAW_RENDER_LAYER(_render_layer_decal);
+            rasterizer_dx9_perf_event_end("decal");
+
+
+            rasterizer_dx9_perf_event_begin("decals_alpha_blend_prelight", NULL);
+            if (render_decals_enabled)
+            {
+                rasterizer_dx9_decals_begin(_decal_layer_lit_alphablend_prelight);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+            }
+            rasterizer_dx9_perf_event_end("decals_alpha_blend_prelight");
+
+            rasterizer_dx9_perf_event_begin("render_cinematic_lightmap_shadows", NULL);
+            render_cinematic_lightmap_shadows(effect_flag);
+            rasterizer_dx9_perf_event_end("render_cinematic_lightmap_shadows");
+
+            rasterizer_dx9_perf_event_begin("selfillumination", NULL);
+            DRAW_RENDER_LAYER(_render_layer_selfillumination);
+            rasterizer_dx9_perf_event_end("selfillumination");
+
+            rasterizer_dx9_perf_event_begin("render_lights_new", NULL);
+            render_lights_new();
+            rasterizer_dx9_perf_event_end("render_lights_new");
+
+            rasterizer_dx9_perf_event_begin("decals_alpha_blend", NULL);
+            if (render_decals_enabled)
+            {
+                rasterizer_dx9_decals_begin(_decal_layer_lit_alphablend);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+            }
+            rasterizer_dx9_perf_event_end("decals_alpha_blend");
+
+            rasterizer_dx9_perf_event_begin("overlay", NULL);
+            DRAW_RENDER_LAYER(_render_layer_overlay);
+            rasterizer_dx9_perf_event_end("overlay");
+
+            rasterizer_dx9_perf_event_begin("decals", NULL);
+            if (render_decals_enabled)
+            {
+                rasterizer_dx9_decals_begin(_decal_layer_double_multiply);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+
+                rasterizer_dx9_decals_begin(_decal_layer_multiply);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+
+                rasterizer_dx9_decals_begin(_decal_layer_max);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+
+                rasterizer_dx9_decals_begin(_decal_layer_add);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+                
+                rasterizer_dx9_decals_begin(_decal_layer_error);
+                render_decal_visibility(rasterizer_dx9_decals_draw, 0);
+                rasterizer_dx9_decals_end();
+            }
+            rasterizer_dx9_perf_event_end("decals");
+        }
+        // RENDER LAYER 0, 3 - 5
+        else
+        {
+            /*
+            * TODO:
+            * DO NOT ENABLE THIS (for now)
+            * Causes graphical issues on the start of outskirts with black geo being rendered
+            rasterizer_dx9_perf_event_begin("texaccum", NULL);
+            DRAW_RENDER_LAYER(_render_layer_texture_accumulate);
+            rasterizer_dx9_perf_event_end("texaccum");
+            */
+
+            rasterizer_dx9_perf_event_begin("lightmap_indirect", NULL);
+            DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+            rasterizer_dx9_perf_event_end("lightmap_indirect");
+
+            rasterizer_dx9_perf_event_begin("sh_prt", NULL);
+            DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+            rasterizer_dx9_perf_event_end("sh_prt");
+
+            rasterizer_dx9_perf_event_begin("overlay", NULL);
+            DRAW_RENDER_LAYER(_render_layer_overlay);
+            rasterizer_dx9_perf_event_end("overlay");
+        }
+
+        // RENDER LAYER 2
+        if (render_layer_debug_view == 2)
+        {
+render_layer_2:
+            DRAW_RENDER_LAYER(_render_layer_transparent);
+            
+            if (render_layer_debug_view != 2)
+            {
+                rasterizer_dx9_perf_event_begin("game_engine_render", NULL);
+                game_engine_render();
+                rasterizer_dx9_perf_event_end("game_engine_render");
+
+                rasterizer_dx9_perf_event_begin("contrails", NULL);
+                contrails_render();
+                rasterizer_dx9_perf_event_end("contrails");
+            }
+
+            if (render_transparent_geo)
+            {
+                transparent_geometry_draw();
+            }
+
+            if (g_submit_occlusion_tests && effect_flag != 2)
+            {
+                submit_occlusion_tests(lens_flare_occlusion_test);
+            }
+
+            const s_scenario_fog_result* g_fog_result = global_fog_result_get();
+            if (render_layer_debug_view != 2 &&
+                *get_render_fog_enabled() &&
+                render_patchy_fog_enabled &&
+                effect_flag != 2 &&
+                !g_fog_result->field_96)
+            {
+                rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
+                render_patchy_fog(*visible_geometry_group_count_get() <= 0, true);
+                rasterizer_dx9_perf_event_end("patchy_fog");
+            }
+
+            if (render_layer_selfibloomination)
+            {
+                if (effect_flag == 2)
+                {
+render_postprocess:
+                    rasterizer_dx9_perf_event_begin("lens_flares", NULL);
+                    if (lens_flare_occlusion_test)
+                    {
+                        lens_flares_draw(_rasterizer_target_render_primary);
+                    }
+                    rasterizer_dx9_perf_event_end("lens_flares");
+
+                    if (render_layer_debug_view == 2)
+                    {
+                        rasterizer_suns_glow_occlude(_rasterizer_target_render_primary);
+                    }
+                    else
+                    {
+                        c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
+                        list_type->m_field_4 = 0;
+                        list_type->m_field_C = 0;
+                        list_type->m_render_layer_flags.clear();
+                        rasterizer_transparent_geometry_reset_counts();
+                        render_camera(
+                            render_layer_debug_view,
+                            render_transparent_geo,
+                            lens_flare_occlusion_test,
+                            render_layer_selfibloomination,
+                            hologram_flag,
+                            effect_flag);
+                    }
+
+                    rasterizer_dx9_set_render_state(D3DRS_FILLMODE, D3DBLEND_SRCCOLOR);
+                    if (effect_flag != 2 && render_layer_debug_view != 2)
+                    {
+                        rasterizer_dx9_postprocess_scene(
+                            render_layer_debug_view,
+                            lens_flare_occlusion_test,
+                            render_layer_selfibloomination);
+                    }
+                    goto render_scene_end;
+                }
+
+                DRAW_RENDER_LAYER(_render_layer_selfibloomination);
+            }
+
+            if (effect_flag != 2)
+            {
+                rasterizer_occlusion_submit();
+            }
+            goto render_postprocess;
+        }
+
+        if (effect_flag != 2)
+        {
+            if (global_window_parameters->fog_result.draw_sky)
+            {
+                rasterizer_dx9_perf_event_begin("render_sky", NULL);
+                rasterizer_dx9_set_stencil_mode(2);
+                render_sky();
+                rasterizer_dx9_set_stencil_mode(0);
+                rasterizer_dx9_perf_event_end("render_sky");
+            }
+
+            if (get_render_fog_enabled())
+            {
+                const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+                const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
+                // If we're not using shader model 3 draw the depth on the backbuffer in a seperate pass
+                // In shader model 3 these are already drawn during the lightmap_indirect stage
+                if (!rasterizer_globals->d3d9_sm3_supported)
+                {
+                    rasterizer_dx9_perf_event_begin("render depth to backbuffer", NULL);
+
+                    const real32 depth_range = global_window_parameters->camera.z_far - global_window_parameters->camera.z_near;
+                    const real_vector4d constants{ 0.f, 1.f, depth_range, 1.f };
+                    rasterizer_dx9_set_target(_rasterizer_target_backbuffer, 0, true);
+                    global_d3d_device->Clear(
+                        0,
+                        NULL,
+                        D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+                        global_white_pixel32.color,
+                        1.f,
+                        0);
+
+                    if (rasterizer_get_main_pixel_shader_cache()->test_cache(16, &constants, 1))
+                    {
+                        global_d3d_device->SetPixelShaderConstantF(16, (real32*)&constants, 1);
+                    }
+
+                    *global_rasterizer_pixel_shader_index_get() = 1;
+
+                    DRAW_RENDER_LAYER(_render_layer_lightmap_indirect);
+                    DRAW_RENDER_LAYER(_render_layer_spherical_harmonics_prt);
+
+                    rasterizer_dx9_perf_event_end("render depth to backbuffer");
+                }
+
+                if (rasterizer_globals->d3d9_sm3_supported)
+                {
+                    g_dx9_dont_draw_to_depth_target_if_mrt_is_used = true;
+                }
+                else
+                {
+                    *global_rasterizer_pixel_shader_index_get() = 0;
+                }
+
+                render_atmospheric_fog();
+                DRAW_RENDER_LAYER(_render_layer_fog);
+            }
+        }
+
+        if (render_water_enabled)
+        {
+            g_water_refraction_surface_updated = false;
+
+            const s_scenario_fog_result* g_fog_result = global_fog_result_get();
+
+            const bool water_enabled = !g_fog_result->camera_immersion_flags.test(_camera_immersion_disable_water_bit);
+            bool clear_target = false;
+
+            if (water_enabled)
+            {
+                const c_render_primitive_list* list_type = render_primitive_get_by_primitive_list_type(0);
+                clear_target = list_type->is_layer_different(_render_layer_water_alpha_masks);
+                DRAW_RENDER_LAYER(_render_layer_water_alpha_masks);
+            }
+
+            render_water(water_enabled, clear_target);
+        }
+
+        if (get_render_fog_enabled() && render_patchy_fog_enabled)
+        {
+            if (effect_flag == 2)
+            {
+render_widgets:
+                rasterizer_dx9_perf_event_begin("liquids", NULL);
+                liquid_render();
+                rasterizer_dx9_perf_event_end("liquids");
+                rasterizer_dx9_perf_event_begin("weather", NULL);
+                weather_render();
+                rasterizer_dx9_perf_event_end("weather");
+                goto render_layer_2;
+            }
+
+            const s_scenario_fog_result* g_fog_result = global_fog_result_get();
+            rasterizer_dx9_perf_event_begin("patchy_fog", NULL);
+            if (g_fog_result->field_96)
+            {
+                render_patchy_fog(1, 1);
+            }
+            else if (*visible_geometry_group_count_get() > 0)
+            {
+                render_patchy_fog(1, 0);
+            }
+            rasterizer_dx9_perf_event_end("patchy_fog");
+        }
+
+        if (effect_flag != 2)
+        {
+            if (lens_flare_occlusion_test && render_lens_flares_enabled)
+            {
+                render_light_lens_flares();
+                render_sky_lens_flares();
+            }
+
+            if (!g_submit_occlusion_tests)
+            {
+                submit_occlusion_tests(lens_flare_occlusion_test);
+            }
+        }
+        goto render_widgets;
+    }
+
+render_scene_end:
+    rasterizer_dx9_render_scene_end();
+    return;
+}
+
+
 /* private code */
 
 int32* get_global_window_out_cluster_index(int32 index)
@@ -319,6 +735,11 @@ int32* get_global_window_out_leaf_index(int32 index)
 uint32* global_view_frame_num_get(void)
 {
     return Memory::GetAddress<uint32*>(0x4E6960);
+}
+
+uint32* global_scene_rendered_count_get(void)
+{
+    return Memory::GetAddress<uint32*>(0x4E6964);
 }
 
 int32* curent_window_bound_index_get(void)
@@ -487,7 +908,7 @@ void render_view(
 
     frame.render_type = render_type;
     frame.field_6 = zero_1;
-    frame.window_bound_index = window_bound_index;
+    frame.window_bound_index = (int16)window_bound_index;
     frame.is_texture_camera = is_texture_camera;
     frame.field_4 = neg_one;
     frame.render_fog = true;
@@ -512,7 +933,7 @@ void render_view(
             render_beam();
             render_light_clear_data();
             render_view_visibility_compute_to_usercall(user_index);
-            rasterizer_render_scene(is_texture_camera);
+            render_scene_wrapper(is_texture_camera);
 
             rasterizer_dx9_perf_event_begin("interface", NULL);
             rasterizer_dx9_set_stencil_mode(0);
@@ -531,5 +952,92 @@ void render_view(
     }
 
     rasterizer_update_cameras();
+    return;
+}
+
+void __cdecl render_scene_bitflags_set(void)
+{
+    INVOKE(0x2664AF, 0x0, render_scene_bitflags_set);
+    return;
+}
+
+bool render_scene_is_splitscreen(void)
+{
+    const s_frame* global_window_parameters = global_window_parameters_get();
+
+    // The following checks determine if the current camera viewport bounds are covering the whole screen
+    // If the viewport bounds are not the entire screen we assume that there's more than 1 viewport being drawn
+    // We also check if the player count is above 1 for good measure
+    return
+        global_window_parameters->camera.viewport_bounds.left != 0 ||
+        global_window_parameters->camera.viewport_bounds.top != 0 ||
+        global_window_parameters->camera.viewport_bounds.right != rasterizer_get_width() ||
+        global_window_parameters->camera.viewport_bounds.bottom != rasterizer_get_height() ||
+        get_player_window_count() > 1;
+}
+
+void render_scene_wrapper(bool is_texture_camera)
+{
+    const s_frame* global_window_parameters = global_window_parameters_get();
+    const s_frame_parameters* g_frame_parameters = global_frame_parameters_get();
+
+    bool lens_flare_occlusion_test;
+    bool render_layer_selfibloomination;
+    bool render_transparent_geo = true;
+
+    int32 render_layer_debug_view = 1;
+    real32 depth_range = 0.f;
+
+    render_scene_bitflags_set();
+
+    if (g_render_layer_view_4)
+    {
+        render_layer_debug_view = 4;
+        render_transparent_geo = false;
+        lens_flare_occlusion_test = false;
+        render_layer_selfibloomination = false;
+    }
+    else if (g_render_layer_view_5)
+    {
+        render_layer_debug_view = 5;
+        render_transparent_geo = false;
+        lens_flare_occlusion_test = false;
+        render_layer_selfibloomination = false;
+    }
+    else if (global_window_parameters->render_type == 2)
+    {
+        lens_flare_occlusion_test = false;
+        render_layer_selfibloomination = false;
+    }
+    else if (!is_texture_camera)
+    {
+        lens_flare_occlusion_test = g_frame_parameters->frame_type != 6;
+        render_layer_selfibloomination = (g_frame_parameters->frame_type != 7 ? !render_scene_is_splitscreen() : false);
+    }
+    else
+    {
+        lens_flare_occlusion_test = false;
+        render_layer_selfibloomination = false;
+    }
+    
+    render_scene(render_layer_debug_view, render_transparent_geo, lens_flare_occlusion_test, render_layer_selfibloomination, 0, 0, depth_range);
+    return;
+}
+
+void __cdecl render_camera(
+    int32 render_layer_debug_view,
+    bool render_transparent_geo,
+    bool lens_flare_occlusion_test,
+    bool render_layer_selfibloomination,
+    int32 hologram_flag,
+    int32 effect_flag)
+{
+    INVOKE(0x1912B3, 0x0, render_camera,
+        render_layer_debug_view,
+        render_transparent_geo,
+        lens_flare_occlusion_test,
+        render_layer_selfibloomination,
+        hologram_flag,
+        effect_flag);
     return;
 }

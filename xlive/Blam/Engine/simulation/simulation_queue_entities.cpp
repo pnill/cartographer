@@ -23,22 +23,32 @@ c_simulation_entity_definition* simulation_queue_entities_get_definition(e_simul
 
 void simulation_queue_entity_creation_insert(s_simulation_queue_element* simulation_queue_element)
 {
+	ASSERT(simulation_queue_element->type == _simulation_queue_element_type_entity_creation);
+
 	simulation_get_world()->simulation_queue_enqueue(simulation_queue_element);
 	return;
 }
 
-void simulation_queue_entity_encode_header(c_bitstream* stream, e_simulation_entity_type type, datum gamestate_index)
+void simulation_queue_entity_encode_header(c_bitstream* bitstream, e_simulation_entity_type type, datum gamestate_index)
 {
-	stream->write_integer("entity-type", type, 5);
+	ASSERT(bitstream);
+	// TODO, gamestate index
+	// ASSERT(gamestate_index != NONE);
+
+	bitstream->write_integer("entity-type", type, 5);
 	//simulation_gamestate_index_encode(stream, gamestate_index);
 }
 
-bool simulation_queue_entity_decode_header(c_bitstream* stream, e_simulation_entity_type* type, datum* gamestate_index)
+bool simulation_queue_entity_decode_header(c_bitstream* bitstream, e_simulation_entity_type* entity_type, datum* gamestate_index)
 {
-	*type = (e_simulation_entity_type)stream->read_integer("entity-type", 5);
+	ASSERT(bitstream);
+	ASSERT(entity_type);
+	ASSERT(gamestate_index);
+
+	*entity_type = (e_simulation_entity_type)bitstream->read_integer("entity-type", 5);
 	*gamestate_index = NONE;
 	//simulation_gamestate_index_decode(stream, gamestate_index);
-	bool successfully_decoded = IN_RANGE(*type, _simulation_entity_type_slayer_engine_globals, k_simulation_entity_count - 1);
+	bool successfully_decoded = VALID_INDEX(*entity_type, k_simulation_entity_count);
 	return successfully_decoded;
 }
 
@@ -51,6 +61,9 @@ bool encode_simulation_queue_creation_to_buffer(
 	int32* out_encoded_size
 )
 {
+	// TODO, gamestate index
+	// ASSERT(gamestate_index != NONE);
+
 	c_bitstream stream(encode_buffer, encode_buffer_size);
 	stream.begin_writing(k_bitstream_default_alignment);
 	
@@ -173,6 +186,9 @@ bool decode_simulation_queue_creation_from_buffer(int32 encoded_size, uint8* enc
 
 bool simulation_queue_entity_creation_allocate(s_simulation_queue_entity_data* sim_queue_entity_data, uint32 initial_update_mask, s_simulation_queue_element** element, int32* gamestate_index)
 {
+	ASSERT(game_is_distributed());
+	ASSERT(!game_is_playback());
+
 	//int32 entity_index = simulation_gamestate_entity_create();
 
 	bool result = false;
@@ -273,6 +289,10 @@ void dump_entity_unit_creation_to_file(
 
 void simulation_queue_entity_creation_apply(const s_simulation_queue_element* element)
 {
+	ASSERT(element);
+	ASSERT(element->type == _simulation_queue_element_type_entity_creation);
+
+
 	s_simulation_queue_decoded_creation_data decoded_creation_data;
 	if (game_is_distributed() && !game_is_playback())
 	{
@@ -282,6 +302,14 @@ void simulation_queue_entity_creation_apply(const s_simulation_queue_element* el
 		{
 			c_simulation_entity_definition* entity_def = simulation_queue_entities_get_definition(decoded_creation_data.entity_type);
 			s_simulation_game_entity* game_entity = simulation_get_entity_database()->entity_get(decoded_creation_data.entity_index);
+			
+			// TODO, gamestate index
+			// ASSERT(decoded_creation_data.gamestate_index != NONE);
+
+			if (game_is_playback())
+			{
+				//v8 = simulation_gamestate_entity_create_at_index(decoded_creation_data.gamestate_index);
+			}
 
 			if (game_entity)
 			{

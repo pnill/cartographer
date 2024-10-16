@@ -48,6 +48,11 @@ e_game_mode game_mode_get(void)
 	return get_main_game_globals()->options.game_mode;
 }
 
+bool game_in_editor(void)
+{
+    return 0;
+}
+
 bool game_is_campaign(void)
 {
 	return game_options_get()->game_mode == _game_mode_campaign;

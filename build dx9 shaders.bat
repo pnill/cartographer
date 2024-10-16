@@ -4,7 +4,7 @@ GOTO:MAIN
 :compile_shader
 	SETLOCAL ENABLEDELAYEDEXPANSION
 		:: The part where we compile the shader bytecode
-		.\bin\fxc.exe /O3 /T %~1 /Fo ./xlive/Blam/Engine/rasterizer/dx9/shaders/compiled/%~2_%~1.pso ./xlive/Blam/Engine/rasterizer/dx9/shaders/%~2.fx
+		.\bin\fxc.exe /O3 /T %~1 %~3 /Fo ./xlive/Blam/Engine/rasterizer/dx9/shaders/compiled/%~2_%~1.pso ./xlive/Blam/Engine/rasterizer/dx9/shaders/%~2.fx
     ENDLOCAL
 EXIT /B 0
 
@@ -31,8 +31,8 @@ EXIT /B 0
 
 :add_shader
 	SETLOCAL ENABLEDELAYEDEXPANSION
-		call:compile_shader "ps_2_0" %~1
-		call:compile_shader "ps_3_0" %~1
+		call:compile_shader "ps_2_0" %~1 %~2
+		call:compile_shader "ps_3_0" %~1 %~2
 		
 		set file="./xlive/Blam/Engine/rasterizer/dx9/shaders/compiled/%~1.h"
 		echo #pragma once > %file%
@@ -55,7 +55,7 @@ EXIT /B 0
 :MAIN
 cd 
 
-call:add_shader "fog_atmospheric_apply"
+call:add_shader "fog_atmospheric_apply" "/Gpp"
 call:add_shader "motion_sensor_sweep"
 call:add_shader "sun_glow_convolve"
 call:add_shader "weather_particle_generic"

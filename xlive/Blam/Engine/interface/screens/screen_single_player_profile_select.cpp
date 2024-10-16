@@ -60,7 +60,7 @@ void c_player_profile_list::update_displayed_profiles()
 
 	if (profile_storage_size > 0)
 	{
-		for (int32 current_profile_storage_index = 0; current_profile_storage_index < profile_storage_size; ++current_profile_storage_index)
+		for (uint32 current_profile_storage_index = 0; current_profile_storage_index < profile_storage_size; ++current_profile_storage_index)
 		{
 			enumerated_file_index = profile_storage[current_profile_storage_index].enumerated_file_index;
 

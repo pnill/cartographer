@@ -45,6 +45,16 @@ void network_configuration_apply_patches(void)
     return;
 }
 
+int32 __cdecl network_adapter_index_get(void)
+{
+    return INVOKE(0x1AAEFF, 0x0, network_adapter_index_get);
+}
+
+const char* __cdecl network_adapter_name_get(int32 network_adapter_index)
+{
+    return INVOKE(0x1AB006, 0x0, network_adapter_name_get, network_adapter_index);
+}
+
 void __cdecl network_configuration_initialize(void)
 {
 	INVOKE(0x1A9DE6, 0x0, network_configuration_initialize);

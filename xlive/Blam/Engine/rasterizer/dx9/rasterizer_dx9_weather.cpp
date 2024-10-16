@@ -7,9 +7,9 @@
 #include "rasterizer_dx9_submit.h"
 #include "rasterizer_dx9_shader_submit.h"
 
-#include "render/render_weather.h"
-
 #include "cache/pc_geometry_cache.h"
+#include "rasterizer/rasterizer_globals.h"
+#include "render/render_weather.h"
 
 /* structures */
 
@@ -40,27 +40,29 @@ void rasterizer_dx9_weather_apply_patches(void)
 
 bool __cdecl rasterizer_dx9_weather_plate_setup_pipeline(const c_animated_background_plate* plate)
 {
-	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, 1);
+	rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
 	rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_BLENDFACTOR);
 	rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 	rasterizer_dx9_set_render_state(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 	rasterizer_dx9_set_render_state(D3DRS_BLENDFACTOR, global_white_pixel32.color);
-	rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 0);
-	rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, 0);
+	rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);
+	rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, FALSE);
 	rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_ALWAYS);	// D3DCMP_LESSEQUAL on xbox?
 	rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
 	rasterizer_dx9_set_render_state(D3DRS_SLOPESCALEDEPTHBIAS, 0);
-	rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
-	rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
+	rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
+	rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 	rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	if (!*rasterizer_dx9_disable_stencil_get())
 	{
-		rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, 0);
+		rasterizer_dx9_set_render_state(D3DRS_STENCILENABLE, FALSE);
 	}
 
+	const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+
 	rasterizer_dx9_set_target(_rasterizer_target_render_primary, 0, false);
-	rasterizer_dx9_set_target_as_texture(0, _rasterizer_target_backbuffer);
+	rasterizer_dx9_set_target_as_texture(0, rasterizer_globals->d3d9_sm3_supported ? _rasterizer_target_z_a8b8g8r8 : _rasterizer_target_backbuffer);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	rasterizer_dx9_set_sampler_state(0, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
@@ -204,21 +206,21 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 		}
 		else
 		{
-			rasterizer_dx9_set_render_state(D3DRS_POINTSPRITEENABLE, 1);
-			rasterizer_dx9_set_render_state(D3DRS_POINTSCALEENABLE, 1);
+			rasterizer_dx9_set_render_state(D3DRS_POINTSPRITEENABLE, TRUE);
+			rasterizer_dx9_set_render_state(D3DRS_POINTSCALEENABLE, TRUE);
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_A, 0);
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_B, 0);
 			rasterizer_dx9_set_render_state(D3DRS_POINTSCALE_C, 0x3F800000);
 		}
 
-		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, 1);
+		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, TRUE);
 		rasterizer_dx9_set_render_state(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 		rasterizer_dx9_set_render_state(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 1);
+		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, TRUE);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHAREF, 0);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-		rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, 0);
-		rasterizer_dx9_set_render_state(D3DRS_ZENABLE, 1);
+		rasterizer_dx9_set_render_state(D3DRS_ZWRITEENABLE, FALSE);
+		rasterizer_dx9_set_render_state(D3DRS_ZENABLE, TRUE);
 		rasterizer_dx9_set_render_state(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
 		if (!is_rain)
@@ -289,10 +291,10 @@ bool rasterizer_dx9_draw_weather_particles(c_particle_system_lite* system)
 			rasterizer_dx9_draw_primitive_up(D3DPT_POINTLIST, used_vertices, g_weather_particle_primitives, sizeof(s_dx9_weather_particle_primitive));
 		}
 
-		rasterizer_dx9_set_render_state(D3DRS_POINTSPRITEENABLE, 0);
-		rasterizer_dx9_set_render_state(D3DRS_POINTSCALEENABLE, 0);
-		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, 0);
-		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, 0);
+		rasterizer_dx9_set_render_state(D3DRS_POINTSPRITEENABLE, FALSE);
+		rasterizer_dx9_set_render_state(D3DRS_POINTSCALEENABLE, FALSE);
+		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, FALSE);
+		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 		rasterizer_dx9_reset_depth_buffer();
 	}
 	

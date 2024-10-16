@@ -11,9 +11,9 @@ real_matrix3x3* matrix3x3_from_forward_and_up(real_matrix3x3* matrix, const real
 
 real_matrix3x3* matrix3x3_rotation_from_quaternion(real_matrix3x3* matrix, const real_quaternion* quaternion)
 {
-	real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
+	const real32 dot_product = dot_product4d_quaternion(quaternion, quaternion);
 
-	real32 scalar = (dot_product > k_real_math_epsilon ? 2.0f / dot_product : 0.0f);
+	const real32 scalar = (dot_product > k_real_math_epsilon ? 2.0f / dot_product : 0.0f);
 
 	real_vector3d scaled_vector;
 	scale_vector3d(&quaternion->v, scalar, &scaled_vector);

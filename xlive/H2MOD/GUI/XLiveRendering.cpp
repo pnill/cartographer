@@ -67,7 +67,7 @@ int WINAPI XLiveInitializeEx(XLIVE_INITIALIZE_INFO* pXii, DWORD dwVersion)
 }
 
 // #5000: XLiveInitialize
-int WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
+HRESULT WINAPI XLiveInitialize(XLIVE_INITIALIZE_INFO* pXii)
 {
 	return XLiveInitializeEx(pXii, 0);
 }
@@ -178,46 +178,7 @@ HRESULT WINAPI XLiveRender()
 		return E_UNEXPECTED;
 	}
 
-	D3DVIEWPORT9 pViewport;
-	g_pD3DDevice9->GetViewport(&pViewport);
-
-	D3DDEVICE_CREATION_PARAMETERS cparams;
-	g_pD3DDevice9->GetCreationParameters(&cparams);
-	RECT gameWindowRect, gameWindowInnerRect;
-	GetWindowRect(cparams.hFocusWindow, &gameWindowRect);
-	GetClientRect(cparams.hFocusWindow, &gameWindowInnerRect);
-
-	int gameWindowWidth = gameWindowRect.right - gameWindowRect.left - GetSystemMetrics(SM_CXSIZEFRAME);
-	int gameWindowHeight = gameWindowRect.bottom - gameWindowRect.top;
-
-	//if (displayXyz && (NetworkSession::LocalPeerIsSessionHost() || game_is_campaign())) {
-	//	int text_y_coord = 60;
-	//	player_iterator player_it;
-	//	while (player_it.get_next_active_player())
-	//	{
-	//		real_point3d* player_position = s_player::get_unit_coords(player_it.get_current_player_index());
-	//		object_datum* biped_unit = (object_datum*)s_player::get_player_unit_data(player_it.get_current_player_index());
-	//		if (player_position != nullptr) {
-	//			std::wstring playerNameWide(player_it.get_current_player_name());
-	//			std::string playerName(playerNameWide.begin(), playerNameWide.end());
-	//			std::string xyzText =
-	//				"Player name: " + playerName +
-	//				", xyz = " + std::to_string(player_position->x) + " "
-	//				+ std::to_string(player_position->y) + " "
-	//				+ std::to_string(player_position->z) + " "
-	//				+ "Velocity: " + std::to_string(magnitude3d(&biped_unit->translational_velocity));
-	//			drawText(0, text_y_coord, COLOR_GOLD, xyzText.c_str(), normalSizeFont);
-	//			text_y_coord += 15;
-	//		}
-	//	}
-	//}
-
 	ImGuiHandler::DrawImgui();
-
-	// limit framerate if needed
-	// UPDATE: frame limiting in XLiveRender adds input lag
-	// shell_windows_throttle_framerate(H2Config_fps_limit);
-
 	return S_OK;
 }
 

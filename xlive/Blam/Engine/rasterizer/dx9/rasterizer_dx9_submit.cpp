@@ -3,6 +3,12 @@
 
 /* public code */
 
+void __cdecl rasterizer_dx9_gpu_frontend_initialize(void)
+{
+	INVOKE(0x26F29B, 0x0, rasterizer_dx9_submit_resolve);
+	return;
+}
+
 void __cdecl rasterizer_dx9_set_vertex_shader_permutation(int32 shader_index)
 {
 	INVOKE_TYPE(0x26F3CE, 0x0, void(__cdecl*)(int32), shader_index);
@@ -32,4 +38,8 @@ void __cdecl rasterizer_dx9_submit_resolve(void)
 	return;
 }
 
-
+void __cdecl rasterizer_dx9_clear_staged_texture_cache(void)
+{
+	INVOKE(0x26F49E, 0x0, rasterizer_dx9_clear_staged_texture_cache);
+	return;
+}

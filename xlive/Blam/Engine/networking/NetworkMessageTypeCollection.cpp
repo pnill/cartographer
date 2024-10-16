@@ -66,11 +66,11 @@ bool __cdecl decode_team_change_message(c_bitstream* stream, int a2, s_team_chan
 
 void __cdecl encode_rank_change_message(c_bitstream* stream, int a2, const s_rank_change* data)
 {
-	stream->write_integer("rank", data->rank, 8);
+	stream->write_integer("rank", data->rank, CHAR_BITS);
 }
 bool __cdecl decode_rank_change_message(c_bitstream* stream, int a2, s_rank_change* data)
 {
-	data->rank = stream->read_integer("rank", 8);
+	data->rank = (int8)stream->read_integer("rank", CHAR_BITS);
 	return stream->error_occured() == false;
 }
 

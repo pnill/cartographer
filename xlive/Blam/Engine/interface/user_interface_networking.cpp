@@ -99,9 +99,10 @@ void __cdecl sub_5AD5AB(XSESSION_INFO* session, XNKEY* key, XNADDR* host_address
     return;
 }
 
-void user_interface_squad_clear_match_playlist()
+void __cdecl user_interface_squad_clear_match_playlist(void)
 {
-    return INVOKE_TYPE(0x209DF4, 0x0, void(*__cdecl)(void));
+    INVOKE(0x209DF4, 0x0, user_interface_squad_clear_match_playlist);
+    return;
 }
 
 void __cdecl user_interface_squad_clear_game_settings()

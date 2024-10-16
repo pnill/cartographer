@@ -2,6 +2,14 @@
 #include "math/color_math.h"
 #include "math/real_math.h"
 
+/* structures */
+
+struct s_rasterizer_dx9_driver_globals
+{
+    bool using_amd_or_ati_gpu;
+    bool disable_amd_or_ati_patches;
+};
+
 /* classes */
 
 template <size_t size>
@@ -56,6 +64,10 @@ public:
         return result;
     }
 };
+
+/* globals */
+
+extern s_rasterizer_dx9_driver_globals g_rasterizer_dx9_driver_globals;
 
 /* public code */
 

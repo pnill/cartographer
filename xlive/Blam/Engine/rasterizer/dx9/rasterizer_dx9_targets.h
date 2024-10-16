@@ -66,7 +66,7 @@ struct s_rasterizer_target
 
 /* globals */
 
-
+extern bool g_dx9_dont_draw_to_depth_target_if_mrt_is_used;
 
 /* public code */
 
@@ -105,3 +105,13 @@ IDirect3DSurface9** rasterizer_dx9_last_target_get(void);
 IDirect3DSurface9** rasterizer_dx9_last_z_target_get(void);
 
 IDirect3DSurface9** rasterizer_dx9_last_z_stencil_get(void);
+
+bool __cdecl rasterizer_dx9_primary_targets_initialize(void);
+
+void __cdecl rasterizer_dx9_primary_targets_dispose(void);
+
+bool __cdecl rasterizer_dx9_secondary_targets_initialize(void);
+
+void __cdecl rasterizer_dx9_secondary_targets_dispose(void);
+
+bool __cdecl rasterizer_dx9_targets_initialize(void);

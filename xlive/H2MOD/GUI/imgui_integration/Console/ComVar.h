@@ -1,7 +1,5 @@
 #pragma once
-#include "stdafx.h"
-
-static std::string empty = std::string();
+extern std::string empty;
 
 /// Command Variable
 

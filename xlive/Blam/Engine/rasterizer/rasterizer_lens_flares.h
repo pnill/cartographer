@@ -3,6 +3,10 @@
 
 /* public code */
 
-void lens_flare_fix(void);
+void rasterizer_lens_flares_apply_patches(void);
 
-e_rasterizer_target rasterizer_suns_glow_draw(e_rasterizer_target target);
+e_rasterizer_target __cdecl rasterizer_suns_glow_occlude(e_rasterizer_target rasterizer_target);
+
+e_rasterizer_target rasterizer_suns_glow_draw(e_rasterizer_target rasterizer_target);
+
+e_rasterizer_target __cdecl lens_flares_draw(e_rasterizer_target rasterizer_target);

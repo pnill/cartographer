@@ -15,7 +15,6 @@
 #include "text/unicode.h"
 
 #include "H2MOD/GUI/imgui_integration/imgui_handler.h"
-#include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/Tweaks/Tweaks.h"
 
@@ -30,8 +29,6 @@ std::map<std::string, unsigned int> objectIds;
 
 const char command_error_bad_arg[] = "# exception catch (bad arg): ";
 
-ComVarFromPtr(d3d9ex_var_cmd, bool, &H2Config_d3d9ex,
-	"var_d3d9ex", "enable/disable d3d9ex, 1 parameter(s): <bool>", 1, 1, CommandCollection::SetD3D9ExStateCmd);
 ComVarFromPtr(network_stats_overlay_var_cmd, bool, &ImGuiHandler::g_network_stats_overlay,
 	"var_net_metrics", "enable/disable useful net metrics, 1 parameter(s)", 1, 1, CommandCollection::NetworkMetricsCmd);
 
@@ -56,7 +53,6 @@ void CommandCollection::InitializeCommands()
 	if (InitializeCommandsMap_initialized) return;
 	InitializeCommandsMap_initialized = true;
 
-	InsertCommand(new ConsoleCommand(d3d9ex_var_cmd));
 	InsertCommand(new ConsoleCommand(network_stats_overlay_var_cmd));
 	InsertCommand(new ConsoleCommand(og_frame_limiter_var_cmd));
 	InsertCommand(new ConsoleCommand(display_xyz_var_cmd));

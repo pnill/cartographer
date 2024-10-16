@@ -60,6 +60,6 @@ struct s_dynamic_geometry_parameters
 };
 ASSERT_STRUCT_SIZE(s_dynamic_geometry_parameters, 152)
 
-/* public code */
+/* prototypes */
 
 void rasterizer_dx9_primitive_builder(uint8* data, uint32 size, const void* old_data);

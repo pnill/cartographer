@@ -7,6 +7,7 @@
 #include "main/main_screenshot.h"
 #include "rasterizer/rasterizer_globals.h"
 
+
 /* constants */
 
 // This is no longer used
@@ -34,9 +35,12 @@ rasterizer_dx9_dispose_t p_rasterizer_dx9_primary_targets_dispose;
 rasterizer_dx9_dispose_t p_rasterizer_dx9_secondary_targets_dispose;
 rasterizer_dx9_get_render_target_surface_t p_rasterizer_dx9_get_render_target_surface;
 
+IDirect3DTexture9* g_d3d_texture_render_z_as_target_z = NULL;
+
 real32 g_sun_size = 0.2f;
 
-bool global_d3d_target_use_depth = false;
+bool g_d3d_target_use_depth = false;
+bool g_dx9_dont_draw_to_depth_target_if_mrt_is_used = false;
 
 /* prototypes */
 
@@ -47,12 +51,6 @@ uint32* motion_sensor_texture_size_get(void);
 IDirect3DTexture9* rasterizer_dx9_get_target_texture(e_rasterizer_target rasterizer_target);
 IDirect3DSurface9* __cdecl rasterizer_dx9_get_target_mip_surface(e_rasterizer_target target, int16 mip);
 void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(IDirect3DSurface9* target, IDirect3DSurface9* z_stencil, bool a3);
-
-bool __cdecl rasterizer_dx9_primary_targets_initialize(void);
-void __cdecl rasterizer_dx9_primary_targets_dispose(void);
-bool __cdecl rasterizer_dx9_secondary_targets_initialize(void);
-void __cdecl rasterizer_dx9_secondary_targets_dispose(void);
-
 
 /* public code */
 
@@ -128,28 +126,30 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
         *last_target = target;
     }
 
-    bool target_set = false;
-    if (*global_rasterizer_stage_get() == 2)
+    bool z_target_set = false;
+    if (*global_rasterizer_pixel_shader_index_get() == 2)
     {
         const s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-        if (target == dx9_globals->global_d3d_surface_render_primary && *last_z_stencil != dx9_globals->global_d3d_surface_render_z_as_target_z)
+        if (target == dx9_globals->global_d3d_surface_render_primary)
         {
-            *last_z_target = dx9_globals->global_d3d_surface_render_z_as_target_z;
-            HRESULT hr = global_d3d_device->SetRenderTarget(1, *last_z_stencil);
+            // Set the target to scratch if we don't want to draw to the depth target for specific render layers
+            *last_z_target = g_dx9_dont_draw_to_depth_target_if_mrt_is_used ? NULL : dx9_globals->global_d3d_surface_render_z_as_target_z;
+
+            const HRESULT hr = global_d3d_device->SetRenderTarget(1, *last_z_target);
             valid = valid && SUCCEEDED(hr);
-            target_set = true;
+            z_target_set = true;
         }
     }
 
-    if (!target_set && *last_z_target != NULL)
+    if (!z_target_set && *last_z_target != NULL)
     {
         *last_z_target = NULL;
         HRESULT hr = global_d3d_device->SetRenderTarget(1, NULL);
-        valid = valid && SUCCEEDED(hr);
+        valid &= SUCCEEDED(hr);
     }
 
     bool result;
-    global_d3d_target_use_depth = use_depth;
+    g_d3d_target_use_depth = use_depth;
     if (z_stencil == (IDirect3DSurface9*)NONE || *last_z_stencil == z_stencil)
     {
         result = valid;
@@ -158,7 +158,6 @@ bool __cdecl rasterizer_dx9_set_render_target_internal(IDirect3DSurface9* target
     {
         HRESULT hr = global_d3d_device->SetDepthStencilSurface(z_stencil);
         *last_z_stencil = z_stencil;
-
         result = valid && SUCCEEDED(hr); 
     }
 
@@ -263,7 +262,7 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
         d3d_texture = rasterizer_dx9_get_target_texture(_rasterizer_target_texaccum);
         break;
     case _rasterizer_target_backbuffer:
-        d3d_texture = dx9_globals->global_d3d_backbuffer_texture;
+        d3d_texture = dx9_globals->global_d3d_texture_backbuffer;
         break;
     case _rasterizer_target_frontbuffer:
         DISPLAY_ASSERT("###ERROR### attempt to set front buffer as a texture");
@@ -306,6 +305,9 @@ bool __cdecl rasterizer_dx9_set_target_as_texture(int16 stage, e_rasterizer_targ
     case _rasterizer_target_particle_distortion:
         d3d_texture = rasterizer_dx9_get_target_texture(_rasterizer_target_particle_distortion);
         break;
+    case _rasterizer_target_z_a8b8g8r8:
+        d3d_texture = g_d3d_texture_render_z_as_target_z;
+        break;
     case _rasterizer_target_motion_sensor:
         d3d_texture = dx9_globals->global_d3d_texture_motion_sensor;
         break;
@@ -346,8 +348,9 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     bool valid_target = true;
     bool depth_provided = false;
 
-    e_rasterizer_target target = (*global_rasterizer_stage_get() != _rasterizer_target_texaccum ? rasterizer_target : _rasterizer_target_backbuffer);
-    switch (target)
+    int32 g_ps_index = *global_rasterizer_pixel_shader_index_get();
+    rasterizer_target = (g_ps_index == 1 ? _rasterizer_target_backbuffer : rasterizer_target);
+    switch (rasterizer_target)
     {
     case _rasterizer_target_render_primary:
         depth_provided = true;
@@ -376,7 +379,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     case _rasterizer_target_bloom_secondary:
     case _rasterizer_target_gamma_remap_lut:
     case _rasterizer_target_scratch:
-        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(target);
+        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(rasterizer_target);
         d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_primary_z;
         break;
     case _rasterizer_target_frontbuffer:
@@ -384,7 +387,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
         valid_target = false;
         break;
     case _rasterizer_target_backbuffer:
-        d3d_surface = dx9_globals->global_d3d_backbuffer_surface;
+        d3d_surface = dx9_globals->global_d3d_surface_backbuffer;
         d3d_depth_buffer_stencil = dx9_globals->global_d3d_surface_render_z_as_target_z;
         depth_provided = true;
         break;
@@ -397,7 +400,7 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
     case _rasterizer_target_shadow_scratch2:
     case _rasterizer_target_convolution_scratch1:
     case _rasterizer_target_convolution_scratch2:
-        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(target);
+        d3d_surface = rasterizer_dx9_target_get_main_mip_surface(rasterizer_target);
         break;
     case _rasterizer_target_shadow_alias_swizzled:
         d3d_surface = rasterizer_dx9_get_target_mip_surface(_rasterizer_target_shadow_alias_swizzled, mipmap_index);
@@ -494,17 +497,17 @@ void __cdecl rasterizer_dx9_set_target(e_rasterizer_target rasterizer_target, in
             viewport.Height = g_cubemap_resolution;
         }
         else if (
-            target == _rasterizer_target_render_primary ||
-            target == _rasterizer_target_resolved ||
-            target == _rasterizer_target_2 ||
-            target == _rasterizer_target_texaccum ||
-            target == _rasterizer_target_cinematic ||
-            target == _rasterizer_target_backbuffer ||
-            target == rasterizer_dx9_get_overlay_destination_target())
+            rasterizer_target == _rasterizer_target_render_primary ||
+            rasterizer_target == _rasterizer_target_resolved ||
+            rasterizer_target == _rasterizer_target_2 ||
+            rasterizer_target == _rasterizer_target_texaccum ||
+            rasterizer_target == _rasterizer_target_cinematic ||
+            rasterizer_target == _rasterizer_target_backbuffer ||   // For when the depth is rendered to the backbuffer
+            rasterizer_target == rasterizer_dx9_get_overlay_destination_target())
         {
             const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
             const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-            if (target == rasterizer_dx9_get_overlay_destination_target())
+            if (rasterizer_target == rasterizer_dx9_get_overlay_destination_target())
             {
                 if (global_window_parameters->is_texture_camera)
                 {
@@ -572,6 +575,309 @@ IDirect3DSurface9** rasterizer_dx9_last_z_stencil_get(void)
     return Memory::GetAddress<IDirect3DSurface9**>(0xA4B194);
 }
 
+bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
+{
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
+    const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
+
+    bool success = false;
+    const D3DFORMAT backbuffer_fmt = rasterizer_globals->display_parameters.backbuffer_format;
+
+    if (SUCCEEDED(global_d3d_device->CreateTexture(
+        screen_bounds_width,
+        screen_bounds_height,
+        1,
+        D3DUSAGE_RENDERTARGET,
+        backbuffer_fmt,
+        D3DPOOL_DEFAULT,
+        &dx9_globals->global_d3d_texture_render_resolved,
+        NULL)))
+    {
+        const D3DMULTISAMPLE_TYPE type = rasterizer_globals->d3d9_sm3_supported ? D3DMULTISAMPLE_NONE : dx9_globals->global_d3d_primary_multisampletype;
+        const uint32 quality = rasterizer_globals->d3d9_sm3_supported ? 0 : dx9_globals->global_d3d_primary_multisamplequality;
+
+        const D3DFORMAT depthstencil_fmt = rasterizer_globals->display_parameters.depthstencil_format;
+
+        success =
+            SUCCEEDED(dx9_globals->global_d3d_texture_render_resolved->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_render_resolved)) &&
+            SUCCEEDED(global_d3d_device->CreateRenderTarget(
+                screen_bounds_width,
+                screen_bounds_height,
+                backbuffer_fmt,
+                type,
+                quality,
+                false,
+                &dx9_globals->global_d3d_surface_render_primary,
+                NULL)) &&
+            SUCCEEDED(global_d3d_device->CreateDepthStencilSurface(
+                screen_bounds_width,
+                screen_bounds_height,
+                depthstencil_fmt,
+                type,
+                quality,
+                false,
+                &dx9_globals->global_d3d_surface_render_primary_z,
+                NULL));
+    }
+
+    const char white_source[] = "float4 main() : COLOR { return float4(1.0f, 1.0f, 0.0f, 1.0f); }";
+    const char* shader_version = rasterizer_globals->d3d9_sm3_supported ? "ps_3_0" : "ps_2_0";
+
+
+    LPD3DXBUFFER pBuffer;
+    const HRESULT hr = D3DXCompileShader(white_source, strlen(white_source), NULL, NULL, "main", shader_version, 0, &pBuffer, NULL, NULL);
+
+    bool result = false;
+    if (pBuffer)
+    {
+        const HRESULT ps_hr = global_d3d_device->CreatePixelShader((const DWORD*)pBuffer->GetBufferPointer(), global_d3d_shader_white_source_get());
+        pBuffer->Release();
+
+        result = success && SUCCEEDED(hr) && SUCCEEDED(ps_hr);
+    }
+
+    return result;
+}
+
+void __cdecl rasterizer_dx9_primary_targets_dispose(void)
+{
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+
+    IDirect3DPixelShader9** global_d3d_shader_white_source = global_d3d_shader_white_source_get();
+    if (*global_d3d_shader_white_source)
+    {
+        (*global_d3d_shader_white_source)->Release();
+        *global_d3d_shader_white_source = NULL;
+    }
+    if (dx9_globals->global_d3d_surface_screenshot)
+    {
+        dx9_globals->global_d3d_surface_screenshot->Release();
+        dx9_globals->global_d3d_surface_screenshot = NULL;
+    }
+
+    if (dx9_globals->global_d3d_texture_render_resolved)
+    {
+        dx9_globals->global_d3d_texture_render_resolved->Release();
+        dx9_globals->global_d3d_texture_render_resolved = NULL;
+    }
+    if (dx9_globals->global_d3d_surface_render_resolved)
+    {
+        dx9_globals->global_d3d_surface_render_resolved->Release();
+        dx9_globals->global_d3d_surface_render_resolved = NULL;
+    }
+
+    if (dx9_globals->global_d3d_surface_render_primary)
+    {
+        dx9_globals->global_d3d_surface_render_primary->Release();
+        dx9_globals->global_d3d_surface_render_primary = NULL;
+    }
+    if (dx9_globals->global_d3d_surface_render_primary_z)
+    {
+        dx9_globals->global_d3d_surface_render_primary_z->Release();
+        dx9_globals->global_d3d_surface_render_primary_z = NULL;
+    }
+    return;
+}
+
+bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
+{
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
+    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
+
+    const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
+    const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
+
+    bool succeeded = SUCCEEDED(global_d3d_device->CreateTexture(
+        screen_bounds_width,
+        screen_bounds_height,
+        1,
+        D3DUSAGE_RENDERTARGET,
+        rasterizer_globals->display_parameters.backbuffer_format,
+        D3DPOOL_DEFAULT,
+        &dx9_globals->global_d3d_texture_backbuffer,
+        NULL));
+
+    HRESULT hr;
+    if (succeeded)
+    {
+        if (dx9_globals->global_d3d_texture_backbuffer->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_backbuffer) >= 0)
+        {
+            const bool sm3_supported = rasterizer_globals->d3d9_sm3_supported;
+
+            const D3DFORMAT format = (sm3_supported ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
+            const D3DMULTISAMPLE_TYPE type = D3DMULTISAMPLE_NONE;
+            const uint32 quality = 0;
+
+            // If shader model 3 is supported we create the z target as a texture rather than a depth stencil surface
+            // We do this as the game will render out the z target at the same time as the lightmap indirect stage when shader model 3 is in use
+            if (sm3_supported)
+            {
+                succeeded = SUCCEEDED(global_d3d_device->CreateTexture(
+                    screen_bounds_width,
+                    screen_bounds_height,
+                    1,
+                    D3DUSAGE_RENDERTARGET,
+                    rasterizer_globals->display_parameters.backbuffer_format,
+                    D3DPOOL_DEFAULT,
+                    &g_d3d_texture_render_z_as_target_z,
+                    NULL));
+
+                // Get texture of the render target from the render target surface
+                succeeded &= SUCCEEDED(g_d3d_texture_render_z_as_target_z->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_render_z_as_target_z));
+            }
+            else
+            {
+                hr = global_d3d_device->CreateDepthStencilSurface(
+                    screen_bounds_width,
+                    screen_bounds_height,
+                    format,
+                    type,
+                    quality,
+                    false,
+                    &dx9_globals->global_d3d_surface_render_z_as_target_z,
+                    NULL);
+                succeeded = SUCCEEDED(hr);
+            }
+        }
+        else
+        {
+            succeeded = false;
+        }
+    }
+
+    uint32 g_motion_sensor_texture_size = *motion_sensor_texture_size_get();
+    rasterizer_dx9_create_texture(g_motion_sensor_texture_size,
+        g_motion_sensor_texture_size,
+        0,
+        1,
+        bitmap_data_format_a8r8g8b8,
+        false,
+        &dx9_globals->global_d3d_texture_motion_sensor);
+
+    bool result = false;
+    if (dx9_globals->global_d3d_texture_motion_sensor)
+    {
+        hr = dx9_globals->global_d3d_texture_motion_sensor->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_motion_sensor);
+        result = succeeded && SUCCEEDED(hr) && dx9_globals->global_d3d_surface_motion_sensor != NULL;
+    }
+
+    // We calculate the sun glow target width and height based on the viewport resolution
+    const s_frame* global_window_parameters = global_window_parameters_get();
+    const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
+    const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
+
+    D3DVIEWPORT9 d3d_viewport;
+    dx9_globals->global_d3d_device->GetViewport(&d3d_viewport);
+
+    dx9_globals->global_d3d_sun_width = (d3d_viewport.Height * g_sun_size) * rasterizer_globals->sun_width_scale;
+    dx9_globals->global_d3d_sun_height = (d3d_viewport.Height * g_sun_size);
+
+    result &=
+        rasterizer_dx9_create_texture(
+            dx9_globals->global_d3d_sun_width,
+            dx9_globals->global_d3d_sun_height,
+            0,
+            D3DUSAGE_RENDERTARGET,
+            bitmap_data_format_a8r8g8b8,
+            0,
+            &dx9_globals->global_d3d_texture_sun_glow_primary) &&
+        SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_primary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_primary)) &&
+
+        rasterizer_dx9_create_texture(
+            dx9_globals->global_d3d_sun_width,
+            dx9_globals->global_d3d_sun_height,
+            0,
+            D3DUSAGE_RENDERTARGET,
+            bitmap_data_format_a8r8g8b8,
+            0,
+            &dx9_globals->global_d3d_texture_sun_glow_secondary) &&
+        SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_secondary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_secondary));
+
+    // Fail if any of the textures or surfaces are null
+    if (!dx9_globals->global_d3d_texture_sun_glow_primary ||
+        !dx9_globals->global_d3d_surface_sun_glow_primary ||
+        !dx9_globals->global_d3d_texture_sun_glow_secondary ||
+        !dx9_globals->global_d3d_surface_sun_glow_secondary)
+    {
+        result = false;
+        error(2, "### ERROR rasterizer_secondary_targets_initialize() failed to create offscreen surface(s)");
+    }
+
+    return result;
+}
+
+void __cdecl rasterizer_dx9_secondary_targets_dispose(void)
+{
+    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
+    if (dx9_globals->global_d3d_surface_motion_sensor)
+    {
+        dx9_globals->global_d3d_surface_motion_sensor->Release();
+        dx9_globals->global_d3d_surface_motion_sensor = NULL;
+    }
+    if (dx9_globals->global_d3d_texture_motion_sensor)
+    {
+        dx9_globals->global_d3d_texture_motion_sensor->Release();
+        dx9_globals->global_d3d_texture_motion_sensor = NULL;
+    }
+
+    if (dx9_globals->global_d3d_surface_sun_glow_primary)
+    {
+        dx9_globals->global_d3d_surface_sun_glow_primary->Release();
+        dx9_globals->global_d3d_surface_sun_glow_primary = NULL;
+    }
+    if (dx9_globals->global_d3d_surface_sun_glow_secondary)
+    {
+        dx9_globals->global_d3d_surface_sun_glow_secondary->Release();
+        dx9_globals->global_d3d_surface_sun_glow_secondary = NULL;
+    }
+
+    if (dx9_globals->global_d3d_texture_sun_glow_primary)
+    {
+        dx9_globals->global_d3d_texture_sun_glow_primary->Release();
+        dx9_globals->global_d3d_texture_sun_glow_primary = NULL;
+    }
+    if (dx9_globals->global_d3d_texture_sun_glow_secondary)
+    {
+        dx9_globals->global_d3d_texture_sun_glow_secondary->Release();
+        dx9_globals->global_d3d_texture_sun_glow_secondary = NULL;
+    }
+
+    if (dx9_globals->global_d3d_surface_backbuffer)
+    {
+        dx9_globals->global_d3d_surface_backbuffer->Release();
+        dx9_globals->global_d3d_surface_backbuffer = NULL;
+    }
+    if (dx9_globals->global_d3d_texture_backbuffer)
+    {
+        dx9_globals->global_d3d_texture_backbuffer->Release();
+        dx9_globals->global_d3d_texture_backbuffer = NULL;
+    }
+
+    if (dx9_globals->global_d3d_surface_render_z_as_target_z)
+    {
+        dx9_globals->global_d3d_surface_render_z_as_target_z->Release();
+        dx9_globals->global_d3d_surface_render_z_as_target_z = NULL;
+    }
+
+    if (g_d3d_texture_render_z_as_target_z)
+    {
+        g_d3d_texture_render_z_as_target_z->Release();
+        g_d3d_texture_render_z_as_target_z = NULL;
+    }
+
+    return;
+}
+
+bool __cdecl rasterizer_dx9_targets_initialize(void)
+{
+    return INVOKE(0x2804FF, 0x0, rasterizer_dx9_targets_initialize);
+}
+
 /* private code */
 
 IDirect3DPixelShader9** global_d3d_shader_white_source_get(void)
@@ -623,281 +929,3 @@ void __cdecl rasterizer_set_render_target_internal_hook_set_main_render_surface(
     return;
 }
 
-bool __cdecl rasterizer_dx9_primary_targets_initialize(void)
-{
-    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-    const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
-    const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
-
-    bool success = false;
-    const D3DFORMAT backbuffer_fmt = rasterizer_globals->display_parameters.backbuffer_format;
-
-    if (SUCCEEDED(global_d3d_device->CreateTexture(
-        screen_bounds_width,
-        screen_bounds_height,
-        1,
-        D3DUSAGE_RENDERTARGET,
-        backbuffer_fmt,
-        D3DPOOL_DEFAULT,
-        &dx9_globals->global_d3d_texture_render_resolved,
-        NULL)))
-    {
-        const D3DMULTISAMPLE_TYPE type = dx9_globals->global_d3d_primary_multisampletype;
-        const uint32 quality = dx9_globals->global_d3d_primary_multisamplequality;
-
-        const D3DFORMAT depthstencil_fmt = rasterizer_globals->display_parameters.depthstencil_format;
-        
-        success = 
-            SUCCEEDED(dx9_globals->global_d3d_texture_render_resolved->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_render_resolved)) &&
-            SUCCEEDED(global_d3d_device->CreateRenderTarget(screen_bounds_width,
-                screen_bounds_height,
-                backbuffer_fmt,
-                type,
-                quality,
-                false,
-                &dx9_globals->global_d3d_surface_render_primary,
-                NULL)) &&
-            SUCCEEDED(global_d3d_device->CreateDepthStencilSurface(screen_bounds_width,
-                screen_bounds_height,
-                depthstencil_fmt,
-                type,
-                quality,
-                false,
-                &dx9_globals->global_d3d_surface_render_primary_z,
-                NULL));
-    }
-
-    const char whiteSource[] = "float4 main() : COLOR { return float4(1.0f, 1.0f, 0.0f, 1.0f); }        ";
-    LPD3DXBUFFER pBuffer;
-    const HRESULT hr = D3DXCompileShader(whiteSource, strlen(whiteSource), NULL, NULL, "main", "ps_2_0", 0, &pBuffer, NULL, NULL);
-
-    bool result = false;
-    if (pBuffer)
-    {
-        const HRESULT ps_hr = global_d3d_device->CreatePixelShader((const DWORD*)pBuffer->GetBufferPointer(), global_d3d_shader_white_source_get());
-        pBuffer->Release();
-
-        result = success && SUCCEEDED(hr) && SUCCEEDED(ps_hr);
-    }
-
-    return result;
-}
-
-void __cdecl rasterizer_dx9_primary_targets_dispose(void)
-{
-    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-
-    IDirect3DPixelShader9** global_d3d_shader_white_source = global_d3d_shader_white_source_get();
-    if (*global_d3d_shader_white_source)
-    {
-        (*global_d3d_shader_white_source)->Release();
-        *global_d3d_shader_white_source = NULL;
-    }
-    if (dx9_globals->global_d3d_surface_screenshot)
-    {
-        dx9_globals->global_d3d_surface_screenshot->Release();
-        dx9_globals->global_d3d_surface_screenshot = NULL;
-    }
-
-    if (dx9_globals->global_d3d_texture_render_resolved)
-    {
-        dx9_globals->global_d3d_texture_render_resolved->Release();
-        dx9_globals->global_d3d_texture_render_resolved = NULL;
-    }
-    if (dx9_globals->global_d3d_surface_render_resolved)
-    {
-        dx9_globals->global_d3d_surface_render_resolved->Release();
-        dx9_globals->global_d3d_surface_render_resolved = NULL;
-    }
-    
-    if (dx9_globals->global_d3d_surface_render_primary)
-    {
-        dx9_globals->global_d3d_surface_render_primary->Release();
-        dx9_globals->global_d3d_surface_render_primary = NULL;
-    }
-    if (dx9_globals->global_d3d_surface_render_primary_z)
-    {
-        dx9_globals->global_d3d_surface_render_primary_z->Release();
-        dx9_globals->global_d3d_surface_render_primary_z = NULL;
-    }
-    return;
-}
-
-bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
-{
-    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-    const s_rasterizer_globals* rasterizer_globals = rasterizer_globals_get();
-    IDirect3DDevice9Ex* global_d3d_device = rasterizer_dx9_device_get_interface();
-
-    const int16 screen_bounds_width = rectangle2d_width(&rasterizer_globals->screen_bounds);
-    const int16 screen_bounds_height = rectangle2d_height(&rasterizer_globals->screen_bounds);
-
-    bool succeeded = SUCCEEDED(global_d3d_device->CreateTexture(
-            screen_bounds_width,
-            screen_bounds_height,
-            1,
-            1,
-            D3DFMT_A8R8G8B8,
-            D3DPOOL_DEFAULT,
-            &dx9_globals->global_d3d_backbuffer_texture,
-            NULL));
-
-    HRESULT hr;
-    if (succeeded)
-    {
-        if (dx9_globals->global_d3d_backbuffer_texture->GetSurfaceLevel(0, &dx9_globals->global_d3d_backbuffer_surface) >= 0)
-        {
-            const bool render_depth = rasterizer_globals->render_depth_backbuffer;
-
-            const D3DFORMAT format = (render_depth ? rasterizer_globals->display_parameters.backbuffer_format : rasterizer_globals->display_parameters.depthstencil_format);
-            const D3DMULTISAMPLE_TYPE type = (render_depth ? dx9_globals->global_d3d_primary_multisampletype : D3DMULTISAMPLE_NONE);
-            const uint32 quality = (render_depth ? dx9_globals->global_d3d_primary_multisamplequality : 0);
-
-            ;
-            if (render_depth)
-            {
-                hr = global_d3d_device->CreateRenderTarget(screen_bounds_width,
-                    screen_bounds_height,
-                    format,
-                    type,
-                    quality,
-                    false,
-                    &dx9_globals->global_d3d_surface_render_z_as_target_z,
-                    NULL);
-            }
-            else
-            {
-                hr = global_d3d_device->CreateDepthStencilSurface(screen_bounds_width,
-                    screen_bounds_height,
-                    format,
-                    type,
-                    quality,
-                    false,
-                    &dx9_globals->global_d3d_surface_render_z_as_target_z,
-                    NULL);
-            }
-            succeeded = SUCCEEDED(hr);
-        }
-        else
-        {
-            succeeded = false;
-        }
-    }
-
-    uint32 g_motion_sensor_texture_size = *motion_sensor_texture_size_get();
-    rasterizer_dx9_create_texture(g_motion_sensor_texture_size,
-        g_motion_sensor_texture_size,
-        0,
-        1,
-        bitmap_data_format_a8r8g8b8,
-        false,
-        &dx9_globals->global_d3d_texture_motion_sensor);
-
-    bool result = false;
-    if (dx9_globals->global_d3d_texture_motion_sensor)
-    {
-        hr = dx9_globals->global_d3d_texture_motion_sensor->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_motion_sensor);
-        result = succeeded && SUCCEEDED(hr) && dx9_globals->global_d3d_surface_motion_sensor != NULL;
-    }
-
-    // We calculate the sun glow target width and height based on the viewport resolution
-    const s_frame* global_window_parameters = global_window_parameters_get();
-    const int16 viewport_width = rectangle2d_width(&global_window_parameters->camera.viewport_bounds);
-    const int16 viewport_height = rectangle2d_height(&global_window_parameters->camera.viewport_bounds);
-
-    D3DVIEWPORT9 d3d_viewport;
-    dx9_globals->global_d3d_device->GetViewport(&d3d_viewport);
-
-    dx9_globals->global_d3d_sun_width = (d3d_viewport.Height * g_sun_size) * rasterizer_globals->sun_width_scale;
-    dx9_globals->global_d3d_sun_height = (d3d_viewport.Height * g_sun_size);
-
-    result &=
-        rasterizer_dx9_create_texture(
-            dx9_globals->global_d3d_sun_width,
-            dx9_globals->global_d3d_sun_height,
-            0,
-            1,
-            bitmap_data_format_a8r8g8b8,
-            0,
-            &dx9_globals->global_d3d_texture_sun_glow_primary) &&
-        SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_primary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_primary)) &&
-
-        rasterizer_dx9_create_texture(
-            dx9_globals->global_d3d_sun_width,
-            dx9_globals->global_d3d_sun_height,
-            0,
-            1,
-            bitmap_data_format_a8r8g8b8,
-            0,
-            &dx9_globals->global_d3d_texture_sun_glow_secondary) &&
-        SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_secondary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_secondary));
-
-    // Fail if any of the textures or surfaces are null
-    if (!dx9_globals->global_d3d_texture_sun_glow_primary ||
-        !dx9_globals->global_d3d_surface_sun_glow_primary ||
-        !dx9_globals->global_d3d_texture_sun_glow_secondary ||
-        !dx9_globals->global_d3d_surface_sun_glow_secondary)
-    {
-        result = false;
-        error(2, "### ERROR rasterizer_secondary_targets_initialize() failed to create offscreen surface(s)");
-    }
-
-    return result;
-}
-
-void __cdecl rasterizer_dx9_secondary_targets_dispose(void)
-{
-    s_rasterizer_dx9_main_globals* dx9_globals = rasterizer_dx9_main_globals_get();
-    if (dx9_globals->global_d3d_surface_motion_sensor)
-    {
-        dx9_globals->global_d3d_surface_motion_sensor->Release();
-        dx9_globals->global_d3d_surface_motion_sensor = NULL;
-    }
-    if (dx9_globals->global_d3d_texture_motion_sensor)
-    {
-        dx9_globals->global_d3d_texture_motion_sensor->Release();
-        dx9_globals->global_d3d_texture_motion_sensor = NULL;
-    }
-
-    if (dx9_globals->global_d3d_surface_sun_glow_primary)
-    {
-        dx9_globals->global_d3d_surface_sun_glow_primary->Release();
-        dx9_globals->global_d3d_surface_sun_glow_primary = NULL;
-    }
-    if (dx9_globals->global_d3d_surface_sun_glow_secondary)
-    {
-        dx9_globals->global_d3d_surface_sun_glow_secondary->Release();
-        dx9_globals->global_d3d_surface_sun_glow_secondary = NULL;
-    }
-    if (dx9_globals->global_d3d_texture_sun_glow_primary)
-    {
-        dx9_globals->global_d3d_texture_sun_glow_primary->Release();
-        dx9_globals->global_d3d_texture_sun_glow_primary = NULL;
-    }
-    if (dx9_globals->global_d3d_texture_sun_glow_secondary)
-    {
-        dx9_globals->global_d3d_texture_sun_glow_secondary->Release();
-        dx9_globals->global_d3d_texture_sun_glow_secondary = NULL;
-    }
-
-    if (dx9_globals->global_d3d_backbuffer_surface)
-    {
-        dx9_globals->global_d3d_backbuffer_surface->Release();
-        dx9_globals->global_d3d_backbuffer_surface = NULL;
-    }
-    if (dx9_globals->global_d3d_backbuffer_texture)
-    {
-        dx9_globals->global_d3d_backbuffer_texture->Release();
-        dx9_globals->global_d3d_backbuffer_texture = NULL;
-    }
-
-    if (dx9_globals->global_d3d_surface_render_z_as_target_z)
-    {
-        dx9_globals->global_d3d_surface_render_z_as_target_z->Release();
-        dx9_globals->global_d3d_surface_render_z_as_target_z = NULL;
-    }
-    return;
-}

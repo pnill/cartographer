@@ -8,11 +8,16 @@
 #include "objects/damage_effects.h"
 #include "simulation/simulation.h"
 
+/* globals */
+
+real32 g_vibration_dt_accumulator = 0.f;
+
+/* prototypes */
 
 s_vibration_globals* vibration_globals_get(void);
-XINPUT_VIBRATION vibration_get_state_usercall(s_vibration_user_globals* user_globals);
-
 XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals);
+
+/* public code */
 
 void __cdecl rumble_player_set_scripted_scale(real32 scale)
 {
@@ -42,7 +47,6 @@ void player_vibration_apply_patches(void)
     return;
 }
 
-real32 g_vibration_dt_accumulator = 0.f;
 void __cdecl vibration_update(real32 dt)
 {
     g_vibration_dt_accumulator += dt;
@@ -97,22 +101,11 @@ void __cdecl vibration_update(real32 dt)
     return;
 }
 
+/* private code */
 
 s_vibration_globals* vibration_globals_get(void)
 {
     return *Memory::GetAddress<s_vibration_globals**>(0x4CA378, 0x4F3DC4);
-}
-
-XINPUT_VIBRATION vibration_get_state_usercall(s_vibration_user_globals* user_globals)
-{
-    XINPUT_VIBRATION state;
-    void* fn = (void*)Memory::GetAddress(0x90254);
-    __asm {
-        mov eax, user_globals
-        call fn
-        mov state, eax
-    }
-    return state;
 }
 
 XINPUT_VIBRATION vibration_get_state(s_vibration_user_globals* user_globals)

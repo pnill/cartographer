@@ -32,6 +32,8 @@ uint16 g_bloom_info_log_timer = 0;
 
 /* prototypes */
 
+IDirect3DPixelShader9** local_pixel_shaders_get(void);
+
 void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper);
 
 /* public code */
@@ -45,6 +47,18 @@ void rasterizer_dx9_screen_effect_apply_patches(void)
 	// possibly because of the additional rendering/processing overhead
 	// function at halo2.exe+0x2728EE is responsible for telling the game to draw the bloom
 	WriteValue<bool>(Memory::GetAddress(0x26C6FA) + 1, false);
+	return;
+}
+
+void __cdecl rasterizer_dx9_create_screen_effect_pixel_shaders(void)
+{
+	INVOKE(0x27C7FE, 0x0, rasterizer_dx9_create_screen_effect_pixel_shaders);
+	return;
+}
+
+void rasterizer_dx9_set_screen_effect_pixel_shader(int32 local_pixel_shader)
+{
+	rasterizer_dx9_device_get_interface()->SetPixelShader(local_pixel_shaders_get()[local_pixel_shader]);
 	return;
 }
 
@@ -68,7 +82,7 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 		real32 overbrightness;
 		rasterizer_get_bloom_brightness(&brightness, &overbrightness);
 		
-		real32 bloom_threshold = 0.89999998f;
+		real32 bloom_threshold = 0.9f;
 		if (global_window_parameters->bloom_data)
 		{
 			bloom_threshold *= (1.f - (1.f - global_window_parameters->bloom_data->field_10) * 1.f);
@@ -125,10 +139,12 @@ void rasterizer_dx9_postprocess_scene(int32 render_layer_debug_view, bool lens_f
 				{
 					if (rasterizer_cinematic_globals->field_3C && rasterizer_cinematic_globals->field_40 > 0.f)
 					{
+						rasterizer_dx9_perf_event_begin("depth of field", NULL);
 						rasterizer_dx9_render_depth_of_field(
 							rasterizer_cinematic_globals->field_44.lower,
 							rasterizer_cinematic_globals->field_44.upper,
 							rasterizer_cinematic_globals->field_40);
+						rasterizer_dx9_perf_event_end("depth of field");
 					}
 
 					if (rasterizer_cinematic_globals->field_AC.lower > 0.f)
@@ -221,6 +237,11 @@ void __cdecl rasterizer_dx9_render_screen_flash(void)
 }
 
 /* private code */
+
+IDirect3DPixelShader9** local_pixel_shaders_get(void)
+{
+	return Memory::GetAddress<IDirect3DPixelShader9**>(0xA56C0C);
+}
 
 void __cdecl rasterizer_dx9_render_crossfade(real32 lower, real32 upper)
 {

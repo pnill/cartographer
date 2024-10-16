@@ -39,3 +39,7 @@ struct s_water_definition
 	real32 dynamic_height_bias;
 };
 ASSERT_STRUCT_SIZE(s_water_definition, 172);
+
+/* prototypes */
+
+bool __cdecl render_water(bool water_enabled, bool clear_target);

@@ -220,7 +220,7 @@ public:
 		}
 	}
 
-	const char* GetStringAtIndex(int headerIdx) const
+	const char* GetStringAtIndex(size_t headerIdx) const
 	{
 		assert(headerIdx < GetHeaderCount());
 		const StringLineHeader& string_header = GetHeader(headerIdx);

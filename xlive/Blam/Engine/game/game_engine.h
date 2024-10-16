@@ -174,7 +174,7 @@ struct s_multiplayer_event_response_definition
 };
 ASSERT_STRUCT_SIZE(s_multiplayer_event_response_definition, 0xA8);
 
-/* public code */
+/* prototypes */
 
 s_game_engine_globals* game_engine_globals_get(void);
 
@@ -185,3 +185,5 @@ bool __cdecl game_engine_variant_cleanup(uint16* flags);
 void __cdecl game_engine_player_activated(datum player_index);
 
 bool __cdecl game_engine_team_is_enemy(e_game_team a, e_game_team b);
+
+void __cdecl game_engine_render(void);

@@ -109,7 +109,7 @@ void __cdecl rasterizer_present_hook(bitmap_data* bitmap) {
 	//typedef void(__cdecl* rasterizer_present_t)(int);
 	//auto p_rasterizer_present = Memory::GetAddress<rasterizer_present_t>(0x26271A);
 
-	rasterizer_present(bitmap);
+	rasterizer_dx9_present(bitmap);
 	shell_windows_throttle_framerate(H2Config_fps_limit);
 }
 

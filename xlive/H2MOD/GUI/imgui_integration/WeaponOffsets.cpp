@@ -56,11 +56,11 @@ namespace ImGuiHandler {
 
 				ImGui::Text(weapon_offsets_get_string(text));
 				ImGui::PushItemWidth(WidthPercentage(60));
-				ImGui::SliderFloat(slider, &offset, -0.15, 0.15, ""); ImGui::SameLine();
+				ImGui::SliderFloat(slider, &offset, -0.15f, 0.15f, ""); ImGui::SameLine();
 				if (ImGui::IsItemEdited() && weapOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));
-				ImGui::InputFloat(sliderId.c_str(), &offset, -0.15, 0.15, "%.3f"); ImGui::SameLine();
+				ImGui::InputFloat(sliderId.c_str(), &offset, -0.15f, 0.15f, "%.3f"); ImGui::SameLine();
 				if (ImGui::IsItemEdited() && weapOffsets[weapon].tag != nullptr) { ApplyOffset(weapon); }
 
 				ImGui::PushItemWidth(WidthPercentage(20));

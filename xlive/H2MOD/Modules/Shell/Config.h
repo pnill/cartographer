@@ -1,6 +1,5 @@
 #pragma once
 
-#include "H2MOD/Modules/Input/ControllerInput.h"
 extern bool g_force_cartographer_update;
 
 void InitH2Config();
@@ -63,7 +62,6 @@ extern int H2Config_fps_limit;
 extern int8 H2Config_static_lod_state;
 extern bool H2Config_shader_lod_max;
 extern bool H2Config_light_suppressor;
-extern bool H2Config_d3d9ex;
 extern bool H2Config_disable_ingame_keyboard;
 extern bool H2Config_hide_ingame_chat;
 extern bool H2Config_xDelay;
@@ -98,6 +96,9 @@ extern e_override_texture_resolution H2Config_Override_Water;
 extern bool H2Config_upnp_enable;
 extern bool H2Config_no_events;
 extern bool H2Config_spooky_boy;
+
+extern bool H2Config_force_off_d3d9ex;
+extern bool H2Config_force_off_sm3;
 
 #ifndef NDEBUG
 extern int H2Config_forced_event;

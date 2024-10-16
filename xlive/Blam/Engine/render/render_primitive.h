@@ -28,12 +28,18 @@ public:
 	int32 m_field_C;
 	c_flags_no_init<e_render_layer, uint32, k_number_of_render_layers> m_render_layer_flags_backup;
 	c_render_primitive* m_primitives;
+
+	bool is_layer_different(e_render_layer layer_index) const;
 };
 ASSERT_STRUCT_SIZE(c_render_primitive_list, 24);
 
 /* globals */
 
 extern c_render_primitive_list g_render_primitives_by_primitive_list_type[3];
+
+/* prototypes */
+
+void __cdecl create_visible_render_primitives(int32 hologram_flag);
 
 /* public code */
 

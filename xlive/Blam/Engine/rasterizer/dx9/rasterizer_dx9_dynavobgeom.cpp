@@ -41,6 +41,12 @@ uint32 rasterizer_dx9_get_primitive_count(uint32 vertex_count, uint32 primitive_
 
 /* public code */
 
+void __cdecl rasterizer_dx9_create_dynavobgeom_pixel_shaders(void)
+{
+	INVOKE(0x271BEF, 0x0, rasterizer_dx9_create_dynavobgeom_pixel_shaders);
+	return;
+}
+
 void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parameters* parameters, const s_dynamic_vertex_data* vertex_data)
 {
 	// INVOKE(0x271C57, 0x0, rasterizer_dx9_dynamic_screen_geometry_draw, parameters, vertex_data);
@@ -54,7 +60,7 @@ void rasterizer_dx9_dynamic_screen_geometry_draw(const s_dynamic_geometry_parame
 	if (!global_window_parameters->render_type)
 	{
 		rasterizer_dx9_set_render_state(D3DRS_CULLMODE, D3DCULL_NONE);
-		rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_DESTALPHA);
+		rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHABLENDENABLE, D3DBLEND_ZERO);
 		rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);
 		rasterizer_dx9_set_render_state(D3DRS_ZENABLE, FALSE);

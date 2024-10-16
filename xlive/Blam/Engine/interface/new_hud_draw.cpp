@@ -6,7 +6,6 @@
 #include "new_hud.h"
 #include "new_hud_definitions.h"
 #include "bitmaps/bitmap_group.h"
-#include "game/game_engine_util.h"
 #include "game/players.h"
 #include "rasterizer/dx9/rasterizer_dx9_shader_submit_new.h"
 #include "render/render.h"
@@ -29,7 +28,8 @@ static const pixel32 g_draw_hud_bitmap_widget_shield_pixel_colors[9]
 	D3DCOLOR_XRGB(0,120,240),
 };
 
-c_static_flags_no_init<k_number_of_users> g_draw_hud_user_draw_player_indicators;
+// k_number_of_users, we have 4 bits left to spare in this value
+uint8 g_draw_hud_user_draw_player_indicators_mask;
 
 /* private code */
 
@@ -216,8 +216,8 @@ void __cdecl draw_hud_bitmap_widget(uint32 local_render_user_index, s_new_hud_te
 	if (bitmap_widget->effect.count > 0)
 		hud_widget_effect_evaluate(local_render_user_index, user_state, bitmap_widget->effect[0], &offset_result, &scale_result, &theta_result);
 
-	bitmap_width = (bitmap_width * scale_result.x);
-	bitmap_height = (bitmap_height * scale_result.y);
+	bitmap_width = (uint32)(bitmap_width * scale_result.x);
+	bitmap_height = (uint32)(bitmap_height * scale_result.y);
 
 	real32 hud_scale = *get_primary_hud_scale();
 
@@ -705,8 +705,8 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		int32 text_height = rectangle2d_height(&draw_string_bounds);
 		real32 calc_text_height = (text_height * *get_primary_hud_scale()) * scale_result.y;
 
-		int32 ceil_text_width = ceilf(calc_text_width);
-		int32 ceil_text_height = ceilf(calc_text_height);
+		int32 ceil_text_width = ceil(calc_text_width);
+		int32 ceil_text_height = ceil(calc_text_height);
 
 		draw_string_set_player_color(global_real_argb_white);
 		draw_string_set_shadow_color(global_real_argb_black);
@@ -714,22 +714,22 @@ void __cdecl draw_hud_text_widget(uint32 local_render_user_index, s_new_hud_temp
 		switch(text_widget->justification)
 		{
 		case text_justification_center:
-			text_bounds.left = (final_location.x - (real32)(ceil_text_width >> 1));
-			text_bounds.top = final_location.y;
-			text_bounds.right = (final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
-			text_bounds.bottom = ceil_text_height + final_location.y;
+			text_bounds.left = (int16)(final_location.x - (real32)(ceil_text_width >> 1));
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)(final_location.x + (real32)(ceil_text_width - (ceil_text_width >> 1)));
+			text_bounds.bottom = (int16)ceil_text_height + final_location.y;
 			break;
 		case text_justification_right:
-			text_bounds.left = (final_location.x - ceil_text_width);
-			text_bounds.top = final_location.y;
-			text_bounds.right = final_location.x;
-			text_bounds.bottom = (final_location_y + ceil_text_height);
+			text_bounds.left = (int16)(final_location.x - ceil_text_width);
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)final_location.x;
+			text_bounds.bottom = (int16)(final_location_y + ceil_text_height);
 			break;
 		default:
-			text_bounds.left = final_location.x;
-			text_bounds.top = final_location.y;
-			text_bounds.right = ceil_text_width + final_location.x;
-			text_bounds.bottom = ceil_text_height + final_location.y;
+			text_bounds.left = (int16)final_location.x;
+			text_bounds.top = (int16)final_location.y;
+			text_bounds.right = (int16)(ceil_text_width + final_location.x);
+			text_bounds.bottom = (int16)(ceil_text_height + final_location.y);
 			break;
 		}
 
@@ -742,7 +742,7 @@ void __cdecl draw_hud_player_indicators(uint32 local_render_user_index)
 	typedef void(__cdecl* game_mode_engine_draw_team_indicators_t)(int);
 	auto p_game_mode_engine_draw_team_indicators = Memory::GetAddress<game_mode_engine_draw_team_indicators_t>(0x6AFA4);
 
-	if (g_draw_hud_user_draw_player_indicators.test(local_render_user_index))
+	if (TEST_BIT(g_draw_hud_user_draw_player_indicators_mask, local_render_user_index))
 		p_game_mode_engine_draw_team_indicators(local_render_user_index);
 }
 /* public code */
@@ -759,15 +759,14 @@ int32 hud_bitmap_data_index_get(void)
 
 void hud_player_indicators_draw_enabled_set(int32 user_index, bool enabled)
 {
-	g_draw_hud_user_draw_player_indicators.set(user_index, enabled);
+	SET_FLAG(g_draw_hud_user_draw_player_indicators_mask, user_index, enabled);
+	return;
 }
 
-void hud_player_indicators_draw_reset()
+void hud_player_indicators_draw_reset(void)
 {
-	g_draw_hud_user_draw_player_indicators.set(0, true);
-	g_draw_hud_user_draw_player_indicators.set(1, true);
-	g_draw_hud_user_draw_player_indicators.set(2, true);
-	g_draw_hud_user_draw_player_indicators.set(3, true);
+	g_draw_hud_user_draw_player_indicators_mask = 0xFF;	// Set all bits to 1
+	return;
 }
 
 void __cdecl draw_hud_layer(void)
@@ -776,11 +775,12 @@ void __cdecl draw_hud_layer(void)
 	return;
 }
 
-void new_hud_draw_apply_patches()
+void new_hud_draw_apply_patches(void)
 {
 	hud_player_indicators_draw_reset();
 
 	PatchCall(Memory::GetAddress(0x226702), draw_hud_player_indicators);
 	PatchCall(Memory::GetAddress(0x224F46), draw_hud_bitmap_widget);
 	PatchCall(Memory::GetAddress(0x224FDA), draw_hud_text_widget);
+	return;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "camera/camera.h"
 #include "math/color_math.h"
+#include "memory/static_arrays.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
 #include "tag_files/tag_reference.h"
@@ -9,13 +10,14 @@
 #define k_maximum_mixers_per_scenario_atmospheric_fog_palette_entry 2
 #define MAXIMUM_PLANAR_FOG_PALETTE_ENTRIES_PER_SCENARIO 127
 
-enum e_camera_immersion_flags : short
+enum e_camera_immersion_flags : uint16
 {
-    camera_immersion_flag_disable_atmospheric_fog = FLAG(0),
-    camera_immersion_flag_disable_secondary_fog = FLAG(1),
-    camera_immersion_flag_disable_planar_fog = FLAG(2),
-    camera_immersion_flag_invert_planar_fog_priorities = FLAG(3),
-    camera_immersion_flag_disable_water = FLAG(4)
+    _camera_immersion_disable_atmospheric_fog_bit = 0,
+    _camera_immersion_disable_secondary_fog_bit = 1,
+    _camera_immersion_disable_planar_fog_bit = 2,
+    _camera_immersion_invert_planar_fog_priorities_bit = 3,
+    _camera_immersion_disable_water_bit = 4,
+    k_camera_immersion_flag_count
 };
 
 enum e_fog_mode : uint32
@@ -52,7 +54,8 @@ struct s_scenario_fog_result
     real_rgb_color sky_fog_color;
     real32 sky_fog_alpha;
     datum patchy_fog_tag_index;
-    int8 gap_6C[24];
+    real_vector4d patchy_fog_color;
+    int8 gap_6C[8];
     real_bounds field_88;
     real32 patchy_min_distance;
     real32 patchy_max_distance;
@@ -78,7 +81,7 @@ struct s_scenario_fog_result
     real32 field_E4;
     real32 field_E8;
     real32 gamma_ramp;
-    uint32 flags;
+    c_flags_no_init<e_camera_immersion_flags, uint32, k_camera_immersion_flag_count> camera_immersion_flags;
     real_plane3d fog_plane;
     bool fog_plane_set;
     int8 pad_105[3];

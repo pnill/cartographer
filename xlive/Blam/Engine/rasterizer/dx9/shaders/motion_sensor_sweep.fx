@@ -1,27 +1,28 @@
 struct PS_INPUT
 {
-    float2 TexCoord0 : TEXCOORD0;
-    float4 Color0 : COLOR0;
+    float4 position : SV_POSITION;
+    float4 color[2] : COLOR;
+    float4 texcoord[7] : TEXCOORD;
 };
 
 struct PS_OUTPUT
 {
-    float4 texColor;
+    float4 color;
 };
 
 float1 hud_fade : register(c0);
-sampler2D s0 : register(s0);
+sampler2D tex : register(s0);
 
 PS_OUTPUT main(PS_INPUT input) : COLOR
 {
     PS_OUTPUT output;
     
-    output.texColor = tex2D(s0, input.TexCoord0);
-    output.texColor *= hud_fade;
-    // prevent the alpha to go below 0.5
+    output.color = tex2D(tex, input.texcoord[0].xy);
+    output.color *= hud_fade;
+    // prevent the alpha to go below 0.192160
     // which allows the points on the radar to be rendered properly
     // might need some fine-tuning
-    output.texColor.a = max(output.texColor.a, 0.5f);
-    output.texColor *= input.Color0;
+    output.color.a = max(output.color.a, 0.192160f);
+    output.color *= input.color[0];
     return output;
 }

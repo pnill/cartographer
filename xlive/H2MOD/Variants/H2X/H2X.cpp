@@ -3,8 +3,6 @@
 
 #include "items/weapon_definitions.h"
 #include "game/game_time.h"
-#include "math/math.h"
-
 
 const H2X::h2x_mod_info weapons[] =
 {

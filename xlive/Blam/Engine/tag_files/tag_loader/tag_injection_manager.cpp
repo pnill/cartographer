@@ -341,11 +341,11 @@ datum c_tag_injecting_manager::get_tag_datum_by_name(e_tag_group group, const ch
 	cache_file_tag_instance temp_instance;
 
 	int32 current_offset = 0;
-	uint32 next_offset = 0;
+	int32 next_offset = 0;
 	uint32 current_size = 0;
 	char name_buffer[MAX_PATH] = {};
 
-	for(uint32 current_index = 0; current_index < this->m_active_map_cache_header.debug_tag_name_count; current_index++)
+	for(int32 current_index = 0; current_index < this->m_active_map_cache_header.debug_tag_name_count; ++current_index)
 	{
 		if (current_index + 1 != this->m_active_map_cache_header.debug_tag_name_count)
 		{

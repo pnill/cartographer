@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "render_visibility_collection.h"
 
+/* public code */
+
 void __cdecl render_visibility_predict_resources_for_pvs(int32 cluster_index)
 {
 	INVOKE(0x19460E, 0x1804B5, render_visibility_predict_resources_for_pvs, cluster_index);

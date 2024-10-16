@@ -41,9 +41,17 @@ struct s_rasterizer_globals_display_parameters
 };
 ASSERT_STRUCT_SIZE(s_rasterizer_globals_display_parameters, 56);
 
+struct s_rasterizer_parameters
+{
+	int16 field_0;
+	int32 field_4;
+	int32 field_8;
+};
+ASSERT_STRUCT_SIZE(s_rasterizer_parameters, 12);
+
 struct s_rasterizer_globals_clipping_parameters
 {
-	uint32 field_0[3];
+	s_rasterizer_parameters parameters;
 	real32 z_near;
 	real32 z_far;
 	real32 depth_near;
@@ -100,7 +108,7 @@ struct s_rasterizer_globals
 	real32 sun_width_scale;
 	int32 rasterizer_blur_type;
 	bool field_E0;
-	bool render_depth_backbuffer;
+	bool d3d9_sm3_supported;
 	int16 pad_4;
 	bitmap_data* bitmap_data_array[1024];
 	uint32 next_bitmap_index;
@@ -121,6 +129,6 @@ uint32 rasterizer_get_width(void);
 
 uint32 rasterizer_get_height(void);
 
-void __cdecl rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
+void rasterizer_get_screen_bounds(rectangle2d* screen_bounds);
 
-void __cdecl rasterizer_get_frame_bounds(rectangle2d* frame_bounds);
+void rasterizer_get_frame_bounds(rectangle2d* frame_bounds);

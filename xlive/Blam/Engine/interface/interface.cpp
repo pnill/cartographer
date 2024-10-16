@@ -15,7 +15,6 @@
 
 /* prototypes */
 
-int32 get_player_window_count(void);
 e_split_type get_splitscreen_split_type(void);
 void set_display_type(e_display_type display_type);
 void render_splitscreen_line(void);
@@ -93,11 +92,6 @@ void __cdecl interface_draw_bitmap(
 }
 
 /* private code */
-
-int32 get_player_window_count(void)
-{
-	return *Memory::GetAddress<int32*>(0x4E6974);
-}
 
 e_split_type get_splitscreen_split_type(void)
 {

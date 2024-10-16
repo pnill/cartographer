@@ -3,6 +3,7 @@
 #include "ServerConsole.h"
 
 #include "cseries/cseries_strings.h"
+#include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Utils/Utils.h"
 

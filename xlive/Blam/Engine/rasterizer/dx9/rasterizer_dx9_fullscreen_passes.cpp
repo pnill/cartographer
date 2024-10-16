@@ -3,6 +3,7 @@
 
 #include "rasterizer_dx9.h"
 #include "rasterizer_dx9_main.h"
+#include "rasterizer_dx9_screen_effect.h"
 #include "rasterizer_dx9_shader_submit.h"
 
 #include "rasterizer/rasterizer_globals.h"
@@ -94,7 +95,7 @@ void rasterizer_dx9_fullscreen_calculate_texcoords(const real_rectangle2d* bound
 
 void __cdecl rasterizer_dx9_render_fullscreen_overlay_geometry(
     real_rectangle2d* a1,
-    bool(__cdecl* a2)(int32),
+    bool(__cdecl* a2)(void*),
     bool(__cdecl* a3)(
         int32 output_type,
         real_rectangle2d* bounds,
@@ -179,7 +180,7 @@ void __cdecl rasterizer_dx9_apply_gamma_and_brightness(e_rasterizer_target raste
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXANISOTROPY, 1);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MIPMAPLODBIAS, 0);
             rasterizer_dx9_set_sampler_state(0, D3DSAMP_MAXMIPLEVEL, 0);
-            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DBLEND_INVBLENDFACTOR);
+            rasterizer_dx9_set_render_state(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA);
             rasterizer_dx9_set_render_state(D3DRS_ZENABLE, D3DZB_FALSE);
             rasterizer_dx9_set_render_state(D3DRS_DEPTHBIAS, 0);
             rasterizer_dx9_set_render_state(D3DRS_ALPHATESTENABLE, FALSE);

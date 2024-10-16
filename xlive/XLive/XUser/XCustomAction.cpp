@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "XCustomAction.h"
 
 #include "XLive/xbox/xbox.h"

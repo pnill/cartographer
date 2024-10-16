@@ -1,5 +1,5 @@
 #pragma once
-#include "H2MOD/GUI/ImGui_Integration/Console/CommandHandler.h"
+#include "H2MOD/GUI/ImGui_Integration/Console/CommandsUtil.h"
 
 namespace ServerConsole
 {

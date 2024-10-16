@@ -325,7 +325,7 @@ datum tag_loaded(uint32 group_tag, const char* name)
 		{
 			cache_file_tag_instance* global_tag_instances = global_tag_instances_get();
 
-			for (uint32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; i++)
+			for (int32 i = 0; i < g_cache_file_memory_globals->tags_header->tag_count; ++i)
 			{
 				cache_file_tag_instance* tag_instance = &global_tag_instances[i];
 				if (group_tag == tag_instance->group_tag.group)

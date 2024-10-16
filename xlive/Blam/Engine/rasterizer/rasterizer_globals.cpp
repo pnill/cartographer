@@ -23,14 +23,13 @@ uint32 rasterizer_get_height(void)
 	return rasterizer_globals_get()->resolution_y;
 }
 
-
-void __cdecl rasterizer_get_screen_bounds(rectangle2d* screen_bounds)
+void rasterizer_get_screen_bounds(rectangle2d* screen_bounds)
 {
 	*screen_bounds = rasterizer_globals_get()->screen_bounds;
 	return;
 }
 
-void __cdecl rasterizer_get_frame_bounds(rectangle2d* frame_bounds)
+void rasterizer_get_frame_bounds(rectangle2d* frame_bounds)
 {
 	*frame_bounds = rasterizer_globals_get()->frame_bounds;
 	return;
