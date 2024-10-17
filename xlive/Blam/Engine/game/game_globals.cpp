@@ -47,6 +47,13 @@ s_game_globals* scenario_get_game_globals(void)
 	return *Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C);
 }
 
+s_camera_track_definition* game_globals_get_default_camera_track()
+{
+	s_game_globals* game_globals = scenario_get_game_globals();
+
+	return (s_camera_track_definition*)tag_get_fast(game_globals->camera[0]->default_unit_camera_track.index);
+}
+
 void scenario_set_game_globals(s_game_globals* globals)
 {
 	*Memory::GetAddress<s_game_globals**>(0x479E70, 0x4A642C) = globals;

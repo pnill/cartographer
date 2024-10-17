@@ -356,3 +356,5 @@ real_vector3d* __cdecl perpendicular3d(const real_vector3d* in, real_vector3d* o
 real_vector3d* __cdecl generate_up_vector3d(const real_vector3d* forward, real_vector3d* up);
 
 void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, const real_euler_angles3d* angles);
+
+void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angles2d* angles);
