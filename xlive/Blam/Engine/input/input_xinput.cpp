@@ -14,7 +14,7 @@ XInputGetStateEx_t XInputGetStateEx;
 
 HMODULE g_xinput1_4_module;
 
-//bool g_input_feedback_suppress = false;
+bool g_input_feedback_suppress = false;
 XINPUT_VIBRATION g_xinput_vibration{};
 input_device** g_xinput_devices;
 uint32* g_main_controller_index;
@@ -74,7 +74,8 @@ void input_xinput_update_rumble_state(void)
 {
 	bool global_suppress_rumble = false;
 
-	if (*input_suppress_global_get()
+	if (!g_input_feedback_suppress
+		|| *input_suppress_global_get()
 		|| !game_in_progress()
 		|| game_time_get_paused())
 	{
@@ -92,7 +93,6 @@ void input_xinput_update_rumble_state(void)
 
 			if (!global_suppress_rumble && rumble_enabled)
 			{
-				// ###punpckhdq TODO: what is g_xinput_vibration? why shouldn't we use a local variable
 				csmemcpy(&g_xinput_vibration, &g_vibration_state[controller_index], sizeof(g_xinput_vibration));
 			}
 			else
