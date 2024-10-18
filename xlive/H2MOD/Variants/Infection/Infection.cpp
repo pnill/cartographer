@@ -257,7 +257,7 @@ void Infection::onGameTick()
 {
 	if(get_game_life_cycle() == _life_cycle_in_game && NetworkSession::LocalPeerIsSessionHost())
 	{
-		if (time_globals::get_game_time() > 0)
+		if (get_game_time_ticks() > 0)
 		{
 			bool should_end_game = shouldEndGame();
 
@@ -265,12 +265,12 @@ void Infection::onGameTick()
 			if (!should_end_game)
 			{
 				// and update the time if it shouldn't be
-				last_time_at_game_should_not_end = time_globals::get_game_time();
+				last_time_at_game_should_not_end = get_game_time_ticks();
 			}
 
 			// check the difference between game time now
 			// if the time wasn't updated for more than 5 seconds, end the game
-			if (game_ticks_to_seconds(time_globals::get_game_time() - last_time_at_game_should_not_end) > 5.0f)
+			if (game_ticks_to_seconds(get_game_time_ticks() - last_time_at_game_should_not_end) > 5.0f)
 			{
 				NetworkSession::EndGame();
 			}

@@ -30,7 +30,7 @@ float projectile_get_update_tick_length(datum projectile_datum_index, bool proje
 	char* proj_tag_data = (char*)tag_get_fast(*((datum*)object_data));
 
 	if ((*(DWORD*)(proj_tag_data + 0xBC) & FLAG(5)) != 0 // check if travels instantaneously flag is set in the projectile flags
-		&& (projectile_instant_update || *(int*)(object_data + 428) == time_globals::get_game_time())) // also check if the projectile is updated twice in the same tick
+		&& (projectile_instant_update || *(int*)(object_data + 428) == get_game_time_ticks())) // also check if the projectile is updated twice in the same tick
 	{
 		//LIMITED_LOG(128, LOG_TRACE_GAME, "{} - projectile: {:X} at 30 hz context", __FUNCTION__, projectile_datum_index);
 		return game_tick_length() * ((float)time_globals::get()->ticks_per_second / 30.f);
@@ -46,7 +46,7 @@ float projectile_get_update_tick_length(datum projectile_datum_index, bool proje
 inline void projectile_set_creation_tick(datum projectile_datum_index)
 {
 	char* object_data = (char*)object_get_fast_unsafe(projectile_datum_index);
-	*(int*)(object_data + 428) = time_globals::get_game_time(); // store the projectile creation tick count
+	*(int*)(object_data + 428) = get_game_time_ticks(); // store the projectile creation tick count
 }
 
 bool __cdecl projectile_new_hook(datum projectile_object_index, int a2)

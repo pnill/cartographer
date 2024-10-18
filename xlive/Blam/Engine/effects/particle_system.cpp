@@ -25,7 +25,7 @@ s_data_array* get_particle_system_table()
 
 void particle_system_update_game_time(datum datum_index)
 {
-	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = time_globals::get_game_time();
+	particle_system_game_time[DATUM_INDEX_TO_ABSOLUTE_INDEX(datum_index)] = get_game_time_ticks();
 }
 
 void particle_system_reset_game_time(datum datum_index)
@@ -232,7 +232,7 @@ bool c_particle_system::keep_system_alive(real32 dt)
 
 	particle_system_update_dt(particle_system_datum_index, dt);
 
-	int32 ticks = time_globals::get_game_time() - particle_system_game_time[particle_system_abs_index];
+	int32 ticks = get_game_time_ticks() - particle_system_game_time[particle_system_abs_index];
 	if (ticks > 1)
 	{
 		particle_system_reset_game_time(particle_system_datum_index);
