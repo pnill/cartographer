@@ -47,12 +47,12 @@ void player_vibration_apply_patches(void)
 	return;
 }
 
-void __cdecl vibration_update(real32 delta_time)
+void __cdecl vibration_update(real32 dt)
 {
 	// ### TODO Use game_tick_length() here when we use 30 tick in multiplayer
 	const real32 k_tick_length = 1.f / 30.f;
 
-	g_vibration_dt_accumulator += delta_time;
+	g_vibration_dt_accumulator += dt;
 
 	// Only execute the rumble logic every tick
 	if (g_vibration_dt_accumulator >= k_tick_length)
