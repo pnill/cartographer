@@ -4,6 +4,7 @@
 #include "materials.h"
 
 #include "bitmaps/bitmap_group.h"
+#include "camera/camera_track_definition.h"
 #include "interface/interface.h"
 #include "main/game_preferences.h"
 #include "main/level_definitions.h"
@@ -581,6 +582,9 @@ ASSERT_STRUCT_SIZE(s_game_globals, 644);
 /* public code */
 
 s_game_globals* scenario_get_game_globals(void);
+
+s_camera_track_definition* game_globals_get_default_camera_track();
+
 void scenario_set_game_globals(s_game_globals* globals);
 
 s_ui_levels_definition* game_globals_get_ui_levels(void);

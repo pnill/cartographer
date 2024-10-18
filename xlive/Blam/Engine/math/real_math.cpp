@@ -172,3 +172,15 @@ void vectors3d_from_euler_angles3d(real_vector3d* forward, real_vector3d* up, co
 	matrix4x3_to_point_and_vectors(&matrix, &point, forward, up);
 	return;
 }
+
+void vector3d_from_euler_angles2d(real_vector3d* forward, const real_euler_angles2d* angles)
+{
+	ASSERT(forward);
+	ASSERT(angles);
+
+	const real32 horizontal_projection = cos(angles->pitch);
+
+	forward->i = cos(angles->yaw) * horizontal_projection;
+	forward->j = sin(angles->yaw) * horizontal_projection;
+	forward->k = sin(angles->pitch);
+}
