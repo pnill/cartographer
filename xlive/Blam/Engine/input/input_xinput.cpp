@@ -74,7 +74,7 @@ void input_xinput_update_rumble_state(void)
 {
 	bool global_suppress_rumble = false;
 
-	if (!g_input_feedback_suppress
+	if (g_input_feedback_suppress
 		|| *input_suppress_global_get()
 		|| !game_in_progress()
 		|| game_time_get_paused())

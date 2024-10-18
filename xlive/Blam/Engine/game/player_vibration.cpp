@@ -50,17 +50,19 @@ void player_vibration_apply_patches(void)
 void __cdecl vibration_update(real32 dt)
 {
 	// ### TODO Use game_tick_length() here when we use 30 tick in multiplayer
-	const real32 k_tick_length = 1.f / 30.f;
+	const real32 k_vibration_tick_length = 1.f / 30.f;
 
 	g_vibration_dt_accumulator += dt;
 
 	// Only execute the rumble logic every tick
-	if (g_vibration_dt_accumulator >= k_tick_length)
+	if (g_vibration_dt_accumulator >= k_vibration_tick_length)
 	{
 		g_vibration_dt_accumulator = 0.f;
 
 		if (!main_time_halted() && !simulation_starting_up() && !game_is_playback())
 		{
+			XINPUT_VIBRATION controller_vibration_states[k_number_of_controllers] = { 0 };
+
 			for (uint32 user_index = 0; user_index < k_number_of_users; ++user_index)
 			{
 				s_vibration_user_globals* globals = vibration_get(user_index);
@@ -69,7 +71,7 @@ void __cdecl vibration_update(real32 dt)
 				for (uint32 duration_index = 0; duration_index < k_count_of_effects_that_effect_vibration; ++duration_index)
 				{
 					// Increment by the tick_length instead of dt for now to fix issues when playing above 30fps
-					globals->duration[duration_index] += k_tick_length;
+					globals->duration[duration_index] += k_vibration_tick_length;
 				}
 
 				if (player_index != NONE)
@@ -77,17 +79,21 @@ void __cdecl vibration_update(real32 dt)
 					s_player* player = (s_player*)datum_get(s_player::get_data(), player_index);
 					if (player->controller_index != NONE)
 					{
-						XINPUT_VIBRATION state = { };
 						ASSERT(VALID_INDEX(player->controller_index, k_number_of_controllers));
 
 						if (user_interface_controller_get_rumble_enabled(player->controller_index))
 						{
-							state = vibration_get_state(globals);
+							controller_vibration_states[player->controller_index] = vibration_get_state(globals);
 						}
-
-						input_set_gamepad_rumbler_state(player->controller_index, state.wLeftMotorSpeed, state.wRightMotorSpeed);
 					}
 				}
+			}
+
+			for (uint32 controller_index = 0; controller_index < NUMBEROF(controller_vibration_states); ++controller_index)
+			{
+				const XINPUT_VIBRATION state = controller_vibration_states[controller_index];
+
+				input_set_gamepad_rumbler_state(controller_index, state.wLeftMotorSpeed, state.wRightMotorSpeed);
 			}
 		}
 	}
