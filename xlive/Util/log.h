@@ -1,7 +1,5 @@
 #pragma once
-#include "spdlog/spdlog.h"
-
-#include <assert.h>
+#include "spdlog/logger.h"
 
 enum log_level : unsigned int {
 	trace,    //          Tell me *everything*
@@ -22,7 +20,7 @@ public:
 	~h2log();
 
 	// Good for checking if the logger is actually able to ouput logs
-	bool is_valid();
+	bool is_valid() const;
 
 	std::string name() const { return this->sname; }
 

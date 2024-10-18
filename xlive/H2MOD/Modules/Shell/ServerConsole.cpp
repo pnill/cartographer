@@ -17,6 +17,8 @@ kablam_vip_add_t p_kablam_vip_add;
 typedef signed int(__cdecl* kablam_vip_clear_t)();
 kablam_vip_clear_t p_kablam_vip_clear;
 
+static std::map<const wchar_t*, ServerConsole::e_server_console_commands> commands_map;
+
 void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count, char a3) {
 
 	wchar_t* command = command_line_split_wide[0];
@@ -86,13 +88,13 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	// all server command functions will be hooked in the future and these event executes will be removed.
 
 	bool playCommand = false;
-	auto playCommandFind = ServerConsole::commands_map.find(lower_command.get_string());
-	if (playCommandFind != ServerConsole::commands_map.end()
+	auto playCommandFind = commands_map.find(lower_command.get_string());
+	if (playCommandFind != commands_map.end()
 		&& playCommandFind->second == ServerConsole::play)
 		playCommand = true;
 
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, ServerConsole::commands_map[lower_command.get_string()]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_before, commands_map[lower_command.get_string()]);
 
 	void* result = p_dedi_command(command_line_split_wide, split_count, a3);
 
@@ -100,7 +102,7 @@ void* __cdecl DediCommandHook(wchar_t** command_line_split_wide, int split_count
 	// all server command functions will be hooked in the future and these executes will be removed.
 	
 	if (!playCommand)
-		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, ServerConsole::commands_map[lower_command.get_string()]);
+		EventHandler::ServerCommandEventExecute(EventExecutionType::execute_after, commands_map[lower_command.get_string()]);
 
 	return result;
 }
