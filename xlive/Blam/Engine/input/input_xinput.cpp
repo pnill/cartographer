@@ -53,7 +53,6 @@ uint32 xinput_device::get_port() const
 	return dwUserIndex;
 }
 
-
 void input_xinput_clear_rumble_state(void)
 {
 	// Originally 20
@@ -73,32 +72,43 @@ void input_xinput_clear_rumble_state(void)
 
 void input_xinput_update_rumble_state(void)
 {
-	bool suppress_rumble = g_input_feedback_suppress || *input_suppress_global_get();
-	if (!game_in_progress() || game_time_get_paused())
+	bool global_suppress_rumble = false;
+
+	if (g_input_feedback_suppress
+		|| *input_suppress_global_get()
+		|| !game_in_progress()
+		|| game_time_get_paused())
 	{
-		suppress_rumble = true;
+		global_suppress_rumble = true;
 	}
 
-	if (controller_profile_get(_controller_index_0)->field_1658 != 1)
+	for (uint32 device_index = 0; device_index < k_number_of_controllers; ++device_index)
 	{
-		suppress_rumble = true;
-	}
+		e_controller_index controller_index = (e_controller_index)device_index;
 
-	if (controller_button_state_get(_controller_index_0)->plugged_in)
-	{
-		g_xinput_vibration.wLeftMotorSpeed = (suppress_rumble ? 0 : g_vibration_state[_controller_index_0].wLeftMotorSpeed);
-		g_xinput_vibration.wRightMotorSpeed = (suppress_rumble ? 0 : g_vibration_state[_controller_index_0].wRightMotorSpeed);
-		input_device* device = g_xinput_devices[*g_main_controller_index];
-
-		if (device)
+		if (controller_button_state_get(controller_index)->plugged_in)
 		{
-			device->XSetState(&g_xinput_vibration);
+			input_device* device = g_xinput_devices[device_index];
+			bool rumble_enabled = controller_profile_get(controller_index)->field_1658;
+
+			if (!global_suppress_rumble && rumble_enabled)
+			{
+				csmemcpy(&g_xinput_vibration, &g_vibration_state[controller_index], sizeof(g_xinput_vibration));
+			}
+			else
+			{
+				csmemset(&g_xinput_vibration, 0, sizeof(g_xinput_vibration));
+			}
+
+			if (device)
+			{
+				device->XSetState(&g_xinput_vibration);
+			}
 		}
 	}
 
 	return;
 }
-
 
 void input_xinput_update_button(uint8* frames_down, uint16* msec_down, bool button_down, uint16 duration_ms)
 {
@@ -244,7 +254,6 @@ void input_xinput_update_get_gamepad_buttons(uint32 gamepad_index, uint16* out_b
 	ASSERT(out_buttons != nullptr);
 	if (gamepad && gamepad->XGetState(&state) == ERROR_SEVERITY_SUCCESS)
 	{
-		
 		if (get_game_life_cycle() == _life_cycle_in_game || game_mode_get() == _game_mode_campaign)
 		{
 			for (uint8 button_index = 0; button_index < k_number_of_xinput_buttons; button_index++)
