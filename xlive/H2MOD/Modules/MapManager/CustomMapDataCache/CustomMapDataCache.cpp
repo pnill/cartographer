@@ -844,29 +844,22 @@ static __declspec(naked) void jmp_initialize() { __asm jmp c_custom_map_manager:
 static __declspec(naked) void jmp_get_custom_map_list_ids_by_map_name() { __asm jmp c_custom_map_manager::get_custom_map_list_ids_by_map_name }
 
 // custom map selection list code
-class c_custom_game_custom_map_list
+class c_custom_game_custom_map_list // : public c_list_widget
 {
 public:
+	//c_list_item_widget item_widget[14];
 
 	c_custom_game_custom_map_list* __thiscall constructor_hook(int a2)
 	{
 		typedef c_custom_game_custom_map_list*(__thiscall* original_constructor_t)(c_custom_game_custom_map_list*, int);
-		auto p_original_constructor = Memory::GetAddressRelative<original_constructor_t>(0x65AE3B);
+		auto p_original_constructor = Memory::GetAddress<original_constructor_t>(0x25AE3B);
 
 		// execute first part of the function
 		p_original_constructor(this, a2);
 		// then load the map list
-		load_custom_map_list();
-		return this;
-	}
 
-	void __thiscall load_custom_map_list()
-	{
 		// here we replace the custom map list allocator
 		DWORD thisptr = (DWORD)this;
-
-		typedef void(__thiscall* sub_6113D3_t)(DWORD* thisptr, DWORD* a2);
-		auto p_sub_6113D3 = Memory::GetAddressRelative<sub_6113D3_t>(0x6113D3);
 
 		s_data_array** custom_map_menu_list = (s_data_array**)(thisptr + 112);
 
@@ -894,12 +887,14 @@ public:
 		if (map_ids_buffer != nullptr)
 			delete[] map_ids_buffer;
 
-		if (thisptr == 0xFFFFF814)
-			p_sub_6113D3((DWORD*)(thisptr + 172), 0);
-		else
-			p_sub_6113D3((DWORD*)(thisptr + 172), (DWORD*)(thisptr + 2032));
+		_slot_linker* linker = (_slot_linker*)(thisptr + 172);
+		_slot* slot = (_slot*)(thisptr + 2032);
+		linker->link(slot);
+
+		return this;
 	}
 };
+//ASSERT_STRUCT_SIZE(c_custom_game_custom_map_list, 3292);
 
 static __declspec(naked) void jmp_c_custom_game_custom_map_list_constructor_hook() { __asm jmp c_custom_game_custom_map_list::constructor_hook }
 
