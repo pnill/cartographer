@@ -243,6 +243,15 @@ void rasterizer_dx9_main_apply_patches(void)
 
     // Redirect dx9 initialization function so we can use d3d9on12 and do other cool stuff
     DETOUR_ATTACH(p_rasterizer_dx9_initialize, Memory::GetAddress<rasterizer_dx9_initialize_t>(0x263359, 0x0), rasterizer_dx9_initialize);
+
+    // disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
+    // 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
+    // 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
+
+    // maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
+    BYTE SetGammaRampSkipBytes[] = { 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
+    NopFill(Memory::GetAddress(0x26192F), 15);
+    WriteBytes(Memory::GetAddress(0x26193E), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
     return;
 }
 

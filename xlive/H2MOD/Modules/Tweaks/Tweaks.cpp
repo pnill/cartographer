@@ -283,15 +283,6 @@ void H2Tweaks::ApplyPatches() {
 		NopFill(Memory::GetAddressRelative(0x66BA7C), 8);
 		NopFill(Memory::GetAddressRelative(0x66A092), 8);
 
-		// disable gamma correction by using D3D9::SetGammaRamp, TODO: implement a shader to take care of this, because D3D9::SetGammaRamp function seems to have 2 issues:
-		// 1) it's very heavy on NVIDIA/Intel (not sure about AMD) GPUs (or there is something wrong with the drivers), causing stuttering on maps that override gamma (like Warlock, Turf, Backwash)
-		// 2) it doesn't apply the gamma override when playing in windowed mode (thus why some people like using windowed mode, because it doesn't cause stuttering on these maps)
-
-		// maybe we could find a way to use the gamma shader built in by converting the override gamma ramp to something that shader could understand
-		BYTE SetGammaRampSkipBytes[] = { 0xE9, 0x94, 0x00, 0x00, 0x00, 0x90 };
-		NopFill(Memory::GetAddressRelative(0x66192F), 15);
-		WriteBytes(Memory::GetAddressRelative(0x66193E), SetGammaRampSkipBytes, sizeof(SetGammaRampSkipBytes));
-
 		// nop a call to SetCursor(), to improve the FPS framedrops when hovering the mouse around in the main menus or where the cursor is used, mainly when using mice that use 1000 polling rate
 		// it'll get called anyway by the D3D9Device::ShowCursor() API after
 		//NopFill(Memory::GetAddressRelative(0x48A99C), 8);
