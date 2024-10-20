@@ -2,7 +2,7 @@
 
 #include "math/matrix_math.h"
 
-void __cdecl object_get_model_node_data(
+void object_get_model_node_data(
 	datum object_index,
 	bool first_person,
 	int16 render_model_index_index,
