@@ -755,7 +755,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
         g_motion_sensor_texture_size,
         0,
         1,
-        bitmap_data_format_a8r8g8b8,
+        _bitmap_format_a8r8g8b8,
         false,
         &dx9_globals->global_d3d_texture_motion_sensor);
 
@@ -783,7 +783,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
             dx9_globals->global_d3d_sun_height,
             0,
             D3DUSAGE_RENDERTARGET,
-            bitmap_data_format_a8r8g8b8,
+            _bitmap_format_a8r8g8b8,
             0,
             &dx9_globals->global_d3d_texture_sun_glow_primary) &&
         SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_primary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_primary)) &&
@@ -793,7 +793,7 @@ bool __cdecl rasterizer_dx9_secondary_targets_initialize(void)
             dx9_globals->global_d3d_sun_height,
             0,
             D3DUSAGE_RENDERTARGET,
-            bitmap_data_format_a8r8g8b8,
+            _bitmap_format_a8r8g8b8,
             0,
             &dx9_globals->global_d3d_texture_sun_glow_secondary) &&
         SUCCEEDED(dx9_globals->global_d3d_texture_sun_glow_secondary->GetSurfaceLevel(0, &dx9_globals->global_d3d_surface_sun_glow_secondary));

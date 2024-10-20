@@ -48,6 +48,7 @@
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "rasterizer/dx9/rasterizer_dx9_weather.h"
+#include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
@@ -879,6 +880,7 @@ void H2MOD::ApplyHooks() {
 		aim_assist_apply_patches();
 		main_game_apply_patches();
 		
+		rasterizer_main_apply_patches();
 		rasterizer_dx9_bitmaps_apply_patches();
 		rasterizer_dx9_dof_apply_patches();
 		rasterizer_dx9_fog_apply_patches();

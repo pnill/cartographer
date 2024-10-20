@@ -769,6 +769,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lights.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_occlusion.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_profile.cpp" />
@@ -1163,6 +1164,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lights.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_memory.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_occlusion.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_profile.h" />

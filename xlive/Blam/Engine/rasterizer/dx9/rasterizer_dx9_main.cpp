@@ -300,7 +300,7 @@ void __cdecl rasterizer_dx9_reset_depth_buffer(void)
     return INVOKE(0x269835, 0x0, rasterizer_dx9_reset_depth_buffer);
 }
 
-void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
+void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2)
 {
     bool result = true;
     if (!media_foundation_player_running())
@@ -312,8 +312,8 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
         {
             rectangle2d screen_bounds = rasterizer_globals->screen_bounds;
 
-            const int16 calc_width = screen_bounds.left + screenshot_bitmap->width_pixels;
-            const int16 calc_height = screen_bounds.top + screenshot_bitmap->height_pixels;
+            const int16 calc_width = screen_bounds.left + screenshot_bitmap->width;
+            const int16 calc_height = screen_bounds.top + screenshot_bitmap->height;
             screen_bounds.right = (screen_bounds.right > calc_width ? calc_width : screen_bounds.right);
             screen_bounds.bottom = (screen_bounds.bottom > calc_height ? calc_height : screen_bounds.bottom);
 
@@ -321,7 +321,7 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
             int32 screenshot_width = rectangle2d_width(&screen_bounds);
 
             D3DLOCKED_RECT locked_rect;
-            if ((screenshot_bitmap->format == bitmap_data_format_a8r8g8b8 || screenshot_bitmap->format == bitmap_data_format_x8r8g8b8)
+            if ((screenshot_bitmap->format == _bitmap_format_a8r8g8b8 || screenshot_bitmap->format == _bitmap_format_x8r8g8b8)
                 && !screenshot_bitmap->mipmap_count
                 && SUCCEEDED(dx9_globals->global_d3d_surface_screenshot->LockRect(&locked_rect, NULL, D3DLOCK_READONLY)))
             {
@@ -330,9 +330,9 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
                     int32 screenshot_pitch = screenshot_width * (bitmap_format_get_bits_per_pixel(screenshot_bitmap->format) / 8);
                     for (int16 row_index = 0; row_index < screenshot_height; ++row_index)
                     {
-                        uint8* base_address = bitmap_get_base_address(screenshot_bitmap, 0, row_index, 0);
+                        uint32* base_address = bitmap_2d_address(screenshot_bitmap, 0, row_index, 0);
                         uint8* data = (uint8*)locked_rect.pBits;
-                        csmemcpy(base_address, data + row_index * locked_rect.Pitch, screenshot_pitch);
+                        csmemcpy(base_address, &data[row_index * locked_rect.Pitch], screenshot_pitch);
                     }
                     result = SUCCEEDED(dx9_globals->global_d3d_surface_screenshot->UnlockRect());
                 }
@@ -366,12 +366,6 @@ void rasterizer_dx9_present(bitmap_data* screenshot_bitmap)
             rasterizer_globals->reset_screen = true;
         }
     }
-}
-
-void rasterizer_present_frame_wrapper(bitmap_data* pointer_to_bitmap)
-{
-    rasterizer_dx9_present(pointer_to_bitmap);
-    return;
 }
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4)
