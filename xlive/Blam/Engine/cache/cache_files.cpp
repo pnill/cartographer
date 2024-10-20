@@ -217,7 +217,10 @@ bool __cdecl scenario_tags_load(const char* scenario_path)
 
 	const uint32 aligned_tag_size_read = cache_header->tag_size + cache_header->tag_offset_mask;
 
-	if(!cache_header_verify(cache_header) || strlen(cache_header->version_string) > 32)
+	if(!cache_header_verify(cache_header)
+		// This condition will never be true, included by bungie for some reason
+		/* || strlen(cache_header->version_string) > 32 */
+		)
 	{
 		scenario_tags_load_internal_panic();
 		return false;

@@ -200,13 +200,16 @@ bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vecto
 	{
 		return result;
 	}
-	return TEST_FLAG(FLAG(object_header->cluster_index & 31), cluster_activation[object_header->cluster_index / 32].cluster_bitvector);
+	return BIT_VECTOR_TEST_FLAG(cluster_activation->cluster_bitvector, object_header->cluster_index);
 }
 
 
 bool set_object_position_if_in_cluster(s_location* location, datum object_index)
 {
 	object_datum* object = object_get_fast_unsafe(object_index);
+	
+	ASSERT(object->parent_object_index == NONE);
+	
 	scenario_location_from_point(location, &object->object_origin_point);
 
 	if (location->cluster_index == NONE)
@@ -286,13 +289,13 @@ void object_reconnect_to_map(s_location* location, datum object_index)
 		object_header->cluster_index = p_location->cluster_index;
 		object->flags.set(_object_outside_of_map_bit, false);
 	}
-	s_game_cluster_bit_vectors cluster_bitvector[16];
+	s_game_cluster_bit_vectors cluster_bitvector;
 	s_game_cluster_bit_vectors* p_cluster_bitvector = NULL;
 	bool cluster_overflow = false;
 	if (object->flags.test(_object_cinematic_visibility_bit))
 	{
-		csmemset(cluster_bitvector, -1, 4 * ((get_global_structure_bsp()->clusters.count + 31) / 32));
-		p_cluster_bitvector = cluster_bitvector;
+		csmemset(cluster_bitvector.cluster_bitvector, NONE, BIT_VECTOR_SIZE_IN_LONGS(get_global_structure_bsp()->clusters.count));
+		p_cluster_bitvector = &cluster_bitvector;
 	}
 
 	s_object_payload payload;
@@ -1073,17 +1076,17 @@ int16 __cdecl internal_object_get_markers_by_string_id(datum object_index, strin
 
 	object_datum* object = object_get_fast_unsafe(object_index);
 	marker_object->node_index = 0;
-	matrix4x3_identity(&marker_object->matrix0);
+	matrix4x3_identity(&marker_object->node_matrix);
 		
-	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix1))
+	if (!halo_interpolator_interpolate_object_node_matrix(object_index, 0, &marker_object->matrix))
 	{
-		marker_object->matrix1 = *object_get_node_matrix(object_index, 0);
+		marker_object->matrix = *object_get_node_matrix(object_index, 0);
 	}
 		
 	marker_object->field_6C = 0;
 	if (object->flags.test(_object_mirrored_bit))
 	{
-		scale_vector3d(&marker_object->matrix1.vectors.left, -1.0f, &marker_object->matrix1.vectors.left);
+		scale_vector3d(&marker_object->matrix.vectors.left, -1.0f, &marker_object->matrix.vectors.left);
 	}
 
 	return (marker != 0 ? marker_index : 1);

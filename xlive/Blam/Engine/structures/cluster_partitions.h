@@ -30,9 +30,9 @@ ASSERT_STRUCT_SIZE(s_scenario_cluster_data, 52);
 
 struct s_game_cluster_bit_vectors
 {
-    int32 cluster_bitvector;
+	int32 cluster_bitvector[BIT_VECTOR_SIZE_IN_LONGS(MAXIMUM_CLUSTERS_PER_STRUCTURE)];
 };
-ASSERT_STRUCT_SIZE(s_game_cluster_bit_vectors, 4);
+ASSERT_STRUCT_SIZE(s_game_cluster_bit_vectors, 64);
 
 struct cluster_partition
 {

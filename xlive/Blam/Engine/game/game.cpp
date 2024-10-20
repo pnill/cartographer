@@ -50,7 +50,7 @@ e_game_mode game_mode_get(void)
 
 bool game_in_editor(void)
 {
-    return 0;
+    return false;
 }
 
 bool game_is_campaign(void)
@@ -115,7 +115,7 @@ bool game_is_authoritative(void)
 
 s_game_cluster_bit_vectors* game_get_cluster_activation(void)
 {
-	return get_main_game_globals()->cluster_activation;
+	return &get_main_game_globals()->cluster_activation;
 }
 
 void __cdecl game_options_setup_default_players(int32 player_count, s_game_options* game_options)

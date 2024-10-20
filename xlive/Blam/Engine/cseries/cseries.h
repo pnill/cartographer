@@ -70,7 +70,7 @@ static_assert(sizeof(datum) == 4);
 #define INVOKE_TYPE(_addr_client, _addr_server, _type, ...) INVOKE_BY_TYPE(_addr_client, _addr_server, _type, __VA_ARGS__)
 
 #define INVOKE_VFPTR_FN(_get_table_fn, _index, _type, ...) \
-    (this->**_get_table_fn<_type>(_index))(__VA_ARGS__)
+	(this->**_get_table_fn<_type>(_index))(__VA_ARGS__)
 
 #define INVOKE_CLASS_FN(classobj, functionPtr)  ((classobj)->*(functionPtr))
 
@@ -124,7 +124,7 @@ static_assert(sizeof(datum) == 4);
 #define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_FLAG(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 /// Creates a mask out of a count number of flags
-#define MASK(count) ( (unsigned)(1 << (count)) - (unsigned)1 )
+#define MASK(count) ( (unsigned)FLAG(count) - (unsigned)1 )
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
 static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");
@@ -136,17 +136,18 @@ static_assert (offsetof(STRUCT, FIELD) == (OFFSET), #STRUCT " Offset(" #OFFSET "
 #define DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)       \
 display_assert(#STATEMENT, __FILE__, __LINE__, IS_EXCEPTION);   \
 if (!is_debugger_present() && g_catch_exceptions)               \
-    exit(-1);                                                   \
+	exit(-1);                                                   \
 else                                                            \
-    __debugbreak();                                             \
+	__debugbreak();                                             \
 
 #define DISPLAY_ASSERT(STATEMENT) DISPLAY_ASSERT_EXCEPTION(STATEMENT, true)
 
 #define ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)               \
 if (!(STATEMENT))                                               \
 {                                                               \
-    DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           \
-}
+	DISPLAY_ASSERT_EXCEPTION(STATEMENT, IS_EXCEPTION)           \
+}                                                               \
+(void)0
 
 #define ASSERT(STATEMENT)   ASSERT_EXCEPTION(STATEMENT, true)
 #else

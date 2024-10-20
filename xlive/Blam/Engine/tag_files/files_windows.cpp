@@ -3,60 +3,50 @@
 
 // TODO create an extended version of s_file_reference that supports MAX_PATH and wide strings
 
-s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory)
+s_file_reference* __cdecl file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory)
 {
-	typedef s_file_reference* (__cdecl* file_reference_create_from_path_t)(s_file_reference*, const utf8*, bool);
-	auto p_file_reference_create_from_path = Memory::GetAddress<file_reference_create_from_path_t>(0x8C409, 0x86D37);
-	return p_file_reference_create_from_path(file_reference, path, path_is_directory);
+	return INVOKE(0x8C409, 0x86D37, file_reference_create_from_path, file_reference, path, path_is_directory);
 }
 
-bool file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code)
+void __cdecl file_create_parent_directories_if_not_present(s_file_reference* file_reference)
 {
-	typedef bool(__cdecl* file_open_t)(s_file_reference*, e_file_open_flags, e_file_open_error*);
-	auto p_file_open = Memory::GetAddress<file_open_t>(0x638BF, 0x65BBF);
-	return p_file_open(file_reference, flags, out_error_code);
+	INVOKE(0x8C531, 0x0, file_create_parent_directories_if_not_present, file_reference);
+	return;
 }
 
-bool file_close(s_file_reference* file_reference)
+bool __cdecl file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code)
 {
-	typedef bool(__cdecl* file_close_t)(s_file_reference*);
-	auto p_file_close = Memory::GetAddress<file_close_t>(0x63B66, 0x65E66);
-	return p_file_close(file_reference);
+	return INVOKE(0x638BF, 0x65BBF, file_open, file_reference, flags, out_error_code);
 }
 
-bool file_create(s_file_reference* file_reference)
+bool __cdecl file_close(s_file_reference* file_reference)
 {
-	typedef bool(__cdecl* file_create_t)(s_file_reference*);
-	auto p_file_create = Memory::GetAddress<file_create_t>(0x632F1, 0x655F1);
-	return p_file_create(file_reference);
+	return INVOKE(0x63B66, 0x65E66, file_close, file_reference);
 }
 
-bool file_delete(s_file_reference* file_reference)
+bool __cdecl file_create(s_file_reference* file_reference)
 {
-	typedef bool(__cdecl* file_delete_t)(s_file_reference*);
-	auto p_file_delete = Memory::GetAddress<file_delete_t>(0x63667, 0x65967);
-	return p_file_delete(file_reference);
+	return INVOKE(0x632F1, 0x655F1, file_close, file_reference);
 }
 
-bool file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer)
+bool __cdecl file_delete(s_file_reference* file_reference)
 {
-	typedef bool(__cdecl* file_read_t)(s_file_reference*, uint32, bool, void*);
-	auto p_file_read = Memory::GetAddress<file_read_t>(0x63C60, 0x65F3C);
-	return p_file_read(file_reference, bytes_to_read, suppress_errors, data_buffer);
+	return INVOKE(0x63667, 0x65967, file_delete, file_reference);
 }
 
-bool file_write(s_file_reference* file_reference, uint32 data_size, void* data)
+bool __cdecl file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer)
 {
-	typedef bool(__cdecl* file_write_t)(s_file_reference*, uint32, void*);
-	auto p_file_write = Memory::GetAddress<file_write_t>(0x63CBC, 0x65F98);
-	return p_file_write(file_reference, data_size, data);
+	return INVOKE(0x63C60, 0x65F3C, file_read, file_reference, bytes_to_read, suppress_errors, data_buffer);
 }
 
-bool file_get_size(s_file_reference* file_reference, uint32* size)
+bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, void* data)
 {
-	typedef bool(__cdecl* file_get_size_low_t)(s_file_reference*, uint32*);
-	auto p_file_get_size_low = Memory::GetAddress<file_get_size_low_t>(0x63E10, 0x660EC);
-	return p_file_get_size_low(file_reference, size);
+	return INVOKE(0x63CBC, 0x65F98, file_write, file_reference, data_size, data);
+}
+
+bool __cdecl file_get_size(s_file_reference* file_reference, uint32* size)
+{
+	return INVOKE(0x63E10, 0x660EC, file_read_only, file_reference, size);
 }
 
 bool file_set_eof(s_file_reference* file_reference)
@@ -84,18 +74,14 @@ bool file_change_size(s_file_reference* file_reference, int32 new_size)
 	return false;
 }
 
-bool file_read_only(s_file_reference* file_reference, bool read_only)
+bool __cdecl file_read_only(s_file_reference* file_reference, bool read_only)
 {
-	typedef bool(__cdecl* file_read_only_t)(s_file_reference*, bool);
-	auto p_file_read_only = Memory::GetAddress<file_read_only_t>(0x6341D, 0x6571D);
-	return p_file_read_only(file_reference, read_only);
+	return INVOKE(0x6341D, 0x6571D, file_read_only, file_reference, read_only);
 }
 
-bool file_set_hidden(s_file_reference* file_reference, bool hidden)
+bool __cdecl file_set_hidden(s_file_reference* file_reference, bool hidden)
 {
-	typedef bool(__cdecl* file_set_hidden_t)(s_file_reference*, bool);
-	auto p_file_set_hidden = Memory::GetAddress<file_set_hidden_t>(0x63545, 0x65845);
-	return p_file_set_hidden(file_reference, hidden);
+	return INVOKE(0x63545, 0x65845, file_set_hidden, file_reference, hidden);
 }
 
 bool compress_file_to_zip(zipFile zip_file, s_file_reference* file_to_add, const char* path_in_zip)

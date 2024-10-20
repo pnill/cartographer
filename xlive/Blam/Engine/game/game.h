@@ -25,9 +25,9 @@ struct s_main_game_globals
 	DWORD ticks_till_end;
 	int32 game_ragdoll_count;
 	int unused_1;
-	byte cluster_pvs[64];
-	byte cluster_pvs_local[64];
-	s_game_cluster_bit_vectors cluster_activation[16];
+	s_game_cluster_bit_vectors cluster_pvs;
+	s_game_cluster_bit_vectors cluster_pvs_local;
+	s_game_cluster_bit_vectors cluster_activation;
 	byte enable_scripted_camera_pvs;
 	byte pad_2;
 	WORD pvs_object_is_set;		// If it's 2 then it's set but if it's 1 or 0 then it's not?

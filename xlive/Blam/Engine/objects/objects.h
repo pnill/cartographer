@@ -123,7 +123,7 @@ ASSERT_STRUCT_SIZE(object_attachment, 8);
 struct object_datum
 {
 	datum tag_definition_index;
-	c_flags<e_object_data_flags, uint32, k_object_data_flags_count> flags;
+	c_flags_no_init<e_object_data_flags, uint32, k_object_data_flags_count> flags;
 	void* object_header_block;
 	datum next_index;
 	datum current_weapon_datum;
@@ -199,8 +199,8 @@ struct object_marker
 {
 	int16 node_index;
 	int16 region_index;
-	real_matrix4x3 matrix0;
-	real_matrix4x3 matrix1;
+	real_matrix4x3 node_matrix;
+	real_matrix4x3 matrix;
 	int32 field_6C;
 };
 ASSERT_STRUCT_SIZE(object_marker, 112);
