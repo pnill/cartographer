@@ -99,7 +99,6 @@ bool __cdecl render_ingame_user_interface_hud_element_hook(
 
 void render_apply_patches(void);
 
-
 int32 get_global_render_window_count();
 
 bool get_global_render_split_horizontally();
@@ -145,6 +144,13 @@ void render_scene_geometry(e_collection_type collection_type, e_render_layer ren
 bool __cdecl structure_get_cluster_and_leaf_from_render_point(real_point3d* point, int32* out_cluster_index, int32* out_leaf_index);
 
 e_screen_split_type get_screen_split_type(uint32 render_user_index);
+
+void __cdecl render_frame(
+	uint32 frame_render_type,
+	int32 window_count,
+	int32 player_count,
+	int32 screen_split_type,
+	window_bound* window);
 
 // Render window
 void __cdecl render_window(window_bound* window, bool is_texture_camera);

@@ -20,3 +20,9 @@ bool __cdecl pc_geometry_cache_preload_geometry(geometry_block_info* geometry_bl
 {
 	return INVOKE(0x2652BC, 0, pc_geometry_cache_preload_geometry, geometry_block_info, preload_flags);
 }
+
+void geometry_cache_block_for_one_frame(int32 a1)
+{
+	/* does nothing on pc */
+	return;
+}

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "main_render.h"
 
+#include "main_screenshot.h"
 #include "render/render_cartographer_ingame_ui.h"
 
 /*  prototypes */
@@ -21,7 +22,10 @@ void main_render_apply_patches(void)
 
 void main_render_hook(void)
 {
-	render_cartographer_ingame_ui();
+	if (!cubemap_screenshot_in_progress())
+	{
+		render_cartographer_ingame_ui();
+	}
 
 	return;
 }
