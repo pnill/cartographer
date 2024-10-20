@@ -37,6 +37,5 @@ ASSERT_STRUCT_SIZE(s_motion_sensor_globals, 0xBC8);
 s_motion_sensor_globals* get_motion_sensor_globals();
 
 void motion_sensor_update_with_delta(real32 delta);
-void radar_patch();
 void motion_sensor_apply_patches();
 void motion_sensor_fix_size();

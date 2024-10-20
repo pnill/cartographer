@@ -18,8 +18,6 @@ real32 g_motion_sensor_observation_accumulator = 0.f;
 real32 g_motion_sensor_sample_accumulator = 0.f;
 real32 g_motion_sensor_sweeper_accumulator = 0.f;
 
-IDirect3DPixelShader9* motion_sensor_sweep_shader;
-
 void __cdecl motion_sensor_update_examine_nearby_players()
 {
 	INVOKE(0x22BAE6, 0, motion_sensor_update_examine_nearby_players);
@@ -118,21 +116,6 @@ void motion_sensor_update_with_delta(real32 delta)
 	}
 }
 
-void __cdecl rasterizer_dx9_create_motion_sensor_shader()
-{
-	INVOKE(0x28458C, 0x0, rasterizer_dx9_create_motion_sensor_shader);
-
-	const unsigned char* ps = rasterizer_globals_get()->d3d9_sm3_supported ? k_motion_sensor_sweep_ps_3_0 : k_motion_sensor_sweep_ps_2_0;
-	rasterizer_dx9_device_get_interface()->CreatePixelShader((const DWORD*)ps, &motion_sensor_sweep_shader);
-	return;
-}
-
-void radar_patch()
-{
-	PatchCall(Memory::GetAddress(0x263563), rasterizer_dx9_create_motion_sensor_shader);
-	WritePointer(Memory::GetAddress(0x2849EA) + 2, &motion_sensor_sweep_shader);
-}
-
 //void motion_sensor_render_update(int32 local_player_index, int32 a2, point2d* offset_point)
 //{
 //	real32 safe_area = *Memory::GetAddress<real32*>(0x9770F0);
@@ -165,7 +148,6 @@ void motion_sensor_render_update(real_point2d* position, real32 pulse)
 
 void motion_sensor_apply_patches()
 {
-	radar_patch();
 	motion_sensor_fix_size();
 
 	// Remove hud motion sensor update from game tick
