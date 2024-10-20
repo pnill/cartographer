@@ -1,5 +1,6 @@
 #pragma once
 #include "game/aim_assist.h"
+#include "units/unit_definitions.h"
 
 
 class c_player_input
@@ -86,7 +87,7 @@ struct s_player_control_camera_info
 	datum slave_object;
 	int16 parent_seat_index;
 	int16 pad;
-	int8* unit_camera;
+	s_unit_camera* unit_camera;
 	real_point3d location;
 };
 ASSERT_STRUCT_SIZE(s_player_control_camera_info, 24);
