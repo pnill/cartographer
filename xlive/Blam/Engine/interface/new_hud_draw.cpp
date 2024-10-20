@@ -96,8 +96,8 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 
 		bitmap_data* bitmap_data = bitmap->bitmaps[0];
 
-		*out_width_pixels = bitmap_data->width_pixels;
-		*out_height_pixels = bitmap_data->height_pixels;
+		*out_width_pixels = bitmap_data->width;
+		*out_height_pixels = bitmap_data->height;
 		*out_bitmap_index = 0;
 
 		bounds->y1 = 1.f;
@@ -119,8 +119,8 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 		if (bitmap_sequence->bitmap_count > 1 && player_unk_84_from_user_index(local_render_user_index))
 			bitmap_index += 1;
 
-		*out_width_pixels = bitmap->bitmaps[bitmap_index]->width_pixels;
-		*out_height_pixels = bitmap->bitmaps[bitmap_index]->height_pixels;
+		*out_width_pixels = bitmap->bitmaps[bitmap_index]->width;
+		*out_height_pixels = bitmap->bitmaps[bitmap_index]->height;
 		*out_bitmap_index = bitmap_index;
 		bounds->y1 = 1.f;
 		bounds->x1 = 1.f;
@@ -137,8 +137,8 @@ void draw_hud_get_bitmap_data(uint32 local_render_user_index, s_hud_bitmap_widge
 	bitmap_group_sprite* bitmap_sprite = bitmap_sequence->sprites[sprite_index];
 	bitmap_data* bitmap_data = bitmap->bitmaps[bitmap_sprite->bitmapIndex];
 
-	*out_width_pixels = bitmap_data->width_pixels;
-	*out_height_pixels = bitmap_data->height_pixels;
+	*out_width_pixels = bitmap_data->width;
+	*out_height_pixels = bitmap_data->height;
 	*out_bitmap_index = bitmap_sprite->bitmapIndex;
 	bounds->y0 = bitmap_sprite->bounds.y0;
 	bounds->y1 = bitmap_sprite->bounds.y1;

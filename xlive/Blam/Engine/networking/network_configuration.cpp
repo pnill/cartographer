@@ -124,7 +124,7 @@ uint32 network_adapter_addresses_populate(IP_ADAPTER_ADDRESSES** adapter_address
         *adapter_address = NULL;
         i++;
     }
-    while ((error == ERROR_BUFFER_OVERFLOW) && (i < k_get_adapter_max_tries));
+    while (i < k_get_adapter_max_tries);
 
     return error;
 }

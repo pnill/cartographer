@@ -315,6 +315,9 @@
     <ClCompile Include="Blam\Engine\bink\wmv_playback.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmaps.cpp" />
     <ClCompile Include="Blam\Engine\bitmaps\bitmap_group.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\targa_file.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\tiff_file.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_files.cpp" />
     <ClCompile Include="Blam\Engine\cache\cache_file_verification.cpp" />
     <ClCompile Include="Blam\Engine\cache\pc_geometry_cache.cpp" />
@@ -562,6 +565,9 @@
     <ClInclude Include="Blam\Engine\bink\wmv_playback.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmaps.h" />
     <ClInclude Include="Blam\Engine\bitmaps\bitmap_group.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
     <ClInclude Include="Blam\Engine\cache\cache_file_verification.h" />
     <ClInclude Include="Blam\Engine\cache\pc_geometry_cache.h" />
     <ClInclude Include="Blam\Engine\cache\pc_texture_cache.h" />
@@ -769,6 +775,7 @@
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lens_flares.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_lights.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_loading.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_memory.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_occlusion.cpp" />
     <ClCompile Include="Blam\Engine\rasterizer\rasterizer_profile.cpp" />
@@ -1163,6 +1170,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lens_flares.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_lights.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_loading.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_memory.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_occlusion.h" />
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_profile.h" />

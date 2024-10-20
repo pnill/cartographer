@@ -25,7 +25,6 @@ namespace ServerConsole
 
 	static int __cdecl OutputCb(StringHeaderFlags flags, const char* fmt, ...);
 
-	static std::map<const wchar_t*, e_server_console_commands> commands_map;
 	void ApplyHooks();
 	void LogToDedicatedServerConsole(const wchar_t* fmt, ...);
 	void SendCommand(wchar_t** command, int split_commands_size, char unk);

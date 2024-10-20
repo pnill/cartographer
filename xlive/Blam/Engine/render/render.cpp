@@ -266,6 +266,17 @@ void render_scene_geometry(e_collection_type collection_type, e_render_layer ren
     return;
 }
 
+void __cdecl render_frame(
+    uint32 frame_render_type,
+    int32 window_count,
+    int32 player_count,
+    int32 screen_split_type,
+    window_bound* window)
+{
+    INVOKE(0x192140, 0x0, render_frame, frame_render_type, window_count, player_count, screen_split_type, window);
+    return;
+}
+
 void __cdecl render_window(window_bound* window, bool is_texture_camera)
 {
     s_screen_flash screen_flash;

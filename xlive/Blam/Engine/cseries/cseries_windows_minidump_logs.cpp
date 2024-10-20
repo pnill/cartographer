@@ -387,13 +387,13 @@ void setup_game_global_text(const wchar_t* reports_path)
         fwprintf(file, L"Game Ragdoll Count: %d\n", game_globals->game_ragdoll_count);
 
         fwprintf(file, L"Cluster PVS: ");
-        print_array_to_file(file, game_globals->cluster_pvs, sizeof(game_globals->cluster_pvs));
+        print_array_to_file(file, game_globals->cluster_pvs.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs.cluster_bitvector));
 
         fwprintf(file, L"Cluster PVS Local: ");
-        print_array_to_file(file, game_globals->cluster_pvs_local, sizeof(game_globals->cluster_pvs_local));
+        print_array_to_file(file, game_globals->cluster_pvs_local.cluster_bitvector, NUMBEROF(game_globals->cluster_pvs_local.cluster_bitvector));
 
         fwprintf(file, L"Cluster Activation: ");
-        print_array_to_file(file, game_globals->cluster_activation, NUMBEROF(game_globals->cluster_activation));
+        print_array_to_file(file, game_globals->cluster_activation.cluster_bitvector, NUMBEROF(game_globals->cluster_activation.cluster_bitvector));
 
         fwprintf(file, L"Enable Scripted Camera PVS: ");
         print_bool_to_file(file, game_globals->enable_scripted_camera_pvs);

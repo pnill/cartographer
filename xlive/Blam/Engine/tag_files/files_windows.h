@@ -46,31 +46,33 @@ enum e_file_open_error : DWORD
 	_file_open_error_unknown = 6,
 };
 
-s_file_reference* file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory);
+s_file_reference* __cdecl file_reference_create_from_path(s_file_reference* file_reference, const utf8* path, bool path_is_directory);
+
+void __cdecl file_create_parent_directories_if_not_present(s_file_reference* file_reference);
 
 /* Returns success */
-bool file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code);
+bool __cdecl file_open(s_file_reference* file_reference, e_file_open_flags flags, e_file_open_error* out_error_code);
 
 /* Returns success */
-bool file_close(s_file_reference* file_reference);
+bool __cdecl file_close(s_file_reference* file_reference);
 
 /* Deletes the file or directory pointed to by the s_file_reference, returns success */
-bool file_create(s_file_reference* file_reference);
+bool __cdecl file_create(s_file_reference* file_reference);
 
 /* Returns true if the path exists and we can access it */
-bool file_delete(s_file_reference* file_reference);
+bool __cdecl file_delete(s_file_reference* file_reference);
 
 /*
 On success the data read is written to data_buffer and the function returns true
 On failure, if hide_errors_from_user is set to false an error is displayed to the user and false is returned, if the number of bytes read doesn't match the requested amount ERROR_HANDLE_EOF is set
 */
-bool file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer);
+bool __cdecl file_read(s_file_reference* file_reference, uint32 bytes_to_read, bool suppress_errors, void* data_buffer);
 
 /* Returns success */
-bool file_write(s_file_reference* file_reference, uint32 data_size, void* data);
+bool __cdecl file_write(s_file_reference* file_reference, uint32 data_size, void* data);
 
 /* */
-bool file_get_size(s_file_reference* file_reference, uint32* size);
+bool __cdecl file_get_size(s_file_reference* file_reference, uint32* size);
 
 /* */
 bool file_set_eof(s_file_reference* file_reference);
@@ -79,10 +81,10 @@ bool file_set_eof(s_file_reference* file_reference);
 bool file_change_size(s_file_reference* file_reference, int32 new_size);
 
 /* */
-bool file_read_only(s_file_reference* file_reference, bool read_only);
+bool __cdecl file_read_only(s_file_reference* file_reference, bool read_only);
 
 /* */
-bool file_set_hidden(s_file_reference* file_reference, bool hidden);
+bool __cdecl file_set_hidden(s_file_reference* file_reference, bool hidden);
 
 // Add a file to a zip file using zlib
 // zip_file: zip file we want to add the file to

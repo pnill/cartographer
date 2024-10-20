@@ -41,9 +41,9 @@ void __cdecl first_person_camera_build_observer_command(datum player_unit_index,
 					object_marker vehicle_marker{};
 					if(object_get_markers_by_string_id(player_unit->object.parent_object_index, (string_id)0xF0000DBu, &vehicle_marker, 1))
 					{
-						observer_command->position.position = vehicle_marker.matrix1.position;
-						observer_command->forward = vehicle_marker.matrix1.vectors.forward;
-						observer_command->up = vehicle_marker.matrix1.vectors.up;
+						observer_command->position.position = vehicle_marker.matrix.position;
+						observer_command->forward = vehicle_marker.matrix.vectors.forward;
+						observer_command->up = vehicle_marker.matrix.vectors.up;
 					}
 					else
 					{

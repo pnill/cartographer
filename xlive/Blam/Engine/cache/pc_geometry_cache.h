@@ -32,3 +32,5 @@ void __cdecl geometry_cache_new(void);
 void __cdecl pc_geometry_cache_block_count_clear(void);
 
 bool __cdecl pc_geometry_cache_preload_geometry(geometry_block_info* geometry_block_info, e_pc_geometry_cache_preload_flags preload_flags);
+
+void geometry_cache_block_for_one_frame(int32 a1);

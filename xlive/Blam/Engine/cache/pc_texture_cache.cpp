@@ -18,3 +18,9 @@ IDirect3DTexture9* __cdecl pc_texture_cache_preload_bitmap(bitmap_data* bitmap_d
 {
 	return INVOKE(0x265986, 0, pc_texture_cache_preload_bitmap, bitmap_data, flags, unk, unused);
 }
+
+void __cdecl texture_cache_block_for_one_frame(int32 a1)
+{
+	INVOKE(0x265948, 0x0, texture_cache_block_for_one_frame, a1);
+	return;
+}

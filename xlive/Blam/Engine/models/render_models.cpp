@@ -1,12 +1,15 @@
 #include "stdafx.h"
 #include "render_models.h"
 
+/* public code */
+
 int32 __cdecl render_model_find_marker_group_by_name(datum render_model_index, string_id name)
 {
 	return INVOKE(0x37A358, 0x3250C8, render_model_find_marker_group_by_name, render_model_index, name);
 }
 
-void __cdecl render_model_apply_two_bone_ik(datum render_model_index,
+void __cdecl render_model_apply_two_bone_ik(
+	datum render_model_index,
 	int32 node_index,
 	real_matrix4x3* bone_1,
 	real_matrix4x3* bone_2,
@@ -18,7 +21,8 @@ void __cdecl render_model_apply_two_bone_ik(datum render_model_index,
 	return;
 }
 
-int32 __cdecl render_model_get_markers_by_name(datum render_model_index,
+int32 __cdecl render_model_get_markers_by_name(
+	datum render_model_index,
 	string_id marker_string,
 	void* collision_region_block,
 	int32 a4,

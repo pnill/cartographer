@@ -907,7 +907,6 @@ real_matrix4x3* first_person_weapon_get_relative_node_matrix_interpolated(int32 
 
 void first_persoon_apply_interpolation_patches(void)
 {
-    PatchCall(Memory::GetAddress(0x19D281), object_get_model_node_data);
     PatchCall(Memory::GetAddress(0x22B2D4), first_person_weapons_update_nodes);
     PatchCall(Memory::GetAddress(0x195EDA), first_person_weapon_build_models);
 }

@@ -185,8 +185,8 @@ void c_shader_submission_interface_new::stage_texture(
                 {
                     ASSERT(group);
                     const bitmap_data* bitmap = group->bitmaps[hud_bitmap_data_index_get()];
-                    *res_x = bitmap->width_pixels;
-                    *res_y = bitmap->height_pixels;
+                    *res_x = bitmap->width;
+                    *res_y = bitmap->height;
                 }
             }
 

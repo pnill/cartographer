@@ -87,9 +87,7 @@ bool __cdecl rasterizer_dx9_reset(bool create_window);
 
 void __cdecl rasterizer_dx9_reset_depth_buffer(void);
 
-void __cdecl rasterizer_dx9_present(bitmap_data* screenshot_bitmap);
-
-void rasterizer_present_frame_wrapper(bitmap_data* pointer_to_bitmap);
+void rasterizer_dx9_present(bitmap_data* screenshot_bitmap, bool a2);
 
 void __cdecl rasterizer_dx9_set_texture_direct(int16 stage, datum bitmap_tag_index, int16 bitmap_data_index, real32 a4);
 

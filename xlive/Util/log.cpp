@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include "log.h"
+#include "spdlog/spdlog.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
@@ -22,7 +23,7 @@ h2log::~h2log()
 	output = nullptr;
 }
 
-bool h2log::is_valid()
+bool h2log::is_valid() const
 {
 	return output != nullptr;
 }

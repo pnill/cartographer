@@ -61,8 +61,8 @@ void __cdecl interface_draw_bitmap(
 		real32 bounds_x = (right_vertices ? rectangle_used->x1 : rectangle_used->x0);
 		real32 bounds_y = (top_vertices ? rectangle_used->y1 : rectangle_used->y0);
 
-		real32 v1 = ((bitmap->width_pixels * bounds_x) - bitmap->registration_point.x) * size;
-		real32 v2 = ((bitmap->height_pixels * bounds_y) - bitmap->registration_point.y) * size;
+		real32 v1 = ((bitmap->width * bounds_x) - bitmap->registration_point.x) * size;
+		real32 v2 = ((bitmap->height * bounds_y) - bitmap->registration_point.y) * size;
 		
 		real32 pos_x = (v1 * cos_rotation + position->x) - (v2 * sin_rotation);
 		real32 pos_y = (v1 * sin_rotation) + (v2 * cos_rotation) + position->y;

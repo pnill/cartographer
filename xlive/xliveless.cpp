@@ -87,14 +87,6 @@ DWORD WINAPI XGetOverlappedResult(PXOVERLAPPED pOverlapped, LPDWORD pResult, BOO
 	//LOG_TRACE_XLIVE("XGetOverlappedResult  (bWait = %d)  (internalLow = %X, internalHigh = %X)",
 	// bWait, pOverlapped->InternalLow, pOverlapped->InternalHigh );
 
-	if (bWait)
-	{
-		while (pOverlapped->InternalLow == ERROR_IO_INCOMPLETE)
-		{
-			Sleep(1);
-		}
-	}
-
 	if( pResult )
 	{
 		*pResult = pOverlapped->InternalHigh;

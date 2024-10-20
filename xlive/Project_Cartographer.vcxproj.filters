@@ -444,6 +444,11 @@
     <ClCompile Include="Blam\Engine\networking\online\online_task_xbox.cpp" />
     <ClCompile Include="Blam\Engine\render\render_patchy_fog.cpp" />
     <ClCompile Include="H2MOD\GUI\imgui_integration\Console\ComVar.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\tiff_file.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\dx12\rasterizer_dx12_main.cpp" />
+    <ClCompile Include="Blam\Engine\rasterizer\rasterizer_main.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\bitmap_utilities.cpp" />
+    <ClCompile Include="Blam\Engine\bitmaps\targa_file.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1161,6 +1166,12 @@
     <ClInclude Include="Blam\Engine\rasterizer\rasterizer_vertex_shader_definitions.h" />
     <ClInclude Include="Blam\Engine\networking\online\online_task_xbox.h" />
     <ClInclude Include="Blam\Engine\render\render_patchy_fog.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\tiff_file.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx12\rasterizer_dx12_main.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\rasterizer_main.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\bitmap_utilities.h" />
+    <ClInclude Include="Blam\Engine\bitmaps\targa_file.h" />
+    <ClInclude Include="Blam\Engine\memory\hashtable.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

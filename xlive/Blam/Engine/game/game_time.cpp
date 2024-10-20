@@ -16,9 +16,9 @@ time_globals* time_globals::get()
 	return *Memory::GetAddress<time_globals**>(0x4C06E4, 0x4CF0EC);
 }
 
-int time_globals::get_game_time()
+uint32 get_game_time_ticks(void)
 {
-	return get()->tick_count;
+	return time_globals::get()->passed_ticks_count;
 }
 
 int time_globals::get_tickrate()

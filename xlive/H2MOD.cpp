@@ -33,11 +33,11 @@
 #include "main/loading.h"
 #include "main/main_game.h"
 #include "main/main_render.h"
+#include "main/main_screenshot.h"
 #include "networking/memory/networking_memory.h"
 #include "networking/network_configuration.h"
 #include "networking/Transport/transport.h"
 #include "units/bipeds.h"
-#include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/dx9/rasterizer_dx9_bitmaps.h"
 #include "rasterizer/dx9/rasterizer_dx9_dof.h"
 #include "rasterizer/dx9/rasterizer_dx9_fog.h"
@@ -48,6 +48,8 @@
 #include "rasterizer/dx9/rasterizer_dx9_screen_effect.h"
 #include "rasterizer/dx9/rasterizer_dx9_water.h"
 #include "rasterizer/dx9/rasterizer_dx9_weather.h"
+#include "rasterizer/rasterizer_lens_flares.h"
+#include "rasterizer/rasterizer_main.h"
 #include "render/render.h"
 #include "render/render_cameras.h"
 #include "render/render_submit.h"
@@ -861,8 +863,6 @@ void H2MOD::ApplyHooks() {
 		PatchCall(Memory::GetAddress(0x13ff75), FlashlightIsEngineSPCheck);
 
 
-
-		levels_apply_patches();
 		new_hud_apply_patches();
 		motion_sensor_apply_patches();
 		render_cameras_apply_patches();
@@ -877,8 +877,15 @@ void H2MOD::ApplyHooks() {
 		font_group_apply_hooks();
 		screens_apply_patches();
 		aim_assist_apply_patches();
-		main_game_apply_patches();
 		
+		levels_apply_patches();
+		main_game_apply_patches();
+		main_render_apply_patches();
+		main_screenshot_apply_patches();
+
+		rasterizer_lens_flares_apply_patches();
+		rasterizer_main_apply_patches();
+
 		rasterizer_dx9_bitmaps_apply_patches();
 		rasterizer_dx9_dof_apply_patches();
 		rasterizer_dx9_fog_apply_patches();
@@ -891,8 +898,8 @@ void H2MOD::ApplyHooks() {
 		rasterizer_dx9_water_apply_patches();
 		rasterizer_dx9_weather_apply_patches();
 
-
 		render_lod_new_apply_patches();
+		render_submit_apply_patches();
 		render_weather_apply_patches();
 
 		cinematics_apply_patches();
@@ -901,14 +908,11 @@ void H2MOD::ApplyHooks() {
 		apply_particle_update_patches();
 		apply_dead_camera_patches();
 		loading_apply_patches();
-		rasterizer_lens_flares_apply_patches();
 		liquid_apply_patches();
 		contrails_apply_patches();
-		render_submit_apply_patches();
 		cloth_apply_patches();
 		camera_apply_patches();
 		player_control_apply_patches();
-		main_render_apply_patches();
 		effects_apply_patches();
 		xinput_apply_patches();
 		player_vibration_apply_patches();

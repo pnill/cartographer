@@ -131,30 +131,30 @@ enum e_bitmap_data_flags : short
 
 enum e_bitmap_data_format : int16
 {
-    bitmap_data_format_a8 = 0,
-    bitmap_data_format_y8 = 1,
-    bitmap_data_format_ay8 = 2,
-    bitmap_data_format_a8y8 = 3,
-    bitmap_data_format_unused1 = 4,
-    bitmap_data_format_unused2 = 5,
-    bitmap_data_format_r5g6b5 = 6,
-    bitmap_data_format_unused3 = 7,
-    bitmap_data_format_a1r5g5b5 = 8,
-    bitmap_data_format_a4r4g4b4 = 9,
-    bitmap_data_format_x8r8g8b8 = 10,
-    bitmap_data_format_a8r8g8b8 = 11,
-    bitmap_data_format_unused4 = 12,
-    bitmap_data_format_unused5 = 13,
-    bitmap_data_format_dxt1 = 14,
-    bitmap_data_format_dxt3 = 15,
-    bitmap_data_format_dxt5 = 16,
-    bitmap_data_format_p8bump = 17,
-    bitmap_data_format_p8 = 18,
-    bitmap_data_format_argbfp32 = 19,
-    bitmap_data_format_rgbfp32 = 20,
-    bitmap_data_format_rgbfp16 = 21,
-    bitmap_data_format_v8u8 = 22,
-    bitmap_data_format_g8b8 = 23,
+    _bitmap_format_a8 = 0,
+    _bitmap_format_y8 = 1,
+    _bitmap_format_ay8 = 2,
+    _bitmap_format_a8y8 = 3,
+    _bitmap_format_unused1 = 4,
+    _bitmap_format_unused2 = 5,
+    _bitmap_format_r5g6b5 = 6,
+    _bitmap_format_unused3 = 7,
+    _bitmap_format_a1r5g5b5 = 8,
+    _bitmap_format_a4r4g4b4 = 9,
+    _bitmap_format_x8r8g8b8 = 10,
+    _bitmap_format_a8r8g8b8 = 11,
+    _bitmap_format_unused4 = 12,
+    _bitmap_format_unused5 = 13,
+    _bitmap_format_dxt1 = 14,
+    _bitmap_format_dxt3 = 15,
+    _bitmap_format_dxt5 = 16,
+    _bitmap_format_p8bump = 17,
+    _bitmap_format_p8 = 18,
+    _bitmap_format_argbfp32 = 19,
+    _bitmap_format_rgbfp32 = 20,
+    _bitmap_format_rgbfp16 = 21,
+    _bitmap_format_v8u8 = 22,
+    _bitmap_format_g8b8 = 23,
     k_bitmap_format_count
 };
 
@@ -186,8 +186,8 @@ enum e_bitmap_cache_usage : byte
 struct bitmap_data
 {
     char signature[4];
-    int16 width_pixels;
-    int16 height_pixels;
+    int16 width;
+    int16 height;
     uint8 depth_pixels;                       // Depth is 1 for 2D textures and cube maps.
 
     e_more_bitmap_data_flags more_flags;

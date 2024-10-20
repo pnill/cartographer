@@ -51,7 +51,7 @@ public:
 	// Checks if current value set for the bitflag is valud
 	bool valid(void) const
 	{
-		return !TEST_FLAG(m_storage, ~(FLAG(k_count) - 1));
+		return !TEST_FLAG(m_storage, ~MASK(k_count));
 	}
 
 	void clear(void)
