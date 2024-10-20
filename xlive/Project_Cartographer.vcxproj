@@ -1148,6 +1148,7 @@
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_water.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_weather.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\rasterizer_dx9_widgets.h" />
+    <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\bloom_simple.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\fog_atmospheric_apply.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\motion_sensor_sweep.h" />
     <ClInclude Include="Blam\Engine\rasterizer\dx9\shaders\compiled\sun_glow_convolve.h" />

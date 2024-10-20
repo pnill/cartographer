@@ -61,6 +61,7 @@ call:add_shader "sun_glow_convolve"
 call:add_shader "weather_particle_generic"
 call:add_shader "weather_particle_rain"
 call:add_shader "weather_plate"
+call:add_shader "bloom_simple"
 call:add_shader "zprime"
 
 call::cleanup
