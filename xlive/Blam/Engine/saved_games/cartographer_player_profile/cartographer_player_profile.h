@@ -85,21 +85,12 @@ struct s_saved_game_cartographer_player_profile_v3
 };
 ASSERT_STRUCT_SIZE(s_saved_game_cartographer_player_profile_v3, 268);
 
-
 // These properties control the currently used version of the cartographer profile in the project.
 typedef s_saved_game_cartographer_player_profile_v3 s_saved_game_cartographer_player_profile;
 
-union s_saved_game_cartographer_player_profile_container
-{
-	s_saved_game_cartographer_player_profile_v1 v1;
-	s_saved_game_cartographer_player_profile_v2 v2;
-	s_saved_game_cartographer_player_profile_v3 v3;
-	s_saved_game_cartographer_player_profile current;
-};
-
 struct s_cartographer_profile_run_time
 {
-	s_saved_game_cartographer_player_profile_container profile;
+	s_saved_game_cartographer_player_profile profile;
 	int32 enumerated_file_index;
 	e_controller_index controller_index;
 	int32 user_index;
