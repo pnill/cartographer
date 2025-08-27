@@ -116,6 +116,8 @@ void __cdecl new_hud_engine_globals_set_drawing_player_index(datum player_datum)
 s_hud_scripted_globals* get_hud_scripted_globals(void);
 s_new_hud_temporary_user_state* get_new_hud_temporary_user_state(int32 local_user_index);
 
+real_rgb_color* get_local_user_hud_color(uint32 local_user_index);
+
 void __cdecl new_hud_widget_anchor_calculate_point(int32 anchor, real_point2d* out_point);
 
 uint32 __cdecl new_hud_text_get_split_screen_font_type(e_hud_anchor anchor);

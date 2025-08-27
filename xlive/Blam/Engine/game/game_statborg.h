@@ -51,6 +51,7 @@ public:
 	int16 get_player_stat(int32 player_index, e_statborg_entry statborg_entry);
 	int16 get_team_stat(int32 team_index, e_statborg_entry statistic);
 
+	int32 get_score(int32 player_index);
 };
 ASSERT_STRUCT_SIZE(c_game_statborg, 660);
 

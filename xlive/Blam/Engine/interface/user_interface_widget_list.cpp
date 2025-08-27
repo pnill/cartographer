@@ -110,6 +110,11 @@ void c_list_widget::setup_item_indices()
 	INVOKE_TYPE(0x2136CE, 0x0, void(__thiscall*)(c_list_widget*), this);
 }
 
+void c_list_widget::sub_613E7C(s_list_item_datum* datum)
+{
+	INVOKE_TYPE(0x613E7C, 0, void(__thiscall*)(c_list_widget*, s_list_item_datum*), this, datum);
+}
+
 
 // c_list_widget virtual functions
 

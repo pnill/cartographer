@@ -14,7 +14,6 @@
 #include "networking/transport/transport_security.h"
 #include "networking/network_event.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 
@@ -108,16 +107,6 @@ void __stdcall read_channel_message_hook(c_network_message_handler* thisx, int32
 			&& peer_network_channel->get_network_address(&addr))
 		{
 			thisx->handle_session_anticheat_status(&addr, network_channel_index, (s_network_message_anti_cheat*)packet);
-		}
-		break;
-	}
-
-	case _network_message_type_custom_variant_settings:
-	{
-		if (peer_network_channel->is_channel_state_5()
-			&& peer_network_channel->get_network_address(&addr))
-		{
-			thisx->handle_session_custom_variant_settings(&addr, network_channel_index, (s_network_message_session_custom_variant_settings*)packet);
 		}
 		break;
 	}
@@ -304,18 +293,6 @@ void c_network_message_handler::handle_session_anticheat_status(const transport_
 		if (session->channel_is_authoritative(channel_index))
 		{
 			twizzler_set_status(received_data->enabled);
-		}
-	}
-}
-
-void c_network_message_handler::handle_session_custom_variant_settings(const transport_address* address, int32 channel_index, const s_network_message_session_custom_variant_settings* received_data)
-{
-	c_network_session* session = m_session_manager->get_session(&received_data->session_data.identifier);
-	if (session)
-	{
-		if (session->channel_is_authoritative(channel_index))
-		{
-			CustomVariantSettings::UpdateCustomVariantSettings(&received_data->settings);
 		}
 	}
 }

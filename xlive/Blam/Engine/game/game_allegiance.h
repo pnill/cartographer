@@ -16,6 +16,7 @@ enum e_game_team : int16
 	_game_team_neutral = 8,
 
 	k_game_multiplayer_team_count = 8,
+	k_game_simulation_team_count = 9,
 
 	// SP
 	_game_team_default = 0,

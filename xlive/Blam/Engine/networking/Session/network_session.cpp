@@ -236,6 +236,11 @@ void network_session_interface_set_local_user_rank(int32 user_index, int8 rank)
 	return;
 }
 
+bool __cdecl network_session_get_scenario_id(uint32* out_1, uint32* out_2, uint32* out_3, s_custom_map_id** out_custom_map)
+{
+	return INVOKE(0x1B126F, 0, network_session_get_scenario_id, out_1, out_2, out_3, out_custom_map);
+}
+
 bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat)
 {
 	return INVOKE(0x1B10E0, 0x1970A8, network_session_interface_get_local_user_properties, user_index, out_controller_index, out_properties, out_player_voice, out_player_text_chat);

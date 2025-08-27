@@ -1,0 +1,490 @@
+﻿#pragma once
+#include "user_interface_widget_text.h"
+#include "main/game_preferences.h"
+#include "saved_games/game_variant.h"
+#include "tag_files/global_string_ids.h"
+#include "tag_files/string_id.h"
+#include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
+
+#define k_maximum_game_setting_blocks 40
+#define k_maximum_text_value_pair_blocks 32
+#define k_maximum_text_value_pairs_new_per_block k_maximum_text_value_pair_blocks
+#define k_maximum_default_variants 100
+#define k_number_of_editable_game_variant_parameters 112
+
+/* const */
+
+const static wchar_t* g_multiplayer_variant_interface_bool_value_strings[k_language_count][2] =
+{
+	// English
+	{
+		L"Off",
+		L"On"
+	},
+	// Japanese
+	{
+		L"オフ",
+		L"オン"
+	},
+	// German
+	{
+		L"Aus",
+		L"An"
+	},
+	// French
+	{
+		L"Désactivé",
+		L"Activé"
+	},
+	// Spanish
+	{
+		L"Desactivado",
+		L"Activado"
+	},
+	// Italian
+	{
+		L"Disattivato",
+		L"Attivato"
+	},
+	// Korean
+	{
+		L"꺼짐",
+		L"켜짐"
+	},
+	// Chinese
+	{
+		L"关闭",
+		L"开启"
+	},
+	// Portuguese
+	{
+		L"Desativado",
+		L"Ativado"
+	}
+};
+
+
+/* enums */
+
+enum e_default_variant_definition_type : uint32
+{
+	_default_variant_definition_type_slayer,
+	_default_variant_definition_type_oddball,
+	_default_variant_definition_type_juggernaut,
+	_default_variant_definition_type_king,
+	_default_variant_definition_type_ctf,
+	_default_variant_definition_type_assault,
+	_default_variant_definition_type_territories,
+	_default_variant_definition_type_head_hunter,
+
+	k_default_variant_definition_type_count,
+	k_default_variant_definition_type_base_count = 7
+};
+
+enum e_variant_setting_category_type : uint32
+{
+	_variant_setting_category_type_match_ctf,
+	_variant_setting_category_type_match_slayer,
+	_variant_setting_category_type_match_oddball,
+	_variant_setting_category_type_match_king,
+	_variant_setting_category_type_match_race,
+	_variant_setting_category_type_match_head_hunter,
+	_variant_setting_category_type_match_juggernaut,
+	_variant_setting_category_type_match_territories,
+	_variant_setting_category_type_match_assault,
+	_variant_setting_category_type_players,
+	_variant_setting_category_type_cartographer_settings,
+	_variant_setting_category_type_vehicles,
+	_variant_setting_category_type_equipment,
+	_variant_setting_category_type_game_ctf,
+	_variant_setting_category_type_game_slayer,
+	_variant_setting_category_type_game_oddball,
+	_variant_setting_category_type_game_king,
+	_variant_setting_category_type_game_race,
+	_variant_setting_category_type_game_head_hunter,
+	_variant_setting_category_type_game_juggernaut,
+	_variant_setting_category_type_game_territories,
+	_variant_setting_category_type_game_assault,
+	_variant_setting_category_type_quick_options_ctf,
+	_variant_setting_category_type_quick_options_slayer,
+	_variant_setting_category_type_quick_options_oddball,
+	_variant_setting_category_type_quick_options_king,
+	_variant_setting_category_type_quick_options_race,
+	_variant_setting_category_type_quick_options_head_hunter,
+	_variant_setting_category_type_quick_options_juggernaut,
+	_variant_setting_category_type_quick_options_territories,
+	_variant_setting_category_type_quick_options_assault,
+	_variant_setting_category_type_team_ctf,
+	_variant_setting_category_type_team_slayer,
+	_variant_setting_category_type_team_oddball,
+	_variant_setting_category_type_team_king,
+	_variant_setting_category_type_team_race,
+	_variant_setting_category_type_team_head_hunter,
+	_variant_setting_category_type_team_juggernaut,
+	_variant_setting_category_type_team_territories,
+	_variant_setting_category_type_team_assault,
+
+	k_variant_setting_category_type_count,
+	_variant_setting_category_type_none = (uint32)NONE
+};
+
+static e_variant_setting_category_type g_variant_setting_category_type_match[k_game_engine_playable_types]
+{
+	_variant_setting_category_type_none,
+	_variant_setting_category_type_match_ctf,
+	_variant_setting_category_type_match_slayer,
+	_variant_setting_category_type_match_oddball,
+	_variant_setting_category_type_match_king,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_match_race,
+	//_variant_setting_category_type_match_head_hunter,
+	_variant_setting_category_type_match_slayer,
+	_variant_setting_category_type_match_slayer,
+	_variant_setting_category_type_match_juggernaut,
+	_variant_setting_category_type_match_territories,
+	_variant_setting_category_type_match_assault
+};
+
+static e_variant_setting_category_type g_variant_setting_category_type_game_type[k_game_engine_playable_types]
+{
+	_variant_setting_category_type_none,
+	_variant_setting_category_type_game_ctf,
+	_variant_setting_category_type_game_slayer,
+	_variant_setting_category_type_game_oddball,
+	_variant_setting_category_type_game_king,
+	_variant_setting_category_type_game_race,
+	_variant_setting_category_type_game_head_hunter,
+	_variant_setting_category_type_game_juggernaut,
+	_variant_setting_category_type_game_territories,
+	_variant_setting_category_type_game_assault
+};
+
+static e_variant_setting_category_type g_variant_setting_category_type_quick_options[k_game_engine_playable_types]
+{
+	_variant_setting_category_type_none,
+	_variant_setting_category_type_quick_options_ctf,
+	_variant_setting_category_type_quick_options_slayer,
+	_variant_setting_category_type_quick_options_oddball,
+	_variant_setting_category_type_quick_options_king,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_quick_options_race,
+	//_variant_setting_category_type_quick_options_head_hunter,
+	_variant_setting_category_type_quick_options_slayer,
+	_variant_setting_category_type_quick_options_slayer,
+	_variant_setting_category_type_quick_options_juggernaut,
+	_variant_setting_category_type_quick_options_territories,
+	_variant_setting_category_type_quick_options_assault
+};
+
+static e_variant_setting_category_type g_variant_setting_category_type_team[k_game_engine_playable_types]
+{
+	_variant_setting_category_type_none,
+	_variant_setting_category_type_team_ctf,
+	_variant_setting_category_type_team_slayer,
+	_variant_setting_category_type_team_oddball,
+	_variant_setting_category_type_team_king,
+	// the settings for all of these are the same instead of duplicating data just reuse a different one
+	//_variant_setting_category_type_team_race,
+	//_variant_setting_category_type_team_head_hunter,
+	_variant_setting_category_type_team_slayer,
+	_variant_setting_category_type_team_slayer,
+	_variant_setting_category_type_team_juggernaut,
+	_variant_setting_category_type_team_territories,
+	_variant_setting_category_type_team_assault
+};
+
+enum e_variant_setting_parameter_type : uint32
+{
+	_variant_setting_parameter_type_match_round_setting,
+	_variant_setting_parameter_type_match_ctf_score_to_win,
+	_variant_setting_parameter_type_match_slayer_score_to_win_round,
+	_variant_setting_parameter_type_match_oddball_score_to_win_round,
+	_variant_setting_parameter_type_match_king_score_to_win_round,
+	_variant_setting_parameter_type_match_race_score_to_win_round,
+	_variant_setting_parameter_type_match_headhunter_score_to_win_round,
+	_variant_setting_parameter_type_match_juggernaut_score_to_win_round,
+	_variant_setting_parameter_type_match_territories_score_to_win_round,
+	_variant_setting_parameter_type_match_assault_score_to_win_round,
+	_variant_setting_parameter_type_match_round_time_limit,
+	_variant_setting_parameter_type_match_rounds_reset_map,
+	_variant_setting_parameter_type_match_tie_resolution,
+	_variant_setting_parameter_type_match_observers,
+	_variant_setting_parameter_type_match_join_in_progress,
+	_variant_setting_parameter_type_maximum_players,
+	_variant_setting_parameter_type_lives_per_round,
+	_variant_setting_parameter_type_respawn_time,
+	_variant_setting_parameter_type_suicide_penalty,
+	_variant_setting_parameter_type_shields,
+	_variant_setting_parameter_type_motion_sensor,
+	_variant_setting_parameter_type_invisibility,
+	_variant_setting_parameter_type_team_changing,
+	_variant_setting_parameter_type_team_scoring,
+	_variant_setting_parameter_type_friendly_fire,
+	_variant_setting_parameter_type_team_respawn_setting,
+	_variant_setting_parameter_type_betrayal_respawn_penalty,
+	_variant_setting_parameter_type_team_killer_management,
+	_variant_setting_parameter_type_slayer_bonus_points,
+	_variant_setting_parameter_type_slayer_suicide_point_loss,
+	_variant_setting_parameter_type_slayer_death_point_loss,
+	_variant_setting_parameter_type_headhunter_moving_head_bin,
+	_variant_setting_parameter_type_headhunter_point_multiplier,
+	_variant_setting_parameter_type_headhunter_suicide_point_loss,
+	_variant_setting_parameter_type_headhunter_death_point_loss,
+	_variant_setting_parameter_type_headhunter_uncontested_bin,
+	_variant_setting_parameter_type_headhunter_speed_with_heads,
+	_variant_setting_parameter_type_headhunter_max_heads_carried,
+	_variant_setting_parameter_type_king_uncontested_hill,
+	_variant_setting_parameter_type_king_team_time_multiplier,
+	_variant_setting_parameter_type_king_moving_hill,
+	_variant_setting_parameter_type_king_extra_damage_on_hill,
+	_variant_setting_parameter_type_king_dmg_resistance_on_hill,
+	_variant_setting_parameter_type_oddball_ball_spawn_count,
+	_variant_setting_parameter_type_oddball_ball_hit_damage,
+	_variant_setting_parameter_type_oddball_speed_with_ball,
+	_variant_setting_parameter_type_oddball_driving_gunning_with_ball,
+	_variant_setting_parameter_type_oddball_waypoint_to_ball,
+	_variant_setting_parameter_type_race_random_track,
+	_variant_setting_parameter_type_race_uncontested_flag,
+	_variant_setting_parameter_type_ctf_game_type,
+	_variant_setting_parameter_type_ctf_sudden_death,
+	_variant_setting_parameter_type_ctf_flag_may_be_returned,
+	_variant_setting_parameter_type_ctf_flag_at_home_to_score,
+	_variant_setting_parameter_type_ctf_flag_reset_time,
+	_variant_setting_parameter_type_ctf_speed_with_flag,
+	_variant_setting_parameter_type_ctf_flag_hit_damage,
+	_variant_setting_parameter_type_ctf_driving_gunning_with_flag,
+	_variant_setting_parameter_type_ctf_waypoint_to_own_flag,
+	_variant_setting_parameter_type_assault_game_type,
+	_variant_setting_parameter_type_assault_sudden_death,
+	_variant_setting_parameter_type_assault_detonation_time,
+	_variant_setting_parameter_type_assault_bomb_at_home_to_score,
+	_variant_setting_parameter_type_assault_arming_time,
+	_variant_setting_parameter_type_assault_speed_with_bomb,
+	_variant_setting_parameter_type_assault_bomb_hit_damage,
+	_variant_setting_parameter_type_assault_driving_gunning_with_bomb,
+	_variant_setting_parameter_type_assault_waypoint_to_own_bomb,
+	_variant_setting_parameter_type_juggernaut_betrayal_point_loss,
+	_variant_setting_parameter_type_juggernaut_juggy_extra_damage,
+	_variant_setting_parameter_type_juggernaut_juggy_infinite_ammo,
+	_variant_setting_parameter_type_juggernaut_juggy_overshields,
+	_variant_setting_parameter_type_juggernaut_juggy_active_camo,
+	_variant_setting_parameter_type_juggernaut_juggy_motion_sensor,
+	_variant_setting_parameter_type_territories_territory_count,
+	_variant_setting_parameter_type_veh_respawn,
+	_variant_setting_parameter_type_veh_primary_light_land,
+	_variant_setting_parameter_type_veh_secondary_light_land,
+	_variant_setting_parameter_type_veh_primary_heavy_land,
+	_variant_setting_parameter_type_veh_primary_flying,
+	_variant_setting_parameter_type_veh_secondary_heavy_land,
+	_variant_setting_parameter_type_veh_primary_turret,
+	_variant_setting_parameter_type_veh_secondary_turret,
+	_variant_setting_parameter_type_equip_weapons_on_map,
+	_variant_setting_parameter_type_equip_overshields_on_map,
+	_variant_setting_parameter_type_equip_active_camo_on_map,
+	_variant_setting_parameter_type_equip_grenades_on_map,
+	_variant_setting_parameter_type_equip_weapon_respawn_times,
+	_variant_setting_parameter_type_equip_starting_grenades,
+	_variant_setting_parameter_type_equip_primary_starting_equipment,
+	_variant_setting_parameter_type_uns_max_living_players,
+	_variant_setting_parameter_type_uns_teams_enabled,
+	_variant_setting_parameter_type_uns_assault_bomb_may_be_returned,
+	_variant_setting_parameter_type_uns_max_teams,
+	_variant_setting_parameter_type_uns_equip_secondary_starting_equipment,
+	_variant_setting_parameter_type_uns_assault_fuse_time,
+	_variant_setting_parameter_type_uns_juggy_movement,
+	_variant_setting_parameter_type_uns_sticky_fuse,
+	_variant_setting_parameter_type_uns_terr_contest_time,
+	_variant_setting_parameter_type_uns_terr_control_time,
+	_variant_setting_parameter_type_uns_oddb_carr_invis,
+	_variant_setting_parameter_type_uns_king_invis_in_hill,
+	_variant_setting_parameter_type_uns_ball_carr_dmg_resis,
+	_variant_setting_parameter_type_uns_king_dmg_res_in_hill,
+	_variant_setting_parameter_type_uns_players_ex_dmg,
+	_variant_setting_parameter_type_uns_players_dmg_resis,
+	_variant_setting_parameter_type_uns_ctf_carr_dmg_resis,
+	_variant_setting_parameter_type_uns_ctf_carr_invis,
+	_variant_setting_parameter_type_uns_juggy_dmg_resis,
+	_variant_setting_parameter_type_uns_bomb_carr_dmg_resis,
+	_variant_setting_parameter_type_uns_bomb_carr_invis,
+	_variant_setting_parameter_type_uns_force_even_teams,
+
+	// cartographer settings
+	_variant_setting_parameter_type_cartographer_engine_mode = 113,
+	_variant_setting_parameter_type_cartographer_infinite_ammo,
+	_variant_setting_parameter_type_cartographer_infinite_grenades,
+	_variant_setting_parameter_type_cartographer_explosion_physics,
+	_variant_setting_parameter_type_cartographer_force_default_fov,
+	_variant_setting_parameter_type_cartographer_force_default_weapon_offsets,
+	_variant_setting_parameter_type_cartographer_force_default_cross_hair_offset,
+	_variant_setting_parameter_type_cartographer_game_speed,
+	_variant_setting_parameter_type_cartographer_gravity,
+	_variant_setting_parameter_type_cartographer_spawn_protection,
+
+	k_variant_setting_parameter_type_count,
+	k_variant_setting_parameter_type_base_count = 112,
+	k_variant_setting_parameter_type_cartographer_count = 10,
+
+	_variant_setting_parameter_type_invalid = (uint32)NONE
+};
+
+enum e_text_value_pair_reference_flags : uint32
+{
+	_text_value_pari_reference_unused,
+	_text_value_pair_reference_default,
+
+	k_text_value_pair_reference_flags_count
+};
+
+enum e_multiplayer_variant_setting_interface_conversion_type : uint32
+{
+	_multiplayer_variant_setting_interface_conversion_type_flags_16 = 0,
+	_multiplayer_variant_setting_interface_conversion_type_flags_32 = 1,
+	_multiplayer_variant_setting_interface_conversion_type_boolean = 2,
+	_multiplayer_variant_setting_interface_conversion_type_int8 = 3,
+	_multiplayer_variant_setting_interface_conversion_type_int16 = 4,
+	_multiplayer_variant_setting_interface_conversion_type_int32 = 5,
+	_multiplayer_variant_setting_interface_conversion_type_real32 = 6,
+};
+
+static const e_variant_setting_parameter_type g_multiplayer_variant_interface_headhunter_parameter_types[k_multiplayer_variant_headhunter_parameter_count]
+{
+	_variant_setting_parameter_type_king_moving_hill,
+	_variant_setting_parameter_type_headhunter_point_multiplier,
+	_variant_setting_parameter_type_headhunter_suicide_point_loss,
+	_variant_setting_parameter_type_headhunter_death_point_loss,
+	_variant_setting_parameter_type_king_uncontested_hill,
+	_variant_setting_parameter_type_headhunter_speed_with_heads,
+	_variant_setting_parameter_type_headhunter_max_heads_carried
+};
+
+/* structure */
+
+// max: k_number_of_editable_game_variant_parameters
+struct s_default_variant_setting
+{
+	e_variant_setting_parameter_type type;
+	int32 value;
+};
+ASSERT_STRUCT_SIZE(s_default_variant_setting, 8);
+
+
+// max: k_maximum_game_setting_blocks
+struct s_variant_setting_edit_reference
+{
+	e_variant_setting_category_type setting_category;
+
+	int32 padding;
+
+	// tag_ref: sily
+	tag_block<tag_reference> options;
+
+	int32 unused_1;
+	int32 unused_2;
+};
+ASSERT_STRUCT_SIZE(s_variant_setting_edit_reference, 24);
+
+// max: k_maximum_default_variants
+struct s_default_variant_definition
+{
+	string_id variant_name;
+
+	e_default_variant_definition_type variant_type;
+
+	tag_block<s_default_variant_setting> settings;
+
+	e_game_variant_description_index description_index;
+
+	int8 padding[3];
+};
+ASSERT_STRUCT_SIZE(s_default_variant_definition, 20);
+
+
+
+struct s_multiplayer_variant_settings_interface_definition // goof
+{
+	tag_reference editing_screen_format; //wgit
+	tag_reference quick_options_screen_format; //wgit
+	tag_reference low_level_editing_list_screen_format; // wgit
+
+	tag_block<s_variant_setting_edit_reference> game_engine_settings;
+
+	// tag_ref: unic
+	tag_reference default_variant_strings;
+
+	tag_block<s_default_variant_definition> default_variants;
+
+	s_default_variant_definition default_slayer_settings;
+
+	s_default_variant_definition default_king_settings;
+
+	s_default_variant_setting default_unused_settings;
+
+	s_default_variant_definition default_oddball_settings;
+
+	s_default_variant_definition default_juggernaut_settings;
+
+	s_default_variant_definition default_unused_2_settings;
+
+	s_default_variant_definition default_ctf_settings;
+
+	s_default_variant_definition default_assault_settings;
+
+	s_default_variant_definition default_territories_settings;
+
+	int8 unused[152];
+};
+ASSERT_STRUCT_SIZE(s_multiplayer_variant_settings_interface_definition, 368);
+
+// max: k_maximum_text_value_pairs_new_per_block
+struct s_text_value_pair_reference_new
+{
+	c_flags_no_init<e_text_value_pair_reference_flags, uint32, k_text_value_pair_reference_flags_count> flags;
+
+	int32 value;
+
+	string_id label_string;
+};
+ASSERT_STRUCT_SIZE(s_text_value_pair_reference_new, 12);
+
+struct s_text_value_pair_definition // sily
+{
+	e_variant_setting_parameter_type parameter;
+
+	int32 pad;
+
+	tag_reference string_list; // unic
+
+	string_id title_text;
+	string_id header_text;
+	string_id description_test;
+
+	tag_block<s_text_value_pair_reference_new> text_value_pairs;
+};
+ASSERT_STRUCT_SIZE(s_text_value_pair_definition, 36);
+
+void multiplayer_variant_settings_interface_apply_patches();
+
+s_variant_setting_edit_reference* __cdecl multiplayer_variant_settings_interface_get_category_reference(e_variant_setting_category_type category_type);
+
+s_text_value_pair_definition* __cdecl multiplayer_variant_settings_interface_get_text_value_pair_for_parameter(e_variant_setting_parameter_type parameter_type);
+
+int32 __cdecl multiplayer_variant_settings_interface_get_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type type);
+
+void __cdecl multiplayer_variant_settings_interface_set_variant_parameter_value(s_game_variant* variant, e_variant_setting_parameter_type parameter_type, int32 value);
+
+s_text_value_pair_reference_new* __cdecl multiplayer_variant_settings_interface_get_variant_parameter_label(s_text_value_pair_definition* text_value_pair, int32 value);
+
+void __cdecl multiplayer_variant_settings_interface_get_variant_setting_string(s_game_variant* variant, c_text_widget* widget, int32 setting_index, wchar_t* separator, wchar_t* buffer);
+
+bool multiplayer_variant_settings_interface_parameter_is_custom(s_game_variant* variant, e_variant_setting_parameter_type type);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_label(s_game_variant* variant, e_variant_setting_parameter_type type, int32 value, wchar_t* out_string);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, int32 parameter_index, wchar_t* out_string);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_title(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
+
+void multiplayer_variant_settings_interface_get_custom_variant_parameter_description(s_game_variant* variant, e_variant_setting_parameter_type type, wchar_t* out_string);
+
+int32 multiplayer_variant_settings_interface_get_custom_variant_parameter_value_count(s_game_variant* variant, e_variant_setting_parameter_type type);

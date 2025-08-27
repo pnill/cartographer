@@ -207,6 +207,39 @@ void c_bitstream::read_unit_vector(const char* name, real_vector3d* out_unit_vec
 	dequantize_unit_vector(quantized_vector, out_unit_vector);
 }
 
+void c_bitstream::push_position()
+{
+	this->m_stack[this->m_position_stack_depth++] = this->m_current_bit_position;
+}
+
+void c_bitstream::pop_position(bool clear)
+{
+	int32 previous_stack_position = this->m_stack[--this->m_position_stack_depth];
+
+	if (clear)
+	{
+		if (this->m_state == _bitstream_state_writing)
+		{
+			int32 current_stack_position = this->m_current_bit_position;
+			if (previous_stack_position < current_stack_position)
+			{
+				++this->field_30;
+				this->field_2C = m_current_bit_position - previous_stack_position;
+
+				int32 previous_stack_length = previous_stack_position / 8;
+
+				if (previous_stack_length < this->m_stream_buf_size_bytes)
+					this->m_stream_buf[previous_stack_length] &= (1 << (previous_stack_position & 8)) - 1;
+
+				int32 size_to_clear = this->m_stream_buf_size_bytes - previous_stack_length - 1;
+				if (size_to_clear > 0)
+					csmemset(&this->m_stream_buf[previous_stack_length + 1], 0, size_to_clear);
+			}
+		}
+		this->m_current_bit_position = previous_stack_position;
+	}
+}
+
 __declspec(naked) void jmp_write_unit_vector()
 {
 	CLASS_HOOK_JMP(c_bitstream__write_unit_vector, c_bitstream::write_unit_vector);

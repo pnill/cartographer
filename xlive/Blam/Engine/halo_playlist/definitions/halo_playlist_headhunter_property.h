@@ -1,0 +1,26 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_headhunter_property_item_count 13
+
+enum e_halo_playlist_headhunter_property : int32
+{
+	_halo_playlist_headhunter_property_score_to_win,
+	_halo_playlist_headhunter_property_team_play,
+	_halo_playlist_headhunter_property_team_scoring,
+	_halo_playlist_headhunter_property_team_changing,
+	_halo_playlist_headhunter_property_force_even_teams,
+	_halo_playlist_headhunter_property_uncontested_hill,
+	_halo_playlist_headhunter_property_moving_hill,
+	_halo_playlist_headhunter_property_team_time_multiplier,
+	_halo_playlist_headhunter_property_extra_damage_on_hill,
+	_halo_playlist_headhunter_property_damage_resistance_on_hill,
+	_halo_playlist_headhunter_property_active_camo_on_hill,
+	_halo_playlist_headhunter_property_max_heads_carried,
+	_halo_playlist_headhunter_property_speed_with_heads,
+
+	k_halo_playlist_headhunter_property_count,
+	k_halo_playlist_headhunter_property_invalid = NONE
+};
+
+e_halo_playlist_headhunter_property halo_playlist_item_collection_headhunter_property_get_value(wchar_t* value);

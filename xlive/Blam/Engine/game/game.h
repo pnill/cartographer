@@ -85,6 +85,7 @@ s_game_options* game_options_get(void);
 s_game_variant* current_game_variant(void);
 e_game_mode game_mode_get(void);
 bool game_in_editor(void);
+bool game_is_finished();
 int16 game_get_active_structure_bsp_index();
 bool game_is_campaign(void);
 bool game_is_multiplayer(void);

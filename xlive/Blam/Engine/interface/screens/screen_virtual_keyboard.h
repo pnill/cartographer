@@ -116,7 +116,7 @@ ASSERT_STRUCT_SIZE(c_virtual_keyboard_button, 0x100);
 
 class c_screen_virtual_keyboard : protected c_screen_widget
 {
-protected:
+public:
 	e_vkbd_context_type m_context;
 	e_saved_game_file_type m_saved_game_file_type;
 	wchar_t m_buffer[256];
@@ -162,4 +162,5 @@ ASSERT_STRUCT_SIZE(c_screen_virtual_keyboard, 0x3B80);
 /* public code */
 
 void* ui_load_virtual_keyboard(wchar_t* out_keyboard_text, uint32 out_keyboard_text_length, e_vkbd_context_type keyboard_type);
+void __cdecl ui_load_virtual_keyboard_variant(e_controller_index controller_index, e_vkbd_context_type type, e_saved_game_file_type save_type, wchar_t* text, uint32 text_size);
 void ui_set_virtual_keyboard_in_use(bool state);

@@ -118,6 +118,9 @@ public:
 
 	void write_unit_vector(const char* name, const real_vector3d* unit_vector);
 	void read_unit_vector(const char* name, real_vector3d* out_unit_vector);
+
+	void push_position();
+	void pop_position(bool clear);
 };
 ASSERT_STRUCT_SIZE(c_bitstream, 52);
 

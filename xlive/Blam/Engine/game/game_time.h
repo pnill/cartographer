@@ -1,5 +1,7 @@
 #pragma once
 
+constexpr real32 k_game_time_default_game_speed = 1.f;
+
 struct time_globals
 {
 	bool initialized;

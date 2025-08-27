@@ -1,0 +1,21 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_equipment_property_item_count 8
+
+enum e_halo_playlist_equipment_property : int32
+{
+	_halo_playlist_equipment_property_starting_weapon,
+	_halo_playlist_equipment_property_secondary_weapon,
+	_halo_playlist_equipment_property_starting_grenades,
+	_halo_playlist_equipment_property_weapons_on_map,
+	_halo_playlist_equipment_property_weapon_respawn_time,
+	_halo_playlist_equipment_property_grenades_on_map,
+	_halo_playlist_equipment_property_over_shields_on_map,
+	_halo_playlist_equipment_property_active_camo_on_map,
+
+	k_halo_playlist_equipment_property_count,
+	k_halo_playlist_equipment_property_invalid = NONE
+};
+
+e_halo_playlist_equipment_property halo_playlist_item_collection_equipment_property_get_value(wchar_t* value);

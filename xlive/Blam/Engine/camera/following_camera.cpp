@@ -4,6 +4,7 @@
 #include "camera_track_definition.h"
 #include "director.h"
 #include "observer.h"
+#include "game/game.h"
 #include "game/game_globals.h"
 #include "game/player_control.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
@@ -151,6 +152,13 @@ void __cdecl following_camera_player_control_get_camera_info(int32 user_index, s
 real32 following_camera_get_default_camera_field_of_view()
 {
 	s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(updating_user_index);
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
+	{
+		return DEGREES_TO_RADIANS(78.f);
+	}
+
 	return DEGREES_TO_RADIANS(player_profile->vehicle_field_of_view);
 }
 

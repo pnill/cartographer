@@ -88,6 +88,16 @@ void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point)
 	INVOKE(0x13D2EC, 0, unit_get_camera_position, unit_index, out_point);
 }
 
+void unit_get_aiming_vector(datum unit_index, real_vector3d* out_vector)
+{
+	unit_datum* unit = (unit_datum*)object_try_and_get_and_verify_type(unit_index, _object_mask_unit);
+
+	ASSERT(unit);
+	ASSERT(out_vector);
+
+	*out_vector = unit->unit.aiming_vector;
+}
+
 void __cdecl unit_control(datum unit_index, const unit_control_data* control_data)
 {
 	INVOKE(0x138B75, 0x1279C4, unit_control, unit_index, control_data);

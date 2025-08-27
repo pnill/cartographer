@@ -1,0 +1,46 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+#include "saved_games/game_variant.h"
+
+#define k_halo_playlist_score_to_win_round_item_count 11
+#define k_halo_playlist_score_to_win_round_time_item_count 16
+
+enum e_halo_playlist_score_to_win_round : int32
+{
+	_halo_playlist_score_to_win_round_unlimited,
+	_halo_playlist_score_to_win_round_one,
+	_halo_playlist_score_to_win_round_three,
+	_halo_playlist_score_to_win_round_five,
+	_halo_playlist_score_to_win_round_ten,
+	_halo_playlist_score_to_win_round_fifteen,
+	_halo_playlist_score_to_win_round_twenty,
+	_halo_playlist_score_to_win_round_twenty_five,
+	_halo_playlist_score_to_win_round_fifty,
+	_halo_playlist_score_to_win_round_one_hundred,
+	_halo_playlist_score_to_win_round_two_hundred_fifty,
+
+	k_halo_playlist_score_to_win_round_count,
+	k_halo_playlist_score_to_win_round_invalid = NONE
+};
+
+enum e_halo_playlist_score_to_win_round_time : int32
+{
+	_halo_playlist_score_to_win_round_time_off,
+	_halo_playlist_score_to_win_round_time_thirty_seconds = 30,
+	_halo_playlist_score_to_win_round_time_one_minutes = 60,
+	_halo_playlist_score_to_win_round_time_two_minutes = 120,
+	_halo_playlist_score_to_win_round_time_three_minutes = 180,
+	_halo_playlist_score_to_win_round_time_five_minutes = 300,
+	_halo_playlist_score_to_win_round_time_seven_minutes = 420,
+	_halo_playlist_score_to_win_round_time_ten_minutes = 600,
+	_halo_playlist_score_to_win_round_time_fifteen_minutes = 900,
+
+	k_halo_playlist_score_to_win_round_time_count = 9,
+	k_halo_playlist_score_to_win_round_time_invalid = NONE
+};
+
+e_halo_playlist_score_to_win_round halo_playlist_item_collection_get_score_to_win_round_value(wchar_t* value);
+e_halo_playlist_score_to_win_round_time halo_playlist_item_collection_get_score_to_win_round_time_value(wchar_t* value);
+
+bool halo_playlist_item_collection_score_to_win_round_write_to_variant(wchar_t* value, s_game_variant* variant);
+bool halo_playlist_item_collection_score_to_win_round_time_write_to_variant(wchar_t* value, s_game_variant* variant);

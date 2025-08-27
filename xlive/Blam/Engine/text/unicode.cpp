@@ -443,3 +443,33 @@ bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name)
 
 	return err == ERROR_SUCCESS;
 }
+
+bool __cdecl uniswcntrl(wchar_t* string)
+{
+	ASSERT(string);
+
+	return INVOKE(0x4C792, 0x31B72, uniswcntrl, string);
+}
+
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...)
+{
+	va_list va_args;
+	va_start(va_args, format);
+
+	ASSERT(string != NULL);
+	ASSERT(size > 0);
+
+	int32 result = _vsnwprintf_s(string, size - 1, UINT_MAX, format, va_args);
+	va_end(va_args);
+	return result;
+}
+
+bool __cdecl validate_wchar_characters(wchar_t* string)
+{
+	return INVOKE(0x4C706, 0x31AE6, validate_wchar_characters, string);
+}
+
+bool wchar_has_double_pipe(wchar_t* string)
+{
+	return INVOKE(0x4BF26, 0, wchar_has_double_pipe, string);
+}

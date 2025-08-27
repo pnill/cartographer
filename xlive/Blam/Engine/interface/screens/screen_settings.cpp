@@ -4,8 +4,8 @@
 #include "screen_audio_settings.h"
 #include "screen_video_settings.h"
 #include "screen_about_dialog.h"
+#include "screen_game_engine_category.h"
 #include "screen_network_adapter.h"
-#include "screen_variant_game_engine_type.h"
 #include "screen_single_player_profile_select.h"
 
 #include "cache/cache_files.h"
@@ -234,7 +234,7 @@ void c_settings_list::handle_item_variant(s_event_record** pevent)
 	params.m_screen_state.field_0 = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_order = 0xFFFFFFFF;
 	params.m_screen_state.m_last_focused_item_index = 0xFFFFFFFF;
-	params.m_load_function = c_screen_game_engine_category::load_for_settings;
+	params.m_load_function = c_screen_game_engine_category::load_settings;
 
 	params.m_load_function(&params);
 }

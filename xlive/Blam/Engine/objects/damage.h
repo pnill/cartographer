@@ -17,7 +17,8 @@ enum e_damage_data_flags : uint32
 	_damage_bypasses_shields_bit = 0x5,
 	_damage_damaged_one_object_bit = 0x6,
 	_damage_no_statistics_bit = 0x7,
-	NUMBER_OF_DAMAGE_DATA_FLAGS = 0x8,
+	_damage_can_affect_physics = 0x8, // H2V verified
+	NUMBER_OF_DAMAGE_DATA_FLAGS = 0x9,
 };
 
 /* structures */
@@ -34,7 +35,7 @@ ASSERT_STRUCT_SIZE(s_damage_owner, 12);
 struct s_damage_data
 {
 	datum definition_index;
-	e_damage_data_flags flags;
+	c_flags_no_init<e_damage_data_flags, uint32, NUMBER_OF_DAMAGE_DATA_FLAGS> flags;
 	s_damage_owner owner;
 	int32 field_1C;
 	datum inventory_owner_unit_index;
@@ -86,3 +87,5 @@ void damage_apply_patches(void);
 void damage_initialize_for_new_map(void);
 
 void __cdecl object_cause_damage(s_damage_data* damage_data, datum object_index, int16 node_index, int16 region_index, int16 material_index, real_vector3d* object_normal);
+
+void __cdecl object_apply_damage_aftermath(datum object_index, s_damage_data* damage_data);

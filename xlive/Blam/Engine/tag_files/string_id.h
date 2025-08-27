@@ -12,3 +12,5 @@
 typedef int32 string_id;
 
 void __cdecl user_interface_global_string_get(string_id id, c_maximum_interface_text* dest);
+
+string_id __cdecl string_id_number(uint8 number);

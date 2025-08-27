@@ -126,3 +126,11 @@ void __cdecl wchar_string_to_utf8_string(const wchar_t* src, utf8* dst, int32 co
 size_t utf8_string_length(const utf8* src, size_t size);
 
 bool ugetenv(wchar_t* buffer, size_t count, const wchar_t* var_name);
+
+bool __cdecl uniswcntrl(wchar_t* string);
+
+int32 usnzprintf(wchar_t* string, size_t size, const wchar_t* format, ...);
+
+bool __cdecl validate_wchar_characters(wchar_t* string);
+
+bool __cdecl wchar_has_double_pipe(wchar_t* string);

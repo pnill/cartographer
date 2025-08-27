@@ -28,10 +28,6 @@ static void encode_anti_cheat_message(c_bitstream* stream, int a2, const s_netwo
 
 static bool decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_message_anti_cheat* data);
 
-static void encode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data);
-
-static bool decode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data);
-
 /* public code */
 
 void network_message_types_register_cartographer_types(c_network_message_type_collection* message_collection)
@@ -76,15 +72,6 @@ void network_message_types_register_cartographer_types(c_network_message_type_co
 		decode_anti_cheat_message,
 		NULL);
 
-	message_collection->register_message_type(
-		_network_message_type_custom_variant_settings,
-		"variant-settings",
-		0,
-		k_custom_variant_settings_packet_size,
-		k_custom_variant_settings_packet_size,
-		encode_custom_variant_settings,
-		decode_custom_variant_settings,
-		NULL);
 	return;
 }
 
@@ -222,19 +209,5 @@ static bool decode_anti_cheat_message(c_bitstream* stream, int a2, s_network_mes
 {
 	stream->read_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
 	data->enabled = stream->read_bool("");
-	return stream->error_occured() == false;
-}
-
-static void encode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
-{
-	stream->write_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
-	CustomVariantSettings::EncodeVariantSettings(stream, a2, &data->settings);
-	return;
-}
-
-static bool decode_custom_variant_settings(c_bitstream* stream, int a2, s_network_message_session_custom_variant_settings* data)
-{
-	stream->write_raw_data("session-id", &data->session_data.identifier, SIZEOF_BITS(data->session_data.identifier));
-	CustomVariantSettings::DecodeVariantSettings(stream, a2, &data->settings);
 	return stream->error_occured() == false;
 }

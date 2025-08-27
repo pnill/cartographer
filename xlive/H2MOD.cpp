@@ -18,9 +18,9 @@
 #include "game/aim_assist.h"
 #include "game/cheats.h"
 #include "game/game.h"
+#include "game/game_engine.h"
 #include "game/game_globals.h"
 #include "game/game_time.h"
-#include "game/multiplayer_globals.h"
 #include "game/player_control.h"
 #include "game/player_vibration.h"
 #include "hs/hs.h"
@@ -90,7 +90,6 @@
 
 #include "H2MOD/GUI/ImGui_Integration/Console/CommandCollection.h"
 #include "H2MOD/Modules/Accounts/AccountLogin.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 #include "H2MOD/Modules/DirectorHooks/DirectorHooks.h"
 #include "H2MOD/Modules/EventHandler/EventHandler.hpp"
 #include "H2MOD/Modules/GamePhysics/Patches/ProjectileFix.h"
@@ -100,13 +99,17 @@
 #include "H2MOD/Modules/MainMenu/Ranks.h"
 #include "H2MOD/Modules/MapManager/MapManager.h"
 #include "H2MOD/Modules/OnScreenDebug/OnscreenDebug.h"
-#include "H2MOD/Modules/PlaylistLoader/PlaylistLoader.h"
 #include "H2MOD/Modules/RenderHooks/RenderHooks.h"
 #include "H2MOD/Modules/Shell/Config.h"
 #include "H2MOD/Modules/SpecialEvents/SpecialEvents.h"
 #include "H2MOD/Modules/TagFixes/TagFixes.h"
 #include "H2MOD/Variants/VariantSystem.h"
 #include "H2MOD/Variants/H2X/H2X.h"
+#include "halo_playlist/halo_playlist.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
+#include "interface/user_interface_networking.h"
+#include "items/weapons.h"
+#include "physics/physics_constants.h"
 
 /* typedefs */
 
@@ -242,14 +245,14 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 
 				if (sound_flags & FLAG(_sound_type_slayer))
 				{
-					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_slayer];
+					tag_block<s_multiplayer_event_response_definition>* slayer_events = &runtime_tag_block_data->slayer_events;
 					slayer_events->count = 0;
 					slayer_events->data = 0;
 				}
 
 				if (sound_flags & ALL_SOUNDS_NO_SLAYER) // check if there is any point in running the code below
 				{
-					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->events[_multiplayer_event_response_game_type_general];
+					tag_block<s_multiplayer_event_response_definition>* general_events = &runtime_tag_block_data->general_events;
 					for (int i = 0; i < general_events->count; i++)
 					{
 						s_multiplayer_event_response_definition* general_event = (*general_events)[i];
@@ -264,7 +267,7 @@ void H2MOD::disable_score_announcer_sounds(uint32 sound_flags)
 							// disable all sounds from english to chinese
 							for (size_t language = 0; language < k_language_count; ++language)
 							{
-								general_event->primary_sound.sounds[language].index = NONE;
+								general_event->primary_sound.sound[language].index = NONE;
 							}
 						}
 					}
@@ -350,13 +353,11 @@ void H2MOD::Initialize()
 	else
 	{
 		kablam_apply_patches();
-		playlist_loader::initialize();
 	}
 
 	cartographer_player_profile_initialize();
 	tag_injection_initialize();
 	CustomVariantHandler::RegisterCustomVariants();
-	CustomVariantSettings::Initialize();
 	MapSlots::Initialize();
 	HaloScript::Initialize();
 	ProjectileFix::ApplyPatches();
@@ -499,6 +500,12 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 			else if (StrStrIW(variant_name, L"ogh2"))
 			{
 				event(_event_status, "h2mod: OGH2 turned on!");
+				g_xbox_tickrate_enabled = true;
+			}
+
+			if (options->game_variant.cartographer_settings.flags.test(_cartographer_variant_thirty_tick_rate))
+			{
+				event(_event_status, "h2mod: 30 tick engine mode enabled");
 				g_xbox_tickrate_enabled = true;
 			}
 
@@ -648,6 +655,7 @@ static void h2mod_apply_hooks(void)
 	game_life_cycle_apply_patches();
 
 	network_memory_apply_patches();
+	network_game_definitions_apply_patches();
 
 	simulation_apply_patches();
 	simulation_players_apply_patches();
@@ -657,6 +665,16 @@ static void h2mod_apply_hooks(void)
 	network_utilities_apply_patches();
 	damage_apply_patches();
 	files_windows_apply_patches();
+
+	game_variant_apply_patches();
+	game_engine_apply_patches();
+	simulation_type_collection_apply_patches();
+	simulation_game_events_apply_patches();
+	user_interface_networking_apply_patches();
+	unit_action_system_apply_patches();
+	weapons_apply_patches();
+	physics_constants_apply_patches();
+	game_time_apply_patches();
 
 	// server/client detours 
 	DETOUR_ATTACH(p_player_spawn, Memory::GetAddress<player_spawn_t>(0x55952, 0x5DE4A), OnPlayerSpawn);
@@ -754,6 +772,11 @@ static void h2mod_apply_hooks(void)
 		new_hud_draw_apply_patches();
 		user_interface_utilities_apply_patches();
 		scenario_apply_patches();
+		multiplayer_variant_settings_interface_apply_patches();
+	}
+	else
+	{
+		halo_playlist_apply_patches();
 	}
 	return;
 }

@@ -58,6 +58,11 @@ void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index c
 	INVOKE(0x209B72, 0x0, user_interface_globals_set_edit_player_profile, controller_index, profile_index, profile);
 }
 
+void __cdecl user_interface_globals_save_edit_profile_to_disk()
+{
+	INVOKE(0x209C3E, 0, user_interface_globals_save_edit_profile_to_disk);
+}
+
 s_user_interface_globals* user_interface_globals_get(void)
 {
 	return Memory::GetAddress<s_user_interface_globals*>(0x9718E0);

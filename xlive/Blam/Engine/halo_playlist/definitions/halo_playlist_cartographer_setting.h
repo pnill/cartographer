@@ -1,0 +1,66 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_cartographer_setting_property_count 10
+#define k_halo_playlist_cartographer_engine_mode_count 4
+#define k_halo_playlist_cartographer_game_speed_count 5
+#define k_halo_playlist_cartographer_gravity_count 8
+#define k_halo_playlist_cartographer_spawn_protection_count 9
+
+enum e_halo_playlist_cartographer_setting_property_type : int32
+{
+	_halo_playlist_cartographer_setting_thirty_tick_rate,
+	_halo_playlist_cartographer_setting_infinite_ammo,
+	_halo_playlist_cartographer_setting_infinite_grenades,
+	_halo_playlist_cartographer_setting_explosion_physics,
+	_halo_playlist_cartographer_setting_default_fov,
+	_halo_playlist_cartographer_setting_default_weapon_offsets,
+	_halo_playlist_cartographer_setting_default_cross_hair_offset,
+	_halo_playlist_cartographer_setting_game_speed,
+	_halo_playlist_cartographer_setting_gravity,
+	_halo_playlist_cartographer_setting_spawn_protection,
+
+	k_halo_playlist_cartographer_setting_count,
+	k_halo_playlist_cartographer_setting_invalid = NONE
+};
+
+enum e_halo_playlist_cartographer_setting_engine_mode : int32
+{
+	_halo_playlist_cartographer_setting_engine_mode_default,
+	_halo_playlist_cartographer_setting_engine_mode_legacy,
+
+	k_halo_playlist_cartographer_setting_engine_mode_count,
+	k_halo_playlist_cartographer_setting_engine_mode_invalid = NONE
+};
+
+wchar_t* halo_playlist_item_collection_cartographer_setting_get_name(e_halo_playlist_cartographer_setting_property_type value);
+
+e_halo_playlist_cartographer_setting_property_type halo_playlist_item_collection_cartographer_setting_get_value(wchar_t* value);
+
+e_halo_playlist_cartographer_setting_engine_mode halo_playlist_item_collection_cartographer_engine_mode_get_value(wchar_t* value);
+
+e_game_speed_modifier halo_playlist_item_collection_cartographer_game_speed_get_value(wchar_t* value);
+
+e_game_gravity_modifier halo_playlist_item_collection_cartographer_gravity_get_value(wchar_t* value);
+
+e_player_spawn_protection_timer halo_playlist_item_collection_cartographer_spawn_protection_get_value(wchar_t* value);
+
+bool halo_playlist_item_collection_cartographer_engine_mode_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_infinite_ammo_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_infinite_grenades_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_explosion_physics_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_default_fov_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_default_weapon_offsets_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_default_crosshair_position_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_game_speed_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_gravity_write_to_variant(wchar_t* value, s_game_variant* variant);
+
+bool halo_playlist_item_collection_cartographer_spawn_protection_write_to_variant(wchar_t* value, s_game_variant* variant);

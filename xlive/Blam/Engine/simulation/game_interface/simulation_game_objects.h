@@ -56,6 +56,7 @@ public:
 
 	// c_simulation_game_object_entity_definition additions
 
+	virtual void* handle_object_update(datum object_index, uint32 update_mask, int32 state_data_size, void* state_data) = 0;
 	virtual void* object_required_to_join_game(datum object_index) = 0;
 	virtual void* create_object(int32 creation_data_size, void* creation_data, uint32* flags, int32 internal_state_data_size, void* initial_state_data) = 0;
 	virtual void* unk31(int32 a1) = 0;

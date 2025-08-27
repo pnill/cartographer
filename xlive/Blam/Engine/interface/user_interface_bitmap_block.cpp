@@ -63,3 +63,41 @@ c_user_interface_text* c_bitmap_widget::get_interface()
 	//return INVOKE_TYPE(0x21C5DC, 0x0, c_user_interface_text*(__thiscall*)(c_bitmap_widget*), this);
 	return nullptr;
 }
+
+void __cdecl user_interface_set_bitmap_from_variant(s_game_variant* variant, c_bitmap_widget* widget)
+{
+	int16 bitmap_index = 10;
+	switch (variant->variant_game_engine_index)
+	{
+	case _game_engine_type_ctf:
+		bitmap_index = 6;
+		break;
+	case _game_engine_type_slayer:
+		bitmap_index = 0;
+		break;
+	case _game_engine_type_oddball:
+		bitmap_index = 3;
+		break;
+	case _game_engine_type_koth:
+		bitmap_index = 1;
+		break;
+	case _game_engine_type_race:
+		bitmap_index = 2;
+		break;
+	case _game_engine_type_headhunter:
+		bitmap_index = 5;
+		break;
+	case _game_engine_type_juggernaut:
+		bitmap_index = 4;
+		break;
+	case _game_engine_type_territories:
+		bitmap_index = 8;
+		break;
+	case _game_engine_type_assault:
+		bitmap_index = 7;
+		break;
+	}
+
+	widget->verify_and_change_sprite(bitmap_index);
+	widget->set_visible(true);
+}

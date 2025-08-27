@@ -5,6 +5,7 @@
 #include "observer.h"
 
 #include "cache/cache_files.h"
+#include "game/game.h"
 #include "game/game_globals.h"
 #include "game/players.h"
 #include "game/player_control.h"
@@ -114,9 +115,19 @@ static void __cdecl first_person_camera_update(int8* camera, s_director_update* 
 	// New method to override the crosshair offset using carto profiles
 	if (true)
 	{
-		s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(director_update->user_index);
-		result->crosshair_position.x = 0.f;
-		result->crosshair_position.y = player_profile->crosshair_offset;
+		s_game_variant* variant = get_game_variant();
+
+		if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_cross_hair_offset))
+		{
+			result->crosshair_position = k_observer_default_cross_hair_position;
+		}
+		else
+		{
+			s_saved_game_cartographer_player_profile* player_profile = cartographer_player_profile_get_by_user_index(director_update->user_index);
+
+			result->crosshair_position.x = k_observer_default_cross_hair_position.x;
+			result->crosshair_position.y = player_profile->crosshair_offset;
+		}
 	}
 	// Original method of setting the crosshair position
 	else

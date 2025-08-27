@@ -6,7 +6,7 @@
 #include "interface/user_interface_controller.h"
 
 
-typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
+typedef void(__cdecl* ok_cancel_dialog_t)(e_user_interface_channel_type channel_type, e_ui_error_types  error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8);
 ok_cancel_dialog_t p_ok_cancel_dialog;
 void __cdecl ok_cancel_dialog_show_hook(e_user_interface_channel_type channel_type, e_ui_error_types error_type, e_user_interface_render_window window_index, uint16 user_flags, void* ok_callback, void* fallback, int a7, int a8)
 {
@@ -53,6 +53,11 @@ void* __cdecl c_screen_error_dialog_ok::load_for_active_users(s_screen_parameter
 		parameters->m_user_flags = user_interface_controller_get_signed_in_controllers_mask() | FLAG(k_windows_device_controller_index);
 	}
 	return INVOKE(0x20E032, 0x0, c_screen_error_dialog_ok::load_for_active_users, parameters);
+}
+
+void c_screen_error_dialog_ok::load_for_disk_result(int16 controllers_mask, e_saved_game_disk_result disk_result)
+{
+	INVOKE_TYPE(0x209B0F, 0, void(__cdecl*)(int16, e_saved_game_disk_result), controllers_mask, disk_result);
 }
 
 void c_screen_error_dialog_ok::apply_patches()

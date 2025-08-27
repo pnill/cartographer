@@ -54,7 +54,7 @@ public:
 	virtual bool handle_event(s_event_record* event) override;
 	virtual c_list_item_widget* get_list_items() override;
 	virtual int32 get_list_items_count() override;
-	virtual void update_list_items(c_list_item_widget*, int32 skin_index) override;
+	virtual void update_list_items(c_list_item_widget* item, int32 skin_index) override;
 
 	void sort_event(s_event_record* event, int32 selected_column_index);
 };

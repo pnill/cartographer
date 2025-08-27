@@ -5,6 +5,7 @@
 #include "interface/user_interface_widget_button.h"
 #include "interface/user_interface_widget_text_entry.h"
 #include "interface/signal_slot.h"
+#include "saved_games/game_variant.h"
 
 /* enums */
 
@@ -83,5 +84,7 @@ public:
 
 	static void apply_instance_patches();
 	static void apply_patches_on_map_load();
+	static void __cdecl globals_set_variant(s_game_variant* variant);
+	static void __cdecl globals_set_unk_flag(bool state);
 };
 ASSERT_STRUCT_SIZE(c_screen_multiplayer_pregame_lobby, 0x3594);

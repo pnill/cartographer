@@ -47,6 +47,10 @@ static_assert(sizeof(real64) == 8);
 typedef long datum;
 static_assert(sizeof(datum) == 4);
 
+// 32-bit file storage identifier
+typedef int32 enumerated_file_index;
+static_assert(sizeof(enumerated_file_index) == 4);
+
 // 32-bit character that's specified as a utf32 string
 struct utf32
 {
@@ -91,6 +95,12 @@ extern bool g_catch_exceptions;
 #define IN_RANGE(value, begin, end) (((value) >= (begin)) && ((value) <= (end)))
 #define VALID_INDEX(index, count) ((index) >= 0 && (index) < (count))
 #define VALID_COUNT(index, count) ((index) >= 0 && (index) <= (count))
+
+#define ENUMERATED_INDEX_IS_DEFAULT_SAVE(enumerated_file_index) (((enumerated_file_index) & 0x200000) != 0)
+#define ENUMERATED_INDEX_GET_TYPE(enumerated_file_index) (e_saved_game_file_type)(((enumerated_file_index) & 0xF) >> 0)
+#define ENUMERATED_INDEX_GET_ABS_INDEX(enumerated_file_index) (((enumerated_file_index) & 0x1FFF00) >> 8)
+#define ENUMERATED_INDEX_GET_MEMORY_UNIT(enumerated_file_index)	(((enumerated_file_index) & 0xF0) >> 4)
+#define ENUMERATED_INDEX_GET_SALT(enumerated_file_index) (((enumerated_file_index) & 0x7FC000 ) >> 14)
 
 // TODO remove padding macros
 // Explanation:
@@ -247,3 +257,16 @@ int32 csstrncmp(const char* s1, const char* s2, size_t size);
 
 // Convert string to lowercase
 char* csstrnlwr(char* s, size_t size);
+
+constexpr uint32 bits_required_for(uint64 max_value)
+{
+	// minimum of 1 bit for 1 and 0
+
+	uint32 bits = 1;
+	while (max_value > 1)
+	{
+		max_value >>= 1;
+		++bits;
+	}
+	return bits;
+}

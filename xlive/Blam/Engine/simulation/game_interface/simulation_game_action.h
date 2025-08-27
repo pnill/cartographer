@@ -15,4 +15,6 @@ void __cdecl simulation_action_pickup_equipment(datum unit_datum_index, datum gr
 
 void __cdecl simulation_action_game_engine_player_update(datum player_index, uint32 update_mask);
 
+void __cdecl simulation_action_game_engine_globals_update(uint32 update_mask);
+
 void simulation_game_action_apply_patches(void);

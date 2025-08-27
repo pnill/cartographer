@@ -28,7 +28,6 @@ public:
 	void handle_map_filename_response(const struct transport_address* address, int32 channel_index, const struct s_network_message_custom_map_filename* received_data);
 	void handle_player_property_rank(const struct transport_address* address, int32 channel_index, const struct s_network_message_rank_change* received_data);
 	void handle_session_anticheat_status(const struct transport_address* address, int32 channel_index, const struct s_network_message_anti_cheat* received_data);
-	void handle_session_custom_variant_settings(const struct transport_address* address, int32 channel_index, const struct s_network_message_session_custom_variant_settings* received_data);
 
 	void handle_leave_session(const struct transport_address* address, const struct s_network_message_session_data* received_data);
 	void handle_membership_update(const struct transport_address* address, int32 channel_index, const struct s_network_message_session_data* received_data);

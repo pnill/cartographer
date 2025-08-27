@@ -59,7 +59,6 @@ enum e_network_message_type : int32
 	_network_message_type_custom_map_filename,
 	_network_message_type_rank_change,
 	_network_message_type_anti_cheat,
-	_network_message_type_custom_variant_settings,
 
 	k_network_message_type_count
 };

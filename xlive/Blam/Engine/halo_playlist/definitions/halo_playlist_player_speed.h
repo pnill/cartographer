@@ -1,0 +1,8 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_player_speed_item_count 3
+
+e_ctf_engine_player_speed halo_playlist_item_collection_headhunter_speed_with_heads_get_value(wchar_t* value);
+
+bool halo_playlist_item_collection_headhunter_speed_with_heads_write_to_variant(wchar_t* value, s_game_variant* variant);

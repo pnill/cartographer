@@ -1,0 +1,27 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_ctf_property_item_count 14
+
+enum e_halo_playlist_ctf_property : int32
+{
+	_halo_playlist_ctf_property_score_to_win_round,
+	_halo_playlist_ctf_property_team_changing,
+	_halo_playlist_ctf_property_force_even_teams,
+	_halo_playlist_ctf_property_flag_type,
+	_halo_playlist_ctf_property_sudden_death,
+	_halo_playlist_ctf_property_flag_at_home_to_score,
+	_halo_playlist_ctf_property_flag_touch_return,
+	_halo_playlist_ctf_property_flag_reset_time,
+	_halo_playlist_ctf_property_slow_with_flag,
+	_halo_playlist_ctf_property_flag_hit_damage,
+	_halo_playlist_ctf_property_damage_resistance_with_flag,
+	_halo_playlist_ctf_property_active_camo_with_flag,
+	_halo_playlist_ctf_property_vehicle_operation,
+	_halo_playlist_ctf_property_flag_indicator,
+
+	k_halo_playlist_ctf_property_count,
+	k_halo_playlist_ctf_property_invalid = NONE
+};
+
+e_halo_playlist_ctf_property halo_playlist_item_collection_ctf_property_get_value(wchar_t* value);

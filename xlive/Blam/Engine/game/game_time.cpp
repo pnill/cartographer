@@ -1,12 +1,14 @@
 #include "stdafx.h"
 #include "game_time.h"
 
+#include "game.h"
 #include "main/main_time.h"
 #include "H2MOD.h"
 #include "cutscene/cinematics.h"
 #include "math/math.h"
 #include "main/interpolator.h"
 #include "main/main_game_time.h"
+#include "shell/shell.h"
 #include "shell/shell_windows.h"
 
 time_globals* time_globals::get()
@@ -149,8 +151,69 @@ void game_time_advance(void)
 	return;
 }
 
+
+void __cdecl game_time_reset()
+{
+	time_globals* game_time_globals = time_globals::get();
+
+	game_time_globals->initialized = false;
+	game_time_globals->tick_length = 0;
+	game_time_globals->passed_ticks_count = 0;
+	game_time_globals->game_speed = 0.f;
+	game_time_globals->game_ticks_leftover = 0.f;
+	game_time_globals->field_14 = 0.f;
+	game_time_globals->field_18 = 0.f;
+	game_time_globals->field_1C = 0.f;
+	game_time_globals->field_20 = 0.f;
+}
+
+void __cdecl game_time_setup_scenario()
+{
+	game_time_reset();
+
+	time_globals* game_time_globals = time_globals::get();
+	s_game_options* game_options = game_options_get();
+
+	game_time_globals->ticks_per_second = game_options->game_tick_rate;
+	game_time_globals->tick_length = 1.f / (real32)game_time_globals->ticks_per_second;
+
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant)
+	{
+		switch (variant->cartographer_settings.game_speed)
+		{
+			case _game_speed_modifier_half:
+				game_time_globals->game_speed = 0.5f;
+				break;
+			case _game_speed_modifier_hundred_fifty:
+				game_time_globals->game_speed = 1.5f;
+				break;
+			case _game_speed_modifier_double:
+				game_time_globals->game_speed = 2.f;
+				break;
+			case _game_speed_modifier_ludicrous:
+				game_time_globals->game_speed = 5.f;
+				break;
+			case _game_speed_modifier_none:
+			default:
+				game_time_globals->game_speed = k_game_time_default_game_speed;
+				break;
+		}
+	}
+	else
+		game_time_globals->game_speed = k_game_time_default_game_speed;
+
+	game_time_globals->initialized = true;
+}
+
 void game_time_apply_patches()
 {
-	// apply framerate throttle patches for when the game is minimized
-	PatchCall(Memory::GetAddress(0x39A2A), cinematic_is_running_hook);
+	if (!shell_is_dedicated_server())
+	{
+		// apply framerate throttle patches for when the game is minimized
+		PatchCall(Memory::GetAddress(0x39A2A), cinematic_is_running_hook);
+	}
+
+	WritePointer(Memory::GetAddress(0x3A06F8, 0x35D428), game_time_setup_scenario);
 }

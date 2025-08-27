@@ -37,3 +37,5 @@ private:
 	c_simulation_event_definition* m_event_definitions[k_simulation_event_type_maximum_count];
 };
 ASSERT_STRUCT_SIZE(c_simulation_type_collection, 264);
+
+void simulation_type_collection_apply_patches();

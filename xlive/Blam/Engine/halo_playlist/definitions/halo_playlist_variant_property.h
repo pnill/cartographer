@@ -1,0 +1,16 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_variant_property_item_count 3
+
+enum e_halo_playlist_variant_property_type
+{
+	_halo_playlist_variant_property_name,
+	_halo_playlist_variant_property_base_variant,
+	_halo_playlist_variant_property_game_type,
+
+	k_halo_playlist_variant_property_count,
+	k_halo_playlist_variant_property_invalid = NONE
+};
+
+e_halo_playlist_variant_property_type halo_playlist_item_collection_get_variant_property_type(wchar_t* value);

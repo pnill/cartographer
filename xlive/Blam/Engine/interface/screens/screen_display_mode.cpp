@@ -146,7 +146,7 @@ void c_display_mode_edit_list::handle_item_pressed_event(s_event_record** pevent
 	}
 	else
 	{
-		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_no_fullscreen_res, _window_4, NONE, nullptr, nullptr);
+		screen_error_ok_dialog_show(_user_interface_channel_type_game_error, _ui_error_no_fullscreen_res, _window_4, (uint16)NONE, nullptr, nullptr);
 	}
 }
 

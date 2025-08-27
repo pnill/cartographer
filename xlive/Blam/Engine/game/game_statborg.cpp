@@ -18,6 +18,11 @@ int16 c_game_statborg::get_team_stat(int32 team_index, e_statborg_entry statisti
 	return this->m_team_data[team_index].statistic[statistic];
 }
 
+int32 c_game_statborg::get_score(int32 player_index)
+{
+	return INVOKE_TYPE(0x5B1F6, 0x3CE56, int32(__thiscall*)(c_game_statborg*, int32), this, player_index);
+}
+
 typedef void(__thiscall* adjust_player_stat_t)(c_game_statborg* statborg, datum, e_statborg_entry, int16, int32, bool);
 adjust_player_stat_t p_c_game_statborg__adjust_player_stat;
 void c_game_statborg::adjust_player_stat(datum player_datum, e_statborg_entry statistic, int16 count, int32 game_result_statistic, bool adjust_team_stat)

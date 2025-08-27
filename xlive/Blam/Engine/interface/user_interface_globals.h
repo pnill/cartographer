@@ -132,4 +132,5 @@ void __cdecl user_interface_globals_commit_edit_profile_changes();
 void __cdecl user_interface_globals_save_profile_changes_to_disk();
 void __cdecl user_interface_globals_finish_saving_profile_changes();
 void __cdecl user_interface_globals_set_edit_player_profile(e_controller_index controller_index, uint32 profile_index, struct s_saved_game_player_profile* profile);
+void __cdecl user_interface_globals_save_edit_profile_to_disk();
 s_user_interface_globals* user_interface_globals_get(void);

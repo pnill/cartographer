@@ -11,9 +11,14 @@ enum e_session_protocol
 	_session_protocol_xbox_live_coop = 0x4,
 	_session_protocol_xbox_live_custom = 0x5,
 	_session_protocol_xbox_live_optimatch = 0x6,
+	_session_protocol_invalid = -1
 };
 
+/* forward decleration */
+
 /* public methods */
+
+void __cdecl user_interface_networking_apply_patches();
 
 bool session_protocol_has_coop(e_session_protocol protocol);
 bool __cdecl user_interface_create_new_squad(bool a1, bool online);
@@ -23,7 +28,8 @@ bool __cdecl user_interface_squad_session_is_xbox_live();
 int16 __cdecl user_interface_session_get_campaign_difficulty(void);
 int16 __cdecl user_interface_squad_get_player_count();
 e_session_protocol __cdecl user_interface_squad_get_active_protocol();
-struct s_game_variant* __cdecl user_interface_session_get_game_variant(void);
+bool __cdecl user_interface_game_settings_set_game_variant(union s_game_variant* variant);
+union s_game_variant* __cdecl user_interface_session_get_game_variant(void);
 
 void __cdecl user_interface_networking_reset_player_counts(void);
 void __cdecl user_interface_squad_clear_match_playlist(void);

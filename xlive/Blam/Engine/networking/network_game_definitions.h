@@ -1,5 +1,8 @@
 #pragma once
 #include "saved_games/player_profile.h"
+#include "memory/bitstream.h"
+#include "saved_games/game_variant.h"
+
 
 /* enums */
 
@@ -41,3 +44,9 @@ struct s_player_properties
 	int8 unk2;
 };
 ASSERT_STRUCT_SIZE(s_player_properties, 132);
+
+/* public code */
+void network_game_definitions_apply_patches();
+
+void __cdecl network_game_definitions_encode_game_variant(c_bitstream* packet, s_game_variant* variant);
+bool __cdecl network_game_definitions_decode_game_variant(c_bitstream* packet, s_game_variant* variant);

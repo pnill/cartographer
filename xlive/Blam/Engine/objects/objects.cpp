@@ -992,6 +992,11 @@ datum object_get_ultimate_parent(datum object_index)
 	return result;
 }
 
+void object_attach_to_node(datum parent_index, datum child_index, uint16 node_index)
+{
+	INVOKE(0x13768C, 0x12655C, object_attach_to_node, parent_index, child_index, node_index);
+}
+
 #ifdef OBJECT_DEBUG
 void objects_information_get(objects_information* information)
 {

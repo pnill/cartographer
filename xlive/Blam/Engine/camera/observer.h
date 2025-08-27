@@ -4,6 +4,8 @@
 
 /* constants */
 
+constexpr real_point2d k_observer_default_cross_hair_position{ {0.f, 0.138f} };
+
 enum
 {
 	k_observer_command_values = 6

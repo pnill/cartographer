@@ -121,7 +121,7 @@ void c_player_profile_list::update_displayed_profiles(void)
 					else if (!saved_game_player_profile_load(current_profile_index, &stored_profile->profile))
 					{
 						csmemset(&stored_profile->profile, 0, sizeof(s_saved_game_player_profile));
-						saved_games_get_display_name(enumerated_file_index, stored_profile->profile.name);
+						saved_game_get_display_name(enumerated_file_index, stored_profile->profile.name);
 					}
 				}
 			}

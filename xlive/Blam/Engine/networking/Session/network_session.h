@@ -2,6 +2,7 @@
 #include "game/game_allegiance.h"
 #include "game/player_constants.h"
 #include "input/controllers.h"
+#include "main/map_repository.h"
 #include "networking/network_game_definitions.h"
 #include "networking/transport/transport.h"
 #include "networking/transport/transport_security.h"
@@ -680,5 +681,6 @@ e_network_session_class network_squad_session_get_session_class();
 bool network_session_interface_set_local_user_character_type(int32 user_index, e_character_type character_type);
 bool network_session_interface_get_local_user_identifier(int32 user_index, s_player_identifier* out_identifier);
 void network_session_interface_set_local_user_rank(int32 user_index, int8 rank);
+bool __cdecl network_session_get_scenario_id(uint32* out_1, uint32* out_2, uint32* out_3, s_custom_map_id** out_custom_map);
 bool __cdecl network_session_interface_get_local_user_properties(int32 user_index, int32* out_controller_index, s_player_properties* out_properties, int32* out_player_voice, int32* out_player_text_chat);
 void __cdecl network_globals_switch_environment(int32 a1, bool a2);

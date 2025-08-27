@@ -21,6 +21,7 @@
 #include "H2MOD/Modules/Achievements/Achievements.h"
 #include "H2MOD/Modules/Updater/Updater.h"
 #include "version_git.h"
+#include "interface/multiplayer_variant_settings_interface_definition.h"
 
 /* defines */
 
@@ -52,6 +53,7 @@ static void render_cartographer_status_bar(const char* build_text);
 static void render_cartographer_git_build_info(void);
 static bool render_cartographer_achievement_message(const char* achivement_message);
 static void render_cartographer_update_message(const char* update_text, int64 update_size_bytes, int64 update_downloaded_bytes);
+static void render_cartographer_variant_extra_settings(rectangle2d* bounds);
 static void render_netdebug_text(void);
 static void render_main_game_time_debug(void);
 
@@ -136,6 +138,11 @@ void render_cartographer_status_bar(const char *build_text)
 		bounds.top += line_height;
 		bounds.bottom = bounds.top + line_height;
 		rasterizer_draw_unicode_string(&bounds, master_state_string_buffer);
+
+		if (paused_or_in_menus)
+		{
+			render_cartographer_variant_extra_settings(&bounds);
+		}
 	}
 
 	return;
@@ -265,6 +272,42 @@ void render_cartographer_update_message(const char* update_text, int64 update_si
 	}
 
 	return;
+}
+
+void render_cartographer_variant_extra_settings(rectangle2d* bounds)
+{
+	s_game_variant* variant = get_game_variant();
+
+	if (game_is_multiplayer() && variant)
+	{
+		wchar_t string_buffer[256];
+		const int16 line_height = get_text_size_from_font_cache(k_status_text_font);
+
+		draw_string_reset();
+		draw_string_set_draw_mode(k_status_text_font, 0, 0, 0, global_real_argb_white, global_real_argb_black, false);
+
+		bounds->top += line_height * 3;
+		bounds->bottom = bounds->top + line_height;
+
+		for (uint32 i = k_variant_setting_parameter_type_base_count + 1; i < k_variant_setting_parameter_type_base_count + 1 + k_variant_setting_parameter_type_cartographer_count; ++i)
+		{
+			e_variant_setting_parameter_type type = (e_variant_setting_parameter_type)i;
+
+			wchar_t title_buffer[512];
+			wchar_t label_buffer[512];
+			int32 setting_value = multiplayer_variant_settings_interface_get_variant_parameter_value(variant, type);
+
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_title(nullptr, type, title_buffer);
+			multiplayer_variant_settings_interface_get_custom_variant_parameter_label(nullptr, type, setting_value, label_buffer);
+
+			swprintf(string_buffer, NUMBEROF(string_buffer), L"%s: %s", title_buffer, label_buffer);
+
+			rasterizer_draw_unicode_string(bounds, string_buffer);
+
+			bounds->top += line_height;
+			bounds->bottom = bounds->top + line_height;
+	}
+}
 }
 
 void render_main_game_time_debug(void)

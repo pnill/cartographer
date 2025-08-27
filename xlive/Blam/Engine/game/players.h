@@ -56,7 +56,8 @@ struct player_datum
 	int8 gap_192[2];
 	int32 betraying_player_index;
 	int8 gap_198[2];
-	int32 field_19C;
+	int16 field_19A;
+	int16 player_on_hill_time;
 	int8 gap_19E[30];
 	int32 field_1BC;
 	int8 gap_1C0[60];

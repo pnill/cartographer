@@ -206,7 +206,7 @@ struct _unit_datum
 	real32 boost_dead_time;
 	object_header_block_reference weapon_raised_block;
 	object_header_block_reference udlg_block;
-	object_header_block_reference object_header_358;
+	object_header_block_reference action_storage;
 	int32 field_35C;
 };
 
@@ -241,6 +241,8 @@ datum player_index_from_unit_index(datum unit_index);
 void __cdecl unit_get_head_position_interpolated(datum unit_index, real_point3d* position);
 
 void __cdecl unit_get_camera_position(datum unit_index, real_point3d* out_point);
+
+void __cdecl unit_get_aiming_vector(datum unit_index, real_vector3d* out_vector);
 
 void __cdecl unit_control(datum unit_index, const unit_control_data* control_data);
 

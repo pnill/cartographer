@@ -5,8 +5,15 @@
 #include "user_interface_controller.h"
 
 #include "game/player_constants.h"
+#include "main/map_repository.h"
 #include "networking/logic/life_cycle_manager.h"
 #include "networking/session/network_session.h"
+
+/* typedef */
+typedef e_session_protocol(__cdecl* t_user_interface_squad_get_active_protocol)();
+t_user_interface_squad_get_active_protocol p_user_interface_squad_get_active_protocol;
+
+/* private code */
 
 bool* byte_D6840E_get(void)
 {
@@ -26,6 +33,13 @@ int32* dword_86EEE0_get(void)
 bool* from_game_invite_global_get(void)
 {
 	return Memory::GetAddress<bool*>(0x46EEA0);
+}
+
+/* public code */
+
+void user_interface_networking_apply_patches()
+{
+	DETOUR_ATTACH(p_user_interface_squad_get_active_protocol, Memory::GetAddress<t_user_interface_squad_get_active_protocol>(0x215EA9, 0x1FD528), user_interface_squad_get_active_protocol);
 }
 
 bool session_protocol_has_coop(e_session_protocol protocol)
@@ -67,7 +81,92 @@ int16 __cdecl user_interface_squad_get_player_count()
 
 e_session_protocol __cdecl user_interface_squad_get_active_protocol()
 {
-	return INVOKE(0x215EA9, 0x0, user_interface_squad_get_active_protocol);
+	e_network_session_class session_class = network_squad_session_get_session_class();
+
+	if (session_class < _network_session_class_offline)
+		return _session_protocol_invalid;
+
+	c_network_session* session = NULL;
+
+
+	if (network_life_cycle_in_squad_session(&session))
+	{
+		s_game_variant* session_variant = &session->m_session_parameters.game_variant;
+		uint32 unk_1;
+		uint32 unk_2;
+		uint32 unk_3;
+		s_custom_map_id* custom_map_id;
+
+		if (!network_session_get_scenario_id(&unk_1, &unk_2, &unk_3, &custom_map_id))
+		{
+			unk_1 = UINT_MAX;
+			unk_2 = UINT_MAX;
+			custom_map_id = nullptr;
+		}
+		if (session_class <= _network_session_class_system_link)
+		{
+			if (unk_1 != UINT_MAX)
+				return session_class != 0 ? _session_protocol_system_link_coop : _session_protocol_splitscreen_coop;
+
+			if (session_variant)
+			{
+				switch (session_variant->variant_game_engine_index)
+				{
+				case _game_engine_type_ctf:
+				case _game_engine_type_slayer:
+				case _game_engine_type_oddball:
+				case _game_engine_type_koth:
+				case _game_engine_type_race:
+				case _game_engine_type_headhunter:
+				case _game_engine_type_juggernaut:
+				case _game_engine_type_territories:
+				case _game_engine_type_assault:
+				{
+					return (e_session_protocol)(2 * (session_class != _network_session_class_offline) + 1);
+				}
+				default:
+					return _session_protocol_invalid;
+				}
+			}
+			return _session_protocol_invalid;
+		}
+
+		if (session_class != _network_session_class_xbox_live || session->m_session_parameters.field_4C90 != 1)
+			return _session_protocol_invalid;
+
+		if (unk_1 != UINT_MAX)
+			return _session_protocol_xbox_live_coop;
+
+		if (!session_variant)
+			return _session_protocol_invalid;
+
+
+		switch (session_variant->variant_game_engine_index)
+		{
+		case _game_engine_type_ctf:
+		case _game_engine_type_slayer:
+		case _game_engine_type_oddball:
+		case _game_engine_type_koth:
+		case _game_engine_type_race:
+		case _game_engine_type_headhunter:
+		case _game_engine_type_juggernaut:
+		case _game_engine_type_territories:
+		case _game_engine_type_assault:
+		{
+			return _session_protocol_xbox_live_custom;
+		}
+		default:
+			return _session_protocol_invalid;
+		}
+	}
+
+	return _session_protocol_invalid;
+	//return INVOKE(0x215EA9, 0x0, user_interface_squad_get_active_protocol);
+}
+
+bool user_interface_game_settings_set_game_variant(s_game_variant* variant)
+{
+	return INVOKE(0x216901, 0, user_interface_game_settings_set_game_variant, variant);
 }
 
 s_game_variant* __cdecl user_interface_session_get_game_variant(void)

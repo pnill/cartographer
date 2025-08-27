@@ -6,7 +6,7 @@ struct s_async_completion
 	bool unk_1;
 	bool unk_2;
 	bool unk_3;
-	int32 unk_4;
+	int32 creation_result;
 	char file_path[2048];
 	real32 unk_808;
 };

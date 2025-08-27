@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "players.h"
 
+#include "game_time.h"
 #include "game/game.h"
 #include "game/game_engine.h"
 #include "game/game_globals.h"
@@ -311,7 +312,7 @@ void __cdecl player_validate_configuration(datum player_index, s_player_properti
 
 	if (current_game_engine())
 	{
-		if (TEST_BIT(get_game_variant()->game_engine_flags, _game_engine_teams_bit))
+		if (get_game_variant()->game_engine_flags.test(_game_engine_teams_bit))
 		{
 			if (configuration_data->team_index != _game_team_observer && !TEST_BIT(game_engine_globals_get()->team_bitmask, configuration_data->team_index))
 			{
@@ -587,6 +588,32 @@ void __cdecl players_update_after_game(const simulation_update* update)
 	return;
 }
 
+int32 __cdecl player_get_spawn_protection_time(real32 timer)
+{
+	s_game_variant* variant = get_game_variant();
+
+	if (variant)
+	{
+		switch (variant->cartographer_settings.spawn_protection)
+		{
+		case _player_spawn_protection_timer_none:
+			return 0;
+		case _player_spawn_protection_timer_one_second:
+			return time_globals::seconds_to_ticks_round(1);
+		case _player_spawn_protection_timer_three_seconds:
+			return time_globals::seconds_to_ticks_round(3);
+		case _player_spawn_protection_timer_five_seconds:
+			return time_globals::seconds_to_ticks_round(5);
+		case _player_spawn_protection_timer_ten_seconds:
+			return time_globals::seconds_to_ticks_round(10);
+		default:
+			return time_globals::seconds_to_ticks_round(timer);
+		}
+	}
+
+	return time_globals::seconds_to_ticks_round(timer);
+}
+
 void players_apply_patches(void)
 {
 	// Change the validation for player_appearance_valid to use the updated k_player_character_type_count constant
@@ -599,6 +626,10 @@ void players_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x58182, 0x6067A), players_update_activation);
 
 	PatchCall(Memory::GetAddress(0x936F2, 0x4B9F2), player_find_action_context);
+
+	// this is just c_time_globals::get_seconds_to_ticks_imprecise being patch called
+	// remove this patch call when the player_spawn function is rewritten
+	PatchCall(Memory::GetAddress(0x55D02, 0x4BD66), player_get_spawn_protection_time);
 	return;
 }
 

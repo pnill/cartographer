@@ -30,6 +30,11 @@ void __cdecl simulation_action_game_engine_player_update(datum player_index, uin
 	return;
 }
 
+void simulation_action_game_engine_globals_update(uint32 update_mask)
+{
+	INVOKE(0x1B65B7, 0x1B04E7, simulation_action_game_engine_globals_update, update_mask);
+}
+
 void __cdecl simulation_action_game_engine_player_create(int16 player_index)
 {
 	if (game_is_server() && game_is_distributed())

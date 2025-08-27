@@ -1,6 +1,6 @@
 #pragma once
 #include "network_message_handler.h"
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
+#include "network_message_type_collection.h"
 
 /* structures */
 
@@ -28,12 +28,6 @@ struct s_network_message_anti_cheat
 {
 	s_network_message_session_data session_data;
 	bool enabled;
-};
-
-struct s_network_message_session_custom_variant_settings
-{
-	s_network_message_session_data session_data;
-	CustomVariantSettings::s_variant_settings settings;
 };
 
 /* prototypes */

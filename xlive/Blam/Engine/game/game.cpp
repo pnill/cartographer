@@ -140,6 +140,11 @@ bool game_in_editor(void)
 	return false;
 }
 
+bool game_is_finished()
+{
+	return get_main_game_globals()->game_is_finished;
+}
+
 bool game_is_campaign(void)
 {
 	return game_options_get()->game_mode == _game_mode_campaign;
@@ -509,7 +514,7 @@ static void game_info_initialize_for_new_map(const s_game_options* options)
 
 	if (game_is_multiplayer() || game_globals->options.game_variant.variant_game_engine_index)
 	{
-		game_engine_variant_cleanup(&game_globals->options.game_variant.flags);
+		game_variant_cleanup(&game_globals->options.game_variant);
 	}
 	random_math_set_seed(game_globals->options.random_seed);
 	game_globals->game_is_lost = false;

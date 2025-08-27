@@ -1,6 +1,5 @@
 #pragma once
 #include "user_interface_shared_globals.h"
-
 #include "math/color_math.h"
 #include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
@@ -303,75 +302,6 @@ enum e_button_key_type : short
 	button_key_type_a_ok = 22
 };
 
-enum e_animation_index : short
-{
-	none = 0,
-	animation_index_00 = 1,
-	animation_index_01 = 2,
-	animation_index_02 = 3,
-	animation_index_03 = 4,
-	animation_index_04 = 5,
-	animation_index_05 = 6,
-	animation_index_06 = 7,
-	animation_index_07 = 8,
-	animation_index_08 = 9,
-	animation_index_09 = 10,
-	animation_index_10 = 11,
-	animation_index_11 = 12,
-	animation_index_12 = 13,
-	animation_index_13 = 14,
-	animation_index_14 = 15,
-	animation_index_15 = 16,
-	animation_index_16 = 17,
-	animation_index_17 = 18,
-	animation_index_18 = 19,
-	animation_index_19 = 20,
-	animation_index_20 = 21,
-	animation_index_21 = 22,
-	animation_index_22 = 23,
-	animation_index_23 = 24,
-	animation_index_24 = 25,
-	animation_index_25 = 26,
-	animation_index_26 = 27,
-	animation_index_27 = 28,
-	animation_index_28 = 29,
-	animation_index_29 = 30,
-	animation_index_30 = 31,
-	animation_index_31 = 32,
-	animation_index_32 = 33,
-	animation_index_33 = 34,
-	animation_index_34 = 35,
-	animation_index_35 = 36,
-	animation_index_36 = 37,
-	animation_index_37 = 38,
-	animation_index_38 = 39,
-	animation_index_39 = 40,
-	animation_index_40 = 41,
-	animation_index_41 = 42,
-	animation_index_42 = 43,
-	animation_index_43 = 44,
-	animation_index_44 = 45,
-	animation_index_45 = 46,
-	animation_index_46 = 47,
-	animation_index_47 = 48,
-	animation_index_48 = 49,
-	animation_index_49 = 50,
-	animation_index_50 = 51,
-	animation_index_51 = 52,
-	animation_index_52 = 53,
-	animation_index_53 = 54,
-	animation_index_54 = 55,
-	animation_index_55 = 56,
-	animation_index_56 = 57,
-	animation_index_57 = 58,
-	animation_index_58 = 59,
-	animation_index_59 = 60,
-	animation_index_60 = 61,
-	animation_index_61 = 62,
-	animation_index_62 = 63,
-	animation_index_63 = 64
-};
-
 enum e_text_flags : int
 {
 	text_flag_left_justify_text = FLAG(0),
@@ -407,7 +337,7 @@ enum e_button_flags : int
 struct s_button_widget_reference
 {
 	e_text_flags text_flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short pad;
 
@@ -422,7 +352,7 @@ struct s_button_widget_reference
 	string_id string_id;
 	short render_depth_bias;
 	short mouse_region_top_offset;
-	
+
 	e_button_flags button_flags;
 };
 ASSERT_STRUCT_SIZE(s_button_widget_reference, 0x3C);
@@ -511,7 +441,7 @@ struct s_list_reference
 	short num_visible_items;
 	point2d bottom_left;
 
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 
 	// Explaination("UNUSED", "This is unused")
@@ -559,7 +489,7 @@ ASSERT_STRUCT_SIZE(s_table_view_list_row_reference_OBSOLETE, 16);
 struct s_table_view_list_reference_OBSOLETE
 {
 	e_table_view_list_reference_flags flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 
 	e_custom_font custom_font;
@@ -574,7 +504,7 @@ ASSERT_STRUCT_SIZE(s_table_view_list_reference_OBSOLETE, 40);
 struct s_text_block_reference
 {
 	e_text_flags text_flags;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short pad0;
 
@@ -608,7 +538,7 @@ struct s_hud_block_reference
 {
 	e_hud_block_reference_flags flags;
 
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 	short intro_animation_delay_milliseconds;
 	short render_depth_bias;
 	short starting_bitmap_sequence_index;
@@ -642,14 +572,14 @@ struct s_player_block_reference
 	byte column_count;
 	short row_height;
 	short column_width;
-}; 
+};
 ASSERT_STRUCT_SIZE(s_player_block_reference, 24);
 
 #define k_maximum_number_of_window_pane_tag_blocks 16
 struct s_window_pane_reference
 {
 	short pad;
-	e_animation_index animation_index;
+	e_ui_animation_index animation_index;
 
 	// Explaination("Button Definitions", "If the pane contains buttons, define them here")
 	tag_block<s_button_widget_reference> buttons;
@@ -679,7 +609,7 @@ ASSERT_STRUCT_SIZE(s_window_pane_reference, 0x4C);
 // ### TODO Finish this
 struct s_user_interface_screen_widget_definition
 {
-	/* Explaination("Notes on screen widgets:", 
+	/* Explaination("Notes on screen widgets:",
 	"- the widget coordinate system is a left-handed system (+x to the right, +y up, +z into the screen)
 	with the origin centered in the display(regardless of display size)
 	- for widget component placement, all coordinates you define in the tag specifiy the object's

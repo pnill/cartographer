@@ -80,6 +80,10 @@ public:
 		ASSERT(index < k_maximum_count);
 		return &m_data[index];
 	}
+	t_type* next()
+	{
+		return &this->m_data[this->m_count++];
+	}
 protected:
 	uint32 m_count = 0;
 	t_type m_data[k_maximum_count];

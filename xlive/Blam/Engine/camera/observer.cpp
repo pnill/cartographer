@@ -5,6 +5,7 @@
 
 #include "cutscene/cinematics.h"
 #include "effects/player_effects.h"
+#include "game/game.h"
 #include "game/game_time.h"
 #include "game/players.h"
 #include "interface/first_person_weapons.h"
@@ -14,7 +15,6 @@
 #include "scenario/scenario.h"
 #include "shell/shell.h"
 
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 /* constants */
 
@@ -132,14 +132,24 @@ void observer_set_suggested_field_of_view(real32 fov)
 	if (fov <= 0 || fov > 110) return;
 
 	float final_fov_rad;
-	if (currentVariantSettings.forced_fov == 0)
+
+	if (game_is_multiplayer())
 	{
-		final_fov_rad = DEGREES_TO_RADIANS(fov);
+		s_game_variant* variant = get_game_variant();
+		if (variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
+		{
+			final_fov_rad = DEGREES_TO_RADIANS(78.f);
+		}
+		else
+		{
+			final_fov_rad = DEGREES_TO_RADIANS(fov);
+		}
 	}
 	else
 	{
-		final_fov_rad = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+		final_fov_rad = DEGREES_TO_RADIANS(fov);
 	}
+
 	*Memory::GetAddress<float*>(0x413780, 0x3B5300) = final_fov_rad;
 	return;
 }

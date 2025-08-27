@@ -1,0 +1,17 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_match_settings_property_item_count 4
+
+enum e_halo_playlist_match_settings_property : int32
+{
+	_halo_playlist_match_settings_property_number_of_rounds,
+	_halo_playlist_match_settings_property_round_time_limit,
+	_halo_playlist_match_settings_property_rounds_reset_map,
+	_halo_playlist_match_settings_property_resolve_ties,
+
+	k_halo_playlist_match_settings_property_count,
+	k_halo_playlist_match_settings_property_invalid = NONE
+};
+
+e_halo_playlist_match_settings_property halo_playlist_item_collection_match_settings_property_get_value(wchar_t* value);

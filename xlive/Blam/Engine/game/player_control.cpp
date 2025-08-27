@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "player_control.h"
 
+#include "game.h"
 #include "players.h"
 
 #include "cache/cache_files.h"
@@ -9,8 +10,6 @@
 #include "main/interpolator.h"
 #include "saved_games/cartographer_player_profile/cartographer_player_profile.h"
 #include "units/units.h"
-
-#include "H2MOD/Modules/CustomVariantSettings/CustomVariantSettings.h"
 
 real32 g_player_control_dt = 0.0f;
 
@@ -29,10 +28,11 @@ real32 __cdecl player_control_get_field_of_view(uint32 user_index)
 	{
 		float fov;
 		const s_saved_game_cartographer_player_profile* profile_settings = cartographer_player_profile_get_by_user_index(user_index);
+		const s_game_variant* variant = get_game_variant();
 
-		if (currentVariantSettings.forced_fov != 0)
+		if (game_is_multiplayer() && variant && variant->cartographer_settings.flags.test(_cartographer_variant_force_default_fov))
 		{
-			fov = DEGREES_TO_RADIANS(currentVariantSettings.forced_fov);
+			fov = DEGREES_TO_RADIANS(78.f);
 		}
 		else if (profile_settings)
 		{

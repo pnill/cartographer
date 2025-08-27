@@ -699,3 +699,13 @@ void c_screen_multiplayer_pregame_lobby::apply_patches_on_map_load()
 	csmemcpy(cooperative_pane->text_blocks[_pregame_lobby_pane_1_text_chat_body], custom_games_pane->text_blocks[_pregame_lobby_pane_0_text_chat_body], sizeof(s_text_block_reference));
 
 }
+
+void __cdecl c_screen_multiplayer_pregame_lobby::globals_set_variant(s_game_variant* variant)
+{
+	INVOKE(0x243CFA, 0, globals_set_variant, variant);
+}
+
+void c_screen_multiplayer_pregame_lobby::globals_set_unk_flag(bool state)
+{
+	INVOKE(0x243DD1, 0, globals_set_unk_flag, state);
+}

@@ -1,0 +1,8 @@
+#pragma once
+#include "halo_playlist_item_collection.h"
+
+#define k_halo_playlist_max_heads_carried_item_count 8
+
+e_headhunter_max_heads_carried halo_playlist_item_collection_max_heads_carried_get_value(wchar_t* value);
+
+bool halo_playlist_item_collection_max_heads_carried_write_to_variant(wchar_t* value, s_game_variant* variant);

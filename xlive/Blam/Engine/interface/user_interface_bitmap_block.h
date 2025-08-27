@@ -38,3 +38,5 @@ public:
 	virtual c_user_interface_text* get_interface() override;
 };
 ASSERT_STRUCT_SIZE(c_bitmap_widget, 0x98);
+
+void __cdecl user_interface_set_bitmap_from_variant(s_game_variant* variant, c_bitmap_widget* widget);

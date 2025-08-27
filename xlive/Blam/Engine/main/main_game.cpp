@@ -8,7 +8,7 @@
 
 /* constants */
 
-s_variant_description_map k_launch_multiplayer_variants[k_variant_count] =
+s_variant_description_map k_launch_multiplayer_variants[k_base_game_variant_description_count] =
 {
 	{ "slayer", _game_variant_description_slayer },
 	{ "oddball", _game_variant_description_oddball },
@@ -90,7 +90,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 		g_main_game_launch_user_count = player_count;
 		if (g_main_game_launch_options.game_variant.variant_game_engine_index == _game_engine_type_none)
 		{
-			game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
+			game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
 			g_main_game_launch_options.game_variant.round_time_limit = 0;
 		}
 	}
@@ -100,7 +100,7 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 void main_game_launch_set_multiplayer_variant(const char* variant_name)
 {	
 	size_t i = 0;
-	for (; i < k_variant_count; ++i)
+	for (; i < k_base_game_variant_description_count; ++i)
 	{
 		if (!csstricmp(variant_name, k_launch_multiplayer_variants[i].name))
 		{
@@ -108,14 +108,14 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 		}
 	}
 
-	if (i == k_variant_count)
+	if (i == k_base_game_variant_description_count)
 	{
 		error(_error_silent, "%s: invalid variant name [%s] provided, defaulting to slayer", __FUNCTION__, variant_name);
-		game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
+		game_variant_create_default_new(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
 	}
 	else
 	{
-		game_variant_build_default(&g_main_game_launch_options.game_variant, k_launch_multiplayer_variants[i].index);
+		game_variant_create_default_new(&g_main_game_launch_options.game_variant, k_launch_multiplayer_variants[i].index);
 	}
 
 	g_main_game_launch_options.game_variant.round_time_limit = 0;

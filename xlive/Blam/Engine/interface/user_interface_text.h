@@ -245,6 +245,9 @@ ASSERT_STRUCT_SIZE(c_user_interface_text, 0x44);
 
 float get_ui_text_label_scale();
 void set_ui_text_label_scale(float scale);
+
+void __cdecl user_interface_parse_private_use_character_game_type(int32 a1, wchar_t* buffer);
+
 bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, char a3);
 
 void user_interface_text_apply_hooks();
