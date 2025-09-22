@@ -86,24 +86,27 @@ void GetAchievements(unsigned long long xuid)
 		document.Parse(readBuffer.c_str());
 
 		csmemset(g_achievement_list, false, sizeof(g_achievement_list));
-		for (rapidjson::Value& achievement : document["achievements"].GetArray())
+		if (!document.HasParseError() && document.HasMember("achievements"))
 		{
-			// TODO: remove string conversion once master is updated and just do achievement.GetUint() 
-			if (achievement.IsString() || achievement.IsUint())
+			for (rapidjson::Value& achievement : document["achievements"].GetArray())
 			{
-				const uint32 id = achievement.IsString() ? (uint32)std::stoll(achievement.GetString()) : achievement.GetUint();
-				if (VALID_INDEX(id, NUMBEROF(g_achievement_list)))
+				// TODO: remove string conversion once master is updated and just do achievement.GetUint() 
+				if (achievement.IsString() || achievement.IsUint())
 				{
-					g_achievement_list[id] = true;
+					const uint32 id = achievement.IsString() ? (uint32)std::stoll(achievement.GetString()) : achievement.GetUint();
+					if (VALID_INDEX(id, NUMBEROF(g_achievement_list)))
+					{
+						g_achievement_list[id] = true;
+					}
+					else
+					{
+						error(_error_immediate, "invalid achievement index provided: %d", id);
+					}
 				}
 				else
 				{
-					error(_error_immediate, "invalid achievement index provided: %d", id);
+					error(_error_immediate, "invalid data type in achievements array");
 				}
-			}
-			else
-			{
-				error(_error_immediate, "invalid data type in achievements array");
 			}
 		}
 	}

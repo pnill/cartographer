@@ -673,7 +673,7 @@ void CServerList::GetServerCounts(PXOVERLAPPED pOverlapped)
 
 		document.Parse(readBuffer.c_str());
 
-		if (document.HasMember("public_count"))
+		if (!document.HasParseError() && document.HasMember("public_count"))
 		{
 			h2v_service_properties.total_count = document["total"].GetInt();
 			h2v_service_properties.total_peer = document["peer_count"].GetInt();
