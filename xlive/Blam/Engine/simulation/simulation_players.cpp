@@ -4,7 +4,10 @@
 #include "simulation.h"
 
 #include "cartographer/discord/discord_interface.h"
+#include "networking/logic/life_cycle_manager.h"
 #include "shell/shell.h"
+
+#include <H2MOD/Modules/EventHandler/EventHandler.hpp>
 
 /* prototypes */
 
@@ -38,6 +41,13 @@ void __cdecl simulation_player_joined_game(datum player_index)
 			// Update discord player counts
 			discord_interface_set_player_counts();
 		}
+	}
+
+	// Remove this when new custom variant settings are finished
+	c_network_session* session = NULL;
+	if (network_life_cycle_in_squad_session(&session))
+	{
+		EventHandler::NetworkPlayerEventExecute(EventExecutionType::execute_after, session->get_player_membership(player_index)->peer_index, EventHandler::NetworkPlayerEventType::add);
 	}
 	return;
 }
