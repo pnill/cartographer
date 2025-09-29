@@ -1,6 +1,8 @@
 #pragma once
 #include "game/game_allegiance.h"
+#include "tag_files/string_id.h"
 #include "tag_files/tag_block.h"
+#include "tag_files/tag_reference.h"
 
 
 enum e_combination_rule : short

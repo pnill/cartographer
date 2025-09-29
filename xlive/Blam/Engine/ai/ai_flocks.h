@@ -4,10 +4,14 @@
 #include "tag_files/tag_block.h"
 #include "tag_files/string_id.h"
 
+/* constants */
 
-#define k_max_flock_definitions_per_map 20
-#define k_max_sinks_per_flock 10
-#define k_max_sources_per_flock 10
+enum
+{
+	k_max_flock_definitions_per_map = 20,
+	k_max_sinks_per_flock = 10,
+	k_max_sources_per_flock = 10,
+};
 
 enum e_flock_definition_flags : short
 {
@@ -94,3 +98,7 @@ struct flock_definition
 	string_id flock_name;
 };
 ASSERT_STRUCT_SIZE(flock_definition, 132);
+
+/* prototypes */
+
+void __cdecl flocks_initialize_for_new_map(void);

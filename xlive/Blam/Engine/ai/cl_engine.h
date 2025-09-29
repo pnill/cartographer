@@ -36,3 +36,7 @@ struct cs_script_data
 	byte pad[120];
 };
 ASSERT_STRUCT_SIZE(cs_script_data, 128);
+
+/* prototypes */
+
+void __cdecl cs_initialize_for_new_map(void);

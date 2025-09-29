@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "H2MOD.h"
 
+#include "ai/ai.h"
 #include "cache/cache_files.h"
 #include "camera/camera.h"
 #include "camera/dead_camera.h"
@@ -133,8 +134,6 @@ bool g_xbox_tickrate_enabled = false;
 /* prototypes */
 
 static void toggle_xbox_tickrate(s_game_options* options, bool toggle);
-
-static void toggle_ai_multiplayer(bool toggle);
 
 static bool __cdecl OnPlayerSpawn(datum playerDatumIdx);
 
@@ -380,12 +379,6 @@ static void toggle_xbox_tickrate(s_game_options* options, bool toggle)
 	return;
 }
 
-static void toggle_ai_multiplayer(bool toggle)
-{
-	WriteValue<BYTE>(Memory::GetAddress(0x30E684, 0x2B93F4), toggle ? JMP_OP_CODE : JNZ_OP_CODE);
-	return;
-}
-
 static void __cdecl OnPlayerDeath(datum player_index)
 {
 	CustomVariantHandler::OnPlayerDeath(ExecTime::_preEventExec, player_index);
@@ -449,7 +442,6 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 	}
 
 	// reset everything
-	toggle_ai_multiplayer(false);
 	toggle_xbox_tickrate(options, false);
 
 	// reset custom gametypes state
@@ -508,7 +500,6 @@ static bool __cdecl OnMapLoad(s_game_options* options)
 				ProjectileFix::ApplyProjectileVelocity();
 			}
 
-			toggle_ai_multiplayer(true);
 			if (get_game_life_cycle() == _life_cycle_in_game)
 			{
 				// send server map checksums to client
@@ -627,6 +618,8 @@ static void h2mod_apply_hooks(void)
 
 	// disable part of custom map tag verification
 	NopFill(Memory::GetAddress(0x4FA0A, 0x56C0A), 6);
+
+	ai_apply_patches();
 
 	cheats_apply_patches();
 	main_apply_patches();

@@ -14,11 +14,11 @@ enum
 
 /* typedefs */
 
-typedef void(__cdecl* initialize_proc_t)(void);
-typedef void(__cdecl* dispose_proc_t)(void);
-typedef void(__cdecl* reset_proc_t)(void);
-typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
-typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
+typedef void(__cdecl* t_initialize_proc)(void);
+typedef void(__cdecl* t_dispose_proc)(void);
+typedef void(__cdecl* t_initialize_for_new_map_proc)(void);
+typedef void(__cdecl* t_dispose_from_old_map_proc)(void);
+typedef void(__cdecl* t_activation_proc)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
 
 /* structures */
 
@@ -50,15 +50,15 @@ ASSERT_STRUCT_SIZE(game_globals_storage, 0x1270);
 
 struct s_game_systems
 {
-	initialize_proc_t initialize_proc;
-	dispose_proc_t dispose_proc;
-	reset_proc_t reset_proc;
-	dispose_from_old_map_proc_t dispose_from_old_map_proc;
+	t_initialize_proc initialize_proc;
+	t_dispose_proc dispose_proc;
+	t_initialize_for_new_map_proc initialize_for_new_map_proc;
+	t_dispose_from_old_map_proc dispose_from_old_map_proc;
 	void* unk4;
 	void* unk5;
 	void* unk6;
 	void* unk7;
-	activation_proc_t activation_proc;
+	t_activation_proc activation_proc;
 };
 ASSERT_STRUCT_SIZE(s_game_systems, 36);
 

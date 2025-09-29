@@ -146,3 +146,7 @@ struct triggers_block
 	tag_block<order_completion_condition_definition> conditions;
 };
 ASSERT_STRUCT_SIZE(triggers_block, 48);
+
+/* prototypes */
+
+void __cdecl orders_initialize_for_new_map(void);

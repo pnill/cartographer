@@ -238,4 +238,8 @@ struct actor_datum
 };
 ASSERT_STRUCT_SIZE(actor_datum, 0x898);
 
-data_array* get_actor_table();
+/* prototypes */
+
+data_array* get_actor_table(void);
+
+void __cdecl actors_initialize_for_new_map(void);

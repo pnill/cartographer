@@ -38,12 +38,6 @@
 typedef void(__cdecl* game_frame_t)(real32);
 typedef void(__cdecl* t_main_loop_process_global_state_changes)();
 
-typedef void(__cdecl* initialize_proc_t)(void);
-typedef void(__cdecl* dispose_proc_t)(void);
-typedef void(__cdecl* reset_proc_t)(void);
-typedef void(__cdecl* dispose_from_old_map_proc_t)(void);
-typedef void(__cdecl* activation_proc_t)(s_game_cluster_bit_vectors*, s_game_cluster_bit_vectors*);
-
 /* structures */
 
 
@@ -462,9 +456,9 @@ void __cdecl game_initialize_for_new_map(const s_game_options* options)
 	s_game_systems* g_game_systems = get_game_systems();
 	for (int32 i = 0; i < 70; i++)
 	{
-		if (g_game_systems[i].reset_proc)
+		if (g_game_systems[i].initialize_for_new_map_proc)
 		{
-			g_game_systems[i].reset_proc();
+			g_game_systems[i].initialize_for_new_map_proc();
 		}
 	}
 	game_globals->initializing = false;

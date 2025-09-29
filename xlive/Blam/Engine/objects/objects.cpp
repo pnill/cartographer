@@ -174,7 +174,7 @@ void objects_apply_patches(void)
 	objects_apply_interpolation_patches();
 
 	s_game_systems* g_game_systems = get_game_systems();
-	WritePointer((uintptr_t)&g_game_systems[28].reset_proc, objects_initialize_for_new_map);
+	WritePointer((uintptr_t)&g_game_systems[28].initialize_for_new_map_proc, objects_initialize_for_new_map);
 	return;
 }
 

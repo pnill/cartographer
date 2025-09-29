@@ -7,9 +7,12 @@
 
 /* constants */
 
-#define k_max_roles_per_scene 10
-#define k_max_variants_per_line 10
-#define k_max_lines_per_scenario 500
+enum
+{
+	k_max_roles_per_scene = 10,
+	k_max_variants_per_line = 10,
+	k_max_lines_per_scenario = 500
+};
 
 /* enums */
 
@@ -178,3 +181,7 @@ struct ai_mission_dialogue
 	tag_block<mission_dialogue_line> lines;
 };
 ASSERT_STRUCT_SIZE(ai_mission_dialogue, 8);
+
+/* prototypes */
+
+void __cdecl ai_scenes_initialize_for_new_map(void);

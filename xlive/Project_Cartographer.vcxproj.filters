@@ -58,7 +58,6 @@
     <ClCompile Include="H2MOD\Modules\TagFixes\TagFixes.cpp" />
     <ClCompile Include="H2MOD\Modules\RenderHooks\RenderHooks.cpp" />
     <ClCompile Include="Util\Memory.cpp" />
-    <ClCompile Include="H2MOD\Modules\HaloScript\HaloScript.cpp" />
     <ClCompile Include="Blam\Engine\game\game_time.cpp" />
     <ClCompile Include="H2MOD\Modules\DirectorHooks\DirectorHooks.cpp" />
     <ClCompile Include="H2MOD\Modules\MainMenu\MapSlots.cpp" />
@@ -340,7 +339,6 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_list_item.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_text.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_4way_signin.cpp" />
-    <ClCompile Include="Blam\Engine\interface\user_interface_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_memory.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_utilities.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_widget_tab_view.cpp" />
@@ -507,6 +505,29 @@
     <ClCompile Include="Blam\Engine\game\game_allegiance.cpp" />
     <ClCompile Include="Blam\Engine\sapien\patches_initialize.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_splitscreen_setting.cpp" />
+    <ClCompile Include="Blam\Engine\achievements\achievement_live_interface.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_channel.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_address.cpp" />
+    <ClCompile Include="Blam\Engine\networking\transport\transport_security.cpp" />
+    <ClCompile Include="Blam\Engine\simulation\game_interface\simulation_game_vehicles.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Coagulation.cpp" />
+    <ClCompile Include="H2MOD\Modules\SpecialEvents\Events\MapObjectPlacements\Halloween\Lockout.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_player.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_debug.cpp" />
+    <ClCompile Include="Blam\Engine\ai\swarms.cpp" />
+    <ClCompile Include="Blam\Engine\ai\props.cpp" />
+    <ClCompile Include="Blam\Engine\ai\squads.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_orders.cpp" />
+    <ClCompile Include="Blam\Engine\ai\clumps.cpp" />
+    <ClCompile Include="Blam\Engine\ai\joint_behavior.cpp" />
+    <ClCompile Include="Blam\Engine\ai\actor_dynamic_firing_position.cpp" />
+    <ClCompile Include="Blam\Engine\ai\cl_engine.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_script.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_dialogue.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_mission_dialogue.cpp" />
+    <ClCompile Include="Blam\Engine\ai\ai_flocks.cpp" />
+    <ClCompile Include="Blam\Engine\ai\gravemind.cpp" />
+    <ClCompile Include="Blam\Engine\ai\event_handling.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -652,7 +673,6 @@
     <ClInclude Include="H2MOD\Modules\TagFixes\TagFixes.h" />
     <ClInclude Include="H2MOD\Modules\RenderHooks\RenderHooks.h" />
     <ClInclude Include="Util\Memory.h" />
-    <ClInclude Include="H2MOD\Modules\HaloScript\HaloScript.h" />
     <ClInclude Include="H2MOD\Modules\DirectorHooks\DirectorHooks.h" />
     <ClInclude Include="Blam\Engine\objects\damage.h" />
     <ClInclude Include="H2MOD\Modules\MainMenu\MapSlots.h" />
@@ -834,7 +854,6 @@
     <ClInclude Include="Blam\Engine\items\items.h" />
     <ClInclude Include="Blam\Engine\items\weapons.h" />
     <ClInclude Include="Blam\Engine\objects\object_definition.h" />
-    <ClInclude Include="Blam\Engine\objects\object_type_list.h" />
     <ClInclude Include="Blam\Engine\objects\object_types.h" />
     <ClInclude Include="Blam\Engine\units\bipeds.h" />
     <ClInclude Include="Blam\Engine\main\main.h" />
@@ -1094,7 +1113,6 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_list_item.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_text.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_4way_signin.h" />
-    <ClInclude Include="Blam\Engine\interface\user_interface_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_memory.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_utilities.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_widget_tab_view.h" />
@@ -2047,6 +2065,32 @@
     <ClInclude Include="Blam\Engine\sapien\patches_initialize.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_splitscreen_setting.h" />
     <ClInclude Include="Blam\Engine\input\input_constants.h" />
+    <ClInclude Include="Blam\Engine\achievements\achievement_live_interface.h" />
+    <ClInclude Include="Blam\Engine\interface\channel_with_history.h" />
+    <ClInclude Include="Blam\Engine\interface\dialog_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\gameshell_background_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\gameshell_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\game_error_dialog_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\hardware_error_dialog_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\online_menu_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_channel.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_main_menu_music.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat_receiver.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_text_chat_sender.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_address.h" />
+    <ClInclude Include="Blam\Engine\networking\transport\transport_security.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_player.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_debug.h" />
+    <ClInclude Include="Blam\Engine\ai\swarms.h" />
+    <ClInclude Include="Blam\Engine\ai\props.h" />
+    <ClInclude Include="Blam\Engine\ai\squads.h" />
+    <ClInclude Include="Blam\Engine\ai\clumps.h" />
+    <ClInclude Include="Blam\Engine\ai\joint_behavior.h" />
+    <ClInclude Include="Blam\Engine\ai\actor_dynamic_firing_position.h" />
+    <ClInclude Include="Blam\Engine\ai\ai_script.h" />
+    <ClInclude Include="Blam\Engine\ai\gravemind.h" />
+    <ClInclude Include="Blam\Engine\ai\event_handling.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
