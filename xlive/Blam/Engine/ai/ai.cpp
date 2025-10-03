@@ -31,7 +31,7 @@ static ai_globals_type* ai_globals_get(void);
 void ai_apply_patches(void)
 {
     // Replace function so we can initialize ai in MP
-    WritePointer((uintptr_t)&get_game_systems()[4].initialize_for_new_map_proc, ai_initialize_for_new_map);
+    WritePointer((uintptr_t)&get_game_systems()[59].initialize_for_new_map_proc, ai_initialize_for_new_map);
     return;
 }
 
@@ -79,5 +79,5 @@ void __cdecl ai_initialize_for_new_map(void)
 
 static ai_globals_type* ai_globals_get(void)
 {
-    return *Memory::GetAddress<ai_globals_type**>(0xA965CC, 0x0);
+    return *Memory::GetAddress<ai_globals_type**>(0xA965CC, 0x9A1C4C);
 }
