@@ -33,3 +33,5 @@ version_git.h
 JSON/
 
 xlive/version_git.h
+xlive/3rdparty/zlib/lib
+xlive/3rdparty/zlib/objects

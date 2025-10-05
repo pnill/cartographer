@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xlive", "xlive\Project_Cartographer.vcxproj", "{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F} = {0A00117C-C1D6-4C5C-B241-694D7F87421F}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "zlib", "xlive\3rdparty\zlib\zlib.vcxproj", "{0A00117C-C1D6-4C5C-B241-694D7F87421F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +31,18 @@ Global
 		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_min_msvc|x86.Build.0 = release_min_msvc|Win32
 		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.ActiveCfg = release_msvc|Win32
 		{DC9655D6-D9C0-4837-8A63-B0693EEED4E8}.release_msvc|x86.Build.0 = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.debug_llvm|x86.ActiveCfg = debug_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.debug_llvm|x86.Build.0 = debug_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.debug_msvc|x86.ActiveCfg = debug_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.debug_msvc|x86.Build.0 = debug_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_llvm|x86.ActiveCfg = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_llvm|x86.Build.0 = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_min_llvm|x86.ActiveCfg = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_min_llvm|x86.Build.0 = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_min_msvc|x86.ActiveCfg = release_min_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_min_msvc|x86.Build.0 = release_min_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_msvc|x86.ActiveCfg = release_msvc|Win32
+		{0A00117C-C1D6-4C5C-B241-694D7F87421F}.release_msvc|x86.Build.0 = release_msvc|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
