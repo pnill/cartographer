@@ -4,6 +4,7 @@
 // Disable sign/unsigned comparison mismatch in spdlog
 #pragma warning( push )
 #pragma warning( disable : 4389)
+#pragma warning( disable : 4244)
 #include "spdlog/logger.h"
 #pragma warning( pop )
 
