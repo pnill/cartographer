@@ -1,5 +1,4 @@
 #pragma once
-#include "transport.h"
 
 /* structures */
 
@@ -25,6 +24,7 @@ struct s_transport_unique_identifier
 
 /* prototypes */
 
+// Return true if both secure addresses are the same
 bool transport_secure_address_compare(const s_transport_secure_address* a, const s_transport_secure_address* b);
 
 char* transport_secure_identifier_get_string(const s_transport_secure_identifier* identifier);
@@ -39,8 +39,10 @@ const char* transport_secure_address_get_mac_string(const s_transport_secure_add
 
 bool __cdecl transport_secure_identifier_retrieve(
 	const struct transport_address* usable_address,
-	e_transport_platform platform,
+	enum e_transport_platform platform,
 	int32* remote_identifier,
 	struct s_transport_secure_identifier* secure_identifier,
 	struct s_transport_secure_key* secure_key,
 	struct s_transport_secure_address* secure_address);
+
+bool __cdecl transport_secure_address_get(struct s_transport_secure_address* secure_address, struct transport_address* address);

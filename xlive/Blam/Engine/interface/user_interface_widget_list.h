@@ -90,7 +90,7 @@ public:
 	void remove_focused_item_datum_from_data_array();
 	void remove_item_from_list(class c_list_item_widget* item);
 	void setup_item_indices();
-
+	bool transfer_focus_by_item_index(int32 item_index);
 
 	// c_list_widget virtual functions
 

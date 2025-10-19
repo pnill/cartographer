@@ -110,6 +110,10 @@ void c_list_widget::setup_item_indices()
 	INVOKE_TYPE(0x2136CE, 0x0, void(__thiscall*)(c_list_widget*), this);
 }
 
+bool c_list_widget::transfer_focus_by_item_index(int32 item_index)
+{
+	return INVOKE_TYPE(0x213E7C, 0x0, bool(__thiscall*)(c_list_widget*, int32), this, item_index);
+}
 
 // c_list_widget virtual functions
 

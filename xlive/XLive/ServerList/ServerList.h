@@ -59,7 +59,8 @@
 #define XLOCATOR_SERVER_PAGE_REPORT_ITEM_COUNT_MIN 24
 
 #define XLOCATOR_SERVER_PAGE_MIN_ITEMS		50
-#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		200
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS_OLD	200
+#define XLOCATOR_SERVER_PAGE_MAX_ITEMS		2000	// Increased because we hit the limit
 
 /* structs */
 
@@ -91,6 +92,18 @@ typedef struct _HALO2VISTA_TITLE_SERVICE_PROPERTIES
 	int total_public_gold_property_id = 0x0;
 	int total_public_gold = 0;
 } HALO2VISTA_TITLE_SERVICE_PROPERTIES;
+
+
+typedef struct _XLOCATOR_FILTER_GROUP {
+	int field_0;
+	void* field_4;
+} XLOCATOR_FILTER_GROUP;
+
+
+typedef struct _XLOCATOR_SORTER {
+	int field_0;
+	void* field_4;
+} XLOCATOR_SORTER;
 
 /* classes */
 

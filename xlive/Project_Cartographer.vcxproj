@@ -725,6 +725,7 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_memory.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_model_block.cpp" />
     <ClCompile Include="Blam\Engine\interface\screens\screen_single_player_profile_select.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_player_widget.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_shared_globals.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_text_block.cpp" />
@@ -1096,6 +1097,7 @@
     <ClInclude Include="Blam\Engine\interface\user_interface_model_block.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_networking.h" />
     <ClInclude Include="Blam\Engine\interface\screens\screen_single_player_profile_select.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_network_search.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_player_widget.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_shared_globals.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_text.h" />
@@ -1164,6 +1166,7 @@
     <ClInclude Include="Blam\Engine\networking\logic\network_bandwidth.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_broadcast_search.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_life_cycle.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\network_logic.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_search.h" />
     <ClInclude Include="Blam\Engine\Networking\logic\network_session_interface.h" />
     <ClInclude Include="Blam\Engine\networking\logic\storage\network_storage.h" />

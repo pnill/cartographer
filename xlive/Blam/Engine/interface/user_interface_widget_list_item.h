@@ -15,7 +15,11 @@ protected:
 
 public:
 	c_list_item_widget();
+	
+	void set_last_data_index(int32 index);
+	
 	datum get_last_data_index(void) const;
+
 	void set_item_transitioning(bool state);
 
 	

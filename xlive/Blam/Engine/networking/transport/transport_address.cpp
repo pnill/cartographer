@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "transport_address.h"
 
+#include "transport.h"
 #include "transport_security.h"
 
 /* globals */

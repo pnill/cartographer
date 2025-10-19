@@ -941,7 +941,18 @@ DWORD WINAPI XLocatorGetServiceProperty(DWORD dwUserIndex, DWORD cNumProperties,
 }
 
 // TODO: implement filters
-DWORD WINAPI XLocatorCreateServerEnumerator(int a1, DWORD cItems, DWORD cRequiredPropertyIDs, DWORD* pRequiredPropertyIDs, int a5, int a6, int a7, int a8, DWORD* pcbBuffer, PHANDLE phEnum)
+DWORD WINAPI XLocatorCreateServerEnumerator(
+	DWORD dwUserIndex,
+	DWORD cItems,
+	DWORD cRequiredPropertyIDs,
+	DWORD* pRequiredPropertyIDs,
+	DWORD cFilterGroupItems,
+	XLOCATOR_FILTER_GROUP* pxlFilterGroups,
+	DWORD cSorterItems,
+	XLOCATOR_SORTER* pSorterItems,
+	DWORD* pcbBuffer,
+	PHANDLE phEnum
+)
 {
 	LOG_TRACE_XLIVE("{}()", __FUNCTION__);
 

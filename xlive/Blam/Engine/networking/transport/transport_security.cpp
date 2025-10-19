@@ -144,7 +144,6 @@ const char* transport_secure_address_get_mac_string(const s_transport_secure_add
 	return transport_unique_identifier_get_string(&unique_id);
 }
 
-
 bool __cdecl transport_secure_identifier_retrieve(
 	const transport_address* usable_address,
 	e_transport_platform platform, 
@@ -154,4 +153,9 @@ bool __cdecl transport_secure_identifier_retrieve(
 	s_transport_secure_address* secure_address)
 {
 	return INVOKE(0x1B5F84, 0x1963BE, transport_secure_identifier_retrieve, usable_address, platform, remote_identifier, secure_identifier, secure_key, secure_address);
+}
+
+bool __cdecl transport_secure_address_get(s_transport_secure_address* secure_address, transport_address* address)
+{
+	return INVOKE(0x1B5836, 0x0, transport_secure_address_get, secure_address, address);
 }

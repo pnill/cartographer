@@ -514,6 +514,7 @@
     <ClCompile Include="Blam\Engine\physics\collision_usage.cpp" />
     <ClCompile Include="Blam\Engine\tool\tool_patches_initialize.cpp" />
     <ClCompile Include="H2MOD\Modules\h2log\h2log.cpp" />
+    <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1970,6 +1971,8 @@
     <ClInclude Include="Blam\Engine\units\vehicle_scenario_definitions.h" />
     <ClInclude Include="Blam\Engine\tool\tool_patches_initialize.h" />
     <ClInclude Include="H2MOD\Modules\h2log\h2log.h" />
+    <ClInclude Include="Blam\Engine\interface\user_interface_network_search.h" />
+    <ClInclude Include="Blam\Engine\networking\logic\network_logic.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

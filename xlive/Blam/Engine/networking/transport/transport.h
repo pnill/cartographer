@@ -1,4 +1,5 @@
 #pragma once
+#include "transport_security.h"
 
 /* constants */
 
@@ -39,6 +40,13 @@ struct s_transport_globals
 	void* reset_parameters[k_number_of_transition_functions];
 };
 ASSERT_STRUCT_SIZE(s_transport_globals, 136);
+
+struct s_transport_session_description
+{
+	s_transport_secure_identifier id;
+	s_transport_secure_key key;
+	s_transport_secure_address host_address;
+};
 
 /* prototypes */
 

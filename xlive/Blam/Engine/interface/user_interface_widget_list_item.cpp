@@ -14,6 +14,12 @@ c_list_item_widget::c_list_item_widget() :
 
 }
 
+void c_list_item_widget::set_last_data_index(int32 index)
+{
+	m_last_data_index = index;
+	return;
+}
+
 datum c_list_item_widget::get_last_data_index(void) const
 {
 	return this->m_last_data_index;
