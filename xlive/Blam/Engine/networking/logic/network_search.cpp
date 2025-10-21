@@ -61,7 +61,7 @@ s_available_session* network_search_session(int32 session_index)
 	s_available_session* result = NULL;
 
 	s_network_search_globals* g_network_search_globals = network_search_globals_get();
-	if (session_index > 0 && session_index < g_network_search_globals->available_sessions_count)
+	if (VALID_INDEX(session_index, g_network_search_globals->available_sessions_count))
 	{
 		s_available_session* session = &g_network_search_globals->available_sessions[session_index];
 		if (network_search_session_valid(session))
