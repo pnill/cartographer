@@ -98,7 +98,8 @@ void main_apply_patches(void)
 	PatchCall(Memory::GetAddress(0x397F6, 0x4130F), main_game_reset_map_blue_screen_detection);
 	if (shell_is_dedicated_server())
 	{
-		PatchCall(Memory::GetAddress(0x0, 0xC684), main_loop_body_server);	// main_loop
+		PatchCall(Memory::GetAddress(0x0, 0xBA40), main_time_initialize);	// main_loop_initialize
+		PatchCall(Memory::GetAddress(0x0, 0xC684), main_loop_body_server);	// main_loop		
 	}
 	else
 	{

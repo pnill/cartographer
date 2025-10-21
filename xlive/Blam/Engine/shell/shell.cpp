@@ -55,7 +55,7 @@ void shell_apply_patches(void)
 	}
 	else
 	{
-		PatchCall(Memory::GetAddress(0x0, 0xC9BE), shell_initialize);
+		PatchCall(Memory::GetAddress(0x0, 0xC9BE), shell_initialize);	// main_loop_initialize
 	}
 
 	return;
