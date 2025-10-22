@@ -790,45 +790,6 @@ static void h2mod_apply_tweaks(void)
 	return;
 }
 
-static void __cdecl input_abstraction_update_key_state(BYTE* a1, WORD* a2, BYTE* a3, bool a4, int a5)
-{
-	auto p_update_keyboard_buttons_state_hook = Memory::GetAddressRelative<decltype(&input_abstraction_update_key_state)>(0x42E4C5);
-
-	BYTE keyboardState[256] = {};
-	if (!H2Config_disable_ingame_keyboard && GetKeyboardState(keyboardState))
-	{
-		for (int i = 0; i < 256; i++)
-		{
-			if (i != VK_SCROLL)
-			{
-				bool state = keyboardState[i] & 0x80;
-
-				// these keys need to be queried using GetAsyncKeyState because the Window Processing (WndProc) may consume the keys
-				if (i == VK_RSHIFT
-					|| i == VK_LSHIFT
-					|| i == VK_RCONTROL
-					|| i == VK_LCONTROL
-					|| i == VK_RMENU
-					|| i == VK_LMENU)
-				{
-					SHORT asyncKeyState = GetAsyncKeyState(i);
-
-					state = asyncKeyState & 0x8000;
-				}
-
-				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], state, a5);
-			}
-		}
-	}
-	else
-	{
-		for (int i = 0; i < 256; i++)
-			if (i != VK_SCROLL)
-				p_update_keyboard_buttons_state_hook(&a1[i], &a2[i], &a3[i], false, a5);
-	}
-	return;
-}
-
 static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, int a5, int a6)
 {
 	if (widget_type == 0x117)
