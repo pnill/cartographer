@@ -230,6 +230,8 @@ void input_windows_notify_change_device_mapping();
 
 void input_windows_release_key(WCHAR param);
 
+void input_windows_clear_keyboard_input_state(void);
+
 void __cdecl input_set_gamepad_rumbler_state(int16 gamepad_index, uint16 left, uint16 right);
 
 

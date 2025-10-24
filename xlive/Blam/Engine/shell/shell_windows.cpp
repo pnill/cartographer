@@ -439,13 +439,16 @@ static LRESULT WINAPI H2WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPar
 	switch (uMsg)
 	{
 	case WM_KEYUP:
+	case WM_SYSKEYUP:
 		input_windows_release_key((WCHAR)wParam);
 		break;
 	case WM_SETFOCUS:
 		g_custom_mouse_cursor_enabled = false;
+		input_windows_clear_keyboard_input_state();
 		break;
 	case WM_KILLFOCUS:
 		g_custom_mouse_cursor_enabled = true;
+		input_windows_clear_keyboard_input_state();
 		break;
 	case WM_SETCURSOR:
 		// check if the cursor is actually in client area

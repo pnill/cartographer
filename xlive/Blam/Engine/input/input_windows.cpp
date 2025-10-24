@@ -98,7 +98,7 @@ static s_key_remap g_key_remap[REMAPPED_KEY_COUNT] =
 	{ _key_c_cedilla, L'\xE7', NONE }
 };
 
-static bool g_keyboard_input_state[NUMBER_OF_KEYS];
+static c_static_flags_no_init<NUMBER_OF_KEYS> g_keyboard_input_state;
 
 bool g_should_offset_gamepad_indices = false;
 
@@ -224,7 +224,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				break;
 			}
 			keystroke.key_code = input_map_ascii_to_keycode(key);
-			g_keyboard_input_state[keystroke.key_code] = true;
+			g_keyboard_input_state.set(keystroke.key_code, true);
 		}
 		// Handle other characters
 		else if (msg == WM_CHAR || msg == WM_SYSCHAR)
@@ -239,7 +239,7 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 				keystroke.ascii_code = (int8)(upper_bit_exists ? NONE : wParam);
 				keystroke.utf16_code = (wchar_t)wParam;
 				keystroke.key_code = input_map_ascii_to_keycode(key);
-				g_keyboard_input_state[keystroke.key_code] = true;
+				g_keyboard_input_state.set(keystroke.key_code, true);
 			}
 		}
 
@@ -279,12 +279,12 @@ void input_add_key(int32 msg, uint32 wParam, uint32 lParam, bool fHandled)
 	byte key_state[256];
 	if (GetKeyboardState(key_state))
 	{
-		key_state[VK_LSHIFT] = 0;
-		key_state[VK_RSHIFT] = 0;
-		key_state[VK_LCONTROL] = 0;
-		key_state[VK_RCONTROL] = 0;
-		key_state[VK_LMENU] = 0;
-		key_state[VK_RMENU] = 0;
+		key_state[_key_left_shift] = 0;
+		key_state[_key_right_shift] = 0;
+		key_state[_key_left_control] = 0;
+		key_state[_key_right_control] = 0;
+		key_state[_key_left_alt] = 0;
+		key_state[_key_right_alt] = 0;
 		SetKeyboardState(key_state);
 	}
 	return;
@@ -551,18 +551,54 @@ void input_windows_release_key(WCHAR param)
 {
 	ASSERT(VALID_INDEX(param, NUMBER_OF_KEYS));
 
-	const e_input_key_code code = (e_input_key_code)PIN(param, 0, _key_not_a_key);
-	if (code)
+	e_input_key_code code = (e_input_key_code)PIN(param, 0, _key_not_a_key);
+	switch (code)
 	{
-		update_button(
-			&input_globals->keyboard.frames_down[code],
-			&input_globals->keyboard.msec_down[code],
-			&input_globals->keyboard.key_bool[code],
-			false,
-			0
-		);
-		g_keyboard_input_state[code] = false;
+	case _key_shift:
+		if (GetAsyncKeyState(VK_RSHIFT) > 0)
+		{
+			code = _key_right_shift;
+		}
+		else if (GetAsyncKeyState(VK_LSHIFT) > 0)
+		{
+			code = _key_left_shift;
+		}
+		break;
+	case _key_control:
+		if (GetAsyncKeyState(VK_LCONTROL) > 0)
+		{
+			code = _key_left_control;
+		}
+		else if (GetAsyncKeyState(VK_RCONTROL) > 0)
+		{
+			code = _key_right_control;
+		}
+		break;
+	case _key_menu:
+		if (GetAsyncKeyState(VK_RMENU) > 0)
+		{
+			code = _key_left_alt;
+		}
+		else if (GetAsyncKeyState(VK_LMENU) > 0)
+		{
+			code = _key_right_alt;
+		}
+		break;
 	}
+	update_button(
+		&input_globals->keyboard.frames_down[code],
+		&input_globals->keyboard.msec_down[code],
+		&input_globals->keyboard.key_bool[code],
+		false,
+		0
+	);
+	g_keyboard_input_state.set(code, false);
+	return;
+}
+
+void input_windows_clear_keyboard_input_state(void)
+{
+	g_keyboard_input_state.clear();
 	return;
 }
 
@@ -659,7 +695,7 @@ static void __cdecl update_button_input_update_hook(uint8 * frames, uint16 * mse
 			&input_globals->keyboard.frames_down[code],
 			&input_globals->keyboard.msec_down[code],
 			&input_globals->keyboard.key_bool[code],
-			g_keyboard_input_state[code],
+			g_keyboard_input_state.test(code),
 			elapsed_msec
 		);
 	}
