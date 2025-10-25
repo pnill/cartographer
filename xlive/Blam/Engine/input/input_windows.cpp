@@ -50,6 +50,8 @@ static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, b
 // Hook for update_button call in input_update
 static void __cdecl update_button_input_update_hook(uint8 * frames, uint16 * msec, bool* key_bool, bool down, int32 elapsed_msec);
 
+static void update_button_release_key(e_input_key_code code);
+
 static int compare_device_compatibility(const void* p1, const void* p2);
 
 static int compare_device_ports(const void* p1, const void* p2);
@@ -555,44 +557,39 @@ void input_windows_release_key(WCHAR param)
 	switch (code)
 	{
 	case _key_shift:
-		if (GetAsyncKeyState(VK_RSHIFT) > 0)
+		if (GetAsyncKeyState(VK_LSHIFT) >= 0)
 		{
-			code = _key_right_shift;
+			update_button_release_key(_key_left_shift);
 		}
-		else if (GetAsyncKeyState(VK_LSHIFT) > 0)
+		if (GetAsyncKeyState(VK_RSHIFT) >= 0)
 		{
-			code = _key_left_shift;
+			update_button_release_key(_key_right_shift);
 		}
 		break;
 	case _key_control:
-		if (GetAsyncKeyState(VK_LCONTROL) > 0)
+		if (GetAsyncKeyState(VK_LCONTROL) >= 0)
 		{
-			code = _key_left_control;
+			update_button_release_key(_key_left_control);
 		}
-		else if (GetAsyncKeyState(VK_RCONTROL) > 0)
+		if (GetAsyncKeyState(VK_RCONTROL) >= 0)
 		{
-			code = _key_right_control;
+			update_button_release_key(_key_right_control);
 		}
 		break;
 	case _key_menu:
-		if (GetAsyncKeyState(VK_RMENU) > 0)
+		if (GetAsyncKeyState(VK_LMENU) >= 0)
 		{
-			code = _key_left_alt;
+			update_button_release_key(_key_left_alt);
 		}
-		else if (GetAsyncKeyState(VK_LMENU) > 0)
+		if (GetAsyncKeyState(VK_RMENU) >= 0)
 		{
-			code = _key_right_alt;
+			update_button_release_key(_key_right_alt);
 		}
 		break;
+	default:
+		update_button_release_key(code);
+		break;
 	}
-	update_button(
-		&input_globals->keyboard.frames_down[code],
-		&input_globals->keyboard.msec_down[code],
-		&input_globals->keyboard.key_bool[code],
-		false,
-		0
-	);
-	g_keyboard_input_state.set(code, false);
 	return;
 }
 
@@ -699,6 +696,19 @@ static void __cdecl update_button_input_update_hook(uint8 * frames, uint16 * mse
 			elapsed_msec
 		);
 	}
+	return;
+}
+
+static void update_button_release_key(e_input_key_code code)
+{
+	update_button(
+		&input_globals->keyboard.frames_down[code],
+		&input_globals->keyboard.msec_down[code],
+		&input_globals->keyboard.key_bool[code],
+		false,
+		0
+	);
+	g_keyboard_input_state.set(code, false);
 	return;
 }
 
