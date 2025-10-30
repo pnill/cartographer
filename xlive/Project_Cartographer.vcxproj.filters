@@ -515,6 +515,7 @@
     <ClCompile Include="Blam\Engine\tool\tool_patches_initialize.cpp" />
     <ClCompile Include="H2MOD\Modules\h2log\h2log.cpp" />
     <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_ground.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3rdparty\miniupnpc\include\miniupnpc\codelength.h" />
@@ -1973,6 +1974,7 @@
     <ClInclude Include="H2MOD\Modules\h2log\h2log.h" />
     <ClInclude Include="Blam\Engine\interface\user_interface_network_search.h" />
     <ClInclude Include="Blam\Engine\networking\logic\network_logic.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_ground.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />

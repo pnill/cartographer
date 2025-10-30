@@ -53,6 +53,7 @@
 #include "networking/network_utilities.h"
 #include "networking/network_memory.h"
 #include "networking/network_configuration.h"
+#include "physics/character_physics_mode_ground.h"
 #include "units/bipeds.h"
 #include "rasterizer/rasterizer_lens_flares.h"
 #include "rasterizer/rasterizer_main.h"
@@ -151,15 +152,6 @@ static int __cdecl showErrorScreen(int a1, int widget_type, int a3, __int16 a4, 
 static int __cdecl sub_20E1D8_boot(int a1, int a2, int a3, int a4, int a5, int a6);
 
 static void __cdecl user_interface_controller_set_desired_team_index_hook(e_controller_index controller_index, e_game_team team);
-
-static void bipeds_physics_apply_patches(void);
-
-static void __stdcall biped_ground_mode_update_hook(
-	void* thisx,
-	void* physics_output,
-	void* physics_input,
-	void* a4,
-	int32 a5);
 
 static int OnAutoPickUpHandler(datum player_datum, datum object_datum);
 
@@ -626,7 +618,10 @@ static void h2mod_apply_hooks(void)
 	simulation_game_units_apply_patches();
 	players_apply_patches();
 	objects_apply_patches();
-	bipeds_physics_apply_patches();
+
+	c_character_physics_mode_melee_datum::apply_hooks();
+	character_physics_mode_ground_apply_patches();
+	
 	weapon_definitions_apply_patches();
 	observer_apply_patches();
 
@@ -825,62 +820,6 @@ static void __cdecl user_interface_controller_set_desired_team_index_hook(e_cont
 		return;
 	}
 	p_user_interface_controller_set_desired_team_index(controller_index, team);
-}
-
-__declspec(naked) static void biped_ground_mode_update_to_stdcall(void)
-{
-	__asm
-	{
-		pop eax // pop return address
-		push ecx // push ecx as first param
-		push eax // push the return address back on stack
-		jmp biped_ground_mode_update_hook
-	}
-}
-
-// fixes the biped unit movement physics from applying too much movement, especially when edge-dropping by adjusting the default constant (0.117) value to tickrate
-__declspec(naked) static void update_biped_ground_mode_physics_constant(void)
-{
-#define _stack_pointer_offset 4h + 4Ch
-#define _last_param_offset 4h + 10h
-	__asm
-	{
-		movss xmm2, [esp + _stack_pointer_offset + _last_param_offset]
-		ret
-	}
-#undef _stack_pointer_offset
-#undef _last_param_offset
-}
-
-static void bipeds_physics_apply_patches(void)
-{
-	// fixes edge drop fast fall when using higher tickrates than 30
-	PatchCall(Memory::GetAddress(0x1082B4, 0xFA5D4), biped_ground_mode_update_to_stdcall);
-	Codecave(Memory::GetAddress(0x106E23, 0xF9143), update_biped_ground_mode_physics_constant, 3);
-
-	// melee physics mode hooks
-	c_character_physics_mode_melee_datum::apply_hooks();
-	return;
-}
-
-static void __stdcall biped_ground_mode_update_hook(
-	void* thisx,
-	void* physics_output,
-	void* physics_input,
-	void* a4,
-	int32 a5)
-{
-	const real32 k_edge_drop_value = 0.117f;
-
-
-	real32 edge_drop_per_tick = 30.f * k_edge_drop_value * game_tick_length();
-
-	// push last parameter despite the function taking just 5 parameters
-	INVOKE_TYPE(0x1067F0, 0xF8B10, void(__thiscall*)(void*, void*, void*, void*, int32, real32), thisx, physics_output, physics_input, a4, a5, edge_drop_per_tick);
-
-
-	// account for the last parameter that doesn't get handled by the actual function
-	__asm add esp, 4;
 }
 
 static int OnAutoPickUpHandler(datum player_datum, datum object_datum)

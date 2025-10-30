@@ -850,6 +850,7 @@
     <ClCompile Include="Blam\Engine\objects\object_identifier.cpp" />
     <ClCompile Include="Blam\Engine\objects\object_types.cpp" />
     <ClCompile Include="Blam\Engine\objects\widgets\widgets.cpp" />
+    <ClCompile Include="Blam\Engine\physics\character_physics_mode_ground.cpp" />
     <ClCompile Include="Blam\Engine\physics\collisions.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_bsp.cpp" />
     <ClCompile Include="Blam\Engine\physics\collision_model_definitions.cpp" />
@@ -1488,6 +1489,7 @@
     <ClInclude Include="Blam\Engine\objects\widgets\widgets.h" />
     <ClInclude Include="Blam\Engine\physics\breakable_surface_definitions.h" />
     <ClInclude Include="Blam\Engine\physics\character_physics_definitions.h" />
+    <ClInclude Include="Blam\Engine\physics\character_physics_mode_ground.h" />
     <ClInclude Include="Blam\Engine\physics\collisions.h" />
     <ClInclude Include="Blam\Engine\physics\collision_bsp.h" />
     <ClInclude Include="Blam\Engine\objects\damage_reporting.h" />
