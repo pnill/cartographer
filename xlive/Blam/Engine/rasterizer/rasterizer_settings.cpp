@@ -541,9 +541,10 @@ void create_new_display_setting_array(void)
 			{
 				g_display_options[count].aspect_ratio = _aspect_ratio_16x10;
 			}
+			// Treat as 16:9 by default
 			else
 			{
-				g_display_options[count].aspect_ratio = _aspect_ratio_4x3;
+				g_display_options[count].aspect_ratio = _aspect_ratio_16x9;
 			}
 			count++;
 		}
