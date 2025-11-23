@@ -7,7 +7,7 @@ permissions:
 
 jobs:
   fetch-dxsdk2010:
-    runs-on: windows-2022
+    runs-on: windows-2025
     outputs:
       dxsdk-path: ${{steps.dxsdk-set-path.outputs.DXSDK_DIR}}
 
@@ -39,7 +39,7 @@ jobs:
 
   build-win:
     needs: fetch-dxsdk2010
-    runs-on: windows-2022
+    runs-on: windows-2025
 
     env:
       SOLUTION_FILE_PATH: .
