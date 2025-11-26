@@ -109,21 +109,7 @@ void __cdecl real_math_reset_precision(void)
 int32 real_to_long_round(real32 v)
 {
 	ASSERT(real_math_valid_control_register_configuration());
-#if _REAL_MATH_USE_LEGACY_FPU_INSTRUCTIONS
-	int32 result;
-
-	__asm
-	{
-		fld v
-		fistp result
-	}
-
-	return result;
-#elif defined(_M_IX86_FP) && (_M_IX86_FP == 1 || _M_IX86_FP == 2)
-	return _mm_cvt_ss2si(_mm_load_ss(&v));
-#else
 	return lrintf(v);
-#endif
 }
 
 real32 distance_squared2d(const real_point2d* a, const real_point2d* b)
