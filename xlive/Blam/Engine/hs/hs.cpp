@@ -789,7 +789,7 @@ int16 hs_find_global_by_name(const char* name)
 		const hs_global_external* global = assert_return(HS_GLOBAL_EXTERNAL_GET(HS_GLOBAL_INDEX(global_index)));
 		if (!csstricmp(name, global->name))
 		{
-			result = HS_GLOBAL_INDEX(global_index) | MASK(SHORT_BITS);
+			result = HS_GLOBAL_INDEX(global_index) | FLAG(SHORT_BITS - 1);
 			global_found = true;
 			break;
 		}
@@ -806,7 +806,7 @@ int16 hs_find_global_by_name(const char* name)
 				const hs_global_internal* global = assert_return(HS_GLOBAL_INTERNAL_GET(global_index));
 				if (!csstricmp(name, global->name))
 				{
-					result = HS_GLOBAL_INDEX(global_index) | MASK(SHORT_BITS);
+					result = HS_GLOBAL_INDEX(global_index) | FLAG(SHORT_BITS - 1);
 					global_found = true;
 					break;
 				}

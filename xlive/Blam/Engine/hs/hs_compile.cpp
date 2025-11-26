@@ -380,7 +380,7 @@ bool hs_parse(int32 expression_index, int16 expected_type)
 	ASSERT(!hs_compile_globals.error_message);
 	ASSERT(hs_type_valid(expected_type) || expected_type == _hs_special_form || expected_type == _hs_unparsed);
 
-	if (!node->type)
+	if (node->type == _hs_unparsed)
 	{
 		node->type = (e_hs_type)expected_type;
 		if (TEST_BIT(hs_syntax_get(expression_index)->flags, _hs_syntax_node_primitive_bit))

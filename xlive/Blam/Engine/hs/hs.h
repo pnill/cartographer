@@ -305,7 +305,7 @@ extern int32 g_error_buffer_length;
 
 /* macros */
 
-#define HS_GLOBAL_INDEX(index) (index) & 0x7FFF
+#define HS_GLOBAL_INDEX(index) ((index) & MASK(SHORT_BITS-1))
 
 #define HS_GLOBAL_EXTERNAL_GET(index) hs_global_external_get((index))
 #define HS_GLOBAL_INTERNAL_GET(index) (TAG_BLOCK_GET_ELEMENT((&(global_scenario_get()->hs_globals)), (index), hs_global_internal))
