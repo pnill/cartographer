@@ -2,11 +2,6 @@
 
 /* constants */
 
-#define _REAL_MATH_USE_LEGACY_FPU_INSTRUCTIONS 1
-
-// faster than actual calls to trig functions
-#define _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS 1
-
 #define _real_epsilon 0.0001f
 #define k_real_epsilon _real_epsilon
 
@@ -201,20 +196,7 @@ extern const real_rectangle3d* const global_null_rectangle3d;
 
 inline real32 square_root(real32 f)
 {
-#if _REAL_MATH_USE_LEGACY_FPU_INSTRUCTIONS 
-	real32 result;
-
-	__asm
-	{
-		fld f
-		fsqrt
-		fstp result
-	}
-
-	return result;
-#else
-	return ::sqrtf(f);
-#endif
+	return ::sqrtf(f);;
 }
 
 inline real32 reciprocal_square_root(real32 f)
@@ -474,56 +456,17 @@ inline void set_real_point3d(real_point3d* point, real32 x, real32 y, real32 z)
 
 inline real32 sine(real32 x)
 {
-#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
-	real32 result;
-
-	__asm
-	{
-		fld x
-		fsin
-		fstp result
-	}
-
-	return result;
-#else
 	return ::sinf(x);
-#endif
 }
 
 inline real32 cosine(real32 x)
 {
-#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
-	real32 result;
-
-	__asm
-	{
-		fld x
-		fcos
-		fstp result
-	}
-
-	return result;
-#else
 	return ::cosf(x);
-#endif
 }
 
 inline real32 tangent(real32 x)
 {
-#if _REAL_MATH_USE_LEGACY_TRIG_INSTRUCTIONS
-	real32 result;
-
-	__asm
-	{
-		fld x
-		fptan
-		fstp result
-	}
-
-	return result;
-#else
 	return ::tanf(x);
-#endif
 }
 
 inline real32 arcsine(real32 x)
