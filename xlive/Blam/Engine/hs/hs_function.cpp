@@ -4897,6 +4897,8 @@ const hs_function_definition* hs_function_table[] =
 	&sleep_until_definition,
 	&wake_definition,
 	&inspect_definition,
+
+#if !defined(RELEASE_DLL) && RELEASE_DLL == false
 	&object_to_unit_definition,
 	&not_definition,
 	&pin_definition,
@@ -4942,6 +4944,8 @@ const hs_function_definition* hs_function_table[] =
 	&object_set_ranged_attack_inhibited_definition,
 	&object_set_melee_attack_inhibited_definition,
 	&objects_dump_memory_definition,
+#endif
+
 /*
 	&object_get_health_definition,
 	&object_get_shield_definition,

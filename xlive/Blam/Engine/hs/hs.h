@@ -371,6 +371,6 @@ int16 hs_find_global_by_name(const char* name);
 int16 hs_find_function_by_name(const char* name, int16 count);
 
 // Given a substring, return the number and a list of autocomplete results
-int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** results, int16 maximum_count);
+int16 hs_tokens_enumerate(const char* substring, uint32 type_flags, const char** results, int16 maximum_count);
 
 #endif

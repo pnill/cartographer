@@ -835,7 +835,7 @@ int16 hs_find_function_by_name(const char* name, int16 count)
 	return result;
 }
 
-int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** results, int16 maximum_count)
+int16 hs_tokens_enumerate(const char* substring, uint32 type_flags, const char** results, int16 maximum_count)
 {
 	ASSERT(!enumeration_results);
 
