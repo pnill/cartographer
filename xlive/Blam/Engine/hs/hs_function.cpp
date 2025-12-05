@@ -14,6 +14,9 @@
 #include "interface/user_interface.h"
 #endif
 
+#include "cartographer/cartographer.h"
+
+#include "main/console.h"
 #include "main/main.h"
 #include "main/main_game.h"
 #include "main/main_screenshot.h"
@@ -6223,7 +6226,14 @@ static void scripted_player_effect_screen_fade_in_evaluate(int16 function_index,
 
 static void main_load_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
 {
-	main_load_core();
+	if (cartographer_allow_action_during_networked_game())
+	{
+		main_load_core();
+	}
+	else
+	{
+		console_printf(k_cartographer_function_evaluate_error);
+	}
 	hs_return(thread_index, 0);
 	return;
 }
@@ -6241,7 +6251,15 @@ static void main_load_core_name_evaluate(int16 function_index, int32 thread_inde
 
 static void main_save_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
 {
-	main_save_core();
+	if (cartographer_allow_action_during_networked_game())
+	{
+		main_save_core();
+	}
+	else
+	{
+		console_printf(k_cartographer_function_evaluate_error);
+	}
+
 	hs_return(thread_index, 0);
 	return;
 }
@@ -6251,7 +6269,14 @@ static void main_save_core_name_evaluate(int16 function_index, int32 thread_inde
 	int32* arguments = (int32*)hs_macro_function_evaluate(function_index, thread_index, initialize);
 	if (arguments)
 	{
-		main_save_core_name((const char*)arguments[0]);
+		if (cartographer_allow_action_during_networked_game())
+		{
+			main_save_core_name((const char*)arguments[0]);
+		}
+		else
+		{
+			console_printf(k_cartographer_function_evaluate_error);
+		}
 		hs_return(thread_index, 0);
 	}
 	return;
@@ -6259,7 +6284,14 @@ static void main_save_core_name_evaluate(int16 function_index, int32 thread_inde
 
 static void main_game_load_from_core_evaluate(int16 function_index, int32 thread_index, bool initialize)
 {
-	main_game_load_from_core();
+	if (cartographer_allow_action_during_networked_game())
+	{
+		main_game_load_from_core();
+	}
+	else
+	{
+		console_printf(k_cartographer_function_evaluate_error);
+	}
 	hs_return(thread_index, 0);
 	return;
 }
@@ -6269,7 +6301,14 @@ static void main_game_load_from_core_name_evaluate(int16 function_index, int32 t
 	int32* arguments = (int32*)hs_macro_function_evaluate(function_index, thread_index, initialize);
 	if (arguments)
 	{
-		main_game_load_from_core_name((const char*)arguments[0]);
+		if (cartographer_allow_action_during_networked_game())
+		{
+			main_game_load_from_core_name((const char*)arguments[0]);
+		}
+		else
+		{
+			console_printf(k_cartographer_function_evaluate_error);
+		}
 		hs_return(thread_index, 0);
 	}
 	return;

@@ -319,7 +319,7 @@ void __cdecl game_dispose(void)
 {
     set_main_game_globals(NULL);
     s_game_systems* g_game_systems = get_game_systems();
-    for (int32 system_index = 69; system_index >= 0; --system_index)
+    for (int32 system_index = k_game_system_count; system_index >= 0; --system_index)
     {
         ASSERT(g_game_systems[system_index].dispose_proc);
         g_game_systems[system_index].dispose_proc();

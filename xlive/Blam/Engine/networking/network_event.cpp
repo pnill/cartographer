@@ -479,13 +479,13 @@ static datum network_event_find_category(const char* event_name, int32 level)
 {
 	ASSERT(event_name);
 	ASSERT(network_event_globals.initialized);
-	char category_strings[8][k_event_category_string_length];
+	char category_description[k_network_event_category_maximum_depth][k_event_category_string_length];
 	
-	int32 max_category_count = network_event_parse_and_get_category_count(event_name, 8, k_event_category_string_length, category_strings);
+	int32 category_count = network_event_parse_and_get_category_count(event_name, k_network_event_category_maximum_depth, k_event_category_string_length, category_description);
 	datum result = datum_absolute_index_to_index(network_event_globals.categories, 0);
-	if (max_category_count > 0)
+	if (category_count > 0)
 	{
-		result = network_event_find_category_recursive(result, (int8)level, max_category_count, category_strings);
+		result = network_event_find_category_recursive(result, (int8)level, category_count, category_description);
 	}
 	return result;
 }

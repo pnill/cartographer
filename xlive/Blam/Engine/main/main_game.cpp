@@ -202,26 +202,22 @@ void main_game_launch_set_difficulty(int16 difficulty)
 
 void main_game_launch_set_coop_player_count(int32 player_count)
 {
-	if (!IN_RANGE(player_count, 1, k_number_of_users))
-	{
-		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
-	}
-	else
+	if (IN_RANGE(player_count, 1, k_number_of_users))
 	{
 		g_main_game_launch_options.game_mode = _game_mode_campaign;
 		g_main_game_launch_options.coop = player_count > 1;
 		g_main_game_launch_user_count = player_count;
+	}
+	else
+	{
+		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
 
 void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 {
-	if (!IN_RANGE(player_count, 1, k_number_of_users))
-	{
-		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
-	}
-	else
+	if (IN_RANGE(player_count, 1, k_number_of_users))
 	{
 		g_main_game_launch_options.game_mode = _game_mode_multiplayer;
 		g_main_game_launch_user_count = player_count;
@@ -230,6 +226,10 @@ void main_game_launch_set_multiplayer_splitscreen_count(int32 player_count)
 			game_variant_build_default(&g_main_game_launch_options.game_variant, _game_variant_description_slayer);
 			g_main_game_launch_options.game_variant.round_time_limit = 0;
 		}
+	}
+	else
+	{
+		error(_error_silent, "%s: invalid player count %d (must be from 1-%d)", __FUNCTION__, player_count, k_number_of_users);
 	}
 	return;
 }
@@ -262,13 +262,13 @@ void main_game_launch_set_multiplayer_variant(const char* variant_name)
 
 void main_game_launch_set_game_mode(int32 game_mode)
 {
-	if (!IN_RANGE(game_mode, 1, (int)k_game_mode_count - 1))
+	if (IN_RANGE(game_mode, 1, (int)k_game_mode_count - 1))
 	{
-		error(_error_silent, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
+		g_main_game_launch_options.game_mode = (e_game_mode)game_mode;
 	}
 	else
 	{
-		g_main_game_launch_options.game_mode = (e_game_mode)game_mode;
+		error(_error_silent, "%s: invalid game mode [%d] provided", __FUNCTION__, game_mode);
 	}
 	return;
 }
@@ -348,7 +348,7 @@ static void main_game_launch_setup_game_mode_details(void)
 		break;
 	}
 	default:
-	{   
+	{
 		error(_error_silent, "%s: unknown game mode %d!", __FUNCTION__, (int32)g_main_game_launch_options.game_mode);
 	}
 	}
@@ -370,14 +370,12 @@ static void main_game_launch_set_campaign_details(void)
 		g_main_game_launch_user_count = 1;
 	}
 
-	/*
 	// Removed this so we can campaign games with more than 4 local users
-	// 4 Player doesn't currently work in most campaign maps
-	else if (g_main_game_launch_user_count > 2)
+	// 4 players doesn't currently work in most campaign maps
+	/*else if (g_main_game_launch_user_count > 2)
 	{
 		g_main_game_launch_user_count = 2;
-	}
-	*/
+	}*/
 	return;
 }
 

@@ -221,7 +221,6 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 					}
 					else
 					{
-#ifdef TERMINAL_ENABLED
 						real_argb_color color = *global_real_argb_white;
 						if (priority < _error_log)
 						{
@@ -233,7 +232,6 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 							color.rgb = *global_real_rgb_red;
 						}
 						terminal_printf(&color, "%s", string);
-#endif
 					}
 				}
 
@@ -295,9 +293,9 @@ void error_va(e_error_category category, e_error_priority priority, const char* 
 	return;
 }
 
-#ifdef ERRORS_ENABLED
 void write_to_error_file(e_error_category category, e_error_priority priority, const char* string, bool append_time)
 {
+#ifdef ERRORS_ENABLED
 	ASSERT_EXCEPTION(_error_category_internal_full != category, false);
 	ASSERT(_error_category_internal_subfolder != category);
 
@@ -311,9 +309,9 @@ void write_to_error_file(e_error_category category, e_error_priority priority, c
 	{
 		write_to_error_file_internal(category, string, '\0');
 	}
+#endif
 	return;
 }
-#endif
 
 /* private code */
 

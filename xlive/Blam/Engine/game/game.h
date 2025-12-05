@@ -6,6 +6,8 @@
 
 enum
 {
+	k_game_system_count = 69,
+
 	k_game_maximum_ragdolls = 3,
 	k_game_maximum_ragdolls_new = 6,
 	k_game_maximum_players_to_allow_ragdolls = 8,

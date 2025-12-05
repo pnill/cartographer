@@ -25,14 +25,12 @@
 
 #include "game/game.h"
 
-#ifdef TERMINAL_ENABLED
 #include "interface/hud_definitions.h"
 #include "interface/hud_messaging.h"
 #include "interface/interface.h"
 #include "interface/terminal.h"
 #include "main/console.h"
 #include "math/random_math.h"
-#endif
 
 #ifdef HS_COMPILER_ENABLED
 #include "models/model_definitions.h"
@@ -390,7 +388,9 @@ int32 g_error_buffer_length = 0;
 void hs_apply_patches(void)
 {
 	// hook the print command to redirect the text to our console
+#if TERMINAL_ENABLED
 	PatchCall(Memory::GetAddress(0xE9E50, 0xE49AC), hs_print);
+#endif
 
 	WritePointer((uintptr_t)&get_game_systems()[55].initialize_proc, hs_initialize);
 	WritePointer((uintptr_t)&get_game_systems()[55].dispose_from_old_map_proc, hs_dispose_from_old_map);
@@ -864,15 +864,13 @@ int16 hs_tokens_enumerate(const char* substring, int32 type_flags, const char** 
 
 /* private code */
 
+#ifdef HS_COMPILER_ENABLED
+
 static void __cdecl hs_print(const char* text)
 {
-#ifdef TERMINAL_ENABLED 
 	terminal_printf(global_real_argb_green, text);
-#endif
 	return;
 }
-
-#ifdef HS_COMPILER_ENABLED
 
 static bool sort_by_found_index(const void* s1, const void* s2, const void* compare_data)
 {

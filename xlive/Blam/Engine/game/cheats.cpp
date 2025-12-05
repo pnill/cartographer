@@ -10,9 +10,7 @@
 #include "game/players.h"
 #include "interface/hud_messaging.h"
 #include "math/random_math.h"
-#ifdef TERMINAL_ENABLED
 #include "main/console.h"
-#endif
 #include "objects/object_definition.h"
 #include "objects/objects.h"
 #include "physics/collisions.h"
@@ -279,9 +277,7 @@ static bool cheat_place_tag(const real_vector3d* forward, datum tag_index, const
 					}
 				}
 				simulation_action_object_create(object_index);
-	#ifdef TERMINAL_ENABLED
 				console_printf("placed '%s.%s'", tag_name, "unknown");
-	#endif
 				result = true;
 			}
 		}

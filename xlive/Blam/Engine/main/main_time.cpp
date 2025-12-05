@@ -334,10 +334,8 @@ void main_time_frame_rate_display(void)
 		const int16 width = rectangle2d_width(&camera->window_bounds);
 		const int16 height = rectangle2d_height(&camera->window_bounds);
 
-		// Scale the offsets so we don't end up with different placement based on the resolution
-		// Make sure we select 1 if the result is 0 (or less?)
-		const int16 width_scale_factor = MAX((width / 640), 1);
-		const int16 height_scale_factor = MAX((height / 480), 1);
+		const int16 width_scale_factor = MAX(width / 640, 1);
+		const int16 height_scale_factor = MAX(height / 480, 1);
 
 		const int16 scaled_width_offset = 50 * width_scale_factor;
 		const int16 scaled_height_offset = 50 * height_scale_factor;

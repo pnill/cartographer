@@ -152,7 +152,7 @@ void console_open(bool open_debug_menu)
 		}
 		else
 		{
-			console_globals.input_state.result[0] = '\0';
+			csmemset(console_globals.input_state.result, 0, sizeof(console_globals.input_state.result));
 			console_globals.active = terminal_gets_begin(&console_globals.input_state);
 		}
 
@@ -279,9 +279,7 @@ void console_update(real32 dt)
 					break;
 				}
 				console_process_command(console_globals.input_state.result, true);
-				console_globals.input_state.result[0] = '\0';
-
-				csmemset(console_globals.input_state.result, 0, NUMBEROF(console_globals.input_state.result));
+				csmemset(console_globals.input_state.result, 0, sizeof(console_globals.input_state.result));
 				edit_text_selection_reset(&console_globals.input_state.edit);
 				break;
 			case _key_up_arrow:
