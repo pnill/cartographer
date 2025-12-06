@@ -364,7 +364,6 @@ void __cdecl terminal_draw(void)
 
 void terminal_printf(const real_argb_color* color, const char* format, ...)
 {
-#if TERMINAL_ENABLED
 	va_list args;
 	va_start(args, format);
 
@@ -390,7 +389,6 @@ void terminal_printf(const real_argb_color* color, const char* format, ...)
 	}
 
 	va_end(args);
-#endif
 	return;
 }
 
@@ -424,4 +422,4 @@ static void terminal_remove_line(datum line_index)
 	return;
 }
 
-#endif
+#endif // #ifdef TERMINAL_ENABLED

@@ -16,9 +16,7 @@
 #include "cutscene/cinematics.h"
 #include "game/game.h"
 #include "interface/screens/screen_error_dialog.h"
-#ifdef TERMINAL_ENABLED
 #include "main/console.h"
-#endif
 #include "saved_games/game_variant.h"
 #include "saved_games/player_profile.h"
 #include "scenario/scenario_definitions.h"

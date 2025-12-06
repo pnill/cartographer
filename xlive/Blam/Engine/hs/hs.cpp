@@ -41,9 +41,7 @@
 #include "scenario/scenario.h"
 #include "scenario/scenario_definitions.h"
 
-#ifdef TERMINAL_ENABLED
 #include "scenario/scenario_kill_trigger_volumes.h"
-#endif
 
 /* constants */
 

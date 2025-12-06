@@ -4,9 +4,7 @@
 #include "cseries_windows.h"
 #include "stack_walk_windows.h"
 
-#ifdef TERMINAL_ENABLED
 #include "interface/terminal.h"
-#endif
 #include "math/color_math.h"
 #include "multithreading/synchronization.h"
 #include "networking/network_event.h"
