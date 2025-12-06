@@ -69,7 +69,7 @@ void console_initialize(void)
 		console_globals.input_state.color = k_console_input_color;
 		console_globals.status_render = true;
 		csstrncpy(console_globals.input_state.prompt, "halo( ", NUMBEROF(console_globals.input_state.prompt));
-		console_globals.input_state.result[0] = 0;
+		console_globals.input_state.result[0] = '\0';
 		console_globals.newest_previous_command_index = NONE;
 		console_globals.previous_command_count = 0;
 		console_globals.selected_previous_command_index = NONE;
@@ -167,6 +167,7 @@ void console_close(void)
 	if (console_globals.active)
 	{
 		terminal_gets_end(&console_globals.input_state);
+		console_globals.selected_previous_command_index = NONE;
 		console_globals.open_timeout_seconds = 0.1f;
 		console_globals.active = false;
 		
