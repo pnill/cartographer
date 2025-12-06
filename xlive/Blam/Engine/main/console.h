@@ -26,25 +26,25 @@ void console_update(real32 dt);
 
 #else
 
-inline void console_initialize(void) {}
+#define console_initialize() (void)0 
 
-inline void console_dispose(void) {}
+#define console_dispose() (void)0
 
-inline bool console_is_active(void) {}
+#define console_is_active() (void)0
 
-inline void console_execute_initial_commands(void) {}
+#define console_execute_initial_commands() (void)0
 
-inline void console_open(bool open_debug_menu) {}
+#define console_open(...) (void)0
 
-inline void console_close(void) {}
+#define console_close() (void)0
 
-inline void console_clear(void) {}
+#define console_clear() (void)0
 
-inline void console_printf(const char* format, ...) {}
+#define console_printf(...) (void)0
 
-inline void console_warning(const char* format, ...) {}
+#define console_warning(...) (void)0
 
-inline void console_update(real32 dt) {}
+#define console_update(...) (void)0
 
 #endif
 
