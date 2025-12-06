@@ -2,6 +2,8 @@
 
 #include "particle_system.h"
 
+struct s_particle_state;
+
 struct c_particle_location
 {
 	uint16 datum_salt;
@@ -16,12 +18,6 @@ struct c_particle_location
 	int8 gap_24[16];
 
 	void frame_advance(c_particle_system* particle_system, c_particle_system_definition* particle_system_definition, real32 delta);
-
-	void adjust_emitter_particle_intial_position(
-		c_particle_system* particle_system,
-		real32 dt,
-		const real_matrix4x3* matrix
-	);
 };
 ASSERT_STRUCT_SIZE(c_particle_location, 0x34);
 

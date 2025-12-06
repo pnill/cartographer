@@ -1,7 +1,8 @@
 #pragma once
-#include "particle.h"
-#include "particle_location.h"
+
 #include "particle_system.h"
+#include "particle_location.h"
+#include "particle.h"
 
 #define k_particle_state_values_count 17
 
@@ -52,74 +53,73 @@ void __cdecl particle_state_update(c_flags_no_init<e_particle_state_flags, uint3
 struct s_particle_state
 {
 	real32 m_states[k_particle_state_values_count];
-	struct
-	{
-		c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> flags;
-		c_particle_system* particle_system;
-		c_particle_location* particle_location;
-		c_particle* particle;
-	} m_system;
+	
+	c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> m_updated_states;
+	c_particle_system* m_particle_system;
+	c_particle_location* m_particle_location;
+	c_particle* m_particle;
 
 	s_particle_state()
 	{
-		csmemset(&m_system, 0, sizeof(m_system));
+		m_updated_states = 0;
+		m_particle_system = NULL;
+		m_particle_location = NULL;
+		m_particle = NULL;
 	}
-
-	~s_particle_state() = default;
 
 	void set_particle_system(c_particle_system* particle_system)
 	{
-		if (m_system.particle_system != particle_system)
+		if (m_particle_system != particle_system)
 		{
-			m_system.flags.set(_particle_update_bit_4, false);
-			m_system.flags.set(_particle_update_bit_5, false);
-			m_system.flags.set(_particle_update_bit_6, false);
-			m_system.flags.set(_particle_update_bit_9, false);
-			m_system.flags.set(_particle_update_bit_10, false);
-			m_system.particle_system = particle_system;
+			m_updated_states.set(_particle_update_bit_4, false);
+			m_updated_states.set(_particle_update_bit_5, false);
+			m_updated_states.set(_particle_update_bit_6, false);
+			m_updated_states.set(_particle_update_bit_9, false);
+			m_updated_states.set(_particle_update_bit_10, false);
+			m_particle_system = particle_system;
 		}
 	}
 
 	void set_particle_location(c_particle_location* particle_location)
 	{
-		if (m_system.particle_location != particle_location)
+		if (m_particle_location != particle_location)
 		{
-			m_system.flags.set(_particle_update_bit_7, false);
-			m_system.flags.set(_particle_update_bit_12, false);
-			m_system.flags.set(_particle_update_bit_13, false);
-			m_system.flags.set(_particle_update_bit_16, false);
-			m_system.particle_location = particle_location;
+			m_updated_states.set(_particle_update_bit_7, false);
+			m_updated_states.set(_particle_update_bit_12, false);
+			m_updated_states.set(_particle_update_bit_13, false);
+			m_updated_states.set(_particle_update_bit_16, false);
+			m_particle_location = particle_location;
 		}
 	}
 
 	void set_particle(c_particle* particle)
 	{
-		if (m_system.particle != particle)
+		if (m_particle != particle)
 		{
-			m_system.flags.set(_particle_update_bit_0, false);
-			m_system.flags.set(_particle_update_bit_1, false);
-			m_system.flags.set(_particle_update_bit_2, false);
-			m_system.flags.set(_particle_update_bit_3, false);
-			m_system.flags.set(_particle_update_bit_11, false);
-			m_system.flags.set(_particle_update_bit_12, false);
-			m_system.flags.set(_particle_update_bit_13, false);
-			m_system.flags.set(_particle_update_bit_14, false);
-			m_system.flags.set(_particle_update_bit_15, false);
-			m_system.particle = particle;
+			m_updated_states.set(_particle_update_bit_0, false);
+			m_updated_states.set(_particle_update_bit_1, false);
+			m_updated_states.set(_particle_update_bit_2, false);
+			m_updated_states.set(_particle_update_bit_3, false);
+			m_updated_states.set(_particle_update_bit_11, false);
+			m_updated_states.set(_particle_update_bit_12, false);
+			m_updated_states.set(_particle_update_bit_13, false);
+			m_updated_states.set(_particle_update_bit_14, false);
+			m_updated_states.set(_particle_update_bit_15, false);
+			m_particle = particle;
 		}
 	}
 
-	void state_update(c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> flags)
+	void state_update(c_flags_no_init<e_particle_state_flags, uint32, k_particle_state_flags> states_to_update)
 	{
 		particle_state_update(
-			~m_system.flags & flags,
-			m_system.particle_system,
-			m_system.particle_location,
-			m_system.particle,
+			~m_updated_states & states_to_update,
+			m_particle_system,
+			m_particle_location,
+			m_particle,
 			this,
 			k_particle_state_values_count
 		);
-		m_system.flags |= flags;
+		m_updated_states |= states_to_update;
 	}
 };
 ASSERT_STRUCT_SIZE(s_particle_state, 84);

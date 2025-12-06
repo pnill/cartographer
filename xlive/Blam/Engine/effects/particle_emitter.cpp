@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "particle_emitter.h"
 
-#include "particle_state.h"
-
 #include "camera/camera.h"
 #include "render/render_cameras.h"
 
@@ -124,94 +122,7 @@ void c_particle_emitter::calc_matrix(
 		matrix3x3_multiply(&this->m_matrix, &rotations_matrix, &this->m_matrix);
 	}
 
-	this->m_position.x += translated_vector.i;
-	this->m_position.y += translated_vector.j;
-	this->m_position.z += translated_vector.k;
-	return;
-}
-
-// ### FIXME this approach will probably not work
-// because when the particle is spawned, it'll use the position of the emitter at that time
-// that can change in time
-// that or we need to figure out a way to update the effect just once
-// thus update only the spawn position
-void c_particle_emitter::adjust_initial_particle_position(
-	c_particle_system* particle_system,
-	c_particle_emitter_definition* emitter_definition,
-	s_particle_state* particle_state,
-	const real_matrix4x3* matrix,
-	real32 dt
-)
-{
-	c_particle_system_definition* particle_system_definition = particle_system->get_definition();
-	real32 scale = 1.0f;
-
-	this->m_previous_position = this->m_position;
-	if (matrix)
-	{
-		// Use sky scale if the particle is in the sky
-		if (particle_system->get_in_sky())
-		{
-			scale = matrix->scale;
-		}
-
-		calc_matrix(emitter_definition, particle_system, scale, matrix);
-	}
-
-	datum particle_index = this->m_particle_index;
-	real32 particle_count_to_emit = 0.0f;
-
-	// if particle is not none, the particle count got to emit got updated at least once
-	if (particle_index != NONE)
-	{
-		particle_count_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt;
-	}
-
-	while (particle_index != NONE)
-	{
-		c_particle* particle = (c_particle*)datum_get(get_particle_table(), particle_index);
-
-		if (!particle_system_definition->system_is_looping_particle())
-		{
-			particle_count_to_emit = emitter_definition->get_particle_emissions_per_tick(particle_state) * dt + particle_count_to_emit;
-		}
-
-		if (particle_count_to_emit + k_real_epsilon >= 1.0f)
-		{
-			real32 spread = 0.f;
-			real32 accumulator = 0.f;
-
-			if (particle_system->get_ever_pulsed_or_frame_updated() && particle_system_definition->spread_between_ticks())
-			{
-				spread = 1.f / particle_count_to_emit;
-			}
-			else
-			{
-				spread = 0.f;
-				accumulator = 1.f;
-				dt = 0.f;
-			}
-
-			while (particle_count_to_emit + k_real_epsilon >= 1.0f)
-			{
-				particle_count_to_emit -= 1.0f;
-				particle->adjust_initial_position(emitter_definition, this, particle_state, particle_system, accumulator, dt, scale);
-				accumulator += spread;
-				
-				if (particle_count_to_emit + k_real_epsilon >= 1.0f && particle->next_particle != NONE)
-				{
-					particle = (c_particle*)datum_get(get_particle_table(), particle->next_particle);
-				}
-				else
-				{
-					break;
-				}
-			}
-		}
-
-		particle_index = particle->next_particle;
-	}
-
+	add_vectors3d((real_vector3d*)&m_position, &translated_vector, (real_vector3d*)&m_position);
 	return;
 }
 

@@ -130,10 +130,11 @@ extern bool g_catch_exceptions;
 #define BIT_VECTOR_SET_FLAG(BIT_VECTOR, BIT, ENABLE) (SET_BIT(BIT_VECTOR[(BIT) / LONG_BITS], ((BIT) & (LONG_BITS - 1)), ENABLE))
 
 // Creates a bitmask that sets every bit between (bit) - 1 and bit 0 to 1
-// It does this by taking the FLAG value of bit - 1 and using logical OR on it with one of two choices:
-// 0 if the bit passed is less than or equal to 1, otherwise 1 minus the FLAG value of bit - 1
-// Ex. MASK(12) sets bit 11 to bit 0 to 1
-#define MASK(bit) ( (FLAG((bit)-1)) | ((bit) <= 1 ? 0 : ( (FLAG((bit)-1) - 1) )) )
+// Also can offset the resulting mask, if you need a specific bit region to be masked
+// Ex. MASK(12) sets bit 11 through bit 0 to 1
+
+#define MASK_OFFSET(count, offset) ( ( FLAG((count) - 1) | (FLAG((count) - 1) - 1) ) << (offset) )
+#define MASK(count) MASK_OFFSET(count, 0)
 
 #define ASSERT_STRUCT_SIZE(STRUCT, _SIZE)\
 static_assert (sizeof(STRUCT) == (_SIZE), "Invalid size for struct ("#STRUCT") expected size (" #_SIZE")");

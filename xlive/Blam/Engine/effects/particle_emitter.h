@@ -37,14 +37,6 @@ struct c_particle_emitter
 		real32 a7
 	);
 
-	void adjust_initial_particle_position(
-		c_particle_system* particle_system,
-		c_particle_emitter_definition* emitter_definition,
-		s_particle_state* particle_state,
-		const real_matrix4x3* matrix,
-		real32 dt
-	);
-
 	void calc_matrix(
 		c_particle_emitter_definition* definition,
 		c_particle_system* particle_system,

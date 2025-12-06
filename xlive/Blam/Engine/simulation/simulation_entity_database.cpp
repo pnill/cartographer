@@ -269,7 +269,7 @@ uint32 c_simulation_entity_database::read_creation_from_packet(int32 entity_inde
 						if (entity_definition->entity_update_decode(true, &entity_initial_update_mask, state_data_size, state_data, packet))
 						{
 							// check if the state contains updates allowed only on creation
-							if (TEST_FLAG(~entity_allowed_initial_update_mask, entity_initial_update_mask))
+							if (TEST_FLAG(entity_initial_update_mask, ~entity_allowed_initial_update_mask))
 							{
 								event(
 									_event_error,

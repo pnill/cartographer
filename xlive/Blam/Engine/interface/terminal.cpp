@@ -71,6 +71,7 @@ void terminal_initialize(void)
 		terminal_globals.newest_output_line_index = NONE;
 		terminal_globals.oldest_output_line_index = NONE;
 		terminal_globals.console_output = false;
+		terminal_globals.suppress_output = false;
 		terminal_globals.initialized = true;
 	}
 	return;
@@ -315,11 +316,9 @@ void __cdecl terminal_draw(void)
 			for (int32 i = terminal_globals.newest_output_line_index; i != NONE && font_size - font_size_scaled > 0; i = line->older_line_index)
 			{
 				line = (output_line_datum*)datum_get(terminal_globals.output_lines, i);
-				real32 fade_progress = (4.f - line->fade_progress) / 1.f;
+				real32 fade_progress = PIN(4.f - line->fade_progress, 0.0f, 1.0f);
 
 				real_argb_color color = line->color;
-
-				fade_progress = PIN(fade_progress, 0.f, 1.f);
 
 				color.alpha *= fade_progress;
 				shadow_color.alpha = color.alpha;
@@ -337,18 +336,16 @@ void __cdecl terminal_draw(void)
 				if (line->tabstop)
 				{
 					const int16* tab_stops = k_terminal_tab_stops;
-					if (true)
+
+					const int16 width = rectangle2d_width(&bounds);
+					const int16 width_per_stop = width / 4;
+					const int16 scaled_tab_stops[3] =
 					{
-						const int16 width = rectangle2d_width(&bounds);
-						const int16 width_per_stop = width / 4;
-						const int16 scaled_tab_stops[3] = 
-						{ 
-							(int16)(width_per_stop * (int16)1),
-							(int16)(width_per_stop * (int16)2),
-							(int16)(width_per_stop * (int16)3)
-						};
-						tab_stops = scaled_tab_stops;
-					}
+						(int16)(width_per_stop * (int16)1),
+						(int16)(width_per_stop * (int16)2),
+						(int16)(width_per_stop * (int16)3)
+					};
+					tab_stops = scaled_tab_stops;
 
 					draw_string_set_tab_stops(tab_stops, NUMBEROF(k_terminal_tab_stops));
 				}
@@ -378,7 +375,7 @@ void terminal_printf(const real_argb_color* color, const char* format, ...)
 			output_line->fade_progress = 0.f;
 			output_line->color = color ? *color : default_color;
 			
-			vsprintf(output_line->buffer, 256, format, args);
+			vsprintf(output_line->buffer, ARRAYSIZE(output_line->buffer), format, args);
 			output_line->tabstop = strstr(output_line->buffer, "|t") != NULL;
 
 			if (terminal_globals.console_output)

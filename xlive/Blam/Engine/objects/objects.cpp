@@ -1395,7 +1395,7 @@ static datum object_allocate_header(datum tag_definition_index)
 static void free_object_memory(datum object_index)
 {
 	object_header_datum* object_header = object_header_get(object_index);
-	object_header->flags.set_unsafe(0);
+	object_header->flags = 0;
 	if (object_header->datum != NULL)
 	{
 		memory_pool_block_free(object_memory_pool_get(), &object_header->datum);

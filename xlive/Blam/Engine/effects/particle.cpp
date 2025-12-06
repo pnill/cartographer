@@ -2,7 +2,6 @@
 #include "particle.h"
 
 #include "effects.h"
-#include "particle_state.h"
 #include "physics/collisions.h"
 
 
@@ -46,9 +45,7 @@ void c_particle::adjust_initial_position(
 
 		points_interpolate(&particle_emitter->m_previous_position, &particle_emitter->m_position, fraction, &interpolated_position);
 		matrix3x3_transform_vector(&particle_emitter->m_matrix, (real_vector3d*)&m_position, (real_vector3d*)&m_position);
-		m_position.x += interpolated_position.x;
-		m_position.y += interpolated_position.y;
-		m_position.z += interpolated_position.z;
+		add_vectors3d((real_vector3d*)&m_position, (real_vector3d*)&interpolated_position, (real_vector3d*)&m_position);
 		matrix3x3_transform_vector(&particle_emitter->m_matrix, &m_velocity, &m_velocity);
 
 		if (emitter_def->emission_shape == _particle_system_emitter_shape_debris)

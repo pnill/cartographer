@@ -238,7 +238,6 @@ void __cdecl player_configuration_validate_character_type(s_player_configuration
 			configuration_data->profile_traits.profile.player_character_type = _character_type_elite;
 		}
 
-
 		// Force skeletons in mp during the halloween event
 		// Carto addition
 		if (e_character_type character = configuration_data->profile_traits.profile.player_character_type;

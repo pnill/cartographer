@@ -42,7 +42,7 @@ struct s_simulation_object_creation_data
 };
 ASSERT_STRUCT_SIZE(s_simulation_object_creation_data, 16);
 
-class c_simulation_game_object_entity_definition : public c_simulation_entity_definition
+class c_simulation_object_entity_definition : public c_simulation_entity_definition
 {
 public:
 	virtual int8 entity_replication_required_for_view_activation(s_simulation_game_entity* entity) override;
@@ -54,7 +54,7 @@ public:
 	virtual bool promote_game_entity_to_authority(s_simulation_game_entity* entity) override;
 	virtual uint32 build_creation_data(s_simulation_game_entity* entity, int32 creation_data_size, void* out_creation_data) override;
 
-	// c_simulation_game_object_entity_definition additions
+	// c_simulation_object_entity_definition additions
 
 	virtual void* object_required_to_join_game(datum object_index) = 0;
 	virtual void* create_object(int32 creation_data_size, void* creation_data, uint32* flags, int32 internal_state_data_size, void* initial_state_data) = 0;
