@@ -18,14 +18,6 @@ real32 g_rumble_factor = 1.f;
 
 /* structures */
 
-struct ascii_key
-{
-	e_input_key_code key;
-	bool remapped;
-	int32 field_8;
-	int16 remapped_key;
-};
-
 struct s_key_remap
 {
 	const e_input_key_code key;
@@ -39,11 +31,7 @@ static void input_stop_removed_controller_handler_from_panicking(void);
 
 static void input_rewrite_button_timing_loop(void);
 
-static ascii_key* ascii_to_key_table_get(void);
-
 static e_input_key_code input_map_ascii_to_keycode(uint8 ascii);
-
-static void input_windows_initialize_key_remapping(void);
 
 static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec);
 
@@ -102,15 +90,275 @@ static s_key_remap g_key_remap[REMAPPED_KEY_COUNT] =
 
 static c_static_flags_no_init<NUMBER_OF_KEYS> g_keyboard_input_state;
 
-bool g_should_offset_gamepad_indices = false;
+static bool g_should_offset_gamepad_indices = false;
 
-bool g_notified_to_change_mapping = false;
+static bool g_notified_to_change_mapping = false;
 
-uint32 input_device_change_delay_timer = NULL;
+ascii_key ascii_to_key_table[NUMBER_OF_KEYS] =
+{
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_backspace, true, _string_id_key_backspace, L'\0' },
+	{ _key_tab, true, _string_id_key_tab, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_return, true, _string_id_key_return, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _keypad_left_shift, true, _string_id_key_left_shift, L'\0' },
+	{ _keypad_left_control, true, _string_id_key_left_control, L'\0' },
+	{ _key_left_alt, true, _string_id_key_left_alt, L'\0' },
+	{ _key_pause, true, _string_id_key_pause, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_escape, true, _string_id_key_escape, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_space, true, _string_id_key_space, L'\0' },
+	{ _key_page_up, true, _string_id_key_page_up, L'\0' },
+	{ _key_page_down, true, _string_id_key_page_down, L'\0' },
+	{ _key_end, true, _string_id_key_end, L'\0' },
+	{ _key_home, true, _string_id_key_home, L'\0' },
+	{ _key_left_arrow, true, _string_id_key_left_arrow, L'\0' },
+	{ _key_up_arrow, true, _string_id_key_up_arrow, L'\0' },
+	{ _key_right_arrow, true, _string_id_key_right_arrow, L'\0' },
+	{ _key_down_arrow, true, _string_id_key_down_arrow, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_snapshot, true, _string_id_key_print_screen, L'\0' },
+	{ _key_insert, true, _string_id_key_insert, L'\0' },
+	{ _key_delete, true, _string_id_key_delete, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_left_windows, true, _string_id_key_left_windows, L'\0' },
+	{ _key_right_windows, true, _string_id_key_right_windows, L'\0' },
+	{ _key_application, true, _string_id_key_menu, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _keypad_0, true, _string_id_keypad_0, L'\0' },
+	{ _keypad_1, true, _string_id_keypad_1, L'\0' },
+	{ _keypad_2, true, _string_id_keypad_2, L'\0' },
+	{ _keypad_3, true, _string_id_keypad_3, L'\0' },
+	{ _keypad_4, true, _string_id_keypad_4, L'\0' },
+	{ _keypad_5, true, _string_id_keypad_5, L'\0' },
+	{ _keypad_6, true, _string_id_keypad_6, L'\0' },
+	{ _keypad_7, true, _string_id_keypad_7, L'\0' },
+	{ _keypad_8, true, _string_id_keypad_8, L'\0' },
+	{ _keypad_9, true, _string_id_keypad_9, L'\0' },
+	{ _keypad_multiply, true, _string_id_keypad_multiply, L'\0' },
+	{ _keypad_add, true, _string_id_keypad_add, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _keypad_subtract, true, _string_id_keypad_subtract, L'\0' },
+	{ _keypad_decimal, true, _string_id_keypad_decimal, L'\0' },
+	{ _keypad_divide, true, _string_id_keypad_divide, L'\0' },
+	{ _key_f1, true, _string_id_key_f1, L'\0' },
+	{ _key_f2, true, _string_id_key_f2, L'\0' },
+	{ _key_f3, true, _string_id_key_f3, L'\0' },
+	{ _key_f4, true, _string_id_key_f4, L'\0' },
+	{ _key_f5, true, _string_id_key_f5, L'\0' },
+	{ _key_f6, true, _string_id_key_f6, L'\0' },
+	{ _key_f7, true, _string_id_key_f7, L'\0' },
+	{ _key_f8, true, _string_id_key_f8, L'\0' },
+	{ _key_f9, true, _string_id_key_f9, L'\0' },
+	{ _key_f10, true, _string_id_key_f10, L'\0' },
+	{ _key_f11, true, _string_id_key_f11, L'\0' },
+	{ _key_f12, true, _string_id_key_f12, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _keypad_num_lock, true, _string_id_keypad_num_lock, L'\0' },
+	{ _key_scroll_lock, true, _string_id_key_scroll_lock, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_left_shift, true, _string_id_key_left_shift, L'\0' },
+	{ _key_right_shift, true, _string_id_key_right_shift, L'\0' },
+	{ _key_left_control, true, _string_id_key_left_control, L'\0' },
+	{ _key_right_control, true, _string_id_key_right_control, L'\0' },
+	{ _key_left_alt, true, _string_id_key_left_alt, L'\0' },
+	{ _key_right_alt, true, _string_id_key_right_alt, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' },
+	{ _key_not_a_key, false, _string_id_invalid, L'\0' }
+};
 
 input_globals_windows* input_globals;
 
 bool* g_input_windows_request_terminate;
+
+uint32 input_device_change_delay_timer = 0;
 
 /* public code */
 
@@ -129,6 +377,8 @@ void input_windows_apply_patches(void)
 	
 	// Replace initialize key mapping function so we properly handle keyboard layouts
 	PatchCall(Memory::GetAddress(0x2FEA9), input_windows_initialize_key_remapping);
+	PatchCall(Memory::GetAddress(0x2EFF5), input_windows_get_remapped_key);
+	PatchCall(Memory::GetAddress(0x2F0CF), input_windows_get_remapped_key);
 	PatchCall(Memory::GetAddress(0x7C87), input_add_key);
 
 	// Add logic to take the config option to disable the keyboard into account
@@ -593,6 +843,79 @@ void input_windows_release_key(WCHAR param)
 	return;
 }
 
+void input_windows_initialize_key_remapping(void)
+{
+	const HKL layout = GetKeyboardLayout(0);
+
+	// Loop through every VK key and set the remapped key
+	for (int32 vk_key = 0; vk_key < NUMBER_OF_KEYS; ++vk_key)
+	{
+		if (!ascii_to_key_table[vk_key].remapped)
+		{
+			const int16 remapped_key = (int16)MapVirtualKeyExA(vk_key, MAPVK_VK_TO_CHAR, layout);
+			if (remapped_key)
+			{
+				ascii_to_key_table[vk_key].remapped = true;
+				ascii_to_key_table[vk_key].remapped_character = remapped_key;
+			}
+		}
+	}
+
+	// Remap every key in the key remap array from the character to be printed
+	// to the key that will print it
+	for (int32 i = 0; i < REMAPPED_KEY_COUNT; ++i)
+	{
+		ASSERT(g_key_remap[i].key == i + FIRST_REMAPPED_KEY);
+
+		const int16 result = VkKeyScanExW(g_key_remap[i].ch, layout);
+		const bool shift_state_exists = (result & 0xFF00) != 0;
+
+		// Make sure we only add a key remap if it doesn't have a shift state
+		// Ex. pressing Shift/Ctrl and another character to print a specific character is not allowed
+		if (!shift_state_exists)
+		{
+			g_key_remap[i].virtual_key = result;
+			ascii_to_key_table[g_key_remap[i].virtual_key].key = g_key_remap[i].key;
+		}
+	}
+	return;
+}
+
+uint8 __fastcall input_windows_get_remapped_key(e_input_key_code key_code)
+{
+	uint8 result = _key_not_a_key;
+	if (key_code >= NUMBER_OF_KEYS)
+	{
+		if (key_code >= _keypad_unk_261)
+		{
+			ASSERT(VALID_INDEX(key_code - FIRST_REMAPPED_KEY, _countof(g_key_remap)));
+			result = (uint8)g_key_remap[key_code - FIRST_REMAPPED_KEY].virtual_key;
+		}
+		else
+		{
+			switch (key_code)
+			{
+			case _keypad_left_control:
+				result = _key_control;
+				break;
+			case _keypad_left_windows:
+				result = _key_left_windows;
+				break;
+			case _keypad_left_menu:
+				result = _key_menu;
+				break;
+			default:
+				ASSERT(false);
+			}
+		}
+	}
+	else
+	{
+		result = (uint8)key_code;
+	}
+	return result;
+}
+
 void input_windows_clear_keyboard_input_state(void)
 {
 	g_keyboard_input_state.clear();
@@ -617,61 +940,14 @@ static void input_rewrite_button_timing_loop(void)
 	return;
 }
 
-static ascii_key* ascii_to_key_table_get(void)
-{
-	return Memory::GetAddress<ascii_key*>(0x411AA0);
-}
-
 static e_input_key_code input_map_ascii_to_keycode(uint8 ascii)
 {
-	const ascii_key* ascii_to_key_table = ascii_to_key_table_get();
-
 	e_input_key_code result = (e_input_key_code)ascii;
-	if (ascii_to_key_table[ascii].key != NONE)
+	if (ascii_to_key_table[ascii].key != _key_not_a_key)
 	{
 		result = ascii_to_key_table[ascii].key;
 	}
 	return result;
-}
-
-static void input_windows_initialize_key_remapping(void)
-{
-	const HKL layout = GetKeyboardLayout(0);
-
-	ascii_key* ascii_to_key_table = ascii_to_key_table_get();
-
-	// Loop through every VK key and set the remapped key
-	for (int32 vk_key = 0; vk_key < NUMBER_OF_KEYS; ++vk_key)
-	{
-		if (!ascii_to_key_table[vk_key].remapped)
-		{
-			const int16 remapped_key = (int16)MapVirtualKeyExW(vk_key, MAPVK_VK_TO_CHAR, layout);
-			if (remapped_key)
-			{
-				ascii_to_key_table[vk_key].remapped = true;
-				ascii_to_key_table[vk_key].remapped_key = remapped_key;
-			}
-		}
-	}
-
-	// Remap every key in the key remap array from the character to be printed
-	// to the key that will print it
-	for (int32 i = 0; i < REMAPPED_KEY_COUNT; ++i)
-	{
-		ASSERT(g_key_remap[i].key == i + FIRST_REMAPPED_KEY);
-	
-		const int16 result = VkKeyScanExW(g_key_remap[i].ch, layout);
-		const bool shift_state_exists = (result & 0xFF00) != 0;
-
-		// Make sure we only add a key remap if it doesn't have a shift state
-		// Ex. pressing Shift/Ctrl and another character to print a specific character is not allowed
-		if (!shift_state_exists)
-		{
-			g_key_remap[i].virtual_key = result;
-			ascii_to_key_table[g_key_remap[i].virtual_key].key = g_key_remap[i].key;
-		}
-	}
-	return;
 }
 
 static void __cdecl update_button(uint8* frames, uint16* msec, bool* key_bool, bool down, int32 elapsed_msec)

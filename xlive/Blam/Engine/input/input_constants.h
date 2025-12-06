@@ -292,6 +292,12 @@ enum e_input_key_code : int16
 	_key_not_a_key,
 	NUMBER_OF_KEYS,
 
+	_keypad_left_shift = 257,
+	_keypad_left_control,
+	_keypad_left_windows,
+	_keypad_left_menu,
+
+	_keypad_unk_261 = 261,
 	_keypad_enter = 262,
 
 	/* Below are keys that don't have a VK key code that we resolve at runtime */

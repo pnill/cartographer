@@ -1,7 +1,11 @@
 #include "stdafx.h"
 #include "user_interface_text.h"
 
+#include "user_interface_utilities.h"
+
 #include "interface/hud.h"
+#include "input/input_constants.h"
+#include "main/game_preferences.h"
 
 c_user_interface_text::c_user_interface_text()
 {
@@ -74,6 +78,122 @@ bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, cha
 	return INVOKE(0x22F712, 0x0, user_interface_parse_string, string, max_length, a3);
 }
 
+void user_interface_get_key_character(e_input_key_code key_code, c_static_wchar_string<512>* string)
+{
+	c_maximum_interface_text src;
+
+	ascii_key* key = &ascii_to_key_table[input_windows_get_remapped_key(key_code)];
+	switch (key_code)
+	{
+	case _key_oem_8:
+		if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_exclamation, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_tilde:
+		if (get_current_language() == _language_italian)
+		{
+			user_interface_global_string_get(_string_id_key_grave_o, &src);
+			string->set(src.get_string());
+		}
+		else if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_grave_u, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_left_square_bracket:
+		if (get_current_language() == _language_german)
+		{
+			user_interface_global_string_get(_string_id_key_beta, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_right_square_bracket:
+		if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_acute, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_backslash:
+		if (get_current_language() == _language_japanese)
+		{
+			user_interface_global_string_get(_string_id_key_yen, &src);
+			string->set(src.get_string());
+		}
+		else if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_asterisk, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_forwardslash:
+		if (get_current_language() == _language_italian)
+		{
+			user_interface_global_string_get(_string_id_key_grave_u, &src);
+			string->set(src.get_string());
+		}
+		else if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_colon, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_colon:
+		if (get_current_language() == _language_french)
+		{
+			user_interface_global_string_get(_string_id_key_dollar, &src);
+			string->set(src.get_string());
+		}
+		else if (get_current_language() == _language_italian)
+		{
+			user_interface_global_string_get(_string_id_key_grave_e, &src);
+			string->set(src.get_string());
+		}
+		break;
+	case _key_quotation_mark:
+		if (get_current_language() == _language_italian)
+		{
+			user_interface_global_string_get(_string_id_key_grave_a, &src);
+			string->set(src.get_string());
+		}
+		break;
+	default:
+		bool is_remapped_character = false;
+		if (key->remapped)
+		{
+			if (key->string == _string_id_invalid)
+			{
+				if (key->remapped_character)
+				{
+					wchar_t str[2] = { key->remapped_character, L'\0' };
+					string->set(str);
+					is_remapped_character = true;
+				}
+				else
+				{
+					user_interface_global_string_get(_string_id_invalid, &src);
+				}
+			}
+			else
+			{
+				user_interface_global_string_get(key->string, &src);
+			}
+		}
+	   
+
+		if (!is_remapped_character)
+		{
+			string->set(src.get_string());
+		}
+		break;
+	}
+	return;
+}
+
 // this seems to compute the required space to display the text?
 void __cdecl ui_get_text_bounds_and_position_hook(int a1, wchar_t* string, int a3, int a4, float scale)
 {
@@ -90,4 +210,5 @@ void user_interface_text_apply_hooks()
 	WritePointer(Memory::GetAddress(0x23066A) + 4, &ui_text_label_scaling);
 
 	PatchCall(Memory::GetAddress(0x22CFFD), ui_get_text_bounds_and_position_hook);
+	PatchCall(Memory::GetAddress(0x22FCDC), user_interface_get_key_character);
 }

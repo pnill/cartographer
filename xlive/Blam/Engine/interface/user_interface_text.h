@@ -1,5 +1,6 @@
 #pragma once
 #include "math/color_math.h"
+#include "input/input_windows.h"
 
 /* classes */
 
@@ -49,5 +50,7 @@ ASSERT_STRUCT_SIZE(c_user_interface_text, 0x44);
 float get_ui_text_label_scale();
 void set_ui_text_label_scale(float scale);
 bool __cdecl user_interface_parse_string(wchar_t* string, size_t max_length, char a3);
+
+void user_interface_get_key_character(e_input_key_code key_code, c_static_wchar_string<512>* string);
 
 void user_interface_text_apply_hooks();

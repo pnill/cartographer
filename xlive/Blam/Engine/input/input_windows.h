@@ -2,6 +2,7 @@
 #include "controllers.h"
 #include "input_abstraction.h"
 #include "input_constants.h"
+#include "tag_files/tag_groups.h"
 
 /* constants */
 
@@ -62,6 +63,14 @@ enum
 };
 
 /* structures */
+
+struct ascii_key
+{
+	e_input_key_code key;
+	bool remapped;
+	string_id string;
+	wchar_t remapped_character;
+};
 
 struct key_stroke
 {
@@ -188,8 +197,12 @@ ASSERT_STRUCT_SIZE(dinput_device, 0x40);
 
 /* globals */
 
+extern ascii_key ascii_to_key_table[NUMBER_OF_KEYS];
+
 extern input_globals_windows* input_globals;
+
 extern bool* g_input_windows_request_terminate;
+
 extern uint32 input_device_change_delay_timer;
 
 /* public code */
@@ -229,6 +242,10 @@ bool input_windows_has_split_device_active();
 void input_windows_notify_change_device_mapping();
 
 void input_windows_release_key(WCHAR param);
+
+void input_windows_initialize_key_remapping(void);
+
+uint8 __fastcall input_windows_get_remapped_key(e_input_key_code key_code);
 
 void input_windows_clear_keyboard_input_state(void);
 
