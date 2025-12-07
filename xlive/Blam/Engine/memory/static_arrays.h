@@ -110,6 +110,18 @@ public:
 		return;
 	}
 
+	const t_storage_type get_unsafe(void) const
+	{
+		return m_storage;
+	}
+
+	void set_unsafe(t_storage_type raw_bits)
+	{
+		m_storage = raw_bits;
+		ASSERT(valid());
+		return;
+	}
+
 	void clear(void)
 	{
 		m_storage = 0;
@@ -147,8 +159,7 @@ public:
 
 	void operator=(t_storage_type value)
 	{
-		m_storage = value;
-		ASSERT(valid());
+		set_unsafe(value);
 		return;
 	}
 
