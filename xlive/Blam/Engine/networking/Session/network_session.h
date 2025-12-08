@@ -122,7 +122,6 @@ namespace NetworkSession
 
 	wchar_t* GetGameVariantName();
 
-	bool IsVariantTeamPlay();
 	void LeaveSession();
 }
 
@@ -228,7 +227,7 @@ struct s_session_vote
 };
 ASSERT_STRUCT_SIZE(s_session_vote, 160);
 
-struct s_membership_peer
+struct s_network_session_peer
 {
 	s_transport_secure_address secure_address;
 	uint8 gap_24[4];
@@ -252,9 +251,9 @@ struct s_membership_peer
 	uint32 update_number;
 	datum local_players_indexes[k_number_of_users];
 };
-ASSERT_STRUCT_SIZE(s_membership_peer, 268);
+ASSERT_STRUCT_SIZE(s_network_session_peer, 268);
 
-struct s_membership_player
+struct s_network_session_player
 {
 	s_player_identifier identifier; // -0xA
 	int32 peer_index; // -0x8
@@ -268,21 +267,21 @@ struct s_membership_player
 	uint32 player_voice;
 	uint32 player_text_chat;
 };
-ASSERT_STRUCT_OFFSET(s_membership_player, controller_index, 20);
-ASSERT_STRUCT_SIZE(s_membership_player, 296);
+ASSERT_STRUCT_OFFSET(s_network_session_player, controller_index, 20);
+ASSERT_STRUCT_SIZE(s_network_session_player, 296);
 
 struct s_session_membership
 {
 	int32 update_number; // 0x70
 	int32 session_leader_peer_index; // 0x74
-	uint64 dedicated_server_xuid; // 0x78
+	uint64 dedicated_server_id; // 0x78
 	int32 xbox_session_leader_peer_index; // 0x80
 	int32 peer_count; // 0x84
-	s_membership_peer membership_peers[k_network_maximum_machines_per_session]; // 0x88
+	s_network_session_peer peers[k_network_maximum_machines_per_session]; // 0x88
 	int32 player_count; // 0x1254
-	uint32 players_active_mask; // 0x1258
-	s_membership_player players[k_maximum_players]; // 0x125C
-	uint32 unk;
+	uint32 player_valid_flags; // 0x1258
+	s_network_session_player players[k_maximum_players]; // 0x125C
+	uint32 player_sequence_number;
 };
 ASSERT_STRUCT_SIZE(s_session_membership, 9328);
 
@@ -446,12 +445,12 @@ public:
 		return m_local_state;
 	}
 
-	s_membership_peer* get_peer_membership(int32 peer_index)
+	s_network_session_peer* get_peer_membership(int32 peer_index)
 	{
-		return &m_session_membership.membership_peers[peer_index];
+		return &m_session_membership.peers[peer_index];
 	}
 
-	s_membership_player* get_player_membership(datum player_index)
+	s_network_session_player* get_player_membership(datum player_index)
 	{
 		return &m_session_membership.players[DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index)];
 	}
@@ -634,7 +633,7 @@ public:
 
 	bool is_session_player_active(datum player_index) const
 	{
-		return TEST_BIT(m_session_membership.players_active_mask, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
+		return TEST_BIT(m_session_membership.player_valid_flags, DATUM_INDEX_TO_ABSOLUTE_INDEX(player_index));
 	}
 
 	int32 get_peer_index_from_address(const struct transport_address* address)
@@ -657,9 +656,14 @@ public:
 	{
 		if (is_host())
 		{
-			get_player_membership(player_index)->configuration.team_index = (int8)team_index;
 			request_membership_update();
+			get_player_membership(player_index)->configuration.team_index = (int8)team_index;
 		}
+	}
+
+	bool game_variant_is_team_play() const
+	{
+		return TEST_BIT(m_session_parameters.game_variant.game_engine_flags, _game_engine_teams_bit);
 	}
 
 	// switch multiple players with a single membership update

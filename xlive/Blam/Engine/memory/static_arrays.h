@@ -253,7 +253,7 @@ public:
 		return;
 	}
 
-	bool test(int32 index)
+	bool test(int32 index) const
 	{
 		ASSERT(VALID_INDEX(index, k_maximum_count));
 		ASSERT(m_flags);

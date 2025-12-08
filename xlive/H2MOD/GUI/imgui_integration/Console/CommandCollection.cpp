@@ -574,7 +574,7 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 		const s_observer_channel* peer_observer_channel = &observer->m_observer_channels[session->m_session_peers[peer_index].observer_channel_index];
 
 		char name[XUSER_NAME_SIZE * 2];
-		wchar_string_to_utf8_string(session->m_session_membership.membership_peers[peer_index].name, name, NUMBEROF(name));
+		wchar_string_to_utf8_string(session->m_session_membership.peers[peer_index].name, name, NUMBEROF(name));
 
 		c_static_string<512> string;
 		string.set("# Peer index=");
@@ -584,9 +584,9 @@ static int CommandCollection::LogPeersCmd(const std::vector<std::string>& tokens
 		string.append(", Connection Status=");
 		string.append(std::to_string(peer_observer_channel->state).c_str());
 		string.append(", Peer map state: ");
-		string.append(std::to_string(session->m_session_membership.membership_peers[peer_index].map_status).c_str());
+		string.append(std::to_string(session->m_session_membership.peers[peer_index].map_status).c_str());
 		
-		const datum player_index = session->m_session_membership.membership_peers[peer_index].local_players_indexes[0];
+		const datum player_index = session->m_session_membership.peers[peer_index].local_players_indexes[0];
 		const player_datum* player = (player_datum*)datum_get(player_data_get(), player_index);
 		if (player)
 		{

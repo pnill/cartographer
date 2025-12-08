@@ -523,8 +523,6 @@ bool simulation_queue_entity_update_allocate(s_simulation_queue_entity_data* ent
 		}
 	}
 
-		
-
 	return result;
 }
 

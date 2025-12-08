@@ -47,7 +47,7 @@ int32 __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int
 
 		if (out_host_map_status)
 		{
-			*out_host_map_status = membership->membership_peers[session->m_session_host_peer_index].map_status;
+			*out_host_map_status = membership->peers[session->m_session_host_peer_index].map_status;
 		}
 
 		result_map_status = _network_session_map_status_loaded;
@@ -58,15 +58,15 @@ int32 __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int
 			// NOTE UPDATE 7/29/2021: now this checks if there's any peer that can load the map, instead of if there's any peer that cannot load the map
 			// *************
 
-			// now we only check our peer and session host peer, instead of all the membership_peers
+			// now we only check our peer and session host peer, instead of all the peers
 			// but make sure the game won't start if we have just 1 player that doesn't have the map
 			if (session->m_local_peer_index == i)
-				local_peer_map_status = membership->membership_peers[i].map_status;
+				local_peer_map_status = membership->peers[i].map_status;
 
 			if (session->m_session_host_peer_index == i)
-				host_peer_map_status = membership->membership_peers[i].map_status;
+				host_peer_map_status = membership->peers[i].map_status;
 
-			switch (membership->membership_peers[i].map_status)
+			switch (membership->peers[i].map_status)
 			{
 			case _network_session_map_status_unable_to_precache:
 				result_precache_percentage = 0;
@@ -74,7 +74,7 @@ int32 __cdecl network_life_cycle_session_get_global_map_precache_status_hook(int
 				break;
 
 			case _network_session_map_status_precaching:
-				result_precache_percentage = MIN(membership->membership_peers[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
+				result_precache_percentage = MIN(membership->peers[i].map_progress_percentage, result_precache_percentage); // get the least map precaching percentage
 				break;
 
 			case _network_session_map_status_loaded:
@@ -161,7 +161,7 @@ bool __stdcall game_life_cycle_get_map_load_status(void* thisx, c_network_sessio
 		//if ((i == session->local_peer_index || i == session->m_session_host_peer_index) 
 			//|| !more_than_one_peer_other_than_dedicated_server(session)) 
 		{
-			switch (membership->membership_peers[i].map_status)
+			switch (membership->peers[i].map_status)
 			{
 			case _network_session_map_status_none:
 			case _network_session_map_status_unable_to_precache:

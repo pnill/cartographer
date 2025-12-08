@@ -105,7 +105,7 @@ int32 NetworkSession::GetLocalPeerIndex()
 
 IN_ADDR NetworkSession::GetLocalNetworkAddress()
 {
-	return GetActiveNetworkSession()->m_session_membership.membership_peers[GetLocalPeerIndex()].secure_address.addr.inaOnline;
+	return GetActiveNetworkSession()->m_session_membership.peers[GetLocalPeerIndex()].secure_address.addr.inaOnline;
 }
 
 int32 NetworkSession::GetPeerIndex(datum player_index)
@@ -153,11 +153,6 @@ void NetworkSession::EndGame()
 wchar_t* NetworkSession::GetGameVariantName()
 {
 	return GetActiveNetworkSession()->m_session_parameters.game_variant.variant_name;
-}
-
-bool NetworkSession::IsVariantTeamPlay()
-{
-	return TEST_BIT(GetActiveNetworkSession()->m_session_parameters.game_variant.flags, _game_engine_teams_bit);
 }
 
 void NetworkSession::LeaveSession()
@@ -263,14 +258,19 @@ void network_session_membership_update_local_players_teams()
 		{
 			int32 local_peer_index = session->get_local_peer_index();
 
-			for (int32 i = 0; i < k_number_of_users; i++)
+			if (session->game_variant_is_team_play())
 			{
-				datum player_index = session->get_peer_membership(local_peer_index)->local_players_indexes[i];
-				if (player_index != NONE)
+				for (int32 i = 0; i < k_number_of_users; i++)
 				{
-					const s_membership_player* membership_player = session->get_player_membership(player_index);
-					user_interface_controller_set_desired_team_index((e_controller_index)i, (e_game_team)membership_player->configuration.team_index);
-					user_interface_controller_update_network_properties((e_controller_index)i);
+					datum player_index = session->get_peer_membership(local_peer_index)->local_players_indexes[i];
+					if (player_index != NONE)
+					{
+						const s_network_session_player* membership_player = session->get_player_membership(player_index);
+						ASSERT(session->is_session_player_active(player_index));
+						ASSERT(membership_player->controller_index != NONE);
+						user_interface_controller_set_desired_team_index((e_controller_index)membership_player->controller_index, (e_game_team)membership_player->configuration.team_index);
+						user_interface_controller_update_network_properties((e_controller_index)membership_player->controller_index);
+					}
 				}
 			}
 		}
@@ -285,7 +285,7 @@ void network_session_set_player_team(datum player_index, e_game_team team)
 		if (session->established() 
 			&& session->is_host())
 		{
-			s_membership_player* membership_player = session->get_player_membership(player_index);
+			s_network_session_player* membership_player = session->get_player_membership(player_index);
 			membership_player->configuration.team_index = (int8)team;
 
 			if (session->peer_index_local_peer(membership_player->peer_index))
@@ -341,7 +341,7 @@ void c_network_session::switch_players_to_teams(datum* player_indexes, int32 pla
 	{
 		for (int32 i = 0; i < player_count; i++)
 		{
-			s_membership_player* player_membership = get_player_membership(player_indexes[i]);
+			s_network_session_player* player_membership = get_player_membership(player_indexes[i]);
 			player_membership->configuration.team_index = (int8)team_indexes[i];
 		}
 		request_membership_update();
@@ -434,10 +434,10 @@ const char* c_network_session::get_peer_description(int32 peer_index) const
 	char* result = g_network_session_peer_description[g_network_session_peer_description_index];
 	g_network_session_peer_description_index = (g_network_session_peer_description_index + 1) % 2;
 
-	if (established() && VALID_INDEX(peer_index, m_session_membership.peer_count) && m_session_membership.membership_peers[peer_index].description[0] != '\0')
+	if (established() && VALID_INDEX(peer_index, m_session_membership.peer_count) && m_session_membership.peers[peer_index].description[0] != '\0')
 	{
-		const char* mac_string = transport_secure_address_get_mac_string(&m_session_membership.membership_peers[peer_index].secure_address);
-		csprintf(result, 35, "#%02d:%S:%s", peer_index, m_session_membership.membership_peers[peer_index].description[0], mac_string);
+		const char* mac_string = transport_secure_address_get_mac_string(&m_session_membership.peers[peer_index].secure_address);
+		csprintf(result, 35, "#%02d:%S:%s", peer_index, m_session_membership.peers[peer_index].description[0], mac_string);
 	}
 	else
 	{
@@ -471,7 +471,7 @@ int32 c_network_session::get_peer_from_secure_address(const s_transport_secure_a
 	{
 		for (int32 i = 0; i < m_session_membership.peer_count; ++i)
 		{
-			if (transport_secure_address_compare(secure_address, &m_session_membership.membership_peers[i].secure_address))
+			if (transport_secure_address_compare(secure_address, &m_session_membership.peers[i].secure_address))
 			{
 				result = i;
 				break;
