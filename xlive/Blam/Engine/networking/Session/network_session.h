@@ -94,13 +94,11 @@ namespace NetworkSession
 	bool GetMapFileLocation(wchar_t* buffer, size_t size);
 
 	bool LocalPeerIsSessionHost();
-	bool LocalPeerIsSessionLeader();
 	bool LocalPeerIsEstablished();
 
 	// peer functions
 	int32 GetPeerCount();
 	int32 GetLocalPeerIndex();
-	IN_ADDR GetLocalNetworkAddress();
 	void KickPeer(int32 peer_index);
 	void EndGame();
 

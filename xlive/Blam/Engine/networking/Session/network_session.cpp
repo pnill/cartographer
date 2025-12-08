@@ -75,11 +75,6 @@ bool NetworkSession::LocalPeerIsSessionHost()
 	return GetActiveNetworkSession()->is_host();
 }
 
-bool NetworkSession::LocalPeerIsSessionLeader()
-{
-	return GetActiveNetworkSession()->is_local_peer_session_leader();
-}
-
 bool NetworkSession::LocalPeerIsEstablished()
 {
 	return GetActiveNetworkSession()->established();
@@ -101,11 +96,6 @@ int32 NetworkSession::GetPeerCount()
 int32 NetworkSession::GetLocalPeerIndex()
 {
 	return GetActiveNetworkSession()->get_local_peer_index();
-}
-
-IN_ADDR NetworkSession::GetLocalNetworkAddress()
-{
-	return GetActiveNetworkSession()->m_session_membership.peers[GetLocalPeerIndex()].secure_address.addr.inaOnline;
 }
 
 int32 NetworkSession::GetPeerIndex(datum player_index)
