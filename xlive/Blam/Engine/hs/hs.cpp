@@ -386,9 +386,7 @@ int32 g_error_buffer_length = 0;
 void hs_apply_patches(void)
 {
 	// hook the print command to redirect the text to our console
-#if TERMINAL_ENABLED
 	PatchCall(Memory::GetAddress(0xE9E50, 0xE49AC), hs_print);
-#endif
 
 	WritePointer((uintptr_t)&get_game_systems()[55].initialize_proc, hs_initialize);
 	WritePointer((uintptr_t)&get_game_systems()[55].dispose_from_old_map_proc, hs_dispose_from_old_map);
@@ -862,13 +860,13 @@ int16 hs_tokens_enumerate(const char* substring, uint32 type_flags, const char**
 
 /* private code */
 
-#ifdef HS_COMPILER_ENABLED
-
 static void __cdecl hs_print(const char* text)
 {
 	terminal_printf(global_real_argb_green, text);
 	return;
 }
+
+#ifdef HS_COMPILER_ENABLED
 
 static bool sort_by_found_index(const void* s1, const void* s2, const void* compare_data)
 {

@@ -358,15 +358,10 @@ static void console_complete(void)
 {
 	const char* matching_items[256];
 
-#if !defined(RELEASE_DLL) && RELEASE_DLL == false
-	uint32 type_flags = (uint32)NONE;
-#else
-	// enumerate just function names
-	uint32 type_flags = FLAG(3) | FLAG(5);
-#endif
+	uint32 enumeration_type_flags = (uint32)NONE;
 
 	char* token = console_get_token();
-	const int16 count = hs_tokens_enumerate(token, type_flags, matching_items, NUMBEROF(matching_items));
+	const int16 count = hs_tokens_enumerate(token, enumeration_type_flags, matching_items, NUMBEROF(matching_items));
 
 	if (count > 0)
 	{
