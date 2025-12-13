@@ -447,22 +447,8 @@ namespace ImGuiHandler {
 				if (ImGui::CollapsingHeader(advanced_settings_get_string(_advanced_string_controller_title)))
 				{
 					DrawDeadzones();
-					ImGui::Columns(2, NULL, false);
-					//Uniform Sensitivity
-					TextVerticalPad(advanced_settings_get_string(_advanced_string_uniform_sensitivity));
-					ImGui::SameLine(ImGui::GetColumnWidth() - 35);
-					ImGui::Checkbox("##C_Sep", &g_advanced_settings_current_cartographer_profile->mouse_uniform);
-					if (ImGui::IsItemEdited())
-					{
-						input_abstraction_set_mouse_look_sensitivity(_controller_index_0, g_advanced_settings_current_cartographer_profile->mouse_sensitivity);
-					}
-					if (ImGui::IsItemHovered())
-					{
-						ImGui::SetTooltip(advanced_settings_get_string(_advanced_string_uniform_sensitivity_tooltip));
-					}
+					
 					ImGui::Columns(1);
-
-
 					ImGui::Text(advanced_settings_get_string(_advanced_string_controller_sensitivity));
 					ImGui::PushItemWidth(WidthPercentage(75));
 					int g_controller_sens = (int)g_advanced_settings_current_cartographer_profile->controller_sensitivity;
