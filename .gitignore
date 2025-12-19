@@ -24,6 +24,7 @@ xliveless.v12.suo
 /Halo2
 /Halo2Server
 /xlive/objects
+/objects
 *.opensdf
 *.user
 *.ipch
@@ -41,3 +42,7 @@ xlive/3rdparty/tinyxml/lib
 xlive/3rdparty/tinyxml/objects
 xlive/3rdparty/zlib/lib
 xlive/3rdparty/zlib/objects
+
+bin/h2admin.exe
+
+bin/h2admin.pdb

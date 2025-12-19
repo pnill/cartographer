@@ -1,0 +1,623 @@
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(0a8c5d7f-2550-40da-b357-e1fd83dbe393),
+	version(1.0),
+	implicit_handle(handle_t kablam_commands_IfHandle)
+]
+
+interface kablam_commands_interface
+{
+
+	#pragma region Enums
+	typedef enum
+	{
+		skip_result_code_match_skipped = 0x0,
+		skip_result_code_match_ended = 0x1,
+		skip_result_code_match_ending_waiting = 0x2,
+		skip_result_code_server_not_active = 0x3,
+
+	} e_kablam_command_skip_code;
+
+	typedef enum
+	{
+		status_result_code_offine_initializing = 0x0,
+		status_result_code_offline_product_key_required = 0x1,
+		status_result_code_offline_invalid_product_key = 0x2,
+		status_result_code_server_banned = 0x3,
+		status_result_code_update_required = 0x4,
+		status_result_code_offline = 0x5,
+		status_result_code_signing_in = 0x6,
+		status_result_code_signin_out = 0x7,
+		status_result_code_connecting = 0x8,
+		status_result_code_offline_waiting_to_reconnect = 0x9,
+		status_result_code_offline_signin_failed = 0xA,
+		status_result_code_offline_disconnected = 0xB,
+		status_result_code_online_no_playlist = 0xC,
+		status_result_code_online_failed_to_load_playlist = 0xD,
+		status_result_code_online_empty_playlist = 0xE,
+		status_result_code_online_pregame_lobby = 0xF,
+		status_result_code_online_starting_game = 0x10,
+		status_result_code_online_game_in_progress = 0x11,
+		status_result_code_online_game_over = 0x12,
+		status_result_code_online_postgame_carnage_report = 0x13,
+		k_status_result_code_count = 0x14,
+
+	} e_kablam_command_status_result_code;
+
+	[v1_enum] typedef enum
+	{
+		status_response_flag_lobby_info = 0,
+		status_response_flag_live = 1,
+		status_response_flag_xlive_signin_result = 2,
+		status_response_flag_signin_mode = 3,
+		status_response_flag_has_gamertag = 4,
+		status_response_flag_has_lan_name = 5,
+		status_response_flag_has_playlist_path = 6
+
+	} e_kablam_command_status_response_flags;
+
+	typedef enum
+	{
+		kick_player_response_player_kicked = 0x0,
+		kick_player_response_server_not_running = 0x1,
+		kick_player_response_player_not_found = 0x2,
+
+	} kablam_command_kick_result_code;
+
+	typedef enum
+	{
+		name_result_code_success = 0x0,
+		name_result_code_lan_only = 0x1,
+		name_result_code_invalid_utf16 = 0x2,
+
+	} e_kablam_command_set_unicode_setting_result_code;
+
+	typedef enum
+	{
+		play_error_playlist_read_failed = 0x0,
+		play_error_file_not_found = 0x1,
+		play_error_file_open_access_denied = 0x2,
+		play_error_playlist_no_valid_matches = 0x4,
+
+	} e_kablam_command_play_error_code;
+
+	typedef enum
+	{
+		play_warning_duplicate_playlist_section = 0,
+		play_warning_duplicate_variant_name = 1,
+		play_warning_error_unknown_setting = 2,
+		play_warning_error_unknown_section = 3,
+		play_warning_error_invalid_setting_value = 4,
+		play_warning_error_setting_value_already_set = 5,
+		play_warning_error_match_missing_setting = 6,
+		play_warning_error_invalid_variant_setting = 7,
+		play_warning_error_variant_missing_type_or_base = 8,
+		play_warning_error_variant_missing_name = 9,
+		play_warning_error_variant_invalid_utf16 = 10,
+		play_warning_error_fariant_pipe_forbidden = 11,
+		play_warning_error_variant_invalid_base_variant = 12,
+		play_warning_error_variant_both_type_and_base = 13,
+		play_warning_error_variant_missing_or_invalid = 14,
+		play_warning_error_map_missing_or_invalid = 15,
+		play_warning_warn_variants_overflow = 16,
+		play_warning_warn_matches_overflow = 17
+
+	} e_kablam_command_play_warning_type;
+
+	typedef enum
+	{
+		send_message_result_code_sent = 0x0,
+		send_message_result_code_server_not_active = 0x2,
+		send_message_result_code_no_players_in_session = 0x3,
+		send_message_result_code_message_failed = 0x4,
+
+	} e_kablam_command_send_message_result_code;
+
+	typedef enum
+	{
+		live_key_response_code_product_key_set = 0x0,
+		live_key_response_code_key_invalid = 0x1,
+		live_key_response_code_key_set_failed = 0x2,
+
+	} e_kablam_command_live_key_response_code;
+
+	typedef enum
+	{
+		live_auto_signin_response_code_auto_signin_enabled = 0x0,
+		live_auto_signin_response_code_auto_signin_failed = 0x1,
+		live_auto_signin_response_code_live_only = 0x2,
+
+	} e_kablam_command_live_auto_signin_response_code;
+
+	typedef enum
+	{
+		live_signin_result_code_success = 0x0,
+		live_signin_result_code_live_only = 0x1,
+
+	} e_kablam_command_live_signin_result_code;
+
+	typedef enum
+	{
+		live_signout_result_code_signing_out_live = 0x0,
+		live_signout_result_code_not_signed_in = 0x1,
+		live_signout_result_code_live_only = 0x2,
+
+	} e_kablam_command_live_signout_result_code;
+
+	typedef enum
+	{
+		ban_network_result_code_success = 0x0,
+		ban_network_result_code_lan_only = 0x1,
+		ban_network_result_code_ban_list_full = 0x2,
+		ban_network_result_code_ban_not_found = 0x3,
+
+	} e_kablam_command_ban_network_result_code;
+
+	typedef enum
+	{
+		gamer_table_result_code_success = 0x0,
+		gamer_table_result_code_live_only = 0x1,
+		gamer_table_result_code_table_full = 0x2,
+		gamer_table_result_code_gamer_not_found = 0x3,
+
+	} e_kablam_command_gamer_table_result_code;
+
+	typedef enum
+	{
+		unban_all_ip = 0x0,
+		unban_all_nic = 0x1,
+		unban_all_gamertags = 0x2,
+
+	} e_kablam_unban_all_type;
+
+	typedef enum
+	{
+		unban_all_result_code_success = 0x0,
+		unban_all_result_code_failed = 0x1,
+
+	} e_kablam_command_unban_all_result_code;
+
+	typedef enum
+	{
+		vip_clear_result_code_success = 0x0,
+		vip_clear_result_code_live_only = 0x1,
+
+	} e_kablam_command_vip_clear_result_code;
+
+	typedef enum
+	{
+		stats_folder_result_code_success = 0x0,
+		stats_folder_result_code_invalid = 0x1,
+		stats_folder_result_code_not_writable = 0x2,
+		stats_folder_result_code_export_disabled = 0x3,
+
+	} e_kablam_command_stats_folder_result_code;
+
+	typedef enum
+	{
+		kablam_command_privacy_open = 0x0,
+		kablam_command_privacy_gold = 0x1,
+		kablam_command_privacy_vip = 0x2,
+		k_kablam_command_privacy_type_count,
+		kablam_command_privacy_none = -1
+
+	} e_kablam_command_privacy_type;
+
+	typedef enum
+	{
+		privacy_result_code_success = 0x0,
+		privacy_result_code_live_only = 0x1,
+
+	} e_kablam_command_privacy_result_code;
+
+	typedef enum
+	{
+		set_max_players_result_code_success = 0x0,
+		set_max_players_result_code_out_of_range = 0x1,
+
+	} e_kablam_command_set_max_players_result_code;
+#pragma endregion
+	#pragma region Structures
+	typedef struct kablam_command_skip_result
+	{
+	    e_kablam_command_skip_code 	result_code;
+		wchar_t 					playing_variant[32];
+		wchar_t 					playing_map[32];
+		wchar_t 					next_variant[32];
+		wchar_t 					next_map[32];
+
+	} kablam_command_skip_result;
+
+	typedef struct kablam_command_status_result
+	{
+		e_kablam_command_status_result_code  	result_code;
+		e_kablam_command_status_response_flags 	flags;
+		long 									game_time_remaining;
+		long									game_time_in_seconds;
+		wchar_t 								playing_variant[32];
+		wchar_t 								playing_map[32];
+		wchar_t 								next_variant[32];
+		wchar_t 								next_map[32];
+		short 									player_count;
+		wchar_t 								player_names[16][32];
+		wchar_t 								playlist_path[256];
+		wchar_t 								custom_map_path[256];
+		long 									xlive_signin_result_code;
+		wchar_t 								live_id[256];
+		char 									gamer_tag[16];
+		wchar_t 								server_description[32];
+		wchar_t 								lan_server_name[16];
+
+	} kablam_command_status_result;
+
+	typedef struct kablam_command_playlist_warning // todo: define
+	{
+		e_kablam_command_play_warning_type		warning_type;
+		unsigned long 		line_number;
+		wchar_t 	parameter[32];
+		wchar_t 	value[32];
+		wchar_t 	help[32];
+
+	} kablam_command_playlist_warning;
+
+	typedef struct kablam_command_play_result
+	{
+		short 									playlist_load_result;
+		e_kablam_command_play_error_code 		error_code;
+		wchar_t 								loaded_playlist_path[256];
+		struct kablam_command_playlist_warning 	warnings[200];
+		unsigned long 							warning_count;
+		long 									possibly_unused;
+
+	} kablam_command_play_result;
+
+	typedef struct s_ipv4_subnet
+	{
+		long ipv4_address;
+		char cidr;
+
+	} s_ipv4_subnet;
+
+	typedef struct s_mac_address
+	{
+		char octets[6];
+
+	} s_mac_address_rpc;
+
+	typedef struct s_gamertag
+	{
+		wchar_t gamertag[16];
+
+	} s_gamertag;
+
+	typedef struct s_exipration_entry_ipv4_subnet
+	{
+		hyper 	expiry_time_stamp;
+		struct	s_ipv4_subnet ipv4_address;
+
+	} s_exipration_entry_ipv4_subnet;
+
+	typedef struct s_expiration_entry_mac_address
+	{
+		hyper 					expiry_time_stamp;
+		struct s_mac_address	mac_address;
+
+	} s_expiration_entry_mac_address;
+
+	typedef struct s_expiration_entry_gamer
+	{
+		hyper 				expiry_time_stamp;
+		struct s_gamertag	gamer_tag;
+
+	} s_expiration_entry_gamer;
+	#pragma endregion
+	#pragma region Functions
+	void kablam_command_get_version_rpc
+	(
+		[in]
+			long unk_version_length,
+		[out][string][size_is(unk_version_length)]
+			char* unk_version,
+		[in]
+			long build_string_length,
+		[out][string][size_is(build_string_length)]
+			char* build_string,
+		[out]
+			long* version_int
+	);
+
+	void kablam_command_kill_server_rpc();
+
+	void kablam_command_skip_rpc
+	(
+		[out]
+			struct kablam_command_skip_result* result
+	);
+
+	void kablam_command_kick_rpc
+	(
+		[in][string]
+			wchar_t* gamer_tag,
+		[out][ref]
+			kablam_command_kick_result_code* result
+	);
+
+	void kablam_command_status_rpc
+	(
+		[out]
+			struct kablam_command_status_result* result
+	);
+
+	void kablam_command_get_name_rpc
+	(
+		[out][ref]
+			e_kablam_command_set_unicode_setting_result_code* result_code,
+		[in]
+			long buffer_length,
+		[out][string][size_is(buffer_length)]
+			wchar_t* out_name
+	);
+
+	void kablam_command_set_name_rpc
+	(
+		[in][string] 
+			wchar_t* name,
+		[out][ref] 
+			e_kablam_command_set_unicode_setting_result_code* result_code
+	);
+
+	void kablam_command_get_description_rpc
+	(
+		[out][ref] 
+			e_kablam_command_set_unicode_setting_result_code* result_code,
+		[in]
+			long buffer_length,
+		[out][string][size_is(buffer_length)]
+			wchar_t* out_description
+	);
+
+	void kablam_command_set_description_rpc
+	(
+		[in][string]
+			wchar_t* description,
+		[out][ref]
+			e_kablam_command_set_unicode_setting_result_code* result_code
+	);
+
+	void kablam_command_send_message_rpc
+	(
+		[in][string][size_is(122)] 
+			wchar_t* message,
+		[out][ref] 
+			e_kablam_command_send_message_result_code* result_code
+	);
+
+	void kablam_command_play_rpc
+	(
+		[in][string]
+			wchar_t* file_path,
+		[out]
+			struct kablam_command_play_result* out_response
+	);
+
+	void kablam_command_playing_rpc
+	(
+		[out]
+			struct kablam_command_play_result* out_response
+	);
+
+	void kablam_command_live_activate_rpc
+	(
+		[in][string]
+			wchar_t* key,
+		[out][ref] 
+			e_kablam_command_live_key_response_code* result_code
+	);
+
+	void kablam_command_live_auto_signin_rpc
+	(
+		[in][string]
+			wchar_t* username,
+		[in][string]
+			wchar_t* password,
+		[out][ref] 
+			e_kablam_command_live_auto_signin_response_code* result_code,
+		[out]
+			unsigned long* xlive_login_result
+	);
+
+	void kablam_command_live_signin_rpc
+	(
+		[in][string] 
+			wchar_t* username,
+		[in][string]
+			wchar_t* password,
+		[out][ref] 
+			e_kablam_command_live_signin_result_code* result_code
+	);
+
+	void kablam_command_live_signout_rpc
+	(
+		[out][ref]
+			e_kablam_command_live_signout_result_code* result_code
+	);
+
+	void kablam_command_ban_ip_rpc
+	(
+		[in]
+			long ipv4_address,
+		[in]
+			char subnet,
+		[in]
+			long duration,
+		[out][ref]
+			e_kablam_command_ban_network_result_code* result_code
+	);
+
+	void kablam_command_ban_nic_rpc
+	(
+		[in]
+			struct s_mac_address* mac_address,
+		[in]
+			long duration,
+		[out][ref]
+			e_kablam_command_ban_network_result_code* result_code
+	);
+
+	void kablam_command_ban_gamer_rpc
+	(
+		[in][string]
+			wchar_t* gamer_tag,
+		[in]
+			long duration,
+		[out][ref]
+			e_kablam_command_gamer_table_result_code* result_code
+	);
+
+	void kablam_command_unban_ip_rpc
+	(
+		[in]
+			long ipv4_address,
+		[in]
+			char cidr,
+		[out][ref]
+			e_kablam_command_ban_network_result_code* result_code
+	);
+
+	void kablam_command_unban_nic_rpc
+	(
+		[in]
+			struct s_mac_address* mac_address,
+		[out][ref]
+			e_kablam_command_ban_network_result_code* result_code
+	);
+
+	void kablam_command_unban_gamer_rpc
+	(
+		[in][string]
+			wchar_t* gamer_tag,
+		[out][ref]
+			e_kablam_command_gamer_table_result_code* result_code
+	);
+
+	void kablam_command_unban_all_rpc
+	(
+		[in]
+			e_kablam_unban_all_type unban_all_type,
+		[out][ref]
+			e_kablam_command_unban_all_result_code* result_code
+	);
+
+	void kablam_command_get_ban_ip_rpc
+	(
+		[out]
+			unsigned long* returned_results_count,
+		[out]
+			long* returned_results_size,
+		[out][ref][size_is(, *returned_results_size)]
+			struct s_exipration_entry_ipv4_subnet** buffer
+	);
+
+	void kablam_command_get_ban_nic_rpc
+	(
+		[out]
+			unsigned long* returned_results_count,
+		[out]
+			long* returned_results_size,
+		[out][ref][size_is(, *returned_results_size)]
+			struct s_expiration_entry_mac_address** buffer
+	);
+
+	void kablam_command_get_ban_gamer_rpc
+	(
+		[out]
+			unsigned long* returned_results_count,
+		[out]
+			long* returned_results_size,
+		[out][ref][size_is(, *returned_results_size)]
+			struct s_expiration_entry_gamer** buffer
+	);
+
+	void kablam_command_vip_add_rpc
+	(
+		[in][string] 
+			wchar_t* gamer_tag,
+		[out][ref]
+			e_kablam_command_gamer_table_result_code* result_code
+	);
+
+	void kablam_command_vip_remove_rpc
+	(
+		[in][string]
+			wchar_t* gamer_tag,
+		[out][ref]
+			e_kablam_command_gamer_table_result_code* result_code
+	);
+
+	void kablam_command_vip_clear_rpc
+	(
+		[out][ref]
+			e_kablam_command_vip_clear_result_code* arg_1
+	);
+
+	void kablam_command_get_vip_rpc
+	(
+		[out]
+			unsigned long* returned_results_count,
+		[out]
+			long* returned_results_size,
+		[out][ref][size_is(, *returned_results_size)]
+			struct s_gamertag** buffer
+	);
+
+	void kablam_command_get_stats_folder_rpc
+	(
+		[out][ref]
+			e_kablam_command_stats_folder_result_code* result_code,
+		[in]
+			long buffer_length,
+		[out][string][size_is(buffer_length)]
+			wchar_t* out_path
+	);
+
+	void kablam_command_set_stats_folder_rpc
+	(
+		[in][string]
+			wchar_t* in_path,
+		[out][ref]
+			e_kablam_command_stats_folder_result_code* result_code
+	);
+
+	void kablam_command_set_privacy_rpc
+	(
+		[in]
+			e_kablam_command_privacy_type privacy_type,
+		[out][ref]
+			e_kablam_command_privacy_result_code* result_code
+	);
+
+	void kablam_command_get_privacy_rpc
+	(
+		[out][ref]
+			e_kablam_command_privacy_type* out_privacy,
+		[out][ref]
+			e_kablam_command_privacy_result_code* result_code
+	);
+
+	void kablam_command_set_max_players_rpc
+	(
+		[in]
+			unsigned int player_count,
+		[out][ref]
+			e_kablam_command_set_max_players_result_code* result_code
+	);
+
+	void kablam_command_get_max_players_rpc
+	(
+		[out]
+			unsigned long* out_player_count
+	);
+	#pragma endregion
+}

@@ -542,6 +542,9 @@
     <ClCompile Include="Blam\Engine\interface\user_interface_network_search.cpp" />
     <ClCompile Include="Blam\Engine\physics\character_physics_mode_ground.cpp" />
     <ClCompile Include="Blam\Engine\cartographer\cartographer.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\h2admin\h2admin.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablam_string\kablam_string.cpp" />
+    <ClCompile Include="Blam\Engine\kablam\kablam_shell\kablam_shell.cpp" />
     <ClCompile Include="Blam\Engine\networking\network_loading.cpp" />
     <ClCompile Include="Blam\Engine\units\vehicles.cpp" />
     <ClCompile Include="Blam\Engine\tag_files\files.cpp" />
@@ -2100,10 +2103,13 @@
     <ClInclude Include="Blam\Engine\cartographer\build_version\cartographer_build_version.h" />
     <ClInclude Include="Blam\Engine\networking\messages\network_messages.h" />
     <ClInclude Include="Blam\Engine\cseries\language.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablam_string\kablam_string.h" />
+    <ClInclude Include="Blam\Engine\kablam\kablam_shell\kablam_shell.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resources\Resource.rc" />
     <ResourceCompile Include="resources\VersionRes.rc" />
+    <ResourceCompile Include="Blam\Engine\kablam\h2admin\h2admin.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\bitmaps\crash_window_header.bmp" />

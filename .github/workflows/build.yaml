@@ -76,6 +76,8 @@ jobs:
       with:
         name: xlive ${{matrix.BUILD_CONFIGURATION}}
         path: |
+            ./bin/h2admin.exe
+            ./bin/h2admin.pdb
             ./Halo2/xlive.dll
             ./Halo2/xlive.map
             ./xlive/objects/${{matrix.BUILD_CONFIGURATION}}/xlive.pdb

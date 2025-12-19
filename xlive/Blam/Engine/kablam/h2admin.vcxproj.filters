@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="h2admin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_rpc\kablam_rpc_client.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_ban.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_description.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_exit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_kick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_live.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_name.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_play.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_players.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_playing.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_privacy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_sendmsg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_skip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_statsfolder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_status.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_table.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_unban.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_util.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_command\kablam_command_vip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_strings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_shell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_rpc\kablam_commands_c.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="kablam_rpc\kablam_commands_s.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="kablam_rpc\kablam_commands.idl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="kablam_rpc\kablam_rpc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_rpc\kablam_rpc_client.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_ban.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_description.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_exit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_kick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_live.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_play.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_players.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_playing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_privacy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_sendmsg.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_skip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_statsfolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_status.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_unban.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_command\kablam_command_vip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_strings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_shell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="kablam_rpc\kablam_commands_h.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xlive_result_codes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="h2admin.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
