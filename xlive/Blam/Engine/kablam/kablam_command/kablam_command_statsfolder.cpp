@@ -26,19 +26,18 @@ void kablam_command_statsfolder::parse_response(kablam_command* in_command)
 	if (command->type == _kablam_command_stats_folder_set)
 	{
 		int32 response_string_id = 0;
-
 		switch (command->result_code)
 		{
-		case stats_folder_result_code_success:
+		case _stats_folder_result_code_success:
 			response_string_id = kablam_string_info_statsfolder_changed;
 			break;
-		case stats_folder_result_code_invalid:
+		case _stats_folder_result_code_invalid:
 			response_string_id = kablam_string_err_statsfolder_invalid;
 			break;
-		case stats_folder_result_code_not_writable:
+		case _stats_folder_result_code_not_writable:
 			response_string_id = kablam_string_err_statsfolder_not_writeable;
 			break;
-		case stats_folder_result_code_export_disabled:
+		case _stats_folder_result_code_export_disabled:
 			response_string_id = kablam_string_info_stats_export_disabled;
 			break;
 		}
@@ -54,44 +53,45 @@ void kablam_command_statsfolder::parse_response(kablam_command* in_command)
 		}
 		else
 		{
-			if (command->result_code == stats_folder_result_code_export_disabled)
+			if (command->result_code == _stats_folder_result_code_export_disabled)
 			{
 				kablam_string_quick_wprintf(L"%ws", kablam_string_info_stats_export_disabled);
 			}
 			else
 			{
-				// ASSERT(result==stats_folder_result_code_export_disabled);
+				//assert(result==stats_folder_result_code_export_disabled);
 			}
 		}
 	}
 }
 
-kablam_command* kablam_command_statsfolder::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_statsfolder::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_statsfolder* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	kablam_command_statsfolder* instance = new kablam_command_statsfolder();
-
-	instance->valid = true;
-	instance->result_code = stats_folder_result_code_success;
-
-	if (argument_count == 2)
+	else
 	{
-		instance->type = _kablam_command_stats_folder_set;
-		wcsncpy_s(instance->folder_path, MAX_PATH, arguments[1], -1);
-	}
+		result = new kablam_command_statsfolder();
 
-	if (argument_count == 1)
-	{
-		instance->type = _kablam_command_stats_folder_get;
-		instance->folder_path[0] = L'\0';
-	}
+		result->valid = true;
+		result->result_code = _stats_folder_result_code_success;
 
-	return instance;
+		if (argument_count == 2)
+		{
+			result->type = _kablam_command_stats_folder_set;
+			wcsncpy_s(result->folder_path, NUMBEROF(result->folder_path), arguments[1], _TRUNCATE);
+		}
+		else if (argument_count == 1)
+		{
+			result->type = _kablam_command_stats_folder_get;
+			result->folder_path[0] = L'\0';
+		}
+	}
+	return result;
 }

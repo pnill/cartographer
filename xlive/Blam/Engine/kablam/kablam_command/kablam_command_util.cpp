@@ -113,7 +113,7 @@ void kablam_command_print_playlist_warning(kablam_command_playlist_warning* warn
 	return;
 }
 
-bool kablam_command_parse_duration_string(wchar_t* duration_string, int32* out_duration)
+bool kablam_command_parse_duration_string(const wchar_t* duration_string, int32* out_duration)
 {
 	enum parse_state
 	{
@@ -131,7 +131,7 @@ bool kablam_command_parse_duration_string(wchar_t* duration_string, int32* out_d
 	int32  seconds = -1;
 
 	parse_state state = state_initial_or_ws;
-	wchar_t* p = duration_string;
+	const wchar_t* p = duration_string;
 
 	while (state != state_done && state != state_error)
 	{
@@ -276,7 +276,7 @@ bool kablam_command_parse_duration_string(wchar_t* duration_string, int32* out_d
 	return true;
 }
 
-bool kablam_command_parse_ip_cidr(wchar_t* address_string, uint32* ip_out, int8* cidr_out)
+bool kablam_command_parse_ip_cidr(const wchar_t* address_string, uint32* ip_out, int8* cidr_out)
 {
 	enum parse_state
 	{
@@ -296,7 +296,7 @@ bool kablam_command_parse_ip_cidr(wchar_t* address_string, uint32* ip_out, int8*
 	int32 digits_in_value = 0;
 	int8 cidr_value = -1;
 
-	wchar_t* p = address_string;
+	const wchar_t* p = address_string;
 
 	while (state != state_done && state != state_error)
 	{
@@ -457,12 +457,12 @@ bool kablam_command_parse_ip_cidr(wchar_t* address_string, uint32* ip_out, int8*
 	return false;
 }
 
-bool kablam_command_parse_ip_cidr(wchar_t* address_string, s_ipv4_subnet* ipv4_subnet)
+bool kablam_command_parse_ip_cidr(const wchar_t* address_string, s_ipv4_subnet* ipv4_subnet)
 {
 	return kablam_command_parse_ip_cidr(address_string, (uint32*)&ipv4_subnet->ipv4_address, (int8*)&ipv4_subnet->cidr);
 }
 
-bool kablam_command_parse_mac_address(wchar_t* mac_string, s_mac_address* out_mac)
+bool kablam_command_parse_mac_address(const wchar_t* mac_string, s_mac_address* out_mac)
 {
 	enum parse_state
 	{
@@ -479,7 +479,7 @@ bool kablam_command_parse_mac_address(wchar_t* mac_string, s_mac_address* out_ma
 	int32 current_byte = 0;
 	int32 digit_count = 0;
 
-	wchar_t* p = mac_string;
+	const wchar_t* p = mac_string;
 
 	while (!(state == state_done || state == state_error))
 	{

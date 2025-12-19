@@ -8,7 +8,7 @@ public:
 
 	static void print_help_text();
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t *const *arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_vip_add : public kablam_command_vip
@@ -20,7 +20,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t *const *arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_vip_remove : public kablam_command_vip
@@ -32,7 +32,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t *const *arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_vip_get : public kablam_command_dynamic_array
@@ -41,7 +41,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command * in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t *const *arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_vip_clear : public kablam_command_vip
@@ -52,5 +52,5 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t *const *arguments, uint32 argument_count, class kablam_string* out_message);
 };

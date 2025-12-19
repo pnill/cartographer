@@ -10,7 +10,7 @@ class kablam_command_definition
 {
 public:
 	const wchar_t* command;
-	class kablam_command* (*command_constructor)(wchar_t** arguments, uint32 arugument_count, class kablam_string* out_message);
+	class kablam_command* (*command_constructor)(const wchar_t *const *arguments, uint32 arugument_count, class kablam_string* out_message);
 	void (*help_text_function)();
 	void (*parse_response_function)(class kablam_command* in_command);
 };

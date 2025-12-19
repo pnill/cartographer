@@ -61,7 +61,7 @@ int main()
             print_admin_usage_and_die();
         }
 
-        wcsncpy_s(instance_name_uppercase, 12, instance_name, -1);
+        wcsncpy_s(instance_name_uppercase, 12, instance_name, _TRUNCATE);
         _wcsupr_s(instance_name_uppercase, 12);
 
         instance_name = instance_name_uppercase;
@@ -70,7 +70,7 @@ int main()
     {
         g_instance_is_lan = true;
 
-        wcsncpy_s(instance_name_uppercase, 12, L"LAN", -1);
+        wcsncpy_s(instance_name_uppercase, 12, L"LAN", _TRUNCATE);
 
         instance_name = instance_name_uppercase;
     }

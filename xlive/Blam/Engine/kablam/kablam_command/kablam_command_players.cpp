@@ -34,11 +34,7 @@ void kablam_command_players::parse_response(kablam_command* in_command)
 	if (command->type == _kablam_command_players_set)
 	{
 		kablam_string response_string;
-
-		if (command->result_code == set_max_players_result_code_out_of_range)
-			response_string.load(kablam_string_err_player_count_out_of_range);
-		else
-			response_string.load(kablam_string_info_player_count_changed);
+		response_string.load(command->result_code == _set_max_players_result_code_out_of_range ? kablam_string_err_player_count_out_of_range : kablam_string_info_player_count_changed);
 
 		wprintf(L"%s", response_string.get());
 
@@ -46,7 +42,7 @@ void kablam_command_players::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_players::create_instance(wchar_t** arguments, uint32 argument_count,	kablam_string* out_message)
+kablam_command* kablam_command_players::create_instance(const wchar_t* const* arguments, uint32 argument_count,	kablam_string* out_message)
 {
 	out_message->free();
 

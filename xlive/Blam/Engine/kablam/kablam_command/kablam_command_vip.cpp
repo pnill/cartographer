@@ -50,7 +50,7 @@ void kablam_command_vip::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_vip::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_vip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
 	out_message->free();
 
@@ -94,57 +94,54 @@ void kablam_command_vip_add::parse_response(kablam_command* in_command)
 	kablam_command_vip_add* command = (kablam_command_vip_add*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case gamer_table_result_code_success:
-			response_string_id = kablam_string_info_vip_added;
-			break;
-		case gamer_table_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
-		case gamer_table_result_code_table_full:
-			response_string_id = kablam_string_err_vip_list_full;
-			break;
-		case gamer_table_result_code_gamer_not_found:
-			response_string_id = kablam_string_err_vip_not_found;
-			break;
+	case _gamer_table_result_code_success:
+		response_string_id = kablam_string_info_vip_added;
+		break;
+	case _gamer_table_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
+	case _gamer_table_result_code_table_full:
+		response_string_id = kablam_string_err_vip_list_full;
+		break;
+	case _gamer_table_result_code_gamer_not_found:
+		response_string_id = kablam_string_err_vip_not_found;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_vip_add::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_vip_add::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_vip_add* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count < 3)
 	{
 		out_message->load(kablam_string_err_missing_gamertag);
-		return nullptr;
 	}
-
-	if (argument_count > 3)
+	else if (argument_count > 3)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	if (!wcslen(arguments[2]))
+	else if (!wcslen(arguments[2]))
 	{
 		out_message->load(kablam_string_err_invalid_gamertag);
-		return nullptr;
 	}
+	else
+	{
+		kablam_command_vip_add* result = new kablam_command_vip_add();
 
-	kablam_command_vip_add* instance = new kablam_command_vip_add();
+		result->type = _kablam_command_vip_add;
+		result->valid = true;
+		result->result_code = _gamer_table_result_code_success;
 
-	instance->type = _kablam_command_vip_add;
-	instance->valid = true;
-	instance->result_code = gamer_table_result_code_success;
-
-	wcsncpy_s(instance->gamertag, 16, arguments[2], -1);
-
-	return instance;
+		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
+	}
+	return result;
 }
 
 void kablam_command_vip_remove::execute_rpc_command()
@@ -160,54 +157,52 @@ void kablam_command_vip_remove::parse_response(kablam_command* in_command)
 
 	switch (command->result_code)
 	{
-		case gamer_table_result_code_success:
-			response_string_id = kablam_string_info_vip_removed;
-			break;
-		case gamer_table_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
-		case gamer_table_result_code_table_full:
-			response_string_id = kablam_string_err_vip_list_full;
-			break;
-		case gamer_table_result_code_gamer_not_found:
-			response_string_id = kablam_string_err_vip_not_found;
-			break;
+	case _gamer_table_result_code_success:
+		response_string_id = kablam_string_info_vip_removed;
+		break;
+	case _gamer_table_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
+	case _gamer_table_result_code_table_full:
+		response_string_id = kablam_string_err_vip_list_full;
+		break;
+	case _gamer_table_result_code_gamer_not_found:
+		response_string_id = kablam_string_err_vip_not_found;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_vip_remove::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_vip_remove::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_vip_remove* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count < 3)
 	{
 		out_message->load(kablam_string_err_missing_gamertag);
-		return nullptr;
 	}
-
-	if (argument_count > 3)
+	else if (argument_count > 3)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	if (!wcslen(arguments[2]))
+	else if (!wcslen(arguments[2]))
 	{
 		out_message->load(kablam_string_err_invalid_gamertag);
-		return nullptr;
 	}
+	else
+	{
+		result = new kablam_command_vip_remove();
 
-	kablam_command_vip_remove* instance = new kablam_command_vip_remove();
+		result->type = _kablam_command_vip_remove;
+		result->valid = true;
+		result->result_code = _gamer_table_result_code_success;
 
-	instance->type = _kablam_command_vip_remove;
-	instance->valid = true;
-	instance->result_code = gamer_table_result_code_success;
-
-	wcsncpy_s(instance->gamertag, 16, arguments[2], -1);
-
-	return instance;
+		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
+	}
+	return result;
 }
 
 void kablam_command_vip_get::execute_rpc_command()
@@ -250,24 +245,27 @@ void kablam_command_vip_get::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_vip_get::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_vip_get::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_vip_get* result = nullptr;
+	
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
+	}
+	else
+	{
+		kablam_command_vip_get* result = new kablam_command_vip_get();
+
+		result->type = _kablam_command_vip_get;
+		result->valid = true;
+		result->entry_count = 0;
+		result->entry_buffer = nullptr;
 	}
 
-	kablam_command_vip_get* instance = new kablam_command_vip_get();
-
-	instance->type = _kablam_command_vip_get;
-	instance->valid = true;
-	instance->entry_count = 0;
-	instance->entry_buffer = nullptr;
-
-	return instance;
+	return result;
 }
 
 void kablam_command_vip_clear::execute_rpc_command()
@@ -280,35 +278,36 @@ void kablam_command_vip_clear::parse_response(kablam_command* in_command)
 	kablam_command_vip_clear* command = (kablam_command_vip_clear*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case vip_clear_result_code_success:
-			response_string_id = kablam_string_info_vip_cleared;
-			break;
-		case vip_clear_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
+	case _vip_clear_result_code_success:
+		response_string_id = kablam_string_info_vip_cleared;
+		break;
+	case _vip_clear_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_vip_clear::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_vip_clear::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_vip_clear* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
+	else
+	{
+		result = new kablam_command_vip_clear();
 
-	kablam_command_vip_clear* instance = new kablam_command_vip_clear();
-
-	instance->type = _kablam_command_vip_clear;
-	instance->valid = true;
-	instance->result_code = vip_clear_result_code_success;
-
-	return instance;
+		result->type = _kablam_command_vip_clear;
+		result->valid = true;
+		result->result_code = _vip_clear_result_code_success;
+	}
+	return result;
 }

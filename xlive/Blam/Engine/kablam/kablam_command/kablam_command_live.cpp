@@ -59,45 +59,46 @@ void kablam_command_live::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_live::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
-	out_message->free();
+	kablam_command* result = nullptr;
 
+	out_message->free();
 
 	if (g_instance_is_lan)
 	{
 		out_message->load(kablam_string_err_command_live_only);
-		return nullptr;
 	}
-
-	if (argument_count < 2)
+	else if (argument_count < 2)
 	{
 		out_message->load(kablam_string_err_missing_subcommand);
-		return nullptr;
 	}
-
-	if (!_wcsicmp(L"key", arguments[1]))
+	else
 	{
-		return kablam_command_live_key::create_instance(arguments, argument_count, out_message);
+		if (!_wcsicmp(L"key", arguments[1]))
+		{
+			result = kablam_command_live_key::create_instance(arguments, argument_count, out_message);
+		}
+		else if (!_wcsicmp(L"signin", arguments[1]))
+		{
+			result = kablam_command_live_signin::create_instance(arguments, argument_count, out_message);
+		}
+
+		else if (!_wcsicmp(L"autosignin", arguments[1]))
+		{
+			result = kablam_command_live_auto_signin::create_instance(arguments, argument_count, out_message);
+		}
+		else if (!_wcsicmp(L"signout", arguments[1]))
+		{
+			result = kablam_command_live_signout::create_instance(arguments, argument_count, out_message);
+		}
+		else
+		{
+			out_message->load(kablam_string_err_unknown_command);
+		}
 	}
 
-	if (!_wcsicmp(L"signin", arguments[1]))
-	{
-		return kablam_command_live_signin::create_instance(arguments, argument_count, out_message);
-	}
-
-	if (!_wcsicmp(L"autosignin", arguments[1]))
-	{
-		return kablam_command_live_auto_signin::create_instance(arguments, argument_count, out_message);
-	}
-
-	if (!_wcsicmp(L"signout", arguments[1]))
-	{
-		return kablam_command_live_signout::create_instance(arguments, argument_count, out_message);
-	}
-
-	out_message->load(kablam_string_err_unknown_command);
-	return nullptr;
+	return result;
 }
 
 void kablam_command_live_key::execute_rpc_command()
@@ -110,74 +111,71 @@ void kablam_command_live_key::parse_response(kablam_command* in_command)
 	kablam_command_live_key* command = (kablam_command_live_key*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case live_key_response_code_product_key_set:
-			response_string_id = kablam_string_info_product_key_set;
-			break;
-		case live_key_response_code_key_invalid:
-			response_string_id = kablam_string_err_product_key_invalid;
-			break;
-		case live_key_response_code_key_set_failed:
-			response_string_id = kablam_string_err_product_key_set_failed;
-			break;
+	case _live_key_response_code_product_key_set:
+		response_string_id = kablam_string_info_product_key_set;
+		break;
+	case _live_key_response_code_key_invalid:
+		response_string_id = kablam_string_err_product_key_invalid;
+		break;
+	case _live_key_response_code_key_set_failed:
+		response_string_id = kablam_string_err_product_key_set_failed;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_live_key::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_key::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_live_key* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count == 2)
 	{
 		out_message->load(kablam_string_err_missing_product_key);
-		return nullptr;
 	}
-
-	if (argument_count > 3)
+	else if (argument_count > 3)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
-	}
-
-	kablam_command_live_key* instance = new kablam_command_live_key();
-
-	instance->type = _kablam_command_live_key;
-	instance->valid = true;
-
-	if (wcsncpy_s(instance->live_key, 30, arguments[2], -1))
-	{
-		instance->result_code = live_key_response_code_product_key_set;
 	}
 	else
 	{
-		wchar_t* live_key = instance->live_key;
+		result = new kablam_command_live_key();
+		result->type = _kablam_command_live_key;
+		result->valid = true;
 
-		uint32 length = (unsigned int)wcslen(live_key);
-
-		bool format_ok = (length == 29);
-
-		if (length != 0)
+		if (wcsncpy_s(result->live_key, NUMBEROF(result->live_key), arguments[2], _TRUNCATE))
 		{
-			for (unsigned int index = 0; index < length && format_ok; ++index)
-			{
-				unsigned int one_based = index + 1;
-				wchar_t ch = live_key[index];
-
-				if (one_based % 6 != 0)
-					format_ok = (iswalnum(ch) != 0);
-				else
-					format_ok = (ch == L'-');
-			}
+			result->result_code = _live_key_response_code_product_key_set;
 		}
+		else
+		{
+			const wchar_t* live_key = result->live_key;
+			const size_t length = wcslen(live_key);
+			
+			bool format_ok = (length == 29);
 
-		instance->result_code = format_ok ? live_key_response_code_product_key_set : live_key_response_code_key_invalid;
+			if (length != 0)
+			{
+				for (unsigned int index = 0; index < length && format_ok; ++index)
+				{
+					unsigned int one_based = index + 1;
+					wchar_t ch = live_key[index];
+
+					if (one_based % 6 != 0)
+						format_ok = (iswalnum(ch) != 0);
+					else
+						format_ok = (ch == L'-');
+				}
+			}
+
+			result->result_code = format_ok ? _live_key_response_code_product_key_set : _live_key_response_code_key_invalid;
+		}
 	}
-
-	return instance;
+	return result;
 }
 
 void kablam_command_live_signin::execute_rpc_command()
@@ -190,79 +188,79 @@ void kablam_command_live_signin::parse_response(kablam_command* in_command)
 	kablam_command_live_signin* command = (kablam_command_live_signin*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case live_signin_result_code_success:
-			response_string_id = kablam_string_info_signing_in_manual;
-			break;
-		case live_signin_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
+	case _live_signin_result_code_success:
+		response_string_id = kablam_string_info_signing_in_manual;
+		break;
+	case _live_signin_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_live_signin::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_signin::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
-	out_message->free();
+	kablam_command_live_signin* result = nullptr;
 
+	out_message->free();
 	if (argument_count < 3)
 	{
 		out_message->load(kablam_string_err_missing_argument);
-		return nullptr;
 	}
-
-	if (argument_count > 3)
+	else if (argument_count > 3)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	kablam_string_quick_wprintf(L"%ws\r\n\r\n", kablam_string_hint_live_autosignin);
-
-	HANDLE std_handle = GetStdHandle(STD_INPUT_HANDLE);
-	DWORD std_console_mode = 0;
-
-	GetConsoleMode(std_handle, &std_console_mode);
-	SetConsoleMode(std_handle, (std_console_mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT)) | ENABLE_LINE_INPUT);
-
-	kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_password);
-
-	fflush(stdout);
-
-	wchar_t password[64];
-	wchar_t confirm_password[64];
-
-	_getws_s(password, 64);
-
-	wprintf(L"\r\n");
-
-	kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_confirm_password);
-
-	_getws_s(confirm_password, 64);
-
-	wprintf(L"\r\n\r\n");
-
-	SetConsoleMode(std_handle, std_console_mode);
-
-	if (wcscmp(password, confirm_password) != 0)
+	else
 	{
-		out_message->load(kablam_string_err_passwords_do_not_match);
-		return nullptr;
+		kablam_string_quick_wprintf(L"%ws\r\n\r\n", kablam_string_hint_live_autosignin);
+
+		const HANDLE std_handle = GetStdHandle(STD_INPUT_HANDLE);
+		
+		DWORD std_console_mode = 0;
+		GetConsoleMode(std_handle, &std_console_mode);
+		SetConsoleMode(std_handle, (std_console_mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT)) | ENABLE_LINE_INPUT);
+
+		kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_password);
+
+		fflush(stdout);
+
+		wchar_t password[64];
+		wchar_t confirm_password[64];
+
+		_getws_s(password, NUMBEROF(password));
+
+		wprintf(L"\r\n");
+
+		kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_confirm_password);
+
+		_getws_s(confirm_password, NUMBEROF(confirm_password));
+
+		wprintf(L"\r\n\r\n");
+
+		SetConsoleMode(std_handle, std_console_mode);
+
+		if (wcscmp(password, confirm_password) != 0)
+		{
+			out_message->load(kablam_string_err_passwords_do_not_match);
+		}
+		else
+		{
+			result = new kablam_command_live_signin();
+
+			result->type = _kablam_command_live_signin;
+			result->valid = true;
+			result->result_code = _live_signin_result_code_success;
+
+			wcsncpy_s(result->username, NUMBEROF(result->username), arguments[2], _TRUNCATE);
+			wcsncpy_s(result->password, NUMBEROF(result->password), password, _TRUNCATE);
+		}
 	}
 
-	kablam_command_live_signin* instance = new kablam_command_live_signin();
-
-	instance->type = _kablam_command_live_signin;
-	instance->valid = true;
-	instance->result_code = live_signin_result_code_success;
-
-	wcsncpy_s(instance->username, 256, arguments[2], -1);
-	wcsncpy_s(instance->password, 64, password, -1);
-
-	return instance;
+	return result;
 }
 
 void kablam_command_live_auto_signin::execute_rpc_command()
@@ -275,86 +273,91 @@ void kablam_command_live_auto_signin::parse_response(kablam_command* in_command)
 	kablam_command_live_auto_signin* command = (kablam_command_live_auto_signin*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case live_auto_signin_response_code_auto_signin_enabled:
-			response_string_id = kablam_string_info_autosignin_enabled;
-			break;
-		case live_auto_signin_response_code_auto_signin_failed:
-			response_string_id = kablam_string_err_autosignin_failed;
-			break;
-		case live_auto_signin_response_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
+	case _live_auto_signin_response_code_auto_signin_enabled:
+		response_string_id = kablam_string_info_autosignin_enabled;
+		break;
+	case _live_auto_signin_response_code_auto_signin_failed:
+		response_string_id = kablam_string_err_autosignin_failed;
+		break;
+	case _live_auto_signin_response_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 
 	if (command->xlive_login_result < XLIVE_S_OK)
+	{
 		wprintf(L" (0x%08x)", command->xlive_login_result);
+	}
 }
 
-kablam_command* kablam_command_live_auto_signin::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_auto_signin::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_live_auto_signin* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count < 3)
 	{
 		out_message->load(kablam_string_err_missing_argument);
-		return nullptr;
 	}
-
-	if (argument_count > 3)
+	else if (argument_count > 3)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	kablam_string_quick_wprintf(L"%ws\r\n\r\n", kablam_string_hint_live_autosignin);
-
-	HANDLE std_handle = GetStdHandle(STD_INPUT_HANDLE);
-	DWORD std_console_mode = 0;
-
-	GetConsoleMode(std_handle, &std_console_mode);
-	SetConsoleMode(std_handle, (std_console_mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT)) | ENABLE_LINE_INPUT);
-
-	kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_password);
-
-	fflush(stdout);
-
-	wchar_t password[64];
-	wchar_t confirm_password[64];
-
-	_getws_s(password, 64);
-
-	wprintf(L"\r\n");
-
-	kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_confirm_password);
-
-	_getws_s(confirm_password, 64);
-
-	wprintf(L"\r\n\r\n");
-
-	SetConsoleMode(std_handle, std_console_mode);
-
-	if (wcscmp(password, confirm_password) != 0)
+	else
 	{
-		out_message->load(kablam_string_err_passwords_do_not_match);
-		return nullptr;
+		kablam_string_quick_wprintf(L"%ws\r\n\r\n", kablam_string_hint_live_autosignin);
+
+		const HANDLE stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+
+		assert(stdin_handle != INVALID_HANDLE_VALUE);
+
+		DWORD std_console_mode = 0;
+		GetConsoleMode(stdin_handle, &std_console_mode);
+		SetConsoleMode(stdin_handle, (std_console_mode & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT)) | ENABLE_LINE_INPUT);
+
+		kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_password);
+
+		fflush(stdout);
+
+		wchar_t password[64];
+		wchar_t confirm_password[64];
+
+		_getws_s(password, NUMBEROF(password));
+
+		wprintf(L"\r\n");
+
+		kablam_string_quick_wprintf(L"%ws", kablam_string_prompt_confirm_password);
+
+		_getws_s(confirm_password, NUMBEROF(confirm_password));
+
+		wprintf(L"\r\n\r\n");
+
+		SetConsoleMode(stdin_handle, std_console_mode);
+
+		if (wcscmp(password, confirm_password) != 0)
+		{
+			out_message->load(kablam_string_err_passwords_do_not_match);
+		}
+		else
+		{
+			result = new kablam_command_live_auto_signin();
+
+			result->type = _kablam_command_live_signin;
+			result->valid = true;
+			result->result_code = _live_auto_signin_response_code_auto_signin_enabled;
+			result->xlive_login_result = XLIVE_S_OK;
+
+			wcsncpy_s(result->username, NUMBEROF(result->username), arguments[2], _TRUNCATE);
+			wcsncpy_s(result->password, NUMBEROF(result->password), password, _TRUNCATE);
+		}
 	}
-
-	kablam_command_live_auto_signin* instance = new kablam_command_live_auto_signin();
-
-	instance->type = _kablam_command_live_signin;
-	instance->valid = true;
-	instance->result_code = live_auto_signin_response_code_auto_signin_enabled;
-	instance->xlive_login_result = XLIVE_S_OK;
-
-	wcsncpy_s(instance->username, 256, arguments[2], -1);
-	wcsncpy_s(instance->password, 64, password, -1);
-
-	return instance;
+	
+	return result;
 }
 
 void kablam_command_live_signout::execute_rpc_command()
@@ -367,25 +370,23 @@ void kablam_command_live_signout::parse_response(kablam_command* in_command)
 	kablam_command_live_signout* command = (kablam_command_live_signout*)in_command;
 
 	int32 response_string_id = 0;
-
 	switch (command->result_code)
 	{
-		case live_signout_result_code_signing_out_live:
-			response_string_id = kablam_string_info_signing_out_live;
-			break;
-		case live_signout_result_code_not_signed_in:
-			response_string_id = kablam_string_live_not_signed_in;
-			break;
-		case live_signout_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
+	case _live_signout_result_code_signing_out_live:
+		response_string_id = kablam_string_info_signing_out_live;
+		break;
+	case _live_signout_result_code_not_signed_in:
+		response_string_id = kablam_string_live_not_signed_in;
+		break;
+	case _live_signout_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
 }
 
-kablam_command* kablam_command_live_signout::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_live_signout::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
-
 	return nullptr;
 }

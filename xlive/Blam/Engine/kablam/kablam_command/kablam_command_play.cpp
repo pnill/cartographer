@@ -27,17 +27,17 @@ void kablam_command_play::parse_response(kablam_command* in_command)
 		switch (command->response.error_code)
 		{
 
-			case play_error_file_not_found:
+			case _play_error_file_not_found:
 				response_string_id = kablam_string_err_file_not_found;
 				break;
-			case play_error_file_open_access_denied:
+			case _play_error_file_open_access_denied:
 				response_string_id = kablam_string_err_file_open_access_denied;
 				break;
-			case play_error_playlist_no_valid_matches:
+			case _play_error_playlist_no_valid_matches:
 				response_string_id = kablam_string_err_playlist_no_valid_matches;
 				break;
 			default:
-			case play_error_playlist_read_failed:
+			case _play_error_playlist_read_failed:
 				response_string_id = kablam_string_err_playlist_read_failed;
 				break;
 		}
@@ -77,29 +77,30 @@ void kablam_command_play::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_play::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_play::create_instance(const wchar_t *const *arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_play* result = NULL;
+	
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	if (argument_count == 1)
+	else if (argument_count == 1)
 	{
 		out_message->load(kablam_string_err_missing_argument);
-		return nullptr;
+	}
+	else
+	{
+		result = new kablam_command_play();
+
+		result->type = _kablam_command_play;
+		result->valid = true;
+
+		wcsncpy_s(result->file_path, NUMBEROF(result->file_path), arguments[1], _TRUNCATE);
+		memset(&result->response, 0, sizeof(kablam_command_play_result));
 	}
 
-	kablam_command_play* instance = new kablam_command_play();
-
-	instance->type = _kablam_command_play;
-	instance->valid = true;
-
-	wcsncpy_s(instance->file_path, 256, arguments[1], -1);
-	memset(&instance->response, 0, sizeof(kablam_command_play_result));
-
-	return instance;
+	return result;
 }

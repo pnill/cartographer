@@ -8,7 +8,7 @@ public:
 
 	static void print_help_text();
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_unban_ip : public kablam_command_unban
@@ -20,7 +20,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_unban_nic : public kablam_command_unban
@@ -32,7 +32,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_unban_gamer : public kablam_command_unban
@@ -44,7 +44,7 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };
 
 class kablam_command_unban_all : public kablam_command_unban
@@ -56,5 +56,5 @@ public:
 	void execute_rpc_command() override;
 
 	static void parse_response(kablam_command* in_command);
-	static kablam_command* create_instance(wchar_t** arguments, uint32 argument_count, class kablam_string* out_message);
+	static kablam_command* create_instance(const wchar_t* const* arguments, uint32 argument_count, class kablam_string* out_message);
 };

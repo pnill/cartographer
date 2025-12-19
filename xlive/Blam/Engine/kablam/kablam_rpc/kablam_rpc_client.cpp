@@ -14,9 +14,9 @@ kablam_rpc_client* g_kablam_rpc_client;
 void kablam_rpc_client::build_instance_endpoint(wchar_t* instance_name)
 {
     if (instance_name)
-        _snwprintf_s(this->m_rpc_endpoint, 27, -1, L"%s_%s", g_kablam_rpc_endpoint_prefix, instance_name);
+        _snwprintf_s(this->m_rpc_endpoint, 27, _TRUNCATE, L"%s_%s", g_kablam_rpc_endpoint_prefix, instance_name);
     else
-        wcsncpy_s(this->m_rpc_endpoint, 27, g_kablam_rpc_endpoint_prefix, -1);
+        wcsncpy_s(this->m_rpc_endpoint, 27, g_kablam_rpc_endpoint_prefix, _TRUNCATE);
 }
 
 RPC_STATUS kablam_rpc_client::build_binding_string_local()

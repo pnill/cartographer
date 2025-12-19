@@ -18,7 +18,7 @@ void kablam_command_exit::execute_rpc_command()
 	}
 }
 
-kablam_command* kablam_command_exit::create_instance(wchar_t** arguments, uint32 argument_count,
+kablam_command* kablam_command_exit::create_instance(const wchar_t* const* arguments, uint32 argument_count,
 	kablam_string* out_message)
 {
 	kablam_command_exit* instance = new kablam_command_exit();

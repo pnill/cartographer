@@ -5,7 +5,7 @@
 
 #include "kablam_strings.h"
 
-const wchar_t* const g_kablam_command_privacy_mode_strings[k_kablam_command_privacy_type_count]
+static const wchar_t* const k_kablam_command_privacy_mode_strings[k_kablam_command_privacy_type_count]
 {
 	L"open",
 	L"gold",
@@ -34,8 +34,7 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 	{
 
 		int32 response_string_id = 0;
-
-		if (command->result_code == privacy_result_code_live_only)
+		if (command->result_code == _privacy_result_code_live_only)
 		{
 			response_string_id = kablam_string_err_command_live_only;
 		}
@@ -43,17 +42,17 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 		{
 			switch (command->privacy_mode)
 			{
-				case kablam_command_privacy_open:
-					response_string_id = kablam_string_privacy_open_label;
-					break;
-				case kablam_command_privacy_gold:
-					response_string_id = kablam_string_privacy_gold_label;
-					break;
-				case kablam_command_privacy_vip:
-					response_string_id = kablam_string_privacy_vip_label;
-					break;
-				default:
-					break;
+			case _kablam_command_privacy_open:
+				response_string_id = kablam_string_privacy_open_label;
+				break;
+			case _kablam_command_privacy_gold:
+				response_string_id = kablam_string_privacy_gold_label;
+				break;
+			case _kablam_command_privacy_vip:
+				response_string_id = kablam_string_privacy_vip_label;
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -63,11 +62,7 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 	if (command->type == _kablam_command_privacy_set)
 	{
 		kablam_string response_string;
-
-		if (command->result_code == privacy_result_code_live_only)
-			response_string.load(kablam_string_err_command_live_only);
-		else
-			response_string.load(kablam_string_info_privacy_changed);
+		response_string.load(command->result_code == _privacy_result_code_live_only ? kablam_string_err_command_live_only : kablam_string_info_privacy_changed);
 
 		wprintf(L"%ws", response_string.get());
 
@@ -75,47 +70,51 @@ void kablam_command_privacy::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_privacy::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_privacy::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_privacy* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
-	}
-
-	kablam_command_privacy* instance = new kablam_command_privacy();
-
-	instance->valid = true;
-
-	if (argument_count == 1)
-	{
-		instance->type = _kablam_command_privacy_get;
-		instance->privacy_mode = kablam_command_privacy_none;
-		instance->result_code = privacy_result_code_success;
 	}
 	else
 	{
-		instance->type = _kablam_command_privacy_set;
-		instance->privacy_mode = kablam_command_privacy_none;
-		instance->result_code = privacy_result_code_success;
+		result = new kablam_command_privacy();
+		result->valid = true;
 
-		for (int32 i = 0; i < k_kablam_command_privacy_type_count; ++i)
+		if (argument_count == 1)
 		{
-			if (_wcsicmp(arguments[1], g_kablam_command_privacy_mode_strings[i]))
-			{
-				instance->privacy_mode = (e_kablam_command_privacy_type)i;
-				break;
-			}
+			result->type = _kablam_command_privacy_get;
+			result->privacy_mode = _kablam_command_privacy_none;
+			result->result_code = _privacy_result_code_success;
 		}
-
-		if (instance->privacy_mode == kablam_command_privacy_none)
+		else
 		{
-			out_message->load(kablam_string_err_privacy_mode_invalid);
-			return nullptr;
+			result->type = _kablam_command_privacy_set;
+			result->privacy_mode = _kablam_command_privacy_none;
+			result->result_code = _privacy_result_code_success;
+
+			for (int32 i = 0; i < k_kablam_command_privacy_type_count; ++i)
+			{
+				if (_wcsicmp(arguments[1], k_kablam_command_privacy_mode_strings[i]))
+				{
+					result->privacy_mode = (e_kablam_command_privacy_type)i;
+					break;
+				}
+			}
+
+			if (result->privacy_mode == _kablam_command_privacy_none)
+			{
+				out_message->load(kablam_string_err_privacy_mode_invalid);
+
+				delete result;
+				result = nullptr;
+			}
 		}
 	}
 
-	return instance;
+	return result;
 }

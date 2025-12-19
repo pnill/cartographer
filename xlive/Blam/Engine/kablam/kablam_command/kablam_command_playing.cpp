@@ -60,7 +60,7 @@ void kablam_command_playing::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_playing::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_playing::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
 	out_message->free();
 

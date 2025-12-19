@@ -33,7 +33,7 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 		{
 			kablam_string response_string;
 
-			if (command->result_code == name_result_code_invalid_utf16)
+			if (command->result_code == _name_result_code_invalid_utf16)
 				response_string.load(kablam_string_err_variant_invalid_utf16);
 			else
 				response_string.load(kablam_string_err_command_lan_only);
@@ -50,15 +50,15 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 
 		switch (command->result_code)
 		{
-			case name_result_code_success:
-				result_string_id = kablam_string_info_session_name_changed;
-				break;
-			case name_result_code_lan_only:
-				result_string_id = kablam_string_err_command_lan_only;
-				break;
-			case name_result_code_invalid_utf16:
-				result_string_id = kablam_string_err_variant_invalid_utf16;
-				break;
+		case _name_result_code_success:
+			result_string_id = kablam_string_info_session_name_changed;
+			break;
+		case _name_result_code_lan_only:
+			result_string_id = kablam_string_err_command_lan_only;
+			break;
+		case _name_result_code_invalid_utf16:
+			result_string_id = kablam_string_err_variant_invalid_utf16;
+			break;
 		}
 
 		kablam_string_quick_wprintf(L"%s", result_string_id);
@@ -66,30 +66,31 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 }
 
 
-kablam_command* kablam_command_name::create_instance(wchar_t** arguments, uint32 argument_count, kablam_string* out_message)
+kablam_command* kablam_command_name::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	kablam_command_name* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count > 2)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
-	}
-
-	kablam_command_name* instance = new kablam_command_name();
-
-	instance->valid = true;
-
-	if (argument_count == 1)
-	{
-		instance->type = _kablam_command_get_name;
-		memset(instance->name, 0, 16);
 	}
 	else
 	{
-		instance->type = _kablam_command_set_name;
-		wcsncpy_s(instance->name, 16, arguments[1], -1);
-	}
+		result = new kablam_command_name();
+		result->valid = true;
 
-	return instance;
+		if (argument_count == 1)
+		{
+			result->type = _kablam_command_get_name;
+			memset(result->name, 0, 16);
+		}
+		else
+		{
+			result->type = _kablam_command_set_name;
+			wcsncpy_s(result->name, NUMBEROF(result->name), arguments[1], _TRUNCATE);
+		}
+	}
+	return result;
 }
