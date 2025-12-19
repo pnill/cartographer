@@ -34,14 +34,14 @@ errno_t kablam_string::load(int32 string_id)
 		string_resource = load_resource(string_id, english_language);
 		if (!string_resource || (string_size = *string_resource) == 0)
 		{
-			_wassert(L"false && \"error not loading string\"", __FILEW__, __LINE__);
+			assert(false && "error not loading string");
 		}
 	}
 	wchar_t* string = new wchar_t[2 * string_size + 1];
 	this->m_string_handle = (HANDLE)string;
 	if (!string)
 	{
-		_wassert(L"false && \"could not allocate memory for string\"", __FILEW__, __LINE__);
+		assert(false && "could not allocate memory for string");
 	}
 
 	this->m_string_found = true;

@@ -7,39 +7,13 @@
 #include "kablam_shell.h"
 #include "kablam_strings.h"
 
+/* prototypes */
+
 static bool valid_instance_name(const wchar_t* instance_name);
 
-bool valid_instance_name(const wchar_t* instance_name)
-{
-    assert(instance_name != NULL);
+static void print_admin_usage_and_die(void);
 
-    int length = 0;
-
-    for (const wchar_t* p = instance_name; *p != L'\0'; ++p)
-    {
-        wchar_t ch = *p;
-
-        bool is_upper = (ch >= L'A' && ch <= L'Z');
-        bool is_lower = (ch >= L'a' && ch <= L'z');
-        bool is_digit = (ch >= L'0' && ch <= L'9');
-
-        if (!is_upper && !is_lower && !is_digit)
-            return false;
-
-        ++length;
-        if (length >= 13)
-            return false;
-    }
-
-    return (length > 0);
-}
-
-void print_admin_usage_and_die()
-{
-    kablam_string_quick_wprintf(L"%s\r\n\r\n", kablam_string_help_admin_cli_usage);
-
-    exit(1);
-}
+/* public code */
 
 int main()
 {
@@ -150,10 +124,7 @@ int main()
 
     bool do_main_loop = true;
 
-    wchar_t stdin_buffer[1024]{};
-
-    wchar_t* command_arguments[131]{};
-
+    wchar_t stdin_buffer[1024];
     while (do_main_loop)
     {
         if (instance_name)
@@ -161,9 +132,10 @@ int main()
         else
             wprintf(L"\r\nh2server$ ");
 
-        if (kablam_shell_read_input(stdin_buffer, 1024))
+        if (kablam_shell_read_input(stdin_buffer, NUMBEROF(stdin_buffer)))
         {
             uint32 command_argument_count = 0;
+            wchar_t* command_arguments[512] = {};
 
             kablam_command_table_parse_input(stdin_buffer, command_arguments, 128, &command_argument_count);
 
@@ -254,4 +226,39 @@ void __RPC_USER midl_user_free(void* p)
 {
     // todo: move to cseries free?
     free(p);
+    return;
+}
+
+/* private code */
+
+static bool valid_instance_name(const wchar_t* instance_name)
+{
+    assert(instance_name != NULL);
+
+    int length = 0;
+
+    for (const wchar_t* p = instance_name; *p != L'\0'; ++p)
+    {
+        wchar_t ch = *p;
+
+        bool is_upper = (ch >= L'A' && ch <= L'Z');
+        bool is_lower = (ch >= L'a' && ch <= L'z');
+        bool is_digit = (ch >= L'0' && ch <= L'9');
+
+        if (!is_upper && !is_lower && !is_digit)
+            return false;
+
+        ++length;
+        if (length >= 13)
+            return false;
+    }
+
+    return (length > 0);
+}
+
+static void print_admin_usage_and_die(void)
+{
+    kablam_string_quick_wprintf(L"%s\r\n\r\n", kablam_string_help_admin_cli_usage);
+    exit(1);
+    return;
 }

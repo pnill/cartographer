@@ -46,3 +46,9 @@ bin/h2admin.exe
 
 bin/h2admin.pdb
 
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_c.c
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_h.h
+
+xlive/Blam/Engine/kablam/kablam_rpc/kablam_commands_s.c

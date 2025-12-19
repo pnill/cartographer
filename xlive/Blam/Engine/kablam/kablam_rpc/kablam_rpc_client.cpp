@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "kablam_rpc_client.h"
 
-#include <cwchar>
-
 #include "kablam_rpc/kablam_commands_h.h"
 #include "kablam_rpc/kablam_rpc.h"
 

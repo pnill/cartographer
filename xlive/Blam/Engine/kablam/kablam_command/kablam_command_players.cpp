@@ -5,9 +5,6 @@
 
 #include "kablam_strings.h"
 
-#include <cwchar>
-#include "resource.h"
-
 void kablam_command_players::execute_rpc_command()
 {
 	if (this->type == _kablam_command_players_get)

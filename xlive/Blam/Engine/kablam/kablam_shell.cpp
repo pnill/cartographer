@@ -1,12 +1,18 @@
 #include "stdafx.h"
 #include "kablam_shell.h"
 
+/* constants */
+
 enum
 {
     kablam_shell_max_arguments = 256,
 };
 
-static void kablam_shell_parse_command_line();
+/* prototypes */
+
+static void kablam_shell_parse_command_line(void);
+
+/* globals */
 
 static wchar_t g_kablam_shell_command_line[SHRT_MAX + 1]{};
 
@@ -19,9 +25,11 @@ static bool g_kablam_shell_failed_to_read_input = false;
 bool g_instance_is_live = false;
 bool g_instance_is_lan = false;
 
+/* public code */
+
 void kablam_shell_initialize()
 {
-	wcsncpy_s(g_kablam_shell_command_line, SHRT_MAX, GetCommandLineW(), UINT_MAX);
+	wcsncpy_s(g_kablam_shell_command_line, NUMBEROF(g_kablam_shell_command_line)-1, GetCommandLineW(), UINT_MAX);
     kablam_shell_parse_command_line();
     return;
 }
@@ -81,12 +89,14 @@ bool kablam_shell_read_input(wchar_t* out_buffer, size_t max_read_size)
     return false;
 }
 
-bool kablam_shell_read_input_failed()
+bool kablam_shell_read_input_failed(void)
 {
     return g_kablam_shell_failed_to_read_input;
 }
 
-void kablam_shell_parse_command_line()
+/* private code */
+
+static void kablam_shell_parse_command_line(void)
 {
     // write pointer used when compacting quoted strings
     wchar_t* quote_write_ptr = NULL;

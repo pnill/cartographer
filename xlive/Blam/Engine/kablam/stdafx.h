@@ -7,11 +7,6 @@
 #pragma comment(lib, "Rpcrt4.lib")
 
 #include <assert.h>
-
-#ifdef NDEBUG
-#define _wassert(...)
-#endif
-
 #include <Windows.h>
 
 #endif
