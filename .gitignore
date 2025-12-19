@@ -14,10 +14,9 @@ Project_Cartographer.vcxproj.user
 *.suo
 *.opendb
 *.db
+*.aps
 xlive.ilk
-xliveless.aps
 xliveless.opensdf
-xliveless.v12.suo
 **/.vs
 **/.vscode
 /Directx SDK/include
@@ -46,3 +45,4 @@ xlive/3rdparty/zlib/objects
 bin/h2admin.exe
 
 bin/h2admin.pdb
+
