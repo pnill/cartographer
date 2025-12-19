@@ -133,12 +133,10 @@ kablam_command* kablam_command_vip_add::create_instance(const wchar_t* const* ar
 	}
 	else
 	{
-		kablam_command_vip_add* result = new kablam_command_vip_add();
-
+		result = new kablam_command_vip_add();
 		result->type = _kablam_command_vip_add;
 		result->valid = true;
 		result->result_code = _gamer_table_result_code_success;
-
 		wcsncpy_s(result->gamertag, NUMBEROF(result->gamertag), arguments[2], _TRUNCATE);
 	}
 	return result;
@@ -247,6 +245,8 @@ void kablam_command_vip_get::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_vip_get::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+
 	kablam_command_vip_get* result = nullptr;
 	
 	out_message->free();
@@ -257,7 +257,7 @@ kablam_command* kablam_command_vip_get::create_instance(const wchar_t* const* ar
 	}
 	else
 	{
-		kablam_command_vip_get* result = new kablam_command_vip_get();
+		result = new kablam_command_vip_get();
 
 		result->type = _kablam_command_vip_get;
 		result->valid = true;
@@ -293,6 +293,8 @@ void kablam_command_vip_clear::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_vip_clear::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+
 	kablam_command_vip_clear* result = nullptr;
 
 	out_message->free();

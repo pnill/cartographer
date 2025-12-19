@@ -139,8 +139,8 @@ void kablam_command_table_print_help_function(e_kablam_command_type command_type
 void kablam_command_table_parse_input(wchar_t* command_buffer, wchar_t** command_arguments, uint32 max_argument_count, uint32* command_argument_count)
 {
 	wchar_t* quote_write_ptr = NULL;
-	int argument_count = 0;
-	int state = 0;
+	uint32 argument_count = 0;
+	int32 state = 0;
 	wchar_t** arg_slot = command_arguments - 1;
 
 	int done = 0;

@@ -1,10 +1,10 @@
 #include "stdafx.h"
 #include "kablam_shell.h"
 
-#include <climits>
-#include <corecrt_wstdio.h>
-
-#define kablam_shell_max_arguments 256
+enum
+{
+    kablam_shell_max_arguments = 256,
+};
 
 static void kablam_shell_parse_command_line();
 
@@ -22,9 +22,8 @@ bool g_instance_is_lan = false;
 void kablam_shell_initialize()
 {
 	wcsncpy_s(g_kablam_shell_command_line, SHRT_MAX, GetCommandLineW(), UINT_MAX);
-
     kablam_shell_parse_command_line();
-    auto a = 1;
+    return;
 }
 
 bool kablam_shell_argument_exists(const wchar_t* argument)

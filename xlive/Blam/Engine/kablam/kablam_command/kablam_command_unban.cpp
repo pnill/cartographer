@@ -140,8 +140,7 @@ kablam_command* kablam_command_unban_ip::create_instance(const wchar_t* const* a
 		}
 		else
 		{
-			kablam_command_unban_ip* result = new kablam_command_unban_ip();
-
+			result = new kablam_command_unban_ip();
 			result->type = _kablam_command_unban_ip;
 			result->valid = true;
 			result->ipv4_subnet = ipv4_subnet;

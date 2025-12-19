@@ -388,5 +388,8 @@ void kablam_command_live_signout::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_live_signout::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+	UNREFERENCED_PARAMETER(out_message);
 	return nullptr;
 }

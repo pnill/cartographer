@@ -18,14 +18,15 @@ void kablam_command_exit::execute_rpc_command()
 	}
 }
 
-kablam_command* kablam_command_exit::create_instance(const wchar_t* const* arguments, uint32 argument_count,
-	kablam_string* out_message)
+kablam_command* kablam_command_exit::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
-	kablam_command_exit* instance = new kablam_command_exit();
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+	UNREFERENCED_PARAMETER(out_message);
 
+	kablam_command_exit* instance = new kablam_command_exit();
 	instance->valid = true;
 	instance->type = _kablam_command_exit;
-
 	return instance;
 }
 
@@ -36,5 +37,7 @@ void kablam_command_exit::print_help_text()
 
 void kablam_command_exit::parse_response(kablam_command* in_command)
 {
+	UNREFERENCED_PARAMETER(in_command);
 	wprintf(L"How in the world did you get this far, you are not supposed to be here!");
+	return;
 }

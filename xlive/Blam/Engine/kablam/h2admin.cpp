@@ -11,8 +11,7 @@ static bool valid_instance_name(const wchar_t* instance_name);
 
 bool valid_instance_name(const wchar_t* instance_name)
 {
-    if (!instance_name)
-        _wassert(L"instance_name!=NULL", __FILEW__, __LINE__);
+    assert(instance_name != NULL);
 
     int length = 0;
 
@@ -85,7 +84,7 @@ int main()
     copyright.load(kablam_string_copyright_2006_2007_ms);
     title.load(kablam_string_title_admin_console);
 
-    wprintf(L"%s [%S %S %d]\r\n%s\r\n", title.get(), L"", "11122.07.08.24.1808.main", 11122, copyright.get());
+    wprintf(L"%ls [%ls %ls %d]\r\n%ls\r\n", title.get(), L"", L"11122.07.08.24.1808.main", 11122, copyright.get());
 
     copyright.free();
     title.free();

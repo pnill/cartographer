@@ -62,20 +62,24 @@ void kablam_command_playing::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_playing::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+
+	kablam_command_playing* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count != 1)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
+	else
+	{
+		result = new kablam_command_playing();
 
-	kablam_command_playing* instance = new kablam_command_playing();
+		result->type = _kablam_command_playing;
+		result->valid = true;
 
-	instance->type = _kablam_command_playing;
-	instance->valid = true;
-
-	memset(&instance->response, 0, sizeof(kablam_command_play_result));
-
-	return instance;
+		memset(&result->response, 0, sizeof(kablam_command_play_result));
+	}
+	return result;
 }

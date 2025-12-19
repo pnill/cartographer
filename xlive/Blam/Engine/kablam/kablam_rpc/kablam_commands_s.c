@@ -7,7 +7,7 @@
 /* at Mon Jan 18 22:14:07 2038
  */
 /* Compiler settings for kablam_rpc\kablam_commands.idl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
+    Oicf, W0, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
     protocol : all , ms_ext, app_config, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
@@ -1825,7 +1825,7 @@ static const RPC_DISPATCH_TABLE kablam_commands_interface_v1_0_DispatchTable =
 /* at Mon Jan 18 22:14:07 2038
  */
 /* Compiler settings for kablam_rpc\kablam_commands.idl:
-    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
+    Oicf, W0, Zp8, env=Win64 (32b run), target_arch=AMD64 8.01.0628 
     protocol : all , ms_ext, app_config, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 

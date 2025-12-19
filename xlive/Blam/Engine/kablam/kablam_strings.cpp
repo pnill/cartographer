@@ -6,18 +6,18 @@ constexpr WORD english_language = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
 
 kablam_string::kablam_string()
 {
-	this->string_handle = nullptr;
-	this->string = nullptr;
-	this->string_found = false;
-	this->string_is_resource_handle = false;
+	this->m_string_handle = nullptr;
+	this->m_string = nullptr;
+	this->m_string_found = false;
+	this->m_string_is_resource_handle = false;
 }
 
 kablam_string::kablam_string(int32 string_id)
 {
-	this->string_handle = nullptr;
-	this->string = nullptr;
-	this->string_found = false;
-	this->string_is_resource_handle = false;
+	this->m_string_handle = nullptr;
+	this->m_string = nullptr;
+	this->m_string_found = false;
+	this->m_string_is_resource_handle = false;
 
 	this->load(string_id);
 }
@@ -38,40 +38,40 @@ errno_t kablam_string::load(int32 string_id)
 		}
 	}
 	wchar_t* string = new wchar_t[2 * string_size + 1];
-	this->string_handle = string;
+	this->m_string_handle = (HANDLE)string;
 	if (!string)
 	{
 		_wassert(L"false && \"could not allocate memory for string\"", __FILEW__, __LINE__);
 	}
 
-	this->string_found = true;
-	this->string_is_resource_handle = false;
+	this->m_string_found = true;
+	this->m_string_is_resource_handle = false;
 	return wcsncpy_s(string, string_size + 1, (wchar_t*)(string_resource + 1), string_size);
 }
 
 const wchar_t* kablam_string::get() const
 {
-	if (!this->string_found)
-		return this->string;
+	if (!this->m_string_found)
+		return this->m_string;
 
-	return (wchar_t*)this->string_handle;
+	return (wchar_t*)this->m_string_handle;
 }
 
 void kablam_string::free()
 {
-	if (this->string_handle && this->string_found)
+	if (this->m_string_handle && this->m_string_found)
 	{
-		if (this->string_is_resource_handle)
-			LocalFree(this->string_handle);
+		if (this->m_string_is_resource_handle)
+			LocalFree(this->m_string_handle);
 		else
-			::free(this->string_handle);
+			::free(this->m_string_handle);
 
-		this->string_found = false;
-		this->string_is_resource_handle = false;
-		this->string_handle = nullptr;
+		this->m_string_found = false;
+		this->m_string_is_resource_handle = false;
+		this->m_string_handle = nullptr;
 	}
 
-	this->string = nullptr;
+	this->m_string = nullptr;
 }
 
 short* kablam_string::load_resource(int32 string_id, WORD language)

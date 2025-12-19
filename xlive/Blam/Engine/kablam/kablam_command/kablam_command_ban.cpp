@@ -365,14 +365,15 @@ void kablam_command_ban_get_ip::parse_response(kablam_command* in_command)
 				{
 					kablam_string_quick_wprintf(L" %ws", kablam_string_until_label);
 
-					wchar_t time_buffer[32]{};
-					if (!_wctime64_s(time_buffer, 32, &entry->expiry_time_stamp))
+					wchar_t time_buffer[32];
+					if (!_wctime64_s(time_buffer, NUMBEROF(time_buffer), &entry->expiry_time_stamp))
 					{
 						// remove the trailing new line at the end of a formatted time string
-						*(wcschr(time_buffer, L'\n')) = L'\0';
-
-						// dumb stupid bungie way
-						// time_buffer[24] = L"\0";
+						wchar_t* p = wcschr(time_buffer, L'\n');
+						if (p)
+						{
+							p[0] = L'\0';
+						}
 
 						wprintf(L" %ws", time_buffer);
 					}
@@ -393,15 +394,16 @@ void kablam_command_ban_get_ip::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_ban_get_ip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+
 	out_message->free();
 
 	kablam_command_ban_get_ip* instance = new kablam_command_ban_get_ip();
-
 	instance->type = _kablam_command_get_ban_ip;
 	instance->valid = true;
 	instance->entry_count = 0;
 	instance->entry_buffer = nullptr;
-
 	return instance;
 }
 
@@ -470,15 +472,16 @@ void kablam_command_ban_get_nic::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_ban_get_nic::create_instance(const wchar_t* const* arguments, uint32 argument_count,	kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+
 	out_message->free();
 
 	kablam_command_ban_get_nic* instance = new kablam_command_ban_get_nic();
-
 	instance->type = _kablam_command_get_ban_nic;
 	instance->valid = true;
 	instance->entry_count = 0;
 	instance->entry_buffer = nullptr;
-
 	return instance;
 }
 
@@ -540,14 +543,15 @@ void kablam_command_ban_get_gamer::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_ban_get_gamer::create_instance(const wchar_t* const* arguments, uint32 argument_count,kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+
 	out_message->free();
 
 	kablam_command_ban_get_gamer* instance = new kablam_command_ban_get_gamer();
-
 	instance->type = _kablam_command_get_ban_gamer;
 	instance->valid = true;
 	instance->entry_count = 0;
 	instance->entry_buffer = nullptr;
-
 	return instance;
 }

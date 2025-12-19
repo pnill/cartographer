@@ -239,22 +239,25 @@ void kablam_command_status::parse_response(kablam_command* in_command)
 	}
 }
 
-kablam_command* kablam_command_status::create_instance(const wchar_t* const* arguments, uint32 argument_count,	kablam_string* out_message)
+kablam_command* kablam_command_status::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+	UNREFERENCED_PARAMETER(argument_count);
+
+	kablam_command_status* result = nullptr;
+
 	out_message->free();
 
-	if (argument_count <= 1)
+	if (argument_count > 1)
 	{
-		kablam_command_status* instance = new kablam_command_status();
-
-		instance->type = _kablam_command_status;
-		instance->valid = true;
-
-		memset(&instance->response, 0, sizeof(kablam_command_status_result));
-
-		return instance;
+		out_message->load(kablam_string_err_too_many_args);
 	}
-
-	out_message->load(kablam_string_err_too_many_args);
-	return nullptr;
+	else
+	{
+		result = new kablam_command_status();
+		result->type = _kablam_command_status;
+		result->valid = true;
+		memset(&result->response, 0, sizeof(kablam_command_status_result));
+	}
+	return result;
 }

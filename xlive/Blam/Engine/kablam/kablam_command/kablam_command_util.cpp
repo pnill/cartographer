@@ -412,7 +412,7 @@ bool kablam_command_parse_ip_cidr(const wchar_t* address_string, uint32* ip_out,
 			{
 				if (digits_in_value > 0)
 				{
-					cidr_value = current_value;
+					cidr_value = (int8)current_value;
 					state = state_after_cidr;
 				}
 				else

@@ -54,20 +54,22 @@ void kablam_command_skip::parse_response(kablam_command* in_command)
 
 kablam_command* kablam_command_skip::create_instance(const wchar_t* const* arguments, uint32 argument_count, kablam_string* out_message)
 {
+	UNREFERENCED_PARAMETER(arguments);
+
+	kablam_command_skip* result = nullptr;
+
 	out_message->free();
 
 	if (argument_count > 1)
 	{
 		out_message->load(kablam_string_err_too_many_args);
-		return nullptr;
 	}
-
-	kablam_command_skip* instance = new kablam_command_skip();
-
-	instance->type = _kablam_command_skip;
-	instance->valid = true;
-
-	memset(&instance->result, 0, sizeof(kablam_command_skip_result));
-
-	return instance;
+	else
+	{
+		result = new kablam_command_skip();
+		result->type = _kablam_command_skip;
+		result->valid = true;
+		memset(&result->result, 0, sizeof(kablam_command_skip_result));
+	}
+	return result;
 }

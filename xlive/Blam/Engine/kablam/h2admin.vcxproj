@@ -100,6 +100,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -127,10 +128,12 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">
@@ -147,6 +150,7 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -174,10 +178,12 @@
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StringPooling>true</StringPooling>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -242,6 +248,10 @@
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">Stub</GenerateServerFiles>
       <GenerateClientFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Stub</GenerateClientFiles>
       <GenerateServerFiles Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">Stub</GenerateServerFiles>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_msvc|Win32'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_msvc|Win32'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='debug_msvc|x64'">0</WarningLevel>
+      <WarningLevel Condition="'$(Configuration)|$(Platform)'=='release_msvc|x64'">0</WarningLevel>
     </Midl>
   </ItemGroup>
   <ItemGroup>
