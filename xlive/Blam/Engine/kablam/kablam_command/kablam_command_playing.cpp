@@ -26,9 +26,7 @@ void kablam_command_playing::parse_response(kablam_command* in_command)
 		return;
 	}
 
-	kablam_string playlist_label;
-
-	playlist_label.load(kablam_string_label_playlist);
+	kablam_string playlist_label(kablam_string_label_playlist);
 
 	wprintf(L"%s %ws\r\n", playlist_label.get(), command->response.loaded_playlist_path);
 

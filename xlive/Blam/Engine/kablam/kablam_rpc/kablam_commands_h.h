@@ -67,10 +67,11 @@ extern "C"{
 typedef /* [public][public][public] */ 
 enum __MIDL_kablam_commands_interface_0001
     {
-        skip_result_code_match_skipped	= 0,
-        skip_result_code_match_ended	= 0x1,
-        skip_result_code_match_ending_waiting	= 0x2,
-        skip_result_code_server_not_active	= 0x3
+        _skip_result_code_match_skipped	= 0,
+        _skip_result_code_match_ended	= 1,
+        _skip_result_code_match_ending_waiting	= 2,
+        _skip_result_code_server_not_active	= 3,
+        k_skip_result_code_count	= ( _skip_result_code_server_not_active + 1 ) 
     } 	e_kablam_command_skip_code;
 
 typedef /* [public][public][public] */ 
@@ -139,24 +140,25 @@ enum __MIDL_kablam_commands_interface_0006
 typedef /* [public][public][public][public] */ 
 enum __MIDL_kablam_commands_interface_0007
     {
-        play_warning_duplicate_playlist_section	= 0,
-        play_warning_duplicate_variant_name	= 1,
-        play_warning_error_unknown_setting	= 2,
-        play_warning_error_unknown_section	= 3,
-        play_warning_error_invalid_setting_value	= 4,
-        play_warning_error_setting_value_already_set	= 5,
-        play_warning_error_match_missing_setting	= 6,
-        play_warning_error_invalid_variant_setting	= 7,
-        play_warning_error_variant_missing_type_or_base	= 8,
-        play_warning_error_variant_missing_name	= 9,
-        play_warning_error_variant_invalid_utf16	= 10,
-        play_warning_error_fariant_pipe_forbidden	= 11,
-        play_warning_error_variant_invalid_base_variant	= 12,
-        play_warning_error_variant_both_type_and_base	= 13,
-        play_warning_error_variant_missing_or_invalid	= 14,
-        play_warning_error_map_missing_or_invalid	= 15,
-        play_warning_warn_variants_overflow	= 16,
-        play_warning_warn_matches_overflow	= 17
+        _play_warning_duplicate_playlist_section	= 0,
+        _play_warning_duplicate_variant_name	= 1,
+        _play_warning_error_unknown_setting	= 2,
+        _play_warning_error_unknown_section	= 3,
+        _play_warning_error_invalid_setting_value	= 4,
+        _play_warning_error_setting_value_already_set	= 5,
+        _play_warning_error_match_missing_setting	= 6,
+        _play_warning_error_invalid_variant_setting	= 7,
+        _play_warning_error_variant_missing_type_or_base	= 8,
+        _play_warning_error_variant_missing_name	= 9,
+        _play_warning_error_variant_invalid_utf16	= 10,
+        _play_warning_error_fariant_pipe_forbidden	= 11,
+        _play_warning_error_variant_invalid_base_variant	= 12,
+        _play_warning_error_variant_both_type_and_base	= 13,
+        _play_warning_error_variant_missing_or_invalid	= 14,
+        _play_warning_error_map_missing_or_invalid	= 15,
+        _play_warning_warn_variants_overflow	= 16,
+        _play_warning_warn_matches_overflow	= 17,
+        k_play_warning_count	= ( _play_warning_warn_matches_overflow + 1 ) 
     } 	e_kablam_command_play_warning_type;
 
 typedef /* [public][public] */ 

@@ -7,7 +7,7 @@
 
 #include "xlive_result_codes.h"
 
-const wchar_t* const k_status_result_code_strings[k_status_result_code_count]
+static const wchar_t* const k_status_result_code_strings[k_status_result_code_count]
 {
 	L"offline - initializing",
 	L"offline - product key required",
@@ -45,7 +45,7 @@ void kablam_command_status::parse_response(kablam_command* in_command)
 {
 	kablam_command_status* command = (kablam_command_status*)in_command;
 
-	bool is_live = TEST_BIT(command->response.flags, status_response_flag_live);
+	const bool is_live = TEST_BIT(command->response.flags, status_response_flag_live);
 
 	wprintf(L"Network mode: %ws\r\n", is_live ? L"LIVE" : L"LAN");
 

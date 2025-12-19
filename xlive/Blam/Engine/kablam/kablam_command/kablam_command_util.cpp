@@ -5,10 +5,37 @@
 
 #include "kablam_strings.h"
 
+/* constants */
+
+static const int32 k_play_string_labels[k_play_warning_count]
+{
+	kablam_string_err_playlist_section_dup,
+	kablam_string_err_variant_name_duplicate,
+	kablam_string_err_unknown_setting,
+	kablam_string_err_unknown_section,
+	kablam_string_err_invalid_value_for_setting,
+	kablam_string_err_already_set,
+	kablam_string_err_match_missing_setting,
+	kablam_string_err_invalid_setting_for_variant,
+	kablam_string_err_variant_missing_type_or_base,
+	kablam_string_err_variant_missing_name,
+	kablam_string_err_variant_invalid_utf16,
+	kablam_string_err_variant_pipe_forbidden,
+	kablam_string_err_invalid_base_variant,
+	kablam_string_err_variant_both_type_and_base,
+	kablam_string_err_variant_missing_or_invalid,
+	kablam_string_err_map_missing_or_invalid,
+	kablam_string_warn_variants_overflow,
+	kablam_string_warn_matches_overflow
+};
+
+/* prototypes */
 
 static int32 hex_digit_value_from_wchar(wchar_t ch);
 
 static bool kablam_set_ipv4_octet(uint32* ip_value, uint32* octet_index, uint32 value);
+
+/* public code */
 
 void kablam_command_print_help_text(int32 description_string_id, int32 usage_string_id)
 {
@@ -37,103 +64,53 @@ void kablam_command_print_help_text(int32 description_string_id, int32 usage_str
 
 void kablam_command_print_playlist_warning(kablam_command_playlist_warning* warning)
 {
+	const bool valid_warning = VALID_INDEX(warning->warning_type, k_play_warning_count);
 	kablam_string label;
-	switch (warning->warning_type)
-	{
-		case play_warning_duplicate_playlist_section:
-			label.load(kablam_string_err_playlist_section_dup);
 
+	if (valid_warning)
+	{
+		label.load(k_play_string_labels[warning->warning_type]);
+
+		switch (warning->warning_type)
+		{
+		case _play_warning_duplicate_playlist_section:
 			wprintf(L"%ws", label.get());
 			break;
-		case play_warning_duplicate_variant_name:
-			label.load(kablam_string_err_variant_name_duplicate);
-
+		case _play_warning_duplicate_variant_name:
+		case _play_warning_error_unknown_setting:
+		case _play_warning_error_unknown_section:
+		case _play_warning_error_match_missing_setting:
 			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
 			break;
-		case play_warning_error_unknown_setting:
-			label.load(kablam_string_err_unknown_setting);
-
-			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
-			break;
-		case play_warning_error_unknown_section:
-			label.load(kablam_string_err_unknown_section);
-
-			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
-			break;
-		case play_warning_error_invalid_setting_value:
-			label.load(kablam_string_err_invalid_value_for_setting);
-
+		case _play_warning_error_invalid_setting_value:
 			wprintf(label.get(), warning->parameter, warning->value);
 			break;
-		case play_warning_error_setting_value_already_set:
-			label.load(kablam_string_err_already_set);
-
+		case _play_warning_error_setting_value_already_set:
 			wprintf(label.get(), warning->parameter);
 			break;
-		case play_warning_error_match_missing_setting:
-			label.load(kablam_string_err_match_missing_setting);
-
-			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
-			break;
-		case play_warning_error_invalid_variant_setting:
-			label.load(kablam_string_err_invalid_setting_for_variant);
-
+		case _play_warning_error_invalid_variant_setting:
 			_wprintf_p(label.get(), warning->parameter, warning->value);
 			break;
-		case play_warning_error_variant_missing_type_or_base:
-			label.load(kablam_string_err_variant_missing_type_or_base);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_error_variant_missing_name:
-			label.load(kablam_string_err_variant_missing_name);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_error_variant_invalid_utf16:
-			label.load(kablam_string_err_variant_invalid_utf16);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_error_fariant_pipe_forbidden:
-			label.load(kablam_string_err_variant_pipe_forbidden);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_error_variant_invalid_base_variant:
-			label.load(kablam_string_err_invalid_base_variant);
-
+		case _play_warning_error_variant_invalid_base_variant:
 			_wprintf_p(label.get(), warning->parameter);
 			break;
-		case play_warning_error_variant_both_type_and_base:
-			label.load(kablam_string_err_variant_both_type_and_base);
-
+		case _play_warning_error_variant_missing_type_or_base:
+		case _play_warning_error_variant_missing_name:
+		case _play_warning_error_variant_invalid_utf16:
+		case _play_warning_error_fariant_pipe_forbidden:
+		case _play_warning_error_variant_both_type_and_base:
+		case _play_warning_error_variant_missing_or_invalid:
+		case _play_warning_error_map_missing_or_invalid:
+		case _play_warning_warn_variants_overflow:
+		case _play_warning_warn_matches_overflow:
 			wprintf(L"%ws", label.get());
 			break;
-		case play_warning_error_variant_missing_or_invalid:
-			label.load(kablam_string_err_map_missing_or_invalid);
+		}
 
-			wprintf(L"%ws (\"%ws\")", label.get(), warning->parameter);
-			break;
-		case play_warning_error_map_missing_or_invalid:
-			label.load(kablam_string_warn_variants_overflow);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_warn_variants_overflow:
-			label.load(kablam_string_warn_variants_overflow);
-
-			wprintf(L"%ws", label.get());
-			break;
-		case play_warning_warn_matches_overflow:
-			label.load(kablam_string_warn_matches_overflow);
-
-			wprintf(L"%ws", label.get());
-			break;
+		wprintf(L"\r\n");
+		label.free();
 	}
-
-	wprintf(L"\r\n");
-	label.free();
+	return;
 }
 
 bool kablam_command_parse_duration_string(wchar_t* duration_string, int32* out_duration)
@@ -631,6 +608,8 @@ bool kablam_command_parse_mac_address(wchar_t* mac_string, s_mac_address* out_ma
 
 	return true;
 }
+
+/* private code */
 
 static int32 hex_digit_value_from_wchar(wchar_t ch)
 {

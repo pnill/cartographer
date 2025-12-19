@@ -5,6 +5,7 @@
 
 #include "kablam_strings.h"
 
+
 void kablam_command_skip::execute_rpc_command()
 {
 	kablam_command_skip_rpc(&this->result);
@@ -19,27 +20,27 @@ void kablam_command_skip::parse_response(kablam_command* in_command)
 {
 	kablam_command_skip* command = (kablam_command_skip*)in_command;
 
-	int response_string_id = 0;
+	int32 response_string_id = 0;
 
 	switch (command->result.result_code)
 	{
-		case skip_result_code_match_skipped:
+		case _skip_result_code_match_skipped:
 			response_string_id = kablam_string_info_playlist_entry_skipped;
 			break;
-		case skip_result_code_match_ended:
+		case _skip_result_code_match_ended:
 			response_string_id = kablam_string_info_match_ended;
 			break;
-		case skip_result_code_match_ending_waiting:
+		case _skip_result_code_match_ending_waiting:
 			response_string_id = kablam_string_info_match_ending_waiting;
 			break;
-		case skip_result_code_server_not_active:
+		case _skip_result_code_server_not_active:
 			response_string_id = kablam_string_status_server_not_active;
 			break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws\r\n", response_string_id);
 
-	if (command->result.result_code == skip_result_code_match_skipped)
+	if (command->result.result_code == _skip_result_code_match_skipped)
 	{
 		if (wcscmp(command->result.playing_variant, L"") && wcscmp(command->result.playing_map, L""))
 			wprintf(L"\r\nPlaying: %s on %s.", command->result.playing_variant, command->result.playing_map);
