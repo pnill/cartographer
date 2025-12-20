@@ -3,6 +3,7 @@
 
 constexpr WORD default_system_language = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
 constexpr WORD english_language = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+constexpr WORD spanish_language = MAKELANGID(LANG_SPANISH, SUBLANG_SPANISH);
 
 kablam_string::kablam_string()
 {
