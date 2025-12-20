@@ -66,7 +66,7 @@ bool kablam_rpc_client::connect_local(const wchar_t* instance_name, const wchar_
 
 	if (!instance_name)
 	{
-		// ASSERT();
+		assert(false && "instance name is nullptr");
 		return false;
 	}
 	else
@@ -80,7 +80,7 @@ bool kablam_rpc_client::connect_local(const wchar_t* instance_name, const wchar_
 
 		if (this->m_last_status)
 		{
-			// ASSERT();
+			assert(this->m_last_status && "RPC failed to build binding string");
 			return false;
 		}
 
@@ -88,7 +88,7 @@ bool kablam_rpc_client::connect_local(const wchar_t* instance_name, const wchar_
 
 		if (this->m_last_status)
 		{
-			// ASSERT();
+			assert(this->m_last_status && "RPC failed to binding");
 			return false;
 		}
 
@@ -100,7 +100,7 @@ bool kablam_rpc_client::connect_local(const wchar_t* instance_name, const wchar_
 
 		//if (this->m_last_status)
 		//{
-		// // ASSERT();
+		//	  assert(this->m_last_status && "RPC failed to set authentication info");
 		//    return false;
 		//}
 

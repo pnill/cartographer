@@ -59,7 +59,7 @@ void kablam_command_statsfolder::parse_response(kablam_command* in_command)
 			}
 			else
 			{
-				//assert(result==stats_folder_result_code_export_disabled);
+				assert(command->result_code != _stats_folder_result_code_export_disabled);
 			}
 		}
 	}

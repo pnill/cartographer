@@ -23,6 +23,9 @@ void kablam_command_vip::execute_rpc_command()
 		case _kablam_command_vip_clear:
 			((kablam_command_vip_clear*)this)->execute_rpc_command();
 			break;
+		default:
+			assert(false && "unknown command type reached");
+			break;
 	}
 }
 
@@ -46,6 +49,9 @@ void kablam_command_vip::parse_response(kablam_command* in_command)
 			break;
 		case _kablam_command_vip_clear:
 			((kablam_command_vip_clear*)in_command)->parse_response(in_command);
+			break;
+		default:
+			assert(false && "unknown command type reached");
 			break;
 	}
 }

@@ -5,6 +5,8 @@
 
 #include "kablam_strings.h"
 
+
+
 void kablam_command_unban::execute_rpc_command()
 {
 	switch (this->type)
@@ -22,8 +24,7 @@ void kablam_command_unban::execute_rpc_command()
 			((kablam_command_unban_all*)this)->execute_rpc_command();
 			break;
 		default:
-			//ASSERT();
-			//No.
+			assert(false && "unknown command type reached");
 			break;
 	}
 }
@@ -50,8 +51,7 @@ void kablam_command_unban::parse_response(kablam_command* in_command)
 			((kablam_command_unban_all*)in_command)->parse_response(in_command);
 			break;
 		default:
-			//ASSERT();
-			//No.
+			assert(false && "unknown command type reached");
 			break;
 	}
 }

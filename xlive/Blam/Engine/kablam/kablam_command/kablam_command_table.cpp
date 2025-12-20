@@ -66,7 +66,7 @@ kablam_command* kablam_command_table_create_command(wchar_t** arguments, uint32 
 
 			for (uint32 i = 0; i < k_kablam_command_table_count; ++i)
 			{
-				if (g_command_table[i].command && !_wcsicmp(g_command_table[i].command, base_command))
+				if (g_command_table[i].command && !_wcsicmp(g_command_table[i].command, arguments[1]))
 				{
 					g_command_table[i].help_text_function();
 

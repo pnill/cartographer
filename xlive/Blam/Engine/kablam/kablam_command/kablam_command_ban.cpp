@@ -30,8 +30,7 @@ void kablam_command_ban::execute_rpc_command()
 			((kablam_command_ban_get_gamer*)this)->execute_rpc_command();
 			break;
 		default:
-			//ASSERT();
-			//no.
+			assert(false && "unknown command type reached");
 			break;
 	}
 }
@@ -64,8 +63,7 @@ void kablam_command_ban::parse_response(kablam_command* in_command)
 			((kablam_command_ban_get_gamer*)in_command)->parse_response(in_command);
 			break;
 		default:
-			//ASSERT();
-			//no.
+			assert(false && "unknown command type reached");
 			break;
 	}
 }

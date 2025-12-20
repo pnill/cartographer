@@ -73,9 +73,6 @@ void kablam_command_print_playlist_warning(kablam_command_playlist_warning* warn
 
 		switch (warning->warning_type)
 		{
-		case _play_warning_duplicate_playlist_section:
-			wprintf(L"%ws", label.get());
-			break;
 		case _play_warning_duplicate_variant_name:
 		case _play_warning_error_unknown_setting:
 		case _play_warning_error_unknown_section:
@@ -103,6 +100,7 @@ void kablam_command_print_playlist_warning(kablam_command_playlist_warning* warn
 		case _play_warning_error_map_missing_or_invalid:
 		case _play_warning_warn_variants_overflow:
 		case _play_warning_warn_matches_overflow:
+		case _play_warning_duplicate_playlist_section:
 			wprintf(L"%ws", label.get());
 			break;
 		}

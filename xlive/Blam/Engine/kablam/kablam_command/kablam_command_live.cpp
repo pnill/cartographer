@@ -25,8 +25,7 @@ void kablam_command_live::execute_rpc_command()
 			((kablam_command_live_signout*)this)->execute_rpc_command();
 			break;
 		default:
-			//ASSERT()
-			//No.
+			assert(false && "unknown command type reached");
 			break;
 	}
 }
@@ -53,8 +52,7 @@ void kablam_command_live::parse_response(kablam_command* in_command)
 		((kablam_command_live_signout*)in_command)->parse_response(in_command);
 		break;
 	default:
-		//ASSERT()
-		//No.
+		assert(false && "unknown command type reached");
 		break;
 	}
 }
