@@ -99,7 +99,7 @@ void kablam_command_vip_add::parse_response(kablam_command* in_command)
 {
 	kablam_command_vip_add* command = (kablam_command_vip_add*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _gamer_table_result_code_success:
@@ -113,6 +113,9 @@ void kablam_command_vip_add::parse_response(kablam_command* in_command)
 		break;
 	case _gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_vip_not_found;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -157,8 +160,7 @@ void kablam_command_vip_remove::parse_response(kablam_command* in_command)
 {
 	kablam_command_vip_remove* command = (kablam_command_vip_remove*)in_command;
 
-	int32 response_string_id = 0;
-
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _gamer_table_result_code_success:
@@ -172,6 +174,9 @@ void kablam_command_vip_remove::parse_response(kablam_command* in_command)
 		break;
 	case _gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_vip_not_found;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -283,7 +288,7 @@ void kablam_command_vip_clear::parse_response(kablam_command* in_command)
 {
 	kablam_command_vip_clear* command = (kablam_command_vip_clear*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _vip_clear_result_code_success:
@@ -291,6 +296,9 @@ void kablam_command_vip_clear::parse_response(kablam_command* in_command)
 		break;
 	case _vip_clear_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 

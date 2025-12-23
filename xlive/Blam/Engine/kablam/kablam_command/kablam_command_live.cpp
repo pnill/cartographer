@@ -108,7 +108,7 @@ void kablam_command_live_key::parse_response(kablam_command* in_command)
 {
 	kablam_command_live_key* command = (kablam_command_live_key*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _live_key_response_code_product_key_set:
@@ -119,6 +119,9 @@ void kablam_command_live_key::parse_response(kablam_command* in_command)
 		break;
 	case _live_key_response_code_key_set_failed:
 		response_string_id = kablam_string_err_product_key_set_failed;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -185,7 +188,7 @@ void kablam_command_live_signin::parse_response(kablam_command* in_command)
 {
 	kablam_command_live_signin* command = (kablam_command_live_signin*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _live_signin_result_code_success:
@@ -193,6 +196,9 @@ void kablam_command_live_signin::parse_response(kablam_command* in_command)
 		break;
 	case _live_signin_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -270,7 +276,7 @@ void kablam_command_live_auto_signin::parse_response(kablam_command* in_command)
 {
 	kablam_command_live_auto_signin* command = (kablam_command_live_auto_signin*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _live_auto_signin_response_code_auto_signin_enabled:
@@ -281,6 +287,9 @@ void kablam_command_live_auto_signin::parse_response(kablam_command* in_command)
 		break;
 	case _live_auto_signin_response_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -367,7 +376,7 @@ void kablam_command_live_signout::parse_response(kablam_command* in_command)
 {
 	kablam_command_live_signout* command = (kablam_command_live_signout*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _live_signout_result_code_signing_out_live:
@@ -378,6 +387,9 @@ void kablam_command_live_signout::parse_response(kablam_command* in_command)
 		break;
 	case _live_signout_result_code_live_only:
 		response_string_id = kablam_string_err_command_live_only;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 

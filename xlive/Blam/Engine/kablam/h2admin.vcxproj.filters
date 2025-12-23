@@ -87,9 +87,6 @@
     <ClCompile Include="kablam_rpc\kablam_commands_c.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="kablam_rpc\kablam_commands_s.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Midl Include="kablam_rpc\kablam_commands.idl">

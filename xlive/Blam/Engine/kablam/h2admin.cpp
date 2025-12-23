@@ -15,13 +15,17 @@ static void print_admin_usage_and_die(void);
 
 /* public code */
 
-int main()
+int main(int argc, const char** argv, const char** envp)
 {
+    UNREFERENCED_PARAMETER(argc);
+    UNREFERENCED_PARAMETER(argv);
+    UNREFERENCED_PARAMETER(envp);
+
     kablam_shell_initialize();
     kablam_rpc_client_initialize();
 
     wchar_t* instance_name = nullptr;
-    wchar_t instance_name_uppercase[12];
+    wchar_t instance_name_buffer[12];
 
     if (kablam_shell_argument_exists(L"-live"))
     {
@@ -34,18 +38,16 @@ int main()
             print_admin_usage_and_die();
         }
 
-        wcsncpy_s(instance_name_uppercase, 12, instance_name, _TRUNCATE);
-        _wcsupr_s(instance_name_uppercase, 12);
-
-        instance_name = instance_name_uppercase;
+        wcsncpy_s(instance_name_buffer, NUMBEROF(instance_name_buffer), instance_name, _TRUNCATE);
+        _wcsupr_s(instance_name_buffer, NUMBEROF(instance_name_buffer));
+        instance_name = instance_name_buffer;
     }
     else if (kablam_shell_argument_exists(L"-lan"))
     {
         g_instance_is_lan = true;
 
-        wcsncpy_s(instance_name_uppercase, 12, L"LAN", _TRUNCATE);
-
-        instance_name = instance_name_uppercase;
+        wcsncpy_s(instance_name_buffer, NUMBEROF(instance_name_buffer), L"LAN", _TRUNCATE);
+        instance_name = instance_name_buffer;
     }
     else
     {

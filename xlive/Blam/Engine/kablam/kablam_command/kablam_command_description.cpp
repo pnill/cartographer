@@ -45,18 +45,21 @@ void kablam_command_description::parse_response(kablam_command* in_command)
 
 	if (command->type == _kablam_command_set_description)
 	{
-		int32 result_string_id = 0;
+		int32 result_string_id;
 		switch (command->result_code)
 		{
-			case _name_result_code_success:
-				result_string_id = kablam_string_info_session_description_changed;
-				break;
-			case _name_result_code_lan_only:
-				result_string_id = kablam_string_err_command_live_only;
-				break;
-			case _name_result_code_invalid_utf16:
-				result_string_id = kablam_string_err_variant_invalid_utf16;
-				break;
+		case _name_result_code_success:
+			result_string_id = kablam_string_info_session_description_changed;
+			break;
+		case _name_result_code_lan_only:
+			result_string_id = kablam_string_err_command_live_only;
+			break;
+		case _name_result_code_invalid_utf16:
+			result_string_id = kablam_string_err_variant_invalid_utf16;
+			break;
+		default:
+			result_string_id = 0;
+			break;
 		}
 
 		kablam_string_quick_wprintf(L"%s", result_string_id);

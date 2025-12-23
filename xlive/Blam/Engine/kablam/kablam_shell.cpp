@@ -14,7 +14,7 @@ static void kablam_shell_parse_command_line(void);
 
 /* globals */
 
-static wchar_t g_kablam_shell_command_line[SHRT_MAX + 1]{};
+static wchar_t g_kablam_shell_command_line[SHORT_MAX + 1]{};
 
 static wchar_t* g_kablam_shell_arguments[kablam_shell_max_arguments]{};
 
@@ -82,8 +82,10 @@ bool kablam_shell_read_input(wchar_t* out_buffer, size_t max_read_size)
     if (g_kablam_shell_failed_to_read_input)
         return false;
 
-	if (_getws_s(out_buffer, max_read_size))
+    if (_getws_s(out_buffer, max_read_size))
+    {
         return (wcslen(out_buffer) < max_read_size - 1);
+    }
 
 	g_kablam_shell_failed_to_read_input = true;
     return false;

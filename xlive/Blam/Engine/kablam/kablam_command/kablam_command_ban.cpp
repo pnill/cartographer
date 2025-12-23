@@ -123,7 +123,7 @@ void kablam_command_ban_ip::parse_response(kablam_command* in_command)
 {
 	kablam_command_ban_ip* command = (kablam_command_ban_ip*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _ban_network_result_code_success:
@@ -137,6 +137,9 @@ void kablam_command_ban_ip::parse_response(kablam_command* in_command)
 		break;
 	case _ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_warn_unknown;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -194,21 +197,24 @@ void kablam_command_ban_nic::parse_response(kablam_command* in_command)
 {
 	kablam_command_ban_nic* command = (kablam_command_ban_nic*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
-		case _ban_network_result_code_success:
-			response_string_id = kablam_string_info_ban_added;
-			break;
-		case _ban_network_result_code_lan_only:
-			response_string_id = kablam_string_err_command_lan_only;
-			break;
-		case _ban_network_result_code_ban_list_full:
-			response_string_id = kablam_string_err_ban_list_full;
-			break;
-		case _ban_network_result_code_ban_not_found:
-			response_string_id = kablam_string_warn_unknown;
-			break;
+	case _ban_network_result_code_success:
+		response_string_id = kablam_string_info_ban_added;
+		break;
+	case _ban_network_result_code_lan_only:
+		response_string_id = kablam_string_err_command_lan_only;
+		break;
+	case _ban_network_result_code_ban_list_full:
+		response_string_id = kablam_string_err_ban_list_full;
+		break;
+	case _ban_network_result_code_ban_not_found:
+		response_string_id = kablam_string_warn_unknown;
+		break;
+	default:
+		response_string_id = 0;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
@@ -267,21 +273,24 @@ void kablam_command_ban_gamer::parse_response(kablam_command* in_command)
 {
 	kablam_command_ban_gamer* command = (kablam_command_ban_gamer*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
-		case _gamer_table_result_code_success:
-			response_string_id = kablam_string_info_ban_added;
-			break;
-		case _gamer_table_result_code_live_only:
-			response_string_id = kablam_string_err_command_live_only;
-			break;
-		case _gamer_table_result_code_table_full:
-			response_string_id = kablam_string_err_ban_list_full;
-			break;
-		case _gamer_table_result_code_gamer_not_found:
-			response_string_id = kablam_string_warn_unknown;
-			break;
+	case _gamer_table_result_code_success:
+		response_string_id = kablam_string_info_ban_added;
+		break;
+	case _gamer_table_result_code_live_only:
+		response_string_id = kablam_string_err_command_live_only;
+		break;
+	case _gamer_table_result_code_table_full:
+		response_string_id = kablam_string_err_ban_list_full;
+		break;
+	case _gamer_table_result_code_gamer_not_found:
+		response_string_id = kablam_string_warn_unknown;
+		break;
+	default:
+		response_string_id = 0;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);

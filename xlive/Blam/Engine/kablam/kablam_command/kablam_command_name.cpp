@@ -46,8 +46,7 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 
 	if (command->type == _kablam_command_set_name)
 	{
-		int result_string_id = 0;
-
+		int32 result_string_id;
 		switch (command->result_code)
 		{
 		case _name_result_code_success:
@@ -58,6 +57,9 @@ void kablam_command_name::parse_response(kablam_command* in_command)
 			break;
 		case _name_result_code_invalid_utf16:
 			result_string_id = kablam_string_err_variant_invalid_utf16;
+			break;
+		default:
+			result_string_id = 0;
 			break;
 		}
 

@@ -1,9 +1,16 @@
 #include "stdafx.h"
 #include "kablam_strings.h"
 
-constexpr WORD default_system_language = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT);
-constexpr WORD english_language = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
-constexpr WORD spanish_language = MAKELANGID(LANG_SPANISH, SUBLANG_SPANISH);
+/* constants */
+
+enum
+{
+	k_default_system_language = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+	k_english_language = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+	k_spanish_language = MAKELANGID(LANG_SPANISH, SUBLANG_SPANISH),
+};
+
+/* public code */
 
 kablam_string::kablam_string()
 {
@@ -27,12 +34,12 @@ errno_t kablam_string::load(int32 string_id)
 {
 	this->free();
 
-	short* string_resource = load_resource(string_id, default_system_language);
+	short* string_resource = load_resource(string_id, k_default_system_language);
 	size_t string_size = 0;
 
 	if (!string_resource || (string_size = *string_resource) == 0)
 	{
-		string_resource = load_resource(string_id, english_language);
+		string_resource = load_resource(string_id, k_english_language);
 		if (!string_resource || (string_size = *string_resource) == 0)
 		{
 			assert(false && "error not loading string");

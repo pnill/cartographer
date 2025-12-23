@@ -20,22 +20,24 @@ void kablam_command_skip::parse_response(kablam_command* in_command)
 {
 	kablam_command_skip* command = (kablam_command_skip*)in_command;
 
-	int32 response_string_id = 0;
-
+	int32 response_string_id;
 	switch (command->result.result_code)
 	{
-		case _skip_result_code_match_skipped:
-			response_string_id = kablam_string_info_playlist_entry_skipped;
-			break;
-		case _skip_result_code_match_ended:
-			response_string_id = kablam_string_info_match_ended;
-			break;
-		case _skip_result_code_match_ending_waiting:
-			response_string_id = kablam_string_info_match_ending_waiting;
-			break;
-		case _skip_result_code_server_not_active:
-			response_string_id = kablam_string_status_server_not_active;
-			break;
+	case _skip_result_code_match_skipped:
+		response_string_id = kablam_string_info_playlist_entry_skipped;
+		break;
+	case _skip_result_code_match_ended:
+		response_string_id = kablam_string_info_match_ended;
+		break;
+	case _skip_result_code_match_ending_waiting:
+		response_string_id = kablam_string_info_match_ending_waiting;
+		break;
+	case _skip_result_code_server_not_active:
+		response_string_id = kablam_string_status_server_not_active;
+		break;
+	default:
+		response_string_id = 0;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws\r\n", response_string_id);

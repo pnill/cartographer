@@ -19,7 +19,7 @@ void kablam_command_sendmsg::parse_response(kablam_command* in_command)
 {
 	kablam_command_sendmsg* command = (kablam_command_sendmsg*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _send_message_result_code_sent:
@@ -33,6 +33,9 @@ void kablam_command_sendmsg::parse_response(kablam_command* in_command)
 		break;
 	case _send_message_result_code_message_failed:
 		response_string_id = kablam_string_err_send_message_failed;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 

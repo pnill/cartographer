@@ -103,6 +103,9 @@ void kablam_command_print_playlist_warning(kablam_command_playlist_warning* warn
 		case _play_warning_duplicate_playlist_section:
 			wprintf(L"%ws", label.get());
 			break;
+		default:
+			unreachable();
+			break;
 		}
 
 		wprintf(L"\r\n");

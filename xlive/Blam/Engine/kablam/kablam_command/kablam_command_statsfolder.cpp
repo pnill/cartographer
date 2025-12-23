@@ -25,7 +25,7 @@ void kablam_command_statsfolder::parse_response(kablam_command* in_command)
 
 	if (command->type == _kablam_command_stats_folder_set)
 	{
-		int32 response_string_id = 0;
+		int32 response_string_id;
 		switch (command->result_code)
 		{
 		case _stats_folder_result_code_success:
@@ -39,6 +39,9 @@ void kablam_command_statsfolder::parse_response(kablam_command* in_command)
 			break;
 		case _stats_folder_result_code_export_disabled:
 			response_string_id = kablam_string_info_stats_export_disabled;
+			break;
+		default:
+			response_string_id = 0;
 			break;
 		}
 

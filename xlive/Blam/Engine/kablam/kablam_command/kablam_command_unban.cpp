@@ -96,7 +96,7 @@ void kablam_command_unban_ip::parse_response(kablam_command* in_command)
 {
 	kablam_command_unban_ip* command = (kablam_command_unban_ip*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _ban_network_result_code_success:
@@ -110,6 +110,9 @@ void kablam_command_unban_ip::parse_response(kablam_command* in_command)
 		break;
 	case _ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_err_ban_not_found;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -159,7 +162,7 @@ void kablam_command_unban_nic::parse_response(kablam_command* in_command)
 {
 	kablam_command_unban_nic* command = (kablam_command_unban_nic*)in_command;
 
-	int32 response_string_id = 0;
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _ban_network_result_code_success:
@@ -173,6 +176,9 @@ void kablam_command_unban_nic::parse_response(kablam_command* in_command)
 		break;
 	case _ban_network_result_code_ban_not_found:
 		response_string_id = kablam_string_err_ban_not_found;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -219,8 +225,7 @@ void kablam_command_unban_gamer::parse_response(kablam_command* in_command)
 {
 	kablam_command_unban_gamer* command = (kablam_command_unban_gamer*)in_command;
 
-	int32 response_string_id = 0;
-
+	int32 response_string_id;
 	switch (command->result_code)
 	{
 	case _gamer_table_result_code_success:
@@ -234,6 +239,9 @@ void kablam_command_unban_gamer::parse_response(kablam_command* in_command)
 		break;
 	case _gamer_table_result_code_gamer_not_found:
 		response_string_id = kablam_string_err_player_not_found;
+		break;
+	default:
+		response_string_id = 0;
 		break;
 	}
 
@@ -279,19 +287,18 @@ void kablam_command_unban_all::parse_response(kablam_command* in_command)
 {
 	kablam_command_unban_all* command = (kablam_command_unban_all*)in_command;
 
-	int32 response_string_id = 0;
-
+	int32 response_string_id;
 	switch (command->result_code)
 	{
-		case _unban_all_result_code_success:
-			response_string_id = kablam_string_info_ban_cleared;
-			break;
-		case _unban_all_result_code_failed:
-			if (command->clear_type == _unban_all_gamertags)
-				response_string_id = kablam_string_err_command_live_only;
-			else
-				response_string_id = kablam_string_err_command_lan_only;
-			break;
+	case _unban_all_result_code_success:
+		response_string_id = kablam_string_info_ban_cleared;
+		break;
+	case _unban_all_result_code_failed:
+		response_string_id = command->clear_type == _unban_all_gamertags ? kablam_string_err_command_live_only : kablam_string_err_command_lan_only;
+		break;
+	default:
+		response_string_id = 0;
+		break;
 	}
 
 	kablam_string_quick_wprintf(L"%ws", response_string_id);
