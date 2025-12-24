@@ -68,19 +68,6 @@ struct dump_datum
 };
 #endif
 
-/* globals */
-
-t_object_new p_object_new;
-
-#ifdef OBJECT_OVERRIDE_ENABLED
-s_object_override_data g_object_override_data[k_maximum_object_override_count];
-#endif
-
-#ifdef OBJECT_DEBUG
-int32 debug_last_out_of_memory_dump_game_time;
-int32 g_object_memory_dump_number;
-#endif
-
 /* prototypes */
 
 static s_memory_pool* object_memory_pool_get(void);
@@ -160,6 +147,19 @@ static void object_add_to_dump(datum object_index, dump_datum* dump);
 static void object_dump_print_info(_iobuf* handle, const dump_datum* dump);
 
 static int sort_dumps(const dump_datum* dump1, const dump_datum* dump2);
+#endif
+
+/* globals */
+
+static t_object_new p_object_new;
+
+#ifdef OBJECT_OVERRIDE_ENABLED
+static s_object_override_data g_object_override_data[k_maximum_object_override_count];
+#endif
+
+#ifdef OBJECT_DEBUG
+static int32 debug_last_out_of_memory_dump_game_time;
+static int32 g_object_memory_dump_number;
 #endif
 
 /* public code */
