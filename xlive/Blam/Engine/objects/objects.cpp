@@ -112,7 +112,7 @@ static void object_occlusion_data_initialize(datum object_index);
 
 static void __cdecl object_cleanup_havok(datum object_index);
 
-static bool set_object_position_if_in_cluster(s_location* location, datum object_index);
+static bool object_find_initial_location(datum object_index, s_location* location);
 
 static bool __cdecl object_compute_change_colors(datum object_index);
 
@@ -716,7 +716,7 @@ datum __cdecl object_new(object_placement_data* data)
 				// If the object (can) connect to the map we make sure it gets connected
 				if (objects_can_connect_to_map())
 				{
-					data->location_valid = set_object_position_if_in_cluster(&data->location, object_index);
+					data->location_valid = object_find_initial_location(object_index, &data->location);
 
 					// If the object is inside a cluster set the location to the one passed in the placement data
 					// If not then pass null
@@ -757,7 +757,7 @@ datum __cdecl object_new(object_placement_data* data)
 					objects_can_connect_to_map() && 
 					!TEST_BIT(data->flags, 1))
 				{
-					if (!TEST_BIT(data->flags, 2))
+					if (TEST_BIT(data->flags, 2))
 					{
 						if (object->object.location.cluster_index != NONE)
 						{
@@ -1168,11 +1168,11 @@ void __cdecl object_set_hidden(datum object_index, bool hidden)
 	}
 	else
 	{
-		object->object.flags.set(_object_hidden_bit, false);
 		if (object_is_connected_to_map(object_index))
 		{
 			object_disconnect_from_map(object_index, true, false);
 		}
+		object->object.flags.set(_object_hidden_bit, true);
 		object_update_collision_culling(object_index);
 	}
 	return;
@@ -1453,7 +1453,7 @@ static void __cdecl object_cleanup_havok(datum object_index)
 	return;
 }
 
-static bool set_object_position_if_in_cluster(s_location* location, datum object_index)
+static bool object_find_initial_location(datum object_index, s_location* location)
 {
 	object_datum* object = object_get(object_index);
 
@@ -1570,13 +1570,14 @@ static void object_reconnect_to_map(s_location* location, datum object_index)
 	s_object_payload payload;
 	object_get_payload(object_index, &payload);
 
-	const cluster_partition* partition = collideable_object_cluster_partition_get();
+	cluster_partition* partition = collideable_object_cluster_partition_get();
 	if (!object->object.flags.test(_object_uses_collidable_list_bit))
 	{
 		partition = noncollideable_object_cluster_partition_get();
 	}
 
-	cluster_partition_reconnect(partition,
+	cluster_partition_reconnect(
+		partition,
 		object_index,
 		&object->object.first_cluster_reference,
 		&object->object.object_origin_point,
