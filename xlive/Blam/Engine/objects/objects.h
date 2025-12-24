@@ -53,8 +53,8 @@ enum e_object_data_flags : uint32
 enum e_object_physics_flags : uint16
 {
 	_object_allocated_havok_component_bit = 0,
-	_object_physics_bit_1 = 1,
-	_object_physics_bit_2 = 2,
+	_object_was_in_local_physics_bit = 1,
+	_object_in_local_physics_bit = 2,
 	_object_is_early_mover_bit = 3,
 	_object_is_early_mover_child_bit = 4,
 	_object_physics_bit_5 = 5,

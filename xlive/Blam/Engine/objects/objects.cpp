@@ -728,7 +728,7 @@ datum __cdecl object_new(object_placement_data* data)
 
 				object_wake(object_index);
 
-				object->object.physics_flags.set(_object_physics_bit_1, TEST_BIT(data->flags, 5));
+				object->object.physics_flags.set(_object_was_in_local_physics_bit, TEST_BIT(data->flags, 5));
 
 				object_reconnect_to_physics(object_index);
 				object_initialize_effects(object_index);
