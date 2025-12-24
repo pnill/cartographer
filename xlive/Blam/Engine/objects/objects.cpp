@@ -88,7 +88,7 @@ static void __cdecl object_move(datum object_index);
 
 static datum object_allocate_header(datum tag_definition_index);
 
-static void free_object_memory(datum object_index);
+static void object_header_delete(datum object_index);
 
 static void object_postprocess_node_matrices(datum object_index);
 
@@ -114,7 +114,7 @@ static int8 __cdecl object_lookup_variant_index_from_name(datum object_index, st
 static bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bit_vectors* cluster_activation);
 
 // Reconnects an object to the current bsp that's loaded
-static void object_reconnect_to_map(s_location* location, datum object_index);
+static void object_reconnect_to_map(datum object_index, s_location* location);
 
 // Gets important info about the object and populates the s_object_payload argument with the appropriate data
 static void object_get_payload(datum object_index, s_object_payload* payload);
@@ -317,7 +317,7 @@ bool object_header_block_allocate(datum object_index, int16 block_reference_offs
 		const int32 alignment_size = (1 << alignment_bits) - 1;
 		const int32 padded_size = alignment_size + size;
 		ASSERT(padded_size >= size);
-		if (memory_pool_block_reallocate(object_memory_pool_get(), &object_header->datum, padded_size + object_header->data_size))
+		if (memory_pool_block_reallocate(object_memory_pool_get(), (void**)&object_header->datum, padded_size + object_header->data_size))
 		{
 			const int32 offset = object_header->data_size;
 			object_header->data_size = (int16)(padded_size + offset);
@@ -330,7 +330,7 @@ bool object_header_block_allocate(datum object_index, int16 block_reference_offs
 
 			ASSERT(block->offset >= offset);
 			ASSERT((block->offset - offset) + size <= padded_size);
-			csmemset((int8*)object_header->datum + offset, 0, padded_size);
+			csmemset((uint8*)object_header->datum + offset, 0, padded_size);
 			result = true;
 		}
 	}
@@ -682,7 +682,6 @@ datum __cdecl object_new(object_placement_data* data)
 				object_animation_and_attachments_cleared = true;
 			}
 
-
 			if (can_create_object)
 			{
 				can_create_object = object_type_new(object_index, data, &out_of_objects);
@@ -720,8 +719,8 @@ datum __cdecl object_new(object_placement_data* data)
 
 					// If the object is inside a cluster set the location to the one passed in the placement data
 					// If not then pass null
-					s_location* p_location = (data->location_valid ? &data->location : NULL);
-					object_reconnect_to_map(p_location, object_index);
+					s_location* initial_location = (data->location_valid ? &data->location : NULL);
+					object_reconnect_to_map(object_index, initial_location);
 				}
 
 				object_postprocess_node_matrices(object_index);
@@ -729,7 +728,7 @@ datum __cdecl object_new(object_placement_data* data)
 
 				object_wake(object_index);
 
-				object->object.physics_flags.set(_object_physics_bit_2, TEST_BIT(data->flags, 5));
+				object->object.physics_flags.set(_object_physics_bit_1, TEST_BIT(data->flags, 5));
 
 				object_reconnect_to_physics(object_index);
 				object_initialize_effects(object_index);
@@ -777,7 +776,7 @@ datum __cdecl object_new(object_placement_data* data)
 				{
 					object_type_delete(object_index);
 				}
-				free_object_memory(object_index);
+				object_header_delete(object_index);
 				object_index = NONE;
 			}
 		}
@@ -1088,7 +1087,7 @@ bool __cdecl object_force_inside_bsp(datum object_index, const real_point3d* kno
 void* object_get_and_verify_type(datum object_index, int32 object_type_mask)
 {
 	const object_header_datum* object_header = object_header_get(object_index);
-	const object_datum* object = (object_datum*)object_header->datum;
+	const object_datum* object = object_header->datum;
 	
 	const e_object_type type = object->object.object_identifier.get_type();
 	vassert(TEST_BIT(object_type_mask, type), "got an object type we didn't expect (expected one of 0x%08x but got #%d).", object_type_mask, type);
@@ -1391,14 +1390,17 @@ static datum object_allocate_header(datum tag_definition_index)
 	return object_index;
 }
 
-static void free_object_memory(datum object_index)
+static void object_header_delete(datum object_index)
 {
 	object_header_datum* object_header = object_header_get(object_index);
 	object_header->flags = 0;
 	if (object_header->datum != NULL)
 	{
-		memory_pool_block_free(object_memory_pool_get(), &object_header->datum);
+		ASSERT(!object_header->datum->object.physics_flags.test(_object_allocated_havok_component_bit));
+		memory_pool_block_free(object_memory_pool_get(), (void**)&object_header->datum);
+		object_header->datum = NULL;
 	}
+
 	datum_delete(object_header_data_get(), object_index);
 	return;
 }
@@ -1427,7 +1429,7 @@ static void object_postprocess_node_matrices(datum object_index)
 static void object_initialize_effects(datum object_index)
 {
 	const object_header_datum* object_header = object_header_get(object_index);
-	object_datum* object = (object_datum*)object_header->datum;
+	object_datum* object = object_header->datum;
 
 	if (object_header->type == _object_type_projectile)
 	{
@@ -1506,7 +1508,7 @@ static bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bi
 {
 	bool result = false;
 	object_header_datum* object_header = object_header_get(object_index);
-	const object_datum* object = (object_datum*)object_header->datum;
+	const object_datum* object = object_header->datum;
 
 	if (object->object.flags.test(_object_always_active_bit))
 	{
@@ -1519,10 +1521,10 @@ static bool object_can_activate_in_cluster(datum object_index, s_game_cluster_bi
 	return BIT_VECTOR_TEST_FLAG(cluster_activation->cluster_bitvector, object_header->cluster_index);
 }
 
-static void object_reconnect_to_map(s_location* location, datum object_index)
+static void object_reconnect_to_map(datum object_index, s_location* location)
 {
 	object_header_datum* object_header = object_header_get(object_index);
-	object_datum* object = (object_datum*)object_header->datum;
+	object_datum* object = object_header->datum;
 	bool cluster_index_is_null = object_header->cluster_index == NONE;
 
 	ASSERT(DATUM_INDEX_TO_IDENTIFIER(object_index));

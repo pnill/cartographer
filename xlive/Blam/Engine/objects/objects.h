@@ -126,17 +126,6 @@ struct object_header_block_reference
 };
 ASSERT_STRUCT_SIZE(object_header_block_reference, 4);
 
-struct object_header_datum
-{
-	int16 identifier;
-	c_flags_no_init<e_object_header_flags, uint8, k_object_header_flags> flags;
-	int8/*e_object_type*/ type;
-	int16 cluster_index;
-	int16 data_size;
-	void* datum;
-};
-ASSERT_STRUCT_SIZE(object_header_datum, 12);
-
 struct s_object_payload
 {
 	int16/*e_object_type*/ object_type;
@@ -237,6 +226,17 @@ struct object_datum
 	_object_datum object;
 };
 ASSERT_STRUCT_SIZE(object_datum, 300);
+
+struct object_header_datum
+{
+	int16 identifier;
+	c_flags_no_init<e_object_header_flags, uint8, k_object_header_flags> flags;
+	int8/*e_object_type*/ type;
+	int16 cluster_index;
+	int16 data_size;
+	object_datum* datum;
+};
+ASSERT_STRUCT_SIZE(object_header_datum, 12);
 
 struct object_marker
 {
