@@ -57,6 +57,12 @@ static void sound_classes_fix_values(void);
 // Fix the gravity throne so it uses it's collision model
 static void gravity_throne_collision_fix(void);
 
+// Removes a bitmap from every shader that uses a specific template on nvidia cards that breaks
+static void shader_template_fix_nvidia(const char* template_name, const char* bitmap_name, int32 bitmap_index);
+
+// Goes through all the shader templates that are broken when nvidia applies it fixes in the driver
+static void shader_templates_fix_nvidia(void);
+
 /* public code */
 
 void main_tag_fixes(void)
@@ -70,6 +76,7 @@ void main_tag_fixes(void)
 	tag_fixes_split_screen_hud();
 	sound_classes_fix_values();
 	gravity_throne_collision_fix();
+	shader_templates_fix_nvidia();
 
 	// disabled till z-fighting is fixed.
 	//tag_fixes_elite_mp();
@@ -438,5 +445,64 @@ static void gravity_throne_collision_fix(void)
 			model_definition->collision_model.group = { _tag_group_collision_model };
 		}
 	}
+	return;
+}
+
+
+static void shader_template_fix_nvidia(const char* template_name, const char* bitmap_name, int32 bitmap_index)
+{
+	const datum broken_bitmap_index = tag_loaded(_tag_group_bitmap, bitmap_name);
+	const datum broken_template_index = tag_loaded(_tag_group_shader_template, template_name);
+	if (broken_bitmap_index != NONE && broken_template_index != NONE)
+	{
+		tag_iterator iterator;
+		tag_iterator_new(&iterator, _tag_group_shader);
+
+		while (tag_iterator_next(&iterator) != NONE)
+		{
+			s_shader_definition* shader = (s_shader_definition*)tag_get_fast(iterator.current_tag_index);
+			if (shader->shader_template.index == broken_template_index)
+			{
+				if (shader->postprocess_definition.count > 0)
+				{
+					s_shader_postprocess_definition_new* postprocess_data = (s_shader_postprocess_definition_new*)TAG_BLOCK_GET_ELEMENT(
+						&shader->postprocess_definition,
+						0,
+						s_shader_postprocess_definition_new
+					);
+
+					if (postprocess_data->bitmaps.count >= bitmap_index + 1)
+					{
+						s_shader_postprocess_bitmap_new* bitmap = TAG_BLOCK_GET_ELEMENT(
+							&postprocess_data->bitmaps,
+							bitmap_index,
+							s_shader_postprocess_bitmap_new
+						);
+
+						if (bitmap->bitmap_group == broken_bitmap_index)
+						{
+							bitmap->bitmap_group = NONE;
+						}
+					}
+				}
+			}
+		}
+	}
+	return;
+}
+
+static void shader_templates_fix_nvidia(void)
+{
+	shader_template_fix_nvidia(
+		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test_single_pass",
+		"shaders\\default_bitmaps\\bitmaps\\alpha_white",
+		4
+	);
+
+	shader_template_fix_nvidia(
+		"shaders\\shader_templates\\opaque\\tex_bump_alpha_test",
+		"shaders\\default_bitmaps\\bitmaps\\gray_50_percent",
+		1
+	);
 	return;
 }
